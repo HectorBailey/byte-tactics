@@ -1,41 +1,59 @@
 // Decompiled by space-bunny-free. Names are provisional.
+// Builds the unit list of a recorded game (g_game->net->list) in two passes:
+// one entry per list slot, then the per-unit "extra" strings through
+// FUN_00487bf0, which walks the same list again and looks units up in the
+// vector passed as its third argument.
+// The 0x80-byte frame is [the constructor's dead _Al slot][its _V temporary]
+// [the player byte][the vector][the sprintf buffer], so the vector has to be
+// 16 bytes with the empty allocator at +0: that is what FUN_00487bf0 and
+// 0x487af0 read as Table_00488310's +0 and +4.
+// Still differs (85%): (1) the player check materialises g_game + 331*pl and
+// leaves the array's 0x1b63 displacement in the field offsets, where the
+// original keeps it in the lea and uses +0x73/+0x146; a named Player* gives
+// the original's offsets but costs a frame slot. (2) The original keeps the
+// zero-extension of the entry's flag byte (xor eax,eax; mov al; and al, 0x80)
+// where this folds it into a dword and, because the store then sinks, the
+// f108 multiply picks the other register. Both look like the original's
+// expression went through a byte-typed temporary I could not find a phrasing
+// for.
 #include <stdio.h>
+#include <memory>
 
 struct Unit;
 
-// std::vector<Unit*> exactly as MSVC 5's <vector> declares it: _Ufill is
-// protected, so a derived class is the only way to reach it. Declared, not
-// defined, so the decorated name resolves to the out-of-line 0x406c40.
+// std::vector<Unit*> is declared here rather than included because MSVC 5
+// inlines _Ufill's body into its (count, value) constructor, while the
+// original calls the out-of-line copy (0x406c40) that the game's own vector
+// object holds. Everything else is the real container: allocator::allocate
+// gives the `if (_N < 0) _N = 0` clamp and operator new (not new[]), and
+// ~vector's deallocate is the operator delete at the end.
 namespace std {
-template <class T> class allocator { };
 template <class T, class A = allocator<T> > class vector {
 public:
     typedef T value_type;
+    typedef A::size_type size_type;
+
+    vector(size_type _N, const T& _V = T(), const A& _Al = A())
+        : allocator(_Al)
+    {
+        _Myfirst = allocator.allocate(_N, (void *)0);
+        _Ufill(_Myfirst, _N, _V);
+        _Mylast = _Myfirst + _N;
+        _Myend = _Mylast;
+    }
+    ~vector()
+        { allocator.deallocate(_Myfirst, _Myend - _Myfirst); }
+    T& operator[](size_type _P)
+        { return (*(_Myfirst + _P)); }
+
 protected:
-    T* _Myfirst;                      // +0x0
-    T* _Mylast;                       // +0x4
-    void _Ufill(T* first, unsigned int count, const value_type& val);
+    A allocator;                       // +0x0
+    T* _Myfirst;                       // +0x4
+    T* _Mylast;                        // +0x8
+    T* _Myend;                         // +0xc
+    void _Ufill(T* _F, size_type _N, const T& _X);
 };
 }
-
-struct Filler_00488310 : std::vector<Unit*> {
-    static void Fill(Filler_00488310* v, Unit** first, unsigned int count, Unit* const& val)
-    {
-        v->_Ufill(first, count, val);
-    }
-};
-
-struct Vec_00488310 {
-    char flag;                    // +0x0
-    char pad[3];
-    int* ids;                     // +0x4
-};
-
-// FUN_00487bf0's third argument, as 0x487af0 uses it.
-struct Table_00488310 {
-    char unknown_0[4];
-    int* ids;                         // +0x4
-};
 
 #pragma pack(push, 1)
 struct Pos_00488310 {                // 12 bytes, by value
@@ -109,6 +127,14 @@ struct Game_00488310 {
     Class_00435100* net;              // +0x391e9
     Class_004904b0* mission;          // +0x391ed
 };
+
+// FUN_00487bf0's third argument is the container itself: +0 is the empty
+// allocator and +4 is _First.
+struct Table_00488310 {
+    char allocator_byte;
+    char pad[3];
+    Unit** ids;                       // +0x4
+};
 #pragma pack(pop)
 
 extern Game_00488310* g_game;
@@ -120,58 +146,42 @@ Unit* __stdcall FUN_00485f50(unsigned char player, unsigned short id,
 void __stdcall FUN_00487bf0(Unit* unit, char* text, Table_00488310* table);
 void __stdcall FUN_004b6290(char* message);
 
-static inline bool BadPlayer(unsigned char pl)
-{
-    if (pl >= 10)
-        return true;
-    Player_00488310* p = &g_game->players[pl];
-    return p->active == 0
-        || (p->type != 1 && p->type != 2 && p->type != 3)
-        || p->f146 == 10;
-}
-
 // FUNCTION: 0x488310
 void __cdecl FUN_00488310()
 {
-    char src[4];
-    char buf[0x40];
-    int off = 0;
-    Vec_00488310 vec;
-    int count = g_game->net->count;
-    vec.flag = src[3];
-    Unit** units = new Unit*[count < 0 ? 0 : count];
-    Filler_00488310::Fill((Filler_00488310*)&vec, units, count, (Unit*)&off);
-    Unit** last = units + count;
-    Unit** end = last;
-    if (g_game->net->count > 0) {
-        for (int i = 0; i < g_game->net->count; i++) {
-            Entry_00488310* e = &g_game->net->list[i];
-            Item_00488310* item = FUN_00488a50(e->name);
-            if (item == 0) {
-                units[i] = 0;
-                continue;
-            }
-            unsigned char pl = (unsigned char)(e->player - 1);
-            if (BadPlayer(pl)) {
-                sprintf(buf, "Player number %d invalid for unit %s", e->player, e->name);
-                FUN_004b6290(buf);
-            }
-            FUN_0047ddc0(item, &e->pos);
-            Unit* u = FUN_00485f50((unsigned char)(e->player - 1), item->id, e->pos, 1, 1, 0);
-            if (u) {
-                u->flags = (u->flags & 0x7fff) | ((e->flags & 0x80) << 8);
-                u->f108 = (unsigned short)((unsigned)(u->def->f1fa * e->f1a) / 100);
-                u->f66 = e->f18;
-                units[i] = u;
-            }
+    char buf[100];
+    int n = g_game->net->count;        // only the constructor takes it; the
+    std::vector<Unit*> units(n);       // loops re-read net->count themselves
+    for (int i = 0; i < g_game->net->count; i++) {
+        Entry_00488310* e = &g_game->net->list[i];
+        Item_00488310* item = FUN_00488a50(e->name);
+        if (item == 0) {
+            units[i] = 0;
+            continue;
+        }
+        unsigned char pl = (unsigned char)(e->player - 1);
+        if (pl >= 10
+            || g_game->players[pl].active == 0
+            || (g_game->players[pl].type != 1 && g_game->players[pl].type != 2
+                && g_game->players[pl].type != 3)
+            || g_game->players[pl].f146 == 10) {
+            sprintf(buf, "Player number %d invalid for unit %s", e->player, e->name);
+            FUN_004b6290(buf);
+        }
+        FUN_0047ddc0(item, &e->pos);
+        Unit* u = FUN_00485f50((unsigned char)(e->player - 1), item->id, e->pos, 1, 1, 0);
+        if (u) {
+            u->flags = (u->flags & ~0x8000) | ((e->flags & 0x80) << 8);
+            u->f108 = (unsigned short)((unsigned)(u->def->f1fa * e->f1a) / 100);
+            u->f66 = e->f18;
+            units[i] = u;
         }
     }
     for (int j = 0; j < g_game->net->count; j++) {
         Entry_00488310* e = &g_game->net->list[j];
         if (e->extra && units[j])
-            FUN_00487bf0(units[j], e->extra, (Table_00488310*)&vec);
+            FUN_00487bf0(units[j], e->extra, (Table_00488310*)&units);
     }
     if (g_game->net->count <= 0)
         g_game->mission->FUN_004904b0();
-    delete[] units;
 }
