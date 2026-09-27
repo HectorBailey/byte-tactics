@@ -1,4 +1,6 @@
-// Decompiled by space-bunny-free, class hierarchy fixed by Claude Opus 5.5. Names are provisional.
+// Decompiled by space-bunny-free. Names are provisional.
+// The class hierarchy here was corrected by a later pass (base class
+// Class_0043a1e0, vtable 0x4fd2cc) after the first attempt.
 // The constructor of Class_0043a1f0 (destructor 0x43a1f0, vtable 0x4fd2c8).
 // It first stores 0x4fd2cc, the vtable of the inline constructor of the base
 // class Class_0043a1e0, then runs the member initialisers, then stores its
@@ -14,9 +16,9 @@
 // The two 4-byte fields at +0x2e and +0x32 are pairs of shorts built through
 // a temporary (a derived point, sliced into the member), which is why the
 // original writes each pair with two 16-bit stores and copies the result.
-// The link's value is set through an inline method: a plain
-// `link.value = this` schedules the position pointer's compare before the
-// vtable store (98.9%).
+// The link's value is set through an inline method: a plain `link.value = this`
+// schedules the position pointer's compare before the vtable store and misses,
+// so SetValue() is required to get the link value store at +0x137.
 
 #pragma pack(push, 1)
 struct Entry_0043a1f0 {              // 0x19-byte entries, table at DAT_00512344
