@@ -23,10 +23,19 @@
 // - the array count is clamped into a copy of need, not into need itself: the
 //   original keeps the unclamped need in esi (it is the size of the new end
 //   pointer a few instructions later) and spills it around the copy loop.
+// 95.5 percent, 489 of 493 bytes. The post-realloc count is written as the raw
+// ternary `items.first == 0 ? 0 : (items.last - items.first) / 52` rather than
+// as a size() member call, with a `char* stop = data + need * 52;` local.
+//
 // Still different from the original (see the diff): it stores the
 // operator delete[] argument into the stack slot it has just finished with
 // (`mov [esp+0x18], eax` after the push), it interleaves the `add esp, 4`
-// after that call with the two size leas differently, and in the last two
+// after that call with the two size leas differently, and it keeps the new end
+// pointer in edx with an immediate store where this file keeps it in esi and
+// stores it after the count division. Both are allocator and scheduler choices
+// rather than semantic differences, so this is left here rather than churned
+// further.
+// - in the last two
 // computations and in the first of the three position copies it uses ecx
 // where the original uses eax (or the other way round): register choices only,
 // same instructions.
@@ -135,8 +144,9 @@ void Class_00471430::FUN_004737c0()
                 Copy52_004737c0(to, from);
 
             delete[] items.first;
-            items.end = data + need * 52;
-            int count = items.size();
+            char* stop = data + need * 52;
+            int count = items.first == 0 ? 0 : (items.last - items.first) / 52;
+            items.end = stop;
             items.first = data;
             items.last = data + count * 52;
         }
