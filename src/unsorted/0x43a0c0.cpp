@@ -14,9 +14,9 @@
 // The two 4-byte fields at +0x2e and +0x32 are pairs of shorts built through
 // a temporary (a derived point, sliced into the member), which is why the
 // original writes each pair with two 16-bit stores and copies the result.
-// The link's value is set through an inline method: a plain
-// `link.value = this` schedules the position pointer's compare before the
-// vtable store (98.9%).
+// The link's value is set through an inline method: a plain `link.value = this`
+// schedules the position pointer's compare before the vtable store and misses,
+// so SetValue() is required to get the link value store at +0x137.
 
 #pragma pack(push, 1)
 struct Entry_0043a1f0 {              // 0x19-byte entries, table at DAT_00512344
