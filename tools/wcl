@@ -10,7 +10,7 @@ TC="$ROOT/toolchain/${BT_TOOLCHAIN:-msvc5-sp3}"
 
 winpath() { echo "Z:${1//\//\\}"; }
 
-export WINEPREFIX="$ROOT/toolchain/wineprefix" WINEARCH=win32 WINEDEBUG=-all
+export WINEPREFIX="$ROOT/toolchain/wineprefix" WINEARCH="${WINEARCH:-win64}" WINEDEBUG=-all
 export INCLUDE="$(winpath "$TC/INCLUDE")" LIB="$(winpath "$TC/LIB")"
 
 tool="$(basename "$0")"
