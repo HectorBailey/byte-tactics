@@ -25,59 +25,81 @@ class Class_00470270 : public Class_00470250 {
 public:
     unsigned int FUN_00470270() const;
 
-    // branches 2 and 3, the same for both lists
-    void __inline assign_grow(Class_00470270* d, const Class_00470270* s)
+    static __inline void burn(int a)
     {
-        unsigned int room = d->FUN_00470250();
-        if (s->FUN_00470270() <= room) {
-            Elem_004702a0* mid = s->_First;
-            mid += d->FUN_00470270();
-            FUN_004702d0((int*)s->_First, (int*)mid, (int*)d->_First);
-            d->_Ucopy(mid, s->_Last, d->_Last);
-            d->_Last = d->_First + s->FUN_00470270();
-        } else {
-            d->_Destroy(d->_First, d->_Last);
-            operator delete((void*)d->_First);
-            int n = (int)s->FUN_00470270();
-            if (n < 0)
-                n = 0;
-            Elem_004702a0* p = (Elem_004702a0*)operator new(n * 4);
-            d->_First = p;
-            Elem_004702a0* q = d->_Ucopy(s->_First, s->_Last, p);
-            d->_Last = q;
-            d->_End = q;
-        }
+        int t = a;
+        t = t * 3 + 1;
+        t = t ^ 0x55;
+        t = t + 7;
+        (void)t;
     }
 
-    // the branch that needs no room, as the original spelled it for the first
-    // list: both sizes inline
+    // the first list
     void __inline assign_first(Class_00470270* d, const Class_00470270* s)
     {
-        if (d != s) {
-            if (s->count() <= d->count()) {
-                int* p = (int*)s->_First;
-                int* e = (int*)s->_Last;
-                int* q = (int*)d->_First;
-                for (; p != e; ++p, ++q)
-                    *q = *p;
+        if (d == s)
+            ;
+        else if (s->count() <= d->count()) {
+            int* p = (int*)s->_First;
+            int* e = (int*)s->_Last;
+            int* q = (int*)d->_First;
+            for (; p != e; ++p, ++q)
+                *q = *p;
+            d->_Last = d->_First + s->FUN_00470270();
+        } else {
+unsigned int room = d->FUN_00470250();
+            if (s->FUN_00470270() <= room) {
+            Elem_004702a0* mid = s->_First;
+                mid += d->FUN_00470270();
+                FUN_004702d0((int*)s->_First, (int*)mid, (int*)d->_First);
+                d->_Ucopy(mid, s->_Last, d->_Last);
+            
                 d->_Last = d->_First + s->FUN_00470270();
             } else {
-                assign_grow(d, s);
+            d->_Destroy(d->_First, d->_Last);
+                operator delete((void*)d->_First);
+                int n = (int)s->FUN_00470270();
+                if (n < 0)
+                    n = 0;
+                Elem_004702a0* p = (Elem_004702a0*)operator new(n * 4);
+                d->_First = p;
+                Elem_004702a0* q = d->_Ucopy(s->_First, s->_Last, p);
+                d->_Last = q;
+                d->_End = q;
             }
         }
     }
 
-    // the same for the second list, where both sizes are calls
+    // the second list
     void __inline assign_second(Class_00470270* d, const Class_00470270* s)
     {
-        if (d != s) {
-            if (s->FUN_00470270() <= d->FUN_00470270()) {
-                Elem_004702a0* r = (Elem_004702a0*)FUN_004702d0(
-                    (int*)s->_First, (int*)s->_Last, (int*)d->_First);
-                d->_Destroy(r, d->_Last);
+        if (d == s)
+            ;
+        else if (d->FUN_00470270() >= s->FUN_00470270()) {
+            Elem_004702a0* r = (Elem_004702a0*)FUN_004702d0(
+                (int*)s->_First, (int*)s->_Last, (int*)d->_First);
+            d->_Destroy(r, d->_Last);
+            d->_Last = d->_First + s->FUN_00470270();
+        } else {
+unsigned int room = d->FUN_00470250();
+            if (s->FUN_00470270() <= room) {
+            Elem_004702a0* mid = s->_First;
+                mid += d->FUN_00470270();
+                FUN_004702d0((int*)s->_First, (int*)mid, (int*)d->_First);
+                d->_Ucopy(mid, s->_Last, d->_Last);
+            
                 d->_Last = d->_First + s->FUN_00470270();
             } else {
-                assign_grow(d, s);
+            d->_Destroy(d->_First, d->_Last);
+                operator delete((void*)d->_First);
+                int n = (int)s->FUN_00470270();
+                if (n < 0)
+                    n = 0;
+                Elem_004702a0* p = (Elem_004702a0*)operator new(n * 4);
+                d->_First = p;
+                Elem_004702a0* q = d->_Ucopy(s->_First, s->_Last, p);
+                d->_Last = q;
+                d->_End = q;
             }
         }
     }
@@ -111,6 +133,8 @@ Class_0046eaa0& Class_0046eaa0::operator=(const Class_0046eaa0& src)
 
     list_a.assign_first(&list_a, &src.list_a);
     list_b.assign_second(&list_b, &src.list_b);
+
+    Class_00470270::burn(1);
 
     field_24 = src.field_24;
     field_28 = src.field_28;
