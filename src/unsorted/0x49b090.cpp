@@ -16,6 +16,22 @@
 //   and three static __inline helpers for the differences. All of them score
 //   66.0% or lower (the g_game local drops to 52.2%, a `unit` local to 59.6%),
 //   so none of them moves this particular pair.
+// - The swap is NOT free to fix, and the two orderings have a measurable cost
+//   either way (build/scratch/0x49b090/{v2,lcs}.cpp and .py): reading the three
+//   differences through the `pos` POINTER instead of through `proj->px.i` is
+//   what makes the original's own prologue (`lea edi, [esi+4] / push edi`), its
+//   whole 64-bit distance block and its radius block come out byte exact, but
+//   it moves the cell one step further down the callee-saved order (ebx ->
+//   ebp) and only the cell register then differs. A true LCS over instructions
+//   (build/scratch/0x49b090/lcs.py) says 165/282 for that against 168/282 for
+//   the version kept here, and check.py's difflib number says 64.9% against
+//   66.0%, so the two metrics agree: neither ordering wins. So the original
+//   must be doing a THIRD thing, and the most likely candidate is that its
+//   distance block reads the position through a pointer that is not the call
+//   argument (a `&proj->pos` recomputed inside the block, or the argument
+//   itself with the block reading a second copy), which would give the cell
+//   the third callee-saved register while still coding the loads off one
+//   register.
 // - Distance block: the original computes the differences in the order y, z, x
 //   and keeps x in ebp; x, y, z order scores 66.0% and y, z, x 65.3%, so the
 //   x-first order here is already the better of the two even though it still
