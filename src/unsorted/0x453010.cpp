@@ -1,7 +1,4 @@
 // Decompiled by DeepSeek V4.1 Flash. Names are provisional.
-// PARTIAL 24.0%: the prologue should be sub esp,8 (two locals) but ours uses
-// push ecx; result is reloaded at every exit instead of one shared tail; the
-// p->field_22 store is emitted twice in the group paths.
 #pragma pack(push, 1)
 struct PlayerInfo_00453010 {
     char unknown_0[0x94];
@@ -10,7 +7,7 @@ struct PlayerInfo_00453010 {
 
 struct Player_00453010 {
     int active;                        // +0x00
-    int field_4;                       // +0x04
+    int id;                            // +0x04
     char unknown_8[0xc - 8];
     int field_c;                       // +0x0c
     char unknown_10[0x22 - 0x10];
@@ -34,31 +31,44 @@ extern Game_00453010* g_game;
 
 int __stdcall FUN_0044ffd0(unsigned char index);
 unsigned char __stdcall FUN_0044fe40(int id);
-int __stdcall FUN_00451df0(int player, void* data, int size);
+int __stdcall FUN_00451df0(int player, unsigned char* data, int size);
 void __stdcall FUN_00452cc0(int id);
-int __stdcall FUN_004530e0();
 
-static inline unsigned char FindPlayerIndex(int id)
+static inline unsigned char FindIndex_00453010(int id)
 {
-    if (id != -1) {
-        for (unsigned char i = 0; i < 10; i++) {
-            if (FUN_0044ffd0(i) == id)
-                return i;
-        }
+    for (unsigned char i = 0; i < 10; i++) {
+        if (FUN_0044ffd0(i) == id)
+            return i;
     }
     return 10;
+}
+
+static inline int FindActiveId_00453010()
+{
+    for (int i = 0; i < 10; i++) {
+        if (g_game->players[i].active != 0
+            && (g_game->players[i].state == 1 || g_game->players[i].state == 2))
+            return g_game->players[i].id;
+    }
+    return -1;
 }
 
 // FUNCTION: 0x453010
 int __stdcall FUN_00453010(int id, unsigned char value)
 {
     int result = 0;
+
+    unsigned char fi;
+    if (id == -1)
+        fi = 10;
+    else
+        fi = FindIndex_00453010(id);
+
     Player_00453010* p;
-    if (FindPlayerIndex(id) == 10) {
+    if (fi == 10)
         p = 0;
-    } else {
+    else
         p = &g_game->players[FUN_0044fe40(id)];
-    }
 
     if (p == 0)
         return 0;
@@ -68,42 +78,42 @@ int __stdcall FUN_00453010(int id, unsigned char value)
     *(int*)(msg + 1) = -1;
     msg[5] = value;
 
-    if (p->active != 0) {
-        if ((p->state == 1 || p->state == 2) && p->field_22 == 0) {
-            if (p->state == 1) {
-                for (int i = 0; i < 10; i++) {
-                    if (g_game->players[i].active != 0
-                        && (g_game->players[i].state == 1 || g_game->players[i].state == 2)) {
-                        *(int*)(msg + 1) = g_game->players[i].field_4;
-                        FUN_00451df0(FUN_004530e0(), msg, 6);
-                        FUN_00452cc0(p->field_4);
-                        g_game->players[i].field_22 = value;
-                    }
+    if (p->active != 0
+        && (p->state == 1 || p->state == 2)
+        && p->field_22 == 0) {
+        if (p->state == 1) {
+            for (int i = 0; i < 10; i++) {
+                if (g_game->players[i].active != 0
+                    && (g_game->players[i].state == 1 || g_game->players[i].state == 2)) {
+                    *(int*)(msg + 1) = g_game->players[i].id;
+                    FUN_00451df0(FindActiveId_00453010(), msg, 6);
+                    FUN_00452cc0(p->id);
+                    g_game->players[i].field_22 = value;
                 }
-                result = 1;
-            } else {
-                *(int*)(msg + 1) = p->field_4;
-                FUN_00451df0(FUN_004530e0(), msg, 6);
-                FUN_00452cc0(p->field_4);
-                result = 1;
             }
-        } else if (p->state == 3 && p->field_22 == 0) {
-            *(int*)(msg + 1) = id;
-            result = FUN_00451df0(FUN_004530e0(), msg, 6);
-            if (p->active != 0 && p->state == 3 && p->field_27->field_94 == 1) {
-                unsigned char c = p->field_c;
-                for (int i = 0; i < 10; i++) {
-                    if (g_game->players[i].field_c == c) {
-                        FUN_00452cc0(g_game->players[i].field_4);
-                        g_game->players[i].field_22 = value;
-                    }
+            result = 1;
+        } else {
+            *(int*)(msg + 1) = p->id;
+            FUN_00451df0(FindActiveId_00453010(), msg, 6);
+            FUN_00452cc0(p->id);
+            result = 1;
+        }
+    } else if (p->active != 0 && p->state == 3 && p->field_22 == 0) {
+        *(int*)(msg + 1) = id;
+        result = FUN_00451df0(FindActiveId_00453010(), msg, 6);
+        if (p->active != 0 && p->state == 3 && p->field_27->field_94 == 1) {
+            unsigned char c = p->field_c;
+            for (int i = 0; i < 10; i++) {
+                if (g_game->players[i].field_c == c) {
+                    FUN_00452cc0(g_game->players[i].id);
+                    g_game->players[i].field_22 = value;
                 }
-                p->field_22 = value;
-            } else {
-                FUN_00452cc0(p->field_4);
             }
+        } else {
+            FUN_00452cc0(p->id);
         }
     }
+
     p->field_22 = value;
     return result;
 }

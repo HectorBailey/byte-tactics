@@ -1,11 +1,5 @@
-// Decompiled by DeepSeek V4.1 Flash. Names are provisional.
-//
-// Removes the player with the given id. The id is first resolved to a slot
-// through the two inlined index helpers (FUN_0044ffd0 for the "exists" test,
-// FUN_0044fe40 for the address), the slot's two 11-byte per-player tables are
-// cleared for every still-playing slot, the local player is re-selected with
-// FUN_00486f10, and the slot is torn down (optionally sending the
-// remove-player packet to the network layer at g_game+0x14).
+// scratch v1
+#include <stdio.h>
 #include <string.h>
 
 #pragma pack(push, 1)
@@ -21,7 +15,9 @@ public:
 };
 
 struct PlayerData_00452cc0 {
-    char unknown_0[0x97];
+    char unknown_0[0x94];
+    unsigned char field_94;            // +0x94
+    char unknown_95[0x97 - 0x95];
     unsigned char flags;               // +0x97
     char unknown_98[0x9d - 0x98];
     unsigned short word_9d;            // +0x9d
@@ -35,10 +31,10 @@ struct Player_00452cc0 {
     char unknown_10[0x27 - 0x10];
     PlayerData_00452cc0* data;         // +0x27
     char unknown_2b[0x73 - 0x2b];
-    unsigned char state;               // +0x73
+    unsigned char type;                // +0x73
     char unknown_74[0x108 - 0x74];
-    unsigned char mapA[11];            // +0x108
-    unsigned char mapB[11];            // +0x113
+    unsigned char allies[0xb];         // +0x108
+    unsigned char field_113[0xb];      // +0x113
     char unknown_11e[0x146 - 0x11e];
     unsigned char field_146;           // +0x146
     char unknown_147[0x14b - 0x147];
@@ -51,9 +47,18 @@ struct Game_00452cc0 {
     char unknown_2851[0x2a3c - 0x2851];
     unsigned short field_2a3c;         // +0x2a3c
     char unknown_2a3e[0x2a44 - 0x2a3e];
-    unsigned char flags_2a44;          // +0x2a44
-    char unknown_2a45[0x391e9 - 0x2a45];
-    Class_00435100* field_391e9;       // +0x391e9
+    union {
+        unsigned short value;          // +0x2a44
+        struct {
+            unsigned short b0 : 1;
+            unsigned short b1 : 1;
+            unsigned short b2 : 1;
+            unsigned short b3 : 1;
+            unsigned short rest : 12;
+        };
+    } flags;
+    char unknown_2a45[0x391e9 - 0x2a46];
+    Class_00435100* net;               // +0x391e9
 };
 #pragma pack(pop)
 
@@ -62,10 +67,9 @@ extern Game_00452cc0* g_game;
 int __stdcall FUN_0044ffd0(unsigned char index);
 unsigned char __stdcall FUN_0044fe40(int id);
 void __stdcall FUN_00486f10(unsigned char player);
-int __stdcall FUN_0046c620(int msg);
-int __stdcall FUN_004ca780(void* net, unsigned long id);
+void __stdcall FUN_0046c620(int msg);
+int __stdcall FUN_004ca780(void* net, int id);
 
-// Index of the first live slot whose +4 field matches, else 10.
 static inline unsigned char FindIndex_00452cc0(int id)
 {
     for (unsigned char i = 0; i < 10; i++) {
@@ -75,21 +79,49 @@ static inline unsigned char FindIndex_00452cc0(int id)
     return 10;
 }
 
-// +4 field of a live slot, or -1 when the slot is empty (or is the sentinel).
 static inline int PlayerId_00452cc0(unsigned char i)
 {
-    if (i != 10 && g_game->players[i].state != 0)
+    if (i != 10 && g_game->players[i].type != 0)
         return g_game->players[i].id;
     return -1;
 }
 
 static inline unsigned char FindPlayerIndex_00452cc0(int id)
 {
-    for (unsigned char i = 0; i < 10; i++) {
-        if (PlayerId_00452cc0(i) == id)
-            return i;
+    if (id != -1) {
+        for (unsigned char i = 0; i < 10; i++) {
+            if (PlayerId_00452cc0(i) == id)
+                return i;
+        }
     }
     return 10;
+}
+
+static inline int IsActive12_00452cc0(Player_00452cc0* p)
+{
+    if (p->active == 0)
+        return 0;
+    if (p->type == 1 || p->type == 2)
+        return 1;
+    return 0;
+}
+
+static inline int IsType1_00452cc0(Player_00452cc0* p)
+{
+    if (p->active == 0)
+        return 0;
+    if (p->type == 1)
+        return 1;
+    return 0;
+}
+
+static inline int IsType3_00452cc0(Player_00452cc0* p)
+{
+    if (p->active == 0)
+        return 0;
+    if (p->type == 3)
+        return 1;
+    return 0;
 }
 
 // FUNCTION: 0x452cc0
@@ -111,67 +143,61 @@ void __stdcall FUN_00452cc0(int id)
         return;
     if (p->active == 0)
         return;
-    if (p->state != 1 && p->state != 2 && p->state != 3)
+    if (p->type != 1 && p->type != 2 && p->type != 3)
+        return;
+    if (p->field_146 == 10)
         return;
 
     unsigned char slot = p->field_146;
-    if (slot == 10)
-        return;
-
     int flag = p->data->flags & 1;
 
     for (int i = 0; i < 10; i++) {
         Player_00452cc0* q = &g_game->players[i];
-        if (q->active != 0 && (q->state == 1 || q->state == 2)) {
-            q->mapA[slot] = 0;
-            q->mapB[slot] = 0;
+        if (q->active != 0 && (q->type == 1 || q->type == 2)) {
+            q->field_113[slot] = 0;
+            q->allies[slot] = 0;
         }
     }
 
-    unsigned char pi;
-    if (id == -1)
-        pi = 10;
-    else
-        pi = FindPlayerIndex_00452cc0(id);
+    FUN_00486f10(FindPlayerIndex_00452cc0(id));
 
-    FUN_00486f10(pi);
-
-    if ((g_game->flags_2a44 & 4) != 0) {
-        if (p->active != 0 && (p->state == 1 || p->state == 2))
-            goto decrement;
-    } else if (p->active != 0 && (p->state == 1 || p->state == 2)) {
+    if (g_game->flags.b2) {
+        if (p->active != 0 && (p->type == 1 || p->type == 2))
+            goto after_remove;
+    } else if (p->active != 0 && (p->type == 1 || p->type == 2)) {
         FUN_004ca780((char*)g_game + 0x14, p->id);
     }
-
     ((Class_00463c60*)p)->FUN_00463c60(0);
     p->active = 0;
     p->id = -1;
     p->field_c = 0;
 
-decrement:
+after_remove:
     g_game->field_2a3c--;
     p->data->word_9d &= 0xfffb;
-    memset(&p->mapA, 0, 11);
+    memset(&p->allies, 0, 11);
 
-    if (g_game->field_391e9->FUN_00435100() == 3)
+    if (g_game->net->FUN_00435100() == 3)
         FUN_0046c620(3);
 
-    if ((g_game->flags_2a44 & 4) != 0 && flag != 0) {
-        unsigned int max = 0;
+    if ((g_game->flags.value & 4) && flag != 0) {
+        unsigned int best = 0;
         Player_00452cc0* q = g_game->players;
         int n = 10;
         do {
-            if ((q->active != 0 && q->state == 3)
-                || (q->active != 0 && q->state == 1)) {
-                if (q->id > max)
-                    max = q->id;
+            if ((q->active != 0 && q->type == 3)
+                || (q->active != 0 && q->type == 1)) {
+                if (q->id > best)
+                    best = q->id;
             }
             q++;
         } while (--n);
-        if (FindPlayerIndex_00452cc0(max) != 10) {
-            Player_00452cc0* r = &g_game->players[FindPlayerIndex_00452cc0(max)];
-            if (r != 0)
-                r->data->flags |= 1;
-        }
+        Player_00452cc0* r;
+        if (FindPlayerIndex_00452cc0(best) == 10)
+            r = 0;
+        else
+            r = &g_game->players[FindPlayerIndex_00452cc0(best)];
+        if (r != 0)
+            r->data->flags |= 1;
     }
 }
