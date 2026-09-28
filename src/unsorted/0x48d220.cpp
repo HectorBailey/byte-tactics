@@ -12,14 +12,14 @@
 // out-of-line two-argument insert (0x48ddc0) instead of inlining it and calling
 // the three-argument insert.
 //
-// The push is written as a cast to Class_0048ddc0, the guide's name for an
-// unnamed __thiscall callee. 0x48ddc0 is vector<Unit*>::insert(iterator, const
-// T&) (ret 8, two stack args; 0x48ddc0.cpp), but data/symbols.csv names only
-// the three-argument overload at 0x408f30 (ret 0xc), and check.py undecorates a
+// The push is a cast to Class_0048ddc0, the name for an unnamed __thiscall
+// callee. 0x48ddc0 is vector<Unit*>::insert(iterator, const T&) (ret 8, two
+// stack args; 0x48ddc0.cpp), but data/symbols.csv names only the
+// three-argument overload at 0x408f30 (ret 0xc), and check.py undecorates a
 // name only up to the first @@, so both overloads reduce to
 // PAUUnit::?$vector::insert and a plain vec.insert(vec.end(), u) reports that
-// row as a bad reference. symbols.csv needs one row per overload for this to
-// read as a call to insert.
+// row as a bad reference. A data/aliases.csv row for 0x48ddc0 would let the
+// plain call through, the way IURect_0046e160::IU?$pair::?$_Tree::erase does.
 #include <vector>
 
 struct Unit;
