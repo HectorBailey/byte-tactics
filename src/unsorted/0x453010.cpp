@@ -1,5 +1,7 @@
 // Decompiled by DeepSeek V4.1 Flash. Names are provisional.
-
+// PARTIAL 24.0%: the prologue should be sub esp,8 (two locals) but ours uses
+// push ecx; result is reloaded at every exit instead of one shared tail; the
+// p->field_22 store is emitted twice in the group paths.
 #pragma pack(push, 1)
 struct PlayerInfo_00453010 {
     char unknown_0[0x94];
