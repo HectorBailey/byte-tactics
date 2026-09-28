@@ -79,9 +79,9 @@ unsigned short __stdcall FUN_0048cd80(void)
                     UnitDef_0048cd80* def = u->def;
                     int v = FixMul(def->field_17a, 0x8000) + def->field_17e;
                     v = FixMul(v, def->field_176);
-                    if (v < best) {
-                        best = v;
+                    if (v < best && p->x >= 0) {
                         result = u->field_a8;
+                        best = v;
                     }
                 }
             }
@@ -90,9 +90,11 @@ unsigned short __stdcall FUN_0048cd80(void)
         Slot_0048cd80* s = g_game->list2;
         int n = g_game->count2;
         int best = 99999;
+        int py = p->y;
+        int px = p->x;
         for (int i = n; i > 0; i--) {
-            int dy = s->y - p->y;
-            int dx = s->x - p->x;
+            int dy = s->y - py;
+            int dx = s->x - px;
             int d = dx * dx + dy * dy;
             if (d < 4 && d < best) {
                 best = d;
