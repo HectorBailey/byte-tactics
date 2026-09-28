@@ -1,9 +1,14 @@
-// Decompiled by DeepSeek V4.1 Flash. Names are provisional.
+// Decompiled by DeepSeek V4.1 Flash, finished by space-bunny-free. Names are provisional.
 // A method of the net condenser (class layout from 0x44f8a0.cpp and
 // 0x44f940.cpp): finishes receiving a packet. If a decompressed buffer is
 // still pending it is copied out first; otherwise a DirectPlay packet is
 // received, its header and XOR checksum are verified and the payload is
 // decompressed (kind 4) or copied (kind 3).
+// MATCH. The two differences from DeepSeek V4.1 Flash's version, both in the
+// netCondenser[3] branch at the end: the sprintf arguments are swapped versus
+// the format string (the original really does print *size as "client
+// buffersize" and clientSize as "needed"), and the if needs its own `return
+// result;` so MSVC lays out the block the same way.
 #include <stdio.h>
 #include <string.h>
 
@@ -29,6 +34,7 @@ void FUN_004d1810();
 int Class_0044f9c0::FUN_0044f9c0(void* net, char* data, int* size)
 {
     char msg[256];
+    unsigned int n;
     int clientSize = *size;
 
     if (unknown_8 != 0) {
@@ -53,7 +59,7 @@ int Class_0044f9c0::FUN_0044f9c0(void* net, char* data, int* size)
                 return 0;
             if (*size < 4)
                 return 0x887700be;
-            unsigned int n = *size - 3;
+            n = *size - 3;
             unsigned short sum = 0;
             for (unsigned int i = 3; i < n; i++) {
                 sum += (unsigned char)data[i];
@@ -80,17 +86,13 @@ int Class_0044f9c0::FUN_0044f9c0(void* net, char* data, int* size)
             *size = unknown_c;
             return 0;
         }
-        if (result == 0x887700be) {
+        if (result == 0x887700be || result == 0x8877001e) {
             if (result == 0x8877001e) {
-                sprintf(msg, "netCondenser[3]: needed %ld, had client buffersize = %ld\n",
-                        *size, clientSize);
+                sprintf(msg, "netCondenser[3]: needed %ld, had client buffersize = %ld\n", clientSize, *size);
             }
             return result;
         }
-        if (result == 0x8877001e) {
-            sprintf(msg, "netCondenser[3]: needed %ld, had client buffersize = %ld\n",
-                    *size, clientSize);
-        }
+        return result;
     }
     return result;
 }
