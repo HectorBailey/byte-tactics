@@ -1,4 +1,6 @@
 // Decompiled by DeepSeek V4.1 Flash. Names are provisional.
+// PARTIAL 88.7%: the remaining diffs are register allocation and scheduling;
+// the run was cut off by a provider usage limit before the last hunks.
 #include <windows.h>
 #include <string.h>
 
