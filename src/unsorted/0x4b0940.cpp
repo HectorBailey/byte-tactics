@@ -55,7 +55,6 @@ public:
 
 // The name lookup just before this function in the original file, defined here
 // so /Ob2 inlines it as the original did (the same helper as in 0x4b0830.cpp).
-// FUNCTION: 0x4b07c0
 int Class_004b07c0::FUN_004b07c0(const char* name)
 {
     for (int i = 0; i < table->count; i++) {
