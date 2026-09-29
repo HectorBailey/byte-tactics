@@ -1814,12 +1814,22 @@ name (`std::_Lockit::_Lockit` is 0x4e39b0).
   deriving from that class (`class Class_00435110 : public Class_00435c00`)
   instead of copying the fields into a new one, so the inherited calls keep
   their established names (0x435110).
-- **Known wall: `vector::insert(iterator, size_type, const T&)`** comes out one
-  byte off, a base/index swap in the third inlined `_Ucopy`'s source `lea`
-  (original `[ebx+ecx]`, ours `[ecx+ebx]`), in both 0x46e640 and 0x44ec30 (99.6%
-  each). Neither header sets nor 0 to 700 unused declarations fix it, so it
-  comes from the source shape. Solve it once and it likely solves every
-  instantiation; until then, don't spend a normal budget on it.
+- **`vector::insert(iterator, size_type, const T&)` register family**: which
+  registers the function uses (`this` in ebp or ebx, and the one-byte `lea`
+  base/index swap) follows the numbering order of the third inlined
+  `_Ucopy`'s destination and source, not headers or dummy declarations. Write
+  that copy as a loop with the destination declared first,
+  `{ iterator _d = _Q + _M; const_iterator _s = _P; for (; _s != _Last; ++_d,
+  ++_s) allocator.construct(_d, *_s); }`, in the hand-written vector (a helper
+  `_Ucopy(dest, src, end)` with the destination parameter first does the same,
+  since arguments bind right to left). This took 0x425480 from 57.9% to 80.5%
+  and 0x4732e0 to 80.5% in scratch (Sonnet 5.5, #679). 0x425210, 0x46e640 and
+  0x44ec30 are still one byte out at 99.6%; dead locals never change it.
+  About 1500 variants on 0x44ec30 (every `_Ucopy` form at all four sites, all
+  120 tail orders, file layout, and flags from `/Ob1` to `/G6`) never moved
+  that last byte, so it most likely comes from compiler state set by the rest
+  of the original file, not this function's source. Don't spend a normal budget
+  on it (Sonnet 5.5, #759).
 - **One write and one read of a stack slot on different paths is a bug
   report, not a matching problem**: list each slot's writes and reads in the
   disassembly (a `grep` is enough) before writing source; such a finding
@@ -1872,7 +1882,12 @@ name (`std::_Lockit::_Lockit` is 0x4e39b0).
   memory directly (`cmp [esp+0x10], ebx`) matched once declared `__fastcall`
   (0x46c920, 0x46ca60; about 400 shape variants had not moved it). A quick way
   to test: score the file with each of `/Gr`, `/Gz` and `/Gd` through
-  tools/wcl before rewriting anything.
+  tools/wcl before rewriting anything:
+  `uv run tools/check.py <addr> --flags "/O2 /Ob2 /MT /Gz"`. 0x44b990 (a
+  "scheduler tie" that resisted many attempts) and 0x4b6570 matched unchanged
+  under `/Gz`, and 0x4c2870 under `/Gr`; declaring the function (and any
+  argument-less callee it shares the file with) `__stdcall` or `__fastcall`
+  then matches at the default flags.
 - **Keep a callee's real name with the real container**: when a hand-written
   tree or vector gives a call the wrong name, use the real `std::map` or
   `std::vector` member as a neighbouring matched file does (0x46d1a0).
@@ -1907,3 +1922,12 @@ name (`std::_Lockit::_Lockit` is 0x4e39b0).
   flag);`) gives `xor eax, eax; mov [edx+4], eax`, which is what the original
   does. Give the aggregate a constructor rather than assigning the constant to a
   field; verified in three separate shapes on 0x46d2e0.
+- **Two values tied for a register can be separated by one more use**: when
+  the original gives a handle ebx and a path ebp and yours swaps them, a
+  trivial inline wrapper around a call that takes the handle
+  (`static inline int Next(int h, ...) { int r = FUN_004bc640(h, ...); return r; }`)
+  adds a use without adding bytes and flips the tie (0x4bcb50). Dummy uses
+  such as `h = h` are folded away first and do nothing.
+- **Byte-wide `xor cl, cl` and `not cl`** come from an `unsigned char` local
+  set to 0 on one path and `~v` on the other; a ternary or a cast keeps the
+  arithmetic 32-bit (0x4bd160).
