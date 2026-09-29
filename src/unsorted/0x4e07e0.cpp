@@ -2,19 +2,17 @@
 // Reports the process working set into a caller-supplied buffer, with a
 // psapi.dll QueryWorkingSet refresh at most once every ten calls.
 //
-// Still differs (83.4%, 917 of 934 bytes):
-//  1. The original stores ptn/sharedn/privn into their globals BOTH before the
-//     scan loop and after it; our version has only the second set (MSVC 5
-//     proved the first dead, which it is on the n > 0 path). That is 15 of the
-//     17 missing bytes. Moving the second set inside "if (n)" so the first set
-//     is live on the n == 0 path does not help: it costs 7 extra instructions.
-//     Some other spelling of the loop is needed that keeps both sets.
-//  2. In the scan loop the original has eax = w & 0xfffff000 and
-//     ecx = w & 0xfff, we have them the other way round.
-//  3. Block order inside the refresh (lea/test/loop hoisted above the global
-//     stores, "mov ebp, eax" for the loop count) and the lea/shl/store order at
-//     the head of each of the five number loops are scheduling differences that
-//     follow from 1 and 2.
+// Still differs (84.5%, 916 of 934 bytes). Everything matches except one
+// group of 15 bytes: the original stores ptn/sharedn/privn into their globals
+// BOTH before the scan loop and again after it, while ours only keeps the
+// second set. So the original's source must have the second set INSIDE the
+// loop's "if (n)" block, which is the only way the first set stays live.
+// Written that way it compiles to 951-952 bytes (76%): MSVC 5 then demotes the
+// loop counter out of ebp into a stack slot and drops esi, so the whole
+// register rotation of the loop goes wrong. That is a register pressure
+// problem, not a shape problem, and it is unsolved here.
+// A separate loop counter variable (int i = n) with the stores inside gets the
+// SIZE almost exactly right (938 bytes) but scores lower, 83.6%.
 #include <windows.h>
 #include <stdio.h>
 
@@ -83,9 +81,9 @@ char __cdecl FUN_004e07e0(char *dest)
     int sharedn;
     DWORD *p;
     DWORD w;
-    DWORD hi;
     DWORD lo;
-    int n;
+    DWORD hi;
+    DWORD n;
 
     EnterCriticalSection(cs);
     if (DAT_005295d0 < 0 || !(--DAT_005295d0 > 0)) {
@@ -120,8 +118,8 @@ char __cdecl FUN_004e07e0(char *dest)
         if (n) {
             do {
                 w = *p;
-                hi = w & 0xfffff000;
                 lo = w & 0xfff;
+                hi = w & 0xfffff000;
                 if (hi >= 0xc0000000 && hi <= 0xe0000000) {
                     ptn++;
                 } else if (lo & 1) {
