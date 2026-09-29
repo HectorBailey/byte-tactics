@@ -1,8 +1,22 @@
-// Decompiled by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
+//
+// Still differs: 711 of 861 bytes (38.4%). The whole missing 150 bytes are the
+// outgoing-argument area of the two FUN_00458310 calls. The original reserves
+// it with `sub esp, 0xc` and stores three zeros there (args 6..8 of the
+// `0, 0, 0` tail), instead of `push 0`, which makes FUN_00458310's `ret 0x20`
+// pop them. Literals and named zero locals both fold to `push 0`; the
+// construct that produces the `sub esp, 0xc` plus three zero stores is not
+// found yet, and that also explains the `sub esp, 0x68` vs our `sub esp, 0x54`
+// frame (0x14 bytes, the missing `sub esp, 0xc` region).
+// Everything else, including the two struct field-offset families, the
+// accumulator and child-box slot layout and the fixed-point projection, was
+// derived from the disassembly and matches by construction.
 #include <string.h>
 
 struct Child_4589c0;
 struct Model_4589c0;
+
+union Fixed { int value; struct { unsigned short fraction; short whole; }; };
 
 struct Owner_4589c0 {
     char unknown_0[0x6a];
@@ -70,19 +84,6 @@ struct Surface_4589c0 {
     unsigned int flag1 : 1;
 };
 
-struct Bitmap_4589c0 {
-    unsigned short width;           // +0x00
-    unsigned short height;          // +0x02
-    short dx;                       // +0x04
-    short dy;                       // +0x06
-    unsigned char colour;           // +0x08
-    unsigned char flag9;            // +0x09
-    unsigned char count;            // +0x0a
-    unsigned char kind;             // +0x0b
-    int unknown_c;                  // +0x0c
-    void* field_10;                 // +0x10
-};
-
 class Class_00458310 {
 public:
     void FUN_00458310(int* minX, int* maxX, int* minY, int* maxY, Model_4589c0* model,
@@ -96,6 +97,19 @@ public:
 
 class Class_004c6ae0;
 
+struct Bitmap_4589c0 {
+    unsigned short width;           // +0x00
+    unsigned short height;          // +0x02
+    short dx;                       // +0x04
+    short dy;                       // +0x06
+    unsigned char colour;           // +0x08
+    unsigned char flag9;            // +0x09
+    unsigned char count;            // +0x0a
+    unsigned char kind;             // +0x0b
+    int unknown_c;                  // +0x0c
+    void* field_10;                 // +0x10
+};
+
 void __stdcall FUN_004b8a80(Surface_4589c0* dst, Src_4589c0* src);
 void __stdcall FUN_004b7f90(Class_004c6ae0* dst, Bitmap_4589c0* bmp, int x, int y);
 
@@ -107,7 +121,7 @@ public:
 };
 
 // FUNCTION: 0x4589c0
-void Class_00459200::FUN_004589c0(Image_4589c0* src, Model_4589c0* model)
+void Class_00459200::FUN_004589c0(Image_4589c0* bmp, Model_4589c0* model)
 {
     int minX = 0;
     int maxX = 0;
@@ -118,54 +132,50 @@ void Class_00459200::FUN_004589c0(Image_4589c0* src, Model_4589c0* model)
     while (child != 0) {
         if ((child->flags & 0x20000) == 0) {
             int cminX = 0;
-            int cmaxX = 0;
             int cminY = 0;
+            int cmaxX = 0;
             int cmaxY = 0;
             ((Class_00458310*)this)->FUN_00458310(&cminX, &cmaxX, &cminY, &cmaxY,
                                                   child->model, 0, 0, 0);
             Owner_4589c0* owner = model->owner;
-            int py = child->y - owner->y;
-            int px = child->x - owner->x;
-            int pz = child->z - owner->z;
-            short ya = (short)(py >> 16);
-            short yb = (short)(pz >> 16);
-            int xoff = (short)(px >> 16);
-            int v = ((ya >> 1) * 0xffff + yb) << 16;
-            int yoff = (short)(v >> 16);
-            int t;
-            t = cminX + xoff;
-            if (t < minX) minX = t;
-            t = cmaxX + xoff;
-            if (t > maxX) maxX = t;
-            t = cminY + yoff;
-            if (t < minY) minY = t;
-            t = cmaxY + yoff;
-            if (t > maxY) maxY = t;
+            Fixed dx, dy, dz, sy, sz;
+            dx.value = child->x - owner->x;
+            dy.value = child->y - owner->y;
+            dz.value = child->z - owner->z;
+            sy = dy;
+            sz = dz;
+            int xoff = dx.whole;
+            int ya = (short)(sy.whole >> 1);
+            int yb = sz.whole;
+            int yoff = (short)(((ya << 16) - ya + yb) << 16);
+            if (cminX + xoff < minX) minX = cminX + xoff;
+            if (cmaxX + xoff > maxX) maxX = cmaxX + xoff;
+            if (cminY + yoff < minY) minY = cminY + yoff;
+            if (cmaxY + yoff > maxY) maxY = cmaxY + yoff;
         }
         child = child->next;
     }
-    Image_4589c0* bmp = src;
     int x1 = bmp->width - bmp->dx;
     int y1 = bmp->height - bmp->dy;
     int x0 = -bmp->dx;
     int y0 = -bmp->dy;
     if (minX < x0) x0 = minX;
-    if (x1 < maxX) x1 = maxX;
+    if (maxX > x1) x1 = maxX;
     if (minY < y0) y0 = minY;
-    if (y1 < maxY) y1 = maxY;
+    if (maxY > y1) y1 = maxY;
     int newW = x1 - x0;
     int newH = y1 - y0;
     this->bitmap->width = (unsigned short)newW;
     this->bitmap->height = (unsigned short)newH;
-    this->bitmap->dx = (short)(-x0);
-    this->bitmap->dy = (short)(-y0);
+    this->bitmap->dx = (short)x0;
+    this->bitmap->dy = (short)y0;
     this->bitmap->colour = bmp->colour;
     if (newW == bmp->width && newH == bmp->height) {
-        memcpy(this->bitmap->pixels, bmp->pixels, bmp->height * bmp->width);
-        memcpy(this->bitmap->shade, bmp->shade, bmp->height * bmp->width);
+        memcpy(this->bitmap->pixels, bmp->pixels, bmp->width * bmp->height);
+        memcpy(this->bitmap->shade, bmp->shade, bmp->width * bmp->height);
     } else {
-        short savedDx = bmp->dx;
-        short savedDy = bmp->dy;
+        short sdx = bmp->dx;
+        short sdy = bmp->dy;
         bmp->dx = 0;
         bmp->dy = 0;
         Surface_4589c0 surface;
@@ -173,19 +183,19 @@ void Class_00459200::FUN_004589c0(Image_4589c0* src, Model_4589c0* model)
         memset(this->bitmap->pixels, this->bitmap->colour,
                this->bitmap->height * this->bitmap->width);
         memset(this->bitmap->shade, 0, this->bitmap->height * this->bitmap->width);
-        int dx = this->bitmap->dx - savedDx;
-        int dy = this->bitmap->dy - savedDy;
-        FUN_004b7f90((Class_004c6ae0*)&surface, (Bitmap_4589c0*)bmp, dx, dy);
+        int ddx = this->bitmap->dx - sdx;
+        int ddy = this->bitmap->dy - sdy;
+        FUN_004b7f90((Class_004c6ae0*)&surface, (Bitmap_4589c0*)bmp, ddx, ddy);
         unsigned char* t = bmp->pixels;
         bmp->pixels = bmp->shade;
         bmp->shade = t;
         surface.bits = this->bitmap->shade;
-        FUN_004b7f90((Class_004c6ae0*)&surface, (Bitmap_4589c0*)bmp, dx, dy);
+        FUN_004b7f90((Class_004c6ae0*)&surface, (Bitmap_4589c0*)bmp, ddx, ddy);
         t = bmp->pixels;
         bmp->pixels = bmp->shade;
         bmp->shade = t;
-        bmp->dx = savedDx;
-        bmp->dy = savedDy;
+        bmp->dx = sdx;
+        bmp->dy = sdy;
     }
     ((Class_00458d30*)this)->FUN_00458dd0(this->bitmap, model);
 }
