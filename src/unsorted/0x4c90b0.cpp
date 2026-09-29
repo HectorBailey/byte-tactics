@@ -1,4 +1,34 @@
 // Decompiled by DeepSeek V4.1 Flash, finished by space-bunny-free. Names are provisional.
+// Claude Sonnet 5.5 pass (#624): compiler state ruled out (0 to 400 unused `extern
+// int` declarations in steps of 8: all 199 bytes and 93.4%, and none of the 128
+// header sets of headers.py gets past 93.4%). Scored without effect
+// on the +1 / +5 split (all 193 bytes and 86.1%, i.e. folded to one `lea ecx,
+// [ecx+edx+6]`, and without the `short` they are shorter than the original by the
+// separate `add eax, 5`): a `static inline int* AllocBlock(int len)` that does the
+// malloc(len + 5) and the `*block = 1` with `AllocBlock(n + m + 1)` at the call
+// (also `len + 4 + 1`), a named `int len = n + m + 1;`, `len = n + m; len++;`,
+// `len += m; len += 1;` and `len += 5; malloc(len)`. `int len = n ? n + m + 1 :
+// n + m + 1;` (or on m) does split it into `lea eax,[ecx+esi+1]` plus `add eax,5`,
+// but adds a `test; jne; lea eax,[ecx+1]` branch (201 to 203 bytes, 84.0 to 84.5%).
+// The arithmetic says the original allocates n + m + 6 bytes: one for the
+// terminator and five for `AllocBlock`-style header plus terminator again, as in
+// 0x4c9290 (`malloc(len + 5)` for len = strlen) and 0x4c91b0, so the caller passes
+// n + m + 1 to something that adds 5 and the compiler did not fold it. Note the
+// original also keeps other.ptr in esi from the very first instruction (`push esi`
+// before the emptiness test), which this file matches; only the sum, the position of
+// the n store and the register of the second strcpy destination differ.
+// space-bunny-free pass: convention checked and correct (thiscall, ret 4; malloc and
+// free are cdecl, add esp,4 after each, as declared). A member `static char* Alloc(int
+// len)` with `len + 4 + 1` and the call `Alloc(n + m + 1)` also folds (1 run, worse).
+// Reading of the two facts together (space-bunny-free, from the bytes, not yet
+// tested beyond the ternary above): the +1 and +5 stay apart in the original only
+// when `n + m + 1` is a value MSVC keeps as its own node. Every single-use spelling
+// folds; the one spelling that splits is the one that evaluates the same sum on two
+// paths, which makes it a shared subexpression the reassociator will not reopen.
+// So the original most likely uses `n + m + 1` twice, with the second use removed
+// by the optimiser or living in code this reconstruction lacks. Look for what else
+// could consume that sum (a length store, a bound check) before trying more
+// spellings of the allocation itself.
 // Append of the reference-counted string handle: concatenates other's
 // characters onto this handle's, allocating a new block whose first int is
 // the reference count, then releasing the old block. The handle points at the
