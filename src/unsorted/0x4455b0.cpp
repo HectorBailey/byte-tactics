@@ -20,6 +20,19 @@
 // produce the right SIB but change the loop strength reduction / register
 // allocation and drop to 76-82%. The jump-table entry address also shows as
 // <addr> in the diff, which is normal.
+//
+// Additional session notes (deepseek-v4.1-flash), all scored with --sym, none
+// moving the number: the raw-int forms `*(int*)(off + (char*)g_game)` (operand
+// order reversed, which flips the SIB to [ecx+eax] in a tiny isolated function)
+// fold back to [eax+ecx] once the surrounding block is present; a `char* pp =
+// off + (char*)g_game;` local; `*(int*)((char*)&g_game->players + off)`; and a
+// `Game*`/`char*` base local. Compiled minimal probes show MSVC 5's rule here
+// is that the SIB BASE is always the register holding the `off` variable and the
+// INDEX is the g_game register, i.e. `[offreg + ggamereg]`. The original's
+// `[ecx+eax]` has base = the g_game register and index = off, the opposite of
+// every spelling the compiler produces from any expression form tried. So this
+// is compiler state from earlier in the original source file, not a source
+// shape, and is not reachable from this translation unit alone.
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
