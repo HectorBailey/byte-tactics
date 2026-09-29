@@ -4,6 +4,43 @@ Things to resolve when the per-function files in `src/unsorted/` are merged
 into real classes and translation units. Agents name unknown classes after
 single addresses, so one real class often appears under several names.
 
+## The unit map
+
+`tools/unitmap.py` groups the matched members under `src/` into the classes
+they belong to and writes `data/units.json`. A unit is a class whose matched
+members are spread over more than one file in `src/unsorted/`, which is the
+state every class is in before consolidation. For each unit the map gives its
+members in address order, the file defining each, every file that declares the
+class, the union of the field ledgers those declarations give, and every offset
+where two of them disagree.
+
+```sh
+uv run tools/unitmap.py            # rewrite data/units.json
+uv run tools/unitmap.py --list     # the units, largest first
+uv run tools/unitmap.py --check    # fail if the map is stale
+```
+
+`tools/unitgen.py <unit>` reads the map and writes one candidate file under
+`build/units/`: the reference declaration (the file carrying the most fields)
+with the other views merged in, the union of the other files' includes and
+declarations, and every member's definition copied from the file that holds it,
+in address order. It never invents a line, and it prints the offsets in dispute
+and any base class it could not find.
+
+The candidate is the start of a unit, not a match. Merging changes the compiler
+state and the inline budget, so once the file compiles, every function it holds
+has to be re-checked:
+
+```sh
+uv run tools/check.py <address> build/units/<unit>.cpp
+```
+
+Where two declarations disagree, the generator picks the more specific type and
+says so; that choice is a hypothesis until the checker agrees. Regenerate the
+map after each merge. A disagreement the generator cannot settle from the code
+(for example a field one file reads as an `int` and another indexes as a
+pointer) is a decision for the reviewer, not for the tool.
+
 ## Classes to merge
 
 - `Class_0044cf60` and `Class_0044d010`: both constructors store vtable
