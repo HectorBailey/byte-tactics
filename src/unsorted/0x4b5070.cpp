@@ -4,39 +4,37 @@
 // HKLM\Software\Microsoft\DirectX (the "InstalledVersion" DWORD on NT, the
 // "Version" string on Win9x), and compares the result with the wanted version.
 //
-// NOT MATCHING YET (43.7% by true LCS over instructions, 606 of 619 bytes).
-// What still differs, largest cause first:
+// NOT MATCHING YET (53.7%, 606 of 619 bytes). What still differs, largest
+// cause first:
 //
 // 1. THE FRAME IS 0xD0, THE ORIGINAL'S IS 0xCC, so every [esp+X] in the body
-//    is 4 bytes high and the five argument slots land at +4. The original's
-//    local area (0x10..0xdb) is exactly full with six dwords (0x10..0x24),
-//    the 30-byte version buffer (0x28) and OSVERSIONINFOA (0x48), and it
-//    shares slots pairwise: {dwMaj, hKey}, {dwMin, size30}, {lib, size4}.
-//    This source instead gives dwMaj, dwMin and hKey a slot each (7 dwords),
-//    so it needs one dword more. Moving dwMaj/dwMin/hKey/type into their
-//    blocks does make MSVC share {dwMaj, hKey}, but then isNT shares with
-//    type and a spill slot for minlo appears, and the score drops (27%).
-// 2. REGISTER ROLES. The original holds the four version values in
-//    ebx=majhi, ebp=majlo, edi=minhi, esi=minlo and keeps isNT, lib and
-//    status in memory. Here lib is register-allocated, isNT lives in ebp and
-//    one version value is spilled, which shifts every later choice. The
-//    source order of the four assignments is the only lever found: all 24
-//    permutations were scored, and (majhi, majlo, minlo, minhi) is the best
-//    of them at 43.7%; (majhi, majlo, minhi, minlo) gives 32.9% and
-//    (majhi, minhi, majlo, minlo) 26.9%.
-// 3. THE ZEROING OF THE FIRST 16 BYTES OF THE version BUFFER. Both failure
-//    exits (0x4b52ba) store 0 to [esp+0x28], [esp+0x2c], [esp+0x30] and
-//    [esp+0x34] from one zeroed register, interleaved with the pops, which is
-//    exactly how MSVC 5 expands memset(buf, 0, 16) (verified on a throwaway
-//    function: one zeroed register, four dword stores). The fallback path
-//    stores 0 to [esp+0x2c] alone, one dword into that same buffer. Nothing
-//    in this source writes there, so the original's source still has a
-//    variable or a memset that has not been identified. Not yet tried:
-//    a 16-byte memset on each failure exit, and a DWORD[4] at that offset.
+//    is 4 bytes high. The original's local area is exactly full: six dwords at
+//    0x10..0x24, the 30-byte version buffer at 0x28 and OSVERSIONINFOA at 0x48
+//    (0x94 bytes, ending exactly at 0xdb). It shares slots three ways
+//    (dwMaj/hKey, dwMin/size30, lib/size4). This source needs seven dwords:
+//    the two size variables cannot be folded onto dwMaj, dwMin and lib even
+//    when they are block scoped in the !status block and hKey is moved into
+//    it, which is what variant f does. Declaring one `DWORD size` for both
+//    arms, or two, makes no difference to the generated code.
+// 2. REGISTER ROLES. The original holds ebx=majhi, ebp=majlo, edi=minhi,
+//    esi=minlo, and keeps isNT, err, lib and status in memory; here lib is
+//    register allocated and the four values land in esi=ebx=edi=ebp in a
+//    different order. All four orderings of the four assignments were scored
+//    on top of variant f: the one used here (majhi, majlo, minlo, minhi) is
+//    the best at 53.7%; (majhi, minhi, majlo, minlo) gives 34.9% and
+//    (majhi, majlo, minhi, minlo) 33.9%.
+// 3. THE ZEROING OF THE version BUFFER ON THE TWO FAILURE EXITS. Both
+//    failures (0x4b52ba) store 0 to [esp+0x28]..[esp+0x34] from one zeroed
+//    register, interleaved with the pops, which is exactly how MSVC 5 expands
+//    memset(buf, 0, 16) (one zeroed register, four dword stores). The same
+//    block is also entered from the RegQueryValueExA failure, so the two exits
+//    share it. Duplicating `memset(version, 0, 16); return 0;` into both arms
+//    of the source scores 51.0%, so the spelling is close but not right, and
+//    the 4-byte zero of [esp+0x2c] at 0x4b510a (version[4]) is unexplained.
 // 4. Small shapes: the original tests the LoadLibrary result with `test eax,
-//    eax` and only then stores it (here ebp holds the handle across both
-//    calls), and it compares call results against a zero register (`cmp eax,
-//    ebp`, `cmp eax, eap`) where this source emits `test eax, eax`.
+//    eax` and only then stores it, and compares call results against a zero
+//    register (`cmp eax, ebp`, `cmp eax, ecx`) where this source sometimes
+//    emits `test eax, eax`.
 //
 // Two things in the original look like Cavedog's own bugs, kept here as they
 // are: the "installed version is older" arm at 0x4b5233 compares the major
@@ -63,7 +61,6 @@ int __stdcall FUN_004b5070(int want0, int want1, int want2, int want3, int want4
     DWORD dwMaj;
     DWORD dwMin;
     OSVERSIONINFOA osvi;
-    HKEY hKey;
     LONG err;
     DWORD type;
     char version[30];
@@ -86,6 +83,9 @@ int __stdcall FUN_004b5070(int want0, int want1, int want2, int want3, int want4
         FreeLibrary(lib);
     }
     if (!status) {
+        HKEY hKey;
+        DWORD size4 = 4;
+        DWORD size30 = 30;
         majhi = minhi = minlo = 0;
         isNT = 0;
         osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
@@ -96,11 +96,9 @@ int __stdcall FUN_004b5070(int want0, int want1, int want2, int want3, int want4
         if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\DirectX", 0, KEY_READ, &hKey) == 0) {
             status = 0;
             if (isNT) {
-                DWORD size = 4;
-                err = RegQueryValueExA(hKey, "InstalledVersion", 0, &type, (LPBYTE)&status, &size);
+                err = RegQueryValueExA(hKey, "InstalledVersion", 0, &type, (LPBYTE)&status, &size4);
             } else {
-                DWORD size = 30;
-                err = RegQueryValueExA(hKey, "Version", 0, &type, (LPBYTE)version, &size);
+                err = RegQueryValueExA(hKey, "Version", 0, &type, (LPBYTE)version, &size30);
             }
             RegCloseKey(hKey);
             if (err) {

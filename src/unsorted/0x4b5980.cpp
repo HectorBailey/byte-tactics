@@ -1,4 +1,33 @@
-// Decompiled by space-bunny-free. Names are provisional.
+// Decompiled by space-bunny-free, finished by muse-spark-1.3-free. Names are provisional.
+// Brings the application up: reads the work area and the physical memory
+// size, resets the frame timer, the mouse-event queue and the video-mode
+// struct, runs the five per-object initialisers selected by the flag word at
+// +0xf0, then, when the GDI bit is set, registers the window class, creates
+// and shows the main window and asks for the display mode. Returns 1 on
+// success; on failure it tears the GDI objects down again, shows the
+// "Environment Initialization Failed" box and returns 0.
+//
+// 75.7%, 820 of 820 bytes (size exact). Fixes since the 71.5% version:
+// removed a spurious early `d->unknown_80 = 0` (the original only zeroes
+// +0x80 in the GDI block, and the extra store shifted the videoFlags load),
+// and GetStockObject takes BLACK_BRUSH (4), not WHITE_BRUSH (0).
+//
+// What is still different, all downstream of one allocation decision:
+// the width local lands in ecx spilled through [esp+0x4c] instead of edi,
+// so the height spill, the five flag-test byte registers (dl/al/cl/dx/al
+// here vs cl/dl/al/cx/dl there), the hoisted `lea edi, [esi+0x18]`
+// WNDCLASSA base (original addresses wc through esi and recomputes the
+// address just for RegisterClassA), the mode-copy pointer roles, the menuId
+// zero extension (ecx here, eax there), the ATOM kept in ax and tested with
+// `cmp ax, bx` (original stores the zero-extended word to [esp+0x4c] and
+// tests the `and` flags), the CreateWindowExA reload of w from the stack,
+// and the tail `test eax, eax` (original `cmp eax, ebx`). Tried without
+// effect: both w/h load orders, both store orders, loads before items and
+// flags, items after the loads, stores before items and flags, unsigned
+// w/h, `int cls`, mode copy before the zero stores, `value &= 0xf7ff` for
+// the bit 11 clear. A single long-lived local always takes ebp and the
+// second always spills, whatever the order, so edi stays reserved for the
+// wc base; the original must reach width through a tree that pins edi first.
 // Brings the application up: reads the work area and the physical memory
 // size, resets the frame timer, the mouse-event queue and the video-mode
 // struct, runs the five per-object initialisers selected by the flag word at

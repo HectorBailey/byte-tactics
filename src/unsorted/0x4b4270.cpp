@@ -1,13 +1,56 @@
 // Decompiled by space-bunny-free. Names are provisional.
-// NOT MATCHING YET: 46.0%. The frame size (0x42c) and the sprintf buffer at
-// +0x54 are right, but MSVC 5 gives my locals slots at +0x20 (end), +0x24
-// (base) and puts the section header at +0x28, where the original has end at
-// +0x1c, base at +0x18, the walk pointer at +0x20 and the header at +0x24.
-// It also spends two extra home slots below the header, so every header field
-// read is 4 bytes high, and it keeps arg1 in edi where the original keeps it
-// in ebx and loads arg2 into edi only after the header read. Left as is: the
-// remaining diffs are one allocation state (the home slots of the five
-// memory-resident locals), not four independent problems.
+// NOT MATCHING YET: 46.0% (753 bytes against 737). LEFT AS ONE ALLOCATION
+// STATE, not four problems.
+//
+// Frame layout of the ORIGINAL, read straight off the disassembly (all offsets
+// are from E0 = esp right after "sub esp,0x42c" plus the four register
+// pushes, so a "[esp+X]" in the body is E0+X-0x10):
+//   E0+0x00 buf        (0x4b4324, 0x4b436d store; 0x4b438d, 0x4b447f load)
+//   E0+0x04 len        (0x4b42eb), REUSED by the blob loop counter i
+//                      (0x4b4411 stores 0, 0x4b4510/0x4b451b read+write it)
+//   E0+0x08 base       (0x4b4293 stores it, 0x4b4476 loads it)
+//   E0+0x0c end        (0x4b42b2 stores it, 0x4b4525 loads it)
+//   E0+0x10 p, the record walk pointer (0x4b442a/0x4b4433)
+//   E0+0x14 the 0x2c-byte section header (0x4b428b lea; size +0, strOffset
+//                      +4, nInts +8, nDoubles +0xc, nStrings +0x10, nBlobs
+//                      +0x14, compressed +0x18, so four unused ints follow)
+//   E0+0x40 reclen     (0x4b4446 stores it, 0x4b4465/0x4b44c4 load it)
+//   E0+0x40 the 0x3ec-byte sprintf buffer (0x4b433e and 0x4b4350 both lea
+//                      E0+0x40, and 0x40+0x3ec == 0x42c == the frame size)
+// reclen and the sprintf buffer SHARE one slot, so the frame is exactly 0x42c
+// only if the two scopes' slots are shared, and the header must be 0x2c bytes.
+//
+// What my version gets wrong: it spends ONE extra home slot at E0+0x0c, so
+// end lands at +0x10, p at +0x14 and the header at +0x18, and every header
+// field read is 4 bytes high from there on. It also keeps arg1 in edi where
+// the original keeps it in ebx (and puts this in ebx), and reloads arg2 from
+// the stack in four places where the original holds it in edi from 0x4b42a7
+// to the end. The four scattered diffs in the loop tail are the same state:
+// the original's ebx holds the walked entry pointer from 0x4b44a1 to 0x4b44e6
+// (so e->size is read BEFORE the lea, and e->len is re-read after memcpy),
+// while mine materialises `e` as a statement first, so the reads happen after.
+//
+// Two spellings of the last store inside the blob loop are still unmatched.
+// The original: "test ecx,ecx / jge / mov edx,ecx / mov [eax+0xc],edx", i.e.
+// a real branch reusing the edx that memcpy already zeroed. Mine compiles
+// "e->size < 0 ? e->size : 0" to "setge dl / dec edx / and ecx,edx", which is
+// the if-converted form; an if/else spelling was not tried.
+//
+// TRIED AND REJECTED (do not repeat):
+//  * No local `e` at all: spell the whole
+//    table->slots[table->index].entries[table->slots[...].current] walk out at
+//    every use, the way the original's two re-walks (0x4b4462 and 0x4b44e9)
+//    suggest. 36.0% and 860 bytes: MSVC 5 does not CSE the four uses, so the
+//    body explodes. The repeated expression is what the compiler produces from
+//    ONE local pointer, not what it produces from four copies.
+//  * Keeping the local `e` but writing only the LAST store as the full
+//    expression, and `++i < nBlobs` instead of `i++; ... i < nBlobs`: exactly
+//    46.0%, same 753 bytes, instruction for instruction the same diff. The
+//    repeated expression is free here, so the last store's spelling is not the
+//    cause of the setge there.
+//  * `Header_004b4270` grown from 0x28 to the 0x2c the original needs: the
+//    frame went to 0x430 and no offset improved, because the extra slot at
+//    +0x0c is charged ahead of the locals, not inside the header.
 // Reads one 0x20-byte section header out of a HapiBank archive (FUN_004b4270
 // is called in a loop by 0x4b3770) and, when the caller's name matches the
 // section name, unpacks the section body and files its records away in the
