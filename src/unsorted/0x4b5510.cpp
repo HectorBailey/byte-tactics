@@ -65,7 +65,7 @@ struct Display_004b5510 {
 extern LONG DAT_0052a4e8;
 extern LONG DAT_0052a4ec;
 extern HANDLE DAT_0052a4f0;
-extern Display_004b5510* DAT_0051fbd0;
+extern Display_004b5510 *DAT_0051fbd0;
 
 int __stdcall FUN_0049f710(int guid, void* display, int zero);
 void __stdcall FUN_004b4ff0(Display_004b5510* d);
@@ -189,8 +189,7 @@ int __stdcall FUN_004b5510(int mode)
         FUN_004c6a60(&d->unknown_50[0], DAT_0051fbd0->width, DAT_0051fbd0->height,
                      (DAT_0051fbd0->width + 3) & ~3, (int)bits);
         SelectObject(d->dc, d->dib);
-        SetWindowPos(d->hwnd, HWND_NOTOPMOST, 0, 0, 0, 0,
-                     SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+        SetWindowPos(d->hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
     }
 
     FUN_004ba200(DAT_0051fbd0->entries, 0, 0x100);
