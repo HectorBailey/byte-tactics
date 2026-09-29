@@ -1,6 +1,17 @@
 // Decompiled by GPT-6. Names are provisional.
 // Partial (99.5%): the move opcode uses different temporary stack slots,
 // and opcode 0x10059000 reverses the XOR operand registers. Size is exact.
+// Still open, and what did NOT fix it:
+//  - 0x10059000 wants the FIRST pop in the xor accumulator (ecx), the plain
+//    0x10037000 wants the second. Tried and all gave the second: `a ^ Pop()`,
+//    `Pop() ^ Pop()`, `b ^ a` and `a ^= Pop()`. The accumulator is always the
+//    last pop, so the original's 0x10059000 is probably not two Pop() calls
+//    written the way the others are.
+//  - 0x10001000 wants (19*piece+axis)*4+4 in frame slot esp0+0x1c and the
+//    `pieces` pointer in esp0+0x10; we get them the other way round. `Piece *p`
+//    before or after the two pops, dropping `p`, and `pieces` in both places
+//    all reproduce the same two slots. The frame has 8 dword locals at
+//    esp0+0x00..0x1c plus the 4 dword `arguments` array at esp0+0x20.
 #include <stdlib.h>
 
 struct ScriptTable
