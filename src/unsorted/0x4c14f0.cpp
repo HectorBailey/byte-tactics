@@ -1,4 +1,4 @@
-// Decompiled by Sonnet 5.5, finished by space-bunny-free. Names are provisional.
+// Decompiled by Sonnet 5.5, finished by space-bunny-free, finished by muse-spark-1.3-free. Names are provisional.
 // Draws `text` (a bitmap font string ended by NUL or newline) at x, y into
 // `dst`, or into the locked screen when `dst` is null. When `maxWidth` is not
 // -1 and the text is wider, a copy is cut back one character at a time until
@@ -7,13 +7,22 @@
 // which takes the surface's pixels and pitch, the font, the text, the
 // position and the display's three colour fields at +0x208, +0x20c, +0x210.
 //
-// NOT MATCHED: 60.6%, 632 of 617 bytes. The control flow, the inlined width
-// helper (as in 0x4c1830.cpp), the truncation loop and the two draw paths
-// follow the original. What still differs is one register-allocation decision:
-// the original keeps the `text` parameter in ebp with a SEPARATE esi induction
-// variable and leaves the game pointer in a stack slot at [esp+0x10], while
-// here the loop pointer is the parameter itself in esi and the game pointer
-// takes ebp. Every remaining diff follows from that.
+// NOT MATCHED: 65.0%, 607 of 617 bytes (free scratch score, 1 real run).
+// What moved it from 59.6%: a long-lived `t = text` local used for every text
+// use (width calls, strncpy, draw) spills the game pointer to its stack slot
+// at [esp+0x10] as in the original, instead of keeping game in ebp; the
+// truncation loop as `while (1)` with two breaks plus a `len` local gives the
+// original's store-before-compare order and removes a duplicated head; the
+// width helper increments its parameter as in 0x4c1830.cpp.
+// What still differs, all one allocation decision: the original keeps the
+// text base in ebp and the width accumulator in edi, with a separate esi
+// walker; here text is in edi and width in ebp, so the spill slots come out
+// as t at +0x10 with game at +0x14 (original: game at +0x10, char temp at
+// +0x14) and the frame is 0x188 not 0x184.
+// Tried and did NOT move it: sibling-exact helper alone, indexed loop,
+// while-loop helper, helper taking game, GetFont accessor, extra xx local,
+// width declared first, game assigned before/after t. The width/text swap
+// survived all of them, so it needs a new lever, not more weight tuning.
 #include <string.h>
 
 struct Font_004c14f0 {
@@ -58,10 +67,9 @@ void __cdecl FUN_004ccf60(unsigned char* pixels, int pitch, Font_004c14f0* font,
 static inline int WidthText(Font_004c14f0* font, unsigned char* text)
 {
     int width = 0;
-    unsigned char* p = text;
-    if (p && font) {
-        for (; *p && *p != '\n'; p++) {
-            unsigned char c = *p;
+    if (text && font) {
+        for (; *text && *text != '\n'; text++) {
+            unsigned char c = *text;
             if (c >= font->first) {
                 int d = c - font->first;
                 unsigned int off = 0;
@@ -78,20 +86,23 @@ static inline int WidthText(Font_004c14f0* font, unsigned char* text)
 void __stdcall FUN_004c14f0(Class_004c6ae0* dst, unsigned char* text, int x, int y, int maxWidth)
 {
     Game_004c14f0* game = FUN_004b6220();
-    int width = WidthText(game->font, text);
-    if (text == 0) width = 0;
+    unsigned char* t = text;
+    int width = WidthText(game->font, t);
     if (maxWidth != -1 && width > maxWidth) {
         unsigned char buf[0x12c];
-        strncpy((char*)buf, (char*)text, 0x12b);
-        text = buf;
-        unsigned char* end = buf + strlen((char*)buf) - 1;
-        do {
+        strncpy((char*)buf, (char*)t, 0x12b);
+        int len = strlen((char*)buf);
+        t = buf;
+        unsigned char* end = buf + len - 1;
+        while (1) {
             *end = 0;
             if (end == buf)
                 break;
             end--;
-            width = WidthText(game->font, buf);
-        } while (width > maxWidth);
+            width = WidthText(game->font, t);
+            if (width <= maxWidth)
+                break;
+        }
     }
     Rect_004c14f0 r;
     r.left = x;
@@ -104,7 +115,7 @@ void __stdcall FUN_004c14f0(Class_004c6ae0* dst, unsigned char* text, int x, int
             Rect_004c14f0 clip;
             screen.FUN_004c6ae0(&clip);
             if (FUN_004b6750(&r, &clip))
-                FUN_004ccf60(screen.pixels, screen.pitch, game->font, text, x, y, game->colour1,
+                FUN_004ccf60(screen.pixels, screen.pitch, game->font, t, x, y, game->colour1,
                              game->colour2, game->colour3);
             FUN_004c5fa0(&screen);
         }
@@ -112,7 +123,7 @@ void __stdcall FUN_004c14f0(Class_004c6ae0* dst, unsigned char* text, int x, int
         Rect_004c14f0 clip;
         dst->FUN_004c6ae0(&clip);
         if (FUN_004b6750(&r, &clip))
-            FUN_004ccf60(dst->pixels, dst->pitch, game->font, text, x, y, game->colour1,
+            FUN_004ccf60(dst->pixels, dst->pitch, game->font, t, x, y, game->colour1,
                          game->colour2, game->colour3);
     }
 }
