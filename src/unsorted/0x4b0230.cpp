@@ -12,28 +12,51 @@
 // edges. The colours are the object's bytes at +0x8b2 (dark), +0x8c3 (light)
 // and +0x8c6 (fill).
 //
-// NOT MATCHED (check.py 24.6%, 627 of 631 bytes).  What is still different:
-// 1. The first call's argument registers.  The original hoists argument 2 into
-//    edx and &rect into ecx before the prologue's register saves; every source
-//    shape and type tried here (unsigned/short index, void* callee parameter,
-//    int[4] rect, and the declaration order of the block's locals, which makes
-//    no difference at all) puts &rect in eax and the GAF entries in edx, which
-//    then makes the whole function's register numbering rotate by one: the
-//    three colour arguments, which the original loads into eax/ecx/edx, come
-//    out in ecx/edx/eax, and bmp ends up in edi instead of ebx.
-// 2. The five local slots below the rect.  This file gets row 0x10, x0 0x14,
-//    h 0x18, ypos 0x1c, height 0x20; the original has row 0x10, x0 0x14,
-//    ypos 0x18, height 0x1c, h 0x20, so only the last three are permuted.  In
-//    the original the slots ascend in the order the code touches them (row and
-//    x0 and ypos in the inner loop, then height and h in the loop latch, which
-//    loads height before h; this file loads h before height there).  The two
-//    dead argument homes (arg1 then arg2) hold y0 then the y counter: reusing
-//    the dead `index` parameter as the y counter is what puts y0 in arg1's slot
-//    and the counter in arg2's, and that part matches.
+// NOT MATCHED (check.py 24.6%, 627 of 631 bytes; 232 instructions against the
+// original's 232).  The body is structurally complete: every block of the
+// original is present here.  The whole function is off by a one-register
+// rotation that starts at the very first call and propagates everywhere, so
+// fixing the head is worth far more than any later block.
+//
+// 1. THE HEAD (0x4b0233 and 0x4b0237) is the blocker, and it resisted every
+//    source shape tried.  The original evaluates the three arguments of
+//    FUN_004a15c0 in the order arg2, arg3, arg1 and gives them edx, ecx and
+//    then eax/edi:
+//        mov edx, [esp+0x2c]   ; arg2, hoisted before the register saves
+//        lea ecx, [esp+0x14]   ; &rect
+//        push ebx / push ebp / push esi
+//        mov esi, [esp+0x34]   ; arg1
+//        push edi
+//        push ecx              ; &rect
+//        mov eax, [esi+0x18]
+//        push edx              ; arg2
+//        mov edi, [eax+4]      ; entries
+//        push edi
+//        call
+//    This file instead starts `lea eax, [esp+0x14]`, then puts arg2 in ebx
+//    (a saved register, loaded after the first push) and the GAF entries in
+//    ecx/edx.  Because ebx is taken at the top, the callee-saved registers
+//    rotate: bmp ends up in edi instead of ebx, and the three colour arguments
+//    (eax/ecx/edx in the original) come out as ecx/edx/eax.  Spelling arg2 as
+//    unsigned/short/long, passing &rect as a reference or through a pointer
+//    local, giving the callee a void*/Rect& first parameter, hoisting
+//    obj->holder->entries into a local or a static inline getter, moving the
+//    surface or the cell fetch above the first call, and reordering the local
+//    declarations were all tried; none changes the head, and `#include
+//    <windows.h>` changes nothing here.  Note this is NOT a missing include:
+//    the file has no window types and the head bytes are a pure allocation
+//    choice.  The wanted shape is "arg2 into a volatile register, then &rect
+//    into another, and only then walk the entries chain", so the allocator
+//    must not have reserved ebx before the call.
+// 2. The five local slots below the rect are permuted: the original has
+//    row 0x10, x0 0x14, ypos 0x18, height 0x1c, h 0x20 (ascending in the order
+//    the code touches them, the loop latch loading height before h); this file
+//    loads h before height there.  Note this offset is measured with esp after
+//    the four register saves, so 0x10 is the first slot under the rect.
 // 3. The row index `(y >= height - h + 1) ? 6 : 3` compiles here to
 //    setl/dec/and 3/add 3 (the same value, opposite polarity).  The original
-//    emits setge/dec/and 0xfffffffd/add 6.  Neither the ?: nor a nested
-//    if/else, nor a chained else-if, nor the two-ternary spelling produced it.
+//    emits setge/dec/and 0xfffffffd/add 6.  The ?:, a nested if/else, a
+//    chained else-if and a hoisted `last` local were all tried; none flips it.
 // 4. At the top of the 3x3 block the original pushes both arguments of
 //    FUN_004b7f30 before the branch to the single-child case, this file pushes
 //    one before and one after.
@@ -42,6 +65,11 @@
 // store, but the original reloads x0 from its slot in every iteration and adds
 // x (the only stores to that slot are in the set-up block), so the accumulating
 // form draws the last column in the wrong place and is not what the exe does.
+// Also rejected: a separate `y` local instead of reusing the dead `index`
+// parameter as the y counter.  It matches the same 24.6% and 627 bytes, so it
+// is not an improvement, but it is the more faithful reading of the original
+// (which reloads arg2 from its stack home at 0x4b0392 rather than keeping it
+// in a register), so it is what this file uses.
 
 struct Rect_004b0230 {
     int x0;                          // +0x0
@@ -137,14 +165,8 @@ void __stdcall FUN_004b0230(Object_004b0230* obj, int index, Bits_004b0230* bmp)
         FUN_004b0160(surface, &rect, obj->dark, obj->light, obj->fill);
     } else if (bmp->count > 1) {
         Pic_004b0230* sub = FUN_004b7f30(bmp, 0);
-        int w = sub->width;
-        int h = sub->height;
-        int height;
-        int ypos;
-        int x0;
-        int row;
-        int y0;
-        int width;
+        int w = sub->width, h = sub->height;
+        int height, ypos, x0, row, y0, width, y;
         if (index != 0) {
             y0 = rect.y0;
             x0 = rect.x0;
@@ -154,15 +176,15 @@ void __stdcall FUN_004b0230(Object_004b0230* obj, int index, Bits_004b0230* bmp)
         }
         height = rect.y1 - rect.y0 + 1;
         width = rect.x1 - rect.x0 + 1;
-        index = 0;
-        while (index < height) {
-            if (index != 0)
-                row = (index >= height - h + 1) ? 6 : 3;
+        y = 0;
+        while (y < height) {
+            if (y != 0)
+                row = (y >= height - h + 1) ? 6 : 3;
             else
                 row = 0;
-            if (index + h > height)
-                index = height - h;
-            ypos = y0 + index;
+            if (y + h > height)
+                y = height - h;
+            ypos = y0 + y;
             for (int x = 0; x < width; x += w) {
                 int col;
                 if (x + w >= width) {
@@ -174,7 +196,7 @@ void __stdcall FUN_004b0230(Object_004b0230* obj, int index, Bits_004b0230* bmp)
                 Pic_004b0230* tile = FUN_004b7f30(bmp, row + col);
                 FUN_004b7f90(surface, tile, x0 + x, ypos);
             }
-            index += h;
+            y += h;
         }
     } else {
         FUN_004b7f90(surface, FUN_004b7f30(bmp, 0), 0, 0);

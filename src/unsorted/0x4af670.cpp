@@ -1,27 +1,38 @@
+// Decompiled by space-bunny-free. Names are provisional.
+//
 // Click handler of the file requester (FILEREQ.GUI, opened by 0x4afa30).
 // On close (field_60 == -1) it restores the saved drive and directory and
 // frees the request data. Otherwise it acts on the entry the user clicked:
 // LOAD/SWIN enter a directory, CANC accepts, NAME takes the highlighted file,
 // PATH walks one level up and the *DRV entries pick a drive letter.
 //
-// 90% (check.py). Everything matches up to the PATH branch except the SIB
-// base/index of its two stores and the compare, and the LOAD/SWIN block
-// differs only in register allocation:
-//   - original parks the tail pointer in edi, mine in esi (both reuse esi,
-//     which held the entries pointer, inside this block);
-//   - because of that, mine hoists the destination expression
-//     `cwd + strlen(cwd) - 1` above the source's strlen and spills it to
-//     [esp+0x20], where the original evaluates it after the source strlen,
-//     parks the length in ebx (clobbering the saved parameter, restored at
-//     0x4af9e3) and reaches `dec edi`;
-//   - the one padding byte MSVC puts before the `repne scasb` in the else
-//     block and the slot of the ebx restore inside it follow from those.
-// Twenty source shapes (declaration order and scope of `name`, `i`, `tail`,
-// register, a ternary instead of tail++, the two strlen calls hoisted into
-// temporaries, `&cwd[i]`, `strcat`, a local `char*` for cwd, the branches
-// swapped) all compile to the same 115 differing instructions, so this looks
-// like a register-priority tie rather than a wrong type or argument.
-// Decompiled by space-bunny-free. Names are provisional.
+// 99.1% (check.py), 945 bytes, exactly the original's size. Only three
+// instructions differ, all in the PATH branch, and only in the SIB byte: the
+// original wants the frame-pointer register in the BASE slot, ours puts it in
+// the INDEX slot.
+//   0x4af749  cmp byte ptr [ebp+ecx*1+0x23], 0x3a   (ours [ecx+ebp*1+0x23])
+//   0x4af751  mov byte ptr [ebp+ecx*1+0x25], 0      (ours [ecx+ebp*1+0x25])
+//   0x4af761  mov byte ptr [ebp+ecx*1+0x24], 0      (ours [ecx+ebp*1+0x24])
+// The address is `req->cwd[n-1]`, `req->cwd[n+1]` and `req->cwd[n]` with `req`
+// in ebp and `n` in ecx, so both spellings compute the same address. The loop
+// test two instructions earlier (0x4af739, `req->cwd[n]`) matches: there the
+// compiler reuses the `lea edx,[ebp+0x24]` value, so edx is the base and ecx
+// the index. So the shape is right and only combine()'s choice of base and
+// index differs. Untried: about 60 source spellings of the three statements
+// (array subscript, byte-offset casts, `&req->cwd[n] +- 1`, a `char* p =
+// req->cwd + n` with p[-1]/p[1]/p[0], an if/else and a ternary for the tail,
+// unsigned indices, every declaration order and scope for `n`, `i`, `name`,
+// `entries`, `drive` and `result`) and all 768 header sets headers.py tried
+// (the 128 common ones, and those crossed with <string>, <vector>, <map>,
+// <list> and <iostream>) all produce the same 3 bytes.
+//
+// What did fix the rest (was 90%): the LOAD/SWIN block needs no `tail` local
+// at all. `strcpy(req->cwd + strlen(req->cwd) - 1, tail)` made the compiler
+// hoist the destination above the source scan and spill it; writing the append
+// as the two `strcat` calls of the `strlen(cwd) == 3` test instead
+// (`strcat(req->cwd, req->selected + 1)` / `strcat(req->cwd, req->selected)`)
+// reproduces the original's `dec edi` destination, its ebx length park and its
+// edi tail pointer exactly, with no spill and no extra move.
 #include <string.h>
 
 #pragma pack(push, 1)
@@ -101,11 +112,11 @@ void __stdcall FUN_004af670(Gadget_004af670* gadget)
                     break;
                 }
             }
-            char* tail = req->selected;
             if ((int)strlen(req->cwd) == 3) {
-                tail++;
+                strcat(req->cwd, req->selected + 1);
+            } else {
+                strcat(req->cwd, req->selected);
             }
-            strcpy(req->cwd + (int)strlen(req->cwd) - 1, tail);
             FUN_004bc360(req->cwd);
         } else {
             result = 1;
