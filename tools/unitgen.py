@@ -1,4 +1,4 @@
-"""Emit one merged unit source from data/units.json and the files in src/.
+"""Emit one merged unit source from the unit map and the files in src/.
 
     uv run tools/unitgen.py Class_004b0610
     uv run tools/unitgen.py Class_004b0610 -o build/units/Class_004b0610.cpp
@@ -31,13 +31,12 @@ Writes under build/ by default, which git ignores.
 """
 
 import argparse
-import json
 import re
 from pathlib import Path
 
 from check import ROOT
+from unitmap import build
 
-UNITS = ROOT / "data/units.json"
 ANNOTATION = re.compile(r"^\s*//\s*FUNCTION:\s*(0x[0-9a-fA-F]+)")
 BLOCK = re.compile(r"^\s*(struct|class|union|enum)\s+([A-Za-z_]\w*)\s*(:[^{;]*)?\s*\{")
 FORWARD = re.compile(r"^\s*(struct|class|union|enum)\s+([A-Za-z_]\w*)\s*;\s*$")
@@ -509,12 +508,10 @@ def main() -> None:
     ap.add_argument("-o", "--output", type=Path)
     args = ap.parse_args()
 
-    if not UNITS.exists():
-        raise SystemExit("data/units.json missing, run: uv run tools/unitmap.py")
-    units = json.loads(UNITS.read_text())["units"]
+    units = build()["units"]
     if args.unit not in units:
         near = [u for u in units if args.unit.lower() in u.lower()][:5]
-        raise SystemExit(f"no unit {args.unit!r} in data/units.json"
+        raise SystemExit(f"no unit {args.unit!r} in the map"
                          + (f", did you mean: {', '.join(near)}" if near else ""))
     entry = units[args.unit]
 

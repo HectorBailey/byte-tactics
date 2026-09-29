@@ -1,7 +1,6 @@
 """Group the matched members under src/ into the units they belong to.
 
-    uv run tools/unitmap.py            # rewrite data/units.json
-    uv run tools/unitmap.py --check    # exit 1 if data/units.json is stale
+    uv run tools/unitmap.py            # write build/units.json and summarise
     uv run tools/unitmap.py --list     # print the units, largest first
     uv run tools/unitmap.py --at 0x4b1000   # the unit nearest an address
 
@@ -19,21 +18,23 @@ records for each one:
 
 Nothing here is a decision: a disagreement is reported, not resolved.
 
-Writes data/units.json, which tools/unitgen.py reads.
+The map is built fresh from data/progress.csv and src/ on every run, so it is
+never out of date. build() is the entry point tools/unitgen.py and the two
+lookup modes use; the default mode also writes build/units.json, which git
+ignores, for inspection.
 """
 
 import argparse
 import csv
 import json
 import re
-import sys
 from pathlib import Path
 
 from check import ROOT, base_name
 
 PROGRESS = ROOT / "data/progress.csv"
 SYMBOLS = ROOT / "data/symbols.csv"
-UNITS = ROOT / "data/units.json"
+UNITS = ROOT / "build/units.json"
 
 ANNOTATION = re.compile(r"^\s*//\s*FUNCTION:")
 BLOCK = re.compile(r"^\s*(struct|class|union|enum)\s+([A-Za-z_]\w*)\s*(:[^{;]*)?\s*\{")
@@ -250,22 +251,20 @@ def report(unit: str, member: dict | None, e: dict) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--check", action="store_true", help="exit 1 if data/units.json is not current")
     ap.add_argument("--list", action="store_true", help="print the units, largest first")
     ap.add_argument("--at", metavar="ADDR",
                     help="print the unit a matched address belongs to, or the nearest one")
     args = ap.parse_args()
 
-    text = json.dumps(build(), indent=1, sort_keys=True) + "\n"
+    units = build()["units"]
     if args.at:
         try:
             addr = int(args.at, 16)
         except ValueError:
             raise SystemExit(f"--at wants a hex address, not {args.at!r}")
-        at(addr, json.loads(text)["units"])
+        at(addr, units)
         return
     if args.list:
-        units = json.loads(text)["units"]
         for u in sorted(units.values(), key=lambda u: -len(u["members"])):
             size = sum(m["size"] for m in u["members"])
             state = "clean" if u["safe"] else f"{len(u['conflicts'])} in dispute"
@@ -273,16 +272,13 @@ def main() -> None:
             print(f"{len(u['members']):3d} members {size:7d}B  {len(u['files']):2d} files  "
                   f"{state:14s} {unit}")
         return
-    if args.check:
-        sys.exit(0 if UNITS.exists() and UNITS.read_text() == text
-                 else "data/units.json is not current, run: uv run tools/unitmap.py")
-    UNITS.write_text(text)
-    units = json.loads(text)["units"]
+    UNITS.parent.mkdir(parents=True, exist_ok=True)
+    UNITS.write_text(json.dumps({"units": units}, indent=1, sort_keys=True) + "\n")
     clean = sum(1 for u in units.values() if u["safe"])
     print(f"{len(units)} units, {sum(len(u['members']) for u in units.values())} functions, "
           f"{len({f for u in units.values() for f in u['files']})} files")
     print(f"  {clean} with agreeing declarations, {len(units) - clean} with an offset in dispute")
-    print(f"wrote {UNITS.relative_to(ROOT)}")
+    print(f"wrote {UNITS.relative_to(ROOT)} (git ignores it; the map is rebuilt on every run)")
 
 
 if __name__ == "__main__":

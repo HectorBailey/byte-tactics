@@ -7,18 +7,21 @@ single addresses, so one real class often appears under several names.
 ## The unit map
 
 `tools/unitmap.py` groups the matched members under `src/` into the classes
-they belong to and writes `data/units.json`. A unit is a class whose matched
-members are spread over more than one file in `src/unsorted/`, which is the
-state every class is in before consolidation. For each unit the map gives its
+they belong to and builds a map in memory on every run. A unit is a class whose
+matched members are spread over more than one file in `src/unsorted/`, which is
+the state every class is in before consolidation. For each unit the map gives its
 members in address order, the file defining each, every file that declares the
 class, the union of the field ledgers those declarations give, and every offset
 where two of them disagree.
 
 ```sh
-uv run tools/unitmap.py            # rewrite data/units.json
+uv run tools/unitmap.py            # summarise and write build/units.json (ignored)
 uv run tools/unitmap.py --list     # the units, largest first
-uv run tools/unitmap.py --check    # fail if the map is stale
+uv run tools/unitmap.py --at 0x401070   # the unit nearest an address
 ```
+
+The map is rebuilt from `data/progress.csv` and `src/` on each run, so nothing
+has to be kept current. `build/units.json` is written for inspection only.
 
 A class whose members already live in one file is not a unit, so a consolidated
 class drops out of the map rather than staying as a one-file entry.
