@@ -1,29 +1,44 @@
-// Decompiled by space-bunny-free. Names are provisional.
-// NOT A MATCH: 67.2% at the time of writing (1 real check.py run).
-// The code is right, the register allocation is not. The original keeps SIX
-// memory-resident locals (esp+0x10 len, +0x14 copied, +0x18 the walking
-// pointer, +0x1c count/stack pointer, +0x20 this, +0x24 pc) and so never
-// needs a frame pointer: ebp is the loop counter and ebx is the buffer
-// pointer. Copying the member values into named locals (v2 in
-// build/scratch/0x4d9ca0/v2.cpp) makes it far worse, 30.1%, so the locals
-// are not the problem; what is missing is a source construct that makes
-// MSVC 5 spill all of them at once instead of promoting `this` to ebp.
-// Second difference: the original's `abs(abs(i) & 7)` is one `cdq` shorter
-// than mine in both loops, i.e. it reuses the sign already in edx rather
-// than recomputing it, so the second absolute value is not a source-level
-// abs() of the masked value.
+// Decompiled by space-bunny-free, finished by muse-spark-1.3-free. Names are provisional.
+// NOT A MATCH: 69.5% best (v18). Correct shapes found this run, allocation still open.
+//
+// CERTAIN (byte-exact regions in v18, verified against disassembly):
+// - The grouped-bit conditions are SIGNED `i % 8`, not abs(): `i % 8` compiles to
+//   exactly cdq/xor/sub/and/xor/sub with ONE cdq (see build/scratch/0x4d9ca0/abstest2.cpp,
+//   g1), while abs(abs(i)&7) emits TWO cdqs. Original has one cdq in both loops.
+// - `len` is unsigned (original breaks with jbe on `len <= 0x1e`; signed gives jle).
+// - Loop 2 advances both walkers by one element (`q++; s++;`): the latch shares one
+//   `mov eax,4` for both adds. (`q += 4` would emit add 16.)
+// - `m = copied` up front as a named local helps (+4 over direct reads); the loop 2
+//   bound and last-line check then read the slot exactly like the original.
+// - Loop bodies use walking pointers (r/q/s) with per-iteration slot reloads;
+//   `len -= strlen(p); p += strlen(p);` in that order with two strlen calls each.
+// - Separator default " " is loaded before the modulo (ternary materialization).
+//
+// STILL WRONG (the whole remaining diff is one register-allocation decision):
+// - Original keeps `this` memory-resident (spilled to [esp+0x20] in the prologue,
+//   reloaded for the walker reseeds) with i in ebp, a count temp in esi, p in ebx,
+//   six stack slots (sub esp,0x18). Mine keeps `this` in ebp, i in esi+memory slot.
+// - Tried: up-front n (count) hurts (62.2), up-front q0 (pc) collapses (33.8),
+//   up-front n+m (61.1), base=ret pointer uniformly 60.7 with len taking ebp,
+//   shared single `int i` across loops (+0.9), decl-order shuffle (no change),
+//   __inline RetPtr/StackPtr accessors (no change).
+// - Hypothesis for next attempt: the prologue's copied/pc/count loads may be
+//   MSVC-hoisted invariant loads (m succeeds as a real local but n/q0 do not),
+//   so forcing them all into locals is the wrong model; the spill of `this`
+//   likely needs a different pressure lever (single shared upstream cause per
+//   brief lesson: the ebp/esi swap and the missing spill are one decision).
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 class Class_004d9ca0 {
 public:
-    unsigned long ret[0x1e];           // +0x000: recorded return addresses
-    int count;                         // +0x078: how many of them
-    int stack[0x800];                  // +0x07c: copy of the raw stack
-    int copied;                        // +0x207c: dwords copied above
-    unsigned long* pc;                 // +0x2080: current program counter
-    char buf[0xa44c];                  // +0x2084: the dump buffer
+    unsigned long ret[0x1e];
+    int count;
+    int stack[0x800];
+    int copied;
+    unsigned long* pc;
+    char buf[0xa44c];
 
     void FUN_004d9ca0();
 };
@@ -32,42 +47,47 @@ public:
 void Class_004d9ca0::FUN_004d9ca0()
 {
     char* p = buf;
-    int len = 0xa44c;
+    int i = 0;
+    int m = copied;
+    unsigned int len = 0xa44c;
+
     if (count > 0) {
         sprintf(p, "Call stack:\n");
-        len -= (int)strlen(p);
+        len -= strlen(p);
         p += strlen(p);
-        for (int i = 0; i < count; i++) {
+        unsigned long* r = ret;
+        for (i = 0; i < count; i++) {
             if (len <= 0x1e)
                 break;
-            sprintf(p, "%08lX", ret[i]);
-            strcat(p, (i == count - 1 || abs(abs(i) & 7) == 7) ? "\n" : " ");
-            len -= (int)strlen(p);
+            sprintf(p, "%08lX", *r);
+            strcat(p, (i == count - 1 || i % 8 == 7) ? "\n" : " ");
+            len -= strlen(p);
             p += strlen(p);
+            r++;
         }
     } else {
         p[0] = 0;
     }
-    if (copied > 0 && len > 0x1e) {
+    if (m > 0 && len > 0x1e) {
         sprintf(p, "Stack dump:\n");
-        len -= (int)strlen(p);
+        len -= strlen(p);
         p += strlen(p);
-        unsigned long* pcv = pc;
-        int* sp = stack;
-        for (int i = 0; i < copied; i++) {
+        unsigned long* q = pc;
+        int* s = stack;
+        for (i = 0; i < m; i++) {
             if (len <= 0x1e)
                 break;
-            if (abs(abs(i) & 7) == 0) {
-                sprintf(p, "%08lX: ", (unsigned long)pcv);
-                len -= (int)strlen(p);
+            if (i % 8 == 0) {
+                sprintf(p, "%08lX: ", q);
+                len -= strlen(p);
                 p += strlen(p);
             }
-            sprintf(p, "%08lX", *sp);
-            strcat(p, (i == copied - 1 || abs(abs(i) & 7) == 7) ? "\n" : " ");
-            len -= (int)strlen(p);
+            sprintf(p, "%08lX", (unsigned long)*s);
+            strcat(p, (i == m - 1 || i % 8 == 7) ? "\n" : " ");
+            len -= strlen(p);
             p += strlen(p);
-            pcv += 4;
-            sp++;
+            q++;
+            s++;
         }
     }
 }
