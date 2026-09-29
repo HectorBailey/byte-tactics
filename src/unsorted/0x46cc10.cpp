@@ -83,9 +83,14 @@ public:
 };
 
 // FUNCTION: 0x46cc10
+// The local reference below is load bearing: writing vec.insert(vec.end(), ...)
+// directly makes the front end keep the end() load rooted at ecx+0x14, which
+// blocks the load CSE with the insert's own [esi + 8] read of _Last and costs
+// the original's single `mov edi, ecx` in the capacity block.
 void Class_0046cc10::FUN_0046cc10(Elem_0046faf0* param_1, Elem_0046faf0* param_2)
 {
 	param_2->id = ++field_0;
-	vec.insert(vec.end(), 1, *param_1);
-	FUN_00451bc0(FUN_0044fe00(), (unsigned int)param_1, param_1, 0xe);
+	std::vector<Elem_0046faf0>& _v = vec;
+	_v.insert(_v.end(), 1, *param_2);
+	FUN_00451bc0(FUN_0044fe00(), (unsigned int)param_1, param_2, 0xe);
 }
