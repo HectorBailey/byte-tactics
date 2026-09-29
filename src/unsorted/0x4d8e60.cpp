@@ -1,8 +1,35 @@
-// Decompiled by Claude Sonnet 5.5. Names are provisional.
+// Decompiled by Claude Sonnet 5.5 (skeleton and integration), regions by
+// DeepSeek V4.1 Flash. Names are provisional.
 // Crash handler: appends a report (exception record, registers, code bytes at
 // EIP, debug and floating point registers) to ErrorLog.txt next to the exe.
 // Runs once (guard flag), the report is built in one big stack buffer with
 // `sprintf(log + strlen(log), ...)`.
+//
+// STATUS: not a match. `uv run tools/check.py 0x4d8e60` gives 2652 of 2644
+// bytes, 48.8%. The frame (0x143f0), the callee conventions, every string and
+// call and constant already match; what is left is 8 diff hunks, all of them
+// stack slot order and one register choice:
+//  - the original keeps the three small locals at [esp+0x10] = reason (the
+//    string returned by FUN_004d98c0), [esp+0x14] = base (the exe name after
+//    the last backslash, stored as a local in region r2) and [esp+0x18] = file.
+//    Ours puts base at 0x10, file at 0x14, reason at 0x18. Declaration order
+//    made no difference (all 12 orders of file, base, reason and written gave
+//    48.8%), so try usage order, scope (base declared where it is first set,
+//    file assigned later) or types.
+//  - the original does `call CreateFileA; test eax, eax; mov [esp+0x18], eax`
+//    and pushes eax again for SetFilePointer, so the handle is never held in
+//    a register; ours does `mov esi, eax` first. Same slot problem as above,
+//    or a comparison written differently (`(file = CreateFileA(...)) != 0`).
+//  - every later hunk is the same slot numbers and shifted jump targets; fix
+//    the first two and rerun check.py to see what is really left.
+// The sprintf arguments in regions r3 to r6 (registers, debug registers, the
+// floating point block) were written from the disassembly and match except
+// through the slot shifts above; region scores from `tools/regcheck.py` are
+// r1 84%, r2 75%, r3 49%, r4 45%, r5 48%, r6 33%, r7 52% (a progress signal,
+// not a match check). r6 is the weakest: recheck the `room` maths and the
+// lstrcpynA source (`obj` is used as the raw byte source).
+//
+// Pilot notes: docs/splitting-huge-functions.md and docs/splitting-pilot2-results.md.
 
 // SHARED begin
 #include <windows.h>
