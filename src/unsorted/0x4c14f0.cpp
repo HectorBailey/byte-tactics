@@ -1,4 +1,4 @@
-// Decompiled by Sonnet 5.5. Names are provisional.
+// Decompiled by Sonnet 5.5, finished by space-bunny-free. Names are provisional.
 // Draws `text` (a bitmap font string ended by NUL or newline) at x, y into
 // `dst`, or into the locked screen when `dst` is null. When `maxWidth` is not
 // -1 and the text is wider, a copy is cut back one character at a time until
@@ -7,14 +7,13 @@
 // which takes the surface's pixels and pitch, the font, the text, the
 // position and the display's three colour fields at +0x208, +0x20c, +0x210.
 //
-// NOT MATCHED: 59.6%, 626 of 617 bytes. The control flow, the inlined width
+// NOT MATCHED: 60.6%, 632 of 617 bytes. The control flow, the inlined width
 // helper (as in 0x4c1830.cpp), the truncation loop and the two draw paths
-// follow the original. What differs is the register assignment: the original
-// keeps `text` in ebp and its iterator in esi and spills the display pointer
-// to [esp+0x10], where this puts the display pointer in ebp, and the
-// truncation loop stores its terminator through a zero register instead of an
-// immediate. Iterating over a copy, and do/for/while spellings of the
-// truncation loop, did not change it.
+// follow the original. What still differs is one register-allocation decision:
+// the original keeps the `text` parameter in ebp with a SEPARATE esi induction
+// variable and leaves the game pointer in a stack slot at [esp+0x10], while
+// here the loop pointer is the parameter itself in esi and the game pointer
+// takes ebp. Every remaining diff follows from that.
 #include <string.h>
 
 struct Font_004c14f0 {
@@ -80,6 +79,7 @@ void __stdcall FUN_004c14f0(Class_004c6ae0* dst, unsigned char* text, int x, int
 {
     Game_004c14f0* game = FUN_004b6220();
     int width = WidthText(game->font, text);
+    if (text == 0) width = 0;
     if (maxWidth != -1 && width > maxWidth) {
         unsigned char buf[0x12c];
         strncpy((char*)buf, (char*)text, 0x12b);
