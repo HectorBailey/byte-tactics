@@ -1814,12 +1814,22 @@ name (`std::_Lockit::_Lockit` is 0x4e39b0).
   deriving from that class (`class Class_00435110 : public Class_00435c00`)
   instead of copying the fields into a new one, so the inherited calls keep
   their established names (0x435110).
-- **Known wall: `vector::insert(iterator, size_type, const T&)`** comes out one
-  byte off, a base/index swap in the third inlined `_Ucopy`'s source `lea`
-  (original `[ebx+ecx]`, ours `[ecx+ebx]`), in both 0x46e640 and 0x44ec30 (99.6%
-  each). Neither header sets nor 0 to 700 unused declarations fix it, so it
-  comes from the source shape. Solve it once and it likely solves every
-  instantiation; until then, don't spend a normal budget on it.
+- **`vector::insert(iterator, size_type, const T&)` register family**: which
+  registers the function uses (`this` in ebp or ebx, and the one-byte `lea`
+  base/index swap) follows the numbering order of the third inlined
+  `_Ucopy`'s destination and source, not headers or dummy declarations. Write
+  that copy as a loop with the destination declared first,
+  `{ iterator _d = _Q + _M; const_iterator _s = _P; for (; _s != _Last; ++_d,
+  ++_s) allocator.construct(_d, *_s); }`, in the hand-written vector (a helper
+  `_Ucopy(dest, src, end)` with the destination parameter first does the same,
+  since arguments bind right to left). This took 0x425480 from 57.9% to 80.5%
+  and 0x4732e0 to 80.5% in scratch (Sonnet 5.5, #679). 0x425210, 0x46e640 and
+  0x44ec30 are still one byte out at 99.6%; dead locals never change it.
+  About 1500 variants on 0x44ec30 (every `_Ucopy` form at all four sites, all
+  120 tail orders, file layout, and flags from `/Ob1` to `/G6`) never moved
+  that last byte, so it most likely comes from compiler state set by the rest
+  of the original file, not this function's source. Don't spend a normal budget
+  on it (Sonnet 5.5, #759).
 - **One write and one read of a stack slot on different paths is a bug
   report, not a matching problem**: list each slot's writes and reads in the
   disassembly (a `grep` is enough) before writing source; such a finding
@@ -1835,3 +1845,89 @@ name (`std::_Lockit::_Lockit` is 0x4e39b0).
   original bytes and check.py compares against those. If a function differs
   only where the exe jumps into padding or has a run of `nop`s no compiler
   would emit, report the address and bytes rather than chasing it (0x4cda00).
+- **0x4e67f0 is the CRT's `_CIacos`**: a call to it is a plain `acos()`
+  (`<math.h>`), not a `__fastcall double` helper (0x49a890).
+- **A test of bits 10 and 22 of a dword** (`shr eax, 0xa; test al, 1`) comes
+  from a bitfield struct over the dword, not from shifting by hand (0x499eb0).
+- **`xor reg, reg; mov reg16, [mem]` before a call** means the callee takes an
+  `unsigned int` loaded from a 16-bit field; declaring the parameter
+  `unsigned short` loses the zero-extend (0x499eb0).
+- **A scripted variant search is cheap**: scoring hundreds of generated
+  statement and operand orders with `check.py <addr> <scratch> --sym` costs no
+  runs, and found 0x49a890's and 0x49abb0's best forms (Sonnet 5.5, #1082).
+- **Store order around a call can depend on how `this` is reached**: with a
+  plain local `Display* d = FUN_004b6220();` MSVC puts a struct store before a
+  field load; writing the body as an inline method called on the call's result
+  (`return FUN_004b6220()->LockMe(out);`) lets the store slide between the
+  argument pushes as in the original (0x4c5e70, 0x4c5ff0).
+- **A one-expression inline method of an embedded struct** keeps a null test
+  and the reload after it separate, where a local or a multi-statement helper
+  merges them (`mov eax; cmp eax, edi`) (0x4c5e70).
+- **`test eax, eax` where an inline wrapper gave `cmp eax, edi`**:
+  `switch (x.Lock(&d)) { case 0: break; default: return 0; }` restores the
+  `test` (0x4c5e70).
+- **Two adjacent stores in an inline helper** (`Clear()` doing `active = 0;
+  type = 0;`) can be what reorders them to match (0x4644d0).
+- **A `default:` arm can be read from the jump table**: values that land on
+  the same target as named cases, and the `ja` target, show what `default`
+  does (0x464060).
+- **Search statement orders by script**: a small `uv run` script that calls
+  `compile_source` and `compare` from tools/check.py can score hundreds of
+  moved-statement variants in parallel at no cost in check runs; a
+  move-each-statement hill climb took 0x4644d0 from 94.5% to 99.2% (Sonnet 5.5).
+- **Try the calling convention before more shape variants**: some original
+  files were built with `/Gr` (fastcall default), as others were with `/Gz`
+  (0x424c00). A no-argument free function whose loop reloads a local into a
+  register (`mov ecx, [esp+0x10]; cmp ecx, ebx`) where the original compares
+  memory directly (`cmp [esp+0x10], ebx`) matched once declared `__fastcall`
+  (0x46c920, 0x46ca60; about 400 shape variants had not moved it). A quick way
+  to test: score the file with each of `/Gr`, `/Gz` and `/Gd` through
+  tools/wcl before rewriting anything:
+  `uv run tools/check.py <addr> --flags "/O2 /Ob2 /MT /Gz"`. 0x44b990 (a
+  "scheduler tie" that resisted many attempts) and 0x4b6570 matched unchanged
+  under `/Gz`, and 0x4c2870 under `/Gr`; declaring the function (and any
+  argument-less callee it shares the file with) `__stdcall` or `__fastcall`
+  then matches at the default flags.
+- **Keep a callee's real name with the real container**: when a hand-written
+  tree or vector gives a call the wrong name, use the real `std::map` or
+  `std::vector` member as a neighbouring matched file does (0x46d1a0).
+- **An apparent rematerialisation can be a register role, not a construct**:
+  MSVC 5 will not fold a memory operand whose base register is the destination
+  of the same instruction, so when the accumulator lives in the same register as
+  the base, the load is forced to materialise. A named local can only be
+  spilled, never rematerialised, so an original that re-reads a value after a
+  test is evidence that the value had **no** local at that point. The
+  visibility-gated `Draw` family (0x473590, 0x474170, 0x473a00, 0x4745e0,
+  0x474b80) took about 20 attempts, each looking for a source construct, before
+  this was understood. When a "missing local" or a re-read will not reproduce in
+  a scratch copy, suspect the register roles and stop rewriting the expression.
+- **Integer arithmetic shape is not a register lever**: MSVC 5 canonicalises
+  every parenthesisation of `a + b - c` identically, so re-spelling an integer
+  arithmetic expression never moves the registers it allocates. What does move
+  them is the size of the surrounding code, so when a diff shifts after an
+  unrelated edit, look at the block that grew or shrank rather than at the
+  expression.
+- **Naming an inline accessor is an allocation lever, and it cuts both ways**:
+  routing expressions through `__inline begin()` / `end()` accessors changes how
+  MSVC allocates argument temporaries, and was worth 12 to 25 points on two
+  unrelated functions (on 0x470040 it fixed four diffs across two blocks at
+  once; on 0x46d6c0 it was worth 12.7 points). The right answer differs per
+  site: on 0x46d6c0 the loop had to use the accessors directly while each insert
+  needed its own reference in its own nested block. Use an accessor where
+  call-level indirection is needed and a plain reference where it is not, and
+  expect to try both at each site.
+- **A constructor materialises a constant where a field assignment cannot**:
+  a literal `0` written into a field always compiles to `mov dword [m], 0`, but
+  passing it to a real constructor (`p.first->value = Value_0046d2e0(a, 0, wh,
+  flag);`) gives `xor eax, eax; mov [edx+4], eax`, which is what the original
+  does. Give the aggregate a constructor rather than assigning the constant to a
+  field; verified in three separate shapes on 0x46d2e0.
+- **Two values tied for a register can be separated by one more use**: when
+  the original gives a handle ebx and a path ebp and yours swaps them, a
+  trivial inline wrapper around a call that takes the handle
+  (`static inline int Next(int h, ...) { int r = FUN_004bc640(h, ...); return r; }`)
+  adds a use without adding bytes and flips the tie (0x4bcb50). Dummy uses
+  such as `h = h` are folded away first and do nothing.
+- **Byte-wide `xor cl, cl` and `not cl`** come from an `unsigned char` local
+  set to 0 on one path and `~v` on the other; a ternary or a cast keeps the
+  arithmetic 32-bit (0x4bd160).

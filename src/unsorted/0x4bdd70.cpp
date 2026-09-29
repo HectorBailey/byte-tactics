@@ -8,39 +8,32 @@
 // entry flagged 1, runs FUN_004be010 on its name. With mode 0 the file is
 // closed again and only the in-memory copy stays.
 //
-// NOT MATCHED: 85.8%, 647 of 661 bytes. Two regions differ.
-//
-// (1) The failure block. In the original the block (fclose, free, xor eax,eax,
-// epilogue, ret 8) sits inline between the copyright strcmp and the success
-// continuation, the strcmp's `je` jumps over it, and all five header checks
-// `jne` forward into it. Nothing is materialised. Here the checks are an inline
-// helper returning 1, which is the only spelling found that keeps that block
-// inline, but it costs a `jmp` plus a `mov eax,1` (7 bytes). What did NOT work:
-// writing the cleanup out six times (one copy per check, hoping MSVC 5 would
-// tail-merge them) gave 757 bytes, so it merges nothing; collapsing the five
-// header checks into one `||` chain, whether with its own body (625 bytes) or
-// with a `goto` to a label inside the copyright check's `if` (also 625 bytes),
-// makes MSVC invert the `if (f == 0) return 0;` into `je <epilogue>`, so the
-// early return merges with the tail and the whole first block diffs. Getting
-// all of the original at once needs a shape that keeps the fopen failure inline
-// and the cleanup shared, and I did not find it.
-//
-// (2) The key derivation. The original stores the key byte to [esp+0x70] (a
-// reused incoming-argument slot, since `name` is dead), reloads it as a dword
-// and masks with `and eax,0xff` before rotating, then reloads `h->header->key`
-// after storing it and writes the result into the STACK header's key byte at
-// [esp+0x24]. So the source must assign the decoded key into the stack copy of
-// the 20 byte header as well, and must keep an int-width copy of the key alive.
-// Adding `hdr.key = base->key;` plus `unsigned char k = base->key;` (two
-// structurally different read trees, to break the store-to-load forwarding) and
-// a separate `p += 0x14` gets the total SIZE right, 663 against 661 bytes, but
-// it adds one live graph node and demotes both `f` and `h` one step: `f` moves
-// ebx->ebp and `h` ebp->ebx, so the whole prologue and every field store diff
-// (71.9%). With `hdr.key = base->key;` removed again it is back to 647 bytes at
-// 85.0%. The two effects are one allocation problem, not two.
+// NOT MATCHED: 97.9%, 661 of 661 bytes. Three differences remain, all in the
+// key derivation (0x4bdf29 to 0x4bdf4c), each a consequence of the same thing:
+//   - the original tests the byte copy (`test dl, dl`), here the test is the
+//     flags of `and eax, 0xff` (the condition must be written on the int
+//     copy `w` to get base in ecx and the key in dl; `if (key)` puts the base
+//     in edx and the key in cl and costs 6 points);
+//   - the original computes `mov edx, eax; shr edx, 6; shl eax, 2; or edx,
+//     eax` (shift right first, into a copy, then shift left in place), here
+//     `lea edx, [eax*4]; shr eax, 6; or edx, eax`;
+//   - the next reload of h->header goes into ecx in the original, eax here.
+// What worked (91.0% to 97.9%): the byte local `key` plus an int copy `w`
+// (that pair produces the original's byte home in the dead `name` slot and
+// the `and eax, 0xff` reload), the rotate done on `w` alone
+// (`w = (w >> 6) | (w << 2); key = ~w;`, which keeps the shifts 32-bit and
+// narrows only the `not`), the condition on `w`, and the decrypt loop's
+// locals declared in a nested block in the order k, i, n, p (that order gives
+// `[esi + eax]` instead of `[eax + esi]`). Tried without effect: helper
+// functions and member functions for the rotate, `?:` forms, `+` or `^` for
+// `|`, `w * 4` for `w << 2`, every declaration order of base, key and w,
+// int and unsigned w, char types for the result.
+// The earlier note that the original stores a stale byte is wrong: the
+// original does rotate and complement the value it stores.
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>
+
 
 #pragma pack(push, 1)
 struct Entry_004bdd70 {                // 9 bytes
@@ -89,7 +82,9 @@ static inline int Bad_004bdd70(FILE* f, Header_004bdd70* hdr, char* copyright)
     fread(copyright, 1, len, f);
     copyright[len] = 0;
     strncpy(copyright + (strstr(DAT_004fdbf0, "0000") - DAT_004fdbf0), "0000", 4);
-    return strcmp(copyright, DAT_004fdbf0);
+    if (strcmp(copyright, DAT_004fdbf0) == 0)
+        return 0;
+    return 1;
 }
 
 // FUNCTION: 0x4bdd70
@@ -119,15 +114,23 @@ File_004bdd70* __stdcall FUN_004bdd70(const char* name, int mode)
     {
         Header_004bdd70* base = h->header;
         unsigned char key = base->key;
-        if (key != 0)
-            key = ~(unsigned char)((key >> 6) | (key << 2));
+        unsigned int w = key;
+        if (w) { w = (w >> 6) | (w << 2); key = ~w; }
         base->key = key;
-        unsigned char k = h->header->key;
-        unsigned char* p = (unsigned char*)h->header + 0x14;
-        int n = hdr.size - 0x14;
+        hdr.key = h->header->key;
+        {
+        unsigned char k;
+        int i;
+        int n;
+        unsigned char* p;
+        p = (unsigned char*)h->header;
+        p += 0x14;
+        k = hdr.key;
+        n = hdr.size - 0x14;
         if (k != 0) {
-            for (int i = 0; i < n; i++)
+            for (i = 0; i < n; i++)
                 p[i] = (unsigned char)((i + 0x14) ^ k ^ ~p[i]);
+        }
         }
         base = h->header;
         base->table = (Table_004bdd70*)((char*)base->table + (int)base);
