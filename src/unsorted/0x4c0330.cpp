@@ -1,4 +1,4 @@
-// Decompiled by Sonnet 5.5. Names are provisional.
+// Decompiled by Sonnet 5.5, finished by space-bunny-free. Names are provisional.
 // Fills a convex polygon with one colour, into `surface` or into the locked
 // screen when `surface` is null. It finds the top and bottom vertices and the
 // horizontal extent, rejects the polygon when it lies wholly outside the
@@ -7,16 +7,26 @@
 // per-scanline x positions with 16.16 steps, and finally fills each scanline
 // span clipped to the rect. Returns 1 when something was drawn.
 //
-// NOT MATCHED: 49.4%, 925 of 932 bytes. The algorithm and every branch follow
-// the original, but the frame and register homes do not: the original's frame
-// is 0x14060 (seven dword locals at [esp+0x10..0x28]: minX, locked, maxY,
-// minY, the edge index j, maxIdx, minIdx; the clip rect at 0x2c, the lock
-// descriptor at 0x40, the 2048 span table at 0x70) against 0x14058 here, keeps
-// minY/minX in registers with memory copies and maxX in a register only, and
-// loads the argument pointers after the empty-polygon tests. Declaring the
-// locals in slot order did not move the homes; splitting the four rejection
-// tests into separate `unlock, return 0` blocks (as the original's inline
-// epilogues show) gained 9 points.
+// NOT MATCHED: 56.3%, 929 of 932 bytes. Every branch, both edge walks and the
+// span fill follow the original exactly. What is still wrong is the frame: the
+// original's is 0x14060 (twelve dword locals at [esp+0x10..0x3c], then the
+// 0x30-byte locked-screen struct at 0x40 and the 0x800 x 0x28 span table at
+// 0x70) against 0x1405c here, so every [esp+X] below the lock descriptor is 4
+// bytes low. The two homes still missing are minX (the original keeps it in
+// ebx AND in a slot, reloading the slot on every iteration of the bounds loop;
+// here it is only in edi) and the edge index j (the original stores it at
+// [esp+0x20] at the top of each walk and reloads it at the latch; here it
+// stays in a register). Those two extra spills are also what demote minY from
+// ebx to edi: the original has minY=edi, maxX=esi, minX=ebx, points=ebp,
+// while this has minY=ebx, maxX=esi, minX=edi, points=ebp.
+//
+// Tried and rejected: hoisting `j` and `dy` to function scope on their own
+// (48.0%), and giving the two span walks a `while (cnt)` countdown instead of
+// a `for` over y (48.0%, and one byte over the original). Removing the
+// `minIdx = 0` and `maxIdx = 0` initialisers is what took it from 49.4% to
+// 56.3%: with them MSVC 5 folds the literal 0 into the `surface == 0` test and
+// emits `xor ebp,ebp / cmp eax,ebp` where the original has `test eax,eax`,
+// and two uninitialised index slots are exactly what the original has.
 #include <string.h>
 
 struct Rect_004c0330 {
@@ -57,6 +67,16 @@ int __stdcall FUN_004c0330(Class_004c6ae0* surface, Point_004c0330* points, int 
     Rect_004c0330 clip;
     Span_004c0330 span[0x800];
     int locked;
+    int minY;
+    int maxY;
+    int minX;
+    int maxX;
+    int minIdx;
+    int maxIdx;
+    int i;
+    int j;
+    int dy;
+
     if (surface == 0) {
         if (FUN_004c5e70(&screen) == 0)
             return 0;
@@ -66,13 +86,10 @@ int __stdcall FUN_004c0330(Class_004c6ae0* surface, Point_004c0330* points, int 
         locked = 0;
     }
 
-    int minY = 999999;
-    int maxY = -999999;
-    int minX = 999999;
-    int maxX = -999999;
-    int minIdx = 0;
-    int maxIdx = 0;
-    int i;
+    minY = 999999;
+    maxY = -999999;
+    minX = 999999;
+    maxX = -999999;
     for (i = 0; i < n; i++) {
         int y = points[i].y;
         if (y < minY) {
@@ -123,7 +140,7 @@ int __stdcall FUN_004c0330(Class_004c6ae0* surface, Point_004c0330* points, int 
     Span_004c0330* sp = span;
     i = minIdx;
     do {
-        int j = i - 1;
+        j = i - 1;
         if (j < 0)
             j = n - 1;
         int y1 = points[j].y;
@@ -131,7 +148,7 @@ int __stdcall FUN_004c0330(Class_004c6ae0* surface, Point_004c0330* points, int 
         if (y1 > minY && y0 < y1) {
             int x0 = points[i].x;
             int x1 = points[j].x;
-            int dy = y1 - y0;
+            dy = y1 - y0;
             int slope = ((x1 - x0) << 16) / dy;
             int fx = (x0 << 16) + 0xffff;
             if (y0 < minY) {
@@ -152,7 +169,7 @@ int __stdcall FUN_004c0330(Class_004c6ae0* surface, Point_004c0330* points, int 
     sp = span;
     i = minIdx;
     do {
-        int j = i + 1;
+        j = i + 1;
         if (j >= n)
             j = 0;
         int y1 = points[j].y;
@@ -160,7 +177,7 @@ int __stdcall FUN_004c0330(Class_004c6ae0* surface, Point_004c0330* points, int 
         if (y1 > minY && y0 < y1) {
             int x0 = points[i].x;
             int x1 = points[j].x;
-            int dy = y1 - y0;
+            dy = y1 - y0;
             int slope = ((x1 - x0) << 16) / dy;
             int fx = (x0 << 16) + 0xffff;
             if (y0 < minY) {
@@ -179,14 +196,14 @@ int __stdcall FUN_004c0330(Class_004c6ae0* surface, Point_004c0330* points, int 
     } while (i != maxIdx);
 
     Span_004c0330* s = span;
-    for (int y = minY; y < maxY; y++) {
+    for (i = minY; i < maxY; i++) {
         if (s->right > clip.right)
             s->right = clip.right;
         if (s->left < clip.left)
             s->left = clip.left;
         int w = s->right - s->left;
         if (w > 0)
-            memset(surface->pixels + surface->pitch * y + s->left, color, w);
+            memset(surface->pixels + surface->pitch * i + s->left, color, w);
         s++;
     }
     if (locked)
