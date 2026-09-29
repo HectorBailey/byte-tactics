@@ -20,12 +20,28 @@ uv run tools/unitmap.py --list     # the units, largest first
 uv run tools/unitmap.py --check    # fail if the map is stale
 ```
 
+A class whose members already live in one file is not a unit, so a consolidated
+class drops out of the map rather than staying as a one-file entry.
+
 `tools/unitgen.py <unit>` reads the map and writes one candidate file under
-`build/units/`: the reference declaration (the file carrying the most fields)
-with the other views merged in, the union of the other files' includes and
-declarations, and every member's definition copied from the file that holds it,
-in address order. It never invents a line, and it prints the offsets in dispute
-and any base class it could not find.
+`build/units/`:
+
+- every type the unit's files declare is emitted once. For each name the views
+  are merged: the base list comes from the view that has one, fields and their
+  order from the reference file's view (the layout its matched functions were
+  built against), any field another view declares that a member body actually
+  names is added, and methods are unioned by name, so a view that left one out
+  does not remove it;
+- the reference file (the one carrying the most fields) keeps its order, so
+  `#pragma pack` regions and the order of virtual slots survive;
+- every other file's remaining declarations are inserted above the first place
+  that needs them, rather than at the end;
+- every member's definition is copied from the file that holds it, in address
+  order.
+
+It never invents a line, and it prints the offsets in dispute and any base class
+it could not find. A type whose name no file in the unit declares is not pulled
+in from elsewhere, so a unit that needs one still fails; none does today.
 
 The candidate is the start of a unit, not a match. Merging changes the compiler
 state and the inline budget, so once the file compiles, every function it holds

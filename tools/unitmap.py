@@ -136,6 +136,8 @@ def build() -> dict:
             continue
         mem.sort(key=lambda m: int(m["address"], 16))
         files = sorted({m["file"] for m in mem})
+        if len(files) < 2:                  # already consolidated, nothing to merge
+            continue
 
         ledgers = {}
         for f in files:
