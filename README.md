@@ -16,17 +16,17 @@ original game are listed in `docs/bugs.md`.
 <!-- progress:start -->
 ## Progress
 
-**57.97% of Cavedog's code matched** (493,259 of 850,853 bytes)
+**58.56% of Cavedog's code matched** (498,289 of 850,853 bytes)
 
 `[#######################-----------------]`
 
-By count that is 2,935 of the game's 3,267 functions (89.8%). The headline counts bytes, because the functions left are mostly the longest ones.
+By count that is 2,938 of the game's 3,267 functions (89.9%). The headline counts bytes, because the functions left are mostly the longest ones.
 
 | | Functions | Bytes |
 | --- | ---: | ---: |
-| Matched byte-for-byte | 2,935 | 493,259 |
-| Attempted, not yet matching | 209 | 150,800 |
-| Not attempted yet | 123 | 206,794 |
+| Matched byte-for-byte | 2,938 | 498,289 |
+| Attempted, not yet matching | 229 | 205,857 |
+| Not attempted yet | 100 | 146,707 |
 
 ### By function size
 
@@ -39,7 +39,7 @@ The size bands are the `size:` labels on the issues.
 | large (161 to 400 bytes) | 639 of 703 | 89.9% | 18,079 | `#########-` |
 | xl (401 to 600 bytes) | 183 of 226 | 80.3% | 21,729 | `########--` |
 | xxl (601 to 1,000 bytes) | 115 of 195 | 57.9% | 61,758 | `######----` |
-| huge (over 1,000 bytes) | 24 of 161 | 12.7% | 255,154 | `#---------` |
+| huge (over 1,000 bytes) | 27 of 161 | 14.4% | 250,124 | `#---------` |
 
 ### By area
 
@@ -51,10 +51,10 @@ and Windows calls each window's code uses (`data/areas.csv`).
 | --- | --- | ---: | ---: | ---: | --- |
 | `0x400000` | Unit orders and unit AI | 191 of 210 | 71.8% | 17,144 | `#######---` |
 | `0x410000` | Orders and VTOL states | 211 of 222 | 75.1% | 15,869 | `########--` |
-| `0x420000` | Frontend shell | 137 of 154 | 47.4% | 33,427 | `#####-----` |
+| `0x420000` | Frontend shell | 138 of 154 | 51.2% | 31,052 | `#####-----` |
 | `0x430000` | Maps, missions, briefings | 208 of 228 | 61.6% | 23,195 | `######----` |
-| `0x440000` | Multiplayer setup | 233 of 246 | 61.3% | 23,795 | `######----` |
-| `0x450000` | Options and audio menus | 154 of 176 | 54.3% | 28,836 | `#####-----` |
+| `0x440000` | Multiplayer setup | 234 of 246 | 63.9% | 22,201 | `######----` |
+| `0x450000` | Options and audio menus | 155 of 176 | 56.0% | 27,775 | `######----` |
 | `0x460000` | Game and skirmish setup, unit classes | 186 of 212 | 50.3% | 30,576 | `#####-----` |
 | `0x470000` | Campaign and skirmish screens, resource bars | 227 of 259 | 60.5% | 25,088 | `######----` |
 | `0x480000` | Unit definitions, COB scripting, TNT map | 237 of 264 | 59.5% | 25,788 | `######----` |
