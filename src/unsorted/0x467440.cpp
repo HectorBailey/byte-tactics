@@ -1,12 +1,23 @@
 // Decompiled by deepseek-v4.1-flash. Names are provisional.
-// PARTIAL (21.9%). The four loops and the stack visitor objects are structurally
-// right, but MSVC spills the playerIndex byte (and a pointer) to the stack in
-// this version where the original keeps playerIndex in dl and the PlayerInfo*
-// in ebp; every loop body is byte-shifted from there on. Loop 2 also reads the
-// def signature shorts into a register instead of the original's memory test,
-// and loop 3 bases at u+0xff instead of u+0x92. Likely source-level causes to
-// try next: fewer named locals at the top (compute pl after first/last but do
-// not keep a separate `u`), and inline the def-field reads in the conditions.
+// PARTIAL (21.9%). The five 0x118-stride unit loops and the three stack visitor
+// objects are structurally right, but the register allocation is shifted at the
+// top of the function and every loop body is byte-shifted from there. The
+// original keeps playerIndex in dl, the PlayerInfo* in ebp, and the two loop
+// bounds FIRST and LAST memory-resident ([esp+0x14]/[esp+0x10], reloaded each
+// iteration); this version gives LAST edi, keeps FIRST in ebx, which pushes the
+// PlayerInfo* out of ebp to [esp+0x18] and spills the playerIndex byte, so
+// loop 2's position copy uses ebp as scratch. One structural difference as
+// well: loop 4 walks from u+0x74 in the original (base = the position y short
+// at +0x74) where this version uses u+0x6c.
+// Tried, all scored with check.py --sym:
+//   loop-local `u` in each loop (MSVC 5 for-scope, needed braces): no change.
+//   int copy of the index in place of (unsigned int)p: removes the p spill
+//     (mov eax,edx; and eax,0xff) but the PlayerInfo* still spills: 21.3%.
+//   swapping the first/last declaration order: no change.
+//   declaring pl before first/last: no change.
+//   using g->units_end directly as the loop bound: worse, 19.9%.
+// Next lever to try: make the allocator spill LAST rather than the PlayerInfo*
+// pointer, i.e. reach the original's two-register top (edi = FIRST, ebp = pl).
 #pragma pack(push, 1)
 
 struct Vec3_00467440 {
