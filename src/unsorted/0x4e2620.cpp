@@ -1,44 +1,35 @@
 // Decompiled by space-bunny-free. Names are provisional.
-// The red-black tree insert of MSVC 5's <xtree> (_Tree::_Insert) for the
-// name table at +0: the hint node and the value are passed in and the new
-// node comes back through a hidden pointer because iterator has constructors.
-// The node is 0x208 bytes: left/parent/right, a 504-byte value (a
-// Class_004e1a30 key plus a 500-byte buffer) and the colour at +0x204,
-// 0 = red and 1 = black. DAT_005292c4 is the tree's _Nil, DAT_00529e58 the
-// pooled node free list. See 0x4e17c0.cpp for the singleton's constructor and
-// 0x4df380.cpp for the same node layout.
-// Two things differ from the SP3 <XTREE> header: the else arm that would make
-// _Right(_Y) = _Z is not in the original at all, and the "straight line" arm
-// rotates _Parent(_X) without first assigning it to _X, so the recolouring
-// after the rotation names the old _X. Both are latent here: the only caller
-// passes _X == _Nil and a lower bound as _Y, so key_compare is always true
-// and the missing else is never reached.
+// NOT MATCHED (54.4%). This is MSVC 5's <xtree> _Tree::_Insert for the name
+// table: the hint node and the value come in, the new node comes back through
+// a hidden pointer because the iterator has constructors. The node is 0x208
+// bytes: left/parent/right, a 504-byte value (a Class_004e1a30 key plus a
+// 500-byte buffer) and a 4-byte colour at +0x204, 0 = red and 1 = black.
+// DAT_005292c4 is the tree's _Nil. See 0x4e17c0.cpp for the singleton's
+// constructor and 0x4df380.cpp for the same node layout.
 //
-// NOT MATCHED yet (46.2%, best of 3 real runs). What still differs:
-//  * The link-up block (_Left(_Y) = _Z and the three _Head updates) is placed
+// What still differs (816 bytes vs our 797, 54.4%):
+//  * The link-up block (_Left(_Y) = _Z plus the three _Head updates) is placed
 //    INLINE by this source, after the ++_Size tests, while the original puts
 //    it COLD: all three conditions jump forward to it and it lives after the
-//    epilogue and the ret, at 0x4e2926..0x4e294b, 37 bytes. That single
-//    layout difference misaligns the whole rest of the function, so the
-//    biggest win left is finding the source shape that makes MSVC 5 sink that
-//    block. Tried and did not work: a do{}while(0) wrapper, an empty else.
-//  * Because of that, the third test of the || chain is inverted here
-//    (neg eax) where the original branches on the result of
-//    Class_004e1a30::FUN_004e1a30.
-//  * The loop back edge and the final _Color(_Root()) = _Black store use edi
-//    and an immediate 1 here, where the original keeps _Black live in ebx
-//    across the whole loop (mov ebx,1 just before it). A named local for the
-//    colour is the obvious thing to try next.
-// The value copy needed a user-declared copy assignment: with a plain POD
-// struct MSVC 5 emits a bare rep movsd, the original has the
-// test edi,edi / je self-pointer guard first, which is worth 2 instructions.
+//    epilogue and the ret, at 0x4e2926..0x4e294b, 37 bytes, with the join at
+//    0x4e26ca. The original's block is the then-arm of the `||` chain and MSVC
+//    5 has sunk it; ours is the same then-arm and MSVC 5 kept it inline, so
+//    this is a block-ORDERING difference, not a shape difference. Tried and did
+//    not work: a do{}while(0) wrapper, an empty else, De Morgan on the
+//    condition (which is ruled out anyway, the original mixes je and jne in
+//    the chain so the source really is `_Y == head || _X != _Nil || cmp()`).
+//  * Because the red value 0 lives in a REGISTER in the original (edi, set by
+//    `xor edi,edi` at 0x4e26fe) but is an immediate here, the loop variable
+//    lands in edi instead of esi, and the black-uncle recolouring block uses
+//    edi where the original uses esi. Getting 0 into a register is the lever
+//    that would free edi and promote _X to esi; nothing tried so far does it.
 #include <string.h>
 #include <yvals.h>
 
 class Class_004e1a30 {
 public:
     char* name;                        // +0x0
-    int FUN_004e1a30(const Class_004e1a30& other) const;
+    bool FUN_004e1a30(const Class_004e1a30& other) const;
 };
 
 struct Value_004e2620 {
@@ -47,7 +38,7 @@ struct Value_004e2620 {
 
     Value_004e2620& operator=(const Value_004e2620& v)
     {
-        if (this != &v)
+        if (this)
             memcpy(this, &v, sizeof(Value_004e2620));
         return *this;
     }
@@ -152,6 +143,10 @@ Iter_004e2620 Class_004e2620::FUN_004e2620(Node_004e2620* _X, Node_004e2620* _Y,
             head->right = _Z;
         } else if (_Y == head->left)
             head->left = _Z;
+    } else {
+        _Y->right = _Z;
+        if (_Y == head->right)
+            head->right = _Z;
     }
     for (_X = _Z; _X != head->parent && _X->parent->color == 0; ) {
         if (_X->parent == _X->parent->parent->left) {
@@ -162,8 +157,10 @@ Iter_004e2620 Class_004e2620::FUN_004e2620(Node_004e2620* _X, Node_004e2620* _Y,
                 _X->parent->parent->color = 0;
                 _X = _X->parent->parent;
             } else {
-                if (_X == _X->parent->right)
+                if (_X == _X->parent->right) {
                     Lrotate(_X->parent);
+                    _X = _X->parent;
+                }
                 _X->parent->color = 1;
                 _X->parent->parent->color = 0;
                 Rrotate(_X->parent->parent);
@@ -176,8 +173,10 @@ Iter_004e2620 Class_004e2620::FUN_004e2620(Node_004e2620* _X, Node_004e2620* _Y,
                 _X->parent->parent->color = 0;
                 _X = _X->parent->parent;
             } else {
-                if (_X == _X->parent->left)
+                if (_X == _X->parent->left) {
                     Rrotate(_X->parent);
+                    _X = _X->parent;
+                }
                 _X->parent->color = 1;
                 _X->parent->parent->color = 0;
                 Lrotate(_X->parent->parent);
