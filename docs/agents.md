@@ -916,18 +916,101 @@ Cost units: thousands of tokens weighted by price relative to Haiku (Sonnet 5 co
 | #1356 | deepseek-v4.1-flash | 2 | 1 | 0 | n/a | n/a | n/a |
 | #1349 | deepseek-v4.1-flash | 3 | 1 | 0 | n/a | n/a | n/a |
 | #805 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #828 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #777 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1460 | deepseek-v4.1-flash | 2 | 1 | 0 | n/a | n/a | n/a |
+| #1377 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1461 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1428 | deepseek-v4.1-flash | 3 | 1 | 0 | n/a | n/a | n/a |
+| #833 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1463 | deepseek-v4.1-flash | 3 | 1 | 0 | n/a | n/a | n/a |
+| #1443 | space-bunny-free | 3 | 0 | 0 | n/a | n/a | n/a |
+| #866 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1177 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1137 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1172 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1210 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1390 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1379 | gpt-6 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1229 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1280 | space-bunny-free | 3 | 1 | 0 | n/a | n/a | n/a |
+| #1384 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1389 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1157 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1406 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1230 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1320 | space-bunny-free | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1415 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1386 | deepseek-v4.1-flash | 2 | 1 | 0 | n/a | n/a | n/a |
+| #1228 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1420 | longcat-2.5-preview-free | 3 | 1 | 0 | n/a | n/a | n/a |
+| #1393 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1408 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1419 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1418 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1385 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1417 | gpt-6 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1244 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1422 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1232 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1233 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1226 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1246 | deepseek-v4.1-flash | 1 | 1 | 0 | n/a | n/a | n/a |
+| #1264 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1429 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1407 | gpt-6 | 2 | 1 | 0 | n/a | n/a | n/a |
+| #1440 | gpt-6 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1182 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1279 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1252 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1281 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1283 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1293 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1259 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1285 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1294 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1426 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1250 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1459 | gpt-6 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1439 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1297 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1303 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1213 | deepseek-v4.1-flash | 3 | 1 | 0 | n/a | n/a | n/a |
+| #1196 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1266 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1312 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1306 | deepseek-v4.1-flash | 2 | 1 | 0 | n/a | n/a | n/a |
+| #1305 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1466 | gpt-6 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1296 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1278 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1202 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1325 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1314 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1469 | gpt-6 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1326 | deepseek-v4.1-flash | 3 | 1 | 0 | n/a | n/a | n/a |
+| #1309 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1327 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1446 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1304 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1448 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1450 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1310 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1470 | gpt-6 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1330 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1328 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
 
 ### Escalations
 
 - Opus matched 94 of 114 functions a cheaper model had failed.
 - Sonnet matched 109 of 116 functions a cheaper model had failed.
-- Gpt-6 matched 0 of 22 functions a cheaper model had failed.
-- Space-bunny-free matched 77 of 315 functions a cheaper model had failed.
-- Deepseek-v4.1-flash matched 54 of 171 functions a cheaper model had failed.
+- Gpt-6 matched 1 of 42 functions a cheaper model had failed.
+- Space-bunny-free matched 78 of 323 functions a cheaper model had failed.
+- Deepseek-v4.1-flash matched 62 of 317 functions a cheaper model had failed.
 - Gpt-5.6-terra matched 3 of 16 functions a cheaper model had failed.
 - Mimo-v2.6-flash matched 3 of 5 functions a cheaper model had failed.
 - Sonnet-5.5 matched 29 of 69 functions a cheaper model had failed.
-- Longcat-2.5-preview-free matched 4 of 24 functions a cheaper model had failed.
+- Longcat-2.5-preview-free matched 5 of 29 functions a cheaper model had failed.
 - Muse-spark-1.3-free matched 0 of 4 functions a cheaper model had failed.
 <!-- calibration:end -->
 
