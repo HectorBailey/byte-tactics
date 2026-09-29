@@ -9,6 +9,36 @@ public:
     Class_00438760() { index = 0; }
 };
 
+union Flags110_0043f0e0 {
+    unsigned int raw;
+    struct {
+        unsigned int bits_0 : 31;
+        unsigned int flag_31 : 1;
+    };
+};
+
+union Flags241_0043f0e0 {
+    unsigned int raw;
+    struct {
+        unsigned int bits_0 : 11;
+        unsigned int flag_11 : 1;
+        unsigned int bits_12 : 16;
+        unsigned int flag_28 : 1;
+        unsigned int bits_29 : 3;
+    };
+};
+
+union Flags111_0043f0e0 {
+    unsigned int raw;
+    struct {
+        unsigned int bits_0 : 8;
+        unsigned int flag_8 : 1;
+        unsigned int bits_9 : 8;
+        unsigned int flag_17 : 1;
+        unsigned int bits_18 : 14;
+    };
+};
+
 struct Game_0043f0e0 {
     char unknown_0[0x2a42];
     unsigned char localPlayer;         // +0x2a42
@@ -28,7 +58,10 @@ struct Game_0043f0e0 {
 
 struct Node_0043f0e0 {
     char unknown_0[0x111];
-    unsigned int f111;                 // +0x111
+    union {
+        unsigned int f111;             // +0x111
+        Flags111_0043f0e0 f111bits;
+    };
 };
 
 struct Def_0043f0e0 {
@@ -43,7 +76,10 @@ struct Def_0043f0e0 {
     char unknown_1f2[0x1fa - 0x1f2];
     unsigned int f1fa;                 // +0x1fa
     char unknown_1fe[0x241 - 0x1fe];
-    unsigned int f241;                 // +0x241
+    union {
+        unsigned int f241;             // +0x241
+        Flags241_0043f0e0 f241bits;
+    };
     unsigned int f245;                 // +0x245
 };
 
@@ -77,7 +113,10 @@ struct Unit_0043f0e0 {
     float f104;                        // +0x104
     short f108;                        // +0x108
     char unknown_10a[0x110 - 0x10a];
-    unsigned int f110;                 // +0x110
+    union {
+        unsigned int f110;             // +0x110
+        Flags110_0043f0e0 f110bits;
+    };
 };
 
 struct Pos_0043f0e0 {
@@ -103,14 +142,14 @@ struct Thing_0043f0e0 {
 extern Game_0043f0e0* g_game;
 
 Cell_0043f0e0* __stdcall FUN_004815a0(Pos_0043f0e0* pos);
-int __stdcall FUN_004899b0(Unit_0043f0e0* a, Unit_0043f0e0* b);
-int __stdcall FUN_00489a90(Unit_0043f0e0* a, Unit_0043f0e0* b);
+class Class_004899b0 { public: int FUN_004899b0(Unit_0043f0e0* other); };
+class Class_00489a70 { public: int FUN_00489a90(Unit_0043f0e0* other); };
 Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
                                        Unit_0043f0e0* target, Pos_0043f0e0* pos);
 
 static inline int IsVtol(Def_0043f0e0* def)
 {
-    return (def->f241 >> 11) & 1;
+    return (unsigned char)(def->f241 >> 11) & 1;
 }
 
 static inline Class_00438760 Pick(Def_0043f0e0* def, const char* vtol, const char* ground)
@@ -175,14 +214,14 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
             if ((unit->def->f245 & 0x400) && enemy)
                 return Pick(unit->def, "VTOL_RECLAIMUNIT", "RECLAIMUNIT");
             if (friendly) {
-                if (FUN_004899b0(unit, target) && target->f104 != 0.0f)
+                if (((Class_004899b0*)unit)->FUN_004899b0(target) && target->f104 != 0.0f)
                     return Pick(unit->def, "VTOL_HELPBUILD", "HELPBUILD");
-                if (FUN_004899b0(unit, target))
+                if (((Class_004899b0*)unit)->FUN_004899b0(target))
                     return Pick(unit->def, "VTOL_REPAIRUNIT", "REPAIRUNIT");
             }
             if ((unit->def->f241 & 0x800) && friendly && (target->def->f241 & 0x200))
                 return Class_00438760("VTOL_LANDING");
-            if (target && FUN_00489a90(unit, target))
+            if (target && ((Class_00489a70*)unit)->FUN_00489a90(target))
                 return Pick(unit->def, "VTOL_PICKUP", "GROUND_PICKUP");
             if ((unit->def->f245 & 0x20) && friendly)
                 return Pick(unit->def, "VTOL_FOLLOW", "FOLLOW_GROUND");
@@ -198,7 +237,7 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
             if ((unit->def->f245 & 0x400) && enemy)
                 return FUN_0043f0e0(0xc, unit, target, pos);
             if (target) {
-                if (FUN_004899b0(unit, target) && target->f104 != 0.0f)
+                if (((Class_004899b0*)unit)->FUN_004899b0(target) && target->f104 != 0.0f)
                     return FUN_0043f0e0(8, unit, target, pos);
                 if (target && target->unknown_ff[0] == g_game->localPlayer &&
                     (target->f110 & 0x20) && target->f104 == 0.0f && target->ffb == 0 &&
@@ -225,15 +264,15 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
                 return Class_00438760("CAPTURE");
             if (!((unit->def->f245 & 0x400) && enemy)) {
                 if (friendly) {
-                    if (FUN_004899b0(unit, target) && target->f104 != 0.0f)
+                    if (((Class_004899b0*)unit)->FUN_004899b0(target) && target->f104 != 0.0f)
                         return Pick(unit->def, "VTOL_HELPBUILD", "HELPBUILD");
-                    if (FUN_004899b0(unit, target) &&
+                    if (((Class_004899b0*)unit)->FUN_004899b0(target) &&
                         (unsigned int)target->f108 < target->def->f1fa)
                         return Pick(unit->def, "VTOL_REPAIRUNIT", "REPAIRUNIT");
                 }
                 if ((unit->def->f241 & 0x800) && friendly && (target->def->f241 & 0x200))
                     return Class_00438760("VTOL_LANDING");
-                if (FUN_00489a90(unit, target))
+                if (((Class_00489a70*)unit)->FUN_00489a90(target))
                     return Pick(unit->def, "VTOL_PICKUP", "GROUND_PICKUP");
                 if ((unit->def->f245 & 0x20) && friendly)
                     return Pick(unit->def, "VTOL_FOLLOW", "FOLLOW_GROUND");
@@ -244,42 +283,48 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
         return Pick(unit->def, "VTOL_MOVE", "MOVE_GROUND");
     // REGION r2 end
     // REGION r3 begin
-    case 3:
-        if (!(unit->def->f245 & 0x10))
+    case 3: {
+        Def_0043f0e0* def = unit->def;
+        if (!(def->f245 & 0x10))
             break;
-        if ((int)unit->f110 < 0) {
+        Flags110_0043f0e0 flags;
+        flags.raw = unit->f110;
+        if (flags.flag_31) {
             Node_0043f0e0* node = unit->f10;
             if (!enemy) {
-                if (node->f111 & 0x20000)
+                if (node->f111bits.flag_17)
                     break;
-                if (!(unit->def->f241 & 0x800))
+                if (!(def->f241 & 0x800))
                     return Class_00438760("SUPPRESS");
-                if (unit->def->f1ee->f111 & 0x100)
+                if (def->f1ee->f111bits.flag_8)
                     return Class_00438760("AIRSTRIKE");
                 return Class_00438760("AIRTOGROUND");
             }
-            Def_0043f0e0* tdef = target->def;
             if ((target->f110 & 3) != 2 && (node->f111 & 0x20000))
                 break;
+            Def_0043f0e0* tdef = target->def;
             int reach = tdef->f170 + target->f70;
-            if (reach < g_game->threshold) {
-                if (!(node->f111 & 0x10000) &&
-                    (!(unit->f3b & 2) || !(unit->f2c->f111 & 0x10000)))
+            if (reach >= g_game->threshold)
+                goto reached;
+            if (!(node->f111 & 0x10000)) {
+                if (!(unit->f3b & 2))
                     break;
-                if (g_game->threshold <= reach)
-                    goto reached;
-            } else {
-            reached:
-                if (unit->def->f241 & 0x1000) {
-                    if (node->f111 & 0x10000)
-                        break;
-                    if ((unit->f3b & 2) && (unit->f2c->f111 & 0x10000))
-                        return Class_00438760();
-                }
+                if (!(unit->f2c->f111 & 0x10000))
+                    break;
             }
-            unsigned int f = unit->def->f241;
-            if (f & 0x800) {
-                unsigned int air = unit->def->f1ee->f111 & 0x100;
+            if (reach < g_game->threshold)
+                goto after;
+        reached:
+            if (def->f241 & 0x1000) {
+                if (node->f111 & 0x10000)
+                    break;
+                if ((unit->f3b & 2) && (unit->f2c->f111 & 0x10000))
+                    return Class_00438760();
+            }
+        after:
+            unsigned int f = def->f241;
+            if (def->f241bits.flag_11) {
+                unsigned int air = def->f1ee->f111 & 0x100;
                 if (air && !(tdef->f241 & 0x800))
                     return Class_00438760("AIRSTRIKE");
                 if (!air && (tdef->f241 & 0x800))
@@ -293,12 +338,13 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
             }
             if (unit->moving != 0)
                 return Class_00438760("ATTACK_CHASE");
-            if (unit->f110 & 0x20000000)
+            if (flags.raw & 0x20000000)
                 return Class_00438760("ATTACK_NOMOVE");
         }
-        if (unit->def->f241 & 0x10000000)
+        if (def->f241bits.flag_28)
             return Class_00438760("ATTACK_KAMIKAZE");
         break;
+    }
     // REGION r3 end
     // REGION r4 begin
     case 4:
@@ -313,7 +359,7 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
             return Pick(unit->def, "VTOL_UNLOAD", "GROUND_UNLOAD");
         break;
     case 6:
-        if (!target || !FUN_00489a90(unit, target))
+        if (!target || !((Class_00489a70*)unit)->FUN_00489a90(target))
             break;
         return Pick(unit->def, "VTOL_PICKUP", "GROUND_PICKUP");
     case 7:
@@ -321,7 +367,7 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
             break;
         return Pick(unit->def, "VTOL_FOLLOW", "FOLLOW_GROUND");
     case 8:
-        if (!FUN_004899b0(unit, target))
+        if (!((Class_004899b0*)unit)->FUN_004899b0(target))
             break;
         if (target->f104 == 0.0f)
             return Pick(unit->def, "VTOL_REPAIRUNIT", "REPAIRUNIT");
