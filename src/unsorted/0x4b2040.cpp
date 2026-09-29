@@ -1,6 +1,14 @@
-// Decompiled by GPT-5.6-Terra. Names are provisional.
-// Best attempt: 86.8%. The loader's record loop still differs in its source
-// pointer base and MSVC's register allocation for the inner record fields.
+// Decompiled by GPT-5.6-Terra, finished by space-bunny-free and deepseek-v4.1-flash. Names are
+// provisional.
+// Finishing note (deepseek-v4.1-flash): the loader walks the source buffer with an INDEX
+// (buffer[i]), not with a walking pointer.  As a pointer the two loop-carried values came
+// out in the other stack slots and MSVC picked e[2] (0x18) as the block pivot, giving
+// "add esi,-0x4c"; as an index the record is the plain 0x6c struct (int e[6][3] at 0,
+// a[3] at 0x48, b[3] at 0x54, h[3] at 0x60), MSVC picks e[1] at 0x0c and emits the
+// original's "add esi,-0x58".  The esi bias is per outer iteration only: the latch stores
+// the unbiased buffer pointer back into [esp+0x10], so the j loop's "+4" never carries.
+// The three virtual calls before the j loop read the record's h[3] at 0x60; the two in the
+// j loop read a[j] at 0x48 and b[j] at 0x54.
 
 class Class_004b4bf0 {
 public:
@@ -27,19 +35,6 @@ struct Table_004b2040 {
     int size;
 };
 
-struct Vec3_004b2040 {
-    int v[3];
-};
-
-struct Block_004b2040 {
-    Vec3_004b2040 e[6];
-};
-
-struct Data_004b2040 {
-    int flag;
-    Block_004b2040 block;
-};
-
 struct Rec_004b2040 {
     int value;
     char unknown_4[0x1c];
@@ -53,13 +48,16 @@ struct Big_004b2040 {
     int tail;
 };
 
+struct Data_004b2040 {
+    int flag;
+    int e[6][3];
+};
+
 struct Rec2_004b2040 {
-    Block_004b2040 block;
+    int e[6][3];
     int a[3];
     int b[3];
-    int h0;
-    int h1;
-    int h2;
+    int h[3];
 };
 
 class Class_004b0610 {
@@ -108,29 +106,25 @@ int Class_004b0610::FUN_004b2040(Class_004b4c80* file)
     if (file->FUN_004b4c80(ptr10, size) != size) {
         return 0;
     }
-    char* buffer = FUN_004d83b0("Piece States", bytes);
+    Rec2_004b2040* buffer = (Rec2_004b2040*)FUN_004d83b0("Piece States", bytes);
     if (file->FUN_004b4c80(buffer, bytes) != bytes) {
         return 0;
     }
-    char* piece = buffer;
-    piece += 0x64;
     for (int i = 0; i < field_8->count; i++) {
-        Rec2_004b2040* rec = (Rec2_004b2040*)piece;
         ptr14[i].flag = 1;
-        FUN_00480d50(i, rec->h0);
-        FUN_00480db0(i, rec->h1);
-        FUN_00480df0(i, rec->h2);
+        FUN_00480d50(i, buffer[i].h[0]);
+        FUN_00480db0(i, buffer[i].h[1]);
+        FUN_00480df0(i, buffer[i].h[2]);
         for (int j = 0; j <= 2; j++) {
-            ptr14[i].block.e[0].v[j] = rec->block.e[0].v[j];
-            ptr14[i].block.e[1].v[j] = rec->block.e[1].v[j];
-            ptr14[i].block.e[2].v[j] = rec->block.e[2].v[j];
-            ptr14[i].block.e[3].v[j] = rec->block.e[3].v[j];
-            ptr14[i].block.e[4].v[j] = rec->block.e[4].v[j];
-            ptr14[i].block.e[5].v[j] = rec->block.e[5].v[j];
-            FUN_00480c50(i, j, rec->a[j]);
-            FUN_00480ce0(i, j, rec->b[j]);
+            ptr14[i].e[0][j] = buffer[i].e[0][j];
+            ptr14[i].e[1][j] = buffer[i].e[1][j];
+            ptr14[i].e[2][j] = buffer[i].e[2][j];
+            ptr14[i].e[3][j] = buffer[i].e[3][j];
+            ptr14[i].e[4][j] = buffer[i].e[4][j];
+            ptr14[i].e[5][j] = buffer[i].e[5][j];
+            FUN_00480c50(i, j, buffer[i].a[j]);
+            FUN_00480ce0(i, j, buffer[i].b[j]);
         }
-        piece += 0x6c;
     }
     field_18 = 1;
     FUN_004d85a0(buffer);
