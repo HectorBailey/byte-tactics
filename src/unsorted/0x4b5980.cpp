@@ -204,7 +204,6 @@ int __stdcall FUN_004b5980(App_4b5980* d)
     d->lastTick = GetTickCount();
     d->unknown_1e2 = 0;
     d->unknown_1e6 = 0;
-    d->unknown_80 = 0;
     d->scratch[0] = 0;
     d->scratch[1] = 0;
     d->scratch[2] = 0;
@@ -267,7 +266,7 @@ int __stdcall FUN_004b5980(App_4b5980* d)
         d->wc.lpszMenuName = (LPSTR)d->menuId;
         d->wc.cbClsExtra = 0;
         d->wc.cbWndExtra = 0;
-        d->wc.hbrBackground = GetStockObject(WHITE_BRUSH);
+        d->wc.hbrBackground = GetStockObject(BLACK_BRUSH);
         ATOM cls = RegisterClassA(&d->wc);
         if (cls != 0) {
             d->hwnd = CreateWindowExA(WS_EX_APPWINDOW, d->className, d->title,
