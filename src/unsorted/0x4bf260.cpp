@@ -1,4 +1,5 @@
-// Decompiled by Sonnet 5.5. Names are provisional.
+// Decompiled by Sonnet 5.5, finished by space-bunny-free. Names are provisional.
+//
 // Draws a grid of connected lines into `surface`, or into the screen (locked
 // with FUN_004c5e70, unlocked with FUN_004c5fa0) when `surface` is null:
 // `rows` polylines, where counts[r] is the number of vertices of row r and
@@ -6,15 +7,25 @@
 // FUN_004bea20 and drawn by FUN_004cc7ab. Like 0x4bf060 it returns the lock
 // result on the screen path (a failed lock returns 0 without unlocking) and 1
 // on the caller-surface path, and the locked loop carries an inlined copy of
-// the single segment drawer with its own null-surface lock, which stays
-// because the compiler tests the address of the local `screen`.
-
-// NOT MATCHED: 84.7%, size exact. The four clipped coordinates land in the
-// dead argument slots in a different order than the original's (original: x0
-// at [esp+0x78], x1 0x7c, y1 0x80, y0 0x84; here y1 0x7c, y0 0x80, x1 0x84),
-// and `counts` is loaded before the `rows > 0` test instead of after it. All
-// 24 assignment orders and 24 declaration orders were tried (best 84.7%, the
-// order used by 0x4bf060); function-scope declarations score 56.8%.
+// the single segment drawer (0x4be950) with its own null-surface lock, which
+// stays because the compiler tests the address of the local `screen`.
+//
+// check.py prints MATCH (610 bytes). Three source shapes carry it:
+// - the four clipped coordinates are declared in the order x0, y0, x1, y1 and
+//   assigned in the order y1, x1, y0, x0, the same orders 0x4bf060 uses: that
+//   pair picks which dead argument slot each one lands in (x0 at [esp+0x78],
+//   x1 at 0x7c, y1 at 0x80, y0 at 0x84), which is the only way to get the
+//   original's slot order out of the argument area. All 24 orders of each were
+//   swept; nothing else scores above 85 percent.
+// - `counts` is copied to a local `c` BEFORE `points` is copied to `p`, in both
+//   branches. The original loads the three argument values in the order rows,
+//   counts, points, so the counts pointer has to be live first: hoisting it
+//   past the `rows > 0` test is what puts `mov ebx, [esp + 0x80]` above the
+//   `jle` instead of below it. Worth 9 percent on its own.
+// - the inner loop is a `while` with its own counter increment in the body
+//   ahead of the pointer bump, not a `for`. The original's latch is
+//   `inc edi` and then `add esi, 8`; a `for` header increment is emitted after
+//   the body's last statement, so the two come out the wrong way round.
 
 struct Surface_004bf260 {
     int unknown_0[2];
@@ -43,9 +54,11 @@ int __stdcall FUN_004bf260(Surface_004bf260* surface, Point_004bf260* points, in
         result = FUN_004c5e70(&screen);
         if (result != 0) {
             int r = rows;
+            int* c = counts;
             Point_004bf260* p = points;
             while (r > 0) {
-                for (int j = 0; j < *counts - 1; j++) {
+                int j = 0;
+                while (j < *c - 1) {
                     int x0, y0, x1, y1;
                     y1 = p[1].y;
                     x1 = p[1].x;
@@ -62,19 +75,22 @@ int __stdcall FUN_004bf260(Surface_004bf260* surface, Point_004bf260* points, in
                         if (FUN_004bea20(&screen, &x0, &y0, &x1, &y1))
                             FUN_004cc7ab(&screen, x0, y0, x1, y1, color);
                     }
+                    j++;
                     p++;
                 }
                 p++;
-                counts++;
+                c++;
                 r--;
             }
             FUN_004c5fa0(&screen);
         }
     } else {
         int r = rows;
+        int* c = counts;
         Point_004bf260* p = points;
         while (r > 0) {
-            for (int j = 0; j < *counts - 1; j++) {
+            int j = 0;
+            while (j < *c - 1) {
                 int x0, y0, x1, y1;
                 y1 = p[1].y;
                 x1 = p[1].x;
@@ -82,10 +98,11 @@ int __stdcall FUN_004bf260(Surface_004bf260* surface, Point_004bf260* points, in
                 x0 = p[0].x;
                 if (FUN_004bea20(surface, &x0, &y0, &x1, &y1))
                     FUN_004cc7ab(surface, x0, y0, x1, y1, color);
+                j++;
                 p++;
             }
             p++;
-            counts++;
+            c++;
             r--;
         }
         result = 1;
