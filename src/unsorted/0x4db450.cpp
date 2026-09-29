@@ -1,4 +1,94 @@
-// Decompiled by Space Bunny Free. Names are provisional.
+// Decompiled by Space Bunny Free, finished by space-bunny-free. Names are provisional.
+// NOT A MATCH: 92.9%, 444 of 444 bytes, every difference is a stack-slot
+// displacement. Still differs (see the end of this comment):
+//   * The two map iterators get the wrong two frame slots. The original puts
+//     the lower_bound result in the first frame slot ([esp+0x10]) and reuses
+//     that same slot for the spilled `this`; mine puts the begin() result in
+//     the first slot and gives `this` a slot of its own at [esp+0x18], one
+//     dword higher. Every diff below is that one rotation: it is a single
+//     allocation state, not nine independent problems.
+//   * `lea edx, [eax + esi]` versus `lea edx, [esi + eax]`: the operands of
+//     the commutative `base + len` are in the original's order, mine is
+//     reversed. Writing the sum the other way round does not change it.
+// Frame arithmetic, since it pins the target down (esp0 = esp at entry; the
+// four pushes leave esp = esp0-0x24, so the five locals sit at esp0-0x14,
+// -0x10, -0x0c, -0x08, -0x04 and the one stack argument at esp0+0x04):
+//   - esp0-0x14  `this`'s spill at 0x4db459, reloaded at 0x4db4fc, then
+//                overwritten by the _Ubound result (0x4db508/0x4db521) and
+//                passed by address to the final insert (0x4db5e7). The
+//                original reuses ONE slot for all four roles.
+//   - esp0-0x10  the begin() out slot (0x4db525, 0x4db539), then the second
+//                erase's hidden return slot (0x4db58a).
+//   - esp0-0x0c  NOTHING: the one dword of this five-dword frame that the
+//     original never touches (see the correction below).
+//   - esp0-0x08  p.offset, esp0-0x04 p.length: `p` is one 8-byte Pair.
+// So the original has FOUR homes and NO separate spill slot for `this`; this
+// file has four homes plus a real spill slot at esp0-0x0c. Getting the spill to
+// land on the top slot is the whole remaining problem.
+// CORRECTION to the slot list above (re-derived from the operand bytes: the
+// "third erase" line was wrong). 0x4db5d3's `lea ecx,[esp+0x18]` is not
+// esp0-0x0c. It has the same single outstanding argument push as 0x4db58a's
+// `lea eax,[esp+0x18]`, so both are the same absolute slot, esp0-0x10, the
+// begin() out slot: BOTH erase temporaries share the one begin() slot, and
+// esp0-0x0c is not referenced by any instruction at all. Counting the pushes
+// again for every [esp+N] of the original: disp 0x10 with 4 pushes = esp0-0x14,
+// 0x14 = esp0-0x10, 0x18 with 1 push = esp0-0x10, 0x1c = esp0-0x08, 0x20 =
+// esp0-0x04, 0x28 with 4 pushes = esp0+0x04 (the argument, `size` then `it`),
+// 0x2c with 5 pushes = esp0+0x04. The frame is therefore one dword WIDER than
+// the four homes it uses, which is why `sub esp,0x14` must not be read as "five
+// homes". The whole residual is one allocation state: the original lays the
+// 4-byte homes out as [this-spill + _Ubound result][begin() out + both erase
+// temps][slack] and reuses the spilled `this` slot for the _Ubound result,
+// while this file lays them out as [begin() out + erase temp 1][_Ubound result
+// + erase temp 2][this spill] and gives the spill a dword of its own.
+// Tried and did NOT work (all scored by check.py --sym, all 92.9% or worse):
+//   * permuting the declaration order of `n`, `it2`, `base` and `p` (all 24
+//     orders, with and without the operand swap): no effect at all, so the
+//     slot order here is NOT driven by declaration order;
+//   * re-running six declaration orders of `n`, `it2`, `tmp`, `base`, `p` with
+//     a fresh 4-byte home for the third erase's return: every one is 92.9%,
+//     and with `tmp` declared at all the frame grows to `sub esp,0x18` with
+//     the `this` spill given a slot of its own (82.5%). Adding the fifth home
+//     therefore does NOT make MSVC reuse a dead home, it makes the frame wider,
+//     which rules out "one home too few" as the cause;
+//   * swapping the roles, so the _Ubound result lands where begin()'s does and
+//     the other way round (92.9%): the two four-byte homes keep the order they
+//     have whatever the declaration order, so they cannot be permuted from the
+//     source text at all;
+//   * inline `End()` / `Begin()` accessors in place of `Class_004dd2a0(head)`,
+//     and `it = End()` in place of `it.ptr = head` (the idiom 0x4db000 uses):
+//     no effect;
+//   * passing the map's value_type as `const Pair_004db450&` instead of
+//     `const unsigned int&`, and dropping the `(int*)&it2` cast: no effect;
+//   * packing the two iterators into one 8-byte local, to force adjacent
+//     slots: 87.0%, the pair lands at [esp+0x14] and the local at [esp+0x1c];
+//   * declaring the call's two parameters in the other order (value first):
+//     92.2%;
+//   * making the members inherited instead of cast: the base classes shift
+//     `total` to +0x14: 81.8%;
+//   * a real named local for `it` instead of the parameter-slot alias: 81.8%,
+//     so the alias onto the dead `size` slot is load bearing.
+// Added by space-bunny-free, all 92.9% and 444 of 444 bytes unless stated, so
+// the slot order here is inert to everything a reader would try next:
+//   * the two 4-byte homes are also inert to the LOCAL NAMES. Renaming `n`/`it2`
+//     to aaa/zzz, to zzz/aaa and to q1/q2, declarations and code otherwise
+//     untouched, gives three byte-identical objects. Together with the 24
+//     declaration orders above this rules out both "declaration order" and
+//     "symbol name" as the driver, so the layout is not a hash or source order
+//     effect that a rename or a reorder can reach;
+//   * `base` as a `char*` instead of an `unsigned int`, with
+//     `(unsigned int)(base + len) <= 0x80000000u` and a plain `VirtualFree(base,
+//     ...)`: still `lea edx,[esi + eax]`, so the SIB base/index choice for the
+//     one `lea` difference is NOT driven by the operand being pointer
+//     arithmetic rather than integer addition. This is the natural next guess
+//     for that single instruction and it is wrong;
+//   * the two calls declared as the real STL shapes (the lower_bound returning
+//     the iterator by value into `n`: 55.4% and 438 bytes, it deletes the
+//     `total += len` store; the begin() returning the iterator by value, with
+//     `it2 = *f(&it2)`: 84.1% and 446 bytes, the copy is NOT elided, MSVC emits
+//     the extra store and reorders `total += len` ahead of it). Both are worse
+//     than the explicit out-parameter calls, so the out-parameter spelling in
+//     this file is the right one, not an accident.
 // Grows the allocator: reserves a block of at least `size` bytes with
 // VirtualAlloc (rounded up to 8k, and doubled so the block has room to grow),
 // retrying with half the size while the reservation lands above 2Gb, and then
