@@ -103,14 +103,14 @@ struct Thing_0043f0e0 {
 extern Game_0043f0e0* g_game;
 
 Cell_0043f0e0* __stdcall FUN_004815a0(Pos_0043f0e0* pos);
-int __stdcall FUN_004899b0(Unit_0043f0e0* a, Unit_0043f0e0* b);
-int __stdcall FUN_00489a90(Unit_0043f0e0* a, Unit_0043f0e0* b);
+class Class_004899b0 { public: int FUN_004899b0(Unit_0043f0e0* other); };
+class Class_00489a70 { public: int FUN_00489a90(Unit_0043f0e0* other); };
 Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
                                        Unit_0043f0e0* target, Pos_0043f0e0* pos);
 
 static inline int IsVtol(Def_0043f0e0* def)
 {
-    return (def->f241 >> 11) & 1;
+    return (unsigned char)(def->f241 >> 11) & 1;
 }
 
 static inline Class_00438760 Pick(Def_0043f0e0* def, const char* vtol, const char* ground)
@@ -175,14 +175,14 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
             if ((unit->def->f245 & 0x400) && enemy)
                 return Pick(unit->def, "VTOL_RECLAIMUNIT", "RECLAIMUNIT");
             if (friendly) {
-                if (FUN_004899b0(unit, target) && target->f104 != 0.0f)
+                if (((Class_004899b0*)unit)->FUN_004899b0(target) && target->f104 != 0.0f)
                     return Pick(unit->def, "VTOL_HELPBUILD", "HELPBUILD");
-                if (FUN_004899b0(unit, target))
+                if (((Class_004899b0*)unit)->FUN_004899b0(target))
                     return Pick(unit->def, "VTOL_REPAIRUNIT", "REPAIRUNIT");
             }
             if ((unit->def->f241 & 0x800) && friendly && (target->def->f241 & 0x200))
                 return Class_00438760("VTOL_LANDING");
-            if (target && FUN_00489a90(unit, target))
+            if (target && ((Class_00489a70*)unit)->FUN_00489a90(target))
                 return Pick(unit->def, "VTOL_PICKUP", "GROUND_PICKUP");
             if ((unit->def->f245 & 0x20) && friendly)
                 return Pick(unit->def, "VTOL_FOLLOW", "FOLLOW_GROUND");
@@ -198,7 +198,7 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
             if ((unit->def->f245 & 0x400) && enemy)
                 return FUN_0043f0e0(0xc, unit, target, pos);
             if (target) {
-                if (FUN_004899b0(unit, target) && target->f104 != 0.0f)
+                if (((Class_004899b0*)unit)->FUN_004899b0(target) && target->f104 != 0.0f)
                     return FUN_0043f0e0(8, unit, target, pos);
                 if (target && target->unknown_ff[0] == g_game->localPlayer &&
                     (target->f110 & 0x20) && target->f104 == 0.0f && target->ffb == 0 &&
@@ -225,15 +225,15 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
                 return Class_00438760("CAPTURE");
             if (!((unit->def->f245 & 0x400) && enemy)) {
                 if (friendly) {
-                    if (FUN_004899b0(unit, target) && target->f104 != 0.0f)
+                    if (((Class_004899b0*)unit)->FUN_004899b0(target) && target->f104 != 0.0f)
                         return Pick(unit->def, "VTOL_HELPBUILD", "HELPBUILD");
-                    if (FUN_004899b0(unit, target) &&
+                    if (((Class_004899b0*)unit)->FUN_004899b0(target) &&
                         (unsigned int)target->f108 < target->def->f1fa)
                         return Pick(unit->def, "VTOL_REPAIRUNIT", "REPAIRUNIT");
                 }
                 if ((unit->def->f241 & 0x800) && friendly && (target->def->f241 & 0x200))
                     return Class_00438760("VTOL_LANDING");
-                if (FUN_00489a90(unit, target))
+                if (((Class_00489a70*)unit)->FUN_00489a90(target))
                     return Pick(unit->def, "VTOL_PICKUP", "GROUND_PICKUP");
                 if ((unit->def->f245 & 0x20) && friendly)
                     return Pick(unit->def, "VTOL_FOLLOW", "FOLLOW_GROUND");
@@ -313,7 +313,7 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
             return Pick(unit->def, "VTOL_UNLOAD", "GROUND_UNLOAD");
         break;
     case 6:
-        if (!target || !FUN_00489a90(unit, target))
+        if (!target || !((Class_00489a70*)unit)->FUN_00489a90(target))
             break;
         return Pick(unit->def, "VTOL_PICKUP", "GROUND_PICKUP");
     case 7:
@@ -321,7 +321,7 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
             break;
         return Pick(unit->def, "VTOL_FOLLOW", "FOLLOW_GROUND");
     case 8:
-        if (!FUN_004899b0(unit, target))
+        if (!((Class_004899b0*)unit)->FUN_004899b0(target))
             break;
         if (target->f104 == 0.0f)
             return Pick(unit->def, "VTOL_REPAIRUNIT", "REPAIRUNIT");
