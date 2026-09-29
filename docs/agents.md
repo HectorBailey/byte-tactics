@@ -712,7 +712,7 @@ Cost units: thousands of tokens weighted by price relative to Haiku (Sonnet 5 co
 | #954 | space-bunny-free | 3 | 1 | 0 | n/a | n/a | n/a |
 | #923 | space-bunny-free | 3 | 0 | 0 | n/a | n/a | n/a |
 | #925 | space-bunny-free | 3 | 2 | 0 | n/a | n/a | n/a |
-| #883 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #883 | deepseek-v4.1-flash | 3 | 1 | 0 | n/a | n/a | n/a |
 | #929 | sonnet-5.5 | 3 | 2 | 0 | n/a | n/a | n/a |
 | #950 | muse-spark-1.3-free | 2 | 0 | 0 | n/a | n/a | n/a |
 | #946 | muse-spark-1.3-free | 2 | 0 | 0 | n/a | n/a | n/a |
@@ -721,18 +721,55 @@ Cost units: thousands of tokens weighted by price relative to Haiku (Sonnet 5 co
 | #549 | deepseek-v4.1-flash | 1 | 1 | 0 | n/a | n/a | n/a |
 | #1060 | space-bunny-free | 1 | 0 | 0 | n/a | n/a | n/a |
 | #1057 | space-bunny-free | 3 | 2 | 0 | n/a | n/a | n/a |
+| #1070 | space-bunny-free | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1061 | space-bunny-free | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1072 | space-bunny-free | 2 | 0 | 0 | n/a | n/a | n/a |
+| #553 | space-bunny-free | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1082 | sonnet-5.5 | 3 | 1 | 0 | n/a | n/a | n/a |
+| #1067 | space-bunny-free | 3 | 0 | 0 | n/a | n/a | n/a |
+| #566 | space-bunny-free | 2 | 0 | 0 | n/a | n/a | n/a |
+| #571 | space-bunny-free | 3 | 0 | 0 | n/a | n/a | n/a |
+| #894 | sonnet-5.5 | 2 | 2 | 0 | n/a | n/a | n/a |
+| #574 | sonnet-5.5 | 3 | 1 | 0 | n/a | n/a | n/a |
+| #589 | space-bunny-free | 4 | 0 | 0 | n/a | n/a | n/a |
+| #1098 | sonnet-5.5 | 2 | 2 | 0 | n/a | n/a | n/a |
+| #939 | space-bunny-free | 2 | 0 | 0 | n/a | n/a | n/a |
+| #911 | space-bunny-free | 1 | 0 | 0 | n/a | n/a | n/a |
+| #591 | space-bunny-free | 3 | 0 | 0 | n/a | n/a | n/a |
+| #846 | sonnet-5.5 | 2 | 2 | 0 | n/a | n/a | n/a |
+| #599 | sonnet-5.5 | 1 | 1 | 0 | n/a | n/a | n/a |
+| #679 | sonnet-5.5 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1103 | space-bunny-free | 1 | 0 | 0 | n/a | n/a | n/a |
+| #959 | sonnet-5.5 | 3 | 2 | 0 | n/a | n/a | n/a |
+| #778 | longcat-2.5-preview-free | 1 | 0 | 0 | n/a | n/a | n/a |
+| #601 | space-bunny-free | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1086 | space-bunny-free | 1 | 1 | 0 | n/a | n/a | n/a |
+| #1105 | sonnet-5.5 | 3 | 1 | 0 | n/a | n/a | n/a |
+| #1093 | deepseek-v4.1-flash | 1 | 1 | 0 | n/a | n/a | n/a |
+| #759 | sonnet-5.5 | 1 | 0 | 0 | n/a | n/a | n/a |
+| #554 | sonnet-5.5 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #687 | sonnet-5.5 | 1 | 1 | 0 | n/a | n/a | n/a |
+| #1076 | sonnet-5.5 | 3 | 2 | 0 | n/a | n/a | n/a |
+| #1071 | deepseek-v4.1-flash | 1 | 1 | 0 | n/a | n/a | n/a |
+| #618 | sonnet-5.5 | 1 | 1 | 0 | n/a | n/a | n/a |
+| #1123 | sonnet-5.5 | 1 | 1 | 0 | n/a | n/a | n/a |
+| #779 | longcat-2.5-preview-free | 2 | 0 | 0 | n/a | n/a | n/a |
+| #680 | space-bunny-free | 2 | 1 | 0 | n/a | n/a | n/a |
+| #688 | space-bunny-free | 2 | 1 | 0 | n/a | n/a | n/a |
+| #1135 | sonnet-5.5 | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1107 | sonnet-5.5 | 2 | 1 | 0 | n/a | n/a | n/a |
 
 ### Escalations
 
 - Opus matched 94 of 114 functions a cheaper model had failed.
 - Sonnet matched 109 of 116 functions a cheaper model had failed.
 - Gpt-6 matched 0 of 9 functions a cheaper model had failed.
-- Space-bunny-free matched 65 of 185 functions a cheaper model had failed.
-- Deepseek-v4.1-flash matched 40 of 93 functions a cheaper model had failed.
+- Space-bunny-free matched 68 of 220 functions a cheaper model had failed.
+- Deepseek-v4.1-flash matched 43 of 95 functions a cheaper model had failed.
 - Gpt-5.6-terra matched 3 of 16 functions a cheaper model had failed.
 - Mimo-v2.6-flash matched 3 of 5 functions a cheaper model had failed.
-- Longcat-2.5-preview-free matched 3 of 9 functions a cheaper model had failed.
-- Sonnet-5.5 matched 1 of 1 functions a cheaper model had failed.
+- Sonnet-5.5 matched 19 of 36 functions a cheaper model had failed.
+- Longcat-2.5-preview-free matched 3 of 12 functions a cheaper model had failed.
 - Muse-spark-1.3-free matched 0 of 4 functions a cheaper model had failed.
 <!-- calibration:end -->
 
