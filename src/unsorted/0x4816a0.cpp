@@ -1,4 +1,4 @@
-// Decompiled by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
 #include <string.h>
 
 #pragma pack(push, 1)
@@ -68,10 +68,10 @@ struct Params_004816a0 {
 };
 
 struct Flags_142f1_004816a0 {
-    unsigned char bit0 : 1;
-    unsigned char bit1 : 1;
-    unsigned char mapChanged : 1;
-    unsigned char rest : 5;
+    unsigned short bit0 : 1;
+    unsigned short bit1 : 1;
+    unsigned short mapChanged : 1;
+    unsigned short rest : 13;
 };
 
 struct Game_004816a0 {
@@ -88,7 +88,7 @@ struct Game_004816a0 {
     unsigned short flags;              // +0x14281
     char unknown_14283[0x142f1 - 0x14283];
     Flags_142f1_004816a0 field_142f1;  // +0x142f1
-    char unknown_142f2[0x14357 - 0x142f2];
+    char unknown_142f2[0x14356 - 0x142f2];
     Unit_004816a0* units;              // +0x14357
     Unit_004816a0* units_end;          // +0x1435b
     char unknown_1435f[0x1485b - 0x1435f];
@@ -146,8 +146,8 @@ void __stdcall FUN_004816a0(int arg)
                 int cx = params.pos.x / 0x200000;
                 int cy = params.pos.z / 0x200000 - y;
                 Entry_004816a0* e = FUN_004b7f30(g_game->field_1485b, i);
-                params.field_4[0] = (short)cx - e->field_4;
-                params.field_4[1] = (short)cy - e->field_6;
+                params.field_4[0] = (short)(cx - e->field_4);
+                params.field_4[1] = (short)(cy - e->field_6);
                 *params.field_c = (unsigned char)i;
                 FUN_00482270(&params);
                 FUN_00481930(&params);
