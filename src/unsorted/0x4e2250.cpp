@@ -1,25 +1,21 @@
 // Decompiled by space-bunny-free. Names are provisional.
-// NOT A MATCH (63.9 percent, 801 bytes against our 833). Still differs:
-//  * our frame is 0x20 where the original's is 0x18, so every spill differs
-//    by 8: the original keeps the new node at [esp+0x10] and the head at
-//    [esp+0x14], ours uses [esp+0x14] and [esp+0x18]. Four dwords of the
-//    original's 0x18 frame ([esp+0x00]..[esp+0x0f]) hold nothing we can
-//    account for, so its source has one more or one fewer live local than
-//    ours. That single frame difference is the cause of most of the diff.
+// NOT A MATCH (66.4 percent, 801 bytes against our 830). Still differs:
+//  * our frame is 0x1c where the original's is 0x18: the original keeps the
+//    new node in a slot at [esp+0x10] and the hint node at [esp+0x14], we
+//    keep the hint at [esp+0x18] and have no slot for the new node at all
+//    (4 slots against the original's 6). Every spill in the rest of the
+//    function is then 4 or 8 out of step, which is most of the diff. The
+//    original's extra live local is a node pointer that is live ACROSS the
+//    Class_004e1a30::FUN_004e1a30 call and gets spilled; ours keeps the new
+//    node in a register across it, so adding one more live reference (see
+//    the guide on allocation demotion) is the next thing to try.
 //  * the search loop: the original branches on the strcmp result's own
-//    flags (0x4e22ba `test eax,eax / jge`), ours re-tests the bool. Writing
-//    it as an if/else with `ans = true/false` in the arms (v3) was worse
-//    (55.5 percent), so the ternary form is kept.
-//  * the 504 byte value copy: the original keeps the null check
-//    (`lea edi,[edx+0xc] / cmp edi,ebx / je`) that we lose, and reloads the
-//    source pointer after storing the node pointer.
-//  * the second !multi insert path: the original returns (_P, true), that
-//    is the DECREMENTED iterator rather than the node it just inserted, and
-//    the node is written to a dead local. See the bug note below; our
-//    version returns the new node, which is what the source means.
-// Tried and rejected: a converting ctor from `Node*&` on the iterator type
-// (MSVC 5 in this version mangles `*r` in a mem-initializer); the if/else
-// search loop (above).
+//    flags (0x4e22ba `test eax,eax / jge`) and sets the bool in each arm,
+//    ours materialises the bool and re-tests it (`xor bl,bl / test bl,bl`).
+//    An if/else form with `ans = true/false` in the arms was tried earlier
+//    against the old tail and was worse, but not against this one.
+//  * ++size: the original does the increment into ecx and stores it after
+//    the `y == head` compare; we keep the size in esi and store before.
 // Shaped like std::map<Key, Val>::insert(const value_type&) from MSVC 5's
 // <xtree>, with the _Tree::_Insert body inlined on the _Multi path (the
 // out-of-line copy of it is 0x4e2620, the _Lrotate/_Rrotate copies are
@@ -28,6 +24,17 @@
 // (_Red == 0) and the key is the char* at +0 of the 0x1f8 byte value, which is
 // also where the key_compare instance lives, so the compare calls take the
 // value's address as `this`.
+// Suspected bug in the original: on the first !multi insert path (0x4e24c3)
+// the call to FUN_004e2620 is given the caller's own value reference as its
+// Node*& out-parameter, so the callee writes the new node over the caller's
+// value pointer (and the caller then reads that same slot back at 0x4e24d6
+// as the returned iterator). Same on the second path (0x4e250a/0x4e2512),
+// where the out-parameter is a dead local reused from the _Lockit's slot.
+// Reproduced here deliberately on the first path.
+// Tried and rejected: a converting ctor from `Node*&` on the iterator type
+// (MSVC 5 in this version mangles `*r` in a mem-initializer); the if/else
+// search loop against the old two-iterator tail; `if (this != &v)` as the
+// copy guard (64.0 percent against 66.4 for `if (this)`).
 #include <string.h>
 #include <yvals.h>
 
@@ -42,6 +49,13 @@ public:
 struct Val_004e2250 {
     Class_004e1a30 key;                         // +0x0
     char unknown_4[0x1f4];                      // +0x4
+
+    Val_004e2250& operator=(const Val_004e2250& v)
+    {
+        if (this)
+            memcpy(this, &v, sizeof(Val_004e2250));
+        return *this;
+    }
 };
 
 struct Node_004e2250 {
@@ -175,22 +189,18 @@ Class_004e2a10 Class_004e2250::FUN_004e2250(const Val_004e2250& v)
         head->parent->colour = _Black;
         return Class_004e2a10(Class_004e2ab0(z), (char)1);
     }
-    Class_004e2ab0 p(y);
-    if (!ans) {
-        ;
-    } else if (p == Class_004e2ab0(head->left)) {
-        Node_004e2250* slot;
-        Class_004e2ab0 it;
-        it.ptr = FUN_004e2620(slot, x, y, v);
-        return Class_004e2a10(it, (char)1);
-    } else {
-        p.FUN_004e2ab0();
+    Class_004e2ab0 it(y);
+    if (ans) {
+        if (y == head->left) {
+            it.ptr = FUN_004e2620(*(Node_004e2250**)(char*)const_cast<char*>((const char*)&v), x, y, v);
+            return Class_004e2a10(it, (char)1);
+        }
+        it.FUN_004e2ab0();
     }
-    if (p.ptr->val.key.FUN_004e1a30(v.key)) {
+    if (it.ptr->val.key.FUN_004e1a30(v.key)) {
         Node_004e2250* slot;
-        Class_004e2ab0 it;
         it.ptr = FUN_004e2620(slot, x, y, v);
         return Class_004e2a10(it, (char)1);
     }
-    return Class_004e2a10(p, (char)0);
+    return Class_004e2a10(it, (char)0);
 }
