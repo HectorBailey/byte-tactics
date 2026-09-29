@@ -143,63 +143,81 @@ before it is committed.
 - `data/regions/0x43f0e0.csv`: region address ranges.
 - `tools/regcheck.py`: per-region scoring.
 
-## Pilot 2 plan: 0x43e490
+## Pilot 2 plan: 0x4d8e60
 
-**Function.** `0x43e490`, 3,152 bytes, never attempted. It is the sibling of
-0x43f0e0: the same 14-case switch on the cursor mode (`param_1`), the same
-inlined helpers (visibility test, cell to unit lookup, the 0x80 flag at +0xfe)
-and the same structs, but it returns an integer cursor id (0x13 means none)
-instead of an order name. It has 6 callees (`FUN_004815a0`, `FUN_00489960`,
-`FUN_004899b0`, `FUN_00489a90`, `FUN_0049aa80`, `FUN_0049abb0`), one local,
-floats in case 4, and two 64-bit returns in case 3. The tail recursion
-(`param_1 = 3; goto top`) is MSVC's tail-call elimination of a recursive call.
-Choosing it tests the revised workflow on a function whose helpers and frame
-we already understand, instead of repeating a from-scratch skeleton.
+Pilot 2 must test the workflow, not one function family, so it uses a function
+with a different shape, area and helpers from 0x43f0e0. (An earlier draft of
+this section chose 0x43e490, the cursor-id sibling of 0x43f0e0; it was dropped
+because a good result there would owe too much to the copied helpers.)
 
-**Before the clock starts (not counted, about 15 minutes).**
+**Function.** `0x4d8e60`, 2,644 bytes, never attempted, in the 0x4d0000 area
+(compression, CRT and debug). It is the crash handler that writes
+`ErrorLog.txt`: it builds a path, opens the file with `CreateFileA` and
+`SetFilePointer`, then formats about 40 report lines with `sprintf` and appends
+them with `WriteFile`, and finally calls `CloseHandle`. So it is flat, ordered
+and string heavy, with no switch. It has a 20,732 dword frame (large stack
+buffers, so `_alloca_probe`), 8 callees (`FUN_004d9c60`, `FUN_004d9ca0`,
+`FUN_004ded60`, `sprintf`, the Win32 imports and a few small ones), two loops
+and about 63 conditionals. The same "format a line, write it" step repeats
+dozens of times, which is the repeated pattern the pilot 1 write-up says to
+extract first.
 
-1. Apply the pilot 1 shared fixes to 0x43f0e0 one at a time, scoring each:
-   `__thiscall` for `FUN_004899b0` and `FUN_00489a90`, one cached `def`,
-   `Visible` without `& 0x1f` and with `int` locals, `Lookup` as the original
-   multiplies, `(x >> n) & 1` for bit tests. Keep the ones that raise
-   `check.py` and copy the resulting helper block into the 0x43e490 skeleton.
-2. `tools/regions.py`: generate `data/regions/<addr>.csv` from the jump table
-   (case start to next case start, plus the code after the switch).
-3. `tools/regguard.py`: fail if a branch changed any line outside its own
-   region markers, so shared code cannot be edited by region agents.
-4. A launcher that creates the worktrees, starts the agents and kills each at
-   its deadline, instead of relying on the agent to stop.
+**Regions.** The natural seams are the report sections, in address order. They
+are small (about 250 to 500 bytes), so each agent gets a bounded piece.
+
+| Region | Range | Content |
+| --- | --- | --- |
+| r1 | 0x4d8e60 to 0x4d90d1 | prologue, guard flag, build path, open file, header |
+| r2 | 0x4d90d1 to 0x4d915f | "Exception handler called in", module and address lines |
+| r3 | 0x4d915f to 0x4d9344 | ExceptionCode, access violation text, flags, address, parameters |
+| r4 | 0x4d9344 to 0x4d9498 | Registers block |
+| r5 | 0x4d9498 to 0x4d95ad | Bytes at CS:EIP (a loop) |
+| r6 | 0x4d95ad to 0x4d96cf | Dr0 to Dr7 |
+| r7 | 0x4d96cf to 0x4d98b4 | ContextFlags, floating point state, Cr0NpxState, write, close, return |
+
+**Generic workflow, with the tools it needs (prep, not on the clock).**
+
+1. `tools/regions.py <addr>`: propose region seams for any function. For a
+   switch use the jump table; for flat code cut at anchors (string pushes,
+   repeated calls, loop heads) into pieces of roughly 250 to 500 bytes. Output
+   `data/regions/<addr>.csv`. For this pilot the table above is hand made and
+   `regions.py` is written from what it needed.
+2. `tools/regguard.py <branch>`: fail if a branch edited a line outside its own
+   region markers. The skeleton's shared code (structs, helpers, the frame)
+   sits between `// SHARED begin` and `// SHARED end`.
+3. A launcher that creates one worktree per region, starts the agents, and
+   kills each at its deadline.
+4. `tools/regcheck.py` as built for pilot 1.
 
 **On the clock (20 minutes, one function).**
 
 | Minutes | Phase | Who |
 | --- | --- | --- |
-| 0 to 5 | Skeleton: copy helpers, write the switch with region markers, get the prologue and callee conventions right | strong model |
-| 5 | Gate: `check.py` size within 1% of 3,152 and prologue shape 100. If missed, fan out anyway and keep the prologue for the strong model | orchestrator |
-| 5 to 14 | Six regions in parallel, 9 minute kill deadline, `// SHARED` block read-only | flash agents |
+| 0 to 5 | Skeleton: structs (`EXCEPTION_POINTERS` and context), the frame and `_alloca_probe`, the log-line helper, region markers with stub bodies | strong model |
+| 5 | Gate: `check.py` size within 1% of 2,644 and prologue shape 100. If missed, fan out anyway and keep the prologue for the strong model | orchestrator |
+| 5 to 14 | Seven regions in parallel, 9 minute kill deadline, `SHARED` block read-only | flash agents |
 | 14 to 17 | Merge, `regguard.py`, `regcheck.py` after each merge | orchestrator |
 | 17 to 20 | Apply proposed shared changes one at a time, final `check.py` | strong model |
 
-**Regions (from the jump table, to be confirmed by `regions.py`).**
-r1 case 1 (the large one), r2 case 2, r3 cases 3 and 4 (floats and 64-bit
-returns), r4 cases 5 to 9, 11, 13 and 14, r5 case 12, r6 the block after the
-switch (`LAB_0043edb6` to `LAB_0043f07c`, the non-network branch of case 1).
-Six agents at once is more than the usual two or three, so watch `uptime`. If
-the load average passes the core count, run four and two, each with a 4 minute
-budget.
+Seven agents at once is more than the usual two or three, and each compile
+runs under Wine, so watch `uptime`. If the load average passes the core count,
+run four then three with a 4 minute budget each.
 
 **What to record.** Minutes per phase, `check.py` and `regcheck.py` scores at
 the gate, after each merge and at the end, merge conflicts, whether the gate
-was met, which shared changes the agents proposed and which of them raised the
-score. Compare with pilot 1 (14.1% `check.py`, 63.4% exact and 79.2% shape).
+was met, which shared changes the agents proposed and which raised the score,
+and whether the log-line helper the skeleton defined survived unchanged.
+Compare with pilot 1 (14.1% `check.py`, 63.4% exact and 79.2% shape).
 
 **Success.** Finish inside 20 minutes with no conflict caused by an edit
 outside a region, `check.py` at least 50%, and no region below 85% shape.
 Stretch: a full MATCH. A result well under that with a clear reason is still
 useful.
 
-**Risks.** The function shares code with 0x43f0e0, so a good result may owe
-more to the copied helpers than to the workflow; pilot 3 should use a
-different shape (0x42b370 is a flat 2,375 byte structure copy with no calls).
-The recursion may again make the first block of the function depend on the
-flag setup. Wine compile time under six agents may dominate the region phase.
+**Risks.** The large frame and `_alloca_probe` make the skeleton's prologue
+hard, and pilot 1 showed the frame decides the score, so the gate may fail.
+The `sprintf` argument pushes and the string order depend on how the skeleton
+writes the log-line helper (macro, inline function or repeated code), and that
+choice is shared by every region. Flat code has fewer natural seams than a
+switch, so one region may end up needing pieces of another. Wine compile time
+under seven agents may dominate the region phase.
