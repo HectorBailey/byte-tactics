@@ -60,37 +60,20 @@ the tool.
 
 ## Using the map while decompiling
 
-An issue hands out neighbouring functions and most of them are still unmatched,
-so the first useful question is which class an address belongs to. `--at` answers
-it from the matched functions around the address:
+`docs/agent-guide.md` has the short version: `uv run tools/unitmap.py --at
+0x<addr>` names the class nearest an address and prints its ledger, and
+`tools/unitgen.py <unit>` writes that class with its matched members under
+`build/units/`. What the map cannot tell you:
 
-```sh
-uv run tools/unitmap.py --at 0x4b2100
-```
-
-It prints the nearest matched functions below and above the address, then the
-unit of the nearest one, with everything the map knows: the field ledger and the
-file each field came from, the offsets whose views disagree, the members in
-address order with the file defining each, the vtable address and the base
-classes.
-
-That is the starting point for decoding a function of a known class:
-
-- take the layout from the ledger instead of working it out from the
-  disassembly. If the class is a unit, `uv run tools/unitgen.py <unit>` writes a
-  candidate under `build/units/` that already declares the class and defines
-  every matched member, so a new definition can go into a file that compiles;
-- copy the matched members of the same class: same `this`, same fields, same
-  calling convention;
-- read the offset in dispute before using a field. Every view is listed with the
-  file it came from, and settling one is what unblocks the unit.
-
-Two limits. The map only holds matched members, so a class whose methods are all
-unmatched does not appear, and a class still spelt under several placeholder
-names is split between entries or is not a unit at all. And a conflict is only
-found when a file carries a `// +0xN` comment: two views of one offset that both
-omit it (compact packed structs) are stored as two fields and reported as clean,
-so an empty dispute list means "nothing was flagged", not "the views agree".
+- it only holds matched members, so a class whose methods are all unmatched does
+  not appear, and a class still spelt under several placeholder names is either
+  split between entries or is not a unit at all;
+- a conflict is only found when a file carries a `// +0xN` comment. Two views of
+  one offset that both omit it (compact packed structs) are stored as two fields
+  and reported as clean, so an empty dispute list means "nothing was flagged",
+  not "the views agree";
+- a disputed offset is worth reading before it is used: every view is listed with
+  the file it came from, and settling one is what unblocks the unit.
 
 ## Classes to merge
 
