@@ -1,37 +1,76 @@
-// Decompiled by space-bunny-free. Names are provisional.
+// Decompiled by Space Bunny Free, finished by Claude Sonnet 5.5. Names are provisional.
+// space-bunny-free pass (#1112): re-derived every stack slot, confirmed the body is
+// the right shape and that the one remaining difference is not reachable from the
+// source. Details below; the body itself is unchanged from the previous passes.
 //
-// PARTIAL: 57.6%. The semantics are recovered and the frame, the bounds checks,
-// the strength-reduced row pointer, the 13-byte cell stride and the whole
-// nested loop shape match. What is left is register allocation: the prologue
-// picks different registers, which cascades into the loop body.
+// PARTIAL: 98.0%, 322 of 322 bytes, and the total size is exactly right, so this is
+// a two-instruction residual and nothing else: the first pair of 16-bit adds.
 //
-// What still differs:
-//  - the two bound sums. The original loads one operand of each into a
-//    register and folds the other: `mov ax, [pos.x]; add ax, [size.x]` and
-//    `mov dx, [size.y]; add dx, [pos.y]`. Ours always loads the size operand
-//    (`mov ax, [size.x]; add ax, [pos.x]`, `mov dx, [size.y]; add dx, [pos.y]`),
-//    so only the y sum lines up. Ruled out: swapping the source operand order,
-//    splitting each sum into an assignment plus `+=`, taking one operand from a
-//    scalar short local, taking both from a Point local, and declaring the
-//    Point before or after the sums; all of them compile to the same form, so
-//    MSVC fixes the operand order of a memory+memory add here;
-//  - `g_game` goes in edi in ours and esi in the original (esi is later reused
-//    for the cell pointer), which also moves `push edi` and the dword load of
-//    the position one instruction later;
-//  - the mask index `n` lives in esi in ours and in the (dead) second argument
-//    slot in the original, and our `bit` is spilled to a byte-sized copy of
-//    that slot instead of staying in dl for the whole loop. The two locals
-//    compete for that slot; declaring them in either order, making `bit` an
-//    int or a char and making `n` unsigned all give the same code, so the
-//    original's choice (the counter in the slot, the mask byte in dl) is not
-//    reachable from the source shapes tried;
-//  - so the cell pointer is in ecx in ours and esi in the original, and the
-//    original does `mov bl, [ecx+edi]; and bl, dl; test bl, bl` where ours
-//    folds the load into `test byte ptr [esi+edi], dl`.
+//   original   mov ax,[ecx+0x76]   add ax,[ecx+0x7e]    x end = pos.x then size.x
+//              mov dx,[ecx+0x80]   add dx,[ecx+0x78]    y end = size.y then pos.y
+//   ours       mov ax,[ecx+0x7e]   add ax,[ecx+0x76]    x end: operands swapped
+//              mov dx,[ecx+0x80]   add dx,[ecx+0x78]    y end: correct
 //
-// <windows.h> is included because headers.py names it (with <stdlib.h> and
-// <math.h>) as the closest header set: it is what makes the y sum keep its
-// operand in dx, 55.6% without it.
+// The original's two adds pick OPPOSITE operands: the lower offset goes into the
+// register for x and the higher one for y. No consistent canonicalizer produces
+// that, and this build will not produce it either. Measured this pass, all
+// free-scored with score.py, all at exactly 322 bytes:
+// 1. Source order is not the lever at all. `pos.x+size.x` and `size.x+pos.x`
+//    compile to the same code (verified by diffing the objects), and so do the
+//    four combinations of the two sums: reversing x only, y only, both, and
+//    `size.y+pos.y` for y (the spelling the original's operand order implies).
+//    MSVC picks the operand with the higher displacement for the register and
+//    ignores which side of the `+` it was written on. So the source above is the
+//    most plausible original, and no spelling of it changes the output.
+// 2. Other shapes, all 98.0 with the same residual: one declaration with a comma
+//    (`short xend = ..., yend = ...`), `xend` and `yend` declared uninitialised
+//    and then assigned, `xend = pos.x; xend += size.x` (and the same for y, and
+//    both), the `Point p = obj->pos` copy moved between the two sums, and the two
+//    sums swapped (that one is worse, 97.0: it reorders the four instructions).
+// 3. What does move it is state, not shape. Deleting `#include <windows.h>` flips
+//    BOTH sums to the lower-displacement-first form AND introduces a second
+//    residual, `mov bl,[edi+ecx]` where the original has `mov bl,[ecx+edi]`,
+//    which is the same base/index SIB swap that 0x47d820 could not shake. So the
+//    include is load bearing twice over and stays; the earlier note understated
+//    this by crediting it only with the y sum.
+// 4. The declaration-state probe that reached a padding MATCH on 0x47d820 does
+//    not work here. N unused declarations after the include, N = 4, 12, 20, 32
+//    for each of `extern void __cdecl f(void);`, `extern int __cdecl f(int,int);`,
+//    `static int v;`, `typedef int t;` and `extern int v;`: 98.0 everywhere except
+//    two 96.0s, never MATCH, all at 322 bytes. Combined with the earlier
+//    `extern int dummyK` sweep (K = 0 to 200 step 4) and headers.py's 128 sets
+//    (best 98.0), there is no padding, header or spelling that reaches MATCH.
+//
+// Conclusion, same class as the residual on 0x47d820: front-end symbol-hash
+// state, and the file below is the correct source. Do not spend a pass on the
+// operand order of these two adds. (No padding MATCH was found here to decline.)
+//
+// Claude Sonnet 5.5 pass (#571) notes, kept because they explain the body: the
+// fix that took it from 57.6 to 98.0 percent is to write the mask read with the
+// post-increment inside it, `mask[n++] & bit`, instead of `n++` at the bottom of
+// the loop. The original increments right after the load (`mov ecx,[n]; mov
+// bl,[ecx+edi]; inc ecx; test bl,bl; mov [n],ecx`), and with the increment merged
+// MSVC keeps `n` in the dead `flag` argument slot and gives esi to the cell
+// pointer, as the original does; with `n++` at the bottom it puts `n` in esi and
+// spills `bit`, which cascades through the whole loop. Explicit `(short)` casts
+// and `int` locals for the two ends (56.3 percent, worse) were also tried.
+//
+// Stack map, re-derived this pass from the frame (sub esp,0x14, then four
+// pushes, so the saved registers are at esp+0..0xc and the five local dwords at
+// esp+0x10..0x1c, with arg1 at esp+0x28 and arg2 at esp+0x2c): S+0 xend, S+4 the
+// outer row counter, S+8 first the 4-byte `Point p` copy and then the inner column
+// counter, S+0xc first p.y and then the byte stride 13*width, S+0x10 yend. p.x
+// stays in edi from the copy's dword load and p.y is re-read from the stack
+// half of that copy, which is why `Point p = obj->pos;` must stay a 4-byte copy
+// and not two separate `short` locals.
+//
+// Caller, for whoever names this: the only caller is the thunk 0x47dac0, which
+// forwards its own two arguments unchanged (`push arg2; push arg1; call`, so the
+// last push is the callee's first parameter) and, when the scan succeeds, clears
+// bit 2 of the byte at obj+0x10f, sets it from `flag & 1`, sets
+// obj->[0x110] |= 0x8000000, calls 0x47c790(obj) and then 0x440a40 with the
+// object's point at +0x76 and its point at +0x7e pushed by value. So arg1 is the
+// object being placed and arg2 is a flag, as declared here.
 #include <windows.h>
 #pragma pack(push, 1)
 
@@ -88,9 +127,8 @@ int __stdcall FUN_0047d970(Obj_0047d970* obj, int flag)
     for (int y = p.y; y < yend; y++) {
         Cell_0047d970* c = g_game->cells + y * width;
         for (int x = p.x; x < xend; x++) {
-            if ((obj->unit->mask[n] & bit) && c[x].field_0 != 0 && c[x].field_0 != obj->field_a8)
+            if ((obj->unit->mask[n++] & bit) && c[x].field_0 != 0 && c[x].field_0 != obj->field_a8)
                 return 0;
-            n++;
         }
     }
     return 1;
