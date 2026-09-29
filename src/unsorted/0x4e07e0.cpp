@@ -1,18 +1,24 @@
-// Decompiled by space-bunny-free. Names are provisional.
+// Decompiled by space-bunny-free, finished by muse-spark-1.3-free. Names are provisional.
 // Reports the process working set into a caller-supplied buffer, with a
 // psapi.dll QueryWorkingSet refresh at most once every ten calls.
 //
-// Still differs (84.5%, 916 of 934 bytes). Everything matches except one
-// group of 15 bytes: the original stores ptn/sharedn/privn into their globals
-// BOTH before the scan loop and again after it, while ours only keeps the
-// second set. So the original's source must have the second set INSIDE the
-// loop's "if (n)" block, which is the only way the first set stays live.
-// Written that way it compiles to 951-952 bytes (76%): MSVC 5 then demotes the
-// loop counter out of ebp into a stack slot and drops esi, so the whole
-// register rotation of the loop goes wrong. That is a register pressure
-// problem, not a shape problem, and it is unsolved here.
-// A separate loop counter variable (int i = n) with the stores inside gets the
-// SIZE almost exactly right (938 bytes) but scores lower, 83.6%.
+// Still differs (88.7%, 916 of 934 bytes). All five number-formatting blocks,
+// the shared-bit test and the post-scan store order now match. The only
+// remaining code difference is one group of 18 bytes in the scan prologue:
+// the original stores ptn/sharedn/privn into their globals BOTH before the
+// scan loop (mov [pt],esi / test eax,eax / mov [shared],ebx / mov [priv],edi
+// / jbe) and again after it, while this version only keeps the second set,
+// plus the loop-counter copy sits before the total store (mov ebp,eax early)
+// instead of after the pointer lea, and the loop guard is je instead of jbe.
+// The pre-loop stores must be live on the n==0 path, so they belong outside
+// the loop's if-block with the post-loop stores inside; written that way the
+// build grows to 936-951 bytes and spills (loop counter to a stack slot with
+// per-iteration reload/store, or ptn to memory, plus an ebx zero hoist at the
+// top that cascades). Tried: pre-outside+post-inside, split pre (pt outside,
+// shared+priv inside), separate cnt counter assigned early and late, p lea
+// before/after zeroing and inside/outside the guard, guards != 0 / > 0 /
+// >= 1 / plain, zeroing order swaps. A separate-counter variant keeps the pt
+// pre-store but MSVC dead-stores the other two (926 bytes, 88.0%).
 #include <windows.h>
 #include <stdio.h>
 
@@ -39,18 +45,21 @@ typedef BOOL (WINAPI *QueryWorkingSet_004e07e0)(HANDLE, PVOID, DWORD);
 // Writes n as a decimal with thousands separators, then reverses it.
 static void __inline fmt_004e07e0(char *buf, unsigned int n)
 {
-    char *w = buf;
-    char *f = buf;
-    int digits = 0;
+    char *f;
+    char *w;
+    int digits;
 
-    *w = 0;
+    *buf = 0;
+    f = buf;
+    w = buf;
+    digits = 0;
     do {
         *w = (char)('0' + n % 10);
         w++;
         n /= 10;
         digits++;
         if (digits % 3 == 0) {
-            if (n) {
+            if (n != 0) {
                 *w = ',';
                 w++;
             }
@@ -115,14 +124,14 @@ char __cdecl FUN_004e07e0(char *dest)
         DAT_005295b8 = sharedn;
         DAT_00529528 = privn;
         p = (DWORD *)&ws.WorkingSetInfo[0];
-        if (n) {
+        if (n != 0) {
             do {
                 w = *p;
                 lo = w & 0xfff;
                 hi = w & 0xfffff000;
                 if (hi >= 0xc0000000 && hi <= 0xe0000000) {
                     ptn++;
-                } else if (lo & 1) {
+                } else if (lo & 0x100) {
                     sharedn++;
                 } else {
                     privn++;
@@ -130,9 +139,9 @@ char __cdecl FUN_004e07e0(char *dest)
                 p++;
             } while (--n);
         }
-        DAT_005295c0 = ptn;
-        DAT_005295b8 = sharedn;
         DAT_00529528 = privn;
+        DAT_005295b8 = sharedn;
+        DAT_005295c0 = ptn;
         DAT_005295d0 = 10;
     }
     fmt_004e07e0(pt, DAT_005295c0 << 12);
