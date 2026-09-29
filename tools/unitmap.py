@@ -3,6 +3,7 @@
     uv run tools/unitmap.py            # rewrite data/units.json
     uv run tools/unitmap.py --check    # exit 1 if data/units.json is stale
     uv run tools/unitmap.py --list     # print the units, largest first
+    uv run tools/unitmap.py --at 0x4b1000   # the unit nearest an address
 
 A unit is a class whose matched members are spread over more than one file in
 src/unsorted/. Consolidating a unit means giving the class one home, so the map
@@ -183,13 +184,86 @@ def build() -> dict:
     return {"units": units}
 
 
+def matched_rows() -> list[dict]:
+    with PROGRESS.open() as fh:
+        return [r for r in csv.DictReader(fh) if r["status"] == "matched"]
+
+
+def unit_of(symbol: str, units: dict) -> str | None:
+    """The unit the function named by `symbol` belongs to, if its class is one."""
+    name = base_name(symbol)
+    if "::" not in name:
+        return None
+    cls = name.split("::")[0]
+    return cls if cls in units else None
+
+
+def at(addr: int, units: dict) -> None:
+    """Report the matched neighbours of an address and the unit nearest them."""
+    rows = matched_rows()
+    exact = next((r for r in rows if int(r["address"], 16) == addr), None)
+    if exact:
+        unit = unit_of(exact["symbol"], units)
+        where = f" (unit {unit})" if unit else " (no unit)"
+        print(f"{exact['address']} is {base_name(exact['symbol'])}{where}")
+        if unit:
+            report(unit, exact, units[unit])
+        return
+    below = sorted((r for r in rows if int(r["address"], 16) < addr),
+                   key=lambda r: int(r["address"], 16))[-1:]
+    above = sorted((r for r in rows if int(r["address"], 16) > addr),
+                   key=lambda r: int(r["address"], 16))[:1]
+    print(f"0x{addr:x} is not a matched member")
+    for label, neighbours in (("below", below), ("above", above)):
+        for r in neighbours:
+            unit = unit_of(r["symbol"], units)
+            where = f" (unit {unit})" if unit else " (no unit)"
+            print(f"  nearest matched {label}: {r['address']} "
+                  f"{base_name(r['symbol'])}{where}")
+    units_near = [unit_of(r["symbol"], units) for r in below + above]
+    units_near = [u for u in units_near if u]
+    if units_near:
+        report(units_near[0], None, units[units_near[0]])
+
+
+def report(unit: str, member: dict | None, e: dict) -> None:
+    size = sum(m["size"] for m in e["members"])
+    vtable = e["vtable"] or "-"
+    bases = ", ".join(e["bases"]) or "-"
+    print(f"{unit}: {len(e['members'])} members, {size} bytes, {len(e['files'])} files, "
+          f"vtable {vtable}, bases {bases}")
+    print("  fields (offset, type, name, file it came from):")
+    if not e["fields"]:
+        print("    none parsed")
+    for f in e["fields"]:
+        off = f"+{f['offset']:#x}" if f["offset"] is not None else "  ?  "
+        print(f"    {off:6s} {f['type']} {f['name']}{f['array']}  <- {f['file']}")
+    for c in e["conflicts"]:
+        views = "  vs  ".join(f"{v['type']} {v['name']}{v['array']} ({v['file']})" for v in c["views"])
+        print(f"    in dispute at {c['offset']}: {views}")
+    print("  members (address, name, file):")
+    for m in e["members"]:
+        mark = "  <-" if member and m["address"] == member["address"] else ""
+        print(f"    {m['address']}  {m['name']:45s} {m['file']}{mark}")
+    print(f"  generate the class with: uv run tools/unitgen.py {unit}")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--check", action="store_true", help="exit 1 if data/units.json is not current")
     ap.add_argument("--list", action="store_true", help="print the units, largest first")
+    ap.add_argument("--at", metavar="ADDR",
+                    help="print the unit a matched address belongs to, or the nearest one")
     args = ap.parse_args()
 
     text = json.dumps(build(), indent=1, sort_keys=True) + "\n"
+    if args.at:
+        try:
+            addr = int(args.at, 16)
+        except ValueError:
+            raise SystemExit(f"--at wants a hex address, not {args.at!r}")
+        at(addr, json.loads(text)["units"])
+        return
     if args.list:
         units = json.loads(text)["units"]
         for u in sorted(units.values(), key=lambda u: -len(u["members"])):
