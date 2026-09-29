@@ -869,7 +869,7 @@ address,size,file,symbol,status,similarity
 0x446c70,529,src/unsorted/0x446c70.cpp,?FUN_00446c70@@YAXXZ,matched,100.0
 0x446e90,177,src/unsorted/0x446e90.cpp,?FUN_00446e90@@YGXPAUPlayer_00446e90@@@Z,matched,100.0
 0x446f50,88,src/unsorted/0x446f50.cpp,?FUN_00446f50@@YGXH@Z,matched,100.0
-0x446fb0,414,src/unsorted/0x446fb0.cpp,?FUN_00446fb0@@YAXXZ,partial,28.8
+0x446fb0,414,src/unsorted/0x446fb0.cpp,?FUN_00446fb0@@YAXXZ,partial,51.6
 0x447150,552,src/unsorted/0x447150.cpp,?FUN_00447150@@YGXPAUGadget_00447150@@@Z,matched,100.0
 0x4478b0,607,src/unsorted/0x4478b0.cpp,?FUN_004478b0@@YAXXZ,matched,100.0
 0x448bf0,119,src/unsorted/0x448bf0.cpp,?FUN_00448bf0@@YGXH@Z,matched,100.0
@@ -1228,7 +1228,7 @@ address,size,file,symbol,status,similarity
 0x461da0,15,src/unsorted/0x461da0.cpp,?FUN_00461da0@Class_00461da0@@QAEHH@Z,matched,100.0
 0x461db0,468,src/unsorted/0x461db0.cpp,?FUN_00461db0@Class_00462470@@QAEHHIHH@Z,matched,100.0
 0x461f90,62,src/unsorted/0x461f90.cpp,?FUN_00461f90@Class_00461f90@@QAEXPAUItem_00461f90@@@Z,matched,100.0
-0x461fd0,919,src/unsorted/0x461fd0.cpp,?FUN_00461fd0@Class_00461fd0@@QAEHHH@Z,partial,63.7
+0x461fd0,919,src/unsorted/0x461fd0.cpp,?FUN_00461fd0@Class_00461fd0@@QAEHHH@Z,partial,86.6
 0x462370,60,src/unsorted/0x462370.cpp,?FUN_00462370@Class_00462370@@QAEHH@Z,matched,100.0
 0x4623b0,39,src/unsorted/0x4623b0.cpp,?FUN_004623b0@Class_004623b0@@QAEHXZ,matched,100.0
 0x4623e0,137,src/unsorted/0x4623e0.cpp,?FUN_004623e0@Class_004623e0@@QAEXPAUItem_004623e0@@@Z,matched,100.0
@@ -1287,7 +1287,7 @@ address,size,file,symbol,status,similarity
 0x464de0,143,src/unsorted/0x464de0.cpp,?FUN_00464de0@@YGXPAUGadget_00464de0@@@Z,matched,100.0
 0x464e70,263,src/unsorted/0x464e70.cpp,?FUN_00464e70@@YAXXZ,matched,100.0
 0x4658e0,469,src/unsorted/0x4658e0.cpp,?FUN_004658e0@@YGHPAUMap_004658e0@@HHHHF@Z,partial,82.2
-0x465ac0,865,src/unsorted/0x465ac0.cpp,?FUN_00465ac0@@YGHPAUMap_00465ac0@@PAUUnit_00465ac0@@@Z,partial,95.8
+0x465ac0,865,src/unsorted/0x465ac0.cpp,?FUN_00465ac0@@YGHPAUMap_00465ac0@@PAUUnit_00465ac0@@@Z,partial,98.3
 0x465e30,371,src/unsorted/0x465e30.cpp,?FUN_00465e30@@YAXXZ,matched,100.0
 0x465fb0,147,src/unsorted/0x465fb0.cpp,?FUN_00465fb0@@YGXPAVClass_004b4560@@@Z,matched,100.0
 0x466580,67,src/unsorted/0x466580.cpp,?FUN_00466580@@YAXXZ,matched,100.0
@@ -1560,7 +1560,7 @@ address,size,file,symbol,status,similarity
 0x479760,122,src/unsorted/0x479760.cpp,?FUN_00479760@@YAHXZ,matched,100.0
 0x479bf0,92,src/unsorted/0x479bf0.cpp,?FUN_00479bf0@@YGXPAUObj_00479bf0@@PAD@Z,matched,100.0
 0x47a700,89,src/unsorted/0x47a700.cpp,?FUN_0047a700@@YGHHH@Z,matched,100.0
-0x47a760,372,src/unsorted/0x47a760.cpp,?FUN_0047a760@@YAXXZ,partial,83.3
+0x47a760,372,src/unsorted/0x47a760.cpp,?FUN_0047a760@@YAXXZ,matched,100.0
 0x47a8e0,40,src/unsorted/0x47a8e0.cpp,?FUN_0047a8e0@@YAXXZ,matched,100.0
 0x47a910,390,src/unsorted/0x47a910.cpp,?FUN_0047a910@@YGXPAUMenu_0047a910@@@Z,matched,100.0
 0x47aaa0,70,src/unsorted/0x47aaa0.cpp,?FUN_0047aaa0@@YGXPAUMenu_0047aaa0@@H@Z,matched,100.0
@@ -2198,12 +2198,12 @@ address,size,file,symbol,status,similarity
 0x4ac170,389,src/unsorted/0x4ac170.cpp,?FUN_004ac170@@YGHPAUMenu_004ac170@@PBD111@Z,matched,100.0
 0x4ac300,56,src/unsorted/0x4ac300.cpp,?FUN_004ac300@@YGXPAUObj_4ac300@@@Z,matched,100.0
 0x4ac340,373,src/unsorted/0x4ac340.cpp,?FUN_004ac340@@YGHPAUSub_004ac340@@PAD111H@Z,matched,100.0
-0x4ac4c0,325,src/unsorted/0x4ac4c0.cpp,?FUN_004ac4c0@@YGPADPAUMenu_004ac4c0@@PADHH@Z,partial,67.7
+0x4ac4c0,325,src/unsorted/0x4ac4c0.cpp,?FUN_004ac4c0@@YGPADPAUMenu_004ac4c0@@PADHH@Z,partial,72.4
 0x4ac610,252,src/unsorted/0x4ac610.cpp,?FUN_004ac610@@YGXPAUClass_004ac610@@PAEHHH@Z,matched,100.0
 0x4ac710,179,src/unsorted/0x4ac710.cpp,?FUN_004ac710@@YGXPAUPalEntry_004ac710@@0PAE@Z,matched,100.0
 0x4ac7d0,207,src/unsorted/0x4ac7d0.cpp,?FUN_004ac7d0@@YGXPAUPalette_004ac7d0@@PAUPalEntry_004ac7d0@@1@Z,matched,100.0
 0x4ac8a0,28,src/unsorted/0x4ac8a0.cpp,?FUN_004ac8a0@@YGXPADPAX@Z,matched,100.0
-0x4ac8c0,167,src/unsorted/0x4ac8c0.cpp,?FUN_004ac8c0@@YGXPAUObject_004ac8c0@@@Z,partial,84.7
+0x4ac8c0,167,src/unsorted/0x4ac8c0.cpp,?FUN_004ac8c0@@YGXPAUObject_004ac8c0@@@Z,partial,88.1
 0x4ac970,161,src/unsorted/0x4ac970.cpp,?FUN_004ac970@@YGXPAUObject_004ac970@@HH@Z,partial,83.1
 0x4aca20,181,src/unsorted/0x4aca20.cpp,?FUN_004aca20@@YGXPAUObject_004aca20@@PAEH@Z,matched,100.0
 0x4acae0,246,src/unsorted/0x4acae0.cpp,?FUN_004acae0@@YGXPAEHH@Z,matched,100.0
@@ -2454,7 +2454,7 @@ address,size,file,symbol,status,similarity
 0x4b96e0,90,src/unsorted/0x4b96e0.cpp,?FUN_004b96e0@@YGXPAUImage_004b96e0@@E@Z,matched,100.0
 0x4b9740,778,src/unsorted/0x4b9740.cpp,?FUN_004b9740@@YGXPAVClass_004c6ae0@@PAUBitmap_004b9740@@HHNN@Z,matched,100.0
 0x4b9a50,799,src/unsorted/0x4b9a50.cpp,?FUN_004b9a50@@YGXPAVClass_004c6ae0@@PAUBitmap_004b9a50@@HHNN@Z,matched,100.0
-0x4b9d70,234,src/unsorted/0x4b9d70.cpp,?FUN_004b9d70@@YGXPAUImage_004b9d70@@0HH@Z,partial,58.2
+0x4b9d70,234,src/unsorted/0x4b9d70.cpp,?FUN_004b9d70@@YGXPAUImage_004b9d70@@0HH@Z,partial,80.0
 0x4b9e60,110,src/unsorted/0x4b9e60.cpp,?FUN_004b9e60@@YGHPAEPAUImage_004b9e60@@@Z,matched,100.0
 0x4b9ed0,120,src/unsorted/0x4b9ed0.cpp,?FUN_004b9ed0@@YGXPADH@Z,matched,100.0
 0x4b9f50,175,src/unsorted/0x4b9f50.cpp,?FUN_004b9f50@@YGPADPADHEE@Z,matched,100.0
@@ -2787,7 +2787,7 @@ address,size,file,symbol,status,similarity
 0x4cd9b0,3,src/unsorted/0x4cd9b0.cpp,?FUN_004cd9b0@@YGXH@Z,matched,100.0
 0x4cd9c0,7,src/unsorted/0x4cd9c0.cpp,?FUN_004cd9c0@Class_004cd9c0@@QAEHXZ,matched,100.0
 0x4cd9d0,39,src/unsorted/0x4cd9d0.cpp,?FUN_004cd9d0@Class_004cd9d0@@QAEHP6AXXZ@Z,matched,100.0
-0x4cda00,307,src/unsorted/0x4cda00.cpp,?FUN_004cda00@Class_004cda00@@QAEHXZ,partial,97.2
+0x4cda00,307,src/unsorted/0x4cda00.cpp,?FUN_004cda00@Class_004cda00@@QAEHXZ,matched,100.0
 0x4ce020,7,src/unsorted/0x4ce020.cpp,?FUN_004ce020@Class_004ce020@@QAEHXZ,matched,100.0
 0x4ce030,340,src/unsorted/0x4ce030.cpp,?FUN_004ce030@@YAXHHH@Z,matched,100.0
 0x4ce190,61,src/unsorted/0x4ce190.cpp,?FUN_004ce190@Class_004ce190@@QAEXXZ,matched,100.0
@@ -2861,8 +2861,8 @@ address,size,file,symbol,status,similarity
 0x4d0680,62,src/unsorted/0x4d0680.cpp,?FUN_004d0680@@YGXH@Z,matched,100.0
 0x4d06c0,85,src/unsorted/0x4d06c0.cpp,?FUN_004d06c0@Class_004d06c0@@QAEHPADHH@Z,matched,100.0
 0x4d0720,205,src/unsorted/0x4d0720.cpp,?FUN_004d0720@@YGHPAXPAD@Z,partial,97.5
-0x4d07f0,275,src/unsorted/0x4d07f0.cpp,?FUN_004d07f0@@YGHPAXPAH11@Z,partial,82.7
-0x4d0910,206,src/unsorted/0x4d0910.cpp,?FUN_004d0910@@YGHPAX@Z,partial,76.1
+0x4d07f0,275,src/unsorted/0x4d07f0.cpp,?FUN_004d07f0@@YGHPAXPAH11@Z,partial,88.7
+0x4d0910,206,src/unsorted/0x4d0910.cpp,?FUN_004d0910@@YGHPAX@Z,partial,94.7
 0x4d09e0,47,src/unsorted/0x4d09e0.cpp,?FUN_004d09e0@@YAXXZ,matched,100.0
 0x4d0a10,86,src/unsorted/0x4d0a10.cpp,?FUN_004d0a10@@YGXH@Z,matched,100.0
 0x4d0a70,28,src/unsorted/0x4d0a70.cpp,?FUN_004d0a70@@YAHXZ,matched,100.0
@@ -2873,7 +2873,7 @@ address,size,file,symbol,status,similarity
 0x4d0b80,137,src/unsorted/0x4d0b80.cpp,?FUN_004d0b80@@YGXHH@Z,matched,100.0
 0x4d0c10,56,src/unsorted/0x4d0c10.cpp,?FUN_004d0c10@@YGHH@Z,matched,100.0
 0x4d0c50,389,src/unsorted/0x4d0c50.cpp,?FUN_004d0c50@@YGXH@Z,matched,100.0
-0x4d0de0,373,src/unsorted/0x4d0de0.cpp,?FUN_004d0de0@@YGHHPAH@Z,partial,57.3
+0x4d0de0,373,src/unsorted/0x4d0de0.cpp,?FUN_004d0de0@@YGHHPAH@Z,matched,100.0
 0x4d1480,493,src/unsorted/0x4d1480.cpp,?FUN_004d1480@@YGHPAE0@Z,matched,100.0
 0x4d1800,13,src/unsorted/0x4d1800.cpp,?FUN_004d1800@@YAHXZ,matched,100.0
 0x4d1810,13,src/unsorted/0x4d1810.cpp,?FUN_004d1810@@YAHXZ,matched,100.0
