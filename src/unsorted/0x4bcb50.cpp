@@ -1,11 +1,9 @@
 // Decompiled by space-bunny-free, finished by muse-spark-1.3-free, finished by deepseek-v4.1-flash. Names are provisional.
 // Recursive directory walk: opens path with the search 0x4bc4b0 and, for every
 // entry whose name is neither "." nor "..", either descends into the
-// subdirectory (the sub-search is not itself recursive, because this function
-// recurses) or, when the name matches the wildcard pattern, appends
-// "path\\name" to the vector passed in. The search handle is closed at the end.
-// The frame is exactly a path buffer, a _finddata_t and the string object, so
-// the two sprintfs have to share one buffer.
+// subdirectory or, when the name matches the wildcard pattern, appends
+// "path\\name" to the vector passed in. The search handle is closed at the end
+// (the inlined body of 0x4bc8d0).
 //
 // SOLVED: the register rotation. Four earlier sessions left this at 90.2
 // percent with the path parameter in ebp and the search handle in ebx, the
@@ -104,6 +102,8 @@ int __stdcall FUN_004bc370(const char* str, const char* pat);
 void FUN_004d85a0(void* p);
 void __stdcall FUN_004bcb50(char* path, const char* pat, Class_004be6c0* tree, int state, int recursive);
 
+
+static inline int Next(int h, struct _finddata_t* fd) { int r = FUN_004bc640((Find_004bcb50*)h, fd); return r; }
 // FUNCTION: 0x4bcb50
 void __stdcall FUN_004bcb50(char* path, const char* pat, Class_004be6c0* tree, int state, int recursive)
 {
