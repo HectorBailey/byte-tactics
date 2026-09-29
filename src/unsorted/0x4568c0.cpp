@@ -1,6 +1,6 @@
 // Decompiled by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
 //
-// PARTIAL, 75.9% (up from 59.1%). The frame is byte exact (0x34 locals, with
+// PARTIAL, 76.2% (up from 59.1%). The frame is byte exact (0x34 locals, with
 // idx/out/ret/k4 sharing the dword at +0x14 as the original has them), the
 // player probe, both target-order branches, the candidate collection loop, the
 // shuffle inline and the k3 done-scan loop all match in shape. What still
@@ -11,8 +11,6 @@
 //    the packet stores past the active test;
 //  - `res` ends up in ebp where the original reloads it into edi, and the k3
 //    loop then uses edi as its zero constant where the original uses ebx;
-//  - the shuffle guard is `or eax,edx` on the 64-bit quotient where the
-//    original tests the low dword alone;
 //  - the k3 loop's first arm ends in an unconditional jmp where the original
 //    re-tests `res`, and the original's first `cmp [eax],0` is not hoisted.
 #include <stdlib.h>
@@ -127,7 +125,7 @@ int FUN_004568c0()
                 }
                 q += 0x14b;
             } while (--cnt);
-            if (n > 2 || (__int64)rand() * 2 / 0x8000 != 0)
+            if (n > 2 || (int)((__int64)rand() * 2 / 0x8000) != 0)
                 std::random_shuffle(cand, cand + n);
             int* cp = cand;
             for (int k2 = 0; k2 < 10; k2++) {
