@@ -517,117 +517,6 @@
    "safe": true,
    "vtable": null
   },
-  "Class_00428c90": {
-   "bases": [],
-   "conflicts": [],
-   "declared_in": [
-    "src/unsorted/0x428c60.cpp",
-    "src/unsorted/0x428c90.cpp",
-    "src/unsorted/0x428cd0.cpp",
-    "src/unsorted/0x428e90.cpp"
-   ],
-   "fields": [
-    {
-     "array": "",
-     "file": "src/unsorted/0x428c60.cpp",
-     "name": "field_80",
-     "offset": 128,
-     "others": [],
-     "type": "char*"
-    },
-    {
-     "array": "",
-     "file": "src/unsorted/0x428c60.cpp",
-     "name": "field_84",
-     "offset": 132,
-     "others": [],
-     "type": "char*"
-    },
-    {
-     "array": "",
-     "file": "src/unsorted/0x428c60.cpp",
-     "name": "field_88",
-     "offset": 136,
-     "others": [],
-     "type": "char*"
-    },
-    {
-     "array": "",
-     "file": "src/unsorted/0x428c60.cpp",
-     "name": "field_8c",
-     "offset": 140,
-     "others": [],
-     "type": "int"
-    },
-    {
-     "array": "",
-     "file": "src/unsorted/0x428c60.cpp",
-     "name": "field_90",
-     "offset": 144,
-     "others": [],
-     "type": "int"
-    },
-    {
-     "array": "",
-     "file": "src/unsorted/0x428c60.cpp",
-     "name": "field_94",
-     "offset": 148,
-     "others": [],
-     "type": "int"
-    },
-    {
-     "array": "",
-     "file": "src/unsorted/0x428c60.cpp",
-     "name": "flag",
-     "offset": null,
-     "others": [],
-     "type": "char"
-    },
-    {
-     "array": "[0x7f]",
-     "file": "src/unsorted/0x428c60.cpp",
-     "name": "unknown_1",
-     "offset": null,
-     "others": [],
-     "type": "char"
-    }
-   ],
-   "files": [
-    "src/unsorted/0x428c60.cpp",
-    "src/unsorted/0x428c90.cpp",
-    "src/unsorted/0x428cd0.cpp",
-    "src/unsorted/0x428e90.cpp"
-   ],
-   "kind": "class",
-   "members": [
-    {
-     "address": "0x428c60",
-     "file": "src/unsorted/0x428c60.cpp",
-     "name": "Class_00428c90::Class_00428c90",
-     "size": 47
-    },
-    {
-     "address": "0x428c90",
-     "file": "src/unsorted/0x428c90.cpp",
-     "name": "Class_00428c90::FUN_00428c90",
-     "size": 57
-    },
-    {
-     "address": "0x428cd0",
-     "file": "src/unsorted/0x428cd0.cpp",
-     "name": "Class_00428c90::FUN_00428cd0",
-     "size": 63
-    },
-    {
-     "address": "0x428e90",
-     "file": "src/unsorted/0x428e90.cpp",
-     "name": "Class_00428c90::FUN_00428e90",
-     "size": 164
-    }
-   ],
-   "safe": true,
-   "vtable": null
-  },
   "Class_00434f70": {
    "bases": [],
    "conflicts": [
@@ -8010,8 +7899,13 @@
    "files": [
     "src/unsorted/0x46e890.cpp",
     "src/unsorted/0x46ea10.cpp",
+    "src/unsorted/0x46ef50.cpp",
     "src/unsorted/0x46f6d0.cpp",
-    "src/unsorted/0x46fb80.cpp"
+    "src/unsorted/0x46fb80.cpp",
+    "src/unsorted/0x46feb0.cpp",
+    "src/unsorted/0x46ff10.cpp",
+    "src/unsorted/0x46ff70.cpp",
+    "src/unsorted/0x46ff90.cpp"
    ],
    "kind": "class",
    "members": [
@@ -8028,6 +7922,12 @@
      "size": 132
     },
     {
+     "address": "0x46ef50",
+     "file": "src/unsorted/0x46ef50.cpp",
+     "name": "IURect_0046e160::IU?$pair::?$_Tree::insert",
+     "size": 643
+    },
+    {
      "address": "0x46f6d0",
      "file": "src/unsorted/0x46f6d0.cpp",
      "name": "IURect_0046e160::IU?$pair::?$_Tree::_Erase",
@@ -8038,6 +7938,30 @@
      "file": "src/unsorted/0x46fb80.cpp",
      "name": "IURect_0046e160::IU?$pair::?$_Tree::_Insert",
      "size": 731
+    },
+    {
+     "address": "0x46feb0",
+     "file": "src/unsorted/0x46feb0.cpp",
+     "name": "IURect_0046e160::IU?$pair::?$_Tree::_Lrotate",
+     "size": 90
+    },
+    {
+     "address": "0x46ff10",
+     "file": "src/unsorted/0x46ff10.cpp",
+     "name": "IURect_0046e160::IU?$pair::?$_Tree::_Rrotate",
+     "size": 92
+    },
+    {
+     "address": "0x46ff70",
+     "file": "src/unsorted/0x46ff70.cpp",
+     "name": "IURect_0046e160::IU?$pair::?$_Tree::_Buynode",
+     "size": 27
+    },
+    {
+     "address": "0x46ff90",
+     "file": "src/unsorted/0x46ff90.cpp",
+     "name": "IURect_0046e160::IU?$pair::?$_Tree::iterator::_Dec",
+     "size": 159
     }
    ],
    "safe": true,
