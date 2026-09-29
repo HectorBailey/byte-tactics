@@ -376,9 +376,14 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
         if (unit->def->f245 & 0x40) {
             if (unit->moving == 0)
                 return Class_00438760("QPATROL");
-            if (!((unit->def->f245 >> 9) & 1))
-                return Pick(unit->def, "VTOL_PATROL", "PATROL");
-            return Pick(unit->def, "VTOL_REPAIRPATROL", "REPAIRPATROL");
+            if ((unit->def->f245 >> 9) & 1) {
+                if ((unit->def->f241 >> 11) & 1)
+                    return Class_00438760("VTOL_REPAIRPATROL");
+                return Class_00438760("REPAIRPATROL");
+            }
+            if ((unit->def->f241 >> 11) & 1)
+                return Class_00438760("VTOL_PATROL");
+            return Class_00438760("PATROL");
         }
         break;
     case 10:
