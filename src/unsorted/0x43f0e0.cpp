@@ -403,7 +403,7 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
     case 12: {
         if (!(unit->def->f245 & 0x400))
             break;
-        Thing_0043f0e0* t = pos ? Lookup(pos) : 0;
+        Thing_0043f0e0* t = Lookup(pos);
         if (pos) {
             if ((unit->def->f245 & 0x800) && Visible(unit, pos) && Marked(t))
                 return Class_00438760("RESURRECT");
