@@ -1,3 +1,4 @@
+// Decompiled by space-bunny-free. Names are provisional.
 // Click handler of the file requester (FILEREQ.GUI, opened by 0x4afa30).
 // On close (field_60 == -1) it restores the saved drive and directory and
 // frees the request data. Otherwise it acts on the entry the user clicked:
