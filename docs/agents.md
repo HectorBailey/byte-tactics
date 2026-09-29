@@ -457,7 +457,6 @@ Cost units: thousands of tokens weighted by price relative to Haiku (Sonnet 5 co
 | #357 | space-bunny-free | 4 | 0 | 0 | n/a | n/a | n/a |
 | #420 | space-bunny-free | 2 | 1 | 0 | n/a | n/a | n/a |
 | #285 | deepseek-v4.1-flash | 6 | 4 | 0 | n/a | n/a | n/a |
-| #286 | space-bunny-free | 6 | 4 | 0 | n/a | n/a | n/a |
 | #438 | space-bunny-free | 2 | 1 | 0 | n/a | n/a | n/a |
 | #436 | opus | 2 | 2 | 0 | n/a | n/a | n/a |
 | #431 | opus | 3 | 3 | 0 | n/a | n/a | n/a |
@@ -630,7 +629,6 @@ Cost units: thousands of tokens weighted by price relative to Haiku (Sonnet 5 co
 | #509 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
 | #537 | gpt-5.6-terra | 2 | 0 | 0 | n/a | n/a | n/a |
 | #609 | space-bunny-free | 4 | 1 | 0 | n/a | n/a | n/a |
-| #609 | space-bunny-free | 4 | 1 | 0 | n/a | n/a | n/a |
 | #555 | gpt-5.6-terra | 4 | 0 | 0 | n/a | n/a | n/a |
 | #531 | deepseek-v4.1-flash | 2 | 1 | 0 | n/a | n/a | n/a |
 | #557 | gpt-5.6-terra | 4 | 1 | 0 | n/a | n/a | n/a |
@@ -655,7 +653,6 @@ Cost units: thousands of tokens weighted by price relative to Haiku (Sonnet 5 co
 | #595 | deepseek-v4.1-flash | 2 | 1 | 0 | n/a | n/a | n/a |
 | #781 | deepseek-v4.1-flash | 3 | 2 | 0 | n/a | n/a | n/a |
 | #696 | deepseek-v4.1-flash | 2 | 1 | 0 | n/a | n/a | n/a |
-| #861 | space-bunny-free | 3 | 0 | 0 | n/a | n/a | n/a |
 | #861 | space-bunny-free | 3 | 0 | 0 | n/a | n/a | n/a |
 | #425 | space-bunny-free | 3 | 3 | 0 | n/a | n/a | n/a |
 | #749 | space-bunny-free | 3 | 1 | 0 | n/a | n/a | n/a |
@@ -705,7 +702,6 @@ Cost units: thousands of tokens weighted by price relative to Haiku (Sonnet 5 co
 | #930 | space-bunny-free | 3 | 0 | 0 | n/a | n/a | n/a |
 | #933 | space-bunny-free | 3 | 0 | 0 | n/a | n/a | n/a |
 | #932 | space-bunny-free | 3 | 1 | 0 | n/a | n/a | n/a |
-| #858 | space-bunny-free | 3 | 0 | 0 | n/a | n/a | n/a |
 | #953 | space-bunny-free | 3 | 0 | 0 | n/a | n/a | n/a |
 | #917 | space-bunny-free | 1 | 1 | 0 | n/a | n/a | n/a |
 | #874 | space-bunny-free | 4 | 1 | 0 | n/a | n/a | n/a |
@@ -1033,14 +1029,23 @@ Cost units: thousands of tokens weighted by price relative to Haiku (Sonnet 5 co
 | #1365 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
 | #1425 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
 | #1451 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1455 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1647 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1644 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1441 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1489 | opus | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1491 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1498 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1494 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1516 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
 
 ### Escalations
 
-- Opus matched 94 of 114 functions a cheaper model had failed.
+- Opus matched 94 of 115 functions a cheaper model had failed.
 - Sonnet matched 109 of 116 functions a cheaper model had failed.
-- Gpt-6 matched 1 of 42 functions a cheaper model had failed.
+- Gpt-6 matched 1 of 43 functions a cheaper model had failed.
 - Space-bunny-free matched 78 of 323 functions a cheaper model had failed.
-- Deepseek-v4.1-flash matched 68 of 391 functions a cheaper model had failed.
+- Deepseek-v4.1-flash matched 68 of 411 functions a cheaper model had failed.
 - Gpt-5.6-terra matched 3 of 16 functions a cheaper model had failed.
 - Mimo-v2.6-flash matched 3 of 5 functions a cheaper model had failed.
 - Sonnet-5.5 matched 29 of 69 functions a cheaper model had failed.
