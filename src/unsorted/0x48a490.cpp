@@ -188,8 +188,8 @@ void __stdcall FUN_0048a490(Unit_0048a490* u)
             int wx = (short)((t.x + u->posx) >> 16);
             int fz = hz & 0xf;
             int fx = wx & 0xf;
-            int gx = (unsigned)wx >> 4;
-            int gz = (unsigned)hz >> 4;
+            unsigned gx = (unsigned)wx >> 4;
+            unsigned gz = (unsigned)hz >> 4;
             int gw = g_game->gridW;
             if (gx >= gw - 1)
                 return;
