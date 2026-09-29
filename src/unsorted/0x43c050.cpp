@@ -1,4 +1,4 @@
-// Decompiled by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
 // Appends one 25-byte record from the static table at 0x4fd288 to the global
 // std::vector<Elem> at 0x512340 (element: 0x19 bytes, char* name at +0x15),
 // std::sorts it with the __stdcall name compare 0x43c020, then calls four
@@ -7,25 +7,49 @@
 // _Unguarded_partition (0x43cb20) and _Insertion_sort (0x43c990) stay
 // out-of-line, so those are called by name here.
 //
-// 82.2% with every reference resolving. Still differs:
-//  - register allocation in the sort range setup (the original keeps _F in esi
-//    and _L in ebp; this keeps _L in esi) and in the tail _Insertion_sort call;
+// 84.5% (up from 82.2%). The one change that mattered: the sort must be
+// reached through the separate template function _Sort_0_0043c050 rather than
+// by pasting its body into FUN_0043c050. The original's std::sort inlines
+// _Sort_0, whose parameters _F/_L are then live ACROSS the inlined _Sort
+// loop, so the allocator has to keep them in memory: the original stores
+// _Sort_0's _F at [esp+0x14] and _L at [esp+0x10] (0x43c18f, 0x43c186) and
+// reloading them at 0x43c292 is what the loop latch at 0x43c1ab/0x43c1bf
+// branches around. Pasting the body in makes _F/_L one variable with the
+// inlined loop's, they stay in registers, and the whole sort block shifts.
+//
+// Still differs (all in the sort block, one shared allocation state):
+//  - the entry: the original loads _L into ebp and _F into ebx and copies _F
+//    to esi; this loads _L into esi and _F into ebx. The loop body and the
+//    _Sort_0 tail are then right but the entry stores and the reloads at
+//    0x43c292 pick different registers.
 //  - the _Median argument setup (index temp edx vs ecx, return buffer edx vs
-//    eax).
-// Approaches that did not reach 100%:
-//  - std::sort: the recursive call is the mangled std::_Sort, which does not
-//    resolve to FUN_0043c720 in data/symbols.csv.
+//    eax), which is downstream of the same allocation.
+// Approaches tried that did NOT help, so nobody repeats them:
+//  - the real <algorithm> std::sort (the toolchain's own ALGORITHM header is at
+//    toolchain/msvc5-sp3/INCLUDE/ALGORITHM) instead of the hand-rolled
+//    templates: 82.7%, it inlines _Sort_0 AND _Sort together and loses the
+//    spill/reload pair.
+//  - writing the _Sort loop as an explicit do/while inside _Sort_0 instead of
+//    calling _Sort_0043c050: 78.1%, it re-derives the loop test and adds a
+//    redundant recomparison.
+//  - a while-form tail (`_F += 16; while (_F != _L) {...}`): 81.9%.
+//  - an extra live local for _F across the _Sort call (two spellings): 83.5%
+//    and 81.6%, both add a spill the original does not have.
+//  - routing the sort's begin()/end() through the v->begin()/v->end()
+//    accessors, and through named locals: all exactly 84.5%, so the
+//    accessors are not the lever here.
+// Earlier dead ends, kept for the record:
+//  - std::sort from <algorithm>: the recursive call is the mangled std::_Sort,
+//    which does not resolve to FUN_0043c720 in data/symbols.csv.
 //  - vector::reserve: its size() call is the mangled
 //    UElem_0043c390::?$vector::size, but data/symbols.csv names 0x43c360
 //    Class_0043c360::FUN_0043c360 (every other vector size in the table is
 //    UElem_<addr>::?$vector::size). That version scores 87.3% but that
-//    reference would be a mismatch, and vector::reserve with a trivial element
-//    inlines _Destroy (0x43c390) away, so the call at 0x43c108 is lost.
+//    reference would be a mismatch.
 //  - giving the element a user destructor makes _Destroy out of line (as in the
-//    original, whose _Destroy is `ret 8`) but changes the sort's allocation.
-//    With the _Sort_0 body as a separate inline function it scores 84.5% and
-//    matches the _Median area, but then _Destroy is inlined as a loop calling
-//    the scalar deleting destructor instead of the single call at 0x43c108.
+//    original, whose _Destroy is `ret 8`) but then _Destroy is inlined as a
+//    loop calling the scalar deleting destructor instead of the single call at
+//    0x43c108.
 #include <vector>
 #include <string.h>
 
@@ -127,16 +151,7 @@ void FUN_0043c050()
         ++p;
     } while (p != &DAT_004fd2a1);
 
-    Elem_0043c390* F = DAT_00512340.begin();
-    Elem_0043c390* L = DAT_00512340.end();
-    if (L - F <= 16) {
-        FUN_0043c990(F, L, FUN_0043c020, 0);
-    } else {
-        _Sort_0043c050(F, L, FUN_0043c020, (Elem_0043c390*)0);
-        FUN_0043c990(F, F + 16, FUN_0043c020, 0);
-        for (F += 16; F != L; ++F)
-            _Unguarded_insert_0043c050(F, Elem_0043c390(*F), FUN_0043c020);
-    }
+    _Sort_0_0043c050(DAT_00512340.begin(), DAT_00512340.end(), FUN_0043c020, (Elem_0043c390*)0);
 
     FUN_00406bf0();
     FUN_00415b20();
