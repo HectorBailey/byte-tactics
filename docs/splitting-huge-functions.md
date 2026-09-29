@@ -143,6 +143,35 @@ before it is committed.
 - `data/regions/0x43f0e0.csv`: region address ranges.
 - `tools/regcheck.py`: per-region scoring.
 
+## Follow-up: shared fixes applied to 0x43f0e0
+
+After the pilot, the shared fixes from the agents' proposals were applied to
+the merged draft one at a time and scored with `check.py`:
+
+| Step | Size | `check.py` |
+| --- | ---: | ---: |
+| Merged draft | 4,556 | 14.1% |
+| One cached `def` at function scope | 4,436 | 13.3% |
+| plus `Visible` with `int` locals and no `& 0x1f`, and `IsVtol` without the `unsigned char` cast | 4,300 | 20.6% |
+| plus the alliance test through `target->player->index` (the field at +0x146 belongs to the player, not the definition) and the flags declared in the original's order | 4,300 | 21.1% |
+| plus the case bodies in the original's address order (3, 9, 8, 7, 12, 13, 6, 5, 14, 4, 11, 10, 2, 1) | 4,340 | 39.6% |
+
+- The prologue and the switch dispatch are now identical to the original.
+- Case order mattered most: MSVC emits case bodies in source order, so once
+  ours matched the original's layout `check.py`'s aligned diff became
+  meaningful (it read 21% while the layout differed). `regcheck.py` barely
+  moved on this step, since it is layout independent by design.
+- A cached `def` alone lowered the score; it only helped together with the
+  `Visible` and `IsVtol` fixes. Score each shared change on its own.
+- What still differs: the original keeps the unit in ebp and `def` in esi, and
+  ours swaps them. Two variants (declaring `def` after the flags, and
+  re-reading `mode`) did not change that.
+
+Lesson for the workflow: the skeleton phase should include the case order
+(read it off the jump table's target addresses) and the field owners (check
+which struct a `+0x146` read really belongs to), and `regcheck.py` should be
+used until the layout matches, then `check.py`.
+
 ## Pilot 2 plan: 0x4d8e60
 
 Pilot 2 must test the workflow, not one function family, so it uses a function
