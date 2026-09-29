@@ -109,7 +109,7 @@ own totals, so treat the absolute numbers as rough; the ratios are what matter.
 | 41-64 |  |  |  |  |  |  | 3/11 (27%) |  |  |  |  | 255/255 (100%) | 96/109 (88%) |  |  |
 | 65-160 |  | 64/67 (96%) |  |  |  |  | 1/6 (17%) |  |  |  |  | 739/747 (99%) | 2/6 (33%) |  |  |
 | 161-400 | 0/10 (0%) | 271/350 (77%) |  | 17/18 (94%) |  |  |  |  |  |  |  | 30/36 (83%) |  |  | 204/291 (70%) |
-| 401+ |  | 49/93 (53%) | 1/8 (12%) | 7/9 (78%) | 17/27 (63%) | 3/8 (38%) |  | 2/15 (13%) | 4/7 (57%) | 10/11 (91%) | 0/3 (0%) | 59/83 (71%) |  | 9/31 (29%) | 71/177 (40%) |
+| 401+ |  | 52/117 (44%) | 1/8 (12%) | 7/9 (78%) | 17/27 (63%) | 3/8 (38%) |  | 2/15 (13%) | 4/7 (57%) | 10/11 (91%) | 0/3 (0%) | 59/83 (71%) |  | 9/31 (29%) | 71/177 (40%) |
 
 ### Cost per batch
 
@@ -853,13 +853,23 @@ Cost units: thousands of tokens weighted by price relative to Haiku (Sonnet 5 co
 | #1078 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
 | #1152 | space-bunny-free | 1 | 0 | 0 | n/a | n/a | n/a |
 | #426 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #423 | deepseek-v4.1-flash | 3 | 1 | 0 | n/a | n/a | n/a |
+| #1183 | space-bunny-free | 2 | 0 | 0 | n/a | n/a | n/a |
+| #424 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1163 | space-bunny-free | 1 | 0 | 0 | n/a | n/a | n/a |
+| #987 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #988 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #989 | deepseek-v4.1-flash | 3 | 1 | 0 | n/a | n/a | n/a |
+| #990 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #991 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #992 | deepseek-v4.1-flash | 3 | 1 | 0 | n/a | n/a | n/a |
 
 ### Escalations
 
 - Opus matched 94 of 114 functions a cheaper model had failed.
 - Sonnet matched 109 of 116 functions a cheaper model had failed.
 - Gpt-6 matched 0 of 9 functions a cheaper model had failed.
-- Space-bunny-free matched 77 of 290 functions a cheaper model had failed.
+- Space-bunny-free matched 77 of 293 functions a cheaper model had failed.
 - Deepseek-v4.1-flash matched 51 of 147 functions a cheaper model had failed.
 - Gpt-5.6-terra matched 3 of 16 functions a cheaper model had failed.
 - Mimo-v2.6-flash matched 3 of 5 functions a cheaper model had failed.
