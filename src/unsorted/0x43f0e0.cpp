@@ -136,17 +136,16 @@ static inline Thing_0043f0e0* Lookup(Pos_0043f0e0* pos)
     if (!cell)
         return 0;
     unsigned short id = cell->feature;
-    if (id < 0xfffb) {
-        if (id < g_game->unitCount)
-            return (Thing_0043f0e0*)(g_game->units + (id << 8));
+    if (id >= 0xfffb) {
+        if (id != 0xfffe)
+            return 0;
+        id = (cell - (cell->offsetY * g_game->mapWidth + cell->offsetX))->feature;
+        if (id >= 0xfffb)
+            return 0;
+    } else if (id >= g_game->unitCount) {
         return 0;
     }
-    if (id == 0xfffe) {
-        id = (cell - (cell->offsetY * g_game->mapWidth + cell->offsetX))->feature;
-        if (id < 0xfffb)
-            return (Thing_0043f0e0*)(g_game->units + (id << 8));
-    }
-    return 0;
+    return (Thing_0043f0e0*)(g_game->units + (id << 8));
 }
 
 static inline int Marked(Thing_0043f0e0* t)
