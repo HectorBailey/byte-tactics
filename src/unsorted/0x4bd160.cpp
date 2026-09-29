@@ -1,4 +1,4 @@
-// Decompiled by Space Bunny Free. Names are provisional.
+// Decompiled by Space Bunny Free, finished by muse-spark-1.3-free. Names are provisional.
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -33,7 +33,7 @@ int __stdcall FUN_004bd160(char* srcname, char* dstname, void (__cdecl* cb)(int)
 {
     char* extra = 0;
     char year[8];
-    struct HapiBuf sb;
+    struct HapiBuf sb = {0};
     char copyright[0x40];
     int off;
     FILE* f;
@@ -43,7 +43,6 @@ int __stdcall FUN_004bd160(char* srcname, char* dstname, void (__cdecl* cb)(int)
     if (cb)
         cb(0);
 
-    sb.buf = 0;
     sb.size = 20;
     sb.buf = (char*)FUN_004d84a0(0, "Package Data", sb.size);
     off = FUN_004bd3b0(srcname, &sb.size, &extra);
