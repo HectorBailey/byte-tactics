@@ -51,11 +51,46 @@ has to be re-checked:
 uv run tools/check.py <address> build/units/<unit>.cpp
 ```
 
-Where two declarations disagree, the generator picks the more specific type and
-says so; that choice is a hypothesis until the checker agrees. Regenerate the
-map after each merge. A disagreement the generator cannot settle from the code
-(for example a field one file reads as an `int` and another indexes as a
-pointer) is a decision for the reviewer, not for the tool.
+Where two declarations disagree, the map records every view and the generator
+says which one it used; that choice is a hypothesis until the checker agrees.
+Regenerate the map after each merge. A disagreement the generator cannot settle
+from the code (for example a field one file reads as an `int` and another indexes
+as a pointer, with a body naming both) is a decision for the reviewer, not for
+the tool.
+
+## Using the map while decompiling
+
+An issue hands out neighbouring functions and most of them are still unmatched,
+so the first useful question is which class an address belongs to. `--at` answers
+it from the matched functions around the address:
+
+```sh
+uv run tools/unitmap.py --at 0x4b2100
+```
+
+It prints the nearest matched functions below and above the address, then the
+unit of the nearest one, with everything the map knows: the field ledger and the
+file each field came from, the offsets whose views disagree, the members in
+address order with the file defining each, the vtable address and the base
+classes.
+
+That is the starting point for decoding a function of a known class:
+
+- take the layout from the ledger instead of working it out from the
+  disassembly. If the class is a unit, `uv run tools/unitgen.py <unit>` writes a
+  candidate under `build/units/` that already declares the class and defines
+  every matched member, so a new definition can go into a file that compiles;
+- copy the matched members of the same class: same `this`, same fields, same
+  calling convention;
+- read the offset in dispute before using a field. Every view is listed with the
+  file it came from, and settling one is what unblocks the unit.
+
+Two limits. The map only holds matched members, so a class whose methods are all
+unmatched does not appear, and a class still spelt under several placeholder
+names is split between entries or is not a unit at all. And a conflict is only
+found when a file carries a `// +0xN` comment: two views of one offset that both
+omit it (compact packed structs) are stored as two fields and reported as clean,
+so an empty dispute list means "nothing was flagged", not "the views agree".
 
 ## Classes to merge
 
