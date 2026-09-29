@@ -174,7 +174,7 @@ void __stdcall FUN_0048a490(Unit_0048a490* u)
         Pos2_0048a490 t;
         Pos2_0048a490 pts[4];
         Hs_0048a490 hs[4];
-        int k = 0;
+        int k;
         for (k = 0; k < 4; k++) {
             MapVertex_0048a490* v = m->verts + row->ids[k];
             int vx = v->x;
