@@ -1,21 +1,17 @@
-// Decompiled by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
 //
-// 2797 bytes, transcribed from the disassembly and Ghidra's pseudo-C inside a
-// short timebox. Not matched. Known remaining differences:
-// - the three ten-player walks each carry a redundant `cmp idx,10; jae` guard
-//   before the body (an inlined bounds-checked accessor in the original);
-//   written here as `if ((unsigned char)i < 10)` wrappers.
-// - case 3 (skirmish/game start) is the bulk of the function and its register
-//   allocation (g_game in esi/ebp vs edx, the zero in ebx) is unverified.
-// - the `(rand() * 2) / 0x8000` test came out of the x86 as a 64-bit
-//   __allmul/__alldiv pair, kept literally.
+// Start-of-battle setup. Seeds the RNG from the clock, then switches the game
+// state on the campaign mode (1 demo, 2 campaign, 3 skirmish or network),
+// handing each mode its start positions, team assignment and view centre, and
+// finally builds the "MAIN2.GUI" gadget and releases the between-mission
+// object.
 #include <windows.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 
-struct Fixed_497180 {
-    int i;                              // 16.16
+union Fixed_497180 {
+    int i;                                  // 16.16
     struct {
         short frac;
         short whole;
@@ -28,28 +24,20 @@ struct FixedPos_497180 {
     Fixed_497180 z;
 };
 
-struct Sub_497180 {
-    char unknown_0[0x10];
+struct Gadget_497180 {
+    char unknown_0[8];
+    void (__stdcall* handler)(Gadget_497180*);  // +0x8
+    char* owner;                                // +0xc
 };
 
-struct Gadget_497180 {
-    char unknown_0[0x8];
-    void (__stdcall* handler)(Gadget_497180*);   // +0x8
-    char* owner;                                 // +0xc
+struct Sub_497180 {
+    char unknown_0[0x10];
 };
 
 class Class_00435100 {
 public:
     int FUN_00435100();
-};
-
-class Class_00435a20 {
-public:
     void FUN_00435a20(void* player);
-};
-
-class Class_00437320 {
-public:
     int FUN_00437320(FixedPos_497180* pos, int id);
 };
 
@@ -73,39 +61,177 @@ public:
     void FUN_004b3630();
 };
 
-extern char* g_game;
+#pragma pack(push, 1)
+struct Player_497180 {                   // pointed at by a record's +0x27
+    char unknown_0[0x8f];
+    unsigned char ready;                  // +0x8f
+    char unknown_90[0x95 - 0x90];
+    unsigned char nameIndex;              // +0x95
+    unsigned char index2;                 // +0x96
+    char unknown_97[0x9b - 0x97];
+    struct {
+        unsigned short lo_b0 : 1;          // +0x9b bit 0
+        unsigned short lo_b1 : 1;
+        unsigned short lo_b2 : 1;
+        unsigned short lo_b3 : 1;
+        unsigned short lo_b4 : 1;
+        unsigned short lo_b5 : 1;
+        unsigned short lo_b6 : 1;          // +0x9b bit 6
+        unsigned short lo_b7 : 1;
+        unsigned short hi_b0 : 1;          // +0x9c bit 0
+        unsigned short hi_b1 : 1;
+        unsigned short hi_b2 : 1;
+        unsigned short hi_rest : 5;
+    } bits9b;                              // +0x9b, two bytes
+    unsigned char unknown_9d[0xa1 - 0x9d];
+    unsigned short size1;                 // +0xa1
+    unsigned short size2;                 // +0xa3
+    unsigned short flags_a5;              // +0xa5
+    char unknown_a7[0x14b - 0xa7];
+};
+
+struct PlayerRec_497180 {                // 0x14b bytes, array at g_game+0x1b63
+    int active;                           // +0x00
+    unsigned char bits21;                 // +0x21
+    char unknown_22[0x27 - 0x22];
+    Player_497180* player;                // +0x27
+    char unknown_2b[0x73 - 0x2b];
+    unsigned char type;                   // +0x73
+    char unknown_74[0xdc - 0x74];
+    float size1;                          // +0xdc
+    float size2;                          // +0xe0
+    char unknown_e4[0x146 - 0xe4];
+    unsigned char team;                   // +0x146
+    unsigned char which;                  // +0x147
+    unsigned short bits148 : 8;           // +0x148
+    unsigned short started : 1;           // +0x149
+    char unknown_14a[0x14b - 0x14a];
+};
+
+struct TeamDef_497180 {                  // 0x18-byte records
+    int mode;                             // +0x00
+    unsigned char nameIndex;              // +0x04
+    unsigned char unknown_5[0x8 - 0x5];
+    unsigned char flags9c;                // +0x08
+    unsigned char unknown_9[0xc - 0x9];
+    int size1;                            // +0x0c
+    int size2;                            // +0x10
+    unsigned char index2;                 // +0x14
+    unsigned char unknown_15[0x18 - 0x15];
+};
+
+struct StartDef_497180 {                // the record at campaigns+0x108
+    int startMode;                        // +0x00
+    unsigned char nameIndex;              // +0x04
+    unsigned char unknown_5[0x8 - 0x5];
+    unsigned char flags9c;                // +0x08
+    unsigned char unknown_9[0xc - 0x9];
+    unsigned char flags10c;               // +0x0c
+    char unknown_d[0x18 - 0xd];
+};
+
+struct Campaign_497180 {                 // pointed at by g_game+0x29a0
+    TeamDef_497180 teams[10];             // +0x00
+    char unknown_f0[0x108 - 0xf0];
+    StartDef_497180 def2;                 // +0x108
+    char unknown_114[0x118 - 0x114];
+    int useOrder;                         // +0x118
+};
+
+struct MissionDef_497180 {               // at g_game+0x39219
+    StartDef_497180 def;                  // +0x00
+};
+
+struct PlayerName_497180 {               // 0x232 bytes, array at g_game+0x37f5f
+    char name[0x232];
+};
+
+struct NetModeFlags_497180 {             // at g_game+0x14281
+    unsigned short b0 : 1;
+    unsigned short b1 : 1;
+    unsigned short b2 : 1;
+    unsigned short rest : 13;
+};
+
+struct Game_497180 {
+    char unknown_0[0x519];
+    Sub_497180 sub;                       // +0x519
+    char unknown_529[0x1b63 - 0x529];
+    PlayerRec_497180 players[10];         // +0x1b63
+    char unknown_2851[0x29a0 - 0x2851];
+    Campaign_497180* campaign;            // +0x29a0
+    char unknown_29a4[0x2a42 - 0x29a4];
+    unsigned char localPlayer;            // +0x2a42
+    unsigned char viewPlayer;             // +0x2a43
+    char unknown_2a44[0x14223 - 0x2a44];
+    int mapW;                             // +0x14223
+    int mapH;                             // +0x14227
+    char unknown_1422b[0x14281 - 0x1422b];
+    NetModeFlags_497180 flags;            // +0x14281
+    char unknown_14283[0x37e37 - 0x14283];
+    int viewWidth;                        // +0x37e37
+    int viewHeight;                       // +0x37e3b
+    char unknown_37e3f[0x37ea0 - 0x37e3f];
+    char guiName[0x37ee6 - 0x37ea0];
+    unsigned short viewTeam;              // +0x37ee6
+    char unknown_37ee8[0x37eec - 0x37ee8];
+    unsigned short camStart;              // +0x37eec
+    char unknown_37eee[0x37ef6 - 0x37eee];
+    int startMode;                        // +0x37ef6
+    char unknown_37efa[0x37f5b - 0x37efa];
+    char namePad[4];                      // +0x37f5b
+    PlayerName_497180 names[4];           // +0x37f5f
+    char unknown_38827[0x38a47 - 0x38827];
+    int lastCount;                        // +0x38a47
+    char unknown_38a4b[0x38a51 - 0x38a4b];
+    unsigned short bits38a51 : 1;         // +0x38a51
+    unsigned short rest38a51 : 15;
+    char unknown_38a53[0x38d6b - 0x38a53];
+    void* mission;                        // +0x38d6b
+    char unknown_38d6f[0x38d75 - 0x38d6f];
+    volatile unsigned short netflags;     // +0x38d75
+    char unknown_38d77[0x38d81 - 0x38d77];
+    int playerCount;                      // +0x38d81
+    char unknown_38d85[0x391e9 - 0x38d85];
+    Class_00435100* net;                  // +0x391e9
+    char unknown_391ed[0x39219 - 0x391ed];
+    MissionDef_497180 missionDef;         // +0x39219
+};
+#pragma pack(pop)
+
+extern Game_497180* g_game;
 extern int DAT_005091cc;
 extern int DAT_00506dbc;
 extern Class_004618a0 DAT_00513000;
 
-void FUN_004b6ca0(int x);
-void FUN_004b6b50(int x);
-int FUN_004b6c30(int x);
-int FUN_00456850();
+void __stdcall FUN_004b6ca0(int x);
+void __stdcall FUN_004b6b50(int x);
+int __stdcall FUN_004b6c30(int x);
+unsigned char FUN_00456850();
 void FUN_00431740();
 void FUN_00453d40();
-void FUN_00465fb0(void* mission);
+void __stdcall FUN_00465fb0(void* mission);
 void FUN_0047a760();
 void FUN_004917d0();
 void FUN_00465e30();
-void FUN_004816a0(int x);
-void FUN_00432610(void* mission);
+void __stdcall FUN_004816a0(int x);
+void __stdcall FUN_00432610(void* mission);
 void FUN_00488310();
 void FUN_0041d1f0();
-void FUN_004288d0(int a, int b, int c, int d);
+void __stdcall FUN_004288d0(int a, int b, int c, int d);
 void FUN_00450f90();
 void FUN_00451180();
 void FUN_00464f80();
 void FUN_0046c620(int x);
 void FUN_004649d0();
-void FUN_0041c4c0(int x, int y, int z);
-unsigned short FUN_00488b10(const char* name);
-void FUN_00496ee0(int team, int startpos);
-void FUN_00485f50(unsigned char team, unsigned short id, FixedPos_497180 pos, int a, int b,
+void __stdcall FUN_0041c4c0(int x, int y, int z);
+unsigned short __stdcall FUN_00488b10(const char* name);
+void __stdcall FUN_00496ee0(int team, int startpos);
+void __stdcall FUN_00485f50(int team, unsigned short id, FixedPos_497180 pos, int a, int b,
     int c);
-Gadget_497180* FUN_004aa8f0(Sub_497180* sub, const char* name, int flags);
+Gadget_497180* __stdcall FUN_004aa8f0(Sub_497180* sub, const char* name, int flags);
 void __stdcall FUN_00494890(Gadget_497180* gadget);
-void __cdecl operator delete(void* p);
+void operator delete(void* p);
 
 // FUNCTION: 0x497180
 void FUN_00497180(void)
@@ -118,108 +244,80 @@ void FUN_00497180(void)
     QueryPerformanceCounter(&perfCount);
     FUN_004b6ca0(perfCount.LowPart + perfCount.HighPart);
     srand((unsigned)time(NULL));
-    *(int*)(g_game + 0x38a47) = 0;
+    g_game->lastCount = 0;
 
-    switch (((Class_00435100*)*(void**)(g_game + 0x391e9))->FUN_00435100()) {
+    switch (g_game->net->FUN_00435100()) {
     case 1: {
+        StartDef_497180* def = &g_game->missionDef.def;
         DAT_005091cc = 0;
-        char* base = g_game + 0x39219;
-        *(int*)(g_game + 0x37ef6) = *(int*)base;
-        *(unsigned short*)(g_game + 0x14281) =
-            (unsigned short)((*(unsigned short*)(g_game + 0x14281) & 0xfffb) |
-                ((*(unsigned char*)(base + 0xc) & 1) << 2));
-        unsigned short v = *(unsigned short*)(g_game + 0x14281);
-        unsigned char b = *(unsigned char*)(base + 4);
-        *(unsigned short*)(g_game + 0x14281) = (unsigned short)(((v ^ b) & 1) ^ v);
-        *(unsigned short*)(g_game + 0x14281) =
-            (unsigned short)((*(unsigned short*)(g_game + 0x14281) & 0xfffd) |
-                ((*(unsigned char*)(base + 8) & 1) << 1));
+        g_game->startMode = def->startMode;
+        g_game->flags.b2 = def->flags10c;
+        g_game->flags.b0 = def->nameIndex ^ g_game->flags.b0;
+        g_game->flags.b1 = def->flags9c;
         FUN_00431740();
         break;
     }
     case 2: {
-        char* base = (char*)*(void**)(g_game + 0x29a0) + 0x108;
-        *(unsigned short*)(g_game + 0x37ee6) = *(unsigned short*)(g_game + 0x37eec);
+        StartDef_497180* def = &g_game->campaign->def2;
+        g_game->viewTeam = g_game->camStart;
         DAT_005091cc = 1;
-        *(int*)(g_game + 0x37ef6) = *(int*)base;
-        *(unsigned short*)(g_game + 0x14281) =
-            (unsigned short)((*(unsigned short*)(g_game + 0x14281) & 0xfffb) |
-                ((*(unsigned char*)(base + 0xc) & 1) << 2));
-        unsigned short v = *(unsigned short*)(g_game + 0x14281);
-        unsigned char b = *(unsigned char*)(base + 4);
-        *(unsigned short*)(g_game + 0x14281) = (unsigned short)(((v ^ b) & 1) ^ v);
-        *(unsigned short*)(g_game + 0x14281) =
-            (unsigned short)((*(unsigned short*)(g_game + 0x14281) & 0xfffd) |
-                ((*(unsigned char*)(base + 8) & 1) << 1));
+        g_game->startMode = def->startMode;
+        g_game->flags.b2 = def->flags10c;
+        g_game->flags.b0 = def->nameIndex ^ g_game->flags.b0;
+        g_game->flags.b1 = def->flags9c;
         break;
     }
     case 3: {
-        *(unsigned short*)(g_game + 0x37ee6) = *(unsigned short*)(g_game + 0x37eec);
+        int sel;
+        g_game->viewTeam = g_game->camStart;
         DAT_005091cc = 1;
-        *(unsigned short*)(g_game + 0x38a51) &= 0xfffe;
-
-        unsigned char sel = (unsigned char)FUN_00456850();
-        if (*(unsigned char*)(g_game + 0x1b63 + 0x14b * sel + 0x21) & 2) {
+        g_game->bits38a51 = 0;
+        sel = FUN_00456850();
+        if (g_game->players[g_game->localPlayer].type & 2) {
+            Player_497180* p;
             do {
-                char* p = *(char**)(g_game + 0x1b63 + 0x14b * *(unsigned char*)(g_game + 0x2a42) + 0x27);
+                p = g_game->players[g_game->localPlayer].player;
                 if (DAT_00506dbc)
                     DAT_00513000.FUN_004618a0(1);
                 FUN_00453d40();
-                sel = (unsigned char)FUN_00456850();
+                sel = FUN_00456850();
                 FUN_004b6b50(0x32);
-                if (sel == 10)
-                    continue;
-                if (*(char*)(p + 0x96) == -1)
-                    continue;
-                if (*(char*)(p + 0x8f) == 0)
-                    continue;
-                break;
-            } while (1);
+            } while (sel == 10 || p->index2 == -1 || !p->ready);
             FUN_004b6b50(0x32);
         }
-
-        ((Class_00435a20*)*(void**)(g_game + 0x391e9))
-            ->FUN_00435a20(*(void**)(g_game + 0x1b63 + 0x14b * sel + 0x27));
-        if ((unsigned char)FUN_00456850() == 10)
+        g_game->net->FUN_00435a20(g_game->players[sel].player);
+        if (FUN_00456850() == 10)
             break;
-
-        unsigned char sel2 = (unsigned char)FUN_00456850();
-        char* p2 = *(char**)(g_game + 0x1b63 + 0x14b * sel2 + 0x27);
-        DAT_005091cc = (*(unsigned short*)(p2 + 0x9b) >> 0xd) & 1;
-        *(int*)(g_game + 0x37ef6) = (*(unsigned short*)(p2 + 0x9b) >> 0xb) & 3;
-        *(unsigned short*)(g_game + 0x14281) =
-            (unsigned short)((*(unsigned short*)(g_game + 0x14281) & 0xfffd) |
-                (*(unsigned char*)(p2 + 0x9c) & 2));
-        *(unsigned short*)(g_game + 0x14281) =
-            (unsigned short)((*(unsigned short*)(g_game + 0x14281) & 0xfffb) |
-                (*(unsigned char*)(p2 + 0x9c) & 4));
-        *(unsigned short*)(g_game + 0x14281) =
-            (unsigned short)((*(unsigned short*)(g_game + 0x14281) & 0xfffe) |
-                (*(unsigned char*)(p2 + 0x9c) & 1));
-        *(unsigned short*)(g_game + 0x37ee6) = *(unsigned short*)(p2 + 0xa5);
+        Player_497180* pl = g_game->players[FUN_00456850()].player;
+        DAT_005091cc = ((unsigned short)(((unsigned char*)pl)[0] | (((unsigned char*)pl)[1] << 8)) >> 0xd) & 1;
+        g_game->startMode = ((unsigned short)(((unsigned char*)pl)[0] | (((unsigned char*)pl)[1] << 8)) >> 0xb) & 3;
+        g_game->flags.b1 = pl->bits9b.hi_b0;
+        g_game->flags.b2 = pl->bits9b.hi_b0;
+        g_game->flags.b0 = pl->bits9b.hi_b0;
+        g_game->viewTeam = pl->flags_a5;
         break;
     }
     default:
         break;
     }
 
-    if (*(void**)(g_game + 0x38d6b) != 0) {
-        ((Class_004b4560*)*(void**)(g_game + 0x38d6b))->FUN_004b4560("summary");
-        if (((Class_004b48f0*)*(void**)(g_game + 0x38d6b))->FUN_004b48f0("BetweenMissions") ==
-            0) {
-            FUN_00465fb0(*(void**)(g_game + 0x38d6b));
-            if (((Class_00435100*)*(void**)(g_game + 0x391e9))->FUN_00435100() == 2) {
+    if (g_game->mission != 0) {
+        ((Class_004b4560*)g_game->mission)->FUN_004b4560("summary");
+        if (((Class_004b48f0*)g_game->mission)->FUN_004b48f0("BetweenMissions") == 0) {
+            FUN_00465fb0(g_game->mission);
+            if (g_game->net->FUN_00435100() == 2) {
+                TeamDef_497180* def = g_game->campaign->teams;
                 int count = 0;
-                int* def = (int*)*(void**)(g_game + 0x29a0);
                 for (int i = 0; i < 10; i++) {
-                    if (*def == 1 || *def == 2)
+                    int mode = def->mode;
+                    if (mode == 1 || mode == 2)
                         count = i + 1;
-                    def += 6;
+                    def++;
                 }
-                int cur = *(int*)(g_game + 0x38d81);
-                if (cur < count)
+                int cur = g_game->playerCount;
+                if (count > cur)
                     cur = count;
-                *(int*)(g_game + 0x38d81) = cur;
+                g_game->playerCount = cur;
                 FUN_0047a760();
             }
         }
@@ -227,113 +325,104 @@ void FUN_00497180(void)
 
     FUN_004917d0();
 
-    if (((Class_00435100*)*(void**)(g_game + 0x391e9))->FUN_00435100() != 1) {
-        if (((Class_00435100*)*(void**)(g_game + 0x391e9))->FUN_00435100() == 3) {
-            *(unsigned short*)(g_game + 0x38d75) |= 4;
-            while ((*(unsigned short*)(g_game + 0x38d75) & 8) == 0)
+    if (g_game->net->FUN_00435100() != 1) {
+        if (g_game->net->FUN_00435100() == 3) {
+            Player_497180* selPl;
+            g_game->netflags |= 4;
+            while ((g_game->netflags & 8) == 0)
                 FUN_004b6b50(0x32);
-
-            unsigned char sel = (unsigned char)FUN_00456850();
-            char* pl = *(char**)(g_game + 0x1b63 + 0x14b * sel + 0x27);
-            *(unsigned short*)(g_game + 0x14281) =
-                (unsigned short)((*(unsigned short*)(g_game + 0x14281) & 0xfffe) |
-                    (*(unsigned char*)(pl + 0x9c) & 1));
-            *(unsigned short*)(g_game + 0x14281) =
-                (unsigned short)((*(unsigned short*)(g_game + 0x14281) & 0xfffd) |
-                    (*(unsigned char*)(pl + 0x9c) & 2));
-            *(unsigned short*)(g_game + 0x14281) =
-                (unsigned short)((*(unsigned short*)(g_game + 0x14281) & 0xfffb) |
-                    (*(unsigned char*)(pl + 0x9c) & 4));
-            *(int*)(g_game + 0x37ef6) = (*(unsigned short*)(pl + 0x9b) >> 0xb) & 3;
-
-            for (int off = 0; off < 0xcee; off += 0x14b) {
-                char* rec = g_game + 0x1b63 + off;
-                if (*(int*)rec == 0)
+            selPl = g_game->players[FUN_00456850()].player;
+            g_game->flags.b0 = selPl->bits9b.hi_b0;
+            g_game->flags.b1 = selPl->bits9b.hi_b0;
+            g_game->flags.b2 = selPl->bits9b.hi_b0;
+            g_game->startMode = ((unsigned short)(((unsigned char*)selPl)[0] | (((unsigned char*)selPl)[1] << 8)) >> 0xb) & 3;
+            for (int i = 0; i < 10; i++) {
+                if (g_game->players[i].active == 0)
                     continue;
-                unsigned char st = *(unsigned char*)(rec + 0x73);
-                if (st != 1 && st != 2)
-                    continue;
-                pos.y.i = 0;
-                pos.x.i = (FUN_004b6c30(*(int*)(g_game + 0x14223) - 0xa0) + 0x50) << 16;
-                pos.z.i = (FUN_004b6c30(*(int*)(g_game + 0x14227) - 0xa0) + 0x50) << 16;
-                if (*(int*)rec != 0 &&
-                    (*(unsigned char*)(*(char**)(rec + 0x27) + 0x9b) & 0x40))
-                    continue;
-                char* pl2 = *(char**)(rec + 0x27);
-                int side = *(unsigned char*)(pl2 + 0x95);
-                int which = *(unsigned char*)(rec + 0x147);
-                ((Class_00437320*)*(void**)(g_game + 0x391e9))
-                    ->FUN_00437320(&pos, which);
-                if (*(int*)rec != 0 && *(unsigned char*)(rec + 0x73) == 1)
-                    start = pos;
-                unsigned short id =
-                    FUN_00488b10(g_game + 0x37f5f + 0x232 * side);
-                FUN_00485f50(*(unsigned char*)(rec + 0x146), id, pos, 1, 1, 0);
-                int s1 = *(unsigned short*)(pl + 0xa1) * 100;
-                int s2 = *(unsigned short*)(pl + 0xa3) * 100;
-                *(unsigned char*)(rec + 0x149) |= 1;
-                *(float*)(rec + 0xdc) = (float)(s1 >= 200 ? s1 : 200);
-                *(float*)(rec + 0xe0) = (float)(s2 >= 200 ? s2 : 200);
+                PlayerRec_497180* rec = &g_game->players[i];
+                if (rec->type == 1 || rec->type == 2) {
+                    Player_497180* pl2;
+                    int n;
+                    pos.y.i = 0;
+                    pos.x.i = (FUN_004b6c30(g_game->mapW - 0xa0) + 0x50) << 16;
+                    pos.z.i = (FUN_004b6c30(g_game->mapH - 0xa0) + 0x50) << 16;
+                    if (rec->active != 0 && (rec->player->flags9b.b.lo & 0x40))
+                        continue;
+                    pl2 = rec->player;
+                    n = pl2->nameIndex;
+                    g_game->net->FUN_00437320(&pos, rec->which);
+                    if (rec->active != 0 && rec->type == 1) {
+                        start.x = pos.x;
+                        start.y = pos.y;
+                        start.z = pos.z;
+                    }
+                    unsigned short id = FUN_00488b10(g_game->names[n].name);
+                    int s1 = selPl->size1 * 100;
+                    int s2 = selPl->size2 * 100;
+                    FUN_00485f50(rec->team, id, pos, 1, 1, 0);
+                    rec->started = 1;
+                    rec->size1 = (float)(s1 >= 200 ? s1 : 200);
+                    rec->size2 = (float)(s2 >= 200 ? s2 : 200);
+                }
             }
-
-            unsigned char li = *(unsigned char*)(g_game + 0x2a42);
-            char* lp = *(char**)(g_game + 0x1b63 + 0x14b * li + 0x27);
-            if ((*(unsigned char*)(lp + 0x9b) >> 6) & 1) {
-                *(unsigned short*)(g_game + 0x14281) &= 0xfffe;
-                *(unsigned short*)(g_game + 0x14281) &= 0xfffd;
-                FUN_0041c4c0(*(int*)(g_game + 0x37e37) / 2,
-                    *(int*)(g_game + 0x37e3b) / 2, 0);
-            } else {
-                FUN_0041c4c0(start.x.h.whole - *(int*)(g_game + 0x37e37) / 2,
-                    start.z.h.whole - *(int*)(g_game + 0x37e3b) / 2, 0);
+            {
+                Player_497180* lp = g_game->players[g_game->localPlayer].player;
+                unsigned char f = lp->bits9b.lo_b6;
+                int hw = g_game->viewWidth / 2;
+                int hh = g_game->viewHeight / 2;
+                if (((f >> 6) & 1) != 0) {
+                    g_game->flags.b0 = 0;
+                    g_game->flags.b1 = 0;
+                    FUN_0041c4c0(hw, hh, 0);
+                } else {
+                    FUN_0041c4c0(start.x.h.whole - hw, start.z.h.whole - hh, 0);
+                }
             }
             FUN_0046c620(6);
-        } else if (((Class_00435100*)*(void**)(g_game + 0x391e9))->FUN_00435100() == 2 &&
-            *(void**)(g_game + 0x38d6b) == 0) {
-            if (*(int*)((char*)*(void**)(g_game + 0x29a0) + 0x118) != 0) {
-                for (int i1 = 0; i1 < 10; i1++) {
-                    if ((unsigned char)i1 < 10) {
-                        char* rec = g_game + 0x1b63 + 0x14b * i1;
-                        if (*(int*)rec != 0) {
-                            unsigned char st = *(unsigned char*)(rec + 0x73);
-                            if ((st == 1 || st == 2 || st == 3) &&
-                                *(unsigned char*)(rec + 0x146) != 10)
-                                FUN_00496ee0(i1, i1);
-                        }
+        } else if (g_game->net->FUN_00435100() == 2 && g_game->mission == 0) {
+            if (g_game->campaign->useOrder != 0) {
+                for (int i = 0; i < 10; i++) {
+                    if ((unsigned char)i < 10) {
+                        PlayerRec_497180* rec = &g_game->players[i];
+                        if (rec->active != 0
+                            && (rec->type == 1 || rec->type == 2 || rec->type == 3)
+                            && rec->team != 10)
+                            FUN_00496ee0(i, i);
                     }
                 }
             } else {
-                for (int i2 = 0; i2 < 10; i2++)
-                    order[i2] = -1;
+                int* slot = order;
                 int n = 0;
-                for (int i3 = 0; i3 < 10; i3++) {
-                    if ((unsigned char)i3 < 10) {
-                        char* rec = g_game + 0x1b63 + 0x14b * i3;
-                        if (*(int*)rec != 0) {
-                            unsigned char st = *(unsigned char*)(rec + 0x73);
-                            if ((st == 1 || st == 2 || st == 3) &&
-                                *(unsigned char*)(rec + 0x146) != 10)
-                                order[n++] = i3;
+                for (int k = 0; k < 10; k++)
+                    order[k] = -1;
+                for (int j = 0; j < 10; j++) {
+                    if ((unsigned char)j < 10) {
+                        PlayerRec_497180* rec = &g_game->players[j];
+                        if (rec->active != 0
+                            && (rec->type == 1 || rec->type == 2 || rec->type == 3)
+                            && rec->team != 10) {
+                            *slot++ = j;
+                            n++;
                         }
                     }
                 }
                 if (n > 2 || (int)(((__int64)rand() * 2) / 0x8000) != 0) {
-                    for (int i5 = 1; i5 < n; i5++) {
-                        int j = rand() % i5;
-                        int t = order[i5];
-                        order[i5] = order[j];
-                        order[j] = t;
+                    for (unsigned int m = 1; m < (unsigned int)n; m++) {
+                        int r = rand() % m;
+                        int t = order[m];
+                        order[m] = order[r];
+                        order[r] = t;
                     }
                 }
-                int k = 0;
-                for (int i4 = 0; i4 < 10; i4++) {
-                    if ((unsigned char)i4 < 10) {
-                        char* rec = g_game + 0x1b63 + 0x14b * i4;
-                        if (*(int*)rec != 0) {
-                            unsigned char st = *(unsigned char*)(rec + 0x73);
-                            if ((st == 1 || st == 2 || st == 3) &&
-                                *(unsigned char*)(rec + 0x146) != 10)
-                                FUN_00496ee0(i4, order[k++]);
+                slot = order;
+                for (int l = 0; l < 10; l++) {
+                    if ((unsigned char)l < 10) {
+                        PlayerRec_497180* rec = &g_game->players[l];
+                        if (rec->active != 0
+                            && (rec->type == 1 || rec->type == 2 || rec->type == 3)
+                            && rec->team != 0x0a) {
+                            int s = *slot++;
+                            FUN_00496ee0(l, s);
                         }
                     }
                 }
@@ -344,49 +433,41 @@ void FUN_00497180(void)
 
     FUN_004816a0(1);
 
-    if (*(void**)(g_game + 0x38d6b) == 0) {
-        if (((Class_00435100*)*(void**)(g_game + 0x391e9))->FUN_00435100() != 1)
-            goto tail;
-    } else {
-        ((Class_004b4560*)*(void**)(g_game + 0x38d6b))->FUN_004b4560("summary");
-        if (((Class_004b48f0*)*(void**)(g_game + 0x38d6b))->FUN_004b48f0("BetweenMissions") ==
-            0) {
-            FUN_00432610(*(void**)(g_game + 0x38d6b));
-            goto tail;
+    if (g_game->mission) {
+        ((Class_004b4560*)g_game->mission)->FUN_004b4560("summary");
+        if (((Class_004b48f0*)g_game->mission)->FUN_004b48f0("BetweenMissions") == 0) {
+            FUN_00432610(g_game->mission);
+        } else {
+            FUN_00488310();
+            FUN_0041d1f0();
         }
+    } else if (g_game->net->FUN_00435100() == 1) {
+        FUN_00488310();
+        FUN_0041d1f0();
     }
-    FUN_00488310();
-    FUN_0041d1f0();
 
-tail:
-    {
-        int pnum = *(unsigned char*)(g_game + 0x2a43);
-        char* rec = g_game + 0x1b63 + 0x14b * pnum;
-        FUN_004288d0(0, 0, 0, 0);
-        char* pl = *(char**)(rec + 0x27);
-        int side = *(unsigned char*)(pl + 0x95);
-        sprintf(g_game + 0x37ea0, "%sMAIN2.GUI", g_game + 0x37f5b + 0x232 * side);
-    }
+    sprintf(g_game->guiName, "%sMAIN2.GUI",
+        g_game->namePad
+            + 0x232 * g_game->players[g_game->viewPlayer].player->nameIndex);
+    FUN_004288d0(0, g_game->viewPlayer, 0, 0);
+
     Gadget_497180* gadget =
-        FUN_004aa8f0((Sub_497180*)(g_game + 0x519), g_game + 0x37ea0, 0x20);
+        FUN_004aa8f0(&g_game->sub, g_game->guiName, 0x20);
     gadget->handler = FUN_00494890;
-    gadget->owner = g_game;
+    gadget->owner = (char*)g_game;
 
-    *(unsigned char*)(*(char**)(g_game + 0x1b63 +
-                          0x14b * *(unsigned char*)(g_game + 0x2a42) + 0x27) +
-        0x9b) |= 0x10;
+    g_game->players[g_game->localPlayer].player->flags9b.b.lo |= 0x10;
     FUN_00450f90();
     FUN_00451180();
     FUN_00464f80();
     FUN_00465e30();
 
-    void* mission = *(void**)(g_game + 0x38d6b);
-    if (mission != 0) {
-        ((Class_004b3630*)mission)->FUN_004b3630();
-        operator delete(mission);
-        *(void**)(g_game + 0x38d6b) = 0;
+    if (g_game->mission != 0) {
+        ((Class_004b3630*)g_game->mission)->FUN_004b3630();
+        operator delete(g_game->mission);
+        g_game->mission = 0;
     }
     FUN_004649d0();
 
-    *(unsigned short*)(g_game + 0x38d75) |= 2;
+    g_game->netflags |= 2;
 }
