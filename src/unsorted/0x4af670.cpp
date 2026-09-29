@@ -4,23 +4,23 @@
 // LOAD/SWIN enter a directory, CANC accepts, NAME takes the highlighted file,
 // PATH walks one level up and the *DRV entries pick a drive letter.
 //
-// 90% (check.py). Everything matches up to the PATH branch except the SIB
-// base/index of its two stores and the compare, and the LOAD/SWIN block
-// differs only in register allocation:
-//   - original parks the tail pointer in edi, mine in esi (both reuse esi,
-//     which held the entries pointer, inside this block);
-//   - because of that, mine hoists the destination expression
-//     `cwd + strlen(cwd) - 1` above the source's strlen and spills it to
-//     [esp+0x20], where the original evaluates it after the source strlen,
-//     parks the length in ebx (clobbering the saved parameter, restored at
-//     0x4af9e3) and reaches `dec edi`;
-//   - the one padding byte MSVC puts before the `repne scasb` in the else
-//     block and the slot of the ebx restore inside it follow from those.
-// Twenty source shapes (declaration order and scope of `name`, `i`, `tail`,
-// register, a ternary instead of tail++, the two strlen calls hoisted into
-// temporaries, `&cwd[i]`, `strcat`, a local `char*` for cwd, the branches
-// swapped) all compile to the same 115 differing instructions, so this looks
-// like a register-priority tie rather than a wrong type or argument.
+// 99.1% (check.py), and the total size is now exact: 945 bytes, same as the
+// original. Only three instructions in the PATH branch still differ, and they
+// are all the same defect: MSVC 5 puts the loop counter in the SIB *base* slot
+// and `req` in the *index* slot, where the original does the opposite.
+//   original  cmp byte [ebp + ecx + 0x23], 0x3a   SIB 0x0d  (base ebp, index ecx)
+//   ours      cmp byte [ecx + ebp + 0x23], 0x3a   SIB 0x29  (base ecx, index ebp)
+// Same address, same length, opposite operand slots; it happens for all three
+// accesses (`cwd[n-1]`, `cwd[n]`, `cwd[n+1]`), and the plain `cwd[n]` in the
+// loop head already agrees (`cmp byte [ecx + edx], 0x5c`, base edx). So the
+// difference is only in which operand MSVC's address generator promotes to
+// base once the constant is folded into the displacement. Six source shapes
+// for this branch (the subscript form, `*(req->cwd + n +- 1)`, a block-local
+// `char* cwd`, a `char* p = req->cwd + n` walked down, a named `int m = n - 1`,
+// and one where the count is read through a local) all keep the swapped slots
+// or change the whole block shape, so this looks like an LTG tie-break that
+// needs a different expression tree, not a different type.
+//
 // Decompiled by space-bunny-free. Names are provisional.
 #include <string.h>
 
@@ -101,11 +101,12 @@ void __stdcall FUN_004af670(Gadget_004af670* gadget)
                     break;
                 }
             }
+            int n = (int)strlen(req->cwd);
             char* tail = req->selected;
-            if ((int)strlen(req->cwd) == 3) {
+            if (n == 3) {
                 tail++;
             }
-            strcpy(req->cwd + (int)strlen(req->cwd) - 1, tail);
+            strcat(req->cwd, tail);
             FUN_004bc360(req->cwd);
         } else {
             result = 1;
