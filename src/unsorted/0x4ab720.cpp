@@ -1,13 +1,30 @@
-// Decompiled by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
 // PARTIAL 79.7%: 1011 of 1015 bytes, control flow and all bodies match. What
 // still differs is register encoding only:
 //  - the char-insert default block: our `if (width > entry->w - 4)` loads the
 //    entry into eax, so the later capacity read is missing the original's
-//    `mov eax, ecx` (2 bytes shorter);
-//  - every `text[i]` store compiles to base=index `[eax+ebp]` instead of the
-//    original `[ebp+eax]`, one byte shorter at disp 0 (three loops).
+//    `mov eax, ecx` (5 bytes longer there, 2 bytes shorter overall);
+//  - the two `text[i] = text[i + 1]` loops and the `lea edi,[ebp+eax]` of the
+//    backward shift compile with the SIB base/index slots swapped: we get
+//    base=index `[eax+ebp]`, the original has base=text `[ebp+eax]`, which also
+//    costs a redundant disp8=0 (1 byte each, three sites).
 // The entry struct must be padded to 0x15b bytes or MSVC scales the index by
 // 0x13a (compiler uses sizeof(Entry)).
+//
+// Tried and rejected (all scored 74.4 to 79.7, none flips a SIB slot):
+//  hoisting the bound (`int e = n - 1`), a pointer-walk loop (`char* p =
+//  text + cursor; for (; p < text + n - 1; p++) *p = *(p + 1);` becomes an
+//  inline rep movsd/movsb memmove and costs 28 bytes), `*(text + i) = *(text +
+//  i + 1)`, a `char c` temp per iteration, the loop counter declared outside,
+//  `text[i] = text[i] + 1`.
+// Probes: `p[i]`, `s->text[i]`, a `char (&t)[N]` reference to the array and a
+//  pointer-walk source all give base=index `[eax+ebp]` in MSVC 5 whatever
+//  register the pointer lands in, while `p[len - 1] = 0` in the SAME function
+//  matches the original's base=index form. So the original's two loop
+//  addresses must have come from a rewritten (IV) address node, not from the
+//  subscript itself, and I could not find the source that produces it.
+//  uv run tools/headers.py 0x4ab720: 128 header sets, all 79.7%, so the SIB
+//  swap is not a header-order effect here.
 //
 // Text-edit key handler for one GUI entry (stride 0x15b, text at +0xb6).
 // __stdcall(control, entryIndex, key): when the holder has no pending
