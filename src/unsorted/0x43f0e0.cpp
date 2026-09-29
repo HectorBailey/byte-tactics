@@ -108,7 +108,7 @@ struct Unit_0043f0e0 {
     Player_0043f0e0* player;           // +0x96
     char unknown_9a[0xfb - 0x9a];
     int ffb;                           // +0xfb
-    char unknown_ff[1];
+    unsigned char unknown_ff[1];
     char unknown_100[0x104 - 0x100];
     float f104;                        // +0x104
     short f108;                        // +0x108
@@ -207,51 +207,51 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
     }
     switch (mode) {
     // REGION r1 begin
-    case 1:
+    case 1: {
+        Def_0043f0e0* def = unit->def;
         if (g_game->flag37efa == 1) {
-            if ((unit->def->f245 & 0x10) && enemy)
+            if ((def->f245 & 0x10) && enemy)
                 return FUN_0043f0e0(3, unit, target, pos);
-            if ((unit->def->f245 & 0x400) && enemy)
-                return Pick(unit->def, "VTOL_RECLAIMUNIT", "RECLAIMUNIT");
-            if (friendly) {
-                if (((Class_004899b0*)unit)->FUN_004899b0(target) && target->f104 != 0.0f)
-                    return Pick(unit->def, "VTOL_HELPBUILD", "HELPBUILD");
-                if (((Class_004899b0*)unit)->FUN_004899b0(target))
-                    return Pick(unit->def, "VTOL_REPAIRUNIT", "REPAIRUNIT");
-            }
-            if ((unit->def->f241 & 0x800) && friendly && (target->def->f241 & 0x200))
+            if ((def->f245 & 0x400) && enemy)
+                return Pick(def, "VTOL_RECLAIMUNIT", "RECLAIMUNIT");
+            if (friendly && ((Class_004899b0*)unit)->FUN_004899b0(target) &&
+                target->f104 != 0.0f)
+                return Pick(def, "VTOL_HELPBUILD", "HELPBUILD");
+            if (friendly && ((Class_004899b0*)unit)->FUN_004899b0(target))
+                return Pick(def, "VTOL_REPAIRUNIT", "REPAIRUNIT");
+            if ((def->f241 & 0x800) && friendly && (target->def->f241 & 0x200))
                 return Class_00438760("VTOL_LANDING");
             if (target && ((Class_00489a70*)unit)->FUN_00489a90(target))
-                return Pick(unit->def, "VTOL_PICKUP", "GROUND_PICKUP");
-            if ((unit->def->f245 & 0x20) && friendly)
-                return Pick(unit->def, "VTOL_FOLLOW", "FOLLOW_GROUND");
-            if ((unit->def->f245 & 0x800) && pos && Visible(unit, pos) && Marked(Lookup(pos)))
+                return Pick(def, "VTOL_PICKUP", "GROUND_PICKUP");
+            if ((def->f245 & 0x20) && friendly)
+                return Pick(def, "VTOL_FOLLOW", "FOLLOW_GROUND");
+            if ((def->f245 & 0x800) && pos && Visible(unit, pos) && Marked(Lookup(pos)))
                 return Class_00438760("RESURRECT");
-            if ((unit->def->f245 & 0x400) && pos && Visible(unit, pos) && Marked(Lookup(pos)))
-                return Pick(unit->def, "VTOL_RECLAIM", "RECLAIM");
-            if (!(unit->def->f245 & 0x80) || unit->moving == 0)
+            if ((def->f245 & 0x400) && pos && Visible(unit, pos) && Marked(Lookup(pos)))
+                return Pick(def, "VTOL_RECLAIM", "RECLAIM");
+            if (!(def->f245 & 0x80) || unit->moving == 0)
                 break;
         } else {
-            if ((unit->def->f245 & 0x10) && enemy)
+            if ((def->f245 & 0x10) && enemy)
                 return FUN_0043f0e0(3, unit, target, pos);
-            if ((unit->def->f245 & 0x400) && enemy)
+            if ((def->f245 & 0x400) && enemy)
                 return FUN_0043f0e0(0xc, unit, target, pos);
-            if (target) {
-                if (((Class_004899b0*)unit)->FUN_004899b0(target) && target->f104 != 0.0f)
-                    return FUN_0043f0e0(8, unit, target, pos);
-                if (target && target->unknown_ff[0] == g_game->localPlayer &&
-                    (target->f110 & 0x20) && target->f104 == 0.0f && target->ffb == 0 &&
-                    (!target->f86 || (target->f86->f110 & 0x40000000)))
-                    break;
-            }
-            if ((unit->def->f245 & 0x800) && pos && Visible(unit, pos) && Marked(Lookup(pos)))
+            if (target && ((Class_004899b0*)unit)->FUN_004899b0(target) &&
+                target->f104 != 0.0f)
+                return FUN_0043f0e0(8, unit, target, pos);
+            if (target && target->unknown_ff[0] == g_game->localPlayer &&
+                (target->f110 & 0x20) && target->f104 == 0.0f && target->ffb == 0 &&
+                (!target->f86 || (target->f86->f110 & 0x40000000)))
+                break;
+            if ((def->f245 & 0x800) && pos && Visible(unit, pos) && Marked(Lookup(pos)))
                 return Class_00438760("RESURRECT");
-            if ((unit->def->f245 & 0x400) && pos && Visible(unit, pos) && Marked(Lookup(pos)))
-                return Pick(unit->def, "VTOL_RECLAIM", "RECLAIM");
-            if (!(unit->def->f245 & 0x80) || unit->moving == 0)
+            if ((def->f245 & 0x400) && pos && Visible(unit, pos) && Marked(Lookup(pos)))
+                return Pick(def, "VTOL_RECLAIM", "RECLAIM");
+            if (!(def->f245 & 0x80) || unit->moving == 0)
                 break;
         }
-        return Pick(unit->def, "VTOL_MOVE", "MOVE_GROUND");
+        return Pick(def, "VTOL_MOVE", "MOVE_GROUND");
+    }
     // REGION r1 end
     // REGION r2 begin
     case 2:
