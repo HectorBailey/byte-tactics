@@ -69,7 +69,9 @@ struct Player_497180 {                   // pointed at by a record's +0x27
     unsigned char nameIndex;              // +0x95
     unsigned char index2;                 // +0x96
     char unknown_97[0x9b - 0x97];
-    struct {
+    union {
+        unsigned short word;               // +0x9b, read whole for the shifts
+        struct {
         unsigned short lo_b0 : 1;          // +0x9b bit 0
         unsigned short lo_b1 : 1;
         unsigned short lo_b2 : 1;
