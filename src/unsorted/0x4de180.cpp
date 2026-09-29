@@ -3,17 +3,27 @@
 // stack walker need, then SymInitialize()s the symbol handler with a search
 // path of "<windir>;<directory of this exe>".
 //
-// Not byte identical yet (93.5%, ours 830 bytes, original 823). All three
-// remaining differences are one allocator state in the block from
-// GetModuleFileNameA to the end, and it starts at one instruction: the
-// original materialises GetModuleFileNameA's NULL module handle into esi
-// (`xor esi,esi; push esi`), ours folds it to `push 0`. That costs esi as a
-// register through the call, so the original demotes the strlen sum to ebp
-// where ours keeps it in esi, and at the tail the original's symPath pointer
-// takes esi and the GetCurrentProcess pointer edi, where ours swaps them.
-// Tried and did not change the codegen: NULL instead of 0, a named local
-// holding 0, a named local for the sum, `windir && len < 1000` instead of the
-// nested if, and a named pointer for symPath.
+// check.py prints MATCH.
+//
+// Two source-level facts carry the whole match, both about VARIABLES that must
+// be live rather than folded:
+//
+// 1. One search-path pointer, not a constant. The original materialises the
+//    module handle it passes to GetModuleFileNameA into esi
+//    (`xor esi, esi; push esi`) instead of using `push 0`, and it reuses that
+//    same esi for the symPath argument of SymInitialize. Both fall out of a
+//    single `char* searchPath;` that is assigned 0 as a statement just before
+//    the GetModuleFileNameA call and is then set to symPath inside the if, so
+//    its 0 is still live on the path where GetModuleFileNameA fails (and is
+//    pushed as a NULL search path there: a suspected original bug). Declaring
+//    it as `char* searchPath = 0;` instead puts the `xor` in the function's
+//    entry block and in ebp, which costs two bytes and the tail's esi/edi
+//    roles.
+// 2. The second SymInitialize call passes the FIRST call's result as its
+//    fSearchSymbols argument: the original has `push 1` for the first call and
+//    `push eax` for the second, where eax is the failed BOOL. Hence
+//    `BOOL inited = ...` and `SymInitialize(..., inited)`. A literal 1 in both
+//    calls, or a literal 0 in the second, both miss.
 #include <windows.h>
 #include <string.h>
 #include <stdlib.h>
@@ -54,6 +64,7 @@ char __cdecl FUN_004de180(char param)
                                    "-disableimagehlp", 0, 0);
     char path[0x100];
     char symPath[0x3e8];
+    char* searchPath;
     char* windir;
     char* slash;
     typedef int (__stdcall *GetProcAddress_004de180)(HMODULE, char*);
@@ -86,7 +97,8 @@ char __cdecl FUN_004de180(char param)
     if (DAT_00528ab4)
         symOpts = 0x14;
     DAT_00528ad0(symOpts);
-    if (GetModuleFileNameA(0, path, sizeof(path))) {
+    searchPath = 0;
+    if (GetModuleFileNameA((HMODULE)searchPath, path, sizeof(path))) {
         windir = getenv("windir");
         if (windir) {
             if (strlen(path) + strlen(windir) < 0x3e8) {
@@ -97,15 +109,17 @@ char __cdecl FUN_004de180(char param)
                     strcat(symPath, ";");
                     strcat(symPath, path);
                 }
+                searchPath = symPath;
             }
         }
     }
-    if (!DAT_00528ab8(getCurrentProcess(), symPath, 1)) {
+    BOOL inited = DAT_00528ab8(getCurrentProcess(), searchPath, 1);
+    if (!inited) {
         DAT_00528ac4 = (SymProc_004de180)FUN_004de0a0;
         DAT_00528ac8 = (SymProc_004de180)FUN_004de100;
         DAT_00528acc = 0;
         DAT_00528ab4 = 0;
-        if (!DAT_00528ab8(getCurrentProcess(), symPath, 1)) {
+        if (!DAT_00528ab8(getCurrentProcess(), searchPath, inited)) {
             GetLastError();
             FUN_004de110();
             DAT_00528ad8 = 1;
