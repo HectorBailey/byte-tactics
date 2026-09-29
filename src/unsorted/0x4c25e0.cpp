@@ -1,4 +1,4 @@
-// Decompiled by Sonnet 5.5. Names are provisional.
+// Decompiled by Sonnet 5.5, finished by space-bunny-free. Names are provisional.
 // Redraws the software mouse cursor: reads the cursor position, computes the
 // cursor's top left (position minus the sprite's origin), rebuilds the saved
 // background and the composed image in the three off-screen surface
@@ -6,14 +6,13 @@
 // restores what the old cursor covered, draws the sprite, and hands the union
 // of the old and new cursor rectangles to FUN_004c60d0 to be shown.
 //
-// NOT MATCHED: 71.7%, size exact. The frame is 0x58 in the original and 0x64
-// here: the 0x30-byte lock descriptor passed to FUN_004c5ff0 (at [esp+0x2c] in
-// the original) shares its stack space with the union rect and one of the
-// other rects, which are only written after it is dead, while here every local
-// gets its own slot. Scoping the descriptor in a block and declaring the rects
-// after it did not make MSVC overlap them. The rest (call order and
-// arguments, field offsets) follows the original; FUN_004cbbe0 has no source
-// yet, so its argument types are guesses.
+// The 0x30-byte surface descriptor FUN_004c5ff0 fills (F+0x28) is itself the
+// first rectangle handed to FUN_004cbbe0, so it needs no rect local of its
+// own; the two cursor rectangles sit at F+0x08 (new) and F+0x18 (old), which
+// is what makes the frame 0x58. Computing the old rectangle's right and
+// bottom from its own just-stored left and top fields is what puts
+// app->savedX in edx, app->savedY in ebp and app->saved in ecx and makes the
+// original re-read app->savedY for the call.
 #include <windows.h>
 
 #pragma pack(push, 1)
@@ -54,22 +53,21 @@ struct App_004c25e0 {
 #pragma pack(pop)
 
 struct Info_004c25e0 {
-    int data[11];
+    int data[12];
 };
 
 int __stdcall FUN_004c5ff0(Info_004c25e0* info);
 void __cdecl FUN_004cbbe0(void* a, void* b, int x, int y);
 void __stdcall FUN_004c69c0(Desc_004c25e0* d);
 void __stdcall FUN_004b7f90(Desc_004c25e0* d, Sprite_004c25e0* s, int x, int y);
-int __stdcall FUN_004c60d0(Rect_004c25e0* out, Rect_004c25e0* a, Rect_004c25e0* b);
+int __stdcall FUN_004c60d0(void* out, Rect_004c25e0* a, Rect_004c25e0* b);
 
 // FUNCTION: 0x4c25e0
 void __stdcall FUN_004c25e0(App_004c25e0* app)
 {
     Info_004c25e0 info;
-    Rect_004c25e0 r2;
     Rect_004c25e0 r1;
-    Rect_004c25e0 r3;
+    Rect_004c25e0 r2;
     POINT pt;
     if (app->enabled == 0)
         return;
@@ -88,7 +86,7 @@ void __stdcall FUN_004c25e0(App_004c25e0* app)
     app->work->width = app->sprite->width;
     app->work->height = app->sprite->height;
     app->work->pitch = app->sprite->width;
-    FUN_004cbbe0(app->under, &r3, -x, -y);
+    FUN_004cbbe0(app->under, &info, -x, -y);
     FUN_004cbbe0(app->under, app->saved, app->savedX - x, app->savedY - y);
     FUN_004cbbe0(app->work, app->under, 0, 0);
     FUN_004c69c0(app->work);
@@ -96,19 +94,19 @@ void __stdcall FUN_004c25e0(App_004c25e0* app)
     FUN_004cbbe0(app->saved, app->work, x - app->savedX, y - app->savedY);
     r1.left = app->savedX;
     r1.top = app->savedY;
-    r1.right = app->savedX + app->saved->width;
-    r1.bottom = app->saved->height + app->savedY;
+    r1.right = r1.left + app->saved->width;
+    r1.bottom = app->saved->height + r1.top;
     r2.left = x;
     r2.top = y;
     r2.right = x + app->sprite->width;
     r2.bottom = y + app->sprite->height;
-    FUN_004cbbe0(&r3, app->saved, app->savedX, app->savedY);
-    FUN_004cbbe0(&r3, app->work, x, y);
+    FUN_004cbbe0(&info, app->saved, app->savedX, app->savedY);
+    FUN_004cbbe0(&info, app->work, x, y);
     app->saved->width = app->sprite->width;
     app->saved->height = app->sprite->height;
     app->saved->pitch = app->sprite->width;
     FUN_004cbbe0(app->saved, app->under, 0, 0);
     app->savedX = x;
     app->savedY = y;
-    FUN_004c60d0(&r3, &r1, &r2);
+    FUN_004c60d0(&info, &r1, &r2);
 }
