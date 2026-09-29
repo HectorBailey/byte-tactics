@@ -1,4 +1,4 @@
-// Decompiled by Sonnet 5.5. Names are provisional.
+// Decompiled by Sonnet 5.5, finished by space-bunny-free. Names are provisional.
 // Opens a HAPI archive: reads the 20 byte header and checks the "HAPI" magic
 // and version bytes, then checks that the file ends with the Cavedog
 // copyright line (with the year patched to "0000", as the writer 0x4bd160
@@ -8,15 +8,36 @@
 // entry flagged 1, runs FUN_004be010 on its name. With mode 0 the file is
 // closed again and only the in-memory copy stays.
 //
-// NOT MATCHED: 85.8%, 647 of 661 bytes. In the original the failure block
-// (fclose, free, return 0) sits inline after the copyright compare and the
-// header byte checks jump forward to it, with no materialised result. Here the
-// checks are an inline helper returning non-zero for a bad file, which is the
-// only spelling that kept the failure block inline, but it costs a `mov eax,1`
-// and a jump. Written as one `if` with the checks (comma expressions or an
-// inline tail helper) or with gotos, the failure block moves to the end and
-// merges with the early return. The key derivation and the decrypt loop also
-// differ slightly (the original spills the key byte through [esp+0x70]).
+// NOT MATCHED: 85.8%, 647 of 661 bytes. Two regions differ.
+//
+// (1) The failure block. In the original the block (fclose, free, xor eax,eax,
+// epilogue, ret 8) sits inline between the copyright strcmp and the success
+// continuation, the strcmp's `je` jumps over it, and all five header checks
+// `jne` forward into it. Nothing is materialised. Here the checks are an inline
+// helper returning 1, which is the only spelling found that keeps that block
+// inline, but it costs a `jmp` plus a `mov eax,1` (7 bytes). What did NOT work:
+// writing the cleanup out six times (one copy per check, hoping MSVC 5 would
+// tail-merge them) gave 757 bytes, so it merges nothing; collapsing the five
+// header checks into one `||` chain, whether with its own body (625 bytes) or
+// with a `goto` to a label inside the copyright check's `if` (also 625 bytes),
+// makes MSVC invert the `if (f == 0) return 0;` into `je <epilogue>`, so the
+// early return merges with the tail and the whole first block diffs. Getting
+// all of the original at once needs a shape that keeps the fopen failure inline
+// and the cleanup shared, and I did not find it.
+//
+// (2) The key derivation. The original stores the key byte to [esp+0x70] (a
+// reused incoming-argument slot, since `name` is dead), reloads it as a dword
+// and masks with `and eax,0xff` before rotating, then reloads `h->header->key`
+// after storing it and writes the result into the STACK header's key byte at
+// [esp+0x24]. So the source must assign the decoded key into the stack copy of
+// the 20 byte header as well, and must keep an int-width copy of the key alive.
+// Adding `hdr.key = base->key;` plus `unsigned char k = base->key;` (two
+// structurally different read trees, to break the store-to-load forwarding) and
+// a separate `p += 0x14` gets the total SIZE right, 663 against 661 bytes, but
+// it adds one live graph node and demotes both `f` and `h` one step: `f` moves
+// ebx->ebp and `h` ebp->ebx, so the whole prologue and every field store diff
+// (71.9%). With `hdr.key = base->key;` removed again it is back to 647 bytes at
+// 85.0%. The two effects are one allocation problem, not two.
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>

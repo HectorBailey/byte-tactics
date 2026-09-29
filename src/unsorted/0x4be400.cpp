@@ -1,4 +1,4 @@
-// Decompiled by Sonnet 5.5. Names are provisional.
+// Decompiled by Sonnet 5.5, finished by space-bunny-free. Names are provisional.
 // Walks a directory tree (the search 0x4bc4b0 allocates, the same one 0x4bcb50
 // uses) and, for every plain file, marks the matching entry of every open
 // HAPI archive: the entry named "path + file name" is looked up with
@@ -6,11 +6,44 @@
 // index on) and gets bit 2 set unless bit 1 is already set. Sub directories
 // other than "." and ".." are entered with the path extended by "name\\".
 //
-// NOT MATCHED: 99.2%, size exact. One branch target differs: when the file
-// loop has nothing to do (`i >= count` on entry) the original jumps past the
-// reload of the search handle into esi (it only needs reloading after the loop
-// body has used esi); here the guard jumps to the reload. The `for`/`while`
-// spelling, a pointer-typed handle and the local order change nothing.
+// NOT MATCHED: 99.2%, size exact. Exactly one instruction differs, the target
+// of the file loop's entry test at 0x4be5d4. When the loop has nothing to do
+// (`i >= d->count` on entry) the original jumps PAST the reload of the search
+// handle into esi at 0x4be66d and lands on the FUN_004bc640 argument setup at
+// 0x4be672; here the guard jumps to the reload. The join block 0x4be66d has
+// four predecessors (the two strcmp matches at 0x4be4dd and 0x4be51a, the
+// recursion at 0x4be5ba and the loop latch falling through from 0x4be667), and
+// the original simply lets the fifth edge, the guard, skip it, which is safe
+// because on that edge esi still holds the handle.
+//
+// A second session (this one) spent about thirty shapes on that one edge and
+// every one of them still emits `jge` to the reload, so all of these are ruled
+// out, not merely untried:
+//   - the inner loop: `for (; i < n; i++)`, `for (i = (i < 0 ? 0 : i + 1); ...)`,
+//     `while (i < n) { ...; i++; }`, `if (i < n) do { ... } while (++i < n);`,
+//     `for (;;) { if (i >= n) break; ...; i++; }`, `while (1) { if (...) break;
+//     ...; i++; }` (that last one is the only one that changes anything: it
+//     stops the rotation and drops to 68.0), `for (i = i; ...)`;
+//   - the clamp: the `if (i < 0) i = 0; else i++;` three-statement form, the
+//     `i = (i < 0) ? 0 : i + 1;` assignment and the clamp as the `for` init;
+//   - `i` as int, unsigned (94.1: it also breaks the two strcmp joins) and long;
+//   - the handle as a `Find*` throughout with `(Find*)-1` compared, and the
+//     local count and the local name pointer pulled out of the loop (61.8 and
+//     76.8: both change the whole frame);
+//   - the outer loop: `do { } while (cond)`, `while (1) { ...; if (cond ==
+//     -1) break; }`, the `if (h == -1) return;` guard versus the whole body and
+//     the tail nested inside an `if (h != -1)`, and the whole if/else wrapped in
+//     an extra nested block;
+//   - the if/else: the two branches swapped, `else if (!(attrib & 0x10))`,
+//     `if ((attrib & 0x10) != 0)`, and the file branch ending in `continue`
+//     instead of an `if` guard (which is what the original's branchy strcmp
+//     wants but does not move the edge either).
+// So the edge is not a loop-shape, type, branch-order or local-order effect. The
+// only shape that even touched it is one that adds a live local to the loop
+// (`Entry* e = 0;` before the body, 92.3), and that goes the wrong way. Worth
+// trying next: something that gives the compiler a second definition of the
+// handle inside the outer loop, so the join block at 0x4be66d exists for the
+// directory branch only and the file branch's latch reaches 0x4be672 directly.
 #include <io.h>
 #include <string.h>
 
