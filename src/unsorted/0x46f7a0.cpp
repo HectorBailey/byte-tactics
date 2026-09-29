@@ -1,4 +1,5 @@
-// Decompiled by space-bunny-free. Names are provisional.
+// Decompiled by space-bunny-free, finished by space-bunny-free. Names are
+// provisional.
 //
 // 80.1% (799 bytes against 798). Both non-reallocating branches, the whole
 // prologue and every call target are byte identical; the single byte and every
@@ -36,9 +37,41 @@
 // What would need hand-rolling: the vector's own insert body, so that _Ufill's
 // counter is prevented from coalescing with the caller's _M, which is what
 // costs _P its callee-saved register here.
+//
+// Second run, still 80.1%, but it fixed a LATENT SYMBOL BUG worth recording:
+// Class_0046eaa0 must be spelled `struct`, not `class`. check.py prints the
+// original's references from the disassembly and its own from the object, and
+// at +0x26c/+0x2e6/+0x303 they now both read
+// ??4Class_0046eaa0@@QAEAAU0@ABU0@@Z. The byte score is identical either way
+// (80.1%), so the mismatch is invisible to a percentage and only shows up in
+// that reference list, but it is a wrong name and would have blocked a MATCH
+// outright. Mangled names encode class-vs-struct as V against U in the return
+// and parameter type of an assignment operator, so a "class"-spelled base
+// silently costs a U. Worth checking this list on any function whose
+// assignment operator is a hand-written forwarding wrapper.
+//
+// Also tried this run, both free scratch scores, both no better than 80.1%:
+// headers.py over all 128 sets (best is 80.1%, four sets tie), operator= taking
+// the base type as its parameter (40.2%, the assignment then gets a second
+// mangled name), a default constructor on the derived class, and spending the
+// /Ob2 inline budget on a dead __inline helper called three times, which was
+// the obvious candidate for the allocator decision and is a no-op here.
+//
+// Third run (muse-spark-1.3-free), still 80.1%, all free scratch scores:
+// emitting insert through a file-scope member pointer global (the 0x408f30
+// recipe) and through a derived access struct both score exactly 80.1% with a
+// byte-identical diff, so the emission path is not the lever. A two-statement
+// operator= body (call, then return *this) folds to the same inline and also
+// scores 80.1%. int[0x17] instead of char[0x5c] for the base storage, and
+// adding <string> or <algorithm> on top of <vector> (the headers headers.py
+// does not cover), all score exactly 80.1%. The COMDAT body is fully
+// determined by the header plus T: every variant tried lands on the same 799
+// bytes, so the remaining allocator decision (_P in edi with the _Ufill
+// counter spilled, against our _P in ecx with the counter in edi) is out of
+// reach from this file, the same residue 0x408f30 kept at 88.7%.
 #include <vector>
 
-class Class_0046eaa0 {                 // 0x5c bytes, the base subobject
+struct Class_0046eaa0 {                // 0x5c bytes, the base subobject
 public:
     char unknown_0[0x5c];
 
