@@ -5,25 +5,43 @@
 // entries vector. On a syntax error it appends a message to the error buffer
 // and calls FUN_004b6290 (which never returns normally).
 //
-// PARTIAL: 39.7%, 1126 bytes against 1115. The whole control flow and every
-// callee are in place. What still differs:
-//  - register allocation: the original puts `this` in ebp and caches &children
-//    in ebx (`lea ebx,[ebp+4]`); ours puts `this` in ebx. The original also
-//    spills this to [esp+0x24] and &children to [esp+0x38], which is what makes
-//    its frame 0x7fc instead of our 0x7f0 and the error buffer land at
-//    [esp+0x3c] instead of [esp+0x30] (three extra dwords before it).
-//  - the two std::vector default constructors: the original stores the empty
-//    allocator byte read from an uninitialised local (`mov al,[esp+7]`), ours
-//    (a hand-declared std::vector with insert left undefined, so the compiler
-//    cannot inline it) omits those two byte stores.
-//  - the whitespace skip: the original keeps the loaded char in al and tests it
-//    after the pointer increment; ours reloads from the top of the loop.
-//  - the key equality test: original loads the second char into bl before the
-//    compare (`mov bl,[esi]; cmp dl,bl`), ours compares against memory.
+// PARTIAL: 1152 bytes against 1115, true instruction LCS 166/401 vs 166/420
+// (~40.4%). Note: `check.py` reports a lower difflib number (25.6%) than an
+// earlier revision (36.3%) even though LCS went up and the two previously
+// missing allocator-byte stores are now correct; difflib punishes the reordered
+// prologue, which is the downstream effect of the register decision below. The
+// whole control flow and every callee are in place. Resolved since the earlier
+// revision: the allocator-byte stores, and the whitespace skip (writing it as a
+// temporary `char* p = current; ... current = p;` keeps `current` in ecx and
+// stores it only once, which is the original's shape). The one remaining cause
+// is a single register-allocation decision, and every visible diff follows
+// from it:
+//  - the original puts `this` in ebp and materialises &children in ebx
+//    (`lea ebx,[ebp+4]`), and spills both (`this` to [esp+0x24], &children to
+//    [esp+0x38]). That is what makes its frame 0x7fc instead of our 0x7f4 and
+//    its error buffer land at [esp+0x3c]. Ours puts `this` in ebx and never
+//    keeps &children in a register (it recomputes `lea ecx,[ebx+4]` at the
+//    insert call), so nothing needs spilling and the frame is 8 bytes short.
+//    Because the original reuses ebp for the binary-search `mid` and ebx for
+//    the inlined strcmp's `bl`, it holds this and &children in memory across
+//    those blocks. Everything else (whitespace-skip shape, the strcmp's
+//    `mov bl,[esi]; cmp dl,bl`, the block order) is downstream of that.
+//  - resolved here: the two std::vector default constructors. MSVC 5's
+//    vector(const _A& _Al = _A()) copies the allocator from the default-argument
+//    temporary, whose storage is an uninitialised stack slot, hence the
+//    original's `mov al,[esp+7]` / `mov cl,[esp+0xf]` and the two byte stores.
+//    Giving our vector the same defaulted-argument constructor reproduces them.
+// Tried and did NOT flip the allocation, so nobody repeats them:
+//  - including <vector> and taking &insert: the calls still get inlined
+//    (function grows past 2000 bytes) even though the out-of-line instantiation
+//    is emitted; dead inline call sites did not consume the budget either.
+//    Using the real <vector> DOES give `mov ebp,ecx` / `lea ebx,[ebp+4]`, so
+//    the allocation and the inlining are entangled, but the inlining is fatal.
+//  - pointer/reference locals to children (`&children`, `children.end()` saved
+//    first, an inline `Kids(self)` accessor, calling the insert from an inline
+//    `AddChild(this, child)` helper): all fold back to `[ebx+4]`.
 // The std::vector below is declared rather than included so that
-// vector<T>::insert stays an out-of-line call to 0x4c4d70 / 0x4c51e0; including
-// <vector> makes /Ob2 inline both instantiation bodies and the function grows
-// to 2020 bytes.
+// vector<T>::insert stays an out-of-line call to 0x4c4d70 / 0x4c51e0.
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,7 +67,7 @@ public:
     T* _Last;
     T* _End;
 
-    vector() : _First(0), _Last(0), _End(0) {}
+    explicit vector(const A& al = A()) : _A(al), _First(0), _Last(0), _End(0) {}
     iterator begin() { return _First; }
     iterator end() { return _Last; }
     T& operator[](size_type i) { return _First[i]; }
@@ -136,9 +154,12 @@ Class_004c3e40::Class_004c3e40(char* name, char* text, int* nextblock, char* fil
     this->name = FUN_004d8610(name);
 
     while (1) {
-        while (*current && (*current == ' ' || *current == '\t'
-                || *current == '\r' || *current == '\n'))
-            current++;
+        {
+            char* p = current;
+            while (*p && (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n'))
+                p++;
+            current = p;
+        }
 
         if (*current == 0) {
             if (nextblock == 0) {
@@ -158,9 +179,12 @@ Class_004c3e40::Class_004c3e40(char* name, char* text, int* nextblock, char* fil
             Class_004c91a0 subname;
             ((Class_004c4340*)this)->FUN_004c4340(&subname, current + 1, close);
             current = close + 1;
-            while (*current && (*current == ' ' || *current == '\t'
-                    || *current == '\r' || *current == '\n'))
-                current++;
+            {
+                char* p = current;
+                while (*p && (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n'))
+                    p++;
+                current = p;
+            }
             if (*current != '{') {
                 strcat(error, "Sub-record - opening '{' not found");
                 ((Class_004c9390*)&subname)->FUN_004c9390();
