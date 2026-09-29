@@ -1,4 +1,26 @@
-// Decompiled by DeepSeek V4.1 Flash. Names are provisional.
+// Decompiled by DeepSeek V4.1 Flash, finished by space-bunny-free. Names are provisional.
+//
+// 81.3%, 823 bytes against 772. What still differs:
+//  1. This function emits three copies of the final
+//     `p->field_22 = value; return result;` tail plus its epilogue
+//     (one after the state==1 loop, one after the state==2 block, one at
+//     the end). The original has a single shared tail at 0x4532ff that
+//     every path reaches with a jump, and each branch only stores 1 into
+//     the result local first. MSVC 5 is not tail merging here, so some
+//     upstream construct is still wrong; I did not find it in the time.
+//  2. The two `players[i]` loops use the g_game pointer as the address
+//     base and the byte-offset induction variable as the index
+//     ([eax + esi + 0x1b63]); we emit the reverse ([esi + eax + 0x1b63]).
+//     Seven instructions are affected, in both loops.
+//  3. Block addresses differ only because of the two extra tails.
+//
+// Tried and rejected:
+//  - `Player* q = &g_game->players[i];` inside the state==1 loop (to flip
+//    the base/index roles) scores 57%: MSVC promotes q to an induction
+//    variable and the whole loop body changes shape.
+//  - The three inlined copies of the "find an active player" helper only
+//    match with `while (1) { ...; if (i >= 10) return -1; }`; the plain
+//    `for` form is rotated and puts the found block out of line (75.4%).
 #pragma pack(push, 1)
 struct PlayerInfo_00453010 {
     char unknown_0[0x94];
@@ -45,12 +67,15 @@ static inline unsigned char FindIndex_00453010(int id)
 
 static inline int FindActiveId_00453010()
 {
-    for (int i = 0; i < 10; i++) {
+    int i = 0;
+    while (1) {
         if (g_game->players[i].active != 0
             && (g_game->players[i].state == 1 || g_game->players[i].state == 2))
             return g_game->players[i].id;
+        i++;
+        if (i >= 10)
+            return -1;
     }
-    return -1;
 }
 
 // FUNCTION: 0x453010
