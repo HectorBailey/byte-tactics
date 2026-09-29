@@ -1,12 +1,18 @@
-// Decompiled by space-bunny-free. Names are provisional.
-// GAVE UP at 91.8%. Everything matches except one block: the original keeps
-// the pre-append length in edx and copies it to esi (mov esi, edx) for the
-// nameOffset store, so its lea reads [edx + ecx + 1] and its strcpy dest lea
-// is [esi + eax]. This source folds the two uses of buf.len into one value in
-// esi (lea [esi + ecx + 1], lea [eax + esi]), which is 2 bytes shorter and
-// shifts every later jump target by 2. Tried: swapping the version/noff
-// statements, writing the size update as noff + strlen(ext) + 1, and
-// strcpy(noff + buf.data, ext) - none of them change the register choice.
+// Decompiled by space-bunny-free, finished by muse-spark-1.3-free. Names are provisional.
+// Best 92.6%. One block differs, 2 bytes: the original keeps the pre-append
+// buf.len in edx and copies it to esi (mov esi, edx) for the noff store, so
+// its size lea reads [edx + ecx + 1] and buf.data is loaded after the lea.
+// This source loads buf.len straight into esi (lea [esi + ecx + 1]) with the
+// buf.data load hoisted above the strlen tail, 2 bytes shorter, shifting
+// later jump targets. Fixed vs prior version: compress size pointer is
+// &buf.csize (was &buf.len), which matched the compress-call lea; computing
+// the new length through an oldlen temp before assigning noff matched the
+// strcpy lea operand order. Tried without effect: +=, swapped addends,
+// strlen into a separate elen local, inline length helper, pointer access to
+// buf.data, embedded buf.len assignment in the realloc call, unsigned noff,
+// &buf.data[noff], version/noff/nameOffset store reorderings. Frame layout
+// matches (buf at esp+0x10, noff at esp+0x1c, header at esp+0x20,
+// path at esp+0x44).
 #include <stdio.h>
 #include <string.h>
 
@@ -86,8 +92,9 @@ int Class_004b3750::FUN_004b39c0(char* name, char* ext, int param_3, int param_4
     memset(&header, 0, sizeof(header));
     strncpy(header.name, "HAPIBANK", 8);
     header.version = 1;
-    noff = buf.len;
-    buf.len = buf.len + strlen(ext) + 1;
+    int oldlen = buf.len;
+    buf.len = oldlen + strlen(ext) + 1;
+    noff = oldlen;
     buf.data = (char*)FUN_004d8580(buf.data, buf.len);
     strcpy(buf.data + noff, ext);
     header.nameOffset = noff;
@@ -104,7 +111,7 @@ int Class_004b3750::FUN_004b39c0(char* name, char* ext, int param_3, int param_4
     char* cbuf = (char*)FUN_004d8450(buf.csize);
     FUN_004d8e50(handle);
     if (cbuf != 0) {
-        err = FUN_004d1820(cbuf, &buf.len, buf.data, dsize, 1, 0);
+        err = FUN_004d1820(cbuf, &buf.csize, buf.data, dsize, 1, 0);
     } else {
         err = noff;
     }
