@@ -1,5 +1,5 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// Partial: 77.2%. One-child tree updates are inlined in the executable;
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, re-checked by deepseek-v4.1-flash. Names are provisional.
+// Partial: 77.2% (best of the variants tried; no change beat it). One-child tree updates are inlined in the executable;
 // supplying the matched helper body restores those missing blocks. Local
 // control-state grouping improves stack slots, but packet-loop registers
 // and several control-flow details still differ.

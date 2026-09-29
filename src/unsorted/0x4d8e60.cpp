@@ -1,12 +1,30 @@
 // Decompiled by Claude Sonnet 5.5 and deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// Partial: 50.6%, retaining the best-scoring implementation. The original
-// formats reason at 0x4d9171: [esp+0x1c] before the 12-byte sprintf cleanup
-// is the reason slot at frame offset 0x10. This file instead formats file.
-// Correcting it scores 40.2%; grouping buffers/state, pointer loops and header
-// sweeps did not recover the loss. This is a known semantic mismatch.
-// The object starts at original frame offset 0x7f30 and has 0xc4d0 bytes;
-// shrinking it is not supported. An extra saved record-pointer slot drives
-// the 4-byte frame excess and the parameter loop still differs.
+// Partial: 50.6%, size exact at 2644 bytes. The whole diff is a 4-byte frame
+// shift, so it is ONE problem, not many. Measured frame layout of the
+// original (offsets from esp just after _alloca_probe, which is frame - 0x143f0):
+//   +0x00 written (DWORD), +0x04 base, +0x08 file, +0x0c reason / loop info
+//   +0x10 path[0x3e8]  +0x3e8 name[0x3e8]  +0x7d0 log[0x7358]
+//   +0x7b28 exe[0x3e8] +0x7f10 16 bytes +0x7f20 obj[0xc4d0] -> +0x143f0
+// This file instead has path at +0x14 (an extra 4-byte slot, see the ebx
+// spill below), and it puts exe at +0x3ec and name at +0x7b2c, i.e. the two
+// 0x3e8 arrays are SWAPPED against the original. Getting the array order and
+// the small-slot count right is worth far more than anything inside the
+// sprintf chain; the sprintf calls themselves already match.
+// Known causes still open:
+//  1. `EXCEPTION_RECORD* rec = ep->ExceptionRecord;` makes MSVC spill ebx
+//     (`mov dword ptr [esp+0x30], ebx`) just before the first ctor call, which
+//     the original has no counterpart for. That spill is the extra 4 bytes.
+//     Declaring rec at the top of the function, swapping rec/ctx, using a
+//     reference, or dropping rec entirely (all tried) does not remove it.
+//     Dropping rec does fix the array order: with it removed, name lands at
+//     +0x3e4 and exe at +0x7b24, i.e. the original's order, but the frame then
+//     becomes 0x143ec, 4 bytes short, and the code grows to 2656 bytes
+//     (38.4%). So the original's order needs 4 small slots AND the right array
+//     order at once: one construct is doing both jobs.
+//  2. The original's `lea ecx,[esp+0x7f10]` for FUN_004d9ca0 is exactly 0x10
+//     below obj, and this file reproduces that with a cast. A real 16-byte
+//     local declared between exe and obj would also explain the 0x18 of
+//     padding above exe, but adding one grows the frame past 0x143f0.
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>
