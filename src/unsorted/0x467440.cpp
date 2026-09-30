@@ -1,5 +1,5 @@
 // Decompiled by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
-// PARTIAL: 42.4% (1003 of the original's 1015 bytes). Five loops over the unit
+// PARTIAL: 43.6% (997 of the original's 1015 bytes). Five loops over the unit
 // array (stride 0x118): A clears/sets flags 0x1000/0x700/0x300 from the player
 // index and two "data" records, B ranges over pl->field_67..pl->field_6b and
 // hands a Class_00467840 visitor to FUN_0047e890, C does the same with the two
@@ -14,7 +14,33 @@
 // inline in all three loops B, C, D restored the original's reload shape and
 // took 39.1% -> 42.4%.
 //
-// What still differs (all register allocation, the instruction sequence is right):
+// What still differs (43.6%: the prologue now matches byte for byte, the char
+// was the frame's cause):
+//  - Frame is 0x24 vs the original's 0x28. The last lever: pl (ebp in the
+//    original, kept live from the prologue through loops B and C) is spilled to
+//    [esp+0x18] here, because our loop B uses ebp as the position-copy temp
+//    (`lea ebp,[..+0x6a]`) where the original uses edx/edi there and keeps ebp
+//    for pl. Fixing that is what closes both the frame and the +0x18 store.
+//  - The two loop-C visitors overlap into one +0x18 slot (original: +0x18 and
+//    +0x1c). Declaring both in one scope gives the right frame but hoists both
+//    vtable stores to the block entry (31.0%).
+//  - Loop D's induction is biased +0x96 (via field_96) where the original biases
+//    +0x92 (via def), so every loop-D displacement differs by 4.
+//  - Loop E (see build/scratch/0x467440/v8.cpp): the original computes x and y
+//    INSIDE each arm of the mode test, giving the same movsx/sar sequence twice
+//    and the +0x74 bias; the in-arm form is 1030 bytes and scores 38.2%, so the
+//    hoisted form is kept here.
+//  - The biggest lever found in this session: the `player` byte local must not
+//    need a stack home. Removing the local from the `pl` address expression
+//    (`(unsigned int)g_game->playerIndex * 0x14b` instead of the local) removed
+//    the prologue's extra store/reload and the `and eax,0xff` now matches the
+//    original's `mov dl,[..]; mov eax,edx; and eax,0xff` exactly: 42.4% -> 43.6%.
+//  - Loop E's `pi` byte local is still spilled the same way; the same treatment
+//    there is the next thing to try (it needs cl to stay live for `shl edx,cl`).
+//
+// Scratch variants scored (all with `check.py --sym`): v1/v4-v7 38-39%,
+// v8/v12/v13 36%, v14 39.1%, gen_bi_ci_di 42.4% (the pre-session file),
+// base42.cpp 42.4%, v_inlinepidx 43.6% is this file.
 //  - Frame is 0x24 vs the original's 0x28. The original keeps the three visitor
 //    locals in three distinct slots (+0x18, +0x1c, +0x20); MSVC here overlaps
 //    the two 4-byte loop-C visitors into one +0x18 slot, dropping 4 bytes.
@@ -169,8 +195,8 @@ void FUN_00467440(void)
     unsigned char player = g_game->playerIndex;
     Unit_00467440* first = g_game->units + 1;
     Unit_00467440* last = g_game->units_end;
-    PlayerInfo_00467440* pl =
-        (PlayerInfo_00467440*)((char*)g_game + 0x1b63 + (unsigned int)player * 0x14b);
+    PlayerInfo_00467440* pl = (PlayerInfo_00467440*)((char*)g_game + 0x1b63
+        + (unsigned int)g_game->playerIndex * 0x14b);
     Unit_00467440* u;
 
     for (u = first; u <= last; u++) {
