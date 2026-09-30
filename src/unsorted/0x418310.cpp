@@ -1,4 +1,4 @@
-// Decompiled by GPT-5.6 Astra, finished by deepseek-v4.1-flash; verified by GPT-6.1-sol. Names are provisional.
+// Decompiled by GPT-5.6 Astra, finished by deepseek-v4.1-flash; verified by GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
 // GPT-6 retry: scalar/point screen counters, projection and step helpers,
 // function-scope quad homes and guarded do/while loops did not improve 55.5%.
 // Most screen-counter variants add a hoisted row invariant and a four-byte frame
@@ -88,6 +88,24 @@
 // Neither number decides it alone; score them together, which is the doc's
 // "score the merge, not just the branch" applied to the skeleton itself.
 //
+// deepseek-v4.1 session (still 55.5%, 2203 bytes, three probes, none moved a
+// byte). The slot map is the whole remaining difference and it is one slot
+// wide: ours has p[4] at esp+0x10, x at esp+0x30, y at esp+0x34, baseY at
+// esp+0x38, baseX at esp+0x3c, heights at esp+0x40; the original has y at
+// esp+0x10, p[4] at esp+0x14, x at esp+0x34, baseX at esp+0x38, baseY at
+// esp+0x3c, tile at esp+0x40 and heights at esp+0x48. Everything downstream of
+// y follows from that one slot: give y the low slot and p/x/bases/heights land
+// where the original has them. What does NOT move y: declaring `int y;` at
+// function scope and assigning it in the for-init, and defining `int y=firstY;`
+// above the loop with an empty for-init (`for(;y<lastY;++y)`) both recompile to
+// the identical 2203 bytes with y still at esp+0x34. Swapping the two
+// inner-block declarations (heights[4] before Point p[4]) likewise changes
+// nothing at all. So MSVC5's nested-block slot walk, not declaration order,
+// decides these homes, and the original's y-below-p layout needs a source shape
+// that changes that walk (the array being pinned at the frame bottom while a
+// scalar sits below it is the shape to hunt for). The preheader also stores
+// lastX twice (before and after the width clamp) where the original stores it
+// once at 0x4183cc; the ternary spelling of the clamp was already tried.
 #include <stdlib.h>
 // SHARED begin
 struct Point { int x,y; };

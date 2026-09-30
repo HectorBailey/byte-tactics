@@ -1,4 +1,29 @@
-// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, verified by GPT-6.1-sol. Names are provisional.
+// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, verified by GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
+// deepseek-v4.1 retry (84.1%, unchanged): the whole remaining diff is one
+// instruction plus the register names it drags with it. Check says original
+// 1329 bytes vs ours 1327, and the 2 bytes are exactly the encoding gap
+// between `mov ebp, esi` (2) and the original's `mov ebp, [esp+0x34]` (4),
+// so no other instruction is missing anywhere: the sole real difference is
+// that the original's else arm of the selection reads `button` back from the
+// parameter home slot while every other use is the cached edi, which in turn
+// gives button edi and entries esi (ours: esi/edi). New evidence this round:
+// making the first parameter a reference (`Entry*& button`) does reproduce the
+// original prologue exactly (push edi / mov edi,[esp+0x34] / lea ebx /
+// mov esi,[esp+0x38]) but it also dereferences through the reference, grows
+// the frame and loses 12 points, which proves the source shape is a plain
+// pointer whose *variable* is read from its home slot once. Shapes retried at
+// 84.1% with byte-identical output (each one run through check.py): an index
+// local (drops to 63.9%), a type local, `q = &entries[i]` element pointer,
+// a `base = &entries[0]` pointer, comma-operator duplicate uses of button,
+// `Pick(list, btn)` and `Pick(btn, list)` inline helpers, a local
+// reference binding `Entry*& b = button;` (VC5 folds it away), void*/char*
+// casts in the else arm, the `entries + button->index` pointer form, and an
+// `int* pidx = &button->index;` local (61.3%, same 1329 byte size but the
+// whole shape shifts). Every shape that keeps the code shape lands on exactly
+// 84.1% with identical bytes, so the one memory read cannot be levered from
+// the source expression; it needs the construct that made VC5 treat `button`
+// as memory-resident for that single use (address-taken semantics), which no
+// local reference, inline helper or cast reproduced.
 // GPT-6 retry: a selection object holding the button parameter by reference
 // or pointer, with ternary/early-return/assignment selection, did not improve
 // 84.1%. The button stack reload and entries/button register swap remain.
