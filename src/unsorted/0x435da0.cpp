@@ -33,6 +33,14 @@
 //   MeteorDensity/MeteorDuration calls sits after the next call's
 //   `mov ecx; push 0` in the original, right after the call here) and the
 //   `lea edi,[ebp+0xa08]` (edi there, esi here once -1 takes esi).
+// deepseek-v4.1 retry 2 (issue #1964, 12-minute box): the -1 register weight
+// is fed only by SOURCE-level int uses (the four `= -1` stores); the inlined
+// strlen `-1` (or ecx,-1) does not count towards it. A named `int negOne = -1;`
+// reused by the four stores still materialises the value into eax and leaves
+// every strlen counter as `or ecx,-1` (scratch 0x435da0/t1.cpp), so the
+// ebx=0 / esi=-1 assignment stays out of reach this way; the one-extra-store
+// probes from the earlier pass (4 stores is one short of the threshold)
+// remain the only measured route, and that route adds instructions.
 // Tried and rejected this session (all 2740 bytes unless noted):
 // `int found = ...; if (found)` for the missionfile test (fixed the count,
 // 89.5% unchanged, kept here at 2712 bytes where it lifts 92.6 to 92.7),
