@@ -1,4 +1,18 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
+// Confirmed 62.2% (4792 bytes against 4772) and inspected by deepseek-v4.1.
+// Two concrete differences visible in the check.py diff:
+//  1. The original keeps one shared zero in esi: the first two FUN_004c46c0
+//     calls are `xor esi,esi; push esi` / `push esi`, ours push the literal 0
+//     each time (`push 0`), so declare one `int def = 0;` local before them.
+//  2. The Class_00438760 conversion temp does not sit in its own slot: the
+//     original builds it at [esp+0x23] with its char member at [esp+0x2b]
+//     (this+8), overlapping the head of the `char buf[100]` slot (which starts
+//     at [esp+0x24]). Ours places it at [esp+0x20] with the byte at [esp+0x28].
+//     So its slot overlaps buf's first 0xc bytes, which is what the source's
+//     declaration order produced.
+//  3. The bail-out jumps differ (0x42d154 vs 0x42d167) only because our body is
+//     20 bytes longer; fix the instruction differences first, the offsets then
+//     follow.
 // Gave up at 62.2% (4792 bytes against 4772). Expanded the missing flag,
 // capability, sound, movement, weapon, yard-map and geometry tail. Removed
 // the duplicate explicit parser destructor. Remaining local-byte placement,
