@@ -1,4 +1,26 @@
 // Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
+// Pass 3 (deepseek-v4.1): 64.7%, ours 4716 bytes against 4772.
+// Confirmed: the original's single `xor esi,esi` at 0x42c0f0 initialises the
+// soundcategory loop counter (`int sound = 0;`), which stays in esi across the
+// whole function; the original then serves every zero default argument from
+// that live zero register (`push esi`, 85 sites) and the `cmp ..., esi` tests
+// at 0x42cbde/0x42cc5f, instead of materialising its own zero constant.
+// Declaring `int sound = 0;` right after the objectname block (where the
+// original's xor sits) and removing the `int def = 0;` temp raised the score
+// from 62.6% to 64.7% and shrank our body from 4804 to 4716 bytes.
+// Remaining first divergence: MSVC still materialises its own zero register in
+// ebx in our build (`xor ebx,ebx` at the start of the getter block, then
+// `push ebx` at the default sites), where the original pushes esi; the
+// FUN_004c4800 group rematerialises `xor eax,eax; push eax` in the original
+// while ours pushes ebx.
+// Tried this pass, all still 64.7%: passing the `sound` variable itself as the
+// default argument at the FUN_004c46c0/FUN_004c4760 sites; declaring
+// `int number = 0;` early; moving `unsigned int value` down to its first
+// assignment. Inlining the FUN_004c46c0 float conversions (dropping the named
+// `scratch` local) grew the frame by 4 so every esp+N shifted, 62.3%.
+// Still different: the Class_00438760 temp is read as `mov al,[eax]` in ours
+// where the original loads `mov al,[esp+0x2b]` from its byte-packed slot.
+
 // Still 62.6% (ours 4804 bytes against 4772) after deepseek-v4.1's second pass.
 // Confirmed fixed this pass (both match the original now):
 //   - the Class_00438760 conversion temp must be an unnamed temporary in the
@@ -147,7 +169,6 @@ void __stdcall FUN_0042bf40(char* fbi_file, char* unitdef) {
             goto FINISH;
         }
         {
-            unsigned int value = 0;
             ((Class_004c48c0*)parser.current)
                 ->FUN_004c48c0(unitdef + 0x20, "unitname", 0x20, DAT_005119b8);
             FUN_004c58a0(&parser, unitdef, "name", 0x20, 0);
@@ -171,21 +192,21 @@ void __stdcall FUN_0042bf40(char* fbi_file, char* unitdef) {
                     ->FUN_004c48c0(unitdef + 0x80, "objectname", 0x20, DAT_005119b8) == 0) {
                 strcpy(unitdef + 0x80, unitdef + 0x20);
             }
-            int def = 0;
-            scratch = ((Class_004c46c0*)parser.current)->FUN_004c46c0("buildcostenergy", def);
+            int sound = 0;
+            scratch = ((Class_004c46c0*)parser.current)->FUN_004c46c0("buildcostenergy", 0);
             *(float*)(unitdef + 0x186) = (float)scratch;
-            scratch = ((Class_004c46c0*)parser.current)->FUN_004c46c0("buildcostmetal", def);
+            scratch = ((Class_004c46c0*)parser.current)->FUN_004c46c0("buildcostmetal", 0);
             *(float*)(unitdef + 0x18a) = (float)scratch;
             *(int*)(unitdef + 0x192) =
-                *((Class_004c4800*)parser.current)->FUN_004c4800(&scratch, "maxvelocity", value);
+                *((Class_004c4800*)parser.current)->FUN_004c4800(&scratch, "maxvelocity", 0);
             *(int*)(unitdef + 0x19a) =
-                *((Class_004c4800*)parser.current)->FUN_004c4800(&scratch, "brakerate", value);
+                *((Class_004c4800*)parser.current)->FUN_004c4800(&scratch, "brakerate", 0);
             *(int*)(unitdef + 0x19e) =
-                *((Class_004c4800*)parser.current)->FUN_004c4800(&scratch, "acceleration", value);
+                *((Class_004c4800*)parser.current)->FUN_004c4800(&scratch, "acceleration", 0);
             *(int*)(unitdef + 0x1a2) =
                 *((Class_004c4800*)parser.current)->FUN_004c4800(&scratch, "bankscale", 0x10000);
             *(int*)(unitdef + 0x1a6) =
-                *((Class_004c4800*)parser.current)->FUN_004c4800(&scratch, "pitchscale", value);
+                *((Class_004c4800*)parser.current)->FUN_004c4800(&scratch, "pitchscale", 0);
             *(int*)(unitdef + 0x1aa) = *((Class_004c4800*)parser.current)
                                             ->FUN_004c4800(&scratch, "damagemodifier", 0x10000);
             *(int*)(unitdef + 0x1ae) =
@@ -195,219 +216,219 @@ void __stdcall FUN_0042bf40(char* fbi_file, char* unitdef) {
                 *((Class_004c4800*)parser.current)
                      ->FUN_004c4800(&scratch, "moverate2", *(int*)(unitdef + 0x192) * 2);
             *(short*)(unitdef + 0x1ba) =
-                (short)((Class_004c46c0*)parser.current)->FUN_004c46c0("turnrate", def);
-            unitdef[0x22c] = (char)((Class_004c46c0*)parser.current)->FUN_004c46c0("waterline", def);
+                (short)((Class_004c46c0*)parser.current)->FUN_004c46c0("turnrate", 0);
+            unitdef[0x22c] = (char)((Class_004c46c0*)parser.current)->FUN_004c46c0("waterline", 0);
             unitdef[0x22a] =
-                (char)((Class_004c46c0*)parser.current)->FUN_004c46c0("transportsize", def);
+                (char)((Class_004c46c0*)parser.current)->FUN_004c46c0("transportsize", 0);
             unitdef[0x22b] =
-                (char)((Class_004c46c0*)parser.current)->FUN_004c46c0("transportcapacity", def);
+                (char)((Class_004c46c0*)parser.current)->FUN_004c46c0("transportcapacity", 0);
             *(float*)(unitdef + 0x1c2) =
-                ((Class_004c4760*)parser.current)->FUN_004c4760("energymake", def, def);
+                ((Class_004c4760*)parser.current)->FUN_004c4760("energymake", 0, 0);
             *(float*)(unitdef + 0x1c6) =
-                ((Class_004c4760*)parser.current)->FUN_004c4760("energyuse", def, def);
+                ((Class_004c4760*)parser.current)->FUN_004c4760("energyuse", 0, 0);
             *(float*)(unitdef + 0x1ca) =
-                ((Class_004c4760*)parser.current)->FUN_004c4760("metalmake", def, def);
+                ((Class_004c4760*)parser.current)->FUN_004c4760("metalmake", 0, 0);
             *(float*)(unitdef + 0x1ce) =
-                ((Class_004c4760*)parser.current)->FUN_004c4760("extractsmetal", def, def);
-            unitdef[0x22d] = (char)((Class_004c46c0*)parser.current)->FUN_004c46c0("makesmetal", def);
+                ((Class_004c4760*)parser.current)->FUN_004c4760("extractsmetal", 0, 0);
+            unitdef[0x22d] = (char)((Class_004c46c0*)parser.current)->FUN_004c46c0("makesmetal", 0);
             *(float*)(unitdef + 0x1d2) =
-                ((Class_004c4760*)parser.current)->FUN_004c4760("windgenerator", def, def);
+                ((Class_004c4760*)parser.current)->FUN_004c4760("windgenerator", 0, 0);
             *(float*)(unitdef + 0x1d6) =
-                ((Class_004c4760*)parser.current)->FUN_004c4760("tidalgenerator", def, def);
+                ((Class_004c4760*)parser.current)->FUN_004c4760("tidalgenerator", 0, 0);
             *(float*)(unitdef + 0x1e2) =
-                ((Class_004c4760*)parser.current)->FUN_004c4760("energystorage", def, def);
+                ((Class_004c4760*)parser.current)->FUN_004c4760("energystorage", 0, 0);
             *(float*)(unitdef + 0x1e6) =
-                ((Class_004c4760*)parser.current)->FUN_004c4760("metalstorage", def, def);
+                ((Class_004c4760*)parser.current)->FUN_004c4760("metalstorage", 0, 0);
             *(int*)(unitdef + 0x1ea) =
-                ((Class_004c46c0*)parser.current)->FUN_004c46c0("buildtime", def);
+                ((Class_004c46c0*)parser.current)->FUN_004c46c0("buildtime", 0);
             *(short*)(unitdef + 0x1fe) =
-                (short)((Class_004c46c0*)parser.current)->FUN_004c46c0("workertime", def);
+                (short)((Class_004c46c0*)parser.current)->FUN_004c46c0("workertime", 0);
             *(short*)(unitdef + 0x200) =
-                (short)((Class_004c46c0*)parser.current)->FUN_004c46c0("healtime", def);
+                (short)((Class_004c46c0*)parser.current)->FUN_004c46c0("healtime", 0);
             *(int*)(unitdef + 0x1fa) =
-                ((Class_004c46c0*)parser.current)->FUN_004c46c0("maxdamage", def);
+                ((Class_004c46c0*)parser.current)->FUN_004c46c0("maxdamage", 0);
             *(short*)(unitdef + 0x202) =
-                (short)((Class_004c46c0*)parser.current)->FUN_004c46c0("sightdistance", def);
+                (short)((Class_004c46c0*)parser.current)->FUN_004c46c0("sightdistance", 0);
             *(short*)(unitdef + 0x204) =
-                (short)((Class_004c46c0*)parser.current)->FUN_004c46c0("radardistance", def);
+                (short)((Class_004c46c0*)parser.current)->FUN_004c46c0("radardistance", 0);
             *(short*)(unitdef + 0x206) =
-                (short)((Class_004c46c0*)parser.current)->FUN_004c46c0("sonardistance", def);
+                (short)((Class_004c46c0*)parser.current)->FUN_004c46c0("sonardistance", 0);
             *(short*)(unitdef + 0x20a) =
-                (short)((Class_004c46c0*)parser.current)->FUN_004c46c0("radardistancejam", def);
+                (short)((Class_004c46c0*)parser.current)->FUN_004c46c0("radardistancejam", 0);
             *(short*)(unitdef + 0x20c) =
-                (short)((Class_004c46c0*)parser.current)->FUN_004c46c0("sonardistancejam", def);
-            unitdef[0x22f] = (char)((Class_004c46c0*)parser.current)->FUN_004c46c0("bmcode", def);
+                (short)((Class_004c46c0*)parser.current)->FUN_004c46c0("sonardistancejam", 0);
+            unitdef[0x22f] = (char)((Class_004c46c0*)parser.current)->FUN_004c46c0("bmcode", 0);
             unsigned int value2;
             int number;
+            unsigned int value;
             value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("standingmoveorder", 2);
             *(unsigned int*)(unitdef + 0x241) =
                 (value ^ *(unsigned int*)(unitdef + 0x241)) & 3 ^ *(unsigned int*)(unitdef + 0x241);
             value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("standingfireorder", 2);
             *(unsigned int*)(unitdef + 0x241) =
                 (value & 3) << 2 | *(unsigned int*)(unitdef + 0x241) & 0xfffffff3;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("init_cloaked", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("init_cloaked", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 (value & 1) << 4 | *(unsigned int*)(unitdef + 0x241) & 0xffffffef;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("downloadable", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("downloadable", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 (value & 1) << 5 | *(unsigned int*)(unitdef + 0x241) & 0xffffffdf;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("builder", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("builder", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 (value & 1) << 6 | *(unsigned int*)(unitdef + 0x241) & 0xffffffbf;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("stealth", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("stealth", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 (value & 1) << 8 | *(unsigned int*)(unitdef + 0x241) & 0xfffffeff;
-            scratch = ((Class_004c46c0*)parser.current)->FUN_004c46c0("cloakcost", def);
+            scratch = ((Class_004c46c0*)parser.current)->FUN_004c46c0("cloakcost", 0);
             *(float*)(unitdef + 0x1da) = (float)scratch;
             int cloakDefault = (int)*(float*)(unitdef + 0x1da);
             scratch =
                 ((Class_004c46c0*)parser.current)->FUN_004c46c0("cloakcostmoving", cloakDefault);
             *(float*)(unitdef + 0x1de) = (float)scratch;
-            number = ((Class_004c46c0*)parser.current)->FUN_004c46c0("mincloakdistance", def);
+            number = ((Class_004c46c0*)parser.current)->FUN_004c46c0("mincloakdistance", 0);
             *(short*)(unitdef + 0x208) = (short)number;
-            number = ((Class_004c46c0*)parser.current)->FUN_004c46c0("buildangle", def);
+            number = ((Class_004c46c0*)parser.current)->FUN_004c46c0("buildangle", 0);
             *(short*)(unitdef + 0x210) = (short)number;
-            number = ((Class_004c46c0*)parser.current)->FUN_004c46c0("builddistance", def);
+            number = ((Class_004c46c0*)parser.current)->FUN_004c46c0("builddistance", 0);
             *(short*)(unitdef + 0x212) = (short)number;
-            number = ((Class_004c46c0*)parser.current)->FUN_004c46c0("sortbias", def);
+            number = ((Class_004c46c0*)parser.current)->FUN_004c46c0("sortbias", 0);
             *(short*)(unitdef + 0x21a) = (short)number;
-            number = ((Class_004c46c0*)parser.current)->FUN_004c46c0("cruisealt", def);
+            number = ((Class_004c46c0*)parser.current)->FUN_004c46c0("cruisealt", 0);
             *(short*)(unitdef + 0x21c) = (short)number;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("zbuffer", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("zbuffer", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 (value & 1) << 7 | *(unsigned int*)(unitdef + 0x241) & 0xffffff7f;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("isairbase", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("isairbase", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 (value & 1) << 9 | *(unsigned int*)(unitdef + 0x241) & 0xfffffdff;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("istargetingupgrade", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("istargetingupgrade", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 (value & 1) << 10 | *(unsigned int*)(unitdef + 0x241) & 0xfffffbff;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("teleporter", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("teleporter", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 *(unsigned int*)(unitdef + 0x241) & 0xffffdfff | (value & 1) << 0xd;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("hidedamage", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("hidedamage", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 *(unsigned int*)(unitdef + 0x241) & 0xffffbfff | (value & 1) << 0xe;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("shootme", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("shootme", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 *(unsigned int*)(unitdef + 0x241) & 0xffff7fff | (value & 1) << 0xf;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("armoredstate", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("armoredstate", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 (value & 1) << 0x11 | *(unsigned int*)(unitdef + 0x241) & 0xfffdffff;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("activatewhenbuilt", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("activatewhenbuilt", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 (value & 1) << 0x12 | *(unsigned int*)(unitdef + 0x241) & 0xfffbffff;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("canfly", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("canfly", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 (value & 1) << 0xb | *(unsigned int*)(unitdef + 0x241) & 0xfffff7ff;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("canhover", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("canhover", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 *(unsigned int*)(unitdef + 0x241) & 0xffffefff | (value & 1) << 0xc;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("upright", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("upright", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 (value & 1) << 0x14 | *(unsigned int*)(unitdef + 0x241) & 0xffefffff;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("floater", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("floater", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 (value & 1) << 0x13 | *(unsigned int*)(unitdef + 0x241) & 0xfff7ffff;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("amphibious", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("amphibious", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 (value & 1) << 0x15 | *(unsigned int*)(unitdef + 0x241) & 0xffdfffff;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("isfeature", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("isfeature", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 (value & 1) << 0x18 | *(unsigned int*)(unitdef + 0x241) & 0xfeffffff;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("noshadow", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("noshadow", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 (value & 1) << 0x19 | *(unsigned int*)(unitdef + 0x241) & 0xfdffffff;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("immunetoparalyzer", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("immunetoparalyzer", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 (value & 1) << 0x1a | *(unsigned int*)(unitdef + 0x241) & 0xfbffffff;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("hoverattack", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("hoverattack", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 (value & 1) << 0x1b | *(unsigned int*)(unitdef + 0x241) & 0xf7ffffff;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("antiweapons", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("antiweapons", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 *(unsigned int*)(unitdef + 0x241) & 0xdfffffff | (value & 1) << 0x1d;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("digger", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("digger", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 *(unsigned int*)(unitdef + 0x241) & 0xbfffffff | (value & 1) << 0x1e;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("onoffable", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("onoffable", 0);
             *(unsigned int*)(unitdef + 0x245) =
                 (value & 1) << 2 | *(unsigned int*)(unitdef + 0x245) & 0xfffffffb;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("mobilestandorders", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("mobilestandorders", 0);
             *(unsigned int*)(unitdef + 0x245) =
                 (value ^ *(unsigned int*)(unitdef + 0x245)) & 1 ^ *(unsigned int*)(unitdef + 0x245);
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("firestandorders", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("firestandorders", 0);
             *(unsigned int*)(unitdef + 0x245) =
                 (value & 1) << 1 | *(unsigned int*)(unitdef + 0x245) & 0xfffffffd;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("canstop", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("canstop", 0);
             *(unsigned int*)(unitdef + 0x245) =
                 (value & 1) << 3 | *(unsigned int*)(unitdef + 0x245) & 0xfffffff7;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("canattack", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("canattack", 0);
             *(unsigned int*)(unitdef + 0x245) =
                 (value & 1) << 4 | *(unsigned int*)(unitdef + 0x245) & 0xffffffef;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("canguard", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("canguard", 0);
             *(unsigned int*)(unitdef + 0x245) =
                 (value & 1) << 5 | *(unsigned int*)(unitdef + 0x245) & 0xffffffdf;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("canpatrol", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("canpatrol", 0);
             *(unsigned int*)(unitdef + 0x245) =
                 (value & 1) << 6 | *(unsigned int*)(unitdef + 0x245) & 0xffffffbf;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("canmove", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("canmove", 0);
             *(unsigned int*)(unitdef + 0x245) =
                 (value & 1) << 7 | *(unsigned int*)(unitdef + 0x245) & 0xffffff7f;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("canload", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("canload", 0);
             *(unsigned int*)(unitdef + 0x245) =
                 (value & 1) << 8 | *(unsigned int*)(unitdef + 0x245) & 0xfffffeff;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("canreclamate", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("canreclamate", 0);
             *(unsigned int*)(unitdef + 0x245) =
                 (value & 1) << 10 | *(unsigned int*)(unitdef + 0x245) & 0xfffffbff;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("canresurrect", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("canresurrect", 0);
             *(unsigned int*)(unitdef + 0x245) = (*(unsigned int*)(unitdef + 0x245) & 0x400) >> 1 |
                                                 (value & 1) << 0xb |
                                                 *(unsigned int*)(unitdef + 0x245) & 0xfffff5ff;
-            value2 = ((Class_004c46c0*)parser.current)->FUN_004c46c0("cancapture", def);
+            value2 = ((Class_004c46c0*)parser.current)->FUN_004c46c0("cancapture", 0);
             value = *(unsigned int*)(unitdef + 0x245);
             value2 = (value2 & 1) << 0xc;
             *(unsigned int*)(unitdef + 0x245) = value & 0xffffefff | value2;
             *(unsigned int*)(unitdef + 0x245) = value & 0xffffcfff | value2 |
                                                 (unsigned int)(0.0 < *(float*)(unitdef + 0x1da))
                                                     << 0xd;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("candgun", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("candgun", 0);
             *(unsigned int*)(unitdef + 0x245) =
                 *(unsigned int*)(unitdef + 0x245) & 0xffffbfff | (value & 1) << 0xe;
-            number = ((Class_004c46c0*)parser.current)->FUN_004c46c0("maneuverleashlength", def);
+            number = ((Class_004c46c0*)parser.current)->FUN_004c46c0("maneuverleashlength", 0);
             *(short*)(unitdef + 0x214) = (short)number;
-            number = ((Class_004c46c0*)parser.current)->FUN_004c46c0("attackrunlength", def);
+            number = ((Class_004c46c0*)parser.current)->FUN_004c46c0("attackrunlength", 0);
             *(short*)(unitdef + 0x216) = (short)number;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("kamikaze", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("kamikaze", 0);
             *(unsigned int*)(unitdef + 0x241) =
                 *(unsigned int*)(unitdef + 0x241) & 0xefffffff | (value & 1) << 0x1c;
-            number = ((Class_004c46c0*)parser.current)->FUN_004c46c0("kamikazedistance", def);
+            number = ((Class_004c46c0*)parser.current)->FUN_004c46c0("kamikazedistance", 0);
             *(short*)(unitdef + 0x218) = (short)number;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("norestrict", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("norestrict", 0);
             *(unsigned int*)(unitdef + 0x245) =
                 *(unsigned int*)(unitdef + 0x245) & 0xffff7fff | (value & 1) << 0xf;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("showplayername", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("showplayername", 0);
             *(unsigned int*)(unitdef + 0x245) =
                 (value & 1) << 0x11 | *(unsigned int*)(unitdef + 0x245) & 0xfffdffff;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("commander", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("commander", 0);
             *(unsigned int*)(unitdef + 0x245) =
                 (value & 1) << 0x12 | *(unsigned int*)(unitdef + 0x245) & 0xfffbffff;
-            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("cantbetransported", def);
+            value = ((Class_004c46c0*)parser.current)->FUN_004c46c0("cantbetransported", 0);
             *(unsigned int*)(unitdef + 0x245) =
                 (value & 1) << 0x13 | *(unsigned int*)(unitdef + 0x245) & 0xfff7ffff;
 
             char* countdown =
                 ((Class_004c4630*)parser.current)->FUN_004c4630("selfdestructcountdown");
             unsigned int* flags = (unsigned int*)(unitdef + 0x245);
-            if (countdown == (char*)def)
+            if (countdown == (char*)0)
                 *flags = (*flags & 0xffdfffff) | 0x500000;
             else
                 *flags = (*flags & 0xff8fffff) | ((unsigned int)atoi(countdown) & 7) << 20;
             ((Class_004c48c0*)parser.current)->FUN_004c48c0(buf, "category", 100, DAT_005119b8);
             ((Class_00488e70*)unitdef)->FUN_00488e70(buf);
-            int sound = 0;
             if (((Class_004c48c0*)parser.current)
-                    ->FUN_004c48c0(buf, "soundcategory", 100, DAT_005119b8) != def) {
+                    ->FUN_004c48c0(buf, "soundcategory", 100, DAT_005119b8) != 0) {
                 while (sound < *(int*)(g_game + 0x37e17)) {
                     if (_strcmpi(*(char**)(g_game + 0x37e13) + sound * 0x160, buf) == 0)
                         goto SOUND_FOUND;
