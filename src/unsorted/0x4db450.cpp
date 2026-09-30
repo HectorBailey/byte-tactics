@@ -125,6 +125,21 @@
 // _Ubound destination declared as `Node_004db450*` (worse, 85.4%, and it also
 // loses the Neq idiom), n and it2 in one declaration statement (92.9%),
 // n/it2 declared after len+base+p in the ORIGINAL order (93.5%, this file).
+// Added by deepseek-v4.1 (all 93.5%, 444 of 444 bytes, the same eight hunks):
+//   * declaration orders len/base/n/it2/p, len/base/n/p/it2, len/base/it2/n/p,
+//     n/it2/len/base/p, p/n/it2/len/base, n/len/base/it2/p and
+//     len/n/it2/base/p: byte-identical objects, so the slot rotation is not
+//     reachable by reordering the declaration block;
+//   * declaring n, it2, p and base at their point of use (a seed pattern from
+//     the board) is inert too, and so is an extra dead 4-byte local;
+//   * the erase and the insert declared as by-value-returning STL shapes
+//     (`it2 = f(x)`): 456 bytes, 87.2%, the hidden return pointer grows the
+//     frame to 0x18.
+// The single root difference left: it2 lands at temp0 here and temp1 in the
+// original (n and the spilled `this` follow it one slot down), so the erase
+// pair temp sits at temp0/temp1 here instead of temp1/temp2. The emitted
+// instruction sequence is otherwise identical, so that one allocation state is
+// not steered by anything the declaration list or the call spelling can reach.
 #include <windows.h>
 
 struct Node_004db450 {
