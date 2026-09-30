@@ -1,4 +1,4 @@
-// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash and GPT-6.1-sol. Names are provisional.
+// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash and GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
 // std::vector<unsigned char>::insert(iterator, size_type, const T&) from
 // MSVC 5's <vector>, with _Ucopy, _Ufill, fill and copy_backward all
 // inlined. 0x409160 calls it from the inlined resize() of the vector at
@@ -22,6 +22,17 @@
 // A fourth sum (the source start of the third _Ucopy) flips with compiler
 // state every 256 declarations: <windows.h> plus <ddraw.h> (or <math.h>)
 // gives the original's order there. Same family as 0x408f30 and 0x40d020.
+// This file is the member-address form (no manual body): the body below is
+// the SP3 VECTOR header's insert(), whose reallocation tail reads
+// `_End = _S + _N; _Last = _S + size() + _M;` exactly as the original. The
+// residue is pure register/schedule choice for those two sums, so it is not
+// expressible from this side of the header. Confirmed on 2026-09-30:
+// headers.py --cpp (768 sets, 0 failures) tops out at 93.3%, a windows.h +
+// math.h + ddraw.h triple is worse (92.8%), and 1/2/3/6/12 dummy preceding
+// typedefs (the every-256-declarations state flip) do not move it. A
+// written-out namespace std { class vector } carrier (as in 0x425210.cpp,
+// which reaches 99.6% for a 2-byte element) scores 91.0% here, so for a
+// 1-byte element the real <vector> stays the better carrier.
 #include <windows.h>
 #include <ddraw.h>
 #include <vector>

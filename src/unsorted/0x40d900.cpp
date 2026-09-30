@@ -1,5 +1,6 @@
 // Decompiled by DeepSeek V4.1 Flash, finished by Claude Opus 5.5,
-// deepseek-v4.1-flash, and GPT-6.1-sol. Names are provisional.
+// deepseek-v4.1-flash, and GPT-6.1-sol, edited by deepseek-v4.1.
+// Names are provisional.
 //
 // Partial (97.5%): clears the kind byte of every cell in each dirty group of
 // eight cells, then clears the dirty masks. One dirty word covers 256 cells
@@ -21,6 +22,19 @@
 // p += i * 256, a second grid pointer, unsigned i, a separate ClearLast body
 // order, and all 128 tools/headers.py header sets give the same 93.7%/97.5%
 // code.
+//
+// still-differs note (deepseek-v4.1, 10 check runs): the only hunk left is the
+// ClearLast tail: the original emits `mov edx,ebp` / `mov [eax],0` / `mov
+// edi,[esi+0x1c]` / `shl edx,0xa` / `add edi,edx`, while this version emits
+// `mov edi,[esi+0x1c]` before the branch and sinks the store after `add`.
+// The load can only stay after the store if the source stores before it
+// evaluates `cells`, and every such shape (p = &cells[i*256]; p = cells;
+// p += i*256; int off = i<<10; (char*)cells + off, bits declared before the
+// if) makes MSVC pick ecx for the base and edi for the shift (93.7%), and
+// declaring `bits` before the if also reallocates the first loop's index to
+// ecx. The front end only copies `bits` to ebx, freeing edx for the shift,
+// when the pointer is assigned before the guard, which is exactly what hoists
+// the load above the test.
 //
 // Possible original bug: in the last block the bounds check starts `c` at
 // `i << 8` again for every group of eight cells instead of at the group's own
