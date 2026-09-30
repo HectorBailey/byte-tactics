@@ -1,10 +1,36 @@
 // Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by
-// deepseek-v4.1-flash. Names are provisional.
+// deepseek-v4.1-flash, edited by deepseek-v4.1. Names are provisional.
 //
-// 2797 bytes. Best so far: 78.6% (2837 vs 2797 bytes). No MATCH.
+// 2797 bytes. Best so far: 80.7% (2822 vs 2797 bytes). No MATCH.
 //
 // Earlier passes (still in this file) fixed the Fixed union, the __stdcall
 // declarations, the int sel/sel2 locals and the initial `==3` guard.
+//
+// What the last pass fixed, 78.6 -> 80.7:
+// - The FUN_0041c4c0 call after the 0x9b bit-6 test was duplicated in both
+//   branches here; the original computes the two ints in each arm and has ONE
+//   shared call (`jmp` into a common `push 0; push eax; push esi; call`).
+//   Rewritten as two ints set in the if/else plus one call. Also made the
+//   bit-6 read an `unsigned char` local shifted in its own statement.
+// - Still open: the g_game[0x14281] read-modify-writes. The original zero
+//   extends each byte (`xor edx,edx; mov dl,[p+0x9c]`), masks 32-bit
+//   (`and edx,2/4/1`) and ORs into a word load (`mov cx,[g+0x14281];
+//   and ecx,0xfffd; or ecx,edx`). An `unsigned int` temp does give the 32-bit
+//   AND (`and ecx,2` and `or`), but MSVC then drops the 2-byte xor (it knows
+//   the mask clears the high bits) and the function comes out 2770 bytes:
+//   same instruction shapes, different registers, and the checker scores it
+//   LOWER (75.0), so the narrow `and bl,2; movzx si,bl` form is kept. Shapes
+//   measured with tools/wcl + /Fa in build/scratch/0x497180/{t,u,u2,u3}.asm:
+//   `int`/`unsigned int` temp of the whole byte then `temp & mask` in the OR
+//   gives `and reg,2` and no xor; `unsigned char` temp with an `unsigned int`
+//   flags temp gives the xor but then `and dl,2; movzx dx,dl`.
+// - Also still open: `test byte ptr [..+0x9b],0x40` here vs the original's
+//   `mov al,[..]; shr al,6; test al,1` (all of a local, a shifted local, a
+//   bitfield-free expression and three bitfield shapes fold to the test in
+//   tools/wcl micro-tests, so the original may read a real bitfield there);
+//   `or byte ptr [g+0x38d75],4/2` here vs the original's word load/or/store
+//   (the volatile network-flags signature); edi vs edx for the reused
+//   constant 1; and the extra `(((long long)rand() * 2) / 0x8000)` mul/div.
 //
 // What this pass fixed, in order of how much it moved the number:
 // - The three ten-player walks: indexing a record as
@@ -324,15 +350,20 @@ void FUN_00497180(void)
 
             unsigned char li = *(unsigned char*)(g_game + 0x2a42);
             char* lp = *(char**)(g_game + 0x1b63 + 0x14b * li + 0x27);
-            if ((*(unsigned char*)(lp + 0x9b) >> 6) & 1) {
+            unsigned char lpflag = *(unsigned char*)(lp + 0x9b);
+            lpflag = lpflag >> 6;
+            int cx;
+            int cz;
+            if (lpflag & 1) {
                 *(unsigned short*)(g_game + 0x14281) &= 0xfffe;
                 *(unsigned short*)(g_game + 0x14281) &= 0xfffd;
-                FUN_0041c4c0(*(int*)(g_game + 0x37e37) / 2,
-                    *(int*)(g_game + 0x37e3b) / 2, 0);
+                cx = *(int*)(g_game + 0x37e37) / 2;
+                cz = *(int*)(g_game + 0x37e3b) / 2;
             } else {
-                FUN_0041c4c0(start.x.h.whole - *(int*)(g_game + 0x37e37) / 2,
-                    start.z.h.whole - *(int*)(g_game + 0x37e3b) / 2, 0);
+                cx = start.x.h.whole - *(int*)(g_game + 0x37e37) / 2;
+                cz = start.z.h.whole - *(int*)(g_game + 0x37e3b) / 2;
             }
+            FUN_0041c4c0(cx, cz, 0);
             FUN_0046c620(6);
         } else if (((Class_00435100*)*(void**)(g_game + 0x391e9))->FUN_00435100() == 2 &&
             *(void**)(g_game + 0x38d6b) == 0) {

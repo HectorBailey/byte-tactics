@@ -1,4 +1,4 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol and space-bunny-free. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol and space-bunny-free, edited by deepseek-v4.1. Names are provisional.
 // PARTIAL 78.8%: in-game command/gadget event dispatcher, original 2292 bytes,
 // ours 2292 (exact size; structure, jump tables and case order agree).
 //
@@ -57,6 +57,26 @@
 //       back edge matches. Tried and did not help: a hoisted
 //       `std::vector<int>::iterator e = sel.end();`, `sel.end() != it`,
 //       `!(it == sel.end())`, `int*` iteration, and a `const&` to sel.
+// - Measured 2026-09-30 with a free LCS diff of the two disassemblies
+//   (build/scratch/0x495e90/sd.py on orig.txt vs ours_now.txt): the +3 is
+//   exactly two deltas, and every other instruction in the body has the same
+//   text and size as the original.
+//   * case 0xd7 entry is 41 bytes in the original, 42 here: `mov esi,
+//     dword ptr [g_game]` is 6 bytes where the original's moffs `mov eax,
+//     g_game` is 5. The original also tests the flag first, then loads
+//     field_38c53 (into ecx), stores, compares; writing `int old` inside the
+//     guard fixes that order but costs the same byte (`mov ecx, g_game`) and
+//     scores 75.7%, so the hoisted form is kept. A local `Game_495e90* g`
+//     for the guard/load/store also scores 78.8%, no better.
+//   * case 0xad entry has one extra `mov eax, [esp + 0x20]` (2 bytes): the
+//     original folds that operand into `cmp esi, dword ptr [esp + 0x20]`.
+//     A hoisted `stop = sel.end()` scores 73.9%, `sel.end() != it` 78.7%, a
+//     `while` form 78.8%. The back edge already matches.
+//   Fixing both deltas should make the whole body line up; MATCH was not
+//   reached in this session. (Corrected note: case 0xec now uses dl and
+//   matches the original; the older al note above is stale.)
+// - Frame slots still differ (CTRL buf esp+0x18 vs esp+0x10, the 0xd7
+//   findData/path buffers esp+0x38/0x150 vs esp+0x28/0x140).
 // - Case 0xec (0x4962f8) loads the guard into al where the original uses dl
 //   (`test al,1` is 2 bytes, `test dl,1` is 3). A `char` bitfield base for
 //   Flags_00495e90_37f2f was tried and is much worse (69.6%), so the
