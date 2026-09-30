@@ -1,4 +1,4 @@
-// Decompiled by deepseek-v4.1-flash, finished by deepseek-v4.1. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
 // Partial: 99.6%, 1174 bytes. The whole body is byte-identical except the second
 // GlobalMemoryStatus: ours emits
 //     lea edx,[esp+0x10]; mov dword ptr [esp+0x10],0x20; push edx; call esi
@@ -14,6 +14,13 @@
 // before FUN_004b4fd0 even moves it into that call's delay slot at
 // [esp+0x18]), so only the scheduler's tie-break differs; the frame, every
 // esp+N slot and every other instruction are correct.
+// A second deepseek-v4.1-flash pass added: an N-declaration sweep 0..2400 (all
+// 99.6%), a check of the other push+store-shadow sites in the exe (0x4b5980 and
+// this function's first call both have a preceding push; 0x490aa0, the plain
+// single-call sibling, is also store-before-push), and about 70 scratch variants
+// (pointer/reference locals, union, inline helpers, ternaries, comma operator,
+// sizeof, array form, declaration order, volatile diagnostics). None moved the
+// store into the push shadow.
 
 #include <string.h>
 #include <windows.h>
