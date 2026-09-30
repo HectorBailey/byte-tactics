@@ -65,6 +65,51 @@
 // slot with the local. So that is not a bug in Cavedog's code, it is just
 // slot sharing; worth knowing so nobody reads it as a wild pointer.
 //
+// space-bunny-free, second pass. Two things settled, one lead closed.
+//
+// 1. The `push ebp` at 0x4ab972 is NOT a frame grow and NOT a stack leak, so
+//    do not chase an unbalanced-push construct. It is simply the first
+//    FUN_004a5030's argument: `text` is in ebp, the callee is `ret 4`, so it
+//    eats the push. The apparent `[esp+0x30]` stores are at esp = E-4, i.e.
+//    E+0x2c, the same place ours writes at esp = E. The `lea eax,[esp+0x2c]`
+//    at 0x4ab983 and the `mov ecx,[esp+0x10]` at 0x4ab98f are both at esp = E,
+//    so they are right too. Everything in the block is consistent and there is
+//    no bug in Cavedog's code here.
+// 2. The call ORDER cannot be changed inside one expression. Measured on a
+//    standalone probe (`build/scratch/0x4ab720/probe.cpp`): for `A + B` where
+//    one call's argument is a bare register push and the other's needs a
+//    `lea`, MSVC 5 always evaluates the `lea` one FIRST, whichever way round
+//    the operands are written. `f(a) + f(c)` and `f(c) + f(a)` both put the
+//    stack-array call first. So `FUN(text) + FUN(c)` can never produce the
+//    original's order, and every parenthesisation is folded identically:
+//    `A + (B + 0)`, `(A + 0) + B`, `A + B * 1`, `A + (B - 0)`, `0 + (A + B)`
+//    and `B - -A` all compile byte-identically to the file below.
+// 3. Lead closed. The two-statement form does give the original's order AND
+//    `add edi, eax`, but it costs TWO independent things, so it is not a near
+//    miss any more:
+//      a. the sum's destination and the (entry, entry->w - 4) pair trade
+//         places one preference step. Original: sum in edi (in place),
+//         entry ecx, w-4 edx. `w += F(c)`: sum in edi, entry EAX, w-4 ecx.
+//         `int w = F(text); int width = w + F(c);`: sum in eax, entry ecx,
+//         w-4 edx. So the original needs the in-place edi sum AND a node that
+//         keeps eax busy; neither spelling has both.
+//      b. every two-statement spelling is 733 code bytes, not 735, so the
+//         jump table after it shifts by two and the byte count can never
+//         agree even if the block did.
+//    Best of the two-statement family, `if (entry->w - 4 < w)` instead of
+//    `if (w > entry->w - 4)`, keeps the 735-byte length and gets the order,
+//    the edi sum and the entry in ecx, but sends the `- 4` to eax
+//    (`movsx eax / add eax,-4` and `mov edx,ecx` where the original has
+//    `movsx edx / sub edx,4` and `mov eax,ecx`): 60 differing bytes,
+//    LCS 237/243, against 72 and 238/243 for the file below. Kept the file
+//    below because it wins on shape, which is the better predictor.
+//    Variants scored: `w = w + F(c)`, `w += F(c)`, `int w; int width = w +
+//    F(c)`, `int w; int v; width = w + v`, the positive `if (w <= lim)` form
+//    (which emits a THIRD FUN_004a5030 call), `w` at function scope, a live
+//    `int n = entry->capacity - 1` across the calls, `(unsigned)w`, a local
+//    `char*` for c, an inline `char* mk(char*,int)` builder, and an
+//    `entry`-copy local. All worse or equal.
+//
 // Text-edit key handler for one GUI entry (stride 0x15b, text at +0xb6).
 // __stdcall(control, entryIndex, key): when the holder has no pending
 // event source it pulls keys from FUN_004c1ab0. Handles backspace, escape,
