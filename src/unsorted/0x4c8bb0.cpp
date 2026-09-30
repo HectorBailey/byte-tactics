@@ -1,4 +1,5 @@
-// Decompiled by GPT-6, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol. Names are provisional.
+// Decompiled by GPT-6, finished by deepseek-v4.1-flash, finished by
+// GPT-6.1-sol, finished by space-bunny-free. Names are provisional.
 // Partial 51.6%. This is a textured/gouraud triangle rasteriser into 10-int
 // span rows, then one FUN_004c8020 call per scanline. The sibling 0x4c8760 is
 // the same algorithm without the light channel and is matched to 67.9%; its
@@ -8,16 +9,32 @@
 //  - frame is 0x7d5c vs original 0x7d60. The original keeps one more live int
 //    in the low temp region: its `defaults`/`spans` start at [esp+0x50] where
 //    ours start at [esp+0x4c], so every default, spans and argument offset is
-//    4 lower. The original's extra slot is [esp+0x4c], the raw `index-1` in
-//    the first edge loop (used twice: for `next` and for the loop update).
-//    Giving the first loop that duplicate (as done here) did NOT grow the
-//    region: MSVC folded it into an existing slot.
+//    4 lower. The original has 16 scalar slots (0x10..0x4c) and this file has
+//    15 (0x10..0x48); the difference is NOT only the extra `index-1` slot.
+//    Traced slot by slot, the original spends 11 slots on the edge loops
+//    (0x10 nxt/dl, 0x14 next/dz, 0x18 lowX/n, 0x1c y1, 0x20 y0, 0x24 x,
+//    0x2c out, 0x38 dv, 0x3c du, 0x40 dx, 0x44 bottom, plus 0x4c previous)
+//    and 5 on the min/max scan (0x18 lowX, 0x28 highY, 0x30 lowIndex,
+//    0x34 lowY, 0x48 highIndex) with highX in NO slot at all: `edi` holds it,
+//    from `mov edi, 0xfff0bdc1` with no store, through `cmp eax,edi` in the
+//    scan, to `test edi,edi` after it. This file instead spends 6 on the scan
+//    (it gives highX a slot at 0x10) and folds `lowX` onto the edge loop's `x`
+//    at 0x18. So the missing slot is a NET of two: `previous` must gain one
+//    AND highX must lose one.
 //  - the min/max loop: original keeps lowY in esi, highX in edi, lowX in ebp
 //    and reloads `vertices` from its argument slot; ours keeps `vertices` in
 //    esi and spills highX/lowX/both. That is an allocator decision, not a
 //    source-shape one that reordering fixed.
 //  - the null checks use edx as the zero register; the original zeroes ebp
-//    (`xor ebp,ebp` between push ebp and push esi). Consequence of the above.
+//    (`xor ebp,ebp` between push ebp and push esi). This is the one upstream
+//    cause worth chasing: because the original's zero is ebp, its `vertices`
+//    argument stays in edx all the way into the min/max scan and becomes the
+//    scan's induction variable directly (`add edx, 0x10`, no reload), so
+//    `vertices` costs no second register. Here edx holds the zero, `vertices`
+//    must be copied into ebp and then into edx (`mov edx, ebp`), and that one
+//    extra live register is what demotes highX out of edi into a stack slot.
+//    Nothing reachable from the null checks moved MSVC's choice of zero
+//    register; see the ruled-out list.
 //
 // Ruled out (measured with free --sym scratch runs): moving `bottom` before
 // the guard, early-return null checks, function-scope min/max declarations,
@@ -30,6 +47,29 @@
 // Hoisting the block-scope `x`/`y1` (the sibling 0x4c8760's
 // winning change) and hoisting the span `x`/`y1` plus porting its whole loop
 // structure; those scored 51.3 and 36.1 and did not grow the frame either.
+// Also measured here, all free --sym runs, none better than 51.6%:
+//  - the sibling 0x4c8760 first-loop shape verbatim, `int previous=index-1`
+//    plus `index=previous; if(index<0) index=3;` at the latch (the original's
+//    `mov edx,[esp+0x4c]` / `mov edi,edx` / `test` / `mov edi,3` / `cmp`):
+//    48.2%, frame still 0x7d5c. It DOES give `previous` its own slot, but
+//    only by stealing highX's, and it also makes lowX fold onto `x`, so the
+//    count stays at 15. The same as a function-scope `previous` (48.2%) and
+//    as `previous<0?3:previous` in both places (48.0%).
+//  - rewriting the whole edge body around `currentVertex`/`nextVertex` local
+//    pointers (which is how the original's `lea ebp,[ecx+esi]` / `add eax,ecx`
+//    pair is shaped): 42.4%, 1284 bytes.
+//  - min/max scan as a pointer walk (`int* v=vertices+i*4;`, or a function
+//    scope `vp` with `vp+=4`), `if (target) if (texture) if (vertices)`,
+//    `!=0` spellings, all six orders of the lowY/highY/highX/lowX
+//    initialisers, four separate statements instead of one declaration list,
+//    a throwaway live `walk` and `spare` int in the scan, and taking the
+//    address of `index`: every one is exactly 51.6% and leaves both the
+//    allocation and the frame untouched, so none of them is a lever.
+//  - hoisting `n` to function scope shared by both edge loops: 37.8% on top
+//    of the previous/next split, 51.6% on its own. Hoisting `x`/`y0`/`y1`/`n`
+//    together with the previous/next split: 47.7%.
+//  - one C++ header in front, by hand: <string>, <vector>, <map>, <list> and
+//    <iostream> are all exactly 51.6%.
 //
 // Fixes that did land: second edge loop writes ints 1,4,5,7,9 of the span row
 // (the row is [xL,xR,uL,vL,uR,vR,zL,zR,lL,lR]), the rasterise guard is
