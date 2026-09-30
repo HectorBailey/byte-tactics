@@ -1,5 +1,6 @@
-// Decompiled by Claude Opus 5.5, finished by GPT-6, verified by GPT-6.1-sol. Names are provisional.
-// Partial: 68.4%. Income branches and x87 scheduling still differ. Reordered resource resets and accumulation; ddraw.h improves compiler state. GPT-6.1-sol tested branch order, income algebra, and local declaration order at 68.4%; reset order scored 67.7%, retaining this best variant.
+// Decompiled by Claude Opus 5.5, finished by GPT-6, verified by GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
+// Partial: 70.6% (was 68.4%). UseEnergy must be written with the v >= 0 path first (fall through) and the v < 0 AddIncome tail last; inverting it gained 2.2 points. `static inline` and plain `static` for UseEnergy compile identically here.
+// Still differs: the original materialises the helper result in eax (`mov eax,1; mov edx,eax` / `xor eax,eax; ...; mov edx,eax`) as an inlined callee return, ours assigns edx directly; ours also hoists the backlog compare above the `used += v` store. Ours is 67 bytes shorter (2172 vs 2239). In the tail the demand-ratio argument to EndTick is read from [esp+0x10] in the original while ours reads a different array slot (0x18/0x14 order swaps in the accumulation block at ~0x401889).
 #include <ddraw.h>
 struct Unit_00401360;
 
@@ -120,16 +121,18 @@ static inline void AddIncome(Unit_00401360* u, float* dst, float v)
     *dst += v;
 }
 
-static inline int UseEnergy(Unit_00401360* u, float v)
+static int UseEnergy(Unit_00401360* u, float v)
 {
-    if (v < 0) {
-        AddIncome(u, &u->econ.res[0].produced, -v);
+    if (v >= 0) {
+        u->econ.res[0].used += v;
+        if (u->econ.res[0].backlog <= 0) {
+            u->econ.res[0].demand += v;
+            return 1;
+        }
         return 0;
     }
-    u->econ.res[0].used += v;
-    if (u->econ.res[0].backlog > 0) return 0;
-    u->econ.res[0].demand += v;
-    return 1;
+    AddIncome(u, &u->econ.res[0].produced, -v);
+    return 0;
 }
 
 static inline void EndTick(Res_00401360* r, float ratioDemand, float ratioBacklog)

@@ -1,4 +1,4 @@
-// Decompiled by Claude Opus 5.5, finished by GPT-6, verified by GPT-6.1-sol. Names are provisional.
+// Decompiled by Claude Opus 5.5, finished by GPT-6, verified by GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
 // Partial: 95.1%. Remaining diffs are the help-build constructor argument load order and the associated short branch offsets. Replacing the direct order expressions with a cached Order* drops the score; explicit follow-position fields also worsen register allocation.
 #include <stdio.h>
 struct Vec3 {

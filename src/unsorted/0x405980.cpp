@@ -1,5 +1,13 @@
-// Decompiled by Claude Opus 5.5, finished by GPT-6, verified by GPT-6.1-sol. Names are provisional.
-// Partial: 90.9%. GPT-6.1-sol rechecked the baseline and a reversed energy threshold (90.3%); kept baseline. Second energy comparison and range setup differ; the energy reclaim constructor tail remains duplicated.
+// Decompiled by Claude Opus 5.5, finished by GPT-6, verified by GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
+// Partial: 90.9%. Two known differences:
+// 1. The three reclaim blocks that end in `new Class_0043a1f0("RECLAIM", ...)` should share the tail
+//    (VC5 same-code folding put one copy at 0x405d01 and made the energy<cap, metal+amount and
+//    energy+amount blocks jump into it). Our build folds only the last two, so the energy<cap copy
+//    stays inline and the function is 41 bytes too long. Reordering the range2 local, inlining the
+//    range expression and reversing the thresholds all kept or lowered the score.
+// 2. The second `if` starts with the mirrored energy compare (fld cap, fmul, fld energy, test ah,1,
+//    jne) where the original emits (fld energy, fld cap, fmul, fcompp, test ah,0x41, je): writing it
+//    as `energy < energyCapacity * 0.2` gets the load order but adds an fxch (89.9%).
 #include <vector>
 struct Vec3 { int x, y, z; };
 struct Unit;
