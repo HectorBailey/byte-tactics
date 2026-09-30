@@ -17,6 +17,14 @@
 // must build one more register-holding node across the a0570 group plus the
 // condition than we do, from a node the front end folds away.
 //
+// deepseek-v4.1 retry 2 (issue 1876): the one-step rotation after the big condition
+// is unchanged by: `!(p->info->field_96 == 0xff)` for `!= 0xff`, an
+// `(unsigned char)0xff` cast on that compare, `sizeof(name)` for the 0x80 in
+// lstrcpynA, and 0..24 unused `extern int dummy` declarations before the function
+// (all 1318 bytes, all 93.5%). Still exactly the same single hunk: the second
+// sprintf group, lstrcpynA and the FUN_0049fdf0/FUN_0049ff10 pair come out one
+// step behind the original's register rotation, then reconverge before strcat.
+//
 // deepseek-v4.1 retry: all 128 header sets from tools/headers.py stay at 93.5%
 // (windows.h/stdio.h is the set in the file). Also tried, all 93.5% with the same
 // one-step rotation and the same 1318 bytes: casts on every byte compare and on
