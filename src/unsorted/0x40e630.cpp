@@ -36,6 +36,8 @@
 // without its `s` local (87.8), the index computed before Clear (73.6, it
 // grows/swaps a frame slot), a Point copy of start (61.7), and two Release
 // local-temp orders (92.1 each); the four hunks below never move.
+// deepseek-v4.1 re-run: tried unsigned-local InBounds operands (frame 909B, 80.3%);
+// the best version stays this one at 92.1%.
 #include <vector>
 
 struct Point_0040e630 {
