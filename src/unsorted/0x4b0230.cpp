@@ -1,4 +1,4 @@
-// Decompiled by space-bunny-free, finished by Sonnet 5.5 (partial), deepseek-v4.1-flash (partial), verified by GPT-6.1-sol. Names are provisional.
+// Decompiled by space-bunny-free, finished by Sonnet 5.5 (partial), deepseek-v4.1-flash (partial), verified by GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
 // #1700 retry by Codex / GPT-6.1-sol: checkall reconfirmed 82.9% (631/631 bytes), no MATCH.
 // Both direct checks and all 128 headers.py combinations left the 3x3 tiling mismatch unchanged.
 // Draws a list box's frame. FUN_004a15c0 gives the entry's rectangle; when no
@@ -85,6 +85,15 @@
 // the `index` and `hv` loads (index, hv, 0 in the original; hv, index, 0 when
 // both extents follow the branch), which no source reordering tested here
 // changes. Kept the 82.9% version.
+// deepseek-v4.1 (#1892): re-checked, still 82.9% (631/631). New evidence: the register
+// pair x0/y0 flips because the early x1 load that computing width before the branch forces
+// occupies edi. Source shapes scored this pass: w h / if / height width index=0 76.7
+// (633 bytes), if before w h 74.6, w / if / h 74.6 (in the last one the index load does
+// land in edx as in the original, but h recycles edx after the compare, so h ends in edx
+// instead of ecx and the rest of the block stays rotated). Swapping the declarations of
+// height and ypos does not move their frame slots, so the 0x18/0x1c transposition is not
+// declaration order. Nothing beat the version below.
+//
 struct Rect_004b0230 {
     int x0;                          // +0x0
     int y0;                          // +0x4
