@@ -133,6 +133,25 @@
 // textually at both sites (no helper at all) also compiles to the same 800
 // bytes, so the two expansions never become textually identical whatever the
 // source shape.
+//
+// Retried by deepseek-v4.1-flash (6 check runs): the two-site shape was rebuilt
+// with the delay in a named local so both sites push a literal (scratch vB:
+// `unsigned int when;` + `when = FUN_004b6c30(0xf) + 0x1e;` in case 3,
+// `when = FUN_004b6c30(0x1e) + 0x1e;` in case 9's else, the same tail text in
+// both). That does reproduce the original's case-3 head (`push 0xf` then a jump
+// over the case-9 copy), but the two inlined Wait copies still do not fold:
+// case 3's copy allocates flags6 to edx, g_game to ecx and the sum to edx,
+// while case 9's else (which is the copy the original kept at 0x43b951)
+// allocates flags6 to edi, g_game to edx, the sum to ecx. MSVC 5's block
+// folding compares allocated code, so the two tails must come out register
+// identical; the case-3 copy's allocation is the blocker (67.8%, 800 bytes).
+// Also tried and worse or equal: `int when` at both sites (67.8%), the same
+// shape with f9/next9 declared at their point of use instead of the top of the
+// loop (67.8%), the pending expression inlined into the notify call instead of
+// the local (67.4%, 776 bytes), and the mask declared before the due check so
+// its live range spans the branch (64.0%, 804 bytes). The case-3 copy's flags6
+// register did not move in any of them, so the merge looks unreachable from
+// the Wait statement's own spelling.
 
 #pragma pack(push, 1)
 
