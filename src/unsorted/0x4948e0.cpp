@@ -1,5 +1,5 @@
 // Decompiled by deepseek-v4.1, finished by space-bunny-free. Names are provisional.
-// Partial: 77.8% (real check.py run; 1451 bytes vs the original 1418).  The
+// Partial: 78.1% (real check.py run; 1451 bytes vs the original 1418).  The
 // frame is 0xd0 in both and the layout matches up to 0x14 (maxw at 0x10, i at
 // 0x14), but everything from the panel up is 4 bytes high, because this version
 // gives the y local a stack slot at 0x18 while the original keeps y purely in
@@ -49,9 +49,17 @@
 // char buf[84] instead of 100 (77.1, and the frame does not move, so the
 // buffer is not what sets the frame size), y += 0x28 moved into the for
 // increment clause (77.6 and 73.5 on v7, frame unchanged), the cleanup block
-// turned into an explicit else (73.2).  Earlier sessions: draw block before
-// the cleanup guard 67.5, pointer-walk cleanup counter 65.6, buf[80] 69.5, y
-// declared only for the outer loop 65.2, v1..v5 66.6.
+// turned into an explicit else (73.2).  This session: hoisting `int n;` before
+// `Quad dst;` and driving the cleanup with it as a do-while pointer walk scores
+// 72.3 (frame 0xd0, panel still at 0x1c, so n did NOT take a hoisted slot);
+// `int y = 0x20;` drops y's slot and moves panel to 0x18 but also swaps the
+// maxw/i slots and shrinks the frame to 0xcc (67.5), and that same constant y
+// with the hoisted-n cleanup is 63.6 (frame 0xcc, y folded into immediates).
+// So the missing slot at 0x28 is n's home, needed only when the cleanup reuses
+// n as its counter with edi taken over by i, and y must stay a register-only
+// (ebx) variable for the panel to land at 0x18.  Earlier sessions: draw block
+// before the cleanup guard 67.5, pointer-walk cleanup counter 65.6, buf[80]
+// 69.5, y declared only for the outer loop 65.2, v1..v5 66.6.
 
 #include <string.h>
 
@@ -206,6 +214,7 @@ void __stdcall FUN_004948e0(void* surface)
     y += 0xf;
 
     for (int i = 0; i < (int)g_game->numPlayers; i++) {
+        int n;
         Quad_004948e0 dst;
         dst.p[0].x = panel.left + 7;
         dst.p[0].y = y + 1;
@@ -216,9 +225,8 @@ void __stdcall FUN_004948e0(void* surface)
         dst.p[3].x = panel.left + 7;
         dst.p[3].y = y + 0x25;
 
-        int n = 0;
         Player_004948e0* p = g_game->players;
-        for (; n < 10; n++, p++) {
+        for (n = 0; n < 10; n++, p++) {
             if (p->field_0 == 0)
                 continue;
             unsigned char c = p->field_73;
