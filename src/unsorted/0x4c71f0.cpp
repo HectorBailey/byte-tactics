@@ -1,4 +1,27 @@
-// Decompiled by DeepSeek V4.1 Flash and space-bunny-free, finished by deepseek-v4.1-flash and space-bunny-free. Names are provisional.
+// Decompiled by DeepSeek V4.1 Flash and space-bunny-free, finished by deepseek-v4.1-flash and space-bunny-free, edited by deepseek-v4.1. Names are provisional.
+//
+// Pass (deepseek-v4.1, #2097): 80.0%, 280 bytes, 9 check.py runs. Six new source
+// shapes, all 80.0% and byte-identical to the body below (so none is kept):
+//   - a `Mix1(a,b)` inline helper whose body loads DAT_0051fe40 into a local
+//     FIRST and then calls FUN_004b7381(a,b,g) (hoping the inliner walks the
+//     global before the first argument),
+//   - a `Mix2(a,b,c)` helper with `int g = c;` as its first statement,
+//   - case 1 with `int r;` for the call result stored afterwards,
+//   - case 2 with `int r = FUN(...)` then `out->low = r; out->high = at_high;`,
+//   - case 2 with DAT_0051fe40 inline as the third argument,
+//   - case 1 with the first argument as `(int)(DAT_0051fe40, at_high)` and
+//     case 2 with at_low through an `Id(x)` inline identity.
+//   Reordering case 1 so the call precedes `out->low = at_low;` (v5) is 276
+//   bytes / 77.8%: MSVC 5 sinks nothing, the store stays where it is written.
+// Still differs (only these two hunks): case 1 wants the same bytes as the
+// original (store, `mov eax,[DAT_0051fe40]` in the 5-byte moffs form, two
+// pushes, then `mov ecx,[esp+0x24]` for at_high as the last push); ours hoists
+// the at_high load above the store into eax and moves the global into edx.
+// Case 2 wants at_low in edx before the first push and at_high in eax after
+// `mov [ecx],eax`; ours loads at_low into ecx after `push ecx` and at_high
+// into edx before `add esp,0xc`. The front end's argument walk order is the
+// remaining unknown; helper shapes that reorder the parameter walk were tried
+// above and did not move it.
 //
 // Fourth pass (space-bunny-free, #1795): still 80.0%, 280 bytes, no MATCH. Four
 // new spellings, every one exactly 80.0% at 280 bytes, so none is kept:
