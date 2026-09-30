@@ -1,4 +1,4 @@
-// Decompiled by deepseek-v4.1. Names are provisional.
+// Decompiled by deepseek-v4.1, finished by space-bunny-free. Names are provisional.
 // (earlier work by deepseek-v4.1-flash and GPT-6.1-sol)
 //
 // STATUS 93.7%, partial. Every byte of the 1015 matches except the scheduling
@@ -32,6 +32,38 @@
 // `[ebp+eax]` instead of `[eax+ebp]` in the copy loops.
 // The entry struct must be padded to 0x15b bytes or MSVC scales the index by
 // 0x13a (compiler uses sizeof(Entry)).
+//
+// space-bunny-free notes, measured with a true instruction LCS over the code
+// bytes only (735 code bytes + 280 of jump-table data in the 1015):
+// this file is 735/735 bytes with instruction LCS 238/243, and the ONLY
+// structural difference is the call order. Nothing in the width expression
+// moves the call order except splitting it into two statements, and that
+// costs the insert block:
+//   * `int w = F(text); w = w + F(c);` and `w += F(c)`: the call block at
+//     0x4ab972..0x4ab98d becomes byte exact, but the entry reload then lands
+//     in eax instead of ecx, so `mov eax, ecx` (0x4ab99e) disappears, the
+//     copy loop uses dl instead of cl, and the final store becomes
+//     [ebp+eax] instead of [ebp+edx]. 733/735 bytes, LCS 232/243.
+//   * `int w = F(text); int v = w + F(c);`: right order AND the entry stays in
+//     ecx, but the sum lands in eax (`add eax,edi`, one byte) and `mov eax,ecx`
+//     is still missing. 733/735 bytes, LCS 238/243, the closest of all.
+//   * `int w1 = F(text); int w2 = F(c);` any combination: the sum becomes
+//     `lea ecx,[eax+edi]` and the entry lands in eax. Worse.
+//   * `if (w + F(c) > entry->w - 4)`: right order, sum in ecx, entry in eax.
+// Also tried, all no better: comma in the sum, unsigned accumulator, a local
+// `char*` for c, a local pointer to the entry, hoisting the capacity or the
+// max-width read above or below the calls, the positive `if (w <= lim)` form,
+// an inline two-call helper, and comma-forced `(F(text), F(c))`.
+// The single remaining lead is a construct that makes MSVC colour the
+// reloaded entry pointer ecx while the width accumulator keeps edi.
+//
+// The two-byte `c` buffer is NOT a frame local in the original: the frame is
+// `sub esp,0x10` plus four pushes, so [esp+0x10] is the entry local and
+// [esp+0x2c] is the incoming `key` argument slot, and the original stores at
+// [esp+0x30]/[esp+0x31] and passes `lea eax,[esp+0x2c]`. A plain `char c[2]`
+// reproduces that exactly, because MSVC 5 shares the dead `key` parameter's
+// slot with the local. So that is not a bug in Cavedog's code, it is just
+// slot sharing; worth knowing so nobody reads it as a wild pointer.
 //
 // Text-edit key handler for one GUI entry (stride 0x15b, text at +0xb6).
 // __stdcall(control, entryIndex, key): when the holder has no pending
