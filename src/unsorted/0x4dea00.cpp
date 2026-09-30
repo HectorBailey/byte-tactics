@@ -45,6 +45,15 @@
 //    source must contain some additional reference to i (or fewer to width) that
 //    keeps i@0x14 while the same C statement still reads width. Blocked on that
 //    allocation decision, plus the preheader transposition it moves with.
+// deepseek-v4.1 (third run, 5 check.py runs + 4 scratch scores): re-tested the loop
+//  shape and the else condition. do-while under `if (n > 0)` scores 92.5 (860 bytes:
+//  the guard test is duplicated and the homes move to 0x1c/0x20), `for (a = addrs;
+//  i < n; i++, a++)` is unchanged at 96.6, and the literal `width` else condition is
+//  71.8 (847 bytes: i moves to 0x18 and width gets a register instead of a home).
+//  New evidence on the preheader: the original's `a = addrs` load and store sit in the
+//  block that is only reached when n > 0, and the loop does not re-test n there, so the
+//  guard is a source-level n > 0 test whose loop entry test the compiler dropped. No
+//  for/do-while/while spelling tried so far reproduces that block split.
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
