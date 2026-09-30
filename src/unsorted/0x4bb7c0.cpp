@@ -1,19 +1,27 @@
 // Decompiled by Sonnet 5.5, finished by deepseek-v4.1-flash, GPT-6, GPT-6.1-sol, and deepseek-v4.1. Names are provisional.
-// Retry #1964: deepseek-v4.1, 99.2% (1042 bytes, exact size). One diff left, a pure register
-// choice: the reload of the clamped size n (for remaining = n and the block-end lea)
-// lands in esi here (mov esi,[esp+0x14]; mov [esp+0x1c],esi; lea esi,[esi+eax-1]) but in
-// ebx in the original (mov ebx,[esp+0x14]; mov [esp+0x1c],ebx; lea esi,[ebx+eax-1]).
+// Retry #1964: deepseek-v4.1, still 99.2% (1042 bytes, exact size). One diff left, a pure
+// register choice: the reload of the clamped size n at 0x4bb807 (feeds remaining = n and
+// the block-end lea) lands in esi here (mov esi,[esp+0x14]; mov [esp+0x1c],esi;
+// lea esi,[esi+eax-1]) but in ebx in the original (mov ebx,[esp+0x14];
+// mov [esp+0x1c],ebx; lea esi,[ebx+eax-1]).
 // The 98.6% hunk is fixed by writing int off = file->pos + file->info->offset; (through
 // file->info, not the cached info local): that is the only form that puts off in eax
 // plus a copy to ebx instead of loading [esi] into ebx first.
-// Tried for the remaining hunk (still 99.2% or worse): every statement order of
-// i = 0 / remaining = n / blocks (i and blocks first give edx, remaining first gives
-// esi, never ebx), int i = 0 inline, int remaining = n inline, unsigned remaining
-// (98.3%), (int)/(unsigned) casts in the expression, computing the lea from remaining,
-// int end = n + file->pos - 1, dst = buf moved earlier (98.3%), swapping the operands
-// of n + file->pos - 1, dropping the item local, routing the compressed-path info uses
-// through file->info (90.6%, the prologue loses esi), splitting the expression into
-// two statements (98.9%), and a blkcount helper (99.2%).
+// New measurements this pass (all variants compiled and scored directly, see
+// build/scratch/0x4bb7c0/sweep*.py): the register of that reload is driven by which
+// statement uses n first: remaining = n first gives esi, blocks first gives edx, and
+// tableSize first gives ebx. The tableSize-first form (tableSize, then blocks) is the
+// only spelling found that produces the original ebx, but it re-colours the whole
+// function (info moves to edx, info->size to ecx, the frame stores reorder) and drops to
+// 78.6%, so the original's source order is the current one and the ebx pick is
+// allocator state, not statement order. Also tried and rejected, all 99.2% or worse:
+// comma forms (remaining = (i = 0, n)), (void)n, n = n, an inlined identity helper
+// around n in the store and in the blocks expression, a reference identity, if (n) {},
+// *(int*)&n, clamp as a ternary (98.6%), the reversed clamp, int avail, 24 permutations
+// of remaining / i / blocks / tableSize, for (; i < blocks; ++i), do/while(0) around the
+// compressed body, a goto-plain form of the compressed test, unsigned/long n and
+// remaining, splitting the blocks expression into two statements, and all 128 header
+// sets from tools/headers.py (every set 99.2%, 72 failed to compile).
 // The block-count/table-size order stays load bearing: writing tableSize as
 // ((size % 65536 != 0) + size / 65536) * 4 (modulo first) makes blocks land in
 // esi and tableSize in edi as the original does.
