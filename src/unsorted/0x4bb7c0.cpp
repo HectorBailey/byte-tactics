@@ -25,6 +25,18 @@
 // The block-count/table-size order stays load bearing: writing tableSize as
 // ((size % 65536 != 0) + size / 65536) * 4 (modulo first) makes blocks land in
 // esi and tableSize in edi as the original does.
+// deepseek-v4.1-flash pass: no source shape found that moves the 0x4bb807 reload
+// from esi to ebx while keeping the rest byte-exact. Tested and still 99.2%:
+// moving dst/remaining/comp/i/blocks/tableSize/b declarations inside the
+// compressed if (scope is not the lever), an isize/pos local cached at the top,
+// hoisting info->compressed into a local (es/cl/in both), an int avail local for
+// the clamp, named block-end temps, Ident/BlkCount/SetInt inline helpers, register
+// qualifiers, and unsigned n (95.9%). The reload register tracks only the FIRST
+// use of n (remaining first gives esi, blocks first gives edx); ebx appears only
+// in a tableSize-first order that recolours the whole frame. A tail-structure
+// probe showed replacing the compressed-path goto with return does put ebx at the
+// head, but it drops the reload and grows/shrinks the tail (88.7%), so the original
+// tail is the current goto form and the ebx pick is pure allocator state.
 #include <stdio.h>
 #include <string.h>
 
