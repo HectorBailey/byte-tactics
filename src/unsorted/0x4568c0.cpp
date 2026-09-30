@@ -1,5 +1,5 @@
 // Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, edited by
-// deepseek-v4.1. Names are provisional.
+// deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
 // Partial, 78.9%. A short loop index restores three induction registers.
 // Remaining difference, a single 4-byte stack slot. The original allocates
 // 0x34 (sub esp,0x34) and keeps only two dword locals below the candidate
@@ -17,6 +17,21 @@
 // call into the players[] expression was tried and changed nothing.
 // Otherwise the body matches; the remaining misses are the readiness tests
 // around 0x456b91 (field_29a4 / field_29d0) and register scheduling.
+//
+// deepseek-v4.1-flash re-checked the frame problem and confirmed the
+// coefficient map from a /Fa listing. i/idx/ret sit at -0x34 and out at
+// -0x30 here, while the original has all four at -0x30; res and cand are
+// already at the original's absolute offsets. So only the i/idx/ret group
+// needs to fold into out's slot and the frame drops from 0x38 to 0x34.
+// Nothing tried moved it: inlining FindOccupied into the players[] index
+// (vA), declaring out before res and assigning in place (vR), a function
+// scope `int* out;` (vB), and a block scoping the idx local (vD) all score
+// 78.9%; dropping the out local entirely scores 64.1% (vC) and assigning
+// out at the top 76.6% (vS). Reordering the tail so res==0 is the
+// fall-through path matches the original's `jne` but still scores 78.4%
+// (the frame dominates), and changing the k4 loop counter from
+// unsigned short to int (the original compares the pointer offset against
+// 0x29f8, cmp bx,0xa here) drops to 77.1%.
 #include <stdlib.h>
 #include <algorithm>
 
