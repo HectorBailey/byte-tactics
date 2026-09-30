@@ -93,6 +93,20 @@
 // instead of ecx and the rest of the block stays rotated). Swapping the declarations of
 // height and ypos does not move their frame slots, so the 0x18/0x1c transposition is not
 // declaration order. Nothing beat the version below.
+// deepseek-v4.1 (#1892, second pass): exhaustively confirmed the tie. All 96
+// combinations of (w/h order) x (the 24 statement orders of width, height and
+// index=0 around the if/else) x (both arm orders) were compiled and scored; the
+// ceiling is 82.9 with `w h / width / if / index=0 / height`, the arm order
+// y0,x0 and no variant reached the original's pre-loop schedule. The shapes that
+// DO put x0 in esi (both extents after the branch) always pay for it: h lands in
+// edx and index in eax, because the width subtraction that otherwise keeps eax
+// busy moves below the branch, so the scheduler reuses eax (freed after the two
+// 16-bit loads) for the index load and pushes h and the compare's zero down a
+// register. Probes for the 0x18/0x1c ypos/height transposition (an early
+// `ypos = 0;` or `height = 0;` folded in front of the block, swapped
+// declarations) leave the slots exactly where they are, so the frame order is
+// not declaration order nor first-use order either; both halves of the mismatch
+// (3x3 registers and the two slots) stay unexplained by any source shape tested.
 //
 struct Rect_004b0230 {
     int x0;                          // +0x0
