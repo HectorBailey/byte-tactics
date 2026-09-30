@@ -48,6 +48,23 @@
 //   ebp = &p->pos; here ebp = g_game/scratch). The relocated call set and every
 //   struct offset now match, so the remaining gap is instruction selection.
 //
+// RETRY NOTE (deepseek-v4.1, pass 4): three shapes tried, all 29.1% or worse.
+//   (a) `Vec3* pos = &p->pos;` used everywhere: 27.8% but it MOVED frame0 to
+//       the original's slot [esp+0x14] (= frame+0x04) and made
+//       `lea ebp,[esi+4]` appear, proof that the original really holds a
+//       &p->pos pointer in ebp; every other slot then shifted +4 (time at
+//       frame+0x14 instead of +0x10), so the win did not carry.
+//   (b) same pointer only inside the visibility test and the FUN_00408090
+//       call: 29.1%, 2208 bytes (4 bytes worse than baseline), no layout change.
+//   (c) hoisting `int visible;` to function scope: byte-for-byte the baseline.
+//   So the whole gap is one allocator decision: in the baseline frame0 lives in
+//   BOTH ebp and [esp+0x14], pushing index to frame+0x18 and the frame to 0x6c
+//   (every stack offset +4); the original keeps frame0 memory-only at
+//   frame+0x04. In the original the four callee-saved registers are all held
+//   (edi g_game, esi p, ebp &p->pos, ebx type), which is what forces frame0
+//   into a slot; our baseline leaves ebp free for frame0 because the pos
+//   addresses are folded into esi-relative operands.
+//
 // RETRY NOTE (deepseek-v4.1, pass 3, best 29.1%): decoded the exact frame map
 // and one real extra store. The prologue is `sub esp,0x68` then push
 // ebx,ebp,esi,edi, so the post-prologue esp is frame-0x10: a local seen as
