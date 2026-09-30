@@ -1,4 +1,4 @@
-// Decompiled by Sonnet 5.5, finished by space-bunny-free, deepseek-v4.1-flash. Names are provisional.
+// Decompiled by Sonnet 5.5, finished by space-bunny-free, deepseek-v4.1-flash, edited by deepseek-v4.1. Names are provisional.
 // space-bunny-free (second pass): still 97.9%, no scratch variant beat it (5 free
 // --sym scorings). Two new facts for the key block:
 //   - A pure `unsigned char key` (no int copy) drops the byte's slot store AND
@@ -72,8 +72,19 @@
 // functions and member functions for the rotate, `?:` forms, `+` or `^` for
 // `|`, `w * 4` for `w << 2`, every declaration order of base, key and w,
 // int and unsigned w, char types for the result.
-// The earlier note that the original stores a stale byte is wrong: the
-// original does rotate and complement the value it stores.
+// deepseek-v4.1 (10 minute run): the shift order is reachable, the register
+// roles are not. `unsigned int m = w; m >>= 6;` does emit the original's
+// `mov edx, eax; shr edx, 6` (the copy appears because w is still live for the
+// left shift), but VC5 then narrows the whole tree to bytes when the OR feeds
+// the byte directly (`key = ~(m | (w << 2))` gives `shl al, 2; or al, dl;
+// not al; mov dl, al`). Storing the OR to a dword local first, or accumulating
+// it with `m |= w << 2`, removes the narrowing and VC5 goes back to commuting
+// the OR: `lea edx, [eax*4]; shr eax, 6; or edx, eax`. `m += w << 2` keeps the
+// copy and the shift right first but folds the add into `lea edx, [edx +
+// eax*4]` (94.9%). So VC5 only keeps the original's order on the byte path.
+// Every spelling with the condition on the byte (key, key != 0, or via the F2
+// shape) still rotates the roles: base edx, key cl, m ecx, 663 bytes.
+// 0x4bdd70: 97.9%, 661 of 661 bytes.
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>
