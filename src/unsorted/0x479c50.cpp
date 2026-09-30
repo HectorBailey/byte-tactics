@@ -38,6 +38,12 @@
 // there must be exactly one guard cmp. The missing lever is a g_game use that
 // raises its priority without emitting an extra instruction, and it was not
 // found in this session.
+// New probe (second session): `Rec1 rec1 = {0}; Rec2 rec2 = {0};` instead of
+// the two memset calls DOES move the g_game temporary into ESI (the 0x479c59
+// shape), but it also folds the numPlayers load into `idiv dword ptr
+// [esi+0x38d81]`, drops the early `mov ecx,[esi+0x38d81]`, pushes EBP before
+// ESI and leaves the wsprintfA import in EBX, so the entry block is worse.
+// Rejected; best remains the variant below.
 #include <windows.h>
 #include <string.h>
 
