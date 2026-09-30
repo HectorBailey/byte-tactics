@@ -1,18 +1,6 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
-// Credits: started by deepseek-v4.1-flash, continued by GPT-6.1-sol and GPT-6.
-// PARTIAL 29.8%. Register allocation, one extra stack slot and branch layout differ.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by GPT-6. Names are provisional.
+// PARTIAL 29.8%. Register allocation, extra stack slot and branch layout differ.
 // Restored unsigned lifetime/speed comparisons and projectile flags/definition reloads.
-// deepseek-v4.1: rewrote the main scan as `count = ...; if (count > 0) { offset = 0;
-// do { ... } while (--count); }` to mirror the original's prologue `jle` and its
-// bottom dec/jne back into the loop body. Still differs: the frame is 0x18 where
-// the original allocates 0x14 (5 dwords: byte idx at [esp+0x10], offset at
-// [esp+0x14], count at [esp+0x18], type at [esp+0x1c], s at [esp+0x20]), so the
-// compiler keeps one extra local live (likely `p` or a `q` temporary); every
-// esp+N reference is shifted by 4 as a result. The body compiles to 1739 bytes
-// against the original's 1853, so the Select/TailOnly tail and the flag-test
-// cascade still pick different branches and register homes. Tried: local order
-// (idx,count,type,s,offset) and (idx,offset,count,type,s), inlining the field_ec
-// temporary; all scored the same 29.8%.
 
 #pragma pack(push, 1)
 
@@ -98,18 +86,18 @@ void FUN_0049b720()
     int s;
 
     count = *(int*)(g_game + 0x141f3);
-    if (count > 0) {
-      offset = 0;
-      do {
+    offset = 0;
+    while (count > 0) {
         Proj_0049b720* p = (Proj_0049b720*)(*(int*)(g_game + 0x141f7) + offset);
         s = *(short*)((char*)p + 0xa);
         type = p->type;
 
         if (p->counter != 0) {
-            if (*(int*)(g_game + 0x38a47) < (p->field_42 + (unsigned int)type->field_ec))
+            unsigned short ec = type->field_ec;
+            if (*(int*)(g_game + 0x38a47) < (p->field_42 + (unsigned int)ec))
                 goto Next;
 
-            if (type->field_ec >= 5 || (p->counter & 1)) {
+            if (ec >= 5 || (p->counter & 1)) {
                 int* arr = p->field_52;
                 idx = 0;
                 while (1) {
@@ -332,7 +320,7 @@ void FUN_0049b720()
 
     Next:
             offset += 0x6b;
-      } while (--count);
+            count--;
     }
 
     FUN_0049ae20();

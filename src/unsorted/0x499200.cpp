@@ -1,11 +1,4 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6.1-sol, finished by deepseek-v4.1. Names are provisional.
-// deepseek-v4.1 (this session): 91.7% -> 91.9%. The `value |= four` object code
-// belongs AFTER the if/else on field_39249, not inside the then-branch: the
-// original's then-branch ends `or byte [m+0x2a44],8; jmp 0x49982a` and shares
-// the `mov eax,[g_game]; or word [m+0x2a44],di` at the join, while the else
-// body (ending at `call FUN_0047a760`) falls into it. Moving the statement out
-// of the then-branch fixed two instructions and made the else-branch shape
-// match. Everything still left is the edi live range below.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6.1-sol. Names are provisional.
 // Header sweeps (128 C and 768 C/C++ combinations) found no improvement.
 // PARTIAL, 91.7% (1653 of 1655 bytes, instruction-text score). Branches, field
 // offsets, call targets, stack slots and the whole 0x4992cd..0x4996fb state
@@ -376,6 +369,7 @@ void FUN_00499200(void)
             ((Class_00435110*)g_game->net)->FUN_00435110(b);
             if (((Class_00435c00*)g_game->net)->FUN_00435c00(a) != 0) {
                 g_game->field_2a44.bits.b3 = 1;
+                g_game->field_2a44.value |= four;
             }
         } else {
             unsigned int saved = g_game->field_2a3c;
@@ -391,7 +385,6 @@ void FUN_00499200(void)
             ((Class_00435a20*)g_game->net)->FUN_00435a20(g_game->field_29a0 + 0x11c);
             FUN_0047a760();
         }
-        g_game->field_2a44.value |= four;
         g_game->field_391f1 = 2;
         g_game->field_391f5 = FUN_00496bb0;
         FUN_004b4fd0(FUN_004578f0, 0);
