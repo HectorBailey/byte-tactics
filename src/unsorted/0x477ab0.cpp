@@ -1,6 +1,20 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// Partial, 48.7%. Restored player and campaign-holder reloads around callbacks.
-// Remaining differences include duplicated mission blocks and branch/register scheduling.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
+// Partial, 48.7% (1887 vs 1935 bytes, 48 short). Best-effort after a 10 minute
+// timebox, so mostly the previous attempt's structure. What still differs:
+//   - first divergence is the prologue: our `jne` lands at 0x477b14, two bytes
+//     early, so the 0x14b player-index computation is two bytes short of the
+//     original's `add ecx, edx` + `lea edi, [ecx + eax*2]` pair.
+//   - the -1 path zeroes the global stores with eax; the original uses the
+//     function-wide zero register ebx (`xor ebx, ebx`, then `cmp mem, ebx`
+//     everywhere). We get `xor eax, eax` for those two stores.
+//   - the original keeps `index` in the `menu` parameter home slot [esp+0x14]
+//     (0x477b83 stores 0 there between the bigButton pushes, 0x477c49 reads it
+//     back for FUN_00435c00); ours lives in a register (ebx after movsx), which
+//     is the root of the `mov eax,[0x51e668]; test eax,eax` vs original
+//     `cmp dword ptr [0x51e668], ebx` difference around 0x477bf3/0x477c2d.
+//   - after 0x477c5a the two attempts diverge structurally; the original's
+//     shared missions tail at 0x477f0e is reached from the Core path branch and
+//     ends at 0x477fec (push ebp; call FUN_004ab0a0).
 // Click handler for the single-player Campaign screen. Dispatches on the gadget
 // name (Start/Campaign/Missions/bigButton, PrevMenu, Difficulty, Side0/Arm,
 // Side1/Core) and rebuilds the campaign or missions list, checking the campaign
@@ -76,7 +90,7 @@ void __stdcall FUN_00477ab0(Menu_00477ab0* menu)
     unsigned char idx0 = *(unsigned char*)(g_game + 0x2a42);
     Entry_00477ab0* entries = menu->holder->entries;
     char* playerInfo = g_game + 0x14b * idx0;
-    int index = 0;
+    int index;
 
     if (menu->current == -1) {
         FUN_004d85a0(DAT_0051e65c);
