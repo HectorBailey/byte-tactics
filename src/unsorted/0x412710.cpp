@@ -7,6 +7,49 @@
 // difference is still the /Ob2 decision on the 3-byte (`ret 8`) out-of-line
 // _Destroy at 0x406c00: taken at the landed site, folded away at the empty
 // site (there the earlier `sete` proves _First == _Last).
+// (Agreed: the frame slot arithmetic is the same conclusion this session
+// reached; the vector object is 16 bytes with the allocator first, so
+// `lea ecx,[esp+0x1c]` and _First at [esp+0x20] are consistent.)
+// deepseek-v4.1 second retry (baseline plus one final check.py run; every
+// sweep below ran through build/scratch/0x412710/sweep*.py + dump.py, which
+// compile and compare without check.py):
+// TARGET SHAPE (a). With _Destroy out of line the landed path is exactly the
+// original's 39 bytes, then `xor eax,eax`:
+//   lea ecx,[esp+0x1c] / mov [edi+6],0 / mov edx,[esp+0x24] /
+//   mov eax,[esp+0x20] / push edx / push eax / call _Destroy /
+//   mov ecx,[esp+0x20] / push ecx / call operator delete / add esp,4
+// The file's 96.1% comes from the explicit `v.~vector();`: MSVC then emits the
+// destructor, but its _Destroy stays inlined and the implicit scope-exit
+// destructor adds zero stores plus a second delete(0), so ours is also 39 bytes
+// with different content. The element type is now spelled `Unit*` (and
+// FUN_0040b530 takes `std::vector<Unit*>*`, reading the element without a
+// member): byte-and-score identical here (96.1%, 1572 bytes) and it is the type
+// the _Destroy reloc names, so a future out-of-line call cannot resolve to a
+// wrong mangled name.
+// NEW MEASUREMENTS for (a), all scored with the scratch scorer:
+//  - Empty inline calls are real inline-budget markers here, exactly as in the
+//    matched 0x48d220.cpp: `static inline void Dummy(void) {}` called 16 times
+//    before `return 7;` flips the EXPLICIT `v.~vector();` site to an out-of-line
+//    _Destroy call (destroy_calls=1, 1592 bytes) while the implicit destructor
+//    keeps its inlined copy, so the extra 20 bytes stay. At 24 markers it flips
+//    back (1564 bytes): non-monotonic, so a marker count must be scored, not
+//    argued. Markers anywhere else (top of the function, case 5, the circling
+//    code, inside the landed block, 1..49 calls) never flip anything.
+//  - The NATURAL source (no explicit destructor, the 93.9% / 1548-byte shape)
+//    could not be flipped at all: 1..49 markers in four placements, TryLand one
+//    level down (94.7%, 1572 bytes), identity and arithmetic consumers, and
+//    1..16 dummy functions or unused inline definitions before the function.
+//    So the implicit destructor at the `return` is expanded in a phase where
+//    those markers do not count; TRY 3's conclusion that the budget is not what
+//    decides that site holds for it, and the explicit site above shows the
+//    budget is real elsewhere in this TU. That plain shape is the honest source
+//    (it reproduces both destructor copies and the original's size once
+//    _Destroy is called); the explicit call is kept only for the score.
+// TARGET SHAPE (b), still differing: the original reloads state 4's spilled
+// orbit distance into edx before `add esp,8`; ours reloads it into eax after
+// `mov ebx,eax`. Tried this session, no change: `speed * 0x10000` for
+// `speed << 16` (96.1%, same diff) and `int d = distance;` inside Offset
+// (94.3%).
 // Prior work: Claude Opus 5.5, deepseek-v4.1-flash and GPT-6.1-sol. Names are provisional.
 // space-bunny-free retry (1 real check.py run, kept 96.1%, nothing improved):
 // The one difference left is the landing block's vector destructor. The real
@@ -221,7 +264,7 @@ void __stdcall FUN_0048a060(Unit*, Unit*, int);
 void __stdcall FUN_0048a0a0(Unit*, Vec3*, int);
 void __stdcall FUN_0043ad10(Unit*, Class_0043a1f0*);
 void __stdcall FUN_0043acb0(Unit*, Class_0043a1f0*);
-void __stdcall FUN_0040b530(int player, Vec3* pos, int range, std::vector<Elem_00406c10>* out);
+void __stdcall FUN_0040b530(int player, Vec3* pos, int range, std::vector<Unit*>* out);
 
 static inline Vec3 Offset(short angle, int distance)
 {
@@ -321,12 +364,12 @@ int __stdcall FUN_00412710(Unit* unit, Order* order, int flags)
     }
     case 4: {
         if ((unsigned int)unit->field_108 < (unit->def->field_1fa >> 2) * 3) {
-            std::vector<Elem_00406c10> v;
+            std::vector<Unit*> v;
             FUN_0040b530(unit->player->index, &unit->pos, 0xf00, &v);
             if (!v.empty()) {
                 ((Class_004388d0*)order)->FUN_004388d0(0);
-                int target = v[FUN_004b6c30(v.size())].unknown_0;
-                FUN_0043acb0(unit, new Class_0043a1f0("VTOL_LANDING", target, 0, 0, 0, 0));
+                Unit* target = v[FUN_004b6c30(v.size())];
+                FUN_0043acb0(unit, new Class_0043a1f0("VTOL_LANDING", (int)target, 0, 0, 0, 0));
                 order->flags = 0;
                 v.~vector();
                 return 0;
