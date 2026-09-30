@@ -25,12 +25,15 @@
 //     tried. A named `bound` local for the health compare is unchanged at
 //     89.9%, as is reversing the compare to (maxHealth>>2)*3 > (unsigned)health.
 //     "Sum into a temporary, then copy" for the tail (87.0%) loses the roles too.
-// Suspected original bug: at the end of case 1 (0x410bdf) the original calls
-//     `operator delete[]` (0x4b4f20) on `[esp+0x4c]`, which is the vector's
-//     SECOND pointer, not its first: the `units` vector object starts at
-//     [esp+0x48] (see `lea ecx,[esp+0x48]` before the ctor at 0x410a5d), the
-//     inline count at 0x410a9f/0x410aab reads first at +0 and last at +4, and
-//     +4 is what gets freed. If that is a real `~vector()` it should free +0.
+// Tried after the 90.3% state: PosOf() inlined by hand at the case 1 tail,
+//     field-wise pos.x=order->pos.x+off.x in statement order (78.2% and 78.7%:
+//     both flip esi to order and edi to unit), an inline ~vector() body
+//     `delete[] first` with the derived class dtor left implicit (89.1%) or
+//     declared out-of-line (89.0%): the first fixes the tail's inlined
+//     delete[] but inlines the three pads destroy sites too. 90.3% remains best.
+// Suspected original bug: none. The final delete[] takes [esp+0x4c], which is
+//     the units vector's first pointer (inlineEmpty reads first at +4 and last
+//     at +8 of the object at [esp+0x48]), so it is a correct inlined ~vector().
 #include <vector>
 struct Unit;
 namespace std {
