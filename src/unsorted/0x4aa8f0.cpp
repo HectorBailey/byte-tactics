@@ -1,27 +1,41 @@
 // Decompiled by deepseek-v4.1. Names are provisional.
 //
-// PARTIAL: GUI layer loader (0x4aa8f0, 1762 bytes). Best 36.3%
-// (ours 1798 bytes vs 1762), first diverging instruction is the frame size.
+// PARTIAL: GUI layer loader (0x4aa8f0, 1762 bytes). Best 38.3%
+// (ours 1783 bytes vs 1762). The frame is now the original 0x21c and long
+// stretches of the middle match; the first divergence is the prologue (ours
+// loads `menu` into EBX before the four pushes and parks `ret` at [S+0x18],
+// the original loads menu into EDI after the pushes and puts `ret` at
+// [S+0x14]).
 //
 // What still differs:
-//  * frame is 0x220 instead of 0x21c, so every [esp+N] above 0x10 is +4.
-//    Original slots (after the four pushes, esp = S = entry-0x22c):
-//      [S+0x10] layer, [S+0x14] ret, [S+0x18] mask,
-//      [S+0x1c..0x28] rect[4], [S+0x2c] layerName[0x100], [S+0x12c] guiName[0x100].
-//    Ours: layer [S+0x10], mask [S+0x14], the PANEL-search entry pointer
-//    spilled at [S+0x18], ret [S+0x1c], rect [S+0x20]. Exactly one extra
-//    spilled dword, the PANEL loop's moving pointer.
-//  * register allocation: we home `menu` in EBX (mov ebx,[esp+0x228] right
-//    after push ebx). The original homes menu in EDI at entry
-//    (mov edi,[esp+0x230]) and re-loads it from its home [S+0x230] at
-//    0x4aac38 / 0x4aad79 / 0x4aae27 / 0x4aaf63; edi then becomes `layer`,
-//    ebp holds `entry` (xor ebp,ebp = entry = 0) and ebx/esi carry the loop
-//    temporaries (base at 0x4aaab9, dst at 0x4aacd2/0x4aad80/0x4aae2e,
-//    e->w at 0x4aa942). `flags` is never cached: [S+0x238] is re-loaded at
-//    0x4aaa1d, 0x4aab29, 0x4aabdf, 0x4aac31.
-//  * tried and rejected: swapping the declaration order to (layer, ret, mask)
-//    changes nothing (still 36.3%); removing the `mask` local and writing
-//    (flags & 0x200) inline drops to 34.3%.
+//  * `menu` is homed in EBX for the whole function here. The original homes
+//    menu in EDI only for the flags & 0x800 block (0x4aa903..0x4aa989) and
+//    then reloads it from its parameter home [S+0x230] at 0x4aa96e /
+//    0x4aaa31 / 0x4aac38 / 0x4aae86 / 0x4aaf63, which frees EBX; ours keeps
+//    it live everywhere, so `menu->layer` loads read `[ebx+0x18]` where the
+//    original has `[edi+0x18]` or a fresh load from the home slot.
+//  * `ret` still lands in [S+0x18] (original [S+0x14]), which flips the two
+//    tests near 0x4aaea2 and the final `mov eax,[esp+0x10]` return.
+//  * the tail here tests the `mask` local where the original re-derives
+//    `flags & 0x200` (and `flags & 0x80`) from the reloaded flags at
+//    0x4aac41..0x4aac68. Writing the tail as `(flags & 0x200) == 0` is
+//    faithful and shrinks us to 1775 bytes, but check.py scores that 37.8%:
+//    the extra flag reloads break more of the tail than the `mask` slot saves.
+//  * `flags` is never cached in a register in the original: [S+0x238] is
+//    re-loaded at 0x4aaa1d, 0x4aab29, 0x4aabdf, 0x4aac31.
+//
+// Tried and kept (0.9% total): `if (cur != 0) {...} else {...}` in the
+// flags & 0x800 block, which matches the original's out-of-line
+// FUN_004bf4d0(0,0,-0x18) at 0x4aa97e; `if (FUN_004aeac0(entry, layerName)
+// != 0) {...} else {...}`, which matches 0x4aaaa5 `je 0x4aac22`; and goto
+// forms that use one variable for both the loop counter and the found index
+// in the PANEL and focusName searches, because the original materialises -1
+// only on the loop fall-through (`or ecx,0xffffffff` at 0x4aab02, `or
+// esi,0xffffffff` at 0x4aae7c). Without those the frame was 0x220 and 36.3%.
+//
+// Tried and rejected: reordering the locals (layer, ret, mask) changes
+// nothing; a Menu layout whose padding array was sized from 0x64 instead of
+// 0x68 put menu->name at +0x9ba, four bytes too high (fixed here).
 //
 // Structural facts recovered from the disassembly (kept because they are
 // load-bearing for whoever tries next):
@@ -93,7 +107,7 @@ struct Menu_004aa8f0 {
     Layer_004aa8f0* layer;         // +0x18
     char unknown_1c[0x48];
     int field_60;                  // +0x64
-    char unknown_64[0x8b2 - 0x64];
+    char unknown_68[0x8b2 - 0x68];
     unsigned char field_8b2[0x104];// +0x8b2
     char name[0x100];              // +0x9b6
 };
@@ -124,8 +138,8 @@ extern int* DAT_0051fba4;
 Layer_004aa8f0* __stdcall FUN_004aa8f0(Menu_004aa8f0* menu, const char* name,
                                        unsigned int flags)
 {
-    int ret = 1;
     Layer_004aa8f0* layer;
+    int ret = 1;
     int mask;
     int rect[4];
     char layerName[0x100];
@@ -134,9 +148,7 @@ Layer_004aa8f0* __stdcall FUN_004aa8f0(Menu_004aa8f0* menu, const char* name,
 
     if (flags & 0x800) {
         Layer_004aa8f0* cur = menu->layer;
-        if (cur == 0) {
-            FUN_004bf4d0(0, 0, -0x18);
-        } else {
+        if (cur != 0) {
             Entry_004aa8f0* e = cur->entries;
             int x;
             int y;
@@ -154,6 +166,8 @@ Layer_004aa8f0* __stdcall FUN_004aa8f0(Menu_004aa8f0* menu, const char* name,
             FUN_004bf4d0(cur->entries->handle, rect, -0x18);
             if (menu->layer != 0)
                 menu->layer->field_14 = 1;
+        } else {
+            FUN_004bf4d0(0, 0, -0x18);
         }
     }
     strncpy(layerName, menu->name, 0x100);
@@ -171,23 +185,24 @@ Layer_004aa8f0* __stdcall FUN_004aa8f0(Menu_004aa8f0* menu, const char* name,
             layer = menu->layer;
             entry = &layer->entries[layer->entries->count + 1];
         }
-        if (FUN_004aeac0(entry, layerName) == 0) {
-            FUN_004d85a0(layer);
-        } else if (mask != 0) {
+        if (FUN_004aeac0(entry, layerName) != 0) {
+          if (mask != 0) {
             Entry_004aa8f0* base = layer->entries;
-            int idx = -1;
+            int idx;
             int i = 1;
             if (i <= base->count) {
                 Entry_004aa8f0* e = &base[1];
                 do {
                     if (strncmp(e->name, "PANEL", 0x10) == 0) {
                         idx = i;
-                        break;
+                        goto panelFound;
                     }
                     i++;
                     e++;
                 } while (i <= base->count);
             }
+            idx = -1;
+        panelFound:
             if (idx == -1) {
                 int j = 1;
                 if (j <= entry->count) {
@@ -218,6 +233,9 @@ Layer_004aa8f0* __stdcall FUN_004aa8f0(Menu_004aa8f0* menu, const char* name,
             layer->entries->count += entry->count;
             memcpy(entry, &entry[1], entry->count * 0x15b);
             entry = layer->entries;
+          }
+        } else {
+            FUN_004d85a0(layer);
         }
     }
     layer->entries = entry;
@@ -281,20 +299,19 @@ Layer_004aa8f0* __stdcall FUN_004aa8f0(Menu_004aa8f0* menu, const char* name,
             layer->field_20 = 0;
             FUN_004a7960(menu, 1);
         } else {
-            int found = -1;
             int i = 1;
             if (i <= entry->count) {
                 Entry_004aa8f0* e = &entry[1];
                 do {
-                    if (strncmp(e->name, dst, 0x10) == 0) {
-                        found = i;
-                        break;
-                    }
+                    if (strncmp(e->name, dst, 0x10) == 0)
+                        goto focusFound;
                     i++;
                     e++;
                 } while (i <= entry->count);
             }
-            layer->field_20 = found;
+            i = -1;
+        focusFound:
+            layer->field_20 = i;
         }
     }
     menu->field_60 = -1;
