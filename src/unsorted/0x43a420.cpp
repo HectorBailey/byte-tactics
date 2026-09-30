@@ -1,7 +1,20 @@
 // Decompiled by deepseek-v4.1, finished by space-bunny-free. Names are provisional.
 // Started by deepseek-v4.1-flash, continued by GPT-6, finished by deepseek-v4.1.
-// Partial: 86.2%, exact 1300-byte size and 0x164-byte frame. Two real
-// differences remain:
+// Partial: 93.8%, exact 1300-byte size and 0x164-byte frame. The two
+// differences below are still what the checker shows (the 2-byte shift is
+// now compensated by the `continue` shape of the fallback loop, so only the
+// loop's own registers and the prologue store are left):
+//  0. fallback loop register roles, still wrong: the original keeps the raw
+//     index in ECX and the filtered (compared) counter in EDX and copies the
+//     result with `mov dl,cl`, while ours compares ECX. All of the plain
+//     break forms give ECX to the compared counter; the `k != desc.kind ->
+//     k++; continue;` form is the one that reaches 93.8% because its two
+//     extra bytes exactly absorb the missing `mov dl,cl`, but it also moves
+//     the end pointer from ESI to EDI and materialises the `continue` jump.
+//     Still open: get ECX on the raw index. A `k++ == desc.kind` compare,
+//     an unsigned char raw index, an else-break, and swapping the two
+//     declarations all leave ECX on the compared counter.
+//  1. prologue scheduling: (see below)
 //  1. prologue scheduling: the original stores the base-class vtable between
 //     the two `push edi` argument pushes of the link member's constructor
 //     (push edi / mov [ebp],0x4fd2cc / push edi / mov ecx,esi / mov byte
@@ -262,12 +275,18 @@ Class_0043a1f0::Class_0043a1f0(Unit_0043a420* punit, Class_004b4ba0* file, char*
             int k = 0;
             int idx = 0;
             Entry_0043a420* p = DAT_00512344;
+            // The `k != desc.kind -> k++; continue;` form (rather than the plain
+            // `if (k == desc.kind) break;`) is what keeps this region 2 bytes
+            // longer than the plain form, which aligns every later branch
+            // target and the switch jump table: 86.2% -> 93.8%.
             if (p <= DAT_00512348) {
                 do {
                     if (!(p->flag14 & 1)) {
-                        if (k == desc.kind)
-                            break;
-                        k++;
+                        if (k != desc.kind) {
+                            k++;
+                            continue;
+                        }
+                        break;
                     }
                     idx++;
                     p++;
