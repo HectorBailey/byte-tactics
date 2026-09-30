@@ -1,14 +1,20 @@
 // Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
 // Earlier attempt by deepseek-v4.1-flash, finished by GPT-6; continued here.
-// Best 71.0% (2753 bytes against 2756). 18 diff hunks remain, all inside the
-// body: the two bit-block groups materialise their bits in byte width
-// (`and cl,1; mov dl,cl`) where the original masks the whole register
-// (`mov cl,[..]; and ecx,1`), the 0x44a00a region reloads the GUI list from
-// g_game+0x531 while we keep it in edi and spill it once, and the
-// 0x449e15 player lookup uses one address expression (0x1b8a) where the
-// original builds `players[i].data` (base 0x1b63, +0x27). Tried and rejected:
-// short flag97 (67.2), bool locals for the comparison bits (67.6),
-// recomputing the list expression at every later use (63.6).
+// Best 72.0% (2756 bytes, exactly the original size), up from the 71.0% the
+// previous attempt left. Remaining diff hunks: the 0x449c21 tests materialise
+// flag97 as `and bl,1` and branch on the flags where the original masks the
+// whole register (`and ebx,1; cmp bx,si`), which needs a 16-bit local, but
+// making flag97 short costs every later use and drops the score to 67.6; the
+// 0x449fd0 bit writes pick cx/dx opposite to the original (length-neutral: the
+// else-if block wants `mov cl,[..]; and ecx,1; shl`, ours widens through
+// `and cl,1; mov dl,cl`); the 0x449e15 player lookup folds to 0x1b8a where the
+// original builds `players[i].data` as lea 0x1b63 + load [..+0x27] (an explicit
+// slot pointer and a struct member both fold back, so the source shape stays
+// unknown); one region spills edi that the original keeps live.
+// Tried and rejected: short flag97 (67.6), int locals for the five else-if bit
+// writes (67.6), --v in the DAT_00512d78 guard (71.6), struct-typed players
+// array (71.6), bool locals (67.6), recomputing the list expression at every
+// later use (63.6).
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -181,7 +187,7 @@ void FUN_00449bb0(void)
     info->field_8d = *(unsigned short*)(g_game + 0x37f1f);
 
     unsigned char c = FUN_0041d6a0(1);
-    info->field_9d = (info->field_9d & 0xfffb) | ((unsigned int)(c != 0) << 2);
+    info->field_9d = (info->field_9d & 0xfffb) | (((unsigned int)(c != 0) & 1) << 2);
 
     holder = FUN_004aa8f0(g_game + 0x519, "LOUNGE2.GUI", 0);
     ((Holder_00449bb0*)holder)->callback = (void*)&FUN_00447b10;
