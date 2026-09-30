@@ -1,4 +1,5 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
+// Continued from a partial left by deepseek-v4.1-flash and GPT-6.
 #include <windows.h>
 #include <string.h>
 
@@ -169,7 +170,10 @@ public:
     void FUN_004618a0(int);
 };
 
-// PARTIAL 75.9%. Player loops, text layout and slider register allocation still differ.
+// PARTIAL 76.6%. Frame now matches (add esp,0x234) after sizing namebuf[128];
+// still differs: low-region rect/constant slots sit 4 bytes low ([esp+0x14] vs
+// [esp+0x18]), the player loop swaps eax/ecx, and the 10-iteration byte-copy loop
+// at 0x4984b0 is optimized away in ours.
 // FUNCTION: 0x497f40
 void FUN_00497f40(void)
 {
@@ -187,7 +191,7 @@ void FUN_00497f40(void)
     unsigned int stamp;
     int rect[4];
     PlayerInfo_00497f40* pi;
-    char namebuf[100];
+    char namebuf[128];
 
     if ((g_game->flags38d75 & 1) == 0) {
         while (g_game->field_531 != 0) {
@@ -239,8 +243,8 @@ void FUN_00497f40(void)
         g_game->field_37e3b = g_game->field_37e33 - g_game->field_37e2b + 1;
         FUN_004288d0("loadgame2bg", 0, 0, 0);
         memset((char*)g_game + 0x29a4, 0, 0x23 * 4);
-        arrayOffset = 0x29a4;
         playersOffset = 0;
+        arrayOffset = 0x29a4;
         do {
             pi = (PlayerInfo_00497f40*)((char*)g_game + 0x1b63 + playersOffset);
             if (*(int*)pi == 0 || (pi->control != 1 && pi->control != 2)) {
@@ -265,11 +269,11 @@ void FUN_00497f40(void)
         DAT_0051e814 = 0;
         DAT_0051e6c8 = 0;
         DAT_0051e818 = 0;
-        DAT_0051e6cc &= 0xffff0000;
+        *(short*)&DAT_0051e6cc = 0;
         g_game->flags38d75 |= 1;
         FUN_0045b640();
     }
-    if ((g_game->flags38d75 & 2) != 0) {
+    if (((unsigned char)g_game->flags38d75 >> 1 & 1) != 0) {
         FUN_0047f750();
         FUN_004257a0();
         FUN_00428730();
@@ -310,13 +314,13 @@ void FUN_00497f40(void)
     do {
         pi = (PlayerInfo_00497f40*)((char*)g_game + 0x1b63 + playersOffset);
         if (*(int*)pi != 0 && (pi->control == 1 || pi->control == 2) &&
-            (FUN_00453320((unsigned int)pi->data, 0), DAT_00506dbc != 0)) {
+            (FUN_00453320(*(unsigned int*)((char*)pi + 4), 0), DAT_00506dbc != 0)) {
             ((Class_004618a0*)&DAT_00513000)->FUN_004618a0(1);
         }
         playersOffset += 0x14b;
     } while (playersOffset < 0xcee);
     FUN_00453d40();
-    if ((g_game->flags38d75 & 4) != 0 && FUN_004568c0() != 0) {
+    if (((unsigned char)g_game->flags38d75 >> 2 & 1) != 0 && FUN_004568c0() != 0) {
         g_game->flags38d75 &= ~4;
         g_game->flags38d75 |= 8;
         FUN_004c9790(0);
