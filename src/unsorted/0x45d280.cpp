@@ -15,6 +15,18 @@
 // the reload line and still widens (88.1%); the previous compound `^=` form
 // scores 90.7%; int bit with fused mask 90.2%; no pointer local 85.8%; byte
 // locals 86.7/87.5%.
+// New tries (issue 2013 rerun, all worse, best still 91.5): byte temp
+// `unsigned char c = (unsigned char)f ^ DAT; game->flags.word = f ^ (c & 1)`
+// 87.5, masks in byte width then `movzx dx,dl`; `int b = (f ^ DAT) & 1;`
+// 86.7 (distributes the mask over both bytes, and loses `game` in edi);
+// one-statement `flags.word = flags.word ^ ((flags.word ^ DAT) & 1)` 90.5,
+// fuses to `and edx,0xfffe` plus `and cl,1 / movzx cx,cl`; `int b =
+// ((unsigned char)f ^ DAT) & 1;` 90.2. Target UNDO flip is
+// `mov ax,[edi+0x37f14] / mov dl,[DAT] / mov cl,al / xor cl,dl / and ecx,1 /
+// xor ecx,eax / mov [edi+0x37f14],cx` (29 bytes; ours 36), i.e. a byte width
+// xor whose result is masked 32-bit while f stays live in eax; NOTRAK`s
+// `f ^ ((f ^ v) & 1)` reaches that byte-xor/32-bit-mask pair (v an int), but
+// with the byte global DAT the optimizer instead fuses or narrows the mask.
 // Other remaining diffs: RESTORE callback setup uses `mov eax,[0x511de8] /
 // mov ecx,[eax+0x10]` where the original keeps ecx through both loads (same
 // size); the apply block pushes the FUN_004ba590 argument slot before `fild`
