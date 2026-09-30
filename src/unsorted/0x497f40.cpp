@@ -170,17 +170,17 @@ public:
     void FUN_004618a0(int);
 };
 
-// PARTIAL 81.8% (3434 vs 3463 bytes), frame exactly 0x234. The address of
+// PARTIAL 83.4% (3431 vs 3463 bytes), frame exactly 0x234. The address of
 // every local now matches the original: rect at +0x10 (its slot widened to 20
 // bytes by the dead tail loop, which stores players[i].control at byte +0x13
 // and is kept because rect's address escapes), scr.gadget at +0x24 with a
 // 24-byte hole after it, namebuf[100] at +0x60, buf[128] at +0xc4, aux[256] at
 // +0x144. The x87 temps land at +0x54/+0x58 as in the original.
 // Still differs, all schedule/allocator state rather than missing code:
-//   (a) both player loops emit the SIB with the offset as base and g_game as
-//       index ([edi+esi+0x1b63], [esi+eax+0x1b63]); the original has
-//       [esi+edi+0x1b63] and [eax+esi+0x1b63]. arrayOffset also sits in ecx
-//       where the original has eax (pi in eax vs ecx).
+//   (a) the player loop now uses eax for the array offset like the original,
+//       but its two SIBs come out [edi+esi+0x1b63] and [eax+esi] where the
+//       original has [esi+edi+0x1b63] and [esi+eax] (base g_game, index the
+//       offset); both sum orders in source give the same reversed SIB.
 //   (b) the DAT_0051f2c8..DAT_0051e818 block uses ebp as its single zero and
 //       hoists the g_game load; the original uses eax/ecx/edx and reloads
 //       g_game in the middle of the stores.
@@ -269,16 +269,16 @@ void FUN_00497f40(void)
         playersOffset = 0;
         arrayOffset = 0x29a4;
         do {
-            pi = (PlayerInfo_00497f40*)((char*)g_game + 0x1b63 + playersOffset);
+            pi = (PlayerInfo_00497f40*)((char*)g_game + playersOffset + 0x1b63);
             if (*(int*)pi == 0 || (pi->control != 1 && pi->control != 2)) {
                 *(int*)((char*)g_game + arrayOffset) = 0;
             } else {
                 *(int*)((char*)g_game + arrayOffset) = 1;
             }
+            bar = (*(int*)pi != 0 && (pi->data->flags & 0x40) != 0) ? 1 : 0;
             arrayOffset += 4;
             playersOffset += 0x14b;
-            *(int*)((char*)g_game + arrayOffset + 0x28) =
-                (*(int*)pi != 0 && (pi->data->flags & 0x40) != 0) ? 1 : 0;
+            *(int*)((char*)g_game + arrayOffset + 0x28) = bar;
         } while (arrayOffset < 0x29cc);
         if (!FUN_004b6b20(FUN_00497c70, 0, 0)) {
             FUN_004b6290("Unable to start the loading thread!");
