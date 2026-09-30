@@ -38,7 +38,27 @@
 //   it spill into a slot of its own is WORSE, 28.9% and 1834 bytes: MSVC then
 //   keeps the loaded flags in a register through the whole prologue and every
 //   epilogue shifts.  Do not repeat that.
+// Re-checked by deepseek-v4.1: still 34.7%, 1856 bytes against the original's
+// 1832.  New measured facts from a fresh disassembly of this exact file:
+// * span and step DO get memory slots here, but at [esp+0x2c] and [esp+0x30]
+//   (the original has span at [esp+0x18] and step at [esp+0x1c]); [esp+0x2c] is
+//   also where our 6-dword point copy starts, so the copy and span share the
+//   same frame dword and the post-call compare at 0x4a393c reloads that slot.
+//   Making point.x/point.y live in registers instead (the original keeps
+//   point.y in edi across the FUN_004ab570 call) is what frees the two slots
+//   the original's frame has.
+// * Slot map of the original, frame offset = [esp+N] - 0x10 with a 0x3c frame
+//   and four pushes: 0x00 orig_sel, 0x04 entries, 0x08 n then span,
+//   0x0c step then flag8, 0x10 flags, 0x14 x0, 0x18 dead, 0x1c x1, 0x20 y1,
+//   0x24 the 24-byte point copy.  Ours has orig_sel at 0x00 like the original
+//   ([esp+0x10], already correct), x0 at 0x04, y1 at 0x08, x1 at 0x0c, n at
+//   0x14 and the point copy at 0x1c, i.e. six scalar slots against nine.
+// * Ours also emits 24 extra bytes (1856 vs 1832) and two extra jumps near
+//   0x4a38e5/0x4a390e/0x4a3911, at the `list == 0 ? FUN_004c1450() : ...`
+//   and `field_da == 0 ? size + 1 : field_da` ternaries, where the original
+//   falls through on one arm and has no jmp.
 #include <string.h>
+
 
 #pragma pack(push, 1)
 struct Entry_004a3780 {                // 0x15b bytes

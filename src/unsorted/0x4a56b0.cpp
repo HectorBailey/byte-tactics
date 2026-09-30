@@ -1,4 +1,4 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by deepseek-v4.1-flash, edited by deepseek-v4.1. Names are provisional.
 // Partial, 49.3%. Earlier work: deepseek-v4.1-flash, finished by GPT-6 (47.8%);
 // deepseek-v4.1 brought it to 49.3%.
 // Frame is right (0xac) and the buffer is the original 0x80 bytes at frame+0x2c.
@@ -24,6 +24,23 @@
 // The Measure helper below is spelled exactly as the matched sibling
 // 0x4a53c0 demands (accumulator first, `char* p` kept separate, three distinct
 // return expressions) and the entry struct matches 0x4a53c0 and 0x4a4660.
+// This session (deepseek-v4.1): the remaining diff is one register allocation
+// choice that cascades everywhere. The original keeps the loop counter i in
+// edi and spills the tab counter t to frame+0x10 (loaded/stored every
+// iteration); i is live across the FUN_004c1420 call on the break path so it
+// earns a callee-saved register, and it also gets a second home at frame+0x14
+// that is re-stored on every loop exit. Ours is the exact reverse: t sits in
+// edi and i lives at frame+0x10, which shifts every later slot by 4 (original
+// rect at frame+0x1c, ours at frame+0x20) and moves the -1 sentinel from bp to
+// di. The original reuses frame+0x10 after the loop as the inlined Measure
+// char temp and width accumulator, so fixing the i/t choice should fix the
+// downstream slots too.
+// Tried this session: swapping the two declarations (byte-identical), placing
+// them apart around the entries pointer (byte-identical), ++t instead of t++
+// (byte-identical), and an explicit `Entry* e = entries + 1` pointer walk to
+// match the original's strength-reduced body (48.7%, worse), so VC5
+// canonicalises the walk back into the indexed form. The allocator's pick is
+// not driven by declaration, statement or increment spelling.
 #include <windows.h>
 #include <string.h>
 
@@ -139,8 +156,8 @@ void __stdcall FUN_004a56b0(Class_004a56b0* obj, int index)
     obj->field_14 = obj->field_0c;
     Entry_004a56b0* entries = obj->holder->entries;
 
-    int t = 0;
     int i = 1;
+    int t = 0;
     for (; i < entries[0].b6.count + 1; i++) {
         if (entries[i].type == 7) {
             if (t == entries[index].tab) {
