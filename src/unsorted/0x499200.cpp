@@ -1,9 +1,54 @@
 // Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6.1-sol. Names are provisional.
 // Header sweeps (128 C and 768 C/C++ combinations) found no improvement.
-// PARTIAL, 91.7% (1653 of 1655 bytes, instruction-text score). Branches, field
-// offsets, call targets, stack slots and the whole 0x4992cd..0x4996fb state
-// machine agree with the original; what is left is register roles only.
-// What this session added (deepseek's notes above are superseded):
+// PARTIAL, 94.7% (1656 of 1655 bytes, instruction-text score). Every branch,
+// field offset, call target, stack slot and basic-block boundary from
+// 0x499200 to 0x499876 now agrees with the original, and the instruction
+// COUNT of the last block matches exactly. What is left is register ROLES in
+// the last block, and our block is one byte longer because of them.
+// SOLVED this session (91.7% -> 94.7%), the thing two earlier sessions gave up
+// on: the constant 4 that lives in edi from 0x499603 to 0x49986b.
+// - A local of any scalar type holding 4 is folded by MSVC 5 into an immediate
+//   at every use (`push 4`, `or word [m],4`). Every spelling tried failed
+//   (int/unsigned/short/char/const/register/static/enum/4.0f/`four = four`,
+//   `four += 0`, dead extra uses, a dead __inline helper, an __inline helper
+//   taking the literal as a parameter, ...).
+// - What works: give it to a 4-byte AGGREGATE WITH A CONSTRUCTOR, pass the
+//   aggregate BY VALUE to FUN_004ce690, and read the field for the `|=`.
+//       struct Four_00499200 { int v; Four_00499200() : v(4) {} };
+//       Four_00499200 four;
+//       g_game->field_10->FUN_004ce690(four);      // -> push edi
+//       g_game->field_2a44.value |= four.v;        // -> or word [m], di
+//   That is the guide's item 29 (a constructor materialises a constant where a
+//   field assignment cannot) plus the guide's "a constant loaded into a
+//   register and pushed" entry (a 4-byte struct passed by value is not
+//   `push 4`). A union with the same constructor, a 1-argument constructor, a
+//   4-argument constructor, a ctor whose body assigns instead of an init list,
+//   two 16-bit members, an __inline accessor and a struct member holding the
+//   aggregate all give the identical 94.7%, so the shape of the aggregate does
+//   not matter, only that it is an aggregate built by a constructor.
+// - The `|= four.v` statement is written TWICE: once inside the inner
+//   `if (net->FUN_00435c00(a) != 0)` in the first arm, once at the end of the
+//   else arm. MSVC then tail-merges the two copies into the single
+//   `mov eax,[g]; or word [m],di` at 0x49982a that both arms reach, which is
+//   the original's shape. Written once after the inner if/else instead, MSVC
+//   puts the `|=` in the first arm only and jumps the else arm over it
+//   (93.9%, and semantically wrong). Written once after the OUTER if/else it
+//   also runs on the inner-if-false path, which the original does not.
+// Still differs (all register roles in the 0x4997a0..0x49986b block, each one
+// step round the eax -> ecx -> edx cycle from the original):
+// - the original builds g_game in edx where we use eax (the 6-byte form versus
+//   the 5-byte `mov eax,[m]`; that is the single extra byte), builds the
+//   FUN_004a9660 field_519 argument in eax where we use ecx, the FUN_004ab400
+//   second argument in ecx where we use edx, and the FUN_00435a20 argument in
+//   edx (with `this` in ecx loaded first) where we use ecx (loaded after it).
+// - the tail uses eax/ecx/edx for field_391f1, field_391f5 and field_10 where
+//   we use edx/eax/ecx. Same one-step rotation, consistently.
+// - This is a scratch-register ROTATION (the guide's "rotated by one across a
+//   loop" entry), not a shape problem: the block's instruction count and every
+//   branch target already agree. Not moved by naming a copy of four.v, by
+//   naming g_game in the else arm (that costs 15 points, the named pointer
+//   stays live), or by any of the aggregate shapes above.
+// Earlier sessions' notes, kept because they record what does NOT work:
 // - +0x2cc6 is NOT involved, but +0x2a44 and +0x3923b are bitfield unions now.
 //   +0x2a44: `|= 8` is a byte RMW and `|= <const>` is a WORD RMW, so the field
 //   is `union { unsigned short value; struct { ...b3:1... } bits; }` and the
@@ -13,42 +58,22 @@
 //   16-bit storage unit gives: `bits.b2 || bits.b4`. A plain `unsigned short`
 //   local folds to `test byte ptr [m],0x14` and loses the load. This was the
 //   only scoring change of the session (+0.5).
-// What still differs, and everything tried:
-// - the constant 4 lives in edi from 0x499603 to 0x49986b in the original
-//   (`mov edi,4`, `push edi` twice, `or word [m],di`); ours rematerialises it
-//   as `push 4` and `or word [m],4`. Tried and all identical at 91.7%:
-//   int/unsigned/short/unsigned short/char/const local; `four = four`,
-//   `four += 0`, `four *= 1`, `four ^= 0`, `four2 = four`, `if (four == 4)`,
-//   a dead extra `|=`/`&=` use, `static int four = 4`, an enum constant,
-//   `4.0f` and `4.0` initialisers, a local struct with an `int` member built
-//   by a constructor, a bitfield union local, `int four_tab[1] = {4}`, a dead
+// What still differs, and everything tried (the edi range is now solved, see
+// above; the list is what earlier sessions proved does NOT work):
+// - a literal-4 local of any type is folded by MSVC 5 into an immediate at
+//   every use. Already tried, all identical at 91.7%: int/unsigned/short/
+//   unsigned short/char/const/register/`four = four`, `four += 0`, `four *= 1`,
+//   `four ^= 0`, `four2 = four`, `if (four == 4)`, a dead extra `|=`/`&=` use,
+//   `static int four = 4`, an enum constant, `4.0f` and `4.0` initialisers, a
+//   bitfield union local, `int four_tab[1] = {4}`, `int four; four = 4;`,
+//   `unsigned short four = 4;`, the declaration at the top of the body, a dead
 //   __inline helper to change the /Ob2 budget, and two __inline helpers
 //   (`Push(n)` / `Or(n)` and one `Mode(n)`) called with the literal 4 so the
-//   constant would arrive through a parameter. MSVC 5 folds every one of them
-//   into an immediate, so I could not find the construct the original used.
-// - revisited by deepseek-v4.1-flash: `register int four = 4;`, moving the
-//   declaration to the top of the function body (live range across all the
-//   frame-queue calls), splitting it into `int four; four = 4;`, and
-//   `unsigned short four = 4;` all still give 91.7% with byte-identical output
-//   to the version above. The edi live range at 0x499603..0x49986b is not
-//   reproducible from a literal-4 local, so the original evidently built the
-//   value some way MSVC 5 refuses to fold.
-// - the second arm of the +0x39249 block then uses edx where we use eax for
-//   g_game, and builds the FUN_00435a20 argument in ecx before pushing instead
-//   of edx. Both look like knock-on effects of the missing edi live range
-//   (the register allocator never had to preserve a value there), but they
-//   were not separable: the score does not move when the constant is removed
-//   from any single use site.
-// PARTIAL, 91.2% (1651 of 1655 bytes). Every branch, field offset, call and
-// stack slot agrees; what is left is register/scheduling only:
-// - +0x3923b: the original is `mov ax,[mem]; mov edi,4; test al,0x14`, this
-//   source folds to `test byte ptr [mem],0x14` because the value is single
-//   use. A plain `unsigned short` local folds for pointer-based loads; the
-//   16-bit load only survives when the field is a direct global.
-// - the constant 4 stays in edi across the whole +0x3923b arm (`push edi`,
-//   `or word [mem],di`); here MSVC rematerialises it as immediates.
-// - register-role swaps when building the +0x519 argument and the
-//   FUN_00435a20 argument (original uses eax/edx, ours ecx).
+//   constant would arrive through a parameter. Do not retry these.
+// - the register-role swaps listed above were called knock-on effects of the
+//   missing edi live range. They were, in part: fixing the edi range moved the
+//   block from 91.7% to 94.7% and made its instruction count exact, but the
+//   rotation is still one step out.
 // Main-loop frame handler. Copies the 24-byte view/input block off g_game,
 // feeds it to the camera update, then runs the order/selection state machine
 // off the flags byte at +0x2cc6 and the mouse message stored in the block.
@@ -126,9 +151,16 @@ public:
     void FUN_00435a20(void* p);
 };
 
+// A 4-byte aggregate, so MSVC materialises the constant 4 into a register
+// (edi) instead of folding it into each use as an immediate.
+struct Four_00499200 {
+    int v;
+    Four_00499200() : v(4) {}
+};
+
 class Class_004ce690 {
 public:
-    void FUN_004ce690(int a);
+    void FUN_004ce690(Four_00499200 a);
 };
 
 struct Game_00499200 {
@@ -333,7 +365,7 @@ void FUN_00499200(void)
         }
     }
 
-    int four = 4;
+    Four_00499200 four;
     if (g_game->field_3923b.bits.b2 || g_game->field_3923b.bits.b4) {
         if (g_game->net->FUN_00435100() != 3 ||
             (((Class_00435100*)g_game->net)->FUN_00435100() == 3 &&
@@ -369,7 +401,7 @@ void FUN_00499200(void)
             ((Class_00435110*)g_game->net)->FUN_00435110(b);
             if (((Class_00435c00*)g_game->net)->FUN_00435c00(a) != 0) {
                 g_game->field_2a44.bits.b3 = 1;
-                g_game->field_2a44.value |= four;
+                g_game->field_2a44.value |= four.v;
             }
         } else {
             unsigned int saved = g_game->field_2a3c;
@@ -384,6 +416,7 @@ void FUN_00499200(void)
             g_game->field_2a3c = saved;
             ((Class_00435a20*)g_game->net)->FUN_00435a20(g_game->field_29a0 + 0x11c);
             FUN_0047a760();
+            g_game->field_2a44.value |= four.v;
         }
         g_game->field_391f1 = 2;
         g_game->field_391f5 = FUN_00496bb0;
