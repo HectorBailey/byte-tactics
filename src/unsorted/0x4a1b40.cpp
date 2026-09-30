@@ -1,4 +1,4 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
+// Decompiled by deepseek-v4.1. Names are provisional.
 // Partial: corner decoration coordinates and register allocation still differ.
 #include <windows.h>
 #include <string.h>
@@ -115,6 +115,18 @@ void __stdcall FUN_004bf4d0(void* surface, Rect_004a1b40* rect, int id);
 void __stdcall FUN_004c7580(void* surface, void* bitmap, Quad_004a1b40* dst,
                             Quad_004a1b40* src);
 
+// Partial (16.3%), not MATCH. Attribution: started by deepseek-v4.1-flash, then GPT-6.
+// First divergence is the prologue: the original homes param_1 in ebp
+//   (sub esp,0xbc / push ebx / push ebp / mov ebp,[esp+0xc8] / xor ebx,ebx / push esi / push edi)
+// while ours homes param_1 in edi and pushes esi,edi before loading it, so every
+// later [esp+N] drifts by 4 (flag is at esp+0x18 here, esp+0x14 in the original).
+// The entries pointer then lands in esi here vs edi there, and the entries base in
+// ebp here vs on the stack in the original, so the register allocation of the whole
+// function differs. Frame size (0xbc) and the address-arithmetic lea chain are right.
+// Tried: moving top=0 into the type==0 branch (+0.3%); no effect on the param_1 register.
+// What is left: get param_1 into ebp and the entry pointer into edi; the two renderer
+// branches (text at 0x4a1c5c, cell grid at 0x4a2052) should then need only local sweeps.
+//
 // FUNCTION: 0x4a1b40
 void __stdcall FUN_004a1b40(Class_004a1b40* param_1, int param_2)
 {
@@ -124,7 +136,6 @@ void __stdcall FUN_004a1b40(Class_004a1b40* param_1, int param_2)
     int& left = bounds.left;
     int& right = bounds.right;
     int& bottom = bounds.bottom;
-    top = 0;
 
     if (param_1->holder != 0)
         param_1->holder->field_14 = 1;
@@ -134,6 +145,7 @@ void __stdcall FUN_004a1b40(Class_004a1b40* param_1, int param_2)
 
     int h = me->h;
     if (me->type == 0) {
+        top = 0;
         left = 0;
     } else {
         left = me->x;
