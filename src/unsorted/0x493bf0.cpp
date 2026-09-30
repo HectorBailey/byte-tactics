@@ -1,11 +1,12 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by
-// space-bunny-free. Names are provisional.
-// Partial: 68.5% (1102 of 1116 bytes). Still differing:
+// Decompiled by deepseek-v4.1. Names are provisional.
+// (previously: deepseek-v4.1-flash, GPT-6, space-bunny-free.)
+// Partial: 68.8% (1102 of 1116 bytes). Still differing:
 //  * entries lives in ESI where the original keeps it in EBX. Every other
 //    saved-mode difference here (the atoi index in ESI, oldmode in BL, mode in
 //    [esp+0x10] rather than EBX, and the tail's ebx/ecx/edx) is downstream of
 //    that one rotation. A throwaway `lay` local and moving the `n` and `mode`
-//    declarations around do not demote it.
+//    declarations around do not demote it. Swapping the types so oldmode is an
+//    int and mode an unsigned char also fails (67.9%).
 //  * the 0x37f2f bit 1 test: the original materialises `shr dl,1` and does
 //    `test al,dl`; every spelling tried folds to `test byte ptr [ecx+x],2`.
 //  * the players[d] address in the digit branch: the original splits it as
@@ -14,8 +15,10 @@
 //  * the mode/oldmode and g_game scratch registers of the tail block.
 // What did work (kept below): the third argument of FUN_004a1080 is an int,
 // not a char, so the reload of mode_2bf0 zero-extends through `xor edx,edx`
-// and `mov dl`; and `saved` is a 10-byte struct copy, which leaves the three
-// loads ahead of the three stores the original has.
+// and `mov dl`; `saved` is a 10-byte struct copy, which leaves the three
+// loads ahead of the three stores the original has; and the letter branch must
+// be written inverted (`if (c != 'a') { if (c == 'e') ... else goto; } else ...`)
+// so the 'a' body is out of line and the 'e' body is the fall-through.
 #include <windows.h>
 #include <string.h>
 #include <stdlib.h>
@@ -194,14 +197,16 @@ void __stdcall FUN_00493bf0(Gadget_00493bf0* gadget)
                     to = (char*)&g_game->players[d] + 0x2b;
                 } else {
                     int c = tolower(p[0]);
-                    if (c == 'a') {
+                    if (c != 'a') {
+                        if (c == 'e') {
+                            mode = 2;
+                            to = DAT_005093ec;
+                        } else {
+                            goto after;
+                        }
+                    } else {
                         mode = 1;
                         to = DAT_00508384;
-                    } else if (c == 'e') {
-                        mode = 2;
-                        to = DAT_005093ec;
-                    } else {
-                        goto after;
                     }
                     p += 2;
                 }

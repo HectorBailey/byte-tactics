@@ -1,13 +1,31 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6, finished by deepseek-v4.1-flash. Names are provisional.
-// Partial: 70.2% (best variant, unchanged). The one upstream cause left is a
-// register-allocation cascade: our `y` is spilled to stack slot E[0x18] and
-// the original keeps it in ebx, so panel and every later local sit 4 bytes
-// high. Every rewrite that moved this instead made it worse: draw block before
-// the cleanup guard (67.5), pointer-walk cleanup counter (65.6), char buf[80]
-// (69.5), y declared only for the outer loop (65.2). Rectangle stack slots and
-// the player-loop registers still differ. The score buffer is 100 bytes;
-// source corners are initialized before the translation calls, and
-// panel.right is restored after shading.
+// Decompiled by deepseek-v4.1. Names are provisional.
+// Started by deepseek-v4.1-flash, space-bunny-free and GPT-6; their first-line
+// credit was replaced by the exact required first line above.
+// Partial: 77.8% (check.py, 1451 bytes vs 1418). Frame is 0xd0 in both and
+// dst (0x2c), hr (0x4c), src (0x5c) and buf (0x7c) all land on the original
+// slots, but the panel rect is 4 bytes high: ours sits at [esp+0x1c] because
+// MSVC gives `y` a stack slot at [esp+0x18], while the original keeps y in ebx
+// and puts the panel at [esp+0x18].
+// Everything up to the panel (maxw [esp+0x10], i [esp+0x14], the animation
+// block, the first two text draws) matches instruction for instruction.
+// Also still different:
+//  - the original computes dst.p[1].x/dst.p[2].x as panel.left + maxw
+//    (mov eax,[esp+0x10]; add eax,ecx) with the store order
+//    p0.x,p3.x,p1.x,p2.x,p1.y,p0.y,p3.y,p2.y, which chained assignments
+//    (dst.p[2].x = dst.p[1].x = ...) reproduce; that variant scored 75.4%,
+//    because without the y slot the frame shrinks to 0xcc and everything
+//    shifts down 4 (see next point).
+//  - the cleanup loop: the original walks a Player* from players[0] with the
+//    counter in memory and is laid out out-of-line after the draw body
+//    (jmp 0x494dc0 from the search-loop exit); our indexed version inlines it
+//    at the search exit and uses [eax+edx+0x1b63] indexed loads.
+//  - with the cleanup written as a pointer walk plus chained dst stores, the
+//    compiler moves y into ebx (good) but then puts i in edx and the frame
+//    collapses to 0xcc (panel 0x14): 66.2%. The original needs y in ebx AND
+//    both maxw and i in memory, and reloads g_game in edx where useful.
+// Tried and worse: draw block moved before the cleanup guard (67.5),
+// pointer-walk cleanup counter (65.6), char buf[80] (69.5), y declared only
+// for the outer loop (65.2).
 #include <string.h>
 
 #pragma pack(push, 1)
