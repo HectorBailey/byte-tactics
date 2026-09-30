@@ -1,52 +1,13 @@
 // Decompiled by GPT-6, finished by space-bunny-free, edited by deepseek-v4.1. Names are provisional.
 // Credit: started by GPT-6, continued by space-bunny-free (left at 94.8%).
-// Partial: 94.8%. The only non-relocation difference is the order of two
-// instructions at 0x4ae7cc: the original emits `mov ebx, 2` and only then
-// `mov byte ptr [esp + 0x13], 9`; ours emits the store first.
-// Third pass tried (all came back 94.5-94.8%, or 91.5% for the helper):
-//   i = 2; tab = '\t'; do {...} while (--i)        -> store first
-//   tab = '\t'; i = 2; do {...} while (--i)        -> store first
-//   tab = '\t'; for (i = 0; i < 2; i++) call       -> store first
-//   int k = 2; tab = '\t'; do {...} while (--k)    -> store first
-//   i = 2, tab = '\t'; (comma expression)          -> store first
-//   for (i = 2, tab = '\t'; i; i--) call           -> store first
-//   i = 2; do { tab = '\t'; call; } while (--i)    -> store first, and the
-//       in-body store gets its own home at [esp+0x1f] (94.5%)
-//   i = 2; do { call; tab = '\t'; } while (--i)    -> `mov ebx, 2` first,
-//       but the store stays in the body at the latch, after the call
-//       (94.5%); this is the closest anyone has come
-//   static helper WriteTabs(out, n) inlined at the site -> 91.5%: inlining
-//       reallocates the locals (the buffer at [esp+0xe0] moves to
-//       [esp+0x144]), so the frame layout stops matching even though a
-//       helper body would explain the argument-materialised-first order.
-// Fourth pass (measured on /Fa listings, see build/scratch/0x4ae630):
-//   THE ORDER IS AN INLINING-BOUNDARY EFFECT, not a statement order. With
-//     static void __inline Tabs(out, n) { char t = '\t';
-//                                       do { W(out, &t, 1); } while (--n); }
-//     Tabs(out, 2);
-//   MSVC 5 emits `mov <reg>, 2` for the ARGUMENT at the inlining boundary and
-//   only then the fresh local's initialising store, which is exactly the
-//   original's order. With n = 1 it emits the same order, so the original's
-//   one-tab loops are NOT this helper: they are the plain form, which sinks
-//   the counter def into the preheader and so emits the store first. Two
-//   sites in one function may therefore use two different spellings.
-//   The store must be the INITIALISATION OF A FRESH LOCAL. Every other way of
-//   putting the store after the argument is scheduled before it:
-//     *t = '\t' with a char* parameter  -> store first
-//     char& parameter                  -> store first
-//     (tab = '\t', &tab) as argument 3 -> store first (even with the count
-//                                         as argument 2)
-//   Three inlined expansions of the helper share ONE stack slot, so the slot
-//   itself is not the problem. The blocker is that adding any extra local
-//   makes MSVC 5 hand out the 100-byte buffers in a different order: the
-//   buffer at [esp+0xe0] moves to [esp+0x144] and the four tail buffers are
-//   permuted (edit/list/empty/hot instead of hot/edit/empty/list). That
-//   permutation is NOT a function of the declaration order: permuting the
-//   declarations leaves it unchanged (build/scratch/0x4ae630/v6.cpp).
-// Conclusion: MSVC 5 sinks the loop counter's `mov ebx, 2` past a store that
-// precedes the loop, and only an inlined function's argument boundary gets in
-// front of it. Remaining hunks: 0x4ae7cc-0x4ae7d1 (this order) and 0x4aea8c
-// (jump table, relocation only).
+// MATCH. The last hunk was the two-tab loop, where the original emits
+// `mov ebx, 2` before `mov byte ptr [esp + 0x13], 9`; the cause is a
+// block-scope definition for both the counter and the char (`int j = 2;`
+// then `char t = '\t';` in one block), which MSVC 5 emits in source order.
+// Loops 1 and 3 must keep the plain `tab = '\t';` plus `for` spelling: an
+// assignment sinks behind the counter and stores first, which is what the
+// original does there. The three block-scope chars (t1, t2, t3) share the
+// one slot at [esp+0x13], so the frame is unchanged.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -67,7 +28,6 @@ void __stdcall FUN_004ad4f0(void*, Class_004bbbe0*, int);
 // FUNCTION: 0x4ae630
 void __stdcall FUN_004ae630(char* obj, char* name)
 {
-    char tab;
     int index;
     char button[100];
     char slider[100];
@@ -96,16 +56,20 @@ void __stdcall FUN_004ae630(char* obj, char* name)
         FUN_004accd0(out, 1);
         FUN_004bbbe0(out, "{\n", 2);
         sprintf(common, "[%s]", "COMMON");
-        tab = '\t';
-        for (int i = 0; i < 1; i++) FUN_004bbbe0(out, &tab, 1);
+        {
+            char t1 = '\t';
+            for (int i = 0; i < 1; i++) FUN_004bbbe0(out, &t1, 1);
+        }
         FUN_004bbbe0(out, common, strlen(common));
         FUN_004bbbe0(out, "\n", 1);
         FUN_004accd0(out, 2);
         FUN_004bbbe0(out, "{\n", 2);
         FUN_004ace50(p, out, 2);
-        i = 2;
-        tab = '\t';
-        do { FUN_004bbbe0(out, &tab, 1); } while (--i);
+        {
+            int j = 2;
+            char t2 = '\t';
+            do { FUN_004bbbe0(out, &t2, 1); } while (--j);
+        }
         FUN_004bbbe0(out, "}\n", 2);
         switch (*(unsigned char*)p) {
         case 0:
@@ -148,8 +112,10 @@ void __stdcall FUN_004ae630(char* obj, char* name)
             FUN_004acde0(out, "nuttin", _itoa(*(int*)(p + 0xb6), empty, 10), 1);
             break;
         }
-        tab = '\t';
-        for (i = 0; i < 1; i++) FUN_004bbbe0(out, &tab, 1);
+        {
+            char t3 = '\t';
+            for (int i = 0; i < 1; i++) FUN_004bbbe0(out, &t3, 1);
+        }
         FUN_004bbbe0(out, "}\n", 2);
     }
     FUN_004bb5d0(out);
