@@ -32,6 +32,26 @@
 // (the frame dominates), and changing the k4 loop counter from
 // unsigned short to int (the original compares the pointer offset against
 // 0x29f8, cmp bx,0xa here) drops to 77.1%.
+// deepseek-v4.1-flash: PlayerId_004568c0 written with early returns
+// (return id; / return -1;) instead of an `int id = -1;` assigned in an if.
+// That stops MSVC spilling `id` and raises 78.9% to 79.4% (1298 to 1308
+// bytes; the original is 1310).
+// The early-return PlayerId was the shared upstream cause: with `id` no
+// longer holding a stack slot, the k4 loop index can be a plain `int k4`
+// (was `unsigned short k4`), which reproduces the original's single
+// induction form and the exact 1310-byte size, 82.4%.
+// deepseek-v4.1-flash then split the readiness test into two separate ifs
+// (`if (res != 0) {...}` followed by `if (res == 0) {...}`) instead of
+// if/else. That reproduces the original's redundant `cmp edi,ebx; jne`
+// re-test at 0x456ba8 and stops MSVC hoisting `field_29a4[i]` into a
+// register, 82.4% to 83.4%.
+// Current state: 83.4%, exactly 1310 bytes. Remaining difference is still
+// the one 4-byte stack slot (sub esp,0x38 vs 0x34): `out` does not share
+// the index slot at esp+0x14. Everything at or below it (res esp+0x18,
+// cand esp+0x1c) and the k4 loop's induction registers follow from that.
+// headers.py changes nothing (all 128 sets 83.4%). The k4 loop still
+// spills its `int` counter to memory and uses edi for the 0x29d0 offset,
+// where the original keeps the counter in ebx and esi for the offset.
 #include <stdlib.h>
 #include <algorithm>
 
@@ -99,10 +119,9 @@ static inline unsigned char FindOccupied_004568c0() {
 }
 
 static inline int PlayerId_004568c0(unsigned char pi) {
-    int id = -1;
     if (pi != 10 && g_game->players[pi].state != 0)
-        id = g_game->players[pi].id;
-    return id;
+        return g_game->players[pi].id;
+    return -1;
 }
 
 // FUNCTION: 0x4568c0
@@ -164,7 +183,8 @@ int FUN_004568c0() {
                     ret = 0;
                     break;
                 }
-            } else {
+            }
+            if (res == 0) {
                 if (g_game->field_29a4[k3] == 0) {
                     ret = 0;
                     break;
@@ -173,7 +193,7 @@ int FUN_004568c0() {
         }
     }
     if (res != 0) {
-        for (unsigned short k4 = 0; k4 < 10; k4++) {
+        for (int k4 = 0; k4 < 10; k4++) {
             if (g_game->field_29d0[k4] == 0) {
                 unsigned char packet[2];
                 packet[0] = 0x1e;
