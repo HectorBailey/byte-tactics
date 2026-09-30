@@ -1,4 +1,39 @@
 // Decompiled by deepseek-v4.1-flash, finished by space-bunny-free and deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
+// Third pass (deepseek-v4.1, issue 1962): 79.3 kept as best. Flipped the reindex loop address spelling three ways (g_game + 0x1b63 + off, off + g_game + 0x1b63, g_game + (0x1b63 + off)); all emit the same `[eax + ecx + 0x1b63]` SIB with base=off/eax while the original encodes base=g_game/ecx, although g_game is in ecx in ours too, so the base/index pick is not reachable from the expression form. Everything below still stands.
+
+// Fourth pass (space-bunny-free, issue 1962): confirmed 79.3% with a real
+// check.py run and could not move it. Root cause of the largest remaining
+// cluster (four diffs in three blocks) identified below: `pl` is only ever
+// USED through its own address at one point, 0x44a759 `mov al,[ebp+0x22]`
+// right after 0x44a749 `lea ebp,[esi+eax*2+0x1b63]`. MSVC 5 folds that
+// single read back into the g_game-relative form
+// (`mov cl,byte ptr [esi+eax*2+0x1b85]`), so the register live range of `pl`
+// has a hole from 0x44a750 to 0x44a933 and the allocator never gives it ebp.
+// The original's ebp range is continuous, which is why it reloads
+// `mov ebp,[esp+0x14]` at 0x44a92f and uses `[ebp+0x27]` at 0x44a956 and
+// 0x44ac23. Since the fold is what breaks the range, every change to pl's
+// type or spelling is a dead end; it needs a source form in which the first
+// read cannot be re-derived from g_game, which MSVC 5's CSE does not permit
+// (brief item 18: an inlined function boundary is not a CSE boundary).
+// Tried this pass, all scored with check.py --sym, none above 79.3:
+// - pl: reading the field through a named byte local (79.3, no change),
+//   `&pl->field_22` (79.3), assigning `pl` at the top of the function so the
+//   range starts earlier (74.8, the whole block moves), and a second identical
+//   pointer value to defeat the CSE (15.9, the compiler duplicates the body).
+// - MAXUNITS/METAL/ENERGY: one named local per value (78.1), only the maxunits
+//   value (79.3, no change), and reading all three through the existing `u2`
+//   instead of repeating `g_game->players[b2].data` (77.7). The original uses
+//   edi,edi,esi for those three temporaries and we use edx,edx,eax: the value
+//   temporaries want callee-saved registers and eax is free in our version.
+// - the reindex loop: reversing every addend order so the compiler picks
+//   base=g_game/index=off (79.3, it ignores the addend order), and spelling
+//   the byte store as `((unsigned char*)(g_game+0x1b63+off))[0x146]` so the
+//   address tree differs from the compare (79.3). The extra
+//   `lea edx,[eax+ecx+0x1ca9]` is a speculative hoist MSVC emits for the
+//   `= i` store only; the `= 10` store never uses it, in ours or the original.
+// - the `w[0x63] < *(*(unsigned short**)(w+0xbe))-1` compare: naming both
+//   operands as locals gives the exact original size, 2340 bytes, but scores
+//   72.7 because the surrounding block then reorders.
 // Second worker pass (deepseek-v4.1, issue 1962): 79.0 -> 79.3, still 2333 bytes
 // against the original 2340. Fixed here: the LOGO text rect pair must be
 // (rect.left + rect.right) for x but (rect.bottom + rect.top) for y, which
@@ -260,16 +295,16 @@ void FUN_0044a680()
 
                 int i = 0;
                 for (int off = 0; off <= 0xcee; off += 0x14b, i++) {
-                    int v = *(int*)((char*)g_game + 0x1b63 + off);
+                    int v = *(int*)((char*)g_game + (0x1b63 + off));
                     if (v != 0) {
-                        unsigned char f73 = *(unsigned char*)((char*)g_game + 0x1bd6 + off);
+                        unsigned char f73 = *(unsigned char*)((char*)g_game + (0x1bd6 + off));
                         if ((f73 == 1 || f73 == 2 || f73 == 3) &&
-                            *(unsigned char*)((char*)g_game + 0x1ca9 + off) != 10)
-                            *(unsigned char*)((char*)g_game + 0x1ca9 + off) = (unsigned char)i;
+                            *(unsigned char*)((char*)g_game + (0x1ca9 + off)) != 10)
+                            *(unsigned char*)((char*)g_game + (0x1ca9 + off)) = (unsigned char)i;
                         else
-                            *(unsigned char*)((char*)g_game + 0x1ca9 + off) = 10;
+                            *(unsigned char*)((char*)g_game + (0x1ca9 + off)) = 10;
                     } else {
-                        *(unsigned char*)((char*)g_game + 0x1ca9 + off) = 10;
+                        *(unsigned char*)((char*)g_game + (0x1ca9 + off)) = 10;
                     }
                 }
                 A = savedA;
@@ -415,15 +450,14 @@ void FUN_0044a680()
     }
 }
 
-// Remaining differences (best 74.4%, ours 2218 bytes vs original 2340):
+// Remaining differences (best 79.3%, ours 2333 bytes vs original 2340):
 // - Register allocation is one step off through the whole function. The
 //   original holds `entries` in ebx and `pl` in ebp (it spills ebp at
-//   0x44a750 and reloads it with `mov ebp,[esp+0x14]` at 0x44a92f); we spill
-//   `pl` to [esp+0x1c] and re-read it, so the swap loop's A/end run in
-//   ecx/edx like the original but `entries` and `end` swap stack slots
-//   (ours 0x1c/0x18, original 0x18/0x1c). Per technique 2 in the brief this
-//   is ONE allocator state, not three problems: nothing tried (reordering the
-//   declarations of pl/entries, hoisting b2 to function scope) moved it.
+//   0x44a750 and reloads it with `mov ebp,[esp+0x14]` at 0x44a92f); we hold
+//   `entries` in ebx and spill `pl` to [esp+0x14], so the swap loop's A/end run
+//   in ecx/edx like the original but `pl` costs a reload at 0x44a92f, 0x44a956
+//   and 0x44ac23. See the top of the file: the fold of the one early
+//   `pl->field_22` read is what keeps pl out of a register.
 // - The first condition reloads g_game after the test in ours and before it
 //   in the original (`mov eax,[g_game] / test eax,eax / jne`).
 // - The reindex loop after each swap: the original tests the dword at
@@ -431,6 +465,13 @@ void FUN_0044a680()
 //   materialises the +0x1ca9 address; ours loads both up front and emits one
 //   extra `lea edx,[eax+ecx+0x1ca9]`. Rewriting it as
 //   `g_game->players[i]` with a do-while scored 73.4, so the raw offsets stay.
+// - the `DAT_00512994` branch: re-measured this pass. Inverting the test to
+//   `if (DAT_00512994 == 0) { FUN_004455b0(); } else { <loop> }` does give the
+//   original's `test / jne LOOP / call / jmp JOIN` shape, but MSVC then sinks
+//   the whole loop out of line (to 0x44ae58) instead of placing it just after
+//   the call, and drops the `mov ebx,[esp+0x18] / mov ebp,[esp+0x14]` pair at
+//   the loop exit, for 69.0%. Keeping `!= 0` costs only the two-instruction
+//   hunk, so it stays.
 // - `(r != 0) ? 4 : 0` at 0x44af80 compiles to neg/sbb/and; the original has
 //   `test al,al / setne bl / and ebx,1 / shl ebx,2 / or edx,ebx`. A
 //   `unsigned int bits; if (r) bits=1; else bits=0; bits<<=2;` self-correction

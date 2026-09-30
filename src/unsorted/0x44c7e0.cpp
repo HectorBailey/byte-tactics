@@ -27,6 +27,23 @@
 //  swap and the downstream tail schedule resist every source shape tried; the
 //  variant that wins item offset in edi does so by giving the desc gadget ebp
 //  instead of ebx, which costs more than it gains.
+// Second session (deepseek-v4.1-flash) confirmed this baseline at 84.6% and
+// tried: (W1) moving "int n = 0;" out of the declaration into a plain
+// "n = 0;" statement (identical 1596 bytes, the merge with xor edi,edi is not
+// source-order driven); (W2) using the scrollPanel local for the
+// FUN_0044bfd0/FUN_0049fa90 pair, which is what the original does (esi holds
+// g_game+0x519 from 0x44cc38), gives 1592 bytes, only 6 over the original and
+// the tail hunks shrink, but the score drops to 80.5% because idx and the
+// panel then trade registers over the whole tail (the original keeps idx in
+// edi and the panel in esi; ours gets idx in esi); (X1) the index form
+// g_game->items[i] on top of W2 is byte-identical to W2 (1592); (X2) an item
+// pointer walk (item = items+1, item += 0x249) on top of W2 drops to 77.6%
+// (1533 bytes). The scan loop's ebp/edi swap (ours: xor edi,edi merged with
+// the count store, item offset in ebp; original: mov [esp+0x14],0 immediate,
+// xor ebp,ebp record offset, mov edi,0x249 item offset) is unchanged by every
+// shape tried, so it is the register allocator's global choice, not the
+// source. Kept: this 84.6% version, because the orchestrator scores by the
+// percentage.
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
