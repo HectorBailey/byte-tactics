@@ -1,8 +1,9 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6. Names are
-// provisional. Gave up at 56.1% (2289 bytes against 2173). Correct the double division of the
-// compacted pointer difference, 16-entry insertion-sort prefix, comparison direction, cached sort
-// end, signed shift and full-width loading counters. The inherited 74.8% version had semantic
-// errors. Remaining frame size, registers, GUI suffix-loop rotation and stack slots differ.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6, finished by deepseek-v4.1-flash. Names are provisional.
+// Best result 82.9% (2257 bytes against 2173). Corrected the compaction polarity (keep elements
+// with bit 23 set), the class loop to a do-while, the index loop to a do-while, and the unit and
+// sidedata loop counters to unsigned short. Remaining: the GUI suffix loop is rotated by /O2 (the
+// original is not), the compaction has a different branch layout and spills d, and the unit loop
+// caches the type count in a register where the original reloads it.
 #include <string.h>
 #include <stdio.h>
 
@@ -202,7 +203,7 @@ void FUN_0042d2e0() {
         Class_00440320* cls = Class_00440290::DAT_00512358.entries;
         Class_00440320* cls_end = &Class_00440290::DAT_00512358.entries[32];
         int i = 0;
-        while (cls < cls_end) {
+        do {
             sprintf(classbuf, "CLASS%d", i);
             ((Class_004c3e10*)&parser)->FUN_004c3e10();
             if (((Class_004c3410*)&parser)->FUN_004c3410(classbuf)) {
@@ -213,7 +214,7 @@ void FUN_0042d2e0() {
             }
             cls++;
             i++;
-        }
+        } while ((int)cls < (int)cls_end);
         ((Class_004c3240*)&parser)->FUN_004c3240();
     }
 
@@ -233,8 +234,7 @@ void FUN_0042d2e0() {
             scale = (float)d;
     }
     int size = (int)(v * scale);
-    size = (size + 0xfff) & 0xfffff000;
-    ((Class_00458180*)g_game->field_1437b)->FUN_00458180(size);
+    ((Class_00458180*)g_game->field_1437b)->FUN_00458180((size + 0xfff) & 0xfffff000);
 
     FUN_004d8780(g_game->field_1439b);
 
@@ -242,21 +242,22 @@ void FUN_0042d2e0() {
     Class_0042b370* start = g_game->field_1439b + 1;
 
     Class_0042b370* p = start;
-    Class_0042b370* d = end;
-    if (p != end) {
-        while (~(p->flags.value) & 0x800000) {
-            if (++p == end)
+    Class_0042b370* d;
+    if (p == end) {
+        d = p;
+    } else {
+        do {
+            if (~(p->flags.value) & 0x800000)
                 break;
-        }
+            p++;
+        } while (p != end);
         d = p;
         if (p != end) {
-            Class_0042b370* s = p + 1;
-            while (s != end) {
-                if (~(s->flags.value) & 0x800000) {
+            for (Class_0042b370* s = p + 1; s != end; s++) {
+                if (!(~(s->flags.value) & 0x800000)) {
                     *d = *s;
                     d++;
                 }
-                s++;
             }
         }
     }
@@ -286,10 +287,10 @@ void FUN_0042d2e0() {
     {
         unsigned short index = 0;
         if (g_game->field_1438f > 0) {
-            while ((int)index < g_game->field_1438f) {
+            do {
                 g_game->field_1439b[index].field_21e = index;
                 index++;
-            }
+            } while ((int)index < g_game->field_1438f);
         }
     }
     int c = g_game->field_1438f;
@@ -303,9 +304,9 @@ void FUN_0042d2e0() {
 
     g_game->field_14377 = (void**)FUN_004d83b0("MODEL PTRS", g_game->field_1438f * 4);
 
-    for (int u = 1; u < g_game->field_1438f; u++) {
+    for (unsigned short u = 1; u < g_game->field_1438f; u++) {
         Class_0042b370* type = &g_game->field_1439b[u];
-        g_game->field_38d71 = (unsigned char)((int)(u * 100) / g_game->field_1438f);
+        g_game->field_38d71 = (unsigned char)((u * 100) / g_game->field_1438f);
         type->field_21e = u;
         FUN_004290f0(path, "units", type->name, "FBI");
         if (FUN_004bbc40(path))
@@ -362,7 +363,7 @@ void FUN_0042d2e0() {
         FUN_004b6290("Can't load GAMEDATA.TDF");
     } else {
         short* list = (short*)FUN_004d83b0("TEMP UTYPE LIST", 0x3c);
-        for (int s = 1; s < g_game->field_1438f; s++) {
+        for (unsigned short s = 1; s < g_game->field_1438f; s++) {
             Class_0042b370* type = &g_game->field_1439b[s];
             type->field_152 = 0;
             type->field_156 = 0;
