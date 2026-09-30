@@ -1,22 +1,43 @@
-// Decompiled by Claude Sonnet 5.5, finished by GPT-6, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol. Names are provisional.
-// Retry #1766: GPT-6.1-sol confirmed the bool `credited` variant at 63.0% after eight worker invocations; final batch did not MATCH.
-// Partial: 63.0% (1916 vs 1964 bytes). Body structure is right; the whole
-// function differs by callee-saved register allocation, which cascades.
-// Remaining hunks by original address:
-//   0x4866d0  cmd arg goes to ebp, original keeps it in ebx; original loads
-//             ebx immediately after `push ebx`, we push ebx+ebp then load ebp.
-//             Consequence: original never caches g_game in a register, ours
-//             keeps g_game in ebx (e.g. 0x486832 edx vs ebx, 0x4869d1 ecx vs
-//             ebx). Root is 4 live callee-saved values (cmd, unit, credited,
-//             g_game) vs the original's 3; g_game caching pushed cmd to ebp.
-//   0x4867da  depth temporary: original stores cl to [esp+0x14], reloads dword
-//             and `and edx,0xff`; we keep it in a register and push directly.
-//   0x486a98  case 3/leaderboard: original keeps rec in [esp+0x80] and reloads;
-//             ours restructured the FUN_00435100 calls with a value cache.
-//   0x486c74  g_game bit test 0x37f06 (>>7 &1) register differs.
-// Tried: unsigned char depth local (dropped to 56.8%, reverted), swapping the
-// unit/credited declaration order (no change).
-
+// Decompiled by Claude Sonnet 5.5, finished by GPT-6, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by space-bunny-free. Names are provisional.
+// Retry #1766, pass 2 (space-bunny-free, 900s budget): 64.7%, still no MATCH.
+// Improvements this pass: the g_game+0x37eee arms are DOUBLE literals (-0.5/-0.7,
+// not float) and are spelled as a switch, which is what gives the original
+// `sub ecx,0 / je` + `dec ecx / jne` chain instead of two `test` compares (+1.7).
+// Still wrong, by original address:
+//   0x4866d0  callee-saved allocation. Original: esi=unit, ebx=cmd, edi=credited, and
+//             g_game is never cached. Ours: esi=unit, edi=cmd, ebp=g_game (kept live
+//             across calls), credited in bl. The tail then re-reads cmd from [esp+0x7c]
+//             twice where the original keeps one register copy (0x486c9e, 0x486d24).
+//             Every diff below is downstream of this one cause.
+//   0x4867da  depth temp: the original stores cl to [esp+0x14], reloads the dword and
+//             `and edx,0xff`; we keep it in a register. An `unsigned char depth` local
+//             does produce that store/reload shape but scores 57.0% on its own,
+//             because the extra spill re-shuffles the already wrong allocation.
+//   0x486a98  leaderboard: the original spills rec to [esp+0x80] and rank to [esp+0x10]
+//             and holds mine in a register (movsx edi,ax); we spill mine instead.
+//             Modelling rank/best as int gets the size right (1956 vs 1964) but scores
+//             50.8%, so unsigned char is right and the spill is a downstream effect.
+// Tried and did NOT work (free scratch scores, 63.0% baseline):
+//   unsigned char depth local                 57.0%
+//   bitfield union for unit+0x110             61.5%
+//   int rank / int best in the leaderboard   50.8% / 54.1%
+//   `mine > theirs` instead of `theirs<mine`  no change
+//   signed char for the (x>>6)&1 test        no change
+//   int t for the rank-bump loop              no change
+//   caching cmd[10] in a local               53.4%
+//   swapping the unit/credited decl order    no change
+//   keeping `parent` live across the calls   58.9%
+//   int credited instead of bool             63.7%
+//   second g_game local mid-function (CSE
+//     split, brief item 18)                  57.6%
+//   second g_game local at the top           55.4%
+//   unsigned char depth on top of v5         58.7%
+//   unsigned char depth = c?3:0; depth += 3  63.2%
+//   bitfield union for unit+0x110 on v5      63.3%
+//   same with b4/b5 as two 1-bit fields      63.3%
+// Next lever to try: the original spills `rec` to the param slot [esp+0x80] and
+// `rank` to [esp+0x10]; ours puts `mine` at [esp+0x10]. Whoever owns the spill
+// slot is decided by the same callee-saved question as the top of the function.
 extern void* g_game;
 extern char DAT_00508be8[];
 extern char DAT_00508bf0[];
@@ -220,12 +241,17 @@ void __stdcall FUN_004866d0(unsigned char* cmd, int param)
         void* vt = (void*)at<int>(at<char*>(unit, 0xf0), 0xec);
         if (*(int*)vt == 0 || at<char>(vt, 0x73) != 2) {
             f = f + at<float>(at<char*>(unit, 0xf0), 0xd4);
-        } else if (at<int>((void*)g_game, 0x37eee) == 0) {
-            f = at<float>(at<char*>(unit, 0xf0), 0xd4) - f * -0.5f;
-        } else if (at<int>((void*)g_game, 0x37eee) != 1) {
-            f = f + at<float>(at<char*>(unit, 0xf0), 0xd4);
         } else {
-            f = at<float>(at<char*>(unit, 0xf0), 0xd4) - f * -0.7f;
+            switch (at<int>((void*)g_game, 0x37eee)) {
+            case 0:
+                f = at<float>(at<char*>(unit, 0xf0), 0xd4) - f * -0.5;
+                break;
+            case 1:
+                f = at<float>(at<char*>(unit, 0xf0), 0xd4) - f * -0.7;
+                break;
+            default:
+                f = f + at<float>(at<char*>(unit, 0xf0), 0xd4);
+            }
         }
         at<float>(at<char*>(unit, 0xf0), 0xd4) = f;
     }

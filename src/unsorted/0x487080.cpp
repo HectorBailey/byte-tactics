@@ -1,13 +1,21 @@
-// Decompiled by DeepSeek V4.1 Flash, finished by GPT-6, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol. Names are provisional.
-// Retry #1766: GPT-6.1-sol confirmed the `int player` variant at 59.9% after eight worker checks; final batch did not MATCH.
-// Partial: best score 59.9% after changing the reused player value from
-// unsigned char to int. Direct check.py runs: 8; no MATCH.
-// Remaining differences include the first loop's register allocation
-// (original: n in esi, found in ebp, i spilled to [esp+0x10]; ours: n in ebp,
-// i in esi, found in a byte local), player argument register rotation, repeated
-// flag-copy register allocation, record-field stack offsets, piece-copy anchors,
-// and the epilogue xor/pop order. An int found flag dropped to 45.5%; keeping
-// found as bool and player as int is the best tested version.
+// Decompiled by DeepSeek V4.1 Flash, finished by GPT-6, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by deepseek-v4.1-flash. Names are provisional.
+// Retry #1766 deepseek-v4.1-flash: 60.6%. The single gain was fixing the
+// order-count and FUN_0043de30 guard to the correct record fields: the count
+// is rec+0x23 (f23) and the guard is rec+0x27 (f27), not rec+0x33. The old
+// attempt read +0x33 for both, which is the second coordinate of rec.pos.
+// Tried and rejected (all scored on scratch, worse than 60.6): removing the
+// `player` local and recomputing (rec.flags>>4)&3 twice (41.3); modelling
+// rec+0x2b..+0x3b as Vec3 pos plus an {int,short} sub-struct copied whole
+// (47.1); `char` instead of `unsigned char` for rec+0x8d combined with the
+// Script%i argument (59.6); an explicit `else p = 0;` after operator new
+// (46.6); `int found` (46.6). Note `Script%i` in the original takes the search
+// index i, not rec+0x3b, and rec+0x8d is sign-extended at the FUN_0048aac0
+// call, but both changes only ever cost points at this compiler state.
+// Remaining differences: first loop register allocation (original n in esi,
+// found in ebp, i spilled to [esp+0x10]; ours n in ebp, i in esi, found in a
+// byte local), the FUN_00485f50 argument register rotation, the 0x110 flags
+// block rotation, the 3x piece-copy anchors, and the failure epilogue's
+// xor/pop order.
 
 extern "C" int sprintf(char* buf, const char* fmt, ...);
 
@@ -22,7 +30,8 @@ struct SaveRec_00487080 {
     char name[0x20];
     unsigned char player;                    // +0x0
     unsigned short id;                  // +0x21
-    char gap_23[0x2b - 0x23];
+    int f23;                            // +0x23
+    int f27;                            // +0x27
     int f2b;                            // +0x2b
     int f2f;                            // +0x2f
     int f33;                            // +0x33
@@ -282,13 +291,13 @@ Unit_00487080* __stdcall FUN_00487080(unsigned short id, Class_004b4560* file)
     unit->flags = u;
 
     ((Class_00401110*)&unit->info)->FUN_00401110(unit, file);
-    if (rec.f33 != 0)
+    if (rec.f27 != 0)
         ((Class_0043d210*)unit->vtable)->FUN_0043de30(unit, file);
 
     Order_00487080** normal=(Order_00487080**)&unit->listHead;
     Order_00487080** special=(Order_00487080**)&unit->listTail;
     int k = 0;
-    if (rec.f33 > 0) {
+    if (rec.f23 > 0) {
         do {
             sprintf(name, "u%04xm%04x", unit->id, k);
             Order_00487080* p = (Order_00487080*)operator new(0x56);
@@ -297,7 +306,7 @@ Unit_00487080* __stdcall FUN_00487080(unsigned short id, Class_004b4560* file)
             if (p->flags & 0x40000) { *special=p; special=&p->next; }
             else { *normal=p; normal=&p->next; }
             k++;
-        } while (k < rec.f33);
+        } while (k < rec.f23);
     }
     if (unit->listHead != 0)
         ((Class_004388b0*)unit->listHead)->FUN_004388b0();
