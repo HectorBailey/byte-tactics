@@ -1,20 +1,26 @@
 // Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
 // Earlier attempt by deepseek-v4.1-flash, finished by GPT-6; continued here.
-// Best 72.0% (2756 bytes, exactly the original size), up from the 71.0% the
-// previous attempt left. Remaining diff hunks: the 0x449c21 tests materialise
-// flag97 as `and bl,1` and branch on the flags where the original masks the
-// whole register (`and ebx,1; cmp bx,si`), which needs a 16-bit local, but
-// making flag97 short costs every later use and drops the score to 67.6; the
-// 0x449fd0 bit writes pick cx/dx opposite to the original (length-neutral: the
-// else-if block wants `mov cl,[..]; and ecx,1; shl`, ours widens through
-// `and cl,1; mov dl,cl`); the 0x449e15 player lookup folds to 0x1b8a where the
-// original builds `players[i].data` as lea 0x1b63 + load [..+0x27] (an explicit
-// slot pointer and a struct member both fold back, so the source shape stays
-// unknown); one region spills edi that the original keeps live.
-// Tried and rejected: short flag97 (67.6), int locals for the five else-if bit
-// writes (67.6), --v in the DAT_00512d78 guard (71.6), struct-typed players
-// array (71.6), bool locals (67.6), recomputing the list expression at every
-// later use (63.6).
+// Best 72.1% (2764 bytes; frame is 0x2c where the original allocates 0x28).
+// The two field_97 sites drove the gain: the original keeps the branch flag in
+// a 16-bit register (`mov bl,[ebp+0x97]; and ebx,1; cmp bx,si` at 0x449c21,
+// `test bx,bx` at 0x44a005 and 0x44a162), while the value passed to
+// FUN_0046c8e0 at 0x44a124 is a SEPARATE 4-byte local (`mov al,[ecx+0x97];
+// and eax,1; movsx edx,ax; push edx; mov [esp+0x24],eax`), so the source has
+// two variables: `short flag97` for the branches and an `int flagStart` cast
+// to short at the call. Splitting them raised 72.0 to 72.1.
+// Remaining diff: flag97 gets a write-through home slot (`mov [esp+0x20],ebx`)
+// and its mask runs in CL (`and cl,1; mov bl,cl`) where the original masks EBX
+// directly, which is also where the extra 4 bytes of frame go; the 0x1b8a
+// player lookup folds where the original builds lea 0x1b63 then loads [.+0x27];
+// the 0x449fd0 else-if bit writes pick cx/dx opposite to the original; the
+// DAT_00512d78 guard uses lea plus the test flags where the original has
+// dec eax; test eax,eax; jl; and one later region spills edi.
+// Tried and rejected: short flag97 alone (67.6), int flagStart alone (71.3),
+// unsigned short flag97 or an explicit (short) cast (both 72.1, no change),
+// moving the text buffer's declaration into its block (no change), --v in the
+// DAT_00512d78 guard (71.6), struct-typed players array (71.6), int locals for
+// the five else-if bit writes (67.6), bool locals (67.6), recomputing the list
+// expression at later uses (67.9).
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -164,7 +170,7 @@ void FUN_00449bb0(void)
     int metalVal = 1000;
     void* holder = 0;
     int local_1c = 0;
-    char flag97 = 0;
+    short flag97 = 0;
     char text[20];
 
     DAT_00512994 = 0;
@@ -315,8 +321,8 @@ L_a042:
     sprintf(mem->text, "%d",
             *(unsigned short*)(*(int*)(g_game + *(unsigned char*)(g_game + 0x2a42) * 0x14b + 0x1b8a) + 0x99));
 
-    flag97 = (*(unsigned char*)(*(int*)(g_game + *(unsigned char*)(g_game + 0x2a42) * 0x14b + 0x1b8a) + 0x97)) & 1;
-    FUN_0046c8e0((short)flag97);
+    int flagStart = (*(unsigned char*)(*(int*)(g_game + *(unsigned char*)(g_game + 0x2a42) * 0x14b + 0x1b8a) + 0x97)) & 1;
+    FUN_0046c8e0((short)flagStart);
 
     int startArg = ((Class_0046e000*)*(int*)(g_game + 0x2a30))->FUN_0046e000();
     FUN_004a0570(g_game + 0x519, "START", startArg);
