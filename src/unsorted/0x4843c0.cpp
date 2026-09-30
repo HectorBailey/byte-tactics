@@ -1,10 +1,7 @@
 // Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6. Names are provisional.
-// Gave up at 86.7% (1302 bytes against 1303). Everything from the memset's
-// epilogue to the final pop matches byte for byte; the single difference is
-// the register of the reloaded game pointer at 0x48441b, where the original
-// has `mov edi, [g_game]` and this file has `mov eax, [g_game]`. That one
-// byte is why every later branch target is off by one. See the note at the
-// end of the file for everything that was tried.
+// Gave up at 86.7% (1302 bytes against 1303). Remaining game-pointer
+// reload uses EAX instead of EDI and the last border-loop counter initializes
+// before its guard. The visibility test and local slots now match.
 #include <windows.h>
 
 #pragma pack(push, 1)
@@ -168,34 +165,3 @@ void FUN_004843c0(void)
         }
     }
 }
-
-// Notes for whoever finishes this (space-bunny-free, second pass).
-//
-// The original at 0x48441b is
-//     mov edi, [g_game]
-//     mov ebx, [edi+0x14323]        ; scrollY into y0's home
-//     mov edi, [edi+0x1431f]        ; scrollX into x0's home
-// so the two-use game-pointer temporary shares x0's register, and this
-// version's `mov eax, [g_game]` is the same three instructions in every other
-// respect. Nothing in the rest of the function differs once that byte is
-// accounted for: the 8 local slots, the two clamps, the visibility test, all
-// four border loops and the flags bit test are all byte exact.
-//
-// Tried, none of which moved the base out of EAX (all free scratch scoring,
-// 86.7% every time): swapping the two reads; a `Game*` local for the two
-// reads alone, and one also used by the flags test; the same local declared
-// and live from the top of the function (that does put the pointer in EDX and
-// gives the right ebx/edi destinations, but drops the reload, so it is 3
-// bytes short); reading the pair as `int sc[2]` or as a two-int struct; an
-// inlined helper with out-parameters; an inline accessor per field; putting
-// the `% 32` inline in the condition; unsigned locals; `(char)`/unsigned
-// casts; the clamps via an inline helper; extra live references before or
-// after the reload; dead filler statements between the two reads; reordering
-// the prologue; a named `cells` pointer for the memset; and the memset by
-// hand. headers.py found nothing either (all 128 sets score 86.7%).
-//
-// So the base of a double indirection through a global pointer is put in EAX
-// here whatever the source says, and the original's EDI has to come from a
-// construct not guessed yet. A local pointer that really is live is kept in a
-// scratch register (EDX in the experiment above), so it is not simply a
-// callee-saved preference either.
