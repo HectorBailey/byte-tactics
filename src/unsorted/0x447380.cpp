@@ -57,6 +57,29 @@
 // uninitialised `int i; int n;` above it: that is what moved this file 92.7% to
 // 93.5% by putting `xor esi,esi`/`xor edi,edi` and the two stack stores in the
 // original's order.
+//
+// deepseek-v4.1 retry 3 (issue 1876), all still 93.5% with the same one hunk:
+// adding ONE extra FUN_004a0570 call (two scratch allocations) anywhere in the
+// loop-top block leaves the whole condition block byte-identical AND leaves the
+// second sprintf group at eax, so the rotation here is not a running
+// per-allocation counter threaded through block A; an inline
+// SetNames(a,b,c,d,k) helper used only for the `n` group is not inlined and
+// changes the bytes; `char`/`unsigned` retypes of active, type, field_144,
+// field_146, field_96, field_0, flags_9b, flags_2a44, field_1b, field_be and
+// field_c8 are all inert (field_96 signed is the only byte change, -4 bytes);
+// `p = g_game->players + i`, `(int)n`/`(int)i` casts, `&player[0]`,
+// `(char*)player`, a `bool` IsPlaying, `IsPlaying(p) != 0`, a second `int act2`
+// local, the positive `!IsPlaying || ... continue` chain, nested ifs, and
+// `0xff != p->info->field_96` / `!(... == 0xff)` are all inert too. What is left
+// is exactly one unmodelled allocator seed for the `n` group; the fact that an
+// extra call in the loop-top block does not move it means the seed comes from
+// the source tree shape of that group, not from accumulated allocations.
+// Also inert: a visible allocation right at the head of the `n` group
+// (`int z = p->field_140; if (z > 0x7ffffffe) continue;`, 83.7% but the first
+// sprintf still gets eax), dummy static inline helpers before the function, and
+// reading flags_9b/field_96 through a `char*`/`void*` info field. `if (!act)`
+// may become `if (act == 0)` (inert) but the SECOND active test must re-read
+// `p->active` (`if (act == 0)` there costs 81.5%).
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
