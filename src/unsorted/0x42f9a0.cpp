@@ -1,8 +1,25 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6; retry confirmed by deepseek-v4.1-flash. Names are provisional.
 // GPT-6 retry: 96.9%, not MATCH. Prefix/tail inline helpers, registry return
 // types and register-qualified zero/counter variants do not improve it.
 // Remaining differences are the initial zero register and final zero tests.
 // Partial: 96.9%. Corrected missing Sound Mode default to 1 or 2, restructured the final flag branch and corrected callee return types. Early zero register is ebp instead of ebx; final zero tests and stores still differ.
+//
+// deepseek-v4.1-flash retry (confirmed 96.9%, 5470 vs 5472 bytes): the entire
+// residual is that the original keeps the constant 0 in a callee-saved
+// register and COMPARES the FUN_004b69d0 result against it:
+//   early region  cmp eax,ebx   (ebx = 0 held from 0x42f9be)
+//   tail region   xor esi,esi / cmp eax,esi
+// Our build folds every one of those to `test eax,eax` and reuses the call
+// result for the `value = 0` store, so the zero never gets a register and the
+// early `= 0` stores / `push 0` come from ebp instead of ebx. Tried and all
+// scored exactly 96.9%: tools/headers.py (128 sets), an N-unused-declaration
+// sweep from 0 to 500, a named `int zero = 0;` used as the comparison operand
+// and default in the affected regions, a file-scope `static const int zero`,
+// `!= (zero = 0)` assignment expressions, and defining the real preceding
+// functions (0x42f980, 0x42f960) above this one. Every spelling of the zero
+// constant constant-folds here, so the comparison can never become
+// `cmp eax,reg`. Suspect the original compared against a genuine variable
+// (or was built with different compiler state) rather than a literal.
 
 #include <windows.h>
 #include <stdio.h>

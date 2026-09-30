@@ -128,11 +128,10 @@ void FUN_0042dcf0()
                 if (parser.current->FUN_004c48c0(unitbuf, "UNITMENU", 0x20, DAT_005119b8)) {
                     for (unsigned short u = 0; u < g_game->unitDefCount; u++) {
                         if (_strcmpi(g_game->unitDefs[u].name, buf) == 0) {
-                            BuildEntry_0042dcf0* e = &g_game->buildLists[i].entries[j];
-                            e->typeId = u;
-                            e->page = (unsigned char)parser.current->FUN_004c46c0("MENU", 0);
-                            e->slot = (unsigned char)parser.current->FUN_004c46c0("BUTTON", 0);
-                            parser.current->FUN_004c48c0(e->name, "UNITNAME", 0x20, DAT_005119b8);
+                            g_game->buildLists[i].entries[j].typeId = u;
+                            g_game->buildLists[i].entries[j].page = (unsigned char)parser.current->FUN_004c46c0("MENU", 0);
+                            g_game->buildLists[i].entries[j].slot = (unsigned char)parser.current->FUN_004c46c0("BUTTON", 0);
+                            parser.current->FUN_004c48c0(g_game->buildLists[i].entries[j].name, "UNITNAME", 0x20, DAT_005119b8);
                             break;
                         }
                     }
@@ -144,28 +143,27 @@ void FUN_0042dcf0()
 
     FUN_004d8780(g_game->unitDefs);
     for (unsigned short u = 0; u < g_game->unitDefCount; u++) {
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < g_game->buildLists[i].count; j++) {
-                if (g_game->buildLists[i].entries[j].typeId == u) {
-                    unsigned char page = g_game->buildLists[i].entries[j].page;
-                    if (g_game->unitDefs[u].field_22e < page)
-                        g_game->unitDefs[u].field_22e = page;
+        for (int c = 0; c < n; c++) {
+            for (int d = 0; d < g_game->buildLists[c].count; d++) {
+                if (g_game->buildLists[c].entries[d].typeId == u) {
+                    if (g_game->unitDefs[u].field_22e < g_game->buildLists[c].entries[d].page)
+                        g_game->unitDefs[u].field_22e = g_game->buildLists[c].entries[d].page;
                 }
             }
         }
     }
     FUN_004d8710(g_game->unitDefs);
 
+    UnitDef_0042dcf0* defs = g_game->unitDefs;
     for (int k = 0; k < g_game->unitDefCount; k++) {
-        UnitDef_0042dcf0* def = &g_game->unitDefs[k];
-        char* name = def->name;
+        char* name = defs[k].name;
         for (int i = 0; i < g_game->buildListCount; i++) {
             if (_strcmpi(g_game->buildLists[i].entries[0].name, name) == 0
-                && !def->flags_241.downloadable) {
+                && !defs[k].flags_241.downloadable) {
                 char buf[128];
                 sprintf(buf, "Hey!  Somebody forgot to set downloadable=1 for %s", name);
                 FUN_004d8780(g_game->unitDefs);
-                def->flags_241.downloadable = 1;
+                defs[k].flags_241.downloadable = 1;
                 FUN_004d8710(g_game->unitDefs);
             }
         }
