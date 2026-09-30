@@ -64,6 +64,30 @@
 // the counter in ebx, the offset in esi and puts the PlayerId result in edi
 // (ours lands it in ebx, which clobbers the counter). Computing `from` before
 // `to` scores 79.3% at 1292 bytes, so the `to`-first order is kept.
+// deepseek-v4.1 (this pass): the k4 loop now writes the PlayerId test out by
+// hand instead of calling PlayerId_004568c0(k4):
+//     int to = -1;
+//     if (k4 != 10 && g_game->players[k4].state != 0) to = g_game->players[k4].id;
+// That removes the 4-byte counter spill slot, so the frame is the original's
+// 0x34 and res/cand sit at esp+0x18/esp+0x1c: every [esp+N] reference above
+// the k4 loop now matches. 83.9% -> 86.0% (1266 bytes; the original is 1310).
+// What still differs, all of it inside the res != 0 k4 loop at 0x456bd6:
+//  - the original keeps a k4 byte counter in ebx (xor ebx,ebx at 0x456bcd,
+//    cmp bl,0xa at 0x456c06, inc ebx at 0x456cb3), because the helper's
+//    unsigned char parameter is what stops MSVC from folding `k4 != 10` into
+//    the `cmp esi,0x29f8` loop test. Here k4 is folded away entirely
+//    (no xor ebx,ebx / inc ebx) and the state test is merged into `test al,al`.
+//  - with ebx free, `to` lands in ebx and `from` in edi; the original has
+//    `to` in edi and `from` in edx (its from loop does `add edx,eax`, reusing
+//    the g_game register, which is reloaded at 0x456caa).
+//  - the same folding drops the original's redundant active re-test at
+//    0x456c7c (mov eax,[edx+ebp+0x1b63] / test eax,eax / je).
+//  - the tail's out test is `test eax,eax / jne <res!=0 path>` in the
+//    original but `je <res==0 path>` here (branch order, 3 bytes).
+// Tried and rejected this pass, each scored lower: declaring `from` before
+// `to` 83.9; from loop as a helper 78.0; (unsigned char) casts on k4 79.3 and
+// 79.9; a byte pi local 83.9; unsigned char k4 82.7; j at function scope
+// 83.9; the previous helper-call form of `to` 83.9.
 #include <stdlib.h>
 #include <algorithm>
 
@@ -213,7 +237,9 @@ int FUN_004568c0() {
                 packet[1] = (unsigned char)g_game->field_29fc[k4];
                 if (g_game->players[k4].active != 0) {
                     if (g_game->players[k4].state == 3) {
-                        int to = PlayerId_004568c0(k4);
+                        int to = -1;
+                if (k4 != 10 && g_game->players[k4].state != 0)
+                    to = g_game->players[k4].id;
                         int from = -1;
                         for (int j = 0; j < 10; j++) {
                             if (g_game->players[j].state == 1) {
