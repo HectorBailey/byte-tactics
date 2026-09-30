@@ -1,12 +1,31 @@
-// Decompiled by space-bunny-free, finished by GPT-6. Names are provisional.
+// Decompiled by deepseek-v4.1. Names are provisional.
+// Structure, local slots and byte count come from the previous attempt by
+// space-bunny-free / GPT-6 (94.5%, 897 bytes); deepseek-v4.1 retried and
+// confirmed it is the best of 16 variants.
 // PARTIAL 94.5%, 897 bytes. Share y0, y1, x, dx and dz across the two
 // edge walks, but retain block-local z/shade values. Declare bounds in the
 // order maxX, minY, maxY, minX. Both together restore all original local
 // slots and edge-loop instructions. Give the scan its own index initialized
 // before the positive-count guard, and increment it before the point cursor.
-// Remaining differences are prologue scheduling and clipping-register choices.
-// Sharing every temporary instead is worse. Two 768-header sweeps and
-// surface getters/clamping helpers did not resolve the remaining differences.
+// Remaining differences: exactly one register decision at 0x4c0cf0 and its
+// cascade. The original loads surf into ecx and computes every guard value in
+// eax (mov ecx,[esp+0x14040] / xor eax,eax / mov ax,[ecx] / dec eax /
+// cmp ebx,eax), keeps that ecx live to 0x4c0d29 (mov ax,[ecx+2]) and leaves
+// maxY in memory, so 0x4c0d55/0x4c0d5f compare dword ptr [esp+0x18] directly.
+// Ours loads surf into eax, so the guard values go to ecx / esi / ecx and
+// maxY stays live in ecx: 0x4c0d10 mov ecx,[esp+0x18], 0x4c0d27 xor esi,esi /
+// mov si,[eax+2] / mov eax,esi, 0x4c0d55 cmp ecx,eax + mov ecx,eax, and
+// 0x4c0d78 lea eax,[esp+0x3c] instead of lea ecx. Byte counts still agree
+// (two extra bytes at 0x4c0d27 are paid back at 0x4c0d5f).
+// Tried and all stayed at 94.5% (or worse): reversing the comparison
+// ((int)sf->pitch - 1 < minX, 94.2%), dropping the casts, named int and
+// unsigned short pitch locals, computing maxRow as height then maxRow--,
+// moving maxRow's declaration, type-punning the fields through
+// (unsigned short*)sf, a Surface& reference, folding the first two guards into
+// one || condition (79.8%), and using the local pointer at the FUN_004c0b10
+// call site (with the declaration moved to first use). So the choice is not
+// driven by the shape of the guard expression; a different allocation further
+// up the IL is the likely cause.
 
 struct Span_004c0c70 {
     int x1; // +0x0

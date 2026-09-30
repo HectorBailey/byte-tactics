@@ -1,9 +1,19 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6. Names are
-// provisional. PARTIAL 76.0%, 797 of 791 bytes. Share y0/y1 between the two edge walks alongside
-// the previously shared pointer/index/dx locals. This improves the earlier 73.3%, 809-byte version.
-// Remaining differences include clipping register choices, ymin/out and imin/lasty stack-slot swaps
-// and scheduling. Partial temporary-sharing combinations, all 24 bound declaration orders, 768
-// header sets and surface getters did not improve this version.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6, finished by
+// deepseek-v4.1. Names are provisional. PARTIAL 76.0%, 797 of 791 bytes. Share y0/y1 between the
+// two edge walks alongside the previously shared pointer/index/dx locals. This improves the earlier
+// 73.3%, 809-byte version.
+// Remaining differences are slot allocation and its fallout, not control flow:
+//   - two stack-slot swaps: ours ymin@[esp+0x20] / out@[esp+0x18] (original ymin@0x18 / out@0x20),
+//     and ours lasty@[esp+0x2c] / imin@[esp+0x34] (original imin@0x2c / lasty@0x34);
+//   - 6 extra bytes of `mov reg,reg` copies (the clip checks and both loop tails) that follow from
+//     those swaps: surf wants ECX and the 16-bit scratch EAX in the three clip tests, ours is the
+//     other way round; loop 2 uses [esp+0x24] for the vertex pointer and [esp+0x28] for the next
+//     index, the original swaps those two for the second loop only.
+// Tried this session, no change (all still 76.0%, 797 bytes): hoisting `Span* out` to the first
+// local slot, hoisting `int lasty` next to the other scalars. Giving loop 2 its own i/j/k/a/b
+// variables did reshuffle the allocator (ymin then landed on 0x18) but dropped to 72.0% and pushed
+// out to 0x10, so more variables is not the lever. Partial temporary-sharing combinations, all 24
+// bound declaration orders, 768 header sets and surface getters did not improve this version.
 
 struct Surface_004c1000 {
     unsigned short pitch;   // +0x0, also the clip width

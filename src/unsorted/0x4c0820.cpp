@@ -1,12 +1,32 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6. Names are
-// provisional. PARTIAL 59.8%, 608 of 613 bytes. Cache edge start/end heights before testing
-// descent, keep the row countdown separate from the divisor, and share the height locals across
-// both edge walks. The scan uses a guarded do-while with explicit index and point increments. This
-// improves the previous 41.0% and reproduces the original 0x14024-byte stack allocation. Remaining
-// differences include register allocation, extremum-index slots, and the count argument kept in a
-// register rather than its original slot. 768 header sets, count representations and paired
-// extremum indices did not improve the saved version. Count <= 0 still reaches uninitialized
-// extremum indices, as does the original (0x4c08b7 and 0x4c0962).
+// Decompiled by deepseek-v4.1. Names are provisional.
+// (Earlier credit, same file: started by space-bunny-free, continued by deepseek-v4.1-flash,
+//  then GPT-6, whose 59.8 percent body the deepseek-v4.1 pass re-verified and left in place.)
+// PARTIAL 59.8%, 608 of 613 bytes. Cache edge start/end heights before testing descent, keep the
+// row countdown separate from the divisor, and share the height locals across both edge walks.
+// The scan uses a guarded do-while with explicit index and point increments. This improves the
+// previous 41.0% and reproduces the original 0x14024-byte stack allocation.
+//
+// What still differs (deepseek-v4.1 pass, all differences are register allocation; the
+// instruction sequence and the nine local slots are identical):
+//  * original: ebx=pts, esi=ymin, edi=xmax, ymax in [esp+0x14], count reloaded into eax/edx/ecx
+//    scratch, ebp free for the edge-loop pointers.
+//    ours:     ebx is scratch (count reloads), esi=ymin, edi=pts, ebp=ymax, xmax in [esp+0x14].
+//    So the -999999 pair is swapped (xmax <-> ymax) and pts moves edi -> ebx, which also swaps
+//    surf/color (ebp/ebx) in the final call block and the ecx/eax/eax picks there.
+//  * the prologue loads differ from that same cause: original `mov eax,[esp+0x14030]` (count)
+//    before `push ebx`, then `mov ebx,[esp+0x14030]` (pts); ours loads count into ebx after
+//    `push ebx` and pts into edi after `push edi`.
+// Tried, all compiling to the very same 608-byte body (no effect): every declaration order of
+// the four extrema (y-first, x-first, one-line, split lines), the sibling 0x4c0c70 order
+// (maxX, minY, maxY, minX), temps at function scope or at point of use, the scan index
+// declared/initialised before the count guard (moves only the `xor ecx,ecx` slot), a
+// function-scope point cursor, `int y = p->y` temporaries in the scan, and the 0x4c0c70
+// edge-loop shape (function-scope i/j plus shared temps), which drops to 58.8%.
+// Also tried earlier by GPT-6: 768 header sets, count representations and paired extremum
+// indices; none improved the saved version.
+//
+// Count <= 0 still reaches uninitialized extremum indices, as does the original (0x4c08b7 and
+// 0x4c0962).
 
 struct Point_004c0820 {
     int x;
