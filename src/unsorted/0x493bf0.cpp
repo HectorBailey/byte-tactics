@@ -19,6 +19,17 @@
 // inside the strlen block) stops the compiler claiming ESI for entries at the
 // top of the function, which fixed the whole callee-saved rotation; and making
 // the working mode an unsigned char scored marginally higher than an int.
+// Follow-up (deepseek-v4.1-flash): the full 2x2 type matrix, mode int/unsigned
+// char crossed with oldmode int/unsigned char, each at both placements (before
+// lstrcpynA and at the top of the strlen block) and with and without an
+// (unsigned char) cast on the store, was scored. Declaring oldmode at the top of
+// the strlen block always costs 5 to 8 points (entries moves to ESI, the rest is
+// downstream). Every other combination lands at 71.9 to 73.7 and none moves the
+// working mode out of BL. Function-scope declarations of mode and/or oldmode,
+// reversing the declaration order, a pointer local for g_game+0x2bf0, and a
+// redundant `mode = mode;` before the store were also tried; all score 73.7 or
+// below. So the mode-in-memory / oldmode-in-BL split did not flip from any of
+// these source levers.
 #include <windows.h>
 #include <string.h>
 #include <stdlib.h>
