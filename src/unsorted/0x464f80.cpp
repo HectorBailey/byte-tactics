@@ -1,5 +1,10 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// PARTIAL: 66.5%. Correct callee class and by-value position argument. Frame remains 0x40 versus 0x34; duplicated player guards are folded and cold countdown blocks differ.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
+// PARTIAL: 66.9% (was 66.5%). Frame still 0x3c versus 0x34: two extra stack
+// slots, so every [esp+N] above 0x2c is +8 and every branch target label is
+// shifted; the original keeps the 3x3 scan's hw/hh (screen_hw/screen_hh << 16)
+// in edi/ebp, ours spills them. Also still differs: the loop head test
+// (cmp bl,0xa / jae before the body) is dropped as provably true, and the
+// duplicated player guards (0x464fe1..0x465024) are CSE'd into one copy.
 #include <windows.h>
 #include <string.h>
 
@@ -190,11 +195,8 @@ void __stdcall FUN_00464de0(void* gadget);
 void __stdcall FUN_00464f80()
 {
     g_game->field_14207->FUN_0040eb70();
-    unsigned char bl = 0;
-    do {
-        if (bl >= 0xa)
-            break;
-
+    unsigned char bl;
+    for (bl = 0; bl < 0xa; bl++) {
         PlayerInfo_00464f80* pi = &g_game->players[bl];
         if (pi->active == 0)
             goto next;
@@ -238,8 +240,7 @@ void __stdcall FUN_00464f80()
         pi->field_f0 += 0x1e;
 
         if (bl == g_game->localPlayer) {
-            int mode = g_game->mode->FUN_00435100();
-            if (mode == 1) {
+            if (g_game->mode->FUN_00435100() == 1) {
                 if (g_game->list->FUN_00490230() == 0) {
                     if (((Class_00490360*)g_game->list)->FUN_00490360() != 0) {
                         if (g_game->field_39239 < 0) {
@@ -386,8 +387,7 @@ void __stdcall FUN_00464f80()
     watch_check:
         if (g_game->mode->FUN_00435100() == 3 &&
             pi->field_22 == 0) {
-            unsigned char wb = FUN_00456850();
-            if ((g_game->players[wb].data->flags_9b & 0x80) != 0 ||
+            if ((g_game->players[FUN_00456850()].data->flags_9b & 0x80) != 0 ||
                 FUN_00457bc0() > 0) {
                 pi->data->flags_9b |= 0x40;
                 if (bl == g_game->localPlayer) {
@@ -450,8 +450,8 @@ void __stdcall FUN_00464f80()
         goto skip508;
 
     next:
-        bl++;
-    } while (bl < 0xa);
+        ;
+    }
 
     if (g_game->mode->FUN_00435100() == 3 &&
         g_game->field_37ef6 != 2 &&

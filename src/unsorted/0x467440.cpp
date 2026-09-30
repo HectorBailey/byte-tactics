@@ -1,5 +1,14 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// PARTIAL: 29.6%. Unsigned player index, definition reload after range callback, and separate bitmap/bitfield visibility branches. Visitor frame and induction registers still differ.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
+// Started by deepseek-v4.1-flash, finished by GPT-6; reworked by deepseek-v4.1.
+// PARTIAL: 29.6%. What still differs: (1) the visitor locals. Declaring the two
+// 4-byte visitors (Class_00467960, Class_00467980) inside their ifs lets MSVC
+// overlap them into one slot, giving frame 0x24 instead of the original 0x28
+// (last=+0x10, first=+0x14, visitors at +0x18/+0x1c, Class_00467840 at +0x20);
+// declaring both at the top of the loop body restores the 0x28 frame (that
+// variant scored 25.6%). (2) g_game is loaded into esi before push edi in the
+// original; ours puts it in edi. (3) loop A keeps its induction as &u->flags
+// (lea eax,[edi+0x110], test with lea ecx,[eax-0x110]) and the original reloads
+// g_game inside loops D and E instead of caching it.
 #pragma pack(push, 1)
 
 struct Vec3_00467440 {

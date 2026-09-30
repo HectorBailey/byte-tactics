@@ -1,5 +1,20 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// PARTIAL: 63.4%. Derive projectile coordinate pointer per iteration. Initial enabled/word-flag loads, projectile pointer homes and visibility branch registers still differ.
+// Decompiled by deepseek-v4.1-flash, finished by deepseek-v4.1. Names are provisional.
+// PARTIAL 67.7%: 1639 bytes vs 1662. Structure and all callee argument lists now
+// agree. What still differs: (1) the `enabled` prologue, original is
+// `mov dword [esp+0x1c],1` / `mov ax,[esi+0x14281]` / `test al,3` while we emit
+// `mov eax,1` + `mov [esp+0x1c],eax` and a direct `test byte [esi+0x14281],3`
+// (5 bytes); (2) register homes in the projectile loop: original keeps the
+// projectile base in ecx and the +0xa view in ebx and homes the base at
+// [esp+0x1c] reloading it each iteration, we keep them in ebp/ecx and home the
+// base at [esp+0x28] with the index at [esp+0x1c] (swapped slots); (3) we hoist
+// the `p->shot` flags load above the y divide while the original loads it after.
+// Tried and neutral (same bytes): plain unsigned short for field_14281, the
+// `!= 0` spelling of the slot->field_e test (that one helped, 63.4 -> 67.5),
+// computing the player-info pointer before the 14281 branch (helped),
+// assigning the radar result to a bool in both arms (helped), advancing the
+// +0xa projectile view alongside the base pointer, and moving the x/y scale
+// multiplies into static inline helpers (all three are still in the file; they
+// are harmless but changed nothing).
 #pragma pack(push, 1)
 
 struct Shot_00466dc0;
@@ -151,7 +166,7 @@ struct Game_00466dc0 {
     char unknown_14233[0x14273 - 0x14233];
     unsigned short* field_14273;         // +0x14273
     char unknown_14277[0x14281 - 0x14277];
-    Flags14281_00466dc0 field_14281;     // +0x14281
+    unsigned short field_14281;           // +0x14281
     char unknown_14283[0x142db - 0x14283];
     void* field_142db;                   // +0x142db
     void* field_142df;                   // +0x142df
@@ -197,28 +212,35 @@ static PlayerInfo_00466dc0* PlayerInfo_00466dc0_Get(unsigned char p)
 // halves match the uint8 terrain bitmap and the packed 16-bit bitfield variant.
 static inline int OnRadar_00466dc0(int px, int py)
 {
-    if ((g_game->field_14281.all & 2) == 2) {
-        unsigned int x = (unsigned int)(px >> 5);
-        unsigned int y = (unsigned int)(py >> 5);
-        PlayerInfo_00466dc0* pi = PlayerInfo_00466dc0_Get(g_game->currentPlayer);
-        if (x >= (unsigned int)pi->width)
-            return 0;
-        if (y >= (unsigned int)pi->height)
-            return 0;
-        if (pi->los[y * pi->width + x] == 0)
-            return 0;
-        return 1;
+    PlayerInfo_00466dc0* pi = PlayerInfo_00466dc0_Get(g_game->currentPlayer);
+    int b;
+    if ((g_game->field_14281 & 2) == 2) {
+        if ((unsigned int)(px >> 5) < (unsigned int)pi->width &&
+            (unsigned int)(py >> 5) < (unsigned int)pi->height)
+            b = pi->los[(py >> 5) * pi->width + (px >> 5)] != 0;
+        else
+            b = 0;
     } else {
-        unsigned int x = (unsigned int)(px >> 5);
-        unsigned int y = (unsigned int)(py >> 5);
-        PlayerInfo_00466dc0* pi = PlayerInfo_00466dc0_Get(g_game->currentPlayer);
-        if (x >= (unsigned int)pi->width)
-            return 0;
-        if (y >= (unsigned int)pi->height)
-            return 0;
-        return (g_game->field_14273[y * pi->width + x] &
-                (1 << g_game->currentPlayer)) != 0;
+        if ((unsigned int)(px >> 5) < (unsigned int)pi->width &&
+            (unsigned int)(py >> 5) < (unsigned int)pi->height)
+            b = (g_game->field_14273[(py >> 5) * pi->width + (px >> 5)] &
+                 (1 << g_game->currentPlayer)) != 0;
+        else
+            b = 0;
     }
+    return b;
+}
+
+// Scale a unit's world coordinate by the current zoom, keeping the source
+// order of the multiply so the operand lands in the right register.
+static inline int ScaleX_00466dc0(Unit_00466dc0* u)
+{
+    return (int)u->field_6c * (int)g_game->field_142eb;
+}
+
+static inline int ScaleY_00466dc0(Unit_00466dc0* u)
+{
+    return ((int)u->field_74 - ((int)u->field_70 >> 1)) * (int)g_game->field_142ed;
 }
 
 // FUNCTION: 0x466dc0
@@ -232,7 +254,7 @@ void FUN_00466dc0(void)
     FUN_004c6b70(surface, g_game->field_142df, 0, 0);
 
     int enabled = 1;
-    if ((g_game->field_14281.all & 3) != 0)
+    if ((g_game->field_14281 & 3) != 0)
         enabled = 0;
     if (g_game->field_37f2f.bits.bit9)
         enabled = 1;
@@ -244,10 +266,8 @@ void FUN_00466dc0(void)
             if (u->field_a6 != 0) {
                 if (enabled != 0 || (u->flags_110.all & 0x300) != 0 ||
                     u->field_ff == g_game->currentPlayer) {
-                    int x = ((int)u->field_6c * (int)g_game->field_142eb) /
-                            g_game->field_1422b;
-                    int y = (((int)u->field_74 - ((int)u->field_70 >> 1)) *
-                             (int)g_game->field_142ed) / g_game->field_1422f;
+                    int x = ScaleX_00466dc0(u) / g_game->field_1422b;
+                    int y = ScaleY_00466dc0(u) / g_game->field_1422f;
                     if (u->field_fa == 0 ||
                         (g_game->field_142f0.b.hi & 1) != 0) {
                         FUN_004b7f90(surface,
@@ -288,12 +308,12 @@ void FUN_00466dc0(void)
                                     int r = ((int)g_game->field_142eb *
                                              (shot->field_e0 - 0x200)) /
                                             g_game->field_1422b;
-                                    if (slot->field_e == 0)
-                                        FUN_004c0070(surface, x, y, r, base[0xf]);
-                                    else
+                                    if (slot->field_e != 0)
                                         FUN_004c01a0(surface, x, y, r, base[0xf],
                                                      0x20,
                                                      g_game->field_142f0.b.hi & 1);
+                                    else
+                                        FUN_004c0070(surface, x, y, r, base[0xf]);
                                 }
                                 slot++;
                                 n--;
@@ -314,8 +334,8 @@ void FUN_00466dc0(void)
     Projectile_00466dc0* p = g_game->projectiles;
     int i = 0;
     if (g_game->projectileCount > 0) {
+        short* q = (short*)((char*)p + 0xa);
         do {
-            short* q = (short*)((char*)p + 0xa);
             int px = q[-2];
             int x = (int)g_game->field_142eb * px / g_game->field_1422b;
             int py = q[2] - ((int)q[0] >> 1);
@@ -339,7 +359,7 @@ void FUN_00466dc0(void)
             }
             i++;
             p = (Projectile_00466dc0*)((char*)p + 0x6b);
-
+            q = (short*)((char*)q + 0x6b);
         } while (i < g_game->projectileCount);
     }
 
