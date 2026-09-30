@@ -1,6 +1,29 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by GPT-6. Names are provisional.
-// PARTIAL 68.1%. Aggregate position and packed int/short state copies improve allocation. Piece-loop anchors, remaining registers and null checks still differ.
-
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol. Names are provisional.
+// Saves every live unit (g_game+0x14357..+0x1435b, stride 0x118) as a 0xb8
+// byte record; inverse of 0x487080/0x486fd0. Record and Piece field maps are
+// complete and confirmed by the 0x487080 loader.
+//
+// PARTIAL 73.7%. Three of the four big register-rotation diffs came from one
+// lever: what MSVC materialised as the source address of the rec+0x2b block.
+//  - `rec.pos = unit->pos` (Vec3 member) reproduces the original's
+//    `lea eax,[ebp+0x6a]`; a packed {int,short} copy for f64/f68 reproduces
+//    `lea ecx,[ebp+0x64]`. Without them the block used [ebp+disp] directly
+//    and collapsed (66.5 -> 40.6 for pointer locals, 66.5 -> 68.1 for the
+//    struct copies). Do not use pointer locals here.
+//  - the 3x piece copy: writing the obj deref first
+//    (`dp[k].f8 = obj->f10a;` before `dp[k].f4 = sp[k].f8;`) moves the loop
+//    anchor to the original's `lea esi,[ebp+0xc]` (68.1 -> 70.3).
+//  - the rec+0x27 bool and the rec.f89 null guard: the original does NOT fold
+//    the guard's `ptr != 0`, it emits it a third time. Writing the ternary
+//    condition as the reloaded `unit->f86 != 0` (rather than the local
+//    `a != 0`) stops MSVC proving non-nullness and was worth 66.5 -> 73.0 by
+//    itself. The same reload on the rec.f8b guard scores 73.1 (worse) because
+//    the induced allocation shift is a net loss at this state; left off.
+// Still differs:
+//  - the live zero for the bool lands in edx here but in ecx in the original;
+//    that is the root of the remaining rotation in the rec+0x8f..+0xb3 field
+//    block (ours loads the first accumulators into ecx/eax swapped).
+//  - ours is 3 bytes short of the original 1062.
 #include <string.h>
 
 extern "C" int sprintf(char* buf, const char* fmt, ...);
@@ -10,6 +33,11 @@ struct Vec3_004876c0 {
 };
 
 #pragma pack(push, 1)
+
+struct Sub_004876c0 {
+    int a;
+    short b;
+};
 
 struct PieceFlags_004876c0 {
     unsigned char a : 1;    // bit 0
@@ -52,16 +80,14 @@ struct SavedPiece_004876c0 {        // 0x18 bytes at rec+0x41
     PieceFlags_004876c0 flags;      // +0x17
 };
 
-struct Pair_004876c0 { int value; short count; };
-
 struct UnitRecord_004876c0 {        // 0xb8 bytes
     char name[0x20];                // +0x0
     unsigned char f20;              // +0x20
     unsigned short id;              // +0x21
     int f23;                        // +0x23
     int f27;                        // +0x27
-    Vec3_004876c0 pos;               // +0x2b
-    Pair_004876c0 state;             // +0x37
+    Vec3_004876c0 pos;              // +0x2b
+    Sub_004876c0 s;                 // +0x37
     short f3d;                      // +0x3d
     short f3f;                      // +0x3f
     SavedPiece_004876c0 pieces[3];  // +0x41
@@ -97,7 +123,7 @@ struct Unit_004876c0 {
     int f58;                        // +0x58
     void* listHead;                 // +0x5c
     void* listTail;                 // +0x60
-    Pair_004876c0 state;             // +0x64
+    Sub_004876c0 s64;               // +0x64
     Vec3_004876c0 pos;              // +0x6a
     int f76;                        // +0x76
     int f7a;                        // +0x7a
@@ -234,16 +260,16 @@ void __stdcall FUN_004876c0(Class_004b4560* file)
             rec.id = unit->f_a8;
 
             rec.pos = unit->pos;
-            rec.state = unit->state;
+            rec.s = unit->s64;
             rec.f3d = unit->f108;
 
+            rec.f3f = unit->fb8;
             rec.f23 = n;
             rec.f27 = (unit->vtable != 0);
-            rec.f3f = unit->fb8;
 
             Unit_004876c0* a = (Unit_004876c0*)unit->f86;
             if (a != 0 && (a->flags & 0x10000000)) {
-                rec.f89 = a != 0 ? a->f_a8 : 0;
+                rec.f89 = unit->f86 != 0 ? a->f_a8 : 0;
                 rec.f8d = unit->f_f9;
             } else {
                 rec.f89 = 0;
@@ -256,8 +282,8 @@ void __stdcall FUN_004876c0(Class_004b4560* file)
                 id8b = a2 != 0 ? a2->f_a8 : 0;
 
             rec.f8f = unit->f58;
-            rec.f9b = unit->f7e;
             rec.f8e = unit->f_f4;
+            rec.f9b = unit->f7e;
             rec.fab = unit->f_f5;
             rec.f97 = unit->f7a;
             rec.f8b = id8b;
@@ -282,9 +308,9 @@ void __stdcall FUN_004876c0(Class_004b4560* file)
             Piece_004876c0* sp = unit->pieces;
             SavedPiece_004876c0* dp = rec.pieces;
             for (int k = 0; k < 3; k++) {
+                dp[k].f8 = ((Obj_004876c0*)sp[k].obj)->f10a;
                 dp[k].f4 = sp[k].f8;
                 dp[k].f0 = sp[k].f0;
-                dp[k].f8 = ((Obj_004876c0*)sp[k].obj)->f10a;
                 dp[k].fc = sp[k].f10;
                 dp[k].f10 = sp[k].f14;
                 dp[k].f12 = sp[k].f16;
