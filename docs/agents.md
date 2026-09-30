@@ -108,7 +108,7 @@ own totals, so treat the absolute numbers as rough; the ratios are what matter.
 | 17-40 |  |  |  |  |  |  | 235/337 (70%) |  |  |  |  | 124/124 (100%) | 9/10 (90%) |  |  |
 | 41-64 |  |  |  |  |  |  | 3/11 (27%) |  |  |  |  | 255/255 (100%) | 96/109 (88%) |  |  |
 | 65-160 |  | 64/67 (96%) |  |  |  |  | 1/6 (17%) |  |  |  |  | 739/747 (99%) | 2/6 (33%) |  |  |
-| 161-400 | 0/10 (0%) | 271/350 (77%) |  | 17/18 (94%) |  |  |  |  |  |  |  | 30/36 (83%) |  |  | 204/291 (70%) |
+| 161-400 | 0/10 (0%) | 277/362 (77%) |  | 17/18 (94%) |  |  |  |  |  |  |  | 30/36 (83%) |  |  | 204/291 (70%) |
 | 401+ |  | 63/189 (33%) | 1/8 (12%) | 8/15 (53%) | 17/27 (63%) | 3/8 (38%) |  | 2/18 (11%) | 4/7 (57%) | 10/11 (91%) | 0/3 (0%) | 59/83 (71%) |  | 9/31 (29%) | 72/180 (40%) |
 
 ### Cost per batch
@@ -1272,14 +1272,31 @@ Cost units: thousands of tokens weighted by price relative to Haiku (Sonnet 5 co
 | #2071 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
 | #1992 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
 | #2059 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1978 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #2057 | deepseek-v4.1-flash | 3 | 1 | 0 | n/a | n/a | n/a |
+| #2040 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #2047 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #2000 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #2066 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1891 | space-bunny-free | 1 | 1 | 0 | n/a | n/a | n/a |
+| #2100 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1974 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1852 | space-bunny-free | 3 | 1 | 0 | n/a | n/a | n/a |
+| #1962 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #395 | deepseek-v4.1-flash | 6 | 2 | 0 | n/a | n/a | n/a |
+| #394 | deepseek-v4.1-flash | 6 | 4 | 0 | n/a | n/a | n/a |
+| #1881 | space-bunny-free | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1186 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #2017 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1936 | space-bunny-free | 2 | 0 | 0 | n/a | n/a | n/a |
 
 ### Escalations
 
 - Opus matched 94 of 123 functions a cheaper model had failed.
 - Sonnet matched 109 of 116 functions a cheaper model had failed.
 - Gpt-6 matched 5 of 134 functions a cheaper model had failed.
-- Space-bunny-free matched 80 of 364 functions a cheaper model had failed.
-- Deepseek-v4.1-flash matched 83 of 635 functions a cheaper model had failed.
+- Space-bunny-free matched 82 of 372 functions a cheaper model had failed.
+- Deepseek-v4.1-flash matched 84 of 658 functions a cheaper model had failed.
 - Gpt-5.6-terra matched 3 of 16 functions a cheaper model had failed.
 - Mimo-v2.6-flash matched 3 of 5 functions a cheaper model had failed.
 - Sonnet-5.5 matched 29 of 73 functions a cheaper model had failed.
