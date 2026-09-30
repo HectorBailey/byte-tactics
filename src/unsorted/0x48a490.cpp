@@ -83,6 +83,16 @@
 // after the 64 bit division, with and without a cached owner pointer, drops to 73.9% even though the
 // original schedules it there.
 //
+// deepseek-v4.1 (1208), second pass: re-scored the whole diff and the mask/movsx hunk. The original's
+// p pair (`and eax,0x1f`, then a 16 bit `add ax, [u+0xaa]`, then a dword store and a plain dword
+// reload) cannot be produced by aliasing p: `union { int i; unsigned short s; } p; p.i = ...;
+// p.s += u->fix_lo;` and `*(unsigned short*)&p += u->fix_lo;` both give 867 bytes at 71.9 (taking p's
+// address forces extra spills), so the mask stays dropped here. wx-before-hz scores 76.3 alone and
+// 72.5 with n moved after the 64 bit block, so the present order (hz then wx, n before q, which keeps
+// q = owner->sight and n = frame - age in the same blocks the original schedules them) stays best.
+// Still differs: the m/count ecx/edx swap in the prologue and everything downstream of it, the
+// dropped mask, and the p reload spelled movsx instead of a plain dword load.
+//
 // Sonnet 5.5 retry (#1091), 70.8% to 77.8%: a hill climb over statement positions (moving one
 // statement of the loop body or of the sea-level block at a time, with every statement that
 // touches the same local kept in order and no statement crossing the call it depends on) found two

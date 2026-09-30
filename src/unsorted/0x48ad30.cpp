@@ -1,4 +1,26 @@
 // Decompiled by space-bunny-free, finished by muse-spark-1.3-free, finished by longcat-2.5-preview-free, edited by deepseek-v4.1. Names are provisional.
+// deepseek-v4.1 (#1208) second retry: 84.1% kept (849 bytes, size matches).
+// Re-verified the v22 lead (build/scratch/0x48ad30/v22.cpp): its head emits
+// `push edi` before `xor al,al` and shares one zero register for both
+// `*cnt = 0` and `off = 0` (`xor edi,edi / mov [esp+0x18],edi / mov [ebx],edi`)
+// where the original stores immediates and pushes edi after `cmp al,0xa`.
+// That zero is then forwarded into the body as edi=off, so the original's
+// `mov edx,[esp+0x14]` reload never appears: 9 bytes short (840 vs 849).
+// Tried this run, all 840-851 bytes and 75.1% or worse: for-init initialisers
+// with the declarations split out (t2/t3: the *cnt store does become an
+// immediate, `mov [ebx],0`, but off's zero still lands in edi and the slot
+// order stays cnt 0x14 / off 0x18), `int off` declared before `int* cnt` in
+// every order (t1/t4: slots do not move, though the entry g_game load moves
+// to ecx), the player test written twice as a raw cast expression or via a
+// fresh local (t5/t6: unchanged), a second inlined helper
+// `PlayerAt(int& off)` returning p (t8: unchanged), and using
+// `g_game->f14353` directly with no cnt local (t7: 851 bytes, 60.9%, g_game
+// gets reloaded for the counter).
+// Status: the head differs from the original in exactly these bytes: guard
+// `jb <body>` plus `xor edi,edi / jmp` select instead of `jae <latch>` and a
+// flat `je <latch>` test chain; i in cl not al; off in eax not edx; cnt at
+// [esp+0x14] and off at [esp+0x18] instead of the reverse.
+
 // deepseek-v4.1 (#1208) retry: still 84.1% (849 bytes, equal size). New confirmed
 // lead, much closer than this file, saved as build/scratch/0x48ad30/v22.cpp
 // (840 bytes, 75.1% only because every body jump target shifts by 9 bytes):
