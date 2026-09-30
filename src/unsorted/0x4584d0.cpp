@@ -1,5 +1,5 @@
 // Decompiled by GPT-6-Luna, finished by Space Bunny Free, finished by
-// deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
+// deepseek-v4.1-flash, finished by space-bunny-free, edited by deepseek-v4.1. Names are provisional.
 // PARTIAL, 79.6% (unchanged by the second and third passes). Callers (0x4584b4, 0x458997, 0x4593ff,
 // 0x459476) push the surface pointer as the second argument and the address of a
 // 12-byte {x,y,z} struct as the third, so the argument order is
@@ -48,7 +48,9 @@
 // Ten inner-loop spellings (field-by-field assignment, `idx[j]`, a walked
 // `poly`, a walked `idx`, a hoisted count, y-before-x) all measure 69-79% and
 // none reaches the original's shape. It is a priority tie, not a scheduling
-// accident: do not re-sweep it without a new idea.
+// accident: do not re-sweep it without a new idea. Since then, declaring the
+// inner counter `j` at its point of use inside the loop body was tried and
+// scores exactly the same 79.6% (457 bytes), so that lever is dead too.
 //
 // A MEASURED NEGATIVE worth keeping: the brief's "redundant store is a
 // variable initialiser" lever is dead here. Removing `int found = 0` style
@@ -205,7 +207,6 @@ void Class_004584d0::FUN_004584d0(Model_4584d0* model, void* surface,
                 - ((short)((vertices[i].y + off.y) >> 16) >> 1) + 0x20;
         }
     }
-    int j;
     Face_4584d0* face = info->faces;
     if (info->firstFace != -1) {
         face++;
@@ -214,6 +215,7 @@ void Class_004584d0::FUN_004584d0(Model_4584d0* model, void* surface,
         i = 0;
     }
     for (; i < info->faceCount; i++, face++) {
+        int j;
         unsigned short* idx = face->indices;
         for (j = 0; j < face->count; j++)
             poly[j] = projected[*idx++];
