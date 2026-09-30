@@ -21,6 +21,18 @@
 //    to 1020 bytes at 75.3%, so the chain is not the original's shape either.
 // Also tried and no better than 90.9%: nesting the two gate tests, `!(a >= b)`, `a >= b && a >= b`,
 //    the reversed `||`, and the same four blocks as one chain with block A kept separate.
+// 4. Tried writing the gate as the negated guard `if (energy >= capE*0.2 && metal >= capM*0.2)
+//    return 2;` and as the nested `if (energy >= capE*0.2) { if (metal >= capM*0.2) return 2; }`.
+//    Both give the original's polarity for the first test (`test ah,0x41; je <body>`) but MSVC
+//    then computes capE*0.2 first, adds an `fxch st(1)`, and emits a second inline `return 2`
+//    epilogue at the gate (+54 bytes, 89.1%). Still to do: get `fld energy; fld capE; fmul 0.2;
+//    fcompp` (energy first, no fxch) and fold the gate's `jne <ret2>` into the shared epilogue.
+// 5. The `goto ret2;` guard form (`if (energy >= capE*0.2 && metal >= capM*0.2) goto ret2;`)
+//    DOES give the original's second test verbatim (`jne <shared ret2>`) and drops the duplicate
+//    epilogue, but refactoring the body into one block reordered the first test's loads anyway
+//    (capE first, fxch) and it ends 1083 bytes at 89.9%, so the `||` form scores higher. Moving
+//    `int range2` after the pointer locals (to get the original's late `movsx`/`shl`) keeps 1081
+//    bytes but drops to 85.2%; the scheduling difference is not worth chasing.
 #include <vector>
 struct Vec3 { int x, y, z; };
 struct Unit;
