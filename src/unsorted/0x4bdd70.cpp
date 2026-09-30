@@ -1,4 +1,48 @@
-// Decompiled by Sonnet 5.5, finished by space-bunny-free. Names are provisional.
+// Decompiled by Sonnet 5.5, finished by space-bunny-free, deepseek-v4.1-flash. Names are provisional.
+// space-bunny-free (second pass): still 97.9%, no scratch variant beat it (5 free
+// --sym scorings). Two new facts for the key block:
+//   - A pure `unsigned char key` (no int copy) drops the byte's slot store AND
+//     the `mov eax,[esp+0x70]; and eax,0xff` reload: MSVC keeps the byte in a
+//     register only (`mov al,[ecx+0xc]; test al,al; mov dl,al; shl dl,2; shr
+//     al,6; or dl,al; not dl; mov [ecx+0xc],al`, 91.7%). So the original really
+//     does have a byte local and a dword local sharing slot 0x70, and the
+//     `and eax,0xff` is the dword one.
+//   - With the condition on the byte (`if (key)`) the `and eax,0xff` stays in
+//     eax but everything else moves one register down: base=edx, key=cl, shift
+//     temp=ecx (the byte condition needs cl, not dl). Splitting the rotate into
+//     two temps (`unsigned int hi = w >> 6; w = w << 2; key = (unsigned
+//     char)~(hi | w);`) does give the wanted `shl eax, 2` and a byte `not` (95.3%)
+//     but keeps the cl/edx roles. Reversing the shift order with the byte
+//     condition is 91.7% and 2 bytes long. The only form with the original's
+//     roles (base=ecx, key=dl, w=eax) is the one with the condition on `w`,
+//     which folds the test into the `and`. Both the wanted `test dl,dl` and the
+//     wanted roles cannot be had at once with any spelling tried.
+// deepseek-v4.1-flash (600s run): confirmed 97.9% and did not improve on it.
+//
+// deepseek-v4.1-flash (second run): the three remaining diffs are ONE allocator
+// decision. Testing the int `w` (this file) keeps the original register roles
+// (base=ecx, key=dl, m=eax) but folds the test into the `and eax,0xff` flags.
+// Testing the byte `key` (in ANY spelling: `if (key)`, `if (key != 0)`,
+// `if ((unsigned char)key)`, `if (key==0) { } else`, do/while(0), ternary,
+// switch, a static inline helper that inlines, a separate copy `k2 = key`) emits
+// the wanted `test al,al` but rotates every role: base=edx, key=al, m=ecx, and
+// costs exactly one byte because `and ecx,0xff` is `81 E1` (6 bytes) where
+// `and eax,0xff` is `25` (5 bytes). The rotation is self-reinforcing: with key
+// in al, m cannot take eax, so it takes ecx, so base falls to edx. ~30 scratch
+// forms tried this run, all 90.4 to 96.2%, none above 97.9%: every declaration
+// order of base/key/m, `m = key` vs `m = key & 0xff` vs `(unsigned char)key`,
+// separate shift temp `t`, reversed shift order `(w << 2) | (w >> 6)` (same
+// 97.9 when the condition stays on w), `unsigned long m`, `int m`, `long`,
+// `k = 0` else forms, ternary, and inline-helper forms. The load/store of the
+// byte plus `mov eax,[esp+0x70]; and eax,0xff` (the dword reload of the byte
+// home, in the dead `name` argument slot) is identical in all of them.
+// deepseek-v4.1-flash (first run): confirmed 97.9% and did not improve on it.
+// Re-tried and ruled out: `if (key)`/`if (key != 0)`/`(int)key` (base moves to edx,
+// key to cl, 91.7), named `hi`/`lo` locals (92 to 95.3), `+`/`^` for `|`, both
+// operand orders, separate output byte locals, ternaries and `key >> 6 | key << 2`
+// (using the byte for the shifts). If the condition is on the byte the allocator
+// puts the shift temp and key in ecx and base in edx; if it is on `w` base stays
+// ecx but the test folds into the `and eax,0xff` flags.
 // Opens a HAPI archive: reads the 20 byte header and checks the "HAPI" magic
 // and version bytes, then checks that the file ends with the Cavedog
 // copyright line (with the year patched to "0000", as the writer 0x4bd160

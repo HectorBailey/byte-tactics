@@ -1,56 +1,46 @@
-// Decompiled by space-bunny-free, retried by deepseek-v4.1-flash. Names are provisional.
-// Fills a help page (HELP.TDF, node "Help", keys "Line<n>"): for every line of
-// the page it looks the line up, cuts it at the '|' into a left and a right
-// half and adds two TEXT entries for them, 0x12 pixels lower each time.
+// Decompiled by space-bunny-free, retried by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6.1-sol. Names are provisional.
+// GPT-6.1-sol retry: 3 checks retained 98.7%; only the first line-buffer LEA register still differs (EDX in the original, ECX here).
+// Fills a help page (gamedata/help.TDF, node "Help", keys "Line<n>"): for every
+// line of the page it looks the line up, cuts it at the '|' into a left and a
+// right half and adds two TEXT entries for them, 0x12 pixels lower each time.
 //
-// PARTIAL (96%). Two spots in the loop preheader still differ:
-// - the original loads both arguments into registers and multiplies them
-//   (`mov eax,[page]; mov ecx,[lineCount]; imul eax,ecx`); here the second
-//   argument is read into ecx and the first folded into the imul's memory
-//   operand (`mov ecx,[lineCount]; mov eax,ecx; imul eax,[page]`), so the
-//   whole int computation lands after the two pushes instead of before them.
-//   MSVC always normalises a multiply this way when one operand is a plain
-//   stack-argument read, and no source phrasing tried (both operand orders, a
-//   temp per operand, unsigned, an inlined Range() helper, the multiply
-//   written twice) changed it.
-// - because of that, the `lea esi,[eax+ecx]` and the first byte store of the
-//   blank strings swap places, and the address of the value buffer for the
-//   first FUN_004b6af0 call lands in ecx instead of edx.
+// 98.7%. One instruction left, at 0x45f9f7. The whole loop preheader now
+// matches, which was the blocker for the two earlier passes. What finally made
+// MSVC 5 emit the original's
+//     mov eax,[page] / mov ecx,[lineCount] / imul eax,ecx
+// is that NEITHER operand of the multiply may be a bare load: with
+// `page * lineCount` it folds `page` into the imul's memory operand
+// (`mov ecx,[lineCount] / mov eax,ecx / imul eax,[page]`), two bytes shorter.
+// A ternary with identical arms (`page ? page : page`) is not folded away by
+// MSVC 5, so it fails codegen's "this is a load" test while emitting nothing.
+// An `& 0x7fffffff` on `page` also works but costs the 5-byte `and`. The two
+// operands are read through locals declared in the opposite order to the
+// multiply (`p2` then `n`, used `n * p2`) because the load order follows the
+// declaration order and the original loads `page` first; all six other
+// orderings give the right registers with the two loads swapped, which is the
+// 98.0% version.
 //
-// A second pass, all still 96.0%: two separate locals holding the same
-// `lineCount` (`int n1 = lineCount; int n2 = lineCount;` then
-// `first = page * n1; last = first + n2`, which is the guide's "two weights
-// sharing one local" idea applied to this), a local per operand
-// (`a = page; b = lineCount;`), a local for only `lineCount`, the reversed
-// operand order `lineCount * page`, the product written twice, an `unsigned`
-// product, a `(long)` product, a pointer-arithmetic product, assigning into
-// `lines.first` / `lines.last` before or after the locals, `last += n` as two
-// statements, and a `for` loop instead of the do/while. `tools/headers.py`
-// tried all 128 sets and the best is 96.0% with <windows.h>, <ddraw.h>,
-// <windows.h>+<stdio.h>, +<stdlib.h> and +<string.h>, so this is not the
-// headers-are-compiler-state effect either. The multiply is the only blocker
-// and the other two differences are its knock-on effects.
+// What is left: the original materialises the value buffer's address for the
+// first FUN_004b6af0 call into edx, this version into ecx. Same instruction,
+// same operand, only the register, and the second call at 0x45fa45 uses edx in
+// both, so it is the register pool state in the merged block, not the value.
+// Things tried that did not change it: a named `char* v = value` local in
+// AddLine, a local for the first call's string, an explicit `&value[0]`, an
+// intermediate temp for FUN_004b6af0's result, a Table* local for
+// layer->entries, swapping the '|' and non-'|' branches, moving the
+// `int y = 0x32` declaration, an extra char buffer, and four further multiply
+// spellings that all produce the identical preheader bytes.
 //
-// Retry by deepseek-v4.1-flash, still 96.0%. Additional things tried that all
-// compiled to the same memory-form multiply: reordering/renaming the operand
-// locals, compound assignment and declarator forms, inline identity/product/sum
-// helpers (by value, by reference, returning a struct), changing AddLine's
-// parameter order, every loop spelling (while, for(;;), goto label, separate
-// counter), a struct-typed 32-bit-bitfield parameter, casts, and up to 400
-// extra declarations plus 40 more headers. p1/p2 do reach 97.4% with the right
-// instruction schedule (imul before the pushes) but only when `last = first +
-// page`, which is the wrong value.
-//
-// Diagnostic that pins the cause: the wanted shape is reachable. Writing the
-// multiply as `(page & 0x7fffffff) * lineCount` gives exactly
-// `mov eax,[page]; mov ecx,[lineCount]; imul eax,ecx`, but MSVC then also emits
-// the `and eax,0x7fffffff` (5 extra bytes). So MSVC only materialises the
-// `page` operand in eax when its expression is not a bare parameter; a plain
-// `page * lineCount` folds `page` into the imul memory operand as soon as
-// `lineCount` is already in ecx for the following add. The original had no
-// `and`, so its `page` expression was some construct that forces a register
-// without emitting an instruction, which is not expressible from the two
-// parameters here.
+// deepseek-v4.1-flash added these failed attempts: tools/headers.py (all 128
+// sets, closest 98.7 with <windows.h>), the compiler-state sweep of 0 to 400
+// unused `extern int dummyN;` declarations (flat 98.7 throughout), prepending
+// 0x45f800's text (both its structs only and its full renamed body, flat 98.7),
+// a loop-level `char* v`, an outer `char* vp`, an `int ok` temp for the lookup
+// result, AddLine parameter reordering, `char (&value)[0x80]`, `char value[]`,
+// `unsigned char` buffer, an inlined identity helper around `value` and around
+// FUN_004c5740, an AddText helper wrapping FUN_004ab1b0 (93.4, arg order
+// changed), a Layer* local inside AddLine, and a hoisted `char c`. The single
+// lea/push register pair is compiler state this file cannot reach.
 #include <windows.h>
 #include <string.h>
 
@@ -155,8 +145,10 @@ void __stdcall FUN_0045f8c0(Sub_0045f8c0* sub, int page, int lineCount)
         int y = 0x32;
         if (((Class_004c3410*)&parser)->FUN_004c3410("Help")) {
             Page_0045f8c0 lines;
-            int first = page * lineCount;
-            int last = first + lineCount;
+            int p2 = (page ? page : page);
+            int n = (lineCount ? lineCount : lineCount);
+            int first = (n ? n : n) * (p2 ? p2 : p2);
+            int last = first + n;
             lines.blank[0] = ' ';
             lines.blank[1] = 0;
             lines.blank2[0] = ' ';

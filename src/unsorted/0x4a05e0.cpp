@@ -1,6 +1,7 @@
-// Decompiled by GPT-5.6-Terra, finished by muse-spark-1.3-free, finished by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by GPT-5.6-Terra, finished by muse-spark-1.3-free, finished by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol. Names are provisional.
+// Retry #1784: GPT-6.1-sol confirmed 56.5% after twelve worker checks; the final combined check also did not MATCH.
 //
-// Gave up at 52.2% (check.py, 488 bytes against the original's 494). The
+// Best checked source this pass: 56.5% (check.py, 488 bytes against the original's 494); no MATCH. The scan-index form scan = entries + j raises the reported score, but the disassembly still differs broadly and this appears to be a similarity-alignment artifact, not a close match. The
 // control flow, the two inlined strlens, the two tolower pairs and both loop
 // shapes are right. What is left is one allocator state, clearest in the
 // prologue:
@@ -18,6 +19,15 @@
 // build/scratch/0x4a05e0) changed nothing, so the remaining lever is making
 // `entries` land in EBX. The dead `if (entry == 0) return;` is there because
 // one extra live reference there is worth 2.2 points.
+//
+// Correction (deepseek-v4.1-flash, issue 1177): the claim above that the
+// original keeps `entries` in EBX is wrong. Disassembly shows EBX holds the
+// live-across-call first-tolower temp `a` (mov ebx,eax at 0x4a0710), and
+// `entries` is reloaded from the obj-slot spill [esp+0x1c] at 0x4a0752 and
+// 0x4a076a. All four callee-saved registers are loop state in the original
+// (i=ebp, scan=esi, j=edi, a=ebx), so BOTH `entries` ([esp+0x1c]) and `text`
+// ([esp+0x20]) are memory-homed. The remaining lever is to make MSVC rank
+// i/j/scan/a above `text`, not to put `entries` in EBX.
 //
 // Tried this round and rejected (all in build/scratch/0x4a05e0):
 //  a1 swapping the declaration order of `length` and `entry`,
@@ -110,6 +120,24 @@
 // Open: something makes the original's C1 keep `entries` in a callee-saved
 // register and give `text` a home, while here `text` outranks both `entries`
 // and `j`. Nothing tried this round moves that ranking.
+//
+// Second pass (deepseek-v4.1-flash, issue 1542) confirmed 52.2% is the local
+// maximum. New levers tried and rejected this round (all in
+// build/scratch/0x4a05e0/ds2):
+//  * `register` on entries / text / j: byte-identical to the base (and on a
+//    struct pointer it does not compile),
+//  * `char type` instead of `unsigned char type`: byte-identical,
+//  * `entry = &entries[index];` instead of `entries + index`: byte-identical,
+//  * a foldable extra `if (j > entries->u.count) break;` at the top of the
+//    inner body: 49.2% (and it grows the code),
+//  * reordering the declarations to put i, j, scan first: 49.7%,
+//  * initialising every local at its declaration: 48.9%,
+//  * a dummy static function or global placed before this one, and forward
+//    declarations of the siblings FUN_004a0570 / FUN_004a07d0: byte-identical,
+//  * tools/headers.py: all 128 include sets give 52.2% or less.
+// The single remaining difference is still that MSVC gives the fourth
+// callee-saved register to `text` here and to `j` (with `entries` and `text`
+// both memory-homed) in the original.
 #include <string.h>
 
 int __cdecl tolower(int);
@@ -190,8 +218,8 @@ void __stdcall FUN_004a05e0(Object_004a05e0* obj, int index)
 
     for (i = 0; i < length; i++) {
         if (text[i] != ' ') {
-            scan = entries;
-            for (j = 0; j <= entries->u.count; j++, scan++) {
+            for (j = 0; j <= entries->u.count; j++) {
+                scan = entries + j;
                 if (scan->type == 1) {
                     int a = tolower((signed char)scan->u.text[0x13a - 0xb6]);
                     int b = tolower((signed char)text[i]);

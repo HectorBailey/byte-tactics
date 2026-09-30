@@ -1,6 +1,93 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by deepseek-v4.1-flash, finished by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by deepseek-v4.1-flash, finished by space-bunny-free, finished by deepseek-v4.1-flash, finished by LongCat 2.5 Preview Free, finished by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
+// GPT-6 retry: 61.1% (857 of 861 bytes), not MATCH. A memset-based Pos
+// constructor restores model in ebp and the rotated child loop. Position
+// setup, child-bound stack slots and fixed-point arithmetic still differ.
+// Constructor, layout, temporary-argument and 768 header variants tested.
+// Earlier attempts and their measurements are preserved below.
 //
-// Result: 54.6% (840 of 861 bytes), from 52.5%. GAVE UP, not MATCH.
+// deepseek-v4.1-flash pass: still 59.3% (857 of 861 bytes). No source spelling
+// moved the first diff, the prologue register split: the original loads the
+// model argument into ebp (`mov ebp,[esp+0x8c]`) and the by-value Pos address
+// into esi, ours loads model into esi and the Pos address into the caller-saved
+// edx. First tried this pass: taking the address of the local Pos into a
+// pointer local (`Pos* pp = &pos; pp->x = 0; ...`) to lengthen its live range,
+// which compiles byte-identically, so the split is allocation-intrinsic.
+// The whole tail follows from it. The `(ya*0xffff + yb) << 16` fold at
+// 0x458abf is the same bar the sibling 0x48a870 hit (see build/scratch/SHARED.md).
+//
+// Result: 59.3% (857 of 861 bytes), from 54.6%. GAVE UP, not MATCH.
+//
+// THIS PASS (all screened free with check.py --sym, only the winners re-run
+// for real). Four independent changes, each measured on its own:
+// 1. +2.2 points. THE POST-LOOP CLIP NEGATES TWICE, and the old header never
+//    spotted it. The disassembly computes `x0 = -dx` (neg eax at 0x458b51),
+//    clamps it, and then negates AGAIN when storing (neg eax at 0x458b8a,
+//    neg ecx at 0x458b81 just before `mov [ecx+6],cx`). So the source is
+//    `this->bitmap->dx = (short)(-x0)`, NOT `(short)x0`. The old file stored
+//    the clamped value directly, which is both 2 bytes short AND semantically
+//    the wrong sign: with x0 = min(-dx, minX) the stored dx should come out as
+//    -x0 = max(dx, -minX), i.e. positive, shifting the bitmap right when the
+//    children hang off the left edge. Worth re-reading every store in a
+//    "compute negated, clamp, store negated" shape; this one was hiding.
+// 2. The x1/y1 spelling is `bmp->width - bmp->dx` (the original's
+//    `sub ecx,edx` at 0x458b3d), not `bmp->width + x0`. The header had tried
+//    both and recorded the `+ x0` form as the winner, but that verdict was
+//    only true for the pre-fix-1 code; once fix 1 is in, `- bmp->dx` wins by
+//    1.6 points. A lesson worth keeping: a spelling A/B result is only valid
+//    for the code it was measured on, and these three changes interact.
+// 3. `x0`/`y0` come from a pointer into the owner's coordinate triple,
+//    `int* op = &model->owner->x; ... op[0], op[1], op[2]`, which is what
+//    makes the original form `add eax,0x6a` once and index `[eax],[eax+4],
+//    [eax+8]` instead of three separate displacements off model->owner.
+//    Hoisting `Owner_4589c0* owner` first and then taking `&owner->x` scores
+//    worse (54.3%), so the base really is `model->owner`, not a local.
+// 4. The four min/max updates need their sums in named locals
+//    (`int cx = cminX + xoff; ...` then `if (cx < minX) minX = cx;`), not the
+//    expression repeated in the test and the assignment. Worth 0.9 points
+//    even though it ADDS 4 bytes: it changes what the allocator spills.
+//    Partial versions (x-only, y-only, const, `>`-flipped tests) all score
+//    lower, so it is all four or none.
+//
+// Together these took the file from 21 bytes short to 4 bytes short.
+//
+// WHAT IS STILL WRONG, and note these are all REGISTER ALLOCATION now, the
+// size being nearly right:
+// A. The loop is rotated in the original: `je end / jmp top / latch:
+//    mov ebp,[esp+0x80] / test ...`, i.e. the `model` argument is kept in ebp
+//    and reloaded at the bottom of the loop, because the body clobbers ebp.
+//    Ours has a plain bottom-tested loop with no latch. This is the same
+//    "one more thing wants a callee-saved register" as old items 1 and 4:
+//    ours puts `model` in esi and `bmp` in ebp after the loop, the original
+//    does the opposite way round. do/while, for-loops and a separate head
+//    pointer all still produce the unrotated loop (all 57.0%, unchanged).
+// B. The old item 2 (frame slot order of the eight bbox ints) is confirmed
+//    unfixable from the source and should be treated as closed: I compiled
+//    ALL TWENTY-FOUR declaration orders of the four parent accumulators and
+//    every one produced the identical slot order minY, minX, maxY, maxX.
+//    MSVC 5 is ordering these by something internal (they are all passed by
+//    address to the same call), not by declaration. Same for the child set.
+//    Do not spend more runs on declaration order; it is a dead end.
+// C. Old item 3, the y offset. I re-derived the arithmetic from scratch and
+//    the header's reading is CORRECT: the original computes
+//    ((ya<<16) - ya + yb) << 16, and because the low half is provably dead
+//    the whole thing collapses to ((yb - ya) << 16), which is the same 32-bit
+//    value. I confirmed no spelling recovers the six instructions: writing to
+//    off.y, a separate yoff, a bitfield Fixed, `ya * 0xffff`, `ya * 65535`,
+//    an int temp, and a two-step Fixed temp ALL fold to the same four
+//    instructions and the same 853-byte function (56.8% each at the time).
+//    The `<<16` at the end discards bits 0-15 of (ya<<16 - ya + yb), and
+//    `ya<<16` has zero low half, so MSVC 5 legitimately drops it. This is
+//    MSVC out-optimising the original, not a missing source construct: the
+//    original exe was very likely built with a slightly different MSVC 5
+//    build or optimisation setting. I do not think this one is reachable.
+// D. Old item 4 (spilling x1/y0 to the dead bmp argument slot) is now FIXED:
+//    the clip section spills and reloads exactly as the original does, and
+//    the two sections agree instruction for instruction apart from one
+//    duplicated `movsx esi, word [ebp+6]`, which I could not remove by
+//    naming dx/dy in locals (all of d2-d5 scored 58.3-59.3%, none better).
+// E. In the tail, the original reloads the `bmp` argument into ecx for the
+//    colour byte (`mov cl, byte [ebp+8]`) where ours uses `al`, and it
+//    reloads y0 from [esp+0x7c] where ours still has cx. Both follow from A.
 //
 // THIS PASS (all free-scored through check.py --sym):
 // * Declaring the four parent bbox accumulators in the order maxX, minY, maxY,
@@ -99,7 +186,12 @@ struct Model_4589c0;
 
 union Fixed { int value; struct { unsigned short fraction; short whole; }; };
 
-struct Pos_4589c0 { int x; int y; int z; };
+struct Pos_4589c0 {
+    int x;
+    int y;
+    int z;
+    Pos_4589c0() { memset(this, 0, sizeof(*this)); }
+};
 
 #pragma pack(push, 2)
 struct Owner_4589c0 {
@@ -214,9 +306,6 @@ void Class_00459200::FUN_004589c0(Image_4589c0* bmp, Model_4589c0* model)
     int maxY = 0;
     int minX = 0;
     Pos_4589c0 pos;
-    pos.x = 0;
-    pos.y = 0;
-    pos.z = 0;
     ((Class_00458310*)this)->FUN_00458310(&minX, &maxX, &minY, &maxY, model, pos);
     Child_4589c0* child = model->owner->firstChild;
     while (child != 0) {
@@ -226,17 +315,14 @@ void Class_00459200::FUN_004589c0(Image_4589c0* bmp, Model_4589c0* model)
             int cminY = 0;
             int cmaxY = 0;
             Pos_4589c0 cpos;
-            cpos.x = 0;
-            cpos.y = 0;
-            cpos.z = 0;
             ((Class_00458310*)this)->FUN_00458310(&cminX, &cmaxX, &cminY, &cmaxY,
                                                   child->model, cpos);
-            Owner_4589c0* owner = model->owner;
+            int* op = &model->owner->x;
             struct Off { Fixed x, y, z, c; };
             Off off;
-            off.x.value = child->x - owner->x;
-            off.y.value = child->y - owner->y;
-            off.z.value = child->z - owner->z;
+            off.x.value = child->x - op[0];
+            off.y.value = child->y - op[1];
+            off.z.value = child->z - op[2];
             Fixed sz = off.z, sy = off.y;
             int xoff = off.x.whole;
             int ya = (short)(sy.whole >> 1);
@@ -244,27 +330,31 @@ void Class_00459200::FUN_004589c0(Image_4589c0* bmp, Model_4589c0* model)
             Fixed yoff;
             yoff.value = ((ya << 16) - ya + yb) << 16;
             int yo = yoff.whole;
-            if (cminX + xoff < minX) minX = cminX + xoff;
-            if (cmaxX + xoff > maxX) maxX = cmaxX + xoff;
-            if (cminY + yo < minY) minY = cminY + yo;
-            if (cmaxY + yo > maxY) maxY = cmaxY + yo;
+            int cx = cminX + xoff;
+            int dx2 = cmaxX + xoff;
+            int cy = cminY + yo;
+            int dy2 = cmaxY + yo;
+            if (cx < minX) minX = cx;
+            if (dx2 > maxX) maxX = dx2;
+            if (cy < minY) minY = cy;
+            if (dy2 > maxY) maxY = dy2;
         }
         child = child->next;
     }
     int x0 = -bmp->dx;
     int y0 = -bmp->dy;
-    int x1 = bmp->width + x0;
-    int y1 = bmp->height + y0;
+    int x1 = bmp->width - bmp->dx;
+    int y1 = bmp->height - bmp->dy;
     if (minX < x0) x0 = minX;
-    if (maxY > y1) y1 = maxY;
     if (maxX > x1) x1 = maxX;
     if (minY < y0) y0 = minY;
+    if (maxY > y1) y1 = maxY;
     int newW = x1 - x0;
     int newH = y1 - y0;
     this->bitmap->width = (unsigned short)newW;
     this->bitmap->height = (unsigned short)newH;
-    this->bitmap->dx = (short)x0;
-    this->bitmap->dy = (short)y0;
+    this->bitmap->dx = (short)(-x0);
+    this->bitmap->dy = (short)(-y0);
     this->bitmap->colour = bmp->colour;
     if (newW == bmp->width && newH == bmp->height) {
         memcpy(this->bitmap->pixels, bmp->pixels, bmp->width * bmp->height);

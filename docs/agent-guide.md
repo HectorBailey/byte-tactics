@@ -22,6 +22,22 @@ Work from the repository root: `~/repos/personal/byte-tactics`.
 4. Adjust and repeat. Stop at `MATCH`, or when you run out of attempts for that
    function; leave your best (highest %) version in the file either way.
 
+## Finding a class from an address
+
+When `ctx.py` shows your function using `this` or a class pointer and you need
+the layout, matched code has probably already declared that class:
+
+    uv run tools/unitmap.py --at 0x<addr>
+
+It prints the matched functions nearest the address, the class (unit) they
+belong to, the class's fields with their offsets and the file each came from,
+any offset whose views disagree, and its matched members, which are near copies
+of the function you are writing. `uv run tools/unitgen.py <unit>` writes that
+whole class under `build/units/` (never committed); copy the declaration you need
+into your own file. The map only holds matched members, and it only flags a
+dispute where a file carries a `// +0xN` comment, so an empty dispute list means
+"nothing was flagged", not "the views agree". More in `docs/consolidation.md`.
+
 ## Rules
 
 - Only create or edit `src/unsorted/0x<addr>.cpp` for the addresses you were
@@ -1931,3 +1947,51 @@ name (`std::_Lockit::_Lockit` is 0x4e39b0).
 - **Byte-wide `xor cl, cl` and `not cl`** come from an `unsigned char` local
   set to 0 on one path and `~v` on the other; a ternary or a cast keeps the
   arithmetic 32-bit (0x4bd160).
+- **`cmp; ja exit; jmp top` at the bottom of a loop, with the exit jumping
+  past a block that has its own epilogue, is a guard plus a `do` loop whose
+  hit arm returns**: `if (u <= end) { do { if (hit) { ...; return; } u++; }
+  while (u <= end); }`. A `for` or `while` gives a `jbe top` back edge
+  instead, so "a return inside the loop" fails in every `for` spelling
+  (0x48d790).
+- **A partial can compute the wrong thing, not just the right thing in the
+  wrong bytes.** Before building on a previous attempt, check that each store
+  in it happens on the same paths as in the original: a stray unconditional
+  store after an if/else set a flag on the wrong unit, and removing it was
+  part of the fix (0x48d790).
+- **MSVC 5 sinks a store only when it is a top-level statement.** Nested in
+  an expression (for example, inside an inline helper whose return value is
+  assigned), the same store is emitted where it stands. So a store in the
+  wrong slot is usually a statement-shape problem, not a scheduling one. The
+  nested form can cost a register elsewhere, so check both together
+  (0x4ba000, 98.7%). A compiler rule seen in one block is a guess until a
+  second block of the same function agrees.
+- **A by-value struct argument can decide the register allocation.** MSVC
+  may turn it into a live pointer held in a callee-saved register, which
+  evicts whatever the original kept there. Passing the value from an inline
+  helper that returns the struct by value (`return u->pos;`) gave the
+  original's `lea edx, [ebx+0x6a]` and kept ebx for the unit (0x49abb0).
+  Before changing an aggregate's type, check which of its fields the
+  original actually stores.
+- **An `#include` can decide operand order.** At 0x482830 adding
+  `#include <string.h>` flipped which operand of a commutative subtraction
+  MSVC 5 scheduled first, taking the function from 87.3% to MATCH, while
+  `windows.h`, `stdio.h` and `math.h` changed nothing. When operand order
+  survives every rewrite of the expression, change something earlier in the
+  file (compare declaring `memcpy` by hand at 0x4bf4d0).
+- **A helper returning a struct by value, called inside a loop, costs frame
+  space.** At 0x418310 `static inline Point Screen(...)` called four times in
+  the inner loop was exactly the eight extra frame dwords; writing it out took
+  the frame and the byte count to the original's (36.8% to 55.5%). When the
+  frame is too big, look for such helpers before working on registers.
+- **Stack slots follow declaration order.** MSVC 5 hands out frame slots like a
+  plain stack allocator: each newly declared local takes the next slot below
+  the last one allocated. So you can plan the declaration order that puts every
+  local at the original's `[esp+N]` from a `/Fa` listing, without spending
+  `check.py` runs. Dropping a local (by reusing another's value) frees its slot
+  for a later one (0x4c0c70, 0x4c1000).
+- **To break a common subexpression, re-express one of its uses.** When two
+  uses of the same address are shared and no renaming or extra local helps,
+  write one of them through a different path (for example
+  `defs[DAT_005129b4[i].unitType].name`, reloading the field, instead of
+  `defs[type].name`). They are then no longer the same value, and MSVC
+  recomputes the address instead of sharing it (0x44c0d0, 77.0% to MATCH).

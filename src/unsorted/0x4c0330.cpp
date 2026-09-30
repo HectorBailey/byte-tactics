@@ -1,4 +1,71 @@
-// Decompiled by Sonnet 5.5, finished by space-bunny-free, finished by muse-spark-1.3-free, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by Sonnet 5.5, finished by space-bunny-free, finished by muse-spark-1.3-free, finished by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
+//
+// MATCHED (space-bunny-free, 1 check run, 10-minute box). The last instruction
+// is fixed, so the whole file now matches byte for byte at 932 of 932 bytes.
+// The old note (A) below is SOLVED, and the answer is the type pun in the
+// fill: the 4th parameter stays `unsigned char` (the mangled name ends in E)
+// but the value handed to `memset` is an `int` lvalue over the same slot:
+//
+//     memset(dst, *(int *)&color, w);
+//
+// MSVC 5 then treats the fill value as a 32-bit value that happens to be read
+// as a single byte, and its inlined `memset` emits exactly the original's
+// `mov al, byte ptr [esp+0x14080]`. Every other spelling (plain `color`,
+// `(unsigned char)color`, `(unsigned)color`, `color | 0`, `color * 1`,
+// `+color`, `~~color`, `*(unsigned char *)&color`) emits a dword load plus
+// `and eax, 0xff`, and a `char` value gives `movsx`; see the fillblock.py and
+// fillvars.py sweeps in build/scratch/0x4c0330/. An `int` PARAMETER also emits
+// the right instruction but changes the mangled name, so the pun is the only
+// spelling that satisfies both. Nothing else in the function changed: the
+// bounds-loop order, both walk loops and the frame are as the notes below
+// describe.
+//
+// THIS SESSION (deepseek-v4.1-flash, 10-minute box): 80.6 -> 98.8, 933 of 932
+// bytes. The one remaining instruction is item (A) below; everything else
+// matches. The notes that follow are the previous sessions' (kept for the next
+// worker); the three items they listed are now two of the three FIXED:
+//
+// WHAT FIXED IT (the previous session's "one allocator state" guess was right,
+// and the root was the WALK LOOP SHAPE, exactly as the high-level bit below
+// says). The original does NOT do `i = j;` at the loop latch. It recomputes the
+// wrap from the raw `i - 1` / `i + 1` value at the latch:
+//
+//     i = minIdx;
+//     do {
+//         j = i - 1;              // raw, stored to j's home
+//         if (j < 0) j = n - 1;   // wrapped, register only, used by the body
+//         ... body uses j ...
+//         i = i - 1;              // recompute the raw next index
+//         if (i < 0) i = n - 1;   // wrap it again
+//     } while (i != maxIdx);
+//
+// That spelling is byte-for-byte the original's double wrap plus the two
+// "wrapped index stored back" stores disappear. It took the function from 80.6
+// straight to 92.4 and, with it, fixed both index-home swaps AND the fill-loop
+// ebp allocation at the same time, confirming the single-root-cause guess.
+// The forward walk mirrors it with `i + 1`, `>= n`, `i = 0`.
+//
+// THE SECOND FIX: the bounds loop's y pair is written MIN FIRST, then MAX
+// (`if (y < minY) {...} if (y > maxY) {...}`), followed by the x pair MAX
+// first (`if (x > maxX) ... if (x < minX) ...`). That is what puts minY in edi
+// and maxY in [0x18] and produces the original's jge/jle directions. The old
+// note's `y<minY,y>maxY,x>maxX,x<minX` IS this order; with the new walk shape
+// it is now free (worth 92.4 -> 98.6) instead of costing the min/max homes.
+//
+// STILL DIFFERS (A) - SOLVED THIS SESSION, kept for the record:
+//   original: `mov al, byte ptr [esp+0x14080]`
+//   ours:     `movsx eax, byte ptr [esp+0x14080]`
+// (with the plain `unsigned char` param it is `mov eax,[...]; and eax,0xff`,
+// 5 bytes longer; `(char)color` gets to 1 byte). The 4th parameter MUST stay
+// `unsigned char`: the target mangled name ends in `E`, and changing the type
+// changes the mangled name so check.py cannot even correlate the function.
+// Header sweep (tools/headers.py, 128 sets) found nothing but <string.h> at
+// 98.8. What is wanted is MSVC's memset inline to load only the low byte
+// (`mov al`) instead of sign/zero extending the int argument. Not cracked in
+// this session; the previous notes' item about declaring a `unsigned char c`
+// local is neutral now (98.6, dword+mask).
+//
+// ---- previous sessions' notes ----
 // Fills a convex polygon with one colour, into `surface` or into the locked
 // screen when `surface` is null. It finds the top and bottom vertices and the
 // horizontal extent, rejects the polygon when it lies wholly outside the
@@ -171,13 +238,13 @@ int __stdcall FUN_004c0330(Class_004c6ae0* surface, Point_004c0330* points, int 
     maxX = -999999;
     for (i = 0; i < n; i++) {
         int y = points[i].y;
-        if (y > maxY) {
-            maxY = y;
-            maxIdx = i;
-        }
         if (y < minY) {
             minY = y;
             minIdx = i;
+        }
+        if (y > maxY) {
+            maxY = y;
+            maxIdx = i;
         }
         int x = points[i].x;
         if (x > maxX)
@@ -242,7 +309,9 @@ int __stdcall FUN_004c0330(Class_004c6ae0* surface, Point_004c0330* points, int 
                 sp++;
             }
         }
-        i = j;
+        i = i - 1;
+        if (i < 0)
+            i = n - 1;
     } while (i != maxIdx);
 
     sp = span;
@@ -271,7 +340,9 @@ int __stdcall FUN_004c0330(Class_004c6ae0* surface, Point_004c0330* points, int 
                 sp++;
             }
         }
-        i = j;
+        i = i + 1;
+        if (i >= n)
+            i = 0;
     } while (i != maxIdx);
 
     Span_004c0330* s = span;
@@ -282,7 +353,7 @@ int __stdcall FUN_004c0330(Class_004c6ae0* surface, Point_004c0330* points, int 
             s->left = clip.left;
         int w = s->right - s->left;
         if (w > 0)
-            memset(surface->pixels + surface->pitch * i + s->left, color, w);
+            memset(surface->pixels + surface->pitch * i + s->left, *(int *)&color, w);
         s++;
     }
     if (locked)

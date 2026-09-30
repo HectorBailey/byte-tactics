@@ -1,33 +1,26 @@
 // Decompiled by deepseek-v4.1-flash, finished by Space Bunny Free, finished by deepseek-v4.1-flash. Names are provisional.
-// PARTIAL, 97.2 percent (519 of 517 bytes). Everything matches except the
-// operand size of the two `ge == 0` tests, which are the only two extra bytes:
+// MATCH, 517 of 517 bytes.
 //
-//   original: test edi, edi / test esi, esi
-//   ours:     test di,  di  / test si,  si
+// The last defect was the operand width of the two `ge == 0` tests
+// (`test di, di` / `test si, si` where the original has `test edi, edi` /
+// `test esi, esi`). `short ge` makes MSVC test the low 16 bits because a
+// short's upper half is not meaningful; a plain `int ge` makes MSVC fold
+// `(x >= y) == 0` into a single `setl` and reallocate everything.
 //
-// The original tests the whole 32-bit register, which MSVC 5 does for an
-// `int`/`bool` variable but not for a `short`. But `ge` cannot be wide here:
-// `int ge = (value & 0xff) >= (int)(signed char)((char*)g_game)[1];`
-// lets MSVC fold `(ge == 0)` back into the comparison and emit `setl` plus a
-// deferred, differently allocated block; `bool ge` spills to a stack byte and
-// gives edi to the flag pointer. Only the narrowing `short` assignment keeps
-// the original's materialised `xor ecx,ecx / cmp edi,edx / setge cl /
-// mov edi,ecx`, the edi home for `ge`, the `[esp+0x10]` spill of the pointer
-// and the matching index multiply. Tried and rejected: every `ge` spelling
-// (bool/char/unsigned char/int/unsigned int/long/enum), block-scope vs
-// function-scope, every `on` type and cast, the item-5 self-correction
-// (`if (ge) ge = 1; else ge = 0;`, which does produce `test edi,edi` but moves
-// the whole comparison after the index math), inlined helpers returning `ge`,
-// taking `ge` as an `int`/`bool` parameter, and every cast on the comparison.
+// The fix is to give `ge` a 32-bit lvalue identity without changing its
+// value range or its register home: declare `int gv;` and bind the name
+// `ge` to it with a reference, `int& ge = gv;`. The reference forces every
+// use of `ge` to be a real 32-bit read of `gv` (so `ge == 0` becomes
+// `test edi, edi`), but MSVC removes the reference itself, so `gv` still
+// lands in edi (WATCH) and reuses esi (JOIN) exactly as before, and the
+// assignment stays branchless (`setge cl` + `mov edi, ecx`).
 //
-// What did move the number:
-//  - `ge` as a `short` declared UNINITIALISED at function scope, first: the
-//    two-byte value wins edi (WATCH) and reuses esi (JOIN), which is the
-//    original's allocation.
-//  - the flag fold written `(~flags & 0x80) | (flags >> 8)` (no
-//    `(unsigned char)` cast), worth 3.4 points and the exact operand order.
-//  - a single inlined `Apply` helper holding only the `on` test and the
-//    read-modify-write, called from both blocks; it fixes the JOIN fold too.
+// Rejected here and in earlier passes: every scalar spelling of `ge`
+// (short/unsigned short/char/unsigned char/bool/int/unsigned/long), the
+// ternary removed, `if/else`, struct and array wrappers (MSG_00441220
+// struct copy of the record), and every narrowing spelling of the `on`
+// helper. Only the int reference keeps the materialised comparison and the
+// 32-bit test at the same time.
 #include <string.h>
 
 struct Holder_00441220 {
@@ -88,7 +81,7 @@ static inline void Apply_00441220(unsigned short* p, unsigned short r, int ge, E
 void __stdcall FUN_00441220(Menu_00441220* menu, Entry_00441220* entry)
 {
     void* gadgets = menu->holder->gadgets;
-    short ge;
+    int gv; int& ge = gv;
     unsigned short* p;
     Entry_00441220* gd;
     unsigned short on;
@@ -105,7 +98,7 @@ void __stdcall FUN_00441220(Menu_00441220* menu, Entry_00441220* entry)
     int index = FUN_0049fdf0(gadgets, "WATCH", 1);
     if (index != -1) {
         gd = (Entry_00441220*)((char*)gadgets + index * 0x15b);
-        ge = (value & 0xff) >= (int)(signed char)((char*)g_game)[1];
+        gv = ((value & 0xff) >= (int)(signed char)((char*)g_game)[1]) ? 1 : 0;
         p = (unsigned short*)((char*)gd + 0x13c);
         r = (unsigned short)((~flags & 0x80) | (flags >> 8));
         r >>= 3;
@@ -116,7 +109,7 @@ void __stdcall FUN_00441220(Menu_00441220* menu, Entry_00441220* entry)
     index = FUN_0049fdf0(gadgets, "JOINGAME", 1);
     if (index != -1) {
         gd = (Entry_00441220*)((char*)gadgets + index * 0x15b);
-        ge = (value & 0xff) >= (int)(signed char)((char*)g_game)[1];
+        gv = ((value & 0xff) >= (int)(signed char)((char*)g_game)[1]) ? 1 : 0;
         p = (unsigned short*)((char*)gd + 0x13c);
         r = (unsigned short)((flags >> 11) | (flags & 0x10));
         r >>= 4;

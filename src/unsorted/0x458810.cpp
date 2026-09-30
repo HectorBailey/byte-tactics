@@ -1,4 +1,4 @@
-// Decompiled by GPT-6-Luna, finished by Space Bunny Free. Names are provisional.
+// Decompiled by GPT-6-Luna, finished by Space Bunny Free, finished by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
 // PARTIAL, 81.9% (406 of 427 bytes; up from 54.0%).
 //
 // WHAT IS SOLVED. The piece array starts at list+0x22, not +0x44, with `info`
@@ -83,10 +83,72 @@
 // [esp+0x30] here rather than from post+0x20; both are "an uninitialised
 // slot", 0x10 apart.
 //
+// THIRD PASS (Space Bunny Free). Re-measured both families and added the missing
+// one. Deleting the `bitmap` local entirely and spelling every use as
+// `list->bitmap` (so MSVC reloads wherever it must) is NOT a third family: it
+// scores exactly 69.4%, the same as the tail-only reload, because a single
+// `list->bitmap` read after the 0x4586a0 call is all it takes to promote `list`.
+// The ceiling is therefore two-valued and real: 81.9% (no reload) against 69.4%
+// (reload), and the gap is the esi/edi priority tie, not the loop.
+// On the loop itself, four shapes that try to move the induction variable into
+// the frame slot at post+0x14 the way the original has it, while leaving the
+// prologue's esi=x / edi=list alone, all lose: `for (n = count; n > 0; n--)`
+// over `pieces[n-1]` 78.3%, a `while (n > 0)` with `n--` 79.4%, a manual
+// pointer walk with the counter used only by the test (`piece--; n--;`) 76.9%.
+// A named `Class_004581e0* self = this;` used at both explicit call sites is
+// byte-for-byte identical to the `this` form, 81.9%. So the this-versus-counter
+// choice is not reachable from the loop shape either, which is consistent with
+// the note above that the difference is a register priority tie.
+// Variants live in build/scratch/0x458810/ (v0 this file, v1 tail reload,
+// j reload everywhere, a/b/e/f/i loop shapes, g self copy).
+//
+// FOURTH PASS (space-bunny-free). Three findings, none of which moves the score,
+// recorded so nobody repeats them.
+//  1. The /Gz lever is ALREADY pulled. The harness compiles this file so that the
+//     plain `__thiscall` definition already emits `ret 8` and mangles as
+//     `?FUN_00458810@Class_004581e0@@QAEXPAUList_458810@@PAUVec3_458810@@@Z`
+//     (QAE). Writing `__stdcall` on the definition mangles it QAGX instead and
+//     check.py then cannot even pick the function out of the object, so there is
+//     no <xutility>/<algorithm> stand-in to add here: this file calls no template
+//     and no out-of-line helper besides the three real members. headers.py's 128
+//     header sets are all 81.9% as well.
+//  2. The tail-reload family, in its best spelling (`if (list->bitmap != 0)` after
+//     the 0x4586a0 call, so ebx is freed and MSVC promotes `this` into it), is 423
+//     of 427 bytes and matches the whole tail and the whole loop byte for byte.
+//     The ONE thing it gets wrong is the prologue: it gives esi to `list` and edi
+//     to the shifted `g_game` x, where the original has esi=x and edi=list. That
+//     is the esi/edi priority tie recorded above, confirmed here to be the only
+//     remaining difference and not a knock-on: a named `self` copy of `this` used
+//     at both call sites, a second `List*` copy `l` used for every field access,
+//     and hoisting `int visible` above the two g_game reads all still emit esi=list
+//     and edi=x (66.9% each, vC/w1/w2/w3 in build/scratch/0x458810/). Note that
+//     the original's `mov [esp+0x14],ecx` write of `this` in the prologue is
+//     absent in that family, which is the same tie seen from the other side.
+//  3. The loop is a genuine pointer walk, not `&list->pieces[i]`: the original
+//     jumps back from 0x4589a8 to the flag test at 0x458972 and only does
+//     `sub esi,0x36`, while this file's index form re-derives the address with the
+//     `lea ecx,[eax+eax*2] / lea ecx,[ecx+ecx*8] / lea esi,[edi+ecx*2+0x44]` chain
+//     every iteration. A manual `p = &list->pieces[n-1]; ... p--; n--;` walk is
+//     76.9% on its own and 66.9% combined with the tail reload, i.e. it is not a
+//     free win on top of the 81.9% shape either (vA/vB/vC/vD).
+// So the 81.9% here is still the best known. The two open items are unchanged:
+// the esi/edi priority tie, and the doubled `test eax, eax` at 0x4588bd.
+//
 // No suspected bug in the original. The duplicated `test eax, eax` is redundant
 // and `coords.y` is an uninitialised int read out of the save area, but both look
 // like ordinary MSVC artefacts of how the source was written rather than mistakes
 // by Cavedog.
+//
+// deepseek-v4.1-flash confirmation pass. Re-measured the reload family with the
+// one-line `if (list->bitmap != 0)` tail: 423 of 427 bytes, 69.4%. The ONLY
+// difference left in that variant is that the compiler promotes `list` to esi
+// and `x` to edi; the whole tail (ebx=this, the fresh `mov ecx,[esi+0x10]`
+// reload, `mov ecx,ebx` at each call, the loop counter in the dead this slot)
+// matches byte for byte. So the tail-reload and the prologue's esi=edi swap are
+// one tie, exactly as recorded. The doubled `test eax,eax` was retried as
+// `bitmap->field_14 == 0 && bitmap->field_14 == 0` and it still folds to the
+// single test (406 bytes, 81.9%). Both ceilings stand: 81.9% no-reload against
+// 69.4% reload, and 81.9% is kept here.
 extern char* g_game;
 
 struct Vertex_458810 { int x; int y; int z; };

@@ -1,4 +1,25 @@
-// Decompiled by space-bunny-free. Names are provisional.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
+//
+// deepseek-v4.1-flash pass (#1182): tested the header lever. The matched sibling
+// 0x47dfc0, which contains the same feature dispatch and the same unit-reference
+// block, only reached MATCH after a header set was added (its file note credits
+// <stdlib.h>). `uv run tools/headers.py 0x47de60` tries all 128 header sets and
+// every one stays at 86.8 percent, so this residual is not reachable by headers
+// alone. The 4-byte difference is still exactly the six-instruction index block
+// at 0x47dea5 to 0x47deb6.
+//
+// deepseek-v4.1-flash second pass (#1609), all 86.8 percent and 346 bytes:
+//  - both multiply orders, both add orders, `int idx` assigned then added,
+//    spotX/spotY hoisted into `unsigned int` or `unsigned short` locals in
+//    either order, a `Game* g = g_game` second pointer, and a `Cell* p = cell`
+//    second pointer: the index block is still byte-identical to ours, so its
+//    scheduling is not reachable from the expression or its locals;
+//  - headers.py again: 0 of 128 header sets match, all 86.8.
+// The isolated 0x421e60 with the same source emits the fold with the second
+// byte in edx (both registers free); here edx is pinned to g_game, and the
+// pinned case always picks the `mov eax,[width]; imul eax,ecx` form. A plain
+// unit pointer brings the fold back but breaks the two-step unit load, so the
+// two are coupled by the register allocator, not by the source shape.
 // Decides whether a unit with the given footprint can stand on one map cell:
 // the cell's feature must not block it, a unit already standing there must not
 // have moved more recently than the mover, and the cell's ground height and

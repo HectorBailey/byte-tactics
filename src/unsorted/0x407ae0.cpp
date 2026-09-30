@@ -1,4 +1,4 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
+// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, verified by GPT-6.1-sol. Names are provisional.
 // Slot 0 of Class_00407a90 (vtable 0x4fc998), derived from Class_00407350
 // (the family is listed in 0x407350.cpp, whose declarations this copies).
 // Sets field_c to 30..929 ticks from now. A group of fewer than 5 units
@@ -7,22 +7,21 @@
 // around it (mode 2 first, then mode 9). A bigger group is sent to a random
 // point on the map edge.
 //
-// Partial (82.7%): everything outside the scatter loop matches. Left to fix:
-// - The original computes w / 2 and h / 2 after the loop guard
-//   (`cmp ecx, ebx; jle`), keeping w / 2 in ebp and h / 2 on the stack and
-//   `this` only on the stack inside the loop. Explicit hw/hh locals (below)
-//   give that allocation but compute them before the guard (`test ecx, ecx`).
-//   Writing `FUN_004b6c30(w) - w / 2` in the loop (hoisted by the compiler)
-//   puts them after the guard but gives `this` ebp and hw a stack slot.
-// - In the loop body the original adds into pos.x's register
-//   (`mov edx, [pos.x]; sub eax, ebp; shl eax, 16; add edx, eax`); every
-//   variant here adds into eax.
-// - `dest.x = pos.x.value + MakeFixed(FUN_004b6c30(w) - w / 2).value` (with
-//   no hw/hh locals) gets the guard and all registers right (82.3%) but adds a
-//   redundant `and eax, 0xffff0000` after each shift and still adds into eax.
-// - Tried without effect: every header set, `rx = FUN_004b6c30(w)` temps,
-//   `dest.x = pos.x; dest.x += ...`, swapped operands, an explicit guard with
-//   do/while, i declared at the top, other fixed-point helpers.
+// Partial (91.1%): everything outside the scatter loop matches. Differences
+// left in the loop preheader and body:
+// GPT-6.1-sol rechecked the saved source and tried an outer guard with for/do-while
+// loops and direct x/z expressions; none improved on 91.1% (6 checks this pass).
+// - The original rotates the loop, so w / 2 and h / 2 (ebp and a stack slot)
+//   are computed after the guard `cmp ecx, ebx; jle`, while this version
+//   computes them before it (`test ecx, ecx; jle`). Moving them into the loop
+//   body makes the allocator give `this` ebp and spill both halves (58-59%);
+//   an explicit `if (n > 0) do/while` is the same.
+// - In the body the original adds the shifted random delta into the register
+//   holding pos.x/pos.z (`mov edx, [pos.x]; ...; add edx, eax`) and loads pos.y
+//   only after dest.x is finished; every variant here adds into eax and loads
+//   pos.y early.
+// - Tried without effect: every header set (tools/headers.py), halves inside
+//   the loop, an explicit guard with do/while.
 //
 // `field_c = g_game->ticks + FUN_004b6c30(900) + 30` in one expression folds
 // to `lea eax, [eax+edx+0x1e]`; the delay has to be computed first.
@@ -157,8 +156,7 @@ void Class_00407a90::FUN_00407380()
                 int dx = FUN_004b6c30(w) - hw;
                 dest.x = pos.x.value + (dx << 16);
                 dest.y = pos.y.value;
-                int dz = FUN_004b6c30(h) - hh;
-                dest.z = pos.z.value + (dz << 16);
+                dest.z = pos.z.value + ((FUN_004b6c30(h) - hh) << 16);
                 if (i == 0)
                     FUN_00480460(((Group_00407ae0*)field_8)->player, ((Group_00407ae0*)field_8)->id,
                                  2, 0, 0, &dest, 0, 0);

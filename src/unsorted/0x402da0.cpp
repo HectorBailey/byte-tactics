@@ -1,21 +1,30 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
+// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, verified by GPT-6.1-sol. Names are provisional.
 // Order handler: when the unit has just been built (progress 0), copies the
 // QMove/QPatrol orders queued on the factory (order->target) to the new unit
 // and its fire/move states, else parks it; otherwise a small wait state machine.
 //
-// Partial (79.5%): only register choices differ. The case-2 tail is fixed:
+// Retry by GPT-6.1-sol: unchanged best is 87.9%; reversing fire/move stores scored 87.4%, caching target scored 73.9%. Neither matches.
+// Partial (87.9%): only register choices differ. Every hunk is one rotation of
+// the same scratch-register sequence (ours ecx/edx, eax/ecx; original eax/ecx,
+// edx/eax): the first FUN_0043f0e0 argument block, the FUN_0043adc0 call, and
+// the second flag copy (ours mov edx,[ecx+0x110], original reuses ecx; ours
+// mov ecx,[eax+0xac] for the value copy, original edx). Retried with no change:
+// kind declared before the loop, do/while, while(1)+break at top, node outside
+// the init clause, node->pos / &node->pos[0], braces around the branches,
+// `node != 0`, `kind.index != 0`, swapped operands, queued |= 1 / queued++,
+// two throwaway pos loads at loop head (dead-code eliminated; the guide's
+// throwaway-load probe does not shift this rotation). The case-2 tail is fixed:
 // one Wait() after an if/else-if lets MSVC duplicate the tail itself and keeps
 // 0x8000 out of a register (two Wait() calls plus the test hoist it into ebx).
-// Still different: in the loop, the two FUN_0043f0e0 argument blocks and the
-// FUN_0043adc0 call use registers rotated by one (ours ecx/edx, eax/ecx,
-// eax/edx; original eax/ecx, edx/eax, edx/ecx). Adding two throwaway temps in
-// the loop head fixes the loop exactly, so the original allocates the kind's
-// zero (xor al, al) before the two byte loads, or has one temporary fewer
-// there. In the flag copy, the second target->flags load goes to edx (original
-// ecx, reusing the pointer register) and the value copy to ecx (original edx).
 // No-change rewrites: headers.py, preceding 0x402d10 in the file, while loop,
 // operand swaps, operator==, operator=, local pos/node/k copies, ternaries,
 // bitfield Ready(), IsHuman helper, nested ifs.
+// Also no effect (deepseek-v4.1-flash): a 101-point sweep of unused
+// `extern int dummyN;` (N = 0..400 step 4) left every point at 87.9%, so this
+// rotation is not reachable through the compiler-state probe; manual
+// `(flags & ~mask) | (target->flags & mask)` masks and an explicit
+// `unsigned char k = node->kind.index` are also 87.9%; a shared
+// `unsigned int f` accumulator for the two bitfield merges drops to 84.7%.
 class Class_00438760 {
 public:
     unsigned char index;

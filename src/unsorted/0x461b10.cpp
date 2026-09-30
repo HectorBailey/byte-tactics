@@ -1,19 +1,20 @@
-// Decompiled by DeepSeek V4.1 Flash, finished by Claude Opus 5.5. Names are provisional.
-// Partial (84.5%). Everything but one register pair matches: the original
-// keeps `this` in esi and the wrapped index ix in edi before the scan (and
-// reloads them into those registers after the "eligible" print), while this
-// version swaps them. The stack slots, the block order and the scan registers
-// all agree.
+// Decompiled by DeepSeek V4.1 Flash and Claude Opus 5.5, finished by deepseek-v4-flash. Names are provisional.
+// Partial (99.0%, 272 bytes). The original keeps `this` in esi and the wrapped
+// index ix in edi; earlier attempts had that pair swapped (esi=ix, edi=this).
+// The swap is fixed here without any extra instruction: reading head into ix
+// and then assigning it straight back to head (`head = ix;`, a no-op that the
+// compiler folds, but whose use of head is enough to move it off edi) makes
+// MSVC give edi to ix and esi to `this`.
 //
-// What fixed the block order (65.7% to 84.5%): the scan is an inline helper,
-// IsReusable, with one `return` per outcome, that also does the empty-buffer
-// test and both debug prints, exactly like the sibling 0x461c20 (which
-// matches). Tried without moving the swap: declaration orders, ix declared in
-// or outside the loop, `++ix`, int ix, a `self` local, a count local, a
-// NextIndex helper, a Grow() wrapper, `break` to a shared reuse tail, printing
-// `head` in the force path, the helper as a member of the buffer class, helper
-// parameter order. An N-declarations sweep (0 to 1200) and headers.py leave it
-// at 84.5%, so the difference is in the source, not the compiler state.
+// The one remaining difference is the order of the two reloads on the
+// reuse-success path, after the inlined IsReusable's final FUN_00461170 call:
+//   original: mov esi,[esp+0x1c]  then  mov edi,[esp+0x18]
+//   ours:     mov edi,[esp+0x18]  then  mov esi,[esp+0x1c]
+// Same two instructions (reload this and ix for `head = ix;`), swapped. The
+// force-alloc path already reloads ix then this like the original; only this
+// scheduler pick differs. Rewriting the store as this->head = ix, a duplicated
+// store, a temporary value, an unsigned long/int ix, a pointer store, and a
+// separate return local all keep the same 99.0%.
 
 void FUN_00461170(const char* fmt, ...);
 unsigned int FUN_004b6340();
@@ -83,7 +84,9 @@ Class_004629b0* Class_00461b10::FUN_00461b10()
 {
     for (;;) {
         if (count > 0) {
-            unsigned int ix = head + 1;
+            unsigned int ix = head;
+            head = ix;
+            ++ix;
             if (ix >= count)
                 ix = 0;
             Class_004629b0* buf = array[ix];

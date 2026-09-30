@@ -1,4 +1,4 @@
-// Decompiled by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol. Names are provisional.
 //
 // For each player slot in state 1, 2 or 3 with field_146 != 10 and field_c == 0
 // it sends a 10-byte 0x21 message (to = first slot whose data->flags has bit 0,
@@ -9,6 +9,15 @@
 // inlined FUN_00456850 (FindPlayer above); writing them as static inline helpers
 // at the sites where the original inlined them is what took this from 36.4% to
 // 52.3% (it also moves g_game into edi and matches the reference counts).
+//
+// Re-attempt (deepseek-v4.1-flash, issue 1303): re-verified lever 1 and the
+// strength-reduction question below; no variant beat 52.3%, so the body is
+// unchanged. This is the allocator/scheduler wall described below.
+// Retry (GPT-6.1-sol, issue 1627): tried combining the state-1/state-2 bodies,
+// casting the loop index to unsigned char, using raw byte-offset addressing,
+// and using players+i. The first two changes regressed; the pointer forms
+// tied at 52.3%. Replaced state-2's static GetPlayerId helper with the external
+// FUN_0044ffd0 call, which regressed to 42.2%; restored this best version.
 //
 // Still differs from the original (52.3%):
 //  * The original outer player loop keeps the raw index in ebp and recomputes
@@ -22,6 +31,14 @@
 //    a 2D char array, while/do-while/i!=10 forms, short/char/unsigned index,
 //    separate ifs, nested else, a switch, and all 128 header sets from
 //    tools/headers.py. See build/scratch/0x450530/.
+// Tried by space-bunny-free and rejected, all scored with check.py --sym:
+// removing the `p` local from the loop head and writing `g_game->players[i]`
+// at each of the four guard tests (the two `lea` at the top of the loop then
+// become one) drops it to 36.9%; hoisting the state into an
+// `unsigned char st` local and testing st three times drops it to 43.9%, even
+// though it is the shape the original's single `mov al` + three compares
+// suggests. Keep `Player* p = &g_game->players[i]` and the three direct
+// `p->state` tests.
 //  * The state dispatch in the original is a second compare chain
 //    (cmp al,1 / je A / cmp al,2 / jne ... / cmp al,1 / jne B) because its
 //    branch bodies are laid out out of line; ours falls through to A, which is

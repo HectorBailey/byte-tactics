@@ -1,4 +1,41 @@
-// Decompiled by space-bunny-free. Names are provisional.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
+// Third pass by space-bunny-free: still 73.1 percent, 622 of 624 bytes, same
+// first hunk (`lea ecx,[esp+0x10]` wanted, this file lays `it1` down at 0x14).
+// Two new things were tried, both worse, and both are the natural next moves:
+//  * The reference-alias trick the MATCHED sibling 0x4db450 uses to land a
+//    local on a dead parameter's home (`Class_004dd2a0& it =
+//    *(Class_004dd2a0*)&size;`) applied to the erase out-param, i.e.
+//    `Class_004dbe10& node = *(Class_004dbe10*)&p;` with
+//    `FUN_004dc910((Class_004dbe10*)&p, it1.ptr)`. The CALL is then exactly
+//    the original's `lea edx,[esp+0x60]`, but only if `p` is dead first, and
+//    `p` is not: its last use is the `base` mask. Hoisting the `base` copy
+//    above the erase to kill it scores 36.8 percent and rewrites the whole
+//    prologue (MSVC loads `p` from [esp+4] before the `sub esp`, the frame
+//    shrinks to 0x48, and `EnterCriticalSection` loses the `push esi` shape).
+//  * The same alias, but with the copy and the mask split the way the original
+//    schedules them (`unsigned int base = (unsigned int)p;` before the erase,
+//    `base &= 0xfffff000;` after the `DAT_005289f0` subtraction, so the load
+//    lands where 0x4db8c0 has it and the `and` where 0x4db8fd has it): 54.5
+//    percent, 620 bytes. So the split is not what breaks it; making `p` die
+//    before the erase is. `p` has to stay live in its home until the copy, and
+//    a local cannot take a home that is still live, which is the wall.
+// Second pass by deepseek-v4.1-flash: best is 73.1 percent, 622 of 624 bytes.
+// The remaining difference is stack layout plus two scheduling choices:
+//  - our `node` (the erase out-param) occupies frame slot 0x10, so it1 lands at
+//    0x14 and n at 0x1c. In the original `node` is at the parameter home
+//    [esp+0x60], which leaves it1 at 0x10, n at 0x14, it3 at 0x18 and a 4-byte
+//    hole at 0x1c. Fixing that one slot should shift every remaining hunk.
+//  - declaring node as the by-value return buffer of the erase call (whose real
+//    signature is `Iter erase(Iter)`) did NOT move it to the argument area;
+//    MSVC kept the return buffer in the frame at 0x10 (72.9 percent, 626 bytes).
+//  - declaring `LiveEntry* ve = &it1.ptr->entry;` reproduces the original's
+//    single `lea esi,[edx+0xc]`, but the named local grows the frame by 8 and
+//    drops the score to 53.1 percent. The original keeps ve in esi with no slot.
+//  - the original schedules `and edi,0xfffff000` between the DAT_005289f0
+//    subtraction and the `if (blk == 0)` test. Moving the `base` declaration
+//    before that test makes MSVC copy p into esi in the prologue and drops to
+//    15.9 percent.
+//
 // The game's free() for its own heap: under the allocator lock it looks the
 // block up in the live-block map, records the freed header in the debug arena,
 // drops it from the live map, releases the pages it had reserved for the block
@@ -185,7 +222,7 @@ public:
 
 class Class_004dbd00 {
 public:
-    Class_004dbe10 FUN_004dbd00(Class_004dbe10 it);
+    void FUN_004dbd00(Class_004dbe10* out, void* node);
 };
 
 class Class_004dbbc0 {
@@ -241,32 +278,31 @@ void __cdecl FUN_004db7d0(void* p, int flags)
         DAT_005289f0 -= (blk + 0xfff) & 0xfffff000;
         if (blk == 0)
             blk = 1;
-        VirtualFree((void*)((unsigned int)p & 0xfffff000), FUN_004da8c0(blk),
-                    MEM_DECOMMIT);
+        unsigned int base = (unsigned int)p & 0xfffff000;
+        VirtualFree((void*)base, FUN_004da8c0(blk), MEM_DECOMMIT);
         Pair_004db450 pair;
         pair.length = FUN_004da8a0(blk);
         Class_004db450* alloc = (Class_004db450*)FUN_004db610();
-        pair.offset = (unsigned int)p & 0xfffff000;
+        pair.offset = base;
         Class_004dbe10 n;
         ((Class_004dbd20*)alloc)->FUN_004dbd20(&n, pair.offset);
-        Class_004dbe10 it = node;
         Class_004dbe10 it3;
         ((Class_004dbeb0*)alloc)->FUN_004dbeb0(&it3);
-        if (it == it3)
-            it.ptr = alloc->head;
+        if (node == it3)
+            node.ptr = alloc->head;
         else
-            it.FUN_004dbe10(0);
+            node.FUN_004dbe10(0);
         if (alloc->Neq(n, Class_004dbe10(alloc->head))) {
             if (n.ptr->key == pair.offset + pair.length) {
                 pair.length = pair.length + n.ptr->length;
-                ((Class_004dbd00*)alloc)->FUN_004dbd00(n);
+                ((Class_004dbd00*)alloc)->FUN_004dbd00(&it3, n.ptr);
             }
         }
-        if (alloc->Neq(it, Class_004dbe10(alloc->head))) {
-            if (it.ptr->key + it.ptr->length == pair.offset) {
-                pair.length = pair.length + it.ptr->length;
-                pair.offset = it.ptr->key;
-                ((Class_004dbd00*)alloc)->FUN_004dbd00(it);
+        if (alloc->Neq(node, Class_004dbe10(alloc->head))) {
+            if (node.ptr->key + node.ptr->length == pair.offset) {
+                pair.length = pair.length + node.ptr->length;
+                pair.offset = node.ptr->key;
+                ((Class_004dbd00*)alloc)->FUN_004dbd00(&it3, node.ptr);
             }
         }
         ((Class_004dbbc0*)alloc)->FUN_004dbbc0(&it3, &pair);

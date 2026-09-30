@@ -1,4 +1,5 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
+// GPT-6 retry: 99.6%, 636 bytes; pointer and buffer constness and allocator pointer typedef variants left the same third-copy LEA base/index byte different.
 // Sonnet 5.5 retry (#1081): /Gz and /Gr give the same 99.6% (it is a method), the
 // third-copy loop written out by hand with the destination declared first is
 // 51%, and 3000 more random variants (helper parameter orders and loop shapes at
@@ -56,6 +57,28 @@
 // this again give it a distinct name.) Given that the clone trick above removed
 // <stdexcept> successfully, the remaining one byte looks like another header
 // side effect rather than anything reachable from this function's own source.
+//
+// deepseek-v4.1-flash re-verified the wall. Prepending each of 57 single
+// STL/C++ headers (ALGORITHM through XUTILITY, the C++ ones and <windows.h>)
+// to this file gives 99.6% or 89.6% and never 100; two (VECTOR, QUEUE) fail
+// to compile in that arrangement. Eleven more source variants at the third
+// copy all keep the [edx + edi] SIB: `_Q + _M` in a local, `_M + _Q`, a
+// static_cast, explicit loops with the source or the destination declared
+// first (42% to 51%), an index loop, a cached `_Last` (87.5%), a
+// `(const_iterator)` cast, a reordered include block, and `_Ucopy`'s loop
+// with a `_p` local (57.1%) or reversed increments. A second
+// vector<other>::insert instantiation above this one makes it worse (89.6%,
+// 637 bytes). The neighbouring instantiations 0x4758c0/0x475bd0/0x475ef0
+// are themselves at 88.9%/99.7%/83.0%, so prefixing them cannot reproduce
+// the original translation unit's state either. This is compiler state, as
+// the guide says for this family; it needs the regroup-into-original-files
+// phase.
+//
+// deepseek-v4.1-flash (#1401, 2026-09): re-confirmed the same wall. Prepending
+// <windows.h> gives 637 bytes / 89.6%; headers.py tried all 128 combinations of
+// the seven common headers and none match (best still 99.6%). No new source
+// lever: the difference remains the single `lea eax, [edi + edx]` (SIB 0x17)
+// against this build's `[edx + edi]` (SIB 0x3a).
 #include <climits>
 #include <memory>
 #include <xutility>

@@ -1,9 +1,40 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
+// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
+//
+// Still 99.6% (space-bunny-free pass): the code is the same 1678 bytes and every
+// instruction matches except these two hunks, both the SIB base/index order of a
+// byte access to vec_8d (a different SIB byte, not a different instruction):
+//   0x4099f6  orig `mov byte ptr [esi + ecx], al`   ours `mov byte ptr [ecx + esi], al`
+//             (the store of the clamped rating: base should be the vector pointer)
+//   0x409b53  orig `movsx eax, byte ptr [eax + edx]`  ours `movsx eax, byte ptr [edx + eax]`
+//             (the `(char)vec_8d[i] / 2` read: base should be the vector pointer)
+// What this pass added (all scored with check.py --sym, all still 99.6% or worse):
+// - The trigger is NOT the access form but the surrounding function. A 6-line
+//   minimal member reproduces both orders: `v[i]` encodes base=index var, index=
+//   pointer, while a NAMED POINTER LOCAL (`unsigned char* q = v.begin(); q[i]`)
+//   encodes base=pointer, index=index var, for both the byte store and the byte
+//   read feeding a signed /2, with no headers involved. But inserting exactly
+//   that local pointer into this function (v1-v3, 9 variants: local in a block,
+//   value split into a temp first, `char*` cast, unsigned pointer with and
+//   without the `(char)` cast, `&v[0]`, `v.begin()`, the read split into
+//   `int c` first) leaves both SIB bytes swapped; only the reference form
+//   `unsigned char& r = vec_8d[i]; r = ...` changes the code at all, and it is
+//   much worse (1679 bytes, 84.6%). So MSVC5's swap decision here is made on the
+//   full expression/register-pressure state, not on the subscript.
+// - `unsigned char& r = vec_8d[i]` forces the address into a register first
+//   (two extra movs, the pointer kept in ebp) and is never right for a
+//   single-use subscript.
+// - A named pointer local hoists `mov <ptr>, [this+0x91]` to the top of the block
+//   when its initializer is written before the value expression (1675 bytes,
+//   86.6%); writing the value into a temp first puts it back in place.
+//
+// GPT-6 retry: rating access, clamp, half-rating and pointer getter helpers, plus
+// all 768 header sets, did not improve 99.6%. Remaining differences are still the
+// two SIB base/index encodings; accessor wrappers can disturb STL inline budgeting.
 // Recomputes a player's per-unit-type tables (the object built by 0x409160):
 // resizes the tables at +0x8d and +0x65 to the unit type count, then for each
 // unit type rates it into vec_8d[i] and the three bytes of vec_65[i].
 //
-// Best so far 88.1%: the code is the same length and every instruction
+// Best so far 99.6%: the code is the same length and every instruction
 // matches except the base/index order of two byte accesses to vec_8d:
 // the original has `mov [esi + ecx], al` (store) and `movsx eax, byte ptr
 // [eax + edx]` (the `(char)vec_8d[i] / 2` read), ours encodes [ecx + esi] and
@@ -14,6 +45,15 @@
 // division order also flips with the number of declarations in the file
 // (it goes wrong with the full class layout), so both are probably compiler
 // state from the rest of the original file.
+//
+// Retry (deepseek-v4.1-flash) left both bytes unchanged: headers.py --cpp
+// (768 sets) all 99.6%, N unused externs and N prototypes swept wide (0-3000)
+// produce only two score bands and the same two SIB lines, and rewriting the
+// accesses as begin()[i], *(begin()+i), operator[](i), data(), element struct,
+// (signed char) / (int) casts and reference bindings all leave the identical
+// two-line diff. A minimal function with a member vector reproduces the
+// swapped order only when a byte read feeds a signed /2, so the trigger is in
+// the expression's value path, not the access itself.
 //
 // Things that were needed to get here:
 // - MSVC 5's inline budget decides which STL calls stay out of line (the

@@ -1,37 +1,8 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
-// Breaks a unit piece into debris: every four-vertex face of the piece's
-// object (except its selection plate) becomes a debris entry with its own
-// two-sided quad object, a random velocity plus a push along the face
-// normal, and random spin.
-//
-// Not matched (68.8%). The control flow, every call and the stack
-// arguments agree with the original; what differs:
-// - the face normal: the original converts the three vertices to floats
-//   with every fild issued before the first fstp (x87 values popped to
-//   their own slots, then copied into the by-value arguments with integer
-//   moves, B.x and B.y kept in ebx/ebp across the first call). Named
-//   Vec3f locals give one fild/fmul/fstp per component (their stores block
-//   the next load); float scalars (this version) interleave the loads but
-//   keep B on the x87 stack (fst) and reload it with fld for the second
-//   call. Neither a Vec3f(float, float, float) constructor, a converting
-//   helper returning by value, aggregate init, an inline Normal(a, b, c)
-//   with by-value parameters nor field-wise copy helpers reproduce it; a
-//   user copy constructor is called out of line. The original frame is
-//   0x90 bytes (this one 0xa0), with the normal at +0x34, B/A/C at
-//   +0x40/+0x4c/+0x58 and a copy of the first difference at +0x64.
-// - so the stack slots of the outer loop's locals differ (original: off
-//   +0x14, i +0x1c, piece +0x20, count +0x24, verts +0x28, unit +0x2c,
-//   desc +0x30), and in the vertex push loop the original keeps nx/ny in
-//   ebx/ebp and nz in memory (here ny is in memory and nz in eax).
-// - the y sum of `piece->offset + unit->pos` adds in the other order.
-// The unit/desc/count/piece registers of the outer loop (ebx/ebp/esi/edx)
-// match only with float scalars and `piece->offset + unit->pos`.
-// <windows.h> + <memory.h> is headers.py's best set (65.3% without).
-// Findings from scratch tests on the normal: MSVC 5 interleaves the x87
-// loads only when every Vec3f local is consumed once and by a single call
-// (or by copies to memory); a Vec3f used by two calls, as B is here, or
-// two calls each taking one, gives the one-component-at-a-time order.
-// No header set or N-declarations count changes the float block.
+// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash. Names are provisional.
+// Partial: 68.8%, 1756 bytes versus 1692. The scalar vertex conversions
+// retain the best outer-loop registers, but the x87 materialization and
+// local frame differ. A 768-set header sweep, 24 aggregate/copy/order
+// variants and seven explicit hidden-result ABI variants did not improve it.
 
 #include <windows.h>
 #include <memory.h>

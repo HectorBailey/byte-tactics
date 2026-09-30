@@ -1,4 +1,62 @@
-// Decompiled by space-bunny-free, finished by LongCat 2.5 Preview Free. Names are provisional.
+// Decompiled by space-bunny-free, finished by LongCat 2.5 Preview Free, deepseek-v4.1-flash and space-bunny-free. Names are provisional.
+//
+// SPACE-BUNNY-FREE, fourth pass. Still 84.6 percent, 309 of 303 bytes, unchanged:
+// no variant beat the version below (all screened with check.py --sym on scratch
+// copies, so no check.py runs were spent on them). New facts, all worth having:
+//   * tools/headers.py re-run: all 128 sets give 84.6 again, "(none of them)"
+//     included. Confirms the earlier two passes.
+//   * the `short width` / `*(int *)&width` idea is DEAD, from the original's
+//     own instructions, not from a trial: the fog arm's compare is
+//     `cmp edi, ebx` with `mov ebx, dword ptr [edx + 0x80]` materialised
+//     before it, and the row compare is `cmp ecx, dword ptr [edx + 0x84]`, so
+//     +0x80 and +0x84 are dword-typed in BOTH the test and the index. A narrow
+//     field read through an int lvalue cannot produce a materialised dword for
+//     the compare, and a `char` bitfield cannot share a slot with the width
+//     either: `seen` (+0x7c) and `width` (+0x80) are in different dwords, and
+//     both are read as full dwords. Both suggestions in the brief are ruled out.
+//   * the fully local-free arms (287 bytes, 39.4) fail for ONE reason, and it
+//     is the pre-branch g_game register: the local-free shape hoists
+//     `mov ebx, dword ptr [0x511de8]` to the very top and keeps g_game in ebx,
+//     which frees the fog arm's ebx, so MSVC puts the map in EDI and folds the
+//     index into ECX (`imul ecx, dword ptr [edi+0x80]; add ecx, dword ptr
+//     [edi+0x7c]; cmp byte ptr [ecx+edx],0`, 3 instructions where the
+//     original has 5). The original keeps g_game in ecx because its arms need
+//     ebx. So the fog arm's EBX is the thing to buy, and the `w`/`seen` locals
+//     buy it and then spill. That is a closed loop, not a search space.
+//   * the original's two arms are local-free, and this is now certain from the
+//     arm bodies: the fog arm spills NOTHING and the mask arm spills `col`
+//     (`sar ecx,5; mov dword ptr [esp+0x18],ecx; ...; mov ebx,[esp+0x18]`)
+//     into the dead `dest` argument slot, which this file's mask arm already
+//     reproduces exactly. So the 6-byte gap is 10 bytes of local spills in our
+//     two arms against 7 bytes of tail-merged fail block in ours. Each arm's
+//     spill is bought with one of its own three locals, and each is the price
+//     of the pre-block shape. Confirms the "one requirement, not two" note
+//     below from the other side.
+//   * a row-pointer local in the fog arm (`unsigned char* base = map->seen +
+//     w * row;` then `base[col] != 0`, with col, row, w still named) is 291
+//     bytes and 29.9 percent: the extra pointer local is the pressure, and the
+//     pre-block rotates, so `base` cannot replace `seen`.
+//   * dropping ONLY the mask arm's `w` local, with the fog arm's `seen` local
+//     left in place, is 297 bytes and 39.6 percent. So the fog arm's `seen`
+//     local does not on its own hold the original's pre-block: the pre-block
+//     and the mask arm's `w` local are a pair, exactly as the ordering notes
+//     below say. Best screen this pass: 84.6 (the file below).
+//
+// DEEPSEEK-V4.1-FLASH, third pass. Still 84.6 percent, 309 of 303 bytes. New
+// levers tried, all screened with check.py --sym on scratch copies, none better:
+//   * tools/headers.py re-run on the 84.6 file: all 128 sets give 84.6.
+//   * 20 more standard headers (vector, memory.h, algorithm, map, list,
+//     iostream, new.h, limits.h, time.h, math.h, ctype.h, stdarg.h, setjmp.h,
+//     locale.h, signal.h, float.h, assert.h and the four headers.py ones):
+//     every one is byte-identical at 84.6. Compiler state is not the lever here.
+//   * the 0x4745e0 sibling's `int Visible()` method on the Pos sub-struct
+//     (map computed inside, four/five locals): 42.9 [313] and it grows the
+//     frame, so the sibling shape does not transfer to this record.
+//   * `unsigned char* const seen` and `unsigned int const w`: byte-identical.
+// The fog arm spill and the mask arm spill are the whole story; the pre-branch
+// block and both arms' compare chains are byte-identical. See the notes below
+// for why the player pointer has to land in edx and how the locals are what
+// buy that but then spill.
 // GPT-6-Luna rechecked the prior best at 84.6%. Its remaining differences are
 // the spills in the fog and mask arms and merged failure blocks below.
 //

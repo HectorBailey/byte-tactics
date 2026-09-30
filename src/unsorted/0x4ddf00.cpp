@@ -1,5 +1,5 @@
-// Decompiled by Opus. Names are provisional.
-// Codex / GPT-6 retest in #13:
+// Decompiled by Opus, finished by GPT-6.1-sol. Names are provisional.
+// Codex / GPT-6 retest in #13 and GPT-6.1-sol fix pass in #1338:
 // pointer-typed image bases, DWORD-sized arithmetic, a directory
 // reference and an RVA helper did not fix the final eax/ecx operand order.
 // Constructor of the loaded-image reader (the function-local static at
@@ -38,9 +38,25 @@ public:
 };
 
 // The count must be stored before debugDirs is cleared (that order makes
-// MSVC reload ntHeaders for the final sum, as the original does). Still
-// different: the original loads imageBase into eax and the RVA into ecx for
-// that sum; every spelling, type and header set tried gives the swapped pair.
+// MSVC reload ntHeaders for the final sum, as the original does).
+// PARTIAL 91.7% (158/158 bytes, identical instruction sequence, one eax/ecx
+// pair swapped). Original final block:
+//   mov edx,[esi+0x20] / mov eax,[esi+0x18] / mov ecx,[edx+0xa8]
+//   add ecx,eax / mov [esi+0x24],ecx
+// Ours gives the same loads in the same order but: mov ecx,[esi+0x18],
+// mov eax,[edx+0xa8], add eax,ecx, mov [esi+0x24],eax. Only the register
+// pair of the commutative `imageBase + RVA` differs.
+// Measured with no effect on the swap: reversed operands, both operand
+// orders cast to unsigned int/int/long, (char*)/(unsigned char*) imageBase,
+// (void*)/(char*)/(unsigned int) debugDirs, both a free-function and a
+// static-inline RVA helper (args either way), a ternary and an if/else
+// spelling, all 128 header sets tools/headers.py tries (<windows.h> best),
+// and an unused `extern int dummyN;` prefix sweep for N = 0..400 step 4.
+// Reversing source order changes nothing either, so MSVC canonicalises the
+// commutative operands and only the allocator's free-register state chooses
+// eax vs ecx. This is the guide's "operand order that no rewrite changes"
+// case: compiler state from earlier functions of the original translation
+// unit, not the source shape.
 // FUNCTION: 0x4ddf00
 Class_004ddf00::Class_004ddf00(HMODULE m) : Class_004e1560(0)
 {
@@ -57,5 +73,5 @@ Class_004ddf00::Class_004ddf00(HMODULE m) : Class_004e1560(0)
     numDebugDirs = ntHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_DEBUG].Size / sizeof(IMAGE_DEBUG_DIRECTORY);
     debugDirs = 0;
     if (numDebugDirs)
-        debugDirs = (IMAGE_DEBUG_DIRECTORY*)(ntHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress + imageBase);
+        debugDirs = (IMAGE_DEBUG_DIRECTORY*)(imageBase + ntHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_DEBUG].VirtualAddress);
 }

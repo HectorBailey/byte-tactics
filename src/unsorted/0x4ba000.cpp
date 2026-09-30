@@ -1,102 +1,151 @@
-// Decompiled by space-bunny-free. Names are provisional.
-// PARTIAL, 98.7% (430 of 430 bytes; 154 of 158 instructions in place). One
-// basic block still differs: four instructions at the head of the main loop
-// are in a different order. Everything else matches, including the prologue,
-// the stack slot layout, the callee-saved register assignment (ebx = the
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
+// Retry #1733: GPT-6.1-sol verified 98.7% (430/430); no MATCH. The remaining loop-head history store and state normalization order is unresolved.
+// PARTIAL, 98.7% (430 of 430 bytes, 154 of 158 instructions). One basic
+// block differs: four instructions in the head of the main loop are in a
+// different order. Everything else matches, including the prologue, the
+// stack slot layout, the callee-saved register assignment (ebx = the
 // current byte, esi = the run length, ebp = the run start, edi = the output
 // pointer), both `switch` dispatches and all three return points.
 //
-// Compresses one row of an 8-bit sprite (called by FUN_004b9e60, which matched).
-// The first loop is only a test for "the whole row is the colour key": the body
-// then re-reads the row from its first pixel, so the index that loop computed
-// is thrown away. Bytes go into the history array DAT_0051fcaf[1..0x80], whose
-// entry 1 is the separate global DAT_0051fcb0, and runs are emitted through
-// FUN_004b9ed0 (repeat the current value) and FUN_004b9f50 (repeat a value, or
-// emit a count-only run). The return value is the global byte counter
-// DAT_0051fdb0, so a null `out` only measures the row, which is how
-// FUN_004b9e60 asks for the size before compressing.
+// Compresses one row of an 8-bit sprite (called by FUN_004b9e60, which
+// matched). The first loop is only a test for "the whole row is the colour
+// key": the body then re-reads the row from its first pixel, so the index
+// that loop computed is thrown away. Bytes go into the history array
+// DAT_0051fcaf[1..0x80], whose entry 1 is the separate global DAT_0051fcb0,
+// and runs are emitted through FUN_004b9ed0 (repeat the current value) and
+// FUN_004b9f50 (repeat a value, or emit a count-only run). The return value
+// is the global byte counter DAT_0051fdb0, so a null `out` only measures the
+// row, which is how FUN_004b9e60 asks for the size before compressing.
 //
-// What still differs from the original:
-//  1. The head of the main loop, four instructions reordered inside one basic
-//     block. The original emits the history store (`mov byte [esi+0x51fcaf],
-//     bl`) immediately after the byte load, then the source-pointer spill,
-//     then the `state` load, then the store of the current byte to its own
-//     stack slot, and only then the `switch` dispatch. This version emits the
-//     pointer spill, the `state` load, the dispatch, and the two stores
-//     together after it. Reordering `value = c;`, `DAT_0051fcaf[n] = c;` and
-//     `p++` in the source, writing them as chained assignments
-//     (`value = c = DAT_0051fcaf[n] = *p++;`, `DAT_0051fcaf[n] = c = *p++;`,
-//     `DAT_0051fcaf[n] = value = c;`), splitting the read from the increment,
-//     and merging `c` and `value` into a single variable all change the order
-//     of the two stores relative to each other but never lift them ahead of
-//     the pointer spill: MSVC 5's scheduler sinks the pair as one group here,
-//     where the original splits them. Note that the chained form
-//     `value = c = DAT_0051fcaf[n] = *p++;` is what puts the history store
-//     before the stack store, so the original most likely wrote something of
-//     that shape; the remaining gap is the pointer spill, which MSVC hoists
-//     in every arrangement tried.
-//  2. Nothing else. Every other difference in the raw object diff is only an
-//     unresolved address (the calls and the globals), which the checker
-//     resolves and confirms against data/symbols.csv.
+// What still differs, in one block. The original's loop head is
+//   p reload, ++n, load byte, ++p,
+//   DAT_0051fcaf[n] = c,          <- history store
+//   p = p,                        <- pointer spill
+//   state load, value = c, sub eax,0, je
+// and this file emits
+//   p reload, ++n, load byte, ++p,
+//   p = p, state load, sub eax,0, value = c, DAT_0051fcaf[n] = c, je
+// So exactly two relative orders are wrong: the history store sits four
+// slots too late, and the switch's `sub eax,0` two slots too early. Both
+// stores have the right operands, the block is ten instructions long in
+// both, and the four callee-saved registers are all spoken for (esi the run
+// length, ebp the run start, edi the output pointer, ebx the current byte),
+// so the source pointer really does have to live on the stack.
 //
-// A second pass narrowed this to a single inversion and then exhausted it.
-// Reading the two emissions side by side, the only difference is where the
-// history store lands: the original puts `mov byte [esi+0x51fcaf], bl` directly
-// after the load and the `inc`, ahead of the source-pointer spill, while this
-// version puts it last, after the `switch` test has been computed. The store of
-// the current byte to its own stack slot and the `state` load are already in
-// the original's order in the file as written, so those are not the problem.
+// CORRECTION to an earlier note in this file, re-derived from the operand
+// bytes: "MSVC 5 sinks a store to the last slot of the block in this
+// function, always" is WRONG. It sinks a store that is a TOP LEVEL statement
+// of the block. Two counter-examples, both verified by compiling:
+//  - the pre-loop block (0x4ba037..0x4ba06c) is emitted in plain source
+//    order, with the p store at 0x50, the value store at 0x54 and the
+//    `test ecx,ecx` between them. The latch block (0x4ba157) likewise
+//    interleaves the `prev` store at 0x15b between the width load and the
+//    width decrement. So sinking is not a property of this function.
+//  - in the loop head, moving the two stores into a NESTED expression tree
+//    makes them come out IN PLACE. A `static __inline` helper whose return
+//    value is assigned to p, with the history and value stores inside it,
+//    emits the history store at slot 5 and the value store at slot 6, the
+//    original's exact positions. What that shape costs is the register
+//    allocation: MSVC then picks `ecx` for the pointer and `al` for the byte
+//    instead of `eax` and `bl`, and it re-reads through the pointer, so the
+//    block grows by two bytes and the score drops. Getting the store
+//    positions right and the register allocation right at the same time has
+//    not been found.
+// So the residual is not a scheduler tie and not an operand-order or a
+// block-order problem: it is that the original's loop head is one expression
+// tree whose stores MSVC 5 emitted in place, and every flat spelling of the
+// same three statements puts them through the delayed-store list.
 //
-// Stating it as two orderings, original is
-//   history store < pointer spill < state load < stack store < sub eax,0
-// and this file is
-//   pointer spill < state load < sub eax,0 < stack store < history store
-// so there is exactly one inversion to remove, the history store against
-// everything else. That is a tie-break, not a structural error: the block is
-// ten instructions in both, all with the right operands, and the four pushed
-// callee-saved registers are all already spoken for (esi the run length, ebp the
-// run start, edi the output pointer, ebx the current byte), so the source
-// pointer genuinely has to live on the stack and its spill genuinely has to
-// precede the first call in the switch body. Both positions satisfy that, and
-// the original picks the later one.
+// Things measured, all by compiling a variant and scoring it with
+// `check.py --sym` (all 98.7% or worse, so none is worth a real run):
+//  - the three statements `c = *p++`, `value = c`, `DAT_0051fcaf[n] = c` in
+//    all six relative orders, and with the read split from the increment
+//    (`c = *p; p++;`) in four arrangements;
+//  - the four chained-assignment orders of the two stores, with and
+//    without the read fused in (`n++` must stay on its own line: folding it
+//    into the chain's index scores 19.8%);
+//  - `value = c = state` style commas, a `switch (value = c, state)`
+//    condition, both stores inside a nested block, and a throwaway
+//    temporary for the loaded byte;
+//  - the pointer advance written as its own statement in four spellings
+//    (`++p`, `p = p + 1`, `p = &p[1]`, `(p++, value = c)`), which does not
+//    lift the history store past the pointer spill;
+//  - declaration order. `value` before `prev`, `state` before `n`, and the
+//    byte locals before `n`/`state` all leave the loop head byte for byte
+//    identical and only shuffle other blocks (98.7%, 98.1%, 97.5%). The
+//    frame is unaffected, so the slot assignment is not what is being
+//    probed here;
+//  - the history store through a cached base pointer
+//    (`histbase[n] = c`), through `DAT_0051fcb0[n - 1]` (which is the same
+//    byte, since DAT_0051fcb0 is DAT_0051fcaf[1]), and through a pointer
+//    parameter, all 98.7% with the same block;
+//  - the two stores reached through pointers taken as `&value` and
+//    `DAT_0051fcaf + n`;
+//  - loop shapes `while (width) { width--; ... }`, `for (; width; width--)`
+//    and the decrement moved into the latch. All three give the same block;
+//  - `static __inline` helper shapes, twenty of them, grouped by what makes
+//    the difference:
+//     * helpers taking the byte BY VALUE (the caller reads, the helper
+//       stores) never change the block: the stores go back to the end. The
+//       byte has to be read through the pointer INSIDE the helper;
+//     * helpers that read through the pointer and return the bumped pointer
+//       do emit the stores in place. The best of these put the history
+//       store at slot 5 and the pointer store at slot 6 (the original's
+//       positions) but cost an extra reload of the byte and switch the
+//       pointer to `ecx` and the byte to `al`;
+//     * helpers whose read is a separate top-level statement from the call
+//       always revert to the sunk form.
+//    The register shift is the thing still to solve: the flat form keeps
+//    `bl` because `c` is a byte local that MSVC enregisters, and the helper
+//    form loses it because the byte is produced by a call whose result
+//    feeds an assignment.
 //
-// Twenty-three shapes were measured against it, all by compiling a variant and
-// scoring it with `check.py --sym`, and none beat 98.7%:
-//  - the three statements `c = *p++`, `value = c`, `DAT_0051fcaf[n] = c` in all
-//    six relative orders, including the two orders with `n++` moved to its own
-//    statement before and after the load (the latter two are much worse, 86.7%
-//    and 19.8%, which is itself informative: `n++` must stay on its own line);
-//  - the two stores written as chained assignments in all four directions:
-//    `value = c = DAT_0051fcaf[n] = *p++`, `DAT_0051fcaf[n] = c = *p++`,
-//    `value = c = *p++` with the history store after, and
-//    `DAT_0051fcaf[n] = value = c`;
-//  - the read split from the increment (`c = *p; p++;`) in four arrangements;
-//  - the load via a fresh temporary (`unsigned char t = *p++;` then
-//    `DAT_0051fcaf[n] = c = t;`), and the store through `*(DAT_0051fcaf + n)`;
-//  - and five shapes that pull the whole group into a `static inline` helper
-//    taking fresh pointer arguments and returning the bumped pointer, which is
-//    the technique that fixed 0x4a76b0 and 0x443ff0. All five scored 98.7% or
-//    worse (the best two are `helper_fresh` and `helper_vfirst`, both still
-//    98.7%; dropping either the history store or the stack store from the
-//    helper drops to 87.6%, and bumping the pointer before the load drops to
-//    61.0%). So the helper can produce the original's *relative* order of the
-//    two stores but still cannot lift the history store past the pointer
-//    spill, which confirms the spill is scheduled by the loop, not by the
-//    statements that feed it.
+// Two explanations for the late history store were considered and the
+// disassembly rules both out. The first is that `p` might be live for
+// longer than it looks, but [esp+0x1c] is read only at the loop head
+// (0x4ba076) and never inside the switch, so its live range really does end
+// at the store. The second is the induction variable: the width counter is
+// spilled to the `src` argument's dead slot [esp+0x10], and one might
+// expect its spill to compete with `p`'s. It does not, because the back
+// edge is `jne 0x4ba076` at 0x4ba164 and that target skips the
+// `mov [esp+0x10], ecx` at 0x4ba072, so the width spill is peeled out of
+// the loop and only happens on the first iteration.
 //
-// I would call this exhausted for the single-file shape.
+// Frame, for whoever looks next. `sub esp, 8` is exactly the two dedicated
+// locals: the width copy (int) at [esp+0x10] and `value` (byte) at
+// [esp+0x14], 4 + 1 rounded to 8. The other three locals are overlaid on
+// dead argument slots, which is why no frame space is spent on them:
+// `p` reuses `dest` at [esp+0x1c] (edi already holds it by 0x4ba03b),
+// `prev` reuses `src` at [esp+0x20] (esi already holds it by 0x4ba00e),
+// and `state` reuses `width` at [esp+0x24] (ecx already holds it). So the
+// slot a local lands in is decided by its declaration order against the
+// argument list, and moving a declaration moves a slot. Note that [esp+0x14]
+// is written as a byte and read as a DWORD at 0x4ba17a, so `value` is a
+// byte local whose four byte slot is passed whole to FUN_004b9f50.
 //
-// Two explanations for a late spill were considered and the disassembly rules
-// both out. The first is that `p` might be live for longer than it looks, but
-// `[esp+0x1c]` is read only at the loop head (0x4ba076) and never inside the
-// switch, so its live range really does end at the store. The second is the
-// induction variable: the width counter is spilled to the `src` argument's dead
-// slot, and one might expect its spill to compete with `p`'s. It does not,
-// because the loop back edge is `jne 0x4ba076` at 0x4ba164, and that target
-// skips the `mov [esp+0x10], ecx` at 0x4ba072. So the width spill is peeled
-// out of the loop and only happens on the first iteration, and it is not what
-// the scheduler balances against the `p` spill. Both loop heads are ten
-// instructions with the same operands; the only question is the one order.
+// Two explanations for the late history store were considered and the
+// disassembly rules both out. The first is that `p` might be live for
+// longer than it looks, but [esp+0x1c] is read only at the loop head
+// (0x4ba076) and never inside the switch, so its live range really does end
+// at the store. The second is the induction variable: the width counter is
+// spilled to the `src` argument's dead slot [esp+0x10], and one might
+// expect its spill to compete with `p`'s. It does not, because the back
+// edge is `jne 0x4ba076` at 0x4ba164 and that target skips the
+// `mov [esp+0x10], ecx` at 0x4ba072, so the width spill is peeled out of
+// the loop and only happens on the first iteration.
+
+// Appended by deepseek-v4.1-flash. Still 98.7%, the same single block. These
+// further shapes were compiled and scored: hoisting one or both stores into
+// the switch condition as a comma expression
+// (`switch (DAT_0051fcaf[n] = c, state)`, `switch (value = c,
+// DAT_0051fcaf[n] = c, state)`, `switch (DAT_0051fcaf[n] = c, value = c,
+// state)`), and chaining the two stores into one assignment
+// (`DAT_0051fcaf[n] = c = *p++`, `value = DAT_0051fcaf[n] = c`,
+// `DAT_0051fcaf[n] = value = c`), with the read fused or split. Every one
+// emitted a byte-identical block to the flat spelling below, so MSVC 5's
+// scheduler is indifferent to store order and to the expression tree here;
+// the original history-store and `sub eax,0` positions are not reachable this
+// way.
 
 extern unsigned char DAT_0051fcaf[];
 extern unsigned char DAT_0051fcb0[];

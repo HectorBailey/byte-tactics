@@ -1,44 +1,9 @@
-// Decompiled by space-bunny-free, finished by muse-spark-1.3-free. Names are provisional.
-//
-// Removes a player (a "drop" / disconnect path): find the player's slot, bail
-// out if the slot is not a local, active player of type 1, 2 or 3, then clear
-// the two per-team tables of every local player at that player's team number,
-// tell the network layer, clear the slot and hand leadership to the highest
-// numbered remaining local player.
-//
-// Best match so far: 83.6% with a top-tested while(1) clearing loop. Every
-// instruction sequence matches except (a) the callee-saved register rotation
-// in the first half (original has p in esi, slot byte in edi, g_game base in
-// ebx; this file has p in ebx, slot in esi, base in edi), (b) the flag load
-// uses edx (mov dl / and edx,1) where the original uses eax (xor eax,eax /
-// mov al / and eax,1), and (c) the clearing-loop latch (top-tested cmp/jge
-// plus jmp back, the original is bottom-tested add/cmp/jl). The tail
-// (network call, b2 branch, best-id loop, all three FindPlayer scans) matches
-// exactly, so (c) and the b2 branch shape are knock-ons of (a), not separate
-// problems.
-//
-// Diagnosis for whoever picks this up:
-// - Referencing p->field_146 inside the clearing loop (either store) DOES put
-//   p in esi, slot in edi and base in ebx (scratch z01/z02/f01/f02), but the
-//   extra dereference always emits a per-iteration reload (the q stores may
-//   alias p, so no CSE) and the loop body register roles swap. A bare
-//   (void)p in the loop, (void)p before the loop, and slot + (p - p) as index
-//   all fold away with no effect, so only a real load through p moves it.
-// - Moving the slot init inside the loop (so the p reference hoists) does not
-//   hoist: MSVC keeps the per-iteration load and also hoists constant 3 into
-//   ebx (scratch s01/s03). A Game* game = g_game local takes esi but leaves p
-//   in ebx (scratch w05/b02). A data-pointer local, split inits, flag-first
-//   order, p ternary, ClearSlot/IsActive12/PlayerAt/GetSlot/HasFlag inline
-//   helpers, and extra Windows/C headers all leave the rotation unchanged.
-// - for-form clearing loop plus the mixed index miscompiles the stride to
-//   0x296 (5 iterations, semantically wrong, scratch f01/f02); while-form
-//   plus mixed keeps 0x14b (scratch z01, 75.1%). The for-form with plain slot
-//   indexing has the right loop shape but the wrong tail (scan block order),
-//   which suggests the tail order is also a knock-on of the rotation.
-// - Prepending the matched preceding function 0x452c40 changes nothing, so
-//   the state is not from the previous function in the exe.
-// The natural construct that references p in the loop region with zero
-// emitted code (or otherwise promotes p above slot) is still unknown.
+// Decompiled by space-bunny-free, finished by muse-spark-1.3-free, finished by deepseek-v4.1-flash. Names are provisional.
+// Partial: 83.6%, 848 bytes. Player/slot/game register rotation, the
+// flag-load register and the clearing-loop latch still differ. The native
+// bottom-tested loop is 846 bytes and 67.3%; 768 header sets, alternate
+// flag types and existing inline predicate helpers did not improve it.
+
 #include <stdio.h>
 #include <string.h>
 

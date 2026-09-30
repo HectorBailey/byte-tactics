@@ -1,6 +1,10 @@
-// Decompiled by GPT-6 Astra. Names are provisional.
-// Partial: 62.2%. Register allocation and merged order-construction tails differ.
+// Decompiled by GPT-5.6 Astra, finished by deepseek-v4.1-flash and GPT-6. Names are provisional.
+// Partial: callback order-pointer reloads corrected; weapon scan registers,
+// position copying and order-kind temporaries still differ. The inherited
+// 75.0% attempt cached the other order across a callback; the corrected
+// shared construction currently scores 74.5%.
 #include <stdio.h>
+// SHARED begin
 struct Vec3 {
     int x, y, z;
     Vec3 operator+(const Vec3& v) const { Vec3 r; r.x=x+v.x; r.y=y+v.y; r.z=z+v.z; return r; }
@@ -56,9 +60,13 @@ int __cdecl FUN_004b70ef(short, int);
 int __cdecl FUN_004b7123(short, int);
 static inline int Contains(unsigned int* bits, unsigned short index) { return bits[index >> 5] & (1 << (index & 31)); }
 static inline Vec3 Offset(short angle, int distance) { Vec3 v; v.x=-FUN_004b70ef(angle,distance); v.y=0; v.z=-FUN_004b7123(angle,distance); return v; }
+// SHARED end
+
 // FUNCTION: 0x40fbe0
 int __stdcall FUN_0040fbe0(Unit* unit, Order* order, int flags)
 {
+// REGION r1 begin   0x40fbe0-0x40fcda
+//   the guard, the water/terrain move, and the state dispatch
     if (order->target && !(flags&0x48)) {
         if (unit->terrain==g_game->water) {
             Vec3 center;
@@ -74,6 +82,8 @@ int __stdcall FUN_0040fbe0(Unit* unit, Order* order, int flags)
         }
         order->pos=order->target->pos;
         unsigned int state=0; state=order->state;
+// REGION r2 begin   0x40fcda-0x40feda
+//   case 0, the guard order, and case 1
         switch(state) {
         case 0:
             if (unit->motion && (unit->def->flags&0x800)) {
@@ -96,6 +106,16 @@ int __stdcall FUN_0040fbe0(Unit* unit, Order* order, int flags)
         case 1:
             ((Class_00489800*)unit)->FUN_00489800(3);
             return 1;
+// REGION r2 end
+// REGION r3 begin   0x40feda-0x4100d0
+//   case 2's opening: the attacker test, the three-weapon scan, and the
+//   FUN_004899b0 order-kind test.
+//
+//   This text emits 0x40fd26-0x40fedc, which is the original's r2 range, not
+//   r3's: MSVC lays a switch out as case 2, case 1, case 0, so the region
+//   ranges (which follow the emitted order) and these markers (which follow
+//   the written order) disagree. The code that does emit r3's range, the
+//   MobileBuild order-steal chain at 0x40feda-0x4100d0, sits in the r4 block.
         case 2: {
         Unit* attacker=order->target->attacker;
         if (attacker && !attacker->owner->allied[unit->owner->index] && (flags & 0x10) &&
@@ -121,31 +141,41 @@ int __stdcall FUN_0040fbe0(Unit* unit, Order* order, int flags)
                     order->flags=0; return 3;
                 }
             }
+// REGION r3 end
+// REGION r4 begin   0x4100d0-0x4102c6
+//   the MobileBuild and VTOL order-steal chain, then the aim and fire block
+//   The original's ONE tail at 0x4100d6 is now reproduced by a single
+//   construction after the if/else (see STATUS). What still differs is the
+//   `buildOrder` flag the compiler materialises (extra test eax,eax) and the
+//   frame slot of `kind`.
             if (order->target->order && order->target->order->kind.index && (unit->def->flags&0x40) &&
                 ((Class_004899b0*)unit)->FUN_004899b0(order->target->order->target) &&
                 (order->target->def->flags&0x40) && order->target->order &&
                 (order->target->order->capabilities&0x100000) && unit!=order->target->order->target) {
-                int building=order->target->order->kind=="MobileBuild" || order->target->order->kind=="BuildingBuild" || order->target->order->kind=="VTOL_MobileBuild";
                 Order* other=order->target->order;
+                int building=other->kind=="MobileBuild" || other->kind=="BuildingBuild" || other->kind=="VTOL_MobileBuild";
                 int actionable=((other->capabilities&0x200) && other->target) || (other->capabilities&0x400);
+                Class_00438760 kind;
                 if (!building && actionable) {
-                    Class_00438760 kind=other->kind;
+                    kind=other->kind;
                     if (kind=="REPAIRUNIT") kind=Class_00438760("VTOL_REPAIRUNIT");
                     if (kind=="RECLAIM") kind=Class_00438760("VTOL_RECLAIM");
                     if (kind=="RECLAIMUNIT") kind=Class_00438760("VTOL_RECLAIMUNIT");
                     if (kind=="HELPBUILD") kind=Class_00438760("VTOL_HELPBUILD");
                     ((Class_004388d0*)order)->FUN_004388d0(0);
-                    FUN_0043acb0(unit,new Class_0043a1f0(kind,order->target->order->target,&order->target->order->pos,0,0,0));
-                    order->flags=0; return 3;
-                }
-                if (building && other->target) {
+                    goto BuildOrder;
+                } else if (building && other->target) {
                     ((Class_004388d0*)order)->FUN_004388d0(0);
-                    Class_00438760 kind;
                     kind=Class_00438760("VTOL_HelpBuild");
+                    goto BuildOrder;
+                }
+                goto Aim;
+                BuildOrder: {
                     FUN_0043acb0(unit,new Class_0043a1f0(kind,order->target->order->target,&order->target->order->pos,0,0,0));
                     order->flags=0; return 3;
                 }
             }
+            Aim:
             if (flags&0xe0) order->angle+=-FUN_004b6c30(0x2000)-0x4000;
             short angle=order->angle;
             Vec3 pos;
@@ -159,9 +189,14 @@ int __stdcall FUN_0040fbe0(Unit* unit, Order* order, int flags)
             order->flags|=0xf8;
             return 2;
         }
+// REGION r4 end
         }
+// REGION r1 end
+// REGION r5 begin   0x4102c6-0x410398
+//   the default return and the seek-guard tail
         return 7;
     }
     if (!order->next) FUN_0043ad10(unit,new Class_0043a1f0("VTOL_SEEKGUARD",order->target,&order->pos,0,0,0));
     return 5;
+// REGION r5 end
 }

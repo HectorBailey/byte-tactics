@@ -1,7 +1,18 @@
-// Decompiled by Opus. Names are provisional.
+// Decompiled by Opus, finished by deepseek-v4.1-flash and GPT-6.1-sol. Names are provisional.
 // Codex / GPT-6 retest in #13:
 // capturing z first and reversing helper argument order did not
 // preserve the position pointer in ecx and tile x in esi.
+// GPT-6.1-sol retest in #1672: the baseline helper version remains best at 72.7%.
+// Inlining the bounds and cell-index expression fell to 46.0%; restoring the
+// helper and trying the original x/y declaration order again stayed at 72.7%.
+// DeepSeek retest in #1334: the whole diff is still one allocation tie. p
+// wants ecx (short lived, then reused for width) and x wants esi (long
+// lived). Compiling the real preceding function 0x485070 in the same file
+// (same g_game, same struct layouts) did not change it, nor did a CSE'd
+// extra use of x at the GetCell call, a reference/copy of p, raw field
+// access, single-declaration locals, or uninitialised cell/result locals
+// (those last three drop to 68.2%). The instruction sequence is otherwise
+// identical, so this is compiler register priority, not source shape.
 // Returns the average of the two height bytes (+5, +6) of the map cell under
 // a 16.16 fixed-point position, or -1 off the map.
 // Not matched: the original keeps the position pointer in ecx and the tile x

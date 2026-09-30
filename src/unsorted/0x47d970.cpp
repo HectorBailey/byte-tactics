@@ -1,4 +1,25 @@
-// Decompiled by Space Bunny Free, finished by Claude Sonnet 5.5. Names are provisional.
+// Decompiled by Space Bunny Free, finished by Claude Sonnet 5.5 and deepseek-v4.1-flash. Names are provisional.
+// deepseek-v4.1-flash second pass (#1609): attacked only the x sum's register
+// operand with levers not tried before. All scored as scratch (no committed body
+// change): the seven operand orders of the two sums; a `Point&`/`Point*` bound to
+// pos and to size; `short&` and `short*` bound to the individual fields; short
+// and int locals holding pos.x; a static inline helper returning pos.x; static
+// inline add helpers taking the object; and Point member accessors (SumX/SumY)
+// called with the receiver swapped so the x sum is `pos.SumX(size)` and the y sum
+// is `size.SumY(pos)`. Every one is 98.0 with the same two-instruction residual,
+// except the `Point&`-to-size forms which compile x to the higher offset and flip
+// y to the lower offset (96.0). So neither operand order nor any access path in
+// the source can move this x operand: MSVC canonicalises the mem+mem add to the
+// higher displacement regardless. This confirms the earlier conclusion, the
+// residual is front-end state and the body below stays the best version.
+//
+// deepseek-v4.1-flash pass (#1182): re-ran the free-scored sweep (operands
+// swapped, augment form, local/pointer/reference aliases of obj, statement
+// order, comma declaration), the static-helper form, and tools/headers.py
+// (128 sets, best <windows.h> 98.0). Every variant is 98.0 with the same
+// two-instruction residual and the total size exactly right, so the file
+// below stays the best version; the choice is not reachable from the source.
+//
 // space-bunny-free pass (#1112): re-derived every stack slot, confirmed the body is
 // the right shape and that the one remaining difference is not reachable from the
 // source. Details below; the body itself is unchanged from the previous passes.

@@ -1,0 +1,579 @@
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
+// Partial: 24.0%, 3796 bytes versus 5248. Expanded resource/background
+// loading, slider end buttons, text/list initialization, animation lookup
+// and the matched button-frame selection pattern from 0x4a7f70. The earlier
+// incomplete slider stub scored 26.6%; this fuller version preserves more
+// behavior. Font/text tails, surface creation, redraw details and teardown
+// remain incomplete. Further register/frame matching needs the missing body.
+
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#pragma pack(push, 1)
+
+struct GafEntry_004a81e0 {              // 4 bytes: frame table header
+    unsigned short count;               // +0x00
+    unsigned short unknown_2;           // +0x02
+};
+
+struct Glyph_004a81e0 {                 // 8 bytes, returned by FUN_004b7f30
+    unsigned short w;                    // +0x00
+    unsigned short h;                    // +0x02
+    short xoff;                         // +0x04
+    short yoff;                         // +0x06
+};
+
+struct Entry_004a81e0 {                 // 0x15b bytes, one GUI list entry
+    unsigned char type;                 // +0x00
+    unsigned char group;                // +0x01
+    char name[0x11];                    // +0x02 (strncpy 0x10)
+    short x;                            // +0x13
+    short y;                            // +0x15
+    short w;                            // +0x17
+    short h;                            // +0x19
+    int flags;                          // +0x1b
+    unsigned char* colours;             // +0x1f
+    char unknown_23[0x29 - 0x23];
+    unsigned char field_29;             // +0x29 (second loop keep-test)
+    char unknown_2a;
+    void* archive;                      // +0x2b
+    GafEntry_004a81e0* gaf;             // +0x2f
+    char unknown_33[0xb4 - 0x33];
+    unsigned char resourceFlags;
+    char unknown_b5;
+    union {
+        short count;                    // +0xb6 (entry 0 only)
+        struct { short unused_b6; Glyph_004a81e0* firstFrame; } animation;
+        struct {
+            char unknown_0[0x14];
+            GafEntry_004a81e0* gaf;
+            char unknown_18[0x24 - 0x18];
+            short scroll;
+        } list;
+        char text[0x80];                // +0xb6
+        struct {
+            char unknown_0[0xa];
+            void* archive;
+            GafEntry_004a81e0* background;
+        } assets;
+    } u;
+    union {
+        short field_136;
+        struct { unsigned char stage; unsigned char stageIndex; };
+    };
+    short field_138;                    // +0x138
+    union {
+        struct {
+            unsigned char field_13a;
+            unsigned char field_13b;
+            unsigned char field_13c;
+            char unknown_13d;
+        };
+        GafEntry_004a81e0* inputGaf;
+    };
+    char unknown_13e[0x142 - 0x13e];
+    short sliderThumb;
+    char unknown_144[0x14e - 0x144];
+    GafEntry_004a81e0* sliderGaf;
+    unsigned char sliderStyle;
+    char unknown_153[0x15b - 0x153];
+};
+
+struct Layer_004a81e0 {
+    char unknown_00[4];
+    Entry_004a81e0* entries;            // +0x04
+    char unknown_08[0x14 - 0x08];
+    int field_14;                       // +0x14
+};
+
+struct Menu_004a81e0 {                  // the object callers pass as arg1
+    char unknown_00[4];
+    void* gaf;                          // +0x04
+    char unknown_08[0x18 - 0x08];
+    Layer_004a81e0* layer;              // +0x18
+    char unknown_1c[0x70 - 0x1c];
+    int field_70;                       // +0x70
+    char unknown_74[0x9b6 - 0x74];
+    char str_9b6[0x100];                // +0x9b6
+    char str_ab6[0x100];                // +0xab6
+    char str_bb6[0x100];                // +0xbb6
+};
+
+struct Language_004a81e0 {
+    char unknown_00[0xc];
+    void* glyphs;                       // +0x0c
+};
+
+struct FontRoot_004a81e0 {
+    int current;                        // +0x00
+    char unknown_04[0x14 - 0x04];
+    Language_004a81e0* language;        // +0x14
+};
+
+#pragma pack(pop)
+
+extern FontRoot_004a81e0* DAT_0051fba4;
+
+int FUN_004b6700(void);
+int FUN_004b6710(void);
+int FUN_004c1ab0(void);
+unsigned int FUN_004b6340(void);
+int FUN_004c1450(void);
+
+void __stdcall FUN_004a05e0(void* obj, int index);
+void __stdcall FUN_004a16f0(void* obj, int index, int param3);
+void __stdcall FUN_004a1b40(void* obj, int index);
+void __stdcall FUN_004a3ef0(void* obj, int index);
+void __stdcall FUN_004a4660(void* obj, int index);
+void __stdcall FUN_004a4980(void* obj, int index);
+void __stdcall FUN_004a4c90(void* obj, int index, unsigned char param3);
+void __stdcall FUN_004a4d70(void* obj, int index);
+void __stdcall FUN_004a56b0(void* obj, int index);
+void __stdcall FUN_004a5e50(void* obj, int index);
+void __stdcall FUN_004a5f40(void* obj, int index);
+void __stdcall FUN_004b0230(void* obj, int index, void* bmp);
+void* __stdcall FUN_004b7f30(void* gaf, int index);
+void* __stdcall FUN_004b8c60(char* name);
+void* __stdcall FUN_004b8d40(void* gaf, const char* name);
+char* __stdcall FUN_004baff0(char* a, char* b, char* c);
+long __stdcall FUN_004bbc40(char* name);
+char* __stdcall FUN_004bbe50(char* name, int* size);
+void __stdcall FUN_004c1420(int id);
+char* __stdcall FUN_004c5740(char* key);
+void* __stdcall FUN_004c69f0(char* name, int width, int height);
+void __stdcall FUN_004c6ac0(void* obj);
+void __stdcall FUN_004c6b70(void* dst, void* bmp, int x, int y);
+void FUN_004d85a0(int* param_1);
+
+// The memory-resident scalars. &L.i escapes to FUN_004bbe50, which keeps the
+// whole struct in memory. entries is deliberately not a field; it lives in
+// ebp. See the frame note in the header.
+struct Scal_004a81e0 {
+    void* p4;                          // +0x10
+    Glyph_004a81e0* g;                 // +0x14
+    int force;                         // +0x18
+    int i;                             // +0x1c
+    short* pfield;                     // +0x20
+    char* text;                        // +0x24
+    Entry_004a81e0* e;                 // +0x28
+    char* name9b6;                     // +0x2c
+};
+
+// FUNCTION: 0x4a81e0
+int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
+{
+    Entry_004a81e0* entries;
+    Scal_004a81e0 L;
+    char stagebuf[0x20];
+    char textbuf[0x100];
+    char buf1[0x100];
+    char buf2[0x100];
+    char buf3[0x80];
+
+    if (!menu->layer)
+        return 0;
+    entries = menu->layer->entries;
+    if ((flags & 0x100) && (flags & 1)) {
+        entries[0].y = -1;
+        entries[0].x = -1;
+    }
+    if ((flags & 0x1000) && (flags & 1)) {
+        entries[0].y = -2;
+        entries[0].x = -2;
+    }
+    if (entries[0].x == -1) {
+        entries[0].x = (short)((FUN_004b6700() - entries[0].w) / 2);
+        entries[0].y = (short)((FUN_004b6710() - entries[0].h) / 2);
+    }
+    if (entries[0].x == -2) {
+        entries[0].x = (short)(((FUN_004b6700() - 0x80 - entries[0].w) / 2) + 0x80);
+        entries[0].y = (short)((FUN_004b6710() - entries[0].h) / 2);
+    }
+    if (entries[0].x + entries[0].w > FUN_004b6700())
+        entries[0].x = (short)((FUN_004b6700() - entries[0].w) / 2);
+    if (entries[0].y + entries[0].h > FUN_004b6710())
+        entries[0].y = (short)((FUN_004b6710() - entries[0].h) / 2);
+
+    L.force = flags & 1;
+    if (L.force == 0)
+        goto after_entries;
+
+    while (FUN_004c1ab0() != 0)
+        ;
+    if (menu->field_70 != 0) {
+        for (L.i = 0; L.i <= entries[0].u.count; L.i++)
+            if (entries[L.i].type == 1)
+                entries[L.i].field_13a = 0;
+    }
+    if (entries[0].w > FUN_004b6700())
+        return 0;
+    if (entries[0].h > FUN_004b6710())
+        return 0;
+
+    entries[0].u.assets.archive = 0;
+    L.name9b6 = menu->str_9b6;
+    for (L.i = 0; L.i <= entries[0].u.count; L.i++) {
+        L.e = &entries[L.i];
+        buf2[0] = 0;
+        if (menu->str_9b6[0])
+            strcpy(buf2, menu->str_9b6);
+        L.p4 = 0;
+        if (L.e->resourceFlags & 1) {
+            L.e->archive = 0;
+            L.e->gaf = 0;
+            buf1[0] = 0;
+            if (menu->str_ab6[0])
+                strncpy(buf1, menu->str_ab6, 0x100);
+            strcat(buf1, L.e->name);
+            strcat(buf1, "_gadget");
+            FUN_004baff0(buf1, buf1, "GAF");
+            if (FUN_004bbc40(buf1)) {
+                L.e->archive = FUN_004b8c60(buf1);
+                if (L.e->archive)
+                    L.e->gaf = (GafEntry_004a81e0*)FUN_004b8d40(L.e->archive, L.e->name);
+            }
+        }
+        switch (L.e->type) {
+        case 0:
+        case 11: {
+            if (entries[0].y < 0)
+                entries[0].y += (short)FUN_004b6710();
+            buf1[0] = 0;
+            if (menu->str_ab6[0])
+                strncpy(buf1, menu->str_ab6, 0x100);
+            strncpy(textbuf, entries[0].name, 0x10);
+            textbuf[0x10] = 0;
+            strcat(buf1, textbuf);
+            FUN_004baff0(buf1, buf1, "GAF");
+            if (!entries[0].u.assets.archive && FUN_004bbc40(buf1))
+                entries[0].u.assets.archive = FUN_004b8c60(buf1);
+            strncpy(textbuf, entries[0].u.text + 0x46, 0x10);
+            textbuf[0x10] = 0;
+            GafEntry_004a81e0* background = 0;
+            if (entries[0].u.assets.archive)
+                background = (GafEntry_004a81e0*)FUN_004b8d40(entries[0].u.assets.archive, textbuf);
+            if (background == 0 && menu->gaf != 0) {
+                background = (GafEntry_004a81e0*)FUN_004b8d40(menu->gaf, textbuf);
+                if (background == 0) {
+                    background = (GafEntry_004a81e0*)FUN_004b8d40(menu->gaf, "BackTile");
+                    if (background != 0) {
+                        for (int frameIndex = 0; frameIndex < background->count; frameIndex++) {
+                            Glyph_004a81e0* frame = (Glyph_004a81e0*)FUN_004b7f30(background, frameIndex);
+                            frame->yoff = 0;
+                            frame->xoff = 0;
+                        }
+                    }
+                }
+            }
+            entries[0].u.assets.background = background;
+            break;
+        }
+
+        case 4: {
+            L.e->field_13b = 0;
+            GafEntry_004a81e0* sliders = 0;
+            if (entries[0].u.assets.archive)
+                sliders = (GafEntry_004a81e0*)FUN_004b8d40(entries[0].u.assets.archive, "SLIDERS");
+            if (sliders == 0 && menu->gaf != 0) {
+                sliders = (GafEntry_004a81e0*)FUN_004b8d40(menu->gaf, "SLIDERS");
+                if (sliders != 0) {
+                    for (int f = 0; f < sliders->count; f++) {
+                        Glyph_004a81e0* frame = (Glyph_004a81e0*)FUN_004b7f30(sliders, f);
+                        frame->yoff = 0;
+                        frame->xoff = 0;
+                    }
+                    int orientation = L.e->w > L.e->h ? 10 : 0;
+                    Glyph_004a81e0* frame = (Glyph_004a81e0*)FUN_004b7f30(sliders, orientation);
+                    if (L.e->w < L.e->h)
+                        L.e->w = frame->w;
+                    else
+                        L.e->h = frame->h;
+                    L.e->sliderStyle = (unsigned char)orientation;
+                }
+            }
+            L.e->sliderGaf = sliders;
+            if (sliders != 0) {
+                Entry_004a81e0* active = menu->layer->entries;
+                active[0].u.count++;
+                Entry_004a81e0* created = &active[active[0].u.count];
+                memset(created, 0, sizeof(*created));
+                created->type = 1;
+                created->field_29 = 1;
+                Entry_004a81e0* firstEnd = &entries[active[0].u.count];
+                firstEnd->x = L.e->x;
+                firstEnd->y = L.e->y;
+                firstEnd->gaf = sliders;
+                firstEnd->field_13b = L.e->sliderStyle + 6;
+                firstEnd->group = L.e->group;
+                Glyph_004a81e0* frame = (Glyph_004a81e0*)FUN_004b7f30(sliders, L.e->sliderStyle + 6);
+                firstEnd->w = frame->w;
+                firstEnd->h = frame->h;
+                firstEnd->flags = 0x3400;
+                firstEnd->field_29 = L.e->field_29;
+                active = menu->layer->entries;
+                active[0].u.count++;
+                created = &active[active[0].u.count];
+                memset(created, 0, sizeof(*created));
+                created->type = 1;
+                created->field_29 = 1;
+                Entry_004a81e0* secondEnd = &entries[active[0].u.count];
+                secondEnd->field_29 = L.e->field_29;
+                frame = (Glyph_004a81e0*)FUN_004b7f30(sliders, L.e->sliderStyle + 8);
+                secondEnd->gaf = sliders;
+                secondEnd->y = L.e->x;
+                secondEnd->field_13b = L.e->sliderStyle + 8;
+                secondEnd->group = L.e->group;
+                secondEnd->flags = 0x2c00;
+                secondEnd->w = frame->w;
+                secondEnd->h = frame->h;
+                frame = (Glyph_004a81e0*)FUN_004b7f30(sliders, L.e->sliderStyle + 6);
+                if (L.e->w > L.e->h) {
+                    secondEnd->x = L.e->x - frame->w + L.e->w;
+                    L.e->w += (short)(-2 * frame->w);
+                    L.e->x += frame->w;
+                    frame = (Glyph_004a81e0*)FUN_004b7f30(sliders, L.e->sliderStyle + 5);
+                    L.e->sliderThumb = frame->w;
+                    L.e->field_136 = L.e->w - L.e->sliderThumb - 4;
+                } else {
+                    secondEnd->y = L.e->y - frame->h + L.e->h;
+                    secondEnd->x = L.e->x;
+                    L.e->h += (short)(-2 * frame->h);
+                    L.e->y += frame->h;
+                }
+            } else {
+                L.e->field_136 = (L.e->w > L.e->h ? L.e->w : L.e->h) - 6;
+            }
+            break;
+        }
+
+        case 3: {
+            GafEntry_004a81e0* input = menu->gaf ? (GafEntry_004a81e0*)FUN_004b8d40(menu->gaf, "TEXTINPUT") : 0;
+            if (input != 0) {
+                for (int f = 0; f < input->count; f++) {
+                    Glyph_004a81e0* frame = (Glyph_004a81e0*)FUN_004b7f30(input, f);
+                    frame->yoff = 0;
+                    frame->xoff = 0;
+                }
+            }
+            L.e->inputGaf = input;
+            if (L.e->field_138 >= 0x80)
+                L.e->field_138 = 0x7f;
+            memset(L.e->u.text, 0, 0x80);
+            break;
+        }
+        case 2: {
+            GafEntry_004a81e0* list = menu->gaf ? (GafEntry_004a81e0*)FUN_004b8d40(menu->gaf, "LISTBOX") : 0;
+            if (list != 0) {
+                for (int f = 0; f < list->count; f++) {
+                    Glyph_004a81e0* frame = (Glyph_004a81e0*)FUN_004b7f30(list, f);
+                    frame->yoff = 0;
+                    frame->xoff = 0;
+                }
+            }
+            L.e->u.list.gaf = list;
+            for (int j = 1; j <= entries[0].u.count; j++) {
+                Entry_004a81e0* other = &entries[j];
+                if (j != L.i && other->type == 2 && other->group == L.e->group) {
+                    short scroll = other->u.list.scroll > L.e->u.list.scroll ? other->u.list.scroll : L.e->u.list.scroll;
+                    L.e->u.list.scroll = scroll;
+                    other->u.list.scroll = scroll;
+                }
+            }
+            break;
+        }
+        case 12: {
+            strncpy(textbuf, L.e->name, 0x10);
+            textbuf[0x10] = 0;
+            L.e->colours = 0;
+            L.e->u.animation.firstFrame = 0;
+            GafEntry_004a81e0* animation = 0;
+            if (entries[0].u.assets.archive)
+                animation = (GafEntry_004a81e0*)FUN_004b8d40(entries[0].u.assets.archive, textbuf);
+            if (animation == 0)
+                animation = (GafEntry_004a81e0*)FUN_004b8d40(menu->gaf, textbuf);
+            if (animation != 0)
+                L.e->u.animation.firstFrame = (Glyph_004a81e0*)FUN_004b7f30(animation, 0);
+            break;
+        }
+
+        case 1: {
+            L.e->colours = 0;
+            if ((L.e->flags & 0x1800) || (L.e->resourceFlags & 1))
+                break;
+            FUN_004a05e0(menu, L.i);
+            GafEntry_004a81e0* entry = 0;
+            strncpy(textbuf, L.e->name, 0x10);
+            textbuf[0xf] = 0;
+            L.e->field_13b = 0;
+            if (entries[0].u.assets.archive)
+                entry = (GafEntry_004a81e0*)FUN_004b8d40(entries[0].u.assets.archive, textbuf);
+            if (entry == 0 && menu->gaf != 0) {
+                entry = (GafEntry_004a81e0*)FUN_004b8d40(menu->gaf, textbuf);
+                if (entry == 0) {
+                    if (L.e->flags & 0x80) {
+                        entry = (GafEntry_004a81e0*)FUN_004b8d40(menu->gaf, "CHECKBOX");
+                    } else if (L.e->stage != 0) {
+                        int n = L.e->stage < 4 ? L.e->stage : 4;
+                        sprintf(stagebuf, "stagebuttn%d", n);
+                        entry = (GafEntry_004a81e0*)FUN_004b8d40(menu->gaf, stagebuf);
+                        if (L.e->stage == 1) {
+                            L.e->stage = 2;
+                            L.e->flags |= 0x4000;
+                        }
+                    } else {
+                        strcpy(stagebuf, "BUTTONS0");
+                        entry = (GafEntry_004a81e0*)FUN_004b8d40(menu->gaf, stagebuf);
+                    }
+                    if (entry != 0) {
+                        int best = 1000;
+                        for (int f = 0; f < entry->count; f++) {
+                            Glyph_004a81e0* frame = (Glyph_004a81e0*)FUN_004b7f30(entry, f);
+                            if (frame != 0) {
+                                frame->yoff = 0;
+                                frame->xoff = 0;
+                            }
+                        }
+                        for (int j = 0; j < entry->count; j += 4) {
+                            Glyph_004a81e0* frame = (Glyph_004a81e0*)FUN_004b7f30(entry, j);
+                            int distance = abs(L.e->h - frame->h) + abs(L.e->w - frame->w);
+                            if (distance < best) {
+                                L.e->field_13b = (unsigned char)j;
+                                best = distance;
+                            }
+                        }
+                    }
+                }
+            }
+            L.e->gaf = entry;
+            if (entry != 0) {
+                Glyph_004a81e0* frame = (Glyph_004a81e0*)FUN_004b7f30(entry, L.e->field_13b);
+                if (frame != 0) {
+                    L.e->w = frame->w;
+                    L.e->h = frame->h;
+                }
+            }
+            break;
+        }
+
+        case 7:
+            strncpy(buf2, menu->str_bb6, 0x100);
+            { int fileSize; FUN_004bbe50(buf2, &fileSize); }
+            break;
+
+        case 8:
+            strncpy(buf2, L.e->name, 0x10);
+            { int fileSize; FUN_004bbe50(buf2, &fileSize); }
+            break;
+
+        case 13:
+            L.e->field_138 = (short)FUN_004b6340();
+            break;
+
+        case 5:
+            if (L.e->field_136 != 0)
+                FUN_004a05e0(menu, L.i);
+            break;
+
+        default:
+            break;
+        }
+    }
+
+    L.e = &entries[0];
+    L.p4 = FUN_004c69f0(L.e->name, L.e->w, L.e->h);
+    FUN_004c6b70(L.p4, 0, -L.e->x, -L.e->y);
+    L.text = L.e->name;
+    if (L.text == 0)
+        L.text = "GUI SURFACE";
+    L.p4 = FUN_004c69f0("SAVE UNDER", L.e->w, L.e->h);
+    FUN_004c6b70(L.p4, 0, 0, 0);
+
+after_entries:
+    L.e = &entries[0];
+    if ((flags & 4) || L.force || (flags & 0x40)) {
+        if (L.e->u.text[0] != 0) {
+            FUN_004b0230(menu, 0, 0);
+        } else if ((flags & 0x80) == 0) {
+            FUN_004b0230(menu, 0, 0);
+        }
+    }
+
+    for (L.i = 1; L.i <= entries[0].u.count; L.i++) {
+        L.e = &entries[L.i];
+        if (L.e->field_29 == 0)
+            continue;
+        switch (L.e->type) {
+        case 11:
+            FUN_004b0230(menu, L.i, 0);
+            break;
+        case 12:
+            FUN_004a5e50(menu, L.i);
+            break;
+        case 1:
+            if (L.force || (flags & 0x48) != 0)
+                FUN_004a5f40(menu, L.i);
+            break;
+        case 2:
+            L.e->field_136 = 0;
+            if (DAT_0051fba4->language == 0)
+                FUN_004c1450();
+            else
+                FUN_004b7f30(DAT_0051fba4->language->glyphs, 0x49);
+            FUN_004c1420(L.i);
+            FUN_004a1b40(menu, L.i);
+            break;
+        case 3:
+            FUN_004a4d70(menu, L.i);
+            break;
+        case 4:
+            L.e->field_136 = 0;
+            FUN_004a3ef0(menu, L.i);
+            break;
+        case 5:
+            FUN_004a56b0(menu, L.i);
+            break;
+        case 6:
+            if ((L.force == 0) && (flags & 0x40) == 0)
+                break;
+            FUN_004a4980(menu, L.i);
+            break;
+        case 13:
+            if ((L.force == 0) && (flags & 0x40) == 0)
+                break;
+            FUN_004a4660(menu, L.i);
+            break;
+        case 10:
+            if ((L.force == 0) && (flags & 0x40) == 0)
+                break;
+            FUN_004a4c90(menu, L.i, 0);
+            break;
+        default:
+            break;
+        }
+    }
+    FUN_004c1420(DAT_0051fba4->current);
+
+    FUN_004a16f0(menu, 0, 8);
+    if (L.i == entries[0].u.count + 1)
+        FUN_004c1420(DAT_0051fba4->current);
+    if (strncmp(buf1, buf3, 0x10) != 0)
+        FUN_004a16f0(menu, 1, 8);
+
+    if (flags & 2) {
+        if (entries[0].u.text[0] != 0) {
+            FUN_004c6b70(0, 0, 0, 0);
+            FUN_004c6ac0(0);
+        }
+        FUN_004c6ac0(0);
+        for (L.i = 0; L.i <= entries[0].u.count; L.i++) {
+            L.e = &entries[L.i];
+            if (L.e->gaf != 0)
+                FUN_004d85a0((int*)L.e->gaf);
+        }
+    }
+
+    L.pfield = &entries[0].x;
+    (void)L.pfield;
+    return 1;
+}

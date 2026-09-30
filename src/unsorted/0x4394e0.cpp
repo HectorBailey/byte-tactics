@@ -1,4 +1,15 @@
-// Decompiled by DeepSeek V4.1 Flash, finished by Space Bunny Free. Names are provisional.
+// Decompiled by DeepSeek V4.1 Flash, finished by Space Bunny Free, deepseek-v4.1-flash, and GPT-6.1-sol. Names are provisional.
+// #1529 retry by Codex / GPT-6.1-sol: checkall reconfirmed 65.2% (601/601 bytes).
+// Four worker checks found no better version; the remaining mismatch is the register/stack-slot rotation described below.
+//
+// Second pass (deepseek-v4.1-flash): confirmed the register swap is the root
+// and it does not respond to source-level changes. Rewriting the snapshot as
+// explicit field stores, `start; start = *out;`, a const Pos, `*(Pos*)out`, a
+// named node local, `(order, *out)`, and an `(int)order | 0` no-op alias all
+// still score 65.2%, i.e. the allocator always gives ebx to start.x and edi to
+// the node parameter. The original does the opposite (node in ebx, start.x in
+// edi), so the prologue, the delta spills into the argument slots and the whole
+// loop register assignment cascade from that one choice.
 // PARTIAL, 65.2%, ours is the same size as the original (601) and the
 // instruction sequence now matches the original one for one. What the function
 // does: it snapshots the position the caller passed in `out`, calls
@@ -42,7 +53,7 @@
 //    local slot sits 4 higher. Declaration order, local and parameter names,
 //    the spelling of the clamp and of the ternary, and dummy externs (1..12)
 //    all left that unchanged.
-//  - `#include <stdio.h>` is worth one point: the same source is 64.2% without
+//  - A timestamp helper and a snapshot-return helper were each inlined but left the same register assignment at 65.2%. The original register swap remains unresolved.
 //    it.
 #include <math.h>
 #include <stdio.h>

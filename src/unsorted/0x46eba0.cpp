@@ -1,110 +1,85 @@
-// Decompiled by longcat-2.5-preview-free, finished by space-bunny-free. Names are provisional.
-// Class_0046eba0 is a std::vector<Packet_0046cef0> whose three iterators are
-// byte pointers over 0xe-byte elements (allocator byte, _First +0x4, _Last +0x8,
-// _End +0xc). This is its insert(iterator, size_type, const T&), out of line,
-// and it is the same code as 0x46e640, which is the vector<int> instantiation of
-// the same member. The template's shape is taken from 0x46e640: size() is the
-// null-guarded element count, the copy/fill helpers go through
-// allocator.construct (whose null check is the `test dest,dest` guard inside
-// each of those loops), and fill and copy_backward assign directly, which is
-// why only the _Ucopy and _Ufill loops carry the guard.
-//
-// NOT MATCHING yet (check.py: 923 of 936 bytes, 67.6%). What still differs:
-//   * In every _Ucopy loop this file's source induction variable advances by
-//     ONE byte (`inc eax`) where the original advances by 0xe (`add eax,0xe`),
-//     while the destination advances by 0xe in both. The three-branch shape,
-//     the guards, the three size() evaluations, the *14 scalings, the
-//     operator new/delete calls and all three finish paths agree.
-//   * Consequently the whole realloc path is one live-range step off: the
-//     original keeps _P in the argument home slot [esp+0x20] across the
-//     operator new call and uses edx for the _N*14 scaling; this file keeps
-//     _N*14 in edi and reloads it.
-// Tried and rejected (all worse, see build/scratch/0x46eba0/):
-//   * v2/v3: the whole class on Packet_0046cef0* iterators, with the
-//     arithmetic left to the compiler (this is 0x46e640's shape verbatim).
-//     941 bytes, 53.2%, and MSVC 5 puts `this` in ebx where the original has
-//     ebp, which moves the whole allocation.
+// Decompiled by longcat-2.5-preview-free, finished by space-bunny-free and deepseek-v4.1-flash,
+// finished by GPT-6. Names are provisional. PARTIAL 81.2%, 924 of 936 bytes. Replace the old
+// byte-pointer copy loop, which advanced its source by one byte, with typed 14-byte packet
+// pointers. Put the empty allocator at offset zero so the three pointers
+// remain at +4/+8/+0xc. Use its allocate method, preserving the capacity
+// while the allocator clamps its own signed allocation count.
+// A destination-first _Ucopy(_P, _F, _L) improves the register family.
+// The original capacity/new-buffer stack homes and some loop registers
+// still differ. Helper permutations, const/reference forms, capacity-slot
+// variants and 768 header sets did not improve this version further.
 #include <memory>
 #include <xutility>
 
 #pragma pack(push, 1)
-struct Packet_0046cef0 {         // 0xe bytes
-    unsigned char type;          // +0x0
-    unsigned char arg;           // +0x1
-    unsigned int id;             // +0x2
-    int field_6;                 // +0x6
-    int field_a;                 // +0xa
+struct Packet_0046cef0 { // 0xe bytes
+    unsigned char type;  // +0x0
+    unsigned char arg;   // +0x1
+    unsigned int id;     // +0x2
+    int field_6;         // +0x6
+    int field_a;         // +0xa
 };
 #pragma pack(pop)
 
 class Class_0046eba0 {
-public:
+  public:
     typedef std::allocator<Packet_0046cef0> allocator_type;
     typedef unsigned int size_type;
 
-    char unknown_0[4];
-    char* first;                 // +0x4
-    char* last;                  // +0x8
-    char* end;                   // +0xc
     allocator_type alloc;
+    Packet_0046cef0* first; // +0x4
+    Packet_0046cef0* last;  // +0x8
+    Packet_0046cef0* end;   // +0xc
 
-    void FUN_0046eba0(char* _P, unsigned int _M, const Packet_0046cef0* _X);
+    void FUN_0046eba0(Packet_0046cef0* _P, unsigned int _M, const Packet_0046cef0& _X);
 
-    size_type size() { return (first == 0 ? 0 : (last - first) / 14); }
-    char* _Ucopy(char* _F, char* _L, char* _P)
-    {
-        for (; _F != _L; ++_F, _P += 14)
+    size_type size() { return (first == 0 ? 0 : last - first); }
+    Packet_0046cef0* _Ucopy(Packet_0046cef0* _P, Packet_0046cef0* _F, Packet_0046cef0* _L) {
+        for (; _F != _L; ++_F, ++_P)
             alloc.construct((Packet_0046cef0*)_P, *(Packet_0046cef0*)_F);
         return _P;
     }
-    void _Ufill(char* _F, size_type _N, const Packet_0046cef0* _X)
-    {
-        for (; 0 < _N; --_N, _F += 14)
-            alloc.construct((Packet_0046cef0*)_F, *_X);
+    void _Ufill(Packet_0046cef0* _F, size_type _N, const Packet_0046cef0& _X) {
+        for (; 0 < _N; --_N, ++_F)
+            alloc.construct((Packet_0046cef0*)_F, _X);
     }
-    static void fill(char* _F, char* _L, const Packet_0046cef0* _X)
-    {
-        for (; _F != _L; _F += 14)
-            *(Packet_0046cef0*)_F = *_X;
+    static void fill(Packet_0046cef0* _F, Packet_0046cef0* _L, const Packet_0046cef0& _X) {
+        for (; _F != _L; ++_F)
+            *(Packet_0046cef0*)_F = _X;
     }
-    static void copy_backward(char* _F, char* _L, char* _P)
-    {
-        for (--_L; _F != _L; --_L) {
-            _P -= 14;
+    static void copy_backward(Packet_0046cef0* _F, Packet_0046cef0* _L, Packet_0046cef0* _P) {
+        // XUTILITY's copy_backward is `while (_F != _L) *--_X = *--_L;`: both
+        // decrements at the top of the loop, the rotated test between them
+        // and the copy.
+        while (_F != _L) {
+            --_L;
+            --_P;
             *(Packet_0046cef0*)_P = *(Packet_0046cef0*)_L;
         }
     }
 };
 
 // FUNCTION: 0x46eba0
-void Class_0046eba0::FUN_0046eba0(char* _P, unsigned int _M, const Packet_0046cef0* _X)
-{
-    if ((end - last) / 14 < _M)
-    {
-        int _N = size() + (_M < size() ? size() : _M);
-        if (_N < 0)
-            _N = 0;
-        char* _S = (char*)::operator new(_N * 14);
-        char* _Q = _Ucopy(first, _P, _S);
+void Class_0046eba0::FUN_0046eba0(Packet_0046cef0* _P, unsigned int _M, const Packet_0046cef0& _X) {
+    if (end - last < _M) {
+        size_type _N = size() + (_M < size() ? size() : _M);
+        Packet_0046cef0* _S = alloc.allocate(_N, (void*)0);
+        Packet_0046cef0* _Q = _Ucopy(_S, first, _P);
         _Ufill(_Q, _M, _X);
-        _Ucopy(_P, last, _Q + _M * 14);
+        _Ucopy(_Q + _M, _P, last);
         ::operator delete(first);
-        end = _S + _N * 14;
-        last = _S + (size() + _M) * 14;
+        end = _S + _N;
+        last = _S + (size() + _M);
         first = _S;
-    }
-    else if ((last - _P) / 14 < _M)
-    {
-        _Ucopy(_P, last, _P + _M * 14);
-        _Ufill(last, _M - (last - _P) / 14, _X);
+    } else if (last - _P < _M) {
+        _Ucopy(_P + _M, _P, last);
+        _Ufill(last, _M - (last - _P), _X);
         fill(_P, last, _X);
-        last += _M * 14;
-    }
-    else if (0 < _M)
-    {
-        _Ucopy(last - _M * 14, last, last);
-        copy_backward(_P, last - _M * 14, last);
-        fill(_P, _P + _M * 14, _X);
-        last += _M * 14;
+        last += _M;
+    } else if (0 < _M) {
+        _Ucopy(last, last - _M, last);
+        copy_backward(_P, last - _M, last);
+        fill(_P, _P + _M, _X);
+        last += _M;
     }
 }

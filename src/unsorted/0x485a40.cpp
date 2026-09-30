@@ -1,45 +1,5 @@
-// Decompiled by deepseek-v4.1-flash. Names are provisional.
-// Initialises a freshly placed unit from its type definition: looks the type up
-// by the unit's id, mirrors the type's flags into the unit's +0x110 word, sets
-// build progress / health (param_5 selects the finished or under-construction
-// arm), copies the position and derives a screen-space short pair from the
-// unit's +0x14a offset pair, gives the unit a random facing, marks bit 9 from
-// the owning player, resets its three weapon entries, and finally resets the
-// PlayerRef at +0xbc and runs FUN_00480250.
-//
-// PARTIAL (85.3%). Every instruction matches including all the +0x110 bitfield
-// read-modify-write masks, the +0x114 bit, the nibble clear at +0x10f, the
-// stack-scratch pair arithmetic and both FUN_004b6c30 calls; what differs is
-// the register allocator:
-//   - my version keeps the first flags value in EBP, so it pushes EBP and every
-//     stack offset is 4 higher; the original uses EAX (it finishes the type
-//     index chain in EAX first, then reuses EAX for the flags load, while my
-//     scheduler hoists the flags load above the index chain into the free EBP).
-//     Removing the struct copy of the position, or replacing the field_66 block
-//     with anything that does not read unit->type, makes EBP disappear but then
-//     the position store shape or the field_66 code is wrong. This is one
-//     allocator state, not several bugs: the position copy needs a base pointer
-//     (EDI) plus two live shorts, and the field_66 block reloads unit->type
-//     after the call, which together are enough to put the flags in EBP.
-//   - `mov ecx, 0xffff8000` where the original has `mov ecx, 0x8000`. The
-//     expression is `random + (0x8000 - field_210 / 2)` and MSVC folds the
-//     constant for the short store; every spelling tried (unsigned, short,
-//     (short) casts, a separate int local, `>> 1`) gives either 0xffff8000 with
-//     the original 16-bit `shr dx,1`, or 0x8000 with a 32-bit `shr edx,1`. The
-//     original has both at once.
-//   - three scheduling swaps in the +0x110 zero block (the flags store, the
-//     pos.y load and the field_22f read move by a few slots).
-// <windows.h>/<stdio.h>/<string.h>/<math.h> and the other 124 header sets do
-// not change any of this.
-//
-// The type's +0x241 word is a bitfield union; its movOrder/fireOrder/canAttack/
-// b7/b9/hi fields are the ones copied into the unit. The unit's +0x110 is a
-// bitfield union too: b0/b5/b16 are set and b1-b4/b10/b11/b17 cleared by the
-// init, b14/b29 by the type's +0x22f test, mode2/mode from movOrder/fireOrder,
-// b11 from canAttack, b30 from b9, b31 from the type's high half, f22_23 = 3
-// and f24_25 = 0 when the type's +0x22e is above 1, and b8/b9 from the owner
-// comparison. Writing these as explicit masks gives the same bytes; the
-// bitfield form is the one that produced the original's merged clear masks.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free and GPT-6. Names are provisional.
+// MATCH: the screen Y projection uses the passed position Z component.
 
 #pragma pack(push, 1)
 
@@ -158,7 +118,7 @@ struct Unit_485a40 {
     Class_0043dc00* obj;               // +0x0
     char unknown_4[0x64 - 0x4];
     short field_64;                    // +0x64
-    short field_66;                    // +0x66
+    unsigned short field_66;           // +0x66
     short field_68;                    // +0x68
     Pos_485a40 pos;                    // +0x6a
     ShortPair_485a40 screen;           // +0x76
@@ -260,7 +220,7 @@ void __stdcall FUN_00485a40(Unit_485a40* unit, Pos_485a40 pos, int param_5)
     ShortPair_485a40 off = unit->offset;
     ShortPair_485a40 screen;
     screen.x = (short)((pos.x - off.x * 0x80000 + 0x80000) >> 20);
-    screen.y = (short)((pos.y - off.y * 0x80000 + 0x80000) >> 20);
+    screen.y = (short)((pos.z - off.y * 0x80000 + 0x80000) >> 20);
     unit->screen = screen;
 
     unit->field_66 = (short)(FUN_004b6c30(unit->type->field_210)

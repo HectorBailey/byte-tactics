@@ -1,4 +1,4 @@
-// Decompiled by Opus. Names are provisional.
+// Decompiled by Opus, finished by GPT-6.1-sol. Names are provisional.
 // Codex / GPT-6 retest in #13:
 // unsigned queue indices, a pop helper given the capacity and a
 // separate entry pointer did not reproduce the size-before-entry load.
@@ -7,6 +7,10 @@
 // `size` before the entry, this loads the entry first. Source order,
 // temporaries, inline helpers, ++/+= forms, element types, volatile and
 // header sets all left that order unchanged.
+// deepseek-v4.1-flash retest (#1337): size-hoisting local, early-return form,
+// pointer-into-entries, post/pre-increment and unsigned fields all still
+// produce the entry-first order; it is an MSVC scheduler tie-break, not IL
+// order. Remaining 3-byte gap is that single swapped load pair.
 
 #pragma pack(push, 2)
 struct Queue_004c1ab0 {

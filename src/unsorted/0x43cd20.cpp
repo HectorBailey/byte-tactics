@@ -1,16 +1,40 @@
-// Decompiled by Space Bunny Free, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by Space Bunny Free, finished by deepseek-v4.1-flash, finished by
+// space-bunny-free. Names are provisional.
 //
-// NOT MATCHED (45.2%, 927 bytes against 943). The earlier version scored 47.5
-// but only because it modelled the slow-path amount as -dz; that kept dz live
-// to the end and changed the allocation. With the correct -rate it is 45.2.
-// Correct semantics now, but the register allocation and frame
-// still differ: ours is 0x38 bytes of locals against the original's 0x44, so
-// every stack displacement below 0x10 is 12 too low. The original keeps four
-// values live in callee-saved registers across the calls (unit in edi, the
-// address of unit->pos in ebx, d1 in ebp, adiff in esi) and therefore spills
-// the high words of the 64-bit products at [esp+0x18], [esp+0x20] and
-// [esp+0x28]; ours frees registers earlier, keeps fewer values live and uses
-// only two scalar slots.
+// NOT MATCHED (53.5%, 940 bytes against 943). Semantically correct. The frame
+// is 0x3c here, the original's is 0x44 (the earlier 45.2% note's 0x38 is stale).
+//
+// Third pass notes (space-bunny-free, 1 check run). Frame slot map, measured
+// from the original, everything relative to the parameter slot (which is where
+// the original keeps several dead locals):
+//   -0x04 .. -0x08  the three dwords above the array: the array ends 4 bytes
+//                   below the parameter, ours ends 8 bytes below it
+//   -0x28           &p[0]  (ours: -0x2c)
+//   -0x2c, -0x30    the two temps the first _hypot's int args are spilled to
+//                   before the two filds (ours reuses ONE slot, -0x34)
+//   -0x34           len (gap1 sits at -0x3c)
+//   -0x38           a hole, which is where a nested block would end
+//   -0x3c           gap1
+//   -0x44           dz, then ndz
+//   -0x48           the spill of `this` (the top-of-function
+//                   `mov [esp+0x10], esi`); ours spills it at -0x44
+//   the parameter slot itself (0x00) holds, in turn, dx, ndx, p[1].z - pos.z
+//   and the FUN_0048a980 result
+// So the original needs 8 more bytes than ours, and it gets them from two more
+// live slots below the array plus one dword more above it.
+//
+// The root cause of nearly every difference is that ours keeps re-reading
+// `unit` from its parameter slot (see _unit$[esp+72] three times in the tail)
+// while the original parks it in edi with &unit->pos in ebx from just after the
+// v3 call to the end. Because the parameter stays live, the compiler never
+// frees its slot, so the original's `dx` in the parameter slot (0x43cdd1) has
+// nowhere to go in ours. Getting unit into a callee-saved register is the
+// thing to chase; rewriting the expressions will not move it.
+// The `hasPath == 0` arm wants the parameter load first
+// (`mov ecx, [esp+0x58]` then `mov word [esi+0x24], ax`); ours stores the
+// turn first whatever the spelling of the two statements was.
+// Also tried: naming both _hypot arguments as locals and swapping their order
+// (byte-identical output to the inline form, still one temp slot, still 0x3c).
 //
 // What this function does: the path object (vtable 0x4fd458, see
 // 0x44f010.cpp; slot 3 is 0x44f150, slot 5 is 0x44f290) hands over the next
@@ -19,35 +43,47 @@
 // clamped to the type's max_turn, and then the distance this frame may travel
 // is either the type's +0x19e or the negated rate at +0x19a.
 //
-// Corrections to the earlier attempt (all three are evidenced by the
-// disassembly):
-//  - The slow-path amount is -type->field_19a, not -dz. At 0x43d03a
-//    `mov [esp+0x24],esi` runs after four pushes, so it writes [esp+0x14],
-//    overwriting the dz slot, and 0x43d0b4 `mov eax,[esp+0x14]; neg eax`
-//    reads that value back. The original's dz is dead after 0x43ce8c.
-//  - q's numerator is ((field_20*field_20) >> 16) << 16, not >> 32 << 16.
-//  - lim is (turned*turned >> 32) * 4, where turned is the earlier 64-bit
-//    quotient (stored at 0x43d027 and reloaded at 0x43d087); the earlier
-//    attempt used rate*rate. r is q*q >> 32.
+// The slow-path amount is -type->field_19a, not -dz. At 0x43d03a
+// `mov [esp+0x24],esi` runs after four pushes, so it writes [esp+0x14],
+// overwriting the dz slot, and 0x43d0b4 `mov eax,[esp+0x14]; neg eax` reads
+// that value back; dz is dead after 0x43ce8c. q's numerator is
+// ((field_20*field_20) >> 16) << 16, not >> 32 << 16. lim is
+// (turned*turned >> 32) * 4 where turned is the earlier 64-bit quotient
+// (stored at 0x43d027, reloaded at 0x43d087); r is q*q >> 32.
 //
-// Suspected original bug: dz is read only inside the `gap1 > 0x500000` branch
-// (0x43cdde and 0x43ce51) and is never used afterwards, so this is not the
-// uninitialised read the earlier note claimed; the value read at 0x43d0b4 is
-// the spilled rate. The unused store of turned at 0x43d027 followed by the
-// overwrite at 0x43d03a is real (the 0x43d087 reload reads 0x43d027, so the
-// value is live, not dead).
+// What helped: a local `Vec3* ppos = &unit->pos` used for every pos access
+// (lever 6) reproduced the original's ebx = &unit->pos and, with the
+// operator-/Square member functions added to Vec3 (the idiom the matched
+// siblings 0x404730/0x414a80 use), the frame grew from 0x3c to the original
+// 0x44 and the score rose from 50.7 to 58.6 (that variant reused the
+// pre-branch ax/az for d1, which is wrong because the pull-back modifies
+// p[1]; recomputing them is correct but scores 53.5).
 //
-// Tried without changing the allocation: local pointer and reference copies
-// of unit->pos, an inline DistSq/DistSqP helper, __int64 intermediates for
-// d1/d2/q, uninitialised declarations up front, swapping the ax/az and
-// d1/d2 evaluation order, `*0x10000` versus `<<16`, address-taken locals, and
-// the header sets headers.py covers. All compiled to the same 0x38 frame or
-// worse. A fake extra live local does reach 0x44 and scores 51.0, but it is
-// not in the original.
+// What still differs (first hunks): in the hasPath == 0 branch the original
+// loads unit into ecx before storing turn, ours stores turn first; and after
+// the v3 call the original computes ax = p[1].x - pos.x before az = p[1].z -
+// pos.z (slots B+0x14, B+0x1c) while ours computes az first (slots B+0x10,
+// B+0x04). unit ends in eax (original edi); d1 ends in ebp in both.
+//
+// Suspected original bug: none beyond the dead dz store and the reused
+// argument home; the store of turned at 0x43d027 is live (0x43d087 reloads it).
+//
+// Also tried: inline (non-local) recomputation for d1 (49.0), Vec3 delta
+// temporaries, and the header sets headers.py covers.
 
 #include <math.h>
+#include <stdlib.h>
 
-struct Vec3 { int x; int y; int z; };
+struct Vec3 {
+    int x, y, z;
+    Vec3 operator-(const Vec3& other) const {
+        Vec3 r; r.z = z - other.z; r.y = y - other.y; r.x = x - other.x; return r;
+    }
+    int Square() const {
+        __int64 a = x, b = z;
+        return (int)((a*a) >> 32) + (int)((b*b) >> 32);
+    }
+};
 
 #pragma pack(push, 1)
 struct UnitType_0043cd20 {
@@ -114,9 +150,10 @@ void Class_0043cd20::FUN_0043cd20(Unit_0043cc20* unit)
 
     Vec3 p[3];
     obj->v3(p, 0, 3);
+    Vec3* ppos = &unit->pos;
 
-    int ax = p[1].x - unit->pos.x;
-    int az = p[1].z - unit->pos.z;
+    int ax = p[1].x - ppos->x;
+    int az = p[1].z - ppos->z;
     int gap1 = (int)_hypot(ax, az);
 
     int dz;
@@ -139,12 +176,12 @@ void Class_0043cd20::FUN_0043cd20(Unit_0043cc20* unit)
     az = p[1].z - unit->pos.z;
     int d1 = (int)(((__int64)ax * ax) >> 32) + (int)(((__int64)az * az) >> 32);
 
-    short diff = FUN_0048a980(&unit->pos, &p[1]) - unit->heading;
+    short diff = FUN_0048a980(ppos, &p[1]) - unit->heading;
     int sdiff = diff;
-    int adiff = sdiff < 0 ? -sdiff : sdiff;
+    int adiff = abs(sdiff);
 
-    int bx = p[2].x - unit->pos.x;
-    int bz = p[2].z - unit->pos.z;
+    int bx = p[2].x - ppos->x;
+    int bz = p[2].z - ppos->z;
     int d2 = (int)(((__int64)bx * bx) >> 32) + (int)(((__int64)bz * bz) >> 32);
 
     if (diff != 0) {
@@ -173,3 +210,4 @@ void Class_0043cd20::FUN_0043cd20(Unit_0043cc20* unit)
     else
         ((Class_0043cc20*)this)->FUN_0043cc20(unit, -rate);
 }
+

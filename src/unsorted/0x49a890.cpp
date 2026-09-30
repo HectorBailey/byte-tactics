@@ -1,5 +1,6 @@
-// Decompiled by Space Bunny Free. Names are provisional.
-// PARTIAL, 67.6% (503 of 488 bytes). Ballistic launch-angle solver: two roots of the
+// Decompiled by Space Bunny Free, finished by GPT-6.1-sol. Names are provisional.
+// Retry #1736: the saved discriminant association was independently re-checked at 78.2% (497/488); no MATCH. The post-_hypot x87 load/spill schedule still differs.
+// PARTIAL, best 78.2% (503 of 488 bytes). Ballistic launch-angle solver: two roots of the
 // trajectory equation, each tested against zero and turned into a launch angle with
 // acos(sqrt(root) / speed) (0x4e67f0 is the CRT's _CIacos: argument in st(0), then
 // fpatan(sqrt(1 - x*x), x)), pi/2 substituted when the root is not positive.
@@ -12,14 +13,30 @@
 // Reusing `d` for dist, dist^2 and the numerator matters (worth ~5 points), as does
 // the `#include <stdio.h>` (headers change the x87 spill choices; math.h alone: 65%).
 //
-// What still differs: the frame is 0x38 (ours) against 0x30, i.e. one double temp too
-// many, and the original flushes the `add esp,0x10` after _hypot before its first
-// spill ([esp] as the slot of (double)height) where MSVC here defers it. The original
-// order of evaluation is g*h, d*d, speed*speed, h*h, d2*d2, then A = s2 - gh*-2.0,
-// A*s2, h2*gg, (h2 + d2), (d4*gg)*sum; only the middle of the function differs, the
-// tail after the discriminant test matches instruction for instruction.
+// What still differs: after _hypot, the original loads gravity then height, squares
+// the gravity-height product, and uses a distinct x87 spill schedule. This source
+// loads height before gravity and differs through the discriminant arithmetic;
+// its generated function is 9 bytes longer, shifting later branch destinations.
 // Tried (~1000 scratch variants): statement orders, operand orders, named/inline
 // temporaries, variable reuse, all header sets (headers.py, with and without --cpp).
+//
+// deepseek-v4.1-flash re-attempted (issue #1104): ~60 more scratch variants, all 67.6%
+// or worse. Confirmed headers.py finds no fixing set. Factoring d4 out (v_fact) gives
+// 487 bytes (one short) but 66.4%. The first divergence is fixed before any arithmetic:
+// the original filds g then height, ours filds height then g, and defers `add esp,0x10`
+// to reuse the hypot argument slots for scratch. Swapping the gh operands, splitting gh
+// into a helper, changing the d=d*d / d2 model, naming d4/A/h2, reordering the disc
+// terms, and 2.0*gh all leave the schedule byte-identical at 67.6%. The middle looks
+// like one allocator state seeded by that first g/height load order, not by the disc
+// expression. No check.py MATCH.
+//
+// GPT-6.1-sol (issue #1431): five checker runs. Storing `(double)g` into `gh` before
+// multiplying by height raises the best score from 67.6% to 68.3%; separate converted
+// operands tie, while spelling out the discriminant temporaries or nesting the angle
+// tests scores lower. The remaining first divergence is in the post-_hypot x87 load /
+// spill schedule; later branch offsets and return-path layout also differ. Best source
+// kept here at 78.2%; no MATCH.
+// Lead #1431 tried retaining the squared _hypot result in a separate local; it scored 70.3%. GPT-6.1-sol then associated discriminant factors as left-associative `* d * d - d * d * gg * sum`, scoring 78.2%.
 #include <stdio.h>
 #include <math.h>
 
@@ -39,12 +56,13 @@ short __stdcall FUN_0049a890(int x, int height, int z, int speed, float angle)
 {
     int g = g_game->gravity;
     int gg = g * g;
-    double d = _hypot((double)x, (double)z);
-    d = d * d;
-    double gh = (double)g * (double)height;
+    double distance = _hypot((double)x, (double)z);
+    double d = distance * distance;
+    double gh = (double)g;
+    gh = gh * (double)height;
     double s2 = (double)speed * (double)speed;
     double sum = (double)height * (double)height+d;
-    double disc = (((double)height * (double)height) * (double)gg  +  (s2 - gh*-2.0) * s2) * (d * d) - (d * d) * ((double)gg * sum);
+    double disc = (((double)height * (double)height) * (double)gg  +  (s2 - gh*-2.0) * s2) * d * d - d * d * (double)gg * sum;
     if (disc < 0.0)
         return 0x8000;
     disc = sqrt(disc);

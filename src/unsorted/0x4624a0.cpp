@@ -1,6 +1,74 @@
-// Decompiled by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
+// space-bunny-free second pass (1642): still 67.8 percent, 555 against 570
+// bytes, still the single missing ebx = 0 register. New results, all measured
+// with check.py --sym on scratch copies (no check.py runs spent):
+//  - headers.py: all 128 header sets; the best are 67.8 percent for <none>,
+//    <windows.h>, <stdio.h> and <stdlib.h>. Headers are not the lever.
+//  - scratch/0x4624a0/vA.cpp: reuse the parameter `force` itself as the sent
+//    counter (`force = 0; ... force = force + 1; if (force > 0) ...`) instead
+//    of a separate `int sent;`. Byte for byte the same allocation as this file
+//    (555 bytes, 67.8 percent, `sent` still in ebx, `inc ebx`, `test ebx,ebx`),
+//    so the original's use of the dead argument slot for the counter is a
+//    frame-slot allocation decision, not a source level parameter reuse.
+//  - scratch/0x4624a0/vB.cpp: put the counter in the escaped local struct as a
+//    third member. 551 bytes but only 58.9 percent: the third slot changes
+//    `sub esp, 8` to `sub esp, 0xc` and moves every stack reference, which
+//    confirms the two dword frame is exactly `n` plus `headFrame` and the
+//    counter really does live in the argument slot.
+//  - frame arithmetic, worth writing down: at entry ESP = S, so [esp+0x18] is
+//    the return address, [esp+0x1c] is the single argument, and the two locals
+//    are [esp+0x10] and [esp+0x14]. So `n` is the first local, `headFrame` the
+//    second, and `sent` shares the dead argument slot: three memory variables,
+//    no third local slot.
+//  - the missing web: this build does enregister constants locally (the inlined
+//    Pop region gets `xor ecx,ecx` for both `count <= 0` and `writeIdx = 0`),
+//    so MSVC 5 can hold 0 in a register. What it will not do is keep one 0
+//    live across the whole function, which is what the original does (one ebx
+//    from 0x4624d5/0x4624e1 through 0x46262e, then reused for dpid at
+//    0x46263c). `xor ebx,ebx` in both arms of the now<nextSend test, and once
+//    more at 0x46269f, is that web being rematerialised per block, so the
+//    source must name a 0 valued variable that C1 refuses to fold, and every
+//    spelling tried so far (plain int, unsigned, bitfield, address taken,
+//    two definitions) folds or spills.
+//
+// deepseek-v4.1-flash retry (1296): best is now 67.8% (was 67.3%). Moving the
+// per-packet entry declaration out of the for loop to function scope with an
+// = 0 initialiser lifts the byte score by 0.5 points; the missing 15 bytes are
+// still the constant 0 that the original keeps in ebx for the whole function.
+// A literal 0 is rematerialised here; int zero = 0 in many placements and a
+// zero = 0 assignment in both arms of the now-nextSend test (which would
+// explain the two xor ebx,ebx) all fold back to test reg,reg and mov [m],0.
 // Not a match (67.3% with this version; 66.0% without the extra
 // `loc.headFrame = 0;` line, 59.0% for the previous clean-locals version).
+//
+// space-bunny-free pass, re-confirmed the diagnosis and added these results:
+//  - the whole remaining difference is still one register decision. The four
+//    callee-saved registers hold, in the original, esi=this, edi=entry,
+//    ebp=`i` and ebx=THE CONSTANT 0, with `sent` left in the parameter slot
+//    at [esp+0x1c]. This file allocates esi, edi, ebx=`sent`, ebp=`i` and
+//    rematerialises every 0 (`test reg,reg`, `mov [mem],0`), so it is 15
+//    bytes short (555 against 570) purely from `cmp reg,ebx` (2 bytes) against
+//    `test reg,reg` (2 bytes) plus the three `xor ebx,ebx` and the extra
+//    one-byte reloads that follow from it.
+//  - NEW, re-measured here: naming a local `int zero = 0;` at the top of the
+//    function and writing every comparison and every zero store through it
+//    (`force == zero`, `loc.n == zero`, `sent > zero`, `queuedBytes = zero`,
+//    `dpid != zero`, `loc.n != zero`) changes NOTHING: build/scratch/0x4624a0/
+//    e1.cpp (this file plus that `zero` variable) scores 67.3 percent with
+//    the same 555 bytes, i.e. MSVC 5 folds
+//    the variable's single definition back into a constant before the
+//    allocator runs, exactly as the notes below say. Combined with the
+//    `&loc` address escape already in place (so that n and headFrame stay in
+//    memory) this is the one spelling still untried, and it does not help.
+//  - the original's `xor ebx,ebx` appears at the top of BOTH arms of the
+//    `now < nextSend` test and once more before the latch at 0x4626a1, but
+//    `ebx` holds `dpid` in between (0x46263c), and the `queue.count == 0` test
+//    at 0x46269b uses `test eax,eax`, not `cmp eax,ebx`. So ebx is an
+//    enregistered constant that the allocator is free to reuse, not a source
+//    variable: whatever produced it, it is not `x = 0` in the source.
+//  - the two `for`-loop counters are correct: `i` is in ebp and matches, and
+//    the Pop wrap test is the only other difference (`cmp edx,eax` here
+//    against `mov ecx,edx / cmp ecx,eax` there), which is downstream of ebx.
 // The whole remaining difference is still one decision by MSVC 5's register
 // allocator: the original keeps the int constant 0 in ebx for the whole
 // function (every `== 0`, `<= 0` and `= 0` is `cmp reg, ebx` or
@@ -161,6 +229,7 @@ int Class_004624a0::FUN_004624a0(int force)
         return 1;
     int i;
     int sent;
+    Packet_004624a0* entry = 0;
     while (1) {
         loc.headFrame = queue.GetFirst()->frame;
         sent = 0;
@@ -168,7 +237,7 @@ int Class_004624a0::FUN_004624a0(int force)
         for (i = 0; i < loc.n; i++) {
             // Two calls, not one: the original's inlined code has the diamond
             // of a two-return helper and then a second count test of its own.
-            Packet_004624a0* entry = queue.GetFirst();
+            entry = queue.GetFirst();
             queue.Pop();
             if (entry->frame == loc.headFrame) {
                 char* p = (char*)entry->base + entry->offset;

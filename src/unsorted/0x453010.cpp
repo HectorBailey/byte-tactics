@@ -1,33 +1,8 @@
-// Decompiled by DeepSeek V4.1 Flash, finished by space-bunny-free, finished by muse-spark-1.3-free. Names are provisional.
-//
-// 84.1%, 823 bytes against 772. What still differs:
-//  Three sites emit their own copy of the final
-//  `p->field_22 = value; return result;` tail plus epilogue
-//  (after the state==1 loop, after the state==2 block, after the
-//  state==3 c-loop). The original has a single shared tail at 0x4532ff
-//  that every path reaches with a jump; each branch only stores 1 into
-//  the result local first. Everything else matches, including the
-//  `mov bl, 3` constant and the [eax + esi] base/index roles in both
-//  players loops (the roles need `#include <windows.h>`, found via
-//  headers.py, which also raised the score from 81.3% to 84.1%).
-//
-// Tried and rejected:
-//  - goto done (2-3 sites) plus a `done:` label before the tail: MSVC
-//    duplicates the return block at each goto site instead of jumping,
-//    and any label, do-while(0), or nested outer `if (p->active)` in
-//    the function collapses the frame from `sub esp, 8` to `push ecx`
-//    (result goes to ebp, msg to ebx, every [esp+N] shifts by 4,
-//    55.7%). So the shared tail is not reachable that way.
-//  - switch on state with breaks, do-while(0) with breaks: same or
-//    worse (65.3%, 38.9%); breaks do not jump to a shared tail either.
-//  - Extra STL headers (<string>, <vector>, <map>, <list>, <iostream>)
-//    with <windows.h>: change inlining (756/807 bytes), all worse.
-//    <string> alone matches <windows.h> at 84.1% but adds nothing.
-//  - `Player* q = &g_game->players[i];` in the state==1 loop: MSVC
-//    promotes q to an induction variable, whole loop changes (57%).
-//  - `while (1)` form of the find-active helper is required; plain
-//    `for` rotates and puts the found block out of line (75.4%).
-#include <windows.h>
+// Decompiled by DeepSeek V4.1 Flash, finished by space-bunny-free, finished by muse-spark-1.3-free, finished by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
+// MATCH: select the state branch once with if/else. <iostream> gives
+// the shared return block instead of duplicating it into separate arms.
+
+#include <iostream>
 
 #pragma pack(push, 1)
 struct PlayerInfo_00453010 {

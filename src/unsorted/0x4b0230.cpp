@@ -1,4 +1,6 @@
-// Decompiled by space-bunny-free, finished by Sonnet 5.5 (partial). Names are provisional.
+// Decompiled by space-bunny-free, finished by Sonnet 5.5 (partial), deepseek-v4.1-flash (partial), verified by GPT-6.1-sol. Names are provisional.
+// #1700 retry by Codex / GPT-6.1-sol: checkall reconfirmed 82.9% (631/631 bytes), no MATCH.
+// Both direct checks and all 128 headers.py combinations left the 3x3 tiling mismatch unchanged.
 // Draws a list box's frame. FUN_004a15c0 gives the entry's rectangle; when no
 // bitmap arrives, the "Listbox" piece is looked up in the object's GAF and, if
 // found, the rectangle is grown by 3 on every side. The destination is the
@@ -23,6 +25,35 @@
 // loads before the `index != 0` test remain (about 40 instructions, all one
 // cause).
 //
+// Second pass (space-bunny-free, #1152): still 82.9%, one real check.py run,
+// everything else scored free with `check.py --sym`. The diff is ONE allocator
+// decision in the 3x3 block, confirmed by reading the original's registers:
+// the original computes BOTH extents AFTER the x0/y0 if/else, so rect.x0 stays
+// live in esi and rect.y0 in edx across the branch; with ecx=h, ebx=w and the
+// dead 0 in eax already occupying four scratch registers, height=y1-y0+1 is
+// forced into eax and the y counter into edx (edx is free once y0 dies). The
+// counter MUST be in edx, because the row expression clobbers edx (setge/dec/
+// and/add 6), which is why the original compares against the reloaded
+// [esp+0x3c] and reloads it into edx afterwards. This file computes width
+// early, so x0 dies before the branch, edx goes free and the pair comes out
+// rotated (height in edx, counter in eax). Statement orders scored here
+// (body = the five statements before the y loop, W=width, H=height, I=index=0):
+//   sub w h / W / if / I / H  82.9  (kept)
+//   sub w h / if / W / I / H  79.9, and with H then I 81.2
+//   sub w h / if / W / H / I  73.4,  H / W / I 76.7
+//   sub h w / W / if / I / H  77.2
+//   if written as `index == 0` first  78.0,  x0 assigned before y0 78.0
+//   H/W before the if/else 18-75 (chaotic, e.g. h ends up in edx)
+// So the "keep x0 live" source shape is right but only reachable with the
+// extents in the order H then W, which costs 10 points elsewhere; the tie is
+// still open. Declaration order of the 18 locals was re-tested on the kept
+// body: moving height/ypos/width around changes nothing (82.9) except moving
+// x/width, which costs 10 (73.0), so the memory-slot layout (row, x0, height,
+// ypos, h, rect) is robust and is not the lever. Note the original's slot
+// order is row, x0, ypos, height, h, so height and ypos are transposed
+// relative to this file, and the original reloads BOTH the counter and the
+// height at the latch while this file reloads only the height.
+//
 // What moved the score (Sonnet 5.5, #1076), for whoever continues:
 //  * The surface pointer is re-read as obj->holder->entries + 0xbc AFTER the
 //    first call while `entries` stays a local (the original does exactly that:
@@ -40,6 +71,20 @@
 //    extra `cell->step_x` reference in the tile loop flipped it too, which is
 //    the same weight tie). 74% to 82%. A random search over declaration order
 //    plus the order of the six statements before the y loop tops out at 83%.
+//
+// Third pass (deepseek-v4.1-flash, #1369): confirmed the tie is NOT reachable
+// by statement/declaration order. Restructuring so BOTH extents are computed
+// after the if/else does put rect.x0 in esi (the missing half), but the
+// allocator then loads hv (sub->height) BEFORE index and gives hv edx, while
+// the original gives index edx and hv ecx, so it drops to 76.7% (both extents
+// after the branch, H then W) or 74.6% (index test before h, which gets index
+// into edx but hoists y0 into edi and keeps sub in eax). Writing the x0/y0
+// select as ternaries scores 67.8%, a separate loop-counter local is identical
+// to reusing index, an `int cond = index;` copy is folded away, and swapping
+// the if arm order costs 1.7 points. The root cause is the emitted order of
+// the `index` and `hv` loads (index, hv, 0 in the original; hv, index, 0 when
+// both extents follow the branch), which no source reordering tested here
+// changes. Kept the 82.9% version.
 struct Rect_004b0230 {
     int x0;                          // +0x0
     int y0;                          // +0x4

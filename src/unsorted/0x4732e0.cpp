@@ -1,4 +1,22 @@
-// Decompiled by GPT-5.6-Terra. Names are provisional.
+// Decompiled by GPT-5.6-Terra, finished by space-bunny-free and deepseek-v4.1-flash, verified by GPT-6.1-sol. Names are provisional.
+// #1591 retry by Codex / GPT-6.1-sol: check.py reconfirmed 57.9% (547/537 bytes), no MATCH.
+// Existing compiler-state probes already cover the remaining register-allocation wall.
+//
+// WALL (deepseek-v4.1-flash, issue 1244, 1 check run): the first diff is the
+// prologue register assignment and it is compiler state. Grepping the exe for
+// the original prologue (`sub esp,8 / push ebx / push ebp /
+// mov ebx,[esp+0x18] / mov ebp,ecx`) gives exactly 3 hits (0x40d020, 0x425480,
+// 0x4732e0); grepping for the build's own variant (`push ebx / mov ebx,ecx /
+// push ebp / mov ebp,[esp+0x18]`) gives 6 (0x408f30, 0x425210, 0x433b20,
+// 0x44ec30, 0x46e640, 0x4c4d70), so both assignments coexist for the same
+// template and the choice is per instantiation. headers.py: 0 of 128 header
+// sets change anything (all 57.9%). Arguments re-verified: the mangled name
+// fixes (iterator, unsigned, const Class_00471cc0*&) and its order; all 17
+// callers call through the member pointer (no direct E8 to 0x4732e0 in .text),
+// so the call sites carry no extra hint, and the two callees ??2/??3 are cdecl.
+// This is the known wall in docs/agent-guide.md (lines 1160 and 1817); the file
+// keeps the best (57.9%) variant.
+//
 // std::vector<Class_00471cc0*>::insert(iterator, size_type, const T&) from
 // MSVC 5's <vector>, with _Ucopy, _Ufill, fill and copy_backward inlined; the
 // sixteen push_back sites call it out of line (they inline the count-is-one
@@ -55,6 +73,42 @@
 //   constructor, destructor and three pure virtuals, or a struct
 // - taking the vector's protected _Ufill, _Ucopy and _Destroy out of line too,
 //   in all eight combinations
+//
+// A later attempt went past all of that by hand-rolling std::vector itself. A
+// stand-in `class allocator` and a stand-in `template<class _Ty, class _A>
+// class vector`, both in namespace std and written so the template arguments
+// mangle to the same `?$vector@PAVClass_00471cc0@@V?$allocator@PAVClass_00471cc0@@
+// @std@@@std@@` and the member to the same `?insert@...QAEXPAPAV...IABQAV3@@Z`,
+// with the SP3 <vector>'s insert body, size(), _Ucopy, _Ufill, _Destroy and the
+// SP3 XUTILITY fill and copy_backward copied verbatim, DOES reach the original's
+// register assignment at the top of the function:
+//   push ebx / push ebp / mov ebx, [esp+0x18] / mov ebp, ecx
+// that is, the count in ebx and `this` in ebp, with the two moves in the
+// original's order. So the original's prologue is reachable from this source
+// shape, which is the strongest evidence yet that the algorithm and the member
+// are right and that the remaining difference is one allocator decision.
+//
+// The construct that decides that prologue is `allocator::construct`, and it
+// decides the body shape with it, the two cannot be had separately (all six
+// combinations of construct, allocate and destroy were measured; the variants
+// are in build/scratch/0x4732e0/, v1 to v4 and wa to wf):
+// - construct calling the nested `_Construct(_P, _V)` placement-new helper, the
+//   real XMEMORY shape, gives the body this build gives, 546 or 547 bytes, and
+//   the wrong top assignment, `this` in ebx and the count in ebp: 57.1% with the
+//   hand-rolled vector, 57.9% with the real <vector>
+// - construct written as the assignment `*_P = _V` straight in the allocator
+//   gives the original's top assignment and a 511 byte body that is 26 bytes
+//   short: 38.2%. `allocate` (its own inline clamp and `operator new`, or the
+//   nested `_Allocate` template) and `destroy` (empty, or the nested `_Destroy`
+//   pseudo-destructor call) change neither, so they are not the lever
+// With the assignment form the body then differs in about ten places at once,
+// all of them downstream of the prologue: `_End - _Last` lands in ecx instead of
+// eax, `_N` is built with a `lea` instead of an `add` and is spilled into the
+// dead _M argument slot instead of a local, the new buffer keeps a second live
+// copy in esi, the first _Ucopy loop increments before it stores and borrows
+// ebp as its load temporary so `this` has to be reloaded from its slot, and the
+// tail recomputes `this` into edx. Fixing the prologue alone is worth 19 points;
+// fixing the body alone is not reachable, so this file keeps the 57.9% shape.
 #include <vector>
 
 class Class_00471cc0 {

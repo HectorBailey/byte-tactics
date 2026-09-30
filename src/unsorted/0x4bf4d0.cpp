@@ -1,4 +1,4 @@
-// Decompiled by space-bunny-free, finished by space-bunny-free. Names are provisional.
+// Decompiled by space-bunny-free, finished by space-bunny-free, finished by LongCat 2.5 Preview Free, finished by deepseek-v4.1-flash. Names are provisional.
 
 // Screen fade: applies a 256 entry translate table to every pixel of `rect` in
 // `surface` (or in the locked screen when `surface` is 0). `level` selects one
@@ -104,6 +104,70 @@
 //   without collapsing the exits), and giving up `engine` as a variable
 //   altogether by reordering so the two `engine->...` loads are the only uses.
 //
+// MEASURED BY THE LONGCAT PASS (25 more source shapes, all compiled and all
+// free-scored with `check.py --sym`; generators in
+// build/scratch/0x4bf4d0/gen.py, gen2.py, gen3.py, dump.ps1, try.ps1). The
+// body below is UNCHANGED: every shape is the identical 333 bytes / 67.7
+// percent object, except p1, which is worse at 335 bytes / 64.7 percent.
+//
+// (a), the ebx/ebp swap, is flat against nineteen more shapes, so it is now
+// settled as neither a use-count tie nor a declaration-order tie:
+//   - `screen = *surface` instead of `memcpy` (a1); `sizeof(*surface)` and a
+//     literal `0x30` (a7, a8).
+//   - `engine` split into a bare declaration plus a separate assignment, and
+//     fetched after the surface branch instead of before it (a2, a13).
+//   - the branch inverted to `if (surface != 0) memcpy; else lock` (a4), and
+//     the same thing written with a `goto` (a14).
+//   - the table chosen by one conditional expression,
+//     `level < 0x20 ? engine->fade_neg : engine->fade_pos` (a12).
+//   - TWO extra reads of engine->width/height hoisted above the surface branch
+//     (a9) and one read of engine->width (a6). Nothing moves, which finally
+//     kills the "one more use" explanation for (a) as well.
+//   - `surface` aliased through a local declared BEFORE `engine` (a3).
+//   - inlined helper `lock_or_copy(surface, &screen)` doing the null test, the
+//     lock and the copy and returning int (a10); inlined helper
+//     `grab(surface, &screen)` around the copy alone (a11); inlined wrapper
+//     `eng(surface, rect, level)` around FUN_004b6220 whose arguments are
+//     unused, i.e. the guide's "an extra use at a call flips the tie" shape
+//     applied to the other variable (e1). All three give byte-identical
+//     register assignment, so the tie does not break on an added call either.
+//
+// (b), `p` in eax instead of ecx, is flat against fourteen more spellings of
+// the pointer/height block, all producing the same
+// `mov ecx,[esi+4]` / `mov eax,[esp+0x20]` / `imul eax,ecx`:
+//   - the indexing form `&screen.pixels[pitch * top + left]` (g1),
+//     `left + pixels + pitch*top` (g7, p5), `pixels + (left + pitch*top)`
+//     (g8), and `p += left; p += pitch*top` after `p = pixels` (g9, p12).
+//   - a whole-struct copy `Rect_004bf4d0 rr = *rect` used for every field
+//     (b3). MSVC CSEs it back to the same `[esi+n]` loads, so it does not even
+//     change the loads, only the order of the width expression.
+//   - `top` hoisted into a local, before and after `height` (b1, b2, b4, b5),
+//     `pitch` hoisted (p4), and Rect field order permutations.
+//   - the level block hoisted ABOVE the pointer computation (p1). This is the
+//     one shape that does put `level` in eax, the original's register, but it
+//     rewrites the table null test to `cmp ecx,edi / jne` instead of
+//     `test edi,edi / jne` and the row countdown to `lea edx,[ecx+1]`, and
+//     scores 64.7. So (b) is not reachable by moving (b)'s own text around.
+//
+// The one NEW and useful fact of this pass: the pointer block is NOT as
+// canonical as the earlier notes assumed. Declaring memcpy by hand and dropping
+// `#include <string.h>` entirely,
+// `extern "C" void* memcpy(void* d, const void* s, unsigned int n);`, keeps
+// the same 333 bytes and the same 67.7 percent but reallocates the block:
+// `mov ecx,[esi+4]` / `mov eax,ecx` / `imul eax,DWORD PTR [esp+0x20]`, with
+// `screen.pitch` left as a memory operand (f1/f7/f8 in build/scratch). So the
+// allocation there is decided by the EN graph of the WHOLE file, not by the
+// expression. Nobody has yet found the perturbation that puts `p` in ecx; the
+// next attempt should perturb something EARLIER (includes, extra declarations,
+// an unrelated helper) rather than the arithmetic.
+//
+// The "untried" list above is now empty. Both "a helper around only the pixel
+// loop" shapes were measured and are flat: `static inline void
+// fade_rows(p, height, rect, &screen, t)` (e2) and the value-returning
+// `static inline char* fade_row(p, rect, &screen, t)` that does one row and
+// returns `p + screen->pitch` (h3). Both are 333 bytes / 67.7 percent and
+// neither touches the pointer block.
+//
 // Established and matching here: the 48-byte surface layout (pitch at +0x0,
 // pixel pointer at +0xc, clip rect at +0x1c, which fixes the frame at 0x40 and
 // the `rep movsd` count at 0xc), the pixel pointer as a signed `char*` against
@@ -116,6 +180,68 @@
 // The 0x4bf4d0 entry in docs/bugs.md (three failure exits skip the unlock, and
 // `movsx` indexes the table with a sign-extended byte) is confirmed by the
 // disassembly and is reproduced here.
+//
+// DEEPSEEK V4.1 FLASH PASS. The file below is UNCHANGED (333 bytes / 67.7
+// percent); nothing this pass found scored higher on a real object. Two new
+// measurements, both recorded so they are not repeated:
+//
+// HEADERS: `tools/headers.py 0x4bf4d0` tried all 128 sets. The best is 68.4
+// percent with `<windows.h>` (alone or with stdlib/string/memory), and 68.4
+// with `<stdio.h> <string.h>`. No set matches, and none reaches the register
+// allocation. So the (a)/(b) tie is not a header-state tie either.
+//
+// COMPILER STATE, VIA UNUSED DECLARATIONS: this does move ONE thing. Four
+// unused `static` helper functions (or three, or twelve) inserted before the
+// declarations flip the inner-loop table access from `mov bl,[ebx+ebp]` to
+// the original `mov bl,[ebp+ebx]`, giving a 334-byte object at 68.4 percent.
+// A sweep of 1,2,3,4,5,6,8,10,12 unused functions and of 4..512 unused
+// prototypes shows the flip is not monotone (1,2 and 8,10 give 67.7; 3-6 and
+// 12 give 68.4), so it is compiler state, not a source shape. Crucially, in
+// every one of these the ebx/ebp (surface/engine) swap and the eax/ecx
+// (pointer/level) swap are UNCHANGED; the extra byte comes from the `[ebp+ebx]`
+// form needing a disp8=0. Those 334-byte objects are NOT the original source
+// and are not kept here: they are score-gaming with unused functions, and the
+// packet already warns that a higher score on a different object is worse.
+// The 334-byte 68.4 variants live in build/scratch/0x4bf4d0/{w1,d3,d4,d5,d6,d12,
+// p4,p8,p16}.cpp if a future pass wants to study the flip.
+//
+// Also measured this pass, all 333 bytes / 67.7 percent, no change: an
+// `int off = screen.pitch * rect->top;` split of the pointer build; the
+// product with `rect->top` on the left; `pixels + left + product`; a `for
+// (; height != 0; height--)` row loop (329 bytes, still 67.7); pointer
+// hoists for pixels/pitch/top; and inlined helpers `PtrA/PtrB/PtrC` and
+// `HgtA` (each 334 bytes, 68.4 only when the extra unused helpers are left
+// in place to perturb compiler state, see above); a helper returning the
+// final `t` collapses the two null exits (319 bytes, 62.3). Passing `Engine*`
+// into a `static` helper for the default-rect block or for the width/height
+// reads does NOT move engine to ebp here (unlike the earlier `pick` helper),
+// so the (a) tie survives that axis as well.
+//
+// DEEPSEEK V4.1 FLASH, SECOND PASS. Body still 333 bytes / 67.7 percent. Three
+// measurements, all new, all negative, recorded so they are not repeated:
+//
+// 1. The apparent use-count axis of (a) is dead for real, not just for
+//    CSE'd-away reads. Adding a call that truly consumes `engine` after the
+//    FUN_004b6220 call (`sink_004bf4d0(engine);`, 342 bytes / 59.6 percent)
+//    still leaves engine in ebx; adding a second call consuming `surface`
+//    (351 bytes / 58.9 percent) also leaves surface in ebp. So the earlier
+//    "extra read did nothing" results were not a CSE artefact: neither
+//    variable's use count decides the ebx/ebp tie. The guide's 0x4bcb50
+//    pattern (one more use flips the tie) does not apply to (a).
+// 2. Unused declarations before the function do not flip (a) or (b). Swept
+//    unused global int arrays (1..64 elements), unused struct definitions
+//    (1..16), unused function prototypes (1,2,3,4,8) and unused `extern int`
+//    (1,2,4,8). Every one is the same object, 333 bytes / 67.7 percent, except
+//    the struct counts 2,3,8,16 and 8 prototypes, which are the already
+//    recorded 334-byte / 68.4 percent `[ebp+ebx]` disp8 flip. No count moves
+//    the allocator.
+// 3. `register` on the parameters (`register Surface_004bf4d0* surface`,
+//    `register Rect_004bf4d0* rect`) is ignored by MSVC 5 here: identical
+//    bytes, 333 / 67.7.
+//
+// The call sites (22 of them, all pushing surface, rect, level in that order)
+// confirm the signature and the NULL surface/default rect idiom used below;
+// they carry no register information.
 
 #include <string.h>
 

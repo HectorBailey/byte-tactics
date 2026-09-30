@@ -1,5 +1,17 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
+// Decompiled by deepseek-v4.1-flash and space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
+//
+// Two levers finished this. First, adding <math.h> to the file (an include is
+// an allocation lever, see 0x482830) stops MSVC 5 sinking the high-word
+// division of pos.y below the pos.z division, which is what produced the
+// original's y-in-esi, z-in-eax schedule and the spill of y to the dead
+// incoming-argument slot at [esp+0x40]. Before that the function was 640 bytes
+// at 88.5 percent. Second, the two cell stores must be written as full 32 bit
+// subtractions (int locals vx, vz) and only truncated at the store; writing
+// `params.field_4[0] = (short)(cx - e->field_4)` narrows the subtraction to
+// `sub di, word ptr [eax+4]` and loses 6 bytes of the original's `movsx edx,
+// word ptr [eax+4]` plus `sub edi, edx`.
 #include <string.h>
+#include <math.h>
 
 #pragma pack(push, 1)
 struct UnitDef_004816a0 {
@@ -142,12 +154,17 @@ void __stdcall FUN_004816a0(int arg)
                     i = 0;
                 else if (i >= g_game->field_1485b->count)
                     i = g_game->field_1485b->count - 1;
+                // The original reads this as a 16 bit load of the high word of
+                // pos.y, so it is spelled as one here; a plain shift of pos.y
+                // would be a 32 bit load plus `sar`.
                 int y = ((short*)&params.pos.y)[1] / 64;
                 int cx = params.pos.x / 0x200000;
                 int cy = params.pos.z / 0x200000 - y;
                 Entry_004816a0* e = FUN_004b7f30(g_game->field_1485b, i);
-                params.field_4[0] = (short)(cx - e->field_4);
-                params.field_4[1] = (short)(cy - e->field_6);
+                int vx = cx - e->field_4;
+                int vz = cy - e->field_6;
+                params.field_4[0] = (short)vx;
+                params.field_4[1] = (short)vz;
                 *params.field_c = (unsigned char)i;
                 FUN_00482270(&params);
                 FUN_00481930(&params);
@@ -159,3 +176,12 @@ void __stdcall FUN_004816a0(int arg)
     FUN_00466c20();
     FUN_00466dc0();
 }
+
+// Kept from the earlier partial: none of these source orders or spellings for
+// the coordinate block moved the schedule on their own (all 640 bytes, 88.5
+// percent, y sunk past the pos.z division): y/cx/cy in any order, cx/cy/y,
+// cy -= y, int locals for the three divisions, a short or an int for the high
+// word, an inline accessor for it, a function scope int y, and dropping the
+// (short) cast on the two stores. The schedule only changed once <math.h> was
+// in the file; the store shape only changed once the subtraction results were
+// held in int locals.

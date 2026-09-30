@@ -577,3 +577,22 @@ Things that look wrong in the original but have no effect, kept for the record.
   and +0x10 values inside the same loop, so each player gets the maximum of
   the slots up to its own and only the last playing player gets the true
   maximum. May be intended. Found by Claude Opus 5.5 in #431.
+- **0x4bf8c0** (likely): when `surface != 0` the shared tail returns the
+  stack slot at `[esp+0x7c]` (`mov ebx, [esp+0x7c]`), which was last written
+  with `r->bottom` by the right edge's inlined segment code, so the function
+  returns `r->bottom` instead of 1. Found by CubeB's OpenCode /
+  deepseek-v4.1-flash in #1460.
+- **0x4a3ef0** (possible): in the `0x20` arm, when `e->field_c0 <= 0` the
+  `jle` at 0x4a40b2 skips the block that sets up the divisor, and 0x4a40d1
+  then does `idiv ecx` with the register still zero, a divide by zero. The
+  `0x80` arm tests both divisors first, so the check looks forgotten. Found by
+  CubeB's OpenCode / deepseek-v4.1-flash in #1316.
+- **0x4a4170** (possible): `mov ax, [ebp+0x94]` / `sub ax, [ebp+0x7c]` then
+  `add eax, esi` adds a 16-bit difference without sign extension, so the high
+  half of `eax` is whatever a previous call left there, and the sum is stored
+  in `e->off`. Found by CubeB's OpenCode / deepseek-v4.1-flash in #1316.
+- **0x44c0d0** (harmless): `if (defs[type].name)` tests the address of an
+  array member (`lea eax, [esi+0x20]; test eax, eax`), which can never be null,
+  so the check is always true and its false arm is dead. Probably meant to
+  test the first character. Found by CubeB's OpenCode / deepseek-v4.1-flash
+  in #1690.

@@ -1,4 +1,23 @@
-// Decompiled by space-bunny-free. Names are provisional.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
+// GPT-6 retry: <windows.h> improves to 75.2%, not MATCH. Collision and
+// feature lookup helper, width and reference variants did not improve the
+// baseline. Game/height allocation and feature tail still differ.
+// deepseek-v4.1-flash (issue 1400 retry): reconfirmed 73.6% / 842 bytes against
+// 844, no variant beat it. Scored with check.py --sym: removing oz, using
+// proj->py.i directly twice, drops to 62% / 866 and moves cell to ebp, g to ebx;
+// block-local oz in each unit block is 59.2% / 869; oz = pos->y is 53.1% / 878;
+// an early `unsigned short u1 = cell->unit1` is 61% / 847. The allocator always
+// refuses g_game in edi once proj->py.i is a live value, so the first diff (the
+// hoisted `mov ebp,[esi+8]` plus the g spill) is the whole problem; see below.
+// deepseek-v4.1-flash retry: still 73.6%, 842 bytes against 844, no variant
+// improved on it. Removing the `oz` local (direct proj->py.i in both unit
+// blocks), moving it into the unit0 block, reading it through `pos`, swapping
+// which block uses it, adding a second pointer local `q = proj`, and moving
+// `g = g_game` earlier or later all produced the same 842-byte code (MSVC CSEs
+// every spelling of the py load into one hoisted load in ebp). Declaring `g`
+// early or dropping the `g` local entirely scored lower (59.3%, 72.8%). So the
+// py load hoist and the g spill are one allocator state, not source-shape
+// problems, and the notes below about the g-in-edi cause still stand.
 // Not matched yet: 73.6%, 842 bytes against 844 (Sonnet 5.5 retry, #1097; was 72.8%). This header was rewritten
 // because the previous one still described the 66.0% / 870-byte state, which
 // the current body no longer has.
@@ -104,6 +123,8 @@
 // g_game+0x14253, but the 0xfffe reload path at 0x49b2e7 to 0x49b30f re-tests
 // only against 0xfffb and skips the count check, so a feature id read from the
 // neighbouring cell indexes g_game->mapping unchecked.
+
+#include <windows.h>
 
 #pragma pack(push, 1)
 

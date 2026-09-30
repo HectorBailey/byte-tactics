@@ -1,4 +1,18 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, reworked by Claude Sonnet 5.5, finished by GPT-6.1-sol. Names are provisional.
+// GPT-6.1-sol retry (#1616): still 86.9%; explicit shift/subtract tied the existing best.
+// Claude Sonnet 5.5 pass (#755): still 86.9% and 255 bytes, code unchanged. Re-checked
+// on top of the list below, none of it moved the bit 19 fold: the declaration-count
+// sweep (0 to 400 in steps of 8, flat at 255 bytes) and all 128 header sets of
+// headers.py (86.9% at best); the outer shift written as a multiply (`* 0x10000`,
+// `* 65536`, `0x10000 *`, an unsigned cast around the sum, a local `h * 0x10000`);
+// `unsigned char` locals for draft and seaLevel in both orders; `(int)(d * 0xffff)`
+// inside the sum; `(d << 16) - d + sea` written out (one expression, a local, or with
+// the parts on separate statements); and accumulating in `unit->pos.y` itself
+// (`pos.y = d * 0xffff; pos.y += sea; pos.y <<= 16;`), which is the only form that
+// keeps the original's eleven instructions without a pointer trick, but adds the
+// intermediate `mov [esi+0x6e], eax` store (265 bytes, 88.3%, the highest score seen but
+// bigger than the original), and a clamp on the product (`if (h < 0) h = 0`, 266
+// bytes, 87.8%). The original has no such store: its product only ever lives in ecx.
 // Places a unit's height (pos.y, 16.16 fixed point) on the ground, at the sea
 // level or on the water surface, depending on the flags in the unit's type
 // (+0x241): bit 12 floats, bit 19 floats on water, bit 20 can leave the water.
@@ -48,6 +62,21 @@
 // the very end, and the last branch (the FUN_0048a490 call) to 0x48a969 just
 // before it; those targets follow from the size of this block, so they move
 // with it.
+//
+// deepseek-v4.1-flash pass (#1283): wall confirmed, code unchanged (86.9%, 255
+// bytes). headers.py with no header and with --cpp (all 128 and 768 sets) never
+// beats 86.9%. A byte scan of the exe for the original's non-folded product
+// `8B C8 C1 E1 10 2B C8` (mov ecx,eax; shl ecx,0x10; sub ecx,eax) and for the
+// whole bit 19 block `33 C0 33 D2 8A 81 2C 02 00 00 8B C8 C1 E1 10 2B C8` finds
+// exactly one hit each (0x48a94b), so there is no sibling copy to learn the
+// source from. The second hit of the product form is 0x458abf inside 0x4589c0,
+// whose own notes record the identical unresolved fold. The pointer-to-local
+// variant was rerun here: 262 bytes, 86.5%, product in eax, g_game hoisted to
+// edx, seaLevel in ecx, i.e. the whole 11-instruction block is a rotation of
+// the original's ecx/eax/edx schedule, matching docs/field-notes.md item 2
+// ("callee-saved register rotation wall"). Nothing in the source spelling
+// controls which register the allocator picks for the multiply result, so this
+// is left as a wall.
 
 #pragma pack(push, 1)
 struct UnitType_0048a870 {

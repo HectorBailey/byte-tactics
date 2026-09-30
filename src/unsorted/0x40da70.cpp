@@ -1,30 +1,6 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
-// AI path search (the pathfinder object of 0x40df00, 0x40e630 and 0x40eb70):
-// expands one neighbour of the node `from`, stepping in the parent cell's
-// direction turned by `turn` (0..7). A new cell gets a node from the pool
-// (growing it when full) and is pushed on the binary min-heap keyed on f; an
-// open cell whose cost improves is updated and sifted up. `pending` means the
-// heap's top is the node the caller (0x40df00) has just taken: a new node
-// reuses it in place, and an improved node that displaces it frees it.
-//
-// Partial (82.3%). The pool/heap helpers are inline members, as the matched
-// out-of-line copies at the end of the file show (0x40ef20 Remove, 0x40f000
-// SiftUp, 0x40f060 SiftDown, 0x40f110 Grow, 0x40f1e0 Free). The inline
-// budget reproduces the original's choices only with these helpers: SiftUp
-// is inlined in Update's pending branch but called in its else branch and
-// in Push, SiftDown is always called, Grow and Remove are inlined.
-// Update() and the Steps() helper in case 1 are needed for that; a Cost()
-// helper in case 1 gives the same pattern, one in case 0 breaks it.
-// <windows.h> and <ddraw.h> fix the order of from->g and n->penalty in
-// case 1's sum.
-//
-// Still differs: in case 0 the original stores the estimate h to its stack
-// slot (shared with Estimate's `a`) straight after _allshr and uses eax for
-// the cell pointer and the 16-bit steps arithmetic, loading `from` into edx
-// on both sides of the steps if/else. Ours keeps h in eax until d.f, which
-// shifts the registers of the whole case 0 block (flags in dl, from->g in
-// ebx, turn reloaded into ecx). Rewriting h's declaration, the flag test,
-// d.f's expression or the steps assignment did not change it.
+// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash and GPT-6. Names are provisional.
+// Cache the heuristic scale before the virtual call, then use a separate fixed-point
+// multiply helper. Keeping these helper boundaries reproduces the original inlining.
 #include <windows.h>
 #include <ddraw.h>
 
@@ -157,8 +133,8 @@ public:
         for (i = 0; i < count; i++)
             newItems[i] = newNodes + (items[i] - nodes);
         operator delete(items);
-        items = newItems;
         nodes = newNodes;
+        items = newItems;
         capacity = n;
     }
     int Push(const NodeData_0040da70& d)
@@ -238,10 +214,15 @@ public:
     unsigned char turnCost[8];            // +0x68
     unsigned char stepCost[8];            // +0x70
 
+    static int Scale(int a, int b)
+    {
+        __int64 v = (__int64)a * b;
+        return (int)(v >> 16);
+    }
     int Estimate(int x, int y)
     {
-        int a = scale;
-        return (int)(((__int64)target->Func(x, y) * (__int64)a) >> 0x10);
+        int factor = scale;
+        return Scale(target->Func(x, y), factor);
     }
 
     short Steps(NodeData_0040da70* from, int turn)

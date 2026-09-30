@@ -1,5 +1,36 @@
-// Decompiled by space-bunny-free, reworked by Claude Sonnet 5.5. Names are provisional.
-// PARTIAL: 64.5%, 354 of 366 bytes (was 49.4% and 334 bytes).
+// Decompiled by space-bunny-free, reworked by Claude Sonnet 5.5, finished by deepseek-v4.1-flash and space-bunny-free. Names are provisional.
+// PARTIAL: 66.2%, 358 of 366 bytes (was 64.5% and 354 bytes).
+// space-bunny-free pass (#1805): the one change that helped is the third
+// distance, `d3 = Dist(c, b)` (66.2% against 64.5% for `Dist(b, c)`), so
+// FUN_00480570's operand order (b minus c) is what the original wrote even
+// though the abs makes it invisible in the values. Swapping the other two the
+// same way does not help: `Dist(c, a)` for d2 gives 64.7% and `Dist(b, a)` for
+// d1 gives 65.2%. The unnamed `Dist(*p, b)` / `Dist(*p, c)` source keeps the
+// right slot use (local0 = first `a` copy, then d1 in the same slot, local1 =
+// second copy, local2 = a spill) but only reaches 62.0%, with or without
+// `Dist(c, b)`; declaring d1/d2/d3 up front and assigning them later is 62.0%
+// too, so the declaration placement does not move it.
+// What still differs, in the first two distance blocks only: the original keeps
+// b as two member values for the whole body (b.x in ebx, b.y in ebp) and c as
+// two member values too (c.x in ecx, c.y in edx, spilled to [esp+0x18] for the
+// third block), while ours keeps b's members in the volatile ecx/edx (spilling
+// b.y to [esp+0x18]) and copies c as one dword into ebx. That single choice
+// cascades into every later block, including the two epilogues, which in the
+// original re-read the arg slots and in ours compare against bx. Nothing in the
+// source tried here makes MSVC 5 split c; the reverse-angle idea from the
+// packet (computing the distances in the other order, so a return slot is
+// reused) was tried as d2 before d1 (49.5%, 46.9%) and d3 first (39.9%).
+// deepseek-v4.1-flash pass: tried the unnamed `Dist(*p, b)` form (62.0%, and it
+// reorders the two distances: it loads c as a whole dword into ebp and computes
+// a.x - c.x first), a mixed `Dist(a, b)`/`Dist(*p, c)` form (62.0%), the exact
+// FUN_004805570 body for Dist (`Diff d = Sub(a, b); abs...`) both named and
+// unnamed (52.3%, but exactly 366 bytes), `Point a; a = *p;` (64.5%), a `short`
+// Toward step (64.5%) and dropping `inline` (64.5%). Best stays this file. The
+// one remaining structural gap: the original's first Dist temp at local0 is
+// overwritten by d1 (so local1 is the second Dist's `*p` temp), while with a
+// named `Point a` the compiler keeps `a` in local0 and puts d1 in local1;
+// everything else is the resulting register-allocation cascade in the first two
+// distance blocks.
 // Claude Sonnet 5.5 pass (#554): the original calls nothing, because it inlines
 // FUN_00480570 (max of the two absolute differences, Points passed by value) three
 // times and inlines a "move one point towards another" helper twice. That is what
@@ -55,7 +86,7 @@ void __stdcall FUN_004805b0(Point_004805b0* p, Point_004805b0 b, Point_004805b0 
     Point_004805b0 a = *p;
     int d1 = Dist(a, b);
     int d2 = Dist(a, c);
-    int d3 = Dist(b, c);
+    int d3 = Dist(c, b);
     if (d1 > d2) {
         if (d1 > d3) d1 = d3;
         *p = Toward(b, c, d1);
@@ -64,3 +95,4 @@ void __stdcall FUN_004805b0(Point_004805b0* p, Point_004805b0 b, Point_004805b0 
         *p = Toward(c, b, d2);
     }
 }
+

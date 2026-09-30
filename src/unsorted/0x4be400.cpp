@@ -86,6 +86,25 @@
 // edge too (this file). The slot-sharing trick that produced the same shape at
 // 0x4af320 cannot be tried here, because the frame is exactly h (4) + buf
 // (0x100) + fd (0x108) with nothing spare to share.
+//
+// A fifth session (space-bunny-free) built a free scoring generator
+// (build/scratch/0x4be400/gen.py, ~0.35 s per variant, ~500 variants run) over
+// twelve independent knobs: the clamp in four spellings, the inner loop in six
+// shapes, the outer loop in three, the early return versus an `if (h != -1)`
+// wrap, the attrib test in three, the "." / ".." test in three, the entry test
+// in four, the tail in three, `i` as int and long, the handle as int and as a
+// pointer, and a local `int` for the recursion's state argument. Every variant
+// that keeps the bytes is 99.2: the whole family is flat, including the loop
+// shapes that were not previously enumerated (`while (i < d->count)`, `for (;;)`
+// with a break, `if (i < d->count) do {} while`, `for (i = i; ...)`), which all
+// compile to the same graph. Worth recording for the next attempt: the family
+// being flat means the guard's successor is decided after the front end has
+// thrown the shape away, so a source level search cannot reach it.
+// The mechanism, as far as the bytes show: h lives in esi from 0x4be489 and is
+// spilled to [esp+0x10] at 0x4be48e; the file loop body clobbers esi, so the
+// tail's use of h needs `mov esi,[esp+0x10]`. On the guard edge esi still holds
+// h, and the original skips the copy on that edge only, which means MSVC did
+// per edge copy insertion there and did not here.
 // A fourth session (Sonnet 5.5, #1105) confirmed the wall at 99.2%: the dir
 // branch ending in `continue` (file branch after it), the file branch ending in
 // `continue`, `h = h;` before the loop condition, the file loop as a helper that
@@ -94,6 +113,28 @@
 // or worse. The reading that fits the bytes: the reload of the handle is
 // placed on the loop's exit edge and on the strcmp edges only, and the guard edge
 // is left alone because esi still holds h there. No source shape tried moves that.
+// A sixth session (deepseek-v4.1-flash) re-checked and probed one more shape (the
+// inner loop as `if (i < count) do { body; } while (++i < count);` scored with
+// `check.py --sym`): still exactly 99.2, the guard's `jge` still points at the
+// reload at 0x4be66d. The file is left at the best of the flat 99.2 family; the
+// only wrong byte in the 699 is the guard's jump displacement.
+// A seventh session (space-bunny-free) re-confirmed 99.2 and closed the last
+// two shapes that read as still open, both scored with `check.py --sym`, both
+// byte-identical to this file:
+//   - the guard as a `continue` of the outer search loop, `if (i >= d->count)
+//     continue;` placed between the clamp and the `for` (not the "branch ends
+//     in continue" or the "if guard round the for" the earlier sessions tried):
+//     the front end still merges the continue target with the if/else join, so
+//     the copy lands on one block head and the guard still targets it;
+//   - the epilogue, with no `Find* f` copy at all (`if (h) { ... h ... }`) and
+//     with the copy declared inside a `if (h != 0)`, the shape the MATCHED
+//     neighbour 0x4bca30 uses: both are 99.2, the reload at 0x4be66d is still
+//     emitted for all five edges, so the epilogue's spelling of the handle is
+//     not what decides the edge.
+// What the three together show: the edge is not the front end's block for the
+// `continue` target, not the epilogue's use of the handle, and not the loop's
+// shape, so it is the back end choosing between sinking the copy into the head
+// of the five-pred join and leaving it on the four edges that clobber esi.
 #include <io.h>
 #include <string.h>
 

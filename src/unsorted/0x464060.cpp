@@ -1,4 +1,4 @@
-// Decompiled by space-bunny-free. Names are provisional.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, verified by GPT-6.1-sol. Names are provisional.
 // Partial, 87.8%, and exactly the original's 560 bytes. All the code matches
 // except two instructions in the rectangle fill, plus the jump table that
 // follows the code once it does (its bytes only compare equal once the code
@@ -19,8 +19,21 @@
 // or long t and y, assignments to t inside the expression, defining the
 // preceding function 0x464000 above, and every header set (with the C++
 // headers too).
+// Additional retry: a local initialized from y then incremented by t, storing top then using r.bottom += t, and saving y, adding t into y, storing it, then restoring y all canonicalized to the same add eax, ecx. The compiler did not preserve an accumulating destination register.
 // The mode 1 arm of the switch leaves the flag local uninitialised in the
 // original (see the note on the switch below), which this reproduces exactly.
+// Retried by deepseek-v4.1-flash: all 24 store orders, four inline setters, a
+// Fill method, free helpers taking (r,y,t), (r,t,y) or (r,l,t,rr,b), a helper
+// returning the rect, aggregate init and a four-argument constructor,
+// intermediates for the sum / y / t, references and pointers to y and
+// r.bottom, r.top + t / r.left + t / height + t, r.bottom = t + y, t + y,
+// 0 + y + t, y - (-t) and += spellings all compile byte-identically to this
+// file. MSVC canonicalises the sum to "add eax, ecx" because t is already in
+// eax from _ftol. Sweeping 0 to 2000 unused declarations or prototypes, the
+// C++ headers (<string>, <vector>, <map>, <iostream>, <list>), every
+// headers.py set, and defining 0x464000 above are all flat at 87.8. The
+// remainder is allocator and scheduler state from the original file's earlier
+// contents, not a source shape in this block.
 #include <math.h>
 #pragma pack(push, 1)
 

@@ -1,4 +1,22 @@
-// Decompiled by space-bunny-free. Names are provisional.
+// Decompiled by space-bunny-free, reworked by Claude Sonnet 5.5, finished by deepseek-v4.1-flash. Names are provisional.
+// Second pass (deepseek-v4.1-flash, issue 1553): re-ran the wall protocol; the
+// argument list, callers' pushes and every callee ret N are correct, headers.py
+// (768 sets) is flat at 54.0%, the exe byte census still finds each construct
+// exactly once in this function only, and the noted n<0 path is a zero
+// rematerialisation, not a bug. Body unchanged at 54.0%.
+// wall: callee-saved register rotation. The original holds pos in edi and rad in
+// ebx; we get pos in ebx and rad in edi, plus the i = 0 store sinks past the
+// guard and materialises two fresh zeros for x2/y2. deepseek-v4.1-flash checked
+// all four levers: (1) the argument list, callers' pushes and every callee ret N
+// re-verified correct; (2) no inherited "original bug" survives re-derivation
+// (the n < 0 path's loads from the counter slot are a known-zero rematerialisation,
+// not a bug); (3) headers.py swept all 768 header sets, best is the current
+// 54.0%; (4) grepping orig/TotalA.exe for the raw bytes of the construct
+// (loop head 8B5C24185355 and the n<0 double load 8B74244C8B5C244C) finds exactly
+// one hit each, this function, so there is no sibling to copy. 14 more targeted
+// respellings (rad/step/index order and scope, unsigned rad/step/angle, a local
+// pos copy, x2/y2 declaration moves, radius*0x10000) all scored 45.0% to 54.0%,
+// none above the current 54.0%. Stop.
 // PARTIAL, 54.0% (500 of 505 bytes; was 38.2% at hand-off). Up from 38.2% by
 // five things, all confirmed by check.py, so do not re-sweep any of them:
 //   a. `i = 0;` must be a STATEMENT after `int n = ...`, not an initialiser
@@ -72,6 +90,23 @@
 // slot, the negated offsets kept in callee-saved registers, the x, z, y load
 // order in both inlined point copies, the __max double call for the terrain
 // height, and both draw calls.
+// Claude Sonnet 5.5 pass (#705), nothing beat 54.0% and 500 bytes. Ruled out on
+// top of the list below (all scored, none counted as runs): the declaration-count
+// sweep to N = 400 (two states only, 52.2% and 54.0%, both 500 bytes) and all 128
+// header sets of headers.py (54.0% at best); an inline `RingPoint(out, pos, angle,
+// rad)` helper for the two point computations (53.4%); about 75 respellings of
+// the outer structure and the loop body: declaration order and scope of x2, y2, i,
+// angle, lx and ly (53.3 to 54.0%), `radius <<= 16` instead of `rad` (51.0 to
+// 52.8%), an `a2` copy of the angle (52.8%), guard forms, `++i <= n` and early
+// returns (same bytes), the draw-call argument and x1/y1/x2/y2 order (same), a
+// local copy of `pos` (same), p1 and p2 store orders (48.7 to 54.0%).
+// Leads: (1) on the n < 0 path the original loads x2 and y2 from the counter's
+// stack slot inline (`mov esi,[esp+0x4c]; mov ebx,[esp+0x4c]`), which is what
+// UNINITIALISED x2 and y2 give, but that version is 506 bytes and 45.0% (the block
+// moves after `ret`, it loads `index` or `color` instead of `i`, and the roles
+// shift: radius in ebp, zero in ebx). (2) The roles are swapped against the
+// original: its rad is in ebx and its zero/angle in ebp, ours the other way round;
+// its tail uses `test reg, reg` because no zero register survives there.
 // Draws a ring of n + 1 line segments around a 16.16 map position, where
 // n = radius * pi / 4, and the label of the segment number index * 3 under it.
 #include <stdlib.h>

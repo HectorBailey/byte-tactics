@@ -1,4 +1,4 @@
-// Decompiled by space-bunny-free. Names are provisional.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
 // Not matched yet, 84.7% (354 bytes, same size as the original). The only
 // difference left is register allocation in the prologue: the original keeps
 // the x difference in ecx (b.x is loaded into ecx before the register pushes,
@@ -17,6 +17,32 @@
 // and the divisions from b or from d, n/i/c/best declared up front in every
 // order, spelling each subtraction five ways, and 1500 random mixes of in-place
 // and local differences.
+//
+// deepseek-v4.1-flash additions (all still 84.7% or lower): all 128 header
+// sets from tools/headers.py (best 84.7% with <stdlib.h>), a Sub/MaxAbs
+// static inline helper in every field order, separate `int` difference
+// locals built into d, an explicit max local, __max, swapped abs order and
+// swapped division order, `Vec3 p = a` copies, and six-arg layouts. The
+// original loads b.x into ecx before the callee-saved pushes (a.y already
+// owns esi there, and esi is reused for abs(dx)/n), while ours reuses esi for
+// b.x and gives ecx to abs(dx)/n. Nothing tried moves that one choice.
+//
+// Second pass (deepseek-v4.1-flash), still 84.7%: the whole hunk is the one
+// register pair dx=ecx/abs=esi (original) vs dx=esi/abs=ecx (ours). Tried
+// again and ruled out: `Vec3_004851c0 d = b - a` with an inline operator-
+// whose body order is xyz, yxz, yzx, and by-value or const-ref parameters
+// (80.6 to 81.5%); `Vec3 d = b; d -= a;` (82.3%), and the copy before and
+// after the subtractions, `d(b)`, default-construct then assign, d declared
+// at function scope, and field-by-field copies (74.5 to 84.7%): every form
+// that keeps the copy after the in-place subtraction reproduces the byte
+// sequence and the dead `mov [esp+0x10], dx`, so the source shape is right.
+// Also tried: all six subtraction orders, six raw int component locals
+// initialised in the original load order (b.y, b.x, a.x, a.y, a.z, b.z) then
+// subtracted, n computed from the parameter fields before the copy, and a
+// reference alias of b. tools/headers.py confirms no header set beats 84.7%.
+// The original's b.x load is hoisted above the push ebx and above a.y's
+// load, which is a scheduler/allocator decision this source shape does not
+// reach; the instruction sequence is otherwise identical.
 #include <stdlib.h>
 
 #pragma pack(push, 1)

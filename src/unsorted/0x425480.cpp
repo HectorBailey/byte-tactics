@@ -1,9 +1,10 @@
-// Decompiled by Space Bunny Free. Names are provisional.
+// Decompiled by Space Bunny Free, finished by deepseek-v4.1-flash, finished by LongCat 2.5 Preview Free, verified by GPT-6.1-sol. Names are provisional.
 // std::vector<Class_004c2ea0*>::insert(iterator, size_type, const T&), MSVC
 // 5's <vector> written out (as 0x425210.cpp does) with _Ucopy, _Ufill, fill
 // and copy_backward inlined. 0x4222e0 is the only caller (the push_back).
 //
-// Partial (80.5%, 541 of 537 bytes), up from 57.9% with the real <vector>.
+// Partial (for-loop form: 80.5%, 541 of 537 bytes), up from 57.9% with the
+// real <vector>.
 // What changed: the third _Ucopy of the growth branch is written as a loop in
 // the body with the destination declared BEFORE the source,
 //   { iterator _d = _Q + _M; const_iterator _s = _P; for (; _s != _Last; ...) }
@@ -32,6 +33,49 @@
 // four _Ucopy sites in all 256 combinations of inline/helper/manual loop,
 // _Ufill and _Destroy with permuted parameters, for/while/count loops, and
 // dozens of dead declarations before the class.
+// deepseek-v4.1-flash pass: rewrote the growth branch's third _Ucopy as a
+// do-while over the destination-first locals (was a for loop). That drops the
+// redundant `mov esi,[ebp+8]` and the pre-loop `cmp/je`, so ours is 534 bytes
+// against the original's 537 (81.1%, up from 80.5%). The matched-instruction
+// count is unchanged (107 context lines in both diffs); the gain is only three
+// fewer extra instructions. The original's loop is pre-tested with _Last
+// cached in esi, so the faithful for-loop form (80.5%) remains the better
+// structural start and is what the notes above this block describe. Those
+// findings were measured by Space Bunny Free; I confirmed the first _Ucopy
+// spelling has no effect and that no header set (headers.py, 128 sets) moves
+// the score.
+// LongCat 2.5 Preview Free pass: re-tested the two open questions in this
+// (do-while, dest-first) base. The result stands at 534 bytes / 81.1%; 30+
+// scored variants this pass, none better:
+// - every pre-tested form (for/while/if-around-do-while, increments in either
+//   order, _d/_s in for-inits, explicit `if (_s != _Last) do..while`) folds
+//   to the same 541-byte shape (80.5%): it emits the +7 byte pre-test
+//   (`mov <r>,[ebp+8]; cmp <rP>,<r>; je`) but then the source derivation
+//   (`lea eax,[ecx+edi]; sub eax,edx; sub eax,esi`) lands in eax, the same
+//   register the _Last cache was loaded into, so the loop-end test must
+//   reload `mov edx,[ebp+8]` (+3) and the init is 1 byte larger: 45 vs the
+//   original's 41. The original keeps _Last in esi, M4 in edi, dest in eax
+//   and builds the source from _P itself (ecx, merged as the induction var,
+//   `sub ecx,edx; add ecx,eax; sub ecx,edi`), so its cache survives.
+// - the _Last-cache local (const_iterator _l = _Last, in all declaration
+//   orders, do-while and for) re-tested in this base: still reverts the
+//   whole allocation (this to ebx, count to ebp, _P to ebx, 538-546 bytes at
+//   58-60%). The do-while + _l shape is 538 bytes (one over the original)
+//   with the cache surviving in edi, which proves the cache-clobber in our
+//   form is solely the register rotation, not the loop shape itself.
+// - `register`, manual first-copy and fill loops, &_Q[_M] and _M+_Q
+//   spellings, _P as the loop variable itself, hoisted _d/_s at function
+//   scope, the destination-first helper _Ucopy(_Q+_M, _P, _Last), source-
+//   first declare order, and post-increment-in-call constructs: all at or
+//   below 81.1%.
+// So the 3 missing bytes and the register rotation (ours: _P in edi, dest in
+// ecx, src in eax, M4 in esi, _Last reloaded; original: _P/src in ecx, dest
+// in eax, M4 in edi, _Last cached in esi) are one allocator decision that no
+// source lever in this file reaches, the same translation-unit-state wall the
+// sibling family records (0x4732e0, 0x40d020, and the one-byte walls of
+// 0x425210 / 0x44ec30 / 0x46e640). The 534-byte do-while is the best shape;
+// keep it.
+// GPT-6.1-sol verified the saved source with check.py: 81.1%, no MATCH.
 #include <memory>
 #include <xutility>
 
@@ -65,7 +109,7 @@ public:
 			iterator _S = allocator.allocate(_N, (void *)0);
 			iterator _Q = _Ucopy(_First, _P, _S);
 			_Ufill(_Q, _M, _X);
-			{ iterator _d = _Q + _M; const_iterator _s = _P; for (; _s != _Last; ++_d, ++_s) allocator.construct(_d, *_s); }
+			{ iterator _d = _Q + _M; const_iterator _s = _P; do { allocator.construct(_d, *_s); ++_d; ++_s; } while (_s != _Last); }
 			_Destroy(_First, _Last);
 			allocator.deallocate(_First, _End - _First);
 			_End = _S + _N;

@@ -33,6 +33,9 @@ ln -sfn "$ROOT/toolchain" "$DIR/toolchain"
 mkdir -p "$DIR/orig" "$DIR/build"
 ln -sf "$ROOT/orig/TotalA.exe" "$DIR/orig/TotalA.exe"
 [ -d "$ROOT/build/ghidra" ] && ln -sfn "$ROOT/build/ghidra" "$DIR/build/ghidra"
+# Start from the main checkout's compile cache: its keys hash each file's
+# contents, so only the files this PR changes are compiled again.
+[ -d "$ROOT/build/progress" ] && [ ! -d "$DIR/build/progress" ] && cp -r "$ROOT/build/progress" "$DIR/build/"
 
 cd "$DIR"
 changed=$(git diff --name-only "$(git merge-base "pr-$PR" origin/main)" "pr-$PR")
@@ -57,6 +60,13 @@ awk -F, 'NR == FNR { if ($5 == "matched") m[$1] = 1; next }
          FNR > 1 && ($1 in m) && $5 != "matched" { print "  !! matched on main, now " $5 " " $6 "%: " $1 " " $3; bad = 1 }
          END { if (!bad) print "  no function that matches on main stops matching"; exit bad }' \
     build/main-progress.csv data/progress.csv || regressed=1
+# A branch made before main moved on can carry an older, worse copy of a file
+# that is still partial; the squash would overwrite the better one.
+lowered=0
+awk -F, 'NR == FNR { if ($5 == "partial") s[$1] = $6; next }
+         FNR > 1 && ($1 in s) && $5 != "matched" && ($6 == "" || $6 + 0.5 < s[$1] + 0) { print "  !! partial on main at " s[$1] "%, now " ($6 == "" ? $5 : $6 "%") ": " $1 " " $3; bad = 1 }
+         END { exit bad }' \
+    build/main-progress.csv data/progress.csv || lowered=1
 
 sources=$(echo "$changed" | grep '^src/unsorted/.*\.cpp$' | while read -r f; do [ -f "$f" ] && echo "$f"; done || true)
 addresses=$(grep -hoE '^// FUNCTION: 0x[0-9a-f]+' $sources 2>/dev/null | awk '{print $3}' | sort -u || true)
@@ -70,5 +80,9 @@ grep -nE '__fastcall|volatile|__asm|_emit|#pragma optimize|vtable *= *DAT_|\(voi
 git checkout -q -- data README.md 2>/dev/null || true
 if [ "$regressed" = 1 ]; then
     echo "!! do not merge as is: it breaks a function that matches on main"
+    exit 2
+fi
+if [ "$lowered" = 1 ]; then
+    echo "!! do not merge as is: it lowers a partial that main has a better copy of"
     exit 2
 fi

@@ -1,13 +1,8 @@
-// Decompiled by space-bunny-free. Names are provisional.
-//
-// Gave up at 76.3%. The store sequence and order match exactly; the only
-// difference is the register the constant 4 is given. The original materialises
-// 4 into edx before the memset's rep stosd (so the memset has already reserved
-// eax/ecx/edi, and 4 is the first value to be allocated); ours allocates the
-// constant 1 first, so 1 takes edx and 4 falls to eax after the stosd, with one
-// extra `mov eax, 4`. Tried: putting the memset after the 14 stores (MSVC does
-// not hoist it, so the memset has to be the first statement), return type int
-// rather than bool, #pragma pack(1) for the unaligned +0x1745 fields.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
+// Partial: 76.3%, 901 bytes versus 915. The constant 4 stays in EAX
+// rather than EDX, shortening fourteen global stores by one byte each
+// and rotating other constant registers. A 768-set header sweep and
+// signed/unsigned/long global and literal variants did not improve it.
 
 #include <string.h>
 

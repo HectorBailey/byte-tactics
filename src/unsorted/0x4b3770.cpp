@@ -1,4 +1,4 @@
-// Decompiled by GPT-5.6-Terra, finished by space-bunny-free. Names are provisional.
+// Decompiled by GPT-5.6-Terra, finished by space-bunny-free and deepseek-v4.1-flash. Names are provisional.
 // 99.0% (577 bytes against 577, only two instructions differ, see the end).
 //
 // The original's 0xb4-byte frame, read off the disassembly (offsets are from
@@ -104,6 +104,102 @@
 // registers as the original in every spelling tried, and both movs are byte
 // identical.  Only WHICH of the two registers the add names as its destination
 // differs, so this is one 2-byte choice, not two.
+//
+// ---------------------------------------------------------------------------
+// THIRD PASS (space-bunny-free).  40 further spellings, all byte-identical to
+// each other and all still swapped.  What is new here is the SHAPE of the
+// residual and the one thing that is now PROVEN rather than assumed.
+//
+// 1. The residual is exactly two instructions, both inside the strcmpi call:
+//      0x18e  add edx,ecx   /  0x190  push edx      (original)
+//      0x18e  add ecx,edx   /  0x190  push ecx      (ours)
+//    577 bytes against 577, 206 of 208 instructions byte identical, so this is
+//    class (a), an operand-order choice, and the 0x190 push is a cascade of
+//    the add's destination, not a second defect.  There is NO size trap here:
+//    the object is already the original's exact length, so no variant can
+//    "score better by being shorter".
+//
+// 2. THE ORDER RULE, MEASURED (this is the new result).  With both operands
+//    still in memory, MSVC 5.0 loads the POINTER operand first and the INT
+//    offset second, and then names the INT as the add's destination.  I
+//    confirmed the causal direction with an int-only add, where the source
+//    order is under my control:
+//      (char*)img.buf + h.nameoff       ->  mov edx,[buf] / mov ecx,[off]
+//                                           / add ecx,edx   (int is dst)
+//      (char*)(h.nameoff + (int)img.buf) ->  mov edx,[buf] / mov ecx,[off]
+//                                           / add ecx,edx   (int is dst)
+//    Writing the offset FIRST changes neither the load order nor the
+//    destination, which pins the cause: it is not source order at all, it is
+//    the front end canonicalising `+` so the pointer is always the lvalue,
+//    and C1's gendiad then always naming the rvalue, which is the int.  So
+//    no operand permutation of a `+` can reach "add base, off" here, and the
+//    ORIGINAL's add must have had a destination register ASSIGNED to the
+//    IR_ADDS node, which only happens when the sum is assigned to something
+//    the register allocator gave a register to.
+//
+// 3. Why assigning a sum local does not pay (tested, not assumed).  A local
+//    sum that is dead after the call is forwarded into the argument and the
+//    tree is unchanged (`char* b; b = (char*)img.buf; b += h.nameoff;
+//    _strcmpi(name, b);` is byte identical to the bare form).  A local sum
+//    that IS live across the call does get a register, and then the add does
+//    name the base -- but only because the value is promoted to a
+//    callee-saved register, and in this function all four of ebp, ebx, esi
+//    and edi are already pushed and in use, so the extra liveness costs a new
+//    push/pop or a spill.  Measured: 87.0% and 212 bytes, with the whole
+//    function's register assignment reshuffled.  Rejected.
+//
+// 4. Tried this pass and all still swapped, all at 577 bytes with the same
+//    two-instruction diff (so none of them is a size trap, just no effect):
+//    `*(char**)&img` and `*(int*)((char*)&h + 8)` for either operand, so a
+//    deref instead of a direct member load, which is the one thing that would
+//    have changed the operand's IR subtree size; a cast on the whole sum and
+//    on the base through a second type; `char*` for Image_004b3770::buf so
+//    the PTRADD carries no cast node at all (this needs the two allocator
+//    results cast and FUN_004b4270's second parameter declared `char**`);
+//    `int`/`unsigned`/`long` for the nameoff field; `(int)`, `(unsigned)`,
+//    `(long)` casts of either operand; `offset + base` and
+//    `base + offset` as plain int adds; `+(0 - off)` so the IR is a SUB;
+//    a union-mediated read of either operand; seven different cast types on
+//    the base (`unsigned char*`, `signed char*`, `void*`, `short*`, `long*`,
+//    `char* const`, `const char*`); a named sum local declared at each of the
+//    eight possible positions among the other locals, in both the
+//    split-assignment and the single-assignment form; the sum local live
+//    after the if via a call, a dereference, a comparison and a second
+//    strcmpi; the base hoisted into a local that is live after the if.
+//
+// 5. The calling convention is NOT the cause, checked rather than assumed: the
+//    function ends in `ret 0xc` and is a member with three parameters plus
+//    `this` in ecx, and every _strcmpi call is followed by `add esp,8`, so
+//    _strcmpi is __cdecl and the declaration is already right.  A
+//    __stdcall spelling of _strcmpi was not needed and is not the answer.
+//
+// 6. It is not an STL instantiation: no template, no container, no
+//    vector<T>::insert.  It is a plain C++ member function.
+//
+// FOURTH PASS (deepseek-v4.1-flash). An independent, scripted sweep scored 37
+// expression spellings (`(int)`/`(unsigned)`/`(long)` casts of either operand,
+// `(char*)(off + (int)base)`, `&base[off]`, derefs of `&img`, every field type
+// for nameoff, and 9 control-flow shapes: `name != 0 && ...`, `if (name)`,
+// `if (name == 0) {} else ...`, a named `char* p` with `p += off` in-block and
+// hoisted, `!strcmpi`) through check.py's library. ALL 46 land on exactly
+// 99.04%, byte for byte the same two-instruction residual. That pins it: the
+// ADD destination is not a source-order choice at all, MSVC 5 always names the
+// RIGHT operand of `ptr + int` as the destination, and only a plain `+` with
+// the pointer on the right (unwritable in C++) reaches `add base, off`.
+// tools/headers.py tried all 128 header sets: none changes it. Left partial.
+//
+// FIFTH PASS (deepseek-v4.1-flash). Re-ran headers.py (still no header set
+// matches) and swept 38 more spellings through direct /Fa listings. The rule
+// is confirmed and now has a positive control: `add dst, off` with the BASE in
+// dst IS reachable, but only when the offset operand is forced to be
+// materialised in a value register first. `(char*)img.buf + (h.nameoff ?
+// h.nameoff : h.nameoff)` emits "mov eax,[off] / mov edx,[buf] / add edx,eax",
+// i.e. the ADD gets a pre-assigned destination and names the base, but the
+// register roles and the load order flip (off before buf, name in ecx) and the
+// extra mov is not in the original. So the residual is still only:
+//     0x18e add edx,ecx / push edx   (original)
+//     0x18e add ecx,edx / push ecx   (ours)
+// Nothing in this pass changed the file; 99.0% is the best.
 #include <string.h>
 #include <stdio.h>
 

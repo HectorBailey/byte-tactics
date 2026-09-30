@@ -1,4 +1,5 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol. Names are provisional.
+// GPT-6.1-sol retry (#1616): unchanged at 84.1%; the remaining mismatch is the documented ebx/ebp allocation swap.
 // Best result: 84.1% (455 of 455 bytes). The body now compiles to the
 // original except for one global register swap: MSVC puts the `view` pointer
 // in ebx and the face `info` pointer in ebp, while the original keeps view in
@@ -22,6 +23,29 @@
 // none flips that swap, so the cause is compiler state from the original
 // source file's other contents, not this function's source. A renderer file
 // in a DirectDraw game would have included <windows.h>/<ddraw.h> anyway.
+//
+// deepseek-v4.1-flash re-checked that conclusion and confirmed it. The swap
+// survives every source lever tried in build/scratch/0x458fa0: caching
+// vertexCount/faceCount/field_c in locals, hoisting or sinking the bright
+// shade, swapping the two pointer declarations, while/for/do forms, reading
+// view's offsets into locals or through accessors, address-taken pointers to
+// view and info, extra live locals and dead uses to move the allocator, and
+// reordering the vertex-array declarations. The N-declarations test (0 to
+// 1000 unused `extern int`, step 1) only ever toggles between 84.1% and
+// 66.9% (never MATCH), and headers.py --cpp (768 sets, including <string>,
+// <vector>, <map>, <list>, <iostream>) finds no match either. Declaring the
+// real preceding neighbour 0x458dd0 in the same file reproduces the 66.9%
+// vertex-loop layout, not the swap, so the missing state is still elsewhere
+// in the original file. /Gz, /Gr and /Ob1 change nothing; /G6 changes the
+// layout and is worse. This is the one remaining diff, so treat it as
+// compiler state, not a source shape.
+//
+// A second deepseek-v4.1-flash pass added: third parameter as `unsigned char`
+// (worse, 81.8%), unsigned loop counters (80.7%), `piece->info` inline with no
+// local (56.9%), a local alias `vp = view` used everywhere, a pointer-to-
+// pointer intermediate for info, swapping the info/v declaration order, and
+// moving the info declaration outside the while. Every one keeps the exact
+// same 84.1% and the identical ebx/ebp swap, so the file stands at 84.1%.
 //
 // Earlier note from space-bunny-free: several scratch variants scored 80-90%
 // but are wrong; they lay the vertex arrays out 4 bytes high at [esp+0x150],

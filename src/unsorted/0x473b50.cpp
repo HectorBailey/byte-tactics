@@ -1,4 +1,4 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by LongCat 2.5 Preview Free. Names are provisional.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by LongCat 2.5 Preview Free, finished by deepseek-v4.1-flash, verified by GPT-6.1-sol. Names are provisional.
 // Sibling of 0x4736e0 and 0x4742c0: the same base call with the third
 // argument, the same two 24-byte copies and the same trailing virtual call.
 // This one keeps each 24-byte block as a {point, far point} pair, moves the
@@ -20,7 +20,7 @@
 // writing the subtraction against the field, or leaving one of the two out of
 // a temporary, does not.
 //
-// Still differs (87.5%, 497 of 499 bytes), all of it scheduling inside the two
+// Still differs (88.0%, 497 of 499 bytes), all of it scheduling inside the two
 // copies of the helper:
 //   - the 7/11 point is stored just before the next component's loads, where
 //     the original sinks the store past them (x and y, in both blocks);
@@ -104,6 +104,35 @@
 // of separate component references and the scheduling freedom of one base
 // pointer. Also tried: a method on a Seg subclass that takes six int* locals
 // from its own fields (503 bytes, 39.9%).
+// Retry (deepseek-v4.1-flash, #1163): no gain, 88.0% stays the ceiling from
+// source. All of this was measured with free `check.py --sym` scratch scores:
+//   - one straight-line body with direct member expressions (no helper) is
+//     31.8%: it keeps all six lerp results live and spills them;
+//   - the six-`int&` helper (Split(seg.start.x, ..., seg.end.z)) reproduces
+//     the original's base registers but reorders the loads (85.9%);
+//   - a single `Seg&` / `Seg*` parameter, and a `Seg::Split()` method, all
+//     change the prologue (`this` moves to ebp, an extra stack slot) and fall
+//     to 39.9%;
+//   - `<windows.h>`, `<string>`, `<iostream>`, `<vector>`, `<map>`, `<list>`,
+//     `<stdio.h>`, `<stdlib.h>`, `<math.h>` all give 87.5 to 88.0%, so no
+//     header is the lever;
+//   - a sweep of 0 to 516 unused `extern int dummyN;` declarations in front
+//     never exceeds 88.0%, so it is not compiler state either;
+//   - `(&s.x)[1]` / `(&s.x)[2]` compile identically to `s.y` / `s.z`, and
+//     dropping the `ddx` local also compiles identically (all 88.0%).
+// The remaining diff is instruction scheduling inside the inlined helper:
+// MSVC sinks the original's `e.x`/`e.y` stores one slot later (past the next
+// component's loads) and keeps az in edi; ours stores earlier, fuses the z
+// subtraction, and in the second block keeps ebp for `s.y`/`s.z` where the
+// original goes back to `[ebx+0x20]`/`[ebx+0x24]`. No statement order that
+// preserves the 88.0% load order moves any of them.
+// Retry (deepseek-v4.1-flash, #1380): re-confirmed 88.0%. Moving the y loads
+// before the `e.x = bx` store (the first diff hunk) makes MSVC 5 spill s.y to
+// [esp+0x1c] (513 bytes, 66.1%): every source order that delays the store has
+// to keep bx live across both loads, and the allocator spills instead of
+// sinking the store the original's compiler sank. Adding an explicit
+// `int ez = e.z;` local before the z delta compiles byte-identically to this
+// file, so the z copy is not reachable that way either. 88.0% stands.
 class Class_00471d70 {
 public:
     void FUN_00471d70(int param_1);

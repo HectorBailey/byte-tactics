@@ -1,5 +1,10 @@
-// Decompiled by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol. Names are provisional.
 #include <windows.h>
+#include <stdio.h>
+
+// Retry: the 128-set header sweep found no match. Adding <stdio.h> reproduces the
+// best 53.6% result (813 bytes), a slight improvement over the prior 53.5% source.
+// Other attempts in the retry notes and shared board did not improve this variant.
 
 #pragma pack(push, 1)
 
@@ -90,8 +95,11 @@ struct Game_00481d50 {
     char unknown_14283[0x1428f - 0x14283];
     Grid_00481d50 grid1;               // +0x1428f
     char unknown_1429f[0x142f1 - 0x1429f];
-    unsigned char flags_142f1;         // +0x142f1
-    char unknown_142f2[0x1485b - 0x142f2];
+    unsigned short flags_142f1_bit0 : 1;  // +0x142f1
+    unsigned short flags_142f1_bit1 : 1;
+    unsigned short flags_142f1_mapChanged : 1;
+    unsigned short flags_142f1_rest : 13;
+    char unknown_142f3[0x1485b - 0x142f3];
     void* losTable;                    // +0x1485b
 };
 
@@ -116,12 +124,31 @@ inline int Lod_00481d50(Params_00481d50* params)
     return v < 0 ? 0 : v;
 }
 
+// Status: partial, 53.5 percent. The body shape is right; what still differs is
+// the local frame slot assignment (and everything downstream of it). Original
+// slots, low to high: j1 0x10, e2 0x14, i 0x18, x 0x1c, y 0x20, e1 0x24,
+// ref 0x28, bestDiff 0x2c, grid 0x30, lod/j 0x34, table 0x38, line 0x3c,
+// num 0x40, halfH/count 0x44. Ours: j1 0x10, y 0x14, table 0x18, i 0x1c,
+// x 0x20, ref 0x24, bestDiff 0x28, j 0x2c, line 0x30, e1 0x34, e2 0x38,
+// grid 0x3c, num 0x40, halfH 0x44. Only j1 (0x10), num (0x40) and halfH (0x44)
+// agree. This is MSVC spilling in a different order, not declaration order: a
+// probe with six address-taken locals confirms first-declared gets the lowest
+// offset, but here only spilled variables get slots, assigned in spill order.
+// The inner loop must be the comma-for, `for (j = 0, j1 = 1; (short)j <
+// (short)num; j++, j1++)`: j1 increments on the `continue` paths too (the
+// original back edge at 0x481f7a bumps both counters). That alone took 52.7 to
+// 53.5. Tried and rejected (free scratch scoring): all locals at function scope
+// in the exact ascending-slot order (42.2, frame shrank to 779 bytes); removing
+// the named `lod` local (identical 52.7); swapping the top declaration order to
+// x, y, halfW, halfH (50.9). <windows.h> is required (family sibling 0x4825b0
+// matches only with it). The 0x482270 twin is byte-identical apart from the sign
+// of the two explored-map updates and is still unmatched at 50.3.
 // FUNCTION: 0x481d50
 void __stdcall FUN_00481d50(Params_00481d50* params)
 {
     if (((Map_00481d50*)params->field_0)->playerIndex == g_game->playerIndex) {
         g_game->flag3 = 0;
-        g_game->flags_142f1 |= 4;
+        g_game->flags_142f1_mapChanged = 1;
     }
     int halfW = g_game->width / 2;
     int halfH = g_game->height / 2;
@@ -133,8 +160,9 @@ void __stdcall FUN_00481d50(Params_00481d50* params)
             return;
         if ((unsigned)y >= grid->height)
             return;
+        int lod = Lod_00481d50(params);
         void* table;
-        if (Lod_00481d50(params) < ((Class_00433520*)DAT_0051e6a0)->FUN_00433520() - 1)
+        if (lod < ((Class_00433520*)DAT_0051e6a0)->FUN_00433520() - 1)
             table = ((Class_00433500*)DAT_0051e6a0)->FUN_00433500(Lod_00481d50(params));
         else
             table = ((Class_00433500*)DAT_0051e6a0)->FUN_00433500(
@@ -143,8 +171,6 @@ void __stdcall FUN_00481d50(Params_00481d50* params)
         short i = 0;
         ((Map_00481d50*)params->field_0)->explored.data[y * ((Map_00481d50*)params->field_0)->explored.size.width + x]--;
         int ref = *params->field_c;
-        if (count <= 0)
-            return;
         for (i = 0; i < count; i++) {
             void* line = ((Class_4335e0*)table)->FUN_004335e0(i);
             short num = ((Class_004339c0*)line)->FUN_004339c0();
@@ -152,9 +178,7 @@ void __stdcall FUN_00481d50(Params_00481d50* params)
             int bestIdx = 0;
             short j = 0;
             int j1 = 1;
-            if (num <= 0)
-                continue;
-            for (j = 0; j < num; j++) {
+            for (j = 0, j1 = 1; (short)j < (short)num; j++, j1++) {
                 int e1;
                 int e2;
                 ((Class_004339e0*)line)->FUN_004339e0(j, &e1, &e2);
@@ -175,7 +199,6 @@ void __stdcall FUN_00481d50(Params_00481d50* params)
                         bestDiff = d1;
                     }
                 }
-                j1++;
             }
         }
     } else {

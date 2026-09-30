@@ -1,4 +1,5 @@
-// Decompiled by space-bunny-free, finished by space-bunny-free. Names are provisional.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash; further tried by GPT-6.1-sol. Names are provisional.
+// Retry #1769: the saved best remains 70.2% after seven worker checks; the final batch did not MATCH. Lower-scoring local-copy, bool and split-condition trials were reverted.
 // Loads a TDF section into the global map at 0x51fdb8: the section name is
 // compared with the one already loaded, the map is thrown away and rebuilt,
 // then every section of the file contributes one entry keyed by its own
@@ -36,6 +37,38 @@
 // "keys differ" test as a bool in cl with the int form beside it
 // (`xor ecx,ecx; cmp; sete cl; neg cl; sbb ecx,ecx; inc ecx; test cl,cl`),
 // where this file has a plain `test eax,eax`.
+//
+// Tried by deepseek-v4.1-flash, both worse:
+//  - `delete DAT_0051fdb8;` with an implicit destructor: 56.8 percent. The
+//    delete makes the compiler keep the object in a preserved register from
+//    the prologue (`push ebx; mov ebx,[esp+0x22c]` before _strcmpi).
+//  - the same free written out inline inside ~Class_004c5840 instead of
+//    through Free2: 57.0 percent, and the destructor stops being inlined.
+// Keeping the explicit `->~Class_004c5840()` call plus the out-of-line
+// Free2 helper is what holds the 70.2 percent.
+//
+// Retry by deepseek-v4.1-flash, confirmed all of the above and added three
+// more dead ends, none better than 70.2:
+//  - real `std::vector<Elem_004c5bc0>` member plus `delete DAT_0051fdb8`:
+//    56.4 percent, and it emits a scalar deleting destructor (??
+//    _GElem_004c5bc0@@QAEPAXI@Z) the original does not have.
+//  - explicit `old->~Class_004c5840(); operator delete(old);` with the vector
+//    free inlined in the destructor: 57.0 percent; the whole destruction gets
+//    its own frame and `push ebx; mov ebx,[esp+0x22c]` hoists above _strcmpi.
+//  - the destruction in a static inline helper taking the object pointer:
+//    57.0 percent, same hoist.
+//  - a named `Class_004c5840* old = DAT_0051fdb8;` temp at the call site:
+//    70.2 percent, byte-identical output to the current file, no effect.
+// The surviving problem is unchanged: the original loads the global into eax,
+// tests it, then copies eax to ebx and uses edi = eax+1 for the vector; ours
+// puts the object straight in edi (ebx = object+1). Separating the destruction
+// from the inlined destructor is what triggers the ebx hoist, so the inline
+// destructor is not the thing to change.
+// Retry by GPT-6.1-sol: the 70.2 percent version remains best. A fresh local
+// copy of section did not change codegen; materializing strcmp equality before
+// the last-entry test scored 69.6 percent; splitting that last-entry test into
+// a separate insertion path scored 57.2 percent and emitted a scalar deleting
+// destructor. Keep the original short-circuit condition.
 #include <string.h>
 
 extern char DAT_0051fdc0[256];
