@@ -16,6 +16,12 @@
 //    `cmp al,0x52` and `jne`; ours dead-store-eliminates it.
 // 4) the second inline initialises its count with an immediate in the original
 //    (`mov dword ptr [esp+0x14],0`); ours reuses the zero register edx.
+// 5) the window-copy loop (0x4772b1) is NOT rotated in the original (the '&'
+//    test is the loop head, the k limit is the latch); every source form tried
+//    for it (do/while, for(;;) with two breaks, plain while) is inverted and/or
+//    peeled by MSVC5 into test-at-latch order (70.7%). Same for the page-scan
+//    guard: an explicit `if (*p != 0) { do/while }` keeps the cmp-mem form but
+//    costs 4.6% elsewhere (66.7%), and `p[0]` reads compile identically to `*p`.
 // Tried by deepseek-v4.1 (all no better): `for(;;){ if (*p==0) break; ... }` for both
 // page scans (still merges into `mov al,[p]; test al,al`, 70.7%). Reordering the count
 // declaration (int count; before colourState, assigned later) does not move the slots
