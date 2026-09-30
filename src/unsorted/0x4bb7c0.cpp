@@ -1,42 +1,14 @@
 // Decompiled by Sonnet 5.5, finished by deepseek-v4.1-flash, GPT-6, GPT-6.1-sol, and deepseek-v4.1. Names are provisional.
-// Retry #1964: deepseek-v4.1, still 99.2% (1042 bytes, exact size). One diff left, a pure
-// register choice: the reload of the clamped size n at 0x4bb807 (feeds remaining = n and
-// the block-end lea) lands in esi here (mov esi,[esp+0x14]; mov [esp+0x1c],esi;
-// lea esi,[esi+eax-1]) but in ebx in the original (mov ebx,[esp+0x14];
-// mov [esp+0x1c],ebx; lea esi,[ebx+eax-1]).
-// The 98.6% hunk is fixed by writing int off = file->pos + file->info->offset; (through
-// file->info, not the cached info local): that is the only form that puts off in eax
-// plus a copy to ebx instead of loading [esi] into ebx first.
-// New measurements this pass (all variants compiled and scored directly, see
-// build/scratch/0x4bb7c0/sweep*.py): the register of that reload is driven by which
-// statement uses n first: remaining = n first gives esi, blocks first gives edx, and
-// tableSize first gives ebx. The tableSize-first form (tableSize, then blocks) is the
-// only spelling found that produces the original ebx, but it re-colours the whole
-// function (info moves to edx, info->size to ecx, the frame stores reorder) and drops to
-// 78.6%, so the original's source order is the current one and the ebx pick is
-// allocator state, not statement order. Also tried and rejected, all 99.2% or worse:
-// comma forms (remaining = (i = 0, n)), (void)n, n = n, an inlined identity helper
-// around n in the store and in the blocks expression, a reference identity, if (n) {},
-// *(int*)&n, clamp as a ternary (98.6%), the reversed clamp, int avail, 24 permutations
-// of remaining / i / blocks / tableSize, for (; i < blocks; ++i), do/while(0) around the
-// compressed body, a goto-plain form of the compressed test, unsigned/long n and
-// remaining, splitting the blocks expression into two statements, and all 128 header
-// sets from tools/headers.py (every set 99.2%, 72 failed to compile).
-// The block-count/table-size order stays load bearing: writing tableSize as
-// ((size % 65536 != 0) + size / 65536) * 4 (modulo first) makes blocks land in
-// esi and tableSize in edi as the original does.
-// deepseek-v4.1-flash pass: no source shape found that moves the 0x4bb807 reload
-// from esi to ebx while keeping the rest byte-exact. Tested and still 99.2%:
-// moving dst/remaining/comp/i/blocks/tableSize/b declarations inside the
-// compressed if (scope is not the lever), an isize/pos local cached at the top,
-// hoisting info->compressed into a local (es/cl/in both), an int avail local for
-// the clamp, named block-end temps, Ident/BlkCount/SetInt inline helpers, register
-// qualifiers, and unsigned n (95.9%). The reload register tracks only the FIRST
-// use of n (remaining first gives esi, blocks first gives edx); ebx appears only
-// in a tableSize-first order that recolours the whole frame. A tail-structure
-// probe showed replacing the compressed-path goto with return does put ebx at the
-// head, but it drops the reload and grows/shrinks the tail (88.7%), so the original
-// tail is the current goto form and the ebx pick is pure allocator state.
+// MATCH: 1042 bytes. The 0x4bb807 reload of the clamped length n must be written as
+// `i = 0; blocks = ...; tableSize = ...; remaining = n; dst = buf;` in the compressed
+// branch: with `remaining = n;` first, VC5 keeps the reload in esi and folds the
+// block-end lea into the same register (`lea esi,[esi+eax-1]`), but with blocks and
+// tableSize ahead of it the reload lands in ebx and the lea gets its own esi, exactly
+// as the original. The scheduler then hoists the remaining store between the reload
+// and the lea. Earlier passes fixed the 98.6 percent hunk by writing
+// `int off = file->pos + file->info->offset;` through file->info rather than the
+// cached info local. 24+ other permutations, comma/identity/clamp-variant spellings,
+// unsigned/long types, declaration-scope and header-set sweeps all stayed at 99.2.
 #include <stdio.h>
 #include <string.h>
 
@@ -91,6 +63,8 @@ static inline int BlockOffset(File_004bb7c0* file, int& counter, int b, int tabl
         off += file->buffer[counter];
     return off;
 }
+
+
 // FUNCTION: 0x4bb7c0
 int __stdcall FUN_004bb7c0(File_004bb7c0* file, unsigned char* buf, int size)
 {
@@ -109,10 +83,10 @@ int __stdcall FUN_004bb7c0(File_004bb7c0* file, unsigned char* buf, int size)
         if (info->size - (int)file->pos < n)
             n = info->size - (int)file->pos;
         if (info->compressed != 0) {
-            remaining = n;
             i = 0;
             blocks = (((n + file->pos - 1) & 0xffff0000) - (file->pos & 0xffff0000) >> 16) + 1;
             tableSize = ((info->size % 65536 != 0) + info->size / 65536) * 4;
+            remaining = n;
             dst = buf;
             while (i < blocks) {
                 b = file->pos >> 16;
