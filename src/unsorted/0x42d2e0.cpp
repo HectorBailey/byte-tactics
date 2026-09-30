@@ -1,9 +1,15 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6, finished by deepseek-v4.1-flash. Names are provisional.
-// Best result 82.9% (2257 bytes against 2173). Corrected the compaction polarity (keep elements
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6, finished by deepseek-v4.1-flash, edited by deepseek-v4.1. Names are provisional.
+// Best result 83.1% (2257 bytes against 2173). Corrected the compaction polarity (keep elements
 // with bit 23 set), the class loop to a do-while, the index loop to a do-while, and the unit and
-// sidedata loop counters to unsigned short. Remaining: the GUI suffix loop is rotated by /O2 (the
-// original is not), the compaction has a different branch layout and spills d, and the unit loop
-// caches the type count in a register where the original reloads it.
+// sidedata loop counters to unsigned short. Declaring the class index before the class pointer
+// fixed the xor edi,edi / mov esi,<table> order at the top and lifted 82.9 to 83.1.
+// Remaining: /O2 peels and rotates the GUI suffix loop (the original keeps one copy of the body
+// and jumps back to it), the compaction is rewritten as a single pass with d spilled to
+// [esp+0x10] (the original keeps d in edi and runs two loops: a scan that breaks on the first
+// element with bit 23 clear, then a copy loop over the following bit-23-set elements), the sort
+// tail loads [esp+0x10] before ebp += 0x249 where the original compares against memory, and the
+// unit loop caches g_game in edi so idiv reads the count in ecx where the original uses
+// idiv dword ptr [ecx + 0x1438f] and reloads g_game at the bottom of the loop.
 #include <string.h>
 #include <stdio.h>
 
@@ -200,9 +206,9 @@ void FUN_0042d2e0() {
         if (!((Class_004c2f60*)&parser)->FUN_004c2f60(path))
             FUN_004b6290("Can't load MOVEINFO.TDF");
 
+        int i = 0;
         Class_00440320* cls = Class_00440290::DAT_00512358.entries;
         Class_00440320* cls_end = &Class_00440290::DAT_00512358.entries[32];
-        int i = 0;
         do {
             sprintf(classbuf, "CLASS%d", i);
             ((Class_004c3e10*)&parser)->FUN_004c3e10();
