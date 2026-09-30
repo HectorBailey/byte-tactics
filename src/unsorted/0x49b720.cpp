@@ -1,7 +1,18 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by GPT-6. Names are provisional.
-// PARTIAL 29.8%. Register allocation, extra stack slot and branch layout differ.
-// Restored unsigned lifetime/speed comparisons and projectile flags/definition reloads.
-
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by GPT-6, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
+// PARTIAL 31.0% (1731 bytes vs 1853). Per-frame update of the 300-entry
+// projectile array at g_game+0x141f7 (count +0x141f3, stride 0x6b).
+// deepseek-v4.1-flash: the one real win was making the local that caches
+// g_game+0x1427f `unsigned short` instead of `unsigned char`; that removed the
+// sixth stack slot (frame 0x18 -> 0x14) so every esp slot now lines up with the
+// original (idx +0x10, offset +0x14, count +0x18, type +0x1c, s +0x20), worth
+// 29.8 -> 31.0. Still differs: the zero constant lives in esi here and edi in
+// the original, type is swapped into edi, and the type/offset/count locals sit
+// rotated (ours type +0x14, offset +0x18, count +0x1c). Tried with no gain:
+// all 120 declaration orders (identical codegen, so declaration order is not a
+// lever here), caching vs re-reading type->flags, and modelling type->flags
+// (ProjType+0x111) as a 1-bit-bitfield union, which does give the original's
+// shr/test shift forms for bits 1,3,5,8,11,12,20,21,23,24 but dropped the
+// whole-function LCS to 28.8%; keeping the raw-mask spellings scores better.
 #pragma pack(push, 1)
 
 struct Vec_0049b720 {
@@ -307,7 +318,7 @@ void FUN_0049b720()
                 p->field_4a = p->field_4a + type->field_fa;
             }
             {
-                unsigned char sl = *(unsigned char*)(g_game + 0x1427f);
+                unsigned short sl = *(unsigned char*)(g_game + 0x1427f);
                 if (s > sl && *(short*)((char*)p + 0xa) <= sl) {
                     void* v = FUN_004815a0(&p->pos);
                     if (v != 0
