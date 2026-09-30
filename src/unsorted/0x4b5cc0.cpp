@@ -15,6 +15,28 @@
 // instructions: 89.3% -> 92.7%. Next: get `mov eax,1` for the hpalette tail
 // without re-entering the fold group (an early `return 1;` or an early
 // `return hr == DD_OK ? 1 : 0;` with hr = DD_OK both fold early and rejoin it).
+// Session 4 (deepseek-v4.1): the fold is confirmed to be "all identical
+// ret blocks are retargeted to the LAST one in layout", not a predecessor or
+// source-order rule. Diagnostics run this session (scratch variants, all with
+// case order and E_FAIL placement varied):
+//   * hpalette `return DD_OK ? 1 : 0;` (value 0, wrong): 1104 bytes, 90.9%.
+//     Its block is `xor eax, eax / pop esi / ...` which is NOT `mov eax,1`, so
+//     it stays out of the ret-1 group and both callback `je`s do land on the
+//     0x3b9 copy (size matches!), but the block then joins the ret-0 group as
+//     its last member, so the WM_CREATE `je` retargets from 0x4b606c to it.
+//   * `return hr == DD_OK;`, `return !hr;`, `return DD_OK == hr;` (all value 0
+//     there, wrong): 1104 bytes, 92.4%, same membership story.
+//   * early `return 1;` with four source case orders (0x219/0x30f/0x311/0x3b9,
+//     0x219/0x3b9/0x311/0x30f, 0x219/default/0x3b9/0x311/0x30f, 0x30f first):
+//     every one keeps the survivor at the 0x30f hpalette copy, 1112 bytes,
+//     89.3%. So source order cannot move the fold target.
+// Conclusion: a byte-identical `mov eax,1` block at 0x30f always becomes the
+// fold's last member. The original's 0x30f copy must have been produced AFTER
+// the fold ran, i.e. it is the compiler's own specialised copy of the shared
+// `return hr == DD_OK ? 1 : 0;` tail for the edge where hr is known DD_OK. Our
+// build does emit that specialised copy (18 bytes: xor eax,eax / xor ecx,ecx /
+// test eax,eax / sete cl / mov eax,ecx) but stops short of folding the known
+// comparison to `mov eax,1` (12 bytes), which is the whole 8-byte gap.
 // Window procedure of the main application window: translates the custom
 // display messages and forwards the rest to the default handler.
 //
