@@ -5,8 +5,11 @@
 //   * the whole local frame layout: counter at S+0x10, p[0..20] at S+0x14,
 //     names at S+0x68, buf at S+0x88, the 16 byte settings copy at S+0x1a1
 //     (so it is the cast target (Settings*)(buf + 0x119), not a separate local);
-//   * g_game->data[] is at +0x2a47 and desc at +0x2aa7, the zeroing loop is
-//     for (i = 1; i < 16; i++) and p[0] is set inside the if, after it;
+//   * g_game->data[] is at +0x2a47 and desc at +0x2aa7; the zeroing loop is
+//     `i = 0; do { i++; p[i] = data[i]; memset(...); } while (i < 15);`
+//     (the for (i = 1; i < 16; i++) form gets loop-rotated and encodes the
+//     base 4 low: [edx+eax+0x2a43] / [esp+edx+0x10] and cmp edx,0x40),
+//     so 77.1% -> 77.7% with 1815 -> 1812 bytes; p[0] is set inside the if;
 //   * the record walk: p[0] points at rec+0x14 and rec = p[0] - 0x14, so the
 //     record is {settings[0x10]; int field_10; char name[0x20]; char name2[0x20]}
 //     and the loop step is 0x54.
@@ -147,10 +150,12 @@ shown:
     if (count < 0)
         return 0;
 
-    for (i = 1; i < 16; i++) {
+    i = 0;
+    do {
+        i++;
         p[i] = (char*)g_game->data[i];
         memset(p[i], 0, 0xa00);
-    }
+    } while (i < 15);
 
     p[0] = (char*)g_game->desc + 0x18;
     if (count > 0) {
