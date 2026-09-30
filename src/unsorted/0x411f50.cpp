@@ -23,7 +23,13 @@
 //    (byte-identical). The matched sibling 0x412710 emits the same pair only
 //    because its FUN_0048a980 call is not inside an if body, so its leas are
 //    not hoisted into the condition's FP slots; there the argument walk order
-//    survives, here the hoisted pair is a codegen tie.
+//    survives, here the hoisted pair is a codegen tie. Case 5 shows why its
+//    pair looks ordered: its earlier `FUN_0048a0a0(unit, &order->pos, 0)`
+//    statement already fixed &order->pos in ebx at 0x412488, so only
+//    &unit->pos (ebp) is left for the FUN_0048a980 args. In cases 1 and 2
+//    nothing precedes the pair, and the original emits it right-to-left
+//    (arg2 &order->pos -> ebp, then arg1 &unit->pos -> ebx) while VC5 emits it
+//    left-to-right for every source shape tried so far.
 //  - 0x4123ad and 0x4123ec: state 4, the turn-time formula. The original keeps
 //    unit->def in ebp (mov ebp,[esi+0x92]) and computes
 //    `(int)(sqrt(size * 2.0 / rate) * 30.0f * unit->type->field_22) + 1 +
@@ -43,7 +49,16 @@
 //    if/else (inc/add before the target test), so that shape cannot be used.
 //    tools/headers.py over all 128 header sets gave 96.6% for every set (64
 //    sets fail to compile without <list>/<vector>), so header state does not
-//    flip it either.
+//    flip it either. This session added seven more shapes (build/scratch/
+//    0x411f50/varA..varP.cpp): naming the product `float sp = (float)sqrt(size
+//    * 2.0 / rate) * 30.0f;` does flip VC5 to the original's constant-first
+//    multiply order, but it then rewrites fidiv into fdivp/fxch, the field_22
+//    multiply into fild/fmulp and the sum into a single `lea [eax+ecx+1]`,
+//    which is 55 differing lines against 21 here at the same 96.8%; and
+//    writing the sum as `(f216 + 1) - (int)(x * -30.0f)` or as
+//    `f216 + (1 - (int)(x * -30.0f))` compiles to the identical negated bytes,
+//    so VC5 normalises the sign and the association after instruction
+//    selection, not from the source spelling.
 //  - 0x4126f0: the switch jump table address still shows as <addr>; check.py
 //    resolves relocations only once the code matches, so this may not be a real
 //    difference.
