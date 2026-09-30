@@ -146,6 +146,18 @@
 // gives 74.9 at 693 bytes. The
 // file stays at the best of the flat 99.2 family; only the guard's `jge`
 // displacement differs from the original.
+// A ninth session (deepseek-v4.1, 10 minute timebox) ran the baseline plus ten
+// shapes not on the walls above: `int i;` moved to the function top, a single
+// early `Find* f` used in the clamp, the recursion and the latch, a guarded
+// bottom-break `for(;;)`, an explicit `if (!(i < d->count)) continue;` guard,
+// `while` with `i = i + 1`, `!(e == 0) && (e->flags & 1) == 0` in a braced
+// block, the parameter order swapped in the signature, the recursion's state
+// parked in a local, and the outer loop as `while (1)` with a bottom break.
+// Nine of the ten are byte-identical to this file (99.2, same single jge
+// displacement); the tenth (hoisting `strcpy(buf, path)` above the clamp)
+// is 85.2 because it breaks the loop tail. The family stays flat and the
+// guard's target is still a back end copy-insertion choice.
+
 #include <io.h>
 #include <string.h>
 
@@ -199,6 +211,7 @@ void __stdcall FUN_004be400(char* path, int state, int recursive)
     Display_004be400* d = FUN_004b6220();
     char buf[0x100];
     struct _finddata_t fd;
+    int i;
 
     strcpy(buf, path);
     strcat(buf, "*");
@@ -214,7 +227,7 @@ void __stdcall FUN_004be400(char* path, int state, int recursive)
                 FUN_004be400(buf, ((Find_004be400*)h)->state, 0);
             }
         } else {
-            int i = ((Find_004be400*)h)->state;
+            i = ((Find_004be400*)h)->state;
             if (i < 0)
                 i = 0;
             else
