@@ -1206,20 +1206,51 @@ Cost units: thousands of tokens weighted by price relative to Haiku (Sonnet 5 co
 | #1814 | space-bunny-free | 1 | 0 | 0 | n/a | n/a | n/a |
 | #1800 | gpt-6.1-sol | 2 | 0 | 0 | n/a | n/a | n/a |
 | #1807 | space-bunny-free | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1957 | deepseek-v4.1-flash | 2 | 1 | 0 | n/a | n/a | n/a |
+| #1964 | deepseek-v4.1-flash | 2 | 1 | 0 | n/a | n/a | n/a |
+| #1849 | gpt-6.1-sol | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1961 | gpt-6.1-sol | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1928 | gpt-6.1-sol | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1910 | gpt-6.1-sol | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1914 | gpt-6.1-sol | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1921 | gpt-6.1-sol | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1901 | gpt-6.1-sol | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1206 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1911 | gpt-6.1-sol | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1175 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #2009 | gpt-6.1-sol | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1903 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #2055 | gpt-6.1-sol | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1892 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1923 | gpt-6.1-sol | 3 | 0 | 0 | n/a | n/a | n/a |
+| #2076 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1905 | gpt-6.1-sol | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1877 | gpt-6.1-sol | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1900 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1868 | space-bunny-free | 1 | 0 | 0 | n/a | n/a | n/a |
+| #2029 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1984 | deepseek-v4.1-flash | 1 | 1 | 0 | n/a | n/a | n/a |
+| #1988 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #2044 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #2005 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #2105 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1869 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1894 | space-bunny-free | 2 | 0 | 0 | n/a | n/a | n/a |
+| #2032 | longcat-2.5-preview-free | 3 | 0 | 0 | n/a | n/a | n/a |
 
 ### Escalations
 
 - Opus matched 94 of 121 functions a cheaper model had failed.
 - Sonnet matched 109 of 116 functions a cheaper model had failed.
 - Gpt-6 matched 5 of 134 functions a cheaper model had failed.
-- Space-bunny-free matched 80 of 359 functions a cheaper model had failed.
-- Deepseek-v4.1-flash matched 76 of 550 functions a cheaper model had failed.
+- Space-bunny-free matched 80 of 362 functions a cheaper model had failed.
+- Deepseek-v4.1-flash matched 79 of 576 functions a cheaper model had failed.
 - Gpt-5.6-terra matched 3 of 16 functions a cheaper model had failed.
 - Mimo-v2.6-flash matched 3 of 5 functions a cheaper model had failed.
 - Sonnet-5.5 matched 29 of 73 functions a cheaper model had failed.
-- Longcat-2.5-preview-free matched 5 of 34 functions a cheaper model had failed.
+- Longcat-2.5-preview-free matched 5 of 37 functions a cheaper model had failed.
 - Muse-spark-1.3-free matched 0 of 4 functions a cheaper model had failed.
-- Gpt-6.1-sol matched 0 of 78 functions a cheaper model had failed.
+- Gpt-6.1-sol matched 0 of 108 functions a cheaper model had failed.
 <!-- calibration:end -->
 
 ## Findings about the target
