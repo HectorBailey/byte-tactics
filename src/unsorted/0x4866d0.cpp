@@ -1,21 +1,21 @@
-// Decompiled by Claude Sonnet 5.5, finished by GPT-6, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol. Names are provisional.
-// Retry #1766: GPT-6.1-sol confirmed the bool `credited` variant at 63.0% after eight worker invocations; final batch did not MATCH.
-// Partial: 63.0% (1916 vs 1964 bytes). Body structure is right; the whole
-// function differs by callee-saved register allocation, which cascades.
-// Remaining hunks by original address:
-//   0x4866d0  cmd arg goes to ebp, original keeps it in ebx; original loads
-//             ebx immediately after `push ebx`, we push ebx+ebp then load ebp.
-//             Consequence: original never caches g_game in a register, ours
-//             keeps g_game in ebx (e.g. 0x486832 edx vs ebx, 0x4869d1 ecx vs
-//             ebx). Root is 4 live callee-saved values (cmd, unit, credited,
-//             g_game) vs the original's 3; g_game caching pushed cmd to ebp.
-//   0x4867da  depth temporary: original stores cl to [esp+0x14], reloads dword
-//             and `and edx,0xff`; we keep it in a register and push directly.
-//   0x486a98  case 3/leaderboard: original keeps rec in [esp+0x80] and reloads;
-//             ours restructured the FUN_00435100 calls with a value cache.
-//   0x486c74  g_game bit test 0x37f06 (>>7 &1) register differs.
-// Tried: unsigned char depth local (dropped to 56.8%, reverted), swapping the
-// unit/credited declaration order (no change).
+// Decompiled by deepseek-v4.1. Names are provisional.
+// (prior attempts credited to Claude Sonnet 5.5, GPT-6, deepseek-v4.1-flash, GPT-6.1-sol)
+// Partial: 63.0% (1916 vs 1964 bytes). Body structure and the 0x68 frame match;
+// the only real divergence is callee-saved register allocation, which cascades
+// into every branch displacement.
+//   original: ebx = cmd (param1, homed at entry as `push ebx; mov ebx,[esp+0x70]`),
+//             esi = unit, edi = credited (`mov edi,1`), ebp = scratch / player-loop counter.
+//   ours:     edi = cmd, esi = unit, ebx = credited (bl), ebp = scratch.
+// cmd and credited are simply swapped across ebx/edi; esi and ebp agree.
+// Also differs: 0x4867da (original spills depth as a byte to [esp+0x14] then
+// reloads `and edx,0xff`; we keep it in a register), and 0x486a98 (original keeps
+// rec in [esp+0x80] and reloads it; ours restructured the FUN_00435100 calls).
+// Tried this pass, all left the allocator choice unchanged at 63.0%: int credited
+// (62.0), unsigned char/char credited, swapping the unit/credited declaration order,
+// declaring credited at its first use, bool credited = 0 at the top (58.6), an inline
+// wrapper adding a use of cmd around FUN_0044fe40, an inline Game() accessor for
+// g_game. tools/headers.py tried all 128 header sets: none changed it (all 63.0%).
+// This is the MSVC5 allocation-state problem the SHARED board records for 0x4a6ae0.
 
 extern void* g_game;
 extern char DAT_00508be8[];

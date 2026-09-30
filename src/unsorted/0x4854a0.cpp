@@ -1,22 +1,139 @@
-// Decompiled by DeepSeek V4.1 Flash, finished by GPT-6, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol. Names are provisional.
-// Retry #1766: GPT-6.1-sol confirmed 84.8% after four worker checks; final batch still did not MATCH. Remaining differences are std::sort stack cleanup and tail-loop registers.
-// Partial: 84.8%. Using the `pool` local (not g_game->pool) for the +0xff and
-// +0x96 writes made the compiler spill pool to [esp+0x14] and reload it into
-// ebp before the free-list loop, which fixed the whole tail block.
-// Remaining diffs:
-//   0x485691, 0x48574b, 0x485778: an extra `add esp, 0xc`/`add esp, 0x10`
-//     after the std::sort helper calls. The original TU was built with /Gz, so
-//     its <xutility>/<algorithm> templates are __stdcall (see 0x488810.cpp,
-//     0x488920.cpp, 0x488960.cpp). The real <algorithm> is __cdecl. Fix by
-//     standing in for <xutility>/<algorithm> with __stdcall templates, as
-//     0x424c00.cpp does for <vector>; that also fixes the jump offsets that
-//     shift by +3/+6 after each call.
-//   0x485894-0x485934: tail loop register allocation. Original keeps `slot` in
-//     esi and zero-extends unitsPerPlayer through edx; ours uses edx/esi the
-//     other way and emits an extra `xor esi, esi`.
+// Decompiled by deepseek-v4.1. Names are provisional.
+// This TU was built with /Gz (__stdcall default), so the <algorithm> sort
+// templates it instantiated are __stdcall. Standing in for them here with
+// __stdcall copies reproduces the original's `ret 0xc`/`ret 0x10` helpers
+// (0x488810, 0x488920, 0x488960) and removes the caller-side `add esp`
+// (84.8% -> 92.6%). What still differs:
+//   - 0x485750 (_Sort's `_L - _M <= _M - _F` test): the original subtracts
+//     into ecx (left) and edx (right); ours picks edx (left) and ecx (right),
+//     so every byte to the end of the block is swapped but semantically equal.
+//   - 0x485894 tail fill loop: the original keeps `slot` in esi and the
+//     zero-extended copy of unitsPerPlayer in edx; ours keeps `slot` in edx
+//     and loads unitsPerPlayer into esi (adding an `xor esi, esi`), then
+//     rebases the q cursor to q+0xff. Tried: unsigned i, inline slot
+//     expression, while-loop, cached end; all unchanged or worse.
 
-#include <windows.h>
-#include <algorithm>
+#include <string.h>
+
+// <xutility>/<algorithm> as the original file compiled them (/Gz: __stdcall).
+// Defining _ALGORITHM_ keeps out the header's __cdecl copies.
+#define _ALGORITHM_
+namespace std {
+
+const int _SORT_MAX = 16;
+
+template<class _Ty> inline
+_Ty* __stdcall _Val_type(const _Ty*)
+{
+    return ((_Ty*)0);
+}
+
+template<class _Ty, class _Pr> inline
+_Ty __stdcall _Median(_Ty _X, _Ty _Y, _Ty _Z, _Pr _P)
+{
+    if (_P(_X, _Y))
+        return (_P(_Y, _Z) ? _Y : _P(_X, _Z) ? _Z : _X);
+    else
+        return (_P(_X, _Z) ? _X : _P(_Y, _Z) ? _Z : _Y);
+}
+
+template<class _BI1, class _BI2> inline
+_BI2 __stdcall copy_backward(_BI1 _F, _BI1 _L, _BI2 _X)
+{
+    while (_F != _L)
+        *--_X = *--_L;
+    return (_X);
+}
+
+template<class _FI1, class _FI2, class _Ty> inline
+void __stdcall _Iter_swap(_FI1 _X, _FI2 _Y, _Ty*)
+{
+    _Ty _Tmp = *_X;
+    *_X = *_Y, *_Y = _Tmp;
+}
+
+template<class _FI1, class _FI2> inline
+void __stdcall iter_swap(_FI1 _X, _FI2 _Y)
+{
+    _Iter_swap(_X, _Y, _Val_type(_X));
+}
+
+template<class _RI, class _Ty, class _Pr> inline
+void __stdcall _Sort(_RI _F, _RI _L, _Pr _P, _Ty*)
+{
+    for (; _SORT_MAX < _L - _F; ) {
+        _RI _M = _Unguarded_partition(_F, _L, _Median(_Ty(*_F),
+            _Ty(*(_F + (_L - _F) / 2)), _Ty(*(_L - 1)), _P), _P);
+        if (_L - _M <= _M - _F)
+            _Sort(_M, _L, _P, _Val_type(_F)), _L = _M;
+        else
+            _Sort(_F, _M, _P, _Val_type(_F)), _F = _M;
+    }
+}
+
+template<class _RI, class _Ty, class _Pr> inline
+_RI __stdcall _Unguarded_partition(_RI _F, _RI _L, _Ty _Piv, _Pr _P)
+{
+    for (; ; ++_F) {
+        for (; _P(*_F, _Piv); ++_F)
+            ;
+        for (; _P(_Piv, *--_L); )
+            ;
+        if (_L <= _F)
+            return (_F);
+        iter_swap(_F, _L);
+    }
+}
+
+template<class _RI, class _Ty, class _Pr> inline
+void __stdcall _Unguarded_insert(_RI _L, _Ty _V, _Pr _P)
+{
+    for (_RI _M = _L; _P(_V, *--_M); _L = _M)
+        *_L = *_M;
+    *_L = _V;
+}
+
+template<class _RI, class _Ty, class _Pr> inline
+void __stdcall _Insertion_sort_1(_RI _F, _RI _L, _Pr _P, _Ty*)
+{
+    if (_F != _L)
+        for (_RI _M = _F; ++_M != _L; ) {
+            _Ty _V = *_M;
+            if (!_P(_V, *_F))
+                _Unguarded_insert(_M, _V, _P);
+            else {
+                copy_backward(_F, _M, _M + 1);
+                *_F = _V;
+            }
+        }
+}
+
+template<class _RI, class _Pr> inline
+void __stdcall _Insertion_sort(_RI _F, _RI _L, _Pr _P)
+{
+    _Insertion_sort_1(_F, _L, _P, _Val_type(_F));
+}
+
+template<class _RI, class _Ty, class _Pr> inline
+void __stdcall _Sort_0(_RI _F, _RI _L, _Pr _P, _Ty*)
+{
+    if (_L - _F <= _SORT_MAX)
+        _Insertion_sort(_F, _L, _P);
+    else {
+        _Sort(_F, _L, _P, (_Ty*)0);
+        _Insertion_sort(_F, _F + _SORT_MAX, _P);
+        for (_F += _SORT_MAX; _F != _L; ++_F)
+            _Unguarded_insert(_F, _Ty(*_F), _P);
+    }
+}
+
+template<class _RI, class _Pr> inline
+void __stdcall sort(_RI _F, _RI _L, _Pr _P)
+{
+    _Sort_0(_F, _L, _P, _Val_type(_F));
+}
+
+}
 
 class Class_00435100 {
 public:
@@ -115,4 +232,3 @@ void __stdcall FUN_004854a0(void)
         }
     }
 }
-

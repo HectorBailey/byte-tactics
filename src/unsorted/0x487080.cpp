@@ -1,4 +1,5 @@
-// Decompiled by DeepSeek V4.1 Flash, finished by GPT-6, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol. Names are provisional.
+// Decompiled by deepseek-v4.1. Names are provisional.
+// Credit chain: Decompiled by DeepSeek V4.1 Flash, finished by GPT-6, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol. Names are provisional.
 // Retry #1766: GPT-6.1-sol confirmed the `int player` variant at 59.9% after eight worker checks; final batch did not MATCH.
 // Partial: best score 59.9% after changing the reused player value from
 // unsigned char to int. Direct check.py runs: 8; no MATCH.
@@ -8,6 +9,18 @@
 // flag-copy register allocation, record-field stack offsets, piece-copy anchors,
 // and the epilogue xor/pop order. An int found flag dropped to 45.5%; keeping
 // found as bool and player as int is the best tested version.
+// Retry by deepseek-v4.1: re-verified 59.9%, still no MATCH. Measured variants:
+// int found alone 45.5%; int found and Script%i fed the loop index 58.9%;
+// Script%i fed the loop index with bool found 46.6%; inlining (rec.flags>>4)&3
+// at both call sites and dropping the player local 53.5%; rec.b8d as signed char
+// no change. 59.9% is a local optimum: the first loop, the FUN_00485f50 argument
+// build and the flag blocks all sit in a different register rotation.
+// The original reads the Script%i argument from [esp+0x10] (the loop-index slot,
+// whose spill is forced by found living in ebp), not from rec.f3b.
+// Suspected original bug: at 0x4870cd `jne 0x4876ae` skips the `xor eax,eax` at
+// 0x4876ac, so a slot whose flags has 0x10000000 set returns the live unit
+// pointer instead of 0 (the null case at 0x4870bd also targets 0x4876ae, but eax
+// is already 0 there). Source keeps the intended `return 0;` semantics.
 
 extern "C" int sprintf(char* buf, const char* fmt, ...);
 
