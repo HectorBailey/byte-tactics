@@ -2,39 +2,41 @@
 // deepseek-v4.1-flash, and GPT-6.1-sol, edited by deepseek-v4.1.
 // Names are provisional.
 //
-// Partial (97.5%): clears the kind byte of every cell in each dirty group of
+// Partial (98.7%): clears the kind byte of every cell in each dirty group of
 // eight cells, then clears the dirty masks. One dirty word covers 256 cells
 // (0x400 bytes). Every full block is cleared unconditionally; the last block
 // is bounds-checked against the cell count.
 //
-// The first loop's inlined block matches exactly. For the last block the
-// registers now match the original (ebx = dirty word, edx = i << 10, edi =
-// base pointer) but the instruction order does not: the original reads the
-// dirty word and tests it, copies it to ebx, moves i to edx, stores
-// dirty[i] = 0, only then loads cells into edi, shifts edx by 10 and adds.
-// Ours loads cells into edi first (because the base pointer must be live
-// before the block for the allocator to give the shift to edx) and sinks the
-// dirty[i] = 0 store after the add. Declaring the base pointer before the
-// guard and using it inside is what fixes the register choice (97.5% vs
-// 93.7% with the pointer computed inside the guard); the pointer can also be
-// assigned cells inside the guard but then the allocator chooses edi for the
-// shift and ecx for the base again. Explicit byte offsets, int off = i << 10,
-// p += i * 256, a second grid pointer, unsigned i, a separate ClearLast body
-// order, and all 128 tools/headers.py header sets give the same 93.7%/97.5%
-// code.
+// The first loop's inlined body matches exactly. The last block's body also
+// has the original's registers (ebx = dirty word, edx = i << 10, edi = base
+// pointer) and all of the original's instruction order except one: the
+// original loads cells into edi after the `dirty[i] = 0` store, ours loads
+// it three slots earlier, right after the guard's `je` (see the note below).
+// What puts the base in edi and the shift in edx is declaring the pointer
+// inside the guard, after the `bits` load and before the store: any shape
+// with the store before the `cells` load coalesces the shift into edi and
+// takes a scratch for the base (93.7%).
 //
-// still-differs note (deepseek-v4.1, 10 check runs): the only hunk left is the
-// ClearLast tail: the original emits `mov edx,ebp` / `mov [eax],0` / `mov
-// edi,[esi+0x1c]` / `shl edx,0xa` / `add edi,edx`, while this version emits
-// `mov edi,[esi+0x1c]` before the branch and sinks the store after `add`.
-// The load can only stay after the store if the source stores before it
-// evaluates `cells`, and every such shape (p = &cells[i*256]; p = cells;
-// p += i*256; int off = i<<10; (char*)cells + off, bits declared before the
-// if) makes MSVC pick ecx for the base and edi for the shift (93.7%), and
-// declaring `bits` before the if also reallocates the first loop's index to
-// ecx. The front end only copies `bits` to ebx, freeing edx for the shift,
-// when the pointer is assigned before the guard, which is exactly what hoists
-// the load above the test.
+// still-differs note (deepseek-v4.1, ~45 check runs): the only hunk left is
+// the ClearLast tail: the original emits `mov ebx,edx` / `mov edx,ebp` /
+// `mov [eax],0` / `mov edi,[esi+0x1c]` / `shl edx,0xa` / `add edi,edx`,
+// while this version emits the `mov edi,[esi+0x1c]` base load immediately
+// after the `je` (three slots early) and everything else in the original's
+// order. Register allocation is right (edi = base, edx = i << 10, ebx =
+// dirty word); only that load's slot differs.
+// Load placement rule found by bisection: as long as `p = cells;` stands
+// before the `dirty[i] = 0;` store in the source, MSVC gives p edi and the
+// offset edx (98.7%) but places the load first; with the store first MSVC
+// coalesces the offset into edi and loads the base into a scratch (93.7%:
+// `mov edi,ebp` / `shl edi,0xa` / `add edi,ecx`), whether the pointer is
+// written as `&cells[i*256]`, `cells + i*256`, `(char*)cells + (i<<10)`,
+// `p = cells; p += ...`, `p = p + ...`, `p = &p[i*256]`, a named `int off`,
+// a `T&` store (`unsigned int& word = dirty[i]; word = 0;`), a pointer store
+// (`unsigned int* dp = &dirty[i]; *dp = 0;`) or a comma expression that
+// forces the store first (`p = (dirty[i] = 0, ...)`). Two pointer locals
+// (`base`/`p`) do not change it. The same helper inlined twice with a
+// constant `last` (the shape the original evidently came from) also gives
+// 93.7%.
 //
 // Possible original bug: in the last block the bounds check starts `c` at
 // `i << 8` again for every group of eight cells instead of at the group's own
@@ -79,9 +81,9 @@ struct Grid_0040d900 {
 
     void ClearLast(int i)
     {
-        Cell_0040d900* p = cells;
         if (dirty[i]) {
             unsigned int bits = dirty[i];
+            Cell_0040d900* p = cells;
             dirty[i] = 0;
             p += i * 256;
             while (bits) {
