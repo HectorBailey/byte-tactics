@@ -1,16 +1,22 @@
-// Decompiled by Sonnet 5.5, finished by deepseek-v4.1-flash, GPT-6, and GPT-6.1-sol. Names are provisional.
-// Retry #1764: GPT-6.1-sol confirmed 98.6% after ten worker checker invocations; no MATCH. The compressed-size and table-offset register pairs still differ.
-// Partial: 98.6% (1042 bytes, exact size). Everything matches except two
-// pure register-choice diffs, both involving ebx:
-//   1. the clamped size temp that feeds `blocks` is in esi here, ebx in the
-//      original (mov ebx,[esp+0x14]; mov [esp+0x1c],ebx; lea esi,[ebx+eax-1]);
-//   2. the non-compressed `off` is accumulated in ebx here
-//      (mov ebx,[esi]; add ebx,eax) where the original accumulates in eax and
-//      copies (add eax,[esi]; mov ebx,eax).
-// The block-count/table-size order is load bearing: writing tableSize as
+// Decompiled by Sonnet 5.5, finished by deepseek-v4.1-flash, GPT-6, GPT-6.1-sol, and deepseek-v4.1. Names are provisional.
+// Retry #1964: deepseek-v4.1, 99.2% (1042 bytes, exact size). One diff left, a pure register
+// choice: the reload of the clamped size n (for remaining = n and the block-end lea)
+// lands in esi here (mov esi,[esp+0x14]; mov [esp+0x1c],esi; lea esi,[esi+eax-1]) but in
+// ebx in the original (mov ebx,[esp+0x14]; mov [esp+0x1c],ebx; lea esi,[ebx+eax-1]).
+// The 98.6% hunk is fixed by writing int off = file->pos + file->info->offset; (through
+// file->info, not the cached info local): that is the only form that puts off in eax
+// plus a copy to ebx instead of loading [esi] into ebx first.
+// Tried for the remaining hunk (still 99.2% or worse): every statement order of
+// i = 0 / remaining = n / blocks (i and blocks first give edx, remaining first gives
+// esi, never ebx), int i = 0 inline, int remaining = n inline, unsigned remaining
+// (98.3%), (int)/(unsigned) casts in the expression, computing the lea from remaining,
+// int end = n + file->pos - 1, dst = buf moved earlier (98.3%), swapping the operands
+// of n + file->pos - 1, dropping the item local, routing the compressed-path info uses
+// through file->info (90.6%, the prologue loses esi), splitting the expression into
+// two statements (98.9%), and a blkcount helper (99.2%).
+// The block-count/table-size order stays load bearing: writing tableSize as
 // ((size % 65536 != 0) + size / 65536) * 4 (modulo first) makes blocks land in
-// esi and tableSize in edi as the original does. The helper form
-// size / 65536 + (size % 65536 != 0) puts them the other way round (83.5%).
+// esi and tableSize in edi as the original does.
 #include <stdio.h>
 #include <string.h>
 
@@ -138,7 +144,7 @@ int __stdcall FUN_004bb7c0(File_004bb7c0* file, unsigned char* buf, int size)
             }
             goto done;
         }
-        int off = file->pos + info->offset;
+        int off = file->pos + file->info->offset;
         if (off != item->pos) {
             fseek(item->fp, off, 0);
             file->shared->pos = off;
