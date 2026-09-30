@@ -1,9 +1,10 @@
 // Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by GPT-6.1-sol, finished by space-bunny-free, edited by deepseek-v4.1. Names are provisional.
 // Partial: 99.7%. Byte count is exact (1017 = 1017) and every instruction is
-// the right one. The first of the two old scheduler hunks is fixed: writing the
-// field_9c store as `dd->field_9c = 0` (through the &d->draw pointer) instead of
-// `DAT_0051fbd0->draw.field_9c = 0` puts `lea ebx, [esi + 0x84]` before the
-// `push ecx`, 99.3% -> 99.7%.
+// the right one, except one two-slot scheduler rotation at 0x4b55af explained
+// at the bottom of this file. The first of the two old scheduler hunks is
+// fixed: writing the field_9c store as `dd->field_9c = 0` (through the
+// &d->draw pointer) instead of `DAT_0051fbd0->draw.field_9c = 0` puts
+// `lea ebx, [esi + 0x84]` before the `push ecx`, 99.3% -> 99.7%.
 // The original holds the constant 0 in a callee-saved register (ebp) and tests
 // every HRESULT against it with `cmp eax, ebp`, so all ten DirectDraw call
 // results go through one named `HRESULT hr` local (see docs/agent-guide.md on
@@ -216,12 +217,35 @@ fail:
 // the store stays after `push 6`:
 //   mov edx, [esp + 0x14] / mov [edi + 0x4c], ebp / mov [edi + 0x44], ebp /
 //   push 6 / mov [edx], ebp
-// Ours emits the load adjacent to its store, after the two zero stores, so the
-// load sits two slots low. Tried and rejected: every source order of the three
-// stores (h/d/c, c/h/d, d/h/c, h/c/d, d/c/h, c/d/h), chained assignments
-// (`h = d = 0;` before and after the store, and `*c = h = d = 0;`), an explicit
-// `HDC *slot` local (the pointer then lives in eax and the whole SetWindowPos
-// block is recoloured, 96.1%), an inline helper holding the three stores
-// (96.1%), and hoisting the load by reading the slot in an earlier statement
-// (extra frame slot, 84.8%). In every variant the load stays glued to its
-// store, so this is a scheduler tie the source shape does not steer.
+// The rotation is really the basic block's first instruction: `je 0x4b55af`
+// above it targets the reload in the original and the hpalette store here, so
+// the block starts at the reload there and one instruction later here. Same
+// scheduler tie as 0x4b6570 in docs/agent-guide.md, where a reload of an
+// address-taken local drifted by a couple of instructions. The list order is
+// forced: the reload is only generated at the use of setup.dcSlot, the only
+// use in this block is the `*setup.dcSlot = 0` store, and MSVC 5 never hoists
+// that load above the two `mov [edi+0x4c/0x44], ebp` stores (it cannot prove
+// the frame slot does not alias them, and it does not hoist loads at all: a
+// load stays glued to the statement that needs it in every variant here).
+// Tried and rejected: every source order of the three stores (h/d/c, c/h/d,
+// d/h/c, h/c/d, d/c/h, c/d/h), `*c = h = d = 0` and `c = h = *d = 0` (the
+// first gets the reload to the top of the block but emits the two handle
+// stores in the wrong order, 99.3%), an explicit `HDC *slot` local (the
+// pointer then lives in eax and the whole SetWindowPos block is recoloured,
+// 96.1%), an inline helper holding the three stores (96.1%), hoisting the
+// load by reading the slot in an earlier statement (extra frame slot, 84.8%),
+// and two comma-expression forms that try to get the reload's tree in front
+// of the two stores while the store stays behind them:
+// `*((HDC *)(c, h = d = 0)) = 0` makes MSVC fold the discarded c to 0 and
+// emit `mov ds:0, ebp` (95.9%), and `*((HDC *)(h = 0, d = 0, c)) = 0` has
+// the discarded load deleted and is identical to the plain form (99.7%).
+//
+// Frame slot note, verified in the /Fa listing and useful elsewhere: for a
+// local whose address is taken, MSVC 5 keeps the variable's own home and the
+// `&var` it hands to a callee in TWO different frame slots. Here
+// `setup.dcSlot` lives at [esp+0x14] (written at 0x4b5582, reloaded at
+// 0x4b55af and read for the FUN_004c6a60 argument at 0x4b5879) while
+// `&setup.dcSlot` passed to CreateDIBSection is a separate slot at [esp+0x18]
+// (`lea ecx, [esp+0x18]` at 0x4b585a). So the exe really does read a
+// different dword for the bits pointer than the one it passed to
+// CreateDIBSection.

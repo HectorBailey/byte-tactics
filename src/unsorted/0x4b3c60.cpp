@@ -1,10 +1,13 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
-// Partial: 76.5%. Saved file-offset slots, loop register allocation and
-// compression temporaries differ. Cached names plus += length updates and
-// the vector header improve the append loops; the double record is 12 bytes.
-// Retry: reordered the saved file offset without changing codegen; 128 header sets gave no improvement.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by GPT-6.1-sol, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
+// Partial: 83.8% (was 76.5%). Both count2 loops now index slot->items2[i]
+// directly, with no `Item2* it` local, and that one change moved the ftell
+// result off [esp+0x18] back to the original [esp+0x14] and dragged every
+// downstream register with it. What still differs: the blob-count loop keeps
+// its zero in edx where the original has edi, and the count2 record loop keeps
+// dataOffset in a register (edi) where the original reloads it from
+// [esp+0x64], so the strings loop and the compression tail are still off.
 //
-// deepseek-v4.1 session notes (no score gain, best stays 76.5%):
+// deepseek-v4.1 session notes (before the 83.8% step):
 // Slot map read off the disassembly: [esp+0x10] is the append oldlen in every
 // loop AND the byte offset of the count2 record loop (one slot, disjoint
 // ranges), [esp+0x14] the ftell result, [esp+0x18] the saved item2->name
@@ -21,6 +24,14 @@
 // (b) one function-scope `oldlen` shared by every append and by the count2 byte
 // offset, 71.2%; (c) the same with a separate `itemoff` for the count2 record
 // oldlen, also 71.2%. Both spilled a live append temp, so reverting was right.
+//
+// deepseek-v4.1-flash notes (best 83.8%, still partial):
+// The single lever was dropping the `Item2* it` local from BOTH count2 loops
+// and writing `slot->items2[i].field` at each use. An explicit byte offset
+// (`off2 += 0x14`) scored 76.6%; a `char*` walk 64.1%; an `Item2& it` reference
+// in either loop 64% (the reference form is much worse than direct indexing).
+// Keeping the pointer in only one of the two loops scored 74.0% (record) and
+// 79.6% (data), so both must be direct. Free-scored with check.py --sym.
 #include <vector>
 #include <io.h>
 
@@ -167,30 +178,29 @@ void Class_004b3750::FUN_004b3c60(int index, FILE* file, Buffer_004b3c60* buf, i
 
     int dataOffset = ftell(file) + h.nBlobs * 0x10;
     for (i = 0; i < slot->count2; i++) {
-        Item2_004b3c60* it = &slot->items2[i];
-        if (it->len > 0) {
+        if (slot->items2[i].len > 0) {
             int rec[4];
-            if (it->flag != 0) {
+            if (slot->items2[i].flag != 0) {
+                char* nm = slot->items2[i].name;
                 int oldlen = buf->len;
-                buf->len += strlen(it->name) + 1;
+                buf->len += strlen(nm) + 1;
                 buf->data = (char*)FUN_004d8580(buf->data, buf->len);
-                strcpy(buf->data + oldlen, it->name);
+                strcpy(buf->data + oldlen, nm);
                 rec[0] = oldlen;
             } else {
                 rec[0] = -1;
-                rec[1] = (int)it->name;
+                rec[1] = (int)slot->items2[i].name;
             }
             rec[2] = dataOffset;
-            rec[3] = it->len;
+            rec[3] = slot->items2[i].len;
             fwrite(rec, 0x10, 1, file);
-            dataOffset += it->len;
+            dataOffset += slot->items2[i].len;
         }
     }
 
     for (i = 0; i < slot->count2; i++) {
-        Item2_004b3c60* it = &slot->items2[i];
-        if (it->len > 0) {
-            fwrite(it->buffer, it->len, 1, file);
+        if (slot->items2[i].len > 0) {
+            fwrite(slot->items2[i].buffer, slot->items2[i].len, 1, file);
         }
     }
 
