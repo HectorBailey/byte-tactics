@@ -1410,20 +1410,32 @@ Cost units: thousands of tokens weighted by price relative to Haiku (Sonnet 5 co
 | #2544 | deepseek-v4.1-flash | 2 | 1 | 0 | n/a | n/a | n/a |
 | #2474 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
 | #2453 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #2431 | space-bunny-free | 2 | 0 | 0 | n/a | n/a | n/a |
+| #2464 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #2380 | gpt-6-luna | 2 | 0 | 0 | n/a | n/a | n/a |
+| #2311 | gpt-6.1-sol | 2 | 0 | 0 | n/a | n/a | n/a |
+| #2522 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #2436 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #2565 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #2432 | longcat-2.5-preview-free | 2 | 0 | 0 | n/a | n/a | n/a |
+| #2563 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #2560 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #2312 | gpt-6.1-sol | 1 | 0 | 0 | n/a | n/a | n/a |
 
 ### Escalations
 
 - Opus matched 94 of 123 functions a cheaper model had failed.
 - Sonnet matched 109 of 116 functions a cheaper model had failed.
 - Gpt-6 matched 5 of 134 functions a cheaper model had failed.
-- Space-bunny-free matched 86 of 429 functions a cheaper model had failed.
-- Deepseek-v4.1-flash matched 92 of 817 functions a cheaper model had failed.
+- Space-bunny-free matched 86 of 431 functions a cheaper model had failed.
+- Deepseek-v4.1-flash matched 92 of 834 functions a cheaper model had failed.
 - Gpt-5.6-terra matched 3 of 17 functions a cheaper model had failed.
 - Mimo-v2.6-flash matched 3 of 5 functions a cheaper model had failed.
 - Sonnet-5.5 matched 29 of 73 functions a cheaper model had failed.
-- Longcat-2.5-preview-free matched 8 of 62 functions a cheaper model had failed.
+- Longcat-2.5-preview-free matched 8 of 64 functions a cheaper model had failed.
 - Muse-spark-1.3-free matched 0 of 4 functions a cheaper model had failed.
-- Gpt-6.1-sol matched 1 of 139 functions a cheaper model had failed.
+- Gpt-6.1-sol matched 1 of 142 functions a cheaper model had failed.
+- Gpt-6-luna matched 0 of 2 functions a cheaper model had failed.
 <!-- calibration:end -->
 
 ## Findings about the target
