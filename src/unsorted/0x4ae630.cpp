@@ -13,15 +13,40 @@
 //   i = 2; do { tab = '\t'; call; } while (--i)    -> store first, and the
 //       in-body store gets its own home at [esp+0x1f] (94.5%)
 //   i = 2; do { call; tab = '\t'; } while (--i)    -> `mov ebx, 2` first,
-//       but the store is hoisted to after the loop (94.5%)
+//       but the store stays in the body at the latch, after the call
+//       (94.5%); this is the closest anyone has come
 //   static helper WriteTabs(out, n) inlined at the site -> 91.5%: inlining
 //       reallocates the locals (the buffer at [esp+0xe0] moves to
 //       [esp+0x144]), so the frame layout stops matching even though a
 //       helper body would explain the argument-materialised-first order.
+// Fourth pass (measured on /Fa listings, see build/scratch/0x4ae630):
+//   THE ORDER IS AN INLINING-BOUNDARY EFFECT, not a statement order. With
+//     static void __inline Tabs(out, n) { char t = '\t';
+//                                       do { W(out, &t, 1); } while (--n); }
+//     Tabs(out, 2);
+//   MSVC 5 emits `mov <reg>, 2` for the ARGUMENT at the inlining boundary and
+//   only then the fresh local's initialising store, which is exactly the
+//   original's order. With n = 1 it emits the same order, so the original's
+//   one-tab loops are NOT this helper: they are the plain form, which sinks
+//   the counter def into the preheader and so emits the store first. Two
+//   sites in one function may therefore use two different spellings.
+//   The store must be the INITIALISATION OF A FRESH LOCAL. Every other way of
+//   putting the store after the argument is scheduled before it:
+//     *t = '\t' with a char* parameter  -> store first
+//     char& parameter                  -> store first
+//     (tab = '\t', &tab) as argument 3 -> store first (even with the count
+//                                         as argument 2)
+//   Three inlined expansions of the helper share ONE stack slot, so the slot
+//   itself is not the problem. The blocker is that adding any extra local
+//   makes MSVC 5 hand out the 100-byte buffers in a different order: the
+//   buffer at [esp+0xe0] moves to [esp+0x144] and the four tail buffers are
+//   permuted (edit/list/empty/hot instead of hot/edit/empty/list). That
+//   permutation is NOT a function of the declaration order: permuting the
+//   declarations leaves it unchanged (build/scratch/0x4ae630/v6.cpp).
 // Conclusion: MSVC 5 sinks the loop counter's `mov ebx, 2` past a store that
-// precedes the loop, and every spelling that keeps the store in the loop body
-// either gives it a temp home or hoists it after the loop. Remaining hunks:
-// 0x4ae7cc-0x4ae7d1 (this order) and 0x4aea8c (jump table, relocation only).
+// precedes the loop, and only an inlined function's argument boundary gets in
+// front of it. Remaining hunks: 0x4ae7cc-0x4ae7d1 (this order) and 0x4aea8c
+// (jump table, relocation only).
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

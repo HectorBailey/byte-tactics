@@ -1,7 +1,18 @@
-// Decompiled by GPT-6, finished by space-bunny-free, edited by deepseek-v4.1. Names are provisional.
-// Body below (99.5%) was started by GPT-6 and continued by space-bunny-free;
-// finished by deepseek-v4.1, see the two remaining hunks at the end of this note.
-// Partial: 99.5%. Two hunks remain (checked again in #1641 and #2072):
+// Decompiled by GPT-6, finished by space-bunny-free, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
+// Body started by GPT-6, continued by space-bunny-free, edited by deepseek-v4.1.
+// deepseek-v4.1-flash: 99.6%. The 0x10059000 hunk is FIXED by moving the
+// expression into an inline Channel::XorOp() (the inline boundary flips the
+// pop registers to ecx/edx). One hunk remains, in case 0x10001000: the stack
+// packer gives the move[] byte offset [esp+0x10] and reuses [esp+0x18] for the
+// piece base, while the original gives the base [esp+0x10] and the offset
+// [esp+0x1c] (the dword index piece*19+axis keeps [esp+0x18]). The instruction
+// sequence is otherwise byte-identical, so it is a slot pick, not a code shape.
+// Tried with no change: p only in the `if` (current), p declared first in the
+// block, p at function scope, no p at all, an `int&` reference, wrapping the
+// whole body in an inline method, and building the real function 0x4b0d60
+// above this one. p before the stores and p for the stores both cost ~80%.
+// The note below is the earlier attempt; its hunk 2 parts are now fixed.
+// Partial was 99.5%. Two hunks remain (checked again in #1641 and #2072):
 //   1. case 0x10001000 (0x4b0ebf, 0x4b0eec, 0x4b0ef3). The original keeps three
 //      frame slots live across the call: [esp+0x10] = the piece array base,
 //      [esp+0x18] = the dword index piece*19+axis, [esp+0x1c] = the move[]
@@ -69,6 +80,11 @@ struct Channel
     void Push(int value)
     {
         stack[++sp] = value;
+    }
+    void XorOp()
+    {
+        int a = Pop();
+        Push(a ^ Pop());
     }
 };
 struct Piece
@@ -500,7 +516,7 @@ void Class_004b0da0::FUN_004b0da0(unsigned int channel, int elapsed)
                 break;
             }
             case 0x10059000: {
-                c->Push(c->Pop() ^ c->Pop());
+                c->XorOp();
                 c->pc++;
                 break;
             }
