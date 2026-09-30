@@ -16,6 +16,12 @@
 //    `cmp al,0x52` and `jne`; ours dead-store-eliminates it.
 // 4) the second inline initialises its count with an immediate in the original
 //    (`mov dword ptr [esp+0x14],0`); ours reuses the zero register edx.
+// Tried by deepseek-v4.1 (all no better): `for(;;){ if (*p==0) break; ... }` for both
+// page scans (still merges into `mov al,[p]; test al,al`, 70.7%). Reordering the count
+// declaration (int count; before colourState, assigned later) does not move the slots
+// (71.3%). #include <windows.h> is much worse (68.5%). The slot permutation above is
+// not declaration-order driven; the phantom [esp+0x28]/[esp+0x30] re-reads come from
+// MSVC5 splitting dialog/gp into a store home and a lower read home.
 #include <string.h>
 
 #pragma pack(push, 1)
