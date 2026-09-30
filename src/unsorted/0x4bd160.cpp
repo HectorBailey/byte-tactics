@@ -68,6 +68,24 @@
 // array initialiser `unsigned sb[2] = {20};` gives the identical shape, so the
 // dead `mov eax,ecx` is not explained by the array form either.
 //
+// deepseek-v4.1 (second session, 20 more shapes dumped instruction by
+// instruction) confirms the diagnosis and narrows it: the 94.1% `{20}` shape is
+// the ONLY construct that materialises the buffer's zero fresh (`xor ecx,ecx`)
+// instead of folding it into the live ebp zero, and it always sinks BOTH member
+// stores below the argument pushes. Every attempt to flush that zero early
+// (an explicit `sb.buf = 0`, a zeroed local declared before or after the if,
+// inlined helpers that store-and-return, `SetBuf(&sb,0)`, `memset`, reading the
+// aggregate member into a temporary, assignment-expression arguments such as
+// `FUN(sb.buf = 0, ..., sb.size = 20)`, constructor and struct-returning
+// initialisers, computed-zero right-hand sides like `sb.size - sb.size`,
+// `key ^ key`, `i = 0`) either re-CSEs the zero into ebp (the 98.3% here, two
+// stores) or folds the size into an immediate store (576 bytes). Writing the
+// aggregate before the `if` makes the front end emit both stores before the je
+// with an immediate size, so the original's early flush is not a statement
+// order effect either. The `mov eax,ecx` plus early flush look like a front end
+// value-copy (an inlined call result materialised for a store) that no plain
+// assignment spelling reproduces.
+//
 // Frame layout (21 dwords, do not disturb): X+0x00 extra, X+0x04 sb.size,
 // X+0x08 sb.buf, X+0x0c year[8], X+0x14 copyright[0x40].
 #include <stdio.h>
