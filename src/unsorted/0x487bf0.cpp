@@ -1,18 +1,31 @@
 // Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
-// PARTIAL 44.9%. Restored the 256-byte command buffer and removed extra kind initialization stores. Parser switch and temporary allocation still differ.
-// Still differs (baseline 44.9%, ours 1827 bytes vs 1811):
-//  - frame is 0x148 vs the original 0x140, so every small-local offset is shifted by 8
-//    and buf sits at [esp+0x58] instead of [esp+0x50]; our small-local region needs two
-//    dwords fewer (original packs 0x10..0x4f, ours 0x10..0x57).
-//  - roles are swapped: the original keeps `processed` in edi (xor edi,edi; mov edi,1 in
-//    every processed case) and `selected` in memory at [esp+0x2c] (stored via
-//    mov [esp+0x2c],edi only in the D/S/P/A-float cases), while our build has selected in
-//    edi and processed at [esp+0x30]. Swapping the declaration order of the two ints did
-//    not move them (same 44.9%).
-//  - our parser prologue spills the text pointer to its home slot and reuses ebp for
-//    count (mov ebp,eax; mov [esp+0x160],ebp), the original keeps text in ebp the whole
-//    loop and keeps count in a slot at [esp+0x18]; this is an allocation tie-break, not
-//    a source-order effect we found.
+// PARTIAL 60.4% (ours 1847 bytes vs 1811). Frame, command buffer and the five
+// per-case Class_00438760 temporaries now match the original exactly.
+// What got it from 44.9 to 60.4:
+//  - declaring a second (copy) constructor, Class_00438760(const Class_00438760& other),
+//    exactly as src/unsorted/0x419b00.cpp does. This is compiler state, not a call:
+//    without it the frame is 0x148 and `selected` lands at [esp+0x30]; with it the frame
+//    drops to 0x140 and the five `out` temporaries sit at 0x3c/0x40/0x44/0x48/0x4c as in
+//    the original. The declaration alone is worth the 15.5 points (the copy is elided for
+//    the M/U/P/A/G paths that pass an already built `out`, and the chain-constructor
+//    idiom in 0x419b00 uses the same trick for the in-place temporaries).
+//  - moving `int move, fire;` to function scope (the O case used to leave `fire` sharing
+//    `count`'s slot at 0x18, which kept every later slot 4 low and every later `out`
+//    shifted; see below).
+// Still differs:
+//  - parser loop register allocation: the original keeps `text` in ebp for the whole
+//    loop and spills `count` to [esp+0x18], ours spills `text` to its home slot and keeps
+//    `count` in ebp, which adds a `jmp` to the loop body and a reload at the top. This is
+//    an allocation tie-break; declaration order, `char* s = text;` (drops to 22.9%),
+//    `unsigned`/`size_t` count, and assigning count in the call did not move it.
+//  - original still packs `count` 0x18, `move` 0x28, `selected` 0x2c, an unknown 0x30,
+//    `z`/`f3` 0x34, `fire` 0x38; ours puts `selected` 0x28, `fire` 0x30, `move` 0x34,
+//    `f3` 0x38. Reordering the declarations (move/fire before selected, fire before move)
+//    does not change it.
+//  - the O case in the original loads `unit->flags` twice (mov edx,[esi+0x110];
+//    mov eax,[esi+0x110]) and computes move before fire; ours loads once and computes
+//    fire first. Separating the two expressions did not break the CSE.
+//  - headers.py finds no fixing header set (all 60.4%).
 
 #include <ctype.h>
 #include <stdio.h>
@@ -40,6 +53,7 @@ public:
     unsigned char index;
     Class_00438760(const char* name);
     Class_00438760() {}
+    Class_00438760(const Class_00438760& other);
 };
 
 void __stdcall FUN_0043adc0(Class_00438760 kind, int remove, Unit_00487bf0* owner,
@@ -57,6 +71,7 @@ void __stdcall FUN_00487bf0(Unit_00487bf0* unit, char* text, Table_00487bf0* tab
     float f1, f2;
     Vec3_00487bf0 pos;
     int selected = 0;
+    int move, fire;
     int processed = 0;
 
     while (*text != 0) {
@@ -72,8 +87,8 @@ void __stdcall FUN_00487bf0(Unit_00487bf0* unit, char* text, Table_00487bf0* tab
         switch (buf[0]) {
         case 'O':
         case 'o': {
-            int move = (unit->flags >> 0x12) & 3;
-            int fire = (unit->flags >> 0x14) & 3;
+            move = (unit->flags >> 0x12) & 3;
+            fire = (unit->flags >> 0x14) & 3;
             sscanf(buf + 1, " %d %d", &move, &fire);
             unit->flags = (unit->flags & 0xffc3ffff)
                           | ((((fire & 3) << 2) | (move & 3)) << 0x12);
