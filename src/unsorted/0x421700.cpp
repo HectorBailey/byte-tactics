@@ -11,6 +11,13 @@
 // did not: a byte-offset two-pointer vertex-copy loop (64.1), unpacking the
 // inner FUN_004b6eb0 into separate floats (67.1), splitting the float-vertex
 // declarations (no change).
+// Still differs: the frame is 0xa8 vs the original 0x90, 0x18 too big. Writing
+// the three (int)(n.f * 65535.0f) results as plain ints (nx, ny, nz) shrinks
+// the frame to 0x9c (12 bytes of the excess are the 12-byte ni local), and the
+// original really does keep nx/ny in ebx/ebp and spill nz into the reused
+// [esp+0x10] slot, but that variant scored 70.5 so it is reverted here; the
+// float scratch layout (9 vertex floats plus ab/n) is what the second 12 bytes
+// of excess have to come from.
 #include <windows.h>
 #include <memory.h>
 
