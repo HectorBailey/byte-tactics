@@ -9,28 +9,41 @@
 // state 6 flies on and, when the unit is below three quarters of its health,
 // sends it to a random repair pad ("VTOL_LANDING").
 //
-// Partial: 96.6%, same 1980-byte size. What still differs (checked against the
-// disassembly in build/scratch/0x411f50/ctx.txt):
+// Partial: 96.8%, same 1980-byte size, after the state-2 turn sum was moved to
+// the state-2 case below as `Offset(FUN_004b6c30(0x4000) + angle - 0x2000,
+// radius)`. That is the spelling of the matched sibling 0x412710 (state 1
+// there); it removed the whole `lea eax, [edx + eax - 0x2000]` hunk. What
+// still differs (checked against build/scratch/0x411f50/ctx.txt):
 //  - 0x4121d7 and 0x4122b0: the two `lea` copies of &unit->pos and &order->pos
 //    are swapped. The original materialises &order->pos (ebp) first and
-//    &unit->pos (ebx) second; ours does the reverse. Same calls and registers,
-//    pure instruction scheduling.
-//  - 0x412309: `lea eax, [eax + edx - 0x2000]` (random turn first) against our
-//    `lea eax, [edx + eax - 0x2000]`. Rewriting it as
-//    `angle = FUN_004b6c30(0x4000) + angle - 0x2000` did not change codegen.
-//  - 0x4123ad: the original keeps unit->def in ebp (mov ebp,[esi+0x92]) and
-//    unit->def is then read at [ebp+0x21c] and [ebp+0x216]; ours picks ebx.
-//  - 0x4123ec: the original multiplies by +30.0f (0x4fcc50) and then by the
-//    integer field_22 (fmul then fimul), and adds the delay with `add ebx,ecx`.
-//    VC5 rewrites our `(int)(...) + 1 + def->field_216` into
-//    `field_216 - (int)(x * field_22 * -30.0f) + 1` (fmul of a -30.0f constant
-//    and `sub ebx,eax`), which is the same value because truncation commutes
-//    with negation. Splitting the float part into a `float turn` local made the
-//    frame 4 bytes bigger and dropped the score to 92.8%, so it was reverted.
-//    deepseek-v4.1 tried five more rewrites of that line (explicit (float) cast
-//    on field_22, `+ def->field_216 + 1`, an `int turn` temp, field_22 * 30.0f
-//    with the sqrt last, and dropping the `def` local) and all five compiled to
-//    byte-identical output, so the multiply order is not steerable from there.
+//    &unit->pos (ebx) second; ours does the reverse. Same pushes, same
+//    registers, both leas are hoisted above the _hypot call. Tried and
+//    rejected this session: explicit `Vec3* to/from` locals (folded away,
+//    byte-identical) and `(Vec3*)&unit->fixedPos` as the first argument
+//    (byte-identical). The matched sibling 0x412710 emits the same pair only
+//    because its FUN_0048a980 call is not inside an if body, so its leas are
+//    not hoisted into the condition's FP slots; there the argument walk order
+//    survives, here the hoisted pair is a codegen tie.
+//  - 0x4123ad and 0x4123ec: state 4, the turn-time formula. The original keeps
+//    unit->def in ebp (mov ebp,[esi+0x92]) and computes
+//    `(int)(sqrt(size * 2.0 / rate) * 30.0f * unit->type->field_22) + 1 +
+//    def->field_216` as `fmul [30.0]`, `fimul [field_22]`, `inc ebx`,
+//    `add ebx, ecx`; VC5 rewrites our spelling into
+//    `field_216 - (int)(sqrt(...) * field_22 * -30.0f) + 1` (fmul of the -30.0f
+//    constant, `sub ebx, eax`) and puts def in ebx. Earlier passes tried five
+//    rewrites; this session tried eleven more source shapes in
+//    build/scratch/0x411f50/micro*.cpp: the (int) result in its own int local,
+//    that local passed to an inline helper, the sum split over two statements,
+//    `+ def->field_216 + 1`, `1 + ...`, `f216 + 1 + t`, an `unsigned short`
+//    copy of field_216, `(int)(float)(...)`, an `unsigned` sum and a sum whose
+//    field_216 load is a separate local. Every shape materialises the sum in a
+//    local first and every one compiles to the negated -30.0f form. The
+//    positive +30.0f form appears only when the sum is folded into an `lea`
+//    inside a call argument, and the original computes the sum before the
+//    if/else (inc/add before the target test), so that shape cannot be used.
+//    tools/headers.py over all 128 header sets gave 96.6% for every set (64
+//    sets fail to compile without <list>/<vector>), so header state does not
+//    flip it either.
 //  - 0x4126f0: the switch jump table address still shows as <addr>; check.py
 //    resolves relocations only once the code matches, so this may not be a real
 //    difference.
@@ -229,8 +242,7 @@ int __stdcall FUN_00411f50(Unit* unit, Order* order, unsigned int flags)
         int dist = (int)_hypot(order->pos.x - unit->pos.x, order->pos.z - unit->pos.z);
         int angle = FUN_0048a980(&unit->pos, &order->pos);
         int radius = dist / 2;
-        angle += FUN_004b6c30(0x4000) - 0x2000;
-        Vec3 dest = unit->pos + Offset(angle, radius);
+        Vec3 dest = unit->pos + Offset(FUN_004b6c30(0x4000) + angle - 0x2000, radius);
         Class_0044e2d0* obj = new Class_0044e2d0(order, dest);
         ((Class_0044e730*)obj)->FUN_0044e730(0x1e0);
         ((Class_004388d0*)order)->FUN_004388d0((int)obj);
