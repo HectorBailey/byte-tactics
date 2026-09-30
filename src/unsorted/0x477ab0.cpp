@@ -1,16 +1,26 @@
 // Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1, finished by space-bunny-free. Names are provisional.
 // Partial, 72.9% (1914 vs 1935 bytes). Campaign screen click handler.
-// First divergence is a BLOCK LAYOUT choice, not a shape error: the original
-// keeps the Campaign/Start gadget tests inline at 0x477b4b (the `je` after
-// `cmp eax,ebx` targets the very next block) while ours sinks that pair out of
-// line, so every branch target after 0x477b1f shifts.
-// Still unmatched: the original holds a FUNCTION-WIDE ZERO in ebx
-// (`xor ebx,ebx` at 0x477b01 and 0x477b1b, then `cmp dword ptr [0x51e668], ebx`,
-// `mov byte ptr [ecx+0x96], bl`, `push ebx` at 23 sites). We get
-// `mov eax,[..]; test eax,eax` and immediate 0s. Every such site costs 6 bytes.
-// I could not find a source construct that makes MSVC 5 promote the literal 0
-// into a callee-saved register; `int z = 0` and friends are removed before the
-// allocator (see the guide's notes on dead locals).
+// Remaining diff is BLOCK PLACEMENT, not shape. Verified against our own
+// object file (build/obj/unsorted/0x477ab0.obj): MSVC 5 emits
+// `mov eax,[0x51e668]; xor ebx,ebx; cmp eax,ebx; je 0x606` at offset 0x66,
+// then the Missions/Start gadget calls inline, then `cmp [0x51e668],ebx`
+// and `je 0x606`, exactly like the original. The divergence is the target:
+// the original's Campaign/Start pair sits at 0x477b4b (offset 0x9b) and its
+// BigButton block right after at 0x477b6d (offset 0xbd), so all four
+// gadget-test branches are 2-byte shorts (74/75), while our build sinks the
+// Campaign/Start pair and the whole BigButton body to offsets 0x606/0x620,
+// making those same branches 6-byte near forms (0f 84 / 0f 85) and costing
+// 16 bytes at those sites. The zero register in ebx is NOT a diff: our build
+// already keeps `xor ebx,ebx` function-wide (see SHARED 0x4624a0: it is a
+// compiler constant-in-register choice, not a source variable).
+// Tried and rejected: `if (FUN(menu,"Missions") || FUN(menu,"Start")) goto`
+// for the inner pair (byte-identical to the two separate ifs: 1914 bytes,
+// 72.9%), for the outer pair with an explicit `goto PrevMenu` fallthrough
+// (62.3%; the extra jump makes the layout worse), and both at once (62.3%).
+// Next idea: the sink is caused by the `goto BigButton` graph (the original
+// source very likely used a single if/else-if chain with no labels); a
+// nesting that keeps BigButton as the fallthrough of the last gadget test
+// should bring it up to 0xbd.
 
 #pragma pack(push, 1)
 struct Entry_00477ab0 {
