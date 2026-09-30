@@ -1,4 +1,4 @@
-// Decompiled by space-bunny-free, reworked by Claude Sonnet 5.5, finished by deepseek-v4.1-flash and space-bunny-free. Names are provisional.
+// Decompiled by space-bunny-free, reworked by Claude Sonnet 5.5, finished by deepseek-v4.1-flash and space-bunny-free, edited by deepseek-v4.1. Names are provisional.
 // PARTIAL: 66.2%, 358 of 366 bytes (was 64.5% and 354 bytes).
 // space-bunny-free pass (#1805): the one change that helped is the third
 // distance, `d3 = Dist(c, b)` (66.2% against 64.5% for `Dist(b, c)`), so

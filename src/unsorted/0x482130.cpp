@@ -1,4 +1,4 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, edited by deepseek-v4.1. Names are provisional.
 // deepseek-v4.1-flash pass: no score change, best stays 86.3% / 318 bytes.
 // New evidence for the next attempt:
 // - The source is NOT std::remove_if. A faithful std::remove_if + predicate
@@ -143,6 +143,45 @@
 //   (the &d->flagB temp, spilled second) to the lower slot and [esp+0x18] to
 //   `end` (spilled first). So the slot numbers here cannot be steered by
 //   declaration order, only by which value gets spilled first.
+// deepseek-v4.1 pass (issue 2100): still 86.3% / 318 bytes, same three hunks.
+// Every new spelling below lands on the same allocation as the current file,
+// so the p-home is not reachable from the room left in this body:
+// - the whole phase 2 (guards, while loop, compaction, count) as a fully
+//   inlined `static inline void Compact_00482130(Eye*& p)`; the call site
+//   produces the identical 318 bytes (inlined locals allocate the same).
+// - the copy through a reference with the increment fused:
+//   `Eye_00482130& d = *p++; d.player = ...` (86.3%).
+// - the count as a plain pointer difference `g_game->count = p - g_game->eyes;`
+//   instead of the (char*) subtraction and /0x24 spelling (86.3%).
+// - the single-if, for-header source shape
+//   `if (p != end) for (Eye* src = p + 1; src != end; src++)` (86.3%).
+// Worse: a predicate helper `inline bool Live(Eye* e){return
+// e->expires >= g_game->ticks;}` used as `if (Live(src))` (327 bytes, 68.6%,
+// the bool materialises) and the compaction with its own `dest` variable
+// (75.5%, see above), and the reversed comparison `g_game->ticks <=
+// src->expires` (83.3%, it swaps the operands of the test).
+// deepseek-v4.1 pass (issue 2100, second worker): still 86.3% / 318 bytes, no
+// score change. New evidence from this pass:
+// - Swapping the first two copy stores (`d->screen` before `d->player`) drops to
+//   84.3%, so the source order player, screen, x, flagPtr, v, flagA, expires,
+//   screenPos, flagB is confirmed by the bytes, not just by the store order.
+// - A `static` single-use helper for the compaction loop taking (p, end, src) BY
+//   VALUE and returning the new p is NOT the original shape: MSVC5 shrinks the
+//   frame to 8 bytes, the destination moves out of esi and it scores 59.1%
+//   (311 bytes). So the remove_if style parameter home does not survive as a
+//   by-value helper here even though remove_if itself reached the spill.
+// - `const Eye*` for the loop source and a function-scope `src` (assigned inside
+//   the guard) both give the identical 318 bytes and 86.3%, so neither the
+//   constness nor the point of declaration of src changes the tie.
+// - The two-destination shape was rebuilt and re-tested this pass: it is exactly
+//   75.5% / 318 bytes with the whole phase-2 sequence byte-identical to the
+//   original except that the copy destination lands in edx and the source in
+//   esi (the original has destination esi, source edx), and its three stack
+//   slots (end 0x14, src 0x10, advanced destination 0x18) are the original's.
+//   Moving the destination declaration to the top of the function or up before
+//   the guard does not change that; putting `dst = p` inside the guard costs 10
+//   bytes (65.0%). So the register preference between the two pointers is the
+//   whole remaining gap and no declaration order moves it.
 #include <stddef.h>
 
 #pragma pack(push, 1)
