@@ -100,6 +100,17 @@
 // the 0x4dbec0 birth does go through a value copy and only the choice of that
 // copy's register is left.
 //
+// Third pass (deepseek-v4.1) ruled out five more spellings, none of which moves
+// the birth register: the final compare as a raw `it.ptr->key < p->offset`
+// (94.0 percent, 615 bytes, worse: it drops the Less functor and 6 bytes), the
+// birth as `Class_004dd2a0 t(y); it = t;`, the tail store as
+// `out->field_0 = Class_004dd2a0(it);`, an explicit `else` around the
+// `it.FUN_004dd2a0();` call, and the birth cast through `(Node_004dbec0*)(void*)`
+// (the last four byte-identical at 95.6 percent). Together with the sweeps
+// above (128 header sets, 101 dummy externs) this says the tie-break is not
+// reachable from declarations, headers, context or any spelling of the two
+// statements that surround it, and the file is left at its best score.
+//
 // Two things this function does that are worth writing down, both confirmed
 // here and neither obvious from the disassembly:
 //  - The null test on the destination address, `lea eax,[edx+0xc]; cmp eax,ebx;
