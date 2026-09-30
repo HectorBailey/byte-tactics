@@ -1057,20 +1057,148 @@ Cost units: thousands of tokens weighted by price relative to Haiku (Sonnet 5 co
 | #1561 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
 | #1517 | gpt-6 | 1 | 0 | 0 | n/a | n/a | n/a |
 | #1566 | deepseek-v4.1-flash | 1 | 1 | 0 | n/a | n/a | n/a |
+| #1513 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1656 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1563 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1472 | space-bunny-free | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1555 | deepseek-v4.1-flash | 3 | 1 | 0 | n/a | n/a | n/a |
+| #1449 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1579 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1564 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1574 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1474 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1585 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1582 | deepseek-v4.1-flash | 2 | 1 | 0 | n/a | n/a | n/a |
+| #1648 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1569 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1587 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1571 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1590 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1560 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1550 | gpt-6 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1593 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1603 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1609 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1615 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1599 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1591 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1620 | deepseek-v4.1-flash | 1 | 1 | 0 | n/a | n/a | n/a |
+| #1684 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1595 | gpt-6.1-sol | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1623 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1622 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1597 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1618 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1619 | deepseek-v4.1-flash | 1 | 1 | 0 | n/a | n/a | n/a |
+| #1543 | gpt-6.1-sol | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1556 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1636 | gpt-6 | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1610 | gpt-6.1-sol | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1529 | gpt-6.1-sol | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1695 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1612 | sonnet-5.5 | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1673 | gpt-6 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1672 | opus | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1692 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1700 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1702 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1704 | gpt-6.1-sol | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1720 | gpt-6 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1705 | opus | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1708 | longcat-2.5-preview-free | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1718 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1722 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1723 | gpt-6 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1721 | gpt-6 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1727 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1480 | gpt-6 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1359 | space-bunny-free | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1738 | gpt-6 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1478 | gpt-6.1-sol | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1751 | gpt-6 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1739 | gpt-6 | 3 | 2 | 0 | n/a | n/a | n/a |
+| #1361 | gpt-6.1-sol | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1399 | gpt-6.1-sol | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1757 | gpt-6 | 2 | 1 | 0 | n/a | n/a | n/a |
+| #1646 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1759 | deepseek-v4.1-flash | 3 | 1 | 0 | n/a | n/a | n/a |
+| #1650 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1765 | gpt-6 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1652 | gpt-6.1-sol | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1728 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1729 | gpt-6.1-sol | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1768 | gpt-6 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1778 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1733 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1736 | gpt-6.1-sol | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1782 | gpt-6 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1748 | sonnet-5.5 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1758 | gpt-6.1-sol | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1788 | gpt-6 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1764 | gpt-6.1-sol | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1766 | gpt-6.1-sol | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1790 | gpt-6 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1792 | gpt-6 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1779 | gpt-6.1-sol | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1769 | gpt-6.1-sol | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1781 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1816 | gpt-6 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1819 | gpt-6 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1784 | gpt-6.1-sol | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1822 | space-bunny-free | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1785 | gpt-6.1-sol | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1823 | gpt-6 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1524 | gpt-6.1-sol | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1825 | gpt-6 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1655 | gpt-6.1-sol | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1690 | deepseek-v4.1-flash | 3 | 1 | 0 | n/a | n/a | n/a |
+| #1605 | gpt-6.1-sol | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1606 | gpt-6.1-sol | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1827 | gpt-6 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1829 | gpt-6 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1608 | gpt-6.1-sol | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1616 | gpt-6.1-sol | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1834 | gpt-6 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1621 | gpt-6.1-sol | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1835 | gpt-6 | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1624 | gpt-6.1-sol | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1843 | gpt-6 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1625 | gpt-6.1-sol | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1626 | gpt-6.1-sol | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1847 | gpt-6 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1850 | gpt-6 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1627 | gpt-6.1-sol | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1679 | gpt-6 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1714 | gpt-6 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1735 | gpt-6 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1853 | gpt-6 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1628 | gpt-6.1-sol | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1870 | gpt-6 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1631 | gpt-6.1-sol | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1924 | gpt-6 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1635 | gpt-6.1-sol | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1987 | gpt-6 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1642 | space-bunny-free | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1639 | space-bunny-free | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1643 | space-bunny-free | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1990 | gpt-6 | 3 | 1 | 0 | n/a | n/a | n/a |
+| #1683 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1665 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1637 | gpt-6.1-sol | 1 | 0 | 0 | n/a | n/a | n/a |
 
 ### Escalations
 
-- Opus matched 94 of 115 functions a cheaper model had failed.
+- Opus matched 94 of 121 functions a cheaper model had failed.
 - Sonnet matched 109 of 116 functions a cheaper model had failed.
-- Gpt-6 matched 1 of 45 functions a cheaper model had failed.
-- Space-bunny-free matched 78 of 323 functions a cheaper model had failed.
-- Deepseek-v4.1-flash matched 69 of 439 functions a cheaper model had failed.
+- Gpt-6 matched 5 of 134 functions a cheaper model had failed.
+- Space-bunny-free matched 78 of 333 functions a cheaper model had failed.
+- Deepseek-v4.1-flash matched 75 of 543 functions a cheaper model had failed.
 - Gpt-5.6-terra matched 3 of 16 functions a cheaper model had failed.
 - Mimo-v2.6-flash matched 3 of 5 functions a cheaper model had failed.
-- Sonnet-5.5 matched 29 of 69 functions a cheaper model had failed.
-- Longcat-2.5-preview-free matched 5 of 33 functions a cheaper model had failed.
+- Sonnet-5.5 matched 29 of 73 functions a cheaper model had failed.
+- Longcat-2.5-preview-free matched 5 of 34 functions a cheaper model had failed.
 - Muse-spark-1.3-free matched 0 of 4 functions a cheaper model had failed.
-- Gpt-6.1-sol matched 0 of 4 functions a cheaper model had failed.
+- Gpt-6.1-sol matched 0 of 73 functions a cheaper model had failed.
 <!-- calibration:end -->
 
 ## Findings about the target

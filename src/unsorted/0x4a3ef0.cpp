@@ -1,4 +1,14 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6, finished by GPT-6.1-sol. Names are provisional.
+// Retry #1758: GPT-6.1-sol best is 80.9% after nine worker checks; final combined check confirmed no MATCH. Numerator-before-denominator ordering improved the 0x10 arm.
+// GPT-6.1-sol pass: best measured score 80.9% (650 source bytes vs 629,
+// nine checker runs). The 0x10 arm improved by computing its numerator before
+// selecting the denominator. Remaining differences include zero initialization
+// stores and register allocation around the shared zero, plus the 0x20 arm's
+// divisor load/zero-extension and the 0x80 arm's zero comparison.
+// GPT-6 retry: 78.6%, not MATCH. A zero-initialized full-width union with
+// a short view preserves the complete 32-bit divisor, fixing the byte
+// truncation in the previous attempt while improving the score.
+// Historical measurements and semantic warnings below refer to older code.
 // PARTIAL, 77.2% (633 bytes against 629). The prologue, the entry search, the
 // 0x10 arm and the 0x80 arm now match line for line; the 0x20 arm is off only
 // because of the width of its zero register.
@@ -179,7 +189,9 @@ void __stdcall FUN_004a3ef0(Class_004a3ef0* param_1, int param_2)
     Entry_004a3ef0* me = &entries[param_2];
     unsigned char kind = me->kind;
     int found = Find_004a3ef0(entries, kind);
-    char lines = 0;
+    union { int full; short word; } lines;
+    lines.full = 0;
+    lines.word = 0;
     if (found != 0) {
         Entry_004a3ef0* e = &entries[found];
         if (e->type == 2) {
@@ -200,8 +212,10 @@ void __stdcall FUN_004a3ef0(Class_004a3ef0* param_1, int param_2)
                 }
                 int size = (DAT_0051fba4->list == 0) ? FUN_004c1450()
                     : (*(unsigned short*)(FUN_004b7f30(DAT_0051fba4->list->field_0c, 0x49) + 2) + 2);
-                int span = (size + 1 > e->field_da) ? size + 1 : e->field_da;
-                int step = (e->field_19 - 2) / span;
+                int numerator = e->field_19 - 2;
+                int denominator = size + 1;
+                if (e->field_da > denominator) denominator = e->field_da;
+                int step = numerator / denominator;
                 int last = e->field_c0;
                 int rows = (int)((float)step / last * (me->field_19 - 3));
                 me->field_142 = rows;
@@ -217,9 +231,9 @@ void __stdcall FUN_004a3ef0(Class_004a3ef0* param_1, int param_2)
                 if (e->field_c0 > 0) {
                     int a = *(int*)e->field_c6;
                     int b = *(int*)(a + 0x28);
-                    lines = *(unsigned short*)(b + 2) * e->field_c0;
+                    lines.full = *(unsigned short*)(b + 2) * e->field_c0;
                 }
-                int s = e->field_19 * me->field_19 / lines;
+                int s = e->field_19 * me->field_19 / lines.full;
                 me->field_142 = s;
                 if (*(unsigned char*)((char*)me + 0x1b) & 1) {
                     me->field_136 = me->field_17 - s;

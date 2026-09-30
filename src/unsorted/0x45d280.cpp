@@ -1,77 +1,10 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
-//
-// deepseek-v4.1-flash: 88.8 percent (1339 bytes vs 1333), NOT MATCH. Two changes
-// since the 87.2 baseline: FUN_004ce7c0's second parameter is a 1-byte type
-// (char), not int, which drops the per-call `xor eax,eax`; and the UNDO arm's
-// `f` is an int, not unsigned short. Still differs: the UNDO `f` update wants
-// `and ecx,1 / xor ecx,eax` (ours emits extra xor/movzx), the apply tail's
-// `g_game` lands in edx instead of ecx (and the volume-call registers are
-// swapped), the final-block index emits `mov eax,edi; shl eax,3` instead of
-// `lea eax,[edi*8]`, and several pure register picks (g_game in eax vs ecx/edi).
-//
-// The CD-options menu handler (the sibling of 0x45da90, the sound-options
-// handler, which has the same shape): a chain of "command name" tests that
-// drives the CD player, the track-mode page and the volume/undo buttons, with
-// a shared tail for the CD arms and another for the UNDO/RESTORE arms.
-//
-// 75.3 percent (1312 of 1333 bytes), 2 real check.py runs, rest scored with
-// `check.py --sym` on build/scratch/0x45d280/v*.cpp. NOT MATCH. What still
-// differs, block by block, is at the bottom of this comment.
-//
-// What moved the number most:
-//  - The else-if chain is TWO statements, not one. `if (NOTRAK) ... else if
-//    (TRACKMODE) ... else if (TRACKTYPE) ...` and then, separately, `if
-//    (CDPLAY) ... else if (CDNEXT) ... else if (CDPREV) ... else if (CDSTOP)
-//    ...`, then `if (UNDO)`, `if (RESTORE)`, then the fall-through block.
-//    MSVC 5 lays a single chain out with its whole else-arm out of line and
-//    the LAST arm inline; the original has the NOTRAK body falling straight
-//    into the CDPLAY test with only TRACKMODE and TRACKTYPE out of line,
-//    which is exactly what two chains give (26 points).
-//  - The shared tails are `goto` labels placed at the END of the last arm of
-//    their chain (cd_tail inside the CDSTOP arm, apply inside the RESTORE
-//    arm). With the tail written out three times instead, MSVC merges blocks
-//    and the arms lose 3 points.
-//  - `g_game->flags.word = f ^ (((unsigned char)f ^ DAT_00512f46) & 1)`:
-//    the explicit byte cast is what makes the inner xor an 8-bit xor and
-//    stops MSVC rewriting the whole thing as a bitfield test-and-set (3
-//    points), and DAT_00512f46/48 must be `unsigned char` (2 points).
-//  - The two bit tests have to be `g_game->prefs` on an `unsigned char`
-//    bitfield (a word bitfield gives `test word`, not `test byte`) and
-//    `g_game->loaded` on an `unsigned short` bitfield (the store is
-//    `and word [...], 0xfffe`).
-//
-// Still different, and what I tried:
-//  1. Every `entries += i; ... entries[i]` site loses the original's
-//     `add ebp, edi` (three sites: 0x45d611, 0x45d714, 0x45d777) and with it
-//     the `lea eax,[edi*8]` that MSVC only emits when the base pointer is
-//     live in its own register. MSVC 5 folds `(base + i)[i]` to `base[i]`
-//     here, so the address it computes is one element lower than the
-//     original's. Tried and did NOT help: making the pointer a `char*` and
-//     casting at the use; a fresh local `Entry* e = entries + i` (adds a
-//     load, and the original's block has none); a separate `int k = i` for
-//     the index; `entries = entries + i` instead of `+=`.
-//  2. The UNDO flag update is 5 instructions from the original: the original
-//     keeps `f` in ax and the mask in ecx (`and ecx,1 / xor ecx,eax`), mine
-//     materialises a 16-bit mask (`and dl,1 / movzx dx,dl / xor edx,ecx`).
-//     MSVC keeps rewriting `f ^ ((f ^ x) & 1)` as "clear bit 0, then set it
-//     if (f ^ x) & 1" because the test just above computed the same value.
-//     Tried: reading the byte into a local first, and a local `x`; neither
-//     stops the rewrite.
-//  3. The CD arms. The original has `push <arg>; mov ecx,[g_game+0x10]; jmp
-//     tail` in each arm with the shared block starting at the `call`, so the
-//     argument dies in each arm. With one `goto` tail the argument is a phi,
-//     and MSVC copies it into the shared block (`mov eax,ecx`) and shares the
-//     "value 1" block between CDNEXT's clamp and CDSTOP, which the original
-//     does not do. Tried: a `track` local assigned in all three arms (that
-//     one fixes the clamp's shape but costs the copy at the merge, 70.0),
-//     and three separate copies of the tail for MSVC to merge (71.7). The
-//     `goto` form is the best of the three.
-//  4. Register choices only: g_game in eax vs ecx/edx, `mode` in al vs cl,
-//     and the two volume calls' `shl`. The first of these is in the CDPLAY
-//     arm, the first block in the function whose allocation differs, so
-//     whatever causes it is upstream of all the others. Removing the `mode`
-//     local (one fewer live node) changed nothing, so it is not simply a
-//     live-range-count problem.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash and GPT-6. Names are provisional.
+// Partial, 90.7%, 1327 vs 1333 bytes. Keeps the game pointer on the no-call
+// UNDO branch and reloads it after the callback. The flag update still differs,
+// along with volume argument scheduling, final gadget addressing and mode registers.
+#include <string>
+#include <windows.h>
+
 #pragma pack(push, 1)
 
 struct Entry_0045d280 {              // 0x15b-byte gadget entry
@@ -265,14 +198,13 @@ void __stdcall FUN_0045d280(Object_0045d280* obj)
         FUN_0047f1a0(DAT_00502b38, 0);
         g_game->field_37f16 = FUN_004a0f60(obj, DAT_00506984) + 1;
         ((Class_004ce7a0*)g_game->sound)->FUN_004ce7a0(g_game->field_37f16);
-        unsigned char mode = g_game->field_37f16;
-        if (mode == 3) {
+        if (g_game->field_37f16 == 3) {
             DAT_00512fe0 = ((Class_004ce5a0*)g_game->sound)->FUN_004ce5a0();
             FUN_004ab0a0(obj);
             FUN_0045c3f0();
             return;
         }
-        if (mode == 4) {
+        if (g_game->field_37f16 == 4) {
             FUN_004a1080(obj, DAT_0050692c, (unsigned char)((Class_004ce7e0*)g_game->sound)->FUN_004ce7e0(DAT_00512fe0));
             Entry_0045d280* list = ((Holder_0045d280*)g_game->table_531)->entries;
             if (g_game->field_37f16 == 4) {
@@ -329,10 +261,12 @@ void __stdcall FUN_0045d280(Object_0045d280* obj)
         ((Class_004ce3e0*)g_game->sound)->FUN_004ce3e0(DAT_00512f75);
         g_game->field_37f16 = DAT_00512f48;
         ((Class_004ce7a0*)g_game->sound)->FUN_004ce7a0(g_game->field_37f16);
-        if ((g_game->flags.byte ^ DAT_00512f46) & 1)
-            ((Class_004cdb40*)g_game->sound)->FUN_004cdb40();
-        int f = g_game->flags.word;
-        g_game->flags.word = f ^ (((unsigned char)f ^ DAT_00512f46) & 1);
+        Game_0045d280* game = g_game;
+        if ((game->flags.byte ^ DAT_00512f46) & 1) {
+            ((Class_004cdb40*)game->sound)->FUN_004cdb40();
+            game = g_game;
+        }
+        game->flags.word ^= (game->flags.byte ^ DAT_00512f46) & 1;
         ((Class_004ce580*)g_game->sound)->FUN_004ce580(DAT_00512fd9);
         goto apply;
     }

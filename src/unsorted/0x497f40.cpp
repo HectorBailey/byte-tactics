@@ -1,28 +1,4 @@
-// Decompiled by deepseek-v4.1-flash. Names are provisional.
-// PARTIAL, 58.8% (3475 vs 3463 original bytes), 6 check runs.
-// Mode-5 ("load game") state handler installed by FUN_00490b30.
-// Three phases: (1) one-time init gated by g_game->flags38d75 bit 0,
-// (2) finish/switch-to-state-6 gated by bit 1, (3) the loading screen with six
-// progress sliders (Textures/Terrain/Units/Animation/3D Data/Explosions).
-// Fixed this pass: the Game struct was missing padding at +0x38a3f (8 bytes)
-// and +0x38a4b (4 bytes) plus 4 bytes before +0x391f1, so every field from
-// +0x38a47 on was shifted by 8/12/4 bytes; FUN_004d85a0 takes the field value
-// (not its address); the players_29a4 zero-fill is a memset (rep stosd); the
-// player flag byte is a ternary, not a stack local.
-// What still differs (first hunk down):
-//   0x497f45  frame size: orig `sub esp,0x234`, ours 0x110. All locals sit
-//             0x114 too low, so every [esp+NN] local reference is off.
-//   0x498113  orig `lea eax,[esp+0x14c]` / `lea ecx,[esp+0x144]`, ours
-//             0x38 / 0x2c (same frame cause).
-//   0x49823d  player-init loop: memset now matches (rep stosd) but the running
-//             offset lands in ecx vs orig eax, and operands render as
-//             [ecx+esi] vs orig [esi+eax].
-//   0x4986xx  wsprintf/_ftol block and the six slider blocks: register choice
-//             and [esp+NN] offsets follow the frame problem above.
-// The six sliders are unrolled (not a loop) because each reads a different
-// progress byte (g+0x38d6f..0x38d74 / prev DAT_0051e820..825) and a different
-// y (0x87,0xb1,0xda,0x106,0x130,0x15b).
-
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
 #include <windows.h>
 #include <string.h>
 
@@ -85,7 +61,7 @@ struct Game_00497f40 {
     short field_38a4f;                 // +0x38a4f
     char unknown_38a51[0x38d6f - 0x38a51];
     unsigned char progress[6];         // +0x38d6f
-    unsigned short flags38d75;         // +0x38d75
+    volatile unsigned short flags38d75;         // +0x38d75
     char unknown_38d77[0x391e9 - 0x38d77];
     int field_391e9;                   // +0x391e9
     char pad_391ed[0x391f1 - 0x391ed];
@@ -100,15 +76,15 @@ struct Game_00497f40 {
 
 extern Game_00497f40* g_game;
 
-// +0x143a7 surface object lives at a fixed absolute address; access it as a raw offset.
+// Embedded surface at game offset 0x143a7.
 #define SURFACE_143a7 ((void*)((char*)g_game + 0x143a7))
 
 extern "C" int DAT_0051f2c8;
 extern "C" int DAT_0051e810;
 extern "C" int DAT_0051f2cc;
-extern "C" int DAT_0051f2d0;
+extern "C" short DAT_0051f2d0;
 extern "C" int DAT_0051e814;
-extern "C" int DAT_0051e818;
+extern "C" short DAT_0051e818;
 extern "C" int DAT_0051e6c8;
 extern "C" int DAT_0051e6cc;
 extern "C" int DAT_0051f308;
@@ -166,8 +142,9 @@ void __stdcall FUN_004c69a0(void*);
 void* __stdcall FUN_004c69f0(char*, int, int);
 void __stdcall FUN_004c6b70(void*, void*, int, int);
 void __stdcall FUN_004c9790(int);
-void __stdcall FUN_004cdb40(void*);
-void __stdcall FUN_004ce690(void*, int);
+class Class_004cdb40 { public: void FUN_004cdb40(); };
+class Class_004ce690 { public: void FUN_004ce690(int); };
+class Class_004ce800 { public: int FUN_004ce800(); };
 
 int __cdecl FUN_004b6700();
 int __cdecl FUN_004b6710();
@@ -192,17 +169,19 @@ public:
     void FUN_004618a0(int);
 };
 
+// PARTIAL 75.9%. Player loops, text layout and slider register allocation still differ.
 // FUNCTION: 0x497f40
 void FUN_00497f40(void)
 {
-    void* gadget;
+    struct Surface { int width, height; char fields[16]; } gadget;
     char buf[128];
-    int aux[2];
+    char aux[256];
     void* surfaceHandle;
     int i;
     int playersOffset;
     int arrayOffset;
-    unsigned char color;
+    unsigned int color;
+    int flash;
     int bar;
     int field_391e9;
     unsigned int stamp;
@@ -237,12 +216,12 @@ void FUN_00497f40(void)
             FUN_004c62c0();
             SetWindowPos(*(HWND*)(g_game->field_c + 0x40), 0, 0, 0, 0x280, 0x1e0, 4);
             FUN_004b5940(0x280, 0x1e0);
-            g_game->field_37e1b = (int)FUN_004c69f0((char*)0x5091d4, g_game->field_37e1f, g_game->field_37e23);
+            g_game->field_37e1b = (int)FUN_004c69f0("OFFSCREEN", g_game->field_37e1f, g_game->field_37e23);
             FUN_004c61f0(g_game->field_37e1b);
             FUN_004c69a0((void*)g_game->field_37e1b);
         }
-        FUN_004290f0(&aux[1], (char*)0x5031bc, (char*)0x5031c8, (char*)0x5031d0);
-        surfaceHandle = FUN_004bbe50((unsigned int*)&aux[0], 0);
+        FUN_004290f0(aux, "palettes", "guipal", "PAL");
+        surfaceHandle = FUN_004bbe50((unsigned int*)aux, 0);
         FUN_004ac7d0(&g_game->field_519, SURFACE_143a7, surfaceHandle);
         FUN_004d85a0(surfaceHandle);
         g_game->field_38a37 = FUN_004b6340();
@@ -258,7 +237,7 @@ void FUN_00497f40(void)
         g_game->field_37e33 = g_game->field_37e23 - 0x21;
         g_game->field_37e37 = g_game->field_37e2f - g_game->field_37e27 + 1;
         g_game->field_37e3b = g_game->field_37e33 - g_game->field_37e2b + 1;
-        FUN_004288d0((char*)0x509644, 0, 0, 0);
+        FUN_004288d0("loadgame2bg", 0, 0, 0);
         memset((char*)g_game + 0x29a4, 0, 0x23 * 4);
         arrayOffset = 0x29a4;
         playersOffset = 0;
@@ -275,14 +254,14 @@ void FUN_00497f40(void)
                 (*(int*)pi != 0 && (pi->data->flags & 0x40) != 0) ? 1 : 0;
         } while (arrayOffset < 0x29cc);
         if (!FUN_004b6b20(FUN_00497c70, 0, 0)) {
-            FUN_004b6290((char*)0x509620);
+            FUN_004b6290("Unable to start the loading thread!");
         }
         DAT_0051f2c8 = 0;
         DAT_0051e810 = 0;
         DAT_0051f2cc = 0;
         DAT_0051f2d0 = 0;
         *(int*)&DAT_0051e820 = 0;
-        *(int*)&DAT_0051e824 = 0;
+        *(short*)&DAT_0051e824 = 0;
         DAT_0051e814 = 0;
         DAT_0051e6c8 = 0;
         DAT_0051e818 = 0;
@@ -302,7 +281,7 @@ void FUN_00497f40(void)
             SetWindowPos(*(HWND*)(g_game->field_c + 0x40), 0, 0, 0, g_game->field_37f1b,
                          g_game->field_37f1f, 4);
             FUN_004b5940(g_game->field_37f1b, g_game->field_37f1f);
-            g_game->field_37e1b = (int)FUN_004c69f0((char*)0x5091d4, g_game->field_37e1f, g_game->field_37e23);
+            g_game->field_37e1b = (int)FUN_004c69f0("OFFSCREEN", g_game->field_37e1f, g_game->field_37e23);
             FUN_004c61f0(g_game->field_37e1b);
         }
         FUN_00467d70();
@@ -314,12 +293,15 @@ void FUN_00497f40(void)
         g_game->field_589 = 0;
         *(int*)((char*)g_game + 0x38d6f) = 0;
         *(int*)((char*)g_game + 0x38d73) = 0;
-        FUN_004ce690((void*)g_game->field_10, 0);
-        if (!FUN_004ce800()) {
-            FUN_004cdb40((void*)g_game->field_10);
+        ((Class_004ce690*)g_game->field_10)->FUN_004ce690(0);
+        if (!((Class_004ce800*)g_game->field_10)->FUN_004ce800()) {
+            ((Class_004cdb40*)g_game->field_10)->FUN_004cdb40();
         }
+        pi = (PlayerInfo_00497f40*)((char*)g_game + 0x1b63);
         i = 10;
         do {
+            if (*(int*)pi != 0) color = pi->control;
+            pi++;
             i--;
         } while (i != 0);
         return;
@@ -363,27 +345,27 @@ void FUN_00497f40(void)
             if (FUN_0049f580() != 0 && _strcmpi((const char*)FUN_0049f580(), "english") != 0) {
                 _strlwr(namebuf);
             }
-            wsprintfA(buf, "%s: %s", (char*)FUN_004c5740((char*)0x504990), (char*)FUN_004c5740(namebuf));
+            wsprintfA(buf, "%s: %s", (char*)FUN_004c5740("Map"), (char*)FUN_004c5740(namebuf));
             field_391e9 = FUN_004a5030(buf);
-            FUN_004a50e0(&gadget, buf, (int)gadget / 2 - field_391e9 / 2,
-                         (int)((double)(int)gadget - (double)FUN_004c1450() * 1.5), 0, -1);
+            FUN_004a50e0(&gadget, buf, gadget.width / 2 - field_391e9 / 2,
+                         (int)((double)gadget.height - (double)FUN_004c1450() * 1.5), 0, -1);
         }
         {
-            void* lightbar = FUN_004b7f30(FUN_004b8d40(g_game->field_51d, (char*)0x506c78), 0);
+            void* lightbar = FUN_004b7f30(FUN_004b8d40(g_game->field_51d, "LIGHTBAR"), 0);
             *((short*)lightbar + 3) = 0;
             *((short*)lightbar + 2) = 0;
             color = g_game->palette[g_game->progress[0] < 100 ? 2 : 0];
             FUN_004c13a0(color, FUN_004c13f0());
-            if (g_game->progress[0] == 100 && ((unsigned char*)&DAT_0051e6c8)[0] != 100) {
+            if (g_game->progress[0] == 100 && DAT_0051e820 != 100) {
                 ((unsigned char*)&DAT_0051e6c8)[0] = 0x1e;
             }
-            color = ((unsigned char*)&DAT_0051e6c8)[0];
-            ((unsigned char*)&DAT_0051e6c8)[0] = g_game->progress[0];
-            FUN_004a50e0(&gadget, (char*)FUN_004c5740((char*)0x509614), 0x5a, 0x87, -1, color);
+            flash = ((unsigned char*)&DAT_0051e6c8)[0];
+            DAT_0051e820 = g_game->progress[0];
+            FUN_004a50e0(&gadget, (char*)FUN_004c5740("Textures"), 0x5a, 0x87, -1, flash);
             rect[0] = 0xcd;
             rect[1] = 0x87;
-            rect[2] = 0x9b;
-            rect[3] = ((unsigned int)g_game->progress[0] * 7) / 2 + 0xcd;
+            rect[3] = 0x9b;
+            rect[2] = ((int)g_game->progress[0] * 7) / 2 + 0xcd;
             FUN_004bf6f0(&gadget, rect, color);
             FUN_004b7f90(&gadget, lightbar, rect[0], rect[1]);
             color = g_game->palette[g_game->progress[1] < 100 ? 2 : 0];
@@ -391,13 +373,13 @@ void FUN_00497f40(void)
             if (g_game->progress[1] == 100 && DAT_0051e821 != 100) {
                 ((unsigned char*)&DAT_0051e6c8)[1] = 0x1e;
             }
-            color = ((unsigned char*)&DAT_0051e6c8)[1];
-            ((unsigned char*)&DAT_0051e6c8)[1] = g_game->progress[1];
-            FUN_004a50e0(&gadget, (char*)FUN_004c5740((char*)0x50960c), 0x5a, 0xb1, -1, color);
+            flash = ((unsigned char*)&DAT_0051e6c8)[1];
+            DAT_0051e821 = g_game->progress[1];
+            FUN_004a50e0(&gadget, (char*)FUN_004c5740("Terrain"), 0x5a, 0xb1, -1, flash);
             rect[0] = 0xcd;
             rect[1] = 0xb1;
-            rect[2] = 0xc5;
-            rect[3] = ((unsigned int)g_game->progress[1] * 7) / 2 + 0xcd;
+            rect[3] = 0xc5;
+            rect[2] = ((int)g_game->progress[1] * 7) / 2 + 0xcd;
             FUN_004bf6f0(&gadget, rect, color);
             FUN_004b7f90(&gadget, lightbar, rect[0], rect[1]);
             color = g_game->palette[g_game->progress[2] < 100 ? 2 : 0];
@@ -405,13 +387,13 @@ void FUN_00497f40(void)
             if (g_game->progress[2] == 100 && DAT_0051e822 != 100) {
                 ((unsigned char*)&DAT_0051e6c8)[2] = 0x1e;
             }
-            color = ((unsigned char*)&DAT_0051e6c8)[2];
-            ((unsigned char*)&DAT_0051e6c8)[2] = g_game->progress[2];
-            FUN_004a50e0(&gadget, (char*)FUN_004c5740((char*)0x5077ec), 0x5a, 0xda, -1, color);
+            flash = ((unsigned char*)&DAT_0051e6c8)[2];
+            DAT_0051e822 = g_game->progress[2];
+            FUN_004a50e0(&gadget, (char*)FUN_004c5740("Units"), 0x5a, 0xda, -1, flash);
             rect[0] = 0xcd;
             rect[1] = 0xda;
-            rect[2] = 0xee;
-            rect[3] = ((unsigned int)g_game->progress[2] * 7) / 2 + 0xcd;
+            rect[3] = 0xee;
+            rect[2] = ((int)g_game->progress[2] * 7) / 2 + 0xcd;
             FUN_004bf6f0(&gadget, rect, color);
             FUN_004b7f90(&gadget, lightbar, rect[0], rect[1]);
             color = g_game->palette[g_game->progress[3] < 100 ? 2 : 0];
@@ -419,13 +401,13 @@ void FUN_00497f40(void)
             if (g_game->progress[3] == 100 && DAT_0051e823 != 100) {
                 ((unsigned char*)&DAT_0051e6c8)[3] = 0x1e;
             }
-            color = ((unsigned char*)&DAT_0051e6c8)[3];
-            ((unsigned char*)&DAT_0051e6c8)[3] = g_game->progress[3];
-            FUN_004a50e0(&gadget, (char*)FUN_004c5740((char*)0x509600), 0x5a, 0x106, -1, color);
+            flash = ((unsigned char*)&DAT_0051e6c8)[3];
+            DAT_0051e823 = g_game->progress[3];
+            FUN_004a50e0(&gadget, (char*)FUN_004c5740("Animation"), 0x5a, 0x106, -1, flash);
             rect[0] = 0xcd;
             rect[1] = 0x106;
-            rect[2] = 0x11a;
-            rect[3] = ((unsigned int)g_game->progress[3] * 7) / 2 + 0xcd;
+            rect[3] = 0x11a;
+            rect[2] = ((int)g_game->progress[3] * 7) / 2 + 0xcd;
             FUN_004bf6f0(&gadget, rect, color);
             FUN_004b7f90(&gadget, lightbar, rect[0], rect[1]);
             color = g_game->palette[g_game->progress[4] < 100 ? 2 : 0];
@@ -433,13 +415,13 @@ void FUN_00497f40(void)
             if (g_game->progress[4] == 100 && DAT_0051e824 != 100) {
                 ((unsigned char*)&DAT_0051e6cc)[0] = 0x1e;
             }
-            color = ((unsigned char*)&DAT_0051e6cc)[0];
-            ((unsigned char*)&DAT_0051e6cc)[0] = g_game->progress[4];
-            FUN_004a50e0(&gadget, (char*)FUN_004c5740((char*)0x5095f8), 0x5a, 0x130, -1, color);
+            flash = ((unsigned char*)&DAT_0051e6cc)[0];
+            DAT_0051e824 = g_game->progress[4];
+            FUN_004a50e0(&gadget, (char*)FUN_004c5740("3D Data"), 0x5a, 0x130, -1, flash);
             rect[0] = 0xcd;
             rect[1] = 0x130;
-            rect[2] = 0x144;
-            rect[3] = ((unsigned int)g_game->progress[4] * 7) / 2 + 0xcd;
+            rect[3] = 0x144;
+            rect[2] = ((int)g_game->progress[4] * 7) / 2 + 0xcd;
             FUN_004bf6f0(&gadget, rect, color);
             FUN_004b7f90(&gadget, lightbar, rect[0], rect[1]);
             FUN_004b7f90(&gadget, lightbar, rect[0] + *((short*)lightbar + 2),
@@ -449,13 +431,13 @@ void FUN_00497f40(void)
             if (g_game->progress[5] == 100 && DAT_0051e825 != 100) {
                 ((unsigned char*)&DAT_0051e6cc)[1] = 0x1e;
             }
-            color = ((unsigned char*)&DAT_0051e6cc)[1];
-            ((unsigned char*)&DAT_0051e6cc)[1] = g_game->progress[5];
-            FUN_004a50e0(&gadget, (char*)FUN_004c5740((char*)0x5095ec), 0x5a, 0x15b, -1, color);
+            flash = ((unsigned char*)&DAT_0051e6cc)[1];
+            DAT_0051e825 = g_game->progress[5];
+            FUN_004a50e0(&gadget, (char*)FUN_004c5740("Explosions"), 0x5a, 0x15b, -1, flash);
             rect[0] = 0xcd;
             rect[1] = 0x15b;
-            rect[2] = 0x16f;
-            rect[3] = ((unsigned int)g_game->progress[5] * 7) / 2 + 0xcd;
+            rect[3] = 0x16f;
+            rect[2] = ((int)g_game->progress[5] * 7) / 2 + 0xcd;
             FUN_004bf6f0(&gadget, rect, color);
             FUN_004b7f90(&gadget, lightbar, rect[0], rect[1]);
         }

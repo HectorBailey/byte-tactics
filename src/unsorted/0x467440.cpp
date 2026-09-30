@@ -1,12 +1,5 @@
-// Decompiled by deepseek-v4.1-flash. Names are provisional.
-// PARTIAL (21.9%). The four loops and the stack visitor objects are structurally
-// right, but MSVC spills the playerIndex byte (and a pointer) to the stack in
-// this version where the original keeps playerIndex in dl and the PlayerInfo*
-// in ebp; every loop body is byte-shifted from there on. Loop 2 also reads the
-// def signature shorts into a register instead of the original's memory test,
-// and loop 3 bases at u+0xff instead of u+0x92. Likely source-level causes to
-// try next: fewer named locals at the top (compute pl after first/last but do
-// not keep a separate `u`), and inline the def-field reads in the conditions.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
+// PARTIAL: 29.6%. Unsigned player index, definition reload after range callback, and separate bitmap/bitfield visibility branches. Visitor frame and induction registers still differ.
 #pragma pack(push, 1)
 
 struct Vec3_00467440 {
@@ -131,7 +124,7 @@ void FUN_00467440(void)
     if (g->field_2a3c < 2) {
         return;
     }
-    unsigned char p = g->playerIndex;
+    unsigned int p = g->playerIndex;
     Unit_00467440* first = g->units + 1;
     Unit_00467440* last = g->units_end;
     PlayerInfo_00467440* pl = (PlayerInfo_00467440*)((char*)g + 0x1b63 + (unsigned int)p * 0x14b);
@@ -174,9 +167,9 @@ void FUN_00467440(void)
                 Class_00467960 v;
                 FUN_0047e890(&u->pos.vec, (int)def->field_20a << 16, &v);
             }
-            if (def->field_20c != 0) {
+            if (u->def->field_20c != 0) {
                 Class_00467980 v;
-                FUN_0047e890(&u->pos.vec, (int)def->field_20c << 16, &v);
+                FUN_0047e890(&u->pos.vec, (int)u->def->field_20c << 16, &v);
             }
         }
     }
@@ -205,13 +198,14 @@ void FUN_00467440(void)
                 (PlayerInfo_00467440*)((char*)g2 + 0x1b63 + pi * 0x14b);
             int x = u->pos.half.field_6c >> 5;
             int y = (u->pos.half.field_74 - (u->pos.half.field_70 >> 1)) >> 5;
-            bool vis;
+            int vis;
             if ((g2->field_14281 & 2) == 2) {
-                vis = (unsigned int)x < p2->field_80 && (unsigned int)y < p2->field_84
-                    && p2->field_7c[p2->field_80 * y + x] != 0;
+                vis = 0;
+                if ((unsigned int)x < p2->field_80 && (unsigned int)y < p2->field_84)
+                    if (p2->field_7c[p2->field_80 * y + x] != 0) vis = 1;
             } else {
-                vis = (unsigned int)x < p2->field_80 && (unsigned int)y < p2->field_84
-                    && (g2->field_14273[p2->field_80 * y + x] & (1 << pi)) != 0;
+                if ((unsigned int)x >= p2->field_80 || (unsigned int)y >= p2->field_84) vis = 0;
+                else vis = (g_game->field_14273[p2->field_80 * y + x] & (1 << pi)) != 0;
             }
             if (vis) {
                 u->flags = f | 0x100;

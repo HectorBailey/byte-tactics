@@ -1,4 +1,4 @@
-// Decompiled by Claude Opus 5.5. Names are provisional.
+// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash and GPT-6. Names are provisional.
 // "Attacking" order handler of aircraft (VTOL). Interrupts hand over to a
 // "VTOL_SEEKATTACK" order; the order follows its target unit and gives up
 // outside its range. State 0 prepares the order (FUN_0040f200 is defined here
@@ -7,22 +7,12 @@
 // state 6 flies on and, when the unit is below three quarters of its health,
 // sends it to a random repair pad ("VTOL_LANDING").
 //
-// PARTIAL (84.1%). Same size as the original; what still differs:
-// - The range check's _hypot arguments: the original loads the unit's word
-//   before the order's (`movsx ecx, [esi+0x74]; movsx edx, [edi+0x30]`), ours
-//   loads the order's first. No rewrite or header set changed it, but
-//   compiling the real 0x4118e0 above this function in the same file (as in
-//   the original source file) fixes it, so it is compiler state.
-// - State 2: `lea eax, [eax + edx - 0x2000]` (random + angle) comes out as
-//   `[edx + eax - 0x2000]` whatever the order of the terms.
-// - State 4: the original multiplies `sqrt(...) * 30.0f` first and then
-//   `fimul`s type->field_22; MSVC moves the 30.0f factor last in every
-//   unparenthesised float spelling tried (and then negates it to turn the
-//   `+ 1 + def->field_216` into a `sub`). Parenthesising `(s * 30.0f) * n`
-//   keeps the order but switches to `fild rate` first and `fild; fmulp`
-//   instead of `fidiv`/`fimul`. The 2.0 double in the constant pool (at
-//   0x4fcc48, before 30.0f) confirms `size * 2.0` as written. The def pointer
-//   then lands in ebx instead of ebp.
+// Partial: 96.6%, same 1980-byte size. Remaining differences include the
+// random-angle LEA operand order, turn-delay register allocation and multiply
+// order, and switch relocations. The delay subtraction is equivalent: VC5
+// folds the sign into a -30.0f constant, then subtracts the converted result.
+#include <list>
+#include <windows.h>
 #include <math.h>
 #include <vector>
 
