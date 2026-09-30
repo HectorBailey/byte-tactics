@@ -1,8 +1,37 @@
-// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, verified by GPT-6.1-sol. Names are provisional.
+// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, verified by GPT-6.1-sol, finished by space-bunny-free. Names are provisional.
 // GPT-6 retry: a selection object holding the button parameter by reference
 // or pointer, with ternary/early-return/assignment selection, did not improve
 // 84.1%. The button stack reload and entries/button register swap remain.
 // GPT-6.1-sol retry: Rechecked at 84.1%. A reference parameter for button and an explicit index/selected-pointer temporary both produced the same initial register assignment and score. The mismatch remains button/entries in esi/edi instead of edi/esi, affecting repeated calls and branch offsets.
+// space-bunny-free retry: still 84.1%, 1 real check run. The whole diff is the
+// one allocation: esi/edi swapped for the two pointer parameters plus the
+// else arm loading button from its stack slot. Our size is 1327 against 1329,
+// and the 2 bytes are exactly that load (mov ebp,esi versus mov ebp,[esp+34]),
+// so every branch target and every other byte already agrees.
+// The two are one cause. `button` (arg 1) and `entries` (arg 2) are the same
+// type, each live across the whole function, with the same reference count (12
+// uses each: button 11 times as a base for [reg+0x60] and once as the else
+// value, entries 11 times as a pushed argument and once in the lea), so the
+// preference order decides and arg 1 wins. The original gives the better
+// register to arg 2, which is what you get when MSVC 5 gives the else arm's
+// short block its own home in the parameter's stack slot and splits that
+// segment off button. Nothing in the expression tree reached it.
+// NEW, tried and no effect (all byte-identical to the file below, 84.1%):
+// the selection as `button` then an if, as an explicit `ent` pointer local, as
+// `&button[0]`, as `*(Entry**)&button`, as a parenthesised else, with the
+// compared byte hoisted into an int or an unsigned char local, with
+// `(entries, button)` and `((void)entries, button)` as the else operand (to
+// add an early use of entries and a structurally different tree at once),
+// with the SetOrderMode helper written out at each of its 12 call sites and
+// with it declared plain __inline.
+// NEW, tried and WORSE, do not repeat: making the 11 keyword tests one
+// if/else-if chain (with the trailing `else return 0`) instead of 11 separate
+// `if (...) { ...; return 1; }` tests. MSVC 5 if-converts the inner
+// if/else there (mov ebx,1 plus a cmov) and the function drops to 1130 bytes
+// and 36.4%. The separate-tests shape is what the original used. Also worse:
+// `e = button; if (...) e = &entries[...];` (83.8%, the initial assignment is
+// hoisted instead of the else), the inverted ternary (83.8%), an int index
+// local (83.6%), and a flag local in SetOrderMode (18.9%).
 // Handles a click on an order button: finds which order the button's name
 // contains and selects that order mode (FUN_00419bc0 inlined), plays the
 // "immediateorders" or "specialorders" sound and returns 1; returns 0 when the
