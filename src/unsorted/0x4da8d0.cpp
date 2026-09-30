@@ -9,6 +9,15 @@
 // latter: plain `g = p; return p;`, `return g = p;`, chained `g = q = p;`,
 // a block-scoped q, a `static __inline` storer that assigns and returns, and
 // a typed Tree* global instead of void*.
+// Also tried (all compile to the same 285-byte body): a parenthesised or cast
+// assignment as the return operand, an allocated-then-assigned temp, an
+// uninitialised-then-assigned temp, a scope-local reference bound to the
+// global, an out-of-line-able storer helper, `(void*)(unsigned long)p` and
+// `(void*)(char*)p` round trips, a `*(void**)&p` round trip, a union punch
+// through the pointer, and the typed global combined with each of those
+// tails. The front end always emits `mov [g],<home reg>` first and copies the
+// home register to eax afterwards; only a value whose home is already eax
+// would produce the original's 5-byte A3 store.
 // Lazily built singleton for the game's file-record map (the std::_Tree whose
 // insert is 0x4dc680 and whose erase is 0x4dc910): allocate the 0x10-byte tree
 // object, make the _Nil node DAT_00528a50 (black, self-null children) and the
