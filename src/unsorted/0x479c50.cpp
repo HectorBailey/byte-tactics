@@ -16,6 +16,28 @@
 // and the zero ESI, the original the reverse, so an attempt should target the
 // first-use order at entry, not the loop body. See build/scratch/0x479c50/d1.txt
 // for the full checker diff.
+// Further attempts (all scored with check.py --sym, all 78.6% or worse):
+//   headers.py: no header set matches (best is the current <windows.h>).
+//   N unused extern declarations 0..200: flat at 78.6%, so it is source shape,
+//   not compiler state.
+//   loop counter declared early / unsigned, named numPlayers local (51.5%),
+//   flags-before-loop reordered (78.3%), |= vs = x|1, while loop, step/y after
+//   the memsets, implicit null tests, menu local pointer (64.7%): none flipped
+//   the ESI/EBX swap.
+// Root cause narrowed with /Fa listings: the whole diff follows from which
+// register the g_game temporary gets. When g_game lands in ESI the allocator
+// then gives the live zero EBX and the wsprintf import reuses ESI after g_game
+// dies at the loop guard, exactly as the original. When g_game lands in EBX the
+// zero takes ESI and the import reuses EBX (the current state). So the task is
+// to make g_game outrank the constant zero.
+// Things that DO flip g_game to ESI but break the match: an explicit
+// `if (g_game->numPlayers <= 0) return;` before the loop (adds a second cmp,
+// 73.5%), a local `int count = g_game->numPlayers;` used as the bound (adds a
+// 4-byte frame slot, 0x218), a live `menu` local (64.7%), a `Game* p = g_game;`
+// local (59.5%). None of these is the original: the frame must stay 0x214 and
+// there must be exactly one guard cmp. The missing lever is a g_game use that
+// raises its priority without emitting an extra instruction, and it was not
+// found in this session.
 #include <windows.h>
 #include <string.h>
 
