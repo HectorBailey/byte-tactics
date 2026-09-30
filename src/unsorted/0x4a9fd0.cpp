@@ -1,15 +1,47 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6, edited by
-// deepseek-v4.1. Names are provisional.
-// Partial: 41.6%, 2176 bytes versus 2164. First divergence is the prologue:
-// the original pushes ebx, ebp, esi and edi at entry (push ebx / push ebp /
-// mov ebp,[esp+0x40] / push esi / push edi); ours only pushes ebp and sinks
-// the ebx/esi/edi saves below the early "layer == 0" return, so everything
-// after it is shifted by 6 bytes. The body (callback order, the 0x15b entry
-// stride, the switch dispatch and the tail teardown) follows the original.
-// Removed a trailing byte to restore the 0x15b entry stride, represented the
-// palette index as an int, and captured the active entries/current index
-// across callbacks before restoring current. Two 768-set header sweeps found
-// no improvement.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6,
+// edited by deepseek-v4.1, finished by space-bunny-free. Names are provisional.
+//
+// Partial: 42.2%, 2204 bytes versus 2164.
+//
+// What still differs, in order of how much it is worth:
+//
+// 1. The prologue. The original does sub esp,0x34 / push ebx / push ebp /
+//    mov ebp,[esp+0x40] / push esi / push edi, and its early "layer == 0"
+//    exit pops all four. Ours pushes only ebp at the top and sinks
+//    push edi / push esi / push ebx below that early return, so every
+//    address in the body is 4 bytes low. This is one allocation state, not
+//    three separate bugs: in the original ebx carries the loop index i and
+//    edi carries the walk pointer p (each with a spill slot as well), while
+//    in ours `entries` keeps ebx alive all the way into the loop preamble and
+//    i and p are memory-resident, so only ebp/esi/edi ever get saved. Getting
+//    i and p promoted to callee-saved (and `entries` dropped from ebx at the
+//    reload the original does at 0x4aa19a) should move a large part of the
+//    body at once. Several attempts to force it (extra live references,
+//    spelling the loop as a while(1) with the induction variable read from
+//    memory) did not change it.
+// 2. Local slot assignment. sel and i have swapped homes: the original uses
+//    [esp+0x10] for i and [esp+0x48] for sel, we use [esp+0x10] for sel and
+//    [esp+0x48] for i. All other slots (p 0x14, entries 0x18, key 0x1c,
+//    elapsed 0x20, bias 0x24, saved 0x28, point 0x2c/0x30) already agree,
+//    so this looks like the order the first and last temporaries are created
+//    in the lowered graph, i.e. a consequence of (1), not an independent
+//    source-shape problem.
+// 3. The first entry clamp. The original spills both derived edges, right to
+//    [esp+0x34] and bottom to [esp+0x38], and loads point.y into edi before
+//    building them; we keep right in edi and reload point.y after the call
+//    argument is built. One unit more register pressure in that block would
+//    reproduce it, but adding locals there did not.
+// 4. Case 5 (type 5) now matches the original's shape: sel is set to -1
+//    before the name search, so the "not found" test is cmp against the same
+//    materialised -1 the three deselect arms use. Writing the constant out
+//    as a separate `int notfound = -1` scores identically, so the spelling is
+//    not pinned down.
+//
+// Things that did NOT work, so nobody repeats them: a `int elapsed = 0`
+// pre-initialiser (the original assigns 0 only in the else arm, and the
+// extra store is a real byte); naming pt->x and pt->y as locals before the
+// first clamp; two 768-set header sweeps (earlier sessions); removing the
+// `saved` copy of menu->field_68.
 
 #include <windows.h>
 #include <string.h>
@@ -219,10 +251,12 @@ int __stdcall FUN_004a9fd0(Menu_004a9fd0* menu)
         point.x -= entries->x;
         point.y -= entries->y;
 
-        int elapsed = 0;
+        int elapsed;
         if (FUN_004b6340() - DAT_0051fbb4 > 0) {
             elapsed = 1;
             DAT_0051fbb4 = FUN_004b6340();
+        } else {
+            elapsed = 0;
         }
 
         int bias = 0xffffffe1 - (int)entries;
@@ -270,6 +304,7 @@ int __stdcall FUN_004a9fd0(Menu_004a9fd0* menu)
                     break;
                 case 5:
                     if (FUN_004a4440(menu, i, key) != 0) {
+                        sel = -1;
                         int found = -1;
                         int j;
                         for (j = 1; j < entries->u_b6.anim.count + 1; j++) {
@@ -278,7 +313,9 @@ int __stdcall FUN_004a9fd0(Menu_004a9fd0* menu)
                                 break;
                             }
                         }
-                        if (found == -1) {
+                        if (found == entries->u_b6.anim.count + 1)
+                            found = -1;
+                        if (found == sel) {
                             sel = i;
                         } else {
                             Entry_004a9fd0* me;
