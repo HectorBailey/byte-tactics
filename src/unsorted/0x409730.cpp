@@ -1,5 +1,20 @@
 // Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
 //
+// (deepseek-v4.1-flash): key negative finding. The two swapped accesses are NOT
+// a subscript-form problem and NOT a vector-container problem. A named pointer
+// local `unsigned char* q = vec_8d.begin(); q[i]` DOES produce the original's
+// base order for both sites, but only when it is the ONLY use in the loop. Adding
+// the other site back keeps the original base: store via exact-width pointer on
+// plain form like `*(&vec_8d[i])`, and `unsigned char* q = vec_8d.begin(); p[i]`
+// on the store form. At the read, `unsigned char& r = vec_8d[i]` (an element
+// reference) also yields the original base order. HOWEVER every construct that
+// fixes one of the two accesses makes the pointer local survive into the vast
+// mid-function region (it spills to a stack slot and its reload shifts a dozen
+// unrelated instructions, 1679-1690 bytes, 52-85%), whereas the original has no
+// such live pointer there. The free scratch scoring (`check.py --sym`) makes
+// this cheap to test: the variants are in build/scratch/0x409730/exp/. Remaining
+// diff is still exactly the two SIB base/index bytes.
+//
 // Still 99.6% (space-bunny-free pass): the code is the same 1678 bytes and every
 // instruction matches except these two hunks, both the SIB base/index order of a
 // byte access to vec_8d (a different SIB byte, not a different instruction):
