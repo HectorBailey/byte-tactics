@@ -1,4 +1,4 @@
-// Decompiled by space-bunny-free, finished by LongCat 2.5 Preview Free, deepseek-v4.1-flash and space-bunny-free. Names are provisional.
+// Decompiled by space-bunny-free, finished by LongCat 2.5 Preview Free, deepseek-v4.1-flash and space-bunny-free, edited by deepseek-v4.1. Names are provisional.
 //
 // SPACE-BUNNY-FREE, fourth pass. Still 84.6 percent, 309 of 303 bytes, unchanged:
 // no variant beat the version below (all screened with check.py --sym on scratch
@@ -201,6 +201,18 @@
 //   * the map pointer must be computed after the sx/sy header (68.0 the other
 //     way), and the width local must be declared before the test (37-74).
 //   * headers.py is pointless here: all 128 sets give 84.0.
+// DEEPSEEK-V4.1, fifth pass, 84.6 percent, 2 scratch scorings (no new check.py
+// runs on the real file needed, the baseline is unchanged): loading the two
+// spilled values LATE via an assignment inside the index expression
+// (`(seen = map->seen)[w * row + col]`) is 28.4, and `(w = map->size.width)` in
+// the mask arm's index is 39.6. Both sink the pre-block exactly as the notes
+// predict: the early materialisation of seen/width is what keeps the map
+// pointer in edx, so the spill and the pre-block shape cannot be separated.
+// Still differs: the fog arm's `mov ecx,[edx+0x7c]; mov [esp+0x18],ecx` +
+// `mov edx,[esp+0x18]` where the original has one `mov edx,[edx+0x7c]`, the
+// mask arm's `mov [esp+0x1c],ebx` + `mov edx,[esp+0x1c]` where the original
+// re-reads `mov edx,[edx+0x80]`, and the merged fail block (the original keeps
+// one `xor edx,edx; jmp` per arm).
 #include <stddef.h>
 
 void* __stdcall FUN_004b7f30(void* a, int b);
