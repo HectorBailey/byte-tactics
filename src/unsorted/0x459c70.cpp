@@ -39,8 +39,6 @@
 //   0x45a246 polygon loop: index slots differ, fadd direction at 0x45a195.
 //   0x45a3a3 branch layout: firstFace test takes the opposite branch direction.
 //   0x45a419 end copy loop: register assignment differs.
-#include <map>
-#include <memory.h>
 #include <ddraw.h>
 
 extern char* g_game;
@@ -153,7 +151,9 @@ void Class_004581e0::FUN_00459c70(Bitmap_459c70* bitmap, List_459c70* list,
 
     Bitmap_459c70* src;
     int mode;
-    if (((*(unsigned char*)(g_game + 0x37f06) >> 1) & 1) != 0
+    unsigned char renderFlags = *(unsigned char*)(g_game + 0x37f06);
+    renderFlags >>= 1;
+    if ((renderFlags & 1) != 0
         && (list->owner->field_110 & 0x20000000) != 0
         && useColor != 0) {
         mode = 1;
@@ -255,9 +255,9 @@ void Class_004581e0::FUN_00459c70(Bitmap_459c70* bitmap, List_459c70* list,
                 unsigned short* idx = f->indices;
                 for (int j = 0; j < f->count; j++) {
                     int k = idx[j];
-                    accum[k][0] += normal[i][0];
-                    accum[k][1] += normal[i][1];
-                    accum[k][2] += normal[i][2];
+                    accum[k][0] = normal[i][0] + accum[k][0];
+                    accum[k][1] = normal[i][1] + accum[k][1];
+                    accum[k][2] = normal[i][2] + accum[k][2];
                     weight[k]++;
                 }
             }
