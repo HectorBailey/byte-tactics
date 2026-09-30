@@ -33,6 +33,17 @@
 // written-out namespace std { class vector } carrier (as in 0x425210.cpp,
 // which reaches 99.6% for a 2-byte element) scores 91.0% here, so for a
 // 1-byte element the real <vector> stays the better carrier.
+// Re-confirmed 2026-09-30 (deepseek-v4.1, 35 runs): an explicit member
+// specialisation of std::vector<unsigned char>::insert in this same file
+// emits byte-identical code to the header instantiation (93.3%, same four
+// hunks), so the tail is steerable only through source statements; swapping
+// the _End/_Last assignment order gives 83.6% (454 bytes), `_E += _N` temps
+// give 85.8% (475 bytes), and the _Ufill count `_M - _Last + _P` written
+// with integer casts is reassociated straight back. A dummy-typedef scan
+// (0..1024, step 16) shows the compiler state toggles exactly every 256
+// declarations (92.8% in phases 256..511 mod 512, 93.3% in 0..255) and that
+// toggle moves only the fourth sum (the _Ucopy source start), never these
+// two. So the two hunks below are unreachable from this emission context.
 #include <windows.h>
 #include <ddraw.h>
 #include <vector>
