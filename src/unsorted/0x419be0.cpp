@@ -1,4 +1,4 @@
-// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, verified by GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
+// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, verified by GPT-6.1-sol, edited by deepseek-v4.1, finished by space-bunny-free. Names are provisional.
 // deepseek-v4.1 retry (84.1%, unchanged): the whole remaining diff is one
 // instruction plus the register names it drags with it. Check says original
 // 1329 bytes vs ours 1327, and the 2 bytes are exactly the encoding gap
@@ -28,6 +28,22 @@
 // or pointer, with ternary/early-return/assignment selection, did not improve
 // 84.1%. The button stack reload and entries/button register swap remain.
 // GPT-6.1-sol retry: Rechecked at 84.1%. A reference parameter for button and an explicit index/selected-pointer temporary both produced the same initial register assignment and score. The mismatch remains button/entries in esi/edi instead of edi/esi, affecting repeated calls and branch offsets.
+// deepseek-v4.1 round 2 (84.1%, same 1327-byte body): 18 more shapes scored
+// through a local harness, every one byte-identical to the current file:
+// `:(&button)` forms, `(void)&button;`, `Entry** pb = &button;` with `*pb` and
+// `pb[0]`, `button + 0`, a char* cast, inline `Id(Entry*&)`, `Id(Entry* const&)`
+// and `Touch(Entry**)` helpers, a `Entry*& b = button;` alias, a plain local
+// copy of the button (used for all 11 index loads, with the raw parameter left
+// for the else arm, and vice versa), a coalesced `Entry* es = entries;` alias,
+// and a cached `int idx`. VC5 coalesces every one of those copies and still
+// folds the else arm to the parameter's register, so the shape really is
+// allocator state. The only form that reads the home slot and gets the
+// parameter roles right remains the lvalue `?:` (66.6%, see below).
+// Two extra facts from the disassembly: the frame is 0x20 (locals only at
+// [esp+0x10], the 32-byte name buffer), so a spilled local can never land in
+// the parameter home slot; and the original never stores to [esp+0x34] or
+// [esp+0x38] (only two loads plus the else arm read), so the else arm is a
+// genuine read of the incoming parameter, not of a reused local slot.
 // Handles a click on an order button: finds which order the button's name
 // contains and selects that order mode (FUN_00419bc0 inlined), plays the
 // "immediateorders" or "specialorders" sound and returns 1; returns 0 when the
@@ -62,6 +78,32 @@
 // declarations, swapping the parameter declaration order) and a 0..44
 // dummy-`extern int` sweep all produced byte-identical output at 84.1%. So
 // this is compiler state, not something the expression can lever.
+//
+// space-bunny-free round, still 84.1%. New evidence, from a minimal probe
+// (build/scratch/0x419be0/probe*.cpp, compiled with /Fa so the register
+// assignment is readable) that isolates the head:
+// * The callee-saved queue is [param1, param2, orders, sel]: MSVC 5 ranks the
+//   live-across-call values by parameter slot, so the first parameter always
+//   takes the first register it offers. The original has the SECOND parameter
+//   in the first register, so the queue there is [param2, param1, orders, sel].
+// * The same probe compiled WITHOUT the `orders` local (3 registers instead of
+//   4) produces exactly the original's order, param1 in edi and param2 in esi,
+//   from the identical selection expression. So the fourth register-resident
+//   value is what pushes param1 ahead of param2, not the selection form:
+//   eight shapes of `orders` (declared before/after the selection, char* and
+//   PE* types, assigned in a later statement, no local at all) leave the real
+//   function at 84.1% or worse (46.9% and 60.2% for the two that reorder it).
+// * No probe shape produced the original's `mov ebp, [esp+0x34]`: every form
+//   of the selection (ternary, if/else, inverted if/else, address into a
+//   named local first, comma operator, `PE*&` reference parameter, a local
+//   copy of the parameter, `entries + button->index`) still substitutes the
+//   register for the false arm. The reference parameter does reproduce the
+//   two prologue copies but adds a third register for the dereference.
+// * Swapping the two parameter NAMES, so the first stack slot is called
+//   `entries`, scores 84.4% (kept at build/scratch/0x419be0/swapparams.cpp).
+//   It is not the original: the caller pushes the button first, and the
+//   original reads the index out of the first slot, so the declaration has to
+//   be (button, entries). Recorded only, not used.
 #include <string.h>
 
 class Class_00438760 {
