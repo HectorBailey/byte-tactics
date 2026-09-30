@@ -106,6 +106,24 @@
 // scalar sits below it is the shape to hunt for). The preheader also stores
 // lastX twice (before and after the width clamp) where the original stores it
 // once at 0x4183cc; the ternary spelling of the clamp was already tried.
+// deepseek-v4.1 session 2 (55.5%, 2203 bytes, 18 check.py runs, no variant beat
+// this file). Every declaration-order probe recompiled BYTE-IDENTICALLY, so the
+// frame here is not declaration-driven: y, x, p[4] and heights[4] moved between
+// function scope, loop-body scope and block scope; for-init declarations vs
+// pre-declared plus an empty for-init; `Point p[4]` before and after both
+// for-inits; a `Tile* tile` local added at function scope and at loop scope.
+// Code-shape probes that DID change output and scored worse: `unsigned char
+// m=cell->flags&0xfb; if (m!=0 && m!=3)` (54.3%, 2206 bytes) and the explicit
+// baseX/baseY induction form with `baseX+=16` per corner (46.5%, 2239 bytes).
+// The gap stays the allocator's slot walk: the original keeps y at esp+0x10,
+// p[4] at esp+0x14, x at esp+0x34, baseX at esp+0x38, baseY at esp+0x3c, tile at
+// esp+0x40 and heights at esp+0x48, ours keeps p[4] at esp+0x10, x at esp+0x30,
+// y at esp+0x34, baseY at esp+0x38, baseX at esp+0x3c and heights at esp+0x40,
+// with everything from esp+0x50 up identical. The first instruction divergence
+// is the preheader (ours hoists the width load into edi because firstY was
+// coloured ecx instead of the original's edi), i.e. it is downstream of the same
+// whole-function allocation problem, not a statement-order fix.
+
 #include <stdlib.h>
 // SHARED begin
 struct Point { int x,y; };
@@ -172,9 +190,9 @@ void __stdcall FUN_00418310(void* surface)
 // REGION r2 begin   0x418417-0x41862c
 //   the tile quad walk, the offscreen test and the mode dispatch
         int offscreen=1;
+        Point p[4];
+        unsigned char heights[4];
         for (int x=firstX;x<lastX;++x) {
-            Point p[4];
-            unsigned char heights[4];
             Tile* tile=&g_game->tiles[x+y*g_game->width];
             heights[0]=tile->height;
             p[0].x=(x+8)*16-g_game->scrollX;
