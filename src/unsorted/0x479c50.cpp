@@ -1,49 +1,44 @@
-// Decompiled by deepseek-v4.1-flash, rechecked by deepseek-v4.1. Names are provisional.
-// Partial, 78.6% (1154 of 1156 bytes). Everything below the entry block has the
+// Decompiled by deepseek-v4.1-flash, rechecked by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
+// Partial, 82.5% (1154 of 1156 bytes). Everything below the entry block has the
 // right fields, frame (0x214), memset sizes (0x13e + 0xcc) and call order; the
 // whole gap is ONE register swap in the allocator:
-//   original: EBX = the live zero (cmp eax,ebx / mov [..],ebx / mov [..],bl),
-//             ESI = cached _imp__wsprintfA reloaded at the loop head;
-//   ours:     ESI = the live zero (xor esi,esi, re-materialised at the loop
-//             head because the inlined strcpy kills ESI), EBX = the cached
-//             wsprintfA import, so ours emits `call ebx` where the original
-//             reloads `call dword ptr [0x4fc2e8]` after the strcpy clobbers ESI.
+//   original: ESI = the g_game temporary, then the cached _imp__wsprintfA
+//             reloaded at the loop head; EBX = the live zero (cmp eax,ebx /
+//             mov [..],ebx / mov [..],bl);
+//   ours:     EBX = the g_game temporary, then the cached wsprintfA import
+//             (hoisted out of the loop and never clobbered); ESI = the live
+//             zero, re-materialised at the loop head (xor esi,esi) because the
+//             inlined strcpy kills ESI. So ours emits `call ebx` where the
+//             original reloads `call dword ptr [0x4fc2e8]` after the strcpy
+//             clobbers ESI.
 // Consequences of the swap, all visible in the checker diff: `mov [..],0` /
 // `test eax,eax` in ours where the original uses bl/ebx, `mov esi,0x14` and
 // `mov [..],si` where the original uses edi/di, and `mov ebx,[0x511de8]` at
 // entry where the original has `mov esi,[0x511de8]`.
-// The block that decides it is the entry: ours gives the g_game temporary EBX
-// and the zero ESI, the original the reverse, so an attempt should target the
-// first-use order at entry, not the loop body. See build/scratch/0x479c50/d1.txt
-// for the full checker diff.
-// Further attempts (all scored with check.py --sym, all 78.6% or worse):
-//   headers.py: no header set matches (best is the current <windows.h>).
-//   N unused extern declarations 0..200: flat at 78.6%, so it is source shape,
-//   not compiler state.
-//   loop counter declared early / unsigned, named numPlayers local (51.5%),
-//   flags-before-loop reordered (78.3%), |= vs = x|1, while loop, step/y after
-//   the memsets, implicit null tests, menu local pointer (64.7%): none flipped
-//   the ESI/EBX swap.
-// Root cause narrowed with /Fa listings: the whole diff follows from which
-// register the g_game temporary gets. When g_game lands in ESI the allocator
-// then gives the live zero EBX and the wsprintf import reuses ESI after g_game
-// dies at the loop guard, exactly as the original. When g_game lands in EBX the
-// zero takes ESI and the import reuses EBX (the current state). So the task is
-// to make g_game outrank the constant zero.
-// Things that DO flip g_game to ESI but break the match: an explicit
-// `if (g_game->numPlayers <= 0) return;` before the loop (adds a second cmp,
-// 73.5%), a local `int count = g_game->numPlayers;` used as the bound (adds a
-// 4-byte frame slot, 0x218), a live `menu` local (64.7%), a `Game* p = g_game;`
-// local (59.5%). None of these is the original: the frame must stay 0x214 and
-// there must be exactly one guard cmp. The missing lever is a g_game use that
-// raises its priority without emitting an extra instruction, and it was not
-// found in this session.
-// New probe (second session): `Rec1 rec1 = {0}; Rec2 rec2 = {0};` instead of
-// the two memset calls DOES move the g_game temporary into ESI (the 0x479c59
-// shape), but it also folds the numPlayers load into `idiv dword ptr
-// [esi+0x38d81]`, drops the early `mov ecx,[esi+0x38d81]`, pushes EBP before
-// ESI and leaves the wsprintfA import in EBX, so the entry block is worse.
-// Rejected; best remains the variant below.
+// The deciding block is the entry: ours gives the g_game temporary EBX and the
+// zero ESI, the original the reverse. See build/scratch/0x479c50/best_diff.txt.
+// What raised the score from 78.6% to 82.5%: reading the inlined SetEntry body
+// as `Entries* entries = g_game->menu.holder->entries; obj->entry = 0;
+// Gaf* gaf = entries->gaf;`, which reproduces the original's interleave of the
+// entries load above the obj->entry = 0 store (the same body, phrased with a
+// local `holder` first, puts the store before the entries load and scored
+// 78.6%). Same for `short* f = FUN_004b7f30(e, obj->frame);` reading the frame
+// byte late.
+// Further attempts (all scored with check.py --sym, none above 82.5%):
+//   headers.py: no header set matches; adding <string>, <vector>, <map>,
+//   <iostream>, <stdio.h>, <stdlib.h> alone or together: all 82.5%.
+//   N unused extern declarations 0..2000: flat at 82.5%, so the entry swap is
+//   source shape, not compiler state. Defining the real neighbour 0x479bf0
+//   above ours, or calling it as the shared helper, also stayed at 82.5%.
+//   Statement order around step/y/the two memsets (12 permutations): best 82.5%
+//   only when do the two memsets come after the y computation; every order with
+//   the memsets first folds the numPlayers load into `idiv [reg+0x38d81]` and
+//   drops to 56-69%.
+//   inline GetGame()/NumPlayers() accessors, a named `n` local, explicit memset
+//   sizes, `Rec1 rec1 = {0}` initialisers, non-static/__inline helper, flags
+//   reordered, helper taking void*: none flipped the swap.
+// The remaining lever is a g_game use that raises its priority above the live
+// zero without emitting an extra instruction; not found in this session.
 #include <windows.h>
 #include <string.h>
 
@@ -120,9 +115,9 @@ extern Game_00479c50* g_game;
 
 static void __stdcall SetEntry_00479c50(Rec1_00479c50* obj, char* name)
 {
-    Holder_00479c50* holder = g_game->menu.holder;
+    Entries_00479c50* entries = g_game->menu.holder->entries;
     obj->entry = 0;
-    Gaf_004b8d40* gaf = holder->entries->gaf;
+    Gaf_004b8d40* gaf = entries->gaf;
     if (gaf != 0) {
         GafEntry_004b8d40* e = FUN_004b8d40(gaf, name);
         if (e != 0) {
