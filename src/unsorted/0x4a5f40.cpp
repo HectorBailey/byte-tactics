@@ -18,6 +18,13 @@
 //    ours (same frame-size cause).
 //  - several later blocks (the field_138 gloss / strchr path) differ in
 //    register allocation only.
+// Tried and rejected (deepseek-v4.1): the frame dword cannot be steered from
+// the source. Reordering the declarations (x moved to four different places)
+// gives a byte-identical slot profile, and giving the inlined Measure its own
+// function-level accumulator (plain local, or assigned through) still keeps it
+// in ebp, so the frame stays 0xd4; an int& accumulator instead grows it to
+// 0xdc. The original keeps menu/surface/me/p live across the inlined glyph loop
+// and spills the accumulator at [esp+0x20]; MSVC5 spills something else here.
 #include <windows.h>
 #include <stdio.h>
 
