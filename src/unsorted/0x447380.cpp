@@ -1,4 +1,5 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, edited by deepseek-v4.1. Names are provisional.
+// Earlier work on this file: deepseek-v4.1-flash, space-bunny-free, GPT-6 (93.5%).
 // GPT-6 retry: helper return types and member forms did not improve 93.5%.
 // 93.5%, and the code is exactly the right size (1318 bytes). Everything from the
 // function entry to the end of the big `if` condition matches byte for byte, and
@@ -15,6 +16,21 @@
 // top and wrong after the condition, with identical code in between: the original
 // must build one more register-holding node across the a0570 group plus the
 // condition than we do, from a node the front end folds away.
+//
+// deepseek-v4.1 retry: all 128 header sets from tools/headers.py stay at 93.5%
+// (windows.h/stdio.h is the set in the file). Also tried, all 93.5% with the same
+// one-step rotation and the same 1318 bytes: casts on every byte compare and on
+// every call argument; casting g_game's address arithmetic; `(x & 4) == 0` for
+// `!(x & 4)`; `!param_1` for `param_1 == 0`; `&buf[0]` at four call sites;
+// naming the 0/1 thirds of the loop-top a0570 calls in a local; `(int)` casts on
+// the sprintf counters; `int act = p->active != 0;`; a second `int act2` local for
+// the repeat read; splitting IsPlaying into an IsActive helper plus terms; an
+// inline IsHidden helper for the field_96 term; inline helpers for the localPlayer
+// index and the flags_2a44 term; `g_game->localPlayer != i` for `i != ...`;
+// three separate `int` locals for the three middle condition terms (1325 bytes,
+// 75.8%); and `i != 10` for `i < 10` (93.2%). Every change that kept the byte
+// count kept exactly the same single rotation, so the extra node the original has
+// is not reachable from these spellings of the condition and loop-top group.
 //
 // Tried and did NOT help (all keep 1318 bytes, all stay 93.5%): swapping the
 // declaration order of i and n; `int i = 0, n = 0;` in one statement; unsigned

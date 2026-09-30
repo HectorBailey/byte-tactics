@@ -1,8 +1,18 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// Partial, 35.8%: matched callee byte parameters improve argument setup;
-// dispatcher frame, register allocation and string-copy expansions still differ.
-// Partial, 35.4%: complete dispatcher; frame layout, register allocation
-// and remaining inlined string copies differ. Host lookup returns a byte.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
+// (earlier passes by deepseek-v4.1-flash and GPT-6)
+// Partial, 35.8%: a plausible full dispatcher, but the frame does not match.
+// Still differs: our frame is sub esp,0x140 where the original has 0x13c, so
+// every post-prologue stack offset is 4 too high and the sprintf buffers land
+// at [esp+0x54]/[esp+0x58] instead of [esp+0x28]/[esp+0x2c] (one extra live
+// 4-byte local). The 252-byte char buffer and the int[10] table are at the same
+// relative distance, so the extra slot is not either array. Also differs: the
+// 0x447b9c block re-computes the player pointer instead of reusing the
+// [esp+0x10] slot (original keeps it in eax/esi), the sprintf call sites do not
+// reuse lea eax,[esp+N] the way the original does, and the inlined string
+// copies (0x40/0x519 style block moves) are missing at the tail. Unproven
+// hypothesis worth trying next: the extra 4 bytes are unused padding at the
+// bottom of the frame; if the frame becomes 0x13c the two sprintf buffers fall
+// back to [esp+0x28]/[esp+0x2c] and most stack-offset diffs should collapse.
 #include <stdio.h>
 #include <string.h>
 typedef unsigned char byte;

@@ -1,4 +1,5 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6, checked by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, checked by deepseek-v4.1-flash, edited by deepseek-v4.1. Names are provisional.
+// Starting point: deepseek-v4.1-flash, finished by GPT-6, checked by deepseek-v4.1-flash.
 // Partial, 43.8%: signed ring-distance comparison and >= 30 wrap improve branches.
 // Frame remains 8 bytes too large; top-loop and player-loop registers differ.
 // Partial, 43.7%: complete map and player refresh. Still differs: the frame is
