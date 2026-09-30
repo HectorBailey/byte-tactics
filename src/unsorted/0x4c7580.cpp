@@ -1,5 +1,18 @@
-// Decompiled by deepseek-v4.1. Names are provisional.
+// Decompiled by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
 // (started by deepseek-v4.1-flash / GPT-6.1-sol / GPT-6)
+// deepseek-v4.1-flash, second pass (900s box): no score gain. This function is the
+// no-z/no-uv sibling of 0x4c8760 (MATCH-adjacent, 72.5%): same min/max scan, same
+// previous/next edge walk, same out[0]/out[2]/out[3] and out[1]/out[4]/out[5]
+// span layout, same final row loop. 0x4c8760 proves the phrase for the edge loops
+// is `int previous=index-1; int next=previous; if(next<0) next=3;` with `int x0`
+// and `int y1` hoisted; rewrites v1..v4 using it (and `int recs[800][10]` indexed
+// through an `int* out`) all scored 13.2%, against 13.5% here, so the phrase is not
+// the blocker. The blocker is allocation: the original keeps maxx in ebx and minx
+// in ebp while this file spills both (frame 0x7d94 vs 0x7d8c, two extra scalar
+// slots). Unlike 0x4c8760 this variant calls FUN_004c5e70 before the scan, so the
+// zero constant must survive that call in a callee-saved register and takes ebx
+// here; finding the source shape that forces zero to ebp (freeing ebx for maxx)
+// and drops both spilled min/max slots is the remaining work.
 // PARTIAL 13.5%. What still differs, in the order it shows up in the diff:
 //  1. Frame: original emits `mov eax, 0x7d8c; call __chkstk`, ours 0x7d94, so every
 //     [esp+N] below the clip is +8 and every body offset too. The chkstk constant is
