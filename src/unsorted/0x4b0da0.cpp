@@ -1,5 +1,14 @@
 // Decompiled by GPT-6, finished by space-bunny-free, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
 // Body started by GPT-6, continued by space-bunny-free, edited by deepseek-v4.1.
+// deepseek-v4.1-flash #2072: MATCH. The last hunk in case 0x10001000 was the
+// packer swapping the pieces base and the move[] offset between [esp+0x10] and
+// [esp+0x1c]. The fix is that `pieces` is one shared pointer variable declared
+// in the do-block and reused by both 0x10001000 and 0x10002000 (`p = pieces;`
+// then `p[piece]` in each), so the base is a single lifetime and lands in
+// [esp+0x10]; before that, case 0x10001000 had its own `Piece *p;` inside the
+// case block and the base ended up sharing the index's [esp+0x18]. Nothing else
+// changed. Every earlier note below is history: the 99.6%/99.5% hunks and the
+// shapes that failed are kept for reference, do not re-try them.
 // deepseek-v4.1-flash: 99.6%. The 0x10059000 hunk is FIXED by moving the
 // expression into an inline Channel::XorOp() (the inline boundary flips the
 // pop registers to ecx/edx). One hunk remains, in case 0x10001000: the stack
@@ -50,6 +59,21 @@
 //      function (86.2%), proof the pick is global allocation. A fresh
 //      function-scope temp (`int t;` next to `value`) keeps 99.5% but does
 //      not flip the order either.
+// deepseek-v4.1-flash #2072 second pass (17 check.py runs, best stays 99.6%): the
+// remaining hunk is only the packer swapping base and offset slots, and it is
+// not reachable from the case body. Same 99.6% with the same hunk: no `p` at
+// all (direct pieces[piece] in the if), `Piece *p = pieces;` at the assignment
+// point instead of a forward declaration, an unused `int index = piece*19+axis;`
+// local, the two *declarations* swapped (axis first), forward declarations with
+// the assignments kept in place, `p` declared in the do-block before the
+// switch, and `(p = pieces)[piece].move[axis]` inside the condition. Worse:
+// `Piece *p = pieces;` before the stores (99.3%, base gets the third slot
+// [esp+0x1c] and the packer stores it early), `int& movep =`
+// pieces[piece].move[axis] (82.3%), `int* movep = &pieces[piece].move[axis]`
+// (82.3%), `Piece *p = pieces + piece;` with p-> (81.4%), p used for both
+// stores (81.6%), `Piece *p = pieces;` between the two stores (99.4%).
+// The emitted instruction stream is identical apart from the slot numbers, so
+// the pick is made by a global pass, not by the shape of this case.
 #include <stdlib.h>
 
 struct ScriptTable
@@ -175,13 +199,13 @@ void Class_004b0da0::FUN_004b0da0(unsigned int channel, int elapsed)
         int arguments[4];
         do
         {
+            Piece *p;
             unsigned int opcode = table->code[c->pc];
             switch (opcode & 0x100ff000)
             {
             case 0x10001000: {
                 int piece = table->code[c->pc + 1];
                 int axis = table->code[c->pc + 2];
-                Piece *p;
                 pieces[piece].move[axis] = c->Pop();
                 pieces[piece].moveSpeed[axis] = c->Pop() / scale;
                 p = pieces;
@@ -198,7 +222,7 @@ void Class_004b0da0::FUN_004b0da0(unsigned int channel, int elapsed)
                 pieces[piece].turn[axis] = c->Pop() & 0xffff;
                 pieces[piece].acceleration[axis] = 0;
                 pieces[piece].turnSpeed[axis] = c->Pop() / scale;
-                Piece *p = pieces;
+                p = pieces;
                 int delta = p[piece].turn[axis] - FUN_00480cb0(piece, axis);
                 if (delta == 0)
                     p[piece].turnSpeed[axis] = 0;
