@@ -1,7 +1,16 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash and GPT-6. Names are provisional.
-// Partial, 90.7%, 1327 vs 1333 bytes. Keeps the game pointer on the no-call
-// UNDO branch and reloads it after the callback. The flag update still differs,
-// along with volume argument scheduling, final gadget addressing and mode registers.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash and GPT-6, edited by deepseek-v4.1. Names are provisional.
+// Partial, 90.7%, 1327 vs 1333 bytes. Four diffs left:
+// 1. UNDO flag update: original loads the word into ax and stores via
+//    `mov cl,al; xor cl,dl; and ecx,1; xor ecx,eax`, while the compound
+//    assignment folds into `xor word ptr [mem],cx` (6 bytes short). The
+//    NOTRAK branch's `f ^ ((f ^ v) & 1)` shape is right, but with a
+//    byte-typed or int-typed DAT_00512f46 local the compiler distributes
+//    to `and edx,0xfffe` plus a movzx and scores worse.
+// 2. The UNDO branch keeps g_game in edi (reloaded after the callback);
+//    ours uses eax, same size, register names only.
+// 3. The apply block wants fild before push ecx; ours pushes first.
+// 4. The tail index chain wants `lea eax,[edi*8]`; ours emits mov/shl
+//    (3 bytes short). The identical chain in the TRACKTYPE branch matches.
 #include <string>
 #include <windows.h>
 
