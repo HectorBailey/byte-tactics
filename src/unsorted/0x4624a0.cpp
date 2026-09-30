@@ -126,6 +126,26 @@
 //  - the extracted-packet block loads `[edi+4]`/`[edi+0xc]` in the opposite
 //    order, and the send block puts dpid in eax/edx instead of ebx/ebp.
 //
+// deepseek-v4.1 fourth pass (2047): still 67.8 percent, 555 against 570 bytes.
+// Seven check.py runs on scratch copies, every one byte-identical to this file
+// (67.8 percent): `int sent = 0;` at function scope instead of `int sent;`
+// (v20), `Packet_004624a0* entry;` without the `= 0` (v21), a Pop that caches
+// the index in a temp (v22), an `int zero = 0;` local used at every
+// zero comparison and store (v30), and the same zero threaded into the inlined
+// GetFirst as a parameter (v31). One shape regressed: a Push that caches
+// `writeIdx + 1` in a temp (v23) and the Pop+Push combination (v24) drop to
+// 546 bytes and 52.4 percent, so the index must stay written as
+// `writeIdx = writeIdx + 1;` with the wrap test on the member.
+// Flag probe (free, scratch scoring): `/Oa` gives 550 bytes / 40.8 percent and
+// `/Ow /Oa` 550 bytes / 59.9 percent, both worse than the default flags, so the
+// constant-in-ebx choice is not a flag artifact of aliasing assumptions.
+// Still missing: the whole 15-byte gap is the allocator keeping the literal 0
+// in ebx (`cmp reg, ebx`, `mov [esi+0x3c], ebx`, `mov [esi+0x20], ebx`) with
+// `sent` spilled to the dead argument home `[esp+0x1c]` (so `inc dword ptr
+// [esp+0x1c]`), plus the original's `jmp` after the `force == 0` test (ours
+// falls through) and the original's `mov ecx, edx; cmp ecx, eax` copies in the
+// two index wraps. Naming or escaping `sent` does not bring 0 into a register.
+
 // deepseek-v4.1 third pass (2047): still 67.8 percent, 555 against 570 bytes;
 // the file is unchanged because every variant scored lower or equal. Measured
 // with check.py this pass:
