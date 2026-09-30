@@ -37,6 +37,30 @@
 //    as a separate `int notfound = -1` scores identically, so the spelling is
 //    not pinned down.
 //
+// Prologue experiments (deepseek-v4.1, this session): three minimal repros
+// with the same flags (early `if (p->layer == 0) return 0;`, then a loop with
+// a switch and extern calls) ALL shrink-wrap: the parameter homes to one
+// callee-saved reg pushed at entry and the others are pushed after the early
+// return, in reverse save order (edi, esi, ebx). Inverting the structure to
+// `if (layer != 0) { body; return 1; } return 0;` does not change that. So the
+// original's `push ebx / push ebp / mov ebp,[esp+0x40] / push esi / push edi`
+// prologue is not reachable from the early-return shape alone; it is compiler
+// state (in the original ebx is pushed before the plain ebp parameter home),
+// and it should be attacked from the register assignment of the loop (i in ebx,
+// p in edi) rather than from the return structure.
+//
+// 5. Register homes in the loop (deepseek-v4.1): the original reloads
+//    `entries` from its home [esp+0x18] at the loop top (0x4aa19a) and every
+//    iteration (0x4aa1a7 movsx ecx,[eax+0xb6]), keeps the limit in ebx, the
+//    counter in edx and p in edi (0x4aa1c0 lea edi,[ecx+0x17a], 0x4aa567
+//    mov [esp+0x14],edi, 0x4aa555 add edi,0x15b). Ours keeps `entries` in ebx
+//    for the whole loop, so the counter lands in esi and the limit in edx
+//    (movsx edx,[ebx+0xb6] at the loop bottom). Getting `entries` out of ebx
+//    is the remaining lever.
+// 6. Hoisting `int i;` to just after the early return (to give it the [esp+0x10]
+//    home the original has, with sel at [esp+0x48]) is score neutral: 42.2%
+//    both ways, prologue and loop registers unchanged.
+//
 // Things that did NOT work, so nobody repeats them: a `int elapsed = 0`
 // pre-initialiser (the original assigns 0 only in the else arm, and the
 // extra store is a real byte); naming pt->x and pt->y as locals before the
@@ -214,7 +238,7 @@ int __stdcall FUN_004a9fd0(Menu_004a9fd0* menu)
         key = FUN_004a9b90(menu, key);
         if (key != 0) {
             for (int n = 0; n < 0xe; n++)
-                ((char*)menu->layer)[0x28 + n] = ((char*)menu->layer)[0x29 + n];
+                menu->layer->text[n] = menu->layer->text[n + 1];
             menu->layer->field_36 = (char)toupper(key);
             if (menu->layer->cb3b != 0)
                 menu->layer->cb3b(menu);
@@ -222,6 +246,7 @@ int __stdcall FUN_004a9fd0(Menu_004a9fd0* menu)
         }
     }
 
+    int i = 1;
     int sel = menu->field_60;
     if (menu->layer != 0) {
         if (menu->field_cca == 1) {
@@ -261,8 +286,7 @@ int __stdcall FUN_004a9fd0(Menu_004a9fd0* menu)
 
         int bias = 0xffffffe1 - (int)entries;
         unsigned char* p = (unsigned char*)entries + 0x17a;
-        int i;
-        for (i = 1; i < entries->u_b6.anim.count + 1; i++) {
+        for (; i < entries->u_b6.anim.count + 1; i++) {
             Entry_004a9fd0* e = (Entry_004a9fd0*)(p - 0x1f);
             if (e->field_29 != 0) {
                 int x, y;
