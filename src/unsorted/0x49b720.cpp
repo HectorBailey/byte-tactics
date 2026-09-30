@@ -1,5 +1,12 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by GPT-6. Names are provisional.
-// PARTIAL 29.8%. Register allocation, extra stack slot and branch layout differ.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by GPT-6, finished by deepseek-v4.1-flash. Names are provisional.
+// PARTIAL 31.8%. Frame is now 0x14 and short/angle/sl types corrected. Remaining
+// diffs are register roles: original keeps the loop zero in EDI and the type
+// pointer in ESI, ours has them swapped (zero in ESI, type in EDI), which makes
+// MSVC re-zero the zero register at the loop top (jmp preheader) and use direct
+// immediate stores and test reg,reg instead of cmp reg,edi. The original also
+// emits "shr N; test cl,1" for the type flag bits (bits 0,1,3,5,8,11,12,20,21,
+// 23,24) but direct "test [mem],mask" for bits 13,16,18; a full bitfield union
+// for every bit scored worse (30.4%) because it moved s into EDI.
 // Restored unsigned lifetime/speed comparisons and projectile flags/definition reloads.
 
 #pragma pack(push, 1)
@@ -52,7 +59,7 @@ struct Proj_0049b720 {
     void* field_56;                    // +0x56
     char unknown_5a[0x60 - 0x5a];
     short counter;                     // +0x60
-    short field_62;                    // +0x62
+    unsigned short field_62;            // +0x62
     short field_64;                    // +0x64
     char unknown_66[0x69 - 0x66];
     unsigned short flags69;            // +0x69
@@ -73,8 +80,8 @@ void __stdcall FUN_00472810(Vec_0049b720* pos, int value);
 void* __stdcall FUN_004815a0(Vec_0049b720* pos);
 void __stdcall FUN_00420a30(Vec_0049b720* pos, void* value, int a, int b);
 int __stdcall FUN_004b6c30(int range);
-int __cdecl FUN_004b70ef(int angle, int distance);
-int __cdecl FUN_004b7123(int angle, int distance);
+int __cdecl FUN_004b70ef(short angle, int distance);
+int __cdecl FUN_004b7123(unsigned short angle, int distance);
 
 // FUNCTION: 0x49b720
 void FUN_0049b720()
@@ -83,14 +90,15 @@ void FUN_0049b720()
     int offset;
     int count;
     WType_0049b720* type;
-    int s;
+    short s;
 
     count = *(int*)(g_game + 0x141f3);
+    if (count > 0) {
     offset = 0;
-    while (count > 0) {
+    do {
         Proj_0049b720* p = (Proj_0049b720*)(*(int*)(g_game + 0x141f7) + offset);
-        s = *(short*)((char*)p + 0xa);
         type = p->type;
+        s = *(short*)((char*)p + 0xa);
 
         if (p->counter != 0) {
             unsigned short ec = type->field_ec;
@@ -307,8 +315,8 @@ void FUN_0049b720()
                 p->field_4a = p->field_4a + type->field_fa;
             }
             {
-                unsigned char sl = *(unsigned char*)(g_game + 0x1427f);
-                if (s > sl && *(short*)((char*)p + 0xa) <= sl) {
+                int sl = *(unsigned char*)(g_game + 0x1427f);
+                if (s > sl && *(short*)((char*)p + 0xa) <= (short)sl) {
                     void* v = FUN_004815a0(&p->pos);
                     if (v != 0
                         && *(unsigned char*)((char*)v + 5) < *(unsigned char*)(g_game + 0x1427f)
@@ -320,7 +328,7 @@ void FUN_0049b720()
 
     Next:
             offset += 0x6b;
-            count--;
+    } while (--count);
     }
 
     FUN_0049ae20();
