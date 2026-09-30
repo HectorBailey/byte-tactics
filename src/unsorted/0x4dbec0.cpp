@@ -1,4 +1,5 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, edited by
+// deepseek-v4.1. Names are provisional.
 // The red-black tree insert behind std::map<unsigned int, Pair>, the same
 // std::map idiom as 0x4db000 and 0x4db450. DAT_00528a54 is the tree's _Nil
 // node, head->left is begin() and head->parent is the root. The value is
@@ -84,6 +85,20 @@
 // how that local is born (ctor init, raw member compare) both break it, which
 // leaves the field store plus the `operator==` call as the only shape that
 // holds the local together at all.
+//
+// Second pass (deepseek-v4.1) confirms that reading and rules out four more
+// spellings, all byte-identical at 95.6 percent (621 bytes): the compare's
+// first operand read through an inline `_Mynode()` accessor, the iterator
+// declared inside the else arm, the birth written as `it = Class_004dd2a0(y)`,
+// and the whole else arm wrapped in a block with the iterator outside it. A
+// by-value inline compare helper is byte-identical too but keeps the same
+// colouring. A helper around the insert call that takes the iterator as an
+// unused parameter is 91.5 (650 bytes, the extra layer is not folded), and
+// `--it` through an inlined `operator--` is 95.6 and byte-identical. The
+// matched sibling 0x4db000 has the same idiom and reloads its iterator into
+// ecx, but its birth is a plain `mov [esp+0x18], edi` with no temp copy, so
+// the 0x4dbec0 birth does go through a value copy and only the choice of that
+// copy's register is left.
 //
 // Two things this function does that are worth writing down, both confirmed
 // here and neither obvious from the disassembly:
