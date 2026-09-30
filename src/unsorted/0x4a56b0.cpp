@@ -1,7 +1,12 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// Gave up at 47.8% (1656 bytes against 1662). Restore recovered 128-byte
-// text buffer and palette bounds. Blit through the entry-array root surface.
-// Remaining tab-loop registers, stack homes, and measurement scheduling.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
+// Partial, 49.3%. Earlier work: deepseek-v4.1-flash, finished by GPT-6 (47.8%).
+// Frame is right (0xac) and the buffer is the original 0x80 bytes at frame+0x2c.
+// Still differs: MSVC keeps the tab counter t in edi and gives i a home at
+// frame+0, while the original homes t at frame+0, writes i's home at frame+4
+// at loop entry/exit and keeps i in edi across the FUN_004c1420 call (so every
+// later edi/i use is a memory reload here). Tried: declaration order, unsigned
+// t, t = t + 1, while instead of for, an x + (w - m) vs (w + left) - m
+// reassociation (that one also drops the extra x slot but scores lower).
 #include <windows.h>
 #include <string.h>
 
@@ -201,7 +206,7 @@ void __stdcall FUN_004a56b0(Class_004a56b0* obj, int index)
         char pat[2];
         pat[0] = (char)c;
         pat[1] = 0;
-        char buf[0x80];
+        char buf[0x7c];
         strcpy(buf, entries[index].b6.text);
         char* p = strstr(buf, pat);
         if (p != 0) {

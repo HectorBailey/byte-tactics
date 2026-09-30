@@ -1,9 +1,12 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6. Names are provisional.
-// Gave up at 34.7% (1841 bytes against 1832). Remove artificial allocation
-// expression. Scroll down selects using visible-row count. Variable-height
-// rows dereference the bitmap pointer at +0x28. Preserve short narrowing and
-// read flags after writing the current index. Remaining local slots and
-// callee-saved-register allocation differ throughout.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
+// Earlier attempts by deepseek-v4.1-flash, space-bunny-free and GPT-6 are kept
+// below this line. Still partial: the frame is 0x34 where the original has
+// 0x3c, so every esp+N offset is 8 low and the callee-saved registers differ.
+// The original has 9 scalar slots before the 6-dword point copy (0x10 orig_sel,
+// 0x14 entries, 0x18 n/span, 0x1c step/flag8, 0x20 flags, 0x24 x0, 0x28 dead,
+// 0x2c x1, 0x30 y1) while this version puts x0/x1/y1 in 0x14/0x1c/0x18 and
+// keeps step and flags in registers, which also shifts the point copy to
+// [esp+0x2c] instead of [esp+0x34].
 #include <string.h>
 
 #pragma pack(push, 1)

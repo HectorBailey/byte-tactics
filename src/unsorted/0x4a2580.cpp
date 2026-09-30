@@ -1,8 +1,22 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by deepseek-v4.1. Names are provisional.
 // Gave up near 61.3% (1605 bytes against 1631). Reload glyph pointers
 // after callbacks. Reference-returning minimum helpers recover remaining-count
 // stores, and shared glyph locals improve allocation. Remaining extra frame
 // slot, glyph spills, and branch/scheduling differences.
+//
+// 2026-09-30 (deepseek-v4.1), still 61.3%. Every [esp+N] from buf onwards is +4
+// (frame 0x44 against 0x40): the temps at 0x10..0x1c match, so the extra dword
+// sits between them and the shared 16-byte text/rect slot at 0x20. It is the
+// 0x20 temporary that the reference-returning Smaller() forces into memory in
+// the w<h branch. Rewriting those two minima as plain `if (x <= y)` branches
+// shrank the body (1605 to 1578 bytes) but dropped to 56.1%, so the reference
+// helper's schedule is the closer one and was kept. Declaring the text buffer
+// at function scope and reusing it for the rect via `int* rect = (int*)buf`
+// scored 61.2%: the original really does share one slot, but the reuse alone
+// does not recover the frame. Not tried: splitting the two minima so only the
+// w<h one uses Smaller, and hoisting the surface into a local for the
+// otherwise-reloaded h<=w branch (the original keeps it in [esp+0x14] there,
+// but in ebp for w<h).
 #include <ddraw.h>
 #include <string.h>
 #include <stdlib.h>
