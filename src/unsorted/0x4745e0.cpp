@@ -1,5 +1,25 @@
 // Decompiled by space-bunny-free, finished by LongCat 2.5 Preview Free,
 // deepseek-v4.1-flash and space-bunny-free, edited by deepseek-v4.1. Names are provisional.
+// DEEPSEEK-V4.1 (fifth pass, 2026-09-30): 8 scratch variants, no gain, 79.8
+// [294] remains best. Two new data points on the fog arm rotation:
+//   * a reference to the player record (`Map_004745e0& pl = g_game->
+//     players[g_game->playerIndex]`, Contains/index through pl, mask through
+//     g_game) is 26.3 [296] and rotates exactly like the no-local body:
+//     `this` -> edx, p -> esi, playerIndex -> ecx, rect and pre-branch with
+//     them (prologue `mov edx,ecx`). Same byte count and score as the
+//     no-local arm, so the rotation follows the fog arm's pointer shape, not
+//     the missing live value alone.
+//   * a `Game* g = g_game` local live across Contains with fresh
+//     `g->visibilityMask[p->explored.size.width * row + col]` and
+//     `1 << g->playerIndex` is 18.2 [301], worse (extra register pressure
+//     spills the rect).
+// Also re-measured, all byte-identical to the file below at 79.8 [294]: a
+// `unsigned short` cell local, an `int` cell local, and the m/w declaration
+// order swapped (m first). A live w with a hand-spelled Contains against w
+// (fresh width in the index) is 39.4 [294], the same rotation as the 49.5
+// m-local variant: any spelling that drops the fresh first width read moves
+// the pre-branch.
+
 // DEEPSEEK-V4.1 (fourth pass, 9 variants, no code change: the file below is the
 // best measured shape, 79.8 percent, 294 of 306 bytes, mask arm byte-identical).
 // New measurements, all with check.py --sym on scratch copies, all byte-compare:

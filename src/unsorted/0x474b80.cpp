@@ -213,6 +213,24 @@
 // mask arm's `mov [esp+0x1c],ebx` + `mov edx,[esp+0x1c]` where the original
 // re-reads `mov edx,[edx+0x80]`, and the merged fail block (the original keeps
 // one `xor edx,edx; jmp` per arm).
+// DEEPSEEK-V4.1 (worker pass), still 84.6 percent, 309 of 303 bytes. About 30
+// arm shapes screened with check.py --sym, none above 84.6. What this pass
+// settles:
+//   * EVERY fog arm that drops the `seen` local, the `w` local, or both
+//     rotates the whole pre-block (g_game into ebx, map into edi, index into
+//     ecx) and lands at 28.4 to 39.8: A (both locals) is the only pin, and it
+//     is the only source shape that keeps the original's pre-block intact.
+//   * `unsigned char* const seen` / `unsigned int const w`, `*(seen + ...)`
+//     instead of `seen[...]`, the ternary form and the bitwise form (no
+//     `!= 0`) are byte-identical to A at 84.6.
+//   * col/row declaration order, moving seen/w before col/row or after them,
+//     `unsigned int& w`, `unsigned char*& seen`: 28.4 to 84.0, none better.
+//   * the remaining 6 bytes are exactly the fog arm's three spill instructions
+//     (`mov ecx,[edx+0x7c]` / `mov [esp+0x18],ecx` / `mov edx,[esp+0x18]`
+//     against the original's `mov ebx,[edx+0x80]` + `mov edx,[edx+0x7c]`) and
+//     the mask arm's extra `mov ebx,[edx+0x80]` + `mov [esp+0x1c],ebx`
+//     against the original's single reload, plus one fail block the original
+//     keeps per arm (ours tail-merges them, 4 bytes back). Not solved.
 #include <stddef.h>
 
 void* __stdcall FUN_004b7f30(void* a, int b);
