@@ -1,7 +1,4 @@
 // Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6. Names are provisional.
-// Gave up at 86.7% (1302 bytes against 1303). Remaining game-pointer
-// reload uses EAX instead of EDI and the last border-loop counter initializes
-// before its guard. The visibility test and local slots now match.
 #include <windows.h>
 
 #pragma pack(push, 1)
@@ -72,10 +69,14 @@ void FUN_004843c0(void)
 
     memset(grid->cells, 0, grid->count * 2);
 
+    // Reading the two scroll values through g_game twice each (rather than
+    // copying them into locals first) is what lets the reloaded game pointer
+    // land in x0's own register, giving the original's
+    // mov edi,[g_game] / mov ebx,[edi+0x14323] / mov edi,[edi+0x1431f].
+    int ry = g_game->scrollY % 32;
+    int rx = g_game->scrollX % 32;
     int x0 = g_game->scrollX;
     int y0 = g_game->scrollY;
-    int ry = y0 % 32;
-    int rx = x0 % 32;
     if (rx < 16) x0 = x0 / 32 - 1; else x0 = x0 / 32;
     if (ry < 16) y0 = y0 / 32 - 1; else y0 = y0 / 32;
 
@@ -150,8 +151,11 @@ void FUN_004843c0(void)
         }
     }
 
-    if (xEnd > info->width / 2) {
-        for (unsigned int i = 1; i - 1 < grid->height; i++) {
+    // The explicit count guard plus a do/while (rather than a for with the same
+    // condition) is what puts "mov ecx,1" after the preheader's test.
+    if (xEnd > info->width / 2 && grid->height > 0) {
+        unsigned int i = 1;
+        do {
             if (g_game->flags.bits.bit1) {
                 if (grid->cells[i * grid->width - 2].hi & 4)
                     grid->cells[i * grid->width - 2].hi |= 8;
@@ -162,6 +166,7 @@ void FUN_004843c0(void)
                 grid->cells[i * grid->width - 2].lo |= 8;
             if (grid->cells[i * grid->width - 2].lo & 1)
                 grid->cells[i * grid->width - 2].lo |= 2;
-        }
+            i++;
+        } while (i - 1 < grid->height);
     }
 }
