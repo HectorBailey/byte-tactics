@@ -1,20 +1,33 @@
-// Decompiled by deepseek-v4.1-flash, finished by deepseek-v4.1. Names are provisional.
-// PARTIAL 67.7%: 1639 bytes vs 1662. Structure and all callee argument lists now
-// agree. What still differs: (1) the `enabled` prologue, original is
-// `mov dword [esp+0x1c],1` / `mov ax,[esi+0x14281]` / `test al,3` while we emit
-// `mov eax,1` + `mov [esp+0x1c],eax` and a direct `test byte [esi+0x14281],3`
-// (5 bytes); (2) register homes in the projectile loop: original keeps the
-// projectile base in ecx and the +0xa view in ebx and homes the base at
-// [esp+0x1c] reloading it each iteration, we keep them in ebp/ecx and home the
-// base at [esp+0x28] with the index at [esp+0x1c] (swapped slots); (3) we hoist
-// the `p->shot` flags load above the y divide while the original loads it after.
-// Tried and neutral (same bytes): plain unsigned short for field_14281, the
-// `!= 0` spelling of the slot->field_e test (that one helped, 63.4 -> 67.5),
-// computing the player-info pointer before the 14281 branch (helped),
-// assigning the radar result to a bool in both arms (helped), advancing the
-// +0xa projectile view alongside the base pointer, and moving the x/y scale
-// multiplies into static inline helpers (all three are still in the file; they
-// are harmless but changed nothing).
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
+// PARTIAL 71.3% (1641 of 1662 bytes), up from 67.7%. Two changes did it: (1) the
+// los half of OnRadar is a single `&&` chain. As `if (inbounds) b = los[..] != 0;
+// else b = 0;` MSVC 5 if-converts the value to `setne`; folded into the chain
+// (`b = inbounds && los[..] != 0`) the value materialises branchy and every
+// bound failure joins the one `xor edx,edx`, which is the original's shape, and
+// the bitfield half's block order falls into place for free. `? 1 : 0` does NOT
+// work, it if-converts exactly like `!= 0` does. (2) The named `Shot* shot`
+// local had to go: with it MSVC hoists the `p->shot->flags` load above the y
+// divide, and the inlined OnRadar is what puts the pressure there.
+// Still open, roughly in order of size:
+// (1) the projectile loop. The original homes `p` at [esp+0x1c] and reloads it
+//     into ecx as the loop head (so the loop is `jmp`ped over that one reload
+//     and the p store is the latch), while `q` keeps ebx. We keep `p` in ebx and
+//     `q` in ecx, which also pushes the inlined OnRadar's PlayerInfo pointer
+//     onto ebp instead of edx. Declaring q before p, reading player/owner
+//     through q, and `p++` instead of the byte cast were all tried and are
+//     neutral or worse, so the cause is not use counts or declaration order.
+// (2) `enabled`: the original loads 16 bits (`mov ax, word ptr [esi+0x14281]`)
+//     and that word load is what stops MSVC keeping the constant 1 in a
+//     register, so the last store is an immediate. A union-typed field and a
+//     named `unsigned short` local both leave a plain `test byte ptr` and a
+//     register-held 1; a single-use local is folded away before codegen.
+// (3) the two FUN_004b7f90 calls load `surface` after `push eax` there and
+//     before it here.
+// Tried and neutral: the `!= 0` spelling of the slot->field_e test, plain
+// `p++` for the projectile stride, the union-typed +0x14281 field, a named
+// 16-bit local for it. Tried and worse: declaring `q` before `p` (70.8), reading
+// `p->player` and `p->owner` through `q` as the original's encoding does
+// (70.9), the `&&` chain with the bitfield half chained too.
 #pragma pack(push, 1)
 
 struct Shot_00466dc0;
@@ -215,11 +228,9 @@ static inline int OnRadar_00466dc0(int px, int py)
     PlayerInfo_00466dc0* pi = PlayerInfo_00466dc0_Get(g_game->currentPlayer);
     int b;
     if ((g_game->field_14281 & 2) == 2) {
-        if ((unsigned int)(px >> 5) < (unsigned int)pi->width &&
-            (unsigned int)(py >> 5) < (unsigned int)pi->height)
-            b = pi->los[(py >> 5) * pi->width + (px >> 5)] != 0;
-        else
-            b = 0;
+        b = (unsigned int)(px >> 5) < (unsigned int)pi->width &&
+            (unsigned int)(py >> 5) < (unsigned int)pi->height &&
+            pi->los[(py >> 5) * pi->width + (px >> 5)] != 0;
     } else {
         if ((unsigned int)(px >> 5) < (unsigned int)pi->width &&
             (unsigned int)(py >> 5) < (unsigned int)pi->height)
@@ -340,9 +351,8 @@ void FUN_00466dc0(void)
             int x = (int)g_game->field_142eb * px / g_game->field_1422b;
             int py = q[2] - ((int)q[0] >> 1);
             int y = (int)g_game->field_142ed * py / g_game->field_1422f;
-            Shot_00466dc0* shot = p->shot;
-            if ((shot->flags.all & 0x60000000) == 0) {
-                if ((shot->flags.all & 0x40) == 0) {
+            if ((p->shot->flags.all & 0x60000000) == 0) {
+                if ((p->shot->flags.all & 0x40) == 0) {
                     if (OnRadar_00466dc0(px, py) ||
                         p->player == g_game->currentPlayer) {
                         FUN_004bee60(surface, x, y, base[0xe]);
