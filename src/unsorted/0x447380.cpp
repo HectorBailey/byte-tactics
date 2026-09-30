@@ -1,5 +1,27 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, edited by deepseek-v4.1. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
 // Earlier work on this file: deepseek-v4.1-flash, space-bunny-free, GPT-6 (93.5%).
+//
+// deepseek-v4.1-flash retry 4 (issue 1876, 900s): still 93.5%, same one hunk.
+// Built a fast local harness (build/scratch/0x447380/{try,one,gen_*}.py) that
+// compiles a variant once and reports both the similarity and the register of
+// each block's first `lea [esp+..]`, then scanned about 300 variants (the 163
+// already in build/scratch/0x447380 plus 100 new ones). The block-B first lea
+// is eax in every variant that keeps the original's 1318 bytes; it becomes ecx
+// only when the source change also alters the emitted bytes, and then the score
+// drops: `char field_96` instead of `unsigned char` (89.5%), `switch` in IsType
+// (85.9%), `(unsigned)(p->type-1) < 3` (75.7%), an int local for p->type
+// (82.0 to 83.4%), `IsPlaying(p, p->type)` (82.4%), `p != local` for
+// `i != g_game->localPlayer` (75.2%), swapping the two middle && terms (87.1%).
+// Every byte-neutral spelling stays inert at B=eax: extra type/flags/field..
+// locals, inline accessors for type/active/flags_9b/field_146, a `tp` local for
+// param_1, a `hidden` bool for the field_96 test, references and address-taken
+// p->type, always-true && terms, reordering helper definitions, buffer scope, and
+// all 73 pairs of those inert changes taken two at a time.
+// The flip is therefore a one-temporary allocator phase, exactly as the notes
+// above say: an extra register node (not an extra instruction) must sit between
+// the a0570 group and block B, and none of the ~300 source spellings tried puts
+// one there without also emitting an instruction. Left at 93.5% for the next
+// attempt; the harness above makes re-testing a spelling cheap.
 // GPT-6 retry: helper return types and member forms did not improve 93.5%.
 // 93.5%, and the code is exactly the right size (1318 bytes). Everything from the
 // function entry to the end of the big `if` condition matches byte for byte, and

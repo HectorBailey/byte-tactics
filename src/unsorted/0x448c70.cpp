@@ -19,6 +19,31 @@
 // local_b0 sits at frame+0x2c (ours) vs frame+0x24 (original); local_b4 at 0x28 vs
 // 0x20. Zero effect (identical bytes): iVar17 declared first in the list, deleting
 // the unused uVar16/pcVar19/pcVar20 declarations. The ebx/ebp swap below is the gap.
+// Session deepseek-v4.1 (2nd): the first divergence is only 12 instructions in:
+// the original keeps iVar17 in EBP (xor ebp,ebp) and the 0..29 counter in EBX,
+// ours is the exact mirror; also the original folds local_b4 into one lea
+// (`lea eax,[esi+eax*2+0x1b63]`) while ours emits lea+add (add esi,0x1b63), and the
+// original's [esp+0x34] is the running-min pointer seeded from that same lea
+// (0x448cb3) while our local_b0 (-1) and local_b4 share [esp+0x40]. Tried with no
+// effect: local_b4's constant term last, swapping the uVar18/uVar4 load order,
+// moving iVar17=0 after the uVar4 test (43.0%, worse) or before local_b0.
+// Session space-bunny-free: still 44.0% (3902 vs 3948 bytes). The frame slots of
+// the ORIGINAL, read off esp in the disassembly (frame base = esp after
+// `sub esp,0xd4`, so subtract 0x10 for the four register pushes, and remember a
+// `push` before the store shifts it by another 4):
+//   +0x00 sprintf buffer (local_d4, 20)   +0x14 local_c0
+//   +0x18 local_bc   +0x1c player-loop counter (byte STORE, dword LOAD + and 0xff)
+//   +0x20 local_b4 (map slot base, 0x448cb3)  +0x24 local_b0 (running ping min, -1)
+//   +0x28 local_ac (0x448e4a)  +0x2c local_a8 (0x4491ed)  +0x30 local_a4
+//   +0x34 local_a0 (idx*0x14b, 0x449210)  +0x38 local_9c[32]  +0x58 local_7c[20]
+//   +0x6c local_68[52]  +0xa0 local_34[44] -> ends 0xcc, frame 0xd4.
+// MEASURED, do not repeat: (a) declaring the counter `byte` instead of `uint`
+// reorders the WHOLE local block (MSVC does not keep declaration order) and
+// drops the frame to 0xd0 and the score to 38.4%, so the original's counter
+// really is a 4-byte slot at +0x1c whose low byte is written; (b) splitting the
+// increment into a separate byte temp before `| bVar6` changes nothing at all
+// (44.0%, byte-for-byte the same 3948); (c) swapping the declaration order of
+// local_b4 and local_b0 is a no-op, identical output.
 // Session deepseek-v4.1: baseline 44.0% (3902 vs 3948 bytes). Everything after the
 // first 12 instructions differs only in register choices. The original keeps iVar17
 // in ebp and the 0x2a40/strcpy-index temp in ebx; this file has them swapped, and
@@ -112,14 +137,14 @@ void FUN_00448c70(void)
   char local_34 [44];
 
   uVar18 = (uint)*(byte *)((int)g_game + 0x2a42);
-  local_b0 = 0xffffffff;
   iVar17 = 0;
+  local_b0 = 0xffffffff;
   local_c0 = (*(byte *)(*(int *)((int)g_game + uVar18 + 0x1b8a + uVar18 * 0x14a) + 0x9b) & 0x20) >>
              5;
-  local_b4 = (int)g_game + uVar18 + 0x1b63 + uVar18 * 0x14a;
+  local_b4 = (int)g_game + uVar18 + uVar18 * 0x14a + 0x1b63;
   iVar8 = FUN_0049ff90((int)(*(int *)(*(int *)((int)g_game + 0x531) + 4)),(int)("OUTPUT"));
-  uVar18 = (uint)*(ushort *)((int)g_game + 0x2a3e);
   uVar4 = *(ushort *)((int)g_game + 0x2a40);
+  uVar18 = (uint)*(ushort *)((int)g_game + 0x2a3e);
   if ((int)uVar18 < (int)uVar4) {
     uVar18 = uVar18 + 0x1e;
   }

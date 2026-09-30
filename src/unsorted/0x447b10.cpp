@@ -1,18 +1,31 @@
 // Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
 // (earlier passes by deepseek-v4.1-flash and GPT-6)
-// Partial, 41.6% (deepseek-v4.1, 2026-09-30): a plausible full dispatcher, but
-// the frame does not match yet.
+// Partial, 45.7% (deepseek-v4.1, 2026-09-30): a plausible full dispatcher.
 // BIG LEVER FOUND: scalar stack slots follow DECLARATION ORDER. Declaring
 // `int iVar8;` first (it is the first local the original stores, at frame+4)
 // took the score from 35.8% to 41.6% with no other change. The arrays also
 // live in one struct now (see below), which put the buffer below the table.
-// Still differs: our frame is sub esp,0x140 where the original has 0x13c (7
-// live 4-byte scalars instead of 6), so every post-prologue scalar offset is
-// shifted: ours stores iVar8 at frame+8 (original +4) and bVar1 at frame+0x18
-// (original +8). The original's slots are, in store order: frame+0 player
-// pointer, +4 iVar8, +8 bVar1, +0xc iVar6 (player index), +0x10 the
-// FUN_00456850 byte, +0x14 iVar5 (FUN_00457a50 result). Find the one live temp
-// that must go away and declare the scalars in that exact order.
+// SECOND LEVER (this pass, 41.6% -> 45.7%): the two player-pointer locals
+// (iVar11 = g_game + i*0x14b, piVar9 = iVar11 + 0x1b63) are ONE variable in the
+// original. Writing `piVar9 = (int*)((int)g_game + (uint)bVar1*0x14b + 0x1b63)`
+// and using `(int)piVar9 + 0x27` / +0x13f / +4 for the old iVar11+0x1b8a /
+// +0x1ca2 / +0x1b67 sites makes the frame exactly the original sub esp,0x13c
+// (the prologue, the two array slots and the two epilogues now match), as long
+// as the 10-iteration walk loop gets its OWN pointer local (pVar22) so the
+// fused pointer survives the loop. Both swap attempts failed: putting
+// `iVar5 = FUN_00457a50();` before the pointer assignment is 41.9%, moving
+// `int iVar5;` in the declaration list changes nothing (45.7% both).
+// Still differs (next steps):
+//  - the fused pointer lives in esi for us, in ebx for the original, so the
+//    FUN_00457a50 result (iVar5) takes the other register: the original emits
+//    `mov esi,eax` after that call and `lea ebx,[edx+eax+0x1b63]` at its first
+//    use, we emit `mov ebx,eax` and reach the pointer through esi. MSVC5 homes
+//    by first use, so the original pointer's first use must come before iVar5's.
+//  - our scalars sit 4 bytes high: iVar8 is stored at frame+8 (original +4) and
+//    iVar5 at frame+0xc (original +0x14), while our frame+4 is free; the
+//    original's slots are, in store order: frame+0 player pointer, +4 iVar8,
+//    +8 bVar1, +0xc iVar6 (player index), +0x10 the FUN_00456850 byte,
+//    +0x14 iVar5 (FUN_00457a50 result).
 // Tried 2026-09-30 (deepseek-v4.1), all measured with check.py:
 //  - fusing iVar11/piVar9 into one `(int)g_game + 0x1b63 + (uint)bVar1*0x14b`
 //    expression (the original really does keep one pointer and reach
@@ -122,6 +135,7 @@ void __stdcall FUN_00447b10(byte *param_1)
   int bVar3;
   uint uVar7;
   int *piVar9;
+  int *pVar22;
   byte *pbVar10;
   int iVar11;
   int *piVar12;
@@ -146,8 +160,7 @@ void __stdcall FUN_00447b10(byte *param_1)
     return;
   }
   bVar1 = *(byte *)((int)g_game + 0x2a42);
-  iVar11 = (int)g_game + (uint)bVar1 * 0x14b;
-  piVar9 = (int *)(iVar11 + 0x1b63);
+  piVar9 = (int *)((int)g_game + (uint)bVar1 * 0x14b + 0x1b63);
   iVar5 = FUN_00457a50();
   uVar17 = 0;
   do {
@@ -283,16 +296,16 @@ LAB_00447ea4:
     if (bVar3 != 0) {
       bVar4 = *(byte *)(uVar17 + 0x108 + (int)piVar9);
       *(byte *)(uVar17 + 0x108 + (int)piVar9) = bVar4 ^ 1;
-      FUN_00452960((int)(*(uint *)(iVar11 + 0x1b67)),(int)(player[1]),(int)(bVar4 ^ 1),(int)(0));
-      if (*(char *)(iVar11 + 0x1ca2) == '\x05') {
+      FUN_00452960((int)(*(uint *)((int)piVar9 + 4)),(int)(player[1]),(int)(bVar4 ^ 1),(int)(0));
+      if (*(char *)((int)piVar9 + 0x13f) == '\x05') {
         bVar3 = false;
       }
       else {
-        bVar3 = *(char *)(iVar11 + 0x1ca2) == *(char *)((int)player + 0x13f);
+        bVar3 = *(char *)((int)piVar9 + 0x13f) == *(char *)((int)player + 0x13f);
       }
       if (bVar3) {
         FUN_00446e90((int)((int)piVar9));
-        *(undefined1 *)(iVar11 + 0x1ca2) = 5;
+        *(undefined1 *)((int)piVar9 + 0x13f) = 5;
         FUN_00452bd0((int)(piVar9));
       }
       if ((uint)*(byte *)(uVar17 + 0x113 + (int)piVar9) * 2 == 3 ||
@@ -471,16 +484,16 @@ LAB_00448300:
                 iVar5 = 0;
                 FUN_0047f1a0((int)((byte *)"BigButton"),(int)(0));
                 iVar8 = 10;
-                piVar9 = (int *)((int)g_game + 0x1b8a);
+                pVar22 = (int *)((int)g_game + 0x1b8a);
                 do {
-                  if ((*(int *)((int)piVar9 + -0x27) != 0) &&
-                     ((((char)piVar9[0x13] == '\x01' ||
-                       (((*(int *)((int)piVar9 + -0x27) != 0 && ((char)piVar9[0x13] == '\x03')) &&
-                        (*(char *)(*piVar9 + 0x94) == '\x01')))) &&
-                      ((*(byte *)(*piVar9 + 0x9d) & 4) != 0)))) {
+                  if ((*(int *)((int)pVar22 - 0x27) != 0) &&
+                     ((((char)pVar22[0x13] == '\x01' ||
+                       (((*(int *)((int)pVar22 - 0x27) != 0 && ((char)pVar22[0x13] == '\x03')) &&
+                        (*(char *)(*pVar22 + 0x94) == '\x01')))) &&
+                      ((*(byte *)(*pVar22 + 0x9d) & 4) != 0)))) {
                     iVar5 = iVar5 + 1;
                   }
-                  piVar9 = (int *)((int)piVar9 + 0x14b);
+                  pVar22 = (int *)((int)pVar22 + 0x14b);
                   iVar8 = iVar8 + -1;
                 } while (iVar8 != 0);
                 if (((iVar5 < 1) || ((iVar5 < 2 && (iVar8 = FUN_00457af0(), 3 < iVar8)))) ||
@@ -534,7 +547,7 @@ LAB_00448872:
                 bVar3 = ((Class_00435c40*)(*(int *)((int)g_game + 0x391e9)))->FUN_00435c40();
                 if (bVar3) {
                   iVar8 = (int)g_game;
-                  if ((*(byte *)(*(int *)(iVar11 + 0x1b8a) + 0x9b) & 0x80) == 0) {
+                  if ((*(byte *)(*(int *)((int)piVar9 + 0x27) + 0x9b) & 0x80) == 0) {
                     iVar5 = 0;
                     do {
                       if (((*(int *)(iVar8 + 0x1b63 + iVar5) != 0) &&
@@ -547,19 +560,19 @@ LAB_00448872:
                     } while (iVar5 < 0xcee);
                   }
                   *(undefined1 *)(iVar8 + 0x2bc0) = 0x11;
-                  pbVar10 = (byte *)(*(int *)(iVar11 + 0x1b8a) + 0x9b);
+                  pbVar10 = (byte *)(*(int *)((int)piVar9 + 0x27) + 0x9b);
                   *pbVar10 = *pbVar10 | 0x10;
                   FUN_00451180();
                   *(uint *)((int)g_game + 0x39231) =
-                       (*(ushort *)(*(int *)(iVar11 + 0x1b8a) + 0x9b) & 0x200) >> 9;
+                       (*(ushort *)(*(int *)((int)piVar9 + 0x27) + 0x9b) & 0x200) >> 9;
                   *(uint *)((int)g_game + 0x39235) =
-                       (*(ushort *)(*(int *)(iVar11 + 0x1b8a) + 0x9b) & 0x400) >> 10;
+                       (*(ushort *)(*(int *)((int)piVar9 + 0x27) + 0x9b) & 0x400) >> 10;
                   *(uint *)((int)g_game + 0x39229) =
-                       (*(ushort *)(*(int *)(iVar11 + 0x1b8a) + 0x9b) & 0x1800) >> 0xb;
+                       (*(ushort *)(*(int *)((int)piVar9 + 0x27) + 0x9b) & 0x1800) >> 0xb;
                   *(uint *)(*(int *)((int)g_game + 0x29a0) + 0x118) =
-                       (*(ushort *)(*(int *)(iVar11 + 0x1b8a) + 0x9b) & 0x4000) >> 0xe;
+                       (*(ushort *)(*(int *)((int)piVar9 + 0x27) + 0x9b) & 0x4000) >> 0xe;
                   *(uint *)((int)g_game + 0x3922d) =
-                       (*(ushort *)(*(int *)(iVar11 + 0x1b8a) + 0x9b) & 0x100) >> 8;
+                       (*(ushort *)(*(int *)((int)piVar9 + 0x27) + 0x9b) & 0x100) >> 8;
                   FUN_00430f00();
                   *(undefined4 *)((int)g_game + 0x37eee) = 2;
                   return;
@@ -577,7 +590,7 @@ LAB_00448872:
                      (bVar3 = FUN_0049fd60((int)((int)param_1),(int)((byte *)"MAPNAME")),
                      bVar3 != 0)) {
                     FUN_0047f1a0((int)((byte *)"Multi"),(int)(0));
-                    if ((*(byte *)(*(int *)(iVar11 + 0x1b8a) + 0x97) & 1) == 0) {
+                    if ((*(byte *)(*(int *)((int)piVar9 + 0x27) + 0x97) & 1) == 0) {
                       piVar9 = (int*)FUN_004aa8f0((int)((int)g_game + 0x519),(int)("VIEWMAP.GUI"),(int)(0x900));
                       piVar9[2] = (int)FUN_00444ba0;
                       FUN_004288d0((int)((byte *)"DVIEWMAP"),(int)(0),(int)(0),(int)(0));
@@ -599,26 +612,26 @@ LAB_00448872:
               }
               FUN_0047f1a0((int)((byte *)"Multi"),(int)(0));
               uVar17 = FUN_004a0f60((int)((int)param_1),(int)("GAMEOPEN"));
-              iVar8 = *(int *)(iVar11 + 0x1b8a);
+              iVar8 = *(int *)((int)piVar9 + 0x27);
               uVar15 = *(ushort *)(iVar8 + 0x9b) & 0x7fff | (ushort)(uVar17 == 0) << 0xf;
             }
             else {
               FUN_0047f1a0((int)((byte *)"Multi"),(int)(0));
               uVar17 = FUN_004a0f60((int)((int)param_1),(int)("MAPPING"));
-              iVar8 = *(int *)(iVar11 + 0x1b8a);
+              iVar8 = *(int *)((int)piVar9 + 0x27);
               uVar15 = *(ushort *)(iVar8 + 0x9b) & 0xfeff | (ushort)(uVar17 == 0) << 8;
             }
             *(ushort *)(iVar8 + 0x9b) = uVar15;
             goto LAB_00448aaf;
           }
           FUN_0047f1a0((int)((byte *)"Multi"),(int)(0));
-          iVar8 = *(int *)(iVar11 + 0x1b8a);
+          iVar8 = *(int *)((int)piVar9 + 0x27);
           uVar15 = *(ushort *)(iVar8 + 0x9b);
           uVar14 = 0x4000;
         }
         else {
           FUN_0047f1a0((int)((byte *)"Multi"),(int)(0));
-          iVar8 = *(int *)(iVar11 + 0x1b8a);
+          iVar8 = *(int *)((int)piVar9 + 0x27);
           uVar15 = *(ushort *)(iVar8 + 0x9b);
           uVar14 = 0x2000;
         }
@@ -628,20 +641,20 @@ LAB_00448872:
         goto LAB_00448b98;
       }
       FUN_0047f1a0((int)((byte *)"Multi"),(int)(0));
-      *(ushort *)(*(int *)(iVar11 + 0x1b8a) + 0x9b) =
-           *(ushort *)(*(int *)(iVar11 + 0x1b8a) + 0x9b) ^ 0x80;
-      uVar15 = *(ushort *)(*(int *)(iVar11 + 0x1b8a) + 0x9b);
+      *(ushort *)(*(int *)((int)piVar9 + 0x27) + 0x9b) =
+           *(ushort *)(*(int *)((int)piVar9 + 0x27) + 0x9b) ^ 0x80;
+      uVar15 = *(ushort *)(*(int *)((int)piVar9 + 0x27) + 0x9b);
       if ((((uVar15 & 0x80) == 0) && (*piVar9 != 0)) && ((uVar15 & 0x40) != 0)) {
-        *(ushort *)(*(int *)(iVar11 + 0x1b8a) + 0x9b) = uVar15 & 0xffbf;
+        *(ushort *)(*(int *)((int)piVar9 + 0x27) + 0x9b) = uVar15 & 0xffbf;
       }
     }
     else {
       FUN_0047f1a0((int)((byte *)"Multi"),(int)(0));
-      iVar8 = *(int *)(iVar11 + 0x1b8a);
+      iVar8 = *(int *)((int)piVar9 + 0x27);
       uVar15 = *(ushort *)(iVar8 + 0x9b);
       if ((uVar15 & 0x200) == 0) {
         *(ushort *)(iVar8 + 0x9b) = uVar15 | 0x200;
-        pbVar10 = (byte *)(*(int *)(iVar11 + 0x1b8a) + 0x9c);
+        pbVar10 = (byte *)(*(int *)((int)piVar9 + 0x27) + 0x9c);
         *pbVar10 = *pbVar10 | 4;
       }
       else if ((uVar15 & 0x400) == 0x400) {
@@ -654,12 +667,12 @@ LAB_00448872:
   }
   else {
     FUN_0047f1a0((int)((byte *)"Multi"),(int)(0));
-    uVar15 = *(ushort *)(*(int *)(iVar11 + 0x1b8a) + 0x9b);
-    *(ushort *)(*(int *)(iVar11 + 0x1b8a) + 0x9b) =
+    uVar15 = *(ushort *)(*(int *)((int)piVar9 + 0x27) + 0x9b);
+    *(ushort *)(*(int *)((int)piVar9 + 0x27) + 0x9b) =
          ((uVar15 & 0xf800) + 0x800 ^ uVar15) & 0x1800 ^ uVar15;
-    uVar15 = *(ushort *)(*(int *)(iVar11 + 0x1b8a) + 0x9b);
+    uVar15 = *(ushort *)(*(int *)((int)piVar9 + 0x27) + 0x9b);
     if (0x1000 < (uVar15 & 0x1800)) {
-      *(ushort *)(*(int *)(iVar11 + 0x1b8a) + 0x9b) = uVar15 & 0xe7ff;
+      *(ushort *)(*(int *)((int)piVar9 + 0x27) + 0x9b) = uVar15 & 0xe7ff;
     }
   }
 LAB_00448aaf:
