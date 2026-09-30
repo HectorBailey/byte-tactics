@@ -1,4 +1,4 @@
-// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, verified by GPT-6.1-sol, edited by deepseek-v4.1, finished by space-bunny-free. Names are provisional.
+// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, verified by GPT-6.1-sol, edited by deepseek-v4.1, finished by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
 // deepseek-v4.1 retry (84.1%, unchanged): the whole remaining diff is one
 // instruction plus the register names it drags with it. Check says original
 // 1329 bytes vs ours 1327, and the 2 bytes are exactly the encoding gap
@@ -172,6 +172,39 @@
 // prologue from the /Fa listing in about six seconds, which is the fast way
 // to test this; a variant file is `//SUB old => new` lines then `//SEL` and
 // the replacement selection statement.
+// deepseek-v4.1-flash retry 2 (84.1%, code unchanged, 1 real run). Confirmed
+// that the fallback memory read is not reachable from any source expression:
+// about 80 more shapes were compiled with /Fa and every one that keeps the
+// selection shape emits `mov ebp, esi` (never `mov ebp, [esp+0x34]`). Shapes
+// included: `(Entry*)button`, `button+0`, `button-0`, `*&button`, `&*button`,
+// `&button[0]`, `(button)`, `button?button:button`, `button?button:0`,
+// `button==0?0:button`, `*(Entry**)(void*)&button`, `(Entry*)*(int*)&button`,
+// `((Entry**)&button)[0]`, `(Entry*)(unsigned)button`, `(button,button)`,
+// `sizeof(&button)`, a `union{Entry*p;}u;` local, a `struct{Entry*p;}wl;`
+// local, `char* b=(char*)button` with `*(int*)(b+0x60)`, `void*` param,
+// `const Entry*` param and const local, `Entry* const` param, array-declared
+// param, `Entry&`/`Menu&` reference params (index loads then `[edi+0x60]`),
+// `Menu*` param with the cast, Entry/Menu inheritance both ways (implicit,
+// `static_cast`, `reinterpret`), `Contains(entries,text,menu)` with a
+// `Menu*` third parameter (the 0x41a490 idiom), a local `Entry* p=&entries[i]`
+// tested then selected, a local `int i=button->index`, split declaration and
+// assignment, reversed ternary, and `if/else` in all branch orders. The two
+// if/else variants that put the false arm first give `mov ebp, esi` then
+// `mov ebp, ecx`, which is the same register-only fallback in a different
+// block order.
+// Compiler state was ruled out this round: tools/headers.py (128 sets, none
+// match); a sweep of N unused `extern int dummyN;` for N=0..300, of N unused
+// `void dummyN();` prototypes for N=0..400, and sampled N=500..4000 all score
+// exactly 84.1%; defining the real preceding function FUN_00419bc0 above this
+// one (the guide's same-file technique) also changes nothing. So the operand
+// cannot be levered from the source or the file's state; it is the parameter
+// rematerialisation of brief item 19. What remains is the single register-use
+// census point already recorded above (original button 11 register uses because
+// the fallback is a memory read; ours 12), and the memory read is the cause,
+// not a consequence, so every register-only fallback stays 2 bytes short at
+// 1327. Whoever retries: the one construct that would settle this is whatever
+// makes VC5 read a parameter's home slot for a single use while keeping a
+// register copy live for the rest of the function.
 #include <string.h>
 
 class Class_00438760 {
