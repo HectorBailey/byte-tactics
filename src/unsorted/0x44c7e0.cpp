@@ -1,8 +1,26 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// Gave up at 80.5% (1592 bytes against 1586). Remaining shared-zero
-// register, scan-loop induction registers and tail scheduling differ. Reload
-// item pointers after callbacks and preserve the scroll-panel pointer.
-// A version with a fresh scroll panel scored 82.6%, but was less faithful.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6 and space-bunny-free.
+// Names are provisional.
+// Still short of MATCH. 1590 bytes against 1586; difflib says 81.2% but a true
+// LCS over mnemonics says 0.9942 (430 of the original's 432 instructions line
+// up, the rest differ only in a register name), so difflib understates this.
+// What is left is one allocator decision: the DESCLIST gadget (`desc`) and the
+// record byte offset induction variable hold ebx/ebp in the opposite order from
+// the original (the original keeps desc in ebx and gives ebp to the induction
+// variable, and therefore reuses ebp for the inner gadget list and the scroll
+// slider). Every remaining hunk in the item loop, the strcpy loop, the slider
+// loop and the SCROLLSLIDER block is that single swap. Tried and rejected: an
+// explicit `char* rec` walk of the record array (79.4%, it keeps the base
+// pointer in a register instead of reloading the global), `desc->field_1b =
+// desc->field_1b | 0x100` (no change), `!flag` (no change), `g_game->inner`
+// against `g_game->inner->entries` for FUN_004a35a0 costs 1.2 points of
+// difflib score but is one instruction and one LCS step closer, and it is what
+// the disassembly shows (`mov edx, [ecx+0x531]`, no second load), so it stays.
+// The scan loop body must not name a local for the item pointer: spelling the
+// test with the recomputed `g_game->items + off` expression and introducing
+// `item` inside the body is what produces the original's second materialisation
+// (`mov esi, edx / add esi, edi`) and keeps the record byte offset out of the
+// zero that initialises n; naming the local at the top of the body scored
+// 80.5% instead of 82.4%.
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -184,8 +202,9 @@ void FUN_0044c7e0()
     if (g_game->count > 1) {
         int off = 0x249;
         do {
-            Item_44c7e0* item = (Item_44c7e0*)((char*)g_game->items + off);
-            if (((unsigned char)(item->field_245.raw >> 15) & 1) == 0 && item->name != 0) {
+            if ((((unsigned char)(((Item_44c7e0*)((char*)g_game->items + off))->field_245.raw >> 15)) & 1) == 0
+                && ((char*)g_game->items + off) + 0x20 != 0) {
+                Item_44c7e0* item = (Item_44c7e0*)((char*)g_game->items + off);
                 Info_44c7e0 info;
                 sprintf((char*)&DAT_005129b4[n], "%s\r%s %dM  %dE",
                         (char*)g_game->items + off, FUN_004c5740((char*)item + 0xa0),
@@ -237,7 +256,7 @@ void FUN_0044c7e0()
     FUN_0049fa90(scrollPanel);
 
     FUN_004a32a0((char*)g_game + 0x519, "DESCLIST", textArray, n, 0);
-    FUN_004a35a0(g_game->inner->entries, "PICLIST", picArray, n);
+    FUN_004a35a0(g_game->inner, "PICLIST", picArray, n);
     FUN_0044bfd0((char*)g_game + 0x519, 0);
 
     void* panel = (char*)g_game + 0x519;
