@@ -1,4 +1,4 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
 // Saves every live unit (g_game+0x14357..+0x1435b, stride 0x118) as a 0xb8
 // byte record; inverse of 0x487080/0x486fd0. Record and Piece field maps are
 // complete and confirmed by the 0x487080 loader.
@@ -24,6 +24,27 @@
 //    that is the root of the remaining rotation in the rec+0x8f..+0xb3 field
 //    block (ours loads the first accumulators into ecx/eax swapped).
 //  - ours is 3 bytes short of the original 1062.
+//
+// deepseek-v4.1 (attempt 2): confirmed the diff is ONE allocator decision, not
+// a statement-order problem. The original emits `xor ecx,ecx; cmp esi,ecx;
+// setne al` for rec.f27 and then reuses ecx as the zero for the rec.f86 and
+// rec.f_f0 guards, the rec.f89 = 0 arm and the (b & 0xf) mask; ours allocates
+// that zero to edx instead, which rotates every scratch register in the
+// rec+0x8f..+0xbb field block and inside the 3x piece copy.
+// Tried and scored, all worse or equal to 73.7:
+//  - 6 permutations of the rec.f3f / rec.f23 / rec.f27 statements (73.7 at
+//    best, 70.1 at worst): the dx load and store of rec.f3f move with them but
+//    the zero register does not change, so the lever is upstream of that
+//    group.
+//  - rec.f27 written as `unit->vtable ? 1 : 0` and as a 3-way ternary: 73.7
+//    and lower, same zero register.
+//  - rec.f8b moved after rec.fa7 (71.2) and rec.fa3 moved to the head of the
+//    field block (71.2, and 23 bytes shorter): worse.
+//  - the id8b block hoisted above the rec.f86 block: 71.3, 26 bytes shorter.
+// Next idea: give the zero its ecx identity from a statement that already
+// wants a 0 in ecx before the bool, and keep dx live across the bool (in the
+// original edx still holds unit->fb8 when the bool is evaluated, in ours that
+// store has already retired).
 #include <string.h>
 
 extern "C" int sprintf(char* buf, const char* fmt, ...);

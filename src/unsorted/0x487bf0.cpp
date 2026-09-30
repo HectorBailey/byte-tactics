@@ -1,5 +1,18 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by GPT-6. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
 // PARTIAL 44.9%. Restored the 256-byte command buffer and removed extra kind initialization stores. Parser switch and temporary allocation still differ.
+// Still differs (baseline 44.9%, ours 1827 bytes vs 1811):
+//  - frame is 0x148 vs the original 0x140, so every small-local offset is shifted by 8
+//    and buf sits at [esp+0x58] instead of [esp+0x50]; our small-local region needs two
+//    dwords fewer (original packs 0x10..0x4f, ours 0x10..0x57).
+//  - roles are swapped: the original keeps `processed` in edi (xor edi,edi; mov edi,1 in
+//    every processed case) and `selected` in memory at [esp+0x2c] (stored via
+//    mov [esp+0x2c],edi only in the D/S/P/A-float cases), while our build has selected in
+//    edi and processed at [esp+0x30]. Swapping the declaration order of the two ints did
+//    not move them (same 44.9%).
+//  - our parser prologue spills the text pointer to its home slot and reuses ebp for
+//    count (mov ebp,eax; mov [esp+0x160],ebp), the original keeps text in ebp the whole
+//    loop and keeps count in a slot at [esp+0x18]; this is an allocation tie-break, not
+//    a source-order effect we found.
 
 #include <ctype.h>
 #include <stdio.h>
@@ -43,8 +56,8 @@ void __stdcall FUN_00487bf0(Unit_00487bf0* unit, char* text, Table_00487bf0* tab
     char buf[256];
     float f1, f2;
     Vec3_00487bf0 pos;
-    int processed = 0;
     int selected = 0;
+    int processed = 0;
 
     while (*text != 0) {
         while (isspace(*text))
