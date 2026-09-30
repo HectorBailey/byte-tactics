@@ -1,5 +1,17 @@
-// Decompiled by space-bunny-free, verified by GPT-6.1-sol. Names are provisional.
+// Decompiled by deepseek-v4.1. Names are provisional.
+// Prior attempt by space-bunny-free, verified by GPT-6.1-sol.
 // PARTIAL 50.0%. Header sweep found no improvement. Remaining differences include object/entry register allocation and branch layout.
+//
+// deepseek-v4.1 (issue 2040) re-tried the EBX/EBP swap. Register-form
+// experiments that did NOT put obj in EBX: entry computed as
+// &obj->holder->entries[index] (vb), entry = entries + index (vc), a named e0
+// with entries = e0 (vd), swapping the two point.x/point.y subtractions (vh).
+// Promoting point.x/point.y to int locals declared at the top (vj) shrinks the
+// frame to 0x14 and recolors to obj=ESI, index=EBP, entry=EDI, which is worse
+// (original: index=ECX, obj=EBX, entry=EBP). Adding an entries[index] first test
+// and a deferred entry (m1, m2) also left obj in EBP. The original schedules
+// `sub esi,ecx` AFTER loading point.y into EDI, so py lands in EDI; this source
+// schedules it before, so py lands in the scratch ECX and is spilled.
 // PARTIAL 50.0% (1685 bytes against the original's 1703). Greenfield.
 // Command-button click/key handler for the 0x15b-byte entry table.
 //

@@ -1,5 +1,30 @@
-// Decompiled by space-bunny-free, verified by GPT-6.1-sol, finished by GPT-6. Names are provisional.
-// PARTIAL 47.2%. Restored original 200-element navigation array. Remaining differences include switch tails, stack locals and register allocation.
+// Decompiled by deepseek-v4.1. Names are provisional.
+// Best version so far is still the one written by space-bunny-free, GPT-6.1-sol and GPT-6;
+// its code is kept unchanged below (PARTIAL 47.2%). Restored 200-element navigation array.
+//
+// 2026 re-check of the original against this file, from the disassembly:
+//   * frame and slots: the original is `sub esp,0x338` with six scalar slots at
+//     [esp+0x10] out (later start), 0x14 remaining (later the used[]-walk pointer),
+//     0x18 entries, 0x1c bound, 0x20 layer, 0x24 count, and the navigation array at
+//     [esp+0x28] with size 0x310 (196 ints). This file gets five scalar slots with the
+//     array at [esp+0x24] and a 0x334 frame, so the prologue, both argument reads
+//     ([esp+0x34c]/[esp+0x350] versus [esp+0x348]/[esp+0x34c]) and every array access
+//     differ.
+//   * registers: the original loads menu->layer into esi and menu->layer->entries into
+//     edx (spilling them to 0x20/0x18 and reloading after each block); the selected
+//     index stays in ebx. Here entries lands in edx but the index ends up in ebp.
+//   * the big scan loop in the original walks a pointer based at entry+0x17 (x1), so the
+//     fields read as [ecx-0x17] type, [ecx+4] field_1b, [ecx+0x12] field_29,
+//     [ecx+0x125] field_13c, [ecx+0x140] field_157 and x0/y0/x1/y1 as
+//     [ecx-4]/[ecx-2]/[ecx]/[ecx+2]. Here the base is entry+0x00, so the same fields are
+//     reached at +0x00/+0x1b/+0x29/+0x13c/+0x157.
+//   * both type==3 tails are the same inlined helper; in the original the first copy keeps
+//     its walked pointer in slot 0x14 and the second copy in slot 0x18.
+// Tried: a literal rewrite using a Walk_004a7960 view of the entry based at entries+0x172
+// (fields at the original displacements), with `int used[196]`; it scored 44.2%, because
+// it leaves even fewer live scalars and MSVC still places the array first in the frame.
+// Array sizes 197 and 200 both score 47.2%, so the array length alone is not the lever;
+// the six-slot live-range layout is.
 #pragma pack(push, 1)
 
 struct Entry_004a7960 {                // 0x15b bytes
