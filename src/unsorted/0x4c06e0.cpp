@@ -102,6 +102,19 @@
 // shapes tried: what is left is one register-coloring decision (surf reloaded into
 // ebp with x1 in edx and the pitch in eax, versus surf in ebx here).
 
+// Sixth pass (#2034, deepseek-v4.1): the 0x4c0b10 MATCH recipe does not
+// transfer to this function. Applying its head and tail (int w, int start,
+// int count, while (count--), unsigned char color, the depth offset reading
+// span->x1) scores 44.7 to 52.3% in all combinations, worse than the 74.1%
+// baseline, which must keep the x1/x2 locals and the count read from the span.
+// Also scored and worse: inline surf->pitch with a separate `int i = n` loop
+// counter (46.8%), the same with char color (49.4%), `int n` before the guard
+// with the pitch local declared after it (45.0%), the two-step offsets (48.0 to
+// 50.6%), and unsigned char color (72.5%, 204 bytes, scored in the fifth pass). The
+// 74.1% file is unchanged and is a local optimum: only the register colouring of
+// the count block still differs (surf into ebp with x1 in edx there, versus
+// surf into ebx with x1 in ebp here).
+
 #include <string.h>
 
 struct Span_004c06e0 {
