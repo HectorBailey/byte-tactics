@@ -9,6 +9,33 @@
 // every HRESULT against it with `cmp eax, ebp`, so all ten DirectDraw call
 // results go through one named `HRESULT hr` local (see docs/agent-guide.md on
 // 0x4b6880).
+// deepseek-v4.1 new experiments on the remaining 0x4b55af rotation (all 1017
+// bytes, all with the identical 3-instruction diff unless noted):
+//   - `*setup.dcSlot = cleanup->dib = cleanup->hpalette = 0;` (chain reversed
+//     so the hpalette store comes first) keeps the correct h/d store order but
+//     still leaves the reload after them, 99.7, same as the plain three
+//     statements; the chain with hpalette outermost emits d then h, 99.3.
+//   - Putting the side effects in the RHS comma, `*c = (h = 0, d = 0, 0)`,
+//     `*(c) = (...)` and `c[0] = d = h = 0` are all byte-identical to the plain
+//     form: MSVC5 always evaluates the RHS before the LHS address, so the
+//     reload can never be hoisted from the same statement.
+//   - Writing the store first (`*c = 0, h = 0, d = 0;` or c/h/d statement
+//     order) does put the reload at the top of the block, but then the store
+//     is scheduled right after `push 6` and the two handle stores are pushed
+//     to the end (99.3), so the reload is not the only thing that has to move.
+//   - A separate `HDC *slot = setup.dcSlot;` before the two handle stores does
+//     give the wanted list order, but the local is colored eax (never edx) and
+//     the whole SetWindowPos block recolors, 96.4 (same with `HDC *const`, a
+//     declaration hoisted to the function top, or an assignment instead of an
+//     initializer). Only the address-taken frame slot reload, whose scratch
+//     register the code generator picks (edx), keeps the tail intact.
+//   - Dead or self-cancelling statements before the stores (`(void)setup.dcSlot;`,
+//     `if (setup.dcSlot);`, `setup.dcSlot = setup.dcSlot;`,
+//     `setup.dcSlot = setup.dcSlot + 0;`) are all removed by the optimizer and
+//     leave the baseline 99.7 bytes and diff; the other two statement orders
+//     (h/c/d, d/c/h) put the reload in the right place but move one handle
+//     store, 99.3, and c/d/h keeps the reload first while pushing both handle
+//     stores after the `push 6`, also 99.3.
 #include <windows.h>
 #include <ddraw.h>
 
