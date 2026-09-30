@@ -1,10 +1,27 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// Partial: 72.3%, 1086 bytes versus 1074. Correct floating-point vector
-// length (the inherited integer squares could overflow), type reloads after
-// hypot calls, 32-bit conversion before sign extension, and zero-vector
-// assignment. The sqrt result is converted when assigned to k, without an
-// additional cast on the call. The frame is now the original 0x48 bytes;
-// scaling operand order, early-return saves and x87 scheduling still differ.
+// Decompiled by deepseek-v4.1. Names are provisional.
+// Partial: 72.3% (best seen), 1086 bytes versus 1074. Frame is the right 0x48
+// bytes and the mode!=2 early return matches (ebp/ebx are pushed inside the
+// mode==2 arm, as the original does at 0x43d2c3). What still differs:
+//   * the f18 scratch slot is [esp+0x1c] here, [esp+0x18] in the original
+//     (0x43d307), so the whole top-of-body local layout is 4 bytes off;
+//   * the three inlined 64-bit scales push `_allmul` args in the other order
+//     (ours: edx,eax,ebp,ebx; original 0x43d345: ebp,ebx,edx,eax), i.e. the
+//     original keeps `scale` live in ebx:ebp across all three multiplies
+//     while our build rematerialises it;
+//   * the dist>maxd path: the original negs the FUN_004b70ef/FUN_004b7123
+//     results and adds them (neg ebp / neg eax / add edx,ebp at 0x43d466),
+//     ours emits two plain `sub ecx,eax`;
+//   * the original stores maxd and the `h` short in the incoming argument
+//     home slot (fstp [esp+0x5c] at 0x43d3c8, mov [esp+0x1c],ecx at
+//     0x43d44e) and re-reads the unit pointer from that home after each call
+//     (mov ecx,[esp+0x5c] at 0x43d2f1, mov ebx,[esp+0x6c] at 0x43d3ab);
+//   * the tail loses the x87 `fxch` schedule around the k/velocity block.
+// Previously tried (by the first pass): explicit double casts on every
+// scaling multiply, an integer instead of float hypot for the distance,
+// assigning the sqrt result to k before converting; none moved the _allmul
+// push order or the [esp+0x18] slot. Next step: declare the scale pair as an
+// explicit __int64 local (so the allocator keeps it in ebx:ebp across the
+// three multiplies) and let maxd/h live in the parameter home slot.
 
 #include <math.h>
 

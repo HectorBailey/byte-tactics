@@ -1,9 +1,23 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// Partial: 86.2%, same 1300-byte size and 0x164-byte frame. Keeping the
-// address-taken search string inside the successful lookup branch improves
-// its store placement. Remaining differences include base-vtable scheduling,
-// kind-recovery counter registers and the two-byte shift of later branches.
-// 768 header sets and counter/helper variants did not remove those differences.
+// Decompiled by deepseek-v4.1. Names are provisional.
+// Started by deepseek-v4.1-flash, continued by GPT-6, finished by deepseek-v4.1.
+// Partial: 86.2%, exact 1300-byte size and 0x164-byte frame. Two real
+// differences remain:
+//  1. prologue scheduling: the original stores the base-class vtable between
+//     the two `push edi` argument pushes of the link member's constructor
+//     (push edi / mov [ebp],0x4fd2cc / push edi / mov ecx,esi / mov byte
+//     [ebp+4],0 / call 0x4895c0); ours emits both pushes and mov ecx,esi
+//     first, then the store. Writing link(0,0) before kind(0) in the init
+//     list, giving Class_0043a1e0 an explicit empty constructor, and calling
+//     the link constructor from the body all leave the order unchanged.
+//  2. the kind fallback scan at 0x43a556: the original keeps the filtered
+//     counter in EDX and the raw-index counter in ECX and copies cl to dl at
+//     the join (mov dl,cl), while ours keeps the filtered counter in ECX and
+//     the raw index in EDX, so ours is 2 bytes shorter and every later branch
+//     target and the jump table shift by 2. Declaration order, do-while /
+//     while / for, unsigned / unsigned short / unsigned char counters, ++i, a
+//     separate result byte and a reversed comparison all still give ECX to
+//     the variable the loop compares, so MSVC5's pick here does not follow
+//     the declaration order or the ++ sites.
 // Preserve the inclusive fallback-table scan: 0x43a58d uses JBE even though
 // the named lookup passes the same end pointer to exclusive lower_bound.
 #include <stdio.h>
