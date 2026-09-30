@@ -1,18 +1,20 @@
 // Decompiled by deepseek-v4.1. Names are provisional.
 // Unpacks a "SQSH" chunk (see FUN_004d1820 for the packer).
-// Partial at 71.2% (304 bytes vs 296). What still differs: the prologue and
-// every register that follows it. The original loads the data pointer before
-// the register saves and keeps it in edx through the 19-byte header copy
-// (sub esp,0x14 / mov edx,[esp+0x1c] / push ebx / mov eax,edx / push ebp ...),
-// so its copy temp is ecx and the byte tail is al, and the payload pointer is
-// `add edx,0x13`. Ours loads the pointer into ebx after `push ebx` and uses
-// edx as the copy temp (dl for the byte), which shifts every later register
-// and the call setup. Also the type==2 arm: the original keeps the
-// memcmp(data,"SQSH",4) ? *(int*)(data+0xb) : 0 value in eax and stores it to
-// the destLen slot during the argument setup; ours stores 0 or the value in
-// each arm of the branch. Tried and all identical (71.2%, 304 bytes): plain
-// memcpy vs struct assignment, a char* alias for the memcpy source, adding
-// <windows.h>/<stdio.h>/<stdlib.h> to the includes.
+// Best so far: 77.8% (307 bytes vs 296). The prologue and the 0x13-byte header
+// copy now match: `int sum = 0;` must be declared at the very top with its
+// initialiser for MSVC to home `data` in edx before the register pushes
+// (sub esp,0x14 / mov edx,[esp+0x1c] / push ebx / mov eax,edx / push ebp),
+// and the sum loop needs named src/end locals for the original
+// lea esi,[..+edx] bound. Still differs: that top initialiser zeroes sum early
+// in ebp where the original zeroes edi late (sum ends up ebp and compressedSize
+// ebx, the original the other way round), the allocator rematerialises `data`
+// from its stack slot in the case-2 memcmp instead of splitting an ebx copy
+// (no `mov ebx,edx`), and the case-2 arm stores the destLen value in each
+// branch instead of once in eax at the call setup. Tried, all worse or equal:
+// sum without initialiser or declared later (71.2%), length at the top with
+// and without an initialiser (71.2% / 58.7%), inline loop bound (76.6%),
+// unsigned long length, inverted ternary, char* alias for the memcpy source or
+// for the case-2 memcmp, plain memcpy vs struct assignment.
 #include <string.h>
 
 #pragma pack(push, 1)
@@ -34,6 +36,7 @@ int __stdcall _uncompress(unsigned char* dest, unsigned long* destLen, unsigned 
 int __stdcall FUN_004d1970(char* dest, char* data)
 {
     Chunk_4d1970 header;
+    int sum = 0;
     memcpy(&header, data, 0x13);
     if (memcmp(&header, "SQSH", 4) != 0) {
         return 1;
@@ -41,8 +44,9 @@ int __stdcall FUN_004d1970(char* dest, char* data)
     if (header.method >= 4) {
         return 4;
     }
-    int sum = 0;
-    for (unsigned char* p = (unsigned char*)(data + 0x13); p < (unsigned char*)(data + 0x13) + header.compressedSize; p++) {
+    unsigned char* src = (unsigned char*)(data + 0x13);
+    unsigned char* end = src + header.compressedSize;
+    for (unsigned char* p = src; p < end; p++) {
         sum += *p;
     }
     if (header.checksum != sum) {
