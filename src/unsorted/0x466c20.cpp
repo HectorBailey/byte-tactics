@@ -1,16 +1,9 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash and GPT-6.1-sol. Names are provisional.
-// Retry #1781: GPT-6.1-sol confirmed 91.9% after four checks; no MATCH. Two loop-scheduling rewrites and header sweeps did not improve the best.
-// GPT-6.1-sol continuation (#1781): confirmed 91.9% best; alternate counter/store orderings scored lower.
-// GPT-6.1-sol lead pass (#1510): moving the loop counters before the output store via a pixel temporary scored 76.1%; retained the 91.9% best.
-// PARTIAL: best scoring variant, 91.9%, 402 byte original vs 404 bytes ours.
-// Remaining mismatch is loop-bottom scheduling: original increments i, mapX,
-// src, stores through dst, then increments dst. Ours stores through dst before
-// incrementing i and src, and uses eax to increment and save dst. Direct output
-// assignments in each branch fixed the loop-carried local slots and raised the
-// score from 78.6%; post-incrementing dst in those assignments regressed to
-// 84.7%. The condition branches, setup, and loop bodies otherwise match.
-// The `unsigned short` cast on the visibility test is required (without it
-// MSVC emits `test edx,eax`). /Gz makes no difference for this no-arg function.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash and GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
+// MATCH (402/402 bytes) by deepseek-v4.1. The last 2 bytes came from moving
+// `dst++` out of the loop body into the for-increment clause
+// (`j++, mapX += halfWidth, src++, dst++`), which makes MSVC5 emit
+// `mov [edx],cl / ... / inc edx / mov [esp+0x14],edx`; as a body statement it
+// instead sank a `mov eax,edx / inc eax` copy of the store pointer.
 
 #pragma pack(push, 1)
 struct Fx_00466c20 {
@@ -74,7 +67,7 @@ void FUN_00466c20()
         for (int i = 0; i < g_game->height; i++) {
             int mapY = i * halfHeight;
             int mapX = 0;
-            for (int j = 0; j < g_game->width; j++, src++, mapX += halfWidth) {
+            for (int j = 0; j < g_game->width; j++, mapX += halfWidth, src++, dst++) {
                 int index = (mapY / g_game->height) * halfWidth + mapX / g_game->width;
                 if (!(unsigned short)(g_game->visibilityMask[index] & mask)) {
                     *dst = fog;
@@ -83,7 +76,6 @@ void FUN_00466c20()
                 } else {
                     *dst = g_game->fx->colorMap[*src];
                 }
-                dst++;
             }
         }
         g_game->pending = 1;

@@ -1,5 +1,18 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, edited by deepseek-v4.1. Names are provisional.
 // Retry #1781: GPT-6.1-sol independently confirmed 96.5%; no MATCH. The word flag load/store and EDX versus DL test still differ.
+// deepseek-v4.1 retry: the two remaining hunks are (1) original loads the flags word
+// (`mov ax, word [ecx+0x14281]; and ax,2; cmp ax,2; mov word [esp+0x24],ax`) while
+// every source shape tried here compiles to a sliced byte load plus 32-bit AND and a
+// dword spill (`mov al, byte [ecx+0x14281]; and eax,2; cmp ax,2; mov dword [esp+0x24],eax`),
+// and (2) the original tests the first result 32-bit (`test edx,edx`) where the `char vis`
+// local forces `test dl,dl` (an `int vis` local fixes the test but moves the map into esi
+// and drops the score to 75.5%). Shapes tried for the flags: `unsigned short flag = g_game->flags & 2;`,
+// `short flag = ...`, `flag = g_game->flags; flag &= 2;` (both types, compound and plain), an
+// inline helper whose mask is a parameter, `unsigned short flags : 16` and 1-bit bitfield Game
+// structs, and `(unsigned short)(g_game->flags & 2)`; a standalone probe file (build/scratch/0x4658e0/probe*.cpp)
+// shows MSVC5 always slices the load, so the original's 16-bit form is not reachable from
+// these spellings. The direct `if (IsExplored(...)) return 1;` / `else if (IsSeen(...))` block
+// that would give the edx test instead compiles to a different prologue and scores 51.9%.
 // GPT-6.1-sol lead pass (#1510): comparing the masked flag directly (`flag == 2`) scored 87.2%; retained the 96.5% best.
 // PARTIAL: 96.5% (best, verified with check.py). A small mask helper raised
 // similarity from 87.8%, though the inlined helper now makes the compiler
