@@ -1,6 +1,27 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free and deepseek-v4.1-flash, finished
-// by GPT-6. Names are provisional. Partial, 44.4%. Reloads the game after controller callbacks and
-// colour lookup. Free-colour helper preserves the scan; frame and register allocation still differ.
+// Decompiled by deepseek-v4.1. Names are provisional.
+// Restored 44.4% variant below (body by deepseek-v4.1-flash, space-bunny-free, GPT-6).
+// PARTIAL, best score 44.4%. STOP appeared, so this is the best variant seen.
+// What still differs (original 1034 bytes, 0x88 frame; ours 1005 bytes, 0x8c frame):
+//  1. Frame is 4 bytes too big: the anonymous `buffers` struct lands at frame+0xc with
+//     three 4-byte temps below it (playerOffset, entries, players pointer), the original
+//     has only two (offset at [esp+0x10], entries at [esp+0x14]) and the buffers at +0x8.
+//  2. Register roles: original keeps ebp = g_game and ebx = playerIndex*0x18 (the scaled
+//     index is spilled to [esp+0x10] and reloaded at 0x47984d/0x479894/0x479a71); ours
+//     puts the scaled index in ebp, g_game in edx and reloads g_game per use, so the
+//     switch dispatch (0x479810..0x47982d) and every [esp+N] after it differ.
+//  3. The else-branch colour block: original loads the player's own colour into ebx with
+//     `mov ebx,[ecx+ebx+0x14]` (ecx = players reused from the controller test) and later
+//     recomputes the store address (`mov ecx,[ebp+0x29a0]; mov ebp,[esp+0x10];
+//     mov [ebp+ecx+0x14],eax`); ours CSEs the colour address into a third temp and
+//     spills the players pointer, then stores through `mov ecx,[esp+0x18]; mov [ecx],eax`.
+//  4. In the controller==2 arm ours emits `push ebx` (ebx is the known-zero human count)
+//     where the original emits the literal `push 0`.
+// Tried: no local `game` alias (use g_game everywhere), a no-arg static inlined
+// free-colour helper with `colour++/* return -1` shape (loop body itself matches), an
+// explicit `int myColour` local instead of repeating players[playerIndex].color, both
+// `<windows.h>`-only and `#pragma pack(1)` layouts, separate char[64] buffers instead of
+// a struct. None removed the extra CSE slots or flipped ebp/ebx; 36.9% for the g_game-only
+// rewrite and 44.1% for that rewrite plus myColour, versus 44.4% here.
 #include <windows.h>
 
 #pragma pack(push, 1)

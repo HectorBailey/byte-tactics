@@ -1,6 +1,21 @@
-// Decompiled by deepseek-v4.1-flash. Names are provisional.
-// Partial, 78.6%. Zero occupies ESI instead of EBX, and the formatter import
-// remains cached. Header, aggregate, loop and helper variations did not improve it.
+// Decompiled by deepseek-v4.1-flash, rechecked by deepseek-v4.1. Names are provisional.
+// Partial, 78.6% (1154 of 1156 bytes). Everything below the entry block has the
+// right fields, frame (0x214), memset sizes (0x13e + 0xcc) and call order; the
+// whole gap is ONE register swap in the allocator:
+//   original: EBX = the live zero (cmp eax,ebx / mov [..],ebx / mov [..],bl),
+//             ESI = cached _imp__wsprintfA reloaded at the loop head;
+//   ours:     ESI = the live zero (xor esi,esi, re-materialised at the loop
+//             head because the inlined strcpy kills ESI), EBX = the cached
+//             wsprintfA import, so ours emits `call ebx` where the original
+//             reloads `call dword ptr [0x4fc2e8]` after the strcpy clobbers ESI.
+// Consequences of the swap, all visible in the checker diff: `mov [..],0` /
+// `test eax,eax` in ours where the original uses bl/ebx, `mov esi,0x14` and
+// `mov [..],si` where the original uses edi/di, and `mov ebx,[0x511de8]` at
+// entry where the original has `mov esi,[0x511de8]`.
+// The block that decides it is the entry: ours gives the g_game temporary EBX
+// and the zero ESI, the original the reverse, so an attempt should target the
+// first-use order at entry, not the loop body. See build/scratch/0x479c50/d1.txt
+// for the full checker diff.
 #include <windows.h>
 #include <string.h>
 
