@@ -1,14 +1,27 @@
-// Decompiled by deepseek-v4.1-flash, verified by GPT-6.1-sol. Names are provisional.
-// Best 82.7%. The compaction now matches (pointer scan + *e = e[1] loop).
-// Still differs (same instructions, register allocation/order):
-//  - in the position update x, our compiler loads vel.x into eax where the
-//    original loads size.x; likewise pos.z lands in ecx instead of eax, so the
-//    gravity block reuses eax for vel.y instead of reloading it (one fewer
-//    instruction, ours 534 bytes vs 536).
-//  - gravity/angle block: original reads g_game into eax, loads vel.y fresh,
-//    then all three spin words; ours interleaves.
-// GPT-6.1-sol tried spin locals, reordered z arithmetic, cached gravity, and
-// left-associated y arithmetic; none improved the 82.7% best.
+// Decompiled by deepseek-v4.1-flash, verified by GPT-6.1-sol, finished by
+// space-bunny-free. Names are provisional.
+// Best 96.8%, and the size is right: 536 of 536 bytes. Only one block
+// differs now, and it is pure scheduling, same instructions in a different
+// order (all the rest of the function is byte exact).
+// The size was the hard part. It needed the load CSE of d->vel.y between
+// the y position update and the gravity line broken, so the gravity line
+// reloads vel.y the way the original does and eax is then free for the
+// pos.z sum. Reaching vel through a second single-use pointer does it:
+//     Vec3_00420f30* vv = &d->vel;
+//     d->pos.y += d->size.y + vv->y;
+// A second pointer on the gravity side works equally well. A pointer with
+// two or more uses does not: MSVC 5 then materialises the lea and the
+// function grows to 547 bytes.
+// Still differs, both inside the one physics block:
+//  - the y update's vel.y load is issued just before the pos.x store in the
+//    original, and just after the size.y load here;
+//  - the gravity line's vel.y reload is issued after the g_game load in the
+//    original and before the pos.z store here. Because that keeps edx busy
+//    across the gravity load, the three angle updates get emitted rotated
+//    (y, z, x, each load immediately before its add) instead of batched
+//    (three loads, then three adds).
+// So one scheduling difference explains the whole remaining diff: if the
+// reload moves after the g_game load the angle block should batch with it.
 #include <stdio.h>
 #pragma pack(push, 1)
 
@@ -91,8 +104,9 @@ void FUN_00420f30()
     for (n = 0; n < *pCount; n++, d++) {
         if (d->obj != 0) {
             Vec3_00420f30 old = d->pos;
+            Vec3_00420f30* vv = &d->vel;
             d->pos.x += d->size.x + d->vel.x;
-            d->pos.y += d->size.y + d->vel.y;
+            d->pos.y += d->size.y + vv->y;
             d->pos.z += d->size.z + d->vel.z;
             d->vel.y -= g_game->gravity;
             d->angle_x += d->spin.x;

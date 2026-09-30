@@ -1,4 +1,27 @@
-// Decompiled by deepseek-v4.1-flash, verified by GPT-6.1-sol. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, verified by GPT-6.1-sol, finished by deepseek-v4.1-flash. Names are provisional.
+// 84.6% (up from 82.0). One change bought it: write the copy loop as
+//   for (j = 0; j < face->count; j++, idx++) poly[j] = projected[*idx];
+// with idx the walked pointer, instead of poly[j] = projected[*idx++]. That
+// makes MSVC use edx for face->indices and ecx for j, exactly as the original
+// does (82.0 -> 84.6). Remaining diff is the one eviction 0x4584d0 also hits:
+// the original spills the face counter to [esp+0x10] and gives edi to the copy
+// loop's index temp, so ebx takes the projected-x scratch and ebp keeps arr;
+// this file keeps the counter in edi, so the index temp takes ebx and ebp takes
+// the projected-x scratch, forcing reloads of arr and surface. Swept and did
+// NOT move it: separate face counter, hoisted faceCount, explicit int k index,
+// index declared at function scope, poly walked by pointer, arr->faces[i]
+// indexing (42%), while/for shapes, an extra live node, declaration reordering,
+// proj/poly pointer locals, separate outer/inner counters.
+// LEAD for the next attempt, measured: a spurious extra memory LOAD into eax
+// plus a test at the very end of the loop body flips the allocator into the
+// original state (i spilled to [esp+0x10], index temp in edi, arr in ebp) and
+// scores 97.7%: `if (arr->faces == 0) return;` or `if (arr->count == 0) return;`
+// or `if (g_game == 0) return;` placed just before the loop latch. A test of a
+// REGISTER (`if (face == 0) return;`) or of `face->count` does NOT work, so it
+// needs a fresh memory load into eax at the bottom of the body. That extra
+// branch is not in the original (it adds 3 instructions), so it is a compiler
+// state lever, not the real cause: the next attempt should find the source
+// construct with the same allocator effect that emits no extra bytes.
 // PARTIAL, 82.0%. Lead probes: taking the face index address and using it
 // through a pointer kept 82.0%; hoisting faceCount scored 75.8%, reversing the
 // loop comparison scored 81.3%, and reversing the firstFace branch scored 80.0%.
@@ -139,9 +162,10 @@ void __stdcall FUN_004211d0(void* surface, Obj_00421170* obj, Inner_00421550* in
     }
     for (; i < arr->faceCount; i++, face++) {
         unsigned short* idx = face->indices;
-        for (j = 0; j < face->count; j++) {
-            poly[j] = projected[*idx++];
+        for (j = 0; j < face->count; j++, idx++) {
+            poly[j] = projected[*idx];
         }
+
         Flags_004211d0 flags = face->flags;
         if (!flags.bits.a) {
             if (face->count == 4) {
