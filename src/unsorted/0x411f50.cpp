@@ -62,6 +62,27 @@
 //  - 0x4126f0: the switch jump table address still shows as <addr>; check.py
 //    resolves relocations only once the code matches, so this may not be a real
 //    difference.
+//
+// Re-verified by deepseek-v4.1-flash: still 96.8% (1980 bytes), first line
+// credit kept. This session re-ran the N-declarations sweep (nd1..nd24 flat at
+// 96.6%, nd60 down to 93.9%, nd180+ shorter and 83 to 86%) and ~40 more shapes
+// in build/scratch/0x411f50/ (cA..cG, h3..h9, kA..kC, q1..q6): pinning the
+// product in a float local, reordering the two multiply operands, int/double/
+// short/size variants, an inline AngleTo() helper and Vec3* locals for the
+// case-1/2 leas. Every one lands on the same 96.8% bytes. The float order IS
+// reachable in a function whose size/rate are parameters: `float x =
+// (float)sqrt(size * 2.0 / rate) * 30.0f;` then `(int)(x * field_22)` gives the
+// original's `fidiv`/`fmul [30.0]`/`fimul [field_22]` (mf.cpp f3), and a micro
+// reproducing the whole state-4 body gives the original's positive sum when the
+// field_22 multiply becomes `fild`/`fmulp` (micro12 m1/m5/m8/m9/m10). Here every
+// shape that keeps `fidiv` reassociates to `fimul field_22; fmul -30.0`, and
+// every shape that keeps +30.0 turns the field_22 multiply into `fild`/`fmulp`
+// and folds the sum into `lea [eax+ecx+1]`, so the two requirements look coupled
+// to file-wide compiler state (the original source's neighbouring functions),
+// not to the state-4 expression. The def-in-ebp vs def-in-ebx difference is the
+// same swap: original keeps the flags parameter (ebx) through the state-4 test
+// and gives def ebp; VC5 reuses the dead ebx here. Forcing flags live with a
+// named copy (d1..d4) did not move it.
 #include <list>
 #include <windows.h>
 #include <math.h>
