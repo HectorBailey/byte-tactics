@@ -1,119 +1,18 @@
 // Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6.1-sol, finished by deepseek-v4.1-flash, edited by deepseek-v4.1. Names are provisional.
-// PARTIAL, 92.7% (original 1104 bytes, ours 1112). Session 3 (deepseek-v4.1): the
-// 0x219/0x3b9 `je`s are now the original's short ones. The lever was the 0x30f
-// arm's hpalette path: spelling it as an early `return 1;` puts its epilogue in
-// the same fold group as the two callback arms, so MSVC makes it the group's
-// representative and both `je`s become rel32 (+8 bytes). With
-// `hr = DD_OK;` plus an `else if` so the hpalette path falls into the shared
-// `return hr == DD_OK ? 1 : 0;` tail, that epilogue is not merged and the
-// representative is the 0x3b9 copy at 0x4b5fe9, exactly as the original.
-// What still differs: the hpalette path's tail is the unfolded
-// `xor eax,eax / xor ecx,ecx / test eax,eax / sete cl / mov eax,ecx` (20 bytes)
-// where the original has the folded `mov eax,1` (12 bytes), and `mov eax,
-// 0x80004005` is still hoisted to the 0x30f arm entry instead of after
-// `mov edx, [ecx+0x88]` (net zero). Same 1112 bytes, fewer differing
-// instructions: 89.3% -> 92.7%. Next: get `mov eax,1` for the hpalette tail
-// without re-entering the fold group (an early `return 1;` or an early
-// `return hr == DD_OK ? 1 : 0;` with hr = DD_OK both fold early and rejoin it).
-// Session 4 (deepseek-v4.1): the fold is confirmed to be "all identical
-// ret blocks are retargeted to the LAST one in layout", not a predecessor or
-// source-order rule. Diagnostics run this session (scratch variants, all with
-// case order and E_FAIL placement varied):
-//   * hpalette `return DD_OK ? 1 : 0;` (value 0, wrong): 1104 bytes, 90.9%.
-//     Its block is `xor eax, eax / pop esi / ...` which is NOT `mov eax,1`, so
-//     it stays out of the ret-1 group and both callback `je`s do land on the
-//     0x3b9 copy (size matches!), but the block then joins the ret-0 group as
-//     its last member, so the WM_CREATE `je` retargets from 0x4b606c to it.
-//   * `return hr == DD_OK;`, `return !hr;`, `return DD_OK == hr;` (all value 0
-//     there, wrong): 1104 bytes, 92.4%, same membership story.
-//   * early `return 1;` with four source case orders (0x219/0x30f/0x311/0x3b9,
-//     0x219/0x3b9/0x311/0x30f, 0x219/default/0x3b9/0x311/0x30f, 0x30f first):
-//     every one keeps the survivor at the 0x30f hpalette copy, 1112 bytes,
-//     89.3%. So source order cannot move the fold target.
-// Conclusion: a byte-identical `mov eax,1` block at 0x30f always becomes the
-// fold's last member. The original's 0x30f copy must have been produced AFTER
-// the fold ran, i.e. it is the compiler's own specialised copy of the shared
-// `return hr == DD_OK ? 1 : 0;` tail for the edge where hr is known DD_OK. Our
-// build does emit that specialised copy (18 bytes: xor eax,eax / xor ecx,ecx /
-// test eax,eax / sete cl / mov eax,ecx) but stops short of folding the known
-// comparison to `mov eax,1` (12 bytes), which is the whole 8-byte gap.
+// MATCH, 100% (1104 bytes). Session 5 (deepseek-v4.1): the whole 8-byte gap was
+// the 0x30f arm's return path. Writing the two paths as an if/else where each
+// arm stores its own result into a plain `long ok` local and a single
+// `return ok;` follows makes MSVC 5 constant-fold the hpalette arm to the
+// original's `mov eax,1 / pop esi / add esp,0x18 / ret 0x10` (12 bytes) and
+// keeps that block out of the ret-1 tail-merge group, so the 0x219/0x3b9
+// `je`s stay short and land on the 0x3b9 copy at 0x4b5fe9 exactly as the
+// original. `long ok` is register-promoted, no extra frame slot. Every earlier
+// spelling (early `return 1;`, `hr = DD_OK` plus a shared
+// `return hr == DD_OK ? 1 : 0;`, `return DD_OK ? 1 : 0;`) either joined the
+// tail-merge group or left the comparison unfolded; the `ok` local with the
+// ternary materialised in the else arm is the one that folds.
 // Window procedure of the main application window: translates the custom
 // display messages and forwards the rest to the default handler.
-//
-// PARTIAL, 89.3% (original 1104 bytes, ours 1112). Control flow, every struct
-// offset, every call and the whole jump table now match instruction for
-// instruction except for the two points listed below.
-//
-//  * The two FUN_004c2e30 arms are written as two case bodies that `break` out
-//    of the switch into a shared tail (e.message = msg; FUN_004c2e30(&e)).
-//    That is what makes the compiler duplicate their common prefix and
-//    tail-merge the suffix: 0x4b5cc0+0x23c jumps to the tail and the
-//    0x203/0x206 arm falls straight into it, exactly as the original does.
-//    A `default: return DefWindowProcA(...)` clause is required: without it the
-//    switch's default call is dead-eliminated and the function loses 29 bytes.
-//  * The 0x30f arm's E_FAIL has to be declared BEFORE the hpalette `if` so that
-//    `hr` is live across that branch. That extra liveness is what demotes
-//    DAT_0051fbd0 from edx to ecx and the surface pointer into edx, matching
-//    the original's 0x4b60c4 block. Declaring it after the `if` (the obvious
-//    spelling) gives the right code shape but the wrong registers.
-//
-// What still differs, 2 items, 8 bytes:
-//
-//  1. `je` at 0x4b5f9ad and 0x4b5fd3 (the "callback == 0" jumps out of the
-//     0x219 and 0x3b9 arms) are 6 bytes here and 2 bytes in the original,
-//     because the shared "return 1" block they target is laid out after the
-//     0x30f arm instead of immediately after the 0x3b9 arm. Both layouts have
-//     the same three copies of `mov eax,1 / pop esi / add esp,0x18 / ret 0x10`;
-//     MSVC 5 just picks a different representative to absorb the two
-//     duplicates. Reordering the case labels, spelling the 0x219/0x3b9 returns
-//     as a `break` into a shared `return 1` after the switch, and using `goto`
-//     all leave the representative at the end of the function. Those 8 bytes
-//     are the whole size difference.
-//  2. `mov eax, 0x80004005` (E_FAIL) is hoisted to the top of the 0x30f arm
-//     (ours 0x4b60c3) instead of into the primary/palette block (original
-//     0x4b60ca, after `mov edx, [ecx+0x88]`). Net zero bytes: the 0x30f
-//     primary block is otherwise byte identical. Moving the initialiser back
-//     after the hpalette `if` puts the constant in the right place and breaks
-//     the register allocation again (87.8%).
-//
-// Follow-up (deepseek-v4.1-flash, same model, second session): both remaining
-// diffs come from ONE cause, the 8-byte size gap. The gap is exactly the two
-// `je` at 0x4b5f6d and 0x4b5fd3: the original targets the return-1 block right
-// after the 0x3b9 arm (0x4b5fe9, distance 124, short jump), ours targets the
-// 0x30f hpalette return-1 block instead (offset 0x405, distance > 127, rel32).
-// MSVC 5's code folding picks that block as the representative for the
-// `mov eax,1 / pop esi / add esp,0x18 / ret 0x10` tail; the 0x30f arm then also
-// keeps its own copy. The E_FAIL hoist is a consequence, not a cause: the same
-// two long `je` appear in the variant that moves E_FAIL after the hpalette
-// `if` (87.8%).
-//
-// Everything tried against the fold choice, with no effect (all still 1112
-// bytes / 89.3%): every source order of the 0x219/0x30f/0x311/0x3b9 cases;
-// `goto` to a shared `ret1:` label placed right after the 0x3b9 call; an
-// explicit `break` to a labelled return; inline helpers returning 1; braces
-// around every case body; if/else instead of two `if`s; `return TRUE`,
-// `return (DD_OK==DD_OK)?1:0`, `return +1`, `return !!1` and ten other
-// spellings that all fold to `mov eax,1`; moving `HRESULT hr` to function
-// scope; <ddraw.h>/<windows.h>/<stdio.h>/<stdlib.h>/<string.h> alone and in
-// pairs (headers.py: no set fixes it); a sweep of 0..800 unused `extern int`
-// declarations (flat at 89.3%, so it is not compiler state).
-//
-// The one thing that does flip the fold to the 0x3b9 block and makes the size
-// 1104 is changing the hpalette early return to a different value, for example
-// `return DD_OK ? 1 : 0;` (DD_OK is 0), which scores 92.4%. That is not a
-// candidate because it returns 0 where the original returns 1; it is recorded
-// here only as proof of the diagnosis: the fold target is the whole cause.
-// Whichever model finishes this needs a construct that emits `mov eax,1` for
-//
-// Session 3 (deepseek-v4.1): re-confirmed that moving E_FAIL after the hpalette
-// `if` still folds the 0x219/0x3b9 `je` onto the 0x30f hpalette epilogue (87.8%);
-// its only extra damage is in the 0x30f primary block, where DAT_0051fbd0 lands
-// in edx and the surface in ecx instead of ecx/edx. Reordering the source cases
-// to 0x219/0x3b9/0x311/0x30f (the binary layout order) changes nothing either:
-// still 1112 bytes / 89.3%, so the fold target is chosen before case order and
-// before register allocation matter.
-// the 0x30f hpalette path yet keeps that byte-identical block out of the fold.
-
 #include <windows.h>
 #include <ddraw.h>
 
@@ -241,17 +140,21 @@ long __stdcall FUN_004b5cc0(HWND hwnd, unsigned int msg, unsigned int wparam,
             DAT_0051fbd0->callback(0x219, wparam, lparam);
         return 1;
     case 0x30f: {
-        HRESULT hr = E_FAIL;
+        long ok;
         if (DAT_0051fbd0->hpalette) {
             HDC dc = GetDC(DAT_0051fbd0->hwnd);
             SelectPalette(dc, DAT_0051fbd0->hpalette, FALSE);
             RealizePalette(dc);
             ReleaseDC(DAT_0051fbd0->hwnd, dc);
-            hr = DD_OK;
+            ok = 1;
         }
-        else if (DAT_0051fbd0->primary && DAT_0051fbd0->palette)
-            hr = DAT_0051fbd0->primary->SetPalette(DAT_0051fbd0->palette);
-        return hr == DD_OK ? 1 : 0;
+        else {
+            HRESULT hr = E_FAIL;
+            if (DAT_0051fbd0->primary && DAT_0051fbd0->palette)
+                hr = DAT_0051fbd0->primary->SetPalette(DAT_0051fbd0->palette);
+            ok = hr == DD_OK ? 1 : 0;
+        }
+        return ok;
     }
     case 0x311:
         if (DAT_0051fbd0->hwnd == (HWND)wparam)
