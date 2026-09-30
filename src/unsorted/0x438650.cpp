@@ -1,8 +1,29 @@
-// Decompiled by Opus. Names are provisional.
+// Decompiled by Opus, edited by deepseek-v4.1. Names are provisional.
 // Codex / GPT-6 retest in #13:
 // signed intermediate products, a scale helper and a widened
 // multiplier did not preserve both load order and unsigned float conversion.
 // Retain the original best partial, including its redundant 16-bit mask.
+//
+// deepseek-v4.1 in #1995: 0x437a50 is a byte-identical twin of this function
+// (same unit offsets, same 10.0f / 300.0f constants, only the _ftol call and
+// the jg target differ) and it has NO "and edx, 0xffff", so a mask-free source
+// does exist. A cast-free product of the same four factors gives 52.9%: MSVC5
+// computes the division into edx first and loads field_1fe afterwards, so the
+// accumulator is edx, not edi. Every narrowing cast tried, (unsigned short),
+// (short), (unsigned char), restores the original A-first order and the exact
+// original registers, but always appends "and edx, 0xffff" (or the matching
+// mask) and turns the file into 167 bytes vs 161. MSVC5 does not elide that
+// mask even when the value range is obvious: a micro-test whose operand is an
+// unsigned short parameter still emits it, so no cast spelling removes it.
+// Still differs by that one instruction (and the jg target it shifts,
+// 0x4386e9 vs 0x4386ef).
+// Tried and rejected: all 24 factor orders of (field_1fe, (field_b8+5)/5,
+// field_1fa, n) and two-part groupings, an unsigned int numerator local
+// (declared first, declared after the float, assigned later, ++-style `*=`
+// chain), the operands read through extra locals and pointers, widened casts
+// and redundant casts on either side, +0 / *1 / |0 / 0u pads, 5u and
+// (unsigned short)5 divisors, float and double conversions of the product,
+// and an unsigned short local for the division result.
 
 #pragma pack(push, 1)
 struct UnitType_00438650 {
