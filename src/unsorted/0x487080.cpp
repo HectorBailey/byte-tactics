@@ -1,5 +1,28 @@
-// Decompiled by DeepSeek V4.1 Flash, finished by GPT-6, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by deepseek-v4.1-flash. Names are provisional.
-// Retry #1766 deepseek-v4.1-flash: 60.6%. The single gain was fixing the
+// Decompiled by DeepSeek V4.1 Flash, finished by GPT-6, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
+// 60.4% (difflib), 1562 bytes vs 1595. Retry notes from previous models still
+// apply (the FUN_0043de30 guard is rec+0x27, the order count is rec+0x23).
+// This run's change: the 3-piece copy at the end was decoding the wrong struct
+// layout. From the disassembly the destination Piece_00487080 (0x1c bytes at
+// unit+4) is f0 at +0, f8 at +8, an obj pointer at +0xc whose field +0x10a is
+// written from the source's +8 byte, then +0x10, +0x14, +0x16, +0x18, +0x1a
+// and the flag byte at +0x1b. With the correct layout the copy loop compiles
+// instruction-for-instruction identical to the original; only the base register
+// offsets differ (ours eax = dest+0, edi = src+8; original eax = dest+8,
+// edi = src+4), which is MSVC's arbitrary displacement folding and not a
+// source-shape difference I could find a lever for.
+// Measured and rejected this run (free scratch scoring, --sym):
+// `int found` instead of `bool found` (45.5, the first loop's allocation
+// collapses); `sprintf(script, "Script%i", i)` taking the search index (46.3,
+// the original really does use rec+0x3b there even though the slot it reads is
+// the loop counter's); `char script[0x1c]` (58.5); typed `SrcPiece pieces[3]`
+// inside the record (59.1, MSVC 5 then sizes the record 4 bytes larger, which
+// shifts every local above it); `sprintf(name + 4, ...)` (59.1, the original
+// passes the same pointer to sprintf and to FUN_0043a420).
+// Still differing: the first loop's allocation (original n in esi, found in
+// ebp, i spilled to [esp+0x10]; ours n in ebp, i in esi, found in a byte
+// local), the FUN_00485f50 argument rotation, the 0x110 flags block rotation,
+// the extra `lea edx,[esi+0x64]` in the field-copy run, and the failure
+// epilogue's xor/pop order.
 // order-count and FUN_0043de30 guard to the correct record fields: the count
 // is rec+0x23 (f23) and the guard is rec+0x27 (f27), not rec+0x33. The old
 // attempt read +0x33 for both, which is the second coordinate of rec.pos.
@@ -24,62 +47,16 @@ struct Vec3_00487080 {
 };
 
 #pragma pack(push, 1)
-// 0xb8-byte save record. Name at +0x0, id at +0x21 (proven by the
-// `cmp word ptr [esp+0x39], bx` against the record base at esp+0x18).
-struct SaveRec_00487080 {
-    char name[0x20];
-    unsigned char player;                    // +0x0
-    unsigned short id;                  // +0x21
-    int f23;                            // +0x23
-    int f27;                            // +0x27
-    int f2b;                            // +0x2b
-    int f2f;                            // +0x2f
-    int f33;                            // +0x33
-    int f37;                            // +0x37
-    short f3b;                          // +0x3b
-    short f3d;                          // +0x3d
-    short f3f;                          // +0x3f
-    char pieces[3 * 0x18];              // +0x41
-    short childA;                       // +0x89
-    short childB;                       // +0x8b
-    unsigned char b8d;                  // +0x8d
-    unsigned char b8e;                  // +0x8e
-    int f8f;                            // +0x8f
-    int f93;                            // +0x93
-    int f97;                            // +0x97
-    int f9b;                            // +0x9b
-    int f9f;                            // +0x9f
-    int fa3;                            // +0xa3
-    int fa7;                            // +0xa7
-    unsigned char bab;                  // +0xab
-    unsigned char bac;                  // +0xac
-    unsigned char bad;                  // +0xad
-    short bae;                          // +0xae
-    unsigned char bb0;                  // +0xb0
-    unsigned char bb1;                  // +0xb1
-    unsigned char bb2;                  // +0xb2
-    unsigned char b3;                   // +0xb3 (unused padding)
-    unsigned int flags;                 // +0xb4
+struct ObjPiece_00487080 {
+    char gap[0x10a];
+    unsigned char field_10a;
 };
 
-struct SrcPiece_00487080 {              // 0x18 bytes at +0x41 + i*0x18
-    int f0;                             // +0x0
-    int f4;                             // +0x4
-    unsigned char f8;                   // +0x8
-    char gap_9[3];
-    int fc;                             // +0xc
-    short f10;                          // +0x10
-    short f12;                          // +0x12
-    short f14;                          // +0x14
-    unsigned char f16;                  // +0x16
-    union { unsigned char flags; struct { unsigned char bit0:1,bit1:1,bits2:2,bit4:1,rest:3; }; };                // +0x17
-};
-
-struct Piece_00487080 {                 // 0x1c bytes at +0x4 + i*0x1c
+struct SrcPiece_00487080 {
     int f0;
-    int unused;
     int f4;
-    unsigned char* obj;
+    unsigned char f8;
+    char gap_9[3];
     int fc;
     short f10;
     short f12;
@@ -88,6 +65,56 @@ struct Piece_00487080 {                 // 0x1c bytes at +0x4 + i*0x1c
     union { unsigned char flags; struct { unsigned char bit0:1,bit1:1,bits2:2,bit4:1,rest:3; }; };
 };
 
+struct SaveRec_00487080 {
+    char name[0x20];
+    unsigned char player;
+    unsigned short id;
+    int f23;
+    int f27;
+    int f2b;
+    int f2f;
+    int f33;
+    int f37;
+    short f3b;
+    short f3d;
+    short f3f;
+    char pieces[3 * 0x18];
+    short childA;
+    short childB;
+    unsigned char b8d;
+    unsigned char b8e;
+    int f8f;
+    int f93;
+    int f97;
+    int f9b;
+    int f9f;
+    int fa3;
+    int fa7;
+    unsigned char bab;
+    unsigned char bac;
+    unsigned char bad;
+    short bae;
+    unsigned char bb0;
+    unsigned char bb1;
+    unsigned char bb2;
+    unsigned char b3;
+    unsigned int flags;
+};
+
+struct Piece_00487080 {
+    int f0;
+    int gap4;
+    int f8;
+    ObjPiece_00487080* obj;
+    int f10;
+    short f14;
+    short f16;
+    short f18;
+    unsigned char f1a;
+    union { unsigned char flags; struct { unsigned char bit0:1,bit1:1,bits2:2,bit4:1,rest:3; }; };
+};
+
+#pragma pack(push, 1)
 #pragma pack(pop)
 
 #pragma pack(push, 1)
@@ -189,8 +216,8 @@ Unit_00487080* __stdcall FUN_00487080(unsigned short id, Class_004b4560* file)
         return 0;
 
     SaveRec_00487080 rec;
-    char name[32];
-    char script[32];
+    char name[0x20];
+    char script[0x20];
     int n = ((Class_004b4800*)file)->FUN_004b4800("Number of Units", 0);
     bool found = 0;
     int i;
@@ -316,22 +343,26 @@ Unit_00487080* __stdcall FUN_00487080(unsigned short id, Class_004b4560* file)
     }
     ((Class_004b0610*)unit->field_9a)->FUN_004b2040(file);
 
-    for (int j = 0; j < 3; j++) {
-        SrcPiece_00487080* s = (SrcPiece_00487080*)(rec.pieces + j * 0x18);
-        Piece_00487080* d = &unit->pieces[j];
+    SrcPiece_00487080* s = (SrcPiece_00487080*)rec.pieces;
+    Piece_00487080* d = unit->pieces;
+    int j = 3;
+    do {
         d->f0 = s->f0;
-        d->f4 = s->f4;
-        d->obj[0x10a] = s->f8;
-        d->fc = s->fc;
-        d->f10 = s->f10;
-        d->f12 = s->f12;
-        d->f14 = s->f14;
-        d->f16 = s->f16;
-        d->bit0 = s->bit0;
-        d->bit1 = s->bit1;
-        d->bits2 = s->bits2;
-        d->bit4 = s->bit4;
-    }
+        d->f8 = s->f4;
+        d->obj->field_10a = s->f8;
+        d->f10 = s->fc;
+        d->f14 = s->f10;
+        d->f16 = s->f12;
+        d->f18 = s->f14;
+        d->f1a = s->f16;
+        d->flags = (s->flags ^ d->flags) & 1 ^ d->flags;
+        d->flags = (s->flags ^ d->flags) & 2 ^ d->flags;
+        d->flags = (s->flags ^ d->flags) & 0xc ^ d->flags;
+        d->flags = (s->flags ^ d->flags) & 0x10 ^ d->flags;
+        s++;
+        d++;
+        j--;
+    } while (j != 0);
 
     if (unit->b_10f & 4)
         FUN_0047db20(unit);
