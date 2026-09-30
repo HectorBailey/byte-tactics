@@ -1,4 +1,4 @@
-// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
+// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, finished by space-bunny-free, edited by deepseek-v4.1. Names are provisional.
 // space-bunny-free: 87.4% by check.py, 309 of 405 original instructions by true
 // LCS, total size now exactly 1221 bytes. Three things moved it off 84.1%:
 // - The inline Direction() assigns its fields in the order x, z, y (NOT x, y, z).
@@ -67,6 +67,13 @@
 // chains instead of the && chain, (*it)-> instead of a unit local, direct
 // temporaries as FUN_0043adc0 arguments, a Scale helper, FixMul operand orders,
 // TooFar() helpers, and Length(d) versus Length(origin - u->pos) in each branch.
+// deepseek-v4.1 (2092) retried the last rotation with: one iterator variable per
+// for-scope (86.4%), an inline `Player()` accessor for every field_10 read
+// (86.9%), an inline `Units()` accessor for every field_8 read (87.4, same
+// bytes), and four shapes that compile to the identical 1221 bytes (ok
+// pre-initialised to 0, unsigned ok, pos hoisted to the loop-body top, `const u`)
+// plus a stray idx local (no change). The rotation is therefore not steered by
+// the loop-1 locals, their declaration order or their initialisers.
 // Tried and worse: other header sets, the x,y,z or z,y,x orders of Direction()'s
 // fields (85.6% and 85.4%), `target = u->pos + d` (85.2%), the in-place
 // `d.x += u->pos.x` tail (84.1%), expanding the loop-2 flag12 Direction() call
