@@ -1,4 +1,4 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, edited by deepseek-v4.1. Names are provisional.
 // PARTIAL: 98.3 percent, size exact (865 bytes against the original's 865).
 // Everything from the prologue through the third visibility test is byte exact,
 // and so is the whole last test's block shape, including the two long
@@ -259,6 +259,15 @@
 // after the first temp of the block that kills the register it wants. Only
 // which BLOCK it goes in is still wrong, exactly as the notes above say; the
 // intra-block order comes for free once that is right.
+//
+// Fifth pass, deepseek-v4.1. One new arm-order variant, worse: making the
+// explored arm the nested one at the source level, `if ((g_game->flags & 2) != 2)
+// return IsSeen(map, pos); if (IsExplored3(map, pos)) return 1; return 0;`, is
+// NOT normalised back by MSVC 5 (unlike the v_rev.cpp reversal above): it is a
+// different function, 852 bytes and 87.4 percent, so the branch direction is
+// load bearing and the current form (explored arm first) must stay. Nothing
+// else new; the best version is back in the file at 98.3 with the single
+// 6-byte hoist described above.
 #pragma pack(push, 1)
 struct MapSize_00465ac0 {
     unsigned int width;
