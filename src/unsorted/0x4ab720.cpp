@@ -1,13 +1,32 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol. Names are provisional.
-// PARTIAL 93.7%: all bytes match except the order of the two
-// FUN_004a5030 calls in the char-insert default case. The original emits
-// `push ebp; call FUN(text); ...; call FUN(c)`, ours emits FUN(c) first.
+// Decompiled by deepseek-v4.1. Names are provisional.
+// (earlier work by deepseek-v4.1-flash and GPT-6.1-sol)
+//
+// STATUS 93.7%, partial. Every byte of the 1015 matches except the scheduling
+// of the two FUN_004a5030 calls in the char-insert default case (0x4ab972).
+// Original: push ebp / mov [esp+0x30],bl / mov [esp+0x31],0 / call FUN(text) /
+//   mov edi,eax / lea eax,[esp+0x2c] / push eax / call FUN(c) / add edi,eax
+// Ours:     lea eax,[esp+0x2c] / mov [esp+0x2c],bl / push eax /
+//   mov [esp+0x31],0 / call FUN(c) / push ebp / mov edi,eax / call FUN(text) /
+//   add edi,eax
+// Same 29 bytes, same slots (c sits on the param_3 home at frame+0x2c in both),
+// only the evaluation order of the sum differs: the compiler picks the FUN(c)
+// subtree first here. Everything before 0x4ab972 matches byte for byte, so the
+// allocator state at the block is identical; the choice is made inside the
+// width expression.
+// Tried and all byte-identical to the current file:
+//   FUN(c) + FUN(text) (swapped operands), char c[2] = {(char)key,0},
+//   char* cp = c, FUN(&c[0]) on either side, unsigned char c[2],
+//   sum inlined in the if condition.
+// `int w = FUN(text); int width = w + FUN(c);` reproduces the call order and
+// every instruction of 0x4ab972..0x4ab98d exactly, but then the sum lands in
+// eax (add eax,edi) and the insert block loses its `mov eax,ecx`
+// (0x4ab99e entry-in-eax), and the function comes out 2 bytes short.
+// `int width = FUN(text); width += FUN(c);` keeps the size but flips the
+// insert block the same way. So the remaining diff is one allocator decision
+// (which call is hoisted) that no rewrite of that expression moved.
+//
 // The char-insert block's `mov eax, ecx` (entry held in ecx, w in edx) only
-// appears when the width is one combined expression `FUN(text) + FUN(c)`;
-// splitting it into two statements restores the call order but flips the
-// insert block to entry-in-eax, which costs more bytes.
-// Tried split-call, static-helper, and explicit-width variants: best remains
-// the original 93.7% version.
+// appears when the width is one combined expression `FUN(text) + FUN(c)`.
 // The char-insert `int i;` local is declared before `char* text` so MSVC
 // makes the subscript the addressing-mode index, giving the original
 // `[ebp+eax]` instead of `[eax+ebp]` in the copy loops.
