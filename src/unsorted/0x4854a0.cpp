@@ -3,15 +3,23 @@
 // templates it instantiated are __stdcall. Standing in for them here with
 // __stdcall copies reproduces the original's `ret 0xc`/`ret 0x10` helpers
 // (0x488810, 0x488920, 0x488960) and removes the caller-side `add esp`
-// (84.8% -> 92.6%). What still differs:
+// (84.8% -> 92.6%). The two remaining differences are allocator tie-breaks,
+// both from the STL code this TU inlines; the rest of the function is
+// byte-identical. What still differs:
 //   - 0x485750 (_Sort's `_L - _M <= _M - _F` test): the original subtracts
 //     into ecx (left) and edx (right); ours picks edx (left) and ecx (right),
 //     so every byte to the end of the block is swapped but semantically equal.
+//     The mirrored conditions (`_L - _M > _M - _F` with the bodies swapped,
+//     and `_M - _F >= _L - _M`) keep the same jump targets but emit jg from
+//     the other side (jl) or recolor the whole inlined region (73.2%).
 //   - 0x485894 tail fill loop: the original keeps `slot` in esi and the
 //     zero-extended copy of unitsPerPlayer in edx; ours keeps `slot` in edx
-//     and loads unitsPerPlayer into esi (adding an `xor esi, esi`), then
-//     rebases the q cursor to q+0xff. Tried: unsigned i, inline slot
-//     expression, while-loop, cached end; all unchanged or worse.
+//     and loads unitsPerPlayer into esi (adding an `xor esi, esi`), and the
+//     induction variable therefore lands on q+0xff instead of q. Tried: named
+//     end/u locals (90.8%/89.6%), q hoisted above the stores (identical),
+//     0x6b/0x67 store order (89.7%), q declared above the stores and the
+//     bound kept as an item field reload (identical bytes); none move
+//     the edx/esi split, so this is function-wide allocator state.
 
 #include <string.h>
 
