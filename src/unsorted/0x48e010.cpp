@@ -1,22 +1,5 @@
 // Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol. Names are provisional.
-// Class_0048ff40::FUN_0048e010, the victory/defeat condition registration
-// function (counterpart of 0x48ff40). All ~18 registration blocks plus the two
-// "if none registered" defaults are written here from the disassembly and the
-// class declarations of the sibling condition files (0x48eeb0, 0x48efb0,
-// 0x48f0f0, 0x48f250, 0x48f3e0, 0x48f530, 0x48f610, 0x48f6b0, 0x48f7e0,
-// 0x48f8c0, 0x48f9d0, 0x48fb60, 0x48fc70, 0x48fd50).
-// 98.2%: identical length (2542) and identical code except the reader-result
-// branch, where the original is
-//     cmp eax, ebx   (ebx holds the live zero)
-// and ours is
-//     test eax, eax
-// in all 16 `if (reader->FUN_...)` sites. Explicit `!= 0`, a zero local, a
-// void* return and a `new`-style null check all still fold to `test`; the
-// remaining difference is a register-allocation artifact of MSVC 5.
-// Two other things that mattered: the condition classes whose size is not a
-// multiple of 4 (BuildUnitType 0x32, KillAllOfType 0x36) need `#pragma
-// pack(2)` or `operator new` asks for 0x34/0x38; and Class_0048f250's
-// constructor must store pos.z and radius before pos.y = 0x12345678.
+// PARTIAL 98.2%. A 768-set C/C++ header sweep found no improvement. Reader-result tests use test eax,eax where the original uses cmp eax,ebx.
 
 #include <string.h>
 #include <stdio.h>

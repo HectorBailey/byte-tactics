@@ -1,25 +1,6 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol. Names are provisional.
-// Saves every live unit (g_game+0x14357..+0x1435b, stride 0x118) as a 0xb8
-// byte record; inverse of 0x487080/0x486fd0. Record and Piece field maps are
-// complete and confirmed by the 0x487080 loader.
-//
-// PARTIAL 66.5%. Still differs:
-//  - pos copy at rec+0x2b: writing `rec.pos = unit->pos` with a Vec3 member
-//    does produce the original's `lea eax,[ebp+0x6a]`, but it then rotates
-//    ecx/edx through the whole rec+0x2b..+0x57 block and scores worse (64.6).
-//    Kept the three scalar stores instead.
-//  - the rec+0x2b..+0x57 field block has the right stores but a rotated
-//    register order: original materialises `lea ecx,[ebp+0x64]` for the
-//    f64/f68 pair and keeps a live zero in ecx (cmp reg,ecx + setne) while
-//    packing rec.flags into edx; ours uses test/setne and packs into ecx.
-//  - the 3x piece copy loop anchors at &piece.f8 / &dest.f4 in the original
-//    but at &piece.obj / &dest.f8 here (both +4); every body instruction and
-//    displacement matches once that base is accounted for. Swapping the f0/f4
-//    assignments raised 66.2 -> 66.5 but did not move the anchor; pointer
-//    variants that forced `lea ecx,[ebp+0x64]` collapsed the rest (40.6).
-//  - rec+0x89/0x8b conditionals: original repeats `ptr != 0` a third time
-//    (kept live zero register), MSVC folds our equivalent chain.
-//  - frame is 0x120 in both.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by GPT-6. Names are provisional.
+// PARTIAL 68.1%. Aggregate position and packed int/short state copies improve allocation. Piece-loop anchors, remaining registers and null checks still differ.
+
 #include <string.h>
 
 extern "C" int sprintf(char* buf, const char* fmt, ...);
@@ -71,17 +52,16 @@ struct SavedPiece_004876c0 {        // 0x18 bytes at rec+0x41
     PieceFlags_004876c0 flags;      // +0x17
 };
 
+struct Pair_004876c0 { int value; short count; };
+
 struct UnitRecord_004876c0 {        // 0xb8 bytes
     char name[0x20];                // +0x0
     unsigned char f20;              // +0x20
     unsigned short id;              // +0x21
     int f23;                        // +0x23
     int f27;                        // +0x27
-    int px;                         // +0x2b
-    int py;                         // +0x2f
-    int pz;                         // +0x33
-    int f37;                        // +0x37
-    short f3b;                      // +0x3b
+    Vec3_004876c0 pos;               // +0x2b
+    Pair_004876c0 state;             // +0x37
     short f3d;                      // +0x3d
     short f3f;                      // +0x3f
     SavedPiece_004876c0 pieces[3];  // +0x41
@@ -117,8 +97,7 @@ struct Unit_004876c0 {
     int f58;                        // +0x58
     void* listHead;                 // +0x5c
     void* listTail;                 // +0x60
-    int f64;                        // +0x64
-    short f68;                      // +0x68
+    Pair_004876c0 state;             // +0x64
     Vec3_004876c0 pos;              // +0x6a
     int f76;                        // +0x76
     int f7a;                        // +0x7a
@@ -254,11 +233,8 @@ void __stdcall FUN_004876c0(Class_004b4560* file)
             rec.f20 = unit->f_ff;
             rec.id = unit->f_a8;
 
-            rec.px = unit->pos.x;
-            rec.py = unit->pos.y;
-            rec.pz = unit->pos.z;
-            rec.f37 = unit->f64;
-            rec.f3b = unit->f68;
+            rec.pos = unit->pos;
+            rec.state = unit->state;
             rec.f3d = unit->f108;
 
             rec.f23 = n;
