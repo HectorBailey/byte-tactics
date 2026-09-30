@@ -211,6 +211,42 @@ fail:
     return 0;
 }
 
+// Session 4 (deepseek-v4.1), additional measurements on the same rotation.
+// The whole group emitted by the three zero stores plus the next statement is
+// source order with exactly ONE scheduler move: `push 6` (the first push of the
+// SetWindowPos statement) is always inserted immediately before the `mov [edx],
+// ebp` store, and the address load stays glued to that store. Measured on all
+// six statement orders (c/h/d permutations): c first gives load,push6,store,h,d
+// and the load is at the block head; h,d,c (this file) gives h,d,load,push6,
+// store; h,c,d gives h,load,push6,store,d; d,c,h gives d,load,push6,store,h; and
+// the two comma/chained shapes reproduce those. So the original's list was
+// load,h,d,store: the load is materialized one statement before its store, which
+// only an explicit value copy does in this compiler.
+// The copy is the dead end: every real copy (HDC *p = setup.dcSlot; in 20
+// spellings: HDC*/int/void*/int cast, const, reference-to-pointer, union,
+// function scope, nested scope, register, an inline identity wrapper, the same
+// copy with the store before/after the two handle stores) emits the load at the
+// block head but the allocator always puts it in EAX, which recolours the whole
+// SetWindowPos block (hwnd into ecx, width into eax) and scores 96.4%; only a
+// direct store-through-pointer gets EDX, and that form always emits the load at
+// the store's own position. The one variant where a copied pointer did land in
+// edx (copy immediately followed by its store) was copy-propagated straight
+// back into the base form.
+// Other levers measured this session, all inert or worse: address-side-effect
+// trees (`*(setup.dcSlot + (int)(h = 0) + (int)(d = 0)) = 0` and index forms
+// fold to the base order, 99.7), `(h = d = *setup.dcSlot = 0)`-style chains
+// (99.3, handle stores swap), foldable arithmetic on the pointer used as the
+// stored value (`(int)setup.dcSlot * 0`, `& 0`, `- itself`) after which c2
+// deletes the load, dead double stores (kept, 1023 bytes), do/while(0),
+// switch(0) and if(1) wrappers (all 99.7), /Gz, /Gr and /Gd flags (all 99.7),
+// BT_TOOLCHAIN=msvc5-rtm (99.0), and tools/headers.py (all 128 sets 99.7).
+// Frame constraint found while testing the "two variables" reading of the
+// 0x14/0x18 slot pair (pdc at 0x14, bits at 0x18): giving CreateDIBSection its
+// own real local (a third struct member or a plain local) makes MSVC allocate
+// both a home for it AND a separate temp for its address, growing the frame to
+// 0x4d4 and shifting every [esp+N] (90.8/91.8), so the original really had one
+// address-taken local at [esp+0x14] with the compiler's &temp at [esp+0x18].
+//
 // Still differing, one 2-slot rotation at 0x4b55af. The original reloads the
 // stack slot `mov edx, dword ptr [esp + 0x14]` (the address of setup.dcSlot)
 // two instructions before its store, above the hpalette/dib zero stores, and
