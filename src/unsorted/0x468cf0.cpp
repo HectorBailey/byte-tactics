@@ -1,8 +1,37 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by GPT-6.1-sol. Names are provisional.
+// Decompiled by deepseek-v4.1. Names are provisional.
+// (Earlier partials: deepseek-v4.1-flash, then GPT-6, then GPT-6.1-sol.)
 // Partial, 40.0%: rendering and overlay logic is present, but the function's
 // register allocation, temporary/frame layout and x87 scheduling still differ.
 // The 128-set header sweep did not improve the score. Resource fields remain
 // packed for the original 33-byte snapshot comparison.
+//
+// WHAT STILL DIFFERS (deepseek-v4.1, precise finding):
+// The frame size matches exactly (sub esp, 0x214 = 133 dwords, verified from
+// the /Fa listing). The failure is the position of the big local struct:
+//   original: struct base [esp+0x14], one 4-byte fp temp at [esp+0x10],
+//             struct size 0x210 (0x14 + 0x210 = 0x224 = frame top).
+//   ours:     struct base [esp+0x18], two 4-byte temps ([esp+0x10],[esp+0x14]),
+//             struct size 0x20c (0x18 + 0x20c = 0x224).
+// MSVC top-aligns the struct (base = frame top - sizeof), so EVERY [esp+N]
+// slot in ours is exactly +4 of the original's: the first hunk is
+//   -mov dword ptr [esp + 0xac], eax   +mov dword ptr [esp + 0xb0], eax
+//   -lea edi, [esp + 0x34]             +lea edi, [esp + 0x38]
+// To fix it both halves must move together: sizeof(struct) 0x20c -> 0x210
+// (add 4 trailing bytes after local_100, no used field moves) AND the body's
+// bottom temporaries must shrink from 2 dwords to 1 (the original's working
+// set used only [esp+0x10], which it reuses for the fild/fistp int<->float
+// conversions). Adding the 4 trailing bytes alone (scored 39.9%) only grows the
+// frame to 0x218 and leaves the base at 0x18. The two bottom slots come from
+// the int* piVar10 / int iVar11 / uint uVar19 temporaries.
+// Also still wrong after the layout: the inlined stubs for the 48-byte
+// memcpy at 0x468d3a load the g_game+0x37e1b field before setting up edi/ebx
+// (original: mov ecx,0xc / lea edi / mov esi / lea ebx / rep movsd then
+// mov [esp+0x74],ebx), the FUN_004c6b10 OverlayRect argument copy uses
+// eax/ecx instead of edx/eax, and the trailing timer updates reorder
+// (ours stores [esi],eax before sub ecx,edx; original reads both first).
+// Tried this session: a 4-byte trailing pad field after local_100 (scored
+// 39.9%, frame became 0x218 and the base stayed at 0x18, so it was not kept).
+// Tried by earlier models: a 128-variant header sweep (no gain).
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
