@@ -1,11 +1,14 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
-// Partial: 94.2%, 1005 bytes versus 1013. Body and FAT date/time block match.
-// Remaining differences: PE timestamp address folding, gmtime scratch LEA,
-// library-date load timing, system-info pointer register and processor-count
-// formatting. GPT-6 tried 768 header sets and 15 source variants without
-// improvement. Direct sprintf(buf + strlen(buf), ...) restores the library
-// pointer timing but changes processor and memory-status registers (94.1%).
-// Typed NT/file headers and a separate date-prefix length do not improve it.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, edited by deepseek-v4.1. Names are provisional.
+// MATCH at 1013/1013 bytes. Two source shapes were the whole difference:
+//  - the PE timestamp must be reached through IMAGE_NT_HEADERS and
+//    &ntHeaders->FileHeader.TimeDateStamp; adding 8 to the char* instead
+//    folds the two-step add into one lea and loses a byte.
+//  - the processor-count block needs the two branches written differently:
+//    `p = buf + strlen(buf);` in the >1 branch (keeps the count in edx and p
+//    in eax, and pushes the count before the strlen) and an inline
+//    `sprintf(buf + strlen(buf), "1 processor\n")` in the else branch. Two
+//    identical `p = ...` branches let MSVC CSE the buffer lea to before the
+//    cmp and shorten the function by 7 bytes.
 // Original bug preserved: CreateFileA failure is tested against zero at
 // 0x4deee1, so INVALID_HANDLE_VALUE reaches GetFileSize at 0x4deeec.
 #include <windows.h>
@@ -79,10 +82,10 @@ void __cdecl FUN_004ded60(char* dest, int destLen)
     }
 
     HANDLE hMod = GetModuleHandleA(NULL);
-    DWORD* linkTime = (DWORD*)((char*)hMod + ((IMAGE_DOS_HEADER*)hMod)->e_lfanew + 8);
-    gmTimeCopy = *gmtime((time_t*)linkTime);
+    IMAGE_NT_HEADERS* ntHeaders = (IMAGE_NT_HEADERS*)((char*)hMod + ((IMAGE_DOS_HEADER*)hMod)->e_lfanew);
+    gmTimeCopy = *gmtime((time_t*)&ntHeaders->FileHeader.TimeDateStamp);
     p = buf + strlen(buf);
-    sprintf(p, "UTC link time: %08lx - %s", *linkTime, asctime(&gmTimeCopy));
+    sprintf(p, "UTC link time: %08lx - %s", ntHeaders->FileHeader.TimeDateStamp, asctime(&gmTimeCopy));
 
     p = buf + strlen(buf);
     sprintf(p, "Library version %d. Library date %s\n",
@@ -91,10 +94,9 @@ void __cdecl FUN_004ded60(char* dest, int destLen)
     GetSystemInfo(&sysInfo);
     if (sysInfo.dwNumberOfProcessors > 1) {
         p = buf + strlen(buf);
-    sprintf(p, "%d processors\n", sysInfo.dwNumberOfProcessors);
+        sprintf(p, "%d processors\n", sysInfo.dwNumberOfProcessors);
     } else {
-        p = buf + strlen(buf);
-    sprintf(p, "1 processor\n");
+        sprintf(buf + strlen(buf), "1 processor\n");
     }
 
     memStatus.dwLength = sizeof(memStatus);
