@@ -1,5 +1,24 @@
 // Decompiled by GPT-6-Luna, finished by Space Bunny Free, finished by
 // deepseek-v4.1-flash, finished by space-bunny-free, edited by deepseek-v4.1. Names are provisional.
+// FOURTH PASS (deepseek-v4.1): nine variants, none above the 79.6% baseline, so
+// this file is unchanged. The face loop rewritten as the Ghidra do-while shape
+// (`if (i < info->faceCount) do { ...; i++; face++; } while (i < info->faceCount);`)
+// compiles to byte-identical output (79.6%, 457 bytes), so the loop form is not
+// the lever; `q[0].x`/`q[0].y`, hoisting `q` with `Point_4584d0* q;` plus a
+// comma init, `int j = 0;` in the copy loop, and swapping the face-loop
+// increments are all also exactly 79.6%. Moving `q++` into the loop body is
+// 74.1%, y-store-first is 77.6%, swapping the vertex-loop increments is 74.1%,
+// and swapping the copy-loop increments drops to 78.9%. WHAT STILL DIFFERS is
+// exactly the two clusters above: (1) the vertex loop's bias convention, the
+// original sinks `lea ecx,[esp+0xec]` BELOW the `jle` guard and biases the
+// destination by +4 (`add ecx,8` early, stores at [ecx-0xc]/[ecx-8]) with an
+// unbiased source walked late, while this file hoists `lea ecx,[esp+0xe8]`
+// above the guard, biases the SOURCE by +4 (`add eax,4`, `[eax-4]`/`[eax+4]`)
+// and advances the destination mid-body; (2) the single eviction at the face
+// loop, where the original spills `i` to [esp+0x10] and keeps `info` in ebx,
+// while this file keeps `i` in edi, spends ebx on the copy-loop index temp and
+// reloads `info` from [esp+0x3f78] once per face.
+
 // PARTIAL, 79.6% (unchanged by the second and third passes). Callers (0x4584b4, 0x458997, 0x4593ff,
 // 0x459476) push the surface pointer as the second argument and the address of a
 // 12-byte {x,y,z} struct as the third, so the argument order is
