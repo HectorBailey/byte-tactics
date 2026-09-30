@@ -1,4 +1,20 @@
 // Decompiled by deepseek-v4.1-flash, finished by Space Bunny Free, edited by deepseek-v4.1. Names are provisional.
+// Retry 2 (deepseek-v4.1, issue 1186, 17 more check.py runs): the mirror lea is
+// immune to the destination spelling. Still 99.7% with the identical diff for:
+// _Q + 1 * _M, _Q + _M + 0, this->_Last, static_cast<iterator>(_Q + _M),
+// iterator _R = _Q; _R += _M; _Ucopy(_P, _Last, _R), _R = _Q + _M declared before
+// _Ufill, a size_type _MM local copy of _M, a local copy of _P used for the first
+// and third copies, and a while-loop _Ucopy. Swapping _Ufill and the third copy
+// is 51.4% (register allocation changes), _R before _Ufill is 74.7%. The lea's
+// base/index order is decided inside the optimizer's reassociated copy loop
+// (source = dest + (_P - (_Q + _M))), not by anything the caller can spell, so
+// this file needs the original translation unit's other instantiations.
+// Also 99.7% with the identical diff (runs 14 to 17): the loop guard reversed
+// (_L != _F, 98.3% instead, it reorders the compares), the increments swapped
+// (++_F, ++_P), and _Ufill's decrement before the increment. Writing the copy
+// as `*_P = *_F` instead of allocator.construct collapses the whole arm to
+// 49.9%: the rep movsd that the placement-new construct inlines is what the
+// optimizer's reassociated source-pointer tree is built around.
 // std::vector<Record_00475bd0>::insert(iterator, size_type, const T&) from
 // MSVC 5's <vector>, with _Ucopy, _Ufill, fill and copy_backward inlined. The
 // vector's 0x3c-byte element is the frame record of 0x4743a0 (the exe's only
