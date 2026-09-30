@@ -1,4 +1,6 @@
-// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash and GPT-6. Names are provisional.
+// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash and GPT-6, edited by deepseek-v4.1. Names are provisional.
+// Started by an earlier partial (Claude Opus 5.5, GPT-6, deepseek-v4.1-flash);
+// this version keeps that work and was re-verified by deepseek-v4.1.
 // "Attacking" order handler of aircraft (VTOL). Interrupts hand over to a
 // "VTOL_SEEKATTACK" order; the order follows its target unit and gives up
 // outside its range. State 0 prepares the order (FUN_0040f200 is defined here
@@ -7,10 +9,31 @@
 // state 6 flies on and, when the unit is below three quarters of its health,
 // sends it to a random repair pad ("VTOL_LANDING").
 //
-// Partial: 96.6%, same 1980-byte size. Remaining differences include the
-// random-angle LEA operand order, turn-delay register allocation and multiply
-// order, and switch relocations. The delay subtraction is equivalent: VC5
-// folds the sign into a -30.0f constant, then subtracts the converted result.
+// Partial: 96.6%, same 1980-byte size. What still differs (checked against the
+// disassembly in build/scratch/0x411f50/ctx.txt):
+//  - 0x4121d7 and 0x4122b0: the two `lea` copies of &unit->pos and &order->pos
+//    are swapped. The original materialises &order->pos (ebp) first and
+//    &unit->pos (ebx) second; ours does the reverse. Same calls and registers,
+//    pure instruction scheduling.
+//  - 0x412309: `lea eax, [eax + edx - 0x2000]` (random turn first) against our
+//    `lea eax, [edx + eax - 0x2000]`. Rewriting it as
+//    `angle = FUN_004b6c30(0x4000) + angle - 0x2000` did not change codegen.
+//  - 0x4123ad: the original keeps unit->def in ebp (mov ebp,[esi+0x92]) and
+//    unit->def is then read at [ebp+0x21c] and [ebp+0x216]; ours picks ebx.
+//  - 0x4123ec: the original multiplies by +30.0f (0x4fcc50) and then by the
+//    integer field_22 (fmul then fimul), and adds the delay with `add ebx,ecx`.
+//    VC5 rewrites our `(int)(...) + 1 + def->field_216` into
+//    `field_216 - (int)(x * field_22 * -30.0f) + 1` (fmul of a -30.0f constant
+//    and `sub ebx,eax`), which is the same value because truncation commutes
+//    with negation. Splitting the float part into a `float turn` local made the
+//    frame 4 bytes bigger and dropped the score to 92.8%, so it was reverted.
+//    deepseek-v4.1 tried five more rewrites of that line (explicit (float) cast
+//    on field_22, `+ def->field_216 + 1`, an `int turn` temp, field_22 * 30.0f
+//    with the sqrt last, and dropping the `def` local) and all five compiled to
+//    byte-identical output, so the multiply order is not steerable from there.
+//  - 0x4126f0: the switch jump table address still shows as <addr>; check.py
+//    resolves relocations only once the code matches, so this may not be a real
+//    difference.
 #include <list>
 #include <windows.h>
 #include <math.h>

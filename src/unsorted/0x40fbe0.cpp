@@ -1,8 +1,22 @@
-// Decompiled by GPT-5.6 Astra, finished by deepseek-v4.1-flash and GPT-6. Names are provisional.
-// Partial: callback order-pointer reloads corrected; weapon scan registers,
-// position copying and order-kind temporaries still differ. The inherited
-// 75.0% attempt cached the other order across a callback; the corrected
-// shared construction currently scores 74.5%.
+// Decompiled by GPT-5.6 Astra, finished by deepseek-v4.1-flash and GPT-6, edited by deepseek-v4.1. Names are provisional.
+// Started by GPT-5.6 Astra, continued by deepseek-v4.1-flash and GPT-6; the
+// 75.8% version is deepseek-v4.1 lowering the earlier 74.5%.
+// Partial 75.8% (original 1976 bytes, ours 1971). Fixed since the 74.5% attempt:
+// the r4 MobileBuild tail is now two separate source sites (the `new` result
+// used on success, an explicit FUN_0043acb0(unit,0) fallthrough on failure), so
+// MSVC emits both copies instead of tail-merging them (+56 bytes). Still
+// differing: the order->pos = order->target->pos copy at 0x40fce9 wants
+// `add eax,0x6a` (the original consumes the target pointer) where ours emits
+// `lea ecx,[eax+0x6a]` and copies through ebp; the original materialises a zero
+// register (`xor ebp,ebp`, then `cmp eax,ebp` and `push ebp` for the constant
+// arguments, 0x40fe7a-0x410120) where ours uses `test eax,eax` and `push 0`;
+// and the r3 `new` failure path jumps to the shared 0x410120 block in the
+// original but gets its own copy in ours. `goto Aim` around the r3 block and
+// the explicit `if (!cmd)` before the success call were both tried and lose
+// (74.8% for the r3 split). Neutral variants (75.8%, kept): the weapon loop as
+// a pointer walk with a separate byte counter (the original walks
+// `unit->weapons[0].flags` and advances by 0x1c), and `tgt=order->target;`
+// before the position copy.
 #include <stdio.h>
 // SHARED begin
 struct Vec3 {
@@ -80,7 +94,8 @@ int __stdcall FUN_0040fbe0(Unit* unit, Order* order, int flags)
             ((Class_004388d0*)order)->FUN_004388d0((int)move);
             return 2;
         }
-        order->pos=order->target->pos;
+        Unit* tgt=order->target;
+        order->pos=tgt->pos;
         unsigned int state=0; state=order->state;
 // REGION r2 begin   0x40fcda-0x40feda
 //   case 0, the guard order, and case 1
@@ -122,14 +137,17 @@ int __stdcall FUN_0040fbe0(Unit* unit, Order* order, int flags)
             !Contains(unit->def->categories,attacker->category)) {
             if (FUN_0043b1f0(unit,attacker,1)) { order->flags=0; return 3; }
             if (unit->flags & 0x300000) {
-                for (unsigned char i=0;i<3;++i) {
-                    Weapon* weapon=&unit->weapons[i];
+                Weapon* weapon=unit->weapons;
+                unsigned char i=0;
+                do {
                     if ((weapon->flags&2) && (weapon->flags&0x10) && !((unsigned char)(weapon->def->flags >> 26)&1)) {
                         Unit* target=FUN_0048a190(unit,i);
                         if (!target || !FUN_0049abb0(unit,target,i) || Contains(unit->def->weaponCategories[i],target->category))
                             FUN_0048a060(unit,attacker,i);
                     }
-                }
+                    weapon++;
+                    ++i;
+                } while (i<3);
             }
         }
 
@@ -171,7 +189,12 @@ int __stdcall FUN_0040fbe0(Unit* unit, Order* order, int flags)
                 }
                 goto Aim;
                 BuildOrder: {
-                    FUN_0043acb0(unit,new Class_0043a1f0(kind,order->target->order->target,&order->target->order->pos,0,0,0));
+                    Class_0043a1f0* cmd=new Class_0043a1f0(kind,order->target->order->target,&order->target->order->pos,0,0,0);
+                    if (cmd) {
+                        FUN_0043acb0(unit,cmd);
+                        order->flags=0; return 3;
+                    }
+                    FUN_0043acb0(unit,0);
                     order->flags=0; return 3;
                 }
             }

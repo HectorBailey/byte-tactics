@@ -1,10 +1,22 @@
-// Decompiled by GPT-6 Astra, finished by deepseek-v4.1-flash. Names are provisional.
-// Partial: 89.9%, 1050 bytes versus 1051. Remaining differences include
-// health-test register rotation, kind return-buffer placement, position-add
-// code generation and the final vector destruction call. 768 header sets
-// did not improve it. Inlining the native allocator/destroy/deallocate body
-// improved the final destructor but changed earlier destructor call sites
-// and dropped the whole-function score to 86.0%; that variant was rejected.
+// Decompiled by GPT-6 Astra, finished by deepseek-v4.1-flash, edited by deepseek-v4.1. Names are provisional.
+// (base version by GPT-6 Astra; deepseek-v4.1 re-verified and extended the notes)
+// Partial: 89.9%, 1050 bytes versus 1051. Still differing:
+//  1) case 1 health test: original has def in edx, health in ecx, bound in eax
+//     and cmp ecx,eax; ours uses eax/edx/ecx and cmp edx,ecx (same length).
+//  2) the Class_00438760 return buffer of FUN_0043f0e0 sits at [esp+0x64]
+//     (arg2's dead home) in the original and at [esp+0x68] (arg3's home) here,
+//     so the later reload of kind is [esp+0x6c]/[esp+0x70] as well.
+//  3) tail: original writes order->pos + Offset(...) with direct field loads
+//     and ends with an inlined operator delete(units.first); ours reads
+//     order->pos through its address (lea/mov) and calls the out-of-line
+//     vector destructor instead, so the flags |= 0xf8 RMW uses eax not edx.
+// Tried and rejected (all scored lower): field-wise Vec3::operator+ and a
+// free VecAdd (fix the pos loads and the whole final block, but flip the
+// esi/edi parameter roles from the first instruction on: 78.7%); inline
+// ~vector() calling ::operator delete(first) (inlines at all three sites:
+// 86.0%); passing FUN_0043f0e0 straight into the Class_0043a1f0 ctor
+// (73.6%); 3*(...>>2) instead of (...>>2)*3 and a named health local (both
+// unchanged at 89.9%). Region 2 alone did not move under any spelling tried.
 #include <vector>
 struct Unit;
 namespace std {
