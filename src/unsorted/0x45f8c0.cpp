@@ -1,4 +1,4 @@
-// Decompiled by space-bunny-free, retried by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6.1-sol. Names are provisional.
+// Decompiled by space-bunny-free, retried by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
 // GPT-6.1-sol retry: 3 checks retained 98.7%; only the first line-buffer LEA register still differs (EDX in the original, ECX here).
 // Fills a help page (gamedata/help.TDF, node "Help", keys "Line<n>"): for every
 // line of the page it looks the line up, cuts it at the '|' into a left and a
@@ -41,6 +41,23 @@
 // FUN_004c5740, an AddText helper wrapping FUN_004ab1b0 (93.4, arg order
 // changed), a Layer* local inside AddLine, and a hoisted `char c`. The single
 // lea/push register pair is compiler state this file cannot reach.
+//
+// deepseek-v4.1 (issue #2012 rerun) tried 20 check.py runs on this one hunk:
+// `(char*)value`, `value ? value : value`, Page/Layer parameters taken by
+// reference, `*value == '|'`, a pre-increment scan (`*++p`, loses 5 bytes),
+// `(char)0` and `0L` for the second argument, FUN_004b6af0's first parameter
+// typed void*, a cast on FUN_004c5740's argument, textual inlining of the whole
+// AddLine body into the loop (no helper at all), `(LPCSTR)` and `(size_t)`
+// casts on the wsprintf/lookup arguments, `&value[0]` on the first call only,
+// a while-loop spelling of the scan (93.1), and a `char* v = value;` /
+// `register char* v = value;` local live across the if/else merge. All of these
+// stay at exactly 98.7 with the same `lea ecx` / `push ecx` pair, so the
+// difference is not the argument expression: at the merge MSVC 5 has eax, ecx
+// and edx free and picks ecx in every spelling probed, while the original has
+// edx there and edx again at 0x45fa45. Since both files are 504 bytes and every
+// other instruction (including the fragile imul preheader) is identical, the
+// checker's remaining hunk is a whole-function coloring tie-break that no
+// source-level change in this file reaches.
 #include <windows.h>
 #include <string.h>
 
