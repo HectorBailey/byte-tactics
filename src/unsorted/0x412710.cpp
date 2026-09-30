@@ -1,4 +1,12 @@
-// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash and GPT-6.1-sol, edited by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
+// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash and GPT-6.1-sol, edited by deepseek-v4.1-flash, finished by space-bunny-free, edited by deepseek-v4.1. Names are provisional.
+// deepseek-v4.1 retry (2 check.py runs, kept 96.1%): confirmed the landing
+// block's `lea ecx, [esp + 0x1c]` is NOT an off-by-4: VC5's <vector> declares
+// `_A allocator;` BEFORE `iterator _First, _Last, _End;` (VECTOR line 245), so
+// the vector object is 16 bytes at frame+0xc with _First at frame+0x10. Both
+// sites are the plain implicit scope-exit destructor, so the only remaining
+// difference is still the /Ob2 decision on the 3-byte (`ret 8`) out-of-line
+// _Destroy at 0x406c00: taken at the landed site, folded away at the empty
+// site (there the earlier `sete` proves _First == _Last).
 // Prior work: Claude Opus 5.5, deepseek-v4.1-flash and GPT-6.1-sol. Names are provisional.
 // space-bunny-free retry (1 real check.py run, kept 96.1%, nothing improved):
 // The one difference left is the landing block's vector destructor. The real

@@ -1,4 +1,12 @@
 // Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash and GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
+// deepseek-v4.1 (issue #1897) fifth retry: baseline reconfirmed 97.4%, same two
+// regions. Negating both hypot arguments (unit->pos.xw - order->x, ...) scores
+// 96.8: the compiler still emits the [esi] (order) movsx first, this time into
+// edx with `sub eax, edx`, and shifts the spill to [esp+0x50]/fild [esp+0x50],
+// so the load pair is base-register driven, not operand driven. State-3 waypoint
+// variants: sum passed straight to the constructor (92.8, temp moves down 0xc),
+// member-wise p.x/p.y/p.z into a fresh local (93.7, frame -4), explicit += on a
+// copy of target->pos (93.0, frame +4), all worse. Best kept: baseline.
 // #1704 retry by Codex / GPT-6.1-sol: checkall reconfirmed 97.4%, no MATCH.
 // Eight worker checks found no improvement over the existing source.
 // GPT-6 retry: range/difference helpers, target-position addition helpers,
