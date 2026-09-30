@@ -48,6 +48,26 @@
 // Suspected original bug: that same branch builds a Class_0044e2d0 waypoint
 // and sets its speed, but never passes it to the order (no FUN_004388d0
 // call, unlike every other branch), so the object leaks.
+// deepseek-v4.1-flash (issue #1897) third retry: baseline reconfirmed 97.4%.
+// Exactly 25 of 1864 bytes differ, in only two regions: 0x413675..0x41368d
+// (the range-check _hypot) and 0x413950..0x413966 (the state-3 first
+// waypoint). The jump-table hunks the checker prints are only placeholder
+// rendering of the DIR32 table entries; those bytes are masked and do not
+// count. For the _hypot: unit-first operands (96.8), mixed operand order
+// (97.1), two named int locals for the two differences (91.0), (short) casts
+// (91.8), a Vec3& to unit->pos (81.6), a Unit* local (97.4, identical) and
+// short/pointer locals (90.3) all fail. For the state-3 waypoint: explicit
+// member sums (93.0), operator+= (93.0), assigning p field by field (93.5),
+// an int speed<<16 local (97.4, identical), inlining Offset (97.4), a Unit*
+// target local (93.5), a Vec3* target local (92.8) and passing the sum
+// straight to the constructor (92.8) all fail. Both hunks are one allocator
+// tie-break: MSVC fuses each difference as movsx into edx/ecx for the
+// esi-based (order) operand and movsx into eax for the edi-based (unit)
+// operand, and in the waypoint it reuses edi for pos.y instead of hoisting
+// pos.y to ebx before consuming off.x. No source spelling tried reaches the
+// opposite assignment. The sibling 0x412d40 MATCHES with the reverse roles
+// (unit in esi, order in edi), so the tie-break depends on context, not on
+// operand order.
 #include <math.h>
 #include <vector>
 
