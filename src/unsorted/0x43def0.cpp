@@ -77,6 +77,19 @@
 // all give this same 94.2 diff (dest in edx instead of edi, esi reloaded for
 // y), while `Vec3 out = result; out.z = -out.z;` alone is 55.7.
 
+// Third pass (deepseek-v4.1): the neighbouring matched file 0x43d210.cpp shows
+// the original Vec3 carries a ctor (Vec3 zero(0, 0, 0) uses zeroed registers),
+// so Vec3 was retried as a class: `Vec3 v(0, 0, 0); return v;` in the null
+// block, `Vec3 w(0, 0, 0); return w;` in the range block and `return
+// Vec3(result.x, result.y, -result.z);` at the end are byte-identical to the
+// POD field-assignment forms (all four combinations, 94.2, both hunks
+// unchanged, 359 bytes); declaring one `result` at function scope and zeroing
+// it from both blocks is also 94.2 with the identical diff. Only x,y,z in the
+// range block moves bytes: it merges the two zero tails into one (330 bytes,
+// 87.3). So both hunks are allocator state: the end block wants dest = edi,
+// x = edx, y = esi (the same tuple the object-init blocks use) and the range
+// block wants its two xors emitted y before z.
+
 #include <string.h>
 
 struct Vec3 {
