@@ -1,4 +1,32 @@
-// Decompiled by Claude Opus 5.5, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by Claude Opus 5.5, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
+// space-bunny-free (issue #2682, 15-minute box): re-measured the baseline at
+// 89.5%, 2740 bytes, exactly the original's size, and left the source alone.
+// The whole diff is still one allocator decision plus three x87 stores. Two new
+// measurements, both negative, so nobody repeats them:
+// - FRAME LAYOUT PROBE: the `[esp+N]` slots drift by one push for the whole
+//   body (ours `[esp+0x24]` vs original `[esp+0x14]`), which reads like a 16
+//   byte layout difference. It is not. Moving buffer0/1/2 and memory/numPlayers
+//   0x18 earlier (so the whole "everything after the five reset fields" block
+//   shifts down 0x18, matching every [esp+N]) scores 88.8%, still 2740 bytes,
+//   and leaves ebx/esi exactly where they were. The current layout is right and
+//   the [esp+N] drift is a cascade of the constant-register choice, not a cause.
+// - INLINE ACCESSOR AS A NODE LEVER: `__inline int& lim(int i)` returning
+//   `((int*)((char*)this + 0xd30))[i]`, used for the four `-1` stores and the
+//   two `0` stores, is 89.4% (334 diff lines vs 332) with `tidalStrength`
+//   still a real float store, and 87.2% if the float is also routed through
+//   the int accessor (that turns `mov dword ptr [ebp+0xd40], 0xbf800000` into
+//   a register store, which the original does not have). So the accessor adds
+//   the graph nodes but does not demote the constant: -1 still lands in eax.
+//   The one thing that DID move -1 out of eax was routing `tidalStrength =
+//   -1.0f` through the int accessor (it then landed in ebx), so the -1/0
+//   choice really is a pure weight threshold, as earlier notes concluded.
+// The remaining diff, for the record: ours `xor esi,esi` / `or eax,-1` against
+// the original `xor ebx,ebx` / `or esi,-1`, the register renames that follow
+// (`mov edi,ebx` -> `mov ebx,ebx` for the deleted pointer, `lea edi` vs
+// `lea esi` for &list, ebx vs edi inside the inlined strcpy counts), the
+// near-jump offsets that shift by one because of it, and the three fstp stores
+// after killmul, timeMul and MeteorDensity/MeteorInterval which the original
+// schedules one or three instructions later.
 // deepseek-v4.1-flash retry 5 (issue #2525, 10-minute box): re-confirmed the
 // earlier retry-4 measurements. This is the HONEST complete source: 2740 bytes,
 // the original size, 89.5%, no MATCH. (A 95.0% variant existed only by adding
