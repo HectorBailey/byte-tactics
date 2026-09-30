@@ -1,5 +1,9 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by space-bunny-free. Names are provisional.
-// Still differs in WM_COMMAND loop allocation and WM_INITDIALOG local layout (76.1%, best of 5 check runs).
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
+// Still differs in WM_COMMAND loop allocation and WM_INITDIALOG local layout (76.2%).
+// This pass: dropped the Class_004e18c0::FUN_004e18c0 call from the 0x3f4 case (the original only
+// clears the set in the 0x113 case; 0x4dfa7a goes straight to `mov esi,[ebx+0x220]`), and typed
+// DAT_00529e00/DAT_00529e10 as Entry_004df590[] so the `DAT_00529e00[i]` read is an array index.
+// Neither changed the score much (76.1 -> 76.2), but both are closer to the original's code.
 // Remaining hunks, by first differing address:
 //   0x4df630 : [esp+0x10]/[esp+0x14] swap, the 0x113 case stores `info` in the slot the original uses for
 //              `sel` and vice versa. Both are 11-slot frame decisions over all four branches.
@@ -115,8 +119,8 @@ extern unsigned char DAT_00529dd4;
 extern unsigned char DAT_00529ddc;
 extern unsigned char DAT_00529e64;
 extern unsigned char DAT_00529dc8;
-extern unsigned char DAT_00529e00[];
-extern unsigned char DAT_00529e10[];
+extern Entry_004df590 DAT_00529e00[];
+extern Entry_004df590 DAT_00529e10[];
 extern char* DAT_0050d660;
 
 void FUN_004e1b10(int flag);
@@ -164,7 +168,7 @@ BOOL Class_004df590::FUN_004df590(UINT msg, WPARAM wParam, LPARAM lParam)
             for (int j = 0; j < count; j++) {
                 Entry_004df590* e = &entries[j];
                 if (entries[j].flags_8 & mask) {
-                    if (e->field_0 == *(int*)(DAT_00529e00 + i * 0x10))
+                    if (e->field_0 == DAT_00529e00[i].field_0)
                         sel = n;
                     n++;
                     SendDlgItemMessageA(hwnd, id, 0x143, 0, e->text);
@@ -199,7 +203,7 @@ BOOL Class_004df590::FUN_004df590(UINT msg, WPARAM wParam, LPARAM lParam)
                 for (int off = 0; j < count; j++, off += 0x10) {
                     if (entries[j].flags_8 & mask) {
                         if (i == sel) {
-                            *(Entry_004df590*)(DAT_00529e00 + b * 0x10) = entries[j];
+                            DAT_00529e00[b] = entries[j];
                             if (DAT_00529dc8 && entries[j].name != 0) {
                                 int n = 0;
                                 int k = 0;
@@ -207,7 +211,7 @@ BOOL Class_004df590::FUN_004df590(UINT msg, WPARAM wParam, LPARAM lParam)
                                     Entry_004df590* e2 = (Entry_004df590*)((char*)entries + koff);
                                     if (e2->flags_8 & ~mask) {
                                         if (e2->field_0 == (int)entries[j].name) {
-                                            *(Entry_004df590*)(DAT_00529e10 - b * 0x10) = *e2;
+                                            DAT_00529e10[-b] = *e2;
                                             SendDlgItemMessageA(hwnd,
                                                 ((short)wParam == 0x3ed) ? 0x3ee : 0x3ed,
                                                 0x14e, n, 0);
@@ -266,7 +270,6 @@ BOOL Class_004df590::FUN_004df590(UINT msg, WPARAM wParam, LPARAM lParam)
                 if ((wParam >> 16) != 1)
                     return 0;
                 int sel = (int)SendDlgItemMessageA(hwnd, id, 0x188, 0, 0);
-                ((Class_004e18c0*)&set)->FUN_004e18c0();
                 int j = 0;
                 Node_004df590* node = set.head->left;
                 while (Iterator_004df590(node) != Iterator_004df590(set.head)) {
