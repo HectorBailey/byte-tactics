@@ -1,28 +1,34 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by deepseek-v4.1-flash, edited by deepseek-v4.1. Names are provisional.
-// PARTIAL: 64.1% (1466 vs 1519 bytes). Layout follows the matched 0x41d920:
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by deepseek-v4.1-flash, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
+// PARTIAL: 73.2% (1525 vs 1519 bytes). Layout follows the matched 0x41d920:
 // grid1 at +0x1428f and grid2 at +0x1429f (the +0x10/+0x14 words are the
 // separate g_game fields 0x142af/0x142b3). The function allocates both
 // passability grids, marks their borders, propagates row and column maxima
 // twice, then fills the smoothed values.
-// 61.4% -> 64.1%: writing `grid2->cells = cond ? new Rec[n] : 0;` and then
-// reading it back into `cells2` lets VC5 fold the read, merge the new result
-// in eax and emit the single store the original has (instead of one store per
-// branch plus a reload).
+// 64.1% -> 73.2%: the passability pass re-applies q to the freshly assigned
+// p1/p2 cells inside the valid-range branch, not just to the cells carried
+// over from the previous row. Adding `p1[0] = max(p1[0], q); p1[1] =
+// min(p1[1], q);` (and the p2 twin) after each pointer assignment restored
+// the original's second max/min pair. That also released the register
+// pressure that had spilled `cellval` to the stack, so the frame is now the
+// original 0x18 and `idiv` uses ebp.
 // What still differs:
-//  - the frame is 0x1c vs the original 0x18: our `int cellval` gets a stack
-//    home at [esp+0x20] (the original keeps it in ebx through to the final
-//    max/min stores); that pressure also makes the division use ebx for
-//    (v+31) where the original uses ebp (lea ebp,[edx+0x1f]; idiv ebp), and
-//    every [esp+N] offset past 0x14 shifts by 4.
-//  - loop counters landed in different slots: ours has outer=[esp+0x1c],
-//    accum=[esp+0x14], cells2=[esp+0x10], the original has outer=[esp+0x10],
-//    cells2=[esp+0x14] (grid1 reuses that slot later), accum=[esp+0x1c].
-//  - the fourth border loop and the grid2 setup differ in induction variable
-//    and register roles (original: b in edi, a in eax; ours: b in eax, a in
-//    edi), and the row scan schedules `add ebx,0xd` after `inc ecx` where
-//    the original has it before.
-// Earlier steps: removing a redundant `row` local (59.8 -> 61.4) and storing
-// grid2->field_10 before field_14 (part of the 61.4).
+//  - loop counter slots are permuted: ours has outer=[esp+0x1c],
+//    accum=[esp+0x14], cells2/grid1=[esp+0x10]; the original has
+//    outer=[esp+0x10], cells2/grid1=[esp+0x14], accum=[esp+0x1c]. Hoisting
+//    `outer` to function scope and reordering the accum/p1/p2 declarations
+//    did not move them (all scored a flat 73.2), so this is not a plain
+//    declaration-order lever.
+//  - the outer loop carries an extra `jmp`/`xor esi,esi` at its head where
+//    the original zeroes p1 at the loop bottom.
+//  - the two max/min fill loops keep the same instruction sequence but with
+//    `prev`/`res`/`m` in different registers (ours prev in dl, original
+//    prev in cl with a bl copy of it).
+//  - the grid2 setup swaps which of field_14227/field_14223 lands in edi
+//    versus eax, and the fourth border loop uses a different induction
+//    register.
+// Earlier steps: 61.4% removed a redundant `row` local and stored
+// grid2->field_10 before field_14; 64.1% wrote
+// `grid2->cells = cond ? new Rec[n] : 0;` then read it back.
 #include <new.h>
 #include <windows.h>
 
@@ -201,16 +207,22 @@ void FUN_00482c20(void)
                     p2[1] = min(p2[1], q);
                 }
                 if ((unsigned int)t20 < (unsigned int)grid1->width
-                        && (unsigned int)block < (unsigned int)grid1->height)
+                        && (unsigned int)block < (unsigned int)grid1->height) {
                     p1 = grid1->cells + (block * grid1->width + t20) * 2;
-                else
+                    p1[0] = max(p1[0], q);
+                    p1[1] = min(p1[1], q);
+                } else {
                     p1 = 0;
+                }
                 if (t20 != t24
                         && (unsigned int)t24 < (unsigned int)grid1->width
-                        && (unsigned int)block < (unsigned int)grid1->height)
+                        && (unsigned int)block < (unsigned int)grid1->height) {
                     p2 = grid1->cells + (block * grid1->width + t24) * 2;
-                else
+                    p2[0] = max(p2[0], q);
+                    p2[1] = min(p2[1], q);
+                } else {
                     p2 = 0;
+                }
             }
             if (p1) {
                 p1[0] = max(p1[0], cellval);
