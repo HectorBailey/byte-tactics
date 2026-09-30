@@ -1,5 +1,27 @@
 // Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
 //
+// deepseek-v4.1-flash retry 3 (issue 2865, timeboxed): 70.8 -> 77.9 percent
+// (555 of 570 bytes). Two source levers:
+//  (a) Set the packet counter with a separate `sent = 0;` statement at the top
+//      of the while body (before the headFrame read) instead of in the for-init
+//      comma expression. That spills `sent` to the argument home [esp+0x1c]
+//      (`inc dword ptr [esp+0x1c]` in the success path) and frees ebp for `i`,
+//      which is the register/space split the original has. (Placing the same
+//      store after the headFrame read or after the log call scores 73.4.)
+//  (b) Wrap the whole body in `if (now >= nextSend || force != 0) { ... }` with
+//      one trailing `return 1;` after the while loop, instead of an early
+//      `return 1;` inside the now/nextSend test. Now every early return-1 path
+//      shares a single epilogue like the original (0x4626cb) instead of the
+//      first one being emitted inline.
+// Residual, all downstream of keeping the extracted-packet pointer `q` live
+// across the logging call: q takes ebx (`lea ebx,[base+offset+0x14]`), so ebx
+// is no longer the constant 0 and needs a `xor ebx,ebx` restore; that also
+// turns the counter into load/inc/store rather than `inc dword ptr [esp+0x1c]`.
+// The original recomputes base+offset+0x14 for FUN_004614e0 (q dead across the
+// call), but writing that here collapses the allocation back to 51.8 percent
+// (546 bytes), so q-live is kept. Also the loop-top count test is register-form
+// (`mov eax,[esi+0x38]`) where the original tests memory (`cmp [esi+0x38],ebx`).
+//
 // deepseek-v4.1-flash retry 2 (issue 2865, timeboxed): lifted 67.8 -> 70.8
 // percent (556 of 570 bytes). The lever was the twin 0x435a20's "what is live
 // across a call": keep an ADDRESS live across the extracted-packet logging
@@ -336,10 +358,7 @@ int Class_004624a0::FUN_004624a0(int force)
     unsigned int now = FUN_004b6340();
     FUN_00461170("player: %ld, ticks betw sends=%lu, nextsend=%lu, gametimereal=%lu\n",
                  dpid, ticks, nextSend, now);
-    if (now < nextSend) {
-        if (force == 0)
-            return 1;
-    }
+    if (now >= nextSend || force != 0) {
     nextSend = now + ticks;
     Locals_004624a0 loc;
     loc.n = (int)&loc;
@@ -350,9 +369,10 @@ int Class_004624a0::FUN_004624a0(int force)
     int sent;
     Packet_004624a0* entry = 0;
     while (1) {
+        sent = 0;
         loc.headFrame = queue.GetFirst()->frame;
         FUN_00461170("assigning packets to frame number: %ld\n", frame);
-        for (i = 0, sent = 0; i < loc.n; i++) {
+        for (i = 0; i < loc.n; i++) {
             // Two calls, not one: the original's inlined code has the diamond
             // of a two-return helper and then a second count test of its own.
             entry = queue.GetFirst();
@@ -391,4 +411,6 @@ int Class_004624a0::FUN_004624a0(int force)
             continue;
         return 1;
     }
+    }
+    return 1;
 }
