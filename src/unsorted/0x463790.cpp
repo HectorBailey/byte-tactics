@@ -1,5 +1,15 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// PARTIAL: 62.6%. Preserve pointer-returning ring pop and unsigned spacing comparison. Remaining count-loop and ring-entry register allocation differ.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by deepseek-v4.1-flash. Names are provisional.
+// PARTIAL: 62.6% (1000 vs 1040 bytes). Structure and all four blocks are
+// correct; the remaining diff is pure register allocation, not missing logic.
+// First divergence is in the scroll loop (0x4637c0): the original keeps
+// `this->f8++` in EDI and then materialises the constant 0x200 into EDI
+// (`mov edi,0x200`) so the ring bound is a register, while our version keeps a
+// zero in EDI (`cmp eax,edi`, `mov [ecx+4],edi`) and uses immediate 0x200.
+// The same zero-vs-register split moves `n` to EDI and `remaining` to EBP in
+// the count loop where the original has `n`=EBP, `remaining`=EDI. Tried and
+// scored, all 62.6% or worse: ternary vs `&&` for the rows->n test (61.4%),
+// function-scope vs block-scope c/cc, swapped remaining/n declarations,
+// i>0 vs i!=0, do/while(--i), hoisted r/ep/h/t, named const cap for 0x200.
 #include <string.h>
 
 void* operator new(unsigned int size);

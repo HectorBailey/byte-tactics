@@ -1,5 +1,20 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// PARTIAL: 39.9%. Correct packet offsets, byte pointer arithmetic, refill routing, saved-frame flag and sequence resend branches. Frame and ring-pop/register allocation still differ.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by space-bunny-free. Names are provisional.
+// PARTIAL: 39.9% (best of 4 free scratch variants plus the starting point).
+// Still differs: the frame is sub esp,0xc here against sub esp,0x10 in the original
+// (one local fewer), so every argument and local slot is 4 bytes low; and the
+// first ring-pop loop allocates differently. The original uses all four callee
+// saved registers across that loop, esi = &entries[i].tail.buffer as the induction
+// variable with e->field_0 read at [esi-0x28], edi = a long-lived constant zero,
+// ebx = this and ebp = tick, with the loop counter in the stack slot the original
+// shares with the later `entry`. Here tick takes esi, the induction variable takes
+// ebp, there is no zero register, and `entry` ends up in ebp instead of a slot.
+// Tried and rejected: reaching length through int* lp = &length (declared after
+// the loop 39.4%, declared at the top 17.6%); explicit cur/saved locals in the
+// sequence-resend block 33.9%; the whole goto/lp rewrite 16.6%; driving the loop from
+// Ring_00462f30** pb = &entries[0].tail.buffer so the induction variable sits at
+// entry+0x28, which MSVC 5 normalised back to byte-identical code with the plain
+// &entries[i] walk, so the +0x28 induction variable is not reachable from the source.
+// Kept: the loop counter is unsigned, since the original tests it with jb, not jl.
 #include <string.h>
 
 struct RingEntry_00462f30 {
@@ -91,7 +106,7 @@ public:
 int Class_00462d30::FUN_00462f30(void* packet, void* dest, unsigned int* size)
 {
     int tick = g_game->tick;
-    int i;
+    unsigned int i;
     Entry_00462f30* e;
     Ring_00462f30* r;
     int* p;
