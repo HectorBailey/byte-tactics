@@ -1,8 +1,22 @@
-// Decompiled by deepseek-v4.1-flash. Names are provisional.
-// Partial: 99.6%, 1174 bytes. The second GlobalMemoryStatus schedules
-// dwLength before the argument push; the original pushes first. A 768-set
-// header sweep, 20 call/init variants and 12 type/layout variants did not
-// resolve that single instruction-order difference.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
+// Partial: 99.6%, 1174 bytes (size exact, 2 instructions swapped in one place).
+//
+// Still differs, and only here, the second GlobalMemoryStatus:
+//   original: lea edx,[esp+0x10] / push edx / mov dword ptr [esp+0x14],0x20 / call esi
+//   ours:     lea edx,[esp+0x10] / mov dword ptr [esp+0x10],0x20 / push edx / call esi
+// i.e. the dwLength store is scheduled after the argument push there, while at
+// the first call (top of the function) both spellings do put it after the push
+// (that site is byte exact). Every rewrite keeps the store between the
+// lea and the push, so it looks like a per-site scheduler decision in MSVC 5
+// and not a statement-shape one. Spellings tried, none of which moved it:
+//   pointer local (MEMORYSTATUS* p), reference local (MEMORYSTATUS& ms),
+//   separate 0x20 local (ms), *(LPDWORD)&mem, sizeof(mem), the value through
+//   an int local, a __forceinline setter helper, a comma expression inside
+//   the argument, a statement-level comma, do{}while(0), a plain brace block,
+//   if (1) { store; } and a comma-nested form at the FIRST call.
+// Also measured: with the first call removed the remaining site uses
+// call dword ptr [__imp__GlobalMemoryStatus] (no esi hoist) and still does not
+// sink, so the hoist of the import into esi is not the trigger.
 
 #include <string.h>
 #include <windows.h>

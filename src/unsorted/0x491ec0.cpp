@@ -5,6 +5,16 @@
 // still loads into EAX instead of comparing its stack home directly. Two
 // 768-set header sweeps, 25 condition/type variants and 16 buffer/layout
 // variants did not remove the extra load.
+//
+// Further attempts by deepseek-v4.1-flash: a 64-step N-declaration sweep
+// (0..63) and tools/headers.py are both flat at 96.0%. The load survives
+// volatile, unsigned, const, pointer-to-member, pointer-store, separate-int
+// and separate-struct spellings, and it is not caused by the first
+// comparison. A reduced probe shows the materialisation appears only when
+// the FUN_004a0bf0("GAMETYPE", name, 0) call sits between the store and the
+// second comparison: without that call the same source emits the original's
+// `cmp DWORD PTR [bb+..],1`. So the residue is how MSVC 5 reloads a stack
+// home that this call may alias, not the comparison's spelling.
 
 #include <string.h>
 #include <stdio.h>
