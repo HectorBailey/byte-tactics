@@ -68,6 +68,29 @@
 // array initialiser `unsigned sb[2] = {20};` gives the identical shape, so the
 // dead `mov eax,ecx` is not explained by the array form either.
 //
+// deepseek-v4.1, second session (each variant compiled with tools/wcl /O2 /Ob2
+// /MT and objdumped, scoring 576 bytes / under 98.3% unless noted):
+//   98.3%  unchanged file (the best): `{20}` + explicit `sb.buf = 0;` gives the
+//          early buf store but through ebp, and keeps the aggregate's second
+//          buf store after the pushes.
+//   576    `{20}; sb.buf = FUN(sb.buf, ...)` (no explicit zero): arg forwarding
+//          uses the aggregate's fresh ecx zero for `push ecx`, but BOTH stores
+//          stay after the pushes (mov [esp+0x20],eax / mov [esp+0x24],ecx).
+//   576    `{20}; sb.buf = FUN((char*)(sb.size - sb.size), ...)`: the member
+//          reference in the argument HOISTS the buf store before the pushes and
+//          drops the second buf store (exactly the original's schedule), but the
+//          zero folds into ebp and the dead `mov eax,ecx` pair is absent. Same
+//          for `(char*)(unsigned int)(sb.size - sb.size)` and `(char*)q` copies.
+//   576    `{20, 0}`, `{20, (char*)0}`, ctor `HapiBuf() { size = 20; buf = 0; }`
+//          and `HapiBuf() : size(20), buf(0) {}`: all fold to immediate stores.
+//   580    `{20}; sb.buf = (char*)(sb.size - 20);` inserts a `lea ecx,[eax-0x14]`
+//          and a late pointer store, so a computed zero in the statement is not
+//          the original's shape either.
+// Conclusion: the original's early `mov [esp+0x18],ecx` plus dead `mov eax,ecx`
+// is a front end value copy (a zero node distinct from the `extra = 0` ebp
+// zero) that no plain assignment, aggregate, ctor or computed-zero spelling
+// tested reproduces. Everything from 0x4bd198 to the end is already identical.
+//
 // deepseek-v4.1 (second session, 20 more shapes dumped instruction by
 // instruction) confirms the diagnosis and narrows it: the 94.1% `{20}` shape is
 // the ONLY construct that materialises the buffer's zero fresh (`xor ecx,ecx`)
