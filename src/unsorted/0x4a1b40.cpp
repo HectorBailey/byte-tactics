@@ -42,6 +42,8 @@ struct Holder_004a1b40 {
     char unknown_08[0x10 - 0x08];
     int field_10;                       // +0x10
     int field_14;                       // +0x14
+    char unknown_18b[0x20 - 0x18];
+    int field_20;                       // +0x20
     char unknown_18[0x24 - 0x18];
     void* surface;                      // +0x24
 };
@@ -137,10 +139,11 @@ void __stdcall FUN_004a1b40(Class_004a1b40* param_1, int param_2)
     int& right = bounds.right;
     int& bottom = bounds.bottom;
 
-    if (param_1->holder != 0)
-        param_1->holder->field_14 = 1;
+    Holder_004a1b40* holder = param_1->holder;
+    if (holder != 0)
+        holder->field_14 = 1;
 
-    Entry_004a1b40* entries = param_1->holder->entries;
+    Entry_004a1b40* entries = holder->entries;
     Entry_004a1b40* me = &entries[param_2];
 
     int h = me->h;
@@ -154,11 +157,11 @@ void __stdcall FUN_004a1b40(Class_004a1b40* param_1, int param_2)
     right = me->w + left - 1;
     bottom = me->h + top - 1;
 
-    void* surface = param_1->holder->surface;
+    void* surface = holder->surface;
     if (surface == 0)
         surface = param_1->fallback;
     if (surface == 0) {
-        if (!(param_1->holder->field_10 & 0x80))
+        if (!(holder->field_10 & 0x80))
             FUN_004b0230(param_1, param_2, 0);
     } else {
         FUN_004c6d20(entries->bc.surface, surface, &bounds,
@@ -177,6 +180,8 @@ void __stdcall FUN_004a1b40(Class_004a1b40* param_1, int param_2)
         step = me->field_da;
 
     int yoff = 0;
+    int xx;
+    int xw;
     unsigned int flags = (unsigned int)me->flags;
 
     if ((flags & 0x10) != 0 && me->text != 0 && me->field_c0 != 0) {
@@ -200,8 +205,6 @@ void __stdcall FUN_004a1b40(Class_004a1b40* param_1, int param_2)
         char* q = FUN_004b6af0(me->text, me->bc.field_bc);
         int y = me->bc.field_bc;
         int line = 0;
-        int xx;
-        int xw;
 
         for (;;) {
             int x1 = left + 2;
@@ -279,9 +282,12 @@ void __stdcall FUN_004a1b40(Class_004a1b40* param_1, int param_2)
             } else if ((me->flags & 0x100) == 0 &&
                        me->field_ba == line + me->bc.field_bc &&
                        me->field_c0 != 0) {
-                // both disassembly arms (0x4a1fb8 and 0x4a1fcb) pass the same
-                // rect and id; only the branch on holder+0x20 differs.
-                FUN_004bf4d0(entries->bc.surface, &rowRect, 0x1e);
+                // both arms (0x4a1fb8 and 0x4a1fcb) pass the same rect and id,
+                // the arm is chosen by holder->field_20 == param_2
+                if (param_1->holder->field_20 == param_2)
+                    FUN_004bf4d0(entries->bc.surface, &rowRect, 0x1e);
+                else
+                    FUN_004bf4d0(entries->bc.surface, &rowRect, 0x1e);
             } else {
                 FUN_004c13a0((int)col, (int)(font & 0xff));
             }
