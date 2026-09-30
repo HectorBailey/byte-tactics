@@ -53,6 +53,19 @@
 //    version sinks the constant store past the argument pushes, just before
 //    the call. Reordering the field assignments and aggregate initialisation
 //    both leave the store sunk.
+// deepseek-v4.1 pass 2 (#2008, 12 more check.py runs, best stays 93.2 at 367):
+// the clear branch wants `~(mask & 0xff) & old`, which is the only spelling that
+// gives the original's dword mask read and `and eax,0xff; not eax; and eax,edx`,
+// but every `(mask & 0xff)` spelling (in one branch or both) makes MSVC hoist
+// the mask load above the `je` and share it (363 bytes, 80.7 to 82.4), so the
+// original must read the mask twice through a form not CSE-able with itself.
+// Writing lost in place (`old &= ~now`) gives the original's `not al; and cl,al`
+// but moves lost's spill from the dead mask slot [esp+0x14] to old's slot
+// [esp+0xc] (91.5, 367). Declaring lost before gained (75.0), `lost = old`
+// followed by `lost &= ~now` (93.2, unchanged), swapping the OR operands
+// (93.2, identical code), `(old | mask) & 0xff` (93.2, identical) and
+// `(old | mask) % 256` (77.0, 376) do not move hunk 1 either. The packet 0x11
+// store was reordered in source and is still sunk (93.2).
 // The rest of the function (every call, both list walks, the frame, one dword
 // of locals with `int now` in it) matches exactly.
 //
