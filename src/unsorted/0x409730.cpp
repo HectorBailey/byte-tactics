@@ -23,6 +23,29 @@
 // - `unsigned char& r = vec_8d[i]` forces the address into a register first
 //   (two extra movs, the pointer kept in ebp) and is never right for a
 //   single-use subscript.
+// - Second space-bunny-free pass, header set is already optimal: adding
+//   <string>, <list>, <map>, <set>, <deque>, <algorithm>, <iostream> or
+//   <xstring> (before or after <vector>) scores 99.2 / 98.0 / 97.6 / 99.6, never
+//   100, so the missing header is not the cause here. `<memory>` and `<new>`
+//   are neutral at 99.6%, so they are also free to add.
+// - Ten more access forms, all with the identical two-line diff: a named
+//   `unsigned char* p8 = vec_8d.begin()` at the top of the loop body is a
+//   disaster (51.0%, and 48.8% with the stored value split into a temp), even
+//   used at only ONE of the two sites (the read alone 99.6%, the store alone
+//   86.6% because the block reshuffles a dozen unrelated instructions).
+//   Neutral at 99.6% with the same diff: `vec_8d[(unsigned)i]`,
+//   `*(vec_8d.begin() + i)`, an `int k = i` copy for the store, and reading
+//   `(char)vec_8d[i]` into a local first. Worse: an `unsigned char` value temp
+//   before the store (85.1%), a `unsigned char& Rating(int)` member used at
+//   both sites (83.9%, the accessor changes the inline budget), and making
+//   vec_8d a `std::vector<char>` so the read needs no cast (98.0%). Binding
+//   the vector itself to a reference inside the loop body, `v8[i]`, is 73.7%.
+// - So the swap is decided before the subscript is even formed: the register
+//   roles are already identical (pointer and index in the same two registers),
+//   the definition order of the two registers is inconsistent between the two
+//   sites, and the register NUMBERS are inconsistent too, which rules out both
+//   definition order and register number as the rule. It has to be the
+//   operand-tree order or some per-function state the front end carries.
 // - A named pointer local hoists `mov <ptr>, [this+0x91]` to the top of the block
 //   when its initializer is written before the value expression (1675 bytes,
 //   86.6%); writing the value into a temp first puts it back in place.

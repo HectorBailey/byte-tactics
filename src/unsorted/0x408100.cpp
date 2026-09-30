@@ -49,7 +49,14 @@
 //   ecx/edx/edi instead of edi/ecx/edx.
 // Retry by deepseek-v4.1-flash: every source-level shuffle left the allocator
 // decision untouched (byte-identical output, all 83.5%), so loop 1's register
-// choice is not driven by statement order. Tried without effect: a
+// choice is not driven by statement order.
+// Second retry by deepseek-v4.1-flash: expanding ONLY the loop-2 else-branch
+// Direction() call into direct d.x/d.y/d.z stores (angle in an int local)
+// removes the extra `mov reg,reg` and the swapped y/z in that branch. It
+// shifts the GLOBAL allocation, so loop 1 now keeps `this` in ebp instead of
+// ebx (a regression there) but matches 8 more original instructions overall:
+// 84.1% by check.py, and 304 of the 405 original instructions by true LCS
+// (against 296 for the previous version). This is the best version so far. Tried without effect: a
 // function-scope unit shared by both loops, a reference unit, a while loop,
 // pos/ok/idx declaration order, converting `ok` to declaration plus assignment,
 // and renaming loop 1's unit.
@@ -246,7 +253,15 @@ void Class_004085d0::FUN_00407380()
                 int len = Length(d);
                 if (len < 0x1400000) {
                     if (len < 0x100000) {
-                        d = Direction(FUN_004b6c30(0x10000), 0x1400000);
+                        {
+                            // Expanded copy of the inlined Direction() call: writing
+                            // the three components of d directly avoids the extra
+                            // copy and the swapped y/z allocation.
+                            int ang = FUN_004b6c30(0x10000);
+                            d.x = -FUN_004b70ef(ang, 0x1400000);
+                            d.y = 0;
+                            d.z = -FUN_004b7123(ang, 0x1400000);
+                        }
                     } else {
                         int s = FixDiv(0x1400000, len);
                         d.x = FixMul(s, d.x);
