@@ -52,6 +52,18 @@
 // headers.py changes nothing (all 128 sets 83.4%). The k4 loop still
 // spills its `int` counter to memory and uses edi for the 0x29d0 offset,
 // where the original keeps the counter in ebx and esi for the offset.
+// deepseek-v4.1 (this pass): the shared slot at esp+0x14 comes from making
+// `out` and the returning flag ONE variable of type int* (assign the pointer
+// at the top, later assign (int*)1 and (int*)0, return (int)out). That
+// reproduces the original's store at 0x456977, the reload at 0x456aea and
+// the 0x456b7b / 0x456bc1 flag stores all at esp+0x14, raising 83.4% to
+// 83.9%. Declaring out at function scope, as an array reference, as const, or
+// dropping the named idx local changes nothing. What still differs is the k4
+// loop: our build spills its int counter to esp+0x18 (the original's res
+// slot) and keeps the field_29d0 byte offset in edi, while the original keeps
+// the counter in ebx, the offset in esi and puts the PlayerId result in edi
+// (ours lands it in ebx, which clobbers the counter). Computing `from` before
+// `to` scores 79.3% at 1292 bytes, so the `to`-first order is kept.
 #include <stdlib.h>
 #include <algorithm>
 
@@ -128,8 +140,9 @@ static inline int PlayerId_004568c0(unsigned char pi) {
 int FUN_004568c0() {
     unsigned char idx = FindOccupied_004568c0();
     int res = ((Class_00456030*)&g_game->players[idx])->FUN_00456030();
+    int* out;
     if (res != 0 && g_game->field_2a28 == 0) {
-        int* out = g_game->field_29fc;
+        out = g_game->field_29fc;
         if (g_game->players[g_game->localPlayer].info->flag_9b_14) {
             int n = 0;
             for (int k0 = 0; k0 < 10; k0++) {
@@ -174,19 +187,19 @@ int FUN_004568c0() {
         }
         g_game->field_2a28 = 1;
     }
-    int ret = 1;
+    out = (int*)1;
     for (int k3 = 0; k3 < 10; k3++) {
         Player_004568c0* q = &g_game->players[k3];
         if (q->active != 0 && q->state == 3) {
             if (res != 0) {
                 if (g_game->field_29a4[k3] == 0 || g_game->field_29d0[k3] == 0) {
-                    ret = 0;
+                    out = (int*)0;
                     break;
                 }
             }
             if (res == 0) {
                 if (g_game->field_29a4[k3] == 0) {
-                    ret = 0;
+                    out = (int*)0;
                     break;
                 }
             }
@@ -220,19 +233,19 @@ int FUN_004568c0() {
     }
     unsigned char pkt = 0x15;
     if (res != 0) {
-        if (ret != 0) {
+        if (out != (int*)0) {
             for (int k5 = 0; k5 < 10; k5++) {
                 Player_004568c0* q = &g_game->players[k5];
                 if (q->active != 0 && (q->state == 1 || q->state == 2))
                     FUN_00451df0(PlayerId_004568c0(k5), &pkt, 1);
             }
         }
-        return ret;
+        return (int)out;
     }
     for (int k6 = 0; k6 < 10; k6++) {
         Player_004568c0* q = &g_game->players[k6];
         if (q->active != 0 && (q->state == 1 || q->state == 2))
             FUN_00451df0(PlayerId_004568c0(k6), &pkt, 1);
     }
-    return ret;
+    return (int)out;
 }
