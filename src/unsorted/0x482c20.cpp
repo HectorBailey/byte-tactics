@@ -1,20 +1,16 @@
 // Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by deepseek-v4.1-flash, edited by deepseek-v4.1. Names are provisional.
-// PARTIAL: 59.8% (1469 vs 1519 bytes). The Game grid layout follows the
-// matched 0x41d920 (grid1 at +0x1428f, grid2 at +0x1429f as grid2+field_142af
-// +field_142b3), and the two grid2 max-scans now use the original's
-// `if (m <= t) m = t; if (prev <= m) res = m;` branch polarity. What still
-// differs is register allocation: the row scan spills cellp (source, +0xd) to
-// [esp+0x10] and keeps row in ebp, while the original spills the outer row
-// pointer to [esp+0x14], keeps cellp in ebx and uses edx for recp; that also
-// creates a 7th stack slot (frame 0x1c vs 0x18) so accum moves to [esp+0x14],
-// the outer counter to [esp+0x1c] and t20/t24 to [esp+0x24]/[esp+0x28]. In the
-// big loop the divisor (v+31) sits in ebp in the original but forces a spill of
-// cellval in ours. Reversing the recp/cellp compare scored 59.6%. In the
-// grid2 setup the original keeps g_game in eax (ours: ecx) and b in edi (ours:
-// eax), keeps cells_14287 in ebx across the four edge loops, and its big final
-// loop needs one fewer stack slot (frame 0x18 vs our 0x1c). The grid2 cells
-// allocation is a scalar operator new plus an inlined constructor loop
-// (no ??_H vector-constructor-iterator call).
+// PARTIAL: 61.4% (1472 vs 1519 bytes). Layout follows the matched 0x41d920:
+// grid1 at +0x1428f and grid2 at +0x1429f (the +0x10/+0x14 words are the
+// separate g_game fields 0x142af/0x142b3). The function allocates both
+// passability grids, marks their borders, propagates row and column maxima
+// twice, then fills the smoothed values.
+// What still differs is one global register allocation: the original has 6
+// locals (frame 0x18), keeps cellp in ebx through the row scan and keeps the
+// big loop's cellval in ebx, while ours has 7 locals (frame 0x1c) and spills
+// cellval to [esp+0x20]. The grid2 setup is permuted too (the original keeps
+// g_game in eax and b in edi; ours uses ecx/eax). Removing the redundant `row`
+// local and storing grid2->field_10 before field_14 were the changes that
+// lifted this from 59.8% to 61.4%.
 #include <new.h>
 #include <windows.h>
 
@@ -75,10 +71,10 @@ void FUN_00482c20(void)
     Grid2_482c20* grid2 = &g_game->grid2;
     int b = g_game->field_14227 * 0x10000;
     int a = g_game->field_14223 * 0x10000;
+    grid2->field_10 = a;
     grid2->field_14 = b;
     int h2 = (b + 0x7fffff) >> 0x17;
     int w2 = (a + 0x7fffff) >> 0x17;
-    grid2->field_10 = a;
     grid2->width = w2;
     grid2->height = h2;
     operator delete(grid2->cells);
@@ -106,9 +102,8 @@ void FUN_00482c20(void)
         grid2->cells[d * 10] = g_game->field_1427f;
 
     {
-        unsigned char* row = cells2;
         for (int y = 0; y < g_game->height; y++) {
-            unsigned char* recp = row;
+            unsigned char* recp = cells2;
             for (int x = 0; x < g_game->width; x++) {
                 if (cellp[5] > recp[0])
                     recp[0] = cellp[5];
@@ -117,7 +112,7 @@ void FUN_00482c20(void)
                 cellp += 0xd;
             }
             if ((y & 7) == 7)
-                row += grid2->width * 10;
+                cells2 += grid2->width * 10;
         }
     }
 
