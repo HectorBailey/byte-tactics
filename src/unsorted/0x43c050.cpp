@@ -1,4 +1,19 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by deepseek-v4.1-flash, edited by deepseek-v4.1. Names are provisional.
+//
+// 2026-09-30 deepseek-v4.1 probe run: adding ONE extra inline statement
+// anywhere in FUN_0043c050 (a call to a static inline helper whose body is a
+// zero-trip loop, a dead `if`, or even a dead local + branch) does make MSVC
+// emit the missing out-of-line `call _Destroy` at the old 0x43c108, exactly
+// the 8-byte shape this note describes. But the probe itself leaves 12 bytes
+// (765 vs 753) and the register allocation downstream does not settle: 81-82%
+// against this file's 89.8%, so the probe is a dead end, not a shortcut.
+// Mirroring the real <algorithm> inline layers instead (a `sort()` wrapper, an
+// inline `_Insertion_sort` wrapper calling FUN_0043c990, `_Val_type(_F)` at
+// both recursive _Sort call sites) does NOT flip _Destroy at all: still 745
+// bytes, 89.8%. So the flip needs a statement that survives to codegen, and
+// the original evidently had one more such statement than this source does,
+// somewhere that does not change the bytes this file already matches.
+//
 // GPT-6 retry: retained 89.8%. Native insert spellings and 768 header sets
 // did not recover the missing out-of-line _Destroy call. The vector::size
 // symbol discrepancy described below still needs orchestrator review.
