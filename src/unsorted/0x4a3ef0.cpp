@@ -1,4 +1,20 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6, finished by GPT-6.1-sol. Names are provisional.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6, finished by GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
+// Retry #1758 (deepseek-v4.1, issue 2461): best stays 93.1% (629 bytes both).
+// The 0x10 arm is now solved exactly: `int other = e->field_da; int
+// denominator = size + 1; if (other > denominator) denominator = other;`
+// gives the original movsx edx / lea edi,[eax+1] / cmp edx,edi / jle / mov
+// edi,edx, but it costs +2 bytes so it scores 90.6% alone (every jump after
+// the arm shifts by 2) until the 0x20 arm also loses its 2 extra bytes.
+// The 0x20 arm needs `mov edx,[ebx+0xc6]` BEFORE `test eax,eax` and the
+// zero-extension in ecx (`xor ecx,ecx; mov cx,[edx+2]; imul ecx,eax`).
+// A pointer local in an inlined helper rewrites the whole entry allocation
+// (kind leaves cl, 34.7 to 36.3%); a pointer local in the arm keeps the
+// allocation but the union needs the unconditional helper assignment, and
+// `?: 0` hoists the pointer into ecx (not edx) plus a redundant join xor
+// (80.4%). Original bug kept: 0x4a40d1 divides by ecx even when the jle at
+// 0x4a40b2 skipped the setup, so `lines` is 0 there and this is a divide by
+// zero (the 0x80 arm guards its divisors with test, this arm does not).
+// Earlier passes below; the best variant is the one in this file.
 // Retry #1758: GPT-6.1-sol best is 93.1% after refinement; latest best check confirmed no MATCH. A single-use helper for the conditional divisor fixes shared-zero stack setup. The 0x10 denominator register choice and 0x20 pointer/divisor sequence still differ.
 // GPT-6.1-sol pass: best measured score 80.9% (650 source bytes vs 629,
 // nine checker runs). The 0x10 arm improved by computing its numerator before
