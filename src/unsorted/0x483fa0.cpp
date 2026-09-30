@@ -4,6 +4,14 @@
 // lower (p2 0x24, rem1 0x2c, rem2 0x30 against 0x2c/0x30/0x34), so the prologue emits
 // px and py in parallel while the original finishes px (store included) before starting py.
 // Tried: computing px/py before rx/ry, do-while loops with counters in memory, struct 0x18.
+// Second pass re-derived the exact frame: the original uses w1 0x10, px 0x14, w2 0x18,
+// ay 0x1c, ax 0x20, py 0x24, stride 0x28, p2 0x2c, rem1 0x30, rem2 0x34, n 0x38,
+// stride2 0x3c; ours always lands w1 0x10, w2 0x14, px 0x18, ay 0x1c, ax 0x20,
+// p2 0x24, py 0x28, rem1 0x2c, rem2 0x30, stride 0x34. Nine declaration orders of the
+// top-level ints (bare and with initializers) all produce that same map, so the slot
+// order here is not declaration-driven; making p2 function-scope only pushed w2/px to
+// 0x18/0x1c and p2 to 0x14 (50.3%). The px-before-py division schedule of the original
+// (store px before starting py, reload px for rx) also did not reproduce.
 #include <windows.h>
 
 #pragma pack(push, 1)
