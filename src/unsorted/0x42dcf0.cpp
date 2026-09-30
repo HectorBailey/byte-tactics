@@ -1,7 +1,17 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// GPT-6 retry: 66.0%, not MATCH. Stack counter arrays, count helpers and
-// alternate count/counter scopes do not improve the saved implementation.
-// Partial: 66.0%. math.h aligns early registers; caching the current unit definition improves the final loop. Count slots and loop induction registers still differ.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by space-bunny-free. Names are provisional.
+// 77.6%, not MATCH (was 66.0%). Fixed by (a) writing the four entry stores of the
+// first loop as four separate g_game->buildLists[i].entries[j] expressions, so each
+// reloads the list pointer after the preceding call exactly as the original does,
+// and (b) indexing unitDefs through one local base pointer (defs[k]) in the last
+// loop, which makes &unitDefs[k].flags_241 the induction variable (add esi,0x241
+// before the loop) and derives the name from it with lea edi,[esi-0x221].
+// Still differs: a one-step permutation of the callee-saved registers in every
+// loop (the original keeps g_game in EDI and the loop counters in EBP, ours keeps
+// g_game in ESI/EBP and the counters in EBX/EBP), the frame slot of the file
+// count (original [esp+0x10], ours [esp+0x18], with the loop-3 countdown and the
+// loop-4 unit counter swapped the other way), and the address form inside the
+// innermost loop of the max-page scan (original: lea esi,[ebx+eax] then
+// [esi+edx+4]; ours: lea ecx,[edi+ebp] then [ecx+eax+4] and a second lea).
 
 #include <math.h>
 #include <vector>
