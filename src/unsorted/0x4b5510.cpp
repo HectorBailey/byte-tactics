@@ -1,12 +1,13 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by GPT-6.1-sol, finished by space-bunny-free. Names are provisional.
-// Partial: 99.3%. Byte count is exact (1017 = 1017) and every instruction is the
-// right one; only two adjacent pairs are swapped, both 2-instruction scheduler
-// tie-breaks in the display-cleanup block (listed at the bottom of this file).
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by GPT-6.1-sol, finished by space-bunny-free, edited by deepseek-v4.1. Names are provisional.
+// Partial: 99.7%. Byte count is exact (1017 = 1017) and every instruction is
+// the right one. The first of the two old scheduler hunks is fixed: writing the
+// field_9c store as `dd->field_9c = 0` (through the &d->draw pointer) instead of
+// `DAT_0051fbd0->draw.field_9c = 0` puts `lea ebx, [esi + 0x84]` before the
+// `push ecx`, 99.3% -> 99.7%.
 // The original holds the constant 0 in a callee-saved register (ebp) and tests
 // every HRESULT against it with `cmp eax, ebp`, so all ten DirectDraw call
 // results go through one named `HRESULT hr` local (see docs/agent-guide.md on
-// 0x4b6880). That one change took this function from 87.7% to 99.3% and fixed
-// the size, the missing `xor eax,eax` and the CreateSurface argument timing too.
+// 0x4b6880).
 #include <windows.h>
 #include <ddraw.h>
 
@@ -89,7 +90,7 @@ int __stdcall FUN_004b5510(int mode) {
     }
     d = DAT_0051fbd0;
     DirectDrawState *dd = &d->draw;
-    DAT_0051fbd0->draw.field_9c = 0;
+    dd->field_9c = 0;
     FUN_004b4ff0(DAT_0051fbd0);
 
     Display_004b5510 *cleanup = DAT_0051fbd0;
@@ -209,15 +210,18 @@ fail:
     return 0;
 }
 
-// Still differing, both two-instruction swaps of a pair that MSVC 5 5.x emits in
-// the other order, and both inside the cleanup block just after FUN_004b4ff0:
-//   0x4b556d..0x4b5573  original: lea ebx,[esi+0x84] / push ecx
-//                       ours:     push ecx / lea ebx,[esi+0x84]
-//   0x4b55af..0x4b55b3  original: mov edx,[esp+0x10...+0x14] first, then the two
-//                       hpalette/dib zero stores; ours: the two stores, then the
-//                       reload of &cleanup->dc.
-// Tried and rejected: `DirectDrawState *dd` declared before or after the
-// field_9c store (no change), after the FUN_004b4ff0 call (worse), and declaring
-// `cleanup` before the call (MSVC then copies esi to edi, 93.1%).
-// Field_98 is the display's saved back buffer: FUN_004c5e70/FUN_004cbbe0/
-// FUN_004c5fa0 are called on a fresh 0x30-byte surface only when it is set.
+// Still differing, one 2-slot rotation at 0x4b55af. The original reloads the
+// stack slot `mov edx, dword ptr [esp + 0x14]` (the address of setup.dcSlot)
+// two instructions before its store, above the hpalette/dib zero stores, and
+// the store stays after `push 6`:
+//   mov edx, [esp + 0x14] / mov [edi + 0x4c], ebp / mov [edi + 0x44], ebp /
+//   push 6 / mov [edx], ebp
+// Ours emits the load adjacent to its store, after the two zero stores, so the
+// load sits two slots low. Tried and rejected: every source order of the three
+// stores (h/d/c, c/h/d, d/h/c, h/c/d, d/c/h, c/d/h), chained assignments
+// (`h = d = 0;` before and after the store, and `*c = h = d = 0;`), an explicit
+// `HDC *slot` local (the pointer then lives in eax and the whole SetWindowPos
+// block is recoloured, 96.1%), an inline helper holding the three stores
+// (96.1%), and hoisting the load by reading the slot in an earlier statement
+// (extra frame slot, 84.8%). In every variant the load stays glued to its
+// store, so this is a scheduler tie the source shape does not steer.

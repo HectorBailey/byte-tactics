@@ -1,8 +1,26 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by GPT-6.1-sol. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
 // Partial: 76.5%. Saved file-offset slots, loop register allocation and
 // compression temporaries differ. Cached names plus += length updates and
 // the vector header improve the append loops; the double record is 12 bytes.
 // Retry: reordered the saved file offset without changing codegen; 128 header sets gave no improvement.
+//
+// deepseek-v4.1 session notes (no score gain, best stays 76.5%):
+// Slot map read off the disassembly: [esp+0x10] is the append oldlen in every
+// loop AND the byte offset of the count2 record loop (one slot, disjoint
+// ranges), [esp+0x14] the ftell result, [esp+0x18] the saved item2->name
+// pointer, [esp+0x1c]/[esp+0x20] the 8-byte and 12-byte records of the count1
+// loops (rec base 0x1c), [esp+0x28]..[esp+0x37] the 16-byte count2 record,
+// [esp+0x38]..[esp+0x57] the header. This file instead gets [esp+0x18] for the
+// ftell result and [esp+0x14] for the count2 byte offset, i.e. one extra live
+// scratch below the ftell slot, and it keeps the zero register in esi where the
+// original's item loops use edi (0x4b3d13, 0x4b3deb, 0x4b3fd1 are `xor edi,edi`).
+// Tried: (a) count2 loops rewritten as do/while over `(char*)slot->items2 + off`
+// with the item2->len > 0 test inline, 76.1% but code 1548 bytes against the
+// original 1544 (this file is 1552), so the shape was closer while the allocator
+// still chose the same two slots; saved as build/scratch/0x4b3c60/a_byteoff.cpp.
+// (b) one function-scope `oldlen` shared by every append and by the count2 byte
+// offset, 71.2%; (c) the same with a separate `itemoff` for the count2 record
+// oldlen, also 71.2%. Both spilled a live append temp, so reverting was right.
 #include <vector>
 #include <io.h>
 

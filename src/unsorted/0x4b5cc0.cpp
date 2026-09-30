@@ -1,4 +1,20 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6.1-sol, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6.1-sol, finished by deepseek-v4.1-flash, edited by deepseek-v4.1. Names are provisional.
+// PARTIAL, 92.7% (original 1104 bytes, ours 1112). Session 3 (deepseek-v4.1): the
+// 0x219/0x3b9 `je`s are now the original's short ones. The lever was the 0x30f
+// arm's hpalette path: spelling it as an early `return 1;` puts its epilogue in
+// the same fold group as the two callback arms, so MSVC makes it the group's
+// representative and both `je`s become rel32 (+8 bytes). With
+// `hr = DD_OK;` plus an `else if` so the hpalette path falls into the shared
+// `return hr == DD_OK ? 1 : 0;` tail, that epilogue is not merged and the
+// representative is the 0x3b9 copy at 0x4b5fe9, exactly as the original.
+// What still differs: the hpalette path's tail is the unfolded
+// `xor eax,eax / xor ecx,ecx / test eax,eax / sete cl / mov eax,ecx` (20 bytes)
+// where the original has the folded `mov eax,1` (12 bytes), and `mov eax,
+// 0x80004005` is still hoisted to the 0x30f arm entry instead of after
+// `mov edx, [ecx+0x88]` (net zero). Same 1112 bytes, fewer differing
+// instructions: 89.3% -> 92.7%. Next: get `mov eax,1` for the hpalette tail
+// without re-entering the fold group (an early `return 1;` or an early
+// `return hr == DD_OK ? 1 : 0;` with hr = DD_OK both fold early and rejoin it).
 // Window procedure of the main application window: translates the custom
 // display messages and forwards the rest to the default handler.
 //
@@ -66,6 +82,14 @@
 // candidate because it returns 0 where the original returns 1; it is recorded
 // here only as proof of the diagnosis: the fold target is the whole cause.
 // Whichever model finishes this needs a construct that emits `mov eax,1` for
+//
+// Session 3 (deepseek-v4.1): re-confirmed that moving E_FAIL after the hpalette
+// `if` still folds the 0x219/0x3b9 `je` onto the 0x30f hpalette epilogue (87.8%);
+// its only extra damage is in the 0x30f primary block, where DAT_0051fbd0 lands
+// in edx and the surface in ecx instead of ecx/edx. Reordering the source cases
+// to 0x219/0x3b9/0x311/0x30f (the binary layout order) changes nothing either:
+// still 1112 bytes / 89.3%, so the fold target is chosen before case order and
+// before register allocation matter.
 // the 0x30f hpalette path yet keeps that byte-identical block out of the fold.
 
 #include <windows.h>
@@ -201,9 +225,9 @@ long __stdcall FUN_004b5cc0(HWND hwnd, unsigned int msg, unsigned int wparam,
             SelectPalette(dc, DAT_0051fbd0->hpalette, FALSE);
             RealizePalette(dc);
             ReleaseDC(DAT_0051fbd0->hwnd, dc);
-            return 1;
+            hr = DD_OK;
         }
-        if (DAT_0051fbd0->primary && DAT_0051fbd0->palette)
+        else if (DAT_0051fbd0->primary && DAT_0051fbd0->palette)
             hr = DAT_0051fbd0->primary->SetPalette(DAT_0051fbd0->palette);
         return hr == DD_OK ? 1 : 0;
     }
