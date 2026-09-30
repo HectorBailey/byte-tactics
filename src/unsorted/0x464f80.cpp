@@ -1,10 +1,14 @@
 // Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
-// PARTIAL: 66.9% (was 66.5%). Frame still 0x3c versus 0x34: two extra stack
-// slots, so every [esp+N] above 0x2c is +8 and every branch target label is
-// shifted; the original keeps the 3x3 scan's hw/hh (screen_hw/screen_hh << 16)
-// in edi/ebp, ours spills them. Also still differs: the loop head test
-// (cmp bl,0xa / jae before the body) is dropped as provably true, and the
-// duplicated player guards (0x464fe1..0x465024) are CSE'd into one copy.
+// PARTIAL: 72.2% (was 66.9%). Frame still 0x38 versus 0x34: one extra stack
+// slot, so every [esp+N] above 0x14 is +4 and every branch target label is
+// shifted. In ours the slot order is swapped too: hits sits at [esp+0x14] where
+// the original keeps the player pointer, and the pointer is at [esp+0x18] where
+// the original keeps hits. Also still differs: the loop head test (cmp bl,0xa /
+// jae before the body) is dropped as provably true, the duplicated player
+// guards (0x464fe1..0x465024) are CSE'd into one copy, the typeId copy is
+// `mov ecx,eax` where the original uses `mov cx,ax`, `pos.y = 0` is not stored
+// in the same place, and the countdown block keeps 4 in ebp (mov ebp,4) where
+// ours re-materialises the immediate.
 #include <windows.h>
 #include <string.h>
 
@@ -266,9 +270,8 @@ void __stdcall FUN_00464f80()
                     g_game->field_39239--;
                     if (g_game->field_39239 < 0) {
                         if (g_game->field_37ef6 == 2) {
-                            unsigned char b = FUN_00456850();
                             Player_00464f80* self =
-                                g_game->players[b].data;
+                                g_game->players[FUN_00456850()].data;
                             unsigned short typeId = FUN_00488b10(
                                 &g_game->startPos[0x232 *
                                     g_game->players[g_game->localPlayer].data->field_95]);

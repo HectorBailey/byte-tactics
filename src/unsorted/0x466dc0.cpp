@@ -1,4 +1,12 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, edited by deepseek-v4.1. Names are provisional.
+// 2026-09-30 deepseek-v4.1 session: unchanged at 71.3% (1641/1662). Confirmed with the checker that
+// the whole remaining gap is one register choice plus its knock-on: the original keeps the short*
+// q in ebx across the projectile loop and spills p (reloaded from its slot once per iteration at
+// 0x4671c9), while this file keeps p in ebx and reloads both p and q at the latch. Tried and no
+// gain: swapping the ScaleX operand order (still emits the zoom movsx first), a 16-bit union read
+// for field_14281 (the original's `mov ax, word ptr [esi+0x14281]` comes back, but the `enabled = 1`
+// stores then materialise 1 in a register, 1643 bytes / 70.4%), reading p->player and p->owner
+// through q byte casts (70.9%), declaring q before p (70.8%).
 // PARTIAL 71.3% (1641 of 1662 bytes), up from 67.7%. Two changes did it: (1) the
 // los half of OnRadar is a single `&&` chain. As `if (inbounds) b = los[..] != 0;
 // else b = 0;` MSVC 5 if-converts the value to `setne`; folded into the chain
@@ -179,7 +187,7 @@ struct Game_00466dc0 {
     char unknown_14233[0x14273 - 0x14233];
     unsigned short* field_14273;         // +0x14273
     char unknown_14277[0x14281 - 0x14277];
-    unsigned short field_14281;           // +0x14281
+    Flags14281_00466dc0 field_14281;      // +0x14281
     char unknown_14283[0x142db - 0x14283];
     void* field_142db;                   // +0x142db
     void* field_142df;                   // +0x142df
@@ -227,7 +235,7 @@ static inline int OnRadar_00466dc0(int px, int py)
 {
     PlayerInfo_00466dc0* pi = PlayerInfo_00466dc0_Get(g_game->currentPlayer);
     int b;
-    if ((g_game->field_14281 & 2) == 2) {
+    if ((g_game->field_14281.all & 2) == 2) {
         b = (unsigned int)(px >> 5) < (unsigned int)pi->width &&
             (unsigned int)(py >> 5) < (unsigned int)pi->height &&
             pi->los[(py >> 5) * pi->width + (px >> 5)] != 0;
@@ -246,7 +254,7 @@ static inline int OnRadar_00466dc0(int px, int py)
 // order of the multiply so the operand lands in the right register.
 static inline int ScaleX_00466dc0(Unit_00466dc0* u)
 {
-    return (int)u->field_6c * (int)g_game->field_142eb;
+    return (int)g_game->field_142eb * (int)u->field_6c;
 }
 
 static inline int ScaleY_00466dc0(Unit_00466dc0* u)
@@ -265,7 +273,7 @@ void FUN_00466dc0(void)
     FUN_004c6b70(surface, g_game->field_142df, 0, 0);
 
     int enabled = 1;
-    if ((g_game->field_14281 & 3) != 0)
+    if ((g_game->field_14281.all & 3) != 0)
         enabled = 0;
     if (g_game->field_37f2f.bits.bit9)
         enabled = 1;
