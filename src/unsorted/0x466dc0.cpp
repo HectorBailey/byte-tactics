@@ -41,6 +41,24 @@
 // position through the same expression tree as the x and y scaling so the
 // three loads are shared. That combination has not been found.
 //
+// New this session (2025, second pass):
+//   - The top-of-function hunk (0x466e0c region) is an independent cluster, not
+//     part of the projectile loop: the original stores the constant 1 as an
+//     immediate twice and reads the flag word with a 16-bit load
+//     (`mov ax, word ptr [esi+0x14281]`) before `test al, 3`. Spelling the two
+//     low bits as `field_14281.bits.bit0 || field_14281.bits.bit1` reproduces
+//     that load and test exactly, but the constant 1 then materialises in ecx
+//     (`mov ecx, 1` + `mov [esp+0x1c], ecx`) instead of two immediate stores,
+//     which cascades into the field_37f2f read (dx instead of cx) and into the
+//     unit loop (`mov al, [ebx+0xff]` instead of `mov dl, ...`), netting 70.4
+//     percent (1643 bytes). A 2-bit bitfield read and `(all & 3)` both narrow
+//     back to `test byte ptr [esi+0x14281], 3`.
+//   - The projectile loop home slots are p=0x18/i=0x1c/q=0x28 here and
+//     q=0x18/p=0x1c/i=0x28 in the original, so the allocator's variable order
+//     differs and not just its register choice. Declaring q first (over an
+//     independent `g_game->projectiles` read, before p and before i) moves the
+//     homes but stays at 70.8 percent (1645 bytes).
+//
 // Still open, smaller:
 //   - `enabled`: the original loads 16 bits (`mov ax, word ptr [esi+0x14281]`)
 //     and stores the constant 1 as an immediate both times; a 16-bit union
