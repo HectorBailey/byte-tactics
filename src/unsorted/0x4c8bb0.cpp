@@ -1,4 +1,4 @@
-// Decompiled by GPT-6, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
+// Decompiled by GPT-6, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol, edited by deepseek-v4.1, finished by space-bunny-free. Names are provisional.
 // Partial 51.6%. This is a textured/gouraud triangle rasteriser into 10-int
 // span rows, then one FUN_004c8020 call per scanline. The sibling 0x4c8760 is
 // the same algorithm without the light channel and is matched to 67.9%; its
@@ -52,6 +52,7 @@
 // Fixes that did land: second edge loop writes ints 1,4,5,7,9 of the span row
 // (the row is [xL,xR,uL,vL,uR,vR,zL,zR,lL,lR]), the rasterise guard is
 // span[1]-span[0]>0 (not !=0 && >=0), and the loop temps are function-scope.
+
 struct Surface_4c8bb0 { unsigned short width, height; };
 void __stdcall FUN_004c8020(int, int*, Surface_4c8bb0*, Surface_4c8bb0*);
 
@@ -60,8 +61,10 @@ void __stdcall FUN_004c8bb0(Surface_4c8bb0* target, Surface_4c8bb0* texture, int
 {
     int defaults[8];
     int spans[800][10];
-    int index, previous;
+    int index;
+    int previous;
     int* out;
+    int x;
     if (target && texture && vertices) {
         if (!coords) {
             coords=defaults;
@@ -73,12 +76,12 @@ void __stdcall FUN_004c8bb0(Surface_4c8bb0* target, Surface_4c8bb0* texture, int
         int lowY=999999, highY=-999999, highX=-999999, lowX=999999;
         int lowIndex, highIndex;
         for(int i=0;i<4;i++) {
-            int y=vertices[i*4+1];
-            if(y<lowY) { lowY=y; lowIndex=i; }
-            if(y>highY) { highY=y; highIndex=i; }
-            int x=vertices[i*4];
-            if(x>highX) highX=x;
-            if(x<lowX) lowX=x;
+            int vx=vertices[i*4+1];
+            if(vx<lowY) { lowY=vx; lowIndex=i; }
+            if(vx>highY) { highY=vx; highIndex=i; }
+            int xx=vertices[i*4];
+            if(xx>highX) highX=xx;
+            if(xx<lowX) lowX=xx;
         }
         if(highX>=0 && lowX<=target->width-1 && highY>=0 && lowY<=target->height-1) {
             int bottom=target->height-1;
@@ -86,35 +89,47 @@ void __stdcall FUN_004c8bb0(Surface_4c8bb0* target, Surface_4c8bb0* texture, int
             if(highY>bottom) highY=bottom;
             if(highY!=lowY) {
                 {
+                    int* out;
                     out=&spans[0][0];
                     index=lowIndex;
                     do {
                         previous=index-1;
-                        int next=index-1;
+int next;
+                        next=index-1;
                         if(next<0) next=3;
-                        int* nextVertex=vertices+next*4;
-                        int y0=vertices[index*4+1];
-                        int y1=nextVertex[1];
+int* nextVertex;
+                        nextVertex=vertices+next*4;
+int y0;
+                        y0=vertices[index*4+1];
+int y1;
+                        y1=nextVertex[1];
                         if (y1>0 && y0<y1) {
                             int dy=y1-y0;
-                            int dx=((nextVertex[0]-vertices[index*4])*0x10000)/dy;
-                            int x=vertices[index*4]*0x10000+0xffff;
+int dx;
+                            dx=((nextVertex[0]-vertices[index*4])*0x10000)/dy;
+
+                            x=vertices[index*4]*0x10000+0xffff;
                             int u=coords[index*2]*0x10000;
                             int v=coords[index*2+1]*0x10000;
                             int z=vertices[index*4+2]*0x10000;
-                            int light=vertices[index*4+3]*0x10000;
-                            int du=(coords[next*2]*0x10000-u)/dy;
-                            int dv=(coords[next*2+1]*0x10000-v)/dy;
-                            int dz=(nextVertex[2]*0x10000-z)/dy;
-                            int dl=(nextVertex[3]*0x10000-light)/dy;
+                            int lg=vertices[index*4+3]*0x10000;
+int du;
+                            du=(coords[next*2]*0x10000-u)/dy;
+int dv;
+                            dv=(coords[next*2+1]*0x10000-v)/dy;
+int dz;
+                            dz=(nextVertex[2]*0x10000-z)/dy;
+int dl;
+                            dl=(nextVertex[3]*0x10000-lg)/dy;
                             if(y0<0) {
                                 x-=dx*y0; u-=du*y0; v-=dv*y0; z-=dz*y0;
-                                light-=dl*y0;
+                                lg-=dl*y0;
                                 y0=0;
                             }
                             if(y1>bottom) y1=bottom;
                             if(y0<y1) {
-                                int n=y1-y0;
+int n;
+                                n=y1-y0;
                                 do {
                                     out[0]=x>>16; x+=dx;
                                     out[2]=u;
@@ -122,45 +137,57 @@ void __stdcall FUN_004c8bb0(Surface_4c8bb0* target, Surface_4c8bb0* texture, int
                                     out[3]=v;
                                     v+=dv;
                                     out[6]=z;
-                                    out[8]=light;
+                                    out[8]=lg;
                                     out+=10;
 
                                     z+=dz;
-                                    light+=dl;
+                                    lg+=dl;
                                 } while(--n);
                             }
                         }
-                        index=next;
+index=next;
                     } while(index!=highIndex);
                 }
                 {
-                    int* out=&spans[0][0];
+                    int* out;
+                    out=&spans[0][0];
                     int index=lowIndex;
                     do {
-                        int next=(index+1)&3;
-                        int* nextVertex=vertices+next*4;
-                        int y0=vertices[index*4+1];
-                        int y1=nextVertex[1];
+int next;
+                        next=(index+1)&3;
+int* nextVertex;
+                        nextVertex=vertices+next*4;
+int y0;
+                        y0=vertices[index*4+1];
+int y1;
+                        y1=nextVertex[1];
                         if (y1>0 && y0<y1) {
                             int dy=y1-y0;
-                            int dx=((nextVertex[0]-vertices[index*4])*0x10000)/dy;
-                            int x=vertices[index*4]*0x10000+0xffff;
+int dx;
+                            dx=((nextVertex[0]-vertices[index*4])*0x10000)/dy;
+
+                            x=vertices[index*4]*0x10000+0xffff;
                             int u=coords[index*2]*0x10000;
                             int v=coords[index*2+1]*0x10000;
                             int z=vertices[index*4+2]*0x10000;
-                            int light=vertices[index*4+3]*0x10000;
-                            int du=(coords[next*2]*0x10000-u)/dy;
-                            int dv=(coords[next*2+1]*0x10000-v)/dy;
-                            int dz=(nextVertex[2]*0x10000-z)/dy;
-                            int dl=(nextVertex[3]*0x10000-light)/dy;
+                            int lg=vertices[index*4+3]*0x10000;
+int du;
+                            du=(coords[next*2]*0x10000-u)/dy;
+int dv;
+                            dv=(coords[next*2+1]*0x10000-v)/dy;
+int dz;
+                            dz=(nextVertex[2]*0x10000-z)/dy;
+int dl;
+                            dl=(nextVertex[3]*0x10000-lg)/dy;
                             if(y0<0) {
                                 x-=dx*y0; u-=du*y0; v-=dv*y0; z-=dz*y0;
-                                light-=dl*y0;
+                                lg-=dl*y0;
                                 y0=0;
                             }
                             if(y1>bottom) y1=bottom;
                             if(y0<y1) {
-                                int n=y1-y0;
+int n;
+                                n=y1-y0;
                                 do {
                                     out[1]=x>>16; x+=dx;
                                     out[4]=u;
@@ -168,11 +195,11 @@ void __stdcall FUN_004c8bb0(Surface_4c8bb0* target, Surface_4c8bb0* texture, int
                                     out[5]=v;
                                     v+=dv;
                                     out[7]=z;
-                                    out[9]=light;
+                                    out[9]=lg;
                                     out+=10;
 
                                     z+=dz;
-                                    light+=dl;
+                                    lg+=dl;
                                 } while(--n);
                             }
                         }
