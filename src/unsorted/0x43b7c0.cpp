@@ -92,6 +92,23 @@
 // at 0x43b951 is a register-allocation consequence of the rotation, not a
 // separate bug. Left as is: the rotation and the duplicated Wait are the two
 // remaining defects, worth 20 bytes in total.
+//
+// Retried by deepseek-v4.1 (2 more check runs, both 67.8%, byte identical to
+// the 800 already here): the original's case-9 `mov eax, edx` copy suggests
+// the source stored the OR'd flags before reading node->next, so `node->next`
+// was moved after the `node->flags = f9` store, and the store was then spelled
+// as a chained assignment (`node->flags = f9 = node->flags | 0x800000`); MSVC
+// emits the same sunk store both times, so the copy in the original is an
+// allocator decision, not a statement order. The case-3 Wait copy is the real
+// blocker for the tail merge: it picks edx for flags6 and ecx->edx for the
+// g_game frame, while the case-9-else copy (which matches the original's
+// 0x43b951 byte for byte, edi/edx->ecx) is right next to it, so the two
+// blocks are not textually identical and MSVC's folding pass leaves both.
+// Block folding in MSVC 5 is evidently post-allocation here, which is why the
+// register rotation also decides the merge. Writing the Wait body out
+// textually at both sites (no helper at all) also compiles to the same 800
+// bytes, so the two expansions never become textually identical whatever the
+// source shape.
 
 #pragma pack(push, 1)
 
@@ -271,8 +288,8 @@ void __stdcall FUN_0043b7c0(Unit_0043b7c0* unit)
             break;
         case 9: {
             unsigned int f9 = node->flags | 0x800000;
-            Class_0043a1f0* next9 = node->next;
             node->flags = f9;
+            Class_0043a1f0* next9 = node->next;
             if (next9 != 0) {
                 Class_0043a1f0* first9 = *pp;
                 Class_0043a1f0** link9 = (f9 & 0x40000) ? &unit->list2 : pp;
