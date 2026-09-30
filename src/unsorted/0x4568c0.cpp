@@ -1,7 +1,22 @@
 // Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, edited by
-// deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
+// deepseek-v4.1. Names are provisional.
 // Partial, 78.9%. A short loop index restores three induction registers.
-// The frame remains 0x38 vs 0x34; readiness tests and register scheduling differ.
+// Remaining difference, a single 4-byte stack slot. The original allocates
+// 0x34 (sub esp,0x34) and keeps only two dword locals below the candidate
+// array: esp+0x14 and esp+0x18, with cand[10] at esp+0x1c. esp+0x14 is
+// reused three times by MSVC, first for the inlined index loop's byte
+// counter, then for `int* out = &g_game->field_29fc` (0x456977 stores it
+// there), then for the returning flag (0x456b7b stores the immediate 1,
+// 0x456bc1 stores 0, and every epilogue reads [esp+0x14] into eax). res is
+// the only other local, at esp+0x18. This file merges the index with the
+// flag but gives `out` its own slot at esp+0x18, so res moves down to
+// esp+0x1c and cand to esp+0x20, and the frame is 0x38: every [esp+..]
+// reference in the body is off by 4. Making out share esp+0x14 needs the
+// index variable to be gone from the source (the call site read at
+// 0x45691b is the inlined helper's own counter), and inlining the helper
+// call into the players[] expression was tried and changed nothing.
+// Otherwise the body matches; the remaining misses are the readiness tests
+// around 0x456b91 (field_29a4 / field_29d0) and register scheduling.
 #include <stdlib.h>
 #include <algorithm>
 

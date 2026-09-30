@@ -1,6 +1,17 @@
 // Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
 // Partial, 14.3%: player messages and most byte commands are restored. Commands 28, 33
 // and 39 remain missing. Frame, switch layout and register allocation still differ.
+// Re-checked by deepseek-v4.1 at 09:04Z, still 14.3% (6420 of 8944 bytes), no variant
+// scored higher in the timebox. What still differs, from the branch/vs/original diff:
+//  - frame is 0x318 but the original reserves 0x51c, so every [esp+N] local slot is
+//    wrong and the whole prologue plus most early accesses mismatch. The missing
+//    command bodies (28, 33, 39) hold the large locals the original reserved.
+//  - the zeroing loop at 0x453d6c keeps g_game in edx and re-loads it every iteration
+//    (mov edx,[0x511de8] inside the loop); this source hoists it into esi once.
+//  - the sender id loop keeps its index at [esp+0xb4] and the recipient id loop at
+//    [esp+0x110] in the original; here they land at [esp+0xb8] and [esp+0x50].
+// Next step for whoever retries: restore the three missing command bodies first,
+// which should push the frame to 0x51c and fix the local offsets globally.
 #include <string.h>
 
 extern char* g_game;
