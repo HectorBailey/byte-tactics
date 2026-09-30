@@ -32,6 +32,17 @@
 //     the test after the store). Ours keeps it in a register.
 //  Parameter order is right: (surf, bmp, dst, src) with `surf = &local;` written back to
 //  the arg slot at [esp+0x7da0]; esi=bmp, edi=dst, ebp=zero.
+// deepseek-v4.1-flash, third pass: the single upstream cause of both the +8 frame and the
+// ebx/ebp swap is that our `src` parameter is cached in ebp across the whole scan and
+// clip call. The original never caches it: it reads src straight from its argument slot
+// [esp+0x7dac] at each use (0x4c75e2 memory compare, 0x4c77c2 for the previous loop,
+// 0x4c78d7 for the next loop). With ebp free the original keeps zero in ebp and maxx in
+// ebx (maxx is never stored); ours keeps zero in ebx, spills maxx and minx, and uses
+// ebx as the scan scratch. Tried and failed to evict src from ebp: a local `s = src`
+// (coalesced), two per-loop locals s1/s2 (coalesced), aliasing bmp into a live local,
+// a live `sf = surf`, and moving both edge loops into a `static inline BuildSpans`
+// (it inlines, so src's live range is unchanged). The natural construct that makes a
+// written parameter memory-resident instead of promoted is still the remaining work.
 
 #include <windows.h>
 
