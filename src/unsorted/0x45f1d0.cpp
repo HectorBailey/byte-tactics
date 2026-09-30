@@ -1,9 +1,21 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6, finished by space-bunny-free. Names are provisional.
-// PARTIAL: 93.3% (1430 of 1431 bytes). Seven separate string option arrays
-// (frame layout and store order now match) and the 24-byte Rule record
-// stride. Still open: MSVC schedules the g_game load and the index multiply
-// at different points inside the opening push sequence, which moves which of
-// eax/edx/ecx holds the player index and so shifts every later reload.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6, finished by space-bunny-free, edited by deepseek-v4.1. Names are provisional.
+// PARTIAL: 93.301% (orig 1431 bytes, ours 1430). The seven string option
+// arrays, their frame offsets, their store order and the 24-byte Rule stride
+// all match; the whole function matches except two spots:
+//  (1) the first basic block (~96 bytes). The original builds the player
+//      index in ecx, runs the *33/*165 scale in eax/edx, loads g_game into
+//      eax and copies it to edi (edi = g_game + index), then reads playerType
+//      into ecx, rules into edx, opts into ebx and only then rule into ebp.
+//      We keep g_game in ecx and the index in eax, which swaps the roles of
+//      eax/ecx/edx for the whole block and reorders the rule/opts loads.
+//      Every declaration order tried (opts before rule, no game local, rule
+//      via a named playerType, players[] via a PlayerEntry pointer, index as
+//      int/unsigned char) either reproduces this exact code or drops the
+//      score to ~71%, because it also changes the register that every later
+//      g_game reload uses.
+//  (2) the tail loop preheader: the original loads layer->entries
+//      (mov edx,[esi+4]) before the saved count ([esp+0x14]); ours loads
+//      them in the opposite order. Same length, two instruction swap only.
 // Note: Rule_0045f1d0 (24 bytes, startMetal at +0xc, startEnergy at +0x10)
 // and RuleSet_0045f1d0 (startType at +0x118) are the SAME memory: the exe
 // walks g_game->rules with a 24-byte stride for metal and energy but reads
