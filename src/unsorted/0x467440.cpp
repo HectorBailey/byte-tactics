@@ -1,71 +1,47 @@
 // Decompiled by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
-// PARTIAL: 43.6% (997 of the original's 1015 bytes). Five loops over the unit
+// PARTIAL: 53.0% (996 of the original's 1015 bytes). Five loops over the unit
 // array (stride 0x118): A clears/sets flags 0x1000/0x700/0x300 from the player
 // index and two "data" records, B ranges over pl->field_67..pl->field_6b and
 // hands a Class_00467840 visitor to FUN_0047e890, C does the same with the two
 // 4-byte visitors (Class_00467960 / Class_00467980), D sets flag 0x1000 and
 // field_b0, E sets flag 0x100 from the per-player cell masks.
 //
-// Biggest lever so far: do NOT give `u->def` a named local. A named
-// `UnitDef_00467440* def = u->def;` makes MSVC keep the 16-bit field load in a
-// register across the test (`mov cx,[eax+0x204]; test cx,cx; jne; cmp
-// [eax+0x206],cx`), where the original re-loads each field (`cmp
-// word[edx+0x204],0 ... mov ax,word[edx+0x204]`). Writing `u->def->field_...`
-// inline in all three loops B, C, D restored the original's reload shape and
-// took 39.1% -> 42.4%.
+// Biggest lever in this session (43.6% -> 51.6% -> 53.0%): DECLARE EACH VISITOR
+// LAST, after the call arguments have been materialised into locals, and call
+// FUN_0047e890 through those temporaries:
+//     int r = (int)u->def->field_20a << 16;
+//     Vec3_00467440* pp = &u->pos.vec;
+//     Class_00467960 v;
+//     FUN_0047e890(pp, r, &v);
+// That sinks the vptr store to just before the call, exactly where the original
+// has it (after the pushes). Writing the arguments inline instead emits the
+// vtable store at the top of the block; that costs ~8 points.
 //
-// What still differs (43.6%: the prologue now matches byte for byte, the char
-// was the frame's cause):
-//  - Frame is 0x24 vs the original's 0x28. The last lever: pl (ebp in the
-//    original, kept live from the prologue through loops B and C) is spilled to
-//    [esp+0x18] here, because our loop B uses ebp as the position-copy temp
-//    (`lea ebp,[..+0x6a]`) where the original uses edx/edi there and keeps ebp
-//    for pl. Fixing that is what closes both the frame and the +0x18 store.
-//  - The two loop-C visitors overlap into one +0x18 slot (original: +0x18 and
-//    +0x1c). Declaring both in one scope gives the right frame but hoists both
-//    vtable stores to the block entry (31.0%).
-//  - Loop D's induction is biased +0x96 (via field_96) where the original biases
-//    +0x92 (via def), so every loop-D displacement differs by 4.
-//  - Loop E (see build/scratch/0x467440/v8.cpp): the original computes x and y
-//    INSIDE each arm of the mode test, giving the same movsx/sar sequence twice
-//    and the +0x74 bias; the in-arm form is 1030 bytes and scores 38.2%, so the
-//    hoisted form is kept here.
-//  - The biggest lever found in this session: the `player` byte local must not
-//    need a stack home. Removing the local from the `pl` address expression
-//    (`(unsigned int)g_game->playerIndex * 0x14b` instead of the local) removed
-//    the prologue's extra store/reload and the `and eax,0xff` now matches the
-//    original's `mov dl,[..]; mov eax,edx; and eax,0xff` exactly: 42.4% -> 43.6%.
-//  - Loop E's `pi` byte local is still spilled the same way; the same treatment
-//    there is the next thing to try (it needs cl to stay live for `shl edx,cl`).
+// What still differs (53.0%):
+//  - The frame is 0x24 vs the original's 0x28: `pl` is spilled to [esp+0x18]
+//    right before loop A (extra store, and every loop A/B/C jump target is +4).
+//    The original keeps pl in ebp from the prologue through loops B and C. Our
+//    loop B needs one register more than the original's (see next bullet), so
+//    the allocator spills pl and then reuses ebp as a temp.
+//  - Loop B's arithmetic: the original keeps `a` in ax, `b` in di, `t` in ecx
+//    and does `imul ecx,ecx` / `imul edx,edx` in place; ours loads b into cx
+//    early (`mov cx, word[ecx+0x206]`) and needs `mov edi,edx; imul edi,edx`
+//    copies, plus the vptr store lands early. `def` sits in ecx here, in edx
+//    there.
+//  - Loop C's two visitors still share the +0x18 slot (original +0x18/+0x1c),
+//    which is the other half of the 0x24 frame. Declaring both in one scope
+//    gives the right frame but hoists both vptr stores (36.6%).
+//  - Loop E: the original computes x and y INSIDE each arm of the field_14281
+//    mode test (duplicated movsx/sar) and uses ebp for the flags word (u+0x110
+//    via esi = u+0x74); ours hoists x/y and uses bh/edi. The in-arm form was
+//    1030 bytes / 38.2% on the old frame.
+//  - Loop D: original materialises 0x2000 in ebx and 0x1000 in edi, ours the
+//    other way round.
 //
-// Scratch variants scored (all with `check.py --sym`): v1/v4-v7 38-39%,
-// v8/v12/v13 36%, v14 39.1%, gen_bi_ci_di 42.4% (the pre-session file),
-// base42.cpp 42.4%, v_inlinepidx 43.6% is this file.
-//  - Frame is 0x24 vs the original's 0x28. The original keeps the three visitor
-//    locals in three distinct slots (+0x18, +0x1c, +0x20); MSVC here overlaps
-//    the two 4-byte loop-C visitors into one +0x18 slot, dropping 4 bytes.
-//    Declaring both loop-C visitors in one scope gives +0x18/+0x1c and the
-//    0x28 frame but hoists both vtable stores to the block entry; 31.0%.
-//  - A `unsigned char` local that is also used as an int (the `player` byte at
-//    the prologue and `pi` in loop E) is spilled to a byte slot and reloaded
-//    (`mov byte[esp+0x18],dl; mov eax,[esp+0x18]; and eax,0xff`) where the
-//    original keeps it in a register (`mov eax,edx; and eax,0xff`). This is one
-//    shared cause behind both extra stores. A minimal repro is in
-//    build/scratch/0x467440/exp.cpp: `unsigned char p = g[..]` used both as an
-//    index and a shift amount spills; `unsigned int p` does not, but using an
-//    unsigned int here scores worse (36.3% / 32.9%), so the byte form is kept.
-//  - pl is spilled to [esp+0x18] because loop B uses ebp as its position-copy
-//    temporary where the original uses edi and keeps pl in ebp all along.
-//  - Loop D's induction is biased +0x96 (via field_96) where the original biases
-//    +0x92 (via def), so every loop-D displacement differs by 4.
-//  - Loop E (see build/scratch/0x467440/v8.cpp): the original computes x and y
-//    INSIDE each arm of the mode test, giving the same movsx/sar sequence twice
-//    and the +0x74 bias. The in-arm form is 1030 bytes and scores 38.2%, so the
-//    hoisted form is kept here; v8/v13 in the scratch folder is the
-//    structurally exact loop E.
-//
-// Scratch variants scored (all with `check.py --sym`): v1/v4-v7 38-39%,
-// v8/v12/v13 36%, v14 39.1%, gen_bi_ci_di 42.4% is this file.
+// Scratch variants scored (check.py <addr> <file>): base42 42.4%, base43 43.6%,
+// loop-B reorder 43.6%, both loop-C visitors in one scope 36.6%, v516 51.6%,
+// v530 (this file) 53.0%.
+
 #pragma pack(push, 1)
 
 struct Vec3_00467440 {
@@ -219,11 +195,13 @@ void FUN_00467440(void)
                 short a = u->def->field_204;
                 short b = u->def->field_206;
                 int t = a + u->pos.half.f70 * 2;
+                int r = (int)(a > b ? a : b) << 16;
+                Vec3_00467440* pp = &u->pos.vec;
                 Class_00467840 v;
                 v.field_4 = t * t;
                 v.field_8 = (int)b * (int)b;
                 v.pos = u->pos.vec;
-                FUN_0047e890(&u->pos.vec, (int)(a > b ? a : b) << 16, &v);
+                FUN_0047e890(pp, r, &v);
             }
         }
     }
@@ -231,12 +209,16 @@ void FUN_00467440(void)
     for (u = first; u <= last; u++) {
         if ((u->flags & 0x10000000) && u->field_ff != pl->field_146 && (u->field_10e & 1)) {
             if (u->def->field_20a != 0) {
+                int r = (int)u->def->field_20a << 16;
+                Vec3_00467440* pp = &u->pos.vec;
                 Class_00467960 v;
-                FUN_0047e890(&u->pos.vec, (int)u->def->field_20a << 16, &v);
+                FUN_0047e890(pp, r, &v);
             }
             if (u->def->field_20c != 0) {
+                int r2 = (int)u->def->field_20c << 16;
+                Vec3_00467440* pp2 = &u->pos.vec;
                 Class_00467980 v;
-                FUN_0047e890(&u->pos.vec, (int)u->def->field_20c << 16, &v);
+                FUN_0047e890(pp2, r2, &v);
             }
         }
     }
