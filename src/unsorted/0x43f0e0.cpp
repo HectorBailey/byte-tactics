@@ -1,6 +1,15 @@
-// Decompiled by Claude Sonnet 5.5, finished by DeepSeek V4.1 Flash and GPT-6. Names are
-// provisional. Partial, 47.5%. Loads the definition after target validation, restoring the native
-// frame. Unit/definition registers still differ; iostream improves the corrected implementation.
+// Decompiled by Claude Sonnet 5.5, finished by DeepSeek V4.1 Flash and GPT-6, edited by deepseek-v4.1. Names are provisional.
+// Earlier credits: Claude Sonnet 5.5, DeepSeek V4.1 Flash and GPT-6.
+// Partial, 47.5%. First diff is the prologue: the original homes `unit` in ebp and `def` in esi
+// (`mov ebp,[esp+0x14]` after push ebx/push ebp, later `mov esi,[ebp+0x92]`), while ours homes
+// `unit` in esi and `def` in ebp (`push esi; mov esi,[esp+0x18]`, `mov ebp,[esi+0x92]`).
+// `target` in edi and the `friendly` flag in ebx agree. Because every later branch keys off these
+// two registers the whole body diverges after the first few instructions, which drags the score
+// down even where the control flow is right. Everything after that is a knock-on of this swap.
+// Tried: declaring def before the friendly/enemy flags, reordering the target check, and loading
+// unit->def earlier; none moved the allocator off esi for unit.
+// Loads the definition after target validation, restoring the native frame.
+// iostream improves the corrected implementation.
 #include <iostream>
 #include <windows.h>
 

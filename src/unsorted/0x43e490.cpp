@@ -1,6 +1,21 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// Partial, 11.1%. Corrected own-definition capture/landing flags, cached game and node
-// pointers, signed feature bounds and NaN comparison behavior. Register allocation differs.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
+// Started by deepseek-v4.1-flash and continued by GPT-6 before this pass. Partial, 11.1%.
+// The body shape is right (3064 bytes against 3152) but almost no instruction text lines up,
+// so the registers differ throughout. What is known, and what still differs:
+//  - Case bodies are emitted in source order 1,3,9,8,7,12,13,6,5,14,4,11,2,10 (jump table at
+//    0x43f0a8), not in numeric order; case 10 falls into the shared `return 0x13` at 0x43f098
+//    and case 2's body is the last and the largest (0x43e8bb to 0x43f098).
+//  - The prologue is `push ecx; push ebx; mov ebx,[g_game]; push ebp; push esi; push edi`, so
+//    g_game is cached in ebx, target in edi and there is exactly one 4-byte local. Ours emits
+//    `sub esp,8` (two locals) with g_game in ebp and target in ebx.
+//  - The friendly flag lives in esi and in the [esp+0x10] local at once (stored on both paths of
+//    the allied test, reloaded after the FUN_004815a0 call at 0x43e9dc, line 431 of ctx.txt);
+//    the enemy flag is ebp.
+//  - unit->def is kept in ecx across the jump table and spilled into the dead target argument
+//    slot [esp+0x20], reloaded after every __thiscall (0x43e7ed).
+//  - The boolean returns come back as `neg al; sbb eax,eax; and al,imm; add eax,0x13` (case 5 at
+//    0x43e80c, case 9 at 0x43e5de), a mask form a plain `?:` does not produce.
+//  - Cases 1 and 2 are still approximations of the original block order.
 #pragma pack(push, 1)
 
 union Flags110_0043e490 {

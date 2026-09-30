@@ -1,7 +1,9 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// Partial, 63.3%. Clears 15 buffers, displays flags/count in native order and calls the
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
+// Continued from deepseek-v4.1-flash and GPT-6 (their credit kept below).
+// Partial, 64.0%. Clears 15 buffers, displays flags/count in native order and calls the
 // locale getter with no arguments. Packed settings retain the native field offsets.
-// Frame, dead comparison stores and record-setting loads remain different.
+// The frame now matches (p[20], add esp,0x1b4). Dead comparison stores, the
+// record-setting loads and the record loop's register allocation still differ.
 #include <vector>
 
 struct Guid_00441460 {
@@ -73,7 +75,7 @@ void __stdcall FUN_00441220(Sub_00441460* sub, void* entry);
 // FUNCTION: 0x441460
 int __stdcall FUN_00441460(Gadget_00441460* gadget) {
     int count;
-    char* p[21];
+    char* p[20];
     char names[0x20];
     char temp[0x129];
     Settings_00441460 settings;
