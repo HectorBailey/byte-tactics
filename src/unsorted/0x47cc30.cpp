@@ -1,24 +1,33 @@
 // Decompiled by deepseek-v4.1. Names are provisional.
-// PARTIAL 75.1% (best kept here). Body, frame, loop registers and the inlined
-// FUN_0047cb60 owner surgery all match; what still differs:
-// 1) The two bounds tests at the top: the original accumulates the sum in edx
-//    (movsx ebx,dx / movsx edx,ax / mov eax,[ebp+0x14233] / add edx,ebx /
-//    cmp edx,eax) and spills size.x after the cmp. MSVC always builds the sum
-//    in a fresh eax and loads width into edx here, 2 bytes longer. Plain
-//    `pos.x + size.x >= g_game->width`, two separate ifs and named sx/sy locals
-//    were all tried. Any variant must declare sx/sy before the first
-//    `goto remove` (C2362 otherwise).
-// 2) The three rec blocks: the original emits `cmp [ecx],0 / je BAD(next insn) /
-//    cmp [ecx+0x73],3 / je GOOD / BAD...jmp NEXT / GOOD...WRITE / NEXT` (the
-//    else block laid out first, single merged write). MSVC lays the then block
-//    first (`je BAD / jne BAD / GOOD / jmp WRITE / BAD / WRITE / NEXT`), so
-//    every forward jump in the tail sits a few bytes early and the mask
-//    branch's else block is sunk to the end of the function. Plain
-//    `active == 0 || type != 3`, nested ifs, and duplicating the write in the
-//    else were all tried (tested standalone: same layout).
-// 3) `test bl,al` is emitted as `test al,bl`; operand order could not be steered.
-// 4) The owner index does `lea eax,[esi+0x6a]; mov ecx,[esi+0x6a]` while the
-//    original does `lea ecx,[esi+0x6a]; mov edx,ecx` then indexes through edx.
+// PARTIAL 75.1% (best kept here, 1213 bytes vs the original 1199). Body, frame,
+// loops and the inlined FUN_0047cb60 owner surgery all match. What still
+// differs:
+// 1) The two sum tests at the top. The negative tests and the two movsx now
+//    match only with the condition written inline and `size` first
+//    (`size.x + obj->pos.x >= g_game->width`, separate ifs): that variant gets
+//    `mov ebp,g_game / movsx ebx,dx / movsx edx,ax` right and the pos.x/pos.y
+//    registers right (ax/cx), but MSVC still builds the sum in a fresh eax
+//    (`mov eax,ebx / add eax,edx / mov edx,width / cmp eax,edx`) instead of
+//    reusing edx and loading width into eax, and it spills size.x before the
+//    add instead of after the cmp; the second sum keeps height in eax instead
+//    of ecx and adds through a copy of size.y. `int sx, sy` locals (any
+//    declaration order, combined or separate ifs), short locals, operand
+//    order and reversed comparisons (`width <= ...`) all give the same shape
+//    or worse; the sx/sy locals cannot be declared after the first `goto
+//    remove` (C2362).
+// 2) The a-loop's rec block. The b and c loops now match byte for byte in
+//    layout (tests, then arms) but MSVC sinks the a-loop's "bad" arm to the
+//    end of the function (0x47d0c5) so both of its tests become 6-byte near
+//    jumps, +8 bytes over the original's in-place arm. Tried: plain
+//    `active == 0 || type != 3`, `active != 0 && type == 3` with
+//    `goto a_good`, nested ifs, explicit else, duplicated write. All compile
+//    to the same block order.
+// 3) `test bl,al` is emitted as `test al,bl` (same encoding length, the
+//    checker still flags it).
+// 4) The owner index does `lea eax,[esi+0x6a]` style addressing while the
+//    original does `lea ecx,[esi+0x6a]; mov edx,ecx` and indexes through edx.
+// Kept here: the 75.1% build. A 74.7% variant with the correct top negative
+// tests and correct movsx order is in build/scratch/0x47cc30/v9.cpp.
 #pragma pack(push, 1)
 
 struct Obj_0047cc30;
@@ -172,14 +181,13 @@ void __stdcall FUN_0047cc30(Obj_0047cc30* obj)
                         unsigned short id = cell->field_0;
                         if (id != 0) {
                             UnitRec_0047cc30* rec = &g_game->units[id];
-                            if (rec->owner->active != 0 && rec->owner->type == 3) {
-                                rec->flags |= 0x8000000;
-                                obj->flags.all |= 0x4000000;
-                            } else {
+                            if (rec->owner->active == 0 || rec->owner->type != 3) {
                                 rec->flags |= 0x4000000;
                                 obj->flags.all |= 0x8000000;
                                 goto a_next;
                             }
+                            rec->flags |= 0x8000000;
+                            obj->flags.all |= 0x4000000;
                         }
                         cell->field_0 = obj->field_a8;
                     }
@@ -206,14 +214,13 @@ void __stdcall FUN_0047cc30(Obj_0047cc30* obj)
                     unsigned short id = cell->field_0;
                     if (id != 0) {
                         UnitRec_0047cc30* rec = &g_game->units[id];
-                        if (rec->owner->active != 0 && rec->owner->type == 3) {
-                            rec->flags |= 0x8000000;
-                            obj->flags.all |= 0x4000000;
-                        } else {
+                        if (rec->owner->active == 0 || rec->owner->type != 3) {
                             rec->flags |= 0x4000000;
                             obj->flags.all |= 0x8000000;
                             goto b_next;
                         }
+                        rec->flags |= 0x8000000;
+                        obj->flags.all |= 0x4000000;
                     }
                     cell->field_0 = obj->field_a8;
                 b_next:
@@ -229,14 +236,13 @@ void __stdcall FUN_0047cc30(Obj_0047cc30* obj)
                     unsigned short id = cell->field_2;
                     if (id != 0) {
                         UnitRec_0047cc30* rec = &g_game->units[id];
-                        if (rec->owner->active != 0 && rec->owner->type == 3) {
-                            rec->flags |= 0x8000000;
-                            obj->flags.all |= 0x4000000;
-                        } else {
+                        if (rec->owner->active == 0 || rec->owner->type != 3) {
                             rec->flags |= 0x4000000;
                             obj->flags.all |= 0x8000000;
                             goto c_next;
                         }
+                        rec->flags |= 0x8000000;
+                        obj->flags.all |= 0x4000000;
                     }
                     cell->field_2 = obj->field_a8;
                 c_next:
