@@ -2,7 +2,15 @@
 // deepseek-v4.1-flash retry (2026-09-30): confirmed 99.7 is the ceiling for
 // this shape. Re-scored the three statement orders cleanly in isolated files
 // (c/h/d, h/c/d, d/c/h) and all are 99.3, so no permutation reaches the
-// original load,h,d,push6,store. Plain (non-struct) locals for lockResult and
+// original load,h,d,push6,store. A later repeat of the same session re-scored
+// all six orders plus the chain forms (h=d and d=h), the RHS-comma trick
+// `*c = (h = 0, d = 0, 0)` and a duplicate-store variant: identical results,
+// 99.3 for every dc-first order and 99.7 only for the h,d,c family. Whenever
+// the load hoists (any dc-first order) the scheduler puts `push 6` directly
+// after it and the two handle stores after the store, so load,h,d,push6,store
+// is not reachable by statement order either; the h/d-before-store list only
+// appears in the h,d,c family, where the load stays glued to its store. Same
+// scheduler tie as docs/agent-guide.md 0x4b6570. Plain (non-struct) locals for lockResult and
 // dcSlot move the homes to 0x10/0x14 and the &temp to 0x14, so the struct
 // wrapper is required for the 0x14/0x18 slot pair. Nothing new beat 99.7.
 // deepseek-v4.1-flash session, still 99.7 (1017 bytes), only the 0x4b55af
