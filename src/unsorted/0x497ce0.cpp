@@ -1,4 +1,4 @@
-// Decompiled by GPT-5.6-Terra, finished by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
+// Decompiled by GPT-5.6-Terra, finished by deepseek-v4.1-flash, finished by space-bunny-free, edited by deepseek-v4.1. Names are provisional.
 // Draws the "waiting for other players" progress bars: one bar per connected
 // player, each 620/n wide, with a fill proportional to that player's percent.
 //
@@ -58,6 +58,30 @@
 // byte-identical here but not necessarily written the way Cavedog wrote it
 // (see the note in 0x4581e0 about a load order that flips with unrelated code
 // placed before it in the same file).
+//
+// Fourth pass (deepseek-v4.1) reproduced the bounded forms and confirmed the
+// rotation is a fixed three-cycle of the scratch pool, not anything in the
+// body: original ecx -> ours eax, original edx -> ours ecx, original eax ->
+// ours edx, from the first temp after the guard to the final FUN_004a50e0.
+// New measurements:
+//   for + continue (index init before x, `for (; j < 10; j++)`)  80.3%
+//     (moving `int j = 0;` before `int x = 11;` does not move the two
+//      entry stores either: MSVC always emits `mov esi,0xb` before
+//      `mov [esp+0x10],ecx`, whatever the source order)
+//   do-while (`while (++j < 10)`)                                 80.3%
+//   offset in the body, `(PlayerRec*)((char*)g_game->players+off)`
+//     with a duplicated `off += 0x14b` before the continue          77.7%
+//     (this one also flips the head LEA to `[ecx+edi+0x1b63]`, so the
+//      original's ecx is a scaled index, i.e. `g_game->players[j]` with
+//      MSVC's strength reduction, not a hand-written byte offset)
+// Remaining diff for the 90.4% break form, exactly: the loop-2 head is
+// `mov eax,dword ptr [edi+ecx+0x1b63] / lea ebp,[edi+ecx+0x1b63]` in the
+// original versus ours `mov eax,[esp+0x10] / lea ebp,[edi+eax+0x1b63] /
+// mov eax,[edi+eax+0x1b63]` (one extra 4-byte load) and our tail is
+// `add dword ptr [esp+0x10],0x14b / jmp head` versus the original's
+// `mov ecx,[esp+0x10] / add ecx,0x14b / cmp ecx,0xcee /
+// mov [esp+0x10],ecx / jl head`; the original's guard-failure target is
+// 0x497eba (the increment, i.e. continue), ours is the post-loop block.
 #include <stdio.h>
 
 #pragma pack(push, 1)
