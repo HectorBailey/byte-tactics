@@ -1,14 +1,24 @@
-// Decompiled by deepseek-v4.1. Names are provisional.
-// PARTIAL: 70.3%. Frame is now correct (bf[0x40] gives 0x70) and the first
-// ~89 instructions (through the terrain check) match byte for byte. Remaining
-// diffs start at the second player-count loop (0x47af91): the original keeps
-// the count in ecx and its loop copy in edx, ours has them swapped (edx/ecx);
-// swapping the declaration order of i vs p did not change it. The error paths
-// then differ in branch shape: the original jumps (jl) to a shared tail at
-// 0x47b0bf while ours emits an inline error block; the shared
-// FUN_004abd90/FUN_004ab0a0/return tail lands at a different address. Everything
-// after that is shifted. Tried: inline g_game->table dereference in all count
-// loops (fixed the hoisted base load, 68.7->70.3).
+// Decompiled by deepseek-v4.1, edited by deepseek-v4.1. Names are provisional.
+// PARTIAL: 77.8%. Frame, prologue and the first ~89 instructions (through the
+// terrain check) match byte for byte. Now 2961 bytes vs the original 2947, so
+// what is left is register picks and block placement, not missing code:
+//  - 0x47af91 / 0x47b04c: the original keeps the player count in ecx with the
+//    active==2 tally in esi and the loop copy in edx (base in edi); ours keeps
+//    the g_game base live in esi from the first count loop, so the tally lands
+//    in edi and count/copy land in edx/ecx. Both pairs of loops are swapped the
+//    same way, so it is a single allocator decision about esi staying live
+//    across the FUN_00435a20 terrain call.  Declaring the copy before/inside the
+//    if, renaming it, or splitting the count into a fresh variable (the compiler
+//    CSEs it back) did not move it.
+//  - the shared "FUN_004c5740; strcpy(e->text, ...); FUN_004a0090(g_game +
+//    0x519); FUN_004ab0a0(menu)" tail now exists (ours at 0x47b79e, the
+//    original at 0x47b88b) but a few arms still emit their own copy, e.g. the
+//    third LineOfSight arm and part of the SelectMap/Difficulty tail.
+//  - small tails (strcmp("Player"), the "Skirmish" branches) load the menu
+//    argument into eax in ours and edx in the original, and the g_game
+//    temporary is ecx in ours and edx in the original; same instructions.
+// Fixed here: c2<1 and c1<1 must be one "||" test (one shared error block, two
+// "jl" to it) - that alone took this from 70.3 to 77.8.
 #include <windows.h>
 #include <string.h>
 #include <stdlib.h>
@@ -157,14 +167,6 @@ void __stdcall FUN_0047ae60(Menu_0047ae60* menu)
                 p++;
             } while (--i);
         }
-        if (c2 < 1) {
-            FUN_004abd90(g_game + 0x519,
-                         FUN_004c5740("There must be at least one player and one computer opponent"),
-                         0x1e0, 1, 1);
-            FUN_004ab0a0(menu);
-            return;
-        }
-
         int c1 = 0;
         if (count > 0) {
             Player_0047ae60* p = (Player_0047ae60*)*(int*)(g_game + 0x29a0);
@@ -174,7 +176,7 @@ void __stdcall FUN_0047ae60(Menu_0047ae60* menu)
                 p++;
             } while (--count);
         }
-        if (c1 < 1) {
+        if (c2 < 1 || c1 < 1) {
             FUN_004abd90(g_game + 0x519,
                          FUN_004c5740("There must be at least one player and one computer opponent"),
                          0x1e0, 1, 1);
