@@ -1,4 +1,28 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by GPT-6.1-sol, finished by space-bunny-free, edited by deepseek-v4.1. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by GPT-6.1-sol, finished by space-bunny-free, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
+// deepseek-v4.1-flash session, still 99.7 (1017 bytes), only the 0x4b55af
+// reload rotation. New shapes tried, all inert at 99.7 unless noted:
+//   * a `static HDC& DcRef(Display*)` accessor for the dc store, and
+//     `HDC& dc = cleanup->dc; ... dc = 0;` (85.1, reference recolors);
+//   * `*(HDC*)(void*)setup.dcSlot = 0`, `setup.dcSlot[0] = 0` and
+//     `*(setup.dcSlot + 0) = 0` (all identical to the plain store);
+//   * a two-store `static inline ClearHandles(Display*)` for hpalette+dib with
+//     the dc store after it (99.7) or before it (99.3);
+//   * arguments-as-side-effect helpers `ZeroSlot(dib=0, h=0, slot)` /
+//     `ZeroSlot(h=0, d=0, slot)` with the slot last so MSVC evaluates it first
+//     (48.8, helper not inlined the way expected) and `ZeroSlot(slot, h, d)`
+//     (92.1);
+//   * a separate `void* bits` local so setup.dcSlot is not the address taken
+//     by CreateDIBSection (99.7, same rotation);
+//   * a plain `HDC* slot = &cleanup->dc;` used for DeleteDC and the store
+//     (88.9, frame/coloring shifts);
+//   * `{ ... }`, `if (1) { ... }` and `HDC** p = &setup.dcSlot; **p = 0;`
+//     wrappers (all 99.7); a one-iteration for loop (93.6);
+//   * the whole real preceding source-file functions (0x4b52e0, 0x4b5330,
+//     0x4b5370) compiled above ours to change compiler state (99.7, no flip).
+// The load is glued to the store statement and MSVC 5 never hoists it above
+// the two handle stores; every named-local spelling lands in eax and recolors
+// the SetWindowPos argument block. Same tie-break family the guide records for
+// 0x4b6570, so this run stopped there rather than burning more shapes.
 // Partial: 99.7%. Byte count is exact (1017 = 1017) and every instruction is
 // the right one, except one two-slot scheduler rotation at 0x4b55af explained
 // at the bottom of this file. The first of the two old scheduler hunks is
