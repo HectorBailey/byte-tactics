@@ -1,4 +1,32 @@
 // Decompiled by deepseek-v4.1-flash, finished by space-bunny-free and deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
+// Second worker pass (deepseek-v4.1, issue 1962): 79.0 -> 79.3, still 2333 bytes
+// against the original 2340. Fixed here: the LOGO text rect pair must be
+// (rect.left + rect.right) for x but (rect.bottom + rect.top) for y, which
+// pins both [esp+0x38]/[esp+0x40] load orders (the mixed form is the only one
+// that leaves no diff in that hunk), and the reindex loop wants the dword at
+// +0x1b63 tested before the byte at +0x1bd6 is read, which a nested
+// `if (v != 0) { ... }` with the byte local inside it buys (equal score, but
+// the load order then matches the original).
+// Still differing, in size order:
+// - `pl` never gets ebp (original: lea ebp / mov [esp+0x14],ebp / mov al,[ebp+0x22],
+//   then reloads ebp from [esp+0x14] at 0x44a92f and uses [ebp+0x27] at 0x44a956
+//   and 0x44ae00). Ours folds the field_22 load into [esi+eax*2+0x1b85] and keeps
+//   pl in its slot, so every pl use costs an extra reload. Tried this pass:
+//   `g_game->players + g_game->localPlayer` (byte-identical output, no move).
+// - the DAT_00512994 branch: original falls through into `call FUN_004455b0`
+//   and jumps over the compaction loop (`jne 0x44a7ec / call / jmp 0x44a933`);
+//   ours puts the call at the join point (0x44a92f), so the loop-exit reload
+//   `mov ebp,[esp+0x14]` has no counterpart. Inverting the test (the obvious
+//   way to force that layout) was already measured at 68.7, so it stays.
+// - the compaction reindex loop: ours still materialises
+//   `lea edx,[eax+ecx+0x1ca9]` for the byte store (the original issues three
+//   separate base+index+disp references) and emits base=off/index=g_game
+//   instead of the original's base=g_game/index=off.
+// - the first `if`: original hoists `mov eax,[g_game]` between the test and the
+//   jne; ours sinks it into the fall-through. Same for a couple of scheduler
+//   swaps (LOGO `mov edx,[esp+0x18]` before/after the `lea ecx,[esp+0x34]`,
+//   the tail's `xor ebx,ebx` before/after the pl reload) and the mirrored
+//   edx/ecx pick in the `w[0x63] < ... - 1` compare.
 // Base by deepseek-v4.1-flash, space-bunny-free and GPT-6; continued by deepseek-v4.1.
 // Gave up at 79.0% (2333 bytes against 2340). The 1-bit bitfield at
 // Unit+0x9d bit 2 fixed the tail; what is left is the initial local-slot
@@ -184,7 +212,7 @@ void FUN_0044a680()
             ((Flag2bee_44a680*)((char*)g_game + 0x2bee))->bit0 = 1;
     }
 
-    pl = &g_game->players[g_game->localPlayer];
+    pl = g_game->players + g_game->localPlayer;
     if (pl->field_22 != 0) {
         g_game->field_2bc0 = 3;
         FUN_004a9660(&g_game->gui);
@@ -233,13 +261,16 @@ void FUN_0044a680()
                 int i = 0;
                 for (int off = 0; off <= 0xcee; off += 0x14b, i++) {
                     int v = *(int*)((char*)g_game + 0x1b63 + off);
-                    unsigned char f73 = *(unsigned char*)((char*)g_game + 0x1bd6 + off);
-                    if (v != 0 &&
-                        (f73 == 1 || f73 == 2 || f73 == 3) &&
-                        *(unsigned char*)((char*)g_game + 0x1ca9 + off) != 10)
-                        *(unsigned char*)((char*)g_game + 0x1ca9 + off) = (unsigned char)i;
-                    else
+                    if (v != 0) {
+                        unsigned char f73 = *(unsigned char*)((char*)g_game + 0x1bd6 + off);
+                        if ((f73 == 1 || f73 == 2 || f73 == 3) &&
+                            *(unsigned char*)((char*)g_game + 0x1ca9 + off) != 10)
+                            *(unsigned char*)((char*)g_game + 0x1ca9 + off) = (unsigned char)i;
+                        else
+                            *(unsigned char*)((char*)g_game + 0x1ca9 + off) = 10;
+                    } else {
                         *(unsigned char*)((char*)g_game + 0x1ca9 + off) = 10;
+                    }
                 }
                 A = savedA;
             }
@@ -363,7 +394,7 @@ void FUN_0044a680()
                     h = FUN_004a50b0();
                     FUN_004a50e0(0, buf,
                                  (rect.left + rect.right - w) / 2,
-                                 (rect.top + rect.bottom - h) / 2,
+                                 (rect.bottom + rect.top - h) / 2,
                                  w, 0);
                 }
                 i++;
