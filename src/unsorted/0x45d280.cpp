@@ -1,21 +1,26 @@
 // Decompiled by space-bunny-free, finished by deepseek-v4.1-flash and GPT-6, edited by deepseek-v4.1. Names are provisional.
-// Partial, 90.7%, 1327 vs 1333 bytes. Four diffs left:
-// 1. UNDO flag update: original loads the word into ax and stores via
-//    `mov cl,al; xor cl,dl; and ecx,1; xor ecx,eax`, while the compound
-//    assignment folds into `xor word ptr [mem],cx` (6 bytes short). The
-//    NOTRAK branch's `f ^ ((f ^ v) & 1)` shape is right, but with a
-//    byte-typed or int-typed DAT_00512f46 local the compiler distributes
-//    to `and edx,0xfffe` plus a movzx and scores worse.
-// 2. The UNDO branch keeps g_game in edi (reloaded after the callback);
-//    ours uses eax, same size, register names only.
-// 3. The apply block wants fild before push ecx; ours pushes first.
-// 4. The tail index chain wants `lea eax,[edi*8]`; ours emits mov/shl
-//    (3 bytes short). The identical chain in the TRACKTYPE branch matches.
-// Also tried, no better: declaring the game pointer above the FUN_004ce7a0
-// call (gets it into edi but shifts the whole block, 84%); headers.py and
-// swapping <string> for <vector>, <iostream>, <map>, <list>, <string.h> or
-// <stdlib.h> (all still 90.7%); flag update as f ^ ((DAT ^ f) & 1) or the
-// bitfield b0 assignment (90.5%); an int local for DAT_00512f46 (86.8%).
+// Partial, 91.5%, 1339 vs 1333 bytes. Best UNDO flag-update shape so far:
+// `unsigned short f = game->flags.word; int b = (unsigned char)f ^ DAT_00512f46;
+// game->flags.word = f ^ (b & 1);` with the `game = g_game;` reload kept in the
+// if body. That keeps g_game in edi and the `mov edi,[0x511de8]` reload like the
+// original, but compiles the update to
+//   mov bp,[edi+0x37f14] / xor ecx,ecx / mov cl,[DAT] / mov eax,ebp /
+//   and eax,0xff / xor eax,ecx / and eax,1 / xor eax,ebp / mov [edi+..],ax
+// where the original is 7 instructions (mov ax / mov dl,[DAT] / mov cl,al /
+// xor cl,dl / and ecx,1 / xor ecx,eax / mov [..],cx): the original does the xor
+// at byte width and masks 32-bit, MSVC5 here zero-extends with `and eax,0xff`.
+// Fusing the bit as `f ^ (((unsigned char)f ^ DAT_00512f46) & 1)` does give the
+// byte-width xor but widens the bit through dx (88.1%); dropping the reload
+// assignment instead keeps the local live across the callback in edi but loses
+// the reload line and still widens (88.1%); the previous compound `^=` form
+// scores 90.7%; int bit with fused mask 90.2%; no pointer local 85.8%; byte
+// locals 86.7/87.5%.
+// Other remaining diffs: RESTORE callback setup uses `mov eax,[0x511de8] /
+// mov ecx,[eax+0x10]` where the original keeps ecx through both loads (same
+// size); the apply block pushes the FUN_004ba590 argument slot before `fild`
+// where the original loads fild first; the final tail index wants
+// `lea eax,[edi*8]` where ours emits `mov eax,edi / shl eax,3`; the TRACKMODE
+// `field_37f16 == 3` test uses cl/eax where the original uses al/ecx.
 #include <string>
 #include <windows.h>
 
@@ -280,7 +285,9 @@ void __stdcall FUN_0045d280(Object_0045d280* obj)
             ((Class_004cdb40*)game->sound)->FUN_004cdb40();
             game = g_game;
         }
-        game->flags.word ^= (game->flags.byte ^ DAT_00512f46) & 1;
+        unsigned short f = game->flags.word;
+        int b = (unsigned char)f ^ DAT_00512f46;
+        game->flags.word = f ^ (b & 1);
         ((Class_004ce580*)g_game->sound)->FUN_004ce580(DAT_00512fd9);
         goto apply;
     }
