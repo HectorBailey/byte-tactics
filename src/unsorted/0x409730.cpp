@@ -1,4 +1,12 @@
-// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
+// Additional pass (deepseek-v4.1): the read site rewritten as a braced block with
+// `unsigned char* p8 = vec_8d.begin(); x += (char)p8[i] / 2;` recompiles to the
+// identical 1678 bytes with the identical two SIB diffs (the single-use local is
+// propagated back into the subscript), an explicit `(unsigned char)` cast around
+// the clamped store value is neutral at 99.6%, and an `unsigned int` loop index
+// is much worse (1683 bytes, 83.9%, the loop guard turns into a 64-bit compare).
+// The two SIB base/index bytes remain the whole work list.
+//
+// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, edited by deepseek-v4.1, finished by space-bunny-free. Names are provisional.
 //
 // (deepseek-v4.1-flash): key negative finding. The two swapped accesses are NOT
 // a subscript-form problem and NOT a vector-container problem. A named pointer
