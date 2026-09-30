@@ -1,5 +1,20 @@
 // Decompiled by DeepSeek V4.1 Flash and space-bunny-free, finished by deepseek-v4.1-flash and space-bunny-free, edited by deepseek-v4.1. Names are provisional.
 //
+// Pass (deepseek-v4.1, #2097 retry): still 80.0%, 280 bytes, six check.py runs.
+// New shapes, every one byte-identical to the body below, so none is kept: the
+// case 1 store folded into the call as a comma expression in argument 3,
+// `(out->low = at_low, DAT_0051fe40)`, or in argument 1,
+// `(out->low = at_low, at_high)`; the same comma in case 2,
+// `(out->low = FUN_004b7381(at_low, offset, size), at_high)`; (int) casts on
+// all three case 1 arguments; `at_low`/`at_high` copied to `lo_`/`hi_` locals at
+// the function top and used everywhere in the switch; a `Range* p = out;`
+// local; one dead `static int` before the function; and 256 dummy typedefs
+// before the function to perturb compiler state. Since even those leave case 1
+// with at_high hoisted into eax and the global loaded into edx, and case 2 with
+// at_low in ecx and at_high in edx, the two remaining hunks below are an
+// allocator/scheduler choice that statement, argument and declaration shape
+// cannot move.
+//
 // Pass (deepseek-v4.1, #2097): 80.0%, 280 bytes, 9 check.py runs. Six new source
 // shapes, all 80.0% and byte-identical to the body below (so none is kept):
 //   - a `Mix1(a,b)` inline helper whose body loads DAT_0051fe40 into a local
