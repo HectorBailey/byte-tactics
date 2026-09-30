@@ -1,7 +1,13 @@
-// Decompiled by deepseek-v4.1. Names are provisional.
-// Partial: 72.3% (best seen), 1086 bytes versus 1074. Frame is the right 0x48
+// Decompiled by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
+// Partial: 72.6% (best seen), 1086 bytes versus 1074. Frame is the right 0x48
 // bytes and the mode!=2 early return matches (ebp/ebx are pushed inside the
-// mode==2 arm, as the original does at 0x43d2c3). What still differs:
+// mode==2 arm, as the original does at 0x43d2c3).
+// This pass flipped the heading test to `if (d != 0) { big } else { zero }` so
+// the zero case lands after the clamp block (original 0x43d587); worth +0.3.
+// Making the FUN_004b70ef/7123 results `+= -f(...)` did not change the score
+// (kept; it is closer in shape). Removing the `type` local, making scale an
+// explicit __int64, and dropping the `(float)` on the three _hypot calls all
+// scored worse (56.5, 72.6, 71.3). What still differs:
 //   * the f18 scratch slot is [esp+0x1c] here, [esp+0x18] in the original
 //     (0x43d307), so the whole top-of-body local layout is 4 bytes off;
 //   * the three inlined 64-bit scales push `_allmul` args in the other order
@@ -9,19 +15,19 @@
 //     original keeps `scale` live in ebx:ebp across all three multiplies
 //     while our build rematerialises it;
 //   * the dist>maxd path: the original negs the FUN_004b70ef/FUN_004b7123
-//     results and adds them (neg ebp / neg eax / add edx,ebp at 0x43d466),
-//     ours emits two plain `sub ecx,eax`;
+//     results and adds them (neg ebp / neg eax / add edx,ebp at 0x43d466).
+//     Writing `p1.x += -FUN_004b70ef(h, g);` keeps the close shape but the
+//     score is unchanged, so this is not the lever;
 //   * the original stores maxd and the `h` short in the incoming argument
 //     home slot (fstp [esp+0x5c] at 0x43d3c8, mov [esp+0x1c],ecx at
 //     0x43d44e) and re-reads the unit pointer from that home after each call
 //     (mov ecx,[esp+0x5c] at 0x43d2f1, mov ebx,[esp+0x6c] at 0x43d3ab);
 //   * the tail loses the x87 `fxch` schedule around the k/velocity block.
-// Previously tried (by the first pass): explicit double casts on every
-// scaling multiply, an integer instead of float hypot for the distance,
-// assigning the sqrt result to k before converting; none moved the _allmul
-// push order or the [esp+0x18] slot. Next step: declare the scale pair as an
-// explicit __int64 local (so the allocator keeps it in ebx:ebp across the
-// three multiplies) and let maxd/h live in the parameter home slot.
+// Previously tried: explicit double casts on every scaling multiply, an
+// integer instead of float hypot for the distance, assigning the sqrt result
+// to k before converting, `__int64` scale, dropping the `type` local, and
+// dropping the `(float)` on the three _hypot calls; none moved the _allmul
+// push order, the [esp+0x18] slot, or the score above 72.6.
 
 #include <math.h>
 
@@ -142,8 +148,8 @@ void Class_0043d210::FUN_0043d290(Unit_0043d290* unit) {
         p1.z = (int)(((__int64)p1.z * f) >> 16);
         int g = (int)((double)(dist - maxd) * 65536.0);
         short h = unit->f64.y;
-        p1.x -= FUN_004b70ef(h, g);
-        p1.z -= FUN_004b7123(h, g);
+        p1.x += -FUN_004b70ef(h, g);
+        p1.z += -FUN_004b7123(h, g);
     }
 
     int dax = unit->pos.x - a.x;
@@ -168,9 +174,7 @@ void Class_0043d210::FUN_0043d290(Unit_0043d290* unit) {
 
     float hd = (float)_hypot(dax, daz) * eps;
     short d = (short)(heading - unit->f64.y);
-    if (d == 0) {
-        field_24 = 0;
-    } else {
+    if (d != 0) {
         unsigned short max = unit->type->max_turn;
         if (d >= (int)max)
             field_24 = max;
@@ -180,6 +184,8 @@ void Class_0043d210::FUN_0043d290(Unit_0043d290* unit) {
             field_24 = d;
         unit->f64.y = (short)(unit->f64.y + field_24);
         unit->moved = 1;
+    } else {
+        field_24 = 0;
     }
 
     if (hd < 8.0f)

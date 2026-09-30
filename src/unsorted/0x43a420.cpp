@@ -1,4 +1,4 @@
-// Decompiled by deepseek-v4.1. Names are provisional.
+// Decompiled by deepseek-v4.1, finished by space-bunny-free. Names are provisional.
 // Started by deepseek-v4.1-flash, continued by GPT-6, finished by deepseek-v4.1.
 // Partial: 86.2%, exact 1300-byte size and 0x164-byte frame. Two real
 // differences remain:
@@ -18,6 +18,21 @@
 //     separate result byte and a reversed comparison all still give ECX to
 //     the variable the loop compares, so MSVC5's pick here does not follow
 //     the declaration order or the ++ sites.
+// space-bunny-free re-attacked difference 2 and did not move it. All of the
+// following still score 86.2% with ECX on the compared counter, so MSVC5's
+// pick here follows neither the declaration order, nor the ++ sites, nor the
+// loop shape: hoisting the end pointer into a named local; reading desc.kind
+// into a local first; an extra (dead) reference to either counter before or
+// after the loop; `k++ == desc.kind` folded into the compare; `while(1)` with
+// the bound test at the top; the raw index incremented at the TOP of the body
+// from a -1 seed; the index computed by pointer difference; a `continue` form
+// that duplicates the tail; and swapping the two counter declarations. For
+// difference 1, an explicit empty base ctor (with and without `__inline`),
+// `Class_0043a1e0()` written out in the init list, `kind = 0` as a body
+// statement, and naming link's first argument all leave the order unchanged.
+// Note for whoever picks this up: the whole 2-byte shift cascades through every
+// branch target and the jump table, so difference 2 is worth far more than its
+// 5 diff lines suggest, and it is the one to solve first.
 // Preserve the inclusive fallback-table scan: 0x43a58d uses JBE even though
 // the named lookup passes the same end pointer to exclusive lower_bound.
 #include <stdio.h>
