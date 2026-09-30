@@ -1,4 +1,22 @@
 // Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, edited by deepseek-v4.1. Names are provisional.
+// deepseek-v4.1 pass (issue 2100, third worker): still 86.3% / 318 bytes, same
+// three hunks, no score change from more than a dozen source shapes:
+// - scan as `for (; p != end && p->expires >= ticks; p++) ;`, `++src`, `++p`
+//   in the copy, `Eye* d = p++;` as one statement, `d[0].field` stores,`const
+//   Eye* d`, function-scope `Pos* sp; char* fp;` scratch locals, whole phase 2
+//   in a nested `{}`: 86.3% each.
+// - the two-destination shape (separate `dst = p` read by the count, which
+//   reproduces the original slots 0x10/0x14/0x18 and the whole phase-2
+//   instruction stream with the copy destination in edx and the source in
+//   esi swapped) with `dst = p` moved BEFORE `src = p + 1`: 65.0% / 328 bytes.
+// The remaining gap is one allocator eviction; all three hunks follow from it.
+// At the copy the original needs a register for `&d->screenPos` and evicts the
+// live destination (esi -> [esp+0x18], restored at the loop bottom), leaving
+// edi = g_game alone; ours instead gives `&d->screenPos` edi (evicting g_game,
+// restored at the loop bottom) and spills `&d->flagB` to [esp+0x14], so the
+// loop registers stay right (destination esi, source edx) but the tail sign
+// fix-up lands in ecx instead of eax. Making g_game the value that survives
+// the copy is the lever; no source shape tried so far moved it.
 // deepseek-v4.1-flash pass: no score change, best stays 86.3% / 318 bytes.
 // New evidence for the next attempt:
 // - The source is NOT std::remove_if. A faithful std::remove_if + predicate
