@@ -68,6 +68,26 @@
 // opposite assignment. The sibling 0x412d40 MATCHES with the reverse roles
 // (unit in esi, order in edi), so the tie-break depends on context, not on
 // operand order.
+// deepseek-v4.1 (issue #1897) fourth retry: baseline reconfirmed at 97.4%,
+// 25 masked bytes, still the two regions above. Region 1 (range-check _hypot,
+// 8 bytes): the four operand-order/negation combinations were re-measured
+// (25, 25, 47, 47 bytes; 97.4, 97.4, 96.8, 96.8%) and the instruction streams
+// show MSVC fixes the register pair by memory operand here, so [esi+0x30] and
+// [esi+0x2e] (the order side) are always issued first into edx/ecx and only
+// the sub destination follows the source. The matched siblings 0x412d40 and
+// 0x412710 both load their Order object first too (it is the edi-base there),
+// so the original 413470 is the odd one out: it loads [edi+0x74] (unit) first.
+// Nested-if, a local range, an != 0 test and swapped arguments each lose the
+// whole body (500+ byte diff, frame shrinks to 0x30), so no shape tried
+// reaches it. Region 2 (state-3 waypoint, 17 bytes): a Vec3& to
+// order->target->pos plus member-wise p.x/p.y/p.z assignment does reproduce
+// the original's interleaved schedule (load x, push 0x36, add off.x, then load
+// y and z) but accumulates into off.x's register and issues the p.x store
+// early: 34 bytes, 96.5%. The matching sibling site at 0x413a1e (same sum with
+// - off) uses the hoisted form with ebx for y, exactly like our build, so the
+// original really scheduled the two sums differently and the source edit that
+// produced it is not the one that produces this schedule. Add() as a
+// per-member helper scores 97.1%. Best kept: baseline, 97.4%.
 #include <math.h>
 #include <vector>
 
