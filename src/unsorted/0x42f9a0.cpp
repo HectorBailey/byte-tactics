@@ -1,62 +1,26 @@
 // Decompiled by deepseek-v4.1-flash, finished by GPT-6; retry confirmed by deepseek-v4.1-flash, edited by deepseek-v4.1. Names are provisional.
 //
-// deepseek-v4.1 retry #2 (1852): 97.6% (5472 of 5472 bytes), up from 96.9%.
-// THE COMPARE FOLD IS SOLVED: writing each ini result into a NAMED local before
-// the test makes MSVC compare against the hoisted zero register instead of
-// folding to `test eax,eax`:
-//     int ok1 = FUN_004b69d0("Total Annihilation", "Interface Type", &value);
-//     if (ok1 != 0) { ... }
-// The direct spelling `if (FUN_004b69d0(...) != 0)` always folds to `test`, with
-// or without a `{ }` block, and a shared function-scope variable folds too. The
-// trigger is per site, so only the sites that use the register in the original
-// are written this way: the 25 early options up to SwitchAlt, plus the four in
-// the tail (PlayMovie, DisplaymodeDepth, Games, AllMissions). The middle options
-// (Movie Output Rate through the multi/skirmish block) and the six skirmish
-// player-loop sites keep the direct spelling, because the original folds those.
-// Remaining diff (31 hunks, all register names, byte count already exact):
-// the early zero lands in esi instead of the original ebx, so every early
-// `cmp eax,esi` is `cmp eax,ebx` in the original, the two early zero stores use
-// esi instead of ebx, `push esi` replaces `push ebx`, and because esi is taken
-// the constant 2 moves to ebp (0x42fdc0 `mov ebp,2` vs `mov esi,2`) with the
-// Sound Mode bitfield mask following (`or word ptr [..],bp` vs `si`).
-// What was tried and rejected this pass (all measured with the real toolchain):
-//  - 16 comparison spellings (0, 0L, 0U, false, '\0', (short)0, (char)0, NULL,
-//    !x, x-0, x&0xffffffff, reversed, named const int, static const int, bool
-//    temp, result local) all emit `test eax,eax`; a named `int def` assigned 0
-//    then 10 and used as both the compared operand and the default store value
-//    also folds; a local struct with a zero field folds too.
-//  - micro9.cpp: a pointer-returning call followed by two or more zero stores
-//    (`if (p) { p->a = 0; p->b = 0; G = p; } else { G = 0; }`) does emit
-//    `xor ecx,ecx / cmp eax,ecx`, and micro8.cpp a `union { int i; short s; }`
-//    with `z.s = 0` compared as `!= z.i`, but the latter always reloads the
-//    union from memory and the former needs stores this function does not have.
-//  - the toolchain is not the cause: BT_TOOLCHAIN=msvc5-rtm gives the same body.
-//  - an extra zero use at the top, a 3-store cluster in the first else branch,
-//    and 26 identical option blocks (micro7) never move a compare off `test`.
-// The esi-vs-ebx pick is allocator state: our zero chains with the skirmish
-// loop counter and the tail zero (all esi), the original chains ebx with the
-// constant 10 and the loop's 1000 instead.
-// GPT-6 retry: 96.9%, not MATCH. Prefix/tail inline helpers, registry return
-// types and register-qualified zero/counter variants do not improve it.
-// Remaining differences are the initial zero register and final zero tests.
-// Partial: 96.9%. Corrected missing Sound Mode default to 1 or 2, restructured the final flag branch and corrected callee return types. Early zero register is ebp instead of ebx; final zero tests and stores still differ.
-//
-// deepseek-v4.1-flash retry (confirmed 96.9%, 5470 vs 5472 bytes): the entire
-// residual is that the original keeps the constant 0 in a callee-saved
-// register and COMPARES the FUN_004b69d0 result against it:
-//   early region  cmp eax,ebx   (ebx = 0 held from 0x42f9be)
-//   tail region   xor esi,esi / cmp eax,esi
-// Our build folds every one of those to `test eax,eax` and reuses the call
-// result for the `value = 0` store, so the zero never gets a register and the
-// early `= 0` stores / `push 0` come from ebp instead of ebx. Tried and all
-// scored exactly 96.9%: tools/headers.py (128 sets), an N-unused-declaration
-// sweep from 0 to 500, a named `int zero = 0;` used as the comparison operand
-// and default in the affected regions, a file-scope `static const int zero`,
-// `!= (zero = 0)` assignment expressions, and defining the real preceding
-// functions (0x42f980, 0x42f960) above this one. Every spelling of the zero
-// constant constant-folds here, so the comparison can never become
-// `cmp eax,reg`. Suspect the original compared against a genuine variable
-// (or was built with different compiler state) rather than a literal.
+// deepseek-v4.1 retry #3 (1852): MATCH, 5472 of 5472 bytes.
+// The last 27 register-name hunks were NOT a free allocator pick. The compare
+// fold was solved earlier by writing a call result into a NAMED local before the
+// test (`int ok = FUN_004b69d0(...); if (ok != 0)`), because the direct spelling
+// `if (FUN_004b69d0(...) != 0)` folds to `test eax,eax`. That trick was applied
+// at every early option site, including two where the original does NOT fold:
+// Gamma (0x4301a5, `test eax,eax / mov ebx,0xa`) and SwitchAlt (0x430215), where
+// the constant 10 kills the ebx zero beforehand, so those two compares fold and
+// the tail (PlayMovie, AllMissions, after the skirmish loop) gets a fresh
+// `xor esi,esi` zero source instead. Reverting exactly those two sites to the
+// direct spelling flipped the early zero register from esi to ebx and removed
+// all 27 hunks at once: `xor ebx,ebx` at 0x42f9be, every early `cmp eax,ebx`,
+// the two `mov dword ptr [..+0x37efa/0x37ef2], ebx` zero stores, `push ebx`,
+// `mov esi,2` at 0x42fdc0 (with `or word ptr [..],si` for the Sound Mode mask)
+// and `cmp dword ptr [esp+0x10], esi`. So the esi-vs-ebx pick was not allocator
+// state at all, it was caused by those two extra register compares keeping the
+// early zero live past 0x4301a5.
+// Sites that keep the named-local spelling: the 23 early options up to
+// DitheredFog, plus PlayMovie and AllMissions in the tail. Everything else
+// (the middle options, the whole multi/skirmish block and the six skirmish
+// player-loop sites) uses the direct spelling because the original folds there.
 
 #include <windows.h>
 #include <stdio.h>
@@ -402,8 +366,7 @@ void FUN_0042f9a0()
         g_game->flags_37f06.ditheredFog = 0;
         FUN_004b6a50("Total Annihilation", "DitheredFog", g_game->flags_37f06.ditheredFog);
     }
-    int ok24 = FUN_004b69d0("Total Annihilation", "Gamma", &value);
-    if (ok24 != 0) {
+    if (FUN_004b69d0("Total Annihilation", "Gamma", &value) != 0) {
         if (value == 10) {
             g_game->gamma = 0xc;
         } else {
@@ -413,8 +376,7 @@ void FUN_0042f9a0()
         g_game->gamma = 0xc;
         FUN_004b6a50("Total Annihilation", "Gamma", g_game->gamma);
     }
-    int ok25 = FUN_004b69d0("Total Annihilation", "SwitchAlt", &value);
-    if (ok25 != 0) {
+    if (FUN_004b69d0("Total Annihilation", "SwitchAlt", &value) != 0) {
         g_game->flags_37f06.switchAlt = value;
     } else {
         g_game->flags_37f06.switchAlt = 0;
