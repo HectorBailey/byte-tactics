@@ -3094,18 +3094,18 @@ address,size,model,batch,result,similarity,runs,notes
 0x4d0910,206,space-bunny-free,#392,partial,76.1,,issue #392
 0x4d0c50,389,space-bunny-free,#392,matched,100.0,,issue #392
 0x4d0de0,373,space-bunny-free,#392,partial,57.3,,issue #392
-0x4d1670,385,,#394,assigned,,,issue #394
-0x4d1970,296,,#394,assigned,,,issue #394
-0x4d84c0,182,,#394,assigned,,,issue #394
-0x4d89b0,293,,#394,assigned,,,issue #394
-0x4d8c50,226,,#394,assigned,,,issue #394
-0x4da8d0,283,,#394,assigned,,,issue #394
-0x4daa30,214,,#395,assigned,,,issue #395
-0x4dabb0,311,,#395,assigned,,,issue #395
-0x4db610,332,,#395,assigned,,,issue #395
-0x4dbae0,168,,#395,assigned,,,issue #395
-0x4dbbc0,311,,#395,assigned,,,issue #395
-0x4de550,175,,#395,assigned,,,issue #395
+0x4d1670,385,deepseek-v4.1-flash,#394,matched,100.0,,issue #394
+0x4d1970,296,deepseek-v4.1-flash,#394,partial,77.8,,issue #394
+0x4d84c0,182,deepseek-v4.1-flash,#394,matched,100.0,,issue #394
+0x4d89b0,293,deepseek-v4.1-flash,#394,matched,100.0,,issue #394
+0x4d8c50,226,deepseek-v4.1-flash,#394,matched,100.0,,issue #394
+0x4da8d0,283,deepseek-v4.1-flash,#394,partial,95.8,,issue #394
+0x4daa30,214,deepseek-v4.1-flash,#395,partial,82.9,,issue #395
+0x4dabb0,311,deepseek-v4.1-flash,#395,matched,100.0,,issue #395
+0x4db610,332,deepseek-v4.1-flash,#395,partial,48.8,,issue #395
+0x4dbae0,168,deepseek-v4.1-flash,#395,matched,100.0,,issue #395
+0x4dbbc0,311,deepseek-v4.1-flash,#395,partial,66.1,,issue #395
+0x4de550,175,deepseek-v4.1-flash,#395,partial,77.5,,issue #395
 0x4de700,271,space-bunny-free,#396,matched,100.0,,issue #396
 0x4de8a0,347,space-bunny-free,#396,matched,100.0,,issue #396
 0x4df280,163,space-bunny-free,#396,matched,100.0,,issue #396
@@ -4095,8 +4095,8 @@ address,size,model,batch,result,similarity,runs,notes
 0x47de60,342,deepseek-v4.1-flash,#1182,partial,86.8,,"issue #1182, escalated"
 0x48cf30,742,space-bunny-free,#1183,partial,84.9,,"issue #1183, escalated"
 0x48d9a0,644,space-bunny-free,#1183,partial,83.6,,"issue #1183, escalated"
-0x4758c0,779,,#1186,assigned,,,"issue #1186, escalated"
-0x475bd0,791,,#1186,assigned,,,"issue #1186, escalated"
+0x4758c0,779,deepseek-v4.1-flash,#1186,partial,88.9,,"issue #1186, escalated"
+0x475bd0,791,deepseek-v4.1-flash,#1186,partial,99.7,,"issue #1186, escalated"
 0x4c71f0,280,space-bunny-free,#1188,partial,80.0,,"issue #1188, escalated"
 0x4c90b0,195,space-bunny-free,#1188,partial,93.4,,"issue #1188, escalated"
 0x475ef0,794,space-bunny-free,#1190,partial,83.0,,"issue #1190, escalated"
@@ -4779,9 +4779,9 @@ address,size,model,batch,result,similarity,runs,notes
 0x464f80,2392,gpt-6,#1850,partial,66.5,,"issue #1850, escalated"
 0x466dc0,1662,gpt-6,#1850,partial,63.4,,"issue #1850, escalated"
 0x467440,1015,gpt-6,#1850,partial,29.6,,"issue #1850, escalated"
-0x42dcf0,1061,,#1852,assigned,,,"issue #1852, escalated"
-0x42e440,3923,,#1852,assigned,,,"issue #1852, escalated"
-0x42f9a0,5472,,#1852,assigned,,,"issue #1852, escalated"
+0x42dcf0,1061,space-bunny-free,#1852,partial,77.6,,"issue #1852, escalated"
+0x42e440,3923,space-bunny-free,#1852,partial,83.3,,"issue #1852, escalated"
+0x42f9a0,5472,space-bunny-free,#1852,matched,100.0,,"issue #1852, escalated"
 0x45f1d0,1431,gpt-6,#1853,partial,91.1,,"issue #1853, escalated"
 0x462f30,1653,gpt-6,#1853,partial,39.9,,"issue #1853, escalated"
 0x463790,1040,gpt-6,#1853,partial,62.6,,"issue #1853, escalated"
@@ -4815,8 +4815,8 @@ address,size,model,batch,result,similarity,runs,notes
 0x4589c0,861,gpt-6.1-sol,#1877,partial,61.1,,"issue #1877, escalated"
 0x4ac4c0,325,,#1879,assigned,,,"issue #1879, escalated"
 0x4ac8c0,167,,#1879,assigned,,,"issue #1879, escalated"
-0x438c00,660,,#1881,assigned,,,"issue #1881, escalated"
-0x4394e0,601,,#1881,assigned,,,"issue #1881, escalated"
+0x438c00,660,space-bunny-free,#1881,partial,51.1,,"issue #1881, escalated"
+0x4394e0,601,space-bunny-free,#1881,partial,65.2,,"issue #1881, escalated"
 0x410e70,824,opus,#1882,partial,92.5,,"issue #1882, escalated"
 0x414380,1000,opus,#1882,partial,91.3,,"issue #1882, escalated"
 0x48d790,388,,#1883,assigned,,,"issue #1883, escalated"
@@ -4826,7 +4826,7 @@ address,size,model,batch,result,similarity,runs,notes
 0x475470,398,,#1887,assigned,,,"issue #1887, escalated"
 0x485140,117,,#1887,assigned,,,"issue #1887, escalated"
 0x49c880,147,,#1887,assigned,,,"issue #1887, escalated"
-0x4ddf00,158,,#1891,assigned,,,"issue #1891, escalated"
+0x4ddf00,158,space-bunny-free,#1891,matched,100.0,,"issue #1891, escalated"
 0x4b0230,631,deepseek-v4.1-flash,#1892,partial,82.9,,"issue #1892, escalated"
 0x420f30,536,space-bunny-free,#1894,partial,82.7,,"issue #1894, escalated"
 0x4211d0,469,space-bunny-free,#1894,partial,82.0,,"issue #1894, escalated"
@@ -4901,9 +4901,9 @@ address,size,model,batch,result,similarity,runs,notes
 0x4a3ef0,629,gpt-6.1-sol,#1961,partial,93.1,,"issue #1961, escalated"
 0x4a4170,714,gpt-6.1-sol,#1961,partial,80.9,,"issue #1961, escalated"
 0x4a4d70,661,gpt-6.1-sol,#1961,partial,98.7,,"issue #1961, escalated"
-0x449bb0,2756,,#1962,assigned,,,"issue #1962, escalated"
-0x44a680,2340,,#1962,assigned,,,"issue #1962, escalated"
-0x44c7e0,1586,,#1962,assigned,,,"issue #1962, escalated"
+0x449bb0,2756,deepseek-v4.1-flash,#1962,partial,72.1,,"issue #1962, escalated"
+0x44a680,2340,deepseek-v4.1-flash,#1962,partial,79.7,,"issue #1962, escalated"
+0x44c7e0,1586,deepseek-v4.1-flash,#1962,partial,84.9,,"issue #1962, escalated"
 0x435da0,2740,deepseek-v4.1-flash,#1964,partial,92.7,,"issue #1964, escalated"
 0x4bb7c0,1042,deepseek-v4.1-flash,#1964,matched,100.0,,"issue #1964, escalated"
 0x4854a0,1180,deepseek-v4.1-flash,#1967,partial,94.3,,"issue #1967, escalated"
@@ -4914,14 +4914,14 @@ address,size,model,batch,result,similarity,runs,notes
 0x4a2580,1631,deepseek-v4.1-flash,#1970,partial,65.2,,"issue #1970, escalated"
 0x4a3780,1832,deepseek-v4.1-flash,#1970,partial,34.7,,"issue #1970, escalated"
 0x4a56b0,1662,deepseek-v4.1-flash,#1970,partial,60.3,,"issue #1970, escalated"
-0x426e80,6310,,#1974,assigned,,,"issue #1974, escalated"
+0x426e80,6310,deepseek-v4.1-flash,#1974,partial,43.8,,"issue #1974, escalated"
 0x4c54f0,583,,#1975,assigned,,,"issue #1975, escalated"
 0x4c59d0,415,,#1975,assigned,,,"issue #1975, escalated"
 0x4658e0,469,deepseek-v4.1-flash,#1977,partial,96.5,,"issue #1977, escalated"
 0x466c20,402,deepseek-v4.1-flash,#1977,matched,100.0,,"issue #1977, escalated"
-0x49be60,2272,,#1978,assigned,,,"issue #1978, escalated"
-0x49e830,1365,,#1978,assigned,,,"issue #1978, escalated"
-0x4a1b40,2160,,#1978,assigned,,,"issue #1978, escalated"
+0x49be60,2272,deepseek-v4.1-flash,#1978,partial,29.1,,"issue #1978, escalated"
+0x49e830,1365,deepseek-v4.1-flash,#1978,partial,87.7,,"issue #1978, escalated"
+0x4a1b40,2160,deepseek-v4.1-flash,#1978,partial,18.6,,"issue #1978, escalated"
 0x40fbe0,1976,deepseek-v4.1-flash,#1980,partial,75.8,,"issue #1980, escalated"
 0x410850,1051,deepseek-v4.1-flash,#1980,partial,90.3,,"issue #1980, escalated"
 0x411f50,1980,deepseek-v4.1-flash,#1980,partial,96.8,,"issue #1980, escalated"
@@ -4945,7 +4945,7 @@ address,size,model,batch,result,similarity,runs,notes
 0x4876c0,1062,deepseek-v4.1-flash,#1998,partial,73.7,,"issue #1998, escalated"
 0x487bf0,1811,deepseek-v4.1-flash,#1998,partial,44.9,,"issue #1998, escalated"
 0x48e010,2542,deepseek-v4.1-flash,#1998,matched,100.0,,"issue #1998, escalated"
-0x468cf0,5904,,#2000,assigned,,,"issue #2000, escalated"
+0x468cf0,5904,deepseek-v4.1-flash,#2000,partial,46.2,,"issue #2000, escalated"
 0x476ef0,1124,deepseek-v4.1-flash,#2001,partial,71.3,,"issue #2001, escalated"
 0x477ab0,1935,deepseek-v4.1-flash,#2001,partial,72.9,,"issue #2001, escalated"
 0x453d40,8944,,#2003,assigned,,,"issue #2003, escalated"
@@ -4962,9 +4962,9 @@ address,size,model,batch,result,similarity,runs,notes
 0x4b3c60,1544,deepseek-v4.1-flash,#2016,partial,98.6,,"issue #2016, escalated"
 0x4b5510,1017,deepseek-v4.1-flash,#2016,partial,99.7,,"issue #2016, escalated"
 0x4b5cc0,1104,deepseek-v4.1-flash,#2016,matched,100.0,,"issue #2016, escalated"
-0x43e490,3152,,#2017,assigned,,,"issue #2017, escalated"
-0x43f0e0,4420,,#2017,assigned,,,"issue #2017, escalated"
-0x441460,1874,,#2017,assigned,,,"issue #2017, escalated"
+0x43e490,3152,deepseek-v4.1-flash,#2017,partial,23.3,,"issue #2017, escalated"
+0x43f0e0,4420,deepseek-v4.1-flash,#2017,partial,50.4,,"issue #2017, escalated"
+0x441460,1874,deepseek-v4.1-flash,#2017,partial,77.7,,"issue #2017, escalated"
 0x495a30,1105,,#2019,assigned,,,"issue #2019, escalated"
 0x495e90,2292,,#2019,assigned,,,"issue #2019, escalated"
 0x497180,2797,,#2019,assigned,,,"issue #2019, escalated"
@@ -4991,14 +4991,14 @@ address,size,model,batch,result,similarity,runs,notes
 0x481930,1052,deepseek-v4.1-flash,#2037,partial,81.5,,"issue #2037, escalated"
 0x482c20,1519,deepseek-v4.1-flash,#2037,partial,73.2,,"issue #2037, escalated"
 0x49aa80,301,,#2038,assigned,,,"issue #2038, escalated"
-0x4a5f40,2700,,#2040,assigned,,,"issue #2040, escalated"
-0x4a6ae0,1703,,#2040,assigned,,,"issue #2040, escalated"
-0x4a7960,1404,,#2040,assigned,,,"issue #2040, escalated"
+0x4a5f40,2700,deepseek-v4.1-flash,#2040,partial,54.6,,"issue #2040, escalated"
+0x4a6ae0,1703,deepseek-v4.1-flash,#2040,partial,84.2,,"issue #2040, escalated"
+0x4a7960,1404,deepseek-v4.1-flash,#2040,partial,61.4,,"issue #2040, escalated"
 0x4db450,444,,#2042,assigned,,,"issue #2042, escalated"
 0x497f40,3463,deepseek-v4.1-flash,#2044,partial,75.9,,"issue #2044, escalated"
 0x499200,1655,deepseek-v4.1-flash,#2044,partial,94.7,,"issue #2044, escalated"
 0x49b720,1853,deepseek-v4.1-flash,#2044,partial,29.8,,"issue #2044, escalated"
-0x4624a0,570,,#2047,assigned,,,"issue #2047, escalated"
+0x4624a0,570,deepseek-v4.1-flash,#2047,partial,67.8,,"issue #2047, escalated"
 0x4db1c0,646,,#2048,assigned,,,"issue #2048, escalated"
 0x4db7d0,624,,#2048,assigned,,,"issue #2048, escalated"
 0x4dbec0,621,,#2048,assigned,,,"issue #2048, escalated"
@@ -5006,14 +5006,14 @@ address,size,model,batch,result,similarity,runs,notes
 0x458810,427,,#2054,assigned,,,"issue #2054, escalated"
 0x4c63a0,1051,gpt-6.1-sol,#2055,partial,74.4,,"issue #2055, escalated"
 0x4c7580,1183,gpt-6.1-sol,#2055,partial,13.5,,"issue #2055, escalated"
-0x450240,305,,#2057,assigned,,,"issue #2057, escalated"
-0x453360,380,,#2057,assigned,,,"issue #2057, escalated"
-0x461750,208,,#2057,assigned,,,"issue #2057, escalated"
+0x450240,305,deepseek-v4.1-flash,#2057,partial,19.9,,"issue #2057, escalated"
+0x453360,380,deepseek-v4.1-flash,#2057,partial,54.4,,"issue #2057, escalated"
+0x461750,208,deepseek-v4.1-flash,#2057,matched,100.0,,"issue #2057, escalated"
 0x4223e0,127,,#2058,assigned,,,"issue #2058, escalated"
 0x424890,874,,#2058,assigned,,,"issue #2058, escalated"
 0x437580,639,,#2058,assigned,,,"issue #2058, escalated"
 0x481d50,821,deepseek-v4.1-flash,#2059,partial,65.6,,"issue #2059, escalated"
-0x43b7c0,780,,#2066,assigned,,,"issue #2066, escalated"
+0x43b7c0,780,deepseek-v4.1-flash,#2066,partial,67.8,,"issue #2066, escalated"
 0x48e010,2542,space-bunny-free,#2062,matched,100.0,,"follow-up PR #2062 to #1605, escalated"
 0x4876c0,1062,deepseek-v4.1-flash,#2062,partial,73.7,,"follow-up PR #2062 to #1605, escalated"
 0x4bd160,580,,#2068,assigned,,,"issue #2068, escalated"
@@ -5040,8 +5040,8 @@ address,size,model,batch,result,similarity,runs,notes
 0x409730,1678,space-bunny-free,#2092,partial,99.6,,"issue #2092, escalated"
 0x4c71f0,280,,#2097,assigned,,,"issue #2097, escalated"
 0x4c90b0,195,,#2097,assigned,,,"issue #2097, escalated"
-0x4805b0,366,,#2100,assigned,,,"issue #2100, escalated"
-0x482130,318,,#2100,assigned,,,"issue #2100, escalated"
+0x4805b0,366,deepseek-v4.1-flash,#2100,partial,66.2,,"issue #2100, escalated"
+0x482130,318,deepseek-v4.1-flash,#2100,partial,86.3,,"issue #2100, escalated"
 0x4745e0,306,,#2101,assigned,,,"issue #2101, escalated"
 0x474b80,303,,#2101,assigned,,,"issue #2101, escalated"
 0x450a10,872,,#2104,assigned,,,"issue #2104, escalated"
@@ -5177,3 +5177,35 @@ address,size,model,batch,result,similarity,runs,notes
 0x46a860,4247,,#2375,assigned,,,"issue #2375, escalated"
 0x46dad0,1024,,#2375,assigned,,,"issue #2375, escalated"
 0x481d50,821,,#2376,assigned,,,"issue #2376, escalated"
+0x49be60,2272,,#2379,assigned,,,"issue #2379, escalated"
+0x49e830,1365,,#2379,assigned,,,"issue #2379, escalated"
+0x4a1b40,2160,,#2379,assigned,,,"issue #2379, escalated"
+0x450240,305,,#2380,assigned,,,"issue #2380, escalated"
+0x453360,380,,#2380,assigned,,,"issue #2380, escalated"
+0x4a5f40,2700,,#2381,assigned,,,"issue #2381, escalated"
+0x4a6ae0,1703,,#2381,assigned,,,"issue #2381, escalated"
+0x4a7960,1404,,#2381,assigned,,,"issue #2381, escalated"
+0x4624a0,570,,#2382,assigned,,,"issue #2382, escalated"
+0x468cf0,5904,,#2383,assigned,,,"issue #2383, escalated"
+0x43b7c0,780,,#2384,assigned,,,"issue #2384, escalated"
+0x4805b0,366,,#2385,assigned,,,"issue #2385, escalated"
+0x482130,318,,#2385,assigned,,,"issue #2385, escalated"
+0x426e80,6310,,#2386,assigned,,,"issue #2386, escalated"
+0x42dcf0,1061,,#2387,assigned,,,"issue #2387, escalated"
+0x42e440,3923,,#2387,assigned,,,"issue #2387, escalated"
+0x449bb0,2756,,#2388,assigned,,,"issue #2388, escalated"
+0x44a680,2340,,#2388,assigned,,,"issue #2388, escalated"
+0x44c7e0,1586,,#2388,assigned,,,"issue #2388, escalated"
+0x4daa30,214,,#2389,assigned,,,"issue #2389, escalated"
+0x4db610,332,,#2389,assigned,,,"issue #2389, escalated"
+0x4dbbc0,311,,#2389,assigned,,,"issue #2389, escalated"
+0x4de550,175,,#2389,assigned,,,"issue #2389, escalated"
+0x4d1970,296,,#2390,assigned,,,"issue #2390, escalated"
+0x4da8d0,283,,#2390,assigned,,,"issue #2390, escalated"
+0x438c00,660,,#2391,assigned,,,"issue #2391, escalated"
+0x4394e0,601,,#2391,assigned,,,"issue #2391, escalated"
+0x4758c0,779,,#2393,assigned,,,"issue #2393, escalated"
+0x475bd0,791,,#2393,assigned,,,"issue #2393, escalated"
+0x43e490,3152,,#2394,assigned,,,"issue #2394, escalated"
+0x43f0e0,4420,,#2394,assigned,,,"issue #2394, escalated"
+0x441460,1874,,#2394,assigned,,,"issue #2394, escalated"
