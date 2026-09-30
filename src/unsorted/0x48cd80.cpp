@@ -1,4 +1,4 @@
-// Decompiled by GPT-5.6-Terra, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol. Names are provisional.
+// Decompiled by GPT-5.6-Terra, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
 // Partial: 90.4% (432 bytes vs 428). Prologue and branch A match exactly.
 // GPT-6.1-sol verified 90.4% after five check runs and kept this best variant.
 // Branch B needs both hoisted loads out of p (`mov edi,[esi+4]` py,
@@ -11,6 +11,20 @@
 // g_game->view.x (this file). A second pointer q = &g_game->view keeps p in ESI
 // but rematerialises q from g_game (79.1%). 128 header sets (headers.py) and
 // all declaration orders tried leave the choice unchanged.
+// deepseek-v4.1 re-ran the search: any explicit `p->x` read in branch B
+// (loop expression, hoisted int px = p->x, or p = &g_game->view restated
+// inside the branch) makes MSVC move p from ESI to EDI for the whole
+// function and the zero from EDI to ESI: 71.2% (416 bytes), and computing
+// dx before dy that way is 72.7%. Dropping the p local and naming
+// g_game->view everywhere is 67.2% (420 bytes). Giving the counter a
+// function-scope home shared by both loops is byte-identical to this file
+// (90.4%). Only the branch B prologue is left:
+//   original: mov edx,[eax+0x14363]; mov eax,[eax+0x1436b];
+//             mov edi,[esi+4]; mov esi,[esi]; sub/sub
+//   ours:     mov ecx,[eax+0x1436b]; mov edx,[eax+0x14363];
+//             mov esi,[esi+4]; mov edi,[eax+0x2c76]; sub/sub
+// i.e. our allocator keeps g_game live in EAX to rematerialise view.x
+// instead of using ESI as the address, so count2 goes to ECX.; 432 vs 428.
 
 #pragma pack(push, 1)
 struct Point_0048cd80 {
