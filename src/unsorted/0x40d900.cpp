@@ -37,6 +37,25 @@
 // (`base`/`p`) do not change it. The same helper inlined twice with a
 // constant `last` (the shape the original evidently came from) also gives
 // 93.7%.
+// Re-confirmed by deepseek-v4.1 (11 more check.py runs): store-first written
+// as `&cells[i*256]`, `cells + off`, a named `base`, a byte-cast
+// `(char*)cells + (i << 10)`, or with the offset in its own
+// `unsigned int bytes = i << 10;` temp all give the same 93.7%
+// (`mov edi,ebp` / `mov [eax],0` / `mov ecx,[esi+0x1c]` / `shl edi,0xa` /
+// `add edi,ecx`); a pointer local `unsigned int* pd = &dirty[i]` changes the
+// whole function's allocation (78.5%, the loop index moves to ecx). Only the
+// base-load-first order reaches 98.7%.
+//
+// round 2 (deepseek-v4.1): new data points on that one hunk. With the store
+// first in every spelling tried (`dirty[i] = 0;` textually before any mention
+// of `cells`, split or single-expression) the load does land after the store
+// but the allocator then puts the base in ecx and the offset in edi
+// (`mov edi,ebp` / `shl edi,0xa` / `add edi,ecx`, 93.7%), so the slot is
+// governed by the same live-range decision that picks the registers, not by
+// statement order: while `dirty` is still live in ecx the base can only go to
+// edi, and by then the load is already scheduled. Load-first spellings
+// (`Cell* p = cells;` first, even before the `bits` load: 98.7%) all give the
+// original's registers with the load three slots early.
 //
 // Possible original bug: in the last block the bounds check starts `c` at
 // `i << 8` again for every group of eight cells instead of at the group's own
