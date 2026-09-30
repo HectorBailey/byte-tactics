@@ -57,6 +57,29 @@
 //   0x4a38e5/0x4a390e/0x4a3911, at the `list == 0 ? FUN_004c1450() : ...`
 //   and `field_da == 0 ? size + 1 : field_da` ternaries, where the original
 //   falls through on one arm and has no jmp.
+// Re-probed by deepseek-v4.1-flash at a 900s wall: the frame size and the
+// register rotation were attacked directly, with no improvement over 34.7%.
+// Measured facts from that run:
+// * Moving `int i = 1;` before the point copy raises the frame to 0x38 but
+//   drops the score to 27.9%: the allocator then demotes y0 to a stack slot
+//   and gives i ebx. Every position tried for i (before x1, before point, at
+//   function top, and `int i = 1; for (; ...)` with the init pulled out of the
+//   for) reaches that same 27.9% once i is born before the point copy, so the
+//   0x34 frame and 34.7% are the better branch of the allocator.
+// * Declaring x0,y0,x1,y1 together, caching me->field_c0 in a `short nsel`,
+//   reading me->field_da into a `short da` for the span choice, and swapping
+//   the loop compare to `me->group == n` all leave the bytes unchanged.
+// * <stdlib.h>, <stdio.h> and all 128 header sets headers.py tries change
+//   nothing; headers.py reports 34.7% as the ceiling for every set.
+// * The matched siblings 0x4a9830 and 0x4a99c0 share this function's group
+//   loop, size/step and FUN_004b6af0/strncmp blocks, but their exact loop form
+//   (`int n = 0; int i = 1; for (; i < entries->count + 1; i++)`) is what
+//   raises our frame to 0x38 and costs points here, so this original did not
+//   use that form.
+// The remaining diff is one global allocator colouring: the original spills
+// step and flags to slots of their own and leaves frame offset 0x18 dead,
+// while this version keeps flags in ecx and shares one slot between the loop
+// pointer and step. No single source construct found so far forces it.
 #include <string.h>
 
 
