@@ -17,6 +17,21 @@
 // unsigned short parameter still emits it, so no cast spelling removes it.
 // Still differs by that one instruction (and the jg target it shifts,
 // 0x4386e9 vs 0x4386ef).
+//
+// deepseek-v4.1 retest in #1995: the "twin at 0x437a50" note above is wrong.
+// 0x437a50 sits inside Class_00437a30 (a container grow routine) and the whole
+// exe has exactly one "fcomp dword [0x4fd2a4]" site, at 0x438665, so there is
+// no second copy of this function to copy a mask-free shape from. New variants
+// tried this session (signed int field_1fa with an unsigned third parameter,
+// the same with only the last factor cast, (unsigned int) around the whole
+// product, a q local of int/unsigned int declared before the product, an
+// assignment of q inside the product, and moving the (unsigned short) cast to
+// the C factor) all reproduce one of two shapes: 96.6% with the mask, or the
+// 52.9% shape where MSVC hoists the magic division by 5 above the field_1fe
+// load (accumulator edx instead of edi, b->type homed in edi instead of esi).
+// Every 16-bit narrowing of the quotient forces the original order and always
+// pays the 6-byte and edx,0xffff, so the order and the mask appear to be the
+// same front-end decision and this file stays at 96.6%.
 // Tried and rejected: all 24 factor orders of (field_1fe, (field_b8+5)/5,
 // field_1fa, n) and two-part groupings, an unsigned int numerator local
 // (declared first, declared after the float, assigned later, ++-style `*=`
