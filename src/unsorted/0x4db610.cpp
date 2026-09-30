@@ -30,7 +30,13 @@
 //     epilogue copy.
 // Tried and rejected: a 4-byte local whose top byte is read (37.5%), swapping
 // the two byte stores (no change), a `bool` at +0x8 (no change), MEM_COMMIT
-// (worse, the original really passes MEM_RESERVE).
+// (worse, the original really passes MEM_RESERVE), and rewriting the
+// reservation loop as the 0x4db1c0 for(;;) idiom (42.7%, 321 bytes).
+// For the frame: `volatile unsigned char c;` does give the two loads (310
+// bytes, 48.5%) but al and cl come out the other way round. Still 8 bytes of
+// frame after `int n[1] = {4};`, `int& rn = n;`, `volatile int n = 4;` and
+// `int n = 4;` as the first statement (the init store sinks past the lock's
+// destructor).
 #include <windows.h>
 #include <yvals.h>
 

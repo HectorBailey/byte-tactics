@@ -1,16 +1,28 @@
 // Decompiled by deepseek-v4.1. Names are provisional.
 //
-// Still differs at 60.0% (311 vs 281 bytes, all bytes before 0x4dbc12 match):
+// Still differs at 66.1% (311 vs 280 bytes): every byte through the lock
+// destructor and the whole loop matches; the differences start at the
+// _Multi test.
 //  * the three `return Class_004ddbe0(FUN_004dce60(...), true);` sites fold the
 //    bool to `mov byte ptr [eax + 4], 1`, while the original materialises it as
-//    `mov cl, 1` / `mov byte ptr [eax + 4], cl`; tried ctor by value, by
-//    const bool&, member-init list, body assignment, in-class and out-of-class
-//    definitions, all identical.
-//  * the multi and last sites then tail-merge into one shared call+copy block
-//    (the original keeps three separate copies), while the `atbegin` site (with
-//    its named bool) stays separate and matches that site's shape.
-//  * register choices: begin() test lands in al (original cl), final key
-//    compare zeros edx (original ecx), copy-back uses ecx/dl (original edx/cl).
+//    `mov cl, 1` / `mov byte ptr [eax + 4], cl`. Tried ctor by value, by
+//    const bool&, an unsigned char second, member-init list, body assignment,
+//    in-class and out-of-class definitions, and a `bool t = true;` local at
+//    each site (that one drops to 51.5% and shrinks the frame), all fold or
+//    miss in some other way.
+//  * because our Multi site and begin() site compile to byte-identical
+//    argument setups (V in ecx, the _Insert return buffer in edx), MSVC merged
+//    their call+copy tails behind a `jmp`; the original's sites hold V in
+//    ecx / edx / eax respectively, so its three copies stay separate. The
+//    original's extra `mov cl, 1` live range is the likely reason its
+//    allocator coloured the sites differently, so fixing the first point may
+//    also un-merge these.
+//  * remaining register choices follow from that: begin() test in al
+//    (original cl), final key compare zeroes eax (original ecx), last site
+//    copy-back in ecx/dl (original edx/cl), and the last site's lea order.
+//  * the natural `if (ans) { ... }` spelling above scores 66.1 against the
+//    literal `if (!ans) ; else if (...) return ...; else ...;` of the header
+//    (60.0), which the previous attempt used; both produce the same merge.
 //
 // std::_Tree<unsigned int, pair<unsigned int const, int>, ...>::insert(const
 // value_type&) from MSVC 5's <xtree> (lines 211-232), for the allocator's
@@ -105,12 +117,9 @@ Class_004ddbe0 Class_004dce60::FUN_004dbbc0(const Pair_004dbbc0& V)
     }
     if (multi)
         return Class_004ddbe0(FUN_004dce60(X, Y, &V), true);
-    Class_004dd2a0 P(Y);
-    if (!ans)
-        ;
-    else {
-        bool atbegin = (P == Class_004dd2a0(head->left));
-        if (atbegin)
+    Class_004dd2a0 P = Class_004dd2a0(Y);
+    if (ans) {
+        if (P == Class_004dd2a0(head->left))
             return Class_004ddbe0(FUN_004dce60(X, Y, &V), true);
         P.FUN_004dd2a0();
     }
