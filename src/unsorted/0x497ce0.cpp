@@ -82,6 +82,26 @@
 // `mov ecx,[esp+0x10] / add ecx,0x14b / cmp ecx,0xcee /
 // mov [esp+0x10],ecx / jl head`; the original's guard-failure target is
 // 0x497eba (the increment, i.e. continue), ours is the post-loop block.
+//
+// Fifth pass (deepseek-v4.1) rebuilt the bounded form as the control and read
+// the raw /FAs listings for five more guard/body spellings: a positive
+// `if (eligible) {}` instead of `continue`, `(slot-2) + x`, `x + slot - 2`,
+// `unsigned j`, `j` declared outside the for, and the players array in a local
+// pointer. Every bounded spelling emits the same loop-2 entry order
+// (`mov esi,0xb` before the IV spill `mov [esp+0x10],ecx`; the original is the
+// reverse) and the same body head (`lea eax,[esi+ebx-2]`), so none of them
+// moves the phase, and all score 80.3%. Note also that the 90.4% break form
+// kept in this file is only "better" because it drops the bound test: its
+// second loop never terminates and walks past the players array. The honest
+// state of the function is the bounded form at 80.3%.
+// Measured root cause of the rotation: in the bounded form the
+// strength-reduced index stays live in ecx across the body block (the
+// continue edge needs it), so the allocator gives the body's first temp
+// `slot + x - 2` to eax and every later scratch is one register earlier
+// (ours color1 in ecx, surface in eax, rect ptr in edx; original ecx, edx, ecx,
+// eax). In the original that temp is ecx, i.e. there the index live range
+// stops at the loop test and the only reload is the one at 0x497eb6. Finding
+// the source shape that splits the range that way is the remaining step.
 #include <stdio.h>
 
 #pragma pack(push, 1)
