@@ -13,6 +13,24 @@
 // shows MSVC5 always slices the load, so the original's 16-bit form is not reachable from
 // these spellings. The direct `if (IsExplored(...)) return 1;` / `else if (IsSeen(...))` block
 // that would give the edx test instead compiles to a different prologue and scores 51.9%.
+// deepseek-v4.1 (retry 2): 24 more shapes, all 87.2% or lower except the retained 96.5%.
+// New facts: (a) the original's wording of the FIRST test must be `flag == 2` (the masked
+// value compared to 2), not `(flag & 2) == 2`: that alone fixes the instruction schedule
+// (the third memset dword lands after push esi at [esp+0x14]) and gives the original's
+// second test `cmp word ptr [esp+0x24],2` from memory, but it reverts the load to
+// `mov al, byte [...]` and measures 87.2%. (b) The only spelling that produces the
+// original's 16-bit load `mov ax, word [ecx+0x14281]` is keeping the RAW word in the
+// local (`unsigned short flag = g_game->flags;` with `(flag & 2) == 2` at both tests):
+// 87.8%, but the mask then compiles to `and eax,2` and the spill to `mov dword
+// [esp+0x24],eax`, so that variant is 2 bytes short. (c) `int vis` / `short vis` /
+// `unsigned short vis` / a ternary in the if-condition all change the frame (the first two
+// move the map to esi and shift every argument slot by 4; a ternary to the if-condition
+// gives `mov al` plus a 0x10 frame), so `char vis` is what pins the frame and the `dl`
+// test is the price. (d) A probe of 8 scalar shapes (unsigned short/short, `&=`,
+// casts, two-step init) shows MSVC5 always slices the load to a byte when the mask is in
+// the initializer, so the original's `mov ax / and ax,2 / mov word` triple needs a
+// construct this session could not find; treat the 16-bit AND plus 16-bit spill as the
+// remaining unknown, not the test width.
 // GPT-6.1-sol lead pass (#1510): comparing the masked flag directly (`flag == 2`) scored 87.2%; retained the 96.5% best.
 // PARTIAL: 96.5% (best, verified with check.py). A small mask helper raised
 // similarity from 87.8%, though the inlined helper now makes the compiler
