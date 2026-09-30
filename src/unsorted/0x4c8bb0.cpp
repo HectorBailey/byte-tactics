@@ -1,10 +1,20 @@
-// Decompiled by GPT-6, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol. Names are provisional.
+// Decompiled by GPT-6, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
 // Partial 51.6%. This is a textured/gouraud triangle rasteriser into 10-int
 // span rows, then one FUN_004c8020 call per scanline. The sibling 0x4c8760 is
 // the same algorithm without the light channel and is matched to 67.9%; its
 // first edge loop uses the same `previous`/`next` idiom adopted here.
 //
 // Still differs, and it is one systematic cause plus the prologue:
+//  deepseek-v4.1 experiments (both neutral, 51.6% and 1275 bytes unchanged):
+//  rewriting the defaults block to the original's store order
+//  (d0,d1,d2,d4,d3,d6,d5,d7 with CSE'd width-1/height-1) and writing the first
+//  edge loop's `next=index-1` as its own expression. The compiler CSEs both
+//  back to the shapes already here, so the frame stays one slot short. The
+//  original's spans base is 0x70 while this file's is 0x6c (the frame passed
+//  to _alloca_probe is array_base + 0x7d00 - 0x10, i.e. the four saved
+//  registers count inside that size), so the missing slot is a live scalar in
+//  0x10..0x4c; the original keeps `index-1` at [esp+0x4c] and reloads it while
+//  this version coalesces it with `next`.
 //  - frame is 0x7d5c vs original 0x7d60. The original keeps one more live int
 //    in the low temp region: its `defaults`/`spans` start at [esp+0x50] where
 //    ours start at [esp+0x4c], so every default, spans and argument offset is
@@ -48,9 +58,9 @@ void __stdcall FUN_004c8bb0(Surface_4c8bb0* target, Surface_4c8bb0* texture, int
         if (!coords) {
             coords=defaults;
             defaults[0]=0; defaults[1]=0;
-            defaults[2]=texture->width-1; defaults[3]=0;
-            defaults[4]=texture->width-1; defaults[5]=texture->height-1;
-            defaults[6]=0; defaults[7]=texture->height-1;
+            defaults[2]=texture->width-1; defaults[4]=texture->width-1;
+            defaults[3]=0; defaults[6]=0;
+            defaults[5]=texture->height-1; defaults[7]=texture->height-1;
         }
         int lowY=999999, highY=-999999, highX=-999999, lowX=999999;
         int lowIndex, highIndex;
@@ -72,7 +82,7 @@ void __stdcall FUN_004c8bb0(Surface_4c8bb0* target, Surface_4c8bb0* texture, int
                     index=lowIndex;
                     do {
                         previous=index-1;
-                        int next=previous;
+                        int next=index-1;
                         if(next<0) next=3;
                         int* nextVertex=vertices+next*4;
                         int y0=vertices[index*4+1];
