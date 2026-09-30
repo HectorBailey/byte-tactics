@@ -1,31 +1,21 @@
 // Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
 // PARTIAL 60.4% (ours 1847 bytes vs 1811). Frame, command buffer and the five
-// per-case Class_00438760 temporaries now match the original exactly.
-// What got it from 44.9 to 60.4:
-//  - declaring a second (copy) constructor, Class_00438760(const Class_00438760& other),
-//    exactly as src/unsorted/0x419b00.cpp does. This is compiler state, not a call:
-//    without it the frame is 0x148 and `selected` lands at [esp+0x30]; with it the frame
-//    drops to 0x140 and the five `out` temporaries sit at 0x3c/0x40/0x44/0x48/0x4c as in
-//    the original. The declaration alone is worth the 15.5 points (the copy is elided for
-//    the M/U/P/A/G paths that pass an already built `out`, and the chain-constructor
-//    idiom in 0x419b00 uses the same trick for the in-place temporaries).
-//  - moving `int move, fire;` to function scope (the O case used to leave `fire` sharing
-//    `count`'s slot at 0x18, which kept every later slot 4 low and every later `out`
-//    shifted; see below).
-// Still differs:
-//  - parser loop register allocation: the original keeps `text` in ebp for the whole
-//    loop and spills `count` to [esp+0x18], ours spills `text` to its home slot and keeps
-//    `count` in ebp, which adds a `jmp` to the loop body and a reload at the top. This is
-//    an allocation tie-break; declaration order, `char* s = text;` (drops to 22.9%),
-//    `unsigned`/`size_t` count, and assigning count in the call did not move it.
-//  - original still packs `count` 0x18, `move` 0x28, `selected` 0x2c, an unknown 0x30,
-//    `z`/`f3` 0x34, `fire` 0x38; ours puts `selected` 0x28, `fire` 0x30, `move` 0x34,
-//    `f3` 0x38. Reordering the declarations (move/fire before selected, fire before move)
-//    does not change it.
-//  - the O case in the original loads `unit->flags` twice (mov edx,[esi+0x110];
-//    mov eax,[esi+0x110]) and computes move before fire; ours loads once and computes
-//    fire first. Separating the two expressions did not break the CSE.
-//  - headers.py finds no fixing header set (all 60.4%).
+// per-case Class_00438760 temporaries match the original exactly.
+// The one remaining structural difference is the parser loop allocation: the
+// original keeps `text` in ebp for the whole outer loop (writes the parameter
+// home [esp+0x158] at each update and reloads it only after the G case clobbers
+// ebp), ours spills `text` to that home and keeps `count` in ebp instead, so
+// every `text` use reloads from [esp+0x158]. Tried this session, all byte-identical
+// to the 60.4% baseline: `int count;` at function scope (assignment stays in the
+// loop), and declaring `int move, fire;` before `int selected = 0;` so the slots
+// start move 0x28 / selected 0x2c as in the original. Either the allocator tie
+// break needs a source shape not yet found, or another local's live range decides it.
+// Earlier attempts that also failed: `char* s = text;` (22.9%), unsigned/size_t
+// count, assigning count inside the call, headers.py (all 60.4%).
+// Other diffs: O case (original loads unit->flags twice and computes move before
+// fire, ours loads once and computes fire first), and the local slots after pos
+// (original count 0x18 / move 0x28 / selected 0x2c / f3 0x34 / fire,z 0x38; ours
+// n 0x18 / selected 0x28 / fire 0x30 / move 0x34 / f3 0x38).
 
 #include <ctype.h>
 #include <stdio.h>
@@ -70,14 +60,15 @@ void __stdcall FUN_00487bf0(Unit_00487bf0* unit, char* text, Table_00487bf0* tab
     char buf[256];
     float f1, f2;
     Vec3_00487bf0 pos;
-    int selected = 0;
     int move, fire;
+    int selected = 0;
     int processed = 0;
+    int count;
 
     while (*text != 0) {
         while (isspace(*text))
             text++;
-        int count = strcspn(text, ",");
+        count = strcspn(text, ",");
         strncpy(buf, text, count);
         text += count;
         buf[count] = 0;
