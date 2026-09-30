@@ -1,21 +1,32 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by GPT-6, edited by deepseek-v4.1, finished by space-bunny-free. Names are provisional.
 // PARTIAL 60.4% (ours 1847 bytes vs 1811). Frame, command buffer and the five
 // per-case Class_00438760 temporaries match the original exactly.
-// The one remaining structural difference is the parser loop allocation: the
-// original keeps `text` in ebp for the whole outer loop (writes the parameter
-// home [esp+0x158] at each update and reloads it only after the G case clobbers
-// ebp), ours spills `text` to that home and keeps `count` in ebp instead, so
-// every `text` use reloads from [esp+0x158]. Tried this session, all byte-identical
-// to the 60.4% baseline: `int count;` at function scope (assignment stays in the
-// loop), and declaring `int move, fire;` before `int selected = 0;` so the slots
-// start move 0x28 / selected 0x2c as in the original. Either the allocator tie
-// break needs a source shape not yet found, or another local's live range decides it.
-// Earlier attempts that also failed: `char* s = text;` (22.9%), unsigned/size_t
-// count, assigning count inside the call, headers.py (all 60.4%).
-// Other diffs: O case (original loads unit->flags twice and computes move before
-// fire, ours loads once and computes fire first), and the local slots after pos
-// (original count 0x18 / move 0x28 / selected 0x2c / f3 0x34 / fire,z 0x38; ours
-// n 0x18 / selected 0x28 / fire 0x30 / move 0x34 / f3 0x38).
+// THE ONE REMAINING CAUSE, restated from the disassembly by space-bunny-free:
+// the original holds the walk pointer `text` in ebp for the whole outer loop, so
+// its latch at 0x487e50 is just `mov al,[ebp]; cmp al,bl; jne 0x487c1b`, and it
+// writes the parameter home [esp+0x158] at each update (0x487c68, 0x487c76) with
+// the single reload at 0x487e49 after the G case clobbers ebp. Ours instead gives
+// ebp to `count` (strcspn's result), keeps `text` in eax across the switch and so
+// spills it to [esp+0x158]; the latch therefore becomes `mov edx,[home]; mov
+// al,[edx]; cmp al,bl; jne $L1038` plus a separate reload block. Because of the
+// callee-saved preference ESI(unit), EDI(processed), EBX(zero), EBP, `text` and
+// `count` are competing for the same last slot and the loser is memory-resident.
+// Flipping that single choice is worth the remaining ~40%.
+// Tried again by space-bunny-free, all byte-identical to the 60.4% baseline:
+//   - `char* text2 = text;` used for the whole loop instead of the parameter
+//     (1827 bytes but 22.9%: MSVC then never folds the two walks together);
+//   - `processed = 1;` before the MAKESELECTABLE call in the S case, which is
+//     what the original's `mov edi,1` at 0x48820a between the argument pushes
+//     looks like. It makes things WORSE (60.2%), so the assignment really does
+//     come after the call in the source, like the D case at 0x4881e0;
+//   - swapping the O-case extraction order (fire before move), and hoisting the
+//     flags load into a named `unsigned int fl`, both exactly 60.4%, so the
+//     fire-first emission is not decided by the order of the two statements.
+// Other diffs: the local slots after pos (original count 0x18 / move 0x28 /
+// selected 0x2c / f3 0x34 / fire 0x38, with pos at 0x1c..0x24; ours leaves 0x18
+// empty because count is in ebp, then selected 0x28 / fire 0x30 / move 0x34),
+// and the switch's block placement (the original's loop latch sits between the G
+// and P blocks at 0x487e50; ours puts it at the end, shared with the default arm).
 
 #include <ctype.h>
 #include <stdio.h>
