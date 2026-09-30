@@ -272,6 +272,20 @@ Cell_0047f300* __stdcall FUN_00481550(int x, int y);
 // and in this function that live ECX (plus ebp/esi/ebx held by g_game/pos/
 // sound) leaves the allocator a different starting set.
 
+// Addendum (deepseek-v4.1, sixth pass, 1 real check run). Baseline re-confirmed
+// unchanged: 86.5%, 775 bytes, same size as the original. This pass re-read the
+// original disassembly end to end and confirms the single remaining difference
+// is the player pointer's home register: the original ends the address chain
+// with `lea eax,[eax+edx*2+0x1b63]` and reads width/explored through EAX in
+// both arms (re-loading [eax+0x80] three times), while every spelling here ends
+// in EDI (or EDX with the Contains-style arms) and folds the width re-load into
+// the imul. The pre-branch pi zero-extension is a second, smaller tell: the
+// original is `xor ecx,ecx / mov cl,[ebp+0x2a43]` (int pi), which the int-pi
+// variant reaches exactly, but int pi then splits `lea eax,[ebp+ecx]` into
+// `mov eax,ebp / add eax,ecx` and drops the function to 79.7% (763 bytes). No
+// new variant was found that puts the pointer in EAX; the file stays at its
+// best 86.5%.
+
 // FUNCTION: 0x47f300
 int __stdcall FUN_0047f300(int index, Pos_0047f300* pos, int param_3)
 {
