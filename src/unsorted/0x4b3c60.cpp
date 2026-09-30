@@ -28,6 +28,19 @@
 // mentions `off` once more and compiles to nothing, e.g. a `(off & 0)` or a
 // `sizeof`-style trick on a real use, or a slightly different spelling of the
 // two `off + 0x20` fseeks that reaches the same allocation.
+// Tried on 2026-09-30 and all eliminated by the front end (each compiles to the
+// identical no-guard 1540-byte 95.7% version, so a dead use never reaches the
+// allocator): `(void)off;`, `off = off;`, a bare `off;`, an empty
+// `if (off) { }`, an empty `switch (off) { }`, a comma use (`int d = (off, 0);`,
+// `FUN_004d8450((off, len))`, `(off, h.size - 0x20)`), `len + (off & 0)`, a
+// named `int start = off + 0x20;` local used by both fseeks, declaring
+// `char* raw;` before `int len`, `unsigned off`, `0x20 + off` as the second
+// fseek offset, a `char* raw = 0;` two-statement definition, and `int len`
+// written before the FUN_004d8e50(0) call (that last one is worse, 91.8%: the
+// scheduler then keeps the h.size load before the call, 1536 bytes).
+// So every zero-byte nudge dies in the front end, and the smallest real nudge
+// (this `if`) costs 6 bytes: the allocation is a c2-level tie that source
+// spelling cannot split.
 #include <vector>
 #include <io.h>
 
