@@ -111,6 +111,20 @@
 // reachable from declarations, headers, context or any spelling of the two
 // statements that surround it, and the file is left at its best score.
 //
+// Fourth pass (deepseek-v4.1) added nine more inert spellings, all byte
+// identical at 95.6 percent (621 bytes): `out` aliased to a named pointer
+// local either at the top of the else arm or only in the closing arm, the
+// compared key bound to a local, the node pointer bound to a local before
+// the compare, `y` copied through a named node temp before the birth, `p`
+// copied to a named local at the top of the else arm, the closing store as
+// `*(Class_004dd2a0*)&out->field_0 = it;`, as `out->field_0 = it.ptr;` and as
+// `out->field_0 = Class_004dd2a0(it);`, a named `out` alias in the rebuild
+// branch, and the loop key read through a `const unsigned int&`. Binding the
+// insert result to a named iterator is 87.6 percent (652 bytes, the temporary
+// gains its own home). So the birth register is not steerable by any operand,
+// temporary, alias or scope in either arm; the colouring is a function-wide
+// allocator decision that this source cannot reach.
+//
 // Two things this function does that are worth writing down, both confirmed
 // here and neither obvious from the disassembly:
 //  - The null test on the destination address, `lea eax,[edx+0xc]; cmp eax,ebx;
