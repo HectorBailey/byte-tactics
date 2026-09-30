@@ -1,5 +1,17 @@
-// Decompiled by Claude Opus 5.5, finished by GPT-6, verified by GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
-// Partial: 95.1%. Remaining diffs are the help-build constructor argument load order and the associated short branch offsets. Replacing the direct order expressions with a cached Order* drops the score; explicit follow-position fields also worsen register allocation.
+// Decompiled by Claude Opus 5.5, finished by GPT-6, verified by GPT-6.1-sol, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
+// Partial: 95.1% (1152 vs 1149 bytes). Remaining diff is only the shared build/help tail:
+// the original at 0x406658 reloads order->target->order into two registers
+// (mov ecx,[edx+0x5c]; mov edx,[edx+0x5c]; add ecx,0x22; push ecx; mov ecx,[edx+0x16])
+// while ours CSEs it to one load and uses esi for the target; only the short jump
+// targets after it differ, so matching this block alone should match the function.
+// The identical tail appears in the matched 0x40fbe0 at 0x4100d6 (BuildOrder label).
+// Tried and rejected (all scored below 95.1): other->Target()/Position() (92.3), raw
+// ->target/&->pos (88.9), separate Order*/Unit*/Vec3* locals (71-79), the 0x40fbe0
+// goto BuildOrder restructure (76.7; it drops the ebp zero), mixed forms between the
+// two branches (87-90), pos-first local (73.3), declarations swapped (71.8).
+// The N-unused-declarations sweep 0..400 only re-scores 93.8-95.1 and never changes
+// the size, so this is source shape, not compiler state.
+// Replacing the direct order expressions with a cached Order* drops the score; explicit follow-position fields also worsen register allocation.
 #include <stdio.h>
 struct Vec3 {
     int x, y, z;

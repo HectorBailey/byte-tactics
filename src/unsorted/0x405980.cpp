@@ -1,13 +1,26 @@
-// Decompiled by Claude Opus 5.5, finished by GPT-6, verified by GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
-// Partial: 90.9%. Two known differences:
-// 1. The three reclaim blocks that end in `new Class_0043a1f0("RECLAIM", ...)` should share the tail
-//    (VC5 same-code folding put one copy at 0x405d01 and made the energy<cap, metal+amount and
-//    energy+amount blocks jump into it). Our build folds only the last two, so the energy<cap copy
-//    stays inline and the function is 41 bytes too long. Reordering the range2 local, inlining the
-//    range expression and reversing the thresholds all kept or lowered the score.
-// 2. The second `if` starts with the mirrored energy compare (fld cap, fmul, fld energy, test ah,1,
-//    jne) where the original emits (fld energy, fld cap, fmul, fcompp, test ah,0x41, je): writing it
-//    as `energy < energyCapacity * 0.2` gets the load order but adds an fxch (89.9%).
+// Decompiled by Claude Opus 5.5, finished by GPT-6, verified by GPT-6.1-sol, edited by deepseek-v4.1, gate polarity checked by space-bunny-free. Names are provisional.
+// Partial: 90.9% (1081 of 1040 bytes, 41 too long). Three findings for the next attempt:
+// 1. THE GATE IS WRONG HERE, semantically. The original's second energy compare at 0x405b18 is
+//    `fld energy; fld capE; fmul 0.2; fcompp; fnstsw; test ah,0x41; je 0x405b5a`, and 0x405b5a is
+//    the FIRST INSTRUCTION OF THE BODY, so the true edge jumps INTO the body: C0 and C3 both clear
+//    means capE*0.2 > energy, so the body runs when energy < capE*0.2. The metal test right after
+//    (0x405b39, `fld capM; fmul; fld metal; fxch; fcompp; test ah,0x41; jne 0x405d4a`) sends
+//    metal >= capM*0.2 to `return 2`. So the gate is
+//        if (energy < capE*0.2 && metal < capM*0.2) { ...body... }
+//    ("low on both, go and find a spot to reclaim"), not the `||` written here. Writing `&&` scores
+//    89.9% and does give a fresh compare, but MSVC then loads capE first, adds an `fxch` and jumps
+//    to `return 2` instead of into the body, so the energy test's block has to be arranged so its
+//    true edge reaches the body.
+// 2. The first reclaim block (0x405bcb, metal && metal < capM*0.2) calls Class_004388d0::FUN_004388d0(0)
+//    a SECOND time at 0x405c0b, after FUN_0043acb0, which is why its tail is a separate inline copy
+//    while the other three all jump to the one at 0x405d01. Adding that second call costs 6 bytes
+//    and no points, so the un-merged tail is not caused by it.
+// 3. B, C and D share one tail (0x405d01) with the `operator new` and its null check still per
+//    branch. An if/else-if chain assigning one `Class_0043a1f0*` and calling FUN_0043acb0 once after
+//    it (the guide's "several new branches sharing a tail") merges them but collapses the function
+//    to 1020 bytes at 75.3%, so the chain is not the original's shape either.
+// Also tried and no better than 90.9%: nesting the two gate tests, `!(a >= b)`, `a >= b && a >= b`,
+//    the reversed `||`, and the same four blocks as one chain with block A kept separate.
 #include <vector>
 struct Vec3 { int x, y, z; };
 struct Unit;
