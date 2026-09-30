@@ -1,8 +1,14 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// Gave up at 70.1% (2745 bytes against 2756). Remaining flag widths,
-// register allocation and stack slots differ. Correct GUI-entry stride is
-// 0x15b and text buffer is 20 bytes. Preserve panel pointers across callbacks
-// and reload player data where the original reloads it.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
+// Earlier attempt by deepseek-v4.1-flash, finished by GPT-6; continued here.
+// Best 71.0% (2753 bytes against 2756). 18 diff hunks remain, all inside the
+// body: the two bit-block groups materialise their bits in byte width
+// (`and cl,1; mov dl,cl`) where the original masks the whole register
+// (`mov cl,[..]; and ecx,1`), the 0x44a00a region reloads the GUI list from
+// g_game+0x531 while we keep it in edi and spill it once, and the
+// 0x449e15 player lookup uses one address expression (0x1b8a) where the
+// original builds `players[i].data` (base 0x1b63, +0x27). Tried and rejected:
+// short flag97 (67.2), bool locals for the comparison bits (67.6),
+// recomputing the list expression at every later use (63.6).
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -183,10 +189,10 @@ void FUN_00449bb0(void)
 
     FUN_004288d0("battleroom", 0, 1, 0);
 
-    DAT_00512764 = (int)*(short*)((char*)((Holder_00449bb0*)holder)->entries + 0xb6);
-
     GuiEntry_00449bb0* list =
         (GuiEntry_00449bb0*)*(int*)(*(int*)(g_game + 0x531) + 4);
+
+    DAT_00512764 = (int)*(short*)((char*)((Holder_00449bb0*)holder)->entries + 0xb6);
 
     int i = FUN_0049fdf0(list, "MESSAGE", 3);
     if (i != -1) {
@@ -226,25 +232,29 @@ void FUN_00449bb0(void)
         }
 
         if (DAT_00512d7c != 0) {
-            if (DAT_00512d7c == 1) {
+            switch (DAT_00512d7c) {
+            case 1:
                 info->field_9b |= 0x600;
-            } else if (DAT_00512d7c == 2) {
+                break;
+            case 2:
                 info->field_9b = (info->field_9b & 0xfbff) | 0x200;
-            } else if (DAT_00512d7c == 3) {
+                break;
+            case 3:
                 info->field_9b &= 0xfdff;
+                break;
             }
         }
         if (DAT_00512d80 != 0) {
-            info->field_9b = (info->field_9b & 0xdfff) | ((DAT_00512d80 == 2) << 0xd);
+            info->field_9b = (info->field_9b & 0xdfff) | (((DAT_00512d80 == 2) & 1) << 0xd);
         }
         if (DAT_00512d84 != 0) {
-            info->field_9b = (info->field_9b & 0xbfff) | ((DAT_00512d84 == 1) << 0xe);
+            info->field_9b = (info->field_9b & 0xbfff) | (((DAT_00512d84 == 1) & 1) << 0xe);
         }
         if (DAT_00512d88 != 0) {
-            info->field_9b = (info->field_9b & 0xfeff) | ((DAT_00512d88 == 1) << 8);
+            info->field_9b = (info->field_9b & 0xfeff) | (((DAT_00512d88 == 1) & 1) << 8);
         }
         if (DAT_00512d8c != 0) {
-            info->field_9b = (info->field_9b & 0xff7f) | ((DAT_00512d8c == 2) << 7);
+            info->field_9b = (info->field_9b & 0xff7f) | (((DAT_00512d8c == 2) & 1) << 7);
         }
     } else if (flag97 != 0) {
         info->field_9b =

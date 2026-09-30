@@ -1,8 +1,19 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// Gave up at 80.5% (1592 bytes against 1586). Remaining shared-zero
-// register, scan-loop induction registers and tail scheduling differ. Reload
-// item pointers after callbacks and preserve the scroll-panel pointer.
-// A version with a fresh scroll panel scored 82.6%, but was less faithful.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
+// Started by deepseek-v4.1-flash and GPT-6 (their 80.5% version is the basis).
+// Partial at 84.6% (1596 bytes against 1586). What still differs:
+//  1. The unit-type scan loop: the original zeroes the record byte offset with
+//     a separate "xor ebp, ebp" and keeps the item byte offset (0x249 stride)
+//     in edi, while ours coalesces the count's zero-init into that register
+//     and swaps ebp/edi. Tried an explicit record byte-offset local, declared
+//     before and after the item offset, both scored 78.8%; the compiler still
+//     coalesces it with the count's zero-init.
+//  2. The tail (after the two sprintf/_ftol/ENERGYTEXT/METALTEXT pairs) has
+//     scheduling differences: "mov eax, [esp+0x24]" is emitted after the call
+//     instead of before "xor edx, edx".
+//  3. Computing the scroll panel (g_game+0x519) fresh at each use instead of
+//     preserving it in a register scored higher (84.6% vs 80.5%) but is less
+//     faithful to the original, which keeps it in esi.
+// The scan loop's item pointers are reloaded after every call.
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -233,8 +244,8 @@ void FUN_0044c7e0()
         FUN_0045b9b0(scroll, 0);
         scroll->field_14a = (int)g_game;
     }
-    FUN_0044bfd0(scrollPanel, idx);
-    FUN_0049fa90(scrollPanel);
+    FUN_0044bfd0((char*)g_game + 0x519, idx);
+    FUN_0049fa90((char*)g_game + 0x519);
 
     FUN_004a32a0((char*)g_game + 0x519, "DESCLIST", textArray, n, 0);
     FUN_004a35a0(g_game->inner->entries, "PICLIST", picArray, n);

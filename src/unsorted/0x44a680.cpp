@@ -1,7 +1,14 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free and deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// Gave up at 78.4% (2327 bytes against 2340). Remaining initial local-slot
-// order, player-compaction registers and branch placement differ. Reload
-// player data and GUI tables across callbacks; cache the energy text panel.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free and deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
+// Base by deepseek-v4.1-flash, space-bunny-free and GPT-6; continued by deepseek-v4.1.
+// Gave up at 79.0% (2333 bytes against 2340). The 1-bit bitfield at
+// Unit+0x9d bit 2 fixed the tail; what is left is the initial local-slot
+// order, the player-compaction register allocation (original keeps the
+// player pointer in ebp and `entries` in ebx; ours folds the address) and
+// branch placement. Also left: the `xor ebx,ebx` for the bitfield boolean is
+// scheduled after the [esp+0x14] reload instead of before it.
+// Tried and did NOT work (do not repeat): computing the boolean into a local
+// first (77.6), swapping the LOGO rect pair to (right+left - w) (78.7),
+// inverting the DAT_00512994 test so FUN_004455b0 is the fall-through (68.7).
 #include <string>
 #include <windows.h>
 #include <stdio.h>
@@ -13,7 +20,9 @@ struct Unit_44a680 {
     char name[0x97];
     unsigned char flags;          // +0x97
     char unknown_98[0x9d - 0x98];
-    unsigned short field_9d;      // +0x9d
+    unsigned short low2_9d : 2;   // +0x9d bits 0-1
+    unsigned short bit2_9d : 1;   // +0x9d bit 2
+    unsigned short high13_9d : 13;
     char unknown_9f[0xa1 - 0x9f];
     unsigned short energy;        // +0xa1
     unsigned short metal;         // +0xa3
@@ -348,7 +357,7 @@ void FUN_0044a680()
         DAT_005129a8 = FUN_004b6340() + 0x3c;
         r = FUN_0041d6a0(1);
         unit = pl->data;
-        unit->field_9d = (unsigned short)((unit->field_9d & 0xfffb) | ((r != 0) ? 4 : 0));
+        unit->bit2_9d = (r != 0);
         FUN_00456310();
     }
 }
