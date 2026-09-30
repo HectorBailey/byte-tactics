@@ -38,6 +38,13 @@
 // fseek offset, a `char* raw = 0;` two-statement definition, and `int len`
 // written before the FUN_004d8e50(0) call (that last one is worse, 91.8%: the
 // scheduler then keeps the h.size load before the call, 1536 bytes).
+// Second pass (deepseek-v4.1) re-confirmed this and pinned the no-guard code:
+// off ends up in ebx (held across the FUN_004d8e50 call), raw in ebp and
+// off+0x20 materialised into [esp+0x68] (lea eax,[ebx+0x20] / mov [esp+0x68],eax),
+// which is 1540 bytes; the original keeps off in ebp from 0x4b412b to the fseek
+// and spills raw to [esp+0x5c]. Only an extra reference to the off live range
+// that emits zero bytes can split that tie, and every dead spelling tried so far
+// is folded before allocation.
 // So every zero-byte nudge dies in the front end, and the smallest real nudge
 // (this `if`) costs 6 bytes: the allocation is a c2-level tie that source
 // spelling cannot split.
