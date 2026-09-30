@@ -1,34 +1,31 @@
 // Decompiled by GPT-6, finished by deepseek-v4.1-flash, finished by
 // space-bunny-free, finished by GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
-// PARTIAL, 72.8% (1094 original bytes, 1094 ours).
-// The min/max scan and both span-edge loops now emit the same instruction
-// set; every remaining diff is stack frame layout and instruction scheduling.
-// Fixed here: the second span loop writes its u/v through offsets 4 and 5
-// (out = &spans[0][0], out[1]=x, out[4]=u, out[5]=v, out[7]=z), not 2/3 as a
-// first reading of the old source suggested; that is what took it from 67.9
-// to 72.5 and made the byte count exact.
+// PARTIAL, 85.3% (1094 original bytes, 1094 ours).
+// The min/max scan and both span-edge loops emit the same instruction set as
+// the original; every remaining diff is slot coloring and instruction
+// scheduling.
+// What got it here: the second span loop writes its u/v through offsets 4 and
+// 5 (out[1]=x, out[4]=u, out[5]=v, out[7]=z), not 2/3 (67.9 -> 72.5), and
+// promoting the loop-body `int dv` to function scope supplies the missing
+// 14th scalar slot, which fixes the frame (0x7d54 -> 0x7d58, so every
+// parameter and spans offset now lines up) (72.8 -> 85.3).
+// Measured final layout, ours vs original:
+//   x=0x18, y1=0x1c, highY=0x20, lowIndex=0x28, out=0x30, dx=0x34,
+//   bottom=0x3c, highIndex=0x40, previous=0x44, loop2 n=0x28 all match.
 // What still differs:
-// 1. Frame is 0x7d54, original 0x7d58: exactly one 4-byte scalar slot short
-//    (13 slots at 0x10..0x40 vs the original's 14 at 0x10..0x44, so every
-//    [esp+N] differs). The original's ascending slot order is next, lowX, x,
-//    y1, highY, lowY, lowIndex, du, out, dx, nextVertex, bottom, highIndex,
-//    previous; MSVC did NOT share lowX with next/dv there (next=0x10,
-//    lowX=0x14 shared with loop1 n and loop2 next), while ours shares lowX
-//    with next/dv and puts y1 at 0x14. Declaring all fourteen scalars at
-//    function scope in exactly that order gave 72.8% but the frame stayed
-//    0x7d54, so the allocator is coloring by live range, not declaration
-//    order; the levers left are the loop-body locals' scopes (n, dv, dz) that
-//    decide the reuse pairs.
-// 2. First span loop body order: the original emits `x+=dx` right after
-//    `out[0]=x>>16`, before `out[2]=u`; ours emits it after `out+=10`.
-// 3. Second span loop exit: original does `mov edi,eax; mov eax,[highIndex];
-//    cmp edi,eax`; ours uses ecx for highIndex and `cmp eax,ecx`.
-// Tried a rowEnd temporary, reversing lowIndex/highIndex declaration order,
-// and rewriting the final for loop as while; none changed the 72.5% score.
-// The 128-set header sweep also found no improvement. A remaining approach is
-// to find the declaration/scope construct that makes the allocator give lowX
-// its own slot instead of folding it onto next, and makes the second loop's n
-// reuse lowIndex.
+// 1. lowX and next are swapped: ours lowX=0x10, next=0x14 (original next=0x10,
+//    lowX=0x14 shared with loop1 n and loop2 index). Ours then shares 0x10
+//    with nextVertex (orig 0x38) and loop1 n (orig 0x14).
+// 2. dv/lowY/du form a rotation: ours dv=0x24, lowY=0x2c, du=0x38; the
+//    original has lowY=0x24, du=0x2c, nextVertex=0x38 and lets dv share
+//    next's 0x10.
+// 3. Pixel-loop increment order: the original emits u+=du before v+=dv in
+//    source order; ours emits v+=dv first (dv is loaded early into ecx).
+// Tried and rejected: reordering the lowIndex/du/out/dx declarations produced
+// byte-identical output, and moving the dv declaration to two different
+// positions also changed nothing, so this function's coloring is not
+// declaration-order driven. Promoting dz to function scope as well overshoots
+// (74.2%, 1090 bytes).
 struct Surface_4c8760 { unsigned short width, height; };
 void __stdcall FUN_004c7a20(int, int*, Surface_4c8760*, Surface_4c8760*);
 
@@ -43,15 +40,16 @@ void __stdcall FUN_004c8760(Surface_4c8760* target, Surface_4c8760* texture, int
     int y1;
     int highY;
     int lowY;
-    int lowIndex;
-    int du;
-    int* out;
     int dx;
+    int* out;
+    int du;
+    int lowIndex;
     int* nextVertex;
     int bottom;
     int highIndex;
     int previous;
     int highX;
+    int dv;
     if (target && texture && vertices) {
         if (!coords) {
             coords=defaults;
@@ -84,17 +82,18 @@ void __stdcall FUN_004c8760(Surface_4c8760* target, Surface_4c8760* texture, int
                         int* currentVertex=vertices+index*3;
                         int y0=currentVertex[1];
                         y1=vertices[next*3+1];
+                        nextVertex=vertices+next*3;
                         if (y0<y1) {
                             int dy=y1-y0;
-                            dx=((vertices[next*3]-currentVertex[0])*0x10000)/dy;
+                            dx=((nextVertex[0]-currentVertex[0])*0x10000)/dy;
                             x=currentVertex[0]*0x10000+0xffff;
                             int z=currentVertex[2]*0x10000;
                             int u=coords[index*2]*0x10000;
                             int v=coords[index*2+1]*0x10000;
 
                             du=(coords[next*2]*0x10000-u)/dy;
-                            int dv=(coords[next*2+1]*0x10000-v)/dy;
-                            int dz=(vertices[next*3+2]*0x10000-z)/dy;
+                            dv=(coords[next*2+1]*0x10000-v)/dy;
+                            int dz=(nextVertex[2]*0x10000-z)/dy;
 
                             if(y0<0) {
                                 x-=dx*y0; u-=du*y0; v-=dv*y0; z-=dz*y0;
@@ -141,7 +140,7 @@ void __stdcall FUN_004c8760(Surface_4c8760* target, Surface_4c8760* texture, int
                             int v=coords[index*2+1]*0x10000;
 
                             du=(coords[next*2]*0x10000-u)/dy;
-                            int dv=(coords[next*2+1]*0x10000-v)/dy;
+                            dv=(coords[next*2+1]*0x10000-v)/dy;
                             int dz=(nextVertex[2]*0x10000-z)/dy;
 
                             if(y0<0) {
