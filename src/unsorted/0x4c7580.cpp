@@ -1,5 +1,24 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by GPT-6. Names are provisional.
-// PARTIAL 13.5%. Corrected both edge loops to test clip.top and skip nonpositive spans after clipping. Register allocation, frame and branch layout still differ.
+// Decompiled by deepseek-v4.1. Names are provisional.
+// (started by deepseek-v4.1-flash / GPT-6.1-sol / GPT-6)
+// PARTIAL 13.5%. What still differs, in the order it shows up in the diff:
+//  1. Frame: original emits `mov eax, 0x7d8c; call __chkstk`, ours 0x7d94, so every
+//     [esp+N] below the clip is +8 and every body offset too. The chkstk constant is
+//     buffer_base + 32000 - 0x10 (MSVC5 subtracts the 4 pushed regs), and the args sit
+//     at C+0x14+4*i; both hold for the original and for ours, so only the scalars before
+//     the 0x7d00 byte span buffer are 8 bytes too big.
+//  2. Original scalar layout (post-4-push esp): y1=0x10, minx/prev=0x14 (one slot, lives
+//     are disjoint), locked=0x18, maxy=0x1c, miny=0x20, rec=0x24, x0=0x28, dtx=0x2c,
+//     ddx=0x30, minyi=0x34, maxyi=0x38 => clip at 0x3c, tmp quad 0x4c, local surface
+//     0x6c (0x30 bytes), spans buffer 0x9c. Ours has one extra 4 byte temp below the
+//     clip (ours puts `locked` at 0x20, clip 0x40) and 4 bytes of padding between clip
+//     and quad, hence +4/+8.
+//  3. `maxx` must stay register only (ebx) as in the original: it is never stored to
+//     memory, so the scan loop shape (pointer walk with the index in ecx) matters.
+//  4. The walk loops: original keeps the loop index in memory ([esp+0x14]) storing the
+//     *unclamped* i-1 / (i+1)&3 and re-clamping on reload at the bottom (do/while with
+//     the test after the store). Ours keeps it in a register.
+//  Parameter order is right: (surf, bmp, dst, src) with `surf = &local;` written back to
+//  the arg slot at [esp+0x7da0]; esi=bmp, edi=dst, ebp=zero.
 
 #include <windows.h>
 
@@ -93,9 +112,8 @@ void __stdcall FUN_004c7580(void* surf, Frame_004c7580* bmp,
         if (x < minx) minx = x;
     }
 
-    Class_004c6ae0* srf = (Class_004c6ae0*)surf;
     int clip[4];
-    srf->FUN_004c6ae0(clip);
+    ((Class_004c6ae0*)surf)->FUN_004c6ae0(clip);
 
     if (maxx < clip[0]) {
         if (locked) FUN_004c5fa0(&local);
