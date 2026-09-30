@@ -20,6 +20,17 @@
 //   DAT_005091cc stores (byte-identical to the plain constant: MSVC propagates
 //   the constant, so it cannot force a register-held 1).
 //
+// This pass (deepseek-v4.1, second 12 min, 8 check runs): confirmed the
+// 32-bit byte temp is what the original lanes use (it is the only spelling
+// that makes MSVC emit the `xor r,r; mov r8,mem` zero-extension idiom at
+// 0x497303/0x497353/0x49737a), but MSVC then rewrites `(w & ~2) | (b & 2)` as
+// `xor b,w; and b,2; xor b,w` and moves g_game to esi and the byte to
+// eax/ecx/edx: 73.3% with all nine lanes, 80.2% with case 3 only and 76.0%
+// with just the two shift lanes (case 1/2), all worse than 82.4%. Read it as
+// a live-range effect: here the const 1 in edx dies before the case-3 calls,
+// so edx is enough; the original's `and reg,edi` inside the post-call lanes
+// keeps it live across them and that is what forces edi.
+//
 // Still open, in order of how much they cost on the diff:
 // - The nine 0x14281 lane updates: the original zero-extends the byte into a
 //   32-bit register (`xor ebx,ebx; mov bl,[..]`), masks 32-bit (`and ebx,2`,
