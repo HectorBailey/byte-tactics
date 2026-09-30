@@ -1,9 +1,15 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// Partial: 41.6%, 2176 bytes versus 2164. Removed a trailing byte to
-// restore the 0x15b entry stride, represented the palette index as an int,
-// and captured the active entries/current index across callbacks before
-// restoring current. Remaining prologue saves, rectangle registers and
-// selection/local slots differ. Two 768-set header sweeps found no improvement.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6, edited by
+// deepseek-v4.1. Names are provisional.
+// Partial: 41.6%, 2176 bytes versus 2164. First divergence is the prologue:
+// the original pushes ebx, ebp, esi and edi at entry (push ebx / push ebp /
+// mov ebp,[esp+0x40] / push esi / push edi); ours only pushes ebp and sinks
+// the ebx/esi/edi saves below the early "layer == 0" return, so everything
+// after it is shifted by 6 bytes. The body (callback order, the 0x15b entry
+// stride, the switch dispatch and the tail teardown) follows the original.
+// Removed a trailing byte to restore the 0x15b entry stride, represented the
+// palette index as an int, and captured the active entries/current index
+// across callbacks before restoring current. Two 768-set header sweeps found
+// no improvement.
 
 #include <windows.h>
 #include <string.h>

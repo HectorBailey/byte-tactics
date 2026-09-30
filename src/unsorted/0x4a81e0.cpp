@@ -1,10 +1,42 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// Partial: 24.0%, 3796 bytes versus 5248. Expanded resource/background
-// loading, slider end buttons, text/list initialization, animation lookup
-// and the matched button-frame selection pattern from 0x4a7f70. The earlier
-// incomplete slider stub scored 26.6%; this fuller version preserves more
-// behavior. Font/text tails, surface creation, redraw details and teardown
-// remain incomplete. Further register/frame matching needs the missing body.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6, edited by
+// deepseek-v4.1. Names are provisional.
+// Their work is kept below unchanged; this worker rewrote the header and added these notes.
+//
+// Partial: 24.0%, 3796 bytes versus the original 5248. What still differs:
+//
+// - Prologue and frame. The original is `mov eax,[esp+4]; sub esp,0x3c0;
+//   mov eax,[eax+0x18]; push ebx; push ebp; push esi; test eax,eax;
+//   push edi` and it reloads param_1 from [esp+0x3d4] at every later use.
+//   Ours is `sub esp,0x3d4; push ebx; push ebp; push esi; push edi;
+//   mov edi,[esp+0x3e8]` and keeps param_1 live in edi. The entry base is
+//   ebp in the original and ebx here; the flags argument is ebx there and
+//   eax here. The frame is 0x14 too large, so param_2 is read at
+//   [esp+0x3ec] instead of [esp+0x3d8]. Because of this nothing before the
+//   first call lines up byte for byte, and every later displacement is off.
+// - Locals. The original's text buffers sit at esp+0x150 / esp+0x154, that
+//   is 0x140 past its frame base (esp+0x10 after sub esp,0x3c0 and the four
+//   register pushes); ours sit at esp+0x64 / esp+0x68, 0x58 past the base.
+//   Relative to the frame base that is a real 0xe8 difference, not the
+//   4-byte shift a larger frame alone would cause. The original frame is
+//   240 dwords, ours is 244. The declaration order and sizes of the locals
+//   must be recovered from the displacements before anything lines up.
+// - Entry indexing. The original computes the 0x15b stride into ebx with
+//   the lea chain at 0x4a83d1 (`shl eax,3; sub eax,ebx; lea ecx,
+//   [eax+eax*2]; lea edx,[ebx+ecx*2]; lea eax,[ebx+edx*4]; lea ebx,
+//   [ebx+eax*2]`) and then indexes `[ebp + i*0x15b + offset]`. This file
+//   walks a pointer with `add eax,0x15b` in its loops, so those regions
+//   differ even where the logic is right. Writing the loops as
+//   `entries[i].field` should be the next thing to try.
+// - Missing bodies. The original 0x4a9065..0x4a90d0 (the "SAVE UNDER" text
+//   tail of the forced path) and 0x4a90d1..0x4a95d1 (the flags&1 == 0 path)
+//   have no counterpart here; together they are roughly 1280 bytes, most of
+//   the byte deficit. The block from 0x4a82f7 onwards is also emitted in a
+//   different order than this file, so the diff never fully resynchronises.
+//
+// Summary: matching this 5248 byte function needs (1) the original local
+// declaration order, (2) indexed rather than pointer entry loops, and (3)
+// the two missing tail blocks. The logic sketched below looked correct but
+// the register and frame allocation is not.
 
 #include <string.h>
 #include <stdio.h>
