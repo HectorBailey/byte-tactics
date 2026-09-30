@@ -1,71 +1,76 @@
 // Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6,
 // edited by deepseek-v4.1, finished by space-bunny-free. Names are provisional.
 //
-// Partial: 42.2%, 2204 bytes versus 2164.
+// Partial: 43.7%, 2204 bytes versus 2164. Best so far; every earlier attempt is
+// in build/scratch/0x4a9fd0/.
 //
 // What still differs, in order of how much it is worth:
 //
-// 1. The prologue. The original does sub esp,0x34 / push ebx / push ebp /
-//    mov ebp,[esp+0x40] / push esi / push edi, and its early "layer == 0"
-//    exit pops all four. Ours pushes only ebp at the top and sinks
-//    push edi / push esi / push ebx below that early return, so every
-//    address in the body is 4 bytes low. This is one allocation state, not
-//    three separate bugs: in the original ebx carries the loop index i and
-//    edi carries the walk pointer p (each with a spill slot as well), while
-//    in ours `entries` keeps ebx alive all the way into the loop preamble and
-//    i and p are memory-resident, so only ebp/esi/edi ever get saved. Getting
-//    i and p promoted to callee-saved (and `entries` dropped from ebx at the
-//    reload the original does at 0x4aa19a) should move a large part of the
-//    body at once. Several attempts to force it (extra live references,
-//    spelling the loop as a while(1) with the induction variable read from
-//    memory) did not change it.
-// 2. Local slot assignment. sel and i have swapped homes: the original uses
-//    [esp+0x10] for i and [esp+0x48] for sel, we use [esp+0x10] for sel and
-//    [esp+0x48] for i. All other slots (p 0x14, entries 0x18, key 0x1c,
-//    elapsed 0x20, bias 0x24, saved 0x28, point 0x2c/0x30) already agree,
-//    so this looks like the order the first and last temporaries are created
-//    in the lowered graph, i.e. a consequence of (1), not an independent
-//    source-shape problem.
-// 3. The first entry clamp. The original spills both derived edges, right to
-//    [esp+0x34] and bottom to [esp+0x38], and loads point.y into edi before
-//    building them; we keep right in edi and reload point.y after the call
-//    argument is built. One unit more register pressure in that block would
-//    reproduce it, but adding locals there did not.
-// 4. Case 5 (type 5) now matches the original's shape: sel is set to -1
-//    before the name search, so the "not found" test is cmp against the same
-//    materialised -1 the three deselect arms use. Writing the constant out
-//    as a separate `int notfound = -1` scores identically, so the spelling is
+// 1. The prologue, and it is still one allocation state, not six bugs. The
+//    original does sub esp,0x34 / push ebx / push ebp / mov ebp,[esp+0x40] /
+//    push esi / push edi and its early "layer == 0" exit pops all four. Ours
+//    pushes only ebp at the top (to home the parameter) and sinks push edi /
+//    push esi / push ebx below that early return, so every address in the body
+//    is 4 bytes low. MSVC5 shrink-wraps the saves whenever ebx, esi and edi
+//    are all dead in the entry block, and they are, in every spelling tried:
+//    `if (layer == 0) return 0;` first, last, inverted, and with locals
+//    declared before it. Note the original's order, push ebx BEFORE push ebp:
+//    ebp is saved second because it is being used to home the stack parameter,
+//    so this is the shape of a function whose register allocator gave ebp the
+//    parameter and ebx, esi, edi to body variables.
+// 2. Register roles in the entry loop. The original keeps the induction
+//    variable i in EBX and the walk pointer p in EDI (each with a spill slot,
+//    [esp+0x10] and [esp+0x14], reloaded after any call at 0x4aa541), and it
+//    keeps `entries` MEMORY RESIDENT, reloading it from [esp+0x18] every
+//    iteration. Ours keeps `entries` in EBX for the whole loop, so i is memory
+//    resident and p lands in ESI. That single difference also explains the
+//    inner clamp: with `entries` gone from a register the original can keep
+//    both derived edges live (right in EDX, bottom in ESI, 0x4aa1fa..0x4aa214)
+//    whereas ours spills one of them and reloads point.y from [ebp+0x40]. The
+//    lever is still "get `entries` out of EBX", not the clamp spelling.
+// 3. Slot assignment. The original uses [esp+0x10] for i and [esp+0x48] for
+//    sel. [esp+0x48] is not a frame local at all: post-prologue esp is
+//    esp0-0x44, so [esp+0x44] is the return address and [esp+0x48] is the
+//    stack argument slot, which MSVC reuses for a scratch spill once the
+//    parameter has been homed into ebp. Ours puts sel at [esp+0x10] and i at
+//    [esp+0x48], so exactly one variable is in the argument slot in both, but
+//    it is the wrong one. Every other slot already agrees (p 0x14, entries
+//    0x18, key 0x1c, elapsed 0x20, bias 0x24, saved 0x28, point 0x2c/0x30).
+// 4. The first entry clamp. The original spills both derived edges, right to
+//    [esp+0x34] and bottom to [esp+0x38], and loads point.y into EDI before
+//    building them (0x4aa0fd); ours keeps right in EDI and reloads point.y
+//    from [ebp+0x40] after the call argument is built. This is (2) again.
+// 5. The 14-byte text shift. The original builds the address with
+//    `lea ecx,[eax+edx]`, keeping the layer base in EDX and the index in EAX.
+//    Spelling it as `menu->layer->text[n] = menu->layer->text[n+1]` changes
+//    nothing; giving the base its own `char*` local makes MSVC strength-reduce
+//    the whole loop into a pointer walk and is much worse.
+// 6. Case 5 (type 5) matches the original's shape: sel is set to -1 before the
+//    name search, so the "not found" test compares against the same
+//    materialised -1 the three deselect arms use. Writing the constant out as
+//    a separate `int notfound = -1` scores identically, so the spelling is
 //    not pinned down.
 //
-// Prologue experiments (deepseek-v4.1, this session): three minimal repros
-// with the same flags (early `if (p->layer == 0) return 0;`, then a loop with
-// a switch and extern calls) ALL shrink-wrap: the parameter homes to one
-// callee-saved reg pushed at entry and the others are pushed after the early
-// return, in reverse save order (edi, esi, ebx). Inverting the structure to
-// `if (layer != 0) { body; return 1; } return 0;` does not change that. So the
-// original's `push ebx / push ebp / mov ebp,[esp+0x40] / push esi / push edi`
-// prologue is not reachable from the early-return shape alone; it is compiler
-// state (in the original ebx is pushed before the plain ebp parameter home),
-// and it should be attacked from the register assignment of the loop (i in ebx,
-// p in edi) rather than from the return structure.
+// This session (space-bunny-free) moved 42.2 -> 43.7 with two source changes,
+// both about WHERE a variable's live range starts:
+//   * hoisting `int i = 1;` out of the `for` header and declaring it next to
+//     `int sel`, so i is a real local and not a front-end loop temp: +1.0;
+//   * moving that same `int i = 1;` ABOVE the early `if (menu->layer == 0)
+//     return 0;`, so its live range starts at function entry: +0.5. MSVC5
+//     still shrink-wraps, but the shape changes favourably.
 //
-// 5. Register homes in the loop (deepseek-v4.1): the original reloads
-//    `entries` from its home [esp+0x18] at the loop top (0x4aa19a) and every
-//    iteration (0x4aa1a7 movsx ecx,[eax+0xb6]), keeps the limit in ebx, the
-//    counter in edx and p in edi (0x4aa1c0 lea edi,[ecx+0x17a], 0x4aa567
-//    mov [esp+0x14],edi, 0x4aa555 add edi,0x15b). Ours keeps `entries` in ebx
-//    for the whole loop, so the counter lands in esi and the limit in edx
-//    (movsx edx,[ebx+0xb6] at the loop bottom). Getting `entries` out of ebx
-//    is the remaining lever.
-// 6. Hoisting `int i;` to just after the early return (to give it the [esp+0x10]
-//    home the original has, with sel at [esp+0x48]) is score neutral: 42.2%
-//    both ways, prologue and loop registers unchanged.
-//
-// Things that did NOT work, so nobody repeats them: a `int elapsed = 0`
-// pre-initialiser (the original assigns 0 only in the else arm, and the
-// extra store is a real byte); naming pt->x and pt->y as locals before the
-// first clamp; two 768-set header sweeps (earlier sessions); removing the
-// `saved` copy of menu->field_68.
+// Things that did NOT work, so nobody repeats them:
+//   * Giving the text shift a `char*` base local (strength-reduces the loop).
+//   * Hoisting a `Layer* lay = menu->layer;` local above the early return to
+//     try to pin the prologue: score neutral at 43.2.
+//   * Declaring `int i;` above the early return but keeping `for (i = 1; ...)`:
+//     42.2, the gain really does need the initialiser there.
+//   * Moving `int sel = menu->field_60;` above the early return too (both
+//     variables live from entry): 42.7, worse, and it drops 4 bytes.
+//   * An `int elapsed = 0` pre-initialiser (the original assigns 0 only in the
+//     else arm, and the extra store is a real byte); naming pt->x and pt->y as
+//     locals before the first clamp; two 768-set header sweeps (earlier
+//     sessions); removing the `saved` copy of menu->field_68.
 
 #include <windows.h>
 #include <string.h>
@@ -217,6 +222,8 @@ void FUN_004d85a0(Layer_004a9fd0*);
 // FUNCTION: 0x4a9fd0
 int __stdcall FUN_004a9fd0(Menu_004a9fd0* menu)
 {
+    int i = 1;
+
     if (menu->layer == 0)
         return 0;
 
@@ -246,7 +253,6 @@ int __stdcall FUN_004a9fd0(Menu_004a9fd0* menu)
         }
     }
 
-    int i = 1;
     int sel = menu->field_60;
     if (menu->layer != 0) {
         if (menu->field_cca == 1) {
