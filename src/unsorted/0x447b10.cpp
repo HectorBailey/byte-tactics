@@ -4,15 +4,25 @@
 // Still differs: our frame is sub esp,0x140 where the original has 0x13c, so
 // every post-prologue stack offset is 4 too high and the sprintf buffers land
 // at [esp+0x54]/[esp+0x58] instead of [esp+0x28]/[esp+0x2c] (one extra live
-// 4-byte local). The 252-byte char buffer and the int[10] table are at the same
-// relative distance, so the extra slot is not either array. Also differs: the
-// 0x447b9c block re-computes the player pointer instead of reusing the
-// [esp+0x10] slot (original keeps it in eax/esi), the sprintf call sites do not
-// reuse lea eax,[esp+N] the way the original does, and the inlined string
-// copies (0x40/0x519 style block moves) are missing at the tail. Unproven
-// hypothesis worth trying next: the extra 4 bytes are unused padding at the
-// bottom of the frame; if the frame becomes 0x13c the two sprintf buffers fall
-// back to [esp+0x28]/[esp+0x2c] and most stack-offset diffs should collapse.
+// 4-byte local).
+// Tried 2026-09-30 (deepseek-v4.1), all measured with check.py:
+//  - fusing iVar11/piVar9 into one `(int)g_game + 0x1b63 + (uint)bVar1*0x14b`
+//    expression (the original really does keep one pointer and reach
+//    0x108/0x13f/0x27 off it) DOES give sub esp,0x13c, but the score drops to
+//    34.6% and the iVar8 store stays at [esp+0x18] (frame+8) where the original
+//    has [esp+0x14] (frame+4): the extra slot is at frame+4 in ours, the
+//    original's unused hole is at frame+0xc (between bVar1 at +8 and the byte
+//    local at +0x10). So the +4 is a short-lived temp, not the second pointer.
+//  - swapping the declaration order of local_124[252] and local_28[10] changes
+//    the binary not at all; in our build the int[10] table lands low
+//    ([esp+0x28] = frame+0x18) and the 252-byte buffer high, the reverse of the
+//    original ([esp+0x28] buffer = frame+0x18, [esp+0x124] table = frame+0x114).
+//    So slot placement for the arrays is driven by something other than
+//    declaration order (first-use order of the locals is the next thing to try).
+// Also differs: the 0x447b9c block re-computes the player pointer instead of
+// reusing the [esp+0x10] slot (original keeps it in eax/esi), the sprintf call
+// sites do not reuse lea eax,[esp+N] the way the original does, and the inlined
+// string copies (0x40/0x519 style block moves) are missing at the tail.
 #include <stdio.h>
 #include <string.h>
 typedef unsigned char byte;

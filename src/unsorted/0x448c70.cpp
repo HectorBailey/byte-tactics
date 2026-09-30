@@ -12,6 +12,15 @@
 // Fixes that gained points: FUN_00435c40 declared bool (removed a neg/sbb/neg),
 // reading the selected slot pointer before the map-slot local, and clearing
 // local_b8 with 0 instead of & 0xffffff00.
+// Session deepseek-v4.1: baseline 44.0% (3902 vs 3948 bytes). Everything after the
+// first 12 instructions differs only in register choices. The original keeps iVar17
+// in ebp and the 0x2a40/strcpy-index temp in ebx; this file has them swapped, and
+// the swap cascades through every later block. Measured with no effect: iVar17 and
+// uVar18 declaration or first-use order, uint/short types for uVar4 (uint reaches
+// 3944 bytes but 8 fewer matching lines), five operand orders for the local_b4
+// address, inline initialisers. Rewriting the player loop as a byte counter
+// do-while dropped to 38.6%.
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
