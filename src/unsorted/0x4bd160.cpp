@@ -109,6 +109,25 @@
 // value-copy (an inlined call result materialised for a store) that no plain
 // assignment spelling reproduces.
 //
+// deepseek-v4.1 tried (all scored with check.py against scratch copies):
+//   92.6%  `char* buf = 0; unsigned size = 0; size = 20;` then an
+//          uninitialised `struct HapiBuf sb;` assigned from both: the frame
+//          drops to 0x50 (576 bytes) and everything shifts, so separate
+//          locals cannot carry the original frame; MSVC also folds both
+//          stores to immediates and keeps the ebp zero.
+//   97.1%  `buf`/`size` locals plus `struct HapiBuf sb = {20};` and
+//          `sb.size = size;`: frame is right but the size push becomes
+//          `push 0x14` and both member stores land after the pushes.
+//   97.4%  zero produced through a union member (`union { unsigned s;
+//          char* p; } u; u.s = 0; sb.buf = u.p;`): same 98.3% layout but
+//          the union gets its own slot, so one more instruction.
+//   98.3%  `*(char**)&sb.buf = 0;`, identical to the explicit assignment.
+// Conclusion: the fresh `xor ecx,ecx` is a property of the aggregate's own
+// zero-fill (the `{20}` alone produces it), while any explicit `= 0`
+// statement CSEs into ebp; the dead `mov eax,ecx` looks like a value copy
+// from a second target that the optimizer dropped, which no plain
+// assignment spelling reproduces.
+//
 // Frame layout (21 dwords, do not disturb): X+0x00 extra, X+0x04 sb.size,
 // X+0x08 sb.buf, X+0x0c year[8], X+0x14 copyright[0x40].
 #include <stdio.h>
