@@ -1,9 +1,17 @@
-// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
+// Decompiled by deepseek-v4.1. Names are provisional.
+// (Started by Claude Opus 5.5, continued by deepseek-v4.1-flash and GPT-6.)
 // Partial: 55.8%, 1537 bytes versus 1512. <vector>/<windows.h>, an
 // early canRepair declaration and reordered first/onOff/cloak/count locals
 // recover the original 0x240 frame, game in EDI and canRepair in EBP.
 // Remaining first/count/onOff/cloak/cursor slots and tail register allocation
 // differ. A 768-set header sweep and 80 local/type/lifetime variants were tried.
+// deepseek-v4.1 tried reordering the top-of-function local declarations and
+// initialisers to the original's prologue store order (cloak, onOff, canMove,
+// canAttack, canDefend, canPatrol, canLoad, canCapture, canReclaim, canBlast,
+// canStop); that reassigned the stack slots and fell to 29.1%, so the existing
+// declaration order is load-bearing and was kept. The prologue also shows the
+// original sinks the first/count zero stores into the else branch (0x41b3a6,
+// 0x41b3aa) instead of the entry block.
 
 #include <vector>
 #include <windows.h>
