@@ -1,6 +1,10 @@
-// Decompiled by GPT-6 Astra. Names are provisional.
-// Partial: 79.1%. The final vector destructor remains out of line;
-// position addition, local slots and several registers still differ.
+// Decompiled by GPT-6 Astra, finished by deepseek-v4.1-flash. Names are provisional.
+// Partial: 89.9%, 1050 bytes versus 1051. Remaining differences include
+// health-test register rotation, kind return-buffer placement, position-add
+// code generation and the final vector destruction call. 768 header sets
+// did not improve it. Inlining the native allocator/destroy/deallocate body
+// improved the final destructor but changed earlier destructor call sites
+// and dropped the whole-function score to 86.0%; that variant was rejected.
 #include <vector>
 struct Unit;
 namespace std {

@@ -1,4 +1,6 @@
-// Decompiled by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
+// Partial, 48.7%. Restored player and campaign-holder reloads around callbacks.
+// Remaining differences include duplicated mission blocks and branch/register scheduling.
 // Click handler for the single-player Campaign screen. Dispatches on the gadget
 // name (Start/Campaign/Missions/bigButton, PrevMenu, Difficulty, Side0/Arm,
 // Side1/Core) and rebuilds the campaign or missions list, checking the campaign
@@ -71,8 +73,9 @@ void __stdcall FUN_004ab0a0(void* menu);
 // FUNCTION: 0x477ab0
 void __stdcall FUN_00477ab0(Menu_00477ab0* menu)
 {
-    char* playerInfo = g_game + 0x14b * *(unsigned char*)(g_game + 0x2a42);
+    unsigned char idx0 = *(unsigned char*)(g_game + 0x2a42);
     Entry_00477ab0* entries = menu->holder->entries;
+    char* playerInfo = g_game + 0x14b * idx0;
     int index = 0;
 
     if (menu->current == -1) {
@@ -138,6 +141,8 @@ CoreSide:
     *(unsigned char*)(*(int*)(playerInfo + 0x1b8a) + 0x95) = 1;
     *(unsigned char*)(*(int*)(playerInfo + 0x1cd5) + 0x95) = 0;
     if (DAT_00507b6c == 0) {
+        playerInfo = g_game + 0x14b * *(unsigned char*)(g_game + 0x2a42);
+        Holder_00477ab0* campaignHolder = *(Holder_00477ab0**)(g_game + 0x531);
         int side = *(unsigned char*)(*(int*)(playerInfo + 0x1b8a) + 0x95);
         if (DAT_0051e65c) {
             FUN_004d85a0(DAT_0051e65c);
@@ -146,7 +151,7 @@ CoreSide:
         FUN_0047f1a0("smlbutton", 0);
         int count = FUN_00476a60(&DAT_0051e65c, side);
         FUN_004a32a0(g_game + 0x519, "Campaign", DAT_0051e65c, count, 0);
-        index = FUN_0049fdf0(entries, "Campaign", 2);
+        index = FUN_0049fdf0(campaignHolder->entries, "Campaign", 2);
         FUN_004a2be0(g_game + 0x519, index);
         FUN_0049fa90(g_game + 0x519);
     }
@@ -164,6 +169,8 @@ ArmSide:
     *(unsigned char*)(*(int*)(playerInfo + 0x1b8a) + 0x95) = 0;
     *(unsigned char*)(*(int*)(playerInfo + 0x1cd5) + 0x95) = 1;
     {
+        playerInfo = g_game + 0x14b * *(unsigned char*)(g_game + 0x2a42);
+        Holder_00477ab0* campaignHolder = *(Holder_00477ab0**)(g_game + 0x531);
         int side = *(unsigned char*)(*(int*)(playerInfo + 0x1b8a) + 0x95);
         if (DAT_0051e65c) {
             FUN_004d85a0(DAT_0051e65c);
@@ -172,11 +179,11 @@ ArmSide:
         FUN_0047f1a0("smlbutton", 0);
         int count = FUN_00476a60(&DAT_0051e65c, side);
         FUN_004a32a0(g_game + 0x519, "Campaign", DAT_0051e65c, count, 0);
-        index = FUN_0049fdf0(entries, "Campaign", 2);
+        index = FUN_0049fdf0(campaignHolder->entries, "Campaign", 2);
         FUN_004a2be0(g_game + 0x519, index);
         FUN_0049fa90(g_game + 0x519);
     }
-    FUN_004a0570(g_game + 0x519, "Campaign", DAT_00507b6c == 0);
+    FUN_004a0570(menu, "Campaign", DAT_00507b6c == 0);
     if (DAT_0051e668 != 0)
         goto MissionsArm;
     goto End;
@@ -238,8 +245,8 @@ MissionsCore:
         index = ((Class_00435760*)*(void**)(g_game + 0x391e9))->FUN_00435760(&DAT_0051e660);
         FUN_004a32a0(menuSub, "Missions", DAT_0051e660, index, 0);
         index = FUN_0049fdf0(*(Entry_00477ab0**)(holder + 4), "Missions", 2);
-        FUN_004a2be0(menuSub, index);
-        FUN_0049fa90(menuSub);
+        FUN_004a2be0(g_game + 0x519, index);
+        FUN_0049fa90(g_game + 0x519);
     }
     FUN_004ab0a0(menu);
     return;
@@ -259,8 +266,8 @@ MissionsArm:
         index = ((Class_00435760*)*(void**)(g_game + 0x391e9))->FUN_00435760(&DAT_0051e660);
         FUN_004a32a0(menuSub, "Missions", DAT_0051e660, index, 0);
         index = FUN_0049fdf0(*(Entry_00477ab0**)(holder + 4), "Missions", 2);
-        FUN_004a2be0(menuSub, index);
-        FUN_0049fa90(menuSub);
+        FUN_004a2be0(g_game + 0x519, index);
+        FUN_0049fa90(g_game + 0x519);
     }
     FUN_004ab0a0(menu);
     return;
@@ -269,22 +276,3 @@ End:
     FUN_004ab0a0(menu);
 }
 
-// Remaining differences vs. the original (56.9%):
-// - Prologue scheduling: the original loads menu->holder into eax before the
-//   index byte (mov dl,[ecx+0x2a42]) and dereferences holder->entries after
-//   `push edi`; ours computes playerInfo first and loads holder last. Swapping
-//   the two locals' declaration order makes it worse (52.5%), so the schedule
-//   is not declaration-driven here.
-// - `index` now does share the reused menu parameter slot ([esp+0x1c] after
-//   the two FUN_0047f1a0 arg pushes), matching the original.
-// - The Side0/Arm and Side1/Core blocks recompute the player-data pointer from
-//   g_game+0x2a42 instead of reusing the prologue value; our version reuses it,
-//   and the Difficulty block's g_game temp is in eax instead of ecx.
-// - The two duplicated campaign-menu build blocks and the two duplicated
-//   missions blocks still differ in register allocation and load order, as does
-//   the BigButton name-selection chain (we materialize the string address in
-//   eax, the original pushes it inside each arm).
-// The control flow, all 23 callees, string constants, struct offsets and the
-// branch polarity of the end-of-game 0x0f/0x10 writes match; the instruction
-// count is 1746 vs 1935, so about 47 instructions are still scheduled
-// differently or missing.

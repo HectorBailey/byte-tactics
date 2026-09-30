@@ -228,16 +228,12 @@ void __stdcall FUN_004948e0(void* surface)
         FUN_004c7580(surface, frame, &dst, &src);
 
         FUN_004a50e0(surface, p->name, dst.p[0].x + 2, dst.p[0].y + 5, maxw, 0);
-        if (g_game->field_37ef6 == 2)
-            sprintf(buf, "%d", p->field_104);
-        else
-            sprintf(buf, "%d", p->field_fc);
+        int kills = g_game->field_37ef6 == 2 ? p->field_104 : p->field_fc;
+        sprintf(buf, "%d", kills);
         FUN_004a50e0(surface, buf, dst.p[0].x + 2, dst.p[0].y + 0x14, maxw,
                      DAT_0051f2c8[n]);
-        if (g_game->field_37ef6 == 2)
-            sprintf(buf, "%d", p->field_106);
-        else
-            sprintf(buf, "%d", p->field_fe);
+        int losses = g_game->field_37ef6 == 2 ? p->field_106 : p->field_fe;
+        sprintf(buf, "%d", losses);
         FUN_004a50e0(surface, buf, dst.p[2].x - FUN_004a5030(buf) - 2,
                      dst.p[0].y + 0x14, maxw, DAT_0051e810[n]);
         y += 0x28;
