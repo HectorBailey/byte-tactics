@@ -9,6 +9,25 @@
 // kept this 91.3% source. Direct component subtraction, reversed bounds
 // addition, and explicit component arithmetic scored lower. The movement
 // subtraction and bounds operand/register ordering still differ.
+// deepseek-v4.1-flash retry pass: 15 scratch variants scored with --sym, all
+// <= 91.3%. An explicit-component Vec3 operator- (r.x=x-v.x; r.y=y-v.y;
+// r.z=z-v.z;) does reproduce the original state-3 register pattern
+// (edx/edi/ecx, subs before stores) but flips unit/order in esi/edi across
+// the whole function (74.7%); the same flip hits a free-function or by-value
+// subtraction helper (73.3% / 67.7%). In-place (pos-=off), named-off and
+// explicit-pointer forms also score lower (80.7-86.6%). For bounds[0],
+// min+pos, a reference/local min, and a pointer-taking Add helper all keep
+// the same x-register tie (edx/ebp swapped).
+// Previous deepseek retry: 4 more checker runs, all scratch variants scored
+// lower than this 91.3% file: sum-then-copy subtraction (variantA) 72.3%,
+// direct field operator- (variantC) 71.5% (flips unit/order esi/edi),
+// split pos= then pos-= (variantD) 80.7% (bigger, 1024 bytes). The two
+// remaining diffs are unchanged: (1) state-3 target->pos - Offset(...) uses
+// an extra mov edx,ecx pointer copy and interleaves its stores where the
+// original loads x/y/z into edx/edi/ecx, subs x then z, pushes 0x36, then
+// stores x/y/z (this shifts every later branch target by +2); (2) the
+// bounds[0] pos+min add has pos.x in edx / min.x in ebp where the original
+// has pos.x in ebp / min.x in edx. Both are MSVC register/schedule ties.
 #include <stdio.h>
 struct Point { short x, y; };
 struct Vec3 {
