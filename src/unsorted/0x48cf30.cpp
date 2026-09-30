@@ -79,6 +79,16 @@
 // supply that state legitimately.
 // All 768 header sets from tools/headers.py --cpp were tried in this session
 // (best 84.9%, the N = 0 layout), so headers alone cannot supply the state.
+// deepseek-v4.1 (second session): a fifteen-variant statement-shape sweep was
+// run against this same file. Buf scoped inside the if (mode) block, explicit
+// (int) casts on the averages, split declarations with later assignment,
+// unsigned or grouped average declarations, function-scope dx/dz, and
+// avg_x/avg_z at function scope all reproduce the 84.9% body byte for byte.
+// The rest only regress: range declared before the averages 82.8%, buf hoisted
+// above the loop 83.2%, p declared after the sums 70.3%, unsigned count 64.4%,
+// fire/move built as temporaries 62.1%, and an extra math.h include 75.2%.
+// Statement shape therefore does not move the frame permutation; the best
+// version stays this 84.9% one.
 #include <stdio.h>
 
 #pragma pack(push, 1)
