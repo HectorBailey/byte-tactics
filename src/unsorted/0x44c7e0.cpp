@@ -1,4 +1,4 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
 // Started by deepseek-v4.1-flash and GPT-6 (their 80.5% version is the basis).
 // Partial at 84.6% (1596 bytes against 1586). What still differs:
 //  1. The unit-type scan loop: the original zeroes the record byte offset with
@@ -14,6 +14,19 @@
 //     preserving it in a register scored higher (84.6% vs 80.5%) but is less
 //     faithful to the original, which keeps it in esi.
 // The scan loop's item pointers are reloaded after every call.
+// Tried on 2026-09-30 and all scored below this file:
+//  explicit record byte offset (vA 83.0), item local moved into the match block
+//  (vM 81.7), no item local at all (vB 80.3), item offset declared at function
+//  scope (vJ, identical bytes), a separate record counter r (vL, identical),
+//  index form item[i] (vE 83.2), record pointer walk (vV 83.6), item offset
+//  through i * 0x249 (vU, identical), an extra off use in the name check
+//  (vR 83.2), an explicit n * 0x62 (vY, identical), hoisting the slider
+//  handler (vI, identical), defining the real preceding 0x44c7a0 above this
+//  function (vZ, identical), and 0/2/4/8/16/24/32/48/64/96/128/192/256/384
+//  unused extern declarations (all 84.6%, so it is not TU state). The ebp/edi
+//  swap and the downstream tail schedule resist every source shape tried; the
+//  variant that wins item offset in edi does so by giving the desc gadget ebp
+//  instead of ebx, which costs more than it gains.
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

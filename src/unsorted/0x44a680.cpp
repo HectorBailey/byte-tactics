@@ -9,6 +9,28 @@
 // Tried and did NOT work (do not repeat): computing the boolean into a local
 // first (77.6), swapping the LOGO rect pair to (right+left - w) (78.7),
 // inverting the DAT_00512994 test so FUN_004455b0 is the fall-through (68.7).
+// Second pass (space-bunny-free), all scored with check.py --sym on scratch
+// copies, all 78.2 to 79.0 or worse, none above the 79.0 baseline:
+// - reindex loop: hoisting a Player* induction variable instead of a raw
+//   offset (68.5), `g_game->players[i]` with `i <= 10` (78.2), fully inlined
+//   field expressions with no temporaries (78.2), field_73 read inline but
+//   field_0 in a local (78.2), the whole condition nested inside
+//   `if (v != 0)` (79.0, no change), routing the compare and both stores
+//   through one `unsigned char* f146` (78.3), and a `char* q` pointer walk
+//   with `q += 0x14b` (65.9). The raw-offset form with the off <= 0xcee
+//   bound is the best of these; the pointer forms lose the index+displacement
+//   addressing the original uses.
+// - `pl` in a callee-saved register: routing its field reads through a
+//   boxed `__inline` accessor struct (78.7), spelling it `(Player*)pl` or
+//   `*(char*)((char*)pl+0x22)` (79.0, no change), assigning it through a
+//   second named pointer (79.0, no change), swapping the declarations of
+//   `pl` and `entries` (79.0, no change), and hoisting the `entries` load
+//   above the `pl` definition (77.8). None of these move MSVC off the stack
+//   slot, so the [esp+0x14] reload pattern persists.
+// - the MAXUNITS/METAL/ENERGY block: hoisting all three values into named
+//   locals (77.6) and hoisting only the maxunits one (79.0, no change).
+// - splitting the first `if` into `if (...) {} else if (...)` so the g_game
+//   reload lands before the test (79.0, no change).
 #include <string>
 #include <windows.h>
 #include <stdio.h>
