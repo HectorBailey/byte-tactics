@@ -12,6 +12,44 @@
 // The N-unused-declarations sweep 0..400 only re-scores 93.8-95.1 and never changes
 // the size, so this is source shape, not compiler state.
 // Replacing the direct order expressions with a cached Order* drops the score; explicit follow-position fields also worsen register allocation.
+// Second pass (deepseek-v4.1, round 2): the whole 3-byte gap is that one tail block.
+// Original (27 bytes): mov edx,[ebx+0x16]; push ebp x3; mov ecx,[edx+0x5c];
+// mov edx,[edx+0x5c]; add ecx,0x22; push ecx; mov ecx,[edx+0x16]; mov edx,[esp+0x20];
+// push ecx; push edx; mov ecx,eax; call. Ours (24 bytes): mov ecx,[ebx+0x16];
+// push ebp x3; mov edx,[ecx+0x5c]; mov ecx,eax; mov esi,[edx+0x16]; add edx,0x22;
+// push edx; mov edx,[esp+0x20]; push esi; push edx; call.
+// Scored with a scratch harness that calls check.py's compile_source/compare directly
+// (base reproduction scores 95.14, equal to check.py): raw fields 88.95 (1145);
+// accessor target + raw pos 91.98; raw target + accessor pos 92.11 (1145);
+// other->Target()/other->Position() 92.35 (1135); other->target/&other->pos 89.18;
+// casts (*(Unit**)((char*)o+0x16), (Vec3*)((char*)o+0x22)) 91.98/92.11;
+// by-reference inline helpers TargetOf(Order*&)/PosOf(Order*&) (the 0x4077e0 trick)
+// 91.98, inlining collapses them; Order*& oo=order->target->order local 85.68 (1218),
+// at function scope 84.06; Unit* tg/oo/tt temps 56.9-89.4; a second inline method with
+// an identical body 91.98; cross-body helpers TargetOfU(Unit*)/PosOfU(Unit*) 91.98.
+// Every source form either CSEs the second [edx+0x5c] load away or regresses; VC5 keeps
+// one load and reorders the two uses (target into esi before the pos add), the original
+// emitted two loads and put the target in ecx. Against the note at line 13, this sweep
+// points at compiler state (allocator/CSE), not at a missing source spelling.
+// Note for the next pass: adding two unused static inline helpers to the file moved this
+// function 95.14 -> 92.25 at the same 1149 bytes, so unused inline definitions are not
+// inert here; re-check with a bare file before trusting a local comparison.
+// Round 3 probes (all 1149 unless noted): Unit::order read once through a new inline
+// member accessor and once plain 95.14 (merges); by-reference member binding, comma
+// operators and (Vec3*) casts 95.14; the same tail as a single shared goto label 80.16
+// (1116 bytes, it also merges the earlier ctor site); accessor + raw mixes 92.77.
+// The double-load fingerprint (mov ecx,[edx+0x5c]; mov edx,[edx+0x5c]) occurs exactly
+// twice in the whole exe: here and in the matched twin 0x40fbe0 at 0x4100ea. In the twin
+// the unit pointer lives in ESI (push esi before FUN_0043acb0) so ESI is busy, while here
+// unit is in EDI and ESI is free; an isolated repro of this tail (scratch iso9) also picks
+// the free ESI and the cheap schedule, so the twin's extra live register is the best
+// remaining explanation, but no source spelling tried here moves it: the cheap schedule
+// survives, and VC5 even spills a callee-saved register to keep it (see scratch iso9).
+// Also tried and rejected: ternaries around either argument (80.3/77.1, +12 bytes),
+// (Unit*) and (Vec3*) casts 92.77, an inline BuildOrder helper 88.0/85.7 (1219), and a
+// sweep of 0..40 dummy functions before this one: the score cycles 95.14/91.98/92.77 with
+// the count but every state is still 1149 bytes, so the compiler state is reachable, it
+// just never buys the second load.
 #include <stdio.h>
 struct Vec3 {
     int x, y, z;
