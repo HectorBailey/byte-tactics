@@ -7,6 +7,37 @@
 // 0x2c x1, 0x30 y1) while this version puts x0/x1/y1 in 0x14/0x1c/0x18 and
 // keeps step and flags in registers, which also shifts the point copy to
 // [esp+0x2c] instead of [esp+0x34].
+// Measured again by space-bunny-free: 34.7%, unchanged. The frame is still 0x34
+// against the original's 0x3c and that one cause explains most of the diff, so
+// every fix below was tried only as a way to raise the slot count.
+// Findings worth carrying over:
+// * The original's real local slots, offset from the bottom of the 0x3c frame,
+//   are 0x00 orig_sel, 0x04 entries (reused later as the row pointer), 0x08 n
+//   then span, 0x0c step then flag8, 0x10 flags, 0x14 x0, 0x18 NEVER TOUCHED,
+//   0x1c x1, 0x20 y1, and the 24-byte point copy at 0x24. So the original has
+//   nine scalar slots, eight live and one dead, where this file has seven.
+//   0x18 being dead but allocated is the clue: some source local survived frame
+//   allocation and then died in the optimiser.
+// * Our slot at frame offset 0x14 is shared by n, span, step, flag8, remain and
+//   itemp, so this version's allocator is merging more aggressively than the
+//   original's.  The original keeps step (live across the whole 0x10-flag block,
+//   read at [esp+0x1c] 0x4a3b35) in a slot of its own, and keeps flags (stored
+//   0x4a3b03, read 0x4a3b7e) in a slot of its own.
+// * The original keeps point.y in EDI and the first loop's index in ESI.  Here
+//   it is the other way round (point.y in ESI, index in EDI), which is why our
+//   loop pointer spills to [esp+0x28] and the original recomputes it with
+//   lea/add instead.  Fixing that is worth points on its own.
+// * Original `y1` is `f19 + y0 - 1` then `-= 3` (0x4a3820 lea, 0x4a3829 sub).
+//   Writing it as `f19 + y0 - 4`, and even splitting it into two statements with
+//   nothing between them, both fold straight back to `lea [ecx+ebx-4]`.
+// * `me->field_c0` is read once into a SHORT local (0x4a395b `mov si, word ptr
+//   [ebp+0xc0]` / `test si,si`; 0x4a39be `movsx ecx,si`; 0x4a39c6 `dec esi`
+//   storing si).  Reading it into `short nsel` reproduces that shape in the
+//   first block but does not move the percentage.
+// * Hoisting `int flags = me->flags;` above the FUN_004ab570 call to try to make
+//   it spill into a slot of its own is WORSE, 28.9% and 1834 bytes: MSVC then
+//   keeps the loaded flags in a register through the whole prologue and every
+//   epilogue shifts.  Do not repeat that.
 #include <string.h>
 
 #pragma pack(push, 1)

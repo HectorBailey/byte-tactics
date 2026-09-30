@@ -1,12 +1,29 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
-// Partial, 49.3%. Earlier work: deepseek-v4.1-flash, finished by GPT-6 (47.8%).
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by deepseek-v4.1-flash. Names are provisional.
+// Partial, 49.3%. Earlier work: deepseek-v4.1-flash, finished by GPT-6 (47.8%);
+// deepseek-v4.1 brought it to 49.3%.
 // Frame is right (0xac) and the buffer is the original 0x80 bytes at frame+0x2c.
 // Still differs: MSVC keeps the tab counter t in edi and gives i a home at
 // frame+0, while the original homes t at frame+0, writes i's home at frame+4
 // at loop entry/exit and keeps i in edi across the FUN_004c1420 call (so every
-// later edi/i use is a memory reload here). Tried: declaration order, unsigned
-// t, t = t + 1, while instead of for, an x + (w - m) vs (w + left) - m
-// reassociation (that one also drops the extra x slot but scores lower).
+// later edi/i use is a memory reload here).
+// This session: the near-copy sibling 0x4a53c0 walks the same tab loop, but it
+// has no index argument, so it has one more free callee-saved register and
+// keeps BOTH i (esi) and t (edx) in registers. Here index takes esi and entries
+// takes ebx, so exactly one of i/t spills; the original spills t and keeps i in
+// edi, ours does the reverse. The loop shape does not matter: declaration order
+// (t first, i first, i uninitialised), `while`, a guarded `do/while`, explicit
+// pointer walk, `for (i=...)`, `i <= count`, a local bound `n`, `t = t + 1`, and
+// t's type (int, unsigned, long, short, unsigned short, char) all compile to
+// byte-identical code (1656 bytes, 49.3%). Making t `unsigned char` flips the
+// allocation to the original's (i in edi, t in memory) but grows the function to
+// 1685 bytes and drops to 43.2%, because the original stores/loads t as a dword
+// (`mov dword ptr [esp+0x10], 0`), so t is 32-bit.
+// Also tried: hoisting `int tabv = entries[index].tab` across the loop (adds a
+// live node; frame grows, 35%) and an `Entry* entry = &entries[index]` local
+// like the sibling (37.7%) - both worse.
+// The Measure helper below is spelled exactly as the matched sibling
+// 0x4a53c0 demands (accumulator first, `char* p` kept separate, three distinct
+// return expressions) and the entry struct matches 0x4a53c0 and 0x4a4660.
 #include <windows.h>
 #include <string.h>
 
