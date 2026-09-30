@@ -1,4 +1,11 @@
 // Decompiled by Claude Sonnet 5.5, finished by DeepSeek V4.1 Flash and GPT-6, edited by deepseek-v4.1. Names are provisional.
+// deepseek-v4.1-flash pass 3 (50.4%, 4324 vs 4420 bytes): the original's VTOL tests are
+// BITFIELD reads, not `(x >> 11) & 1`. A micro-test (build/scratch/0x43f0e0/t.cpp) shows
+// `(f241 >> 11) & 1` folding to `test ah,8`, while a bitfield read gives the original's
+// `shr ecx,0xb / test cl,1`. Converted IsVtol and the f245 shift checks to bitfields
+// (Flags245 union) and rewrote Pick as `name = vtol; if (!bit) name = ground;`. The
+// original has 27 `shr ..,0xb` sites; we still fold the Pick ternaries to `test`, so the
+// Pick sites remain the main open difference in case 3/9/etc.
 // deepseek-v4.1 pass 2 (50.0%): keeping the `def = unit->def;` store but writing unit->def inside
 // the case bodies makes the allocator give unit ebp and target edi, so the prologue and the
 // whole 0x43f0e0..0x43f1d4 prologue/guard region now match the original byte for byte (score
@@ -59,6 +66,25 @@ union Flags111_0043f0e0 {
     };
 };
 
+union Flags245_0043f0e0 {
+    unsigned int raw;
+    struct {
+        unsigned int bits_0 : 4;
+        unsigned int flag_4 : 1;
+        unsigned int flag_5 : 1;
+        unsigned int flag_6 : 1;
+        unsigned int flag_7 : 1;
+        unsigned int flag_8 : 1;
+        unsigned int flag_9 : 1;
+        unsigned int flag_10 : 1;
+        unsigned int flag_11 : 1;
+        unsigned int flag_12 : 1;
+        unsigned int bits_13 : 1;
+        unsigned int flag_14 : 1;
+        unsigned int bits_15 : 17;
+    };
+};
+
 struct Game_0043f0e0 {
     char unknown_0[0x2a42];
     unsigned char localPlayer;    // +0x2a42
@@ -99,7 +125,10 @@ struct Def_0043f0e0 {
         unsigned int f241; // +0x241
         Flags241_0043f0e0 f241bits;
     };
-    unsigned int f245; // +0x245
+    union {
+        unsigned int f245; // +0x245
+        Flags245_0043f0e0 f245bits;
+    };
 };
 
 struct Player_0043f0e0 {
@@ -174,10 +203,13 @@ class Class_00489a70 {
 Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
                                       Unit_0043f0e0* target, Pos_0043f0e0* pos);
 
-static inline int IsVtol(Def_0043f0e0* def) { return (def->f241 >> 11) & 1; }
+static inline int IsVtol(Def_0043f0e0* def) { return def->f241bits.flag_11; }
 
 static inline Class_00438760 Pick(Def_0043f0e0* def, const char* vtol, const char* ground) {
-    return Class_00438760(IsVtol(def) ? vtol : ground);
+    const char* name = vtol;
+    if (!def->f241bits.flag_11)
+        name = ground;
+    return Class_00438760(name);
 }
 
 static inline int Visible(Unit_0043f0e0* unit, Pos_0043f0e0* pos) {
@@ -290,12 +322,12 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
         if (unit->def->f245 & 0x40) {
             if (unit->moving == 0)
                 return Class_00438760("QPATROL");
-            if ((unit->def->f245 >> 9) & 1) {
-                if ((unit->def->f241 >> 11) & 1)
+            if (unit->def->f245bits.flag_9) {
+                if (unit->def->f241bits.flag_11)
                     return Class_00438760("VTOL_REPAIRPATROL");
                 return Class_00438760("REPAIRPATROL");
             }
-            if ((unit->def->f241 >> 11) & 1)
+            if (unit->def->f241bits.flag_11)
                 return Class_00438760("VTOL_PATROL");
             return Class_00438760("PATROL");
         }
@@ -335,7 +367,7 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
     case 5:
         if ((unit->def->f245 & 0x100) && (unit->def->f241 & 0x800) && target && (target->def->f241 & 0x200))
             return Class_00438760("VTOL_LANDING");
-        if ((unit->def->f245 >> 8) & 1)
+        if (unit->def->f245bits.flag_8)
             return Pick(def, "VTOL_UNLOAD", "GROUND_UNLOAD");
         break;
     case 14:
@@ -343,7 +375,7 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
             break;
         return Pick(def, "VTOL_MOBILEBUILD", "MOBILEBUILD");
     case 4:
-        if ((unit->def->f245 >> 14) & 1)
+        if (unit->def->f245bits.flag_14)
             return Class_00438760("ATTACKSPECIAL");
         break;
     case 11:
