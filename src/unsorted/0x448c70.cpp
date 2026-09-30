@@ -1,5 +1,9 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6, checked by deepseek-v4.1-flash, edited by deepseek-v4.1. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, checked by deepseek-v4.1-flash, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
 // Starting point: deepseek-v4.1-flash, finished by GPT-6, checked by deepseek-v4.1-flash.
+// Frame now 0xd4 (matches). Do not "fix" local_34: the original frame needs it at
+// 0x2c to hit 0xd4. The remaining diffs are ALL register allocation: the top loop
+// has iVar17/uVar18 in ebx/ebp swapped against the original (ebp/ebx), and the
+// player loop and the two pointer locals local_ac/local_bc use different slots.
 // Partial, 43.8%: signed ring-distance comparison and >= 30 wrap improve branches.
 // Frame remains 8 bytes too large; top-loop and player-loop registers differ.
 // Partial, 43.7%: complete map and player refresh. Still differs: the frame is
@@ -92,7 +96,7 @@ void FUN_00448c70(void)
   byte local_9c [32];
   char local_7c [20];
   byte local_68 [52];
-  char local_34 [52];
+  char local_34 [44];
 
   uVar18 = (uint)*(byte *)((int)g_game + 0x2a42);
   local_b0 = 0xffffffff;
