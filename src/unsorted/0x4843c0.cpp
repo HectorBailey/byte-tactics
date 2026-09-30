@@ -1,7 +1,17 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6. Names are provisional.
-// Gave up at 86.7% (1302 bytes against 1303). Remaining game-pointer
-// reload uses EAX instead of EDI and the last border-loop counter initializes
-// before its guard. The visibility test and local slots now match.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
+// Gave up at 86.7% (1302 bytes against 1303). Two real diffs remain, all of the
+// loop-target shifts follow from the first. At 0x48441b the original reloads
+// g_game into EDI (`mov edi, [0x511de8]`, 6 bytes); ours goes to EAX (A1 form,
+// 5 bytes), which shifts every later jump by one. Twenty-eight further spellings
+// of those two scroll reads were probed (void*/char*/const/Game&/reference,
+// spelled offsets, comma and split declarations, ZeroMemory, cast sizes, both
+// declaration orders, pointer live across the memset) and every one still picks
+// EAX. Only `Game* g = g_game;` declared before info yields a 6-byte reload, in
+// EDX, but it moves the matched memset byte count from EDX to EBX. Second diff:
+// in the last border loop ours emits `mov ecx, 1` before `test eax, eax; jbe`,
+// the original emits it after; for/while/do-while/break/cast spellings of that
+// loop all keep our order, so it too looks like fallout from the register
+// tie-break. The visibility test and local slots match.
 #include <windows.h>
 
 #pragma pack(push, 1)
