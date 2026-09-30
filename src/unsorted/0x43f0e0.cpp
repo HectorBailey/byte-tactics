@@ -1,33 +1,23 @@
 // Decompiled by Claude Sonnet 5.5, finished by DeepSeek V4.1 Flash and GPT-6, edited by deepseek-v4.1. Names are provisional.
-// Earlier credits: Claude Sonnet 5.5, DeepSeek V4.1 Flash and GPT-6.
-// Partial, 47.5%. First diff is the prologue: the original homes `unit` in ebp and `def` in esi
-// (`mov ebp,[esp+0x14]` after push ebx/push ebp, later `mov esi,[ebp+0x92]`), while ours homes
-// `unit` in esi and `def` in ebp (`push esi; mov esi,[esp+0x18]`, `mov ebp,[esi+0x92]`).
-// `target` in edi and the `friendly` flag in ebx agree. Because every later branch keys off these
-// two registers the whole body diverges after the first few instructions, which drags the score
-// down even where the control flow is right. Everything after that is a knock-on of this swap.
-// Tried: declaring def before the friendly/enemy flags, reordering the target check, and loading
-// unit->def earlier; none moved the allocator off esi for unit.
-// Loads the definition after target validation, restoring the native frame.
+// deepseek-v4.1 pass 2 (50.0%): keeping the `def = unit->def;` store but writing unit->def inside
+// the case bodies makes the allocator give unit ebp and target edi, so the prologue and the
+// whole 0x43f0e0..0x43f1d4 prologue/guard region now match the original byte for byte (score
+// 47.5 -> 50.0; 4304 bytes vs the original 4420). The first still-differing instruction is at
+// 0x43f177: the original reuses esi (def) for the node pointer (`mov esi,[ebp+0x10]`) and
+// reloads def from [esp+0x20], ours keeps def pinned in esi and puts node in ecx; a couple of
+// extra `mov dl,2` / `xor ebx,ebx` materialisations follow from that. The original treats the
+// local as a memory variable with an opportunistic esi cache; ours still colours it in esi.
+// Removing the local entirely (unit->def at all 46 sites) reaches the same prologue but moves
+// target to ebx and friendly to edi (33.1%), so the local must stay.
+// Previous pass notes (prologue swap) kept in build/scratch/0x43f0e0/.
 // iostream improves the corrected implementation.
 // deepseek-v4.1 pass: verified against the binary that the source order of the cases is
 // already right. The jump table at 0x4401ec maps cases 1..14 to
 // 0x43f9e9, 0x43f845, 0x43f154, 0x43f7e8, 0x43f735, 0x43f701, 0x43f4c7, 0x43f46c,
 // 0x43f3b9, 0x43f82c, 0x43f813, 0x43f4f7, 0x43f6d1, 0x43f7a0, i.e. bodies are emitted in
 // order 3,9,8,7,12,13,6,5,14,4,11,10,2,1, exactly the order this file uses.
-// Diagnosis of the remaining 42% gap: the emitted materialisation order is the same as the
-// original (unit, then target, then def) but the register identities are swapped, so every
-// later branch diverges. MSVC5 allocates by weight, and this file's `def` (47 references)
-// still loses the preferred register to `unit` (17 references):
-//  - dead extra uses do not count: `(void)def->f241;`, an extra `(void)unit->moving;` and a
-//    Pick() that reads def->f245 twice all compile to the identical 4312 bytes, so the
-//    allocator drops them before weighting.
-//  - a live extra use does move a register, but the wrong one: `if (def->f245 == 0x1234)
-//    return Class_00438760();` before the switch moved `enemy` from eax to ecx and cost 32
-//    bytes (46.7%), leaving unit/def untouched.
-// Ours is 108 bytes shorter (4312 vs 4420); the tail of the diff is only the jump table,
-// misaligned because the drift starts at the second instruction.
-// Scratch variants with the experiments are in build/scratch/0x43f0e0/.
+// The case-3 body still differs in scratch-register picks (node/def/intermediate) and in two
+// constant materialisations; the case order and the guard region above are confirmed correct.
 #include <iostream>
 #include <windows.h>
 
@@ -234,7 +224,7 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
     def = unit->def;
     switch (mode) {
     case 3: {
-        if (!(def->f245 & 0x10))
+        if (!(unit->def->f245 & 0x10))
             break;
         Flags110_0043f0e0 flags;
         flags.raw = unit->f110;
@@ -243,14 +233,16 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
             if (!enemy) {
                 if (node->f111bits.flag_17)
                     break;
-                if (!(def->f241 & 0x800))
+                if (!(unit->def->f241 & 0x800))
                     return Class_00438760("SUPPRESS");
-                if (def->f1ee->f111bits.flag_8)
+                if (unit->def->f1ee->f111bits.flag_8)
                     return Class_00438760("AIRSTRIKE");
                 return Class_00438760("AIRTOGROUND");
             }
-            if ((target->f110 & 3) != 2 && (node->f111 & 0x20000))
-                break;
+            if ((target->f110 & 3) != 2) {
+                if (node->f111 & 0x20000)
+                    break;
+            }
             Def_0043f0e0* tdef = target->def;
             int reach = tdef->f170 + target->f70;
             if (reach >= g_game->threshold)
@@ -264,16 +256,16 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
             if (reach < g_game->threshold)
                 goto after;
         reached:
-            if (def->f241 & 0x1000) {
+            if (unit->def->f241 & 0x1000) {
                 if (node->f111 & 0x10000)
                     break;
                 if ((unit->f3b & 2) && (unit->f2c->f111 & 0x10000))
                     return Class_00438760();
             }
         after:
-            unsigned int f = def->f241;
-            if (def->f241bits.flag_11) {
-                unsigned int air = def->f1ee->f111 & 0x100;
+            unsigned int f = unit->def->f241;
+            if (unit->def->f241bits.flag_11) {
+                unsigned int air = unit->def->f1ee->f111 & 0x100;
                 if (air && !(tdef->f241 & 0x800))
                     return Class_00438760("AIRSTRIKE");
                 if (!air && (tdef->f241 & 0x800))
@@ -290,20 +282,20 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
             if (flags.raw & 0x20000000)
                 return Class_00438760("ATTACK_NOMOVE");
         }
-        if (def->f241bits.flag_28)
+        if (unit->def->f241bits.flag_28)
             return Class_00438760("ATTACK_KAMIKAZE");
         break;
     }
     case 9:
-        if (def->f245 & 0x40) {
+        if (unit->def->f245 & 0x40) {
             if (unit->moving == 0)
                 return Class_00438760("QPATROL");
-            if ((def->f245 >> 9) & 1) {
-                if ((def->f241 >> 11) & 1)
+            if ((unit->def->f245 >> 9) & 1) {
+                if ((unit->def->f241 >> 11) & 1)
                     return Class_00438760("VTOL_REPAIRPATROL");
                 return Class_00438760("REPAIRPATROL");
             }
-            if ((def->f241 >> 11) & 1)
+            if ((unit->def->f241 >> 11) & 1)
                 return Class_00438760("VTOL_PATROL");
             return Class_00438760("PATROL");
         }
@@ -315,15 +307,15 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
             return Pick(def, "VTOL_REPAIRUNIT", "REPAIRUNIT");
         return Pick(def, "VTOL_HELPBUILD", "HELPBUILD");
     case 7:
-        if (!(def->f245 & 0x20) || !friendly)
+        if (!(unit->def->f245 & 0x20) || !friendly)
             break;
         return Pick(def, "VTOL_FOLLOW", "FOLLOW_GROUND");
     case 12: {
-        if (!(def->f245 & 0x400))
+        if (!(unit->def->f245 & 0x400))
             break;
         Thing_0043f0e0* t = Lookup(pos);
         if (pos) {
-            if ((def->f245 & 0x800) && Visible(unit, pos) && Marked(t))
+            if ((unit->def->f245 & 0x800) && Visible(unit, pos) && Marked(t))
                 return Class_00438760("RESURRECT");
             if (pos && Visible(unit, pos) && Marked(t))
                 return Pick(def, "VTOL_RECLAIM", "RECLAIM");
@@ -333,7 +325,7 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
         return Pick(def, "VTOL_RECLAIMUNIT", "RECLAIMUNIT");
     }
     case 13:
-        if ((def->f245 & 0x1000) && target && unit->player != target->player)
+        if ((unit->def->f245 & 0x1000) && target && unit->player != target->player)
             return Class_00438760("CAPTURE");
         break;
     case 6:
@@ -341,17 +333,17 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
             break;
         return Pick(def, "VTOL_PICKUP", "GROUND_PICKUP");
     case 5:
-        if ((def->f245 & 0x100) && (def->f241 & 0x800) && target && (target->def->f241 & 0x200))
+        if ((unit->def->f245 & 0x100) && (unit->def->f241 & 0x800) && target && (target->def->f241 & 0x200))
             return Class_00438760("VTOL_LANDING");
-        if ((def->f245 >> 8) & 1)
+        if ((unit->def->f245 >> 8) & 1)
             return Pick(def, "VTOL_UNLOAD", "GROUND_UNLOAD");
         break;
     case 14:
-        if (def->f156 == 0 || unit->moving == 0)
+        if (unit->def->f156 == 0 || unit->moving == 0)
             break;
         return Pick(def, "VTOL_MOBILEBUILD", "MOBILEBUILD");
     case 4:
-        if ((def->f245 >> 14) & 1)
+        if ((unit->def->f245 >> 14) & 1)
             return Class_00438760("ATTACKSPECIAL");
         break;
     case 11:
@@ -359,14 +351,14 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
     case 10:
         return Class_00438760("STOP");
     case 2:
-        if (!(def->f245 & 0x80))
+        if (!(unit->def->f245 & 0x80))
             break;
         if (unit->moving == 0)
             return Class_00438760("QMOVE");
         if (target) {
-            if ((def->f245 & 0x1000) && enemy)
+            if ((unit->def->f245 & 0x1000) && enemy)
                 return Class_00438760("CAPTURE");
-            if (!((def->f245 & 0x400) && enemy)) {
+            if (!((unit->def->f245 & 0x400) && enemy)) {
                 if (friendly) {
                     if (((Class_004899b0*)unit)->FUN_004899b0(target) && target->f104 != 0.0f)
                         return Pick(def, "VTOL_HELPBUILD", "HELPBUILD");
@@ -374,11 +366,11 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
                         (unsigned int)target->f108 < target->def->f1fa)
                         return Pick(def, "VTOL_REPAIRUNIT", "REPAIRUNIT");
                 }
-                if ((def->f241 & 0x800) && friendly && (target->def->f241 & 0x200))
+                if ((unit->def->f241 & 0x800) && friendly && (target->def->f241 & 0x200))
                     return Class_00438760("VTOL_LANDING");
                 if (((Class_00489a70*)unit)->FUN_00489a90(target))
                     return Pick(def, "VTOL_PICKUP", "GROUND_PICKUP");
-                if ((def->f245 & 0x20) && friendly)
+                if ((unit->def->f245 & 0x20) && friendly)
                     return Pick(def, "VTOL_FOLLOW", "FOLLOW_GROUND");
                 return Pick(def, "VTOL_MOVE", "MOVE_GROUND");
             }
@@ -387,30 +379,30 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
         return Pick(def, "VTOL_MOVE", "MOVE_GROUND");
     case 1: {
         if (g_game->flag37efa == 1) {
-            if ((def->f245 & 0x10) && enemy)
+            if ((unit->def->f245 & 0x10) && enemy)
                 return FUN_0043f0e0(3, unit, target, pos);
-            if ((def->f245 & 0x400) && enemy)
+            if ((unit->def->f245 & 0x400) && enemy)
                 return Pick(def, "VTOL_RECLAIMUNIT", "RECLAIMUNIT");
             if (friendly && ((Class_004899b0*)unit)->FUN_004899b0(target) && target->f104 != 0.0f)
                 return Pick(def, "VTOL_HELPBUILD", "HELPBUILD");
             if (friendly && ((Class_004899b0*)unit)->FUN_004899b0(target))
                 return Pick(def, "VTOL_REPAIRUNIT", "REPAIRUNIT");
-            if ((def->f241 & 0x800) && friendly && (target->def->f241 & 0x200))
+            if ((unit->def->f241 & 0x800) && friendly && (target->def->f241 & 0x200))
                 return Class_00438760("VTOL_LANDING");
             if (target && ((Class_00489a70*)unit)->FUN_00489a90(target))
                 return Pick(def, "VTOL_PICKUP", "GROUND_PICKUP");
-            if ((def->f245 & 0x20) && friendly)
+            if ((unit->def->f245 & 0x20) && friendly)
                 return Pick(def, "VTOL_FOLLOW", "FOLLOW_GROUND");
-            if ((def->f245 & 0x800) && pos && Visible(unit, pos) && Marked(Lookup(pos)))
+            if ((unit->def->f245 & 0x800) && pos && Visible(unit, pos) && Marked(Lookup(pos)))
                 return Class_00438760("RESURRECT");
-            if ((def->f245 & 0x400) && pos && Visible(unit, pos) && Marked(Lookup(pos)))
+            if ((unit->def->f245 & 0x400) && pos && Visible(unit, pos) && Marked(Lookup(pos)))
                 return Pick(def, "VTOL_RECLAIM", "RECLAIM");
-            if (!(def->f245 & 0x80) || unit->moving == 0)
+            if (!(unit->def->f245 & 0x80) || unit->moving == 0)
                 break;
         } else {
-            if ((def->f245 & 0x10) && enemy)
+            if ((unit->def->f245 & 0x10) && enemy)
                 return FUN_0043f0e0(3, unit, target, pos);
-            if ((def->f245 & 0x400) && enemy)
+            if ((unit->def->f245 & 0x400) && enemy)
                 return FUN_0043f0e0(0xc, unit, target, pos);
             if (target && ((Class_004899b0*)unit)->FUN_004899b0(target) && target->f104 != 0.0f)
                 return FUN_0043f0e0(8, unit, target, pos);
@@ -418,11 +410,11 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
                 target->f104 == 0.0f && target->ffb == 0 &&
                 (!target->f86 || (target->f86->f110 & 0x40000000)))
                 break;
-            if ((def->f245 & 0x800) && pos && Visible(unit, pos) && Marked(Lookup(pos)))
+            if ((unit->def->f245 & 0x800) && pos && Visible(unit, pos) && Marked(Lookup(pos)))
                 return Class_00438760("RESURRECT");
-            if ((def->f245 & 0x400) && pos && Visible(unit, pos) && Marked(Lookup(pos)))
+            if ((unit->def->f245 & 0x400) && pos && Visible(unit, pos) && Marked(Lookup(pos)))
                 return Pick(def, "VTOL_RECLAIM", "RECLAIM");
-            if (!(def->f245 & 0x80) || unit->moving == 0)
+            if (!(unit->def->f245 & 0x80) || unit->moving == 0)
                 break;
         }
         return Pick(def, "VTOL_MOVE", "MOVE_GROUND");
