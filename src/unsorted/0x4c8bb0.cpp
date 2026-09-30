@@ -32,6 +32,14 @@
 // Ruled out (measured with free --sym scratch runs): moving `bottom` before
 // the guard, early-return null checks, function-scope min/max declarations,
 // a currentVertex pointer, and prepending the real 0x4c8760 (compiler state).
+// deepseek-v4.1 also tried, twice (block-scope `next` then function-scope
+// `next`), giving the first loop a live `previous` exactly like the original
+// disassembly (previous=index-1; next=previous; if(next<0) next=3; ... body ...
+// index=previous; if(index<0) index=3;). Both compiled to the same 15-slot
+// arena (0x10..0x48, spans 0x6c) at 48.0% and 48.4%: the allocator parked
+// `previous` in the top slot and moved highIndex/bottom down one instead of
+// growing the frame, so the missing 0x4c slot is not reachable by making
+// `previous` live. The 51.6% baseline (`index=next`, no live previous) stays.
 // tools/headers.py finds no header set that changes the bytes, and 4 to 64
 // unused `extern int` declarations leave the score at exactly 51.5%.
 // Also tried here: growing defaults to 9 or 10 ints and biasing its pointer
