@@ -1,4 +1,27 @@
-// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash and GPT-6.1-sol, edited by deepseek-v4.1-flash, finished by space-bunny-free, edited by deepseek-v4.1. Names are provisional.
+// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash and GPT-6.1-sol, edited by deepseek-v4.1-flash, finished by space-bunny-free, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
+// deepseek-v4.1-flash retry (1 real check.py run, kept 96.1%): the landing
+// block's out-of-line _Destroy call is NOT reachable with the /Ob2 budget
+// levers that fixed the matched 0x48d220. Measured with the free scratch
+// scorer (build/scratch/0x412710/gen_*.py), natural source (no explicit
+// destructor, 93.9% / 1548 bytes) plus Dummy() markers placed at eight
+// positions (top, case 0, before the vector decl, after it, before the
+// landed return, at the landed return, after the block, before return 7)
+// with 1..64 markers each: no count makes only the landed destructor emit
+// the call. The decision is effectively function-wide: at ~41 markers BOTH
+// destructors go out of line at once (1596 bytes, and the frame grows to
+// 0x28, blowing up the whole function to 81.8%); below that both stay
+// inlined (1548). At 40 markers at the very end the EMPTY path alone calls
+// _Destroy (1568 bytes, 92.7%), the opposite of the original. So the
+// original's one-site state (landed calls, empty omits) is not a budget
+// count we can hit here. Also tried and rejected: TryLand helper (88-90%),
+// hand-rolled byte-buffer + placement new (81-90%), a user-defined empty
+// destructor wrapper (91%), v.clear() on the empty path (92-94%), size()/
+// begin()!=end() empty tests (91-93%), 22 extra headers (93.0-93.9%, some
+// move register allocation but never the destructor), case permutation.
+// The state-4 reload (see below) is very likely downstream of the same
+// allocator state: at 41 case-4 markers the frame grows and the reload
+// becomes an early `mov ecx,[esp+0x48]`, i.e. the original's EDX-before-
+// add-esp shape, which is why no local/expression rewrite reached it.
 // deepseek-v4.1 retry (2 check.py runs, kept 96.1%): confirmed the landing
 // block's `lea ecx, [esp + 0x1c]` is NOT an off-by-4: VC5's <vector> declares
 // `_A allocator;` BEFORE `iterator _First, _Last, _End;` (VECTOR line 245), so
