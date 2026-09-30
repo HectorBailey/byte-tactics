@@ -3,8 +3,13 @@
 // regions. Negating both hypot arguments (unit->pos.xw - order->x, ...) scores
 // 96.8: the compiler still emits the [esi] (order) movsx first, this time into
 // edx with `sub eax, edx`, and shifts the spill to [esp+0x50]/fild [esp+0x50],
-// so the load pair is base-register driven, not operand driven. State-3 waypoint
-// variants: sum passed straight to the constructor (92.8, temp moves down 0xc),
+// so the load pair is base-register driven, not operand driven. Sixth retry by
+// deepseek-v4.1 (issue #1897) re-confirmed both spellings and their exact
+// schedules: with `unit->pos.xw - order->x` first the compiler still issues the
+// esi-based (order) movsx first but into edx with `sub eax, edx`, then spills
+// eax through [esp+0x50] and filds it before the second spill, so even the
+// destination register follows the base register, not the source operand.
+// State-3 waypoint variants: sum passed straight to the constructor (92.8, temp moves down 0xc),
 // member-wise p.x/p.y/p.z into a fresh local (93.7, frame -4), explicit += on a
 // copy of target->pos (93.0, frame +4), all worse. Best kept: baseline.
 // #1704 retry by Codex / GPT-6.1-sol: checkall reconfirmed 97.4%, no MATCH.
