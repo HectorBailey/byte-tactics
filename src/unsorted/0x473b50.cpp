@@ -143,6 +143,22 @@
 //     the `s.x`/`e.x` stores and giving the y delta its own `ddy` temporary all
 //     compile to this identical 497-byte 88.0% body, so the compiler
 //     reassociates and schedules them the same whatever the statement order.
+// Retry (deepseek-v4.1, #1903, 10 min, 30+ check runs), 88.0% (499 vs 497)
+// stands, no gain. The remaining four hunks are unreachable from any
+// two-reference spelling tried, all of which compile to this same 497-byte
+// body byte for byte (confirmed by diff line count, not just the score):
+//   - load hoisting inside the component blocks (y loads between the x 7/11
+//     lerp and the e.x store; z loads likewise), which the earlier notes
+//     already found spills (85.3% with them, 87.0% with the z pair only);
+//   - explicit `int ez = e.z;`/`int ey = e.y;` temporaries, `-sz + e.z`,
+//     a separate `int dz; dz = e.z - sz;`, and field-vs-local spellings of
+//     the z delta all compile to the identical body;
+//   - a `ddz`/`ddy` temporary, or moving the `s.z = az;` store before the x
+//     delta block, change nothing (87.5% for the latter).
+// Flag probe: /O2 /Ob2 /MT /G5, /GB and /G4 are byte-identical to the
+// default build (88.0%), /G6 (P6 scheduling) drops it to 77.5%, so the
+// original is not a different /G setting. `static void` (no inline) is not
+// inlined at all (21.8%), so the helper really must be `inline`.
 class Class_00471d70 {
 public:
     void FUN_00471d70(int param_1);
