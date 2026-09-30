@@ -11,6 +11,11 @@
 // 3. The apply block wants fild before push ecx; ours pushes first.
 // 4. The tail index chain wants `lea eax,[edi*8]`; ours emits mov/shl
 //    (3 bytes short). The identical chain in the TRACKTYPE branch matches.
+// Also tried, no better: declaring the game pointer above the FUN_004ce7a0
+// call (gets it into edi but shifts the whole block, 84%); headers.py and
+// swapping <string> for <vector>, <iostream>, <map>, <list>, <string.h> or
+// <stdlib.h> (all still 90.7%); flag update as f ^ ((DAT ^ f) & 1) or the
+// bitfield b0 assignment (90.5%); an int local for DAT_00512f46 (86.8%).
 #include <string>
 #include <windows.h>
 
