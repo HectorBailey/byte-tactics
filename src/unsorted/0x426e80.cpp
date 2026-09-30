@@ -1,8 +1,21 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by GPT-6.1-sol. Names are provisional.
-// Retry #1779: GPT-6.1-sol confirmed 39.4% (6242/6310 bytes) after seven worker checks; the final checker did not MATCH.
-// Partial, best verified score 39.4%, not MATCH. The state bodies are transcribed,
-// but the outer and nested switch layout, shared exits, and register allocation
-// still differ. Original 0x4270ba selects substate 1 for zero and substate 6 for nonzero.
+// Decompiled by deepseek-v4.1. Names are provisional.
+// Started by deepseek-v4.1-flash, continued by GPT-6 and GPT-6.1-sol (verified 39.4%); this pass reached 40.3%.
+// Partial, best verified score 40.3% (6338/6310 bytes, so ours is 28 bytes long), not MATCH.
+// The first divergence is the prologue: ours emits `push ebp` and the early `je` target is 0x426eca
+// vs the original 0x426ec9, so every later byte is shifted by one. The original uses only ebx/esi/edi.
+// What still differs, in order of appearance:
+//  - The original keeps a zeroed ebx and reuses it as the zero source: it does `xor ebx,ebx` then
+//    `push ebx` (not `push 0`) and `mov byte ptr [..+0x2bbf], bl` (not an immediate). Writing literal
+//    0/1 stores makes MSVC materialise immediates instead, which changes register allocation and
+//    forces the ebp spill (seen as the extra `xor ebp,ebp` in the memcmp-or at state 0x10 / substate 0).
+//    Restoring one shared substate variable that the compiler can keep in bl is the next step to try.
+//  - The original reads the FE flag as `mov dl,[esi+0xf0]; shr dl,1; test dl,1; je`; ours folds it to
+//    `test byte ptr [esi+0xf0], 2`, so `((d->field_f0 >> 1) & 1)` is not the exact source form yet
+//    (possibly a 1-bit bitfield at bit 1, or a char temp holding the shifted value).
+//  - The outer and nested switch layout, the tail-merged exits that store 0x2bbf/0x2bc0, and the
+//    shared LAB exits still differ; writing the tails inline added 28 bytes (6338 vs 6310).
+// NOTE (kept from the previous attempt): the original at 0x4270ba selects substate 1 for zero and
+// substate 6 for nonzero, the reverse of a naive reading.
 
 #include <string.h>
 #include <stdio.h>
@@ -87,7 +100,6 @@ struct Class_00463c60 { void FUN_00463c60(int value); };
 void FUN_00426e80(void)
 {
     char buf[256];
-    char uVar9;
     int uVar7;
 
     char c = g_game[0x2bc0];
@@ -180,10 +192,11 @@ void FUN_00426e80(void)
             break;
         case 7:
             FUN_004256d0(0x425, FRONTEND);
-            uVar9 = 0;
             g_game[0x2bbe] = 0;
             FUN_004256d0(0x9b, FRONTEND);
-            goto LAB_00427f8f;
+            g_game[0x2bbf] = 0;
+            g_game[0x2bc0] = 0;
+            return;
         case 8:
             FUN_004c69a0(*(int*)(g_game + 0x37e1b));
             FUN_004c6890(0, 0);
@@ -453,8 +466,9 @@ void FUN_00426e80(void)
             g_game[0x2bbf] = 0;
             g_game[0x2bc0] = 0;
             FUN_004256d0(0x55e, FRONTEND);
-            uVar9 = 0;
-            goto LAB_00428418;
+            g_game[0x2bbf] = 0;
+            g_game[0x2bc0] = 0;
+            return;
         case 3:
             FUN_004256d0(0x564, FRONTEND);
             g_game[0x2bbe] = 2;
@@ -481,8 +495,9 @@ void FUN_00426e80(void)
                 memcmp(g_game + 0x39201, DAT_004fcdb8, 16) == 0) {
                 if (g_game[0x2aaf] & 1) {
                     FUN_004256d0(0x58f, FRONTEND);
-                    uVar9 = 0x11;
-                    goto LAB_00427f8f;
+                    g_game[0x2bbf] = 0x11;
+                    g_game[0x2bc0] = 0x11;
+                    return;
                 }
                 *(int*)(g_game + 0x2ba2) = 0;
                 *(int*)(g_game + 0x2ba6) = 0;
@@ -576,7 +591,6 @@ SHOW_ERROR:
         }
         return;
     case 0x11:
-        uVar9 = 0x11;
         switch ((unsigned char)g_game[0x2bbf]) {
         case 0:
             if ((g_game[0x2a44] & 4) != 0) {
@@ -608,7 +622,9 @@ SHOW_ERROR:
                     sprintf(buf, "Code segment checksum error found when switching FE states.\nState change called from [line %d, file %s]", 0x613, FRONTEND);
                     FUN_004abd90(g_game + 0x519, buf, 500, 1, 1);
                 }
-                goto LAB_00428418;
+                g_game[0x2bbf] = 0x11;
+                g_game[0x2bc0] = 0x11;
+                return;
             }
             return;
         case 3: {
@@ -705,18 +721,14 @@ LAB_0042789a:
 
 LAB_00427f88:
     FUN_004256d0(0x5b3, FRONTEND);
-    uVar9 = 0;
-LAB_00427f8f:
-    g_game[0x2bbf] = uVar9;
-    g_game[0x2bc0] = uVar9;
+    g_game[0x2bbf] = 0;
+    g_game[0x2bc0] = 0;
     return;
 
 LAB_00427f0f:
     FUN_004256d0(0x9b, FRONTEND);
-    uVar9 = 0;
-LAB_00428418:
-    g_game[0x2bbf] = uVar9;
-    g_game[0x2bc0] = uVar9;
+    g_game[0x2bbf] = 0;
+    g_game[0x2bc0] = 0;
     return;
 
 LAB_004275e0:
