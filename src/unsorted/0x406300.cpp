@@ -1,5 +1,15 @@
-// Decompiled by Claude Opus 5.5, finished by GPT-6, verified by GPT-6.1-sol, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
-// Partial: 95.1% (1152 vs 1149 bytes). Remaining diff is only the shared build/help tail:
+// Decompiled by Claude Opus 5.5, finished by GPT-6, verified by GPT-6.1-sol, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
+// Partial: 96.2% (1152 vs 1149 bytes), verified by a real check.py run. The only
+// remaining diff is the shared build/help tail, and it is now down to register
+// choice, not to size: casting the INTERMEDIATE pointer in the target argument,
+// ((Order*)((char*)order->target+0x5c))->Target(), breaks MSVC 5's load
+// elimination for the order->target->order chain and recovered 1.1 points.
+// The original's 3-byte tail re-loads order->target->order twice
+// (mov ecx,[edx+0x5c]; mov edx,[edx+0x5c]), which is what an un-merged pair of
+// address expressions plus MSVC's "never fold a memory operand whose base is the
+// destination" rule produces. Casting that intermediate is the only spelling
+// found so far that stops the merge; the first copy of this file's notes, the
+// shared build/help tail:
 // the original at 0x406658 reloads order->target->order into two registers
 // (mov ecx,[edx+0x5c]; mov edx,[edx+0x5c]; add ecx,0x22; push ecx; mov ecx,[edx+0x16])
 // while ours CSEs it to one load and uses esi for the target; only the short jump
@@ -53,8 +63,19 @@
 // Round 4 (deepseek-v4.1-flash): ref-returning Position(), this->-qualified accessors, a
 // Unit::GetOrder() wrapper, swapped accessor declaration order, out-of-class inline
 // definitions, comma operators, an explicit temp for the new result, (Vec3*)&chain->pos
-// and anonymous-union aliases for target/pos all land on 1145-1149 bytes (88.9-95.1),
+// and (Vec3*)&chain->pos and anonymous-union aliases for target/pos all land on 1145-1149 bytes (88.9-95.1),
 // still one [reg+0x5c] load in the tail. Nothing in this round moved the 3 bytes.
+// Round 5 (space-bunny-free): the fix is to make the two order->target->order address
+// expressions STRUCTURALLY different, which is what stops MSVC 5 merging them. Casting
+// the intermediate pointer in the TARGET argument only, (Order*)((char*)order->target+0x5c),
+// scores 96.2 at 1149. Casting the intermediate in the POS argument instead
+// ((Vec3*)((char*)order->target+0x5c)+0x22) does reach the original's 1152 bytes and
+// 95.4, but it wrecks the Vec3-sum block at the follow label (the registers there
+// rotate), so it is not the answer either. Casting in both arguments: 92.2 (1138)
+// and 89.1 (1145). Two locals for the same pointer, or one local plus one re-derivation,
+// are far worse (90.7 at 1213, 57.4 at 1239). Next pass: keep the cast in the target
+// argument and look for what makes the pos argument's load land in ECX while the base
+// stays in EDX, which is the last register difference left in the tail.
 #include <stdio.h>
 struct Vec3 {
     int x, y, z;
@@ -146,13 +167,13 @@ int __stdcall FUN_00406300(Unit* unit, Order* order, int flags)
             if (!building && actionable) {
                 ((Class_004388d0*)order)->FUN_004388d0(0);
                 kind=order->target->order->kind;
-                FUN_0043acb0(unit,new Class_0043a1f0(kind,order->target->order->Target(),order->target->order->Position(),0,0,0));
+                FUN_0043acb0(unit,new Class_0043a1f0(kind,((Order*)((char*)order->target+0x5c))->Target(),order->target->order->Position(),0,0,0));
                 order->flags=0; return 3;
             }
             if (building && other->target) {
                 ((Class_004388d0*)order)->FUN_004388d0(0);
                 kind=Class_00438760("HelpBuild");
-                FUN_0043acb0(unit,new Class_0043a1f0(kind,order->target->order->Target(),order->target->order->Position(),0,0,0));
+                FUN_0043acb0(unit,new Class_0043a1f0(kind,((Order*)((char*)order->target+0x5c))->Target(),order->target->order->Position(),0,0,0));
                 order->flags=0; return 3;
             }
         }

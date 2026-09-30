@@ -1,4 +1,25 @@
-// Decompiled by Claude Opus 5.5, finished by GPT-6, verified by GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
+// Decompiled by Claude Opus 5.5, finished by GPT-6, verified by GPT-6.1-sol, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
+// deepseek-v4.1-flash: 77.2% (was 74.4%). Two source changes, both in the statement split/order of an
+// inlined helper. (1) Writing EndTick's backlog update as TWO statements
+// (`r->backlog -= rBacklog * r->backlog;` then `r->backlog += r->demand - rDemand * r->demand;`)
+// instead of one parenthesised expression fixed the two inlined unit-loop EndTick bodies exactly
+// (74.4 -> 76.8). (2) Ordering EndTick's two save-then-zero pairs FIRST
+// (`lastUsed = used; lastProduced = produced; used = 0; produced = 0;` before the backlog math)
+// fixed the player-econ EndTick body too (76.8 -> 77.2). The single parenthesised expression and the
+// `save/zero/save/zero` interleave both scheduled their fsubr/faddp/stores wrong.
+// Correcting deepseek-v4.1's note: the two EndTick summands must stay backlog-first; reversing them
+// (v_e1) is byte-identical to the single-expression form at 74.4, and splitting the update demand-first
+// changes nothing. Also re-tried and confirmed: pure-indexing normalization is 62.2 (keep `have`);
+// `have[0]` instead of `*have` is 74.4; swapping the two EndTick save statements (`lastProduced` before
+// `lastUsed`) is 73.1; an explicit `int ret; return ret;` UseEnergy body and an `unsigned char` return
+// are both 77.2, no better.
+// Still differs at 77.2% (ours 2154 vs original 2239 bytes): UseEnergy's inlined `used += v` store and
+// its `backlog <= 0` test are still scheduled in the opposite order (ours loads backlog first); the
+// original materialises the inlined helper's result in eax then copies to edx (`mov eax,1; mov edx,eax`),
+// ours keeps it in edx; the normalization loop's register roles are mirrored (original: ecx = i byte
+// offset, edx = &produced[i] with `[esp+ecx+off]` addressing; ours: ecx = &produced[i], edx = countdown,
+// with pointer-relative `[ecx+off]` addressing, so ours is ~7 bytes/iteration short) and its second
+// compare keeps the running produced value on the x87 stack where ours spills it with `fst`.
 // Partial: 74.4% (was 70.6%). deepseek-v4.1: the "array shape" is real but is NOT a declaration or
 // zero-init order lever: sweeping the declaration order of the four float[2] accumulators (and of
 // their inits) leaves the frame slots untouched. Wrapping all five arrays (used, backlog, demand,
@@ -149,25 +170,30 @@ static inline void AddIncome(Unit_00401360* u, float* dst, float v)
 
 static int UseEnergy(Unit_00401360* u, float v)
 {
+    int ret;
     if (v >= 0) {
         u->econ.res[0].used += v;
         if (u->econ.res[0].backlog <= 0) {
             u->econ.res[0].demand += v;
-            return 1;
+            ret = 1;
+        } else {
+            ret = 0;
         }
-        return 0;
+    } else {
+        AddIncome(u, &u->econ.res[0].produced, -v);
+        ret = 0;
     }
-    AddIncome(u, &u->econ.res[0].produced, -v);
-    return 0;
+    return ret;
 }
 
 static inline void EndTick(Res_00401360* r, float ratioDemand, float ratioBacklog)
 {
     r->lastUsed = r->used;
-    r->used = 0;
     r->lastProduced = r->produced;
+    r->used = 0;
     r->produced = 0;
-    r->backlog = (r->backlog - ratioBacklog * r->backlog) + (r->demand - ratioDemand * r->demand);
+    r->backlog = r->backlog - ratioBacklog * r->backlog;
+    r->backlog += r->demand - ratioDemand * r->demand;
     r->demand = 0;
 }
 

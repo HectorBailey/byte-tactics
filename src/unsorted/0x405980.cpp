@@ -33,6 +33,12 @@
 //    (capE first, fxch) and it ends 1083 bytes at 89.9%, so the `||` form scores higher. Moving
 //    `int range2` after the pointer locals (to get the original's late `movsx`/`shl`) keeps 1081
 //    bytes but drops to 85.2%; the scheduling difference is not worth chasing.
+// 6. Tried the faithful low-energy gate text `energy < capE*0.2 || ...` alone: it reproduces the
+//    original's compare mask at 0x405b37 (`test ah,0x41; je <body>`) but MSVC then computes
+//    capE*0.2 first, loads energy second and inserts an `fxch st(1)` (+2 bytes, 1083 total, 89.9%),
+//    so the frame and every following [esp+N] move by 2. Left the `capE*0.2 > energy` form, which
+//    keeps 1081 bytes and 90.9%; the remaining gap is the +41 bytes below 0x405b98 (our 4th block
+//    inlines the new/ctor tail the original jumps to at 0x405d01) plus this fxch.
 #include <vector>
 struct Vec3 { int x, y, z; };
 struct Unit;
