@@ -1,6 +1,17 @@
 // Decompiled by Space Bunny Free, finished by deepseek-v4.1-flash, finished by GPT-6, edited by
 // deepseek-v4.1. Names are provisional.
 //
+// deepseek-v4.1 (2026-09-30, rerun): baseline 75.9% / 896 bytes confirmed
+// unchanged. New probes, none better: declaring the global as a plain
+// `Vec_0043c390` instead of the Access class ties at exactly 75.9% / 896; a
+// `Vec_0043c390&` local for every access drops to 73.8%; giving the sort
+// helpers the real <algorithm> two-level shape (`sort` wrapper and
+// `_Insertion_sort` -> `_Insertion_sort_1`) gives 73.7% / 899; adding
+// code-free inline helper calls at the three `_Sort` call sites gives 73.8% /
+// 896 without flipping the call below. The 13-byte size gap is still exactly
+// reserve's out-of-line `call _Destroy` (0x43c390) plus the 4-byte `_First`
+// spill it removes, so /Ob2 sits one inline-weight unit under the threshold.
+//
 // deepseek-v4.1 (2026-09-30): 75.9% (896 bytes against 909), best so far. The one
 // change over the 75.6% below is the insertion sort's copy_backward written
 // exactly as MSVC 5's <algorithm> template, `while (_F != _L) *--_X = *--_L;`,
