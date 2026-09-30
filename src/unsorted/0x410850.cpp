@@ -1,4 +1,4 @@
-// Decompiled by GPT-6 Astra, finished by deepseek-v4.1-flash, edited by deepseek-v4.1. Names are provisional.
+// Decompiled by GPT-6 Astra, finished by deepseek-v4.1-flash, edited by deepseek-v4.1, finished by space-bunny-free. Names are provisional.
 // (base version by GPT-6 Astra; deepseek-v4.1 re-verified and extended the notes)
 // Partial: 89.9%, 1050 bytes versus 1051. Still differing:
 //  1) case 1 health test: original has def in edx, health in ecx, bound in eax
@@ -17,6 +17,17 @@
 // 86.0%); passing FUN_0043f0e0 straight into the Class_0043a1f0 ctor
 // (73.6%); 3*(...>>2) instead of (...>>2)*3 and a named health local (both
 // unchanged at 89.9%). Region 2 alone did not move under any spelling tried.
+// space-bunny-free re-verified all of the above and added, none better than
+// this 89.9% file: a field-wise operator+ as three separate statements into a
+// local plus a named Offset temp (76.8%, same esi/edi flip), the field-wise
+// operator+ with the angle and distance hoisted into named locals (78.7%),
+// reversing the case-1 health compare to (maxHealth>>2)*3 > (unsigned)health
+// (89.7%), and dropping the (unsigned int) cast from the health side (78.7%
+// on top of the operator+ change). The field-wise operator+ DOES reproduce
+// region 3's three direct loads and their register order byte for byte; the
+// only thing it changes is that MSVC then gives ESI to `order` and EDI to
+// `unit` instead of the other way round, which costs far more than region 3
+// gains. Finding the single upstream cause of that swap is the lead here.
 #include <vector>
 struct Unit;
 namespace std {
