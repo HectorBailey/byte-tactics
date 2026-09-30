@@ -12,6 +12,13 @@
 // Fixes that gained points: FUN_00435c40 declared bool (removed a neg/sbb/neg),
 // reading the selected slot pointer before the map-slot local, and clearing
 // local_b8 with 0 instead of & 0xffffff00.
+// Session 2 deepseek-v4.1: confirmed BOTH frames are 0xd4 (objdump of build/obj),
+// but every local slot in ours is 8 bytes higher than the original's: the original
+// packs locals upward from frame+0 and keeps its 8 bytes of temps at the top
+// (0xcc..0xd4), ours has an 8-byte temp hole at [0,8) so locals start at 0x08.
+// local_b0 sits at frame+0x2c (ours) vs frame+0x24 (original); local_b4 at 0x28 vs
+// 0x20. Zero effect (identical bytes): iVar17 declared first in the list, deleting
+// the unused uVar16/pcVar19/pcVar20 declarations. The ebx/ebp swap below is the gap.
 // Session deepseek-v4.1: baseline 44.0% (3902 vs 3948 bytes). Everything after the
 // first 12 instructions differs only in register choices. The original keeps iVar17
 // in ebp and the 0x2a40/strcpy-index temp in ebx; this file has them swapped, and
@@ -87,11 +94,8 @@ void FUN_00448c70(void)
   int iVar13;
   undefined1 uVar14;
   uint uVar15;
-  uint uVar16;
   int iVar17;
   uint uVar18;
-  char *pcVar19;
-  char *pcVar20;
   char local_d4 [20];
   uint local_c0;
   int local_bc;
