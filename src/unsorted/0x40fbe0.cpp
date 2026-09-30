@@ -5,7 +5,7 @@
 // the r4 MobileBuild tail is now two separate source sites (the `new` result
 // used on success, an explicit FUN_0043acb0(unit,0) fallthrough on failure), so
 // MSVC emits both copies instead of tail-merging them (+56 bytes). Still
-// differing: the order->pos = order->target->pos copy at 0x40fce9 wants
+// Differing: the order->pos = order->target->pos copy at 0x40fce9 wants
 // `add eax,0x6a` (the original consumes the target pointer) where ours emits
 // `lea ecx,[eax+0x6a]` and copies through ebp; the original materialises a zero
 // register (`xor ebp,ebp`, then `cmp eax,ebp` and `push ebp` for the constant
@@ -17,6 +17,13 @@
 // a pointer walk with a separate byte counter (the original walks
 // `unit->weapons[0].flags` and advances by 0x1c), and `tgt=order->target;`
 // before the position copy.
+// deepseek-v4.1 re-tested the copy site: dropping the `Unit* tgt` local, a
+// second `tgt2` local inside case 2, and `unsigned int state` in place of
+// `state=0; state=order->state;` are all byte-neutral (1971 bytes, 75.8%), so
+// the wanted `add eax,0x6a` is not reachable from those; writing
+// `order->target->order->...` inline in the VTOL kind-comparison chain loses
+// badly (61.9%, 2009 bytes) because it drops the EDI cache of `other` without
+// freeing a callee-saved register for the zero constant.
 #include <stdio.h>
 // SHARED begin
 struct Vec3 {
@@ -94,8 +101,7 @@ int __stdcall FUN_0040fbe0(Unit* unit, Order* order, int flags)
             ((Class_004388d0*)order)->FUN_004388d0((int)move);
             return 2;
         }
-        Unit* tgt=order->target;
-        order->pos=tgt->pos;
+        order->pos=order->target->pos;
         unsigned int state=0; state=order->state;
 // REGION r2 begin   0x40fcda-0x40feda
 //   case 0, the guard order, and case 1
