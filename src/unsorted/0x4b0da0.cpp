@@ -1,5 +1,7 @@
-// Decompiled by GPT-6, finished by space-bunny-free. Names are provisional.
-// Partial: 99.5%. Two hunks remain (checked again in #1641):
+// Decompiled by GPT-6, finished by space-bunny-free, edited by deepseek-v4.1. Names are provisional.
+// Body below (99.5%) was started by GPT-6 and continued by space-bunny-free;
+// finished by deepseek-v4.1, see the two remaining hunks at the end of this note.
+// Partial: 99.5%. Two hunks remain (checked again in #1641 and #2072):
 //   1. case 0x10001000 (0x4b0ebf, 0x4b0eec, 0x4b0ef3). The original keeps three
 //      frame slots live across the call: [esp+0x10] = the piece array base,
 //      [esp+0x18] = the dword index piece*19+axis, [esp+0x1c] = the move[]
@@ -18,7 +20,25 @@
 //      of ^ first and hands it ecx; the xor destination is always the left
 //      operand's register. Untried: two named locals with `Push(a ^ b)`
 //      (both pops hoisted out of the expression), which is the only spelling
-//      left that can give the first pop ecx.
+//      left that can give the first pop ecx. Tested in #2072 and it cannot:
+//      `int a = c->Pop(); c->Push(a ^ c->Pop());` and the two-local spellings
+//      `int a = c->Pop(); int b = c->Pop(); c->Push(b ^ a);` / `(a ^ b)` all
+//      compile to the identical edx/ecx pair, so the pick is a function-wide
+//      register allocation decision, not something the local source can steer.
+//      Hunk 1 tested in #2072 as well: the frame slot pick survives moving the
+//      `pieces[piece].move[axis] = c->Pop();` lines before `p = pieces;` (that
+//      costs a lot, 99.5% -> 81.4%) and swapping the `Piece *p;` declaration
+//      order (no change).
+//      Also tried in #2072 (all kept 99.5% with the same two hunks, or worse):
+//      `int a = Pop() ^ Pop(); Push(a);`, `int a = Pop(); a ^= Pop(); Push(a);`,
+//      `int a = Pop(); int b = Pop(); a = a ^ b; Push(a);`,
+//      `int a = Pop(); Push(Pop() ^ a);` for hunk 2; and `p = pieces;` moved
+//      after the second Pop (99.2%) or `p[piece].moveSpeed[...]` (80.5%) for
+//      hunk 1. Using the shared function-scope `value` as the XOR temp does
+//      give the original's ecx-first pop order, but it re-colours the whole
+//      function (86.2%), proof the pick is global allocation. A fresh
+//      function-scope temp (`int t;` next to `value`) keeps 99.5% but does
+//      not flip the order either.
 #include <stdlib.h>
 
 struct ScriptTable
@@ -143,9 +163,9 @@ void Class_004b0da0::FUN_004b0da0(unsigned int channel, int elapsed)
             switch (opcode & 0x100ff000)
             {
             case 0x10001000: {
-                Piece *p;
                 int piece = table->code[c->pc + 1];
                 int axis = table->code[c->pc + 2];
+                Piece *p;
                 pieces[piece].move[axis] = c->Pop();
                 pieces[piece].moveSpeed[axis] = c->Pop() / scale;
                 p = pieces;

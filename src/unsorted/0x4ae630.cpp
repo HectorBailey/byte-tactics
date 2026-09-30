@@ -1,18 +1,27 @@
-// Decompiled by GPT-6, finished by space-bunny-free. Names are provisional.
-// Partial: 94.8%. The only real difference left is in the two-tab loop at
-// 0x4ae7cc: the original emits `mov ebx, 2` and only then
-// `mov byte ptr [esp + 0x13], 9`, ours emits the store first (all other
-// bytes agree; the jump-table difference at 0x4aea8c is relocation noise).
-// Second pass tried: moving the `tab = '\t'` store into the loop body
-// (`while (i-- > 0) { tab = '\t'; ... }` and the
-// `for (i = 2; i > 0; i--) { tab = '\t'; ... }` spellings) DOES get the
-// order right, but MSVC then gives the hoisted store its own temporary home
-// at [esp + 0x1f] (inside the first 100-byte buffer) instead of the shared
-// local at [esp + 0x13], so those score 94.5%. Guarding the in-body store
-// with `if (i == 1)` grows the function to 1168 bytes (89.3%). Header
-// sweeps, counter types, countdown forms and local declaration order did not
-// help. Remaining hunk by address: 0x4ae7cc-0x4ae7d1 (order of the two
-// instructions above) and 0x4aea8c (jump table, relocation only).
+// Decompiled by GPT-6, finished by space-bunny-free, edited by deepseek-v4.1. Names are provisional.
+// Credit: started by GPT-6, continued by space-bunny-free (left at 94.8%).
+// Partial: 94.8%. The only non-relocation difference is the order of two
+// instructions at 0x4ae7cc: the original emits `mov ebx, 2` and only then
+// `mov byte ptr [esp + 0x13], 9`; ours emits the store first.
+// Third pass tried (all came back 94.5-94.8%, or 91.5% for the helper):
+//   i = 2; tab = '\t'; do {...} while (--i)        -> store first
+//   tab = '\t'; i = 2; do {...} while (--i)        -> store first
+//   tab = '\t'; for (i = 0; i < 2; i++) call       -> store first
+//   int k = 2; tab = '\t'; do {...} while (--k)    -> store first
+//   i = 2, tab = '\t'; (comma expression)          -> store first
+//   for (i = 2, tab = '\t'; i; i--) call           -> store first
+//   i = 2; do { tab = '\t'; call; } while (--i)    -> store first, and the
+//       in-body store gets its own home at [esp+0x1f] (94.5%)
+//   i = 2; do { call; tab = '\t'; } while (--i)    -> `mov ebx, 2` first,
+//       but the store is hoisted to after the loop (94.5%)
+//   static helper WriteTabs(out, n) inlined at the site -> 91.5%: inlining
+//       reallocates the locals (the buffer at [esp+0xe0] moves to
+//       [esp+0x144]), so the frame layout stops matching even though a
+//       helper body would explain the argument-materialised-first order.
+// Conclusion: MSVC 5 sinks the loop counter's `mov ebx, 2` past a store that
+// precedes the loop, and every spelling that keeps the store in the loop body
+// either gives it a temp home or hoists it after the loop. Remaining hunks:
+// 0x4ae7cc-0x4ae7d1 (this order) and 0x4aea8c (jump table, relocation only).
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
