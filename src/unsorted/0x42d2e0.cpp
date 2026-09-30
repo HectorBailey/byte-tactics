@@ -1,16 +1,8 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6, edited by
-// deepseek-v4.1. Names are provisional. Gave up at 56.1% (2289 bytes against 2173).
-// deepseek-v4.1: rewrote the n>0x10 scale block without a spilled double local; byte count and score
-// unchanged, so the extra 4 bytes are not there.
-// Still differs: the whole frame is 0x614 against the original 0x610, so every local sits exactly 4
-// bytes higher (parser at [esp+0x18] not [esp+0x14], the _ftol result v at frame+8 not frame+4,
-// n still reuses frame+0). The extra 4-byte slot is between the t temp (frame+0, correct) and v, and
-// an extra `mov [esp+0x14], reg` appears in the loop region that the original does not have, so it is
-// one of the loop locals (class index / unit index) getting its own slot instead of being reused.
-// Also: the class loop compares pointers and emits `jb` where the original has `jl` (signed), and
-// `new` is tested with `test eax,eax` where the original has `cmp eax,ebx`. Original keeps the scale
-// value in st(0) across the branch (no fstp/fld pair), so a float local kept in a register is right,
-// and the 5.0 constant is a float while the math is double.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6. Names are
+// provisional. Gave up at 56.1% (2289 bytes against 2173). Correct the double division of the
+// compacted pointer difference, 16-entry insertion-sort prefix, comparison direction, cached sort
+// end, signed shift and full-width loading counters. The inherited 74.8% version had semantic
+// errors. Remaining frame size, registers, GUI suffix-loop rotation and stack slots differ.
 #include <string.h>
 #include <stdio.h>
 
@@ -234,8 +226,11 @@ void FUN_0042d2e0() {
     int n = *(int*)((char*)g_game->field_c + 0x620) / 0x100000 + 1;
     float scale = 1.0f;
     if (n > 0x10) {
-        double d = n * 0.0625;
-        scale = d > 5.0 ? 5.0f : (float)d;
+        double d = (double)n * 0.0625;
+        if (d > 5.0)
+            scale = 5.0f;
+        else
+            scale = (float)d;
     }
     int size = (int)(v * scale);
     size = (size + 0xfff) & 0xfffff000;
