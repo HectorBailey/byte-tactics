@@ -1,34 +1,40 @@
 // Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by
 // deepseek-v4.1-flash. Names are provisional.
 //
-// 2797 bytes. Best so far: 66.8% (2749 vs 2797 bytes). No MATCH.
+// 2797 bytes. Best so far: 78.6% (2837 vs 2797 bytes). No MATCH.
 //
-// What was fixed this pass, in order of how much it moved the number:
-// - `Fixed_497180` was a struct with both an int and a two-short struct, so
-//   sizeof was 8 and FixedPos was 24. It must be a UNION of 4 bytes. That made
-//   `pos`/`start` 12 bytes, turned the `start = pos` copies from a 24-byte
-//   `rep movsd` back into three dword moves, dropped the frame from 0x54 to the
-//   original 0x4c and put every local at the original offset (perfCount S+4,
-//   pos S+0xc, start S+0x18, order S+0x24). 49.7 -> 62.6.
-// - Every free `FUN_*` with `ret N` was declared __cdecl here, so the caller
-//   cleaned the stack and every call site carried a spurious `add esp,N`
-//   (22 in all). Declaring them __stdcall (and FUN_00456850 as returning
-//   unsigned char) removed them and fixed the string call's stack slot.
-// - `sel`/`sel2` as `unsigned char` were homed in memory and reloaded. As
-//   `int sel = FUN_00456850()` they stay in a register (`and eax,0xff`), which
-//   is what the original does.
-// - The initial `==3` guard indexes the CURRENT player (`g_game[0x2a42]`), not
-//   the freshly read `sel`; the disassembly loads [ecx+0x2a42] for the test.
-// - `p[0x96] == 0xff` as `unsigned char` compares against the immediate; the
-//   signed `== -1` spelling materialised 0xff in bl first. 62.6 -> 66.8.
+// Earlier passes (still in this file) fixed the Fixed union, the __stdcall
+// declarations, the int sel/sel2 locals and the initial `==3` guard.
+//
+// What this pass fixed, in order of how much it moved the number:
+// - The three ten-player walks: indexing a record as
+//   `g_game + 0x1b63 + 0x14b * (unsigned char)i` instead of `* i` stops MSVC
+//   strength-reducing the multiply into a pointer walk. The cast reproduces
+//   the original's `mov eax,ebx; and eax,0xff; ...; lea eax,[edx+ecx*2+..]`
+//   and keeps the counter as a live index (`inc ebx`), not a byte offset.
+//   69.8 -> 78.3, the single biggest win.
+// - `std::random_shuffle(order, order + n)` from <algorithm> replaces the
+//   hand-rolled shuffle loop; the header's _Rm/_Rn scaling loop compiles
+//   byte-exactly. 66.8 -> 68.1.
+// - The mission block after FUN_004816a0 is nested the original's way,
+//   `if (mission != 0) { summary; if (BetweenMissions()==0) { FUN_00432610;
+//   goto tail; } } else if (state != 1) goto tail;` then the shared
+//   FUN_00488310/FUN_0041d1f0. 68.1 -> 69.7.
+// - `rec+0x149` as a 1-bit `unsigned short` bitfield gives the original's
+//   direct `or byte ptr [rec+0x149],1`; a plain `unsigned char |=` goes
+//   through a register (this is guide item 1, and it works here too).
+// - The final player-record access goes through a record local (`currec`) so
+//   the pointer chain is `lea ..+0x1b63; mov eax,[rec+0x27];
+//   or byte ptr [eax+0x9b],0x10`, as in the original.
 //
 // Known remaining differences:
-// - The `g_game[0x14281]` flag read-modify-writes: the original masks the
-//   source with the DESTINATION bit (`mov bl,[p+0x9c]; and ebx,2/4/1; ...;
-//   or edx,ebx`, with a `xor ebx,ebx` before), while manual masks here give
-//   `and bl,2; movzx si,bl` and a bitfield-union model (tried, 59.7%) gives
-//   `shr bl,1; and bl,1; movzx si,bl`. 12 redundant movzx remain. Neither the
-//   manual nor the bitfield spelling reproduces the 32-bit AND yet.
+// - The `g_game[0x14281]` flag read-modify-writes: the original loads the byte
+//   into a 32-bit register and masks 32-bit (`mov bl,[p+0x9c]; and ebx,2/4/1`),
+//   ours narrows the operand to 16-bit (`and bl,2; movzx si,bl`). Tried this
+//   pass: an int local per statement (77.4), three separate unsigned int
+//   locals (66.6), and a `static inline unsigned int Bit(b,m)` helper (78.6,
+//   unchanged). None reproduces the 32-bit AND, so it looks like an allocator
+//   choice, not a source shape.
 // - The switch keeps its constant `1` in edx here and the original in edi
 //   (`mov edi,1` once, reused as the mask in cases 1 and 2).
 // - `-1` for the `order` fill is hoisted to `mov ebx,-1` at the switch here
@@ -38,14 +44,14 @@
 //   here; the original loads the word, ORs in a register and stores it back.
 //   That is the volatile-network-flags signature the guide names; left as a
 //   note rather than a volatile declaration.
-// - The three ten-player walks carry an extra `cmp reg,10; jae` guard (an
-//   inlined bounds-checked accessor in the original), written here as
-//   `if ((unsigned char)i < 10)` wrappers.
+// - `if (pl->b9b & 0x40)` here compiles to `test byte ptr [..],0x40`; the
+//   original uses `mov al,[..]; shr al,6; test al,1` for that one test.
 // - the `(rand() * 2) / 0x8000` test came out of the x86 as a 64-bit
 //   __allmul/__alldiv pair, kept literally.
 #include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <algorithm>
 #include <time.h>
 
 union Fixed_497180 {
@@ -60,6 +66,11 @@ struct FixedPos_497180 {
     Fixed_497180 x;
     Fixed_497180 y;
     Fixed_497180 z;
+};
+
+struct RecFlag_497180 {
+    unsigned short started : 1;
+    unsigned short : 15;
 };
 
 struct Sub_497180 {
@@ -306,7 +317,7 @@ void FUN_00497180(void)
                 FUN_00485f50(*(unsigned char*)(rec + 0x146), id, pos, 1, 1, 0);
                 int s1 = *(unsigned short*)(pl + 0xa1) * 100;
                 int s2 = *(unsigned short*)(pl + 0xa3) * 100;
-                *(unsigned char*)(rec + 0x149) |= 1;
+                ((RecFlag_497180*)(rec + 0x149))->started = 1;
                 *(float*)(rec + 0xdc) = (float)(s1 >= 200 ? s1 : 200);
                 *(float*)(rec + 0xe0) = (float)(s2 >= 200 ? s2 : 200);
             }
@@ -328,7 +339,7 @@ void FUN_00497180(void)
             if (*(int*)((char*)*(void**)(g_game + 0x29a0) + 0x118) != 0) {
                 for (int i1 = 0; i1 < 10; i1++) {
                     if ((unsigned char)i1 < 10) {
-                        char* rec = g_game + 0x1b63 + 0x14b * i1;
+                        char* rec = g_game + 0x1b63 + 0x14b * (unsigned char)i1;
                         if (*(int*)rec != 0) {
                             unsigned char st = *(unsigned char*)(rec + 0x73);
                             if ((st == 1 || st == 2 || st == 3) &&
@@ -343,7 +354,7 @@ void FUN_00497180(void)
                 int n = 0;
                 for (int i3 = 0; i3 < 10; i3++) {
                     if ((unsigned char)i3 < 10) {
-                        char* rec = g_game + 0x1b63 + 0x14b * i3;
+                        char* rec = g_game + 0x1b63 + 0x14b * (unsigned char)i3;
                         if (*(int*)rec != 0) {
                             unsigned char st = *(unsigned char*)(rec + 0x73);
                             if ((st == 1 || st == 2 || st == 3) &&
@@ -353,17 +364,12 @@ void FUN_00497180(void)
                     }
                 }
                 if (n > 2 || (int)(((__int64)rand() * 2) / 0x8000) != 0) {
-                    for (int i5 = 1; i5 < n; i5++) {
-                        int j = rand() % i5;
-                        int t = order[i5];
-                        order[i5] = order[j];
-                        order[j] = t;
-                    }
+                    std::random_shuffle(order, order + n);
                 }
                 int k = 0;
                 for (int i4 = 0; i4 < 10; i4++) {
                     if ((unsigned char)i4 < 10) {
-                        char* rec = g_game + 0x1b63 + 0x14b * i4;
+                        char* rec = g_game + 0x1b63 + 0x14b * (unsigned char)i4;
                         if (*(int*)rec != 0) {
                             unsigned char st = *(unsigned char*)(rec + 0x73);
                             if ((st == 1 || st == 2 || st == 3) &&
@@ -379,16 +385,15 @@ void FUN_00497180(void)
 
     FUN_004816a0(1);
 
-    if (*(void**)(g_game + 0x38d6b) == 0) {
-        if (((Class_00435100*)*(void**)(g_game + 0x391e9))->FUN_00435100() != 1)
-            goto tail;
-    } else {
+    if (*(void**)(g_game + 0x38d6b) != 0) {
         ((Class_004b4560*)*(void**)(g_game + 0x38d6b))->FUN_004b4560("summary");
         if (((Class_004b48f0*)*(void**)(g_game + 0x38d6b))->FUN_004b48f0("BetweenMissions") ==
             0) {
             FUN_00432610(*(void**)(g_game + 0x38d6b));
             goto tail;
         }
+    } else if (((Class_00435100*)*(void**)(g_game + 0x391e9))->FUN_00435100() != 1) {
+        goto tail;
     }
     FUN_00488310();
     FUN_0041d1f0();
@@ -407,9 +412,8 @@ tail:
     gadget->handler = FUN_00494890;
     gadget->owner = g_game;
 
-    *(unsigned char*)(*(char**)(g_game + 0x1b63 +
-                          0x14b * *(unsigned char*)(g_game + 0x2a42) + 0x27) +
-        0x9b) |= 0x10;
+    char* currec = g_game + 0x1b63 + 0x14b * *(unsigned char*)(g_game + 0x2a42);
+    *(unsigned char*)(*(char**)(currec + 0x27) + 0x9b) |= 0x10;
     FUN_00450f90();
     FUN_00451180();
     FUN_00464f80();
