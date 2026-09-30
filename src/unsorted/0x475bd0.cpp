@@ -1,4 +1,4 @@
-// Decompiled by deepseek-v4.1-flash, finished by Space Bunny Free. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by Space Bunny Free, edited by deepseek-v4.1. Names are provisional.
 // std::vector<Record_00475bd0>::insert(iterator, size_type, const T&) from
 // MSVC 5's <vector>, with _Ucopy, _Ufill, fill and copy_backward inlined. The
 // vector's 0x3c-byte element is the frame record of 0x4743a0 (the exe's only
@@ -29,6 +29,16 @@
 // the global, 600 random 60-byte element layouts (arrays, mixed widths,
 // pointers, floats), and a statement-order hill climb over all three arms.
 //
+// Retry (deepseek-v4.1, issue 1186): 12 more spellings of the third call and of
+// _Ucopy, each still 99.7% with the identical one-instruction diff: increment
+// order swapped, `&_Q[_M]`, a named destination local, `_M + _Q`,
+// `_Q + size_type(_M)`, `&*(_Q + _M)`, `_P + 0`, a local copy of _P, a local copy
+// of _Q, a local copy of _M, and `_Ucopy(_P3, _Last, _Q + _M)` with a
+// const_iterator local. Also tried: `_Ucopy(_P, end(), _Q + _M)` (71.7%),
+// `_Ucopy(_First + (_P - _First), ...)` and `_Ucopy(_Last - (_Last - _P), ...)`
+// (both 53.3%, they change the whole register allocation), and
+// `_S + size_type(_P - _First) + _M` as the destination (72.8%, 820 bytes).
+// Same TU-state SIB wall as 0x44ec30, 0x408f30, 0x425210, 0x46e640 and 0x476210.
 // State, not source: instantiating any second vector<T>::insert in the same file
 // (33 different element types were tried, before or after) flips this function
 // from the 99.7% shape to the 91.5% one, while unrelated functions do not. So
