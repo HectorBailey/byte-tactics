@@ -192,7 +192,7 @@ void FUN_004c63a0(void)
         if (dd->field_44 == 0) {
             if (d->field_88->Restore() == 0) {
                 if (d->surface->Restore() == 0) {
-        
+
                     FUN_004c5e70(&screen);
                     FUN_004cbbe0(&screen, dd->field_98, 0, 0);
                     UnlockScreen();
