@@ -1,4 +1,10 @@
 // Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, GPT-6.1-sol and space-bunny-free. Names are provisional.
+// GPT-6.1-sol refinement after PR #2138: single-use output helper,
+// address-taken at_low/at_high, and inline global getter all held at 78.9%;
+// no score gain. Cases 0-2 still differ in argument register rotations.
+// GPT-6.1-sol follow-up: six checks kept 78.9% (280/280 bytes). A forwarding
+// helper and neutral arithmetic did not alter the best code. Case 0, 1 and 2
+// argument register scheduling still differs.
 // #1595 retry by Codex / GPT-6.1-sol: checkall reconfirmed 78.9% (280/280 bytes), no MATCH.
 //
 // Eighth pass (space-bunny-free): no score change, 78.9% (280 bytes), 1 check.py
@@ -231,7 +237,7 @@ extern int DAT_0051fefc;
 // GLOBAL: 0x51ff00
 extern int DAT_0051ff00;
 
-int FUN_004b7381(int a, int b, int c);
+int __cdecl FUN_004b7381(int a, int b, int c);
 
 // FUNCTION: 0x4c70d0
 void __stdcall FUN_004c70d0(int value, Range* out, int at_low, int at_high)
