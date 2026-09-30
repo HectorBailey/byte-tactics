@@ -50,6 +50,11 @@
 // sweep of 0..40 dummy functions before this one: the score cycles 95.14/91.98/92.77 with
 // the count but every state is still 1149 bytes, so the compiler state is reachable, it
 // just never buys the second load.
+// Round 4 (deepseek-v4.1-flash): ref-returning Position(), this->-qualified accessors, a
+// Unit::GetOrder() wrapper, swapped accessor declaration order, out-of-class inline
+// definitions, comma operators, an explicit temp for the new result, (Vec3*)&chain->pos
+// and anonymous-union aliases for target/pos all land on 1145-1149 bytes (88.9-95.1),
+// still one [reg+0x5c] load in the tail. Nothing in this round moved the 3 bytes.
 #include <stdio.h>
 struct Vec3 {
     int x, y, z;
