@@ -104,6 +104,39 @@
 //   It is not the original: the caller pushes the button first, and the
 //   original reads the index out of the first slot, so the declaration has to
 //   be (button, entries). Recorded only, not used.
+//
+// space-bunny-free, second pass, still 84.1%. New result: a register-use
+// census proves the two visible diffs are ONE cause, and names the exact
+// quantity the allocator ranks on.
+//   Register-use census of the original (a memory-operand use is not a
+//   register use and does not count):
+//     esi = entries, 12 uses (1 lea + 11 push esi)
+//     edi = button,  11 uses (11 `[edi+0x60]`; the 12th use is the reload,
+//                       which reads [esp+0x34] and so is not a register use)
+//     ebp = sel,     13 uses (1 mov + 11 `[ebp+0x138]`)
+//     ebx = orders,   1 use (1 push ebx)
+//   Parameters are allocated before locals, and within each group by use
+//   count. Ours has entries 12 and button 12, so the tie goes to parameter 1
+//   and button takes esi. The original has entries 12 and button 11, so
+//   entries takes esi. The single missing memory read is therefore both the
+//   2 byte size difference and the esi/edi swap; nothing else is wrong.
+//   Corollary for whoever retries: any byte-neutral way of REMOVING one
+//   register use of `button` (or adding one of `entries`) flips the pair, but
+//   then the size is 1327 and the instruction still differs, so it cannot
+//   reach MATCH on its own.
+// Shapes retried this pass, every one byte-identical at 84.1%: `sizeof
+//   (&button);`, a dead `__inline void Dead(Entry_00419be0**)`, `: (button =
+//   button);`, a local `Entry_00419be0* const& cref = button`, `: *(Entry_00419be0**)
+//   &button;`, `: ((Entry_00419be0*(&)[1])&button)[0];`, the condition written
+//   as `((char*)&entries[button->index])[0] == 1`, `Entry_00419be0* const e
+//   = ...`, a comma operator around the whole ternary, `if (!(e->type == 1))`,
+//   `e = button; if (...) e = &entries[...];` (83.8%, wrong order), an inner
+//   pointer helper doing `p = &en[b->index]; if (p->type != 1) p = b;` (83.3%),
+//   and helpers taking the whole selection by value in both argument orders.
+//   Moving the `orders` declaration below the selection drops to 46.9%
+//   because its initializer then becomes a later statement and the
+//   `lea ebx, [eax+0x2c76]` moves into the middle of the first block, which
+//   confirms declaration order is a real allocator input here.
 #include <string.h>
 
 class Class_00438760 {
