@@ -73,6 +73,26 @@
 //   when its initializer is written before the value expression (1675 bytes,
 //   86.6%); writing the value into a temp first puts it back in place.
 //
+// deepseek-v4.1 near-miss pass (all scored with check.py --sym, every one of them
+// 99.6% or worse, the two SIB bytes unchanged unless noted): the access FORM is
+// irrelevant here. Byte-identical 1678-byte results, i.e. both SIBs still swapped,
+// for `i * 1` / `1 * i` as the index, `*&vec_8d[i]`, an inline cast pointer
+// `((unsigned char*)vec_8d.begin())[i]`, the pointer-to-array forms
+// `(*(unsigned char (*)[1])vec_8d.begin())[i]` and
+// `((unsigned char (*)[1])vec_8d.begin())[i][0]`, and a 1-byte-struct element
+// (`vec_8d[i].value`, 98.0%, which behaves like the char-vector result). Moving the
+// /2 inside the cast, `x += (char)(vec_8d[i] / 2)`, changes the read to
+// `mov al, [edx+eax]; movsx edx, al` (1677 bytes, 94.1%): the value tree changes,
+// the SIB order does not. A `char` cast on the clamped store value is neutral.
+// New finding: a pointer whose tree node is a real VARIABLE (assigned by a comma
+// expression in the same statement, `p8 = vec_8d.begin(), p8[i] = ...`) does flip
+// the store SIB to the original `[esi + ecx]`, but the extra variable reshuffles
+// the schedule (1675 bytes, 86.6%, the pointer load hoists and a register moves
+// from eax to ebx), and the read site needs braces plus the same trick for the
+// 86.6% copy; there is no variant that flips both bytes while keeping the 1678-byte
+// schedule. Remaining work list is unchanged: 0x4099f6 `[esi + ecx]` vs
+// `[ecx + esi]` and 0x409b53 `[eax + edx]` vs `[edx + eax]`.
+//
 // GPT-6 retry: rating access, clamp, half-rating and pointer getter helpers, plus
 // all 768 header sets, did not improve 99.6%. Remaining differences are still the
 // two SIB base/index encodings; accessor wrappers can disturb STL inline budgeting.
