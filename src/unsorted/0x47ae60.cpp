@@ -1,5 +1,14 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// PARTIAL: 65.5%. Player argument, callback table reloads and callee names corrected. Remaining frame, player-count registers and GUI-entry scaling differ.
+// Decompiled by deepseek-v4.1. Names are provisional.
+// PARTIAL: 70.3%. Frame is now correct (bf[0x40] gives 0x70) and the first
+// ~89 instructions (through the terrain check) match byte for byte. Remaining
+// diffs start at the second player-count loop (0x47af91): the original keeps
+// the count in ecx and its loop copy in edx, ours has them swapped (edx/ecx);
+// swapping the declaration order of i vs p did not change it. The error paths
+// then differ in branch shape: the original jumps (jl) to a shared tail at
+// 0x47b0bf while ours emits an inline error block; the shared
+// FUN_004abd90/FUN_004ab0a0/return tail lands at a different address. Everything
+// after that is shifted. Tried: inline g_game->table dereference in all count
+// loops (fixed the hoisted base load, 68.7->70.3).
 #include <windows.h>
 #include <string.h>
 #include <stdlib.h>
@@ -62,7 +71,7 @@ struct Frame_0047ae60 {
     char sA[0xc];
     char sB[0xc];
     int ev[6];
-    char bf[0x30];
+    char bf[0x40];
 };
 #pragma pack(pop)
 
@@ -117,17 +126,15 @@ void __stdcall FUN_0047ae60(Menu_0047ae60* menu)
         }
         FUN_0041d4c0();
 
-        table = *(Table_0047ae60**)(g_game + 0x29a0);
         int n = 0;
         int count = *(int*)(g_game + 0x38d81);
         if (count > 0) {
-            Player_0047ae60* p = table->players;
-            int i = count;
+            Player_0047ae60* p = (Player_0047ae60*)*(int*)(g_game + 0x29a0);
             do {
                 if (p->active == 2)
                     n++;
                 p++;
-            } while (--i);
+            } while (--count);
         }
         *(short*)(g_game + 0x2a3c) = n + 1;
 
@@ -139,12 +146,11 @@ void __stdcall FUN_0047ae60(Menu_0047ae60* menu)
             return;
         }
 
-        table = *(Table_0047ae60**)(g_game + 0x29a0);
         int c2 = 0;
         count = *(int*)(g_game + 0x38d81);
         if (count > 0) {
-            Player_0047ae60* p = table->players;
             int i = count;
+            Player_0047ae60* p = (Player_0047ae60*)*(int*)(g_game + 0x29a0);
             do {
                 if (p->active == 2)
                     c2++;
@@ -161,7 +167,7 @@ void __stdcall FUN_0047ae60(Menu_0047ae60* menu)
 
         int c1 = 0;
         if (count > 0) {
-            Player_0047ae60* p = table->players;
+            Player_0047ae60* p = (Player_0047ae60*)*(int*)(g_game + 0x29a0);
             do {
                 if (p->active == 1)
                     c1++;
@@ -193,11 +199,10 @@ void __stdcall FUN_0047ae60(Menu_0047ae60* menu)
             return;
         }
 
-        table = *(Table_0047ae60**)(g_game + 0x29a0);
         c2 = 0;
         count = *(int*)(g_game + 0x38d81);
         if (count > 0) {
-            Player_0047ae60* p = table->players;
+            Player_0047ae60* p = (Player_0047ae60*)*(int*)(g_game + 0x29a0);
             int i = count;
             do {
                 if (p->active == 2)
@@ -207,7 +212,7 @@ void __stdcall FUN_0047ae60(Menu_0047ae60* menu)
         }
         c1 = 0;
         if (count > 0) {
-            Player_0047ae60* p = table->players;
+            Player_0047ae60* p = (Player_0047ae60*)*(int*)(g_game + 0x29a0);
             do {
                 if (p->active == 1)
                     c1++;
