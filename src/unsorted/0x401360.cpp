@@ -1,5 +1,12 @@
 // Decompiled by Claude Opus 5.5, finished by GPT-6, verified by GPT-6.1-sol, edited by deepseek-v4.1. Names are provisional.
 // Partial: 70.6% (was 68.4%). UseEnergy must be written with the v >= 0 path first (fall through) and the v < 0 AddIncome tail last; inverting it gained 2.2 points. `static inline` and plain `static` for UseEnergy compile identically here.
+// Tried by deepseek-v4.1 (no effect, all still 2172 bytes / 70.6): swapping the declaration order of the
+// accumulator arrays (used/backlog/demand/produced), swapping their zero-init order, making UseEnergy
+// __inline or giving it a single `int r; return r;` body, and reversing the two summands in EndTick's
+// backlog expression. Rewriting AddIncome's tail as `*dst = *dst + v;` or `*dst = v + *dst;` also changes
+// nothing (the compiler always folds to `fadd dword ptr [dst]`), while the original has the 2-instruction
+// `fld dword ptr [dst]; fadd st(1)` form at some of those sites. So the slot layout (orig used@0x10, backlog@0x18, demand@0x20, produced@0x28;
+// ours produced@0x10, used@0x18, backlog@0x20, demand@0x28) is not a declaration/init-order lever.
 // Still differs: the original materialises the helper result in eax (`mov eax,1; mov edx,eax` / `xor eax,eax; ...; mov edx,eax`) as an inlined callee return, ours assigns edx directly; ours also hoists the backlog compare above the `used += v` store. Ours is 67 bytes shorter (2172 vs 2239). In the tail the demand-ratio argument to EndTick is read from [esp+0x10] in the original while ours reads a different array slot (0x18/0x14 order swaps in the accumulation block at ~0x401889).
 #include <ddraw.h>
 struct Unit_00401360;
@@ -141,7 +148,7 @@ static inline void EndTick(Res_00401360* r, float ratioDemand, float ratioBacklo
     r->used = 0;
     r->lastProduced = r->produced;
     r->produced = 0;
-    r->backlog = (r->demand - ratioDemand * r->demand) + (r->backlog - ratioBacklog * r->backlog);
+    r->backlog = (r->backlog - ratioBacklog * r->backlog) + (r->demand - ratioDemand * r->demand);
     r->demand = 0;
 }
 
