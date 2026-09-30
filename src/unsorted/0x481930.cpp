@@ -1,5 +1,5 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, re-tried by deepseek-v4.1-flash, finished by GPT-6, finished by space-bunny-free. Names are provisional.
-// PARTIAL: 71.0% (1047 of 1052 bytes). Fixed this session, all in the branch
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, re-tried by deepseek-v4.1-flash, finished by GPT-6, finished by space-bunny-free, edited by deepseek-v4.1. Names are provisional.
+// PARTIAL: 71.0% (1051 of 1052 bytes). Fixed this session, all in the branch
 // that selects the LOD frame index:
 //  1. The else branch needs the UNCLAMPED lod/32 - 5, then the clamp. Clamping
 //     inside the helper first (as before) emitted sets/dec/and before the -5.
@@ -156,12 +156,11 @@ void __stdcall FUN_00481930(Params_00481930* params)
             for (short i = 0; (short)i < count; i++) {
                 void* line = ((Class_4335e0*)table)->FUN_004335e0(i);
                 short num = ((Class_004339c0*)line)->FUN_004339c0();
-                int j1 = 1;
                 int bestIdx = 0;
+                int j1 = 1;
                 int bestDiff = -1;
                 {
                     for (short j = 0; (short)j < (short)num; j++) {
-                        j1++;
                         int y2, x2;
                         ((Class_004339e0*)line)->FUN_004339e0((short)j, (unsigned short*)&x2, (unsigned short*)&y2);
                         x2 += x;
@@ -185,6 +184,7 @@ void __stdcall FUN_00481930(Params_00481930* params)
                                 }
                             }
                         }
+                        j1++;
                     }
                 }
             }
@@ -247,5 +247,15 @@ void __stdcall FUN_00481930(Params_00481930* params)
 //  * Hoisting a shared `int rhs = bestDiff * j1;` for the two comparisons
 //    changes nothing: the original already reuses the product in eax.
 //  * Moving `j1++` to the end of the loop body instead of the top: no change.
+//  * Swapping the declaration order of bestIdx / j1 (bestIdx first) and moving
+//    j1++ from the body top to the body bottom together: 71.0%, same score but
+//    1051 bytes instead of 1047. MSVC5 still gives ebx to j1 and spills bestIdx
+//    (`mov ebx, 1` before the num guard, `imul edx, [esp+0x20]`), so the
+//    original's ebx-held bestIdx is not reachable by declaration order.
+//  * `for (j = 0; j < num; j++, j1++)` (both increments in the for-increment
+//    clause, bestIdx/bestDiff/j1 order): 70.7%, worse.
+//  The remaining diff is the register allocator's choice of loop-carried
+//  candidate for ebx (bestIdx in the original, j1 here) plus the knock-on
+//  scheduling of the lod clamp before vs after the FUN_00433520 call.
 //  * Wrapping the loop in a bare brace block instead of `if (num > 0)`: needed
 //    for fix (2) above; the block itself is otherwise free.

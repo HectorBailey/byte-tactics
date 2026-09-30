@@ -1,14 +1,19 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by deepseek-v4.1-flash, edited by deepseek-v4.1. Names are provisional.
 // PARTIAL: 59.8% (1469 vs 1519 bytes). The Game grid layout follows the
 // matched 0x41d920 (grid1 at +0x1428f, grid2 at +0x1429f as grid2+field_142af
 // +field_142b3), and the two grid2 max-scans now use the original's
 // `if (m <= t) m = t; if (prev <= m) res = m;` branch polarity. What still
-// differs is register allocation: the original keeps g_game in eax and b in
-// edi in the grid2 setup (ours: g_game ecx, b eax), keeps cells_14287 in ebx
-// across the four edge loops, and its big final loop needs one fewer stack
-// slot (frame 0x18 vs our 0x1c), with the outer counter at [esp+0x10] and
-// grid1 at [esp+0x14]. The 0x482c20 wrapper also allocates grid2 cells with
-// a call to scalar operator new plus an inlined constructor loop
+// differs is register allocation: the row scan spills cellp (source, +0xd) to
+// [esp+0x10] and keeps row in ebp, while the original spills the outer row
+// pointer to [esp+0x14], keeps cellp in ebx and uses edx for recp; that also
+// creates a 7th stack slot (frame 0x1c vs 0x18) so accum moves to [esp+0x14],
+// the outer counter to [esp+0x1c] and t20/t24 to [esp+0x24]/[esp+0x28]. In the
+// big loop the divisor (v+31) sits in ebp in the original but forces a spill of
+// cellval in ours. Reversing the recp/cellp compare scored 59.6%. In the
+// grid2 setup the original keeps g_game in eax (ours: ecx) and b in edi (ours:
+// eax), keeps cells_14287 in ebx across the four edge loops, and its big final
+// loop needs one fewer stack slot (frame 0x18 vs our 0x1c). The grid2 cells
+// allocation is a scalar operator new plus an inlined constructor loop
 // (no ??_H vector-constructor-iterator call).
 #include <new.h>
 #include <windows.h>
