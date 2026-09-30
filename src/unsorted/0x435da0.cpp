@@ -1,4 +1,37 @@
-// Decompiled by Claude Opus 5.5, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by Claude Opus 5.5, edited by deepseek-v4.1, finished by deepseek-v4.1-flash and space-bunny-free. Names are provisional.
+// space-bunny-free (retry, 900s box): still no MATCH. The file keeps the previous
+// session's two-store allocator lever, which is the best score anyone has measured
+// on this function (95.0%). New facts measured this run, all on the 2740-byte
+// no-lever base (89.5%, whose entire diff is the zero register):
+// - A whole-function census confirms field_c1c (0xc1c) is never written by the
+//   original, and 0xc20 is written exactly once (0x4361ef, `mov dword ptr
+//   [ebp + 0xc20], edx`). So the two lever stores are certainly not original
+//   code; they only work as an allocator lever.
+// - Register census of every `push` in both builds: original 237 pushes, ours
+//   236, so no argument is missing anywhere. Of the original's 11 `push ebx`,
+//   one is the prologue save, five are `map` (0x4360e9, 0x43611d, 0x43613f,
+//   0x436186), one is `&description` (0x4364e7), and only FOUR are the zero
+//   constant (0x43626c, 0x43638d, 0x43639e, 0x43643b). This source actually has
+//   SIX zero-register argument pushes, so the original has FEWER of them, not
+//   more. That kills "the original passes one more literal 0" as the missing
+//   use of the constant and says the extra weight must come from elsewhere.
+// - With the lever the constants land exactly right (ebx = 0, esi = -1) but -1's
+//   live range is then carried too far: our inlined strlen for
+//   `strcpy(lower, desc)` emits `mov ecx, esi` where the original rematerialises
+//   `or ecx, -1` (0x436479). That one cause also explains why LoadBriefing puts
+//   `name` in edi instead of esi and grows an extra `or esi, -1`. Those two
+//   hunks are ONE problem, not two.
+// - Still-open diffs in this 95.0% file, all independent of the allocation: the
+//   swapped `or esi,-1` / `xor ebx,ebx` pair at the switch join (0x436195), the
+//   x87 `fstp` delay after killmul / timemul and around the three Meteor
+//   float calls, and the two invented stores themselves.
+// - Tried this run, scored free on the no-lever base: a named
+//   `Class_0048df90* old` with an explicit `FUN_0048dfb0()` call plus
+//   `delete old` (2748 bytes, 87.0%, constants do not move); a named
+//   `Class_004c2ea0* plist = &list` for the three `&list` uses (2740 bytes,
+//   89.4%, no allocation change at all); one function-scope `char msg[0x100]`
+//   replacing the three block-scoped ones (2720 bytes, 86.2%, the overlapping
+//   slots shrink the body).
 // deepseek-v4.1-flash retry 4 (issue #2362): the four `= -1` stores are back in
 // the body, so this source is complete (the earlier 92.7% file was 28 bytes
 // short and scored higher only because four mismatching lines left the
