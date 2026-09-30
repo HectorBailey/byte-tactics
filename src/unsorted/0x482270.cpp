@@ -1,9 +1,34 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, deepseek-v4.1-flash, GPT-6, and GPT-6.1-sol. Names are provisional.
-// Partial: 61.0%, 832 bytes versus 817. The distance counter advances even
-// for out-of-bounds points. Grid accessors recover the receiver-relative
-// addressing. Remaining differences include the LOD clamp timing, local
-// frame slots and register allocation in both branches. Two 768-set header
-// sweeps did not improve the result.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, deepseek-v4.1-flash, GPT-6, GPT-6.1-sol, deepseek-v4.1-flash, finished by deepseek-v4.1-flash. Names are provisional.
+// Partial: 79.1%, 822 bytes versus 817. The big win over the previous 66.9%
+// attempt: the inner loop's seemingly dead x2/y2 stores are really the live
+// update of the int e1/e2 locals. Writing `int e1; int e2;` then
+// `e1 += x; e2 += y; short x16 = (short)e1; short y16 = (short)e2;` (instead
+// of separate int x2/y2 locals) is what the original does, and it moved every
+// branch-1 stack slot except x/y onto the original's offsets (e1=0x24,
+// e2=0x14, i=0x18, j=0x34, etc.).
+// Still differs: x sits at 0x20 and y at 0x1c, the reverse of the original
+// (x=0x1c, y=0x20); no declaration order tried (x first, y first, uninitialised
+// then assigned, one combined declaration) moved the slot. Branch 2 still
+// differs over ~70 lines: the original reuses slot 0x18 for limitX and 0x34
+// for limitY, computes dst before src, and runs the scan as a do/while whose
+// entry jumps straight into the body. Rewriting branch 2 with dst first (or
+// with if/else limits, or with a do/while) collapsed the whole function to
+// 39.0% because it reshuffled the global register allocation, so the src-first
+// ternary form was kept. The imul operand order in the bestDiff/bestIdx
+// comparison is also reversed.
+// The LOD selection block now matches
+// the original instruction for instruction: writing the clamp as a ternary
+// directly in the `if` condition (instead of a separate Lod_ helper call or
+// `int v = ...; int lod = ...;` statements) makes MSVC fold the clamp into
+// `sets cl; dec ecx; and ecx, eax` before the FUN_00433520 call. Dropping the
+// redundant `if (count <= 0) return;` and `if (num <= 0) continue;` guards
+// also removed extra tests. What still differs: stack slot numbering for y,
+// i, grid, lod, table, ref and bestDiff (ours 4 to 8 bytes lower than the
+// original), the inner-loop e1/e2 result slots and the dead int stores of
+// x2/y2 that the original keeps, and the branch-2 limitX/limitY branch
+// layout (ours emits `jge` where the original emits `jl`). The distance
+// counter advances even for out-of-bounds points. Grid accessors recover the
+// receiver-relative addressing.
 // GPT-6.1-sol retry in #1932: four checks kept 61.0%; the reversed coordinate
 // declaration tied, while do-while conversions scored 59.1%. Neighbor coordinates
 // need a signed 16-bit cast before an unsigned bounds check (movsx AX then cmp).
@@ -133,9 +158,10 @@ void __stdcall FUN_00482270(Params_482270* params)
             return;
         if ((unsigned)y >= grid->height)
             return;
-        int idx = Lod_482270(params);
-        if (idx < (short)((Class_00433520*)DAT_0051e6a0)->FUN_00433520() - 1)
-            idx = Lod_482270(params);
+        int idx;
+        if (((params->field_8 / 32 < 0) ? 0 : params->field_8 / 32)
+                < (short)((Class_00433520*)DAT_0051e6a0)->FUN_00433520() - 1)
+            idx = (params->field_8 / 32 < 0) ? 0 : params->field_8 / 32;
         else
             idx = (short)((Class_00433520*)DAT_0051e6a0)->FUN_00433520() - 1;
         void* table = ((Class_00433500*)DAT_0051e6a0)->FUN_00433500(idx);
@@ -143,8 +169,6 @@ void __stdcall FUN_00482270(Params_482270* params)
         short i = 0;
         ((Player_482270*)params->field_0)->grid.at(x, y)++;
         int ref = *params->field_c;
-        if (count <= 0)
-            return;
         for (i = 0; i < count; i++) {
             void* line = ((Class_4335e0*)table)->FUN_004335e0(i);
             short num = ((Class_004339c0*)line)->FUN_004339c0();
@@ -152,16 +176,14 @@ void __stdcall FUN_00482270(Params_482270* params)
             int bestIdx = 0;
             short j = 0;
             int j1 = 1;
-            if (num <= 0)
-                continue;
             for (j = 0; j < num; j++, j1++) {
-                int e2;
                 int e1;
+                int e2;
                 ((Class_004339e0*)line)->FUN_004339e0(j, &e1, &e2);
-                int x2 = x + e1;
-                int y2 = y + e2;
-                short x16 = (short)x2;
-                short y16 = (short)y2;
+                e1 += x;
+                e2 += y;
+                short x16 = (short)e1;
+                short y16 = (short)e2;
                 if ((unsigned)x16 >= grid->width)
                     continue;
                 if ((unsigned)y16 >= grid->height)

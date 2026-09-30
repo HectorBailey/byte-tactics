@@ -1,4 +1,23 @@
-// Decompiled by deepseek-v4.1-flash, finished by Space Bunny Free, edited by deepseek-v4.1. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by Space Bunny Free, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
+// Retry 5 (deepseek-v4.1-flash, issue 2784): still 99.7%, the same one SIB
+// byte. Three more variants, all measured with check.py --sym: replacing
+// _Ufill in the reallocation arm with an explicit `for (_C = _M; 0 < _C;
+// --_C, ++_Q) construct(_Q, _X)` loop (the trick that moved sibling
+// 0x4758c0) shifts the whole arm and scores lower; showing the third copy's
+// destination (`iterator _R = _Q + _M;`) or its source (`iterator _R = _P;`)
+// in a local after _Ufill leaves the exact same 99.7 one-byte diff. The SIB
+// base/index order is chosen during the optimizer's reassociation of the
+// strength-reduced copy, not by any spelling of the call, so this file needs
+// the regroup-into-original-files phase.
+// Retry 4 (deepseek-v4.1-flash, issue 2521): still 99.7%, one instruction. The
+// remaining diff is the identical one described below: the original's third
+// copy source pointer is `lea eax, [esi + edx]`, this build emits
+// `lea eax, [edx + esi]` (same sum, base/index swapped). Adding one header at
+// the top (<windows.h>, <stdio.h>, <string.h>, <math.h>, <stdlib.h>, <stddef.h>,
+// <memory.h>, <xmemory>, <algorithm>) kept the function at 99.7% with the same
+// diff, consistent with the earlier 225/3800 header sweep. No new source
+// spelling was found; this is the compiler-state SIB case from the guide and
+// needs the regroup-into-original-files phase.
 // Retry 2 (deepseek-v4.1, issue 1186, 17 more check.py runs): the mirror lea is
 // immune to the destination spelling. Still 99.7% with the identical diff for:
 // _Q + 1 * _M, _Q + _M + 0, this->_Last, static_cast<iterator>(_Q + _M),
