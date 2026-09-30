@@ -1,12 +1,21 @@
-// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash and GPT-6, verified by GPT-6.1-sol. Names are provisional.
-// #1704 retry by Codex / GPT-6.1-sol: checkall reconfirmed 87.2% (1610/1504 bytes), no MATCH.
-// A lead helper-inversion edit failed to compile; restored and rechecked this prior best.
-// Partial: 87.2%. Total's float accumulation restores field-first x87 addition.
-// Landing still has an extra test of the helper's constant success result; keep
-// its helper boundary to preserve the original vector lifecycle calls and frame.
-// Reclaim constructors still share only part of the tail. A selected destination,
-// common QueueReclaim helper, alternate landing branches, capacity temporaries,
-// and real order constructor bodies did not improve this version.
+// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash and GPT-6, verified by GPT-6.1-Sol. Names are provisional.
+// #1704 retry by Codex / GPT-6.1-Sol: checkall reconfirmed 87.2% (1610/1504 bytes), no MATCH.
+// #1897 by deepseek-v4.1-flash: 1604/1504 bytes, still 87.2%, 23 hunks.
+// Partial: size overshoot is the whole story; most hunks are jmp targets shifted by it.
+// What still differs:
+// 1. Land()'s inline expansion keeps a dead "mov eax,1; test eax,eax; je" of the helper's
+//    constant success result, and the pads vector destructor is emitted right after the
+//    empty() test instead of on the shared path at 0x415474 (12 bytes).
+// 2. Only the first two VTOL_RECLAIM branches jump to the shared ctor tail at 0x415773;
+//    branches 3 and 4 each get a full inline copy of the tail (about 100 bytes). Explicit
+//    per-branch `return 3;` (v3) removed 6 bytes but did not make VC5 cross-jump.
+// 3. Branch 2's float compare is unmatched either way: `energy < energyCapacity * 0.2`
+//    keeps the original's `test ah,0x41 / jne` but loads energy first, while the reversed
+//    `energyCapacity * 0.2 > energy` reproduces the original's load schedule (fld cap,
+//    fmul, fld energy) but emits `test ah,1 / je` and no `fxch st(1)`. Both score 87.2%.
+// Inlining the landing path directly (nested if with an early return) instead of the Land
+// helper reproduces the destructor placement but inlines the vector ctor and flips
+// esi/edi, dropping to 65.9%.
 #include <vector>
 
 struct Vec3 { int x, y, z; };
@@ -192,22 +201,27 @@ int __stdcall FUN_004152f0(Unit* unit, Order* order, int flags)
                 ((Class_004388d0*)order)->FUN_004388d0(0);
                 FUN_0043acb0(unit, new Class_0043a1f0("VTOL_RECLAIM", 0, metal, 0, 0, 0));
                 order->flags = 0;
-            } else if (unit->owner->energy < unit->owner->energyCapacity * 0.2 && energy) {
+                return 3;
+            }
+            if (unit->owner->energy < unit->owner->energyCapacity * 0.2 && energy) {
                 ((Class_004388d0*)order)->FUN_004388d0(0);
                 FUN_0043acb0(unit, new Class_0043a1f0("VTOL_RECLAIM", 0, energy, 0, 0, 0));
                 order->flags = 0;
-            } else if (metal && Total(unit->owner->metal, metalAmount) <= unit->owner->metalCapacity) {
+                return 3;
+            }
+            if (metal && Total(unit->owner->metal, metalAmount) <= unit->owner->metalCapacity) {
                 ((Class_004388d0*)order)->FUN_004388d0(0);
                 FUN_0043acb0(unit, new Class_0043a1f0("VTOL_RECLAIM", 0, metal, 0, 0, 0));
                 order->flags = 0;
-            } else if (energy && Total(unit->owner->energy, energyAmount) <= unit->owner->energyCapacity) {
+                return 3;
+            }
+            if (energy && Total(unit->owner->energy, energyAmount) <= unit->owner->energyCapacity) {
                 ((Class_004388d0*)order)->FUN_004388d0(0);
                 FUN_0043acb0(unit, new Class_0043a1f0("VTOL_RECLAIM", 0, energy, 0, 0, 0));
                 order->flags = 0;
-            } else {
-                return 2;
+                return 3;
             }
-            return 3;
+            return 2;
         }
         return 2;
     }
