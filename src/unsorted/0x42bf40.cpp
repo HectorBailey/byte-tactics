@@ -1,5 +1,23 @@
 // Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
-// Still 62.2% (4792 bytes against 4772) after deepseek-v4.1's pass.
+// Still 62.6% (ours 4804 bytes against 4772) after deepseek-v4.1's second pass.
+// Confirmed fixed this pass (both match the original now):
+//   - the Class_00438760 conversion temp must be an unnamed temporary in the
+//     assignment expression (`unitdef[0x230] = Class_00438760(buf).value;`): as a
+//     named local it gets a 4-aligned slot at [esp+0x20], as a temporary it lands
+//     byte-packed at [esp+0x23] with its byte at [esp+0x2b], exactly the original.
+//   - the three extent stores at unitdef+0x176/+0x17a/+0x17e go through one
+//     `int* p = (int*)(unitdef + 0x176);` with p[0]/p[1]/p[2], matching the
+//     original's lea esi,[ebp+0x176] / mov edi,esi / mov [edi],eax / [edi+4] /
+//     [edi+8]; it also let the four /2 divisions keep w,h in registers.
+//   - `int w`/`int h` locals for the width/height movsx reduce that hunk further
+//     (still +12 bytes though).
+// Still different: the 0 default argument (original: xor esi,esi once at 0x42c0f0
+// plus 83 `push esi`, and `xor eax,eax; push eax` at the FUN_004c4800 sites; ours
+// has `push 0` at each; every initialized-local shape MSVC5 folds) so all esp
+// offsets drift by one pushed dword in the FUN_004c46c0 float region (ours filds
+// at [esp+0x24] where the original filds at [esp+0x1c]) and the tail jumps land
+// 20 bytes late. YardMap loop: original keeps the outer y counter in [esp+0x1c]
+// and x in edi, ours keeps y in edi.
 // The dominant difference is the shared zero default argument. The whole
 // original function contains ZERO `push 0` and 83 `push esi`: it sets
 // `xor esi,esi` once at 0x42c0f0 after the objectname strcpy test and pushes
@@ -136,8 +154,7 @@ void __stdcall FUN_0042bf40(char* fbi_file, char* unitdef) {
             FUN_004c58a0(&parser, unitdef + 0x40, "description", 0x40, 0);
             ((Class_004c48c0*)parser.current)
                 ->FUN_004c48c0(buf, "defaultmissiontype", 100, DAT_005119b8);
-            Class_00438760 conv(buf);
-            unitdef[0x230] = conv.value;
+            unitdef[0x230] = Class_00438760(buf).value;
             ((Class_004c48c0*)parser.current)
                 ->FUN_004c48c0(buf, "wpri_badTargetCategory", 100, DAT_00503ea0);
             *(void**)(unitdef + 0x231) = FUN_00488c50(buf);
@@ -382,7 +399,7 @@ void __stdcall FUN_0042bf40(char* fbi_file, char* unitdef) {
             char* countdown =
                 ((Class_004c4630*)parser.current)->FUN_004c4630("selfdestructcountdown");
             unsigned int* flags = (unsigned int*)(unitdef + 0x245);
-            if (countdown == 0)
+            if (countdown == (char*)def)
                 *flags = (*flags & 0xffdfffff) | 0x500000;
             else
                 *flags = (*flags & 0xff8fffff) | ((unsigned int)atoi(countdown) & 7) << 20;
@@ -390,7 +407,7 @@ void __stdcall FUN_0042bf40(char* fbi_file, char* unitdef) {
             ((Class_00488e70*)unitdef)->FUN_00488e70(buf);
             int sound = 0;
             if (((Class_004c48c0*)parser.current)
-                    ->FUN_004c48c0(buf, "soundcategory", 100, DAT_005119b8)) {
+                    ->FUN_004c48c0(buf, "soundcategory", 100, DAT_005119b8) != def) {
                 while (sound < *(int*)(g_game + 0x37e17)) {
                     if (_strcmpi(*(char**)(g_game + 0x37e13) + sound * 0x160, buf) == 0)
                         goto SOUND_FOUND;
@@ -496,13 +513,17 @@ void __stdcall FUN_0042bf40(char* fbi_file, char* unitdef) {
                     }
                 }
             }
-            *(int*)(unitdef + 0x15e) = (*(short*)(unitdef + 0x14a) * -0x100000) / 2;
-            *(int*)(unitdef + 0x166) = (*(short*)(unitdef + 0x14c) * -0x100000) / 2;
-            *(int*)(unitdef + 0x16a) = (*(short*)(unitdef + 0x14a) << 20) / 2;
-            *(int*)(unitdef + 0x172) = (*(short*)(unitdef + 0x14c) << 20) / 2;
-            *(int*)(unitdef + 0x176) = *(int*)(unitdef + 0x16a) - *(int*)(unitdef + 0x15e);
-            *(int*)(unitdef + 0x17a) = *(int*)(unitdef + 0x16e) - *(int*)(unitdef + 0x162);
-            *(int*)(unitdef + 0x17e) = *(int*)(unitdef + 0x172) - *(int*)(unitdef + 0x166);
+            int w = *(short*)(unitdef + 0x14a);
+            int h = *(short*)(unitdef + 0x14c);
+            *(int*)(unitdef + 0x15e) = (w * -0x100000) / 2;
+            *(int*)(unitdef + 0x166) = (h * -0x100000) / 2;
+            *(int*)(unitdef + 0x16a) = (w << 20) / 2;
+            *(int*)(unitdef + 0x172) = (h << 20) / 2;
+            // tail
+            int* p = (int*)(unitdef + 0x176);
+            p[0] = *(int*)(unitdef + 0x16a) - *(int*)(unitdef + 0x15e);
+            p[1] = *(int*)(unitdef + 0x16e) - *(int*)(unitdef + 0x162);
+            p[2] = *(int*)(unitdef + 0x172) - *(int*)(unitdef + 0x166);
             *(int*)(unitdef + 0x182) = (*(int*)(unitdef + 0x17e) + *(int*)(unitdef + 0x176)) / 3;
             ((Class_004c3240*)&parser)->FUN_004c3240();
             if ((*(unsigned int*)(unitdef + 0x245) & 0x2000) && *(short*)(unitdef + 0x208) == 0)
