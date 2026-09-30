@@ -10,6 +10,24 @@
 // unit->def earlier; none moved the allocator off esi for unit.
 // Loads the definition after target validation, restoring the native frame.
 // iostream improves the corrected implementation.
+// deepseek-v4.1 pass: verified against the binary that the source order of the cases is
+// already right. The jump table at 0x4401ec maps cases 1..14 to
+// 0x43f9e9, 0x43f845, 0x43f154, 0x43f7e8, 0x43f735, 0x43f701, 0x43f4c7, 0x43f46c,
+// 0x43f3b9, 0x43f82c, 0x43f813, 0x43f4f7, 0x43f6d1, 0x43f7a0, i.e. bodies are emitted in
+// order 3,9,8,7,12,13,6,5,14,4,11,10,2,1, exactly the order this file uses.
+// Diagnosis of the remaining 42% gap: the emitted materialisation order is the same as the
+// original (unit, then target, then def) but the register identities are swapped, so every
+// later branch diverges. MSVC5 allocates by weight, and this file's `def` (47 references)
+// still loses the preferred register to `unit` (17 references):
+//  - dead extra uses do not count: `(void)def->f241;`, an extra `(void)unit->moving;` and a
+//    Pick() that reads def->f245 twice all compile to the identical 4312 bytes, so the
+//    allocator drops them before weighting.
+//  - a live extra use does move a register, but the wrong one: `if (def->f245 == 0x1234)
+//    return Class_00438760();` before the switch moved `enemy` from eax to ecx and cost 32
+//    bytes (46.7%), leaving unit/def untouched.
+// Ours is 108 bytes shorter (4312 vs 4420); the tail of the diff is only the jump table,
+// misaligned because the drift starts at the second instruction.
+// Scratch variants with the experiments are in build/scratch/0x43f0e0/.
 #include <iostream>
 #include <windows.h>
 
