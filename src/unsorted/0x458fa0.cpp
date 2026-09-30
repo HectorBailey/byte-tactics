@@ -54,6 +54,18 @@
 // loop / at function scope, info assigned at function scope, v before info,
 // unsigned j, and an inline wrapper around the FUN_004c0820 call passing view.
 // None of them moves the tie, so the swap is not reachable from this file's text.
+// 2026-09-30 deepseek-v4.1: four more threads closed off. Renaming every local
+// and both parameters, renaming the class, the method, and the two parameter
+// struct types (all four change the mangled name and the symbol table) each
+// still compile to exactly 84.1% with the identical ebx/ebp swap, so the tie is
+// not name or hash-order sensitive. Swapping the info/v declaration order,
+// hoisting both declarations out of the while loop, shrinking faceno's live
+// range into the flags block, and using `int j;` declared at function scope are
+// also all 84.1%. The one thing that does move the layout is the ABI: compiling
+// the same body as a free `void __stdcall FUN_00458fa0(...)` instead of a
+// __thiscall member shrinks it to 452 bytes and drops to 66.9% (the vertex loop
+// loses the batched loads), so the implicit `this` variable is part of the
+// allocator state, and this function must stay a member.
 // Earlier note from space-bunny-free: several scratch variants scored 80-90%
 // but are wrong; they lay the vertex arrays out 4 bytes high at [esp+0x150],
 // where the original uses [esp+0x14c]. Always check the `lea eax, ...` base
