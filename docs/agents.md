@@ -1185,20 +1185,34 @@ Cost units: thousands of tokens weighted by price relative to Haiku (Sonnet 5 co
 | #1683 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
 | #1665 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
 | #1637 | gpt-6.1-sol | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1693 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #2062 | space-bunny-free | 2 | 1 | 0 | n/a | n/a | n/a |
+| #1677 | space-bunny-free | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1661 | space-bunny-free | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1657 | space-bunny-free | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1641 | space-bunny-free | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1998 | deepseek-v4.1-flash | 3 | 1 | 0 | n/a | n/a | n/a |
+| #1658 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1663 | space-bunny-free | 2 | 0 | 0 | n/a | n/a | n/a |
+| #1687 | space-bunny-free | 1 | 1 | 0 | n/a | n/a | n/a |
+| #1666 | gpt-6.1-sol | 3 | 0 | 0 | n/a | n/a | n/a |
+| #1685 | space-bunny-free | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1793 | space-bunny-free | 1 | 0 | 0 | n/a | n/a | n/a |
+| #1696 | space-bunny-free | 2 | 0 | 0 | n/a | n/a | n/a |
 
 ### Escalations
 
 - Opus matched 94 of 121 functions a cheaper model had failed.
 - Sonnet matched 109 of 116 functions a cheaper model had failed.
 - Gpt-6 matched 5 of 134 functions a cheaper model had failed.
-- Space-bunny-free matched 78 of 333 functions a cheaper model had failed.
-- Deepseek-v4.1-flash matched 75 of 543 functions a cheaper model had failed.
+- Space-bunny-free matched 80 of 348 functions a cheaper model had failed.
+- Deepseek-v4.1-flash matched 76 of 550 functions a cheaper model had failed.
 - Gpt-5.6-terra matched 3 of 16 functions a cheaper model had failed.
 - Mimo-v2.6-flash matched 3 of 5 functions a cheaper model had failed.
 - Sonnet-5.5 matched 29 of 73 functions a cheaper model had failed.
 - Longcat-2.5-preview-free matched 5 of 34 functions a cheaper model had failed.
 - Muse-spark-1.3-free matched 0 of 4 functions a cheaper model had failed.
-- Gpt-6.1-sol matched 0 of 73 functions a cheaper model had failed.
+- Gpt-6.1-sol matched 0 of 76 functions a cheaper model had failed.
 <!-- calibration:end -->
 
 ## Findings about the target
