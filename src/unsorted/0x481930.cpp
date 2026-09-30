@@ -303,3 +303,58 @@ void __stdcall FUN_00481930(Params_00481930* params)
 //    `add ecx, [edi+0x10]`.
 //  * writing the two bumps as `*src++ = *src; *dst++ = *dst;`: neutral. The
 //    order of the two STATEMENTS is what counts, not the form.
+// Re-tried on the 81.5% base by space-bunny-free, ALL neutral (81.5, 122 diff
+// lines, exactly as the base), so none of these is the missing construct:
+//  * hoisting `int rhs = bestDiff * j1;` for the two comparisons. This was the
+//    most promising idea left, because the allocator's choice of ebx looks like
+//    a reference-count priority: j1 has 4 refs (2 imul reads, the `mov ebx,
+//    [esp+0x1c]` read, and the increment) against bestIdx's 3 (2 imul reads and
+//    the write), so j1 wins the callee-saved slot. Cutting j1 down to 2 refs
+//    does NOT flip it, which kills the reference-count theory.
+//  * `j1++` as the first statement of the inner body (the original's init at
+//    0x481abc is below the `jle`, which is what the rotated-loop peel looks
+//    like, so the top-of-body spelling seemed worth a test).
+//  * `g_game->visibilityMask + halfW * y + x` instead of the indexed form, and
+//    `g_game->width` through a local: the first cell's `imul` destination is
+//    not reachable from the source's shape at all.
+//  * `halfW > x + frame->width` and `halfH > y + frame->height` (swapping the
+//    `<` for a `>`, per the guide's item 16, to flip which ternary arm is the
+//    fall-through in the limitY clamp): 81.2 each, so the limitY `jl` polarity
+//    is not under source control either.
+//  * a second `Frame_00481930*` alias used in the inner loop, and
+//    `if (limitY > ny)` for the row guard.
+// Worse, for the record: declaring j1 before bestIdx (74.8), `changed = 0` at
+// the top of the else branch rather than just before the row guard (75.5), one
+// combined `int bestIdx = 0, bestDiff = -1, j1 = 1;` (81.2), the reversed
+// comparison `bestDiff * j1 < d0 * bestIdx` (81.2), and nx/ny written as
+// `if (nx < 0) nx = 0;` after a bare `-x` (57.1).
+// What the diff still looks like, for the next attempt: the three regions are
+// (a) the first cell's `imul` destination, (b) which of j1/bestIdx inherits
+// ebx from `bit`, (c) the else branch's frame pointer, which the original keeps
+// in ecx and slot 0x24 and we keep in edx and slot 0x38. (b) and (c) are the
+// same slot-allocation story: swapping which variable holds ebx also swaps
+// 0x1c and 0x20 for j1 and y2, and swapping the else branch's frame slot
+// 0x24/0x38 moves every reload. A construct that moves ALL THREE at once is
+// wanted, not three local fixes.
+// deepseek-v4.1 swept 37 more shapes against this base. 22 came out
+// byte-identical (81.5) and the other 15 were worse, so none of these is the
+// missing construct. Neutral: adding
+// <stdio.h>, <stdlib.h>, <string.h>, <stddef.h> (any order), `x + halfW * y`
+// and `(short)x2 + halfW * (short)y2` in the two visibility cells,
+// `x + halfW * y` in both at once, `g_game->visibilityMask + (halfW * y + x)`,
+// reversed conditions on both loops, assignment instead of initialisation for
+// `frame` and for `j1`, ctor-style `int bestIdx(0)` / `int j1(1)`, j1 declared
+// inside the bare block, `int changed` declared last, `unsigned int changed`,
+// and a detached `Frame_00481930* frame;` declaration. Worse: `j1 = 1` moved
+// inside an `if ((short)num > 0)` wrapper (76.1, adds a second guard test),
+// `short j = 0` hoisted above bestIdx's declaration (74.5), x/y declared
+// before halfW/halfH (78.3), the cell line moved above the count line (69.7,
+// 1046 bytes), `ref` loaded before the cell (73.6), x/y as `short` (67.9,
+// 1085), bit declared last (58.4), x/y last (59.7), <math.h> (78.7),
+// WIN32_LEAN_AND_MEAN (78.7), and dropping <windows.h> altogether (36.4: the
+// file needs it). Conclusion: (a), (b) and (c) are not reachable from the
+// source shape of this inner block at all; the next attempt should look for a
+// different construct, most likely one that makes bestIdx and j1 be born in
+// different extended basic blocks (the original's `j1 = 1` store sits in the
+// preheader below the `jle`, ours sits in the guard block with bestIdx), or a
+// different source for the outer loop that moves ebx's first free point.
