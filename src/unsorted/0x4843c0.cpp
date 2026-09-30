@@ -1,17 +1,31 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
-// Gave up at 86.7% (1302 bytes against 1303). Two real diffs remain, all of the
-// loop-target shifts follow from the first. At 0x48441b the original reloads
-// g_game into EDI (`mov edi, [0x511de8]`, 6 bytes); ours goes to EAX (A1 form,
-// 5 bytes), which shifts every later jump by one. Twenty-eight further spellings
-// of those two scroll reads were probed (void*/char*/const/Game&/reference,
-// spelled offsets, comma and split declarations, ZeroMemory, cast sizes, both
-// declaration orders, pointer live across the memset) and every one still picks
-// EAX. Only `Game* g = g_game;` declared before info yields a 6-byte reload, in
-// EDX, but it moves the matched memset byte count from EDX to EBX. Second diff:
-// in the last border loop ours emits `mov ecx, 1` before `test eax, eax; jbe`,
-// the original emits it after; for/while/do-while/break/cast spellings of that
-// loop all keep our order, so it too looks like fallout from the register
-// tie-break. The visibility test and local slots match.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6, finished by space-bunny-free. Names are provisional.
+// Gave up at 86.9% (1302 bytes against 1303). Every other byte matches; the
+// whole remaining diff is ONE instruction: after the inlined memset the original
+// reloads g_game with `mov edi, [0x511de8]` (8B 3D, 6 bytes) while this builds
+// `mov eax, [0x511de8]` (A1, 5 bytes). That single byte shifts every later jump
+// target by 1, and all the other diff hunks are exactly that shift. The temp is
+// live only for the two scroll loads (`mov ebx, [reg+0x14323]`, then
+// `mov edi, [reg+0x1431f]`, whose destination is the same register the base
+// dies in), so the original coalesced it with x0 in EDI; here the base is put in
+// EAX first, which then blocks that coalescing and x0 lands in EDI instead.
+// Still EAX for the base under every spelling tried: swapping the x0/y0
+// declarations, one-line `int y0 = ..., x0 = ...`, uninitialised x0/y0 assigned
+// after the memset, x0/y0/rx/ry declared at the top of the function and assigned
+// later, the rx/ry order reversed, x0/y0/rx/ry as `long` instead of `int`, rx/ry
+// as `long`, the scroll fields declared `long`, grid width/height as `int`, `int`
+// and `1u` and unsigned `bit`, the `flags.raw & 2` test as `flags.bits.bit1`,
+// the `i < 16` clamp as a ternary and as braced if/else, the clamp operand order
+// reversed, `const int` rx/ry, a named `Game*`/`Game&`/`const Game*` base,
+// `g_game[0].field`, pointer-arithmetic loads, `count + count` and `count * 2u`
+// memset lengths, ZeroMemory, (void*) cast and sizeof spelling of the memset, and
+// 128 header sets (headers.py). Merging the map-info pointer into the player-grid
+// pointer (one variable for both roles, which is what the exe actually does,
+// see the note below) changes the IR but drops to 78.8% / 1291 bytes.
+// Unrelated but worth recording: the exe reads a stack slot at [esp+0x24] that is
+// never written (0x4845a5, 0x48470c, 0x48483a) for the visibility width, height
+// and mask, while the only initialiser of &g_game->info goes to [esp+0x20] at
+// 0x4843da. This file reproduces that byte for byte by letting the two locals
+// share a home slot.
 #include <windows.h>
 
 #pragma pack(push, 1)
@@ -80,7 +94,8 @@ void FUN_004843c0(void)
     PlayerGrid* pg = &g_game->players[g_game->playerIndex];
     unsigned int bit = 1 << g_game->playerIndex;
 
-    memset(grid->cells, 0, grid->count * 2);
+    unsigned char* cells = (unsigned char*)grid->cells;
+    memset(cells, 0, grid->count * 2);
 
     int x0 = g_game->scrollX;
     int y0 = g_game->scrollY;
@@ -160,8 +175,9 @@ void FUN_004843c0(void)
         }
     }
 
-    if (xEnd > info->width / 2) {
-        for (unsigned int i = 1; i - 1 < grid->height; i++) {
+    if (xEnd > info->width / 2 && grid->height != 0) {
+        unsigned int i = 1;
+        do {
             if (g_game->flags.bits.bit1) {
                 if (grid->cells[i * grid->width - 2].hi & 4)
                     grid->cells[i * grid->width - 2].hi |= 8;
@@ -172,6 +188,7 @@ void FUN_004843c0(void)
                 grid->cells[i * grid->width - 2].lo |= 8;
             if (grid->cells[i * grid->width - 2].lo & 1)
                 grid->cells[i * grid->width - 2].lo |= 2;
-        }
+            i++;
+        } while (i - 1 < grid->height);
     }
 }
