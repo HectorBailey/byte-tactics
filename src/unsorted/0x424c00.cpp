@@ -1,10 +1,34 @@
-// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
 // Partial: 69.1%, 1514 bytes versus 1496. Names allocation keeps its
 // result in EDI and rematerializes zero inside the fill loop; the original
 // uses EAX as the fill cursor and reloads EDI afterward. Feature-list
 // destruction and subsequent record-loop registers also differ. Twelve
 // allocator ABI variants and twelve native vector fill variants did not
 // improve it. The specialized remap members retain the original inline split.
+//
+// space-bunny-free, 15 check runs (1 real, 14 free --sym scratch scores),
+// none of them moved the number. Everything below is now believed to be ONE
+// allocator state, not a dozen independent problems: the original holds the
+// constant 0 in EBP for the whole first two thirds of the function
+// (0x424c1d, 0x424cdf, 0x424ee4, 0x424f2e), so EBP is never a loop counter.
+// Ours uses EBP as the outer record index and rematerializes 0 into EDI
+// instead (0x424d1d, 0x424eba), and that single difference re-orders the
+// fill loop, the feature-list destructor, and all three record loops.
+//
+// Tried and did NOT work (do not repeat):
+// - `if (*p != 0)` and `if (*p != nul)` around the per-element delete: the
+//   original has no such test (0x424ee4 tests the loop bound, not the
+//   element), and both cost 5 points, 63.8%.
+// - Hoisting DAT_00511fb4 into a local `v` for the free loop: 66.9%. The
+//   original re-loads the global at 0x424ed2 and again at 0x424ef5.
+// - Giving ~vector<...>::~vector a named `iterator* f = &_First` pair: 69.1%
+//   unchanged, i.e. the LEA materialisation at 0x424f16 is not address-of.
+// - Extra live nodes to demote `file` a step (an unused int, an
+//   address-taken int, an `unsigned short*` alias of remap._First): all
+//   dead-code-eliminated, 69.1% unchanged, so the demotion is not reachable
+//   by adding a local here.
+// - Re-binding `file` to a `const` local before the three record loops:
+//   69.1% unchanged.
 
 #include <string.h>
 #include <utility>

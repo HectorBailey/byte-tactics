@@ -1,9 +1,16 @@
 // Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, finished by GPT-6. Names are provisional.
-// Partial: 55.8%, 1537 bytes versus 1512. <vector>/<windows.h>, an
-// early canRepair declaration and reordered first/onOff/cloak/count locals
-// recover the original 0x240 frame, game in EDI and canRepair in EBP.
-// Remaining first/count/onOff/cloak/cursor slots and tail register allocation
-// differ. A 768-set header sweep and 80 local/type/lifetime variants were tried.
+// Partial: 55.8%, 1537 bytes versus 1512. <vector> plus <windows.h> is load
+// bearing for the allocation (<windows.h> alone drops to 41%, and no header
+// set headers.py tries beats this). The 0x240 frame, game in EDI and canRepair
+// in EBP are recovered. Remaining: first and count live in memory where the
+// original keeps them in EBX/EBP in the single-unit branch, u and last land in
+// the wrong registers in the else loop, and the order-word stores swap the
+// game and value registers.
+// Tried with no gain: 13 extra header sets; an N-declarations sweep from 0 to
+// 600 (flat, so the shape not the compiler state differs); 12 local
+// declaration permutations (moving onOff/cloak before the flags collapses to
+// 30%); loop rewrites (continue vs && vs nested if, each 55.8%); and defining
+// the adjacent 0x41b2a0 above this function.
 
 #include <vector>
 #include <windows.h>
