@@ -2322,22 +2322,37 @@ Cost units: thousands of tokens weighted by price relative to Haiku (Sonnet 5 co
 | #4286 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
 | #4282 | sonnet-5.5 | 1 | 0 | 0 | n/a | n/a | n/a |
 | #4304 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #2991 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #4318 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #4198 | sonnet-5.5 | 3 | 1 | 0 | n/a | n/a | n/a |
+| #4154 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #4233 | deepseek-v4.1-flash | 3 | 3 | 0 | n/a | n/a | n/a |
+| #4141 | sonnet-5.5 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #4100 | mimo-v2.6-pro | 2 | 0 | 0 | n/a | n/a | n/a |
+| #3010 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #4170 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #4300 | opus | 1 | 1 | 0 | n/a | n/a | n/a |
+| #4133 | mimo-v2.6-pro | 2 | 0 | 0 | n/a | n/a | n/a |
+| #4106 | mimo-v2.6-pro | 1 | 0 | 0 | n/a | n/a | n/a |
+| #3143 | opus | 1 | 0 | 0 | n/a | n/a | n/a |
+| #4152 | sonnet-5.5 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #4132 | mimo-v2.6-pro | 2 | 0 | 0 | n/a | n/a | n/a |
 
 ### Escalations
 
-- Opus matched 95 of 137 functions a cheaper model had failed.
+- Opus matched 96 of 139 functions a cheaper model had failed.
 - Sonnet matched 109 of 116 functions a cheaper model had failed.
 - Gpt-6 matched 5 of 134 functions a cheaper model had failed.
 - Space-bunny-free matched 87 of 480 functions a cheaper model had failed.
-- Deepseek-v4.1-flash matched 112 of 2261 functions a cheaper model had failed.
+- Deepseek-v4.1-flash matched 115 of 2274 functions a cheaper model had failed.
 - Gpt-5.6-terra matched 3 of 17 functions a cheaper model had failed.
 - Mimo-v2.6-flash matched 3 of 5 functions a cheaper model had failed.
-- Sonnet-5.5 matched 37 of 131 functions a cheaper model had failed.
+- Sonnet-5.5 matched 38 of 138 functions a cheaper model had failed.
 - Longcat-2.5-preview-free matched 9 of 131 functions a cheaper model had failed.
 - Muse-spark-1.3-free matched 0 of 4 functions a cheaper model had failed.
 - Gpt-6.1-sol matched 1 of 278 functions a cheaper model had failed.
 - Gpt-6-luna matched 0 of 2 functions a cheaper model had failed.
-- Mimo-v2.6-pro matched 6 of 49 functions a cheaper model had failed.
+- Mimo-v2.6-pro matched 6 of 56 functions a cheaper model had failed.
 <!-- calibration:end -->
 
 ## Findings about the target
