@@ -2268,6 +2268,11 @@ Cost units: thousands of tokens weighted by price relative to Haiku (Sonnet 5 co
 | #3431 | mimo-v2.6-pro | 2 | 0 | 0 | n/a | n/a | n/a |
 | #3468 | mimo-v2.6-pro | 2 | 1 | 0 | n/a | n/a | n/a |
 | #3772 | mimo-v2.6-pro | 2 | 0 | 0 | n/a | n/a | n/a |
+| #3458 | mimo-v2.6-pro | 1 | 0 | 0 | n/a | n/a | n/a |
+| #3793 | mimo-v2.6-pro | 2 | 1 | 0 | n/a | n/a | n/a |
+| #3584 | mimo-v2.6-pro | 1 | 0 | 0 | n/a | n/a | n/a |
+| #3877 | mimo-v2.6-pro | 1 | 0 | 0 | n/a | n/a | n/a |
+| #4283 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
 
 ### Escalations
 
@@ -2275,7 +2280,7 @@ Cost units: thousands of tokens weighted by price relative to Haiku (Sonnet 5 co
 - Sonnet matched 109 of 116 functions a cheaper model had failed.
 - Gpt-6 matched 5 of 134 functions a cheaper model had failed.
 - Space-bunny-free matched 87 of 480 functions a cheaper model had failed.
-- Deepseek-v4.1-flash matched 105 of 2231 functions a cheaper model had failed.
+- Deepseek-v4.1-flash matched 105 of 2232 functions a cheaper model had failed.
 - Gpt-5.6-terra matched 3 of 17 functions a cheaper model had failed.
 - Mimo-v2.6-flash matched 3 of 5 functions a cheaper model had failed.
 - Sonnet-5.5 matched 36 of 117 functions a cheaper model had failed.
@@ -2283,7 +2288,7 @@ Cost units: thousands of tokens weighted by price relative to Haiku (Sonnet 5 co
 - Muse-spark-1.3-free matched 0 of 4 functions a cheaper model had failed.
 - Gpt-6.1-sol matched 1 of 278 functions a cheaper model had failed.
 - Gpt-6-luna matched 0 of 2 functions a cheaper model had failed.
-- Mimo-v2.6-pro matched 3 of 16 functions a cheaper model had failed.
+- Mimo-v2.6-pro matched 4 of 21 functions a cheaper model had failed.
 <!-- calibration:end -->
 
 ## Findings about the target
