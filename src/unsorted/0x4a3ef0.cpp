@@ -1,4 +1,19 @@
 // Decompiled by space-bunny-free, finished by GPT-6, finished by GPT-6.1-sol, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
+// deepseek-v4.1-flash (issue 3343, 900s run): still 93.1% (629 bytes), no change.
+// Reconfirmed the whole residual is the two 2-byte arms that cancel: the 0x10
+// denominator's two-statement form is exact but costs +2 (631 bytes / 90.6 alone),
+// and the 0x20 arm still loads `e->field_c6` after the `test eax,eax` into ecx.
+// Every shape that hoists that load before the test collapses the function-wide
+// allocation: arm-local `int* p` (with the union, or with a plain `int lines`, or
+// with an explicit else) and a helper parameter `(int* p, int count)` all give
+// 604 bytes / 36.3% (e moves ebx to edi, the shared zero leaves ecx); a helper that
+// reads both `e->field_c0` and `e->field_c6` itself is the same 604 / 36.3; hoisting
+// `int n = 0` to function scope with a plain `int lines` is 658 / 19.5. The closest
+// hoist is the union kept whole with an arm-local `int* p` and the explicit
+// `if (count > 0)`, 644 / 85.4, because `lines` becomes memory-resident and the
+// count<=0 path reloads it from [esp+0x10] (p still lands in ecx, not edx).
+// The one requirement left is unchanged: `entries` in ebp, the 32-bit zero in ecx,
+// and `e->field_c6` in edx, all at the same time. Nothing here reaches it.
 // GPT-6.1-sol (#3140 retry): six checks, best remains 93.1% (629 bytes), no MATCH.
 // The 0x10 denominator selection still has different registers and shorter code;
 // in the 0x20 arm the field_c6 load remains after the count test and zero-extends

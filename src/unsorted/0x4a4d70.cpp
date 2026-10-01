@@ -1,4 +1,4 @@
-// Decompiled by space-bunny-free, finished by GPT-6.1-sol, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by space-bunny-free, finished by GPT-6.1-sol, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
 // Retry #3140 (GPT-6.1-sol): one checker run reconfirmed the inherited 98.7% / 661-byte best, no MATCH. The only differences remain the colour-load SIB operand order and the final marker-call surface-load/push schedule; prior notes record many equivalent source-shape attempts.
 // Retry (deepseek-v4.1-flash, issue 3076): 98.7%, 661 bytes both sides. The
 // colour SIB base/index (`[ecx+eax+0x8b2]` vs `[eax+ecx+0x8b2]`) and the surface
@@ -217,6 +217,28 @@
 //    sourced by a source-level local either.
 // The two hunks are unchanged from the third pass and look like one backend
 // allocator/scheduling state set elsewhere in the original translation unit.
+
+// space-bunny-free retry (issue 3343): 98.7% held, 661 bytes both sides, no
+// MATCH, one real check.py run, everything else scored free with `--sym`.
+// New negative results, all on the same two hunks:
+//  - `me` built as `(Entry*)((char*)entries + param_2 * 0x15b)` (a multiply
+//    node instead of a scaled index, so a different IR shape with identical
+//    code), and with a `char*` intermediate, are both flat at 98.7%: changing
+//    IR node COUNT this way does not move the allocator either.
+//  - A `Holder*` local for `param_1->holder`, dropping the `(int)` cast on the
+//    colour subscript, and `me->colours[param_1 + 0x8b2]`: flat.
+//  - Tail locals: `y2` inlined, a `void* surf` local, `rect.top + height`
+//    instead of `height + rect.top`, and putting `x` before `colour`/`y2`
+//    (96.9%). Inlining the colour, inlining `x`, and reordering to
+//    colour/y2/x all stay worse, as before.
+//  - Measure_004a4d70 spelled `while (*q)`, `if (glyph)`, and `if (p == NULL)`
+//    are flat at 98.7% and byte-identical; the `for (; *q; ++q)` form drops to
+//    76.2%, moving `q` first drops to 91.3%, so that block is only correct for
+//    its current shape, and yet perturbing it cannot move the two hunks.
+// So neither hunk is a source-shape problem reachable from the two blocks they
+// sit in; both are decided by the same late allocator state, and no
+// allocation-level perturbation tried here (IR node count, temp order, local
+// order, tail parameter shape) moves either one.
 
 #pragma pack(push, 1)
 struct Entry_004a4d70 {                // 0x15b bytes
