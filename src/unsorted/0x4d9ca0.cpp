@@ -1,4 +1,11 @@
-// Decompiled by space-bunny-free, finished by muse-spark-1.3-free, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by space-bunny-free, finished by muse-spark-1.3-free, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by deepseek-v4.1-flash, finished by mimo-v2.6-pro. Names are provisional.
+// mimo-v2.6-pro retry: 80.1% (641 bytes) via tools/permute.py inline-helper rewrites
+// (inl0..inl8 wrap n-1, i%8, i, *s, s+1, m-1 etc; the odd if/else/do-while around the
+// loop-2 preheader is a permuter artefact that happens to schedule better). Still differs:
+// the original spills `this` to [esp+0x20] and keeps count/n transient in ESI with len in
+// memory and i in EBP, frame 0x18 with pc spilled to [esp+0x24]; ours keeps `this` in ESI
+// and len in EBP (prologue) so the loop-top reload and the n-1 register differ. The single
+// unflipped decision is ESI holding n (original) vs this (ours). See the long notes below.
 // deepseek-v4.1-flash (seventh run, 10-minute box): still 79.2% (643 bytes). Tested, all worse
 // or tied: dropping `const int n = count;` and reading count directly in both places 73.6 (637
 // bytes); moving `int i = 0;` to last tied 79.2 but reverted to the known-best order.
@@ -142,6 +149,7 @@
 // The n-declaration variants keep landing frame 0x18 with this=esi, len=ebp and
 // i=edi, i.e. MSVC ranks this/len above i; the original ranks i above both and
 // spills them. No source lever found in the box.
+#include <memory.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -168,53 +176,87 @@ public:
 // priority flip, so the 69.5% body below stands (ours: frame 0x10, this=ebp, i=esp+0x18,
 // r=esp+0x14, len=esp+0x10; every mid-body [esp+N] is therefore 4 low).
 //
+static inline int inl2(const int n) { return n - 1; }
+
+static inline int inl3(int i) { return (int)i; }
+
+static inline int inl0(int i) { return i % 8; }
+
+static inline char* inl4(char*p) { return (char*)p; }
+
+static inline unsigned int inl1(int m) { return (unsigned int)(m - 1); }
+
+static inline unsigned long inl5(int*s) { return (unsigned long)*s; }
+
+static inline int* inl7(int*s) { return 1 + s; }
+
+static inline int inl8(int m) { return (int)m; }
+
 // FUNCTION: 0x4d9ca0
 void Class_004d9ca0::FUN_004d9ca0()
 {
-    unsigned int len = 0xa44c;
-    char* p = buf;
-    int i = 0;
-    int m = copied;
+    int* s;
+    unsigned int len;
+    len = 0xa44c;
+    int i;
+    i = 0;
+    int m;
+    m = (((unsigned int)copied));
+    char* p;
     const int n = count;
+    unsigned int len2;
 
-    if (n > 0) {
-        sprintf(p, "Call stack:\n");
+    p = buf;
+    if (((int)(n > 0))) {
+        unsigned long* r;
+        sprintf(inl4(((char*)p)), "Call stack:\n");
         len -= strlen(p);
-        p += strlen(p);
-        unsigned long* r = ret;
-        for (i = 0; i < n; i++) {
-            if (len <= 0x1e)
-                break;
-            sprintf(p, "%08lX", *r);
-            strcat(p, (i == n - 1 || i % 8 == 7) ? "\n" : " ");
-            len -= strlen(p);
-            p += strlen(p);
-            r++;
+        r = ret;
+        i = 0;
+        p += strlen((p));
+        for (; i < n; ) {
+            if (len > 0x1e) {
+            } else { break; }
+            sprintf(p, "%08lX", *((unsigned long*)r));
+            strcat((p), (inl2(n) == (inl3(i)) || 7 == i % 8) ? "\n" : " ");
+            len -= strlen(((char*)p));
+            p = p + strlen(p);
+            i = ((i + 1));
+            r = (1 + r);
         }
-    } else {
-        p[0] = 0;
-    }
-    unsigned int len2 = len;
-    if (m > 0 && len2 > 0x1e) {
-        int* s = stack;
-        sprintf(p, "Stack dump:\n");
-        len2 -= strlen(p);
-        p += strlen(p);
-        unsigned long* q = pc;
-        for (i = 0; i < m; i++) {
-            if (len2 <= 0x1e)
+    } else p[0] = 0;
+    len2 = len;
+    if (m > 0) {
+        if (len2 <= 0x1e) {
+        } else {
+            unsigned long* q;
+            s = stack;
+            sprintf(p, "Stack dump:\n");
+            len2 -= strlen(p);
+            q = pc;
+            p = strlen(p) + p;
+            p = p;
+            i = 0;
+            int tmp0;
+            tmp0 = i >= (inl8(m));
+            if (tmp0) {
+            } else { do {
+                if (len2 > 0x1e) goto skip1;
                 break;
-            if (i % 8 == 0) {
+skip1:;
+                if ((inl0(i))) goto skip0;
                 sprintf(p, "%08lX: ", q);
                 len2 -= strlen(p);
                 p += strlen(p);
-            }
-            sprintf(p, "%08lX", (unsigned long)*s);
-            strcat(p, (i == m - 1 || i % 8 == 7) ? "\n" : " ");
-            len2 -= strlen(p);
-            p += strlen(p);
-            q++;
-            s++;
+skip0:;
+                sprintf(((char*)p), "%08lX", inl5(s));
+                strcat(p, (i == (inl1(m)) || (i % 8) == 7) ? "\n" : " ");
+                len2 -= strlen(p);
+                len2 = len2;
+                do p += strlen(p); while (0);
+                s = inl7(s), q++, i++;
+            } while (i < m); }
         }
+    } else {
     }
 }
