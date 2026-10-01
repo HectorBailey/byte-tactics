@@ -1,4 +1,57 @@
 // Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1, refined by GPT-6.1-sol, finished by mimo-v2.6-pro. Names are provisional.
+// mimo-v2.6-pro 2026-10-01 (session 2, timeboxed): 80.8 -> 85.1 percent,
+// 2370 -> 2386 bytes. BREAKTHROUGH: the duplicate player guard no longer CSEs.
+// The trick is to spell the WHOLE second guard group through a fresh pointer
+// `PlayerInfo_00464f80* pi2 = &g_game->players[bl];` in its own scope. A fresh
+// `&g_game->players[bl]` gets a new value number, so MSVC cannot forward the
+// first group's `pi->type` / `pi->field_146` loads and re-emits
+// `mov al,[edi+0x73]` and `cmp byte [edi+0x146],0xa` (the two reloads that were
+// missing). Crucially this spelling ALSO routes the second reads through EDI
+// (`[edi+0x73]`, `[edi+0x146]`) exactly like the original, and does NOT swap
+// esi/edi (unlike the pi2-for-type-only spelling of earlier passes which sent
+// the second field read through `[ecx+0x1ca9]`). The first active test stays
+// the array form `g_game->players[bl].active` (gives `mov eax,[edx+ecx*2+
+// 0x1b63] / test / lea edi`), and the second active test is `pi2->active`
+// (`cmp dword [edi],0`). See build/scratch/0x464f80/r2.cpp (this file) vs
+// base.cpp / r1.cpp. r1 (pi2 only for type) sent field_146_2 through ecx;
+// r2 (pi2 for the whole second group) is the good one.
+// STILL OPEN (all compiler-state register allocation, 2386 vs 2392 = 6 bytes):
+// (1) The first owner block's switch discriminant is in ECX here
+// (`mov ecx,[edx+0x37eee] / sub ecx,0 / dec ecx`) but EAX in the original
+// (`mov eax,[...] / sub eax,0 / dec eax`). Because block1 keeps `unit->owner`
+// in EAX and the switch reuses ECX here, EAX (owner) survives into block2, so
+// block2 CACHES owner->active (`mov edx,[eax] / test edx,edx`) instead of
+// RELOADING the owner pointer (`mov eax,[esi+0xec] / cmp [eax],0`) like the
+// original. So the switch register is the single root cause of BOTH the missing
+// 6-byte `mov eax,[esi+0xec]` AND block2's active test form. Micro-variants
+// (`int sv = g_game->field_37eee; switch(sv)`, `+0`, named active/own locals)
+// all vanish to identical 85.1 output; the eax-vs-ecx choice is a register
+// allocator coin flip I could not steer. Forcing block2 to reload owner without
+// fixing block1's switch needs an invalidating store between the blocks (there
+// is none: `unit->field_bc=f` is a different field of the same struct).
+// (2) Loop head still spills before the test (`mov [esp+0x10],bl / cmp bl,0xa`)
+// where the original tests first (`cmp bl,0xa / mov [esp+0x10],bl`), and the
+// original keeps BOTH a head test and a bottom test (shared failure exit: head
+// `cmp/mov/jae INC`, tail `inc bl/cmp bl,0xa/mov/jb body`) while ours has one
+// head test and a tail `inc/mov/jmp head`. Loop-shape variants scored lower.
+// (3) `shl edi,0x10` scheduled after `sub eax,ebp` here, before it in original.
+// (4) The watch_check / dialog region: g_game+0x519 reloads pick edx/ecx/eax
+// differently and `mov ebp,[ebx+4]` (w = dlg->field_4) scheduling differs.
+// (5) watch_check player-index lea/mov order (the FUN_00456850 result math).
+// More switch/owner attempts this session, all byte-identical to r2 (85.1,
+// 2386): inline getSw() helper returning field_37eee (block1-only and
+// both-blocks), nested if instead of &&, own/own2 fresh locals for owner,
+// block2 owner via *(Player**)((char*)unit+0xec) and *(int*)((char*)unit->owner),
+// pre-computed int sw before the if (83.7), switch -> if/else chain (84.2),
+// int sv = field_37eee; switch(sv) both blocks (83.9). None flip block1's
+// switch to EAX. A do-while loop shape (if (loopCond) { do {...} while
+// (loopCond(bl)) }) collapses to 66.9 because continue skips the bl++ (C
+// continue in do-while jumps to the condition, not the increment), so the
+// for-shape is required for continue -> increment; keeping BOTH the head and
+// tail tests needs the guide-1101 inline-member-helper trick which the earlier
+// passes could not get to keep the entry test. Next worker: the single highest
+// value lever is still block1's switch discriminant register (ECX -> EAX);
+// everything in the owner region and the 6-byte deficit cascades from it.
 // mimo-v2.6-pro 2026-10-01 (retry, timeboxed): 80.2 -> 80.8 percent,
 // 2386 -> 2370 bytes. SOLVED: the two byte `or`-RMW sites (the dl load-modify-
 // store on `flags_3923b |= 0x10` and `pi->data->flags_9b |= 0x40`). The direct
@@ -377,15 +430,16 @@ void __stdcall FUN_00464f80()
         }
         if (pi->field_146 == 0xa)
             continue;
-        if (pi->active == 0)
-            continue;
         {
-            unsigned char t2 = pi->type;
+            PlayerInfo_00464f80* pi2 = &g_game->players[bl];
+            if (pi2->active == 0)
+                continue;
+            unsigned char t2 = pi2->type;
             if (t2 != 1 && t2 != 2 && t2 != 3)
                 continue;
+            if (pi2->field_146 == 0xa)
+                continue;
         }
-        if (pi->field_146 == 0xa)
-            continue;
 
         if (pi->field_74 != 0)
             pi->field_74->FUN_00408c40();
