@@ -58,6 +58,7 @@ It never writes to `src/`, `data/` or any tracked file. Everything goes to
 | `matches/` | every candidate that MATCHed |
 | `best_raw.cpp` | the best version before cleanup |
 | `best_ratio.cpp` | written when the highest check.py percentage seen is not `best.cpp`'s |
+| `best_search.cpp` | the lowest fine score seen, when its check.py percentage is below the start's (`best.cpp` never is): often the right instruction order with the wrong registers, worth a look |
 
 Always confirm a result with the checker before using it:
 
@@ -215,8 +216,9 @@ and arguments passed by reference count as memory.
    file as a normal edit, keeping the file's credit line, and simplify the
    spelling where you can while it still matches.
 5. A better partial: the same, if check.py's percentage went up. `best.cpp`
-   is chosen by the fine score; when check.py's percentage disagrees,
-   `best_ratio.cpp` holds the version with the highest percentage.
+   is chosen by the fine score among the candidates whose check.py
+   percentage is at least the start's; `best_ratio.cpp` holds the version with
+   the highest percentage when that is another one.
 
 ## First run
 

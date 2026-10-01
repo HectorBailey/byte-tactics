@@ -556,6 +556,7 @@ def permute(address: int, src: Path, minutes: float, jobs: int, seed: int | None
     start: Score | None = None
     matches = 0
     last_gain = t0
+    lowest = INF
     cap = max_minutes if max_minutes is not None else minutes
 
     def write_best(e: Entry):
@@ -590,6 +591,7 @@ def permute(address: int, src: Path, minutes: float, jobs: int, seed: int | None
         if start.status in ("compile", "error", "guard"):
             return Result(address, str(src), start, None, 0, 1, out, f"cannot score the starting file: {start.note}")
         best = Entry(base_text, start, serial)
+        lowest = start.value
         top_ratio = best
         elite.append(best)
         with (out / "log.txt").open("a") as fh:
@@ -671,6 +673,11 @@ def permute(address: int, src: Path, minutes: float, jobs: int, seed: int | None
                     elif sc.value == parent.score.value:
                         stats[k]["equal"] += 1
                 serial += 1
+                if sc.value < lowest:
+                    lowest = sc.value  # search progress, even where best.cpp cannot follow
+                    last_gain = time.time()
+                    if sc.ratio < start.ratio:
+                        (out / "best_search.cpp").write_text(res["text"], encoding="latin-1")
                 e = Entry(res["text"], sc, serial, parent.lineage + names)
                 worst = elite[-1].key() if len(elite) >= elite_size else None
                 if sc.value <= parent.score.value or worst is None or e.key() < worst:
@@ -682,7 +689,11 @@ def permute(address: int, src: Path, minutes: float, jobs: int, seed: int | None
                     # check.py's percentage can disagree with the finer score; keep its best too
                     top_ratio = e
                     (out / "best_ratio.cpp").write_text(e.text, encoding="latin-1")
-                if e.key() < best.key() and (sc.value < best.score.value or sc.ratio > best.score.ratio):
+                # The search climbs the fine score, but best.cpp must never be
+                # worse than the start by check.py's percentage (eight register
+                # swaps score better than one moved instruction, yet read worse).
+                if e.key() < best.key() and (sc.value < best.score.value or sc.ratio > best.score.ratio) \
+                        and sc.ratio >= start.ratio - 1e-9:
                     for k in set(names):
                         stats[k]["new_best"] += 1
                     line = (f"{(time.time() - t0) / 60:6.2f} min  score {parent.score.value:g} -> {sc.value:g}"
@@ -690,8 +701,6 @@ def permute(address: int, src: Path, minutes: float, jobs: int, seed: int | None
                     log_lines.append(line)
                     with (out / "log.txt").open("a") as fh:
                         fh.write(line + "\n")
-                    if sc.value < best.score.value:
-                        last_gain = time.time()
                     best = e
                     write_best(best)
                     (out / "best.json").write_text(json.dumps(summary(False), indent=1))
