@@ -1,4 +1,45 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1, refined by GPT-6.1-sol. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1, refined by GPT-6.1-sol, finished by mimo-v2.6-pro. Names are provisional.
+// mimo-v2.6-pro 2026-10-01 (retry, timeboxed): 80.2 -> 80.8 percent,
+// 2386 -> 2370 bytes. SOLVED: the two byte `or`-RMW sites (the dl load-modify-
+// store on `flags_3923b |= 0x10` and `pi->data->flags_9b |= 0x40`). The direct
+// `or byte ptr [m], K` form is a 1-bit `unsigned short` bitfield set (see the
+// guide's "or byte ptr [m], K straight to memory" fact and 0x4917d0): the
+// flags word at +0x3923b is now `union { unsigned short w; struct { :2, bit2,
+// bit3, bit4, bit5, bit6, :9 } b; }` with `w |= 4` kept for the `or word [m],
+// bp` sites (4 lives in ebp and its low byte is unaddressable, which is why
+// that OR is word-sized) and `b.bit4/bit5/bit6 = 1` for the byte ORs; the unit
+// byte at +0x9b is `union { unsigned char flags_9b; struct { :6, bit6b,
+// bit7b, :8 } fb; }` with `fb.bit6b = 1` for the write and the plain
+// `flags_9b & 0x40/0x80` reads kept (a bitfield read `if (bf)` compiles to
+// shr/test, not `test byte`). Plain `unsigned char |=` goes through a register
+// whenever a second OR to the same location follows anywhere later in the
+// function, and bitfield sets on `unsigned char` storage do too; only the
+// `unsigned short` bitfield spelling is direct every time (micro-tests
+// build/scratch/0x464f80/t_or*.cpp).
+// Loop shape, tried and no better than the current helper-for (80.8):
+// if (loopCond) do {...} while (bl++, loopCond(bl)) 80.5 (guard folds),
+// plain for (bl < 10) 80.7 (head test dropped, rotated tail only),
+// if (loopCond) do {...} while (bl++, bl < 10) 80.7, if (bl < 10) do {...}
+// while (bl++, loopCond(bl)) 80.5 (t_or4/t_loop*.cpp micro-tests show a
+// two-return helper gives test-at-top + jmp back, a single-return helper or a
+// plain bound trips the countdown pass in isolation). The original's head
+// `cmp/mov/jae INC` (failure merged with the increment block, the "shared
+// failure exit") plus bottom `inc/cmp/mov/jb body` is the rotated loop with a
+// kept redundant entry test; no spelling found that keeps both tests without
+// folding one away or tripping the trip-count pass.
+// Duplicate player guard (0x464fe1..0x465024) still CSE'd: the 0x458810
+// recipe (spell the second copy through `g_game->players[bl].` instead of
+// `pi->`, build/scratch/0x464f80/g2.cpp) makes the frontend keep the tests but
+// the second load then goes through `[eax + 0x1bd6]` instead of
+// `[edi + 0x73]` and the whole register file rotates (al -> cl, lea split),
+// 78.5%. pi2 (fresh `&g_game->players[bl]`) reproduces the group byte-for-byte
+// but swaps esi/edi globally (previous passes, 75.6-79.5).
+// Still open beyond those: the `shl edi, 0x10` scheduling in the subscreen
+// setup, the `mov eax,[g_game]` hoisted before the FUN_00490230 jne, the
+// switch value in eax vs ecx (first field_37eee block) and edx vs ecx (second
+// g_game reload), the second owner block re-loading `unit->owner` from
+// `[esi + 0xec]` instead of caching it, and the watch_check player-index
+// computation's lea/mov order.
 // deepseek-v4.1-flash 2026-10-01 (retry 6, timeboxed): no gain, stays 80.2 /
 // 2386 bytes. This session's probes were flat or negative: swapping the
 // countdown_extra 0x10/0x20 byte ors 80.0, `*(unsigned char*)&flags_3923b
@@ -135,8 +176,16 @@ struct Player_00464f80 {
     char unknown_74[0x95 - 0x74];
     unsigned char field_95;            // +0x95
     char unknown_96[0x9b - 0x96];
-    unsigned char flags_9b;            // +0x9b
-    char unknown_9c[0xa1 - 0x9c];
+    union {
+        unsigned char flags_9b;        // +0x9b
+        struct {
+            unsigned short padb : 6;
+            unsigned short bit6b : 1;
+            unsigned short bit7b : 1;
+            unsigned short restb : 8;
+        } fb;
+    };
+    char unknown_9d[0xa1 - 0x9d];
     unsigned short field_a1;           // +0xa1
     unsigned short field_a3;           // +0xa3
     char unknown_a5[0xbc - 0xa5];
@@ -256,7 +305,18 @@ struct Game_00464f80 {
     Class_0048ff40* list;              // +0x391ed
     char unknown_391f1[0x39239 - 0x391f1];
     short field_39239;                 // +0x39239
-    union { unsigned short w; unsigned char b; } flags_3923b;  // +0x3923b
+    union {
+        unsigned short w;
+        struct {
+            unsigned short padb2 : 2;
+            unsigned short bit2 : 1;
+            unsigned short bit3 : 1;
+            unsigned short bit4 : 1;
+            unsigned short bit5 : 1;
+            unsigned short bit6 : 1;
+            unsigned short rest2 : 9;
+        } b;
+    } flags_3923b;                     // +0x3923b
 };
 
 #pragma pack(pop)
@@ -359,7 +419,7 @@ void __stdcall FUN_00464f80()
                             if (g_game->field_39239 < 0) {
                                 g_game->flags_3923b.w |= 4;
                                 g_game->flags_3923b.w &= 0xffef;
-                                g_game->flags_3923b.b |= 0x40;
+                                g_game->flags_3923b.b.bit6 = 1;
                             }
                         }
                     }
@@ -498,7 +558,7 @@ void __stdcall FUN_00464f80()
             pi->field_22 == 0) {
             if ((g_game->players[FUN_00456850()].data->flags_9b & 0x80) != 0 ||
                 FUN_00457bc0() > 0) {
-                pi->data->flags_9b |= 0x40;
+                pi->data->fb.bit6b = 1;
                 if (bl == g_game->localPlayer) {
                     g_game->field_14281 &= 0xfffe;
                     g_game->field_14281 &= 0xfffd;
@@ -537,7 +597,7 @@ void __stdcall FUN_00464f80()
         g_game->flags_3923b.w |= 4;
         g_game->flags_3923b.w &= 0xffef;
         if (pi->field_22 == 0)
-            g_game->flags_3923b.b |= 0x40;
+            g_game->flags_3923b.b.bit6 = 1;
         goto skip508;
 
     check230:
@@ -552,8 +612,8 @@ void __stdcall FUN_00464f80()
             g_game->field_39239--;
             if (g_game->field_39239 < 0) {
                 g_game->flags_3923b.w |= 4;
-                g_game->flags_3923b.b |= 0x10;
-                g_game->flags_3923b.b |= 0x20;
+                g_game->flags_3923b.b.bit4 = 1;
+                g_game->flags_3923b.b.bit5 = 1;
             }
         }
         goto skip508;
@@ -571,7 +631,7 @@ void __stdcall FUN_00464f80()
         if (g_game->field_39239 < 0) {
             g_game->flags_3923b.w |= 4;
             g_game->flags_3923b.w &= 0xffef;
-            g_game->flags_3923b.b |= 0x40;
+            g_game->flags_3923b.b.bit6 = 1;
         }
     }
 }
