@@ -1,5 +1,5 @@
 // Decompiled by GPT-6, finished by space-bunny-free, finished by GPT-6.1-sol,
-// finished by deepseek-v4.1-flash. Names are provisional.
+// finished by deepseek-v4.1-flash, finished by deepseek-v4.1-flash. Names are provisional.
 // PARTIAL, 87.3% (1094 original bytes, 1094 ours).
 // Fixed this pass: hoisting all four shared edge-walk temps (next, dv, dx, du)
 // to function scope, ahead of the min/max locals, restored the frame from
@@ -119,41 +119,39 @@
 // assigned in loop1 and used for the y1/dx/dz reads regresses to 71.4
 // (1093 bytes), so the lowY 0x10 / next 0x14 crossing is not reachable from
 // declaration order or from a named next-vertex pointer.
-// Ninth pass (deepseek-v4.1-flash, timeboxed, no score change): moving the four
-// min/max locals from a bare function-scope declaration plus assignment line
-// into an initialized declaration at their first use inside the if block
-// (guide-1740 lever) is byte-identical at 87.3, so the store placement is not
-// what gives the original lowX slot 0x14; the 0x10/0x14 crossing stands.
-// Tenth pass (deepseek-v4.1-flash, timeboxed): the suggested follow-up of the
-// pass-6 split-next shape (block-scoped `int next` per edge loop) PLUS a
-// function-scope `n` spanning both loops (build/scratch/0x4c8760/varA.cpp)
-// scores 69.9% (1094 bytes), the same attractor as the other block-next
-// variants, so the extra spanning lifetime does not restore the 14-slot
-// arena; the block-scoped-next road is exhausted.
-// Eleventh pass (deepseek-v4.1-flash): the /Fa equate tables were extracted
-// for every variant. Best (87.3) table: lowX+n1 at 0x10, next at 0x14,
-// dv at 0x38, bottom at 0x3c (14 slots, same as original). Block-scoped
-// per-loop next plus hoisted `out` (varB) DOES reproduce the original's
-// sharing exactly (next1 shares dv's slot; lowX+n1+next2 share one slot;
-// n2 shares lowIndex) but the two groups come out swapped (lowX at 0x10,
-// next1/dv at 0x14) and the frame shrinks to 0x7d54 because bottom stays in
-// a register, so it scores 73.4 (varC, bottom hoisted: 73.4; varD,
-// lowY-group declared first: 73.4). Splitting next into two FUNCTION-scope
-// locals on the best file (varE) drops to 67.9, and with out hoisted
-// (varG) 76.0, where next1+next2+lowX+n1 all merge into 0x10. Hoisting out
-// alone (varH) is 85.3. So the original's split ({next1,dv} at 0x10 plus
-// {lowX,n1,next2} at 0x14, temp at 0x38) needs the allocator to order the
-// two groups the other way round while keeping the 14th (bottom) slot; no
-// source shape found yet does both.
-// Twelfth pass (deepseek-v4.1-flash, timeboxed 2026-10-01): the one untried
-// hunk lever was tested and is inert. Writing the y0 fixup products y0-first
-// (`x-=y0*dx; u-=y0*du; v-=y0*dv; z-=y0*dz;`) in loop 1 is byte-identical at
-// 87.3% / 1094 bytes, same two imul hunks: the original's `mov ecx,[dx]; imul
-// ecx,ebp` versus ours `mov ecx,ebp; imul ecx,[0x34]` is a register-versus-
-// memory operand difference driven by the 0x10/0x14 slot crossing, not an
-// operand order choice, so the product order in the source cannot steer it.
-// The lowX 0x10 (ours) versus 0x14 (original) crossover reported above stands.
-
+// Ninth pass (deepseek-v4.1-flash, short timebox, no score change): read the
+// /Fa equate table for the first time (it names every variable) and compared
+// the two builds range by range. The 14 slots are introduced in this order:
+// original: next1(0x10), lowX(0x14), x(0x18), y1(0x1c), highY(0x20), lowY(0x24),
+// lowIndex(0x28), du(0x2c), out(0x30), dx(0x34), nextVertex(0x38), bottom(0x3c),
+// highIndex(0x40), previous(0x44); ours is the SAME list with lowX and next
+// swapped at the front and dv in the nextVertex position, i.e. only five
+// ranges are coloured differently and every other slot matches exactly. That
+// is why the byte diff is only slot crossing plus two loop-body schedules.
+// New measurements (all in build/scratch/0x4c8760/, tables via slots.py):
+//  - v5 (per-loop block-scoped next, nothing else): frame 0x7d54, 13 slots,
+//    {y1,n1}=0x10, {dv,next1}=0x14, {lowX,next2,out1}=0x18, x=0x1c, highY=0x20,
+//    {lowIndex,n2}=0x24, du=0x28, lowY=0x2c, dx=0x30, out2=0x34,
+//    {previous,nv}=0x38, highIndex=0x40: the whole arena renumbers, so the
+//    per-loop next must NOT be a plain re-declaration if the 0x7d58 frame is
+//    to survive.
+//  - va = v5 + out hoisted to function scope: 13 slots but the class
+//    composition finally equals the original's ({lowX,n1,next2}, {dv,next1},
+//    singles x/y1/highY/lowY), with 0x10 and 0x14 swapped and the upper region
+//    shifted (du 0x28, out 0x2c, dx 0x30, {lowIndex,n2} 0x34, previous 0x38,
+//    bottom in a register, nv folded into 0x10). So the original is exactly
+//    this shape plus one more live range that spills: the missing ones are
+//    bottom (0x3c) and the next-vertex temp (0x38 in the original, its own
+//    slot, never merged with lowX/n1 as here).
+//  - vd = va with bottom hoisted to function scope: byte-identical table to
+//    va, so bottom's slot is not reachable by moving its declaration.
+//  - vc = va with a named per-loop nextVertex pointer: 13 slots, the pointer
+//    merges into 0x10 in loop1 and into 0x38 next to previous in loop2, so a
+//    named pointer does not give the original's isolated 0x38 class either.
+// Next lever: find the one extra live range that makes the va shape keep 14
+// slots (its 0x10/0x14 swap then has somewhere to go), most likely by making
+// the loop1 next-vertex temp's range end after dv's definition instead of
+// before it, since the allocator gives the temp's slot to dv in our build.
 struct Surface_4c8760 { unsigned short width, height; };
 void __stdcall FUN_004c7a20(int, int*, Surface_4c8760*, Surface_4c8760*);
 

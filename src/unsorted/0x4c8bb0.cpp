@@ -1,5 +1,15 @@
-// Decompiled by GPT-6, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol, edited by deepseek-v4.1, finished by space-bunny-free, finished by deepseek-v4.1-flash, finished by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by GPT-6, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol, edited by deepseek-v4.1, finished by space-bunny-free, finished by deepseek-v4.1-flash, finished by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional., finished by deepseek-v4.1-flash
 // deepseek-v4.1-flash pass (timeboxed 2026-10-01), body unchanged at 54.1%.
+// deepseek-v4.1-flash pass (2026-10-01, timeboxed at the 07:58Z deadline):
+// the sibling 0x4c8760's winning lever (SHARED.md line 361: hoisting the loop
+// temp dv to function scope ahead of the min/max locals) does NOT transfer
+// here, alone or in the sibling's exact set. Measured with free --sym runs on
+// the 54.1% body, frame stayed 0x7d5c in every case: dv alone 48.8%,
+// dz 49.6%, du 47.3%, dl 51.7% (1271B), dx 48.8%, the sibling's exact
+// `int next, dv, dx, du;` ahead of the min/max group 48.x% (two placements),
+// nextVertex alone 48.3%. So the missing 0x4c slot is not one hoisted edge
+// temp here; the 16th slot still has to come from the raw index-1 or the
+// prologue register set described above.
 // Measured the vK candidate the previous pass left unscored (free --sym):
 // currentVertex+nextVertex pointer locals in both edge loops plus a live
 // previous tail (index=previous; if(index<0) index=3): 49.1%, frame still
