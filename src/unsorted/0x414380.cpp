@@ -1,4 +1,11 @@
 // Decompiled by GPT-6 Astra, finished by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
+// deepseek-v4.1-flash follow-up (issue #3018 retry session, kept from a
+// parallel pass): in the original, bounds[0] accumulates on the min registers
+// (dst=min.x) while bounds[1]'s x accumulates on pos.x but its y/z accumulate
+// on the max registers, so the two sums are likely spelled with opposite
+// operand order in the source: bounds[0] = def->min + pos, bounds[1] =
+// pos + def->max. Untested ideas for the next pass: that operand flip for
+// bounds[0] alone, and the state-3 named-x/y/z-locals-then-assign split.
 // deepseek-v4.1-flash pass (4 real check runs / many --sym): no improvement
 // over 91.3%. New insight into why the explicit operator- flips esi/edi: the
 // prologue "mov esi,[esp+0x38]" runs BEFORE "push edi", so it reads arg2 (the
