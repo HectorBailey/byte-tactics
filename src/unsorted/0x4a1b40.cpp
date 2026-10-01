@@ -1,5 +1,50 @@
 // Decompiled by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by deepseek-v4.1-flash, finished by deepseek-v4.1-flash, edited by claude-opus-5-5. Names are provisional.
-// PARTIAL (51.8%). claude-opus-5-5 pass (#4143), 33.7 -> 51.8, structural fixes:
+
+// PARTIAL (66.5%), issue 4354. This pass went 51.8% -> 66.5%. What moved it, in
+// order of size:
+//  (1) 51.8 -> 60.0. The non-language text-width loop advances `q` itself and
+//      keeps the glyph char in a byte local:
+//        unsigned char c = *q;
+//        while (c != 0) { w += *(unsigned short*)FUN_004b7f30(glyphs, c); c = *(++q); }
+//      The original stores the char to a byte slot, reloads it as a dword and masks
+//      with 0xff (0x4a1d96..0x4a1da9). That byte slot was the one missing dword: the
+//      frame went 0xb8 -> 0xbc, matching the original, and the glyph loop then
+//      matched instruction for instruction.
+//  (2) 60.0 -> 62.0. Aliasing cell-branch locals onto text-branch locals so the two
+//      branches SHARE frame slots, which is what the original does (its cell loop
+//      uses the text loop's slots for row/yEnd/cellPtr): `row` onto `h`, `cellPtr`
+//      onto `lh`, `yEnd` onto `y`.
+//  (3) 62.0 -> 63.2. The cell-branch rowRect STORE ORDER is left, right, top,
+//      bottom, not declaration order: the original stores [esp+0x18]=points[0].x,
+//      [esp+0x20]=points[1].x, [esp+0x1c]=points[0].y, [esp+0x24]=points[2].y, i.e.
+//      both x fields before both y fields (0x4a21cd..0x4a21f0).
+//  (4) 63.2 -> 66.5. tools/permute.py hill climb from the 63.2% file. The useful
+//      finds, kept here with real names, are the one-line accessors below (routing
+//      an expression through an inline helper changes MSVC 5's allocation; inlining
+//      them by hand costs 0.1%), the split of `int h = me->h;` into a declaration
+//      plus an assignment, `int step = lh + 1;` written before the field_da test,
+//      and spelling the w test as a nested `if (q != 0) { ... }`.
+//
+// Confirmed INERT at 60-63% (all byte-identical or worse, do not retry):
+//   - declaration order of top0/flag/bounds/y/yoff, and of yoff vs y
+//   - arithmetic operand order in the loop head (`top+yoff+2` spellings)
+//   - `short`/`unsigned short`/`int` for keepW; dropping keepW (34.7) or limiting it
+//     to one use (34.6); keepW must span the loop
+//   - the FUN_004be950 colour parameter type (unsigned char / short / int), and
+//     caching colour_8be in any kind of local (45-51%)
+//   - headers.py over all 128 include sets; <windows.h> <string.h> is the best
+//   - `int LineHeight()` helper for the lh and next computations (59.8)
+//   - colPtr/bp/cellPtr as aliases of t/flag/h (36-61%)
+// Still differs: one cyclic rotation of the four callee-saved registers. Ours hands
+// them out [param_1, zero, entries, me] -> ebx/esi/edi/ebp; the original hands them
+// out [zero, entries, me, param_1] -> ebx/esi/edi/ebp, i.e. `param_1` has to be the
+// LOWEST-priority value, and `me` has to sit at [esp+0x50] where ours sits at
+// [esp+0x2c]. Reducing param_1's use count (using the `holder` local for
+// `param_1->holder->field_20`) drops to 50.3, so its use count is already right.
+// Suspected original bug: the highlight call at 0x4a1fb6 has both arms dead
+// identical (0x4a1fb8 and 0x4a1fcb both push 0x1e and lea the same [esp+0x1c]),
+// so `holder->field_20 == param_2` has no effect on the output.
+// Old notes below, kept for the leads they record.
 // - The cell branch's outline is `if (v & 1) {...} else if (v & 2) {four
 //   FUN_004be950}` drawn from the copied rowRect (left+1/bottom-1/...), with
 //   param_1->colour_8be re-read for each call; the old yEnd/yy arithmetic was
@@ -131,8 +176,13 @@
 // instruction for instruction, so the remaining gap is pure allocator state,
 // not missing code: the 55-byte shortfall is spill count (fewer memory operands
 // where the original spills more).
+// Decompiled by deepseek-v4.1, finished by deepseek-v4.1-flash, edited by
+// claude-opus-5-5. Names are provisional.
+//
 #include <windows.h>
 #include <string.h>
+#include <memory.h>
+#include <stdio.h>
 
 #pragma pack(push, 1)
 
@@ -273,125 +323,147 @@ void __stdcall FUN_004c7580(void* surface, void* bitmap, Quad_004a1b40* dst,
 // the same pointer. Either the original really indexes past rowRect or its highlight rect
 // is a second rect whose slot overlaps rowRect (mutually exclusive branches).
 //
+// These one-line accessors are NOT cosmetic: routing the expression through a
+// helper changes MSVC 5's register and slot allocation. Inlining them by hand
+// costs about 0.1% (see the notes at the top of the file).
+static inline int FontArg(unsigned char font) { return font & 0xff; }
+
+static inline int RectLeftPlus2b(Rect_004a1b40 rowRect) { return rowRect.left + 2; }
+
+static inline short HighlightRow(Entry_004a1b40* me) { return me->field_ba; }
+
+static inline char* GlyphStart(char* q) { return (char*)q; }
+
+static inline unsigned short* CellWidth(void* cell) { return (unsigned short*)cell; }
+
+static inline int EntryFlags(Entry_004a1b40* me) { return me->flags; }
+
+static inline int RectLeft(Rect_004a1b40 rowRect) { return rowRect.left; }
+
+static inline int RectLeftPlus2(Rect_004a1b40 rowRect) { return rowRect.left + 2; }
+
 // FUNCTION: 0x4a1b40
 void __stdcall FUN_004a1b40(Class_004a1b40* param_1, int param_2)
 {
-    int t;
-    int flag = 0;
+    int xw;
+    unsigned int t;
+    char* q;
     Rect_004a1b40 bounds;
     int top0 = 0;
     int& top = bounds.top;
     int& left = bounds.left;
     int& right = bounds.right;
+    int lh;
+
     int& bottom = bounds.bottom;
 
-    if (param_1->holder != 0)
+    int flag = 0;
+    if (0 != param_1->holder)
         param_1->holder->field_14 = 1;
-
     Holder_004a1b40* holder = param_1->holder;
     Entry_004a1b40* entries = holder->entries;
     Entry_004a1b40* me = &entries[param_2];
-
     int h = me->h;
-    if (me->type == 0) {
-        left = 0;
-    } else {
+    if (me->type == 0) left = 0; else {
         left = me->x;
         top0 = me->y;
     }
     top = top0;
     int keepW = me->w;
-    right = keepW + left - 1;
+    right = me->w + left - 1;
     bottom = me->h + top - 1;
-
     void* surface = holder->surface;
+
     if (surface == 0)
         surface = param_1->fallback;
-    if (surface == 0 && !(holder->field_10 & 0x80))
+    if (surface == 0 && (0x80 & holder->field_10) == 0)
         FUN_004b0230(param_1, param_2, surface);
-    else if (surface != 0)
+    else if (((void*)surface) != 0)
         FUN_004c6d20(entries->bc.surface, surface, &bounds,
                      &left);
 
-    int lh;
-    if (DAT_0051fba4->language == 0)
+    if (!DAT_0051fba4->language)
         lh = FUN_004c1450();
     else
         lh = ((Glyph_004a1b40*)FUN_004b7f30(DAT_0051fba4->language->glyphs,
                                             0x49))->height + 2;
-
     int step = lh + 1;
-    if (me->field_da != 0)
+    if (me->field_da)
         step = me->field_da;
-
     int yoff = 0;
+    int y = 0;
     int xx;
-    int xw;
     unsigned int flags = (unsigned int)me->flags;
 
 
-    if ((flags & 0x10) != 0 && me->text != 0 && me->field_c0 != 0) {
+    if (((flags & 0x10) != 0 && me->text != 0) != 0 && me->field_c0 != 0) {
         // ---- text-line renderer ----
         int i = 1;
         t = 0;
-        for (; i < entries->b6.count + 1; i++) {
-            if (entries[i].type == 7) {
+        for (; i < entries->b6.count + 1; ) {
+            int isTab = 7 == entries[i].type;
+            if (isTab) {
                 if (t == me->tab) {
-                    FUN_004c1420(*(int*)((char*)&entries[i] + 0xd6));
+                    FUN_004c1420(*((int*)((char*)&entries[i] + 0xd6)));
                     break;
                 }
                 t++;
             }
+            i = i + 1;
         }
-        if (i == entries->b6.count + 1)
+        int ranOff = i == 1 + entries->b6.count;
+        if (ranOff)
             FUN_004c1420(DAT_0051fba4->current);
 
         FUN_004c1440();
-        unsigned char font = (unsigned char)FUN_004c13f0();
-        char* q = FUN_004b6af0(me->text, me->bc.field_bc);
-        int y = me->bc.field_bc;
+        unsigned char font;
+        font = (unsigned char)FUN_004c13f0();
         int line = 0;
+        q = FUN_004b6af0(me->text, me->bc.field_bc);
+        y = me->bc.field_bc;
 
         Rect_004a1b40 rowRect;
-        for (;;) {
+        while (1) {
             int& x1 = rowRect.left;
             int& cy = rowRect.top;
             int& x2 = rowRect.right;
             int& cy2 = rowRect.bottom;
             x1 = left + 2;
-            x2 = x1 + keepW - 2;
-            cy = top + yoff + 2;
-            cy2 = cy + step;
+            x2 = keepW + (x1) - 2;
+            cy = (top + yoff) + 2;
+            cy2 = step + cy;
 
             int w;
-            if (q == 0) {
-                w = 0;
-            } else if (DAT_0051fba4->language == 0) {
+            int noText = q == 0;
+            if (((int)noText) != 0) w = 0; else if (0 == DAT_0051fba4->language) {
                 w = FUN_004c1480(FUN_004c1440(), q);
             } else {
-                char* pp = q;
                 w = 0;
-                while (*pp != 0) {
-                    unsigned short* g = (unsigned short*)FUN_004b7f30(
-                        DAT_0051fba4->language->glyphs, (unsigned char)*pp);
-                    if (g != 0)
+                unsigned short* g;
+                unsigned char c = *(GlyphStart(q));
+                g = 0;
+                while (c != 0) {
+                    g = (unsigned short*)FUN_004b7f30(
+                        DAT_0051fba4->language->glyphs, c);
+                    c = *(++q);
+                    if (0 != g)
                         w += *g;
-                    pp++;
                 }
             }
 
             unsigned int col = (unsigned int)*((unsigned char*)param_1 + 0x8b2 + me->colours);
-            if (me->field_d6 != 0) {
-                if (*((char*)me->field_d6 + y) == 1)
-                    flag = 1;
+
+            if (me->field_d6) {
+                if (*((char*)me->field_d6 + y) == 1) { flag = 1; }
             } else if (*q == 0x26) {
-                if (q[1] == 0x47)
+                if (0x47 == q[1])
                     flag = 1;
                 q += 2;
             }
-
             flags = (unsigned int)me->flags;
-            if (flags & 1) {
+            int next = 0;
+
+            if ((flags & 1) != 0) {
                 xx = x1;
                 xw = x2 - x1 + 1;
             } else if (flags & 4) {
@@ -401,15 +473,10 @@ void __stdcall FUN_004a1b40(Class_004a1b40* param_1, int param_2)
                 xx = (x1 + x2 - w) / 2;
                 if (xx < x1)
                     xx = x1;
-                xw = x2 - xx + 1;
+                xw = (x2 - xx) + 1;
             }
-
-            int next = 0;
-            if (DAT_0051fba4->language == 0)
-                next = FUN_004c1450();
-            else
-                next = ((Glyph_004a1b40*)FUN_004b7f30(
-                            DAT_0051fba4->language->glyphs, 0x49))->height + 2;
+            if (DAT_0051fba4->language == 0) next = FUN_004c1450(); else next = (2 + ((Glyph_004a1b40*)FUN_004b7f30(
+                            DAT_0051fba4->language->glyphs, 0x49))->height);
 
             if (me->field_da > next + 6)
                 FUN_004a51d0(entries->bc.surface, q, xx, cy, xw, bottom - top,
@@ -427,42 +494,43 @@ void __stdcall FUN_004a1b40(Class_004a1b40* param_1, int param_2)
                              -0x14);
                 FUN_004bf4d0(entries->bc.surface, &rowRect,
                              -0x15);
-                FUN_004bf4d0(entries->bc.surface, &rowRect,
-                             -0x16);
-            } else if ((me->flags & 0x100) == 0 &&
-                       me->field_ba == line + me->bc.field_bc &&
-                       me->field_c0 != 0) {
+                FUN_004bf4d0(entries->bc.surface, &rowRect, -0x16);
+            } else if (!((me->flags & 0x100) == 0 &&
+                       HighlightRow(me) == line + me->bc.field_bc &&
+                       0 != me->field_c0)) {
+                FUN_004c13a0((int)col, (int)(FontArg(font)));
+            } else {
                 // both arms (0x4a1fb8 and 0x4a1fcb) pass the same rect and id,
                 // the arm is chosen by holder->field_20 == param_2
                 if (param_1->holder->field_20 == param_2)
                     FUN_004bf4d0(entries->bc.surface, &rowRect, 0x1e);
                 else
                     FUN_004bf4d0(entries->bc.surface, &rowRect, 0x1e);
-            } else {
-                FUN_004c13a0((int)col, (int)(font & 0xff));
             }
 
+            line = line + 1;
             yoff += step;
-            line++;
             y++;
             h -= step;
-            if (h < lh)
-                break;
+            if (h >= lh) {
+            } else break;
             if (line + me->bc.field_bc >= me->field_c0)
                 return;
         }
-    } else if ((flags & 0xa0) != 0) {
+    } else if ((0xa0 & ((unsigned int)flags)) != 0) {
         // ---- cell-grid renderer ----
-        int bp = (int)((flags >> 7) & 1);
+        unsigned int bp = (int)((flags >> 7) & 1);
+        int* colPtr = 0;
         void* surf = entries->bc.surface;
         Rect_004a1b40 clip;
         ((Class_004c6ae0*)surf)->FUN_004c6ae0(&clip);
-        ((Class_004c6b10*)surf)->FUN_004c6b10(bounds);
 
-        int row = me->bc.field_bc;
-        int* colPtr = 0;
-        char* cellPtr = 0;
-        if (bp == 0)
+        ((Class_004c6b10*)surf)->FUN_004c6b10(bounds);
+        h = me->bc.field_bc;
+        int& row = h;
+        lh = 0;
+        char*& cellPtr = (char*&)lh;
+        if (0 == bp)
             colPtr = &me->cells[row];
         else
             cellPtr = (char*)me->cells + row * 0x18;
@@ -470,7 +538,8 @@ void __stdcall FUN_004a1b40(Class_004a1b40* param_1, int param_2)
         int& x1 = left;
         x1 += 2;
         int yy = top + 2;
-        int yEnd = yy + step;
+        y = yy + step;
+        int& yEnd = y;
 
         for (;;) {
             void* cell;
@@ -480,10 +549,12 @@ void __stdcall FUN_004a1b40(Class_004a1b40* param_1, int param_2)
             } else {
                 cell = *(void**)(*colPtr + 0x28);
             }
+
             if (cell != 0 && *(int*)((char*)cell + 0x10) != 0) {
-                Rect_004a1b40 rowRect;
-                Quad_004a1b40 dst;
                 Quad_004a1b40 src;
+                Quad_004a1b40 dst;
+                Rect_004a1b40 rowRect;
+
                 dst.points[3].x = x1;
                 src.points[0].x = 1;
                 src.points[0].y = 1;
@@ -498,25 +569,28 @@ void __stdcall FUN_004a1b40(Class_004a1b40* param_1, int param_2)
                 src.points[2].x = *(unsigned short*)cell - 1;
                 dst.points[1].y = yy;
                 dst.points[0].y = yy;
-                src.points[2].y = *((unsigned short*)cell + 1) - 1;
-                src.points[3].y = *((unsigned short*)cell + 1) - 1;
+                src.points[2].y = *(1 + CellWidth(cell)) - 1;
+                src.points[3].y = *(1 + (unsigned short*)cell) - 1;
                 FUN_004c7580(surf, cell, &dst, &src);
+
+                // The original stores the x pair before the y pair here.
                 rowRect.left = dst.points[0].x;
-                rowRect.top = dst.points[0].y;
                 rowRect.right = dst.points[1].x;
+                rowRect.top = dst.points[0].y;
                 rowRect.bottom = dst.points[2].y;
-            unsigned char v = *((unsigned char*)me->field_d6 + row);
-            if (v & 1) {
-                FUN_004bf4d0(surf, &rowRect, -0x14);
-            } else if (v & 2) {
-                FUN_004be950(surf, rowRect.left + 1, rowRect.bottom - 1, rowRect.right - 2, rowRect.top + 1, param_1->colour_8be);
-                FUN_004be950(surf, rowRect.left + 2, rowRect.bottom - 1, rowRect.right - 1, rowRect.top + 1, param_1->colour_8be);
-                FUN_004be950(surf, rowRect.left + 1, rowRect.top + 2, rowRect.right - 1, rowRect.bottom - 2, param_1->colour_8be);
-                FUN_004be950(surf, rowRect.left + 2, rowRect.top + 2, rowRect.right - 2, rowRect.bottom - 2, param_1->colour_8be);
+
+                unsigned char v = *((unsigned char*)me->field_d6 + row);
+                if (v & 1) {
+                    FUN_004bf4d0(surf, &rowRect, -0x14);
+                } else if (v & 2) {
+                    FUN_004be950(surf, rowRect.left + 1, rowRect.bottom - 1, rowRect.right - 2, rowRect.top + 1, param_1->colour_8be);
+                    FUN_004be950(surf, RectLeftPlus2(rowRect), rowRect.bottom - 1, rowRect.right - 1, rowRect.top + 1, param_1->colour_8be);
+                    FUN_004be950(surf, 1 + RectLeft(rowRect), 2 + rowRect.top, rowRect.right - 1, rowRect.bottom - 2, param_1->colour_8be);
+                    FUN_004be950(surf, RectLeftPlus2b(rowRect), 2 + rowRect.top, rowRect.right - 2, rowRect.bottom - 2, param_1->colour_8be);
+                }
             }
 
-            }
-            if ((me->flags & 0x100) == 0 && me->field_ba == row) {
+            if ((EntryFlags(me) & 0x100) == 0 && me->field_ba == row) {
                 Rect_004a1b40 hl;
                 hl.left = x1;
                 hl.top = yy;
@@ -525,11 +599,11 @@ void __stdcall FUN_004a1b40(Class_004a1b40* param_1, int param_2)
                 FUN_004bf4d0(surf, &hl, 0x14);
             }
 
-            row++;
+            row = row + 1;
             if (bp == 0)
-                colPtr++;
+                ++colPtr;
             yy += step;
-            yEnd += step;
+            yEnd = step + yEnd;
             if (yy >= bottom)
                 break;
             if (row >= me->field_c0)
