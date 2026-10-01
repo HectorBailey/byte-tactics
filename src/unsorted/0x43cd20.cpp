@@ -1,4 +1,56 @@
 // Decompiled by Space Bunny Free, finished by space-bunny-free, edited by
+// deepseek-v4.1, finished by deepseek-v4.1-flash, finished by mimo-v2.6-pro.
+// Names are provisional.
+//
+// mimo-v2.6-pro, 2026-10-01 retry: 81.7% (original 943 bytes, ours 944).
+// Four changes lifted the 74.8% base:
+//  1) the first delta is a real Vec3 temp, `Vec3 d = p[1] - *ppos;` with an
+//     x,y,z ordered operator- body: that gives the original's 12-byte temp
+//     (d.x at [esp+0x24], dead y at +0x28, d.z at +0x2c) and the 0x44 frame.
+//  2) the tail select is default-first: `amount = unit->type->field_19e; if
+//     (d1 <= lim || d2 <= r) amount = -rate;` then ONE call. MSVC sinks a
+//     single-use select into the arms (two calls, two epilogues) whenever the
+//     source is `if (c) amount = A; else amount = B;` or the ternary is the
+//     call argument; only the default-first spelling keeps one shared call.
+//  3) the d2 deltas read unit->pos rather than ppos, which flips unit into
+//     edi as in the original (77.6 -> 80.4).
+//  4) the hasPath==0 arm names the rate first, `int r2 = unit->type->field_19a;
+//     turn = hasPath; call(unit, -r2);`, which matches the original's
+//     unit/type/rate load order (80.4 -> 81.7).
+// Still differs (all of it small):
+//  - the turn store: the original is `mov word ptr [esi+0x24], ax` (the v5
+//    result still in ax) and ours folds it to `mov word ptr [esi+0x24], 0`,
+//    because our store comes after the rate load clobbers eax. Keeping the
+//    store first keeps ax but then the unit load cannot move above it (in the
+//    original the unit load goes to ecx, in ours to eax: the same one-step
+//    scratch-register rotation).
+//  - one callee-saved swap: ours ppos=ebp and the ax2/back/d1 temps in ebx,
+//    the original has ppos=ebx and those temps in ebp (this=esi and unit=edi
+//    now agree). Swapping the d2 or recompute statement order costs 1.3
+//    points each, so the swap is an allocator tie-break again.
+//  - the prologue: ours shrinks the register saves (push esi at entry, then
+//    push edi/ebp/ebx after the v5 early exit); the original pushes all four
+//    up front, so the hasPath arm pops only esi here and uses stack slots 12
+//    bytes below the original's.
+//  - the tail layout: ours hoists the field_19e load before the two tests and
+//    keeps the -rate arm on the fallthrough (`jg` out of line to the then
+//    arm); the original keeps the field_19e load in the then arm with `jmp`
+//    over an inline -rate arm. Every spelling that merges the call also
+//    hoists or re-polarises one arm; the exact original layout needs a select
+//    whose arms stay put, which every sink-blocking trick (dead copy, dead
+//    store, unused label, (int) cast, two-int select, inline helper, goto)
+//    failed to produce (all 62-66).
+// Earlier attempts (deepseek-v4.1-flash et al, 74.8% base) are kept below for
+// the history; their measured negatives still hold where re-measured (the
+// 64-bit `(__int64)(unsigned short)adiff * field_20` imul spelling: 71.5
+// alone, 67.2 with the merged tail; if/else and ternary selects: 62-66; t1
+// with the neg before the tests: 73.4; recompute through ppos: 46.5; ppos
+// before the v3 call: 69.6; reversed operator- operands: 71.6).
+//
+// ---------------------------------------------------------------------------
+// Earlier notes (deepseek-v4.1-flash et al), kept for the history:
+//
+// Decompiled by Space Bunny Free, finished by space-bunny-free, edited by
 // deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
 //
 // deepseek-v4.1-flash, 2026-10-01, second probe: `Vec3* const ppos` is
@@ -218,7 +270,7 @@
 struct Vec3 {
     int x, y, z;
     Vec3 operator-(const Vec3& other) const {
-        Vec3 r; r.z = z - other.z; r.y = y - other.y; r.x = x - other.x; return r;
+        Vec3 r; r.x = x - other.x; r.y = y - other.y; r.z = z - other.z; return r;
     }
     int Square() const {
         __int64 a = x, b = z;
@@ -284,19 +336,18 @@ void Class_0043cd20::FUN_0043cd20(Unit_0043cc20* unit)
 {
     int hasPath = obj->v5();
     if (hasPath == 0) {
+        int r2 = unit->type->field_19a;
         turn = hasPath;
-        ((Class_0043cc20*)this)->FUN_0043cc20(unit, -unit->type->field_19a);
+        ((Class_0043cc20*)this)->FUN_0043cc20(unit, -r2);
         return;
     }
 
     Vec3 p[3];
     obj->v3(p, 0, 3);
 
-    int ax = p[1].x - unit->pos.x;
-    int az = p[1].z - unit->pos.z;
-    int gap1 = (int)_hypot(ax, az);
-
     Vec3* ppos = &unit->pos;
+    Vec3 d = p[1] - *ppos;
+    int gap1 = (int)_hypot(d.x, d.z);
 
     int dz;
     if (gap1 > 0x500000) {
@@ -314,8 +365,8 @@ void Class_0043cd20::FUN_0043cd20(Unit_0043cc20* unit)
         }
     }
 
-    az = p[1].z - unit->pos.z;
-    ax = p[1].x - unit->pos.x;
+    int az = p[1].z - unit->pos.z;
+    int ax = p[1].x - unit->pos.x;
     int d1 = (int)(((__int64)ax * ax) >> 32) + (int)(((__int64)az * az) >> 32);
 
     short ang = (short)FUN_0048a980(ppos, &p[1]);
@@ -323,8 +374,8 @@ void Class_0043cd20::FUN_0043cd20(Unit_0043cc20* unit)
     int sdiff = diff;
     int adiff = abs(sdiff);
 
-    int bz = p[2].z - ppos->z;
-    int bx = p[2].x - ppos->x;
+    int bz = p[2].z - unit->pos.z;
+    int bx = p[2].x - unit->pos.x;
     int d2 = (int)(((__int64)bx * bx) >> 32) + (int)(((__int64)bz * bz) >> 32);
 
     if (diff != 0) {
@@ -349,9 +400,9 @@ void Class_0043cd20::FUN_0043cd20(Unit_0043cc20* unit)
     int r = (int)(((__int64)q * q) >> 32);
     int lim = (int)(((__int64)turned * turned) >> 32) * 4;
 
-    if (d1 > lim && d2 > r)
-        ((Class_0043cc20*)this)->FUN_0043cc20(unit, unit->type->field_19e);
-    else
-        ((Class_0043cc20*)this)->FUN_0043cc20(unit, -rate);
+    int amount = unit->type->field_19e;
+    if (d1 <= lim || d2 <= r)
+        amount = -rate;
+    ((Class_0043cc20*)this)->FUN_0043cc20(unit, amount);
 }
 
