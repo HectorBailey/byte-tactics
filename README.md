@@ -16,16 +16,16 @@ original game are listed in `docs/bugs.md`.
 <!-- progress:start -->
 ## Progress
 
-**70.28% of Cavedog's code matched** (597,986 of 850,853 bytes)
+**71.09% of Cavedog's code matched** (604,849 of 850,853 bytes)
 
 `[############################------------]`
 
-By count that is 3,045 of the game's 3,267 functions (93.2%). The headline counts bytes, because the functions left are mostly the longest ones.
+By count that is 3,054 of the game's 3,267 functions (93.5%). The headline counts bytes, because the functions left are mostly the longest ones.
 
 | | Functions | Bytes |
 | --- | ---: | ---: |
-| Matched byte-for-byte | 3,045 | 597,986 |
-| Attempted, not yet matching | 222 | 252,867 |
+| Matched byte-for-byte | 3,054 | 604,849 |
+| Attempted, not yet matching | 213 | 246,004 |
 | Not attempted yet | 0 | 0 |
 
 ### By function size
@@ -35,11 +35,11 @@ The size bands are the `size:` labels on the issues.
 | Size | Functions matched | Bytes matched | Bytes left | |
 | --- | ---: | ---: | ---: | --- |
 | small (1 to 64 bytes) | 1,155 of 1,155 | 100.0% | 0 | `##########` |
-| medium (65 to 160 bytes) | 821 of 827 | 99.2% | 676 | `##########` |
-| large (161 to 400 bytes) | 662 of 703 | 93.5% | 11,658 | `#########-` |
+| medium (65 to 160 bytes) | 823 of 827 | 99.5% | 463 | `##########` |
+| large (161 to 400 bytes) | 665 of 703 | 94.0% | 10,709 | `#########-` |
 | xl (401 to 600 bytes) | 194 of 226 | 85.2% | 16,270 | `#########-` |
-| xxl (601 to 1,000 bytes) | 140 of 195 | 71.4% | 41,996 | `#######---` |
-| huge (over 1,000 bytes) | 73 of 161 | 37.6% | 182,267 | `####------` |
+| xxl (601 to 1,000 bytes) | 141 of 195 | 71.9% | 41,254 | `#######---` |
+| huge (over 1,000 bytes) | 76 of 161 | 39.3% | 177,308 | `####------` |
 
 ### By area
 
@@ -51,17 +51,17 @@ and Windows calls each window's code uses (`data/areas.csv`).
 | --- | --- | ---: | ---: | ---: | --- |
 | `0x400000` | Unit orders and unit AI | 194 of 210 | 76.5% | 14,325 | `########--` |
 | `0x410000` | Orders and VTOL states | 213 of 222 | 78.0% | 14,015 | `########--` |
-| `0x420000` | Frontend shell | 145 of 154 | 66.1% | 21,574 | `#######---` |
+| `0x420000` | Frontend shell | 146 of 154 | 69.5% | 19,401 | `#######---` |
 | `0x430000` | Maps, missions, briefings | 211 of 228 | 65.8% | 20,624 | `#######---` |
 | `0x440000` | Multiplayer setup | 238 of 246 | 69.7% | 18,628 | `#######---` |
 | `0x450000` | Options and audio menus | 161 of 176 | 66.0% | 21,440 | `#######---` |
-| `0x460000` | Game and skirmish setup, unit classes | 194 of 212 | 58.9% | 25,298 | `######----` |
-| `0x470000` | Campaign and skirmish screens, resource bars | 233 of 259 | 71.2% | 18,300 | `#######---` |
-| `0x480000` | Unit definitions, COB scripting, TNT map | 246 of 264 | 75.5% | 15,595 | `########--` |
-| `0x490000` | Config and registry, skirmish summary | 175 of 193 | 59.9% | 23,831 | `######----` |
-| `0x4a0000` | GUI layout and GAF | 183 of 201 | 57.5% | 27,264 | `######----` |
-| `0x4b0000` | UI controls and file packages | 296 of 314 | 83.6% | 10,133 | `########--` |
-| `0x4c0000` | TDF parser, CD audio, string handles | 281 of 298 | 80.5% | 10,549 | `########--` |
+| `0x460000` | Game and skirmish setup, unit classes | 196 of 212 | 60.9% | 24,055 | `######----` |
+| `0x470000` | Campaign and skirmish screens, resource bars | 234 of 259 | 71.8% | 17,902 | `#######---` |
+| `0x480000` | Unit definitions, COB scripting, TNT map | 247 of 264 | 76.7% | 14,853 | `########--` |
+| `0x490000` | Config and registry, skirmish summary | 176 of 193 | 60.2% | 23,684 | `######----` |
+| `0x4a0000` | GUI layout and GAF | 184 of 201 | 60.3% | 25,502 | `######----` |
+| `0x4b0000` | UI controls and file packages | 297 of 314 | 84.1% | 9,801 | `########--` |
+| `0x4c0000` | TDF parser, CD audio, string handles | 282 of 298 | 80.7% | 10,483 | `########--` |
 | `0x4d0000` | Compression (SQSH), CRT/STL, debug, file I/O | 183 of 197 | 72.1% | 10,490 | `#######---` |
 | `0x4e0000` | Process exit, psapi | 92 of 93 | 93.2% | 801 | `#########-` |
 
