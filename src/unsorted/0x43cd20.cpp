@@ -2,44 +2,48 @@
 // deepseek-v4.1, finished by deepseek-v4.1-flash, finished by mimo-v2.6-pro.
 // Names are provisional.
 //
-// mimo-v2.6-pro, 2026-10-01 retry: 81.7% (original 943 bytes, ours 944).
-// Four changes lifted the 74.8% base:
-//  1) the first delta is a real Vec3 temp, `Vec3 d = p[1] - *ppos;` with an
-//     x,y,z ordered operator- body: that gives the original's 12-byte temp
-//     (d.x at [esp+0x24], dead y at +0x28, d.z at +0x2c) and the 0x44 frame.
-//  2) the tail select is default-first: `amount = unit->type->field_19e; if
-//     (d1 <= lim || d2 <= r) amount = -rate;` then ONE call. MSVC sinks a
-//     single-use select into the arms (two calls, two epilogues) whenever the
-//     source is `if (c) amount = A; else amount = B;` or the ternary is the
-//     call argument; only the default-first spelling keeps one shared call.
-//  3) the d2 deltas read unit->pos rather than ppos, which flips unit into
-//     edi as in the original (77.6 -> 80.4).
-//  4) the hasPath==0 arm names the rate first, `int r2 = unit->type->field_19a;
-//     turn = hasPath; call(unit, -r2);`, which matches the original's
-//     unit/type/rate load order (80.4 -> 81.7).
-// Still differs (all of it small):
-//  - the turn store: the original is `mov word ptr [esi+0x24], ax` (the v5
-//    result still in ax) and ours folds it to `mov word ptr [esi+0x24], 0`,
-//    because our store comes after the rate load clobbers eax. Keeping the
-//    store first keeps ax but then the unit load cannot move above it (in the
-//    original the unit load goes to ecx, in ours to eax: the same one-step
-//    scratch-register rotation).
-//  - one callee-saved swap: ours ppos=ebp and the ax2/back/d1 temps in ebx,
-//    the original has ppos=ebx and those temps in ebp (this=esi and unit=edi
-//    now agree). Swapping the d2 or recompute statement order costs 1.3
-//    points each, so the swap is an allocator tie-break again.
-//  - the prologue: ours shrinks the register saves (push esi at entry, then
-//    push edi/ebp/ebx after the v5 early exit); the original pushes all four
-//    up front, so the hasPath arm pops only esi here and uses stack slots 12
-//    bytes below the original's.
-//  - the tail layout: ours hoists the field_19e load before the two tests and
-//    keeps the -rate arm on the fallthrough (`jg` out of line to the then
-//    arm); the original keeps the field_19e load in the then arm with `jmp`
-//    over an inline -rate arm. Every spelling that merges the call also
-//    hoists or re-polarises one arm; the exact original layout needs a select
-//    whose arms stay put, which every sink-blocking trick (dead copy, dead
-//    store, unused label, (int) cast, two-int select, inline helper, goto)
-//    failed to produce (all 62-66).
+// mimo-v2.6-pro, 2026-10-01 second retry: 94.8% (original 943 bytes, ours
+// 964). Two spellings lifted the 81.7% base (the old negative measurements
+// below were all made on the 74.8% base and no longer hold):
+//  1) the tail is TWO call statements, one in each arm of
+//     `if (d1 > lim && d2 > r) call(unit, unit->type->field_19e); else
+//     call(unit, -rate);`. Every select spelling (if/else amount plus one
+//     call, ternary as the argument or assigned, braced or not) makes MSVC
+//     sink the call into both arms with two epilogues (988 bytes, 83.5);
+//     with the call written in each arm the whole register allocation falls
+//     into place at once: the ebx<->ebp swap, the prologue register saves
+//     and the v3 call setup all match the original (81.7 -> 92.9).
+//  2) the hasPath arm is `turn = hasPath; int r2 = unit->type->field_19a;
+//     call(unit, -r2);` (store first, rate named after it): that stores ax
+//     as in the original instead of an immediate 0 (92.9 -> 94.8).
+// Still differs (three things, all small):
+//  - the arm's load order: the original loads unit into ecx BEFORE the turn
+//    store (eax is still busy with the v5 result, so the scratch rotation
+//    runs unit=ecx, type=edx, rate=eax with `neg eax; push eax; push ecx;
+//    mov ecx,esi`); ours stores first and the rotation is one step off
+//    (unit=eax, type=ecx, rate=edx). Forcing the unit load above the store
+//    failed: `Unit* u = unit;` is scalarised and its load sinks past the
+//    store (94.8 same), a type-pointer copy before the store (87.1), the
+//    comma forms `(turn = hasPath, unit)` and `(turn = hasPath,
+//    -unit->type->field_19a)` (identical to store-first), an inline rate
+//    chain (identical), `turn = 0` with the literal-reuse trick (94.8
+//    same), a doubled `turn = hasPath; turn = hasPath;` pair (dead-store
+//    folded, identical) and the fold-away `u += 1; u -= 1` pointer pair
+//    (91.1; it does not fold and keeps two adds).
+//  - `imul ecx` (one-operand 64-bit multiply) against our `imul eax,ecx;
+//    cdq`: the `(__int64)(unsigned short)adiff * field_20` spelling matches
+//    those two bytes on its own (81.7 -> 84.2) but breaks the tail's
+//    register allocation in every combination with the new arm and tail
+//    (92.9 -> 85.8, 94.8 -> 87.7), so the int-product spelling stays.
+//  - the tail arm layout: the original merges the two arms before ONE call
+//    (`mov eax,[ebx+0x19e]; jmp join; mov eax,[esp+0x14]; neg eax; join:
+//    mov ecx,[esp+0x10]; push eax; push edi; call`); the two-call spelling
+//    leaves the else arm's copy of the whole call tail out of line after
+//    `ret 4` (about 27 diff lines, most of the remaining gap). Also tried:
+//    switch on the condition (85.8), a goto label before one shared call
+//    (82.6), explicit returns in both arms and else-first (both 94.8
+//    same), reverse default-first (77.7) and two `if` assignments of
+//    -rate (77.9).
 // Earlier attempts (deepseek-v4.1-flash et al, 74.8% base) are kept below for
 // the history; their measured negatives still hold where re-measured (the
 // 64-bit `(__int64)(unsigned short)adiff * field_20` imul spelling: 71.5
@@ -336,8 +340,8 @@ void Class_0043cd20::FUN_0043cd20(Unit_0043cc20* unit)
 {
     int hasPath = obj->v5();
     if (hasPath == 0) {
-        int r2 = unit->type->field_19a;
         turn = hasPath;
+        int r2 = unit->type->field_19a;
         ((Class_0043cc20*)this)->FUN_0043cc20(unit, -r2);
         return;
     }
@@ -400,9 +404,9 @@ void Class_0043cd20::FUN_0043cd20(Unit_0043cc20* unit)
     int r = (int)(((__int64)q * q) >> 32);
     int lim = (int)(((__int64)turned * turned) >> 32) * 4;
 
-    int amount = unit->type->field_19e;
-    if (d1 <= lim || d2 <= r)
-        amount = -rate;
-    ((Class_0043cc20*)this)->FUN_0043cc20(unit, amount);
+    if (d1 > lim && d2 > r)
+        ((Class_0043cc20*)this)->FUN_0043cc20(unit, unit->type->field_19e);
+    else
+        ((Class_0043cc20*)this)->FUN_0043cc20(unit, -rate);
 }
 
