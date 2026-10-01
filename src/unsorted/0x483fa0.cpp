@@ -1,30 +1,38 @@
 // Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by mimo-v2.6-pro. Names are provisional.
-// mimo-v2.6-pro retry: best 62.4% (1049 bytes against 1046). This session took
-// the prologue to the original's arithmetic order (px, py, rx, ry, w1, w2,
-// rem1, rem2) with int locals vw = g_game->viewW and vh = g_game->viewH so the
-// rem expressions reuse the registers holding viewW/viewH instead of reloading
-// (61.1%), then rebuilt block 3 as `int n = w2; int y = ay; unsigned short s =
-// stride; int stride2 = s * 2; int offset = (py * s + px) * 2;` with the inner
-// counter inside `if (m > 0) { int x = ax; ... }`, which restores the original
-// `and eax, 0xffff` mask on stride, the `mov eax, edx` copy and the lea order
-// (62.4%). Parenthesised p2 offsets and an uninitialised `int py;` declaration
-// changed nothing.
-// WHAT STILL DIFFERS: (1) a three-way slot rotation: ours py 0x1c, ay 0x20, ax
-// 0x24 versus the original ay 0x1c, ax 0x20, py 0x24 (w1 0x10, px 0x14, w2
-// 0x18, stride 0x28, p2 0x2c, rem1 0x30, rem2 0x34, n 0x38, stride2 0x3c all
-// match); (2) block 1 p1/p2: the original shares the offset py*stride+px in
-// eax and keeps mapValues in edx (`add eax, ebp; lea edx, [edx+eax*2-2]` at
-// 0x4840b7), ours computes px+py*stride into ebp and reloads mapValues for p2,
-// so one operand order breaks the CSE; (3) block 3 loop plumbing: the original
-// keeps w1 in ebp and reloads it after the inner loop (`mov ebp, [esp+0x10]`
-// at 0x484384) with `test ebp, ebp` at the outer top, ours reloads w1 at the
-// loop top into edx and carries an entry `jmp`; (4) scattered register colours:
-// tail imul edx vs imul esi for py, block 2 `add edx, [esp+0x14]` memory fold
-// versus an explicit px load (ours keeps px in a register), w2 in eax versus
-// esi at block 3 entry, and the block 3 preheader store interleave (original
-// loads ay, stores n, stores y; ours stores n first). Declaration-order sweeps
-// of ax/ay/py did not move the slot rotation; the remaining levers are the
-// block 1 p2 operand order and the block 3 counter home.
+// mimo-v2.6-pro continued: best 66.2% (1031 bytes against 1046). Prior work
+// took the prologue to the original's arithmetic order with int locals vw/vh
+// and rebuilt block 3 with `unsigned short s = stride` (restores the and
+// 0xffff mask, mov eax,edx copy and lea order), reaching 62.4%; the file now
+// sits at 66.2%.
+// WHAT STILL DIFFERS (all compiler scheduling/register colour, no plain source
+// lever found yet):
+// (1) block 3 counter home: the original keeps w1 in ebp and reloads it in the
+// outer-loop LATCH (`mov ebp,[esp+0x10]` at 0x484384, after the inner loop,
+// inside the if) with NO entry jmp; ours reloads w1 at the loop TOP (0x484336)
+// and carries an entry `jmp 0x48433a` to skip that reload on the first pass.
+// Tried: `int m=w1` before + `m=w1` inside if (variant A, 59.6%, spills m to
+// eax/0x5c); `m=w1` unconditional in latch (variant B, 39.5%); `if(w1>0)` +
+// `int m=w1` inside (variant E, 66.2% identical to current); uninit `int m` +
+// `m=w1` in latch (variant H, 64.5%: reload DOES move to the latch at 0x484390
+// but m gets a stack slot 0x5c and an extra top reload). So the latch reload
+// is reachable but keeping the counter in ebp across the latch is the blocker.
+// (2) slot rotation of px/w2/ay at 0x14/0x18/0x1c: ours w2 0x14, ay 0x18, px
+// 0x1c vs original px 0x14, w2 0x18, ay 0x1c (ax 0x20, py 0x24, w1 0x10,
+// stride 0x28, p2 0x2c, rem1 0x30, rem2 0x34, n 0x38, stride2 0x3c all match).
+// Both files store ax,ay,px,py,w1,w2 in that order, so it is the frame layout
+// (declaration/last-use order), not the store order. Both our order and the
+// original are consistent with "ascending last use -> ascending slot" given a
+// different last-use ordering, so the lever is the last-use POSITION of px/w2
+// (px must end earliest, ay latest). No source rewrite moved it yet.
+// (3) block 1 p1/p2: the original computes the shared offset py*stride+px in
+// eax, then p2 into edx reusing mapValues (`lea edx,[edx+eax*2-2]` at 0x4840b9)
+// and DELAYS the p2 store past the test (`test eax,eax; mov [esp+0x2c],edx`).
+// Ours computes p2 into eax (`lea eax,[edx+eax*2-2]`), stores it before the
+// test, and loads ay into ebp early (0x4840b3) where the original loads ay
+// late (0x4840d1). The lea destination is a register-allocation choice driven
+// by that delayed store / ay load timing.
+// (4) scattered register colours from the above (w2 eax vs esi at block 3
+// entry, imul edx vs esi for py, block 2 px memory fold).
 #include <windows.h>
 
 #pragma pack(push, 1)
@@ -103,8 +111,9 @@ void __stdcall FUN_00483fa0(void* surface)
     bmp.count = 0;
 
     if (rx != 0 || rem1 != 0) {
-        unsigned short* p1 = g_game->mapValues + py * stride + px;
-        unsigned short* p2 = g_game->mapValues + py * stride + px + w1 - 1;
+        int base = py * stride + px;
+        unsigned short* p1 = g_game->mapValues + base;
+        unsigned short* p2 = g_game->mapValues + base + w1 - 1;
         int y = ay;
         int n = w2;
         if (n > 0) do {
