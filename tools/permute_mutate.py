@@ -81,6 +81,7 @@ STATEMENT_TYPES = {
 }
 LOOPS = {"for_statement", "while_statement", "do_statement", "for_range_loop"}
 UNKNOWN = ("?", ())
+FOCUS = 0.75  # how often a mutation picks among the sites on hot lines
 
 
 def canon_type(s: str) -> str:
@@ -1293,6 +1294,33 @@ class Ctx:
         self.funcs = [Func(self, n, c) for n, c in targets]
         self._nodes = None
         self.simplify = False   # prefer the undoing direction of two-way mutations
+        self.hot: set[int] = set()  # 0-based rows to aim at (lines behind differing code)
+
+    def set_hot(self, lines) -> None:
+        """Aim at these 1-based source lines (and their neighbours)."""
+        self.hot = {r for line in lines for r in (line - 2, line - 1, line)}
+
+    def _is_hot(self, item) -> bool:
+        n = item if isinstance(item, Node) else next((x for x in item if isinstance(x, Node)), None) \
+            if isinstance(item, tuple) else None
+        if n is None:
+            return False
+        return any(r in self.hot for r in range(n.start_point[0], n.end_point[0] + 1))
+
+    def pick(self, items: list):
+        """A random item, usually one on a hot line when there are hot lines."""
+        if self.hot and self.rng.random() < FOCUS:
+            hot = [it for it in items if self._is_hot(it)]
+            if hot:
+                return self.rng.choice(hot)
+        return self.rng.choice(items)
+
+    def pick_index(self, nodes: list) -> int:
+        if self.hot and self.rng.random() < FOCUS:
+            hot = [i for i, n in enumerate(nodes) if self._is_hot(n)]
+            if hot:
+                return self.rng.choice(hot)
+        return self.rng.randrange(len(nodes))
 
     def T(self, n: Node | None) -> str:
         return self.text[n.start_byte:n.end_byte] if n is not None else ""
@@ -1470,8 +1498,8 @@ def m_move_stmt(ctx: Ctx):
     blocks = [(f, b, s) for f, b, s in ctx.blocks() if len(s) >= 2]
     if not blocks:
         return None
-    f, b, stmts = ctx.rng.choice(blocks)
-    i = ctx.rng.randrange(len(stmts))
+    f, b, stmts = ctx.pick(blocks)
+    i = ctx.pick_index(stmts)
     d = ctx.rng.choice([-1, 1])
     k = 1
     while ctx.rng.random() < 0.35:
@@ -1513,9 +1541,9 @@ def m_move_decl(ctx: Ctx):
     blocks = [(f, b, s) for f, b, s in ctx.blocks() if len(s) >= 2 and any(x.type == "declaration" for x in s)]
     if not blocks:
         return None
-    f, b, stmts = ctx.rng.choice(blocks)
+    f, b, stmts = ctx.pick(blocks)
     idx = [i for i, s in enumerate(stmts) if s.type == "declaration"]
-    i = ctx.rng.choice(idx)
+    i = idx[ctx.pick_index([stmts[k] for k in idx])]
     # prefer moving among the other declarations
     targets = [j for j in idx if j != i] or [j for j in range(len(stmts)) if j != i]
     if not targets:
@@ -1555,7 +1583,7 @@ def m_split_multi_decl(ctx: Ctx):
             sites.append((f, n, parts))
     if not sites:
         return None
-    f, n, (prefix, decls) = ctx.rng.choice(sites)
+    f, n, (prefix, decls) = ctx.pick(sites)
     ind = ctx.indent_of(n)
     if ctx.rng.random() < 0.5:
         texts = [prefix + ctx.T(d) + ";" for d in decls]
@@ -1582,7 +1610,7 @@ def m_merge_decls(ctx: Ctx):
                         sites.append((x, y, px, py))
     if not sites:
         return None
-    x, y, px, py = ctx.rng.choice(sites)
+    x, y, px, py = ctx.pick(sites)
     text = px[0] + ", ".join(ctx.T(d) for d in px[1] + py[1]) + ";"
     return [(x.start_byte, y.end_byte, text)]
 
@@ -1626,7 +1654,7 @@ def m_split_init(ctx: Ctx):
         sites.append((f, n, decls[0], init))
     if not sites:
         return None
-    f, n, d, init = ctx.rng.choice(sites)
+    f, n, d, init = ctx.pick(sites)
     name, _, _ = unwrap_declarator(d, ctx.text)
     inner = d.child_by_field_name("declarator")
     prefix = ctx.text[n.start_byte:d.start_byte]
@@ -1660,7 +1688,7 @@ def m_merge_init(ctx: Ctx):
             sites.append((x, y, decls[0], right))
     if not sites:
         return None
-    x, y, d, right = ctx.rng.choice(sites)
+    x, y, d, right = ctx.pick(sites)
     prefix = ctx.text[x.start_byte:d.start_byte]
     return [(x.start_byte, y.end_byte, f"{prefix}{ctx.T(d)} = {ctx.T(right)};")]
 
@@ -1685,7 +1713,7 @@ def m_decl_scope(ctx: Ctx):
         sites.append((f, n, decls[0], name, init))
     if not sites:
         return None
-    f, n, d, name, init = ctx.rng.choice(sites)
+    f, n, d, name, init = ctx.pick(sites)
     block = n.parent
     uses = [u for u in uses_of(ctx, f, name) if not (n.start_byte <= u.start_byte < n.end_byte)]
     if ctx.rng.random() < 0.5:
@@ -1766,7 +1794,7 @@ def m_swap_commutative(ctx: Ctx):
         sites.append((f, n, a, b, op))
     if not sites:
         return None
-    f, n, a, b, op = ctx.rng.choice(sites)
+    f, n, a, b, op = ctx.pick(sites)
     if not swappable(f, a, b):
         return None
     ta, tb = f.type_of(a), f.type_of(b)
@@ -1815,7 +1843,7 @@ def m_flip_compare(ctx: Ctx):
             sites.append((f, n, opn, op))
     if not sites:
         return None
-    f, n, opn, op = ctx.rng.choice(sites)
+    f, n, opn, op = ctx.pick(sites)
     a, b = n.child_by_field_name("left"), n.child_by_field_name("right")
     if not swappable(f, a, b):
         return None
@@ -1843,7 +1871,7 @@ def m_negate_if(ctx: Ctx):
         sites.append((f, n, cond))
     if not sites:
         return None
-    f, n, cond = ctx.rng.choice(sites)
+    f, n, cond = ctx.pick(sites)
     cons = n.child_by_field_name("consequence")
     alt = n.child_by_field_name("alternative")
     if alt is not None and alt.type == "else_clause":
@@ -1873,7 +1901,7 @@ def m_empty_then(ctx: Ctx):
             sites.append((f, n, cond, alt))
     if not sites:
         return None
-    f, n, cond, alt = ctx.rng.choice(sites)
+    f, n, cond, alt = ctx.pick(sites)
     a = alt.named_children[0] if alt.type == "else_clause" and alt.named_children else alt
     return [(n.start_byte, n.end_byte, f"if ({negate(ctx, f, cond)}) {ctx.T(a)}")]
 
@@ -1882,7 +1910,7 @@ def m_loop_form(ctx: Ctx):
     sites = ctx.of_type("for_statement", "while_statement", "do_statement")
     if not sites:
         return None
-    f, n = ctx.rng.choice(sites)
+    f, n = ctx.pick(sites)
     ind = ctx.indent_of(n)
     body = n.child_by_field_name("body")
     if body is None:
@@ -2061,7 +2089,7 @@ def m_temp_intro(ctx: Ctx):
         sites.append((f, n))
     if not sites:
         return None
-    f, n = ctx.rng.choice(sites)
+    f, n = ctx.pick(sites)
     if constant(n):
         return None
     stmt = enclosing_stmt(n)
@@ -2156,7 +2184,7 @@ def m_temp_inline(ctx: Ctx):
             sites.append((f, stmts, i, name, init))
     if not sites:
         return None
-    f, stmts, i, name, init = ctx.rng.choice(sites)
+    f, stmts, i, name, init = ctx.pick(sites)
     uses = [u for u in uses_of(ctx, f, name) if not (stmts[i].start_byte <= u.start_byte < stmts[i].end_byte)]
     reexpress = len(uses) > 1
     if not uses:
@@ -2170,7 +2198,7 @@ def m_temp_inline(ctx: Ctx):
             return None
         if p.type == "pointer_expression" and ctx.T(p.child_by_field_name("operator")) == "&":
             return None
-    use = ctx.rng.choice(uses) if reexpress else uses[0]
+    use = ctx.pick(uses) if reexpress else uses[0]
     stmt = enclosing_stmt(use)
     if stmt is None:
         return None
@@ -2207,7 +2235,7 @@ def m_compound_assign(ctx: Ctx):
         sites.append((f, n))
     if not sites:
         return None
-    f, n = ctx.rng.choice(sites)
+    f, n = ctx.pick(sites)
     op = ctx.T(n.child_by_field_name("operator"))
     left, right = n.child_by_field_name("left"), n.child_by_field_name("right")
     # the left side is evaluated once in `x op= y` and twice in `x = x op y`
@@ -2255,7 +2283,7 @@ def m_incdec(ctx: Ctx):
                 sites.append((f, n))
     if not sites:
         return None
-    f, n = ctx.rng.choice(sites)
+    f, n = ctx.pick(sites)
     if n.type == "update_expression":
         arg = n.child_by_field_name("argument")
         op = ctx.T(n.child_by_field_name("operator"))
@@ -2318,7 +2346,7 @@ def m_andor_swap(ctx: Ctx):
             sites.append((f, n))
     if not sites:
         return None
-    f, n = ctx.rng.choice(sites)
+    f, n = ctx.pick(sites)
     a, b = n.child_by_field_name("left"), n.child_by_field_name("right")
     if not (fault_free(f, a) and fault_free(f, b)):
         return None
@@ -2341,7 +2369,7 @@ def m_do_while0(ctx: Ctx):
             sites.append((f, n, body))
         if not sites:
             return None
-        f, n, body = ctx.rng.choice(sites)
+        f, n, body = ctx.pick(sites)
         inner = ctx.text[body.start_byte + 1:body.end_byte - 1].strip()
         if any(c.type == "declaration" for c in body.named_children):
             return [(n.start_byte, n.end_byte, ctx.T(body))]
@@ -2349,8 +2377,8 @@ def m_do_while0(ctx: Ctx):
     blocks = ctx.blocks()
     if not blocks:
         return None
-    f, b, stmts = ctx.rng.choice(blocks)
-    i = ctx.rng.randrange(len(stmts))
+    f, b, stmts = ctx.pick(blocks)
+    i = ctx.pick_index(stmts)
     j = min(len(stmts) - 1, i + ctx.rng.randrange(4))
     sel = stmts[i:j + 1]
     for s in sel:
@@ -2417,7 +2445,7 @@ def m_ternary(ctx: Ctx):
                 sites.append((f, n, None, x))
         if not sites:
             return None
-        f, n, left, c = ctx.rng.choice(sites)
+        f, n, left, c = ctx.pick(sites)
         cond, a, b = (c.child_by_field_name(k) for k in ("condition", "consequence", "alternative"))
         if a is None or b is None or cond is None:
             return None
@@ -2448,7 +2476,7 @@ def m_ternary(ctx: Ctx):
         sites.append((f, n, cond, sa, sb))
     if not sites:
         return None
-    f, n, cond, sa, sb = ctx.rng.choice(sites)
+    f, n, cond, sa, sb = ctx.pick(sites)
     if sa.type == "return_statement" and sb.type == "return_statement":
         va = sa.named_children[0] if sa.named_children else None
         vb = sb.named_children[0] if sb.named_children else None
@@ -2520,7 +2548,7 @@ def m_nested_if(ctx: Ctx):
             sites.append(("merge", f, n, inner))
     if not sites:
         return None
-    kind, f, n, x = ctx.rng.choice(sites)
+    kind, f, n, x = ctx.pick(sites)
     cons = n.child_by_field_name("consequence")
     if kind == "split":
         a, b = x.child_by_field_name("left"), x.child_by_field_name("right")
@@ -2546,7 +2574,7 @@ def m_zero_compare(ctx: Ctx):
             sites.append(("cond", f, n))
     if not sites:
         return None
-    kind, f, n = ctx.rng.choice(sites)
+    kind, f, n = ctx.pick(sites)
     if constant(n):
         return None
     if kind == "not":
@@ -2644,7 +2672,7 @@ def m_cast(ctx: Ctx):
             sites.append(("add", f, n))
     if not sites:
         return None
-    kind, f, n = ctx.rng.choice(sites)
+    kind, f, n = ctx.pick(sites)
     if kind == "remove":
         return [(n.start_byte, n.end_byte, ctx.T(n.child_by_field_name("value")))]
     ty = f.var_type(ctx.T(n))
@@ -2689,7 +2717,7 @@ def m_sign(ctx: Ctx):
         sites.append((f, n, tnode, name, base, init))
     if not sites:
         return None
-    f, n, tnode, name, base, init = ctx.rng.choice(sites)
+    f, n, tnode, name, base, init = ctx.pick(sites)
     if init is not None and not sign_blind_value(ctx, f, init):
         return None
     for u in uses_of(ctx, f, name):
@@ -2756,7 +2784,7 @@ def m_goto_polarity(ctx: Ctx):
         sites.append((f, n, cond, cons))
     if not sites:
         return None
-    f, n, cond, cons = ctx.rng.choice(sites)
+    f, n, cond, cons = ctx.pick(sites)
     label = ctx.fresh_name("skip")
     ind = ctx.indent_of(n)
     inner = ctx.text[cons.start_byte + 1:cons.end_byte - 1].strip("\n").rstrip()
@@ -2774,7 +2802,7 @@ def m_return_var(ctx: Ctx):
         sites.append((f, n, n.named_children[0]))
     if not sites:
         return None
-    f, n, v = ctx.rng.choice(sites)
+    f, n, v = ctx.pick(sites)
     if v.type in ("number_literal", "identifier"):
         return None
     ty = f.type_of(v)
@@ -2809,7 +2837,7 @@ def m_dead_decl(ctx: Ctx):
         sites.append(n)
     if not sites:
         return None
-    return [delete_stmt(ctx, ctx.rng.choice(sites))]
+    return [delete_stmt(ctx, ctx.pick(sites))]
 
 
 def m_strip_parens(ctx: Ctx):
@@ -2838,7 +2866,7 @@ def m_strip_parens(ctx: Ctx):
             sites.append((n, inner))
     if not sites:
         return None
-    n, inner = ctx.rng.choice(sites)
+    n, inner = ctx.pick(sites)
     return [(n.start_byte, n.end_byte, ctx.T(inner))]
 
 
@@ -2870,7 +2898,7 @@ def m_extract_helper(ctx: Ctx):
     sites = [n for f, n in ctx.nodes() if f is primary and n.type in HELPER_KINDS]
     if not sites:
         return None
-    n = ctx.rng.choice(sites)
+    n = ctx.pick(sites)
     if constant(n) or not hoist_ok_expr(n):
         return None
     f = primary
@@ -3023,8 +3051,8 @@ def m_extract_stmts(ctx: Ctx):
     blocks = [(f, b, s) for f, b, s in ctx.blocks() if f is primary]
     if not blocks:
         return None
-    f, b, stmts = ctx.rng.choice(blocks)
-    i = ctx.rng.randrange(len(stmts))
+    f, b, stmts = ctx.pick(blocks)
+    i = ctx.pick_index(stmts)
     j = min(len(stmts) - 1, i + ctx.rng.randrange(3))
     sel = stmts[i:j + 1]
     for s in sel:
@@ -3072,7 +3100,7 @@ def m_self_store(ctx: Ctx):
                         sites.append((f, s, name))
     if not sites:
         return None
-    f, s, name = ctx.rng.choice(sites)
+    f, s, name = ctx.pick(sites)
     t = original_type_text(ctx, f, name)
     if t is None or not in_block(s):
         return None
@@ -3114,7 +3142,7 @@ def m_inline_helper(ctx: Ctx):
                 calls.append((f, n, ctx.T(fn)))
     if not calls:
         return None
-    f, n, name = ctx.rng.choice(calls)
+    f, n, name = ctx.pick(calls)
     m = defs[name]
     params = [re.search(r"(\w+)\s*$", p).group(1) for p in m.group(2).split(",") if p.strip()]
     args = [ctx.T(a) for a in n.child_by_field_name("arguments").named_children]
@@ -3143,7 +3171,7 @@ def inline_void_helper(ctx: Ctx, voids: dict):
                 calls.append((f, n, ctx.T(fn)))
     if not calls:
         return None
-    f, n, name = ctx.rng.choice(calls)
+    f, n, name = ctx.pick(calls)
     m = voids[name]
     params = [re.search(r"(\w+)\s*$", p).group(1) for p in m.group(2).split(",") if p.strip()]
     args = [ctx.T(a) for a in n.child_by_field_name("arguments").named_children]
@@ -3156,6 +3184,16 @@ def inline_void_helper(ctx: Ctx, voids: dict):
     if len(re.findall(r"\b%s\b" % name, ctx.text)) == 2:
         edits.append((m.start(), m.end(), ""))
     return edits
+
+
+def m_dead_helper(ctx: Ctx):
+    """Remove an `inlN` helper that nothing calls any more."""
+    found = [m for m in list(HELPER_DEF.finditer(ctx.text)) + list(VOID_HELPER_DEF.finditer(ctx.text))
+             if len(re.findall(r"\b%s\b" % m.group(1), ctx.text)) == 1]
+    if not found:
+        return None
+    m = ctx.rng.choice(found)
+    return [(m.start(), m.end(), "")]
 
 
 def m_convention(ctx: Ctx):
@@ -3181,7 +3219,7 @@ def m_convention(ctx: Ctx):
         choices.append((s, name))
     if not choices:
         return None
-    s, name = ctx.rng.choice(choices)
+    s, name = ctx.pick(choices)
     head = ctx.text[s.start_byte:name.start_byte]
     m = re.search(r"\b(__stdcall|__cdecl|__fastcall|_stdcall|_cdecl)\b\s*", head)
     options = ["", "__cdecl ", "__fastcall ", "__stdcall "]
@@ -3228,6 +3266,7 @@ MUTATIONS = {
     "convention": (m_convention, 1),
     "self_store": (m_self_store, 1),
     "drop_self_store": (m_drop_self_store, 1),
+    "dead_helper": (m_dead_helper, 1),
 }
 
 # The kinds that can undo another kind's change, for cleaning up a result
@@ -3238,7 +3277,7 @@ SIMPLIFY = {
     "temp_inline": 10, "compound_assign": 3, "incdec": 3, "andor_swap": 2, "do_while0": 3,
     "include": 2, "ternary": 2, "nested_if": 3, "zero_compare": 4, "cast": 4, "sign": 1,
     "dead_decl": 8, "strip_parens": 8, "split_multi_decl": 1, "inline_helper": 8, "convention": 1,
-    "drop_self_store": 8,
+    "drop_self_store": 8, "dead_helper": 8,
 }
 
 
@@ -3258,8 +3297,10 @@ class Mutator:
             return None
         return sum(1 for f in ctx.funcs if f.node.has_error)
 
-    def mutate(self, text: str, rng: random.Random, n: int = 1, tries: int = 60) -> tuple[str, list[str]]:
-        """Apply n mutations; returns the new text and the mutation names."""
+    def mutate(self, text: str, rng: random.Random, n: int = 1, tries: int = 60,
+               hot=()) -> tuple[str, list[str]]:
+        """Apply n mutations; returns the new text and the mutation names.
+        `hot` lists 1-based source lines that the mutations should aim at."""
         names = []
         base_errors = self.errors_in_targets(text)
         if base_errors is None:
@@ -3269,6 +3310,8 @@ class Mutator:
         for _ in range(n):
             ctx = Ctx(text, self.spec, self.fi, rng)
             ctx.simplify = self.simplify
+            if hot and not names:
+                ctx.set_hot(hot)  # the lines belong to the parent text; later mutations go blind
             if not ctx.funcs:
                 return text, names
             for _attempt in range(tries):

@@ -39,6 +39,7 @@ See docs/permuter.md.
 from __future__ import annotations
 
 import argparse
+import bisect
 import csv
 import difflib
 import hashlib
@@ -46,6 +47,7 @@ import json
 import os
 import random
 import re
+import struct
 import sys
 import time
 from collections import Counter
@@ -55,12 +57,15 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from check import (PADDING, ROOT, Original, annotations, compare, compile_source, disasm,  # noqa: E402
+from check import (DEFAULT_FLAGS, PADDING, ROOT, Original, annotations, compare, compile_source, disasm,  # noqa: E402
                    find_source, link_placeholders, load_symbols, normalise, select_function)
 from coff import parse_object  # noqa: E402
 from permute_mutate import MUTATIONS, SIMPLIFY, Mutator, TargetSpec, helper_names  # noqa: E402
 
 OUT = ROOT / "build" / "permute"
+# /Zd adds COFF line numbers and leaves the code as it is (checked per run),
+# which lets the search aim at the statements behind differing instructions.
+FOCUS_FLAGS = DEFAULT_FLAGS + " /Zd"
 INF = 10 ** 9
 
 # --- scoring ---------------------------------------------------------------------
@@ -89,18 +94,23 @@ def instruction_penalty(x: str, y: str) -> int:
     return PENALTY_OPERAND
 
 
-def fine_score(theirs: list[str], ours: list[str]) -> int:
+def fine_score(theirs: list[str], ours: list[str], hot: set | None = None) -> int:
     """decomp-permuter style distance between two normalised instruction lists.
     Identical instructions are aligned first; inside each differing block the
     rest are paired by mnemonic and cost by how much their operands differ.
     What is left counts as a move when the same instruction is left over on
-    the other side, else as an insertion or deletion."""
+    the other side, else as an insertion or deletion. `hot`, if given,
+    collects the indexes of our instructions in the differing blocks."""
     score = 0
     deleted: Counter = Counter()
     inserted: Counter = Counter()
     for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(None, theirs, ours, autojunk=False).get_opcodes():
         if tag == "equal":
             continue
+        if hot is not None:
+            hot.update(range(j1, j2))
+            if j1 == j2 and ours:
+                hot.add(min(j1, len(ours) - 1))  # where the missing instructions belong
         a, b = theirs[i1:i2], ours[j1:j2]
         ma = [t.split(" ", 1)[0] for t in a]
         mb = [t.split(" ", 1)[0] for t in b]
@@ -136,6 +146,47 @@ def unmatched_after(side: Counter, matched: Counter, key) -> Counter:
     return out
 
 
+def line_table(raw: bytes, sec_index: int, symbol: str) -> list[tuple[int, int]]:
+    """(section offset, source line) for one function, from the COFF line
+    numbers that /Zd adds (it leaves the code itself unchanged). Each
+    function's entries start with its symbol index and a 0, and count lines
+    from the line of the function's `.bf` symbol."""
+    try:
+        _, _, _, symptr, nsym, opt, _ = struct.unpack_from("<HHIIIHH", raw, 0)
+        hdr = 20 + opt + 40 * (sec_index - 1)
+        (plines,) = struct.unpack_from("<I", raw, hdr + 28)
+        (nlines,) = struct.unpack_from("<H", raw, hdr + 34)
+        strtab = symptr + 18 * nsym
+
+        def sym(i):
+            name, _, _, _, _, naux = struct.unpack_from("<8sIhHBB", raw, symptr + 18 * i)
+            if name[:4] == b"\0\0\0\0":
+                (o,) = struct.unpack_from("<I", name, 4)
+                name = raw[strtab + o:raw.index(b"\0", strtab + o)]
+            return name.rstrip(b"\0").decode("latin-1"), naux
+
+        out, base = [], None
+        for k in range(nlines):
+            addr, line = struct.unpack_from("<IH", raw, plines + 6 * k)
+            if line == 0:
+                base = None
+                name, naux = sym(addr)
+                if name != symbol:
+                    continue
+                j = addr + 1 + naux
+                while j < nsym:
+                    n2, na2 = sym(j)
+                    if n2 == ".bf":
+                        (base,) = struct.unpack_from("<H", raw, symptr + 18 * (j + 1) + 4)
+                        break
+                    j += 1 + na2
+            elif base is not None:
+                out.append((addr, base + line))
+        return sorted(out)
+    except (struct.error, ValueError, IndexError):
+        return []
+
+
 @dataclass
 class Score:
     value: float         # lower is better, 0 is a MATCH
@@ -143,6 +194,7 @@ class Score:
     status: str          # match | bytes | partial | compile | error | guard
     size: int = 0
     note: str = ""
+    hot: tuple = ()      # source lines (1-based) of the differing instructions
 
     @property
     def pct(self) -> str:
@@ -164,7 +216,7 @@ class Scorer:
         self.lo, self.hi = address, address + (self.size or 0)
         self.theirs_txt = [normalise(i, self.lo, self.hi, in_image) for i in disasm(self.theirs, address)]
 
-    def score(self, obj) -> Score:
+    def score(self, obj, raw: bytes | None = None) -> Score:
         for g_addr, g_q in self.guards:
             res = compare(self.orig, obj, g_addr, None, g_q, self.symbols, quick=True)
             if not res.bytes_match:
@@ -188,8 +240,20 @@ class Scorer:
                        self.address)
         ours_txt = [normalise(i, self.lo, self.hi, self.in_image) for i in shown]
         ratio = difflib.SequenceMatcher(None, self.theirs_txt, ours_txt, autojunk=False).ratio()
-        value = fine_score(self.theirs_txt, ours_txt) + PENALTY_BYTE * abs(len(data) - len(theirs))
-        return Score(max(value, 1), ratio, "partial", len(data))
+        hot_idx: set = set()
+        value = fine_score(self.theirs_txt, ours_txt, hot_idx) + PENALTY_BYTE * abs(len(data) - len(theirs))
+        hot: tuple = ()
+        if raw is not None and hot_idx:
+            table = line_table(raw, sec.index, name)
+            if table:
+                offs = [a for a, _ in table]
+                lines = set()
+                for i in hot_idx:
+                    k = bisect.bisect_right(offs, start + shown[i].address - self.address) - 1
+                    if k >= 0:
+                        lines.add(table[k][1])
+                hot = tuple(sorted(lines))
+        return Score(max(value, 1), ratio, "partial", len(data), hot=hot)
 
 
 # --- worker processes ---------------------------------------------------------------
@@ -198,7 +262,7 @@ _W: dict = {}
 
 
 def worker_init(address: int, qualname: str | None, guards, spec: TargetSpec, base_text: str,
-                basename: str, weights: dict | None):
+                basename: str, weights: dict | None, focus: bool = False):
     try:
         os.nice(10)
     except OSError:
@@ -209,7 +273,8 @@ def worker_init(address: int, qualname: str | None, guards, spec: TargetSpec, ba
     simplifier.simplify = True
     _W.update(scorer=Scorer(address, qualname, guards), mutator=Mutator(base_text, spec, weights),
               simplifier=simplifier, base_lines=base_text.splitlines(),
-              path=work / basename, out_dir=f"permute/{address:#x}/obj/{os.getpid()}", cache={})
+              path=work / basename, out_dir=f"permute/{address:#x}/obj/{os.getpid()}", cache={},
+              flags=FOCUS_FLAGS if focus else DEFAULT_FLAGS)
 
 
 WORD = re.compile(r"\w+|->|::|\+\+|--|&&|\|\||<<=|>>=|[-+*/%&|^!<>=]=|<<|>>|\S")
@@ -233,26 +298,29 @@ def distance(base_lines: list[str], text: str) -> int:
 def compile_and_score(text: str) -> Score:
     path: Path = _W["path"]
     path.write_text(text, encoding="latin-1")
-    obj_path, log = compile_source(path, out_dir=_W["out_dir"])
+    obj_path, log = compile_source(path, _W["flags"], out_dir=_W["out_dir"])
     if obj_path is None:
         err = next((l for l in log.splitlines() if "error" in l), log.strip()[-200:])
         return Score(INF, 0.0, "compile", note=err[-200:])
     try:
-        return _W["scorer"].score(parse_object(obj_path.read_bytes(), obj_path.name))
+        raw = obj_path.read_bytes()
+        return _W["scorer"].score(parse_object(raw, obj_path.name), raw)
     except Exception as exc:  # a broken object must not stop the search
         return Score(INF, 0.0, "error", note=repr(exc)[:200])
 
 
-def evaluate(parent: str, n_mut: int, seed: int, simplify: bool = False) -> dict:
+def evaluate(parent: str, n_mut: int, seed: int, simplify: bool = False, hot: tuple = ()) -> dict:
     """Mutate parent n_mut times (0: score it as is), compile and score.
-    `simplify` draws from the mutations that can undo others (SIMPLIFY)."""
+    `simplify` draws from the mutations that can undo others (SIMPLIFY);
+    `hot` lists the parent's source lines behind differing instructions,
+    which the mutations then prefer."""
     rng = random.Random(seed)
     cache: dict = _W["cache"]
     mutator = _W["simplifier"] if simplify else _W["mutator"]
     text, names = parent, []
     if n_mut:
         for _ in range(4):
-            text, names = mutator.mutate(parent, rng, n_mut)
+            text, names = mutator.mutate(parent, rng, n_mut, hot=hot)
             if names and digest(text) not in cache:
                 break
         if not names:
@@ -415,6 +483,20 @@ def ddmin(items: list, test_many, ok) -> list:
     return items
 
 
+def same_code_with_lines(src: Path, base_obj, address: int, qualname: str | None, guards) -> bool:
+    """Does /Zd leave the scored functions' bytes alone in this file?"""
+    obj_path, _ = compile_source(src, FOCUS_FLAGS, out_dir=f"permute/{address:#x}/base_zd")
+    if obj_path is None:
+        return False
+    zd = parse_object(obj_path.read_bytes(), obj_path.name)
+    for a, q in [(address, qualname)] + list(guards):
+        x, _ = select_function(base_obj, None, q)
+        y, _ = select_function(zd, None, q)
+        if not x or not y or x[1].data[x[2]:x[3]] != y[1].data[y[2]:y[3]]:
+            return False
+    return True
+
+
 def pick_mutation_count(rng: random.Random) -> int:
     r = rng.random()
     return 1 if r < 0.55 else 2 if r < 0.8 else 3 if r < 0.93 else 4
@@ -423,7 +505,7 @@ def pick_mutation_count(rng: random.Random) -> int:
 def permute(address: int, src: Path, minutes: float, jobs: int, seed: int | None,
             patience: float = 0.0, max_minutes: float | None = None, helpers: bool = True,
             elite_size: int = 12, keep_going: bool = False, weights: dict | None = None,
-            quiet: bool = False, cleanup: float = 2.0, stall: float = 0.0) -> Result:
+            quiet: bool = False, cleanup: float = 2.0, stall: float = 0.0, focus: bool = True) -> Result:
     say = (lambda *a: None) if quiet else (lambda *a: print(*a, flush=True))
     out = OUT / f"{address:#x}"
     (out / "matches").mkdir(parents=True, exist_ok=True)
@@ -446,6 +528,7 @@ def permute(address: int, src: Path, minutes: float, jobs: int, seed: int | None
     for a, q in ann:
         if a != address and compare(orig, base_obj, a, None, q, symbols, quick=True).bytes_match:
             guards.append((a, q))
+    focus = focus and same_code_with_lines(src, base_obj, address, qualname, guards)
 
     rng = random.Random(seed)
     mutator = Mutator(base_text, spec, weights)
@@ -454,7 +537,8 @@ def permute(address: int, src: Path, minutes: float, jobs: int, seed: int | None
     if ctx.error or not ctx.funcs:
         return Result(address, str(src), None, None, 0, 0, out, ctx.error or "no function to mutate")
     say(f"{address:#x}: mutating {', '.join(f.name for f in ctx.funcs)} in {src}"
-        + (f"; guarding {', '.join(f'{a:#x}' for a, _ in guards)}" if guards else ""))
+        + (f"; guarding {', '.join(f'{a:#x}' for a, _ in guards)}" if guards else "")
+        + ("" if focus else "; no line numbers, so no focus"))
 
     stats: dict[str, Counter] = {k: Counter() for k in MUTATIONS}
     log_lines: list[str] = []
@@ -495,7 +579,8 @@ def permute(address: int, src: Path, minutes: float, jobs: int, seed: int | None
         del elite[elite_size:]
 
     with ProcessPoolExecutor(max_workers=jobs, initializer=worker_init,
-                             initargs=(address, qualname, guards, spec, base_text, src.name, weights)) as pool:
+                             initargs=(address, qualname, guards, spec, base_text, src.name, weights,
+                                       focus)) as pool:
         first = pool.submit(evaluate, base_text, 0, 0).result()
         start = first["score"]
         if start.status in ("compile", "error", "guard"):
@@ -527,7 +612,7 @@ def permute(address: int, src: Path, minutes: float, jobs: int, seed: int | None
                 weights_ = [1.0 / (i + 1) for i in range(len(elite))]
                 parent = rng.choices(elite, weights_)[0]
                 n = pick_mutation_count(rng)
-            fut = pool.submit(evaluate, parent.text, n, rng.getrandbits(62))
+            fut = pool.submit(evaluate, parent.text, n, rng.getrandbits(62), False, parent.score.hot)
             inflight[fut] = parent
 
         def time_left() -> bool:
@@ -679,6 +764,8 @@ def main() -> None:
     ap.add_argument("--jobs", type=int, default=12, help="parallel compiles (default 12)")
     ap.add_argument("--seed", type=int)
     ap.add_argument("--no-helpers", action="store_true", help="only mutate the annotated function itself")
+    ap.add_argument("--no-focus", action="store_true",
+                    help="do not aim mutations at the source lines behind differing instructions")
     ap.add_argument("--resume", action="store_true", help="start from build/permute/<address>/best.cpp if present")
     ap.add_argument("--keep-going", action="store_true", help="do not stop at the first MATCH")
     ap.add_argument("--only", help="comma-separated mutation kinds to use (see docs/permuter.md)")
@@ -731,7 +818,7 @@ def main() -> None:
             src = start_copy
         res = permute(address, src, args.minutes, args.jobs, args.seed, args.patience, args.max_minutes,
                       helpers=not args.no_helpers, keep_going=args.keep_going, weights=weights,
-                      cleanup=args.cleanup, stall=args.stall)
+                      cleanup=args.cleanup, stall=args.stall, focus=not args.no_focus)
         if res.error:
             print(f"{address:#x}: {res.error}")
         results.append(res)
