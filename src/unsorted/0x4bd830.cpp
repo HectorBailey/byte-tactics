@@ -1,29 +1,37 @@
 // Decompiled by DeepSeek V4.1 Flash, finished by deepseek-v4.1-flash, finished by mimo-v2.6-pro. Names are provisional.
-// Session 13 (mimo-v2.6-pro): best is now 64.7 percent (this file, 1353 bytes).
-// Fixed on top of the 61.9 file: the two `file->shared == 0` tests flipped to
-// `!= 0` with swapped arms (both the size if-chain and the close logic, which
-// also moves the fclose(fp) block to the end as in the original), the size
-// if-chain written as else-if, `unsigned clen` and both `unsigned chunk` made
-// int (the obfuscation loops compare signed: jle/jl in the original), and both
-// min-selects respelled per the guide's 0x4dba40 note: `x >= K ? K : x` gives
-// `mov reg, K; jae; mov reg, x`, which is exactly the original's shape (the
-// old `x < K ? x : K` spelling precomputed the other arm). What still differs:
-// (1) the register mirror, base in ebx and the entry pointer in ebp here vs
-// base in ebp and entry pointer in ebx in the original; (2) the stack-slot map
-// is still a permutation (ours nameoff +0x28, i +0x38, count +0x40; original
-// nameoff +0x20, i +0x34, recarr +0x3c with no count slot at all and packlen
-// +0x40); (3) the nblocks block is signed now (`int nblocks(int w)`, worth
-// +2.5 points on top of this file; the original spelled
-// `int blocks = size / 65536 + (size % 65536 != 0)` with signed division) but
-// size sits in ebp here where the original computes it from ecx; (4) the entry
-// loop latch re-derefs *(unsigned*)(base + off) inline in the original while
-// this file keeps a count local (dropping it shrinks the frame and scores far
-// worse on its own); (5) the two obfuscation loops spill pos to a slot and
-// keep key in a byte register across iterations, this file reloads key each
-// iteration; the original reuses table's slot for the table-obfuscation pos so
-// the second pos is a separate local; (6) the callback computes the subtracted
-// *(int*)(base + 8) * 90 term first into ecx, this file interleaves both
-// multiply chains.
+// Session 13b (mimo-v2.6-pro): best is now 66.7 percent (this file, 1353 bytes).
+// Session 13b change that won 2 points: the table-obfuscation position is a
+// separate local pos2 (declared beside pos). MSVC coalesces pos and pos2 into
+// one slot (+0x24) and the frame-slot map then lands several entries on the
+// original's offsets (nameoff +0x20, n +0x30, i +0x34, packlen +0x40 agree).
+// Also verified from the original's slots: table (+0x24) and the second
+// obfuscation position share a slot, and the third (uncompressed path)
+// position never gets a slot at all (the ftell result stays in eax).
+// What still differs and what I tried in this session:
+// (1) The base/entry register mirror is still wrong (base ebx and entry ebp
+// here, base ebp and entry ebx in the original), and with it the loop head:
+// the original loads nameoff and recarr from slots and computes
+// e = (base + nameoff) + *recarr in ebx, while this file rematerializes
+// *recoff as a folded [off + base + 4] load into ebp. recarr is a real slot
+// local (+0x3c) in the original; our recoff never gets a slot.
+// (2) The obfuscation loops: the original keeps key in the byte register its
+// test used (al in the pack loop, dl in the table and buffer loops) and the
+// accumulator takes the other byte register, folding the buffer read as a
+// memory xor operand; this file reloads key each iteration and uses al as a
+// rolling scratch. Root cause seen in the listing: our loop bound clen is
+// reloaded into eax every iteration (clobbering al), while the original holds
+// clen in ebp across the loop. The buffer loop in the original even keeps the
+// ftell result in eax across the loop (pos read as al). Tried dropping the
+// count local and inlining the loop condition (57.7 percent, the frame
+// shrinks to 0x1238 because recoff stays rematerialized), and declaring the
+// three positions as scoped locals at their point of use (still 66.7).
+// (3) nblocks: all three spellings of w / 65536 + (w % 65536 != 0) compile
+// identically out of line (the mod part into esi first, as in the original),
+// so the interleaved div-first order in this file is inline register pressure
+// (size sits in ebp here, ecx in the original), not the operand order.
+// (4) The callback still interleaves both *90 chains; the original computes
+// the subtracted *(int*)(base + 8) * 90 term fully into ecx first, then
+// *dataptr * 90 into eax, then sub eax, ecx.
 #include <stdio.h>
 #include <string.h>
 #include <io.h>
@@ -102,6 +110,7 @@ void __stdcall FUN_004bd830(char* path, char* base, int off, FILE* f,
     int n;
     unsigned i;
     long pos;
+    long pos2;
     int* recoff;
     unsigned packlen;
 
@@ -164,10 +173,10 @@ void __stdcall FUN_004bd830(char* path, char* base, int off, FILE* f,
                         } while (n != 0);
                     }
                     fseek(f, *dataptr, 0);
-                    pos = ftell(f);
+                    pos2 = ftell(f);
                     if ((char)key != 0) {
                         for (int j = 0; j < (int)(blocks * 4); j++)
-                            ((unsigned char*)table)[j] = (unsigned char)~((char)pos
+                            ((unsigned char*)table)[j] = (unsigned char)~((char)pos2
                                 + (char)j ^ (char)key ^ ((unsigned char*)table)[j]);
                     }
                     fwrite(table, blocks, 4, f);
