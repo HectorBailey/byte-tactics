@@ -24,6 +24,12 @@
 // rect.top. The two hunks look like one allocator state that no local source
 // reshaping reaches.
 // Retry #3140 (GPT-6.1-sol): one checker run reconfirmed the inherited 98.7% / 661-byte best, no MATCH. The only differences remain the colour-load SIB operand order and the final marker-call surface-load/push schedule; prior notes record many equivalent source-shape attempts.
+// Retry (deepseek-v4.1-flash, issue 3277): 98.7%, 661 bytes, no MATCH. Five fresh
+// expression-tree spellings of the colour read are all flat at 98.7% with the
+// same two hunks: `(me->colours + (int)param_1)[0x8b2]`,
+// `((unsigned char*)me->colours + (int)param_1)[0x8b2]`,
+// `*(me->colours + (int)param_1 + 0x8b2)` and the casted-index forms, so the
+// SIB base/index choice is not reachable from the subscript's tree shape.
 // Retry (deepseek-v4.1-flash, issue 3076): 98.7%, 661 bytes both sides. The
 // colour SIB base/index (`[ecx+eax+0x8b2]` vs `[eax+ecx+0x8b2]`) and the surface
 // load not hoisted above the three trailing pushes are one compiler-state
