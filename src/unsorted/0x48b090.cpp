@@ -143,6 +143,84 @@
 //   the ?: form all collapse the whole thing to byte ops or hoist the mask load
 //   above the `je` (81.9 to 83.6, 355 to 363 bytes).
 
+// 30-minute checkpoint (space-bunny-free, issue #4496): best 94.9% at 367 bytes,
+// up from the 93.2% this file started at. What got it: the original's
+// `and cl, al` for `lost` (with `mov byte [esp + 0x14], cl` after it) needs
+// MSVC 5 in a particular optimiser state, and tools/permute.py found it. Read
+// the rest of these notes before trusting the 94.9%: the five uncalled helpers
+// and the split declaration block below are NOT what the original source said.
+// See the "LEAD" bullet further down for the measurements.
+// - what still differs (two hunks): the set/clear arms (the original loads `old`
+//   into eax and the narrowed mask into edx in the set arm, and the narrowed
+//   mask into eax in the clear arm; this version puts the mask in eax in the set
+//   arm and reads it as a byte in the clear arm), and the packet's `mov byte
+//   [esp + 0x14], 0x11`, which sinks past the argument loads and the three
+//   pushes to just before the call here.
+// - what I tried: about 90 hand-written scratch variants (all the notes below),
+//   a 32-way sweep of subsets of the five helpers, a greedy simplify of the
+//   permuter's output, a sweep of N dummy inline helpers, and a 12 minute
+//   permuter run that took 93.2% to 94.9% (5688 candidates). The 94.9% body
+//   compiles BYTE-IDENTICALLY to the plain one once the helpers and the split
+//   declarations are removed, so the gain is compiler state, not source shape.
+// - space-bunny-free pass, first half (about 90 scratch variants): measured:
+// - the arms: with an int mask and no cast, BOTH arms already have the original's
+//   load order and register choice (`mov eax,[old]; mov edx,[mask]; and
+//   eax,0xff; and edx,0xff; or eax,edx` and `mov eax,[mask]; mov
+//   edx,[old]; and eax,0xff; not eax; and eax,edx`) but the mask is never
+//   narrowed: 82.8%, 356 bytes. Narrow the mask by ANY spelling (a cast,
+//   `mask & 0xff`, `(unsigned char)(mask & 0xff)`, an `unsigned char` parameter,
+//   a byte local in the arms or at function scope, an inline helper) and the
+//   mask lands in eax in the set arm and in edx (with `not edx`) in the clear
+//   arm: 92.3 or 93.2%, 367 bytes. The original has the mask narrowed in edx in
+//   the set arm, which no spelling produced. A type sweep of {int, unsigned,
+//   char, short, unsigned short, unsigned char} for the mask times {int, char,
+//   short, unsigned short, unsigned char} for `old`, with and without casts,
+//   changes nothing else: an `int` or `short` `old` stops the spill of `old`
+//   altogether (69 to 74%, 343 to 366 bytes) and an `unsigned char now`
+//   collapses the arms to byte ops (69.0%, 333 bytes). An `unsigned char mask`
+//   parameter with `old | mask` and `old & ~mask` gives both arms at dword width
+//   with both operands narrowed but every register the mirror of the original's
+//   (mask in eax in the set arm, mask in edx and `not edx` in the clear arm).
+// - `mask & 0xff` in either arm hoists the mask load above the `je` and shares
+//   it (82.4%, 363 bytes), while `(unsigned char)(mask & 0xff)` in both arms does
+//   not (92.3%, 367): the hoist comes from the `& 0xff` node being CSE-able
+//   across the two arms and the cast not being.
+// - the packet constant store sinks past the argument loads and the pushes in
+//   every shape tried: a file-scope `static const unsigned char`, a byte temp,
+//   `*(unsigned char*)&packet`, `*(unsigned char*)&packet.type`, a pointer
+//   variable, a `unsigned char buf[4]` with `*(short*)&buf[1]`, the three field
+//   orders, and a dead store (`int t = 0; if (t) packet.type = 0;`) between the
+//   stores and the call. Putting the type store first is the only one that moved
+//   the score (89.7%) and it is still sunk.
+// - gained/lost: MSVC 5 always makes the NOTTED operand the destination of the
+//   AND, so every spelling of `old & ~now` gives `not al; and al, cl`; with lost
+//   declared before gained it gives `mov dl,al; not dl; and dl,cl` for lost and
+//   `not cl; and cl,al` for gained (75.0%, 383 bytes), `int lost` stores a dword
+//   (70.9%), and a plain `int tmp = now;` copy, `int notnow = ~now;` or
+//   `old & (0xff ^ now)` changes nothing.
+// - LEAD (tools/permute.py found this, worth 93.2% -> 94.9% at 367 bytes): the
+//   original's `and cl, al` for `lost` falls out of MSVC 5 optimiser state. The
+//   file below with FIVE UNCALLED static inline helpers at file scope
+//   (inl1, inl0, inl2, inl3, inl4, spelled out above the function) and the
+//   split declaration block at the top of the function scores 94.9%; dropping
+//   any ONE of the helpers drops it to 82.4, 84.1 or 93.2%, and dropping the
+//   split declarations drops it to 93.2%. Nothing about the function body
+//   matters: with the helpers and the declarations removed, this exact body
+//   compiles BYTE-IDENTICALLY to the plain form. A sweep of N identical dummy
+//   `static __inline int IdN(int v) { return v; }` helpers gives 82.4% for
+//   N = 1 and for N >= 6 and 93.2% for N = 2 to 5, so this is state, not source.
+//   Left in because it is the best measured version; a reviewer who wants plain
+//   source should delete the five helpers and the split declarations and accept
+//   93.2%.
+// - frame, re-read from the disassembly: `set` is argument 2 and is read at
+//   [esp+0xc] BEFORE the ebx/esi/edi pushes, so it is [esp+0x18] afterwards;
+//   [esp+0xc] after the pushes is the pushed ecx, the one dword local, and it
+//   holds `old`; [esp+0x14] is argument 1, the mask, reused for `lost` and then
+//   for the packet.
+// - note on the helpers: they are never called; they exist only to move MSVC 5
+//   into the state that allocates `lost` into cl. Nothing in the original
+//   function called anything like them, so do not read them as recovered source.
+
 #pragma pack(push, 1)
 
 struct Player_0048b090 {
@@ -201,11 +279,25 @@ void __stdcall FUN_0047f780(Class_0048b090* unit, int kind, char* text);
 void __stdcall FUN_0041c110(Class_0048b090* unit);
 int __stdcall FUN_00451df0(int player, void* data, int size);
 
+static inline int inl1(int now) { return (int)now; }
+
+static inline Class_004b0940* inl0(Class_0048b090* self) { return self->vars; }
+
+static inline int inl2(unsigned char gained) { return ((unsigned char)gained) & 1; }
+
+static inline int inl3(int now) { return (int)now; }
+
+static inline unsigned char inl4(unsigned char old, int mask) { return (unsigned char)(((unsigned char)old) & ~(unsigned char)mask); }
+
 // FUNCTION: 0x48b090
 void Class_0048b090::FUN_0048b090(int mask, int set)
 {
-    unsigned char old = state;
+    int tmp3, same0;
+    unsigned char old;
+    Class_004895c0* link;
+    old = state;
     int now;
+    unsigned char lost;
     if (set)
         now = old | (unsigned char)mask;
     else
@@ -213,7 +305,7 @@ void Class_0048b090::FUN_0048b090(int mask, int set)
     state = (unsigned char)now;
     if ((unsigned char)now != old) {
         unsigned char gained = ~old & now;
-        unsigned char lost = old & ~now;
+        lost = old & ~now;
         if (gained & 1) {
             vars->FUN_004b0940("Activate", 0, 0);
             FUN_0047f780(this, 3, 0);
