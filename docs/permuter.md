@@ -218,6 +218,27 @@ and arguments passed by reference count as memory.
    is chosen by the fine score; when check.py's percentage disagrees,
    `best_ratio.cpp` holds the version with the highest percentage.
 
+## First run
+
+About an hour on 25 of the 68 partial functions at 90% or more (6,000 to
+13,000 candidates per function in 6 to 9 minutes, two runs side by side) gave
+three MATCHes and three better partials:
+
+| Function | Before | After | What it took |
+| --- | ---: | ---: | --- |
+| 0x4b3770 | 99.0% | MATCH | one declaration moved (stack slots), found within a second |
+| 0x4be400 | 99.2% | MATCH | an `a && b` test split into two nested ifs |
+| 0x4ac970 | 96.6% | MATCH | a lookup result through its own local, a value read straight into a sum, an inline helper |
+| 0x4a4d70 | 98.7% | 99.1% | a value read through the array again instead of through a pointer local |
+| 0x42d2e0 | 96.8% | 97.1% | a global pointer loaded into a local just before its use |
+| 0x4b6c30 | 91.1% | 95.0% | a named correction term that divides again, and `<windows.h>` dropped |
+
+The other functions in the 96% to 99.8% range, which agents had already
+worked over many times, did not move: their differences are scheduler and
+register ties that no rewrite in the catalogue changed. The
+`std::vector::insert` instantiations, which earlier notes put down to
+compiler state, were not run beyond a smoke test.
+
 ## Performance
 
 A compile and score takes about 0.2 s. All Wine processes that share a prefix
