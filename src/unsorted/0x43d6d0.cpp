@@ -1,44 +1,74 @@
 // Decompiled by Space Bunny Free, finished by deepseek-v4.1-flash, finished by space-bunny-free, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by mimo-v2.6-pro. Names are provisional.
 //
-// mimo-v2.6-pro, 2026-10-01: 59.8% (original 920 bytes, ours 908), up from
-// 59.0. The lever: the two-step `Vec3 t = f(); Vec3 v; v.x = t.x; v.y = t.y;
-// v.z = t.z;` combined with the reference-returning inline MaxRef for the b19
-// clamp. Neither works alone (the two-step alone coalesces, the clamp alone
-// does not force v into memory): taking the address of v.y in the clamp gives v
-// real homes, which materialises the FUN_0043e060 return temporary and turns
-// the copy into three real stores, exactly the 6-instruction copy the original
-// has. `Vec3 v; v = f();` + MaxRef also materialises the copy (interleaved
-// load-store pairs through the returned pointer, like the original) but puts v
-// above the temp and scores 56.3; `v = t` (whole-struct copy) scores 59.8.
+// mimo-v2.6-pro, 2026-10-01: 69.5% (original 920 bytes, ours 921), up from
+// 59.8. This pass solved both long-standing levers together:
+//   1. The clamp's address-select (`lea; jmp; spill; lea; mov ecx,[eax]`) is
+//      MSVC 5's class-type ternary: a MAX macro over class objects whose
+//      second operand is a prvalue, `v.y = MAXM(v.y, MakeFixed(x))`, with
+//      `operator>` on the Fixed union. The macro's double evaluation CSEs
+//      into one register value, the compare reads it from the register
+//      (`cmp ecx,eax` shape), and the false arm materialises it lazily into
+//      the dead parameter slot (`mov [esp+0x3c],eax; lea eax,[esp+0x3c]`)
+//      while the true arm does `lea eax,[esp+0x24]; jmp`. Every int
+//      spelling (lvalue ternary, reference max, const-ref binding) hoists
+//      the true-arm lea above the branch and spills lim eagerly, as before.
+//   2. The lim chain `(x * 0xffff + s) << 16` stays unfolded as
+//      `shl/sub/add/shl` when it feeds the clamp compare through the same
+//      MakeFixed bitfield-union trick as 0x4853b0 (union {int value; struct
+//      {unsigned frac:16; int whole:16} parts;} with frac = 0). The fold to
+//      `(s - x) << 16` happens for plain ints and even for MakeFixed when
+//      only an int compare consumes it, but NOT when the Fixed object is an
+//      operand of the class-type ternary.
+//   3. Frame is now 0x28 (matching) because `const Point& draft =
+//      Point(u->draft.x, u->draft.y);` copy-propagates away completely and
+//      only one 4-byte named local (cell) is left at slot 0x00.
 //
-// WHAT STILL DIFFERS (this is what I could not fix):
-// a. Frame is 0x24, the original's is 0x28 (one more dword of locals).
-// b. The copy is load-load-load-store-store-store (t's fields into edi/ecx/ebx,
-//    stores interleaved with the b19 test); the original interleaves
-//    load-store pairs through the returned pointer eax (`mov edi,[eax]; mov
-//    [esp+0x20],edi` ...) and keeps v.x in edi, v.y in ecx for the clamp.
-// c. The clamp spills lim unconditionally before the branch and computes
-//    &v.y first (`lea; jg` over the false arm); the original spills lim only
-//    inside the false arm (`mov [esp+0x3c],eax; lea eax,[esp+0x3c]`) with
-//    `lea eax,[esp+0x24]; jmp` on the true arm. That exact shape is MSVC 5's
-//    codegen for a class-type ternary (see 0x46e160's `? End() : p` and
-//    0x4dbb40): the true arm is a materialised object and the false arm a
-//    register-resident object spilled where its address is needed. All int
-//    ternaries I probed (lvalue ternary, reference-returning max, const-ref
-//    binding, macro) hoist the true-arm lea before the branch and spill lim
-//    eagerly, so the clamp operands are probably 4-byte class objects in the
-//    original, not plain ints.
-// d. The lim value: the original computes (draft<<16)-draft+seaLevel and then
-//    `shl eax,0x10`. Every plain integer spelling of `(x * 0xffff + s) << 16`
-//    folds to `(s - x) << 16` in MSVC 5 (the <<16 truncation lets it drop the
-//    x*0xffff term). The 0x4853b0 bitfield trick (union {int value; struct
-//    {unsigned frac:16; int whole:16} parts;} with frac=0) blocks the fold
-//    when the Fixed is returned (probe: `return MakeFixed(x).value;` gives the
-//    original's exact shl/sub/add/shl chain) but NOT when the result is used
-//    in the clamp compare: there MSVC still folds to (s-d)<<16 and emits
-//    `sub edx,ecx; shl edx,0x10`.
-// e. u->type is loaded before the copy stores (the original loads it after).
-
+// WHAT STILL DIFFERS:
+// a. Slot contents: the original has m@0x00, draft@0x04 (a real dword copy
+//    `mov eax,[esi+0x7e]; mov [esp+0x14],eax` then word reads from the slot),
+//    o/&p1@0x08, v/pos@0x10, temp@0x1c, and cell in the dead parameter slot
+//    [esp+0x3c]. Ours has cell@0x00, m@0x04, o/&p1@0x08, v/pos@0x10,
+//    temp@0x1c, with draft copy-propagated away (direct `movsx eax,word ptr
+//    [esi+0x7e]` reads) and the ny spill in the parameter slot (the original
+//    spills ny into the dead temp slot [esp+0x30]). Getting draft back as a
+//    named local while pushing cell into the dead parameter slot is the one
+//    remaining frame question: named `Point draft = u->draft;` plus cell as a
+//    named local or a `const Point& cell = Point(...)` temporary all grow the
+//    frame to 0x2c (the constructed temporary lands in a frame slot, not the
+//    parameter slot), and `const Point& cell = MakeCell(a,b)` (inline
+//    returning Point by value, sret) scores 63.4 / 65.3.
+// b. The copy after FUN_0043e060: the original interleaves load-store pairs
+//    through the returned pointer (`mov edi,[eax]; mov [esp+0x20],edi; mov
+//    ecx,[eax+4]; ...`) keeping y in ecx for the compare; ours reads the
+//    fixed temp slots grouped (load-load-load-store-store-store) and keeps y
+//    in edi (`cmp edi,eax`). `Vec3 v; v = FUN_0043e060(...);` (build/scratch
+//    /0x43d6d0/f1.cpp) DOES produce the interleaved copy and `cmp ecx,eax`,
+//    but stack slots follow creation order (the later-created value gets the
+//    lower address), so the sret temp lands BELOW v (temp@0x08, v@0x14) and
+//    the frame shrinks to 0x20: 68.6%. A user-declared copy constructor
+//    (g1/g2) makes the copy go through a real copy-ctor call: 62.0 / 62.8.
+//    Untested: some spelling that creates the temp AFTER v while still
+//    copying through the returned pointer.
+// c. The seaLevel load: the original hoists `mov ebx,[g_game]` before the
+//    draft load and reuses edx for the zero-extended byte
+//    (`xor edx,edx; mov ebx,[g_game]; mov dl,[eax+0x22c]` ... `mov
+//    dl,[ebx+0x1427f]; add eax,edx`); ours loads g_game after the draft
+//    computation into edx and seaLevel into ecx.
+// d. Second block instruction order: the original interleaves the p1/pos
+//    loads with the adds (`mov edi,[ebp+8]; mov eax,[esi+0x6a]; mov
+//    ebx,[ebp+0xc]; lea ecx,[ebp+8]; add edi,eax; ...`) and loads p1.z
+//    through the &p1 register; ours groups them differently (nx=edi matches,
+//    but ny is ecx vs the original's eax, and the adds order differs).
+// e. The field_20 clamp block: the original keeps half in ebx and the negated
+//    FUN_004b70ef result in edi; ours swaps them (half in edi, result in
+//    ebx), and the original writes `or dword ptr [esi+0x110],0x10000` in
+//    this tail vs our load-or-store.
+//
+// Ideas not yet tried: declaring Point cell at function scope; a second Point
+// copied from a pointer after draft to trigger the 0x421eb0 first-frame /
+// later-parameter-slot pattern; spilling ny into the dead temp slot by
+// keeping the Vec3 sret temp live longer; a MAX macro spelled on a struct
+// wrapper around y only.
 #include <string.h>` changes codegen: 52.2 / 166 / 893.
 //   - declaration order alone moves nothing: `Point draft;` declared early and
 //     assigned late, or `Vec3 pos;` first, compile byte-identically; inline
@@ -66,14 +96,38 @@
 
 #pragma pack(push, 1)
 
+struct FP_0043d6d0 {
+    unsigned int frac : 16;
+    int whole : 16;
+};
+
+union Fixed_0043d6d0 {
+    int value;
+    FP_0043d6d0 parts;
+};
+
+static inline Fixed_0043d6d0 MakeFixed_0043d6d0(int i)
+{
+    Fixed_0043d6d0 f;
+    f.parts.frac = 0;
+    f.parts.whole = i;
+    return f;
+}
+
+inline int operator>(const Fixed_0043d6d0& a, const Fixed_0043d6d0& b) { return a.value > b.value; }
+
+#define MAXM_0043d6d0(a, b) ((a) > (b) ? (a) : (b))
+
 struct Vec3 {
-    int x, y, z;
+    Fixed_0043d6d0 x, y, z;
     Vec3() {}
-    Vec3(int a, int b, int c) : x(a), y(b), z(c) {}
+    Vec3(int a, int b, int c) { x.value = a; y.value = b; z.value = c; }
 };
 
 struct Point {
     short x, y;
+    Point() {}
+    Point(int a, int b) : x(a), y(b) {}
 };
 
 struct Short3 {
@@ -178,8 +232,7 @@ void Class_0043d6d0::FUN_0043d6d0(Unit_0043d6d0* u)
         v.y = t.y;
         v.z = t.z;
         if (u->type->b19) {
-            int lim = (u->type->draft * 0xffff + g_game->seaLevel) << 16;
-            v.y = MaxRef_0043d6d0(v.y, lim);
+            v.y = MAXM_0043d6d0(v.y, MakeFixed_0043d6d0(u->type->draft * 0xffff + g_game->seaLevel));
         }
         FUN_0048a9f0(u, v, mode);
         Short3 o = FUN_0043e180(u->obj, u->index);
@@ -197,26 +250,26 @@ void Class_0043d6d0::FUN_0043d6d0(Unit_0043d6d0* u)
     }
 
     Vec3* pp = &p1;
-    int nx = pp->x + u->pos.x;
-    int ny = pp->y + u->pos.y;
-    int nz = pp->z + u->pos.z;
+    int nx = pp->x.value + u->pos.x.value;
+    int ny = pp->y.value + u->pos.y.value;
+    int nz = pp->z.value + u->pos.z.value;
     int m = mode;
     Vec3 pos;
-    pos.x = nx;
-    pos.y = ny;
-    pos.z = nz;
-    if (nx == u->pos.x && nz == u->pos.z && ny == u->pos.y && m == (int)(u->flags & 3))
+    pos.x.value = nx;
+    pos.y.value = ny;
+    pos.z.value = nz;
+    if (nx == u->pos.x.value && nz == u->pos.z.value && ny == u->pos.y.value && m == (int)(u->flags & 3))
         return;
 
     field_2a = g_game->field_38a47;
-    Point draft = u->draft;
+    const Point& draft = Point(u->draft.x, u->draft.y);
     Point cell;
     cell.x = (nx - (draft.x << 19) + 0x80000) >> 20;
     cell.y = (nz - (draft.y << 19) + 0x80000) >> 20;
     if (cell.x == u->cell.x && cell.y == u->cell.y && m == (int)(u->flags & 3)) {
-        u->pos.x = nx;
-        u->pos.y = ny;
-        u->pos.z = nz;
+        u->pos.x.value = nx;
+        u->pos.y.value = ny;
+        u->pos.z.value = nz;
         u->flags |= 0x10000;
         return;
     }
@@ -231,34 +284,34 @@ void Class_0043d6d0::FUN_0043d6d0(Unit_0043d6d0* u)
         int cx = (draft2.x + c.x * 2) << 19;
         int cz = (draft2.y + c.y * 2) << 19;
         if (nx > cx + 0x7ffff)
-            pos.x = cx + 0x7ffff;
+            pos.x.value = cx + 0x7ffff;
         else if (nx < cx - 0x7ffff)
-            pos.x = cx - 0x7ffff;
+            pos.x.value = cx - 0x7ffff;
         if (nz > cz + 0x7ffff)
-            pos.z = cz + 0x7ffff;
+            pos.z.value = cz + 0x7ffff;
         else if (nz < cz - 0x7ffff)
-            pos.z = cz - 0x7ffff;
+            pos.z.value = cz - 0x7ffff;
         int half = u->type->range / 2;
         if (field_20 > half) {
             field_20 = half;
             unsigned short angle = u->f64.y;
             Vec3 vec;
-            vec.x = -FUN_004b70ef(angle, half);
-            vec.y = 0;
-            vec.z = -FUN_004b7123(angle, half);
+            vec.x.value = -FUN_004b70ef(angle, half);
+            vec.y.value = 0;
+            vec.z.value = -FUN_004b7123(angle, half);
             *pp = vec;
         }
-        u->pos.x = pos.x;
-        u->pos.y = pos.y;
-        u->pos.z = pos.z;
+        u->pos.x.value = pos.x.value;
+        u->pos.y.value = pos.y.value;
+        u->pos.z.value = pos.z.value;
         u->flags |= 0x10000;
         return;
     }
 
     FUN_0047d0e0(u);
-    u->pos.x = nx;
-    u->pos.y = ny;
-    u->pos.z = nz;
+    u->pos.x.value = nx;
+    u->pos.y.value = ny;
+    u->pos.z.value = nz;
     u->cell = cell;
     u->flags = (u->flags & 0xfffffffc) | (m & 3);
     FUN_0047cc30(u);
