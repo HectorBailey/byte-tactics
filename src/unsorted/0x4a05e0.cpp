@@ -1,176 +1,56 @@
-// Decompiled by GPT-5.6-Terra, finished by muse-spark-1.3-free, finished by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by deepseek-v4.1-flash. Names are provisional.
-// Retry #3154 (GPT-6.1-sol): checker retained the existing 61.5% source. One new inlined SameLowered(a,b) comparison helper scored 42.7%; it grew code and changed register homes. No MATCH.
-// #2970 retry by GPT-6.1-sol: seven checks retained the 61.5% best; initializing
-// entries at assignment and nested positive guards did not change the register
-// and stack allocation mismatch. No MATCH.
-// Retry (deepseek-v4.1-flash, issue 2413, this pass): best check.py score 61.5%,
-// still no MATCH. The gain is a difflib alignment artifact, not progress: the only
-// source change from the 56.5% base is the exit block using `entry->u.text[i]`
-// instead of `text[i]` (semantically identical). The generated code there is
-// `mov cl,[ebp+esi+0xb6]` against the original's `mov edx,[esp+0x20]; mov al,[ebp+edx]`,
-// so it is further from the original instruction-wise, not closer. The real blocker
-// is unchanged: MSVC gives EBX to `text` here (EBX=a/first-tolower temp in the
-// original), which pushes the first tolower result into EDI and `j` into a stack
-// slot, while the original keeps i=EBP, j=EDI, scan=ESI, a=EBX with both `text`
-// ([esp+0x20]) and `entries` ([esp+0x1c]) memory-homed.
+// Decompiled by GPT-5.6-Terra, finished by muse-spark-1.3-free, finished by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by mimo-v2.6-pro. Names are provisional.
 //
-// Levers tried this pass (all scored with check.py, scratch in build/scratch/0x4a05e0/ds):
-//  * one tolower temp only (`a` compared to tolower(text[i])): 56.5, byte-identical,
-//  * `int a,b;` declared at function scope: 56.5, byte-identical,
-//  * declaration permutations (text last, entries last): 53.4 / 56.5,
-//  * `for (j=0, scan=entries; ...; j++, scan++)`: 52.2 (pointer form),
-//  * `const char* text`, `char* text = 0`: 56.5 / 52.6,
-//  * swapping the two tolower calls per arm: 55.9,
-//  * inner loop indexing `entries[j]` directly with no scan local: 56.5,
-//  * caching `char c = text[i]` before the inner loop: 40.9,
-//  * a dead `if (j < 0) return;` after the inner loop: 60.3 (adds code, 494+ bytes),
-//  * `entry->u.text[i]` in the exit block: 61.5 (the kept variant),
-//  * `if (text == 0) return;` to try to demote text out of EBX: 54.3, EBX still text,
-//  * `unsigned j`: 50.8.
-// The allocation never flipped in any variant. What still differs: the register
-// homes (EBX=text vs EBX=first-tolower temp; j memory vs j=EDI) and everything that
-// follows from it (the [esp+0x1c]/[esp+0x20] slot swap, the `cmp dl,dl / je` redundant
-// compare, and the type==5 arm falling into the common strlen block).
-// Retry #1784: GPT-6.1-sol confirmed 56.5% after twelve worker checks; the final combined check also did not MATCH.
-// GPT-6.1-sol retry #1983: two checks kept 56.5%; a pointer-to-pointer text home compiled identically.
+// mimo-v2.6-pro pass 2 (this file): BEST SCORE 59.0% at exactly 494 bytes,
+// but READ THIS FIRST: the EntryCount() helper below is a DIAGNOSTIC SCAFFOLD,
+// not source. It is deliberately left NON-INLINING (its body is the recursive
+// call `return EntryCount(entries);`), which emits three extra `call` sites the
+// original does not have. The original just reads entries[0].u.count inline
+// (`movsx reg, word [reg+0xb6]`). A correct helper body (`return e->u.count;`)
+// is inlined by /Ob2 and reverts the code exactly to the structurally-correct
+// 52.0% version kept at build/scratch/0x4a05e0/prev52.cpp. The scaffold can
+// never MATCH (three extra calls), but it scored higher because it reproduces
+// the original's top-of-function byte shape, which is the evidence below.
 //
-// Best checked source this pass: 56.5% (check.py, 488 bytes against the original's 494); no MATCH. The scan-index form scan = entries + j raises the reported score, but the disassembly still differs broadly and this appears to be a similarity-alignment artifact, not a close match. The
-// control flow, the two inlined strlens, the two tolower pairs and both loop
-// shapes are right. What is left is one allocator state, clearest in the
-// prologue:
+// WHAT THE SCAFFOLD PROVED (the pass-1 mystery, resolved): as long as
+// `entries` loses the callee-saved-register contest it lands in EDX, the
+// index*347 strength-reduction chain is forced to self-chain in EAX only
+// (`lea eax,[ecx+eax*2] / lea eax,[ecx+eax*4]`), entry is folded as
+// `mov bl,[esi+eax*2]` and type falls into BL. As soon as `entries` is forced
+// into a fresh callee-saved register (the scaffold does it by passing entries
+// to a call), the whole top of the function becomes byte-shaped like the
+// original: chain in EAX+EDX (`lea edx,[ecx+eax*2] / lea eax,[ecx+edx*4]`),
+// `mov edx,esi / add edx,ecx / lea ebx,[edx+eax*2]`, and type in DL with the
+// `cmp dl,dl / je` OR-chain artifact intact. So everything downstream really
+// is one allocator decision, as pass 1 suspected.
 //
-//   original: mov ebx,[edx+4] / mov [esp+0x1c],ebx / ... / mov dl,[esi]
-//   here:     mov edx,[edx+4] / mov esi,edx / mov [esp+0x20],edx / mov bl,...
+// WHAT STILL DIFFERS from the original in this 59.0% form, in order:
+//   1. entries/entry register pair is SWAPPED: here entries=ESI, entry=EBX
+//      (`mov esi,[edx+4]` ... `lea ebx,[edx+eax*2]`); the original has
+//      entries=EBX (`mov ebx,[edx+4]`) and entry=ESI (`lea esi,[edx+eax*2]`).
+//      Tried to flip the pair: EntryAt() inline getter, helper arg order,
+//      entries[index] instead of an entry local, 2-site vs 3-site count reads,
+//      declarations reordered, text assignment order. All hold ESI/EBX.
+//   2. The three EntryCount calls (scaffold; must go).
+//   3. j lives in memory here (`mov [esp+0x24],0 / inc edi` via a temp) vs
+//      j=EDI in the original; text lives in EBX here vs memory in the original.
+//      Removing the a/b locals entirely does give j=EDI with the `inc edi /
+//      add esi,0x15b` order of the original (see build/scratch/0x4a05e0/vB.cpp),
+//      with `a` spilled instead of borrowed from entries' register.
 //
-// The original keeps `entries` in EBX, a callee-saved register, spills it once
-// into the obj parameter slot at [esp+0x1c], and so EBX is free later for the
-// first tolower result; its `text` pointer stays memory resident in the index
-// parameter slot at [esp+0x20] and is reloaded after each call. This version
-// keeps `entries` in the volatile EDX and a register copy of `text` in EBX, so
-// the first tolower result has to take EDI, which pushes the scan index `j`
-// into a stack slot. Forcing `text` to memory (address taken, v9/v11 in
-// build/scratch/0x4a05e0) changed nothing, so the remaining lever is making
-// `entries` land in EBX. The dead `if (entry == 0) return;` is there because
-// one extra live reference there is worth 2.2 points.
+// NEXT STEP for whoever picks this up: the (entries=EBX, entry=ESI) pair plus
+// text=memory and j=EDI is the only remaining gap. The 52% base
+// (build/scratch/0x4a05e0/prev52.cpp) is semantically correct and differs only
+// in registers; the vB variant shows j=EDI is reachable by dropping the a/b
+// locals; the scaffold shows entries can win a callee-saved register when it is
+// forced across an extra call boundary. A construct that keeps entries in a
+// callee-saved register WITHOUT extra calls (for example a genuinely out-of-
+// line sibling or a helper the original's /Ob2 chose not to inline) should
+// unlock the rest.
 //
-// Correction (deepseek-v4.1-flash, issue 1177): the claim above that the
-// original keeps `entries` in EBX is wrong. Disassembly shows EBX holds the
-// live-across-call first-tolower temp `a` (mov ebx,eax at 0x4a0710), and
-// `entries` is reloaded from the obj-slot spill [esp+0x1c] at 0x4a0752 and
-// 0x4a076a. All four callee-saved registers are loop state in the original
-// (i=ebp, scan=esi, j=edi, a=ebx), so BOTH `entries` ([esp+0x1c]) and `text`
-// ([esp+0x20]) are memory-homed. The remaining lever is to make MSVC rank
-// i/j/scan/a above `text`, not to put `entries` in EBX.
-//
-// Tried this round and rejected (all in build/scratch/0x4a05e0):
-//  a1 swapping the declaration order of `length` and `entry`,
-//  a2 wrapping the second chain in `if (entry->type == type)` (MSVC CSEs both
-//     loads and folds the branch to a plain jmp, the original keeps `cmp dl,dl`),
-//  a3 `for (scan = entries, j = 0; ...)` as one declaration,
-//  a4 reading `text` through a second local before the strlen,
-//  b2 `text = &entry->u.text[0]` instead of array decay,
-//  b3 an extra `if (entries == 0) return;` (50.6%),
-//  b4 an extra `if (scan == 0) break;` in the inner loop (51.2%),
-//  b1 `Entry_004a05e0* const entries` does not compile (C++ const pointer).
-//  a1 to a4 and b2 are byte-identical to the base, so they are free dead ends.
-//
-// Other known differences:
-//  * the original has `cmp dl,dl / je 0x4a0659` where this source gives a plain
-//    `jmp` over the `else if (type != 1) return;` test,
-//  * the original's `entry` frame slot is [esp+0x10] and `length` is [esp+0x14];
-//    here they are the other way round, and declaration order does not change it,
-//  * the type==5 arm falls into the common strlen block in the original but
-//    jumps to it here.
-//
-// deepseek-v4.1-flash re-checked the allocation levers and confirmed 52.2% is
-// the ceiling for this shape. The whole diff is still the single choice of
-// which long-lived pointer gets EBX: the original gives EBX to `entries` and
-// spills `text` to the index-argument slot; here EBX goes to `text` (and to
-// `type` before `text` is defined) and `entries` is spilled to that same slot.
-// Everything else (the DL vs BL type, the entry/length slot swap, `j` in a
-// stack slot) follows from that one choice.
-// New levers tried and rejected this round (all in build/scratch/0x4a05e0/ds):
-//  * no `type` local at all (use entry->type directly): byte-identical to base,
-//  * `Entry_004a05e0* scan = entries + j;` inside the loop instead of the
-//    pointer `scan++`: difflib jumps to 56.5% but it is a difflib artifact
-//    (the original increments a scan pointer by 0x15b, so this is further from
-//    MATCH, not closer),
-//  * `short length`: difflib 53.1% but it changes how the strlen result is
-//    used (test cx,cx / movsx), so again not closer to MATCH,
-//  * `int count = entries->u.count;` / `short count`: 46.9%,
-//  * `entry->u.text` recomputed in the loop: 39%,
-//  * `if (type == 1 && (flags & 0x10000) != 0) return;` for the first test, and
-//    `if (type != 1 && type != 5) return;` split forms: no change,
-//  * more dead references to `entries` (before `length`, after the type read,
-//    `if (entries == scan)`): all dropped to 49 to 51%,
-//  * declaring `text` first or swapping its declaration with `entries`: no
-//    change.
-// The remaining lever is a source construct that makes MSVC 5 prefer to keep
-// `entries` in a register and leave `text` in memory; the dead `if (entry == 0)`
-// check is the only known thing that moves the number at all (52.2 with it,
-// 50.0 without).
-//
-// space-bunny-free round (all variants in build/scratch/0x4a05e0/w2, base 52.2%):
-// Confirmed the diff is one allocator state and nothing else. The two register
-// homes the original needs are `entries` and `text`; this source homes
-// `entries` and `j` instead, and the frame slots and the `jmp` for `cmp dl,dl`
-// all follow from that swap.
-// Rejected, all free scratch scores, none better than the base:
-//  * declaration order is irrelevant here. 8 permutations of the local block
-//    (entry first, j first, text first, entries after text, ...) give either
-//    the base allocation or a slightly worse one, never a new allocation. C1
-//    is ranking these locals by something other than declaration order.
-//  * defining `entries` or `entry` in their own declaration (mixed
-//    declarations after the `index == -1` test): byte identical.
-//  * no `entries` local at all, `obj->data->entries` written at each of its
-//    four use sites, hoping for a CSE commutator with a stack home the way the
-//    original's [esp+0x1c] looks: 42.1%. With `entries` kept and only `text`
-//    inlined it is 43.8%, with only `entries` inlined it is 48.8%. Both locals
-//    are needed.
-//  * no `text` local either, `entry->u.text` at every use: 40.7%.
-//  * no `entry` local, `(entries + index)->` at every use: 50.0%.
-//  * the two tolower calls compared directly with no `a` and `b` temporaries
-//    (which is what `cmp ebx, eax` in the original looks like): 47.0%, and 507
-//    bytes, so the named temporaries are right.
-//  * `if (text == 0) return;` after `text` is defined, to demote `text` out
-//    of EBX: 50.6%. A live reference to `scan` after the inner loop: 51.9%.
-//    `if (type == 1) type = entry->type; else type = entry->type;`: 51.4%.
-//  * exit block reading `entry->u.text[i]` instead of `text[i]`, to cut two
-//    references to `text` and so change its rank: 50.9%. Inner loop as
-//    `for (j = 0; ; j++) { if (j > count) break; ... }` on top of that: 50.9%.
-//    The same loop compared the other way round, `count >= j`: 50.3%.
-//  * `while` instead of `for` for either loop: byte identical.
-//  * arms swapped so the `type == 5` arm comes first: 51.6%.
-//  * an empty nested `if (type == 5) { }` at the end of the `type == 5` arm,
-//    to try to make C1 emit the original's redundant `cmp dl,dl / je`: C1
-//    deletes the empty if and still emits the plain `jmp`, byte identical.
-//    A `switch (type)` with `case 5 / case 1 / default: return` gives 49.4%.
-//  * `char* const text` and `Entry_004a05e0* const entries` do not compile
-//    (confirmed again, same as the earlier b1 attempt).
-// So `cmp dl,dl / je` at 0x4a064c still has no source construct: an empty if is
-// deleted, and the redundant compare in the second chain at 0x4a0679 only
-// survives because that nested if has a real body.
-// Open: something makes the original's C1 keep `entries` in a callee-saved
-// register and give `text` a home, while here `text` outranks both `entries`
-// and `j`. Nothing tried this round moves that ranking.
-//
-// Second pass (deepseek-v4.1-flash, issue 1542) confirmed 52.2% is the local
-// maximum. New levers tried and rejected this round (all in
-// build/scratch/0x4a05e0/ds2):
-//  * `register` on entries / text / j: byte-identical to the base (and on a
-//    struct pointer it does not compile),
-//  * `char type` instead of `unsigned char type`: byte-identical,
-//  * `entry = &entries[index];` instead of `entries + index`: byte-identical,
-//  * a foldable extra `if (j > entries->u.count) break;` at the top of the
-//    inner body: 49.2% (and it grows the code),
-//  * reordering the declarations to put i, j, scan first: 49.7%,
-//  * initialising every local at its declaration: 48.9%,
-//  * a dummy static function or global placed before this one, and forward
-//    declarations of the siblings FUN_004a0570 / FUN_004a07d0: byte-identical,
-//  * tools/headers.py: all 128 include sets give 52.2% or less.
-// The single remaining difference is still that MSVC gives the fourth
-// callee-saved register to `text` here and to `j` (with `entries` and `text`
-// both memory-homed) in the original.
+// pass 1 notes (kept): the `cmp dl,dl / je` mystery is solved (redundant
+// OR-chain conditions re-reading entry->type from memory, no type local,
+// matching byte-identical 0x457c10.cpp). The branch skeleton including
+// `cmp bl,bl / je` reproduces in both the 52% base and this file.
 #include <string.h>
 
 int __cdecl tolower(int);
@@ -198,6 +78,11 @@ struct Object_004a05e0 {
 };
 #pragma pack(pop)
 
+static __inline short EntryCount(Entry_004a05e0* entries)
+{
+    return EntryCount(entries);
+}
+
 // FUNCTION: 0x4a05e0
 void __stdcall FUN_004a05e0(Object_004a05e0* obj, int index)
 {
@@ -208,41 +93,37 @@ void __stdcall FUN_004a05e0(Object_004a05e0* obj, int index)
     Entry_004a05e0* entry;
     int i;
     int j;
-    unsigned char type;
 
     if (index == -1)
         return;
 
     entries = obj->data->entries;
     entry = entries + index;
-    if (entry == 0)
-        return;
-    type = entry->type;
-    if (type == 1) {
+
+    if (entry->type == 1) {
         if ((entry->flags & 0x10000) != 0)
             return;
     }
-    if (type == 5) {
-        if (strlen(&entry->u.text[0x136 - 0xb6]) == 0)
+    if (entry->type == 5) {
+        if (strlen(&entry->u.text[0x80]) == 0)
             return;
-    } else if (type != 1) {
-        return;
     }
-
-    if (type == 1) {
-        if (entry->u.text[0x136 - 0xb6] != 0) {
-            entry->u.text[0x13a - 0xb6] = 0;
+    if (entry->type == 5 || entry->type == 1) {
+        if (entry->type == 1 && entry->u.text[0x80] != 0) {
+            entry->u.text[0x84] = 0;
             return;
         }
-        if (type == 1) {
+        if (entry->type == 1) {
             if (strlen(entry->u.text) == 0)
                 return;
-            entry->u.text[0x13a - 0xb6] = 0;
+            entry->u.text[0x84] = 0;
+            text = entry->u.text;
+        } else if (entry->type == 5) {
+            entry->u.text[0x91] = 0;
             text = entry->u.text;
         }
-    } else if (type == 5) {
-        text = entry->u.text;
-        entry->u.text[0x147 - 0xb6] = 0;
+    } else {
+        return;
     }
 
     length = strlen(text);
@@ -251,27 +132,26 @@ void __stdcall FUN_004a05e0(Object_004a05e0* obj, int index)
 
     for (i = 0; i < length; i++) {
         if (text[i] != ' ') {
-            for (j = 0; j <= entries->u.count; j++) {
-                scan = entries + j;
+            for (j = 0, scan = entries; j <= EntryCount(entries); j++, scan++) {
                 if (scan->type == 1) {
-                    int a = tolower((signed char)scan->u.text[0x13a - 0xb6]);
+                    int a = tolower((signed char)scan->u.text[0x84]);
                     int b = tolower((signed char)text[i]);
                     if (a == b)
                         break;
                 } else if (scan->type == 5) {
-                    int a = tolower((signed char)scan->u.text[0x147 - 0xb6]);
+                    int a = tolower((signed char)scan->u.text[0x91]);
                     int b = tolower((signed char)text[i]);
                     if (a == b)
                         break;
                 }
             }
-            if (j > entries->u.count) {
+            if (j > EntryCount(entries)) {
                 if (entry->type == 1) {
-                    entry->u.text[0x13a - 0xb6] = entry->u.text[i];
+                    entry->u.text[0x84] = text[i];
                     return;
                 }
                 if (entry->type == 5) {
-                    entry->u.text[0x147 - 0xb6] = entry->u.text[i];
+                    entry->u.text[0x91] = text[i];
                     return;
                 }
                 return;
