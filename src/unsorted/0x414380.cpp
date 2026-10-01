@@ -1,4 +1,11 @@
 // Decompiled by GPT-6 Astra, finished by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol. Names are provisional.
+// deepseek-v4.1-flash follow-up (issue #3136 parallel pass): the matching
+// sibling 0x413d80 uses explicit-component operator- (r.x=x-v.x; r.y=y-v.y;
+// r.z=z-v.z) which makes state-3 byte exact but flips esi/edi globally via the
+// by-value return. The distinct shape worth scoring first next pass is the
+// state-3 named-x/y/z-locals-then-assign split (compute component locals
+// first, then store to the return Vec3): it is not the same tree as the
+// explicit operator- and may keep the global allocation.
 // GPT-6.1-sol issue 3136 retry pass: baseline and best remain 91.3% after six scratch checks; one source check remains after this note. Variants included reverse component subtraction (73.8%), reverse addition operands (91.3%), min+pos (90.1%), reverse assignment order (91.3%), and a target alias (53.7%). One malformed scratch variant failed compilation. No variant improved the source.
 // deepseek-v4.1-flash pass (4 real check runs / many --sym): no improvement
 // over 91.3%. New insight into why the explicit operator- flips esi/edi: the
