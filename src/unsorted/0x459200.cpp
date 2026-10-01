@@ -102,9 +102,18 @@ struct Model_459200;
 struct Team_459200;
 
 #pragma pack(push, 1)
+union TeamFlags_459200 {
+    unsigned int word;
+    struct {
+        unsigned int hi : 30;
+        unsigned int b30 : 1;
+        unsigned int lo : 1;
+    } bits;
+};
+
 struct Team_459200 {
     char unknown_0[0x241];
-    unsigned int flags;                // +0x241
+    TeamFlags_459200 flags;            // +0x241
 };
 
 struct Unit_459200 {
@@ -153,13 +162,17 @@ struct Model_459200 {
     int pos_z;                         // +0x72
 };
 
-struct GameFlags_459200 {
-    unsigned short b0 : 1;
-    unsigned short b1 : 1;
-    unsigned short b2 : 1;
-    unsigned short b3 : 1;
-    unsigned short rest : 12;
+union GameFlags_459200 {
+    unsigned short whole;
+    struct {
+        unsigned short b0 : 1;
+        unsigned short b1 : 1;
+        unsigned short b2 : 1;
+        unsigned short b3 : 1;
+        unsigned short rest : 12;
+    } bits;
 };
+
 
 struct Game_459200 {
     char unknown_0[0x2a43];
@@ -216,15 +229,17 @@ void __stdcall FUN_004ba1b0(int param_1, int value);
 void Class_00459200::FUN_00459200(int param_2, Model_459200* model, Vec3_459200 v, int useColor)
 {
     int bmp = model->bitmap;
-    unsigned int f;
+    TeamFlags_459200 f;
     if (bmp == 0)
         return;
 
     Vec3_459200 cv;
-    cv = v;
     Vec3_459200 d;
+    cv.v[0] = v.v[0];
     v.v[0] = model->owner->pos_x - v.v[0];
+    cv.v[1] = v.v[1];
     v.v[1] = model->owner->pos_y;
+    cv.v[2] = v.v[2];
     v.v[2] = model->owner->pos_z - v.v[2];
     int altitude = FUN_00485070((Pos_459200*)&model->owner->pos_x);
     short dx = v.p.y.whole;
@@ -234,19 +249,19 @@ void Class_00459200::FUN_00459200(int param_2, Model_459200* model, Vec3_459200 
 
     if (*(int*)(bmp+0x14) == 0) {
         GameFlags_459200 gameFlags = g_game->field_37f06;
-        if (gameFlags.b2) {
+        if (gameFlags.whole & 4) {
             f = model->owner->field_92->flags;
-            if (!(f & 0x2000000)) {
+            if (!(f.word & 0x2000000)) {
                 if ((*(unsigned char*)((char*)model->owner+0x113) & 0x20)
-                    && !(f & 0x40000000)) {
+                    && !(f.word & 0x40000000)) {
                     if (model->owner->field_a6 != 0 || dx >= g_game->field_1427f) {
                         if (model->field_14 == 0)
                             ((Class_00437a30*)this)->FUN_0045a790(model,bmp);
                         FUN_004b8500(param_2, model->field_14, v.p.x.whole + 0x85, y);
                     }
                 } else {
-                    if (gameFlags.b3) {
-                        if (!(f & 0x81000)) {
+                    if (gameFlags.bits.b3) {
+                        if (!(f.word & 0x81000)) {
                             ((Class_0045a470*)this)->FUN_0045a470(bmp);
                             FUN_004b8500(param_2, this->bitmap, v.p.x.whole + 0x85, y);
                         }
@@ -287,13 +302,13 @@ void Class_00459200::FUN_00459200(int param_2, Model_459200* model, Vec3_459200 
 
     {
         GameFlags_459200 gameFlags = g_game->field_37f06;
-        if (gameFlags.b2) {
+        if (gameFlags.whole & 4) {
             f = model->owner->field_92->flags;
-            if (!(f & 0x2000000)) {
-                bool bright = (f >> 30) & 1;
-                if (bright) {
+            if (!(f.word & 0x2000000)) {
+                if (f.bits.b30) {
                     ((Class_0045a470*)this)->FUN_0045a470(bmp);
-                    FUN_004ba1b0(this->bitmap, (bright ? 0x4b : 0) + 0x32);
+                    bool b = (model->owner->field_92->flags.word >> 30) & 1;
+                    FUN_004ba1b0(this->bitmap, (b ? 0x4b : 0) + 0x32);
                     FUN_004b8500(param_2, this->bitmap, v.p.x.whole + 0x85, y);
                 } else {
                     if (model->owner->flags & 0x20000000) {
@@ -303,14 +318,13 @@ void Class_00459200::FUN_00459200(int param_2, Model_459200* model, Vec3_459200 
                             FUN_004b8500(param_2, model->field_14, v.p.x.whole + 0x85, y);
                         }
                     } else {
-                        if (gameFlags.b3) {
-                            if (!(f & 0x81000)) {
+                        if (gameFlags.bits.b3) {
+                            if (!(f.word & 0x81000)) {
                                 ((Class_0045a470*)this)->FUN_0045a470(bmp);
-                                if (g_game->field_1427f - dx > 0) {
-                                    bool bright = (model->owner->field_92->flags >> 30) & 1;
+                                int diff = g_game->field_1427f - dx;
+                                if (diff > 0) {
                                     FUN_004ba1b0(this->bitmap,
-                                                 (unsigned char)(g_game->field_1427f - dx)
-                                                     + (bright ? 0x4b : 0) + 0x32);
+                                                 diff + (((model->owner->field_92->flags.word >> 30) & 1 ? 0x4b : 0) + 0x32));
                                 }
                                 FUN_004b8500(param_2, this->bitmap, v.p.x.whole + 0x85, y);
                             }
@@ -344,10 +358,10 @@ void Class_00459200::FUN_00459200(int param_2, Model_459200* model, Vec3_459200 
             }
             unit = unit->list_next;
         }
-        if (g_game->field_1427f - dx > 0) {
-            bool bright = (model->owner->field_92->flags >> 30) & 1;
-            int value = (unsigned char)(g_game->field_1427f - dx)
-                + (bright ? 0x4b : 0) + 0x32;
+        int diff = g_game->field_1427f - dx;
+        if (diff > 0) {
+            bool b = (model->owner->field_92->flags.word >> 30) & 1;
+            int value = diff + ((b ? 0x4b : 0) + 0x32);
             if (!(model->owner->flags & 0x200)
                 && model->owner->kind != g_game->field_2a43) {
                 FUN_004ba1b0(this->bitmap, value);
@@ -355,8 +369,7 @@ void Class_00459200::FUN_00459200(int param_2, Model_459200* model, Vec3_459200 
                 FUN_004b96e0(this->bitmap, value);
             }
         }
-        bool shade = (model->owner->field_92->flags >> 30) & 1;
-        if (shade)
+        if (model->owner->field_92->flags.bits.b30)
             FUN_004ba1b0(this->bitmap, 0x7d);
         if (!(model->owner->field_10e & 4) && g_game->field_14280 == 0) {
             FUN_004b7f90(param_2, this->bitmap, v.p.x.whole + 0x80, z);

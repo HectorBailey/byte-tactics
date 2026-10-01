@@ -1,4 +1,40 @@
 // Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6, finished by GPT-6.1-sol, finished by deepseek-v4.1-flash, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by deepseek-v4.1-flash, finished by deepseek-v4.1-flash, edited by claude-opus-5-5. Names are provisional.
+// deepseek-v4.1-flash retry (this run), 51.5 -> 51.9: the tail antiAlias test
+// drops the `!= 0` so it emits the original's `mov cl,[g+0x37f06]; shr cl,1;
+// test cl,1` instead of folding to `test byte,2`. On the 36.5 base the same
+// change scored 36.4 (it only pays now that the rest lines up). Also retried
+// on this base: sibling prologue shape 51.3 (size 2027 though), accum [2]
+// operand order 51.5 (identical).
+// deepseek-v4.1-flash retry (this run), 50.2 -> 51.5: the fflags test is
+// spelled `if ((fflags & 1) == 0) { if (count == 4) {...} } else { clip; }`
+// so the FUN_004c0c70 clip path goes out of line after the loop like the
+// original's `test al,1 / jne 0x45a3a3` (same lever as sibling 0x459830).
+// Tried on this base and NOT kept: walking-copy vertex loop 42.8, accum as
+// Vec3f 50.2 (identical), tail `while (x--)` 50.0.
+// deepseek-v4.1-flash retry (this run), 43.2 -> 50.2: the shade bias helper
+// stores the bit into a `bool c` first (`bool c = (v >> 30 & 1) != 0; return
+// c ? 125 : 50;`), which gives the original's `shr edx,0x1e; and dl,1; neg
+// dl; sbb edx,edx`. On the pre-struct-normal base the same helper scored
+// 35.8 (it only pays off once the normals loop binds the return temps).
+// deepseek-v4.1-flash retry (this run), 39.6 -> 43.2: `normal` is a Vec3f
+// array and the call results are assigned to normal[fi] as struct copies
+// (`normal[fi] = c; c = FUN_004b6ff0(c); normal[fi] = c;`). The struct
+// assignment binds the hidden return temp directly to the 3-word copy the
+// original emits at 0x45a0b5 and 0x45a0e1, dropping the fieldwise spill
+// copies that the float[3] spelling forced.
+// deepseek-v4.1-flash retry (this run), 39.5 -> 39.6: the cross product is
+// stored into normal[fi] BEFORE the FUN_004b6ff0 normalize call and the same
+// `c` local is reused for the normalized result (the original does a second
+// 3-word store from the second call's return temp at 0x45a0e1, overwriting the
+// cross product at 0x45a0b5; without the first store the call marshaling and
+// temp slots rotate). Vertex loop indexes verts[k] (39.5 pass).
+// deepseek-v4.1-flash retry (this run), 36.5 -> 39.5: the vertex loop indexes
+// `verts[k]` and drops the `verts++`, and the normals loop reads the same
+// `verts` base (`verts[idx[i]]`) instead of re-reading `piece->vertices` into
+// `pv`. The original spills the base to [esp+0x18] and walks a copy at
+// [esp+0x14], which is exactly the codegen of the indexed form; the re-read
+// spelling forced a piece-pointer reload and rotated the normal loop. On top
+// of the claude-opus-5-5 weight/normals pass (38.6).
 // claude-opus-5-5 pass (#4173), 36.5 -> 38.6: the weight clear is
 // `memset(weight, 0, n * 4)` (the original's rep stosd) and the normals loop
 // uses the same `face = info->faces; fi = 0; if (firstFace != -1) { face++;
@@ -283,8 +319,8 @@ struct Class_004581e0 {
 // doubled-bitmap test, once per projected vertex.
 static __inline int shade_bias(List_459c70* list)
 {
-    return (((*(unsigned int*)((char*)list->owner->field_92 + 0x241) >> 30) & 1)
-        != 0) ? 125 : 50;
+    bool c = ((*(unsigned int*)((char*)list->owner->field_92 + 0x241) >> 30) & 1) != 0;
+    return c ? 125 : 50;
 }
 
 // FUNCTION: 0x459c70
@@ -293,7 +329,7 @@ void Class_004581e0::FUN_00459c70(Bitmap_459c70* bitmap, List_459c70* list,
 {
     Poly_459c70 poly[25];
     float accum[2000][3];
-    float normal[2000][3];
+    Vec3f normal[2000];
     int weight[2000];
     Poly_459c70 vertex[2000];
 
@@ -343,13 +379,13 @@ haveMode:
                 int y;
                 int z;
                 if (mode) {
-                    x = (short)(verts->x >> 16) << 1;
-                    y = (short)(verts->y >> 16) << 1;
-                    z = (short)(-verts->z >> 16) << 1;
+                    x = (short)(verts[k].x >> 16) << 1;
+                    y = (short)(verts[k].y >> 16) << 1;
+                    z = (short)(-verts[k].z >> 16) << 1;
                 } else {
-                    x = (short)(verts->x >> 16);
-                    y = (short)(verts->y >> 16);
-                    z = (short)(-verts->z >> 16);
+                    x = (short)(verts[k].x >> 16);
+                    y = (short)(verts[k].y >> 16);
+                    z = (short)(-verts[k].z >> 16);
                 }
                 vertex[k].x = x;
                 vertex[k].y = z - (y >> 1);
@@ -365,7 +401,6 @@ haveMode:
                 accum[k][1] = 0.0f;
                 accum[k][2] = 0.0f;
                 shade += 3;
-                verts++;
             }
         }
 
@@ -379,21 +414,19 @@ haveMode:
         for (; fi < info->faceCount; fi++, face++) {
             unsigned short* idx = face->indices;
             if (idx[0] == idx[1] || idx[1] == idx[2] || idx[2] == idx[0]) {
-                normal[fi][0] = 0.0f;
-                normal[fi][1] = 1.0f;
-                normal[fi][2] = 0.0f;
+                normal[fi].x = 0.0f;
+                normal[fi].y = 1.0f;
+                normal[fi].z = 0.0f;
             } else {
-                Vec3* pv = piece->vertices;
-                Vec3 p0 = pv[idx[1]];
-                Vec3 p1 = pv[idx[0]];
-                Vec3 p2 = pv[idx[2]];
+                Vec3 p0 = verts[idx[1]];
+                Vec3 p1 = verts[idx[0]];
+                Vec3 p2 = verts[idx[2]];
                 Vec3f a = FUN_004b6f00(p0, p1);
                 Vec3f b = FUN_004b6f00(p0, p2);
                 Vec3f c = FUN_004b6f70(a, b);
-                Vec3f d = FUN_004b6ff0(c);
-                normal[fi][0] = d.x;
-                normal[fi][1] = d.y;
-                normal[fi][2] = d.z;
+                normal[fi] = c;
+                c = FUN_004b6ff0(c);
+                normal[fi] = c;
             }
         }
         }
@@ -409,9 +442,9 @@ haveMode:
                 unsigned short* idx = f->indices;
                 for (int j = 0; j < f->count; j++) {
                     int k = idx[j];
-                    accum[k][0] = normal[i][0] + accum[k][0];
-                    accum[k][1] = normal[i][1] + accum[k][1];
-                    accum[k][2] = normal[i][2] + accum[k][2];
+                    accum[k][0] = normal[i].x + accum[k][0];
+                    accum[k][1] = normal[i].y + accum[k][1];
+                    accum[k][2] = normal[i].z + accum[k][2];
                     weight[k]++;
                 }
             }
@@ -448,9 +481,8 @@ haveMode:
                     }
                 }
                 unsigned int fflags = f->flags;
-                if ((fflags & 1) != 0) {
-                    FUN_004c0c70(bmp, poly, f->count, f->unknown_0);
-                } else if (f->count == 4) {
+                if ((fflags & 1) == 0) {
+                if (f->count == 4) {
                     void* pic;
                     if ((fflags & 2) != 0) {
                         if ((fflags & 4) != 0) {
@@ -467,11 +499,14 @@ haveMode:
                     }
                     FUN_004c8bb0(bmp, pic, poly, 0);
                 }
+                } else {
+                    FUN_004c0c70(bmp, poly, f->count, f->unknown_0);
+                }
             }
         }
     }
 
-    if (((Flags_37f06*)(g_game + 0x37f06))->antiAlias != 0) {
+    if (((Flags_37f06*)(g_game + 0x37f06))->antiAlias) {
         if (mode != 0) {
             FUN_004b95a0(bmp, src);
             char* s = src->data2;

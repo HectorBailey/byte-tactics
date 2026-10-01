@@ -132,6 +132,18 @@ struct Flags_459830 {
     unsigned short rest : 14;
 };
 
+struct FaceFlags_459830 {
+    union {
+        unsigned int raw;
+        struct {
+            unsigned int a : 1;
+            unsigned int b : 1;
+            unsigned int c : 1;
+            unsigned int rest : 29;
+        } bits;
+    };
+};
+
 struct Vec3 { int x; int y; int z; };
 
 void* __stdcall FUN_004b7ee0(void* pic);
@@ -170,7 +182,7 @@ struct Face_459c70 {
     void* pic;                       // +0x10
     int unknown_14;                  // +0x14
     unsigned short* color;           // +0x18
-    unsigned int flags;              // +0x1c
+    FaceFlags_459830 flags;              // +0x1c
 };
 
 struct PieceInfo_459c70 {
@@ -214,6 +226,14 @@ static __inline int shade_bias(Owner_459c70* owner)
     bool c = ((*(unsigned int*)(owner->field_92 + 0x241) >> 30) & 1) != 0;
     return c ? 125 : 50;
 }
+static __inline bool shadow_ok(Owner_459c70* owner)
+{
+    return (owner->field_110 & 0x20000000) != 0;
+}
+static __inline bool want_color(int uc)
+{
+    return uc != 0;
+}
 // FUNCTION: 0x459830
 void Class_004581e0::FUN_00459830(Bitmap_459c70* bitmap, List_459c70* list,
     int kind, int useColor)
@@ -225,8 +245,8 @@ void Class_004581e0::FUN_00459830(Bitmap_459c70* bitmap, List_459c70* list,
     bool shadow = ((Flags_459830*)(g_game + 0x37f06))->b1;
     Bitmap_459c70* src;
     if (shadow
-        && (list->owner->field_110 & 0x20000000) != 0
-        && useColor != 0) {
+        && shadow_ok(list->owner)
+        && want_color(useColor)) {
         Bitmap_459c70* shadow = this->shadow;
         mode = 1;
         shadow->width = (unsigned short)(bitmap->width << 1);
@@ -276,11 +296,14 @@ void Class_004581e0::FUN_00459830(Bitmap_459c70* bitmap, List_459c70* list,
             verts++;
         }
 
-        Face_459c70* face = info->faces;
-        int fi = 0;
+        Face_459c70* face;
+        int fi;
         if (info->firstFace != -1) {
-            face++;
+            face = info->faces + 1;
             fi = 1;
+        } else {
+            face = info->faces;
+            fi = 0;
         }
         for (; fi < info->faceCount; fi++, face++) {
             unsigned short* idx = face->indices;
@@ -288,12 +311,12 @@ void Class_004581e0::FUN_00459830(Bitmap_459c70* bitmap, List_459c70* list,
             for (int j = 0; j < face->count; j++, q++, idx++) {
                 *q = vertex[*idx];
             }
-            unsigned int fflags = face->flags;
-            if ((fflags & 1) == 0) {
+            FaceFlags_459830 fflags = face->flags;
+            if (!fflags.bits.a) {
                 if (face->count == 4) {
                     void* pic;
-                    if ((fflags & 2) != 0) {
-                        if ((fflags & 4) != 0) {
+                    if (fflags.bits.b) {
+                        if (fflags.bits.c) {
                             int unit = *(int*)(g_game + 0x1b8a + kind * 0x14b);
                             pic = FUN_004b7f30(face->color,
                                 *(unsigned char*)(unit + 0x96));
