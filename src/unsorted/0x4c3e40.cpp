@@ -1,6 +1,11 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6 and space-bunny-free.
-// Names are provisional.
-// Partial: 60.0%, not MATCH, original 1115 bytes, ours 1090.
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, space-bunny-free
+// and mimo-v2.6-pro. Names are provisional.
+// Partial: 66.2%, not MATCH, original 1115 bytes, ours 1096.
+// mimo-v2.6-pro: phrasing both end cases with "current--" instead of
+// "char* end = current - 1" gave the original dec ecx form and 66.2%.
+// The two FUN_004b6ba0 call tails are still merged into one block (the
+// original keeps one copy per case), and each merged copy stores current
+// back to its frame slot after the dec, which the original never does.
 // What is already right: the 0x7fc frame, the 27 byte string copy plus the
 // 0x315 byte tail zeroing, all eight vector member stores and their offsets,
 // the 0x4340 calls, the four inlined strcat error paths, the sprintf tail.
@@ -166,12 +171,13 @@ char* __cdecl FUN_004d8610(char* text);
 char* FUN_004b6ba0(char* text, int len);
 void FUN_004b6290(char* text);
 
-static inline void SkipSpaceInPlace(char*& p) {
+static inline char* SkipSpace(char* p) {
     char c = *p;
     while (c && (c == ' ' || c == '\t' || c == '\r' || c == '\n')) {
         c = p[1];
         ++p;
     }
+    return p;
 }
 
 // FUNCTION: 0x4c3e40
@@ -183,7 +189,7 @@ Class_004c3e40::Class_004c3e40(char* name, char* text, int* nextblock, char* fil
     this->name = FUN_004d8610(name);
 
     while (1) {
-        SkipSpaceInPlace(current);
+        current = SkipSpace(current);
 
         switch (*current) {
         case '[': {
@@ -193,7 +199,7 @@ Class_004c3e40::Class_004c3e40(char* name, char* text, int* nextblock, char* fil
             Class_004c91a0 subname;
             ((Class_004c4340*)this)->FUN_004c4340(&subname, current + 1, close);
             current = close + 1;
-            SkipSpaceInPlace(current);
+            current = SkipSpace(current);
             if (*current != '{') {
                 strcat(error, "Sub-record - opening '{' not found");
                 ((Class_004c9390*)&subname)->FUN_004c9390();
@@ -208,23 +214,20 @@ Class_004c3e40::Class_004c3e40(char* name, char* text, int* nextblock, char* fil
         case '}': {
             if (nextblock)
                 *nextblock = (int)(current + 1);
-            if (text > current - 1) {
-                unknown_25 = 0;
-                return;
-            }
-            unknown_25 = FUN_004b6ba0(text, (int)(current - 1) - (int)text - 1);
+            char* endA = current - 1;
+            if (text > endA)
+                goto set_zero;
+            unknown_25 = FUN_004b6ba0(text, endA - text - 1);
             return;
         }
         case 0: {
-            if (nextblock == 0) {
-                if (text > current - 1) {
-                    unknown_25 = 0;
-                    return;
-                }
-                unknown_25 = FUN_004b6ba0(text, (int)(current - 1) - (int)text - 1);
-                return;
-            }
-            goto eof_error;
+            if (nextblock)
+                goto eof_error;
+            char* endB = current - 1;
+            if (text > endB)
+                goto set_zero;
+            unknown_25 = FUN_004b6ba0(text, endB - text - 1);
+            return;
         }
         default: {
             char* eq = strchr(current, '=');
@@ -262,6 +265,9 @@ Class_004c3e40::Class_004c3e40(char* name, char* text, int* nextblock, char* fil
         if (name)
             sprintf(error + strlen(error), " - name = '%s' from file %s", name, filename);
         FUN_004b6290(error);
+        return;
+    set_zero:
+        unknown_25 = 0;
         return;
     }
 }
