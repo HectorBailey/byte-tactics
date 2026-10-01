@@ -1,4 +1,4 @@
-// Decompiled by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by Claude Sonnet 5.5. Names are provisional.
 // Session addendum 3 (deepseek-v4.1-flash, 10-minute timebox, no gain):
 // respelling all five __int64 multiplies with the scale operand on the left
 // (`(__int64)s * a` / `(__int64)f * p1.x`) is byte-neutral at 91.9 with the
@@ -209,6 +209,10 @@ extern Game_0043d290* g_game;
 int __cdecl FUN_004b70ef(short angle, int scale);
 int __cdecl FUN_004b7123(short angle, int scale);
 
+// Claude Sonnet 5.5 (found with tools/permute.py): 91.9% -> 92.0%, still
+// partial (1071 bytes against 1074; it was 1074). The only change needed is
+// the final two velocity additions swapped, `p1.z += ...` before `p1.x += ...`
+// (measured 92.0%; the permuter's other rewrites were neutral).
 // FUNCTION: 0x43d290
 void Class_0043d210::FUN_0043d290(Unit_0043d290* unit) {
     if (mode != 2) {
@@ -295,8 +299,8 @@ void Class_0043d210::FUN_0043d290(Unit_0043d290* unit) {
         vz = vz * (f18 / mag);
     }
 
-    p1.x += (int)((double)vx * 65536.0);
     p1.z += (int)((double)vz * 65536.0);
+    p1.x += (int)((double)vx * 65536.0);
     field_20 = p1.Length();
 
     Vec3 delta = p1 - old;

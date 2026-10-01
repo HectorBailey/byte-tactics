@@ -1,4 +1,4 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free and deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free and deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by Claude Sonnet 5.5. Names are provisional.
 // Tenth pass (deepseek-v4.1-flash, issue 4144): measured the byte budget of the
 // reindex loop with objdump on build/obj. The loop is the ONLY place the body
 // grows: the original encodes the `= i` store as one disp32 reference
@@ -318,6 +318,17 @@ int __stdcall FUN_00456760();
 class Class_0046dad0 { public: void FUN_0046dad0(); };
 
 
+// Claude Sonnet 5.5 (found with tools/permute.py): 92.9% -> 93.1%, still
+// partial (2340 bytes exact). Two parts are needed together: the unused helper
+// below stays defined (without it 92.9%; compiler state, nothing calls it),
+// and the reindex loop is a `while` with `off += 0x14b, i++` as its last
+// statement and the g_game base read through a local (`base`) inside the body
+// (the plain `for` form, and the `while` without that local, are 92.9%).
+// Measured as not needed: hoisting savedA,
+// shown and f73 to the top, `edi` as int, and a temporary for the
+// FUN_0045ba20 result.
+static inline void UpdateLoungeStats(Unit_44a680*u2, unsigned char b2) { ((Class_00435a20*)g_game->field_391e9)->FUN_00435a20(u2); FUN_0045b9b0(FUN_004a0200(g_game->gui.table->entries, "MAXUNITS"), g_game->players[b2].data->maxunits - 0x14); FUN_0045b9b0(FUN_004a0200(g_game->gui.table->entries, "METAL"), g_game->players[b2].data->metal * 100); }
+
 // FUNCTION: 0x44a680
 void FUN_0044a680()
 {
@@ -396,8 +407,10 @@ void FUN_0044a680()
                 B->field_0 = 0;
 
                 int i = 0;
-                for (int off = 0; off <= 0xcee; off += 0x14b, i++) {
-                    int v = *(int*)((char*)g_game + (0x1b63 + off));
+                int off = 0;
+                while (off <= 0xcee) {
+                    char* base = (char*)g_game;
+                    int v = *(int*)(base + (0x1b63 + off));
                     if (v != 0) {
                         unsigned char f73 = *(unsigned char*)((char*)g_game + (0x1bd6 + off));
                         if ((f73 == 1 || f73 == 2 || f73 == 3) &&
@@ -408,6 +421,7 @@ void FUN_0044a680()
                     } else {
                         *(unsigned char*)((char*)g_game + (0x1ca9 + off)) = 10;
                     }
+                    off += 0x14b, i++;
                 }
                 A = savedA;
             }

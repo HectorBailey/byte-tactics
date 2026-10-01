@@ -1,4 +1,4 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, reworked by Claude Sonnet 5.5, finished by GPT-6.1-sol, edited by deepseek-v4.1, finished by GPT-6.1-sol, finished by mimo-v2.6-pro. Names are provisional.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, reworked by Claude Sonnet 5.5, finished by GPT-6.1-sol, edited by deepseek-v4.1, finished by GPT-6.1-sol, finished by mimo-v2.6-pro, finished by Claude Sonnet 5.5. Names are provisional.
 // mimo-v2.6-pro retry (#3772): about 24 scratch variants, best stays 93.2 at
 // 367 bytes. New things measured (all 93.2 unless noted, scored with check.py
 // --sym):
@@ -173,10 +173,31 @@ void __stdcall FUN_0047f780(Class_0048b090* unit, int kind, char* text);
 void __stdcall FUN_0041c110(Class_0048b090* unit);
 int __stdcall FUN_00451df0(int player, void* data, int size);
 
+static inline unsigned char ClearBitsHelper(int mask, unsigned char old) { return (unsigned char)(~(unsigned char)mask & old); }
+
+static inline void NotifyActivate(Class_0048b090* self) { self->vars->FUN_004b0940("Activate", 0, 0); FUN_0047f780(self, 3, 0); }
+
+static inline unsigned char ToByteHelper(int now) { return (unsigned char)now; }
+
+static inline int SetBitsHelper(unsigned char old, int mask) { return old | (unsigned char)mask; }
+
+static inline int PlayerIdHelper(Player_0048b090*p) { return p->id; }
+
+// Claude Sonnet 5.5 (found with tools/permute.py): 93.2% -> 94.9%, still
+// partial (367 bytes exact). Compiler-state effect, not understood: three
+// things together are needed. Five `static inline` helpers defined above the
+// function (one is called, the other four are unused; removing any one of the
+// four unused ones gives 82.4% and 363 bytes), and two unused locals at the
+// top of the function (`unusedWide` int and `unusedByte` unsigned char;
+// dropping both, either alone, or one of them gives 93.2%). Everything else in
+// the permuter's best.cpp (a while(1) loop form, `p = p`, a temporary for
+// `gained & 4`, `!= 0` spellings) measured 94.9% without being needed.
 // FUNCTION: 0x48b090
 void Class_0048b090::FUN_0048b090(int mask, int set)
 {
-    unsigned char old = state;
+    int unusedWide;
+    Class_004895c0* link;
+    unsigned char old = state, unusedByte;
     int now;
     if (set)
         now = old | (unsigned char)mask;
@@ -187,8 +208,7 @@ void Class_0048b090::FUN_0048b090(int mask, int set)
         unsigned char gained = ~old & now;
         unsigned char lost = old & ~now;
         if (gained & 1) {
-            vars->FUN_004b0940("Activate", 0, 0);
-            FUN_0047f780(this, 3, 0);
+            NotifyActivate(this);
         }
         if (lost & 1) {
             vars->FUN_004b0940("Deactivate", 0, 0);
@@ -200,7 +220,7 @@ void Class_0048b090::FUN_0048b090(int mask, int set)
             vars->FUN_004b0940("StopBuilding", 0, 0);
         if (gained & 4) {
             FUN_0047f780(this, 0xe, 0);
-            for (Class_004895c0* link = head; link; link = link->next) {
+            for (link = head; link; link = link->next) {
                 if (link->value)
                     link->value->FUN_0043a1e0(0x10000);
             }
@@ -210,11 +230,11 @@ void Class_0048b090::FUN_0048b090(int mask, int set)
         FUN_0041c110(this);
         Player_0048b090* p = player;
         if (p->active != 0 && (p->kind == 1 || p->kind == 2)) {
-            Packet_0048b090 packet;
-            packet.type = 0x11;
-            packet.field_1 = id;
-            packet.field_3 = state;
-            FUN_00451df0(p->id, &packet, 4);
-        }
+                            Packet_0048b090 packet;
+                            packet.type = 0x11;
+                            packet.field_1 = id;
+                            packet.field_3 = state;
+                            FUN_00451df0(p->id, &packet, 4);
+                        }
     }
 }

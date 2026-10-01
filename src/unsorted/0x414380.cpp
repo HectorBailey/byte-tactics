@@ -1,4 +1,4 @@
-// Decompiled by GPT-6 Astra, finished by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol. Names are provisional.
+// Decompiled by GPT-6 Astra, finished by space-bunny-free, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by Claude Sonnet 5.5. Names are provisional.
 // GPT-6.1-sol issue 3136 retry pass: baseline and best remain 91.3% after six scratch checks; one source check remains after this note. Variants included reverse component subtraction (73.8%), reverse addition operands (91.3%), min+pos (90.1%), reverse assignment order (91.3%), and a target alias (53.7%). One malformed scratch variant failed compilation. No variant improved the source.
 // deepseek-v4.1-flash pass (4 real check runs / many --sym): no improvement
 // over 91.3%. New insight into why the explicit operator- flips esi/edi: the
@@ -55,7 +55,7 @@
 // in-place pos-=off, named-off and explicit-pointer forms 80.7-86.6%, and
 // min+pos, a reference or local min and a pointer-taking Add helper for
 // bounds[0], all of which keep the same edx/ebp tie).
-#include <stdio.h>
+#include <math.h>
 struct Point { short x, y; };
 struct Vec3 {
     int x, y, z;
@@ -99,7 +99,7 @@ struct Unit {
     char padb4[0xff-0xb4]; unsigned char player;
     char pad100[4]; float progress;
 };
-struct UnitRef { void* table; Unit* ptr; Unit* Get() { return ptr; } };
+struct UnitRef { void* table; Unit* ptr; Unit* Get() { do return ptr; while (0); } };
 struct Order {
     char pad0[5]; unsigned char state;
     unsigned int flags;
@@ -148,6 +148,15 @@ int __cdecl FUN_004b7123(short,int);
 short __cdecl FUN_004b715a(int,int);
 static inline Vec3 Offset(short angle,int distance) { Vec3 v; v.x=-FUN_004b70ef(angle,distance); v.y=0; v.z=-FUN_004b7123(angle,distance); return v; }
 static inline short Angle(Vec3* a,Vec3* b) { return FUN_004b715a(a->x-b->x,a->z-b->z); }
+static inline unsigned int CurrentTick() { return g_game->tick; }
+
+// Claude Sonnet 5.5 (found with tools/permute.py): 91.3% -> 91.9%, still
+// partial (1000 bytes exact). Four changes are needed together: `<math.h>`
+// instead of `<stdio.h>` (with the rest in place: 87.7%), the inline helper
+// CurrentTick() for `g_game->tick` (without it 86.6%), the FUN_0041ba60 test
+// through a local `inRange` (without it 86.6%), and `UnitRef::Get()` written
+// as `do return ptr; while (0);` (without it 91.3%). The helper and the local
+// each lose 4.7 points alone from the old source, so only the set gains.
 // FUNCTION: 0x414380
 int __stdcall FUN_00414380(Unit* unit,Order* order,int flags)
 {
@@ -187,7 +196,7 @@ int __stdcall FUN_00414380(Unit* unit,Order* order,int flags)
         FUN_0041c110(unit);
         return 1;
     case 3: {
-        if (g_game->tick%150==0) {
+        if (CurrentTick()%150==0) {
             int angle=FUN_0048a980(&unit->pos,&order->target.Get()->pos);
             int range=unit->def->buildRange<<16;
             angle+=0xdb6e;
@@ -197,7 +206,8 @@ int __stdcall FUN_00414380(Unit* unit,Order* order,int flags)
             ((Class_004388d0*)order)->FUN_004388d0((int)move);
         }
         int rate=0; rate=unit->def->buildRate;
-        if (FUN_0041ba60(unit,order->target.Get(),(float)(rate/30))) {
+        int inRange = FUN_0041ba60(unit,order->target.Get(),(float)(rate/30));
+        if (inRange) {
             Vec3 start;
             FUN_0043e400(unit,&start);
             Vec3 bounds[2];
