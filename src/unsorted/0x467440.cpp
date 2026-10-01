@@ -1,4 +1,24 @@
 // Decompiled by deepseek-v4.1, finished by deepseek-v4.1-flash, GPT-6.1-sol, finished by mimo-v2.6-pro. Names are provisional.
+// mimo-v2.6-pro 2026-10-01 (timeboxed retry, second pass): 97.9 -> 98.6
+// percent. Loop D's flags-load hoist is fixed by writing the field_b0 store
+// through an `int&` to the field (the 0x41ba60 pattern from the guide): the
+// reference keeps MSVC from moving the `mov eax,[esi+0x7e]` load above the
+// store.
+// Still differs (98.6): Loop C compare only. Original:
+//   test dword ptr [esi+0x7e],0x10000000 / je
+//   mov al,[esi+0x6d] / mov cl,[ebp+0x146] / cmp al,cl / je
+// Ours (with the single `unsigned char ff` local that fixes the first visitor
+// call block's vptr store and arg registers):
+//   mov ecx,[esi+0x7e] / mov al,[esi+0x6d] / test ecx / je
+//   cmp byte ptr [ebp+0x146],al / je
+// The ff local fixes call 1 but makes the compiler hoist the flags load into
+// ecx and compare memory-to-al. Tried and flat/worse this pass: inline
+// `u->field_ff != pl->field_146` (96.5, gets `test [esi+0x7e]` back but swaps
+// al/cl in the compare and breaks the visitor-call block), inline reversed
+// (96.8, same), nested if with two byte locals either order (96.5/96.8, same
+// al/cl swap). Remaining idea not tried: two locals `ff`/`f146` with one of
+// them as `char` (signed) or the compare written through a tiny inline helper,
+// to force al=field_ff / cl=field_146 while keeping the call block.
 // mimo-v2.6-pro 2026-10-01 (timeboxed retry): 75.9 -> 97.9 percent (1015 of
 // 1015 bytes). What fixed it: Loop E split into IsExplored/IsSeen inline
 // helpers (the matched 0x4658e0 pattern, Contains/Get on a ByteMap at
@@ -8,15 +28,6 @@
 // lost 4 bytes). Loop C's compare now uses an `unsigned char ff` local before
 // the if, which also fixed the first visitor call block's vptr store and arg
 // registers.
-// Still differs (97.9): (1) Loop C compare: ours hoists the flags test into
-// `mov ecx,[esi+0x7e] / test ecx` and compares `cmp byte ptr [ebp+0x146], al`
-// instead of `test dword [esi+0x7e] / mov al,[esi+0x6d] / mov cl,[ebp+0x146]
-// / cmp al, cl`; the ff local fixes call 1 but breaks the test. (2) Loop D:
-// the flags load `mov eax,[esi+0x7e]` is hoisted before the field_b0 store,
-// original loads it after (`mov [esi+0x1e],edx / mov eax,[esi+0x7e] / or`).
-// Tried and flat/worse: operand swap of the compare (75.5), second pointer or
-// inline helper for the Loop D stores (96.8 flat), flags-first store order
-// (96.5), ts local (flat).
 // deepseek-v4.1-flash 2026-10-01 (retry 7, timeboxed): 75.2 -> 75.9 percent
 // (975 bytes). Moving the Loop E `int pi = g_game->playerIndex;` and the p2 lea
 // chain to AFTER the y/x pos loads (`int y ...; int x ...;`) gains 0.7 percent:
@@ -310,7 +321,8 @@ void FUN_00467440(void)
             if (c == 1 || c == 2) {
                 if (u->def->field_245 & 0x2000) {
                     if (FUN_0040b0d0(u->field_ff, &u->pos.vec, u->def->field_208)) {
-                        u->field_b0 = g_game->field_38a47 + 0x5a;
+                        int& b0 = u->field_b0;
+                        b0 = g_game->field_38a47 + 0x5a;
                         u->flags |= 0x1000;
                     }
                 }
