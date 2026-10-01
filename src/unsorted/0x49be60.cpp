@@ -269,7 +269,9 @@ struct Type_0049be60 {
     unsigned char field_10d;           // +0x10d
     unsigned char field_10e;           // +0x10e
     char unknown_10f[0x111 - 0x10f];
-    unsigned int flags;                // +0x111
+    unsigned int flags_0 : 21;         // +0x111
+    unsigned int flag_21 : 1;
+    unsigned int flags_2 : 10;
 };
 
 struct Sprite_0049be60 {
@@ -441,13 +443,14 @@ void __stdcall FUN_0049be60(void* surface)
                     int sx = (int)*(short*)((char*)&sp + 2) + 0x80;
                     int sy = (int)*(short*)((char*)&sp + 10) - ((unsigned short)p->field_5e >> 1) + 0x20;
                     FUN_004b8500(surface, frame0, sx, sy);
+                    short* rp = &p->field_34;
                     *(int*)&rect[0] = *(int*)&p->field_34;
                     rect[1] += 0x8000;
-                    rect[2] = (short)(p->field_38 + 0x8000);
+                    rect[2] = (short)(rp[2] + 0x8000);
                     FUN_0046bae0(surface, &sp, type->field_74, rect);
                     Sprite_0049be60* s = (Sprite_0049be60*)type->field_74;
-                    if (s->field_30 != 0 && time < p->field_46) {
-                        if ((type->flags >> 0x15) & 1) {
+                    if (s->field_30 != 0 && p->field_46 > time) {
+                        if (type->flag_21) {
                             rect[0] = p->field_64;
                             FUN_0046bae0(surface, &sp, s->field_30, rect);
                         } else {
@@ -491,8 +494,7 @@ void __stdcall FUN_0049be60(void* surface)
                         }
                         if (gaf != 0) {
                             int n = *(unsigned short*)gaf;
-                            void* fs = FUN_004b7f30(gaf, (time - p->field_42) % n);
-                            FUN_004b7f90(surface, fs, sx, sy);
+                            FUN_004b7f90(surface, FUN_004b7f30(gaf, (time - p->field_42) % n), sx, sy);
                         }
                     }
                 } else if (type->field_10c == 5) {
@@ -504,8 +506,7 @@ void __stdcall FUN_0049be60(void* surface)
                     int n = FUN_004b7f60(gaf);
                     int fr = n - ((p->field_46 - time) * n) / (int)type->field_e6;
                     if (fr >= 0 && fr < n) {
-                        void* fs = FUN_004b7f30(gaf, fr);
-                        FUN_004b8500(surface, fs, sx, sy);
+                        FUN_004b8500(surface, FUN_004b7f30(gaf, fr), sx, sy);
                     }
                 } else if (type->field_10c == 6) {
                     sp.x = pos->x - (g_game->scrollX << 16);

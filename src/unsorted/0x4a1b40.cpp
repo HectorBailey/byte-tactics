@@ -173,9 +173,8 @@ struct Holder_004a1b40 {
     char unknown_08[0x10 - 0x08];
     int field_10;                       // +0x10
     int field_14;                       // +0x14
-    char unknown_18b[0x20 - 0x18];
+    char unknown_18[0x20 - 0x18];
     int field_20;                       // +0x20
-    char unknown_18[0x24 - 0x18];
     void* surface;                      // +0x24
 };
 
