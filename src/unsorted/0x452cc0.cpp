@@ -35,6 +35,50 @@
 // extra g_game uses, N-dead-declaration sweeps, unsigned/byte/bitfield flag
 // types and inlined flag helpers (their notes follow).
 //
+// mimo-v2.6-pro pass (all scored via build/scratch/0x452cc0/report.py, no
+// check.py budget except the confirm below): the fold-away register-priority
+// pin does NOT work on this function. Every zero-byte spelling I could build
+// tree-folds in c1xx and is NOT counted as a use, so it leaves the register
+// assignment untouched at 848 bytes: `p += 1; p -= 1` and `slot += 1;
+// slot -= 1` (vpinc/vslotinc), dead copies `int d = (int)g_game;` (fd1/fd2),
+// byte-arithmetic pointer ping-pong (fd3), an int-alias ping-pong (fd4), and
+// no-op RMWs `g_game->field_2a3c |= 0` / `+= 0` / `flags.value |= 0` and
+// `g_game->players[0].field_c |= 0` (g_or0/g_or0b/g_add0/g_flags0/h_p0c/h_p0c2)
+// all emit zero bytes AND leave g_game=edi, p=ebx, slot=esi. So a global or
+// heap `|= 0` whose value is not read elsewhere is tree-folded, not a counted
+// reference; the surviving `|= 0` in the flag widen is only a widen-fold
+// preventer, confirmed by redirecting it through the g_game path (flag_gg),
+// which leaves the registers unchanged.
+//
+// What DOES move the registers is a real (byte-emitting) g_game reference.
+// `p->field_c = (int)g_game;` (vreach1/vgs1), `g_game->field_2a3c = 0;`
+// (vgs1/vgsloop/vgsloop2) and a dead `p->field_c = (int)g_game; p->field_c = 0;`
+// before the loop (ds_gg_first) all reshape to g_game=esi, p=ebx, slot=edi at
+// 864-880 bytes: that pushes slot down to edi (which is what the original has)
+// but g_game only ever reaches esi. p is pinned at ebx no matter how many
+// g_game uses I add (2 uses in vgsloop2 = 1 use in vgsloop). So the original's
+// g_game=ebx needs g_game to outrank p, which no count of g_game references
+// achieves here. The same dead store folded into do_remove (ds_gg) instead of
+// before the loop tree-folds to nothing (no count), so I could not build the
+// "counts in c1xx but dead-stored away in c2" middle ground on g_game: before
+// the loop the store is kept (loop aliasing, +16 bytes); in do_remove c1xx
+// deletes it outright.
+//
+// Diagnosis of who holds the top register: making the widened slot volatile
+// (vol_slot, spill to stack) leaves g_game=esi, p=edi. So without the widened
+// slot in a register, g_game already outranks p. It is the WIDENED SLOT's
+// presence (the `mov edi, [esp+0x18]` widen, used as the loop index) that
+// reorders the three into p > slot > g_game. So the lever is most likely the
+// widened slot's weighted count, not g_game's: a spelling of the byte-local
+// widen that is still byte-identical but costs the slot one loop reference
+// would demote slot below p and, per vol_slot, restore g_game above p.
+//
+// To try next: (a) a g_game use the tree optimiser keeps but the instruction
+// selector deletes (the 0x4ac4c0 pin) - none of the ~12 forms above is it;
+// (b) cut the widened slot's loop weight without changing the emitted index
+// arithmetic; (c) reproduce the original's exact p-vs-g_game tie via the p
+// if/else arms (swapping them scores 86.9%, so that block is near the tie).
+//
 // History of the 84.3 base (two diffs then: the flag encoding and this same
 // rotation):
 #include <stdio.h>
