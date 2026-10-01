@@ -77,6 +77,25 @@
 // the loop bottom; our build advances ebx as the info pointer and caches
 // n-1 at F+0x18, so the source should use rec->NumberParameters directly in
 // both the loop test and the i == n-1 test instead of a cached n.
+// deepseek-v4.1-flash pass 3 (issue #3164): still 64.4%. New evidence:
+// (i) the scalar slot order is NOT local-name alphabetical: renaming
+//     reason->cause and base->exename (so names sort as the original slots
+//     reason, base, file, written) changed nothing at all, score stayed 64.4%
+//     with slots base F+0x10, file F+0x14, reason F+0x18.
+// (ii) the whole remaining diff is the position of each "strlen(log)"
+//     destination computation inside the cdecl argument sequence. The original
+//     is strictly right-to-left: it pushes the later sprintf/WriteFile args,
+//     then computes strlen(log), pushes it, then evaluates the earlier args
+//     (e.g. at 0x4d9044 it does repne scasb BEFORE loading ctx->Eip/SegCs,
+//     at 0x4d908f it does it after pushing 0 and &written). Our build hoists
+//     the strlen ahead of the later-argument loads in the "module %s at" and
+//     the final WriteFile statements, which is what the ~1089 diff lines show.
+// (iii) tried and scored WORSE: hoisting ctx->Eip into a scalar and indexing a
+//     byte pointer (2654 bytes, 48.8%), and re-reading rec->NumberParameters
+//     in the parameters loop instead of a cached n.
+// Next idea: give each sprintf its destination through an explicitly computed
+// pointer expression without adding a stack slot, to try to force the strlen
+// to be scheduled first.
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>
