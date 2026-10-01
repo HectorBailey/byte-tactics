@@ -1,4 +1,41 @@
 // Decompiled by Claude Sonnet 5.5 and deepseek-v4.1-flash, finished by GPT-6, finished by GPT-6.1-sol, finished by deepseek-v4.1-flash, finished by deepseek-v4.1-flash, finished by mimo-v2.6-pro. Names are provisional.
+// mimo-v2.6-pro pass 2 (issue #4106, 60-min box): BEST 81.1% (2653 of 2644
+// bytes), same score as the previous pass but two residual lines are now
+// semantically fixed. Wins this pass: (1) `if (rec->NumberParameters > 0)` at
+// the r4 outer test compiles to `test eax,eax / jbe` like the original (the
+// old `0 !=` gave `je`); check diff at that site is now only the jump target;
+// (2) the lstrcpynA source is obj + 0x2084, not &obj: the original's
+// `lea ecx,[esp+0x9fb4]` at 0x4d9543 with no pushes pending is obj (0x7f30)
+// + 0x2084, so Class_004d9c60 now has `char unknown_0[0x2084]; char
+// dump_text[0xa44c];` and the call passes obj.dump_text (our lea is
+// [esp+0x9fb8], right value, still scheduled after the scasb where the
+// original computes it before the room push). Closed levers this pass, all
+// scored with check.py: &written instead of inl0(written) at both WriteFile
+// calls = 79.7% (inl0 keeps the 81.1%); params-loop redesigns all regress -
+// do-while with rec->NumberParameters re-read at the bottom plus a char-sep
+// statement = 73.3%, the same with the ternary sep = 67.9% (so the
+// tmp0/tmp7/goto cached-n form is a real local optimum, not just untested),
+// char-sep statement on the old skeleton = 80.9%, ternary assigned to a char
+// local = byte-identical; (unsigned long) casts on all 14 r6 ctx-> field
+// args with uniform L-wrappers = byte-identical to the mixed forms. Still
+// differs: per-call arg scheduling around each inline scasb strlen (original
+// pattern at the r6 Dr block is `not ecx / dec ecx / lea dest / mov arg /
+// push arg / push fmt / push dest`; ours loads the arg before `not ecx` and
+// folds the dest lea into the push sequence), the params-loop separator in
+// dl (`mov dl,9 / jne / mov dl,0xa / movsx edx,dl`; ours picks al or cl),
+// the CreateFileA handle copied to esi for its first uses where the original
+// keeps eax and reloads from [esp+0x18], and the reason/base/file slot notes
+// below (the /Fa listing shows our scalars already sit at 0x10/0x14/0x18/
+// 0x1c exactly as the original: reason 0x10, base 0x14, file 0x18, written
+// 0x1c, so the older "slot permutation" notes are stale and the residual
+// there is register choice (esi/edx vs eax) and load scheduling only). One
+// tools/permute.py run (seed 137, 28 min) ran to its limit from the 81.1%
+// base without logging an improvement. Suspected original bugs unchanged:
+// the `i % 3 == 3` test is always false (0x4d92cd's mov dl,0xa is only
+// reachable via i == n-1), CreateFileA's result is tested != 0 instead of
+// != INVALID_HANDLE_VALUE, and the lstrcpynA dump_text buffer at obj+0x2084
+// is copied with room = 0x7358 - strlen(log) - 0x3e8 bytes regardless of
+// the buffer's own length.
 // mimo-v2.6-pro pass (issue #4106, 60-min box): BEST 81.1% (2653 of 2644
 // bytes), up from 78.3%. Wins this pass: (1) direct form
 // `sprintf(log + strlen(log), "%s caused an %s in\n", name, reason)` at the r2
@@ -177,7 +214,8 @@
 
 class Class_004d9c60 {
 public:
-    char unknown_0[0xc4d0];
+    char unknown_0[0x2084];
+    char dump_text[0xa44c];
     void FUN_004d9c60(unsigned long ebp, unsigned long esp, unsigned long eip, int zero);
 };
 
@@ -285,7 +323,7 @@ int __cdecl FUN_004d8e60(EXCEPTION_POINTERS* ep, char* handlerName)
     L = same0; sprintf(((size_t)L) + log, "ExceptionFlags = %08lX\t", rec->ExceptionFlags); }
     { size_t L;
     L = strlen(log); sprintf(log + ((size_t)L), "ExceptionAddress = %08lX\n", rec->ExceptionAddress); }
-    if (0 != rec->NumberParameters) {
+    if (rec->NumberParameters > 0) {
         unsigned int n;
         { size_t L = strlen(log);
         L = L; sprintf(log + L, "Parameters = "); }
@@ -349,8 +387,7 @@ skip5:;
     if (0 < room) goto skip11;
     do goto skip8; while (0);
 skip11:;
-    tmp1 = (char*)&obj;
-    lstrcpynA(log + strlen(log), ((char*)tmp1), ((int)room));
+    lstrcpynA(log + strlen(log), obj.dump_text, ((int)room));
     { size_t L = strlen(log);
     L = ((L)); sprintf(log + ((size_t)L), "\n"); }
     { size_t L = strlen(log); 
