@@ -45,9 +45,14 @@
 // `lea edx,[ebx+eax]` at the first _strnicmp), and compute `to` for the digit
 // case before the memset (the CSE'd players[d] temp then lives in ebp like the
 // original). Saved copy before base/oldmode scored 1 point higher.
+// deepseek-v4.1-flash (issue #4340): tools/permute.py lifted this from 89.7 to
+// 92.3 (8871 candidates, 18 minutes): the wins were swap_commutative on the
+// 0x37f2f test operands, goto_polarity plus flip_compare on the bit-1 branch,
+// move_stmt and merge_init on the saved/mode statements, and a sign cast on the
+// digit case. Names tidied (tmpN/inlN -> tN/hN, all single-use inlined
+// helpers). Residual: the original's `mov dl,[m]; shr dl,1; test al,dl` shape
+// for the bit-1 test is still folded differently; 1119 of 1116 bytes.
 #include <windows.h>
-#include <string.h>
-#include <stdlib.h>
 #include <ctype.h>
 
 #pragma pack(push, 1)
@@ -147,35 +152,65 @@ int __stdcall FUN_0049fdf0(Entry_00493bf0* entries, char* name, int type);
 void __stdcall FUN_0049fc50(Gadget_00493bf0* obj, int index);
 void __stdcall FUN_00463e50(Player_00493bf0* from, char* text, int param_3, char* to);
 
+static inline void h2(Gadget_00493bf0*gadget) { FUN_004ab0a0(gadget); }
+
+static inline int h3(short flags) { return 2 | flags; }
+
+static inline Layer_00493bf0* h8(Gadget_00493bf0*gadget) { return gadget->layer; }
+
+static inline unsigned int h11(unsigned int t17) { return (unsigned int)t17; }
+
+static inline bool h14(unsigned int t1) { return 0 != ((((unsigned int)t1))); }
+
 // FUNCTION: 0x493bf0
 void __stdcall FUN_00493bf0(Gadget_00493bf0* gadget)
 {
-    char buf2[0x12c];
-    char buf[0x100];
-    int mode;
+    int t12;
+    char* t7;
+    Entry_00493bf0* t15;
     int oldmode;
-    Entry_00493bf0* entries = gadget->layer->entries;
+    int t13, mode;
+    char buf2[0x12c], * t9;
+    int t6, c;
+    char buf[0x100];
+    unsigned int t4;
+    Layer_00493bf0* t2;
+    int n, t3, r;
+    Entry_00493bf0* entries;
+    t2 = gadget->layer;
+    char * p, * to;
+    unsigned int t1;
+    entries = t2->entries;
+    entries = (Entry_00493bf0*)entries;
+    short flags;
     if (gadget->field_60 == -1) {
         g_game->flags_37ebe &= ~4;
         return;
     }
-    if (_strnicmp(entries[gadget->field_60].name, DAT_0050940c, 8) == 0) {
+    if (!_strnicmp(entries[gadget->field_60].name, DAT_0050940c, 8)) {
         FUN_0047f1a0(DAT_00503130, 0);
-        g_game->mode_2bf0 = 3;
-        FUN_004a1080(gadget, DAT_00509400, g_game->mode_2bf0);
-        int n = atoi(&entries[gadget->field_60].name[8]);
-        unsigned char v = (unsigned char)FUN_004a0ff0(gadget, gadget->field_60);
-        g_game->field_2bf1[n] = v;
-        FUN_0049fa90(gadget);
-        FUN_004ab0a0(gadget);
+        g_game->mode_2bf0 = 3; FUN_004a1080(gadget, DAT_00509400, g_game->mode_2bf0); n = atoi(&entries[gadget->field_60].name[8]);
+        t6 = FUN_004a0ff0(gadget, gadget->field_60);
+        n = n;
+        Gadget_00493bf0* t5;
+        unsigned char t20 = (unsigned char)t6, v;
+        v = t20;
+        n = (unsigned int)n;
+        t5 = (gadget);
+        g_game->field_2bf1[((int)n)] = v;
+            FUN_0049fa90(gadget);
+            do h2((Gadget_00493bf0*)t5); while (0);
         goto tail;
+    } else {
     }
     if (FUN_0049fd60(gadget, DAT_005093f8)) {
+        unsigned char v;
+        int t0;
         FUN_0047f1a0(DAT_00503130, 0);
-        unsigned char v = (unsigned char)FUN_004a0ff0(gadget, gadget->field_60);
-        g_game->field_2bee.bit8 = v & 1;
-        FUN_004a0d00(gadget, DAT_00506578, DAT_0051e788);
-        FUN_004a9660(gadget);
+        t12 = FUN_004a0ff0(gadget, gadget->field_60);
+        t0 = t12;
+        v = (unsigned char)t0;
+        g_game->field_2bee.bit8 = (v) & 1; FUN_004a0d00(gadget, DAT_00506578, DAT_0051e788); FUN_004a9660(gadget);
         FUN_00494050();
         FUN_004ab0a0(gadget);
         return;
@@ -183,68 +218,83 @@ void __stdcall FUN_00493bf0(Gadget_00493bf0* gadget)
     if (FUN_0049fd60(gadget, DAT_00509400)) {
         FUN_0047f1a0(DAT_00503130, 0);
         g_game->mode_2bf0 = (unsigned char)FUN_004a0f60(gadget, DAT_00509400);
-        if (g_game->mode_2bf0 >= 4)
-            g_game->mode_2bf0 = 0;
+        if (g_game->mode_2bf0 >= 4) g_game->mode_2bf0 = 0;
         FUN_00493ae0();
         FUN_004ab0a0(gadget);
         goto tail;
     }
     if (FUN_0049fd60(gadget, DAT_00506578)) {
-        Entry_00493bf0* talk = FUN_004a0010(entries, DAT_00506578);
+        Entry_00493bf0* talk;
+        t15 = FUN_004a0010(entries, DAT_00506578);
+        talk = t15;
         mode = g_game->mode_2bf0;
         lstrcpynA(buf, (char*)talk + 0xb6, 0x100);
-        char* p = buf;
-        while (*p && *p == ' ')
-            p++;
-        if (*p == '+') {
-            short flags = 1;
-            if (flags & g_game->field_37f2f.bit1)
-                flags = 7;
-            if (DAT_005091cc)
-                flags |= 2;
-            int r = FUN_00417b50(p + 1, flags);
-            entries = gadget->layer->entries;
-            if (r & 2)
-                mode = 0;
-        }
+            p = buf;
+            while (*p && (*p) == ' ') p++;
+            if (*p == '+') {
+                        short t8;
+                        flags = 1;
+                        t8 = flags;
+                        t3 = (t8 & g_game->field_37f2f.bit1) != 0;
+                        t1 = h11(((unsigned int)((int)((int)(t3 != 0)))));
+                        t9 = p;
+                        if ((unsigned int)((int)h14(t1) != 0)) flags = 7;
+                        int t18 = DAT_005091cc, t16 = (((int)(0 == ((unsigned int)t18))) != 0) != 0;
+                        if (t16 == 0) goto skip2; else {
+                        }
+                        goto skip1;
+skip2:;
+                        flags = h3(((short)flags));
+    skip1:;
+                        t7 = 1 + t9;
+                        t7 = t7;
+                        t13 = FUN_00417b50((char*)t7, flags);
+                        t4 = t13;
+                        t4 = (unsigned int)t4;
+                        r = (unsigned int)t4;
+                        r = (unsigned int)r;
+                        entries = h8((Gadget_00493bf0*)gadget)->entries;
+                        r = r;
+                        if ((r & 2)) mode = 0;
+                    }
         if (strlen(p) != 0) {
-            Saved_00493bf0 saved = *(Saved_00493bf0*)g_game->field_2bf1;
-            Player_00493bf0* base = &g_game->players[g_game->localPlayer];
-            oldmode = g_game->mode_2bf0;
-            char* to = 0;
-            if (p[1] > ' ' && strchr(DAT_005093f4, p[1]) != 0) {
+                oldmode = g_game->mode_2bf0;
+                Player_00493bf0* base = &g_game->players[g_game->localPlayer];
+                Saved_00493bf0* t10 = (Saved_00493bf0*)g_game->field_2bf1, saved = *t10;
+                do to = 0; while (0);
+                if ((p[1] > ' ' && strchr(DAT_005093f4, p[1])) == 0) goto skip0;
                 if (isdigit(p[0])) {
                     int d = p[0] - '0';
-                    if (d < 0 || d > 9 || g_game->players[d].field_4 == 0)
-                        goto clear;
-                    p += 2;
+                    if ((d < 0 || ((int)d) > 9 || g_game->players[d].field_4 == 0)) goto clear;
+                    p = 2 + p;
                     mode = 3;
-                    to = (char*)&g_game->players[d] + 0x2b;
-                    memset(g_game->field_2bf1, 0, 11);
-                    g_game->field_2bf1[d] = 1;
+                    to = (char*)(&g_game->players[((int)d)]) + 0x2b;
+                    to = to;
+                                to = (char*)to;
+                                to = ((char*)to); memset(g_game->field_2bf1, 0, 11);
+                            g_game->field_2bf1[(d)] = 1;
                 } else {
-                    int c = tolower(p[0]);
-                    if (c != 'a') {
+                    int t19;
+                    c = tolower(p[0]);
+                    t19 = c != 'a';
+                    if (t19) {
                         if (c == 'e') {
-                            mode = 2;
-                            to = DAT_005093ec;
-                        } else {
-                            goto after;
-                        }
+                                mode = 2;
+                                to = DAT_005093ec;
+                            } else goto after;
                     } else {
-                        mode = 1;
-                        to = DAT_00508384;
+                        do mode = 1; while (0);
+                        do to = DAT_00508384; while (0);
                     }
-                    p += 2;
+                    p = p + 2;
                 }
+    skip0:;
+    after:
+                g_game->mode_2bf0 = mode;
+                memset(buf2, 0, sizeof(buf2));
+                FUN_00463e50(((Player_00493bf0*)base), p, 4, to);
+                *((Saved_00493bf0*)g_game->field_2bf1) = saved; g_game->mode_2bf0 = oldmode;
             }
-after:
-            g_game->mode_2bf0 = mode;
-            memset(buf2, 0, sizeof(buf2));
-            FUN_00463e50(base, p, 4, to);
-            *(Saved_00493bf0*)g_game->field_2bf1 = saved;
-            g_game->mode_2bf0 = oldmode;
-        }
 clear:
         memset(DAT_0051e788, 0, 0x81);
         g_game->field_2bee.bit8 = 0;
@@ -252,5 +302,5 @@ clear:
 tail:
     int index = FUN_0049fdf0(entries, DAT_00506578, 3);
     FUN_0049fc50(&g_game->gadget, index);
-    g_game->gadget.layer->field_20 = FUN_0049fdf0(entries, DAT_00506578, 3);
+        do g_game->gadget.layer->field_20 = FUN_0049fdf0((Entry_00493bf0*)entries, DAT_00506578, 3); while (0);
 }
