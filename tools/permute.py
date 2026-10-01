@@ -383,16 +383,19 @@ TOKEN = re.compile(r"\s+|\w+|->|::|\+\+|--|&&|\|\||<<=|>>=|[-+*/%&|^!<>=]=|<<|>>
 
 
 def minimize(pool, base_text: str, text: str, target: Score, jobs: int = 12, seconds: float = 120,
-             say=print) -> tuple[str, Score]:
+             say=print, use_ddmin: bool = False) -> tuple[str, Score]:
     """Undo every part of the change from base_text that the score does not need.
 
     The search drifts across plateaus, so a winning candidate carries many
-    neutral rewrites. A MATCH is first cut down by delta debugging over the
-    text diff; that is safe only because the result must still MATCH, so it
-    computes exactly what the original does. Every result is then cleaned by
-    a search that applies only meaning-preserving mutations and keeps those
-    that bring the text closer to the start without losing score."""
-    if target.status in ("match", "bytes"):
+    neutral rewrites. They are removed by a search that applies only
+    meaning-preserving mutations (most kinds have an inverse) and keeps each
+    one that brings the text closer to the start without losing score.
+
+    With use_ddmin a MATCH is first cut down by delta debugging over the text
+    diff. That is safe only because the result must still MATCH, and it finds
+    smaller diffs, but they can be odd C++ (half of a `do { } while (0)`
+    left as a bare `while (0);`), so it is off by default."""
+    if use_ddmin and target.status in ("match", "bytes"):
         text, target = ddmin_text(pool, base_text, text, target)
     return simplify(pool, text, target, jobs, seconds, say)
 
@@ -505,7 +508,8 @@ def pick_mutation_count(rng: random.Random) -> int:
 def permute(address: int, src: Path, minutes: float, jobs: int, seed: int | None,
             patience: float = 0.0, max_minutes: float | None = None, helpers: bool = True,
             elite_size: int = 12, keep_going: bool = False, weights: dict | None = None,
-            quiet: bool = False, cleanup: float = 2.0, stall: float = 0.0, focus: bool = True) -> Result:
+            quiet: bool = False, cleanup: float = 2.0, stall: float = 0.0, focus: bool = True,
+            use_ddmin: bool = False) -> Result:
     say = (lambda *a: None) if quiet else (lambda *a: print(*a, flush=True))
     out = OUT / f"{address:#x}"
     (out / "matches").mkdir(parents=True, exist_ok=True)
@@ -699,13 +703,14 @@ def permute(address: int, src: Path, minutes: float, jobs: int, seed: int | None
         wait(list(inflight))
         if best.text != base_text and cleanup > 0:
             (out / "best_raw.cpp").write_text(best.text, encoding="latin-1")
-            text, sc = minimize(pool, base_text, best.text, best.score, jobs, cleanup * 60, say)
+            text, sc = minimize(pool, base_text, best.text, best.score, jobs, cleanup * 60, say, use_ddmin)
             say(f"{address:#x}: cleaned the best version to {len(diff_lines(base_text, text))} changed lines "
                 f"(score {sc.value:g}, {sc.pct})")
             best = Entry(text, sc, best.serial, best.lineage)
             write_best(best)
         if top_ratio is not best and top_ratio.score.ratio > best.score.ratio and cleanup > 0:
-            text, sc = minimize(pool, base_text, top_ratio.text, top_ratio.score, jobs, cleanup * 30, say)
+            text, sc = minimize(pool, base_text, top_ratio.text, top_ratio.score, jobs, cleanup * 30, say,
+                                use_ddmin)
             top_ratio = Entry(text, sc, top_ratio.serial, top_ratio.lineage)
             (out / "best_ratio.cpp").write_text(text, encoding="latin-1")
         pool.shutdown(wait=True, cancel_futures=True)
@@ -719,7 +724,8 @@ def permute(address: int, src: Path, minutes: float, jobs: int, seed: int | None
     return Result(address, str(src), start, best.score, mins, evaluated, out)
 
 
-def minimize_file(address: int, src: Path, candidate: Path, jobs: int, seconds: float) -> None:
+def minimize_file(address: int, src: Path, candidate: Path, jobs: int, seconds: float,
+                  use_ddmin: bool = False) -> None:
     """Minimise an existing candidate against the starting file (--minimize)."""
     base_text = src.read_text(encoding="latin-1")
     text = candidate.read_text(encoding="latin-1")
@@ -731,7 +737,7 @@ def minimize_file(address: int, src: Path, candidate: Path, jobs: int, seconds: 
         score = pool.submit(evaluate, text, 0, 0).result()["score"]
         print(f"{address:#x}: {candidate} scores {score.value:g} ({score.pct}, {score.status}), "
               f"{len(diff_lines(base_text, text))} changed lines")
-        new, sc = minimize(pool, base_text, text, score, jobs, seconds)
+        new, sc = minimize(pool, base_text, text, score, jobs, seconds, use_ddmin=use_ddmin)
     out = candidate.with_name(candidate.stem + "_min.cpp")
     out.write_text(new, encoding="latin-1")
     print(f"{address:#x}: wrote {out}: score {sc.value:g} ({sc.pct}, {sc.status}), "
@@ -771,6 +777,8 @@ def main() -> None:
     ap.add_argument("--only", help="comma-separated mutation kinds to use (see docs/permuter.md)")
     ap.add_argument("--cleanup", type=float, default=2.0,
                     help="minutes to spend undoing neutral changes in the best version (default 2, 0: none)")
+    ap.add_argument("--ddmin", action="store_true",
+                    help="cut a MATCH down by delta debugging over the text first (smaller, sometimes odd diffs)")
     ap.add_argument("--minimize", type=Path, metavar="CPP",
                     help="only undo the parts of CPP's change that its score does not need; writes CPP_min.cpp")
     args = ap.parse_args()
@@ -792,7 +800,8 @@ def main() -> None:
         src = args.file or find_source(addresses[0])
         if src is None:
             ap.error(f"no file under src/ has '// FUNCTION: {addresses[0]:#x}'")
-        minimize_file(addresses[0], src.resolve(), args.minimize.resolve(), args.jobs, args.cleanup * 60)
+        minimize_file(addresses[0], src.resolve(), args.minimize.resolve(), args.jobs, args.cleanup * 60,
+                      args.ddmin)
         return
     weights = None
     if args.only:
@@ -818,7 +827,7 @@ def main() -> None:
             src = start_copy
         res = permute(address, src, args.minutes, args.jobs, args.seed, args.patience, args.max_minutes,
                       helpers=not args.no_helpers, keep_going=args.keep_going, weights=weights,
-                      cleanup=args.cleanup, stall=args.stall, focus=not args.no_focus)
+                      cleanup=args.cleanup, stall=args.stall, focus=not args.no_focus, use_ddmin=args.ddmin)
         if res.error:
             print(f"{address:#x}: {res.error}")
         results.append(res)

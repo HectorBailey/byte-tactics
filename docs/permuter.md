@@ -38,6 +38,7 @@ dependencies (tree-sitter and its C++ grammar), which `uv run` installs.
 | `--file F` | start from F instead of the file under `src/` |
 | `--resume` | start from the last `build/permute/<address>/best.cpp` |
 | `--no-helpers` | only rewrite the annotated function, not the inline helpers it calls |
+| `--no-focus` | pick mutation sites anywhere, not mostly on the lines behind differing instructions |
 | `--only a,b` | use only these mutation kinds (names below) |
 | `--keep-going` | do not stop at the first MATCH |
 | `--cleanup M` | minutes for the final cleanup (default 2, 0 to skip) |
@@ -105,6 +106,14 @@ A hill climb with random restarts over a small population:
 - Workers mutate, compile (`compile_source` from check.py, each worker in its
   own scratch folder under `build/permute/<address>/work/`) and score in
   parallel processes. Duplicates are skipped by a hash of the text.
+- **Focus.** Candidates are compiled with `/Zd` added, which puts COFF line
+  numbers in the object and leaves the code itself alone (the tool checks
+  that for the file's scored functions before relying on it, and otherwise
+  turns focus off). The scorer maps every differing instruction to its source
+  line, and three times in four a mutation picks its site on or next to one of
+  those lines. In a 2,000-byte function this is the difference between
+  rewriting the one block that differs and rewriting anything. `--no-focus`
+  turns it off.
 
 ### Cleanup
 
@@ -194,6 +203,10 @@ and arguments passed by reference count as memory.
    percentages; `best_score` is the fine score (lower is better).
 2. `best.diff`: the change. The cleanup removes most neutral rewrites, but not
    all: if a line of the diff looks pointless, revert it by hand and re-check.
+   A hunk can look dead and still be needed: what the file defines before the
+   function is part of MSVC 5's state. At 0x4ac970 the MATCH keeps a `static
+   inline` helper that nothing calls; deleting it drops the function to 93.2%.
+   The cleanup only keeps such a hunk when removing it loses the score.
 3. `log.txt` and `best.json`'s `lineage`: which mutations produced the gains.
    The mutation that made the last step is a hint about the lever (a
    `move_stmt` means statement order, `temp_intro` a missing local, `include`

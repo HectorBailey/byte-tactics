@@ -2552,7 +2552,9 @@ def m_nested_if(ctx: Ctx):
     cons = n.child_by_field_name("consequence")
     if kind == "split":
         a, b = x.child_by_field_name("left"), x.child_by_field_name("right")
-        return [(n.start_byte, n.end_byte, f"if ({ctx.T(a)}) {{ if ({ctx.T(b)}) {ctx.T(cons)} }}")]
+        ind = ctx.indent_of(n)
+        inner = f"if ({ctx.T(b)}) {ctx.T(cons)}".replace("\n", "\n    ")
+        return [(n.start_byte, n.end_byte, f"if ({ctx.T(a)}) {{\n{ind}    {inner}\n{ind}}}")]
     c1 = cond_value(n.child_by_field_name("condition"))
     c2 = cond_value(x.child_by_field_name("condition"))
     p = lambda c: ctx.T(c) if not (c.type == "binary_expression" and ctx_op(c) == "||") and c.type not in (
@@ -3186,6 +3188,134 @@ def inline_void_helper(ctx: Ctx, voids: dict):
     return edits
 
 
+def m_loop_back(ctx: Ctx):
+    """Undo loop_form's one-way shapes:
+    `if (c) do S while ((u), (c));` -> `for (; c; u) S` (or `while (c) S`),
+    `for (;;) { S; if (x) break; }` -> `do { S } while (!x);`, and
+    `e; for (; c; u) S` -> `for (e; c; u) S`."""
+    T = ctx.T
+    sites = []
+    for f, n in ctx.of_type("if_statement", "for_statement"):
+        if n.type == "if_statement":
+            cons = n.child_by_field_name("consequence")
+            cond = cond_value(n.child_by_field_name("condition"))
+            if n.child_by_field_name("alternative") is None and cons is not None and cons.type == "do_statement" \
+                    and cond is not None:
+                sites.append(("guarded", f, n, cons, cond))
+        else:
+            init = n.child_by_field_name("initializer")
+            cond = n.child_by_field_name("condition")
+            upd = n.child_by_field_name("update")
+            body = n.child_by_field_name("body")
+            if init is None and cond is None and upd is None and body is not None \
+                    and body.type == "compound_statement":
+                sites.append(("forever", f, n, body, None))
+            elif init is None and in_block(n):
+                prev = n.prev_named_sibling
+                while prev is not None and prev.type == "comment":
+                    prev = prev.prev_named_sibling
+                if prev is not None and prev.type == "expression_statement" and prev.named_children \
+                        and prev.named_children[0].type in ("assignment_expression", "comma_expression"):
+                    sites.append(("init", f, n, prev, None))
+    if not sites:
+        return None
+    kind, f, n, x, cond = ctx.pick(sites)
+    if kind == "guarded":
+        dcond = cond_value(x.child_by_field_name("condition"))
+        body = x.child_by_field_name("body")
+        if dcond is None or body is None:
+            return None
+        norm = lambda s: re.sub(r"[\s()]", "", s)
+        if norm(T(dcond)) == norm(T(cond)):
+            return [(n.start_byte, n.end_byte, f"while ({T(cond)}) {T(body)}")]
+        if dcond.type == "comma_expression":
+            parts = dcond.named_children
+            if len(parts) == 2 and norm(T(parts[1])) == norm(T(cond)):
+                upd = T(parts[0])
+                while upd.startswith("(") and upd.endswith(")") and upd.count("(") == 1:
+                    upd = upd[1:-1]
+                return [(n.start_byte, n.end_byte, f"for (; {T(cond)}; {upd}) {T(body)}")]
+        return None
+    if kind == "forever":
+        stmts = [c for c in x.named_children if c.type in STATEMENT_TYPES]
+        if not stmts or own_continues(x):
+            return None
+        last = stmts[-1]
+        if last.type != "if_statement" or last.child_by_field_name("alternative") is not None:
+            return None
+        cons = last.child_by_field_name("consequence")
+        inner = single_stmt(cons) if cons.type == "compound_statement" else cons
+        if cons.type == "compound_statement":
+            kids = [c for c in cons.named_children if c.type != "comment"]
+            inner = kids[0] if len(kids) == 1 else None
+        if inner is None or inner.type != "break_statement":
+            return None
+        c = cond_value(last.child_by_field_name("condition"))
+        if c is None:
+            return None
+        rest = ctx.text[x.start_byte:last.start_byte].rstrip() + "\n" + ctx.indent_of(n) + "}"
+        return [(n.start_byte, n.end_byte, f"do {rest} while ({negate(ctx, f, c)});")]
+    # init: move the statement before the loop into its empty initialiser
+    expr = T(x.named_children[0])
+    body_start = n.child_by_field_name("condition") or n.child_by_field_name("update") \
+        or n.child_by_field_name("body")
+    head = ctx.text[n.start_byte:body_start.start_byte]
+    m = re.match(r"for\s*\(\s*;", head)
+    if m is None:
+        return None
+    return [delete_stmt(ctx, x), (n.start_byte, n.start_byte + m.end(), f"for ({expr};")]
+
+
+def m_goto_back(ctx: Ctx):
+    """Undo goto_polarity: `if (c) goto skipN; A skipN:;` -> `if (!c) { A }`."""
+    for f, b, stmts in ctx.blocks():
+        for i, s in enumerate(stmts):
+            if s.type != "if_statement" or s.child_by_field_name("alternative") is not None:
+                continue
+            g = s.child_by_field_name("consequence")
+            if g is None or g.type != "goto_statement":
+                continue
+            label = ctx.T(g.child_by_field_name("label"))
+            if not re.fullmatch(r"skip\d+", label) or len(re.findall(r"\b%s\b" % label, ctx.text)) != 2:
+                continue
+            for j in range(i + 1, len(stmts)):
+                t = stmts[j]
+                if t.type == "labeled_statement" and ctx.T(t.child_by_field_name("label")) == label:
+                    inner = [x for x in stmts[i + 1:j]]
+                    after = [c for c in t.named_children if c.type in STATEMENT_TYPES]
+                    if after and ctx.T(after[0]).strip() != ";":
+                        break
+                    cond = cond_value(s.child_by_field_name("condition"))
+                    if cond is None:
+                        break
+                    ind = ctx.indent_of(s)
+                    body = ctx.text[inner[0].start_byte:inner[-1].end_byte] if inner else ""
+                    body = body.replace("\n", "\n    ")
+                    return [(s.start_byte, t.end_byte,
+                             f"if ({negate(ctx, f, cond)}) {{\n{ind}    {body}\n{ind}}}")]
+    return None
+
+
+def m_strip_braces(ctx: Ctx):
+    """`if (c) { S }` -> `if (c) S` for one plain statement (no if, so no
+    dangling else, and no declaration)."""
+    sites = []
+    for f, n in ctx.of_type("compound_statement"):
+        p = n.parent
+        if p is None or p.type not in ("if_statement", "else_clause", "for_statement", "while_statement",
+                                       "do_statement"):
+            continue
+        kids = [c for c in n.named_children]
+        if len(kids) != 1 or kids[0].type not in ("expression_statement", "return_statement", "break_statement",
+                                                    "continue_statement", "goto_statement"):
+            continue
+        sites.append((n, kids[0]))
+    if not sites:
+        return None
+    n, inner = ctx.pick(sites)
+    return [(n.start_byte, n.end_byte, ctx.T(inner))]
+
+
 def m_dead_helper(ctx: Ctx):
     """Remove an `inlN` helper that nothing calls any more."""
     found = [m for m in list(HELPER_DEF.finditer(ctx.text)) + list(VOID_HELPER_DEF.finditer(ctx.text))
@@ -3267,6 +3397,9 @@ MUTATIONS = {
     "self_store": (m_self_store, 1),
     "drop_self_store": (m_drop_self_store, 1),
     "dead_helper": (m_dead_helper, 1),
+    "loop_back": (m_loop_back, 1),
+    "goto_back": (m_goto_back, 1),
+    "strip_braces": (m_strip_braces, 1),
 }
 
 # The kinds that can undo another kind's change, for cleaning up a result
@@ -3277,7 +3410,7 @@ SIMPLIFY = {
     "temp_inline": 10, "compound_assign": 3, "incdec": 3, "andor_swap": 2, "do_while0": 3,
     "include": 2, "ternary": 2, "nested_if": 3, "zero_compare": 4, "cast": 4, "sign": 1,
     "dead_decl": 8, "strip_parens": 8, "split_multi_decl": 1, "inline_helper": 8, "convention": 1,
-    "drop_self_store": 8, "dead_helper": 8,
+    "drop_self_store": 8, "dead_helper": 8, "loop_back": 6, "goto_back": 6, "strip_braces": 6,
 }
 
 
