@@ -109,7 +109,7 @@ own totals, so treat the absolute numbers as rough; the ratios are what matter.
 | 41-64 |  |  |  |  |  |  | 3/11 (27%) |  |  |  |  | 255/255 (100%) | 96/109 (88%) |  |  |
 | 65-160 |  | 64/67 (96%) |  |  |  |  | 1/6 (17%) |  |  |  |  | 739/747 (99%) | 2/6 (33%) |  |  |
 | 161-400 | 0/10 (0%) | 277/362 (77%) |  | 17/18 (94%) |  |  |  |  |  |  |  | 30/36 (83%) |  |  | 204/291 (70%) |
-| 401+ |  | 63/191 (33%) | 1/8 (12%) | 8/15 (53%) | 17/27 (63%) | 3/8 (38%) |  | 2/18 (11%) | 4/7 (57%) | 10/11 (91%) | 0/3 (0%) | 59/83 (71%) |  | 9/31 (29%) | 72/180 (40%) |
+| 401+ |  | 63/191 (33%) | 1/8 (12%) | 8/15 (53%) | 17/27 (63%) | 3/8 (38%) |  | 2/18 (11%) | 4/7 (57%) | 10/13 (77%) | 0/3 (0%) | 59/83 (71%) |  | 9/31 (29%) | 72/180 (40%) |
 
 ### Cost per batch
 
@@ -2309,22 +2309,53 @@ Cost units: thousands of tokens weighted by price relative to Haiku (Sonnet 5 co
 | #3368 | mimo-v2.6-pro | 1 | 1 | 0 | n/a | n/a | n/a |
 | #3242 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
 | #4272 | sonnet-5.5 | 3 | 0 | 0 | n/a | n/a | n/a |
+| #4333 | sonnet-5.5 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #4327 | mimo-v2.6-pro | 2 | 0 | 0 | n/a | n/a | n/a |
+| #4273 | sonnet-5.5 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #4275 | deepseek-v4.1-flash | 2 | 1 | 0 | n/a | n/a | n/a |
+| #3007 | deepseek-v4.1-flash | 3 | 2 | 0 | n/a | n/a | n/a |
+| #3353 | mimo-v2.6-pro | 1 | 0 | 0 | n/a | n/a | n/a |
+| #3361 | mimo-v2.6-pro | 2 | 0 | 0 | n/a | n/a | n/a |
+| #3249 | deepseek-v4.1-flash | 3 | 1 | 0 | n/a | n/a | n/a |
+| #4211 | mimo-v2.6-pro | 2 | 0 | 0 | n/a | n/a | n/a |
+| #3306 | opus | 3 | 1 | 0 | n/a | n/a | n/a |
+| #4286 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #4282 | sonnet-5.5 | 1 | 0 | 0 | n/a | n/a | n/a |
+| #4304 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #2991 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #4318 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #4198 | sonnet-5.5 | 3 | 1 | 0 | n/a | n/a | n/a |
+| #4154 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #4233 | deepseek-v4.1-flash | 3 | 3 | 0 | n/a | n/a | n/a |
+| #4141 | sonnet-5.5 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #4100 | mimo-v2.6-pro | 2 | 0 | 0 | n/a | n/a | n/a |
+| #3010 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #4170 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #4300 | opus | 1 | 1 | 0 | n/a | n/a | n/a |
+| #4133 | mimo-v2.6-pro | 2 | 0 | 0 | n/a | n/a | n/a |
+| #4106 | mimo-v2.6-pro | 1 | 0 | 0 | n/a | n/a | n/a |
+| #3143 | opus | 1 | 0 | 0 | n/a | n/a | n/a |
+| #4152 | sonnet-5.5 | 2 | 0 | 0 | n/a | n/a | n/a |
+| #4132 | mimo-v2.6-pro | 2 | 0 | 0 | n/a | n/a | n/a |
+| #4139 | mimo-v2.6-pro | 3 | 0 | 0 | n/a | n/a | n/a |
+| #3660 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #4140 | sonnet-5.5 | 2 | 0 | 0 | n/a | n/a | n/a |
 
 ### Escalations
 
-- Opus matched 94 of 134 functions a cheaper model had failed.
+- Opus matched 96 of 139 functions a cheaper model had failed.
 - Sonnet matched 109 of 116 functions a cheaper model had failed.
 - Gpt-6 matched 5 of 134 functions a cheaper model had failed.
 - Space-bunny-free matched 87 of 480 functions a cheaper model had failed.
-- Deepseek-v4.1-flash matched 108 of 2248 functions a cheaper model had failed.
+- Deepseek-v4.1-flash matched 115 of 2277 functions a cheaper model had failed.
 - Gpt-5.6-terra matched 3 of 17 functions a cheaper model had failed.
 - Mimo-v2.6-flash matched 3 of 5 functions a cheaper model had failed.
-- Sonnet-5.5 matched 37 of 126 functions a cheaper model had failed.
+- Sonnet-5.5 matched 38 of 140 functions a cheaper model had failed.
 - Longcat-2.5-preview-free matched 9 of 131 functions a cheaper model had failed.
 - Muse-spark-1.3-free matched 0 of 4 functions a cheaper model had failed.
 - Gpt-6.1-sol matched 1 of 278 functions a cheaper model had failed.
 - Gpt-6-luna matched 0 of 2 functions a cheaper model had failed.
-- Mimo-v2.6-pro matched 6 of 44 functions a cheaper model had failed.
+- Mimo-v2.6-pro matched 6 of 59 functions a cheaper model had failed.
 <!-- calibration:end -->
 
 ## Findings about the target
