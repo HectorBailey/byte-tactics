@@ -1,4 +1,25 @@
-// Decompiled by DeepSeek V4.1 Flash, finished by Space Bunny Free, deepseek-v4.1-flash, GPT-6.1-sol, and Space Bunny Free. , edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by DeepSeek V4.1 Flash, finished by Space Bunny Free, deepseek-v4.1-flash, GPT-6.1-sol, and Space Bunny Free. , edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by mimo-v2.6-pro. Names are provisional.
+// PASS (claude-sonnet-5-5, 2026-10-01): 66.7 unchanged (the permuter's only gain is the
+// redundant parentheses in `dist`, internal score 2132 -> 2007, same percent). Model that fits all
+// measurements: the prologue values {out, flag, order, x} take esi, edi, ebx, ebp in priority
+// order, each the first register not held by a conflicting value. Ours colours out > order > x >
+// flag (order=edi, x=ebx, flag=ebp); the original colours out > x > order > flag (x=edi,
+// order=ebx, flag=ebp). Measured on ~250 variants:
+//  * the 24 orders of {t, dy, dz, dx} x pos before/after the anim group x anim load before/after
+//    the deltas: the prologue is either ours (t first) or {flag=edi, order=ebx, x=ebp} (t after the
+//    deltas), never the original's. Scores 66.7 (current) and 66.2.
+//  * extra uses of x ((start.x.value >> k) sums): 1 to 3 extra uses change nothing, 4 jump x above
+//    out (x=esi); x never lands between out and order. Extra uses of flag lift flag above order.
+//    An extra use of idx in the loop flips the loop pair to the original's (idx=ebx, pos=ebp) but
+//    moves flag to ebx. A single extra out->y use with 3 extra x uses gives out=ebx, order=esi,
+//    x=edi, flag=ebp (order and out swapped relative to the original).
+//  * byte-identical to the base: the snapshot as a comma expression inside any call argument, a
+//    scalar sx next to Pos start, wrappers around the call or the timestamp read (the latter is
+//    worse), declaration order of pos/idx, while and for loop shapes (do-while is much worse),
+//    three scalar snapshot locals (58.9). `Pos end = *out;` after the call: 55.
+//  * the z snapshot IS stored: x, y, z are contiguous at [esp+0x40], [esp+0x44], [esp+0x48] (z is
+//    the `mov [esp+0x50], edx` after two argument pushes), so the "BUG" remark below is wrong.
+// tools/permute.py 15 min (--jobs 4): 490 candidates, no percent gain.
 // RETRY (deepseek-v4.1-flash, 2026-09-30): still 65.2%, the ebx/edi swap is the
 // only residual. No source shape tried here moved it: an `extern int dummyN;`
 // sweep N = 0,4,...,400 (65.2 at N<=12, 64.2 above; compiler state is not the
@@ -131,6 +152,31 @@
 // place of `*out` and a `register` hint on the `order` parameter both compile
 // byte-identically at 66.7% / 601 bytes, so the ebx(order)/edi(start.x) swap
 // still stands as the whole residual.
+//
+// Retry (mimo-v2.6-pro, 2026-10-01, 55 min, 24 check.py runs): best unchanged
+// at 66.7%. I probed the register-priority tie directly (per the guide's
+// "one weighted use" and "pointer kept across a run of calls" patterns):
+//  - a real extra use of order->timestamp, start.x.value or out->z.value at
+//    nine positions (before the snapshot, between snapshot and call, after the
+//    call, after the flag check, mid-deltas, after the loop, inside the loop),
+//    a separate `Pos start; start = *out;`, explicit field stores, and a
+//    `Game_004394e0* game = g_game;` local for the frame/anims reads all keep
+//    the prologue {out: esi, start.x: ebx, order: edi, flag: ebp} (57.0-66.7%).
+//  - the ONLY variant that moved registers: an extra
+//    `if (order->timestamp > K) return;` between the call and the t
+//    computation (62.9%). Its asm shows why: both timestamp reads CSE into one
+//    load, order's range then ends at that load, and order/flag swap into
+//    ebp/edi (start.x keeps ebx). Still not ebx for order.
+//  - three Pos types (the Fixed union; the flat x_frac/x layout of the matched
+//    sibling 0x439740; the caller 0x439b30's plain `int x,y,z` with a hi-word
+//    helper) all compile 65.7-66.7% with the same prologue, so the type is not
+//    the knob.
+//  - NEW FACT: the loop's register pair is pure downstream of the clamp: idx
+//    always reuses t's register and pos takes the other callee-saved one, so
+//    matching the loop needs only t to land in ebx, which follows from the
+//    prologue swap (order freed at [ebx+0x46] then clamp into ebx).
+// What remains: swap {order, start.x} between ebx and edi in the prologue.
+// 20+ shapes across six attempts have not reached it.
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -207,7 +253,7 @@ void __stdcall FUN_004394e0(void* surface, View_004394e0* view,
     int dy = out->y.value - start.y.value;
     int dz = out->z.value - start.z.value;
     int dx = out->x.value - start.x.value;
-    int dist = (int)sqrt((double)dx * dx + (double)dy * dy + (double)dz * dz);
+    int dist = (int)sqrt((double)dx * dx + ((double)dy * dy) + (double)dz * dz);
     if (dist < 0x10000)
         return;
 
