@@ -1,6 +1,19 @@
 // Decompiled by deepseek-v4.1-flash, finished by GPT-6, space-bunny-free
 // and mimo-v2.6-pro. Names are provisional.
-// Partial: 66.2%, not MATCH, original 1115 bytes, ours 1096.
+// Partial: 66.8%, not MATCH, original 1115 bytes, ours 1093.
+// mimo-v2.6-pro (second pass): tail merge is MSVC 5 merging identical block
+// endings before scheduling (guide line 1374). Confirmed in a toy
+// (build/scratch/0x4c3e40/toy*.cpp) that the second of two identical
+// "if (text > end) goto set_zero; unknown_25 = FUN_004b6ba0(...); return;"
+// blocks always jumps into the first block's body, so the original's two
+// separate dec ecx copies need a pre-scheduling difference the scheduler
+// erases. Tried and still merged: char* r = call; unknown_25 = r; an int len
+// local in one case, endB - 1 - text in one case, char* endB = current;
+// endB--. Also tried "current = SkipSpace(close + 1)" for the '[' case: it
+// reproduces the original's mov al,[esi+1]; lea ecx,[esi+1] and removes our
+// early current store (that region matches then), but the 3 byte size change
+// shifts every later jump target and the score falls to 64.8%, so the merged
+// file keeps "current = close + 1; current = SkipSpace(current);".
 // mimo-v2.6-pro: phrasing both end cases with "current--" instead of
 // "char* end = current - 1" gave the original dec ecx form and 66.2%.
 // The two FUN_004b6ba0 call tails are still merged into one block (the
@@ -26,14 +39,17 @@
 //  0x4c3f0f: argument registers for the first 0x4340 call (ecx vs edx).
 //  0x4c3f5d: binary search uses lo=edi, hi=esi, mid=ebp and a cached key.ptr
 //    in ebx, ours uses lo=esi, hi=ebp, mid=edi and reloads the key.
-//  0x4c3fe0: the original puts the 0x9180 temp at frame 0x1c, which is also
-//    the pair's second member, the pair at 0x18 and two more temporaries at
-//    0x20 and 0x24; ours has 0x08, 0x14, 0x18.
-//  0x4c40b8: ours folds *current != '{' into cmp byte ptr [ecx],0x7b and
-//    reorders the whitespace skip store.
+//  0x4c3fe0: original frame (esp+0x10 == S): key S+8, subname S+0xc,
+//    value S+0x10, this-home S+0x14, child S+0x18, empty S+0x1c, pair
+//    S+0x20, kids-home S+0x28, error S+0x2c; ours swaps the this-home and
+//    empty slots (0x1c/0x14). From the /Fa listing: $T1358/$T1359 (the
+//    allocator byte) sits at S+7 in both builds, only its load timing
+//    differs.
 //  0x4c4165 and 0x4c41de: the original shares one unknown_25 = 0 tail at
 //    0x4c4285 reached by ja; ours emits lea eax,[ecx-1]; cmp edi,eax; jbe
-//    inline and never builds the shared block.
+//    inline and never builds the shared block. The blocks below are just
+//    the register/size form of ours; the byte loss is the second dec ecx
+//    copy (see the second-pass note at the top).
 // Tried and rejected: inlining the lookup straight into the body (46.3%),
 // moving char* current = text after the FUN_004d8610 call (58.6%).
 // ctx.py names this Class_004c42a0::FUN_004c3e40, but the original initializes
