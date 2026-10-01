@@ -1,4 +1,18 @@
 // Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1. Names are provisional.
+// deepseek-v4.1-flash retry pass (still 26.5%, 3100 bytes vs 3152): what still differs is the
+// callee-saved allocation only. The original is ebx=g_game, edi=target, esi=friendly (home at
+// [esp+0x10]), ebp=enemy (register only, NO home), unit left in its argument slot [esp+0x1c]
+// and reloaded on every use, def kept in ecx and spilled into the dead target slot [esp+0x20].
+// Ours is ebx=target, ebp=unit (cached!), edi=g_game, esi=friendly, and enemy goes to ecx with
+// a home in the dead target slot [esp+0x20]. The one thing that would fix the cascade is MSVC
+// not caching unit in ebp: with unit memory-resident, ebp frees up for enemy, enemy needs no
+// home, and the frame plus every [esp+N] line up. Tried this pass (all scratch-scored with
+// --sym, no improvement): hoisting a real Def* def = unit->def local (23.2%; it fixes the
+// dispatch to `and eax,0xff; dec eax` but yields sub esp,8 with def in edx), that plus swapped
+// friendly/enemy declarations (23.2%), def declared before friendly/enemy (23.2%), swapping
+// friendly/enemy declarations in the macro version (26.5%), uninitialized decls assigned after
+// the restart label (26.5%), and a tgt = target copy local (26.5%). Cases 1 and 2 body order
+// and the shared return blocks are still approximations.
 // deepseek-v4.1 pass (best so far, 26.5%, 3100 bytes vs 3152): removed the `def` local by
 // expanding every `def->` to `(unit->def)` (macro DEF) so the frame collapsed to one local
 // (push ecx), which is what the original has; g_game is read inline through macro GAME.
