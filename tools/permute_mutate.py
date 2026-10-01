@@ -163,6 +163,7 @@ class StructInfo:
     bases: list[str] = field(default_factory=list)
     has_ctor: bool = False
     is_union: bool = False
+    nontrivial: bool = False      # default construction or destruction runs code
 
 
 @dataclass
@@ -199,6 +200,27 @@ class FileInfo:
         if st is None or depth > 6:
             return False
         return name in st.fields or any(self.has_field(b, name, depth + 1) for b in st.bases)
+
+    def nontrivial(self, name: str | None, depth: int = 0) -> bool:
+        """Does declaring a `name` local without an initialiser run code
+        (a default constructor or destructor with a body, a vtable)?"""
+        if name is None:
+            return True
+        st = self.struct(name)
+        if st is None or depth > 6:
+            return True
+        if st.nontrivial:
+            return True
+        for b in st.bases:
+            if self.nontrivial(b, depth + 1):
+                return True
+        for t in st.fields.values():
+            base = t.rstrip("[]")
+            if base.endswith("*") or base in INT_TYPES or base in FLOAT_TYPES:
+                continue
+            if self.nontrivial(base, depth + 1):
+                return True
+        return False
 
     def method_type(self, cls: str | None, name: str, depth: int = 0) -> str | None:
         st = self.struct(cls)
@@ -312,6 +334,10 @@ def build_file_info(root: Node, text: str) -> FileInfo:
                             st.method_params.setdefault(short, []).append(param_types(fd, text))
                             if short == st.name or short == "~" + st.name:
                                 st.has_ctor = True
+                                if short != st.name or not param_types(fd, text):
+                                    st.nontrivial = True  # body unknown
+                            if any(k.type == "virtual" for k in c.children):
+                                st.nontrivial = True
                     elif name:
                         st.fields[name] = make_type(base, suffix)
                         if st.is_union:
@@ -327,10 +353,18 @@ def build_file_info(root: Node, text: str) -> FileInfo:
                     st.method_params.setdefault(short, []).append(param_types(fd, text))
                     if short == st.name or short == "~" + st.name:
                         st.has_ctor = True
+                        body = c.child_by_field_name("body")
+                        runs = any(k.type == "field_initializer_list" for k in c.children) or (
+                            body is not None and any(k.type != "comment" for k in body.named_children))
+                        if runs and (short != st.name or not param_types(fd, text)):
+                            st.nontrivial = True
+                    if any(k.type == "virtual" for k in c.children):
+                        st.nontrivial = True
             elif c.type in ("struct_specifier", "class_specifier", "union_specifier"):
                 visit_struct(c)
             elif c.type == "virtual_function_specifier":
                 st.has_ctor = True
+                st.nontrivial = True
         if st.is_union:
             # every name declared anywhere inside a union may overlap another
             stack = [body]
@@ -999,7 +1033,8 @@ class Func:
                     e.reads.add(name)  # a declaration is ordered against every use of its name
                 ty = make_type(base, suffix)
                 if not is_scalar(ty) and tnode is not None and tnode.type != "primitive_type":
-                    if st is None or st.has_ctor or "&" in suffix:
+                    if "&" in suffix or self.fi.nontrivial(canon_type(base)) or (
+                            st is not None and st.has_ctor and d.type == "init_declarator"):
                         e.calls = True
                 if init is not None:
                     self._visit(init, e, "r", loops, switches, skip)
