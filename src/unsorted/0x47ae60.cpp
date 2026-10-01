@@ -1,42 +1,56 @@
-// Decompiled by deepseek-v4.1, edited by deepseek-v4.1 and GPT-6.1-sol, finished by deepseek-v4.1-flash. Names are provisional.
-// PARTIAL: 85.5% (ours 2868 bytes vs the original 2947).
-// Retry note (deepseek-v4.1-flash): timebox expired with no validated change.
-// Still differs only in register-allocation tie-breaks (see below). Verified
-// against the original disassembly this pass: the toggle-arm chain order is
-// identical to ours, so the big diff block there is line-alignment noise, not
-// a structural mismatch. The Energy/Metal down-clamp original really is
-// "add ecx, 0xfffffe0c" (imm32 negative) on a signed value; untried idea is
-// forcing that encoding via an unsigned add cast, e.g.
-// "int v = (int)((unsigned)*p + 0xfffffe0c);". TRIED (deepseek-v4.1-flash,
-// issue 3728): the unsigned form is byte-identical to the plain
-// "*p + -0x1f4" (85.5%, 2868 bytes), so the immediate is canonicalised.
-// What fixed 84.2 -> 85.5: the c2/c1 player count block. The original lays it
-// out loop1 / test-c2 / loop2 / test-c1 with ONE shared error stub at
-// 0x47b0bf (both "jl 0x47b0bf"). "if (c2 < 1 || c1 < 1)" and two separate ifs
-// both put the compares after the second loop (75.4). The fix is to nest:
-//   loop1 counts c2; if (c2 >= 1) { loop2 counts c1; if (c1 >= 1) { ...success,
-//   return; } } then the single players-computer error block falls at the end.
-// This yields test-c2 right after loop1 and a single shared error stub, matching
-// the original block order (error stub sits after the success return).
+// Decompiled by deepseek-v4.1, edited by deepseek-v4.1 and GPT-6.1-sol,
+// finished by deepseek-v4.1-flash and mimo-v2.6-pro. Names are provisional.
+// PARTIAL: 86.7% (ours 2874 bytes vs the original 2947).
+// Retry note (mimo-v2.6-pro): what fixed 85.5 -> 86.7 was rewriting all four
+// Energy/Metal clamp arms as compound assignment on the pointee:
+//   *p += 0x1f4; if (*p >= 0x2710) *p = 0x2710;   (up)
+//   *p += -0x1f4; if (*p <= 0xc8) *p = 0xc8;      (down)
+// That flips the register mirror to the original's "mov ecx,[..]; lea eax,
+// [..]; add ecx, 0x1f4" (value in ecx, address in eax, load before the lea),
+// and the down-clamp now emits "add ecx, 0xfffffe0c" exactly as the original:
+// the compound-assignment form keeps the negative immediate and does NOT
+// canonicalise it to "sub reg, 0x1f4" (so the old unsigned-cast idea in the
+// previous note was unnecessary; "*p += -0x1f4" alone does it).
+// The clamp tails still differ in shape: the original stores once after a
+// conditional redefinition ("cmp; jl L; mov ecx, 0x2710; mov [eax], ecx"),
+// ours stores the add result and then the constant ("mov [eax], ecx; jl L;
+// mov [eax], 0x2710"). TRIED for the single-store tail: "int v = *p; v +=
+// 0x1f4; if (v >= 0x2710) v = 0x2710; *p = v;" gives the right tail but the
+// mirrored allocation (lea first, value in eax); "int v = *(t+off); int* p =
+// (int*)((char*)t+off); ... *p = v;" (double address) and the typed-field form
+// "int v = t->players[player].energy; int* p = &t->players[player].energy;"
+// both let MSVC CSE the two addresses and fold the store away entirely (no
+// lea, 81.6-81.9%). Untried: some form where the *= mutation's load-first
+// ordering survives but the clamp lands in a single conditional store of a
+// register (maybe a ternary on the compound value, or a clamp helper).
+// What fixed 84.2 -> 85.5 (previous pass): the c2/c1 player count block nested
+// as loop1 / test-c2 / loop2 / test-c1 with ONE shared error stub at 0x47b0bf.
 // LineOfSight's two "field_114 = 1" stores must precede the strcpy so the seven
 // toggle-arm message tails merge into one strcpy tail at 0x47b88b.
 // The Difficulty arm calls FUN_0047f1a0("SKirmish", 0): the original pushes
 // 0x502a6c (the typo'd literal), not 0x507ccc "Skirmish". Do not correct it.
-// STILL DIFFERS (register-allocation tie-breaks):
-//  - Energy/Metal clamp arms: original "mov ecx,[..]; lea eax,[..]; add ecx,
-//    0x1f4 / add ecx,0xfffffe0c; mov [eax],ecx" (value in ecx, address in eax
-//    reusing the base reg). Ours is the mirror "lea ecx; mov eax; add eax; mov
-//    [ecx],eax". Tried the double-dereference form (recompute the store address
-//    after the load): that dropped to 79.6%. Compound "v += -0x1f4" is flat
-//    (still sub eax,0x1f4 vs the original add ecx,0xfffffe0c). Keeping the
-//    value load first and the address second is the wall.
-//  - menu reload: the original keeps menu in its stack home and reloads
-//    "mov edx,[esp+0x84]; push edx" before each FUN_004ab0a0 / FUN_004a0bf0;
-//    ours keeps menu in a callee-saved register in the toggle/Energy/Metal arms
-//    ("push esi"/"push ebp"). The Color tail is a pure scratch-reg tie-break
-//    ("mov edx,[esp+0x84]" original vs "mov eax,[esp+0x84]" ours).
-//  - g_game reload in the toggle arms lands in a different scratch register
-//    (original mov edx / ours mov ecx or mov eax).
+// STILL DIFFERS:
+//  - menu reload (the big one, worth ~79 bytes of size plus every forward
+//    jump-target line): the original reloads "mov edx,[esp+0x84]; push edx"
+//    before every FUN_004ab0a0 and before the Energy/Metal arm-2 FUN_004a0bf0
+//    ("mov edx,[esp+0x90]" hoisted above "add esp, 0xc"); ours keeps menu in
+//    a callee-saved register ("push esi"/"push ebp") in the Color tail,
+//    Energy/Metal arm 2 and tails, and the SelectMap/Difficulty tails. The
+//    original caches menu in esi/ebp only across clusters of uses (the
+//    FUN_0049fd60 chains, the holder checks, arm-1 FUN_004a0bf0) and reloads
+//    from the stack home at the arm tails. Note the Difficulty arm in the
+//    original frees esi for the zero ("xor esi, esi" for its 0 and its cmp)
+//    while ours takes ebx ("xor ebx, ebx"), which is why our tail pushes keep
+//    using the live esi cache. Suspect MSVC's per-region register promotion
+//    of the stack-home parameter; untried ideas: a second Menu* alias local
+//    ("Menu* m = menu") feeding only the FUN_004ab0a0/arm-2 calls so the
+//    promoted range ends after the holder checks, and the N-unused-extern
+//    dummy-declaration sweep from the guide in case only compiler state
+//    differs.
+//  - small scratch-reg ties: Player tail "mov edx,[esp+0x84]" (ours mov eax);
+//    g_game reload in the toggle arms lands in a different scratch register
+//    (original mov edx / ours mov ecx or mov eax); the strcmp-chain tail
+//    addresses drift by the size gap above.
 #include <windows.h>
 #include <string.h>
 #include <stdlib.h>
@@ -300,11 +314,9 @@ void __stdcall FUN_0047ae60(Menu_0047ae60* menu)
             FUN_0047f1a0("Skirmish", 0);
             Table_0047ae60* t = *(Table_0047ae60**)(g_game + 0x29a0);
             int* p = (int*)((char*)t + player * 24 + 0x10);
-            int v = *p;
-            v += 0x1f4;
-            if (v >= 0x2710)
-                v = 0x2710;
-            *p = v;
+            *p += 0x1f4;
+            if (*p >= 0x2710)
+                *p = 0x2710;
             Table_0047ae60* t2 = *(Table_0047ae60**)(g_game + 0x29a0);
             int* q = (int*)((char*)t2 + player * 24 + 0x10);
             if (*q == 0x2bc)
@@ -317,10 +329,9 @@ void __stdcall FUN_0047ae60(Menu_0047ae60* menu)
             FUN_0047f1a0("Skirmish", 0);
             Table_0047ae60* t = *(Table_0047ae60**)(g_game + 0x29a0);
             int* p = (int*)((char*)t + player * 24 + 0x10);
-            int v = *p + -0x1f4;
-            if (v <= 0xc8)
-                v = 0xc8;
-            *p = v;
+            *p += -0x1f4;
+            if (*p <= 0xc8)
+                *p = 0xc8;
             wsprintfA(frame.sB, "Energy%d", player);
             _itoa((*(Table_0047ae60**)(g_game + 0x29a0))->players[player].energy, frame.sA, 10);
             FUN_004a0bf0(menu, frame.sB, frame.sA, 10);
