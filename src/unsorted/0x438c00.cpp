@@ -1,4 +1,61 @@
-// Decompiled by DeepSeek V4.1 Flash, finished by Space Bunny Free, GPT-6.1-sol and Space Bunny Free, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by DeepSeek V4.1 Flash, finished by Space Bunny Free, GPT-6.1-sol and Space Bunny Free, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by mimo-v2.6-pro. Names are provisional.
+//
+// PASS 11 (claude-sonnet-5-5, 2026-10-01): 52.2 unchanged. Measured, none above 52.2:
+//  * tools/permute.py 15 min (--jobs 4): 495 candidates, no gain.
+//  * `Vec3f* pp = &order->pos` used for the py read and the final copy, with all 120 orders of the
+//    five box stores: best 51.0 (the stores in source order). It reproduces `mov edx,[ecx+4]`
+//    but spills pp at local+0x0c instead of local+0x10, and still enregisters order in ecx.
+//  * sy/sx read first thing, after the type test, after def, or before the box: 44 to 49.
+//  * az/bz written as z-sy-half, z-(half+sy), z+0x20-half-sy, ...: byte-identical (the
+//    compiler canonicalises the sum); the original's (z-half)-sy order is a scheduler outcome.
+//  * a real extra use of `index` late in the body is the only thing that ever gave
+//    `mov edx,[esp+0xc]` at entry (index>>20 folded into the first call's x argument), but the
+//    index then lives in cx and the score is 41.
+//  * making `order` address-exposed does not make MSVC reload it from its slot.
+//  Reading of the original: `order` is only register-resident up to the `lea ecx,[edx+0x22]`; the
+//  later uses (timestamp, owner) reload [esp+0x4c], i.e. the register file is full (ebp, edi, esi,
+//  ebx, ecx=view, eax, edx all live at 0x438cb7) and order is spilled to its home slot there. Ours
+//  keeps order in ecx because its order of the sx/sy subtractions frees registers earlier.
+//
+// PASS 10 (mimo-v2.6-pro, 2026-10-01): 52.2 percent, unchanged. NEW FACT, and
+// the biggest single find of this pass: the flags test IS a bitfield extract.
+// `if (order->owner->flags.bits.b4)` with a 1-bit field at bit 4 of a dword
+// bitfield struct at +0x110 compiles to exactly the original's
+// `mov reg, [reg+0x110]; shr reg, 4; test reg8, 1` (measured in
+// build/scratch/0x438c00/flagstest.cpp, shapes t3/t4: the same extract as
+// `shr reg, 4; and al, 1` when the value is used numerically, and every plain
+// `(flags & 0x10)` / `(flags >> 4) & 1` spelling folds to
+// `test byte ptr [..], 0x10` instead). This closes the "needs a shape not yet
+// found" item from PASS 7. Standalone it still scores WORSE (50.9, see
+// v1_bitfield.cpp): the extract lands in edx over the dz division result, so
+// colour2's byte store sinks into the dx slot and level spills into local+0x00,
+// while the original spills dz into the dead view slot and keeps colour2 at
+// local+0x00. v15 (colour assignments reversed, 50.9) and v16 (bitfield with
+// the dz division first, 51.0) do not recover it. Whoever fixes the entry
+// register swap should keep the bitfield and re-check: the flags bytes then
+// match for free.
+// Entry-register probes (build/scratch/0x438c00/probe.cpp, five minimal
+// __stdcall functions): a multi-use 3rd parameter loads into ECX at entry by
+// default (`mov ecx, [esp+0xc]` in P1 to P5), and the index*585 multiply copy
+// takes EDX when free and falls back to ECX when EDX is held (P2). So the
+// multiply copy register is DERIVED from where `order` sits, not the other way
+// round, and the original's entry EDX for `order` is the one unexplained
+// choice (74 of 1031 functions in the exe load a stack arg into EDX at entry,
+// but only this one loads [esp+0xc] there before a `sub esp`).
+// Compiler-state sweep at the 52.2 baseline (N = 0..39 dummy `extern int`,
+// step 1, finer than any earlier sweep): flat at 52.2 except dips to 51.8 at
+// N = 2, 3, 10, 11, 26, 27 (a mod-8 micro effect). No declaration-count
+// window at this baseline either.
+// New source shapes measured this pass, none above 52.2: pos reads in order
+// px, pz, py (52.2); `Vec3f* pp = &order->pos` with px/pz through order and py
+// through pp (51.0); the same with pp formed after the px/pz reads (50.9);
+// py read as `*(int*)((char*)&order->pos + 4)` (52.2, byte-identical); all
+// three pos reads through pp in px, pz, py order (46.7); the dz division
+// written before dx (51.1, 641 bytes); the def computed via an explicit
+// `index * 0x249` char* multiply (51.8); `level * (bx - ax)` operand order
+// (52.2, byte-identical); a `const Order*` parameter (52.2, byte-identical);
+// pos declarations in order pz, px, py (51.3) and py, pz, px (51.3); all
+// three pos locals in one declaration statement (52.2).
 //
 // PASS 8 (deepseek-v4.1-flash, 2026-09-30): 52.2 percent, unchanged. Two more
 // pointer shapes for the pos reads both scored WORSE than the current 52.2:
