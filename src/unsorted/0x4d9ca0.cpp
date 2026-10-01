@@ -6,6 +6,24 @@
 // memory and i in EBP, frame 0x18 with pc spilled to [esp+0x24]; ours keeps `this` in ESI
 // and len in EBP (prologue) so the loop-top reload and the n-1 register differ. The single
 // unflipped decision is ESI holding n (original) vs this (ours). See the long notes below.
+// mimo-v2.6-pro continuation (60-minute box, all below left ESI=this, nothing beat 80.1):
+// clean rewrites (no helpers) 79.7; capturing q0=pc and/or r0=ret at function scope fixes
+// frame 0x18 and the pc slot 0x24 but shifts m to 0x18 (73.0-73.4) and does NOT free ESI;
+// deriving s as ((Class*)r0)->stack or (char*)r0+0x7c (so `this` dies in the prologue) still
+// leaves the coalesced this/r0 value in ESI (72.5-73.0, type-punning r0 as void*/char* is
+// identical); i=0 hoisted to function scope moves len to [esp+0x10] as
+// `mov [esp+0x10], 0xa44c` exactly like the original (good) but score drops to 78.9 and
+// ESI still holds this; redundant CSE-folding extra uses of n/i (guide register-priority
+// trick) are byte-identical; member accesses wrapped in static inline getters (inlS/inlQ/
+// inlR/inlM/inlN/inlP(this)) fold away byte-identically; void-helper out-param captures of
+// s/q (inlPre(this,&s,&q)) before the phase-2 sprintf 79.7, after the strlens 78.4;
+// count read direct with no n local 74.5 (this lands in EBP). Uninitialised-locals-get-
+// callee-saved-in-declaration-order does not move the needle here (int i first is flat).
+// Best remaining lead: the original's slot order (len=0x10, m=0x14, r=0x18, n=0x1c,
+// r0/this=0x20, q0=0x24) reproduces exactly when q0 and r0 are captured at function scope
+// AND m is declared uninit + assigned (not `int m = copied;`): with `int m = copied;` the
+// compiler swaps m and r (r=0x14, m=0x18). Untested: capture q0/r0 with `int m; m = copied;`
+// declaration style, then retune the tail scheduling (that shape was 72.5 raw).
 // deepseek-v4.1-flash (seventh run, 10-minute box): still 79.2% (643 bytes). Tested, all worse
 // or tied: dropping `const int n = count;` and reading count directly in both places 73.6 (637
 // bytes); moving `int i = 0;` to last tied 79.2 but reverted to the known-best order.
