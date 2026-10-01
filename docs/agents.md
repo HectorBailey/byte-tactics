@@ -1721,20 +1721,45 @@ Cost units: thousands of tokens weighted by price relative to Haiku (Sonnet 5 co
 | #3003 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
 | #3006 | gpt-6.1-sol | 2 | 0 | 0 | n/a | n/a | n/a |
 | #3023 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #3146 | space-bunny-free | 3 | 0 | 0 | n/a | n/a | n/a |
+| #3150 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #3038 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #3045 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #3039 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #3030 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #3031 | gpt-6.1-sol | 1 | 0 | 0 | n/a | n/a | n/a |
+| #3047 | deepseek-v4.1-flash | 1 | 1 | 0 | n/a | n/a | n/a |
+| #3028 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #3055 | deepseek-v4.1-flash | 1 | 1 | 0 | n/a | n/a | n/a |
+| #3027 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #3060 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #3042 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #3032 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #3029 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #3044 | gpt-6.1-sol | 1 | 0 | 0 | n/a | n/a | n/a |
+| #3067 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #3072 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #3061 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
+| #3046 | gpt-6.1-sol | 1 | 0 | 0 | n/a | n/a | n/a |
+| #3077 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #3073 | deepseek-v4.1-flash | 2 | 0 | 0 | n/a | n/a | n/a |
+| #3087 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #3101 | deepseek-v4.1-flash | 1 | 0 | 0 | n/a | n/a | n/a |
+| #3095 | deepseek-v4.1-flash | 3 | 0 | 0 | n/a | n/a | n/a |
 
 ### Escalations
 
 - Opus matched 94 of 123 functions a cheaper model had failed.
 - Sonnet matched 109 of 116 functions a cheaper model had failed.
 - Gpt-6 matched 5 of 134 functions a cheaper model had failed.
-- Space-bunny-free matched 86 of 438 functions a cheaper model had failed.
-- Deepseek-v4.1-flash matched 99 of 1308 functions a cheaper model had failed.
+- Space-bunny-free matched 86 of 441 functions a cheaper model had failed.
+- Deepseek-v4.1-flash matched 101 of 1346 functions a cheaper model had failed.
 - Gpt-5.6-terra matched 3 of 17 functions a cheaper model had failed.
 - Mimo-v2.6-flash matched 3 of 5 functions a cheaper model had failed.
 - Sonnet-5.5 matched 33 of 86 functions a cheaper model had failed.
 - Longcat-2.5-preview-free matched 8 of 97 functions a cheaper model had failed.
 - Muse-spark-1.3-free matched 0 of 4 functions a cheaper model had failed.
-- Gpt-6.1-sol matched 1 of 186 functions a cheaper model had failed.
+- Gpt-6.1-sol matched 1 of 189 functions a cheaper model had failed.
 - Gpt-6-luna matched 0 of 2 functions a cheaper model had failed.
 <!-- calibration:end -->
 
