@@ -1,31 +1,30 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
-// Best 58.0% (1042 bytes against 1046). The frame map is confirmed, not guessed: the two
-// stores before `push edi` at 0x483fcc are relative to the pre-push esp, so they land at
-// final-esp 0x20 (viewX/ax) and 0x1c (viewY/ay). Original final frame: w1 0x10, px 0x14,
-// w2 0x18, ay 0x1c, ax 0x20, py 0x24, stride 0x28, p2 0x2c, rem1 0x30, rem2 0x34,
-// n 0x38, stride2 0x3c. Ours now matches p2 0x2c, rem1 0x30, rem2 0x34, n 0x38,
-// stride2 0x3c and all of the final blit loop except one reload; ours allocates
-// w2 0x14, py 0x18, px 0x1c, ay 0x20, ax 0x24, stride 0x28, so only the
-// px/py/w2/ay/ax block is permuted. Removing the `& 0xffff` masks on stride in the tail
-// block lifted 57.4 -> 57.9, but note the original DOES mask there: at 0x484324 it runs
-// `mov eax,[esp+0x28]; and eax,0xffff; imul edx,eax; lea edi,[eax+eax]` (one mask feeds
-// both the offset imul and stride2), so a `short`-typed or explicitly masked stride
-// respelling may be the right route. Tried this round: original px/py/rx/ry evaluation
-// order (57.0%), function-scope p1/p2 (54.7%), `int stride2 = stride * 2;` before
-// `int offset = ...` in the tail (54.7%, rejected), explicit `(stride & 0xffff)` in both
-// tail uses (57.4%, 1042 bytes), masked plus stride2-first (56.8%, 1039 bytes). Size
-// triangulation on that tail: unmasked 1048, masked 1042, masked+swap 1039, original 1046,
-// and the original tail ends `shl edx,1; mov eax,edx; mov [esp+0x38],eax` (a 2-byte copy
-// ours never emits), so the true tail spelling is masked with one extra edx->eax copy.
-// FOUND THIS ROUND: block 1's `p2 = p1 + w1 - 1` must be spelled
-// `unsigned short* p2 = g_game->mapValues + py * stride + px + w1 - 1;` (58.0%, 1042 bytes):
-// the original adds w1 into the already-computed offset (`add eax,ebp; lea edx,[edx+eax*2-2]`,
-// 0x4840b7), it does not scale the p1 pointer.
-// MSVC 5 assigns these slots by code, not by declaration
-// order (nine declaration orders left every offset unchanged, see SHARED.md), so the
-// remaining gap is the allocator permutation of px/py/w2/ay/ax plus one missing
-// `mov ebp, [esp+0x10]` reload after the block-3 inner loop (the original reloads w1
-// there, ours keeps it in ebp).
+// Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by mimo-v2.6-pro. Names are provisional.
+// mimo-v2.6-pro retry: best 62.4% (1049 bytes against 1046). This session took
+// the prologue to the original's arithmetic order (px, py, rx, ry, w1, w2,
+// rem1, rem2) with int locals vw = g_game->viewW and vh = g_game->viewH so the
+// rem expressions reuse the registers holding viewW/viewH instead of reloading
+// (61.1%), then rebuilt block 3 as `int n = w2; int y = ay; unsigned short s =
+// stride; int stride2 = s * 2; int offset = (py * s + px) * 2;` with the inner
+// counter inside `if (m > 0) { int x = ax; ... }`, which restores the original
+// `and eax, 0xffff` mask on stride, the `mov eax, edx` copy and the lea order
+// (62.4%). Parenthesised p2 offsets and an uninitialised `int py;` declaration
+// changed nothing.
+// WHAT STILL DIFFERS: (1) a three-way slot rotation: ours py 0x1c, ay 0x20, ax
+// 0x24 versus the original ay 0x1c, ax 0x20, py 0x24 (w1 0x10, px 0x14, w2
+// 0x18, stride 0x28, p2 0x2c, rem1 0x30, rem2 0x34, n 0x38, stride2 0x3c all
+// match); (2) block 1 p1/p2: the original shares the offset py*stride+px in
+// eax and keeps mapValues in edx (`add eax, ebp; lea edx, [edx+eax*2-2]` at
+// 0x4840b7), ours computes px+py*stride into ebp and reloads mapValues for p2,
+// so one operand order breaks the CSE; (3) block 3 loop plumbing: the original
+// keeps w1 in ebp and reloads it after the inner loop (`mov ebp, [esp+0x10]`
+// at 0x484384) with `test ebp, ebp` at the outer top, ours reloads w1 at the
+// loop top into edx and carries an entry `jmp`; (4) scattered register colours:
+// tail imul edx vs imul esi for py, block 2 `add edx, [esp+0x14]` memory fold
+// versus an explicit px load (ours keeps px in a register), w2 in eax versus
+// esi at block 3 entry, and the block 3 preheader store interleave (original
+// loads ay, stores n, stores y; ours stores n first). Declaration-order sweeps
+// of ax/ay/py did not move the slot rotation; the remaining levers are the
+// block 1 p2 operand order and the block 3 counter home.
 #include <windows.h>
 
 #pragma pack(push, 1)
@@ -80,13 +79,15 @@ void __stdcall FUN_00483fa0(void* surface)
     int ay = g_game->viewY;
     int sy = g_game->scrollY;
     int px = sx / 32;
-    int rx = sx - px * 32;
     int py = sy / 32;
+    int rx = sx - px * 32;
     int ry = sy - py * 32;
-    int w1 = (g_game->viewW + rx) / 32;
-    int rem1 = g_game->viewW - w1 * 32 + rx;
-    int w2 = (g_game->viewH + ry) / 32;
-    int rem2 = g_game->viewH - w2 * 32 + ry;
+    int vw = g_game->viewW;
+    int w1 = (vw + rx) / 32;
+    int vh = g_game->viewH;
+    int w2 = (vh + ry) / 32;
+    int rem1 = vw - w1 * 32 + rx;
+    int rem2 = vh - w2 * 32 + ry;
     if (rem1 != 0)
         w1++;
     if (rem2 != 0)
@@ -157,19 +158,22 @@ void __stdcall FUN_00483fa0(void* surface)
         w2--;
 
     if (w2 > 0) {
-        int offset = (py * stride + px) * 2;
-        int stride2 = stride * 2;
-        int y = ay;
         int n = w2;
+        int y = ay;
+        unsigned short s = stride;
+        int stride2 = s * 2;
+        int offset = (py * s + px) * 2;
         do {
             unsigned short* p = (unsigned short*)((char*)g_game->mapValues + offset);
-            int x = ax;
             int m = w1;
-            if (m > 0) do {
-                FUN_004c6e70(surface, x, y, g_game->iconSet->data + *p * 0x400);
-                x += 32;
-                p++;
-            } while (--m);
+            if (m > 0) {
+                int x = ax;
+                do {
+                    FUN_004c6e70(surface, x, y, g_game->iconSet->data + *p * 0x400);
+                    x += 32;
+                    p++;
+                } while (--m);
+            }
             offset += stride2;
             y += 32;
         } while (--n);
