@@ -825,6 +825,8 @@ def main() -> None:
         weights = {k: (w if k in kinds else 0) for k, (_, w) in MUTATIONS.items()}
     stack_names = {n.strip() for n in args.stack.split(",") if n.strip()} if args.stack else set()
     if stack_names:
+        if weights is not None and not weights["move_decl"]:
+            ap.error("--stack works through move_decl, which --only leaves out")
         weights = dict(weights or {})
         weights["move_decl"] = max(weights.get("move_decl", MUTATIONS["move_decl"][1]), 40)
 

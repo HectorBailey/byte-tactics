@@ -1553,17 +1553,18 @@ def m_move_decl(ctx: Ctx):
     """Move a declaration up or down past statements it does not depend on
     (MSVC 5 hands out stack slots in declaration order)."""
     blocks = [(f, b, s) for f, b, s in ctx.blocks() if len(s) >= 2 and any(x.type == "declaration" for x in s)]
+    wanted = ctx.spec.stack_names
+    named = [blk for blk in blocks if any(x.type == "declaration" and declared_names(ctx, x) & wanted
+                                          for x in blk[2])] if wanted else []
+    blocks = named or blocks
     if not blocks:
         return None
     f, b, stmts = ctx.pick(blocks)
-    idx = [i for i, s in enumerate(stmts) if s.type == "declaration"]
-    if ctx.spec.stack_names:
-        wanted = [i for i in idx if declared_names(ctx, stmts[i]) & ctx.spec.stack_names]
-        if wanted:
-            idx = wanted
+    decls = [i for i, s in enumerate(stmts) if s.type == "declaration"]
+    idx = [i for i in decls if declared_names(ctx, stmts[i]) & wanted] if named else decls
     i = idx[ctx.pick_index([stmts[k] for k in idx])]
     # prefer moving among the other declarations
-    targets = [j for j in idx if j != i] or [j for j in range(len(stmts)) if j != i]
+    targets = [j for j in decls if j != i] or [j for j in range(len(stmts)) if j != i]
     if not targets:
         return None
     j = ctx.rng.choice(targets)

@@ -2,15 +2,23 @@
 
     uv run tools/stackcmp.py 0x405980
     uv run tools/stackcmp.py 0x405980 src/unsorted/0x405980.cpp
-    uv run tools/stackcmp.py --verify-all          # is /Z7 code-neutral?
+    uv run tools/stackcmp.py --verify-all          # is /Z7 code-neutral on the matched set?
+    uv run tools/stackcmp.py --self-test           # does the depth tracking hold on the original?
 
 When a function differs only in its stack frame, check.py's diff is a wall of
 `[esp + 0x1c]` versus `[esp + 0x24]` and there is no way to tell which local is
 which. This compiles the candidate once more with /Z7 to read the name and frame
 offset of every local from CodeView, aligns our instructions with the original's
-(ignoring stack operands and internal jump targets), and prints which of our
-slots the original puts somewhere else. The code being compared is still the
-normal build: --verify-all checks that /Z7 leaves the code bytes alone.
+(ignoring frame operands and internal jump targets), and prints where the
+original keeps each of our locals. The code being compared is the /Z7 build; it
+warns when that differs from the normal build.
+
+Every frame access is converted to an offset from the stack pointer at entry
+(the return address is at 0, the first parameter at +4, locals below 0), the
+convention CodeView uses for these functions. That needs the stack depth at each
+instruction, which needs to know how many bytes each call pops: the callee's
+`ret N` in the original, the import library's `@N`, the mangled calling
+convention, or, failing all of those, the aligned call on the other side.
 
 The last line is a `--stack` list for tools/permute.py, the locals whose slot is
 wrong, so the permuter can aim its declaration moves at them.
@@ -22,96 +30,98 @@ import re
 import struct
 import sys
 from collections import Counter
+from dataclasses import dataclass, field
+from functools import cache
 from pathlib import Path
+
+import capstone
+from capstone import x86
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from check import (DEFAULT_FLAGS, PADDING, ROOT, Original, annotations, compare,  # noqa: E402
-                   compile_source, disasm, find_source, link_placeholders, load_symbols,
-                   normalise, select_function)
+                   compile_source, find_source, link_placeholders, load_symbols, normalise,
+                   select_function)
 from coff import parse_object  # noqa: E402
+from linkcheck import (CALLCONV, IMPORT_LIBS, LIBDIR, Demangle, address_of,  # noqa: E402
+                       archive_symbols, type_size)
 
 DEBUG_FLAGS = DEFAULT_FLAGS + " /Z7"
 
 # CodeView symbol records (VC5), little-endian.
-S_END = 0x0006
 S_REGISTER = 0x1001
 S_BPREL32 = 0x1006
 S_LPROC32 = 0x100a
 S_GPROC32 = 0x100b
 PROC_TYPES = (S_LPROC32, S_GPROC32)
 
-# `[esp + 0x1c]`, `[esp - 4]`, `[esp]`: the frame slots MSVC 5 /O2 uses (it does
-# not keep an EBP frame, so ebp operands are struct and global accesses).
-STACK_OP = re.compile(r"\[esp(?:\s*([+-])\s*(0x[0-9a-f]+))?\]")
-STACK_ANY = re.compile(r"\[esp(?:\s*[+-]\s*0x[0-9a-f]+)?\]")
+# The stack probe: `mov eax, N; call __chkstk` lowers ESP by N itself.
+PROBE_NAMES = ("__chkstk", "__alloca_probe")
+SAVED = {x86.X86_REG_EBX, x86.X86_REG_ESI, x86.X86_REG_EDI, x86.X86_REG_EBP}
+FRAME_OPERAND = re.compile(r"\[esp[^\]]*\]")
 
 
-# --- the original's FPO frame -------------------------------------------------
+def disasm(code: bytes, va: int) -> list:
+    md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
+    md.syntax = capstone.CS_OPT_SYNTAX_INTEL
+    md.detail = True
+    return list(md.disasm(code, va))
 
-def fpo_records(orig: Original) -> dict[int, tuple[int, int, int, int]]:
-    """address -> (locals bytes, parameter bytes, saved-register bytes, prologue bytes).
 
-    IMAGE_DEBUG_TYPE_FPO holds one 16-byte FPO_DATA per function; cdwLocals is
-    the frame the compiler reserved for locals, which is the number to compare
-    our own frame against."""
-    out: dict[int, tuple[int, int, int, int]] = {}
+# --- FPO records ----------------------------------------------------------------
+
+@dataclass
+class Fpo:
+    locals: int     # bytes
+    params: int     # bytes
+    saved: int      # bytes of saved registers
+
+
+def fpo_records(orig: Original) -> dict[int, Fpo]:
+    out: dict[int, Fpo] = {}
     for d in getattr(orig.pe, "DIRECTORY_ENTRY_DEBUG", []):
         if d.struct.Type != 3:
             continue
         raw = orig.pe.__data__[d.struct.PointerToRawData:d.struct.PointerToRawData + d.struct.SizeOfData]
         for i in range(0, len(raw), 16):
             start, _, locals_dw, params, packed = struct.unpack_from("<IIIHH", raw, i)
-            saved = (packed >> 8) & 0x7
-            prologue = packed & 0xFF
-            out[orig.base + start] = (locals_dw * 4, params * 4, saved * 4, prologue)
+            out[orig.base + start] = Fpo(locals_dw * 4, params * 4, ((packed >> 8) & 0x7) * 4)
     return out
 
 
-def object_fpo(obj, symname: str) -> tuple[int, int, int, int] | None:
-    """Our own FPO record from the /Z7 object's .debug$F section."""
+def object_fpo(obj, symname: str) -> Fpo | None:
+    """Our own FPO record, from the /Z7 object's .debug$F section."""
     for sec in obj.sections:
-        if sec.name == ".debug$F" and any(symname in r.symbol for r in sec.relocs):
-            d = sec.data
-            if len(d) < 16:
-                continue
-            locals_dw, params, packed = struct.unpack_from("<IHH", d, 8)
-            return (locals_dw * 4, params * 4, ((packed >> 8) & 0x7) * 4, packed & 0xFF)
+        if sec.name == ".debug$F" and any(symname in r.symbol for r in sec.relocs) and len(sec.data) >= 16:
+            locals_dw, params, packed = struct.unpack_from("<IHH", sec.data, 8)
+            return Fpo(locals_dw * 4, params * 4, ((packed >> 8) & 0x7) * 4)
     return None
 
 
-# --- CodeView locals ----------------------------------------------------------
+# --- CodeView locals --------------------------------------------------------------
+
+def cv_records(data: bytes):
+    """Yield (record offset, record type, proc name) for every CodeView record."""
+    off = 4 if len(data) >= 4 and struct.unpack_from("<I", data, 0)[0] == 4 else 0
+    while off + 4 <= len(data):
+        reclen, rectyp = struct.unpack_from("<HH", data, off)
+        if reclen == 0:
+            break
+        raw = data[off:off + 2 + reclen]
+        name = raw[40:40 + raw[39]].decode("latin-1") if rectyp in PROC_TYPES and len(raw) >= 40 else ""
+        yield off, rectyp, name
+        off += 2 + reclen
+
 
 def find_debug_section(obj, symname: str, short: str | None):
     for sec in obj.sections:
         if sec.name == ".debug$S" and any(symname in r.symbol for r in sec.relocs):
             return sec
     for sec in obj.sections:
-        if sec.name != ".debug$S":
-            continue
-        for _, rectyp, name in cv_records(sec.data):
-            if rectyp in PROC_TYPES and short and name.split("::")[-1] == short:
-                return sec
+        if sec.name == ".debug$S" and short and any(
+                t in PROC_TYPES and n.split("::")[-1] == short for _, t, n in cv_records(sec.data)):
+            return sec
     return None
-
-
-def cv_records(data: bytes):
-    """Yield (record offset, record type, proc name) for every CodeView record."""
-    off = 0
-    if len(data) >= 4 and struct.unpack_from("<I", data, 0)[0] == 4:
-        off = 4
-    while off + 4 <= len(data):
-        reclen, rectyp = struct.unpack_from("<HH", data, off)
-        if reclen == 0:
-            break
-        end = off + 2 + reclen
-        raw = data[off:end]
-        name = ""
-        if rectyp in PROC_TYPES and len(raw) >= 40:
-            n = raw[39]
-            name = raw[40:40 + n].decode("latin-1")
-        yield off, rectyp, name
-        off = end
 
 
 def parse_locals(sec) -> tuple[list[tuple[str, int]], list[tuple[str, int]]]:
@@ -121,198 +131,379 @@ def parse_locals(sec) -> tuple[list[tuple[str, int]], list[tuple[str, int]]]:
     for off, rectyp, _ in cv_records(sec.data):
         raw = sec.data[off:off + 2 + struct.unpack_from("<H", sec.data, off)[0]]
         if rectyp == S_BPREL32 and len(raw) >= 13:
-            (value,) = struct.unpack_from("<i", raw, 4)
-            n = raw[12]
-            stack.append((raw[13:13 + n].decode("latin-1"), value))
+            stack.append((raw[13:13 + raw[12]].decode("latin-1"), struct.unpack_from("<i", raw, 4)[0]))
         elif rectyp == S_REGISTER and len(raw) >= 11:
-            (reg,) = struct.unpack_from("<H", raw, 8)
-            n = raw[10]
-            regs.append((raw[11:11 + n].decode("latin-1"), reg))
+            regs.append((raw[11:11 + raw[10]].decode("latin-1"), struct.unpack_from("<H", raw, 8)[0]))
     return stack, regs
 
 
-# --- instruction slots --------------------------------------------------------
+# --- how many bytes a call pops ---------------------------------------------------
 
-def esp_disps(op_str: str) -> list[int]:
-    out = []
-    for m in STACK_OP.finditer(op_str):
-        if m.group(2) is None:
-            out.append(0)
-        else:
-            v = int(m.group(2), 16)
-            out.append(-v if m.group(1) == "-" else v)
+PROBE = "probe"   # the stack probe: lowers ESP by the EAX it was given
+
+
+@cache
+def import_pops() -> dict[str, int]:
+    """Undecorated import name -> bytes its callee pops, from the import libraries."""
+    out: dict[str, int] = {}
+    for lib in IMPORT_LIBS:
+        path = LIBDIR / f"{lib}.LIB"
+        if not path.exists():
+            continue
+        for sym in archive_symbols(path):
+            m = re.fullmatch(r"__imp__(\w+?)(?:@(\d+))?", sym)
+            if m:
+                out.setdefault(m.group(1), int(m.group(2) or 0))
     return out
 
 
-def esp_effect(ins) -> int:
-    """Bytes by which this instruction lowers the stack pointer (below entry ESP)."""
-    m, ops = ins.mnemonic, ins.op_str
-    if m == "push":
-        return 4
-    if m == "pop":
-        return -4
-    if m == "lea" and ops.startswith("esp"):
-        v = re.search(r"([+-])\s*0x([0-9a-f]+)", ops)
-        if v:
-            n = int(v.group(2), 16)
-            return -n if v.group(1) == "+" else n
-    return 0
+class Callees:
+    """Bytes popped by the functions of the original, from their own `ret N`."""
+
+    def __init__(self, orig: Original, symbols: dict[str, int]):
+        self.orig = orig
+        self.probe = {symbols[n] for n in ("_alloca_probe", "__alloca_probe", "__chkstk", "_chkstk")
+                      if n in symbols}
+        self.iat: dict[int, str] = {}
+        for entry in getattr(orig.pe, "DIRECTORY_ENTRY_IMPORT", []):
+            for imp in entry.imports:
+                if imp.name:
+                    self.iat[imp.address] = imp.name.decode("latin-1")
+        self.memo: dict[int, int | str | None] = {}
+
+    def at(self, address: int, depth: int = 0) -> int | str | None:
+        if address in self.probe:
+            return PROBE
+        if address in self.memo:
+            return self.memo[address]
+        self.memo[address] = None
+        size = self.orig.sizes.get(address, 512)
+        result = None
+        for ins in disasm(self.orig.read(address, size), address):
+            if ins.mnemonic == "ret":
+                result = ins.operands[0].imm if ins.operands else 0
+                break
+            if ins.mnemonic == "jmp" and depth < 2 and ins.operands[0].type == x86.X86_OP_IMM \
+                    and not address <= ins.operands[0].imm < address + size:
+                result = self.at(ins.operands[0].imm, depth + 1)  # a thunk
+                break
+        self.memo[address] = result
+        return result
+
+    def imported(self, slot: int) -> int | None:
+        name = self.iat.get(slot)
+        return import_pops().get(name) if name else None
 
 
-def _reg_imm(ins_list, i: int, reg: str) -> int | None:
-    """The constant `reg` most recently loaded with, if it is still live."""
-    for k in range(i - 1, max(-1, i - 16), -1):
+def mangled_pops(sym: str) -> int | None:
+    """Bytes a callee pops, from its mangled or decorated name."""
+    m = re.fullmatch(r"_(\w+)@(\d+)", sym)
+    if m:
+        return int(m.group(2))
+    if not sym.startswith("?"):
+        return 0 if re.fullmatch(r"_\w+", sym) else None   # a C function: __cdecl
+    d = Demangle(sym[1:])
+    try:
+        d.qualified()
+        access = d.take()
+        if access not in "YZ" and access not in "CDKLST":
+            d.take()   # `this` qualifiers
+        cc = CALLCONV.get(d.take())
+        if cc == "__cdecl":
+            return 0
+        if d.s[d.i] != "@":
+            if d.s.startswith("?A", d.i):
+                d.i += 2
+            d.type()
+        total = 0
+        while d.i < len(d.s) and d.s[d.i] not in "@Z":
+            if d.s[d.i] == "X" and total == 0:
+                break
+            size = type_size(d.arg())
+            if size is None:
+                return None
+            total += (size + 3) & ~3
+        if d.s[d.i:d.i + 2] == "ZZ":
+            return 0   # variadic: the caller cleans
+        return total
+    except (ValueError, IndexError, KeyError):
+        return None
+
+
+def loaded_from(ins_list, i: int):
+    """For `call reg`, the `mov reg, [address]` that loaded it (MSVC keeps an
+    import called several times in a register), if nothing wrote reg since."""
+    op = ins_list[i].operands[0]
+    if op.type != x86.X86_OP_REG:
+        return None
+    for k in range(i - 1, max(-1, i - 200), -1):
         ins = ins_list[k]
-        if ins.op_str.startswith(reg + ","):
-            rest = ins.op_str.split(",", 1)[1].strip()
-            return int(rest, 16) if re.fullmatch(r"0x[0-9a-f]+", rest) else None
-        if ins.mnemonic in ("xor", "add", "sub", "inc", "dec", "pop", "and", "or", "imul", "lea") \
-                and ins.op_str.startswith(reg):
+        _, written = ins.regs_access()
+        if op.reg in written:
+            src = ins.operands[1] if ins.mnemonic == "mov" and len(ins.operands) == 2 else None
+            if src is not None and src.type == x86.X86_OP_MEM and src.mem.base == 0 and src.mem.index == 0:
+                return ins
             return None
     return None
 
 
-def effect(ins_list, i: int) -> int:
-    """esp_effect, resolving `sub esp, eax` from the preceding `mov eax, N`
-    (the `_chkstk` idiom for frames larger than one page)."""
+def original_pops(ins_list, i: int, callees: Callees) -> int | str | None:
     ins = ins_list[i]
-    if ins.mnemonic in ("sub", "add") and ins.op_str.startswith("esp"):
-        m = re.match(r"esp,\s*(.*)$", ins.op_str)
-        arg = m.group(1).strip() if m else ""
-        if re.fullmatch(r"0x[0-9a-f]+", arg):
-            n = int(arg, 16)
-        elif re.fullmatch(r"e?[a-z]{2}", arg):
-            n = _reg_imm(ins_list, i, arg)
-        else:
-            n = None
-        if n is not None:
-            return n if ins.mnemonic == "sub" else -n
-        return 0
-    return esp_effect(ins)
+    op = ins.operands[0]
+    if op.type == x86.X86_OP_IMM:
+        return callees.at(op.imm)
+    if op.type == x86.X86_OP_MEM and op.mem.base == 0 and op.mem.index == 0:
+        return callees.imported(op.mem.disp)
+    load = loaded_from(ins_list, i)
+    return callees.imported(load.operands[1].mem.disp) if load is not None else None
+
+
+def our_pops(ins_list, i: int, relocs: dict[int, str], callees: Callees,
+             symbols: dict[str, int]) -> int | str | None:
+    """Bytes a call in our object pops, from the symbol its relocation names."""
+    ins = ins_list[i]
+    if ins.operands[0].type == x86.X86_OP_REG:
+        ins = loaded_from(ins_list, i)
+        if ins is None:
+            return None
+    sym = next((relocs[a] for a in range(ins.address, ins.address + ins.size) if a in relocs), None)
+    if sym is None:
+        return None
+    if sym.startswith("__imp_"):
+        m = re.fullmatch(r"__imp__(\w+?)(?:@(\d+))?", sym)
+        return int(m.group(2) or 0) if m else None
+    if sym in PROBE_NAMES:
+        return PROBE
+    address = address_of(sym, symbols)
+    if address is not None:
+        known = callees.at(address)
+        if known is not None:
+            return known
+    return mangled_pops(sym)
+
+
+# --- stack depth --------------------------------------------------------------------
+
+@dataclass
+class Depth:
+    delta: list[int | None]             # bytes below entry ESP before each instruction
+    guessed: set[int] = field(default_factory=set)    # calls whose pops were inferred
+    conflicts: set[int] = field(default_factory=set)  # joins reached at two depths
+
+
+def _imm(op) -> int | None:
+    return op.imm if op.type == x86.X86_OP_IMM else None
+
+
+def _is_esp(op) -> bool:
+    return op.type == x86.X86_OP_REG and op.reg == x86.X86_REG_ESP
 
 
 def _branch_target(ins) -> int | None:
-    if not (ins.mnemonic.startswith("j") or ins.mnemonic.startswith("loop")):
-        return None
-    m = re.search(r"0x([0-9a-f]+)", ins.op_str)
-    return int(m.group(1), 16) if m else None
+    if ins.group(capstone.CS_GRP_JUMP) and ins.operands and ins.operands[0].type == x86.X86_OP_IMM:
+        return ins.operands[0].imm
+    return None
 
 
-def _successors(ins_list, i: int, by_addr: dict[int, int]) -> list[int]:
-    ins = ins_list[i]
-    m = ins.mnemonic
-    if m in ("ret", "retn", "retf"):
-        return []
-    if m == "jmp":
-        target = _branch_target(ins)
-        return [by_addr[target]] if target in by_addr else []
-    if m.startswith("j") or m.startswith("loop"):
-        out = []
-        target = _branch_target(ins)
-        if target in by_addr:
-            out.append(by_addr[target])
-        if i + 1 < len(ins_list):
-            out.append(i + 1)
-        return out
-    return [i + 1] if i + 1 < len(ins_list) else []
+def restored_registers(ins_list) -> set[int]:
+    """Callee-saved registers the epilogues pop: their first push on a path is a save."""
+    out: set[int] = set()
+    for i, ins in enumerate(ins_list):
+        if ins.mnemonic != "ret":
+            continue
+        k = i - 1
+        while k >= 0 and ins_list[k].mnemonic in ("pop", "add", "lea", "mov", "leave"):
+            p = ins_list[k]
+            if p.mnemonic == "pop" and p.operands[0].type == x86.X86_OP_REG and p.operands[0].reg in SAVED:
+                out.add(p.operands[0].reg)
+            k -= 1
+    return out
 
 
-def _delta_pass(ins_list, by_addr, resting: int | None):
-    """Forward dataflow for bytes below entry ESP; None where a block was reached
-    with two different stack depths (an unbalanced push on one path)."""
+@dataclass(frozen=True)
+class State:
+    delta: int
+    args: tuple[int, ...] = ()          # sizes of the argument pushes not yet consumed
+    saved: frozenset = frozenset()      # callee-saved registers already pushed
+    eax: int | None = None              # constant last loaded into EAX (for the probe)
+
+
+def _pop_args(args: tuple[int, ...], n: int) -> tuple[tuple[int, ...], bool]:
+    """Remove n bytes of argument pushes; False if there were not that many."""
+    out = list(args)
+    while n > 0 and out:
+        n -= out.pop()
+    return tuple(out), n <= 0
+
+
+def step(ins, s: State, pops, saves: set[int]) -> tuple[State, bool]:
+    """The state after one instruction, and whether it consumed pushes it never saw."""
+    m, ops = ins.mnemonic, ins.operands
+    eax = s.eax
+    if ops and ops[0].type == x86.X86_OP_REG and ops[0].reg == x86.X86_REG_EAX and m not in ("push", "cmp", "test"):
+        eax = _imm(ops[1]) if m == "mov" and len(ops) == 2 else None
+    if m == "push":
+        if ops[0].type == x86.X86_OP_REG and ops[0].reg in saves and ops[0].reg not in s.saved:
+            return State(s.delta + 4, s.args, s.saved | {ops[0].reg}, eax), True
+        return State(s.delta + 4, s.args + (4,), s.saved, eax), True
+    if m == "pop":
+        args = s.args[:-1] if s.args else s.args
+        return State(s.delta - 4, args, s.saved, eax), True
+    if m in ("sub", "add") and len(ops) == 2 and _is_esp(ops[0]):
+        n = _imm(ops[1])
+        if n is None and ops[1].type == x86.X86_OP_REG and ops[1].reg == x86.X86_REG_EAX:
+            n = s.eax
+        if n is None:
+            return State(s.delta, s.args, s.saved, eax), False
+        if m == "sub":   # frame space: whatever was pushed before is part of the frame now
+            return State(s.delta + n, (), s.saved, eax), True
+        args, _ = _pop_args(s.args, n)
+        return State(s.delta - n, args, s.saved, eax), True
+    if m == "lea" and _is_esp(ops[0]) and ops[1].mem.base == x86.X86_REG_ESP and ops[1].mem.index == 0:
+        n = ops[1].mem.disp
+        if n < 0:
+            return State(s.delta - n, (), s.saved, eax), True
+        args, _ = _pop_args(s.args, n)
+        return State(s.delta - n, args, s.saved, eax), True
+    if m == "call":
+        if pops == PROBE:
+            return State(s.delta + (s.eax or 0), (), s.saved, None), s.eax is not None
+        args, ok = _pop_args(s.args, pops or 0)
+        return State(s.delta - (pops or 0), args, s.saved, None), ok
+    return State(s.delta, s.args, s.saved, eax), True
+
+
+def _ends_block(ins) -> bool:
+    return ins.mnemonic == "ret" or ins.group(capstone.CS_GRP_JUMP)
+
+
+def infer_pops(ins_list, i: int, s: State, known: dict[int, int | str | None], saves: set[int]) -> int:
+    """Pops for a call nothing names (a virtual call, a function pointer).
+
+    Try popping all the pending argument pushes, then fewer, and keep the
+    largest count under which no later call in the same block pops pushes it
+    never saw. That is what tells `push a; push x; call [g]; push eax; call f`
+    (g takes x, f takes a and eax) from `push a; push x; call [g]` (g takes both)."""
+    n = len(s.args)
+    # `call reg; mov ...; add esp, N`: the caller cleans, so the callee popped nothing.
+    for j in range(i + 1, min(i + 6, len(ins_list))):
+        nxt = ins_list[j]
+        if nxt.mnemonic in ("call", "push", "ret") or nxt.group(capstone.CS_GRP_JUMP):
+            break
+        if nxt.mnemonic == "add" and _is_esp(nxt.operands[0]) and _imm(nxt.operands[1]) is not None:
+            if _imm(nxt.operands[1]) in {sum(s.args[n - k:]) for k in range(1, n + 1)}:
+                return 0
+            break
+    for k in range(n, -1, -1):
+        pops = sum(s.args[n - k:])
+        t, ok = step(ins_list[i], s, pops, saves)
+        j = i + 1
+        while ok and j < len(ins_list) and not _ends_block(ins_list[j - 1]):
+            p = known.get(j)
+            if ins_list[j].mnemonic == "call" and p is None:
+                break
+            t, ok = step(ins_list[j], t, p, saves)
+            j += 1
+        if ok:
+            return pops
+    return sum(s.args)
+
+
+def track_depth(ins_list, known: dict[int, int | str | None]) -> Depth:
+    """Forward dataflow over the function's control flow."""
     n = len(ins_list)
-    delta: list[int | None] = [None] * n
-    conflict: set[int] = set()
-    delta[0] = 0
+    by_addr = {ins.address: i for i, ins in enumerate(ins_list)}
+    saves = restored_registers(ins_list)
+    states: list[State | None] = [None] * n
+    depth = Depth([None] * n)
+    if not n:
+        return depth
+    states[0] = State(0)
     todo = [0]
     while todo:
         i = todo.pop()
-        before = delta[i]
-        ins = ins_list[i]
-        if ins.mnemonic == "call" and resting is not None:
-            nxt = ins_list[i + 1] if i + 1 < n else None
-            cleans = nxt is not None and (
-                (nxt.mnemonic in ("add", "lea") and nxt.op_str.startswith("esp")) or nxt.mnemonic == "pop")
-            after = before if cleans else resting
-        else:
-            after = before + effect(ins_list, i)
-        for s in _successors(ins_list, i, by_addr):
-            if delta[s] is None:
-                delta[s] = after
-                todo.append(s)
-            elif delta[s] != after:
-                conflict.add(s)  # two paths, two depths: keep the first
-    return delta, conflict
+        s, ins = states[i], ins_list[i]
+        pops = known.get(i)
+        if ins.mnemonic == "call" and pops is None:
+            pops = infer_pops(ins_list, i, s, known, saves)
+            depth.guessed.add(i)
+        after, _ = step(ins, s, pops, saves)
+        succ = []
+        if ins.mnemonic != "ret":
+            target = _branch_target(ins)
+            if target is not None and target in by_addr:
+                succ.append(by_addr[target])
+            if ins.mnemonic != "jmp" and i + 1 < n:
+                succ.append(i + 1)
+        for k in succ:
+            if states[k] is None:
+                states[k] = after
+                todo.append(k)
+            elif states[k].delta != after.delta:
+                depth.conflicts.add(k)
+    for i, s in enumerate(states):
+        if s is not None:
+            depth.delta[i] = s.delta
+    return depth
 
 
-def stack_deltas(ins_list, resting_hint: int | None = None) -> list[int]:
-    """Bytes below entry ESP at each instruction, for converting `[esp + N]`.
+def frame_offsets(ins, delta: int | None) -> list[int]:
+    """Entry-relative offsets of the frame locations an instruction touches.
 
-    `[esp + d]` with the stack pointer `delta` bytes below entry is the frame
-    location `d - delta`, the same number CodeView reports for a local. delta
-    follows the control flow; a call that cleans its own arguments (a stdcall
-    callee with no following `add esp`) returns the stack pointer to the body's
-    resting depth instead of leaving the pushed arguments counted. The resting
-    depth is the frame's locals plus its saved registers (the FPO record); the
-    mode of the raw depths is only a fallback, since uncorrected stdcall calls
-    inflate it over a large function."""
-    by_addr = {ins.address: i for i, ins in enumerate(ins_list)}
-    if resting_hint is None:
-        first, _ = _delta_pass(ins_list, by_addr, None)
-        seen = [first[i] for i, ins in enumerate(ins_list) if first[i] is not None and esp_disps(ins.op_str)]
-        resting_hint = Counter(seen).most_common(1)[0][0] if seen else 0
-    second, _ = _delta_pass(ins_list, by_addr, resting_hint)
-    return [resting_hint if d is None else d for d in second]
+    No game function keeps an EBP frame (no /GX, no alloca), so every frame
+    access is ESP-based."""
+    if delta is None:
+        return []
+    return [op.mem.disp - delta for op in ins.operands
+            if op.type == x86.X86_OP_MEM and op.mem.segment == 0 and op.mem.base == x86.X86_REG_ESP]
 
 
-def slot_key(ins, lo: int, hi: int, in_image) -> str:
-    """Instruction text with stack slots and code addresses masked, for alignment."""
-    return STACK_ANY.sub("[esp+?]", normalise(ins, lo, hi, in_image, mask_targets=True))
+def frame_key(ins, lo: int, hi: int, in_image) -> str:
+    """Instruction text with frame operands and code addresses masked, for alignment."""
+    return FRAME_OPERAND.sub("[frame]", normalise(ins, lo, hi, in_image, mask_targets=True))
 
 
-def pair_slots(ours, theirs, ours_delta, theirs_delta, lo, hi, in_image):
-    """(ours_offset -> Counter(theirs_offset), pairs) from aligned instructions.
+# --- one side ---------------------------------------------------------------------
 
-    Instructions are aligned on their masked text, so a pair that differs only in
-    a stack operand still lines up and its two frame offsets can be paired."""
-    keys_o = [slot_key(i, lo, hi, in_image) for i in ours]
-    keys_t = [slot_key(i, lo, hi, in_image) for i in theirs]
-    mapping: dict[int, Counter] = {}
-    pairs = 0
+@dataclass
+class Side:
+    ins: list
+    fpo: Fpo | None
+    depth: Depth | None = None
+    offsets: list[list[int]] = field(default_factory=list)
 
-    def record(i: int, j: int):
-        """Pair ours[i] with theirs[j]."""
-        nonlocal pairs
-        do, dt = esp_disps(ours[i].op_str), esp_disps(theirs[j].op_str)
-        if len(do) != len(dt):
-            return
-        for a, b in zip(do, dt):
-            oo, ot = a - ours_delta[i], b - theirs_delta[j]
-            mapping.setdefault(oo, Counter())[ot] += 1
-            pairs += 1
+    def valid(self, off: int) -> bool:
+        """Inside the locals or the parameters: not the return address, a saved
+        register, or an outgoing argument."""
+        if self.fpo is None:
+            return off != 0
+        if 4 <= off < 4 + self.fpo.params:
+            return True
+        return -self.fpo.locals <= off < 0
 
-    for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(None, keys_t, keys_o, autojunk=False).get_opcodes():
-        if tag == "equal":
-            for k in range(i2 - i1):
-                record(j1 + k, i1 + k)
-            continue
-        if tag == "replace" and (i2 - i1) == (j2 - j1):
-            for k in range(i2 - i1):
-                if keys_t[i1 + k] == keys_o[j1 + k]:
-                    record(j1 + k, i1 + k)
-            continue
-        # Uneven block: pair greedily on the masked text, each instruction once.
-        used: set[int] = set()
-        for i in range(i1, i2):
-            for j in range(j1, j2):
-                if j not in used and keys_t[i] == keys_o[j]:
+    def resolve(self, known: dict[int, int | str | None]) -> None:
+        self.depth = track_depth(self.ins, known)
+        self.offsets = [frame_offsets(ins, self.depth.delta[i])
+                        for i, ins in enumerate(self.ins)]
+
+
+def align(ours: list[str], theirs: list[str]) -> list[tuple[int, int]]:
+    """(ours index, theirs index) for instructions that line up on masked text."""
+    pairs = []
+    for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(None, theirs, ours, autojunk=False).get_opcodes():
+        if tag == "equal" or (tag == "replace" and i2 - i1 == j2 - j1):
+            pairs += [(j1 + k, i1 + k) for k in range(i2 - i1) if theirs[i1 + k] == ours[j1 + k]]
+        elif tag == "replace":
+            used: set[int] = set()
+            for i in range(i1, i2):
+                j = next((j for j in range(j1, j2) if j not in used and theirs[i] == ours[j]), None)
+                if j is not None:
                     used.add(j)
-                    record(j, i)
-                    break
-    return mapping, pairs
+                    pairs.append((j, i))
+    return pairs
 
 
-# --- report -------------------------------------------------------------------
+# --- report -----------------------------------------------------------------------
 
 REG_NAMES = {
     0: "ax", 1: "cx", 2: "dx", 3: "bx", 4: "sp", 5: "bp", 6: "si", 7: "di",
@@ -323,6 +514,36 @@ REG_NAMES = {
 
 def signed(v: int) -> str:
     return f"+{v:#x}" if v >= 0 else f"-{-v:#x}"
+
+
+@dataclass
+class Local:
+    names: list[str]
+    start: int
+    end: int                     # exclusive: the next local up, or the end of its area
+    accesses: int = 0
+    votes: Counter = field(default_factory=Counter)   # where the original's paired access puts our start
+
+
+def build_locals(stack: list[tuple[str, int]], fpo: Fpo | None) -> list[Local]:
+    by_offset: dict[int, list[str]] = {}
+    for name, value in stack:
+        by_offset.setdefault(value, []).append(name)
+    starts = sorted(by_offset)
+    params_end = 4 + (fpo.params if fpo else 0x100)
+    out = []
+    for k, start in enumerate(starts):
+        nxt = starts[k + 1] if k + 1 < len(starts) else None
+        if start < 0:
+            end = min(nxt, 0) if nxt is not None else 0
+        else:
+            end = nxt if nxt is not None else max(params_end, start + 4)
+        out.append(Local(by_offset[start], start, end))
+    return out
+
+
+def covering(locals_: list[Local], off: int) -> Local | None:
+    return next((loc for loc in locals_ if loc.start <= off < loc.end), None)
 
 
 def analyse(address: int, src: Path, want: str | None) -> int:
@@ -340,94 +561,164 @@ def analyse(address: int, src: Path, want: str | None) -> int:
     if not picked:
         sys.exit(f"cannot pick the function: {err}")
     name, sec, start, end = picked
-    debug_data = sec.data[start:end]
-    base_picked, err = select_function(base, want, qualname)
-    if not base_picked or base_picked[1].data[base_picked[2]:base_picked[3]] != debug_data:
-        print("warning: /Z7 changed this function's code bytes; slots may not line up")
+    base_picked, _ = select_function(base, want, qualname)
+    if not base_picked or base_picked[1].data[base_picked[2]:base_picked[3]] != sec.data[start:end]:
+        print("warning: /Z7 changed this function's code; the table describes the /Z7 build")
 
     orig = Original()
-    size = orig.sizes.get(address, len(debug_data))
-    theirs_bytes = orig.read(address, size)
+    symbols = load_symbols()
+    score = compare(orig, base, address, want, qualname, symbols)
+    size = orig.sizes.get(address, end - start)
     in_image = lambda v: orig.base <= v < orig.end
     lo, hi = address, address + size
 
-    data, mask = debug_data, sec.mask()[start:end]
+    data, mask = sec.data[start:end], sec.mask()[start:end]
     while data and data[-1] in PADDING and mask[-1]:
         data, mask = data[:-1], mask[:-1]
-    ours_ins = disasm(link_placeholders(orig, sec, start, end, data, address, size), address)
-    theirs_ins = disasm(theirs_bytes, address)
+    ours = Side(disasm(link_placeholders(orig, sec, start, end, data, address, size), address),
+                object_fpo(dbg, name))
+    theirs = Side(disasm(orig.read(address, size), address), fpo_records(orig).get(address))
+
+    callees = Callees(orig, symbols)
+    relocs = {address + r.offset - start: r.symbol for r in sec.relocs if start <= r.offset < end}
+    ours_known = {i: our_pops(ours.ins, i, relocs, callees, symbols)
+                  for i, ins in enumerate(ours.ins) if ins.mnemonic == "call"}
+    theirs_known = {i: original_pops(theirs.ins, i, callees)
+                    for i, ins in enumerate(theirs.ins) if ins.mnemonic == "call"}
+
+    keys_o = [frame_key(i, lo, hi, in_image) for i in ours.ins]
+    keys_t = [frame_key(i, lo, hi, in_image) for i in theirs.ins]
+    pairs = align(keys_o, keys_t)
+
+    # A call one side cannot name takes its pops from the call it lines up with.
+    for i, j in pairs:
+        if ours.ins[i].mnemonic != "call":
+            continue
+        if ours_known.get(i) is None and theirs_known.get(j) is not None:
+            ours_known[i] = theirs_known[j]
+        elif theirs_known.get(j) is None and ours_known.get(i) is not None:
+            theirs_known[j] = ours_known[i]
+    ours.resolve(ours_known)
+    theirs.resolve(theirs_known)
 
     stack, regs = [], []
     dbg_sec = find_debug_section(dbg, name, qualname.split("::")[-1] if qualname else None)
     if dbg_sec is not None:
         stack, regs = parse_locals(dbg_sec)
+    locals_ = build_locals(stack, ours.fpo)
 
-    ofpo, bfpo = object_fpo(dbg, name), fpo_records(orig).get(address)
-    ours_rest = (ofpo[0] + ofpo[2]) if ofpo else None
-    theirs_rest = (bfpo[0] + bfpo[2]) if bfpo else None
-    ours_delta = stack_deltas(ours_ins, ours_rest)
-    theirs_delta = stack_deltas(theirs_ins, theirs_rest)
-    mapping, pairs = pair_slots(ours_ins, theirs_ins, ours_delta, theirs_delta, lo, hi, in_image)
+    for i, offs in enumerate(ours.offsets):
+        for off in offs:
+            loc = covering(locals_, off)
+            if loc:
+                loc.accesses += 1
+    paired_theirs: set[int] = set()
+    unplaced = 0
+    for i, j in pairs:
+        do, dt = ours.offsets[i], theirs.offsets[j]
+        if len(do) != len(dt):
+            continue
+        for oo, ot in zip(do, dt):
+            if not (ours.valid(oo) and theirs.valid(ot)):
+                unplaced += 1
+                continue
+            paired_theirs.add(ot)
+            loc = covering(locals_, oo)
+            if loc:
+                loc.votes[ot - (oo - loc.start)] += 1
 
-    our_slots: set[int] = set()
-    for i, ins in enumerate(ours_ins):
-        our_slots.update(d - ours_delta[i] for d in esp_disps(ins.op_str))
-    their_slots: set[int] = set()
-    for i, ins in enumerate(theirs_ins):
-        their_slots.update(d - theirs_delta[i] for d in esp_disps(ins.op_str))
-
-    ratio = difflib.SequenceMatcher(
-        None, [normalise(i, lo, hi, in_image) for i in theirs_ins],
-        [normalise(i, lo, hi, in_image) for i in ours_ins], autojunk=False).ratio()
-
-    print(f"{address:#x}  {name}  original {size} bytes, ours {len(data)} bytes  ->  {ratio * 100:.1f}%")
-    ours_frame = f"{ofpo[0]:#x} locals + {ofpo[2]:#x} saved" if ofpo else "unknown"
-    orig_frame = f"{bfpo[0]:#x} locals + {bfpo[2]:#x} saved" if bfpo else "unknown"
-    print(f"frame: ours {ours_frame}   original {orig_frame}")
-    print(f"aligned slot pairs: {pairs}")
-
-    # A local at a frame offset may be reached through several instructions; take
-    # the original offset that most of its aligned accesses agree on.
-    by_offset: dict[int, list[str]] = {}
-    for local, value in stack:
-        by_offset.setdefault(value, []).append(local)
+    print(f"{address:#x}  {name}  original {size} bytes, ours {len(data)} bytes  ->  {score.status}")
+    fmt = lambda f: f"{f.locals:#x} locals + {f.saved:#x} saved, {f.params:#x} params" if f else "unknown"
+    print(f"frame: ours {fmt(ours.fpo)}   original {fmt(theirs.fpo)}")
+    print(f"aligned frame accesses: {sum(sum(loc.votes.values()) for loc in locals_)}")
 
     rows, wrong = [], []
-    for value in sorted(by_offset, reverse=True):
-        names = "/".join(by_offset[value])
-        if value not in our_slots:
-            rows.append((names, signed(value), "-", "unused"))
+    for loc in sorted(locals_, key=lambda loc: -loc.start):
+        names = "/".join(loc.names)
+        if not loc.accesses:
+            rows.append((names, signed(loc.start), "-", "unused"))
             continue
-        hits = mapping.get(value)
-        if not hits:
-            rows.append((names, signed(value), "-", "our only"))
-            wrong.extend(by_offset[value])
+        if not loc.votes:
+            rows.append((names, signed(loc.start), "-", "not paired"))
             continue
-        target, count = hits.most_common(1)[0]
-        status = "ok" if target == value else "moved"
-        if status == "moved":
-            wrong.extend(by_offset[value])
-        rows.append((names, signed(value), f"{signed(target)} ({count})", status))
+        target, count = loc.votes.most_common(1)[0]
+        total = sum(loc.votes.values())
+        if target == loc.start:
+            status = "ok"
+        elif loc.start > 0:
+            status = "param differs"
+        else:
+            status = "moved"
+            wrong.extend(loc.names)
+        rows.append((names, signed(loc.start), f"{signed(target)} ({count}/{total})", status))
 
     if rows:
         width = max(len(r[0]) for r in rows + [("local",)])
-        print(f"\n  {'local':<{width}}  {'our slot':>10}  {'original':>14}  status")
+        print(f"\n  {'local':<{width}}  {'our slot':>10}  {'original':>16}  status")
         for names, ours_s, orig_s, status in rows:
-            print(f"  {names:<{width}}  {ours_s:>10}  {orig_s:>14}  {status}")
+            print(f"  {names:<{width}}  {ours_s:>10}  {orig_s:>16}  {status}")
     else:
         print("\nno stack locals in CodeView (all in registers or optimised away)")
 
-    missing = sorted(s for s in their_slots if s not in by_offset and s not in our_slots)
-    if missing:
-        print("\noriginal slots no local of ours reaches: " + ", ".join(signed(s) for s in missing))
+    unpaired = sorted({off for offs in theirs.offsets for off in offs
+                       if theirs.valid(off) and off not in paired_theirs})
+    if unpaired:
+        print("\noriginal frame offsets no aligned access of ours reaches: "
+              + ", ".join(signed(s) for s in unpaired[:24]) + (" ..." if len(unpaired) > 24 else ""))
     if regs:
         print("\nin registers: " + ", ".join(f"{n}={REG_NAMES.get(r, f'r{r}')}" for n, r in regs))
+    notes = []
+    for label, side in (("ours", ours), ("original", theirs)):
+        if side.depth.guessed:
+            notes.append(f"{label}: pops inferred for {len(side.depth.guessed)} call(s) at "
+                         + ", ".join(f"{side.ins[i].address:#x}" for i in sorted(side.depth.guessed)[:6]))
+        if side.depth.conflicts:
+            notes.append(f"{label}: stack depth disagrees at join "
+                         + ", ".join(f"{side.ins[i].address:#x}" for i in sorted(side.depth.conflicts)[:6]))
+    if unplaced:
+        notes.append(f"{unplaced} aligned access(es) fell outside the frame on one side and were skipped")
+    if notes:
+        print("\nnotes:\n  " + "\n  ".join(notes))
     if wrong:
         print("\npermute --stack " + ",".join(dict.fromkeys(wrong)))
     return 0
 
 
-# --- /Z7 neutrality across the matched set ------------------------------------
+# --- checks of the tool itself ------------------------------------------------------
+
+def self_test() -> int:
+    """Track the stack depth through every function of the original and count
+    frame accesses that land somewhere no local can be (the return address, a
+    saved register, past the parameters). Outgoing arguments written with
+    `mov [esp], x` also land outside the frame, so the count is not zero."""
+    import csv
+    orig = Original()
+    symbols = load_symbols()
+    callees = Callees(orig, symbols)
+    fpo = fpo_records(orig)
+    game = [int(r["address"], 16) for r in csv.DictReader((ROOT / "data/functions.csv").open())
+            if r["kind"] == "game"]
+    bad, total, conflicted = [], 0, 0
+    for address in game:
+        if address not in fpo:
+            continue
+        ins = disasm(orig.read(address, orig.sizes[address]), address)
+        side = Side(ins, fpo[address])
+        side.resolve({i: original_pops(ins, i, callees) for i, x in enumerate(ins) if x.mnemonic == "call"})
+        offs = [o for os in side.offsets for o in os]
+        if not offs:
+            continue
+        total += 1
+        conflicted += bool(side.depth.conflicts)
+        # Below the locals is where outgoing arguments go; only these three are impossible.
+        if any(0 <= o < 4 or o >= 4 + side.fpo.params for o in offs):
+            bad.append(address)
+    print(f"{total - len(bad)}/{total} functions place every frame access on a local, a parameter "
+          f"or an outgoing argument; {conflicted} have a join reached at two depths")
+    for address in bad[:20]:
+        print(f"  {address:#x}")
+    return 0
+
 
 def verify_one(row) -> tuple[str, str]:
     address = int(row["address"], 16)
@@ -466,13 +757,17 @@ def main() -> None:
     ap.add_argument("--sym", help="substring of the mangled name, if the annotation can't be used")
     ap.add_argument("--verify-all", action="store_true",
                     help="check that /Z7 leaves every matched function's code bytes alone")
+    ap.add_argument("--self-test", action="store_true",
+                    help="check the stack-depth tracking against every function of the original")
     ap.add_argument("--jobs", type=int, default=8, help="parallel compiles for --verify-all")
     args = ap.parse_args()
 
     if args.verify_all:
         sys.exit(verify_all(args.jobs))
+    if args.self_test:
+        sys.exit(self_test())
     if not args.address:
-        ap.error("an address is required unless --verify-all is given")
+        ap.error("an address is required unless --verify-all or --self-test is given")
     address = int(args.address, 16)
     src = args.source or find_source(address)
     if src is None:
