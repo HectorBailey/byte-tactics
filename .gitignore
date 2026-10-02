@@ -16,3 +16,5 @@ __pycache__/
 
 # Compiler listings (/Fa) from agents; never part of the source.
 src/**/*.asm
+
+.opencode/
