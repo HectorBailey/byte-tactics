@@ -121,6 +121,66 @@ What's left is mostly the harder, larger functions.
   reputation, to decide who gets which issues. If a plan is flat-rate rather
   than per token, match rate is the number that matters.
 
+## Grouping retries by family
+
+`tools/record.py --escalate retry` builds its issue from the functions **this
+pull request** left unmatched. That is the right set to escalate, but it is the
+wrong set to *group* by, because near-copies of the same function are usually
+spread over several pull requests.
+
+Two cases from 2026-10-02, both in #4609 to #4751:
+
+- The 18 `vector<int>::insert` copies came out as four separate issues. Two
+  workers were given 0x425210 and 0x46e640 at the same time, both at 99.6%, both
+  stuck on one swapped SIB byte, and each spent a full pass reaching the same
+  conclusion: that a two-register `lea` ignores source operand order, so the
+  residual is not reachable by respelling the source. That conclusion is worth
+  having once. It was paid for twice.
+- The reverse also happens. #4746 grouped 0x438ea0 with 0x4c3e40, which share
+  no code and no class (`tools/unitmap.py --at` reports `no unit` for both), so
+  the issue gave one worker two unrelated cold starts and put the two functions
+  out of reach of anyone who wanted just one of them.
+
+Grouping does not guarantee a win. #4381 is the counterexample: the shape that
+took 0x4c1000 from 91.4% to 97.1% made 0x4c0820 *worse*, 93.6% against 99.5%,
+because the function-scope `b` already owns the stack slot the fix was trying to
+free. Grouping makes that visible sooner, which is the point, but a shared
+method name is a hint that shapes resemble, not a promise.
+
+### Finding the family
+
+The method name in `data/symbols.csv` is enough, and it groups cleanly:
+
+```
+     19  vector::_Destroy
+     18  vector::insert
+     13  vector::_Ucopy
+     12  vector::size
+     10  vector::_Ufill
+      8  vector::erase
+```
+
+Take the method after `?$vector::`, or the last `::`/`.` component, and keep the
+functions that are still `kind == game` in `data/functions.csv`. Where the class
+prefix carries the element type (`PAVClass_004c2ea0`, `VClass_00489260`),
+separate `vector<int>::insert` from `vector<Unit>::insert`; where it does not,
+the method-name group is still better than nothing.
+
+```sh
+# after record.py --escalate retry, for anything it just retried
+uv run tools/issues.py --addresses <family members still unmatched> \
+    --title "Retry: <n> <method> functions" --label near-miss --open \
+    --note "Same <method> shape as #<issue>. A fix in one is likely to transfer, \
+though not guaranteed: check which local already owns the stack slot before \
+copying a sibling's shape. Read the siblings' files under src/unsorted/ first."
+```
+
+`tools/issues.py` already refuses to hand out a function that is in an open
+issue, listed in `data/attempts.csv` or annotated under `src/`, so the extra
+addresses cannot collide with an issue that already exists. The note matters:
+agents cannot see the family from inside their own worktree, because
+`tools/unitmap.py` reports `no unit` for every one of these unmatched functions.
+
 ## The orchestrator's loop
 
 Run from the main checkout, on `main`:
@@ -153,12 +213,20 @@ Run from the main checkout, on `main`:
      included, so every model's leftovers are escalated this way.
    - `uv run tools/progress.py`
    - `uv run tools/calibration.py`
+   - **Group the retry by family.** `--escalate retry` only sees the functions
+     this pull request left unmatched, which splits near-copies across issues
+     and makes agents re-derive the same conclusion once per function. After
+     it has run, look for the family members of anything just retried and, if
+     any are unmatched and not already in an open issue, put them in the same
+     issue with `tools/issues.py --addresses <the family members> --note "..."`
+     (see [Grouping retries by family](#grouping-retries-by-family)).
 
    Add any suspected original bugs to `docs/bugs.md` and new techniques to
    `docs/agent-guide.md`, commit and push.
 4. **Clean up what was left.** Everything left unmatched goes back out as a
    retry that any model may take; since 2026-10-01 no issue is reserved for
-   one model (the old `claude` label is gone).
+   one model (the old `claude` label is gone). Group near-copies together when
+   you do, for the reason in step 3.
 5. **Fix bad matches too.** A cheap model's file can match and still be wrong
    in other ways: `__fastcall` free functions, hand-stored vtables, invented
    names. The orchestrator fixes those during review, or with a subagent,
