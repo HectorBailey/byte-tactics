@@ -1,6 +1,43 @@
 // Decompiled by deepseek-v4.1-flash, finished by claude-opus-5-5. Names are provisional.
+//
+// Partial (claude-opus-5-5, #4288): rewritten from scratch, 28.0% -> 63.3%,
+// 8932 of 8944 bytes. With [esp+N] masked it scores 92%, with registers masked
+// too 96%, so what is left is mostly the frame slot order.
+//
+// The lookups are the real helpers next door (0x44fdb0 .. 0x450910). MSVC 5
+// inlines a helper at most until a size budget runs out, so the same
+// FindPlayerIndex shows up inlined with GetPlayerId inlined, inlined with
+// GetPlayerId called (FUN_0044ffd0), or called (FUN_0044fe40). The helpers
+// below spell out each variant; defining the real helpers and letting the
+// budget decide got the mix wrong (57.5%).
+//
+// Shape facts that each moved the score:
+//  - `int target = FindPlayerIndex(..)` (not unsigned char): the original
+//    spills the byte result and reloads it with `and 0xff` (43 -> 58).
+//  - InGame(p) as one helper: written as `!IsValid(p) || p->index == 10` the
+//    kick block gets sunk to the loop latch and every FUN_00453010 call in
+//    the function is tail-merged into it.
+//  - FUN_00450030 (HostId) must be a real function, not a static inline:
+//    only then do its two returns join before the call.
+//  - FUN_00453010's second parameter is an int (0x454eb3 zero-extends the
+//    byte before pushing it); 0x453010.cpp matches with either type.
+//
+// Frame slot order (the remaining ~30 points), found with scratch builds:
+// with more than 32 scalar locals MSVC 5 orders the slots by running the CRT
+// quicksort (pivot lo + (n-1)/2) with a comparator that never returns 0 over
+// the locals in IR first-reference order, then assigns them bottom-up;
+// arrays go on top, largest highest. Up to 32 locals it is simply reverse
+// IR order. Weights and names do not matter. That model reproduces scratch
+// functions exactly but not this one, so some locals here must have keys
+// that differ (in the original every inlined FindPlayerIndex result sits in
+// one band at 0x3c..0x78 below all loop counters; ours interleave them).
+//
+// Also still open: packet ([esp+0x10]) is never kept in a register in the
+// original, even with ebp free (case 35), while ours caches it in some cases;
+// case 24's InfoPacket stores and case 38's memcpy load order.
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #pragma pack(push, 1)
 
@@ -190,7 +227,7 @@ void FUN_00446fb0();
 int __stdcall FUN_0044ffd0(unsigned char);
 unsigned char __stdcall FUN_0044fe40(int);
 int __stdcall FUN_00450a10(int);
-int __stdcall FUN_00453010(int, unsigned char);
+int __stdcall FUN_00453010(int, int);
 void __stdcall FUN_00451090(char*, int*, int*, int*, int*);
 void __stdcall FUN_004c9890(void*, char*, char*, int, int, int, int);
 void __stdcall FUN_004565a0(void*);
