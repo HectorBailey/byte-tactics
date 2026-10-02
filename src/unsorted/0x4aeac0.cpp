@@ -1,4 +1,24 @@
-// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by space-bunny-free, edited by deepseek-v4.1, finished by GPT-6.1-sol. Names are provisional.
+// Decompiled by space-bunny-free, finished by deepseek-v4.1-flash, finished by space-bunny-free, edited by deepseek-v4.1, finished by GPT-6.1-sol, finished by DeepSeek V4.1 Flash. Names are provisional.
+// Sixth pass (DeepSeek V4.1 Flash, ten-minute box): best kept is the probe at
+// 86.4 % (736 bytes) with the probe written `e->body.total = (short)i;`, which
+// scores one diff line better than the `nuttin = i` dword probe (86.2 %).
+// Case 6 is a 1-bit bitfield assignment: 0x4ae410 (matched) shows the idiom
+// `int value = FUN_004c46c0(...); obj->hotornot = value;` compiling to exactly
+// the original's `mov ecx,field / xor eax,ecx / and eax,1 / xor eax,ecx`, and
+// the original's case 6 here is that same shape. Declaring Sub6.hotornot as
+// `unsigned int : 1` and assigning through a local does load the field after
+// the call (as the original does) but emits one extra `mov edx,ecx` and shifts
+// the function to 740 bytes (81.5 %), so the register tie is downstream of the
+// latch allocation and does not snap on its own.
+// New loop probes, all still worse: a `for` header with a real (even provably
+// always true) condition gives ONE shared latch but keeps a `cmp esi,-1 / jb`
+// test in it (740 to 744 bytes, 81.1 %); a goto-built loop rotates (756 bytes,
+// 74.6 %); a bitfield self-assign at the latch shrinks the function to 720
+// bytes (60 %). The `while (1)` shape below is still the only one with the
+// original's top-tested guard and no test, and its 6-instruction latch is
+// still copied into every case. A 3-minute permuter run (3271 candidates)
+// found no improvement over 86.4 %.
+//
 // Retry (deepseek-v4.1-flash, ten-minute box): naming the case 6 call result
 // in a local (int hot = FUN_004c46c0("hotornot", 0); x = ((hot ^ x) & 1) ^ x;)
 // regresses 86.2 to 81.5 % (740 bytes), so the statement boundary does not
@@ -365,11 +385,7 @@ int __stdcall FUN_004aeac0(Elem_004aeac0* obj, char* name)
                 e->body.nuttin = parser.current->FUN_004c46c0("nuttin", 0);
                 break;
             }
-            e->body.nuttin = i; // PROBE, not in the original: a seventh latch
-                                // instruction that stops the tail-duplication
-                                // pass (see the note at the top of the file).
-                                // Remove it once the genuine seventh (later
-                                // removed) instruction is found.
+            e->body.total = (short)i; // PROBE, not in the original (see top note)
             i++;
         }
         obj->body.total = (short)(i - 1);
