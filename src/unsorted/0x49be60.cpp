@@ -1,4 +1,32 @@
-// Decompiled by deepseek-v4.1, finished by deepseek-v4.1-flash, edited by claude-sonnet-5-5, finished by claude-opus-5-5. Names are provisional.
+// Decompiled by deepseek-v4.1, finished by deepseek-v4.1-flash, edited by claude-sonnet-5-5, finished by claude-opus-5-5, finished by Fledge Alpha Free. Names are provisional.
+// Fledge Alpha Free next pass (issue 4859, 2026-10-02): tried the fresh
+// angles: kind-7's counted `for (i = n; i != 0; i = i - 1)` loop (87.3),
+// prev-after-advance reordering (85.5), y/z advance swap (86.5), d.x/d.y/d.z
+// statement and divide reorderings (82.0/81.4), `sp = pt = *start;` (inert),
+// explicit prev.x/y/z field copies (inert), do-while outer loop (inert),
+// kind-7 Vec3 locals wrapped in brace scope (inert), comma-expression jitter
+// (inert), self-assignments (inert), int instead of unsigned colour locals
+// (inert). The shared-colour1 arm spelling scores 83.0 with arms' tails now
+// merged, but it still swaps colour1/colour2 slots (+0x00/+0x10), which
+// reschedules registers across kinds 1-6; slot-order tricks (declaration and
+// initialisation reordering, int vs unsigned) do not flip it back. Kind-7's
+// loop-top temp rotation (edx/ecx/eax vs ecx/eax/edx) is consistent through
+// loop top, inner reload and jitter; every spelled reorder is inert or worse.
+// Best remains 87.5% / 2308 bytes / 93.2% shape ignoring jump targets.
+// Fledge Alpha Free (issue 4859, 2026-10-02): still 87.5% / 2308 bytes /
+// shape 93.2%. Two propose.py rounds (20 variants) over the handoff ideas:
+// scrollX/scrollY through short or int locals in kind 0/kind 7 (worse,
+// 69.6%/55.9%), hoisted n64 into kind-7 scope (compile error, the __int64
+// must stay function-scope), x1/x2/y1/y2 declaration order (inert),
+// while(1) outer loop (inert), reversed jitter writes (worse, 85.8%),
+// prev/pt reads via (short)(pt.z >> 16) field access (27.7%),
+// pt.x += (j << 16) jitter shape (50.5%), a pp/pv/ps pointer-copy of
+// pt/prev/sp in the inner loop (inert), PT as the accumulator with sp
+// dropped from kind 7 (82.9%), and v4-collapsed locals for the kind-7
+// draw call (inert). Exactly inert so far: v4,v6,v7,v8,v11,v19.
+// Conclusion: the residue is still the back-end tie noted below (kind-7
+// register rotation, kind-0 tail merge, frame 2308 vs 2272); no
+// front-end spelling tried moves it.
 // PARTIAL (claude-opus-5-5, 2026-10-02): 83.0% -> 87.5%. Four fixes, the first
 // three read off the original's frame:
 //  (1) kind 7's dx/dy/dz are ONE Vec3 local `d` (the original keeps them at
