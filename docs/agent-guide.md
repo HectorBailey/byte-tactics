@@ -230,6 +230,16 @@ matched 0x4ac970, 0x4be400 and 0x4b3770 in under a minute each, after many
 attempts by hand. `docs/permuter.md` has the options and how to read the
 output.
 
+**When the diff is stack slots, name them first.** `uv run tools/stackcmp.py
+<addr>` compiles the file once more with `/Z7` (which leaves the code bytes
+alone; checked across the matched set), reads each local's frame offset from
+CodeView, and aligns our instructions with the original's to show which of our
+slots the original puts somewhere else. Its last line is a `--stack` list for
+the permuter, the locals whose slot is wrong, and `uv run tools/permute.py
+<addr> --stack <names>` aims its declaration moves at them. A local reported
+`unused` (no direct `[esp + N]` access) or an original slot no local of ours
+reaches usually means a missing or extra local, not an ordering problem.
+
 Cavedog wrote many small helper functions and methods, and `/Ob2` inlined
 them. An inlined function boundary changes the order MSVC evaluates things in
 and which registers it keeps values in, so when source-level shuffling has no

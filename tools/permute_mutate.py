@@ -527,6 +527,7 @@ class TargetSpec:
     address: int
     symbol: str | None = None              # explicit symbol from the annotation
     helpers: list[str] = field(default_factory=list)   # names of inline helpers
+    stack_names: set[str] = field(default_factory=set)  # locals stackcmp.py flags as wrong
 
 
 def find_targets(root: Node, text: str, spec: TargetSpec) -> tuple[list[tuple[Node, str | None]], str]:
@@ -1535,6 +1536,19 @@ def region_edit(ctx: Ctx, stmts: list[Node], lo: int, hi: int, order: list[int])
     return (stmts[lo].start_byte, stmts[hi].end_byte, out)
 
 
+def _declarator_name(ctx: Ctx, n: Node) -> str | None:
+    if n.type in ("identifier", "field_identifier"):
+        return ctx.T(n)
+    child = n.child_by_field_name("declarator")
+    if child is not None:
+        return _declarator_name(ctx, child)
+    return next((ctx.T(c) for c in n.named_children if c.type == "identifier"), None)
+
+
+def declared_names(ctx: Ctx, node: Node) -> set[str]:
+    return {n for d in node.children_by_field_name("declarator") if (n := _declarator_name(ctx, d))}
+
+
 def m_move_decl(ctx: Ctx):
     """Move a declaration up or down past statements it does not depend on
     (MSVC 5 hands out stack slots in declaration order)."""
@@ -1543,6 +1557,10 @@ def m_move_decl(ctx: Ctx):
         return None
     f, b, stmts = ctx.pick(blocks)
     idx = [i for i, s in enumerate(stmts) if s.type == "declaration"]
+    if ctx.spec.stack_names:
+        wanted = [i for i in idx if declared_names(ctx, stmts[i]) & ctx.spec.stack_names]
+        if wanted:
+            idx = wanted
     i = idx[ctx.pick_index([stmts[k] for k in idx])]
     # prefer moving among the other declarations
     targets = [j for j in idx if j != i] or [j for j in range(len(stmts)) if j != i]
