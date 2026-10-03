@@ -1,4 +1,12 @@
-// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, finished by GPT-6, finished by deepseek-v4.1-flash, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash, finished by GPT-6, finished by deepseek-v4.1-flash, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by fledge-alpha-free. Names are provisional.
+// fledge-alpha-free (2026-10-03): re-verified 60.8% / 1533 bytes and retried
+// tail assignment orders (bit order 59.9%, prologue-store order 56.9%, both
+// worse) and an extra named zero local for the else-branch first/count stores
+// (33.0%, 0x244 frame). No lever found; residuals unchanged: ESI/EBP zero
+// split (opens with test ax,ax vs original xor esi,esi / cmp ax,si), prologue
+// first=0/count=0 stores forcing first=0x10 (original sinks them to the else
+// at 0x1c/0x20), and the tail cloak/onOff bit writes accumulating in EAX/EDX
+// instead of EBX/EDX.
 // #4099 deepseek-v4.1-flash (10 min): flat at 60.8% / 1533 bytes. Swapping the
 // cloak and u declaration order (onOff, cloak, u) is byte-identical, so the
 // first=0x10 / cloak=0x14 / onOff=0x18 slot map is not steered by that pair.
