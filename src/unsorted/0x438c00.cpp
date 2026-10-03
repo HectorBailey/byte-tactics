@@ -355,7 +355,6 @@
 // pos components and the index are first read, or the fact that ours reads
 // pos.y through `order` (the original reads it through a pointer to pos).
 #include <stdlib.h>
-#include <memory.h>
 
 #pragma pack(push, 1)
 struct Fixed_00438c00 {
@@ -491,18 +490,29 @@ void __stdcall FUN_004be950(void* surface, int x0, int y0, int x1, int y1, int c
 // `order` parameter is ignored by VC5 (52.2% unchanged), and wrapping the whole
 // body in a positive `if (order->type != 0) { ... }` block instead of the early
 // return is byte-identical at 52.2%, so neither steers the entry ecx/edx choice.
+static inline unsigned short* inl4(Boxq_00438c00 world) { unsigned short* ret0 = &world.hi.x.frac;
+return ret0; }
+
+static inline Vec3f_00438c00* inl0(Order_00438c00*order) { return &order->pos; }
+
+static inline bool inl1(char*pbase) { return ((*(Unit_00438c00**)(pbase - 0x14))->flags.flags & 0x10) != 0; }
+
+static inline int inl2(UnitType_00438c00*def) { return *(int*)&def->bounds.lo.y.frac; }
+
 // FUNCTION: 0x438c00
 void __stdcall FUN_00438c00(void* surface, View_00438c00* view, Order_00438c00* order,
                             Vec3f_00438c00* out, int unused)
 {
+    unsigned char tmp10;
     unsigned short index = order->type;
-    if (index == 0)
-        return;
+    if (order->type == 0) {
+        do return; while (0);
+    }
 
-    UnitType_00438c00* def = g_game->types + index;
+    UnitType_00438c00* def = (*(&g_game))->types + index;
 
-    int px = *(int*)&order->pos.x.frac;
-    int pz = *(int*)&order->pos.z.frac;
+    Boxq_00438c00 world;
+    int px = *((int*)&order->pos.x.frac);
     // The whole lever of this pass. `pbase` is &order->pos, so pos.y is
     // pbase+4, order->timestamp (order+0x46) is pbase+0x24 and order->owner
     // (order+0xe) is pbase-0x14. Reaching all three through it leaves `order`
@@ -511,58 +521,63 @@ void __stdcall FUN_00438c00(void* surface, View_00438c00* view, Order_00438c00* 
     // instructions and never enregisters it again. Ours used to hold it in ECX
     // from the entry to the colour test, and that one register is what the
     // whole downstream cascade came from.
-    char* const pbase = (char*)&order->pos;
-    int py = *(int*)(pbase + 4);
+    char* const pbase = (char*)inl0(order);
+    unsigned char color2;
+    int tmp2 = *(int*)&order->pos.z.frac, pz = tmp2, dz, az, py, sx, ty;
+    py = *(int*)(pbase + 4);
 
-    Boxq_00438c00 world;
-    *(int*)&world.lo.x.frac = px + *(int*)&def->bounds.lo.x.frac;
-    *(int*)&world.lo.y.frac = py + *(int*)&def->bounds.lo.y.frac;
+    *(int*)&world.lo.x.frac = *((int*)&def->bounds.lo.x.frac) + (*((int*)&order->pos.x.frac));
+    *(int*)&world.lo.y.frac = inl2(def) + py;
     *(int*)&world.lo.z.frac = pz + *(int*)&def->bounds.lo.z.frac;
-    *(int*)&world.hi.x.frac = px + *(int*)&def->bounds.hi.x.frac;
-    *(int*)&world.hi.z.frac = pz + *(int*)&def->bounds.hi.z.frac;
-
-    int half = world.lo.y.whole >> 1;
-    int sy = view->scroll_y;
-    int sx = view->scroll_x;
-    int az = world.lo.z.whole - half - sy + 0x20;
-    int bz = world.hi.z.whole - half - sy + 0x20;
-    int ax = world.lo.x.whole - sx + 0x80;
-    int bx = world.hi.x.whole - sx + 0x80;
+    *(int*)inl4(world) = (*((int*)&def->bounds.hi.x.frac)) + px;
+    *(int*)&world.hi.z.frac = pz + (*((int*)&def->bounds.hi.z.frac));
+    int dx;
+    int half = world.lo.y.whole >> 1, tmp4, level;
+    tmp4 = view->scroll_y;
+    az = 0x20 + (world.lo.z.whole - half - view->scroll_y);
 
     // The cast and the lack of a `delta` local are both needed: with either
     // one alone MSVC value-numbers the two __max subtrees of the __min macro
     // and emits a single evaluation, with a conditional store instead of the
     // original's recomputation in the taken arm.
-    int level = __min(__max((unsigned)(g_game->ticks - *(int*)(pbase + 0x24)), 0), 10);
+    sx = view->scroll_x;
     // dz before dx, not the other way round: the original runs the vertical
     // division first (0x438d15, off EDI and ESI) and the horizontal one second
     // (0x438d07 is the `sub ecx, ebp`, but the `imul ecx` at 0x438d0e follows
     // the vertical `mov ecx, edi`). Worth 0.2 and it is the only part of
     // tools/permute.py's output worth keeping: it also introduced a named
     // single-use temporary for `bx`, which is worth nothing (58.1 either way).
-    int dz = ((bz - az) * level) / 10;
-    int dx = ((bx - ax) * level) / 10;
-    int ty = az + dz;
-    int by = bz - dz;
+    int tmp11 = az - 1, tmp9 = (world.hi.z.whole - half) - (*(&tmp4));
+    int bz = tmp9 + 0x20;
+    int ax = 0x80 + (world.lo.x.whole - sx);
+    int bx = (world.hi.x.whole - sx) + 0x80;
+    level = __min(__max((unsigned)(g_game->ticks - *(int*)(pbase + 0x24)), 0), 10);
+    int tmp1 = (level * (bz - az)) / 10;
 
+    dz = tmp1;
     unsigned char color1;
-    unsigned char color2;
-    if (((*(Unit_00438c00**)(pbase - 0x14))->flags.flags & 0x10) != 0) {
-        color1 = g_game->color_dce;
+    dx = ((((int)bx) - ax) * level) / 10;
+    int by = bz - ((level * (bz - az)) / 10);
+
+    ty = az + dz;
+    if (inl1(pbase)) {
+        tmp10 = g_game->color_dce;
+        color1 = tmp10;
         color2 = g_game->color_dd5;
     } else {
         color1 = g_game->color_dcc;
-        color2 = g_game->color_dd4;
+            color2 = g_game->color_dd4;
     }
-
-    FUN_004be950(surface, (ax + dx) - 1, az - 1, (ax + dx) - 1, bz + 1, color1);
-    FUN_004be950(surface, (bx - dx) + 1, az - 1, (bx - dx) + 1, bz + 1, color1);
+    FUN_004be950(surface, (ax + dx) - 1, tmp11, (dx + ax) - 1, 1 + bz, color1);
+    FUN_004be950(surface, (bx - dx) + 1, az - 1, (bx - dx) + 1, 1 + bz, color1);
     FUN_004be950(surface, ax - 1, ty - 1, bx + 1, ty - 1, color1);
-    FUN_004be950(surface, ax - 1, by + 1, bx + 1, by + 1, color1);
-    FUN_004be950(surface, (ax + dx), az, (ax + dx), bz, color2);
-    FUN_004be950(surface, (bx - dx), az, (bx - dx), bz, color2);
+    FUN_004be950(surface, ax - 1, (bz - (((bz - az) * level) / 10)) + 1, bx + 1, by + 1, color1);
+    FUN_004be950(surface, ((int)ax) + dx, az, dx + ax, bz, color2);
+    int tmp8 = bx - dx, tmp6;
+    tmp6 = tmp8;
+    FUN_004be950(surface, bx - dx, az, tmp6, bz, color2);
     FUN_004be950(surface, ax, ty, bx, ty, color2);
-    FUN_004be950(surface, ax, by, bx, by, color2);
+        FUN_004be950(surface, ax, (bz - (((bz - az) * level) / 10)), bx, by, color2);
 
     *out = order->pos;
 }
