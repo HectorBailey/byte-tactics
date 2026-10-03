@@ -1,4 +1,4 @@
-// Decompiled by space-bunny-free, finished by GPT-6, deepseek-v4.1-flash, and GPT-6.1-sol. edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by deepseek-v4.1-flash, finished by deepseek-v4.1-flash, finished by Space Bunny Free, finished by claude-opus-5-5. Names are provisional.
+// Decompiled by space-bunny-free, finished by GPT-6, deepseek-v4.1-flash, and GPT-6.1-sol. edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by deepseek-v4.1-flash, finished by deepseek-v4.1-flash, finished by Space Bunny Free, finished by claude-opus-5-5, finished by DeepSeek V4.1 Flash. Names are provisional.
 //
 // Partial, 87.6% at exactly 1506 bytes (issue #4863 took it from 82.2%).
 //
@@ -49,6 +49,25 @@
 //   field_1427f`, so the sprite is drawn when the unit is off the ground OR
 //   in view range, which reads as if it should be AND. Both halves have it.
 //   Also `v.v[1] = pos_y` is a plain copy where x and z are deltas.
+//
+// DeepSeek V4.1 Flash retry (#4924): no gain, 87.6% kept. Swept all 36
+// prologue combinations (cv copy order x v mutation order); only the
+// existing x,z,y / y,x,z pair reaches 87.6, and forcing v.x or v.z through
+// an int local, `cv = v`, `Vec3 cv = v;`, memcpy and an owner pointer all
+// stay byte-identical or lose. The g_game hoist cannot be broken: reading
+// the flags through a Game* local, a reference, a field pointer, an
+// unsigned short local, or a function-scope local is byte-identical, and
+// the bitfield spelling loses 6 points. The b30 arm and the inner b3 arm
+// were re-swept with bias/bitmap locals, `diff + shade_bias` in both
+// orders, and a direct call argument: byte-identical. The unit_has_altitude
+// helper was swept (short/int/unsigned char/unsigned short returns, with
+// and without its short local, Model* argument): the current bool-with-local
+// form is the only one that keeps the second half's register rotation, and
+// inlining the test gives the right `cmp word [ecx+0xa6],0` but drops to
+// 73.9%. tools/permute.py (2 runs, 3 minutes each, seeds 0 and 11, 3880
+// candidates) found nothing above 87.6, and tools/headers.py (256 sets) is
+// flat. The remaining diff is the prologue's v.x/v.z register tie, the
+// merged g_game load, and the two second-half arm rotations.
 #include <string.h>
 #include <stdio.h>
 struct Vec3;
