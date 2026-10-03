@@ -1,4 +1,4 @@
-// Decompiled by GPT-5.6 Astra, finished by deepseek-v4.1-flash; verified by GPT-6.1-sol, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by GPT-5.6 Astra, finished by deepseek-v4.1-flash; verified by GPT-6.1-sol, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by deepseek-v4.1-flash, finished by fledge-alpha-free. Names are provisional.
 // deepseek-v4.1-flash retry session 7 (TIMEBOX): 55.5%, 2203 bytes, unchanged.
 // deepseek-v4.1-flash retry session 8 (TIMEBOX): 55.5%, 2203 bytes, unchanged.
 // deepseek-v4.1-flash retry session 10 (TIMEBOX): 55.5%, 2203 bytes, unchanged.
@@ -222,6 +222,7 @@
 // esp+0x14) and baseX must precede baseY at esp+0x38/0x3c; ours keeps p at
 // esp+0x10 and y at esp+0x34. Everything from esp+0x50 up already matches.
 
+#include <math.h>
 #include <stdlib.h>
 // SHARED begin
 struct Point { int x,y; };
@@ -265,129 +266,185 @@ static inline Point Screen(int x,int y,unsigned char h)
 }
 // SHARED end
 
+static inline int inl1(Game*tmp9) { return tmp9->width-1; }
+
 // FUNCTION: 0x418310
 void __stdcall FUN_00418310(void* surface)
 {
 // REGION r1 begin   0x418310-0x418417
 //   prologue, early-out, mode 1 lookup, loop setup, the eight hoisted invariants
-    if (!g_game->mode && !DAT_00511dd0) return;
-    Movement* movement=0;
-    Player* player=&g_game->players[g_game->playerIndex];
-    if (g_game->mode==1) {
-        Unit* unit=FUN_0048c190(0,0);
-        if (unit) movement=unit->def->movement;
+    int cy, offscreen;
+    int tmp10, tmp7;
+    Game* tmp9, * tmp3;
+    PathCell* cell;
+    int cx;
+    unsigned short tmp0;
+    int tmp1, x;
+    unsigned int state;
+    if (0 == g_game->mode && !((DAT_00511dd0 != 0) != 0)) return;
+    Movement* movement = 0;
+    Player* player = &g_game->players[g_game->playerIndex];
+    int firstY;
+    if (g_game->mode == 1) {
+        Unit* unit = FUN_0048c190(0,0);
+        if (0 != unit) movement=unit->def->movement;
     }
-    int firstY=g_game->scrollY/16;
-    int firstX=g_game->scrollX/16;
-    int lastX=g_game->viewWidth+firstX+1;
-    if (lastX>=g_game->width-1) lastX=g_game->width-1;
-    int lastY=g_game->height-1;
-    unsigned char* colors=g_game->colors;
-    unsigned char arrowColor;
-    for (int y=firstY;y<lastY;++y) {
-// REGION r2 begin   0x418417-0x41862c
-//   the tile quad walk, the offscreen test and the mode dispatch
-        int offscreen=1;
-        Point p[4];
-        unsigned char heights[4];
-        for (int x=firstX;x<lastX;++x) {
-            Tile* tile=&g_game->tiles[x+y*g_game->width];
-            heights[0]=tile->height;
-            p[0].x=(x+8)*16-g_game->scrollX;
-            p[0].y=(y+2)*16-(heights[0]>>1)-g_game->scrollY;
-            ++tile; ++x;
-            heights[1]=tile->height;
-            p[1].x=(x+8)*16-g_game->scrollX;
-            p[1].y=(y+2)*16-(heights[1]>>1)-g_game->scrollY;
-            tile+=g_game->width; ++y;
-            heights[2]=tile->height;
-            p[2].x=(x+8)*16-g_game->scrollX;
-            p[2].y=(y+2)*16-(heights[2]>>1)-g_game->scrollY;
-            --tile; --x;
-            heights[3]=tile->height;
-            p[3].x=(x+8)*16-g_game->scrollX;
-            p[3].y=(y+2)*16-(heights[3]>>1)-g_game->scrollY;
-            tile-=g_game->width; --y;
-            if (p[0].y<g_game->bottom) offscreen=0;
-            if (g_game->mode==1) {
-// REGION r3 begin   0x41862c-0x41882a  the mode 1 body
-                if (movement) {
-                    unsigned int state=(movement->states[x+(y>>4)*movement->width]>>((y&15)*2))&3;
-                    if (state<3) {
-                        unsigned char color=colors[DAT_004fcc68[state]];
-                        FUN_004be950(surface,p[0].x,p[0].y,p[2].x,p[2].y,color);
-                        FUN_004be950(surface,p[1].x,p[1].y,p[3].x,p[3].y,color);
+    firstY = g_game->scrollY/16;
+    int firstX = (*(&g_game->scrollX))/16;
+    int lastX = 1+((*(&g_game))->viewWidth+((int)((*(&g_game->scrollX))/16)));
+    if (lastX >= (*(&g_game->width))-1) { 
+    tmp9 = *(&g_game);
+    tmp7 = inl1((Game*)tmp9);
+    lastX=tmp7; }
+    unsigned char* colors, arrowColor;
+    int lastY = g_game->height-1;
+    int y = ((int)firstY);
+    colors = g_game->colors;
+    colors = colors;
+    if (y < lastY) {
+        while (1) {
+    // REGION r2 begin   0x418417-0x41862c
+    //   the tile quad walk, the offscreen test and the mode dispatch
+            Point p[4];
+            unsigned char heights[4];
+            offscreen = 1;
+            x = firstX;
+            if (x < ((int)lastX)) {
+                while (1) {
+                    Tile* tile = &g_game->tiles[x+y*g_game->width];
+                    heights[0]=tile->height;
+                    tmp1 = (8+x)*16;
+                    p[0].x=tmp1-g_game->scrollX;
+                    tile = tile + 1;
+                    p[0].y=((2+y)*16-(heights[0]>>1))-g_game->scrollY; 
+                    x = ((int)x) + 1;
+                    heights[1]=tile->height;
+                    p[1].x=16*(((int)x)+8)-g_game->scrollX;
+                    tmp3 = g_game;
+                    p[1].y=16*(((int)y)+2)-(heights[1]>>1)-tmp3->scrollY;
+                    tile+=g_game->width;
+                    tile = tile;
+                    y = 1 + y;
+                    heights[2]=tile->height;
+                    tmp10 = (int)x;
+                    tmp10 = tmp10;
+                    p[2].x=16*(8+(tmp10))-g_game->scrollX;
+                    p[2].y=(16*(((int)y)+2))-(heights[2]>>1)-g_game->scrollY;
+                    tile = tile - 1; x = x - 1;
+                    heights[3]=tile->height;
+                    int tmp5 = 16*(2+((int)y))-(heights[3]>>1);
+                    p[3].x=16*(x+8)-(*(&g_game))->scrollX;
+                    tmp5 = ((int)tmp5);
+                    p[3].y=tmp5-g_game->scrollY;
+                    tile-=g_game->width; --y;
+                    if (p[0].y < (*(&g_game))->bottom) offscreen=0; else {
                     }
-                }
-                PathCell* cell=&g_game->paths->cells[x+y*g_game->paths->width];
-                if (cell->flags&4) {
-                    FUN_004c1420(g_game->font);
-                    FUN_004c13a0(rand()&255,FUN_004c13f0());
-                    FUN_004c14f0(surface,"G",p[0].x,p[0].y,-1);
-                }
-                if ((cell->flags&~4)!=0 && (cell->flags&~4)!=3) {
-                    int cx=p[0].x+8,cy=p[0].y+8;
-                    // Flags 5 and 6 pass this test without initializing the original color.
-                    switch(cell->flags) {
-                    case 1: arrowColor=colors[15]; break;
-                    case 2: arrowColor=colors[4]; break;
+                    if (1==g_game->mode) {
+        // REGION r3 begin   0x41862c-0x41882a  the mode 1 body
+                        if (((Movement*)movement)) {
+                            do {
+                                state = 3&(movement->states[x+movement->width*(((int)y)>>4)]>>((y&15)*2));
+                                if (state < 3) {
+                                    unsigned char* tmp8;
+                                    tmp8 = &DAT_004fcc68[state];
+                                    unsigned char color = colors[(*tmp8)];
+                                    do {
+                                        FUN_004be950(surface,p[0].x,p[0].y,p[2].x,p[2].y,color);
+                                        FUN_004be950((surface),p[1].x,p[1].y,p[3].x,p[3].y,color);
+                                    } while (0);
+                                }
+                            } while (0);
+                        }
+                        cell = &g_game->paths->cells[(x)+g_game->paths->width*((int)y)];
+                        if (((&g_game->paths->cells[(x)+g_game->paths->width*((int)y)])->flags&4)) {
+                            do FUN_004c1420(g_game->font); while (0);
+                                    FUN_004c13a0(rand()&255,FUN_004c13f0());
+                                    do FUN_004c14f0(surface,"G",p[0].x,p[0].y,-1); while (0);
+                        }
+                        if (0 != (~4&cell->flags) && 3!=(cell->flags&~4)) {
+                                            cx = 8+(*(&p[0].x));
+                                            cy = 8+p[0].y;
+                                            // Flags 5 and 6 pass this test without initializing the original color.
+                                            switch(cell->flags) {
+                                            case 1: arrowColor=colors[15]; break;
+                                            case 2: 
+                                            arrowColor=((*(&colors[4]))); break;
+                                            }
+                                            FUN_004be950(surface,(cx)-DAT_004fd670[cell->direction]*14,cy-DAT_004fd678[cell->direction]*14,cx,cy,arrowColor);
+                                            int direction;
+                                            direction = (cell->direction+1)&7;
+                                            FUN_004be950(surface,(cx)-DAT_004fd670[direction]*4,cy-DAT_004fd678[direction]*4,cx,cy,arrowColor);
+                                            direction=7&(cell->direction-1);
+                                            FUN_004be950(surface,((int)cx)-DAT_004fd670[direction]*4,(cy)-4*DAT_004fd678[(direction)],((int)cx),cy,arrowColor);
+                                        }
+        // REGION r3 end
+        // REGION r4 begin   0x41882a-0x418a20  the mode 2 body
+                    } else if (g_game->mode==2) {
+                        if (tile->height>g_game->seaLevel) {
+                            FUN_004be950(surface,p[0].x,p[0].y,p[1].x,p[1].y,colors[15]);
+                            FUN_004be950(surface,p[0].x,p[0].y,p[3].x,p[3].y,colors[15]);
+                        } else {
+                            FUN_004be950((void*)surface,p[0].x,p[0].y,p[1].x,p[1].y,colors[13]);
+                            FUN_004be950(surface,p[0].x,p[0].y,p[3].x,p[3].y,colors[13]);
+                        }
+                        tmp0 = tile->unit;
+                        if (0 != tmp0) FUN_004c0310(surface,p,4,(unsigned char)tile->unit); else { if (tile->object != 0xffff) FUN_004c0310(surface,p,4,(unsigned char)(tile->object-56)); }
+                        if (tile->feature != 0) {
+                            FUN_004be950((void*)surface,p[0].x,p[0].y,p[2].x,p[2].y,(unsigned char)tile->feature);
+                            do FUN_004be950(surface,p[1].x,p[1].y,p[3].x,p[3].y,(unsigned char)tile->feature); while (0);
+                        }
+                        if ((2&tile->flags)) {
+                            FUN_004be950(surface,(p[0].x+p[1].x)/2,(p[0].y+p[1].y)/2+2,(p[1].x+p[2].x)/2-2,(p[1].y+p[2].y)/2,colors[15]);
+                            FUN_004be950(surface,(p[1].x+p[2].x)/2-2,(p[1].y+p[2].y)/2,(p[2].x+p[3].x)/2,(p[2].y+p[3].y)/2-2,colors[15]);
+                            FUN_004be950(surface,(p[2].x+p[3].x)/2,(p[2].y+p[3].y)/2-2,2+(p[0].x+p[3].x)/2,(p[3].y+p[0].y)/2,colors[15]);
+                            FUN_004be950(surface,(p[3].x+p[0].x)/2+2,(p[3].y+p[0].y)/2,(p[1].x+p[0].x)/2,2+(p[0].y+p[1].y)/2,colors[15]);
+                        }
+        // REGION r4 end
+        // REGION r5 begin   0x418a20-0x418bab
+        //   the mode 3 and mode 4 bodies, the DAT_00511dd0 tail call, the offscreen
+        //   break and the epilogue
+                    } else if (g_game->mode==3) {
+                        if (tile->height > g_game->seaLevel) {
+                            FUN_004be950(surface,p[0].x,p[0].y,p[1].x,p[1].y,colors[15]);
+                                        FUN_004be950((void*)surface,p[0].x,p[0].y,p[3].x,p[3].y,colors[15]);
+                        } else {
+                            FUN_004be950(surface,p[0].x,p[0].y,p[1].x,p[1].y,colors[13]);
+                            FUN_004be950(surface,p[0].x,p[0].y,p[3].x,p[3].y,colors[13]);
+                        }
+                        FUN_004c1420(g_game->font);
+                        FUN_004c13a0(colors[15],FUN_004c13f0());
+                        char buffer[20];
+                        FUN_004c14f0((void*)surface,_itoa(tile->metal,buffer,10),p[0].x+2,2+p[0].y,-1);
+                    } else if (g_game->mode==4) {
+                        FUN_004be950((void*)surface,p[0].x,p[0].y,p[1].x,p[1].y,colors[0]);
+                        FUN_004be950(surface,p[0].x,p[0].y,p[3].x,p[3].y,colors[0]);
+                        if (player->fog[(((y/2)*player->fogWidth)+x/2)] != 0) {
+                            Rect r;
+                            int tmp6, tmp2;
+                            tmp6 = p[0].y;
+                            tmp2 = ((int)((tmp6))); 
+                            r.top=((((int)tmp2))-5);
+                            r.bottom=(p[0].y+5); 
+                            r.left=p[0].x-5; 
+                            r.right=5+p[0].x;
+                            FUN_004bf6f0(surface,&r,colors[15]);
+                        }
                     }
-                    FUN_004be950(surface,cx-DAT_004fd670[cell->direction]*14,cy-DAT_004fd678[cell->direction]*14,cx,cy,arrowColor);
-                    int direction=(cell->direction+1)&7;
-                    FUN_004be950(surface,cx-DAT_004fd670[direction]*4,cy-DAT_004fd678[direction]*4,cx,cy,arrowColor);
-                    direction=(cell->direction-1)&7;
-                    FUN_004be950(surface,cx-DAT_004fd670[direction]*4,cy-DAT_004fd678[direction]*4,cx,cy,arrowColor);
-                }
-// REGION r3 end
-// REGION r4 begin   0x41882a-0x418a20  the mode 2 body
-            } else if (g_game->mode==2) {
-                if (tile->height>g_game->seaLevel) {
-                    FUN_004be950(surface,p[0].x,p[0].y,p[1].x,p[1].y,colors[15]);
-                    FUN_004be950(surface,p[0].x,p[0].y,p[3].x,p[3].y,colors[15]);
-                } else {
-                    FUN_004be950(surface,p[0].x,p[0].y,p[1].x,p[1].y,colors[13]);
-                    FUN_004be950(surface,p[0].x,p[0].y,p[3].x,p[3].y,colors[13]);
-                }
-                if (tile->unit) FUN_004c0310(surface,p,4,(unsigned char)tile->unit);
-                else if (tile->object!=0xffff) FUN_004c0310(surface,p,4,(unsigned char)(tile->object-56));
-                if (tile->feature) {
-                    FUN_004be950(surface,p[0].x,p[0].y,p[2].x,p[2].y,(unsigned char)tile->feature);
-                    FUN_004be950(surface,p[1].x,p[1].y,p[3].x,p[3].y,(unsigned char)tile->feature);
-                }
-                if (tile->flags&2) {
-                    FUN_004be950(surface,(p[0].x+p[1].x)/2,(p[0].y+p[1].y)/2+2,(p[1].x+p[2].x)/2-2,(p[1].y+p[2].y)/2,colors[15]);
-                    FUN_004be950(surface,(p[1].x+p[2].x)/2-2,(p[1].y+p[2].y)/2,(p[2].x+p[3].x)/2,(p[2].y+p[3].y)/2-2,colors[15]);
-                    FUN_004be950(surface,(p[2].x+p[3].x)/2,(p[2].y+p[3].y)/2-2,(p[3].x+p[0].x)/2+2,(p[3].y+p[0].y)/2,colors[15]);
-                    FUN_004be950(surface,(p[3].x+p[0].x)/2+2,(p[3].y+p[0].y)/2,(p[0].x+p[1].x)/2,(p[0].y+p[1].y)/2+2,colors[15]);
-                }
-// REGION r4 end
-// REGION r5 begin   0x418a20-0x418bab
-//   the mode 3 and mode 4 bodies, the DAT_00511dd0 tail call, the offscreen
-//   break and the epilogue
-            } else if (g_game->mode==3) {
-                if (tile->height>g_game->seaLevel) {
-                    FUN_004be950(surface,p[0].x,p[0].y,p[1].x,p[1].y,colors[15]);
-                    FUN_004be950(surface,p[0].x,p[0].y,p[3].x,p[3].y,colors[15]);
-                } else {
-                    FUN_004be950(surface,p[0].x,p[0].y,p[1].x,p[1].y,colors[13]);
-                    FUN_004be950(surface,p[0].x,p[0].y,p[3].x,p[3].y,colors[13]);
-                }
-                FUN_004c1420(g_game->font);
-                FUN_004c13a0(colors[15],FUN_004c13f0());
-                char buffer[20];
-                FUN_004c14f0(surface,_itoa(tile->metal,buffer,10),p[0].x+2,p[0].y+2,-1);
-            } else if (g_game->mode==4) {
-                FUN_004be950(surface,p[0].x,p[0].y,p[1].x,p[1].y,colors[0]);
-                FUN_004be950(surface,p[0].x,p[0].y,p[3].x,p[3].y,colors[0]);
-                if (player->fog[(y/2)*player->fogWidth+x/2]) {
-                    Rect r;
-                    r.left=p[0].x-5; r.right=p[0].x+5; r.top=p[0].y-5; r.bottom=p[0].y+5;
-                    FUN_004bf6f0(surface,&r,colors[15]);
+                    if (DAT_00511dd0 != 0) FUN_004181d0(((void*)surface),p,heights);
+                    x = x + 1;
+                    if (x >= lastX)
+                        break;
                 }
             }
-            if (DAT_00511dd0) FUN_004181d0(surface,p,heights);
+            if (offscreen) break;
+            int same0;
+            ++y;
+            same0 = y;
+            same0 = same0;
+            y = same0;
+            if (y >= lastY)
+                break;
         }
-        if (offscreen) break;
     }
 // REGION r5 end
 // REGION r2 end
