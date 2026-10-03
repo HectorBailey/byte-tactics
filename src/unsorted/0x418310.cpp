@@ -356,12 +356,13 @@ void __stdcall FUN_00418310(void* surface)
                             } while (0);
                         }
                         cell = &g_game->paths->cells[(x)+g_game->paths->width*((int)y)];
-                        if (((&g_game->paths->cells[(x)+g_game->paths->width*((int)y)])->flags&4)) {
+                        if ((&g_game->paths->cells[(x)+g_game->paths->width*((int)y)])->flags&4) {
                             do FUN_004c1420(g_game->font); while (0);
                                     FUN_004c13a0(rand()&255,FUN_004c13f0());
                                     do FUN_004c14f0(surface,"G",p[0].x,p[0].y,-1); while (0);
                         }
-                        if (0 != (~4&cell->flags) && 3!=(cell->flags&~4)) {
+                        int tmp4 = ~4&cell->flags;
+                        if (0 != (tmp4) && 3!=(cell->flags&~4)) {
                                             cx = 8+(*(&p[0].x));
                                             cy = 8+p[0].y;
                                             // Flags 5 and 6 pass this test without initializing the original color.
