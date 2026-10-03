@@ -1,5 +1,42 @@
-// Decompiled by space-bunny-free, finished by muse-spark-1.3-free, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by deepseek-v4.1-flash, finished by mimo-v2.6-pro. Names are provisional.
-// mimo-v2.6-pro retry: 80.1% (641 bytes) via tools/permute.py inline-helper rewrites
+// Decompiled by space-bunny-free, finished by muse-spark-1.3-free, finished by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by deepseek-v4.1-flash, finished by mimo-v2.6-pro, finished by Space Bunny Free. Names are provisional.
+// Space Bunny Free: 82.8% (660 bytes), and the frame is now the original's:
+// sub esp,0x18 with len@0x10, m@0x14, r/q@0x18, n/s@0x1c, this@0x20, pc@0x24. So the
+// missing local the earlier notes kept missing is the pc copy the phase-2 loop walks,
+// and it only appears if BOTH of these hold:
+//   1. `unsigned long* q0 = pc;` exists at function scope (MSVC keeps it in a slot when
+//      the phase-2 prefix reads `q0[i]`, and folds it away when it reads `*q`);
+//   2. the two phase-2 arrays are INDEXED (`q0[i]` and `stack[i]`), not walked. That is
+//      what makes MSVC strength-reduce both into the pointer walks the original has in
+//      0x18/0x1c (a walked `q`/`s` pair puts the pc walk in 0x1c instead of 0x18).
+// Getting there is worth +2.7 over the 80.1% 5-slot version; it came out of
+// tools/permute.py run on build/scratch/0x4d9ca0/kFstart.cpp (79.7% by hand), best
+// score in build/permute/0x4d9ca0/best_ratio.cpp.
+// Still differs, and the first item is the one to try next:
+//   - `this` is still in esi for the whole function (prologue `mov esi,ecx`, members
+//     read off esi, a reload at the loop-1 latch). The original spills `this` to 0x20 in
+//     the prologue and reads the members off ecx, so its esi is free for the loop temps.
+//     Without the q0 local (same source with `pc[i]` instead of `q0[i]`, build/scratch/
+//     0x4d9ca0/i2_idx.cpp, 626 bytes) MSVC DOES spill `this` and reads esi as the count,
+//     exactly like the original, but then there is no 6th slot and MSVC indexes with
+//     `[edx+ebp*4]` instead of strength-reducing. So the two requirements fight.
+//   - loop 1 keeps n in a slot and reloads it after the sprintf; the original reloads it
+//     into esi at the latch (`mov esi,[esp+0x1c]`) and does `dec esi` there.
+//   - the phase-2 prefix loads the pc item with two instructions
+//     (`mov ecx,[esp+0x18]; mov edx,[ecx]`) where the original has one (`mov edx,[esp+0x18]`),
+//     i.e. the original prints the pc POINTER, not `*pc[i]`. See the BUG note below.
+//   - the original's phase-2 separator compares i against [esp+0x20]-1, and 0x20 holds
+//     `this`, so it compares i against this-1 (see BUG note). Ours reads m. Writing
+//     `i == (int)ret - 1` moves m and this around in the slots and drops the score, so
+//     that one is not just a spelling.
+//   - the phase-2 latch and the prologue store order (scheduling only).
+// Tried and byte-identical or worse in this shape: q0 typed void*/int*/const or written
+// `&pc[0]`/`pc+0`; `q0 + i`/`*(q0+i)` spellings; `q0 = pc` at each of five declaration
+// positions; `r = ret` before/after each strlen; the q/s assignment order in phase 2
+// (all four orders); the separator operand order; reading count directly (no n local);
+// one shared len instead of len2; and a `self` local holding this. A 512-point grid over
+// those axes tops out at 79.7% by hand, and two 10-15 minute permuter runs on the
+// 6-slot `unsigned long* q0 = pc;` + walked-q version topped out at 75.0%.
+// mimo-v2.6-pro retry: 80.1% (641 bytes) via tools/permute.py inline-helper rewrites// mimo-v2.6-pro retry: 80.1% (641 bytes) via tools/permute.py inline-helper rewrites
 // (inl0..inl8 wrap n-1, i%8, i, *s, s+1, m-1 etc; the odd if/else/do-while around the
 // loop-2 preheader is a permuter artefact that happens to schedule better). Still differs:
 // the original spills `this` to [esp+0x20] and keeps count/n transient in ESI with len in
@@ -167,10 +204,11 @@
 // The n-declaration variants keep landing frame 0x18 with this=esi, len=ebp and
 // i=edi, i.e. MSVC ranks this/len above i; the original ranks i above both and
 // spills them. No source lever found in the box.
-#include <memory.h>
+#include <windows.h>
+#include <stdlib.h>
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 
 class Class_004d9ca0 {
 public:
@@ -184,97 +222,64 @@ public:
     void FUN_004d9ca0();
 };
 
-// deepseek-v4.1 (third run, 10-minute box): re-read the disassembly and re-measured the
-// allocator priority. The frame slots are certain (len=frame+0, m=copied=+4, r/q=+8,
-// n=count/s=+0xc, this=+0x10, pc=+0x14) and the original really does keep this, m, pc,
-// len and the walkers in memory with ONLY p=ebx, i=ebp and a temporary n=esi.
-// Confirmed again that adding `int n = count;` (variant a, 59.4%, frame 0x14) makes MSVC
-// give EBP to len and ESI to this, i.e. our allocator ranks len > this > n while the
-// original ranks i > n > len/this; no source-level lever found in the time box for that
-// priority flip, so the 69.5% body below stands (ours: frame 0x10, this=ebp, i=esp+0x18,
-// r=esp+0x14, len=esp+0x10; every mid-body [esp+N] is therefore 4 low).
-//
-static inline int inl2(const int n) { return n - 1; }
+static inline unsigned long inl0(unsigned long*q0, int i) { return q0[i]; }
 
-static inline int inl3(int i) { return (int)i; }
+static inline int inl1(int m) { return (int)(m > 0); }
 
-static inline int inl0(int i) { return i % 8; }
-
-static inline char* inl4(char*p) { return (char*)p; }
-
-static inline unsigned int inl1(int m) { return (unsigned int)(m - 1); }
-
-static inline unsigned long inl5(int*s) { return (unsigned long)*s; }
-
-static inline int* inl7(int*s) { return 1 + s; }
-
-static inline int inl8(int m) { return (int)m; }
+static inline char* inl5(char*p) { return (char*)p; }
 
 // FUNCTION: 0x4d9ca0
 void Class_004d9ca0::FUN_004d9ca0()
 {
-    int* s;
-    unsigned int len;
-    len = 0xa44c;
-    int i;
-    i = 0;
-    int m;
-    m = (((unsigned int)copied));
+    unsigned long* q0;
     char* p;
-    const int n = count;
     unsigned int len2;
-
+    int i;
+    unsigned int len;
+    int m = copied;
+    q0 = pc;
+    const int n = count;
+    len = 0xa44c;
     p = buf;
-    if (((int)(n > 0))) {
+    i = 0;
+    if (n > 0) {
         unsigned long* r;
-        sprintf(inl4(((char*)p)), "Call stack:\n");
+        sprintf((char*)p, "Call stack:\n");
         len -= strlen(p);
+        p = strlen(p) + (p);
         r = ret;
-        i = 0;
-        p += strlen((p));
         for (; i < n; ) {
             if (len > 0x1e) {
-            } else { break; }
-            sprintf(p, "%08lX", *((unsigned long*)r));
-            strcat((p), (inl2(n) == (inl3(i)) || 7 == i % 8) ? "\n" : " ");
-            len -= strlen(((char*)p));
-            p = p + strlen(p);
-            i = ((i + 1));
-            r = (1 + r);
+                sprintf(p, "%08lX", *r);
+                int m8 = i % 8;
+                strcat(p, (i == n - 1 || m8 == 7) ? "\n" : " ");
+                len -= strlen(p);
+                ++i;
+                p = strlen(p) + p;
+                    r = 1 + r;
+            } else break;
         }
     } else p[0] = 0;
     len2 = len;
-    if (m > 0) {
-        if (len2 <= 0x1e) {
-        } else {
-            unsigned long* q;
-            s = stack;
-            sprintf(p, "Stack dump:\n");
-            len2 -= strlen(p);
-            q = pc;
-            p = strlen(p) + p;
-            p = p;
-            i = 0;
-            int tmp0;
-            tmp0 = i >= (inl8(m));
-            if (tmp0) {
-            } else { do {
-                if (len2 > 0x1e) goto skip1;
-                break;
+    if (m > 0 && len2 > 0x1e) {
+    } else goto skip1;
+                        sprintf(p, "Stack dump:\n");
+                        len2 = len2 - strlen(p);
+                        p += strlen(((char*)p));
+                        i = 0;
+                        while ((i) < m) {
+                            if (len2 > 0x1e) {
+                                if (i % 8 == 0) {
+                                    sprintf(p, "%08lX: ", (unsigned long)(q0 + i));
+                                    len2 = len2 - strlen(p);
+                                    p += strlen(p);
+                                }
+                                sprintf(p, "%08lX", (unsigned long)this->stack[i]);
+                                strcat((p), (((int)i) == ((int)m) - 1 || (((int)i) % 8) == 7) ? "\n" : " ");
+                                len2 = len2 - strlen(((char*)p));
+                                p = p + strlen(p);
+                                i = 1 + i;
+                            } else break;
+                        }
 skip1:;
-                if ((inl0(i))) goto skip0;
-                sprintf(p, "%08lX: ", q);
-                len2 -= strlen(p);
-                p += strlen(p);
-skip0:;
-                sprintf(((char*)p), "%08lX", inl5(s));
-                strcat(p, (i == (inl1(m)) || (i % 8) == 7) ? "\n" : " ");
-                len2 -= strlen(p);
-                len2 = len2;
-                do p += strlen(p); while (0);
-                s = inl7(s), q++, i++;
-            } while (i < m); }
-        }
-    } else {
-    }
 }
