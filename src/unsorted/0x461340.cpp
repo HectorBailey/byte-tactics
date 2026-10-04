@@ -90,6 +90,9 @@ public:
     Class_00462d30 member;             // +0xb300
 };
 
-static Class_00460f60 s_obj;
+static Class_00460f60* s_obj;
+// Never called: it only forces the vtable and this deleting destructor to be
+// emitted, where a namespace-scope object would construct during CRT init.
+Class_00460f60* emit_00461340() { return new Class_00460f60; }
 
 // FUNCTION: 0x461340 ??_GClass_00460f60@@UAEPAXI@Z

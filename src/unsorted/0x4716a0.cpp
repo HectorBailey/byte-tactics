@@ -69,4 +69,7 @@ void __stdcall Class_00471cc0::operator delete(void* p)
 }
 
 // FUNCTION: 0x4716a0 ??_GClass_004716a0@@UAEPAXI@Z
-static Class_004716a0* s_object = new Class_004716a0;
+static Class_004716a0* s_object;
+// Never called: it only forces the vtable and this deleting destructor to be
+// emitted, where a namespace-scope `new` would construct during CRT init.
+Class_004716a0* emit_004716a0() { return new Class_004716a0; }

@@ -86,7 +86,10 @@ public:
     Class_00462d30 member;              // +0xb300
 };
 
-static Class_00460f60 s_obj;
+static Class_00460f60* s_obj;
+// Never called: it only forces this out-of-line destructor to be emitted, where
+// a namespace-scope object would construct and register it during CRT init.
+Class_00460f60* emit_00461420() { Class_00460f60* p = new Class_00460f60; delete p; return p; }
 
 // FUNCTION: 0x461420
 Class_00460f60::~Class_00460f60()

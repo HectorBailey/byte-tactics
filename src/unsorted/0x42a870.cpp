@@ -20,4 +20,7 @@ public:
 };
 
 // FUNCTION: 0x42a870 ??_EClass_004c2ea0@@QAEPAXI@Z
-static Class_004c2ea0* s_array = new Class_004c2ea0[1];
+static Class_004c2ea0* s_array;
+// Never called: it only forces the vector deleting destructor to be emitted,
+// where a namespace-scope `new[]` would allocate during CRT init.
+Class_004c2ea0* emit_0042a870() { return new Class_004c2ea0[1]; }
