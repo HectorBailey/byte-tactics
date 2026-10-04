@@ -410,8 +410,10 @@ def stub_cleanup_bytes(name: str) -> int | None:
             return None
         # Every stack argument occupies at least a dword on x86.
         total = sum((s + 3) & ~3 for s in sizes)
-        if kind == "member":
-            total += 4  # the this pointer
+        if kind == "member" and cc != "E":
+            # A __thiscall member passes `this` in ECX, so it is not popped
+            # on return; every other member convention passes it on the stack.
+            total += 4
         if cc in ("G", "E"):
             return total
         return 0
