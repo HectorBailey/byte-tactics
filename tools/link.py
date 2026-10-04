@@ -59,6 +59,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from check import DEFAULT_FLAGS, ROOT, winpath
+from coff import REL_I386_REL32
 from linkcheck import (CRT_LIBS, IMPORT_LIBS, Demangle, MEMBER_STATIC, address_of,
                        archive_symbols, base_name, data_symbol, include_hash, library_symbols,
                        load_known, read_object, type_size)
@@ -74,6 +75,7 @@ GLOBAL_LO, GLOBAL_HI = 0x4FC000, 0x52D000
 IMAGE_SYM_CLASS_EXTERNAL = 2
 IMAGE_SYM_CLASS_WEAK_EXTERNAL = 105
 IMAGE_WEAK_EXTERN_SEARCH_ALIAS = 3
+IMAGE_SYM_CLASS_STATIC = 3
 
 LIBS = ("LIBCMT.LIB", "LIBCPMT.LIB", "OLDNAMES.LIB", "KERNEL32.LIB", "USER32.LIB", "GDI32.LIB",
         "ADVAPI32.LIB", "DDRAW.LIB", "DSOUND.LIB", "DPLAY.LIB", "SHELL32.LIB", "WINMM.LIB")
@@ -125,6 +127,106 @@ def compile_all(jobs: int) -> tuple[list[Path], list[tuple[Path, str]]]:
         else:
             objects.append(obj)
     return objects, failed
+
+
+# --- registration-only initialisers ---------------------------------------------
+
+
+def _registration_only_offsets(data: bytes) -> list[int]:
+    """File offsets of `_$E` initialisers that only register an _atexit
+    destructor, i.e. the bytes `push <dtor>; call _atexit; add esp,4; ret`."""
+    if len(data) < 20:
+        return []
+    machine, nsects, _, symptr, nsyms, opthdr, _ = struct.unpack_from("<HHIIIHH", data, 0)
+    if machine != 0x14C:
+        return []
+    strtab = data[symptr + nsyms * 18:] if symptr else b""
+
+    def sym_name(raw: bytes) -> str:
+        if raw[:4] == b"\0\0\0\0":
+            (off,) = struct.unpack_from("<I", raw, 4)
+            return strtab[off:].split(b"\0", 1)[0].decode("latin-1")
+        return raw.split(b"\0", 1)[0].decode("latin-1")
+
+    # Primary symbol per table index, like the COFF reader: aux records are
+    # skipped but keep the index of the symbol they follow.
+    index_sym: dict[int, tuple[str, int, int, int]] = {}
+    i = 0
+    while i < nsyms:
+        raw = data[symptr + i * 18: symptr + i * 18 + 18]
+        value, secnum, _, sclass, naux = struct.unpack_from("<IhHBB", raw, 8)
+        index_sym[i] = (sym_name(raw[:8]), value, secnum, sclass)
+        i += 1 + naux
+
+    base = 20 + opthdr
+    sections = []
+    for s in range(nsects):
+        hdr = data[base + s * 40: base + s * 40 + 40]
+        name = hdr[:8].split(b"\0", 1)[0].decode("latin-1")
+        _, _, _, rawptr, relptr, _, nrel, _, _ = struct.unpack_from("<IIIIIIHHI", hdr, 8)
+        relocs = []
+        for r in range(nrel):
+            off, symidx, rtype = struct.unpack_from("<IIH", data, relptr + r * 10)
+            relocs.append((off, symidx, rtype))
+        sections.append((name, rawptr, relocs))
+
+    offsets = []
+    for name, _, relocs in sections:
+        if not name.startswith(".CRT$XCU"):
+            continue
+        for _off, symidx, _ in relocs:
+            target = index_sym.get(symidx)
+            if not target:
+                continue
+            _, value, secnum, sclass = target
+            if sclass != IMAGE_SYM_CLASS_STATIC or not (1 <= secnum <= nsects):
+                continue
+            _, rawptr, fn_relocs = sections[secnum - 1]
+            start = value
+            body = data[rawptr + start: rawptr + start + 16]
+            if (len(body) < 16 or body[0] != 0x68 or body[5] != 0xE8
+                    or body[10:14] != b"\x83\xc4\x04\xc3"):
+                continue
+            # It must call _atexit and nothing else.
+            calls = [index_sym[idx][0] for roff, idx, rtype in fn_relocs
+                     if rtype == REL_I386_REL32 and idx in index_sym and roff == 6]
+            if calls and calls[0].lstrip("_") == "atexit" and start not in offsets:
+                offsets.append(rawptr + start)
+    return offsets
+
+
+def neutralise_empty_initialisers(objects: list[Path]) -> list[Path]:
+    """Make every `_$E` initialiser that only calls _atexit a no-op.
+
+    A namespace-scope object with a trivial constructor and a non-trivial
+    destructor makes MSVC emit an initialiser whose whole body registers the
+    destructor. Where the tree holds the object and the destructor in separate
+    files (the matched stubs do), the object is never constructed, so the
+    registered destructor reads a null field at exit. The destructor is a
+    matched function and stays emitted; only the registration is suppressed,
+    so at exit nothing runs it on the unbuilt object."""
+    out_dir = BUILD / "patched"
+    cache = ROOT / "build/progress"
+    result = []
+    count = 0
+    for path in objects:
+        data = path.read_bytes()
+        offsets = _registration_only_offsets(data)
+        if offsets:
+            data = bytearray(data)
+            for off in offsets:
+                data[off] = 0xC3
+            rel = path.relative_to(cache) if path.is_relative_to(cache) else Path(path.name)
+            patched = out_dir / rel
+            patched.parent.mkdir(parents=True, exist_ok=True)
+            patched.write_bytes(bytes(data))
+            result.append(patched)
+            count += 1
+        else:
+            result.append(path)
+    if count:
+        print(f"patched {count} registration-only initialiser(s) in {out_dir.relative_to(ROOT)}")
+    return result
 
 
 # --- the generated global data --------------------------------------------------
@@ -563,6 +665,7 @@ def main() -> None:
         for src, log in failed:
             print(f"{src}: {log}", file=sys.stderr)
         raise SystemExit(f"{len(failed)} file(s) did not compile")
+    objects = neutralise_empty_initialisers(objects)
     symbols, _, _ = load_known()
     data_objs, data_addr = build_data(symbols)
 
