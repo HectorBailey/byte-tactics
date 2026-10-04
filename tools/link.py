@@ -58,6 +58,8 @@ from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
+import pefile
+
 from check import DEFAULT_FLAGS, ROOT, winpath
 from coff import REL_I386_REL32
 from linkcheck import (CRT_LIBS, IMPORT_LIBS, Demangle, MEMBER_STATIC, address_of,
@@ -98,6 +100,46 @@ DPLAYX_EXPORTS = [("DirectPlayEnumerateA", 8, 2), ("DirectPlayLobbyCreateA", 20,
 # arguments to FUN_0049e830 and returns. FUN_0049e830 is a matched function
 # with WinMain's signature, so the bridge goes there.
 WINMAIN_ADDR = 0x49E830
+
+# Gap-region entry points with no source whose callers need a particular
+# return value. FUN_0049ee30 is the command line parser inside the 0x49eda0
+# gap region; WinMain (0x49e830) does `if (FUN_0049ee30(...) == 0) return 1;`,
+# so the default zero stub quits the game before a window exists. With no
+# command-line arguments the real parser returns 1, so the stub reports
+# success. Any other entry needs its own line here with the same evidence.
+GAP_STUB_RESULTS = {0x49EE30: 1}
+
+_ORIG_THUNKS: dict[int, str] | None = None
+
+
+def original_thunks() -> dict[int, str]:
+    """address -> imported name, for every `jmp [IAT]` thunk in the original.
+
+    An imported API is reached through a six-byte thunk that the linker emits
+    into .text, and a decompiler that sees only the thunk address names the
+    import FUN_<address>. The linker must map that spelling back to the import,
+    or the generated stub returns zero and the caller dereferences the null
+    interface the import was supposed to create."""
+    global _ORIG_THUNKS
+    if _ORIG_THUNKS is not None:
+        return _ORIG_THUNKS
+    pe = pefile.PE(str(ROOT / "orig/TotalA.exe"))
+    base = pe.OPTIONAL_HEADER.ImageBase
+    image = pe.get_memory_mapped_image()
+    slot_name: dict[int, str] = {}
+    for entry in pe.DIRECTORY_ENTRY_IMPORT:
+        for imp in entry.imports:
+            if imp.name:
+                slot_name[imp.address] = imp.name.decode()
+    out: dict[int, str] = {}
+    for i in range(0, len(image) - 6, 2):
+        if image[i] == 0xFF and image[i + 1] == 0x25:
+            (slot,) = struct.unpack_from("<I", image, i + 2)
+            name = slot_name.get(slot)
+            if name:
+                out[base + i] = name
+    _ORIG_THUNKS = out
+    return out
 
 
 # --- compiling -----------------------------------------------------------------
@@ -345,6 +387,7 @@ def build_aliases(objects: list[Path], symbols: dict[str, int], data_addr: dict[
     aliases: dict[str, str] = dict(extra or {})
     if winmain_addr is not None and funcs_at.get(winmain_addr):
         aliases.setdefault("_WinMain@16", prefer(funcs_at[winmain_addr]))
+    thunks = original_thunks()
     for info in infos:
         for name, is_func in info.refs.items():
             if name in defined or name in aliases or name in libs:
@@ -354,6 +397,12 @@ def build_aliases(objects: list[Path], symbols: dict[str, int], data_addr: dict[
                 targets = funcs_at.get(addr) if addr is not None else None
                 if targets:
                     aliases[name] = prefer(targets)
+                elif addr is not None and addr in thunks:
+                    # A caller that saw only the `jmp [IAT]` thunk: call the
+                    # import the thunk names.
+                    imported = thunks[addr]
+                    if imported in lib_by_base and lib_by_base[imported] != name:
+                        aliases[name] = lib_by_base[imported]
                 elif base_name(name) in lib_by_base and lib_by_base[base_name(name)] != name:
                     # A caller that spelled a C runtime function as C++ (?tolower@@ -> _tolower).
                     aliases[name] = lib_by_base[base_name(name)]
@@ -523,12 +572,13 @@ def stub_cleanup_bytes(name: str) -> int | None:
         return None
 
 
-def stub_bytes(name: str) -> bytes:
-    """`xor eax, eax` then a return, cleaning the stack for callee-cleans."""
+def stub_bytes(name: str, retval: int = 0) -> bytes:
+    """Return `retval` in eax, cleaning the stack for callee-cleans."""
     cleanup = stub_cleanup_bytes(name)
+    body = b"\x31\xc0" if retval == 0 else b"\xb8" + struct.pack("<I", retval)
     if cleanup:
-        return b"\x31\xc0\xc2" + struct.pack("<H", cleanup)
-    return b"\x31\xc0\xc3"
+        return body + b"\xc2" + struct.pack("<H", cleanup)
+    return body + b"\xc3"
 
 
 def stub_data_size(name: str) -> int:
@@ -537,7 +587,8 @@ def stub_data_size(name: str) -> int:
     return size if size and size > 0 else 4
 
 
-def write_stub_object(funcs: list[str], data: list[str], out: Path) -> None:
+def write_stub_object(funcs: list[str], data: list[str], out: Path,
+                      symbols: dict[str, int]) -> None:
     """A COFF object defining each name: a ret stub in .text, a zero array in
     .data. Written by hand so any mangled spelling can be defined."""
     strings = bytearray()
@@ -555,8 +606,9 @@ def write_stub_object(funcs: list[str], data: list[str], out: Path) -> None:
     text = bytearray()
     text_defs: list[tuple[str, int]] = []
     for name in sorted(funcs):
+        addr = address_of(name, symbols)
         text_defs.append((name, len(text)))
-        text.extend(stub_bytes(name))
+        text.extend(stub_bytes(name, GAP_STUB_RESULTS.get(addr, 0)))
     dat = bytearray()
     data_defs: list[tuple[str, int]] = []
     for name in sorted(data):
@@ -689,7 +741,7 @@ def main() -> None:
         funcs = [n for n, is_func in missing.items() if is_func]
         data = [n for n, is_func in missing.items() if not is_func]
         stubs = BUILD / "stubs.obj"
-        write_stub_object(funcs, data, stubs)
+        write_stub_object(funcs, data, stubs, symbols)
         print(f"stub mode: {len(funcs):,} function stubs and {len(data):,} data stubs "
               f"in {stubs.relative_to(ROOT)}")
         link_objects += [stubs, aliases_path]
