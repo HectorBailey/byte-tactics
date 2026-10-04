@@ -1,4 +1,52 @@
 // Decompiled by Claude Opus 5.5, finished by deepseek-v4.1-flash and GPT-6, verified by GPT-6.1-Sol, finished by space-bunny-free, edited by deepseek-v4.1-flash, edited by Claude Opus 5.5. Names are provisional.
+// Claude Opus 5.5 (#5576, about 45 minutes): 90.5% -> 91.9% (1590 bytes).
+// The landed flag is gone: FUN_004152f0 is the first function compiled in
+// the file (FUN_0040f200 is `inline`, as if from a header, and /Ob2 inlines
+// it), so Land returning 1/0 with the `do {} while (0);` (a no-op debug
+// macro) folds the test away, and the registers come out as in the
+// original (order esi, unit edi, the zero in ebp) because each reclaim arm
+// now ends in its own `result = Done(unit, order, new ...)`: the per-arm
+// `flags = 0` raises order to 80 (c2prio), above case 0's unit web (76).
+// What still differs: the original cross-jumps all four arms into one
+// constructor tail (arms 1 to 3 jump into arm 4's `push X` sequence),
+// which is the single shared tail of the 90.5% version. With per-arm tails
+// MSVC merges only arm 3 into arm 4; arms 1 and 2 keep a full copy each
+// (86 bytes). A toy file merges no per-arm `return` tails at all, so the
+// original most likely had the shared tail and got order's weight from
+// somewhere else. With the shared tail order is 48 in the fold.
+// Other measurements (build/scratch/0x4152f0/):
+//  - The fold also works with FUN_004152f0 first and FUN_0040f200 defined
+//    after it (prototype in front, still inlined), and with the do-while in
+//    the caller inside the health test. `while (0) {}` and `for (; 0;) {}`
+//    work too; `if (0) {}`, `;`, `{}`, a label and `switch (0) {}` do not.
+//    The exe has 0x414e70 and 0x415250 (another order handler) right in
+//    front of 0x4152f0; if they share its TU the original cannot have
+//    folded this way, since any function compiled first brings the test
+//    back.
+//  - Order 48 against case 0's unit 76 (shared tail) did not move for:
+//    `switch (order->state)` or an int state, a `def` or `limit` local in
+//    Land, an Owner* local, `flags = flags | 0xe0`, `(flags & 0xe0) != 0`,
+//    obj initialised to 0, `int landed = Land()`, conditions in steps, a
+//    target local in case 0, headers (math, string, stdio, stdlib, windows,
+//    memory, up to three), void Wait/SetNext/Done/Busy wrappers (propagated
+//    away), the health test outside Land, an IsDamaged helper. A flag Land
+//    (`int& landed` or `int*`) never folds, with a do-while at any one or
+//    two of nine places (1520 bytes, order 81).
+//  - In the 90.5% flag version order's extra weight comes from K in the
+//    set-up block (4 -> 7: the flag, the zero and a `const 0x56` candidate,
+//    the `new` size, which is no candidate at all in the fold) and in the
+//    arms (3 -> 4). Finding what makes 0x56 a candidate is the next lead.
+//  - A Next(order) wrapper on the arms' FUN_004388d0(0) only seemed to help:
+//    four more depth-1 sites cut Land's /Ob2 share to 89 and pads.size()
+//    went out of line. Land's share, (budget at Land - 240) / R, must stay
+//    at 92 or more, so R <= 19 at today's IL size.
+//  - `return Done(...)` per arm gives order 86 but 1582 bytes (86.8%);
+//    `int result = 2;` without the else 84.1%; `return 2;` in the else
+//    81.8%; Done on the help-build path too 86.8%. Case 1's body as an
+//    inline Step() is over budget (not inlined). A 20-minute permuter run
+//    from the shared-tail fold peaked at 76.2%.
+// Earlier version (90.5%, shared tail, `int& landed` flag): see the notes
+// below; it removed the permuter's `obj = (Class_0043a1f0*)obj;` too.
 // Claude Opus 5.5 (#5520): still 90.5%, code unchanged; what was measured, so
 // the next attempt can skip it (all numbers from tools/c2prio.py):
 //  - The do-while fold (Land returning 1/0, `do {} while (0);` after the
@@ -183,7 +231,7 @@ int __stdcall FUN_0043b400(Unit*, Unit*, int);
 union Fixed { int v; struct { unsigned short frac; short whole; } p; };
 int __stdcall FUN_0047ea40(Vec3*, Fixed, Vec3**, float*, Vec3**, float*);
 
-void __stdcall FUN_0040f200(Unit* unit, Order* order, unsigned int flags)
+inline void __stdcall FUN_0040f200(Unit* unit, Order* order, unsigned int flags)
 {
     ((Class_004898b0*)unit)->FUN_004898b0(3);
     if (unit->field_86)
@@ -198,7 +246,7 @@ void __stdcall FUN_0040f200(Unit* unit, Order* order, unsigned int flags)
     }
 }
 
-static inline void Land(Unit* unit, Order* order, int& landed)
+static inline int Land(Unit* unit, Order* order)
 {
     if ((unsigned int)unit->health < (unit->def->maxHealth >> 2) * 3) {
         Class_00410830 pads;
@@ -208,10 +256,18 @@ static inline void Land(Unit* unit, Order* order, int& landed)
             Unit* pad = pads[FUN_004b6c30(pads.size())];
             FUN_0043acb0(unit, new Class_0043a1f0("VTOL_LANDING", pad, 0, 0, 0, 0));
             order->flags = 0;
-            landed = 1;
-            return;
+            return 1;
         }
     }
+    do {} while (0);
+    return 0;
+}
+
+static inline int Done(Unit* unit, Order* order, Class_0043a1f0* obj)
+{
+    FUN_0043acb0(unit, obj);
+    order->flags = 0;
+    return 3;
 }
 
 static inline float Total(float base, float amount)
@@ -229,9 +285,7 @@ int __stdcall FUN_004152f0(Unit* unit, Order* order, int flags)
         ((Class_00439e80*)order)->FUN_00439e80(0x1e);
         return 0;
     }
-    unsigned int state = 0;
-    state = order->state;
-    switch (state) {
+    switch (order->state) {
     case 0:
         if (unit->type && (unit->def->flags & 0x800) && (unit->def->flags2 & 0x200)) {
             if (order->target != 0)
@@ -248,11 +302,9 @@ int __stdcall FUN_004152f0(Unit* unit, Order* order, int flags)
         Class_0044e2d0* obj = new Class_0044e2d0(order, order->pos);
         ((Class_0044e6c0*)obj)->FUN_0044e6c0(unit->def->field_21c);
         ((Class_004388d0*)order)->FUN_004388d0((int)obj);
-        int landed = 0;
         ((Class_00439e80*)order)->FUN_00439e80(0x2d);
         order->flags |= 0xe0;
-        Land(unit, order, landed);
-        if (landed)
+        if (Land(unit, order))
             return 0;
         if (unit->owner->energy >= unit->owner->energyCapacity * 0.2) {
             std::vector<Unit*> units;
@@ -280,25 +332,22 @@ int __stdcall FUN_004152f0(Unit* unit, Order* order, int flags)
         Fixed range;
         range.v = 0xf00000;
         if (FUN_0047ea40(&unit->pos, range, &energy, &energyAmount, &metal, &metalAmount)) {
-            Class_0043a1f0* obj;
+            int result;
             if (unit->owner->GetMetal() < unit->owner->metalCapacity * 0.2 && metal) {
                 ((Class_004388d0*)order)->FUN_004388d0(0);
-                obj = new Class_0043a1f0("VTOL_RECLAIM", 0, (Vec3*)metal, 0, 0, 0);
+                result = Done(unit, order, new Class_0043a1f0("VTOL_RECLAIM", 0, (Vec3*)metal, 0, 0, 0));
             } else if (unit->owner->GetEnergy() < unit->owner->energyCapacity * 0.2 && energy) {
                 ((Class_004388d0*)order)->FUN_004388d0(0);
-                obj = new Class_0043a1f0("VTOL_RECLAIM", 0, energy, 0, 0, 0);
+                result = Done(unit, order, new Class_0043a1f0("VTOL_RECLAIM", 0, energy, 0, 0, 0));
             } else if (metal && Total(unit->owner->GetMetal(), metalAmount) <= unit->owner->metalCapacity) {
                 ((Class_004388d0*)order)->FUN_004388d0(0);
-                obj = new Class_0043a1f0("VTOL_RECLAIM", 0, metal, 0, 0, 0);
-                obj = (Class_0043a1f0*)obj;
+                result = Done(unit, order, new Class_0043a1f0("VTOL_RECLAIM", 0, metal, 0, 0, 0));
             } else if (energy && Total(unit->owner->GetEnergy(), energyAmount) <= unit->owner->energyCapacity) {
                 ((Class_004388d0*)order)->FUN_004388d0(0);
-                obj = new Class_0043a1f0("VTOL_RECLAIM", 0, energy, 0, 0, 0);
+                result = Done(unit, order, new Class_0043a1f0("VTOL_RECLAIM", 0, energy, 0, 0, 0));
             } else
-                return 2;
-            FUN_0043acb0(unit, obj);
-            order->flags = 0;
-            return 3;
+                result = 2;
+            return result;
         }
         return 2;
     }
