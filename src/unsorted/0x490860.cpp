@@ -1,7 +1,6 @@
 // Decompiled by Opus. Names are provisional.
 // Class_004907e0's override of slot 1 (see 0x44ef60.cpp for the family):
-// the base method (0x44ef90, whose class is still spelt Class_44ef90) and
-// then the dirty bit.
+// the base's (0x44ef90) and then the dirty bit.
 
 class Base_00490a10 {                  // the object at +0x4 (see 0x490a10.cpp)
 public:
@@ -63,15 +62,9 @@ public:
     virtual void FUN_0044efc0(Class_00415c10*);     // slot 8, 0x4908c0
 };
 
-// The base method's established name (data/symbols.csv).
-class Class_44ef90 {
-public:
-    void FUN_0044ef90(void* param);
-};
-
 // FUNCTION: 0x490860
 void Class_004907e0::FUN_0044ef90(void* param)
 {
-    ((Class_44ef90*)this)->FUN_0044ef90(param);
+    Class_0044ef20::FUN_0044ef90(param);
     dirty = 1;
 }
