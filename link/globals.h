@@ -703,11 +703,11 @@ extern long DAT_0052a4fc;                                                       
 //   0x5119c0 DAT_005119c0: Class_00409160*[] (7), void*[] (5), Owner*[] (3), Class_00409470*[] (2), and 5 more
 //   0x51fbd0 DAT_0051fbd0: void* (4), int (2), Display_004b4f50* (1), Display_004b5370* (1), and 14 more
 //   0x51e598 IURect_0046e160::IU?$pair::?$_Tree::_Nil: defined in src/network/unit_sync_46c920.cpp
-//   0x528a54 std::IH::IU?$pair::?$_Tree::_Nil: defined in src/unsorted/0x4db610.cpp
+//   0x528a54 std::IH::IU?$pair::?$_Tree::_Nil: defined in src/debug/debug_lib_4db610.cpp
 //   0x512344 DAT_00512344: part of another global: DAT_00512340$S5516+0x4
-//   0x51fbbc std::HH::HU?$pair::?$_Tree::_Nil: defined in src/unsorted/0x4b26f0.cpp
+//   0x51fbbc std::HH::HU?$pair::?$_Tree::_Nil: defined in src/util/int_map_4b26f0.cpp
 //   0x4fd2f8 DAT_004fd2f8: defined in src/data/vtables.cpp
-//   0x5292c4 QBDUValue_004e17c0::PBDU?$pair::?$_Tree::_Nil: defined in src/unsorted/0x4e17c0.cpp
+//   0x5292c4 QBDUValue_004e17c0::PBDU?$pair::?$_Tree::_Nil: defined in src/debug/debug_lib_4e17c0.cpp
 //   0x51fe00 DAT_0051fe00: part of another global: DAT_0051fdc0+0x40
 //   0x4fcdc8 DPSPGUID_MODEM: defined in src/data/guids.cpp
 //   0x4fcdb8 DPSPGUID_SERIAL: defined in src/data/guids.cpp
@@ -754,7 +754,7 @@ extern long DAT_0052a4fc;                                                       
 //   0x512f59 DAT_00512f59: part of another global: DAT_00512f18+0x41
 //   0x512fe8 DAT_00512fe8: Class_004c6a60* (2), void* (1), int (1)
 //   0x51e57c DAT_0051e57c: ScoreBoard_0046c2a0** (1), ScoreBoard_0046bce0** (1), ElemB_0046c190** (1), void* (1)
-//   0x51fbc0 DAT_0051fbc0$S425: defined in src/unsorted/0x4b2290.cpp
+//   0x51fbc0 DAT_0051fbc0$S425: defined in src/util/int_map_4b2290.cpp
 //   0x528ab4 DAT_00528ab4: void* (2), void (__stdcall*)(void) (1), int (__stdcall*)(void*, unsigned long, unsigned long*, Line_004de550*) (1)
 //   0x528acc DAT_00528acc: void* (2), void (__stdcall*)(void) (1), int (__stdcall*)(void*, unsigned long, int*, void*) (1)
 //   0x529e00 DAT_00529e00: Counter_004e1e50 (1), Entry_004df590[] (1), unsigned int (1), EventEntry (1)
@@ -806,11 +806,11 @@ extern long DAT_0052a4fc;                                                       
 //   0x507b70 DAT_00507b70: unsigned char[] (1), ColourEntry_00478790[] (1)
 //   0x5086e0 DAT_005086e0: defined in src/units/unit_messages.cpp
 //   0x50a788 DAT_0050a788: defined in src/data/guids.cpp
-//   0x50c958 g_assertDialog: defined in src/data/debug_dialogs.cpp
-//   0x50cd38 g_memoryDialog: defined in src/data/debug_dialogs.cpp
-//   0x50ced8 g_profilerDialog: defined in src/data/debug_dialogs.cpp
-//   0x50d980 g_pentiumEvents: defined in src/data/perf_counters.cpp
-//   0x50da00 g_pentiumProEvents: defined in src/data/perf_counters.cpp
+//   0x50c958 g_assertDialog: defined in src/debug/debug_dialogs.cpp
+//   0x50cd38 g_memoryDialog: defined in src/debug/debug_dialogs.cpp
+//   0x50ced8 g_profilerDialog: defined in src/debug/debug_dialogs.cpp
+//   0x50d980 g_pentiumEvents: defined in src/debug/perf_counters.cpp
+//   0x50da00 g_pentiumProEvents: defined in src/debug/perf_counters.cpp
 //   0x5122d4 DAT_005122d4: void* (1), char* (1)
 //   0x512328 DAT_00512328: Player_00437cd0* (1), void* (1)
 //   0x512340 DAT_00512340$S5516: defined in src/map/meteors_438450.cpp
@@ -831,7 +831,7 @@ extern long DAT_0052a4fc;                                                       
 //   0x528ab8 DAT_00528ab8: void* (1), int (__stdcall*)(void*, char*, unsigned long) (1)
 //   0x528abc DAT_00528abc: int (__stdcall*)(void*) (1), void (__stdcall*)(void) (1)
 //   0x528ad0 DAT_00528ad0: int (1), unsigned long (__stdcall*)(unsigned long) (1)
-//   0x529500 QBDUValue_004e17c0::PBDU?$pair::?$_Tree::_Nilrefs: defined in src/unsorted/0x4e17c0.cpp
+//   0x529500 QBDUValue_004e17c0::PBDU?$pair::?$_Tree::_Nilrefs: defined in src/debug/debug_lib_4e17c0.cpp
 //   0x529df8 DAT_00529df8: void* (1), EventEntry* (1)
 //   0x4fc474 DAT_004fc474: defined in src/data/unused.cpp
 //   0x4fc978 DAT_004fc978: defined in src/data/unused.cpp
@@ -939,6 +939,6 @@ extern long DAT_0052a4fc;                                                       
 //   0x51f310 DAT_0051f310: defined in src/weapons/weapons_49e610.cpp
 //   0x51fe40 DAT_0051fe40: part of another global: DAT_0051fdc0+0x80
 //   0x51fe98 DAT_0051fe98: part of another global: DAT_0051fdc0+0xd8
-//   0x528a58 std::IH::IU?$pair::?$_Tree::_Nilrefs: defined in src/unsorted/0x4db610.cpp
+//   0x528a58 std::IH::IU?$pair::?$_Tree::_Nilrefs: defined in src/debug/debug_lib_4db610.cpp
 
 #endif

@@ -353,7 +353,7 @@ effect, the missing piece is usually a helper that was inlined:
   place (`mov edx, ebp`) just before the paths merge on the other, is the
   return value of an inlined function with one `return` per path. A local
   assigned on both paths gets a callee-saved register for the whole function
-  instead. See `src/unsorted/0x4c9290.cpp`.
+  instead. See `src/graphics/surface_4c9290.cpp`.
 - A loop that walks a pointer, where the offset is added after the loop
   guard (`add eax, K` after `test/jle`), is plain array indexing
   (`arr[i].field`) in the source; adding the offset yourself moves the `add`
@@ -398,7 +398,7 @@ effect, the missing piece is usually a helper that was inlined:
   constant address with no load, and can never match.
 - **`mov ecx, <global>; jmp <method>`**: a tail call of a method on a global
   object. Declare the object (`extern Class_x DAT_00528a78;`) and write
-  `DAT_00528a78.FUN_004e1650();`. See `src/unsorted/0x4de0f0.cpp`.
+  `DAT_00528a78.FUN_004e1650();`. See `src/debug/debug_lib_4de0f0.cpp`.
 - **Locals in parameter slots**: MSVC 5 reuses the stack slot of a parameter
   that is no longer needed for a local. When the code writes into a
   parameter's slot (a buffer, an output value), declare an ordinary local and
@@ -2167,7 +2167,7 @@ name (`std::_Lockit::_Lockit` is 0x4e39b0).
   an embedded struct (`d->screen.UnlockSurface()`). The screen lock/unlock pair
   is FUN_004c5e70/FUN_004c5fa0 (`IDirectDrawSurface::Lock` +0x64 and `Unlock`
   +0x80 on the surface at display+0x8c), used by many functions around
-  0x4c6b70-0x4c6dc0; see `src/unsorted/0x4c6d20.cpp`.
+  0x4c6b70-0x4c6dc0; see `src/graphics/surface_4c6d20.cpp`.
 - **STL templates ending in `ret N`**: that original file was compiled with
   `__stdcall` as the default. Write the template body as an explicit
   `__stdcall` free function (the real `std::` template gives a plain `ret`).
