@@ -47,7 +47,7 @@ public:
     int SetPlaybackOrder(int param_1);
 };
 
-class Class_004cd9c0 {
+class SJE_CdPlayerClass {
 public:
     int FUN_004cd9c0();
 };
@@ -106,7 +106,7 @@ void FUN_00490fe0()
     ((Class_004ce7a0*)g_game->cd)->SetPlaybackOrder(g_game->field_37f16);
     ((Class_004ce690*)g_game->cd)->SetTrackCategory(saved);
 
-    int id = ((Class_004cd9c0*)g_game->cd)->FUN_004cd9c0();
+    int id = ((SJE_CdPlayerClass*)g_game->cd)->FUN_004cd9c0();
     int index = 0;
     int* slot = &DAT_0051e848;
     while (1) {

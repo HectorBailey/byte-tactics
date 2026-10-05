@@ -714,7 +714,7 @@ struct Class_004cb7c0;
 struct Class_004cb7d0;
 class Class_004cb7f0;
 struct Class_004cb940;
-class Class_004cd9c0;
+class SJE_CdPlayerClass;
 class Class_004cd9d0;
 class Class_004cda00;
 class Class_004cdb40;
@@ -13929,7 +13929,7 @@ struct CdLists_490f80 {  // 0xaa0 bytes, 2 views
     unsigned char tracks[2684];  // +0x24
 };
 
-class Class_004cd9c0 {  // 0x1 bytes, 2 views
+class SJE_CdPlayerClass {  // 0x1 bytes, 2 views
 public:
     char unknown_0[1];
     int FUN_004cd9c0(void);
