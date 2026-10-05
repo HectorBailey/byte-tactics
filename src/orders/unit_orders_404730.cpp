@@ -57,7 +57,7 @@ void __stdcall FUN_004385f0(Unit*, Order*);
 int __stdcall FUN_00438700(Unit*, Order*, int);
 void __stdcall GetNanoPiecePosition(Unit*, Vec3*);
 void __stdcall FUN_00472200(Vec3*, Vec3*, int);
-void __stdcall FUN_00488570(Unit*, void*, int);
+void __stdcall GiveUnitToPlayer(Unit*, void*, int);
 class Class_00489960 { public: int CanReclaim(Unit*); };
 int __stdcall FUN_00438650(Unit*, Unit*, int);
 void __stdcall DamageUnit(Unit*, Unit*, int, int, int);

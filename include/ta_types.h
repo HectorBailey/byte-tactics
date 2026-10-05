@@ -236,9 +236,9 @@ class Class_0043da70;
 class Class_0043db50;
 struct UnitMotion;
 class Class_0043dd70;
-struct Class_00440290;
+struct MovementClassTable;
 struct Class_004402e0;
-struct Class_00440320;
+struct MovementClass;
 class Class_00440470;
 struct Class_004404c0;
 class Class_00440500;
@@ -485,7 +485,7 @@ class Class_0047ffa0;
 class Class_00480020;
 class Class_004800c0;
 class Class_00480100;
-class Class_00480160;
+class Squad;
 class Class_00480c30;
 class Class_00480c50;
 class Class_00480cb0;
@@ -502,10 +502,10 @@ struct Class_00481490;
 struct Class_00482110;
 class UnitScript;
 class Class_00488c50;
-class Class_00488d30;
+class UnitTypeSet;
 struct Class_00488e70;
 class Class_00489240;
-class Class_00489260;
+class UnitCategory;
 class Class_00489540;
 class Class_004895c0;
 class Class_00489650;
@@ -2954,10 +2954,10 @@ public:
     void FUN_004b74f0(Class_004b73c0*);
 };
 
-class Class_00488d30 {  // 0x40 bytes, 5 views
+class UnitTypeSet {     // 0x40 bytes, 5 views
 public:
     int bits[16];  // +0x0
-    void FUN_00488d30(char*, int*);
+    void AddTypeOrCategory(char*, int*);
 };
 
 class Class_004b7410 {  // 0x1 bytes, 3 views
@@ -3076,7 +3076,7 @@ struct Player {  // 0x14b bytes, 312 views
     unsigned short lastIndex;  // +0x71
     unsigned char type;  // +0x73
     int field_74;  // +0x74
-    Class_00480160* squads;  // +0x78
+    Squad* squads;           // +0x78
     ByteMap_00408090 explored;  // +0x7c
     int seenCount;  // +0x88
     float metal;  // +0x8c
@@ -3204,15 +3204,15 @@ struct Slot_4b62d0 {  // 0x10 bytes, 5 views
     virtual void Fire(void);
 };
 
-class Class_00480160 {  // 0x20 bytes, 5 views
+class Squad {           // 0x20 bytes, 5 views
 public:
     int field_0;  // +0x0
     int field_4;  // +0x4
     int field_8;  // +0x8
     int field_c;  // +0xc
     std::vector<int> items;  // +0x10
-    Class_00480160(Class_00480160&);
-    Class_00480160(int, int);
+    Squad(Squad&);
+    Squad(int, int);
 };
 
 struct Elem_0040cc40 {  // 0x8 bytes, 19 views
@@ -3612,7 +3612,7 @@ public:
     void* field_0;  // +0x0
     char unknown_4[24];
     unsigned int lastTick;  // +0x1c
-    void FUN_00440af0(Unit*);
+    void RefreshMovedUnits(Unit*);
 };
 
 class Dummy_00440be0 {  // 0x20 bytes, 4 views
@@ -3620,7 +3620,7 @@ public:
     int* field_0;  // +0x0
     char unknown_4[24];
     unsigned int field_1c;  // +0x1c
-    void FUN_00440be0(Unit*);
+    void RefreshUnitIfStale(Unit*);
 };
 
 struct Grid_0040e630 {  // 0x14 bytes, 1 view
@@ -5457,7 +5457,7 @@ struct Class_004402e0 {  // 0x20 bytes, 3 views
     ~Class_004402e0(void);
 };
 
-struct Class_00440320 {  // 0x20 bytes, 9 views
+struct MovementClass {   // 0x20 bytes, 9 views
     int* field_0;  // +0x0
     short field_4;  // +0x4
     short field_6;  // +0x6
@@ -5471,14 +5471,14 @@ struct Class_00440320 {  // 0x20 bytes, 9 views
     int field_14;  // +0x14
     void* field_18;  // +0x18
     int field_1c;  // +0x1c
-    Class_00440320(void);
-    void FUN_00440340(Source_00440340*);
+    MovementClass(void);
+    void ReadMoveInfo(Source_00440340*);
 };
 
 struct Class_00488e70 {  // 0x220 bytes, 2 views
     char unknown_0[542];
     unsigned short team;  // +0x21e
-    void FUN_00488e70(char*);
+    void AddToCategories(char*);
 };
 
 class Class_004c4630 {  // 0x21 bytes, 2 views
@@ -5526,10 +5526,10 @@ struct CobFile_0042d1f0 {  // 0x194 bytes, 2 views
     int field_18e;  // +0x190
 };
 
-struct Class_00440290 {  // 0x400 bytes, 7 views
-    Class_00440320 entries[32];  // +0x0
-    ~Class_00440290(void);
-    static Class_00440290 DAT_00512358;
+struct MovementClassTable {  // 0x400 bytes, 7 views
+    MovementClass entries[32];   // +0x0
+    ~MovementClassTable(void);
+    static MovementClassTable DAT_00512358;
 };
 
 class Class_00458180 {  // 0x14 bytes, 2 views
@@ -6790,7 +6790,7 @@ public:
     unsigned int width;  // +0x10
     unsigned int height;  // +0x14
     int* cells;  // +0x18
-    void FUN_00440470(unsigned int, unsigned int);
+    void ResizePassMap(unsigned int, unsigned int);
 };
 
 struct Class_004404c0 {  // 0x1c bytes, 1 view
@@ -6798,7 +6798,7 @@ struct Class_004404c0 {  // 0x1c bytes, 1 view
     int stride;  // +0x10
     char unknown_14[4];
     unsigned int* base;  // +0x18
-    void FUN_004404c0(int, int, int);
+    void SetPassMapCell(int, int, int);
 };
 
 class Class_00440500 {  // 0x20 bytes, 3 views
@@ -6816,7 +6816,7 @@ public:
     unsigned int field_14;  // +0x14
     unsigned int* field_18;  // +0x18
     unsigned int lastTick;  // +0x1c
-    void FUN_00440500(void);
+    void BuildPassMap(void);
 };
 
 class Class_00440830 {  // 0x20 bytes, 7 views
@@ -6834,7 +6834,7 @@ public:
     unsigned int height;  // +0x14
     unsigned int* data;  // +0x18
     unsigned int lastTick;  // +0x1c
-    void FUN_00440830(Point16, Point16);
+    void RefreshPassMap(Point16, Point16);
 };
 
 struct Dst_00440ca0 {  // 0xa9 bytes, 1 view
@@ -12761,14 +12761,14 @@ public:
     Class_00488c50(void);
 };
 
-class Class_00489260 {  // 0x8 bytes, 3 views
+class UnitCategory {    // 0x8 bytes, 3 views
 public:
     Class_004c9390 name;  // +0x0
     int value;  // +0x4
-    Class_00489260(Class_00489260&);
-    Class_00489260(Class_004c9390&, void*);
-    ~Class_00489260(void);
-    Class_00489260& operator=(Class_00489260&);
+    UnitCategory(UnitCategory&);
+    UnitCategory(Class_004c9390&, void*);
+    ~UnitCategory(void);
+    UnitCategory& operator=(UnitCategory&);
 };
 
 class Class_00489240 {  // 0x8 bytes, 2 views

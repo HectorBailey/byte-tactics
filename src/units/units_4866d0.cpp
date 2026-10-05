@@ -208,7 +208,7 @@ void __stdcall FUN_00482910(void* pos, int a, int b, int c);
 unsigned char __stdcall FUN_0044fe40(int id);
 void __stdcall FUN_00439eb0(void* unit, int flag);
 void __stdcall FUN_0047f8c0(void* unit);
-void __stdcall FUN_00480250(void* unit, int flag);
+void __stdcall SetUnitSquad(void* unit, int flag);
 void __stdcall FUN_0049c880(void* unit);
 void __stdcall AttachUnitToPiece(void* unit, void* builder, int a, int c);
 void __stdcall DamageUnit(void* a, void* b, int c, int d, int e);
@@ -249,7 +249,7 @@ void __stdcall ApplyUnitDeath(Cmd_004866d0* cmd, int local)
     g_game->x391ed->FUN_004904c0(unit);
     FUN_00439eb0(unit, 1);
     FUN_0047f8c0(unit);
-    FUN_00480250(unit, -1);
+    SetUnitSquad(unit, -1);
     FUN_0049c880(unit);
     if (unit->x86 != 0)
         AttachUnitToPiece(unit, 0, -1, 1);

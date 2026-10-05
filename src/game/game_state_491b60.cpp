@@ -47,8 +47,8 @@ void FreeUnitTypes();
 void FUN_0042f3a0();
 void FUN_0042a570();
 void FUN_00499a80();
-void FUN_00440a00();
-void FUN_00488bf0();
+void FreeMovementClasses();
+void FreeUnitCategories();
 void FUN_00450dd0();
 
 // FUNCTION: 0x491b60
@@ -77,8 +77,8 @@ void FUN_00491b60()
     FUN_0042f3a0();
     FUN_0042a570();
     FUN_00499a80();
-    FUN_00440a00();
-    FUN_00488bf0();
+    FreeMovementClasses();
+    FreeUnitCategories();
     if (g_game->field_391e9->FUN_00435100() == 3) {
         FUN_00450dd0();
     }

@@ -161,7 +161,7 @@ int __stdcall GetGroundHeight(Vec3* pos);
 unsigned short __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
 void __stdcall FUN_00438590(Unit* unit, Order* order, short turn);
 int __stdcall FUN_00438700(Unit* unit, Order* order, int flags);
-unsigned short __stdcall FUN_00488b10(char* name);
+unsigned short __stdcall FindUnitTypeId(char* name);
 void __stdcall GetNanoPiecePosition(Unit* unit, Vec3* out);
 void __stdcall FUN_004720d0(Vec3* from, Box* to, int count);
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short type, Vec3 pos, int a, int b, int c);
@@ -225,7 +225,7 @@ int __stdcall FUN_00404db0(Unit* unit, Order* order, int flags)
                 break;
             }
         }
-        order->unitType = FUN_00488b10(name);
+        order->unitType = FindUnitTypeId(name);
         if (!order->unitType) {
             FUN_0047f780(unit, 7, "Ressurection failed");
             return 8;

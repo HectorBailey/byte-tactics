@@ -99,7 +99,7 @@ void __stdcall DamageUnit(Unit* source, Unit* target, int amount, int type,
                             unsigned short extra);
 
 // FUNCTION: 0x488570
-void __stdcall FUN_00488570(Unit* unit, Player_00488570* other, Packet_00488570* p)
+void __stdcall GiveUnitToPlayer(Unit* unit, Player_00488570* other, Packet_00488570* p)
 {
     if (unit->player == other)
         return;

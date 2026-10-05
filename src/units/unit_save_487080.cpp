@@ -208,12 +208,12 @@ public:
 extern void* g_game;
 
 
-unsigned short __stdcall FUN_00488b10(const char* name);
+unsigned short __stdcall FindUnitTypeId(const char* name);
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId,
                                       Vec3_00487080 pos, int param_5, int mode,
                                       unsigned short id);
 void __stdcall AttachUnitToPiece(Unit* unit, Unit* builder, int piece, int p4);
-void __stdcall FUN_00480250(Unit* unit, int id);
+void __stdcall SetUnitSquad(Unit* unit, int id);
 #pragma pack(push, 1)
 // An order (0x56 bytes); 0x43a420 is its constructor from a saved record.
 class Class_0043a420 {
@@ -234,7 +234,7 @@ class CobScript { public: void LoadScriptState(Class_004b4560*); };
 
 
 // FUNCTION: 0x487080
-Unit* __stdcall FUN_00487080(unsigned short id, Class_004b4560* file)
+Unit* __stdcall LoadUnit(unsigned short id, Class_004b4560* file)
 {
     Unit* unit;
     if (id == 0)
@@ -264,7 +264,7 @@ Unit* __stdcall FUN_00487080(unsigned short id, Class_004b4560* file)
     if (!found)
         return 0;
 
-    unit = CreateUnit(rec.player, FUN_00488b10(rec.name), *(Vec3_00487080*)&rec.f2b, 1, rec.flags.b & 3, rec.id);
+    unit = CreateUnit(rec.player, FindUnitTypeId(rec.name), *(Vec3_00487080*)&rec.f2b, 1, rec.flags.b & 3, rec.id);
     if (unit != 0) {
 
     unit->field_64 = *(Pair_00487080*)&rec.f37;
@@ -273,11 +273,11 @@ Unit* __stdcall FUN_00487080(unsigned short id, Class_004b4560* file)
     unit->field_6e = rec.f2f;
 
     if (rec.childA != 0) {
-        Unit* child = FUN_00487080(rec.childA, file);
+        Unit* child = LoadUnit(rec.childA, file);
         if (child != 0)
             AttachUnitToPiece(unit, child, rec.b8d, rec.flags.b & 3);
     }
-    unit->child = FUN_00487080(rec.childB, file);
+    unit->child = LoadUnit(rec.childB, file);
     unit->b_f9 = rec.b8d;
     unit->b_f4 = rec.b8e;
     unit->field_58 = rec.f8f;
@@ -285,7 +285,7 @@ Unit* __stdcall FUN_00487080(unsigned short id, Class_004b4560* file)
     unit->field_7a = rec.f97;
     unit->field_7e = rec.f9b;
     unit->field_ac = rec.f9f;
-    FUN_00480250(unit, rec.f9f);
+    SetUnitSquad(unit, rec.f9f);
     unit->field_104 = rec.fa7;
     unit->b_f5 = rec.bab;
     unit->b_f6 = rec.bac;
