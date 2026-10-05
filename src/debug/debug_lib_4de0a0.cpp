@@ -1,10 +1,10 @@
 // Decompiled by deepseek-v4.1-flash. Names are provisional.
 #include <windows.h>
 
-class Class_004ddf00 {
+class LoadedImage {
 public:
-    Class_004ddf00(HMODULE m);
-    ~Class_004ddf00();
+    LoadedImage(HMODULE m);
+    ~LoadedImage();
 };
 
 class Class_004de020 {
@@ -19,6 +19,6 @@ public:
 // FUNCTION: 0x4de0a0
 void __stdcall FUN_004de0a0(int unused, unsigned int address)
 {
-    static Class_004ddf00 table(GetModuleHandleA(0));
+    static LoadedImage table(GetModuleHandleA(0));
     ((Class_004de020*)&table)->FindFpoRecord(address);
 }

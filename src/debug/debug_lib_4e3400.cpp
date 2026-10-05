@@ -5,14 +5,14 @@
 // Registry key helper under HKCU\Software\Cavedog Entertainment (0x4e2be0).
 // The window placement is the last member, so the object is 8 + 0x2c = 52
 // bytes and sits at frame offset 0x10.
-class Class_004e2be0 {
+class CavedogRegistryKey {
 public:
     int key;                            // +0x00
     unsigned char readOnly;             // +0x04
     WINDOWPLACEMENT placement;           // +0x08
 
-    Class_004e2be0(char readOnly, char* app, char* section);
-    ~Class_004e2be0();
+    CavedogRegistryKey(char readOnly, char* app, char* section);
+    ~CavedogRegistryKey();
 };
 
 // The two value writers, called on the same object (0x4e2d70, 0x4e2ce0).
@@ -37,7 +37,7 @@ void __cdecl SaveWindowPosition(HWND hwnd, char* name)
     char buf[200];
     strcpy(buf, "WindowPositions\\");
     strncat(buf, name, sizeof(buf) - 1 - strlen(buf));
-    Class_004e2be0 key(0, buf, "Cavedog library");
+    CavedogRegistryKey key(0, buf, "Cavedog library");
     RECT r;
     key.placement.length = sizeof(WINDOWPLACEMENT);
     if (GetWindowPlacement(hwnd, &key.placement)) {

@@ -14,7 +14,7 @@ public:
     void OpenMappedFile(const char* fileName);
 };
 
-class Class_004e1560 {
+class MappedFile {
 public:
     void* hFile;      // +0x0
     void* hMapping;   // +0x4
@@ -22,10 +22,10 @@ public:
     int size;         // +0xc
     int state;        // +0x10
 
-    Class_004e1560(const char* fileName);
+    MappedFile(const char* fileName);
 };
 
-class Class_004ddf00 : public Class_004e1560 {
+class LoadedImage : public MappedFile {
 public:
     HMODULE module;                        // +0x14
     unsigned int imageBase;                // +0x18
@@ -34,7 +34,7 @@ public:
     IMAGE_DEBUG_DIRECTORY* debugDirs;      // +0x24
     unsigned int numDebugDirs;             // +0x28
 
-    Class_004ddf00(HMODULE m);
+    LoadedImage(HMODULE m);
 };
 
 // The count must be stored before debugDirs is cleared (that order makes
@@ -46,7 +46,7 @@ public:
 // any cast of either operand) MSVC always gives the mirror image
 // `mov ecx,[base] / mov eax,[rva] / add eax,ecx`, whatever the header set.
 // FUNCTION: 0x4ddf00
-Class_004ddf00::Class_004ddf00(HMODULE m) : Class_004e1560(0)
+LoadedImage::LoadedImage(HMODULE m) : MappedFile(0)
 {
     char path[1000];
     module = m;

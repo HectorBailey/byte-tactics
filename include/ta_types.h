@@ -807,7 +807,7 @@ class Class_004ddce0;
 class Class_004ddd70;
 class Class_004dddf0;
 class Class_004dde70;
-class Class_004ddf00;
+class LoadedImage;
 class Class_004ddfa0;
 class Class_004ddfe0;
 class Class_004de020;
@@ -825,7 +825,7 @@ class Class_004e0570;
 class Class_004e05c0;
 class Class_004e05f0;
 class Class_004e0b90;
-class Class_004e1560;
+class MappedFile;
 class Class_004e1590;
 class Class_004e1650_2;
 class Class_004e17c0;
@@ -852,7 +852,7 @@ class Class_004e29b0;
 class Class_004e2a10;
 class Class_004e2a30;
 class Class_004e2b60;
-class Class_004e2be0;
+class CavedogRegistryKey;
 class Class_004e2cc0;
 class Class_004e2ce0;
 class Class_004e2d00;
@@ -19377,17 +19377,17 @@ public:
     LiveNode* FUN_004ddc90(unsigned int&);
 };
 
-class Class_004e1560 {  // 0x14 bytes, 2 views
+class MappedFile {      // 0x14 bytes, 2 views
 public:
     void* hFile;  // +0x0
     void* hMapping;  // +0x4
     void* view;  // +0x8
     int size;  // +0xc
     int state;  // +0x10
-    Class_004e1560(char*);
+    MappedFile(char*);
 };
 
-class Class_004ddf00 : public Class_004e1560 {  // 0x2c bytes, 2 views
+class LoadedImage : public MappedFile {         // 0x2c bytes, 2 views
 public:
     void* module;  // +0x14
     unsigned int imageBase;  // +0x18
@@ -19395,8 +19395,8 @@ public:
     _IMAGE_NT_HEADERS* ntHeaders;  // +0x20
     _IMAGE_DEBUG_DIRECTORY* debugDirs;  // +0x24
     unsigned int numDebugDirs;  // +0x28
-    Class_004ddf00(void*);
-    ~Class_004ddf00(void);
+    LoadedImage(void*);
+    ~LoadedImage(void);
 };
 
 class Class_004e1590 {  // 0x14 bytes, 3 views
@@ -19671,14 +19671,14 @@ public:
     void FUN_004e0520(int);
 };
 
-class Class_004e2be0 {  // 0x34 bytes, 6 views
+class CavedogRegistryKey {  // 0x34 bytes, 6 views
 public:
     int key;  // +0x0
     unsigned char readOnly;  // +0x4
     char unknown_5[3];
     tagWINDOWPLACEMENT placement;  // +0x8
-    Class_004e2be0(char, char*, char*);
-    ~Class_004e2be0(void);
+    CavedogRegistryKey(char, char*, char*);
+    ~CavedogRegistryKey(void);
 };
 
 class Class_004e2fe0 {  // 0x5 bytes, 3 views

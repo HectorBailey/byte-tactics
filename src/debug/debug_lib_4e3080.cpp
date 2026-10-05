@@ -12,12 +12,12 @@ public:
     bool FUN_004e2cc0(const char* name, unsigned int defaultValue);
 };
 
-class Class_004e2be0 {
+class CavedogRegistryKey {
 public:
     int key;                           // +0x00
     unsigned char readOnly;            // +0x04
-    Class_004e2be0(char readOnly, char* app, char* section);
-    ~Class_004e2be0();
+    CavedogRegistryKey(char readOnly, char* app, char* section);
+    ~CavedogRegistryKey();
 };
 
 // FUNCTION: 0x4e3080
@@ -54,7 +54,7 @@ unsigned char __cdecl RestoreWindowPosition(HWND hwnd, char* name, double zoomX,
     strcpy(buf, "WindowPositions\\");
     strncat(buf, name, sizeof(buf) - 1 - strlen(buf));
 
-    Class_004e2be0 key(1, buf, "Cavedog library");
+    CavedogRegistryKey key(1, buf, "Cavedog library");
     x = ((Class_004e2d00*)&key)->ReadInt("LeftEdge", -500, 50000, -500);
     y = ((Class_004e2d00*)&key)->ReadInt("TopEdge", -500, 50000, -500);
 
