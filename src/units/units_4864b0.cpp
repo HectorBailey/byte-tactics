@@ -40,7 +40,7 @@ struct Info_4864b0 {
 
 class Class_004b0bc0 {
 public:
-    int FUN_004b0bc0(char* name, int* a, int* b, int c, int d);
+    int QueryScript(char* name, int* a, int* b, int c, int d);
 };
 
 struct Unit {
@@ -117,7 +117,7 @@ void __stdcall FUN_004864b0(Unit* unit, int param_2)
                 amount = 1;
             if (amount > 100)
                 amount = 100;
-            unit->field_9a->FUN_004b0bc0("Killed", &amount, &flag, 0, 0);
+            unit->field_9a->QueryScript("Killed", &amount, &flag, 0, 0);
         }
         if (unit->field_104 != 0.0f) {
             flag = 0;

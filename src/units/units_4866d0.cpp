@@ -59,7 +59,7 @@ public:
 
 class Class_004b0a70 {
 public:
-    int FUN_004b0a70(char* name, void* a, int b, int c, int d, int e, int f, int g);
+    int StartScriptWithArgs(char* name, void* a, int b, int c, int d, int e, int f, int g);
 };
 
 // The unit's script object; deleting it calls the virtual destructor in slot 0x50.
@@ -262,7 +262,7 @@ void __stdcall FUN_004866d0(Cmd_004866d0* cmd, int local)
     if ((g_game->x14281 & 2) == 2)
         FUN_00482090(unit);
     if (local == 0 && cmd->amount > 0)
-        ((Class_004b0a70*)unit->script)->FUN_004b0a70(DAT_00508be8, 0, 1, 1, cmd->amount, 0, 0, 0);
+        ((Class_004b0a70*)unit->script)->StartScriptWithArgs(DAT_00508be8, 0, 1, 1, cmd->amount, 0, 0, 0);
 
     int credited = 0;
     switch (cmd->kind) {

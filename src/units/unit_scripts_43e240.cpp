@@ -20,7 +20,7 @@ static inline Vec3 operator+(const Vec3& a, const Vec3& b)
 
 class Class_004b0bc0 {
 public:
-    int FUN_004b0bc0(char* name, int* param_2, int* param_3, int* param_4, int* param_5);
+    int QueryScript(char* name, int* param_2, int* param_3, int* param_4, int* param_5);
 };
 
 #pragma pack(push, 1)
@@ -38,7 +38,7 @@ static inline int QueryWeaponPiece(Object* obj, unsigned char weapon)
 {
     char* names[3] = { "QueryPrimary", "QuerySecondary", "QueryTertiary" };
     int piece = 0;
-    obj->script->FUN_004b0bc0(names[weapon], &piece, 0, 0, 0);
+    obj->script->QueryScript(names[weapon], &piece, 0, 0, 0);
     return piece;
 }
 

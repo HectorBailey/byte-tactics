@@ -2,7 +2,7 @@
 
 class Class_004b0a70 {
 public:
-    int FUN_004b0a70(char* name, void* param_2, int param_3, int param_4, int param_5, int param_6, int param_7, int param_8);
+    int StartScriptWithArgs(char* name, void* param_2, int param_3, int param_4, int param_5, int param_6, int param_7, int param_8);
 };
 
 #pragma pack(push, 1)
@@ -60,7 +60,7 @@ void Class_0043db50::FUN_0043db50(Unit* unit)
         newState = 0;
     }
     if (unit->state != newState) {
-        unit->script->FUN_004b0a70("setSFXoccupy", 0, 1, 1, newState, 0, 0, 0);
+        unit->script->StartScriptWithArgs("setSFXoccupy", 0, 1, 1, newState, 0, 0, 0);
         unit->state = newState;
     }
 }

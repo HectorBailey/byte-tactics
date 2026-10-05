@@ -23,7 +23,7 @@ public:
 
 class Class_004b0a70 {
 public:
-    int FUN_004b0a70(char* name, void* param_2, int param_3, int param_4, int param_5,
+    int StartScriptWithArgs(char* name, void* param_2, int param_3, int param_4, int param_5,
                     int param_6, int param_7, int param_8);
 };
 
@@ -160,13 +160,13 @@ void __stdcall FUN_00489ce0(Event_00489ce0* ev)
         if (ev->kind == 1) {
             int a = FUN_004b7123(ev->param_7 << 8, 400);
             int b = FUN_004b70ef(ev->param_7 << 8, 400);
-            unit->anims->FUN_004b0a70(s_HitByWeapon_00508d74, 0, 0, 2, a, b, 0, 0);
+            unit->anims->StartScriptWithArgs(s_HitByWeapon_00508d74, 0, 0, 2, a, b, 0, 0);
             int pct = unit->hp * 100 / unit->def->maxhp;
             if (pct < 0)
                 pct = 0;
             if (pct > 100)
                 pct = 100;
-            unit->anims->FUN_004b0a70(s_TakeDamage_00508d68, 0, 0, 1, pct, 0, 0, 0);
+            unit->anims->StartScriptWithArgs(s_TakeDamage_00508d68, 0, 0, 1, pct, 0, 0, 0);
         }
     }
 }

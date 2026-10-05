@@ -230,7 +230,7 @@ class Class_004388b0 { public: void FUN_004388b0(); };
 void __stdcall FUN_0047db20(Unit* unit);
 class Class_00401110 { public: void FUN_00401110(Unit*, Class_004b4560*); };
 class Class_0043d210 { public: void FUN_0043de30(Unit*, Class_004b4560*); };
-class Class_004b0610 { public: void FUN_004b2040(Class_004b4560*); };
+class CobScript { public: void LoadScriptState(Class_004b4560*); };
 
 
 // FUNCTION: 0x487080
@@ -343,7 +343,7 @@ Unit* __stdcall FUN_00487080(unsigned short id, Class_004b4560* file)
         ((Class_004388b0*)unit->listHead)->FUN_004388b0();
     sprintf(script, "Script%i", i);
     ((Class_004b4ba0*)file)->FUN_004b4ba0(script);
-    ((Class_004b0610*)unit->field_9a)->FUN_004b2040(file);
+    ((CobScript*)unit->field_9a)->LoadScriptState(file);
 
     for (int j = 0; j < 3; j++) {
         unit->pieces[j].f0 = rec.pieces[j].f0;
