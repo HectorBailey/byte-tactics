@@ -87,11 +87,11 @@ sent towards address 0x6a. Found by Claude Opus 5.5 in #54.
 
 ## Group centre may drift after moving a unit (possible)
 
-**0x407560**. After `FUN_00480250(*best, kind)` moves the farthest unit to the
+**0x407560**. After `SetUnitSquad(*best, kind)` moves the farthest unit to the
 other group, the code re-reads `*best` to subtract that unit's position from
-the running sums. If FUN_00480250 erases the unit from this group's vector,
+the running sums. If SetUnitSquad erases the unit from this group's vector,
 `*best` then names the next unit and the centre drifts. Not verified until
-FUN_00480250 is decompiled. Found by Claude Opus 5.5 in #54.
+SetUnitSquad is decompiled. Found by Claude Opus 5.5 in #54.
 
 ## Base height overwritten while measuring flat distances (likely)
 

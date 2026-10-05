@@ -138,12 +138,12 @@ struct Object_0040e630 {
 
 class Dummy_00440be0 {
 public:
-    void FUN_00440be0(Object_0040e630* p);
+    void RefreshUnitIfStale(Object_0040e630* p);
 };
 
 class Class_00440af0 {
 public:
-    void FUN_00440af0(Object_0040e630* p);
+    void RefreshMovedUnits(Object_0040e630* p);
 };
 
 class Pathfinder {
@@ -229,7 +229,7 @@ public:
     }
     void Release()
     {
-        owner->FUN_00440be0(object);
+        owner->RefreshUnitIfStale(object);
         object = 0;
         owner = 0;
     }
@@ -248,7 +248,7 @@ void Class_0040e630::FUN_0040e630(Target_0040e630* t)
     owner = (Dummy_00440be0*)object->unit->field_4;
     target = t;
     start = object->pos;
-    ((Class_00440af0*)owner)->FUN_00440af0(object);
+    ((Class_00440af0*)owner)->RefreshMovedUnits(object);
     ResetTable();
     ((Pathfinder*)this)->FUN_0040d900();
 

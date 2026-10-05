@@ -169,7 +169,7 @@ revisit them once the surrounding code is known.
   elsewhere; its getter 0x4e1e30 is `Class_004e1e30::FUN_004e1e30`.
 
 - `Class_004402e0` (constructor 0x4402e0) is the class 0x440290.cpp calls
-  `Class_00440320`, while 0x440320 is recorded as the free function
+  `MovementClass`, while 0x440320 is recorded as the free function
   `FUN_00440320`.
 
 - `Class_0046e4d0::AllowUnit` and `Class_0046e450` are the same object's

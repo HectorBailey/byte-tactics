@@ -74,7 +74,7 @@ void __cdecl FUN_004d85a0(void* data);
 void __stdcall FUN_004a0bf0(Menu_004942e0* menu, char* name, char* text, int param);
 void __stdcall FUN_0049fa90(Menu_004942e0* menu);
 int __stdcall FUN_00465ac0(void* player, void* unit);
-unsigned short __stdcall FUN_00488b10(char* name);
+unsigned short __stdcall FindUnitTypeId(char* name);
 
 // FUNCTION: 0x4942e0
 void __stdcall FUN_004942e0(void)
@@ -91,7 +91,7 @@ void __stdcall FUN_004942e0(void)
     if (g_game->selected != -1) {
         strncpy(name, g_game->menu.holder->entries[g_game->selected].name, 0x10);
         name[0x10] = 0;
-        type = FUN_00488b10(name);
+        type = FindUnitTypeId(name);
     } else {
         unsigned short t = g_game->field_2cba;
         if (t != 0) {

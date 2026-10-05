@@ -84,7 +84,7 @@ void __stdcall FUN_004232f0(int index, int* head);
 int __stdcall GetGroundHeight(Vec3_00423c50* pos);
 void* __stdcall FUN_0045a8d0(void* obj);
 void __stdcall FUN_00472c50(Vec3_00423c50* p, short index);
-void __stdcall FUN_00440a40(Point16_00423c50 a, Point16_00423c50 b);
+void __stdcall RefreshAllPassMaps(Point16_00423c50 a, Point16_00423c50 b);
 
 // Inlined copy of FUN_004232a0: takes a spot off the free list.
 static inline int AllocSpot_004232a0()
@@ -198,6 +198,6 @@ Spot_00423c50* __stdcall FUN_00423c50(Cell_00423c50* cell, unsigned short featur
     Point16_00423c50 p2;
     p2.x = index % g_game->width;
     p2.z = index / g_game->width;
-    FUN_00440a40(p2, f->footprint);
+    RefreshAllPassMaps(p2, f->footprint);
     return spot;
 }

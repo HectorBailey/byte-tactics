@@ -228,7 +228,7 @@ class Class_0042b370 {
     Class_0042b370& operator=(const Class_0042b370& other);
 };
 
-struct Class_00440320 {
+struct MovementClass {
     int* field_0;
     short field_4;
     short field_6;
@@ -243,13 +243,13 @@ struct Class_00440320 {
     void* field_18;
     int field_1c;
 
-    void FUN_00440340(void* parser);
+    void ReadMoveInfo(void* parser);
 };
 
-struct Class_00440290 {
-    Class_00440320 entries[32];
+struct MovementClassTable {
+    MovementClass entries[32];
 
-    static Class_00440290 DAT_00512358;
+    static MovementClassTable DAT_00512358;
 };
 
 struct Game {
@@ -287,7 +287,7 @@ int __stdcall FUN_004cb5f0(void* obj);
 void __stdcall FUN_004b6290(const char* msg);
 void* __stdcall FUN_004b2450(char* path);
 void __stdcall FUN_004bb0f0(char* text);
-short __stdcall FUN_00488b10(char* text);
+short __stdcall FindUnitTypeId(char* text);
 int __cdecl FUN_004d8610(char* name);
 void* __cdecl FUN_004d83b0(const char* name, int size);
 void __cdecl FUN_004d85a0(void* p);
@@ -313,8 +313,8 @@ void LoadUnitTypes() {
             FUN_004b6290("Can't load MOVEINFO.TDF");
 
         int i = 0;
-        Class_00440320* cls = Class_00440290::DAT_00512358.entries;
-        Class_00440320* cls_end = &Class_00440290::DAT_00512358.entries[32];
+        MovementClass* cls = MovementClassTable::DAT_00512358.entries;
+        MovementClass* cls_end = &MovementClassTable::DAT_00512358.entries[32];
         do {
             sprintf(classbuf, "CLASS%d", i);
             ((Class_004c3e10*)&parser)->FUN_004c3e10();
@@ -322,7 +322,7 @@ void LoadUnitTypes() {
                 ((Class_004c48c0*)parser.current)
                     ->FUN_004c48c0(classbuf, "name", 100, DAT_005119b8);
                 cls->field_0 = (int*)FUN_004d8610(classbuf);
-                cls->FUN_00440340(&parser);
+                cls->ReadMoveInfo(&parser);
             }
             cls++;
             i++;
@@ -490,7 +490,7 @@ void LoadUnitTypes() {
                     sprintf(objpath, "canbuild%d", k);
                     while (((Class_004c48c0*)parser2.current)
                                ->FUN_004c48c0(valbuf, objpath, 0x20, DAT_005119b8)) {
-                        short val = FUN_00488b10(valbuf);
+                        short val = FindUnitTypeId(valbuf);
                         if (val != 0) {
                             list[count] = val;
                             count++;

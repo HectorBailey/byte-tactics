@@ -7,11 +7,11 @@ public:
     unsigned int height;            // +0x14
     int* cells;                     // +0x18
 
-    void FUN_00440470(unsigned int w, unsigned int h);
+    void ResizePassMap(unsigned int w, unsigned int h);
 };
 
 // FUNCTION: 0x440470
-void Class_00440470::FUN_00440470(unsigned int w, unsigned int h)
+void Class_00440470::ResizePassMap(unsigned int w, unsigned int h)
 {
     width = w;
     height = h;

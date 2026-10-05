@@ -295,7 +295,7 @@ void __stdcall FUN_004385f0(Unit*, Order*);
 int __stdcall FUN_00438700(Unit*, Order*, int);
 void __stdcall GetNanoPiecePosition(Unit*, Vec3*);
 void __stdcall FUN_00472200(Vec3*, Vec3*, int);
-void __stdcall FUN_00488570(Unit*, void*, int);
+void __stdcall GiveUnitToPlayer(Unit*, void*, int);
 // FUNCTION: 0x404270
 int __stdcall FUN_00404270(Unit* unit, Order* order, unsigned int flags)
 {
@@ -372,7 +372,7 @@ int __stdcall FUN_00404270(Unit* unit, Order* order, unsigned int flags)
         return 2;
     }
     case 5:
-        FUN_00488570(target, unit->owner, 0);
+        GiveUnitToPlayer(target, unit->owner, 0);
         FUN_0047f780(unit, 16, 0);
         return 5;
     }
