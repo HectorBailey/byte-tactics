@@ -15,7 +15,6 @@ struct Chunk;
 struct Class_0051fba4;
 struct Entry_00443100;
 struct Game;
-struct Guid_4ca100;
 struct List_0047f8c0;
 struct Node_004dde70;
 struct Record_005129b4;
@@ -23,15 +22,6 @@ struct Struct_00526ff0;
 
 extern unsigned char DAT_004fca10[8];                                                         // 0x4fca10, 8 bytes; const Table_0040e630 by value in 1 of 2 files (conflicting: struct names only)
 extern unsigned char DAT_004fcc68[8];                                                         // 0x4fcc68, 8 bytes; 1 of 1 files
-extern "C" unsigned char IID_IDirectDraw2[16];                                                // 0x4fccd8, 16 bytes; declared extern "C", type unknown
-extern unsigned char DAT_004fcd78[32];                                                        // 0x4fcd78, 32 bytes; _GUID by value in 2 of 2 files
-extern unsigned char DAT_004fcd98[16];                                                        // 0x4fcd98, 16 bytes; Guid_443ff0 by value in 1 of 5 files (conflicting: struct names only)
-extern unsigned char DAT_004fce18[112];                                                       // 0x4fce18, 112 bytes; _GUID by value in 1 of 1 files
-extern unsigned char DAT_004fce88[32];                                                        // 0x4fce88, 32 bytes; Guid_00441c30 by value in 1 of 1 files
-extern unsigned char DAT_004fcea8[32];                                                        // 0x4fcea8, 32 bytes; Guid_00441c30 by value in 1 of 1 files
-extern unsigned char DAT_004fcee8[32];                                                        // 0x4fcee8, 32 bytes; Guid_00441c30 by value in 1 of 1 files
-extern unsigned char DAT_004fcf08[96];                                                        // 0x4fcf08, 96 bytes; Guid_00441c30 by value in 1 of 1 files
-extern unsigned char DAT_004fcf68[80];                                                        // 0x4fcf68, 80 bytes; const _GUID by value in 1 of 1 files
 extern char DAT_004fd050[200];                                                                // 0x4fd050, 200 bytes; 1 of 1 files
 extern double DAT_004fd2b0;                                                                   // 0x4fd2b0, 8 bytes; 1 of 1 files
 extern double DAT_004fd2b8;                                                                   // 0x4fd2b8, 8 bytes; 1 of 1 files
@@ -227,7 +217,6 @@ extern char DAT_0050a5c0[16];                                                   
 extern int DAT_0050a778;                                                                      // 0x50a778, 4 bytes; 5 of 5 files
 extern void* DAT_0050a77c;                                                                    // 0x50a77c, 4 bytes; 5 of 5 files
 extern int DAT_0050a780;                                                                      // 0x50a780, 4 bytes; 4 of 4 files
-extern Guid_4ca100* DAT_0050a788[4];                                                          // 0x50a788, 16 bytes; 1 of 1 files
 extern int DAT_0050b540;                                                                      // 0x50b540, 4 bytes; 8 of 8 files
 extern int DAT_0050b544;                                                                      // 0x50b544, 4 bytes; 7 of 7 files
 extern void* DAT_0050b9e0[7];                                                                 // 0x50b9e0, 28 bytes; 1 of 1 files
@@ -741,7 +730,7 @@ extern void* DAT_0052a4f8;                                                      
 extern long DAT_0052a4fc;                                                                     // 0x52a4fc, 4 bytes; 2 of 3 files (conflicting: signedness or const)
 extern unsigned char DAT_0052a500[1];                                                         // 0x52a500, 1 bytes; nothing refers to it
 
-// Not declared: 175 globals defined in src/data or whose type is not settled (see data/globals.csv).
+// Not declared: 225 globals defined in src/data or whose type is not settled (see data/globals.csv).
 //   0x513000 DAT_00513000: defined in src/unsorted/0x460e20.cpp
 //   0x5119c0 DAT_005119c0: Class_00409160*[] (7), void*[] (5), Owner*[] (3), Class_00409470*[] (2), and 5 more
 //   0x51fbd0 DAT_0051fbd0: void* (4), int (2), Display_004b4f50* (1), Display_004b5370* (1), and 14 more
@@ -752,13 +741,15 @@ extern unsigned char DAT_0052a500[1];                                           
 //   0x4fd2f8 DAT_004fd2f8: defined in src/data/vtables.cpp
 //   0x5292c4 QBDUValue_004e17c0::PBDU?$pair::?$_Tree::_Nil: defined in src/unsorted/0x4e17c0.cpp
 //   0x51fe00 DAT_0051fe00: part of another global: DAT_0051fdc0+0x40
-//   0x4fcdc8 DAT_004fcdc8: char[] (1), Guid_00441460 (1), Guid_00441bc0 (1), Guid_00441c30 (1), and 3 more
+//   0x4fcdc8 DPSPGUID_MODEM: defined in src/data/guids.cpp
+//   0x4fcdb8 DPSPGUID_SERIAL: defined in src/data/guids.cpp
 //   0x4fd3b8 DAT_004fd3b8: defined in src/data/vtables.cpp
 //   0x511df0 DAT_00511df0: Obj_00421170*[] (2), int[100] (1), void*[100] (1), Obj_00420f30*[100] (1), and 2 more
 //   0x512358 Class_00440290::DAT_00512358: defined in src/unsorted/0x440230.cpp
 //   0x51e59c IURect_0046e160::IU?$pair::?$_Tree::_Nilrefs: defined in src/unsorted/0x46c920.cpp
 //   0x51f2e8 DAT_0051f2e8: char* (4), int (1), int* (1), void* (1)
-//   0x4fcdb8 DAT_004fcdb8: char[] (1), Guid_00441460 (1), Guid_00441bc0 (1), Guid_00441c30 (1), and 2 more
+//   0x4fcd98 DPSPGUID_IPX: defined in src/data/guids.cpp
+//   0x4fcda8 DPSPGUID_TCPIP: defined in src/data/guids.cpp
 //   0x5129ac DAT_005129ac: char* (4), int* (1), void* (1)
 //   0x512f71 DAT_00512f71: char (3), int (2), unsigned char (1)
 //   0x512f75 DAT_00512f75: char[] (4), char (2)
@@ -766,7 +757,6 @@ extern unsigned char DAT_0052a500[1];                                           
 //   0x51e6a0 DAT_0051e6a0: defined in src/unsorted/0x4814c0.cpp
 //   0x51f2e4 DAT_0051f2e4: char* (4), int* (1), void* (1)
 //   0x526ff4 DAT_00526ff4: char* (4), void* (2)
-//   0x4fcda8 DAT_004fcda8: char[] (1), Guid_00441460 (1), Guid_00441bc0 (1), Guid_00441c30 (1), and 1 more
 //   0x5120b8 DAT_005120b8: Entry_00428730[10] (1), char[] (1), Entry_004287d0[10] (1), Entry_00428850[10] (1), and 1 more
 //   0x512c84 DAT_00512c84: part of another global: DAT_00512c80+0x4
 //   0x512d90 DAT_00512d90: part of another global: DAT_00512c80+0x110
@@ -800,6 +790,9 @@ extern unsigned char DAT_0052a500[1];                                           
 //   0x528ab4 DAT_00528ab4: void* (2), void (__stdcall*)(void) (1), int (__stdcall*)(void*, unsigned long, unsigned long*, Line_004de550*) (1)
 //   0x528acc DAT_00528acc: void* (2), void (__stdcall*)(void) (1), int (__stdcall*)(void*, unsigned long, int*, void*) (1)
 //   0x529e00 DAT_00529e00: Counter_004e1e50 (1), Entry_004df590[] (1), unsigned int (1), EventEntry (1)
+//   0x4fcd78 IID_IDirectPlay3A: defined in src/data/guids.cpp
+//   0x4fcec8 DPAID_Modem: defined in src/data/guids.cpp
+//   0x4fcfb8 DAT_004fcfb8: defined in src/data/guids.cpp
 //   0x4fd288 g_readyOrder: defined in src/data/unit_orders.cpp
 //   0x4fd328 DAT_004fd328: defined in src/data/vtables.cpp
 //   0x4fd358 DAT_004fd358: defined in src/data/vtables.cpp
@@ -829,8 +822,13 @@ extern unsigned char DAT_0052a500[1];                                           
 //   0x4fc6e8 g_groundOrders: defined in src/data/unit_orders.cpp
 //   0x4fc9a0 DAT_004fc9a0: defined in src/data/vtables.cpp
 //   0x4fca18 g_vtolOrders: defined in src/data/unit_orders.cpp
-//   0x4fcec8 DAT_004fcec8: Guid_00441c30 (1), const _GUID (1)
-//   0x4fcfb8 DAT_004fcfb8: char[] (1), _GUID (1)
+//   0x4fccd8 IID_IDirectDraw2: defined in src/data/guids.cpp
+//   0x4fce18 IID_IDirectPlayLobby2A: defined in src/data/guids.cpp
+//   0x4fce88 DPAID_ServiceProvider: defined in src/data/guids.cpp
+//   0x4fcea8 DPAID_Phone: defined in src/data/guids.cpp
+//   0x4fcee8 DPAID_INet: defined in src/data/guids.cpp
+//   0x4fcf08 DPAID_ComPort: defined in src/data/guids.cpp
+//   0x4fcf68 IID_IDirectSound3DBuffer: defined in src/data/guids.cpp
 //   0x4fd488 DAT_004fd488: defined in src/data/vtables.cpp
 //   0x501d38 g_consoleCommands: defined in src/data/console_commands.cpp
 //   0x501f48 g_cheatCommands: defined in src/data/console_commands.cpp
@@ -838,6 +836,7 @@ extern unsigned char DAT_0052a500[1];                                           
 //   0x505510 DAT_00505510: unsigned char (1), int (1)
 //   0x507b70 DAT_00507b70: unsigned char[] (1), ColourEntry_00478790[] (1)
 //   0x5086e0 DAT_005086e0: defined in src/data/unit_messages.cpp
+//   0x50a788 DAT_0050a788: defined in src/data/guids.cpp
 //   0x50c958 g_assertDialog: defined in src/data/debug_dialogs.cpp
 //   0x50cd38 g_memoryDialog: defined in src/data/debug_dialogs.cpp
 //   0x50ced8 g_profilerDialog: defined in src/data/debug_dialogs.cpp
@@ -866,6 +865,46 @@ extern unsigned char DAT_0052a500[1];                                           
 //   0x529500 QBDUValue_004e17c0::PBDU?$pair::?$_Tree::_Nilrefs: defined in src/unsorted/0x4e17c0.cpp
 //   0x529df8 DAT_00529df8: void* (1), EventEntry* (1)
 //   0x4fc980 DAT_004fc980: vtable
+//   0x4fcca8 CLSID_DirectDraw: defined in src/data/guids.cpp
+//   0x4fccb8 CLSID_DirectDrawClipper: defined in src/data/guids.cpp
+//   0x4fccc8 IID_IDirectDraw: defined in src/data/guids.cpp
+//   0x4fcce8 IID_IDirectDrawSurface: defined in src/data/guids.cpp
+//   0x4fccf8 IID_IDirectDrawSurface2: defined in src/data/guids.cpp
+//   0x4fcd08 IID_IDirectDrawSurface3: defined in src/data/guids.cpp
+//   0x4fcd18 IID_IDirectDrawPalette: defined in src/data/guids.cpp
+//   0x4fcd28 IID_IDirectDrawClipper: defined in src/data/guids.cpp
+//   0x4fcd38 IID_IDirectDrawColorControl: defined in src/data/guids.cpp
+//   0x4fcd48 IID_IDirectPlay2: defined in src/data/guids.cpp
+//   0x4fcd58 IID_IDirectPlay2A: defined in src/data/guids.cpp
+//   0x4fcd68 IID_IDirectPlay3: defined in src/data/guids.cpp
+//   0x4fcd88 CLSID_DirectPlay: defined in src/data/guids.cpp
+//   0x4fcdd8 IID_IDirectPlay: defined in src/data/guids.cpp
+//   0x4fcde8 IID_IDirectPlayLobby: defined in src/data/guids.cpp
+//   0x4fcdf8 IID_IDirectPlayLobbyA: defined in src/data/guids.cpp
+//   0x4fce08 IID_IDirectPlayLobby2: defined in src/data/guids.cpp
+//   0x4fce28 CLSID_DirectPlayLobby: defined in src/data/guids.cpp
+//   0x4fce38 DPLPROPERTY_MessagesSupported: defined in src/data/guids.cpp
+//   0x4fce48 DPLPROPERTY_LobbyGuid: defined in src/data/guids.cpp
+//   0x4fce58 DPLPROPERTY_PlayerGuid: defined in src/data/guids.cpp
+//   0x4fce68 DPLPROPERTY_PlayerScore: defined in src/data/guids.cpp
+//   0x4fce78 DPAID_TotalSize: defined in src/data/guids.cpp
+//   0x4fce98 DPAID_LobbyProvider: defined in src/data/guids.cpp
+//   0x4fceb8 DPAID_PhoneW: defined in src/data/guids.cpp
+//   0x4fced8 DPAID_ModemW: defined in src/data/guids.cpp
+//   0x4fcef8 DPAID_INetW: defined in src/data/guids.cpp
+//   0x4fcf18 CLSID_DirectSound: defined in src/data/guids.cpp
+//   0x4fcf28 CLSID_DirectSoundCapture: defined in src/data/guids.cpp
+//   0x4fcf38 IID_IDirectSound: defined in src/data/guids.cpp
+//   0x4fcf48 IID_IDirectSoundBuffer: defined in src/data/guids.cpp
+//   0x4fcf58 IID_IDirectSound3DListener: defined in src/data/guids.cpp
+//   0x4fcf78 IID_IDirectSoundCapture: defined in src/data/guids.cpp
+//   0x4fcf88 IID_IDirectSoundCaptureBuffer: defined in src/data/guids.cpp
+//   0x4fcf98 IID_IDirectSoundNotify: defined in src/data/guids.cpp
+//   0x4fcfa8 IID_IKsPropertySet: defined in src/data/guids.cpp
+//   0x4fcfc8 DAT_004fcfc8: defined in src/data/guids.cpp
+//   0x4fcfd8 DAT_004fcfd8: defined in src/data/guids.cpp
+//   0x4fcfe8 DAT_004fcfe8: defined in src/data/guids.cpp
+//   0x4fcff8 DAT_004fcff8: defined in src/data/guids.cpp
 //   0x4fd458 DAT_004fd458: vtable
 //   0x501fcc DAT_00501fcc: defined in src/data/console_commands.cpp
 //   0x5086d8 g_unitMessages: defined in src/data/unit_messages.cpp

@@ -9,67 +9,8 @@
 
 #include "globals.h"
 
-// Data the initial values below point at, which no row names.
-extern const unsigned char DAT_004fcfc8[16];
-extern const unsigned char DAT_004fcfd8[16];
-extern const unsigned char DAT_004fcfe8[16];
-extern const unsigned char DAT_004fcff8[16];
-
 unsigned char DAT_004fca10[8] = {0, 40, 60, 80, 100, 80, 60, 40};  // 0x4fca10 .rdata
 unsigned char DAT_004fcc68[8] = {4, 14, 10};  // 0x4fcc68 .rdata
-unsigned char IID_IDirectDraw2[16] = {224, 243, 166, 179, 67, 43, 207, 17, 162, 222, 0, 170, 0, 185, 51, 86};  // 0x4fccd8 .rdata
-// 0x4fcd78 .rdata
-unsigned char DAT_004fcd78[32] = {
-    65, 254, 62, 19, 220, 50, 208, 17, 156, 251, 0, 160, 201, 10, 67, 203,
-    32, 109, 235, 209, 35, 137, 208, 17, 157, 151, 0, 160, 201, 10, 67, 203
-};
-unsigned char DAT_004fcd98[16] = {0, 196, 91, 104, 44, 157, 207, 17, 169, 205, 0, 170, 0, 104, 134, 227};  // 0x4fcd98 .rdata
-// 0x4fce18 .rdata
-unsigned char DAT_004fce18[112] = {
-    128, 175, 180, 27, 3, 163, 208, 17, 156, 79, 0, 160, 201, 5, 66, 94,
-    16, 248, 232, 47, 165, 178, 208, 17, 167, 135, 0, 0, 248, 3, 171, 252,
-    161, 205, 44, 118, 22, 217, 208, 17, 186, 57, 0, 192, 79, 215, 237, 103,
-    160, 32, 105, 245, 24, 210, 208, 17, 186, 57, 0, 192, 79, 215, 237, 103,
-    34, 147, 49, 180, 13, 210, 208, 17, 186, 57, 0, 192, 79, 215, 237, 103,
-    0, 64, 120, 72, 25, 210, 208, 17, 186, 57, 0, 192, 79, 215, 237, 103,
-    96, 245, 24, 19, 44, 145, 208, 17, 157, 170, 0, 160, 201, 10, 67, 203
-};
-// 0x4fce88 .rdata
-unsigned char DAT_004fce88[32] = {
-    192, 22, 217, 7, 175, 224, 207, 17, 156, 78, 0, 160, 201, 5, 66, 94,
-    64, 86, 185, 89, 103, 150, 208, 17, 167, 125, 0, 0, 248, 3, 171, 252
-};
-// 0x4fcea8 .rdata
-unsigned char DAT_004fcea8[32] = {
-    160, 137, 236, 120, 175, 224, 207, 17, 156, 78, 0, 160, 201, 5, 66, 94,
-    112, 122, 90, 186, 191, 157, 208, 17, 156, 193, 0, 160, 201, 5, 66, 94
-};
-// 0x4fcee8 .rdata
-unsigned char DAT_004fcee8[32] = {
-    160, 77, 165, 196, 175, 224, 207, 17, 156, 78, 0, 160, 201, 5, 66, 94,
-    160, 50, 50, 230, 191, 157, 208, 17, 156, 193, 0, 160, 201, 5, 66, 94
-};
-// 0x4fcf08 .rdata
-unsigned char DAT_004fcf08[96] = {
-    0, 206, 240, 242, 175, 224, 207, 17, 156, 78, 0, 160, 201, 5, 66, 94,
-    70, 217, 212, 71, 232, 98, 207, 17, 147, 188, 68, 69, 83, 84, 0, 0,
-    128, 7, 33, 176, 205, 137, 208, 17, 175, 8, 0, 160, 201, 37, 205, 22,
-    131, 250, 154, 39, 129, 73, 206, 17, 165, 33, 0, 32, 175, 11, 229, 96,
-    133, 250, 154, 39, 129, 73, 206, 17, 165, 33, 0, 32, 175, 11, 229, 96,
-    132, 250, 154, 39, 129, 73, 206, 17, 165, 33, 0, 32, 175, 11, 229, 96
-};
-// 0x4fcf68 .rdata
-unsigned char DAT_004fcf68[80] = {
-    134, 250, 154, 39, 129, 73, 206, 17, 165, 33, 0, 32, 175, 11, 229, 96,
-    129, 7, 33, 176, 205, 137, 208, 17, 175, 8, 0, 160, 201, 37, 205, 22,
-    130, 7, 33, 176, 205, 137, 208, 17, 175, 8, 0, 160, 201, 37, 205, 22,
-    131, 7, 33, 176, 205, 137, 208, 17, 175, 8, 0, 160, 201, 37, 205, 22,
-    48, 172, 239, 49, 92, 81, 208, 17, 169, 170, 0, 170, 0, 97, 190, 147
-};
-extern const unsigned char DAT_004fcfc8[16] = {68, 151, 210, 216, 138, 32, 208, 17, 188, 157, 0, 160, 36, 41, 103, 182};  // 0x4fcfc8 .rdata, a Guid_4ca100 DAT_0050a788 points at
-extern const unsigned char DAT_004fcfd8[16] = {64, 79, 113, 209, 137, 89, 208, 17, 154, 132, 68, 69, 83, 84};  // 0x4fcfd8 .rdata, a Guid_4ca100 DAT_0050a788 points at
-extern const unsigned char DAT_004fcfe8[16] = {160, 43, 70, 37, 141, 206, 207, 17, 131, 155, 0, 170, 0, 185, 48, 72};  // 0x4fcfe8 .rdata, a Guid_4ca100 DAT_0050a788 points at
-extern const unsigned char DAT_004fcff8[16] = {128, 253, 149, 69, 77, 29, 209, 17, 153, 252, 0, 96, 151, 106, 191, 90};  // 0x4fcff8 .rdata, a Guid_4ca100 DAT_0050a788 points at
 char DAT_004fd050[200] = "Warning! The currently installed version of Microsoft%sDirectX may not function properly with Total Annihilation.%sPlease install the version of DirectX included on the%sTotal Annihilation setup CD.";  // 0x4fd050 .rdata
 double DAT_004fd2b0 = 6.28318530717958;  // 0x4fd2b0 .rdata
 double DAT_004fd2b8 = 0.125;  // 0x4fd2b8 .rdata
@@ -368,7 +309,6 @@ char DAT_0050a5c0[16] = "HAPIFILE array";  // 0x50a5c0 .data
 int DAT_0050a778 = 1;  // 0x50a778 .data
 void* DAT_0050a77c = 0;  // 0x50a77c .data
 int DAT_0050a780 = 1;  // 0x50a780 .data
-Guid_4ca100* DAT_0050a788[4] = {(Guid_4ca100*)DAT_004fcfc8, (Guid_4ca100*)DAT_004fcfd8, (Guid_4ca100*)DAT_004fcfe8, (Guid_4ca100*)DAT_004fcff8};  // 0x50a788 .data
 int DAT_0050b540 = -1;  // 0x50b540 .data
 int DAT_0050b544 = -1;  // 0x50b544 .data
 void* DAT_0050b9e0[7] = {(void*)"SQUASHERR_OK", (void*)"SQUASHERR_BADHEADER", (void*)"SQUASHERR_BADCHECKSUM", (void*)"SQUASHERR_BADUNPACKSIZE", (void*)"SQUASHERR_BADUNPACKTYPE", (void*)"SQUASHERR_BADPACKTYPESQUASHERR_BADPARAMS"};  // 0x50b9e0 .data

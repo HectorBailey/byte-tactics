@@ -6,20 +6,60 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x4fca10,DAT_004fca10,.rdata,8,gap,data,const Table_0040e630,1,1,2,conflicting: struct names only,2,0x4,,,,00283c5064503c28
 0x4fca18,g_vtolOrders,.rdata,4,type,data,const UnitOrderType*,1,1,2,conflicting: shape,2,,PTR_s_Standby_004fca18,1,src/data/unit_orders.cpp,18155000
 0x4fcc68,DAT_004fcc68,.rdata,8,gap,data,unsigned char[],1,0,1,one type,1,,,,,040e0a0000000000
-0x4fccd8,IID_IDirectDraw2,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,DAT_004fccd8,,,e0f3a6b3432bcf11a2de00aa00b93356
-0x4fcd78,DAT_004fcd78,.rdata,32,gap,data,_GUID,2,0,1,one type,2,,DAT_004fcd78,,,41fe3e13dc32d0119cfb00a0c90a43cb206debd12389d0119d9700a0c90a43cb
-0x4fcd98,DAT_004fcd98,.rdata,16,gap,data,Guid_443ff0,1,4,5,conflicting: struct names only,5,,DAT_004fcd98,,,00c45b682c9dcf11a9cd00aa006886e3
-0x4fcda8,DAT_004fcda8,.rdata,16,gap,data,char[],1,4,5,conflicting: shape,5,,DAT_004fcda8,,,e05ee9367785cf11960c0080c7534e82
-0x4fcdb8,DAT_004fcdb8,.rdata,16,gap,data,char[],1,5,6,conflicting: shape,6,,DAT_004fcdb8,,,60681d0fd988cf119c4e00a0c905425e
-0x4fcdc8,DAT_004fcdc8,.rdata,12,gap,data,char[],1,6,7,conflicting: shape,7,0xc,DAT_004fcdc8,,,60a7ea4468cbcf119c4e00a0
-0x4fce18,DAT_004fce18,.rdata,112,gap,data,_GUID,1,0,1,one type,1,,DAT_004fce18,,,80afb41b03a3d0119c4f00a0c905425e10f8e82fa5b2d011a7870000f803abfca1cd2c7616d9d011ba3900c04fd7ed67a02069f518d2d011ba3900c04fd7ed67
-0x4fce88,DAT_004fce88,.rdata,32,gap,data,Guid_00441c30,1,0,1,one type,1,0xc,,,,c016d907afe0cf119c4e00a0c905425e4056b9596796d011a77d0000f803abfc
-0x4fcea8,DAT_004fcea8,.rdata,32,gap,data,Guid_00441c30,1,0,1,one type,1,0xc,,,,a089ec78afe0cf119c4e00a0c905425e707a5ababf9dd0119cc100a0c905425e
-0x4fcec8,DAT_004fcec8,.rdata,32,gap,data,const _GUID,1,1,2,conflicting: shape,2,0xc,,,,00c2dcf6fea2d0119c4f00a0c905425ee092fd01ffa2d0119c4f00a0c905425e
-0x4fcee8,DAT_004fcee8,.rdata,32,gap,data,Guid_00441c30,1,0,1,one type,1,0xc,,,,a04da5c4afe0cf119c4e00a0c905425ea03232e6bf9dd0119cc100a0c905425e
-0x4fcf08,DAT_004fcf08,.rdata,96,gap,data,Guid_00441c30,1,0,1,one type,1,0xc,,,,00cef0f2afe0cf119c4e00a0c905425e46d9d447e862cf1193bc444553540000800721b0cd89d011af0800a0c925cd1683fa9a278149ce11a5210020af0be560
-0x4fcf68,DAT_004fcf68,.rdata,80,gap,data,const _GUID,1,0,1,one type,1,,DAT_004fcf68,,,86fa9a278149ce11a5210020af0be560810721b0cd89d011af0800a0c925cd16820721b0cd89d011af0800a0c925cd16830721b0cd89d011af0800a0c925cd16
-0x4fcfb8,DAT_004fcfb8,.rdata,16,gap,data,char[],1,1,2,conflicting: shape,2,,,,,20747999f5f5cf11982700a0241496c8
+0x4fcca8,CLSID_DirectDraw,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,e00eb7d74043cf11b0630020afc2cd35
+0x4fccb8,CLSID_DirectDrawClipper,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,a0173859b37dcf11a2de00aa00b93356
+0x4fccc8,IID_IDirectDraw,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,80db146c33a7ce11a5210020af0be560
+0x4fccd8,IID_IDirectDraw2,.rdata,16,type,data,"extern ""C"" (no type)",2,0,1,one type,2,,DAT_004fccd8,,src/data/guids.cpp,e0f3a6b3432bcf11a2de00aa00b93356
+0x4fcce8,IID_IDirectDrawSurface,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,81db146c33a7ce11a5210020af0be560
+0x4fccf8,IID_IDirectDrawSurface2,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,85588057ec6ecf119441a82303c10e27
+0x4fcd08,IID_IDirectDrawSurface3,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,004e04dab269d011a1d500aa00b8dfbb
+0x4fcd18,IID_IDirectDrawPalette,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,84db146c33a7ce11a5210020af0be560
+0x4fcd28,IID_IDirectDrawClipper,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,85db146c33a7ce11a5210020af0be560
+0x4fcd38,IID_IDirectDrawColorControl,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,e00e9f4b7e0dd0119b0600a0c903a3b8
+0x4fcd48,IID_IDirectPlay2,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,c0f7742b5491cf11a9cd00aa006886e3
+0x4fcd58,IID_IDirectPlay2A,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,8005469d22a8cf11960c0080c7534e82
+0x4fcd68,IID_IDirectPlay3,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,40fe3e13dc32d0119cfb00a0c90a43cb
+0x4fcd78,IID_IDirectPlay3A,.rdata,16,type,data,_GUID,2,1,2,"one type, plus extern ""C"" references",3,,DAT_004fcd78,,src/data/guids.cpp,41fe3e13dc32d0119cfb00a0c90a43cb
+0x4fcd88,CLSID_DirectPlay,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,206debd12389d0119d9700a0c90a43cb
+0x4fcd98,DPSPGUID_IPX,.rdata,16,gap,data,Guid_443ff0,1,5,6,conflicting: struct names only,6,,DAT_004fcd98,,src/data/guids.cpp,00c45b682c9dcf11a9cd00aa006886e3
+0x4fcda8,DPSPGUID_TCPIP,.rdata,16,gap,data,char[],1,5,6,conflicting: shape,6,,DAT_004fcda8,,src/data/guids.cpp,e05ee9367785cf11960c0080c7534e82
+0x4fcdb8,DPSPGUID_SERIAL,.rdata,16,gap,data,char[],1,6,7,conflicting: shape,7,,DAT_004fcdb8,,src/data/guids.cpp,60681d0fd988cf119c4e00a0c905425e
+0x4fcdc8,DPSPGUID_MODEM,.rdata,12,gap,data,char[],1,7,8,conflicting: shape,8,0xc,DAT_004fcdc8,,src/data/guids.cpp,60a7ea4468cbcf119c4e00a0
+0x4fcdd8,IID_IDirectPlay,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,a0e9545465dbce11921c00aa006c4972
+0x4fcde8,IID_IDirectPlayLobby,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,715c46af8895cf11a02000aa006157ac
+0x4fcdf8,IID_IDirectPlayLobbyA,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,706ac62667b3cf11a02400aa006157ac
+0x4fce08,IID_IDirectPlayLobby2,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,20c2940103a3d0119c4f00a0c905425e
+0x4fce18,IID_IDirectPlayLobby2A,.rdata,16,type,data,_GUID,1,1,2,"one type, plus extern ""C"" references",2,,DAT_004fce18,,src/data/guids.cpp,80afb41b03a3d0119c4f00a0c905425e
+0x4fce28,CLSID_DirectPlayLobby,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,10f8e82fa5b2d011a7870000f803abfc
+0x4fce38,DPLPROPERTY_MessagesSupported,.rdata,16,gap,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,a1cd2c7616d9d011ba3900c04fd7ed67
+0x4fce48,DPLPROPERTY_LobbyGuid,.rdata,16,gap,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,a02069f518d2d011ba3900c04fd7ed67
+0x4fce58,DPLPROPERTY_PlayerGuid,.rdata,16,gap,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,229331b40dd2d011ba3900c04fd7ed67
+0x4fce68,DPLPROPERTY_PlayerScore,.rdata,16,gap,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,0040784819d2d011ba3900c04fd7ed67
+0x4fce78,DPAID_TotalSize,.rdata,16,gap,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,60f518132c91d0119daa00a0c90a43cb
+0x4fce88,DPAID_ServiceProvider,.rdata,16,gap,data,Guid_00441c30,1,1,2,"one type, plus extern ""C"" references",2,0xc,,,src/data/guids.cpp,c016d907afe0cf119c4e00a0c905425e
+0x4fce98,DPAID_LobbyProvider,.rdata,16,gap,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,4056b9596796d011a77d0000f803abfc
+0x4fcea8,DPAID_Phone,.rdata,16,gap,data,Guid_00441c30,1,1,2,"one type, plus extern ""C"" references",2,0xc,,,src/data/guids.cpp,a089ec78afe0cf119c4e00a0c905425e
+0x4fceb8,DPAID_PhoneW,.rdata,16,gap,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,707a5ababf9dd0119cc100a0c905425e
+0x4fcec8,DPAID_Modem,.rdata,16,gap,data,const _GUID,1,2,3,conflicting: shape,3,0xc,,,src/data/guids.cpp,00c2dcf6fea2d0119c4f00a0c905425e
+0x4fced8,DPAID_ModemW,.rdata,16,gap,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,e092fd01ffa2d0119c4f00a0c905425e
+0x4fcee8,DPAID_INet,.rdata,16,gap,data,Guid_00441c30,1,1,2,"one type, plus extern ""C"" references",2,0xc,,,src/data/guids.cpp,a04da5c4afe0cf119c4e00a0c905425e
+0x4fcef8,DPAID_INetW,.rdata,16,gap,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,a03232e6bf9dd0119cc100a0c905425e
+0x4fcf08,DPAID_ComPort,.rdata,16,gap,data,Guid_00441c30,1,1,2,"one type, plus extern ""C"" references",2,0xc,,,src/data/guids.cpp,00cef0f2afe0cf119c4e00a0c905425e
+0x4fcf18,CLSID_DirectSound,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,46d9d447e862cf1193bc444553540000
+0x4fcf28,CLSID_DirectSoundCapture,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,800721b0cd89d011af0800a0c925cd16
+0x4fcf38,IID_IDirectSound,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,83fa9a278149ce11a5210020af0be560
+0x4fcf48,IID_IDirectSoundBuffer,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,85fa9a278149ce11a5210020af0be560
+0x4fcf58,IID_IDirectSound3DListener,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,84fa9a278149ce11a5210020af0be560
+0x4fcf68,IID_IDirectSound3DBuffer,.rdata,16,type,data,const _GUID,1,1,2,"one type, plus extern ""C"" references",2,,DAT_004fcf68,,src/data/guids.cpp,86fa9a278149ce11a5210020af0be560
+0x4fcf78,IID_IDirectSoundCapture,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,810721b0cd89d011af0800a0c925cd16
+0x4fcf88,IID_IDirectSoundCaptureBuffer,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,820721b0cd89d011af0800a0c925cd16
+0x4fcf98,IID_IDirectSoundNotify,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,830721b0cd89d011af0800a0c925cd16
+0x4fcfa8,IID_IKsPropertySet,.rdata,16,type,data,"extern ""C"" (no type)",1,0,1,one type,1,,,,src/data/guids.cpp,30acef315c51d011a9aa00aa0061be93
+0x4fcfb8,DAT_004fcfb8,.rdata,16,gap,data,const _GUID,1,2,3,conflicting: shape,3,,,,src/data/guids.cpp,20747999f5f5cf11982700a0241496c8
+0x4fcfc8,DAT_004fcfc8,.rdata,16,gap,data,const _GUID,1,0,1,one type,1,,,,src/data/guids.cpp,4497d2d88a20d011bc9d00a0242967b6
+0x4fcfd8,DAT_004fcfd8,.rdata,16,gap,data,const _GUID,1,0,1,one type,1,,,,src/data/guids.cpp,404f71d18959d0119a84444553540000
+0x4fcfe8,DAT_004fcfe8,.rdata,16,gap,data,const _GUID,1,0,1,one type,1,,,,src/data/guids.cpp,a02b46258dcecf11839b00aa00b93048
+0x4fcff8,DAT_004fcff8,.rdata,16,gap,data,const _GUID,1,0,1,one type,1,,,,src/data/guids.cpp,80fd95454d1dd11199fc0060976abf5a
 0x4fd050,DAT_004fd050,.rdata,200,gap,data,char[],1,0,1,one type,1,,,,,5761726e696e6721205468652063757272656e746c7920696e7374616c6c65642076657273696f6e206f66204d6963726f736f6674257344697265637458206d
 0x4fd288,g_readyOrder,.rdata,28,gap,data,Elem_0043c390[],2,1,2,conflicting: array or pointer,3,0x19,PTR_s_Ready_004fd288,2,src/data/unit_orders.cpp,e8105000a09e430000000000000000000f00000000b8195100000000
 0x4fd2b0,DAT_004fd2b0,.rdata,8,type,float,double,1,0,1,one type,1,,,,,112d4454fb211940
@@ -239,7 +279,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x50a778,DAT_0050a778,.data,4,type,data,int,5,0,1,one type,5,,INT_0050a778,,,01000000
 0x50a77c,DAT_0050a77c,.data,4,type,data,void*,5,0,1,one type,5,,PTR_0050a77c,,,00000000
 0x50a780,DAT_0050a780,.data,4,type,data,int,4,0,1,one type,4,,INT_0050a780,,,01000000
-0x50a788,DAT_0050a788,.data,16,type,data,Guid_4ca100*[4],1,0,1,one type,1,0x10,PTR_DAT_0050a788,4,,c8cf4f00d8cf4f00e8cf4f00f8cf4f00
+0x50a788,DAT_0050a788,.data,16,type,data,const _GUID**,1,1,2,conflicting: array or pointer,2,0x10,PTR_DAT_0050a788,4,src/data/guids.cpp,c8cf4f00d8cf4f00e8cf4f00f8cf4f00
 0x50b540,DAT_0050b540,.data,4,type,data,int,8,0,1,one type,8,,INT_0050b540,,,ffffffff
 0x50b544,DAT_0050b544,.data,4,type,data,int,7,0,1,one type,7,,INT_0050b544,,,ffffffff
 0x50b9e0,DAT_0050b9e0,.data,28,gap,data,void*[],1,0,1,one type,1,,PTR_s_SQUASHERR_OK_0050b9e0,6,,84ba500070ba500058ba500040ba500028ba5000fcb9500000000000
