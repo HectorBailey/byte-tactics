@@ -430,6 +430,14 @@ class Placer:
         piece.why = why
         self.stats["code pieces placed where the original refers to them" if sec.is_code
                    else "data pieces placed where the original refers to them"] += 1
+        if (not sec.is_code and lo and lo == sec.starts[0] and self.img.free(start - lo)
+                and any(off < lo for off, _, _ in sec.relocs)):
+            # A pointer before a section's first symbol goes with it: the
+            # runtime library's vtables (compiled with RTTI) are each preceded
+            # by a pointer to their class's complete object locator.
+            lead = self.place(obj, sec, 0, lo, start - lo, source, f"{sec.name} of {obj.path.stem} (before {sym.name})")
+            lead.why = why
+            self.stats["data placed with the symbol after it"] += 1
         return True
 
     def refs_agree(self, obj: Obj, sec: Sec, start: int) -> bool:
