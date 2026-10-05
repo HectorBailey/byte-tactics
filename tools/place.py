@@ -291,7 +291,8 @@ class Image:
             out.append((self.base + entry.struct.Name, len(entry.dll) + 1))
             for imp in entry.imports:
                 if imp.name:
-                    out.append((self.base + imp.hint_name_table_rva, len(imp.name) + 3))
+                    # A hint, the name and its NUL, padded to an even length.
+                    out.append((self.base + imp.hint_name_table_rva, (len(imp.name) + 4) & ~1))
         return out
 
 
@@ -1110,6 +1111,63 @@ def copy_unbuilt(img: Image) -> None:
         img.copy(start, max(vsize, rsize), COPIED)
 
 
+def place_crt_tables(placer: Placer) -> None:
+    """The C runtime's tables of initialisers and terminators (__xc_a to
+    __xc_z and the rest at the start of .data), which LINK builds from every
+    object's .CRT$X* sections: each section holds a pointer to one function,
+    and goes where the original's table holds that function's address."""
+    img = placer.img
+    data = next(s for s in img.sections if s[0] == ".data")
+    lo, hi = data[1], data[1] + 0x100
+    slots: dict[int, list[int]] = defaultdict(list)
+    for va in range(lo, hi, 4):
+        v = img.u32(va)
+        if v:
+            slots[v].append(va)
+    for obj in list(placer.objects):
+        for sec in obj.secs:
+            if not sec.name.startswith(".CRT$X") or len(sec.data) != 4 or len(sec.relocs) != 1:
+                continue
+            off, symidx, rtype = sec.relocs[0]
+            sym = obj.syms[symidx]
+            if sym.section > 0:
+                target = placer.address_in(obj, sym.section, sym.value)
+            else:
+                target = placer.globals.get(sym.name) or placer.named_address(sym.name)
+            for va in slots.get(target, ()):
+                if img.free(va):
+                    placer.place(obj, sec, 0, 4, va, LIBDATA if obj.library else OBJDATA,
+                                 f"{sec.name} of {obj.path.stem}")
+                    placer.stats["initialiser table entries placed from .CRT$X* sections"] += 1
+                    break
+    # The original's initialisers the tree spells as ordinary functions
+    # (FUN_004205f0): tools/link.py gives each a .CRT$XCU entry of its own.
+    from link import write_init_object
+    names = {a: n for n, a in placer.globals.items()}
+    for v, vas in sorted(slots.items()):
+        va = next((a for a in vas if img.free(a)), None)
+        if va is None or v not in names or not img.inside(v) or img.src[v - img.base] not in (CODE, GAPCODE):
+            continue
+        path = OUT_DIR / "init" / f"{v:08x}.obj"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        write_init_object(names[v], path)
+        obj = parse(path)
+        placer.objects.append(obj)
+        placer.place(obj, obj.secs[0], 0, 4, va, OBJDATA, f".CRT$XCU for {names[v]}")
+        placer.stats["initialiser table entries placed from .CRT$X* sections"] += 1
+    placer.relocate()
+    # What is left of the tables (their null entries) is the linker's.
+    ends = []
+    for row in load_rows(FUNCTIONS):
+        if row["name"] in ("__cinit", "_doexit"):
+            at, size = int(row["address"], 16), int(row["size"])
+            code = img.pristine[at - img.base: at - img.base + size]
+            ends += [struct.unpack_from("<I", code, i + 1)[0] for i in range(len(code) - 5)
+                     if code[i] == 0x68 and lo <= struct.unpack_from("<I", code, i + 1)[0] < hi]
+    if ends:
+        img.copy(lo, max(ends) + 4 - lo, FIXED)
+
+
 def pad_data(placer: Placer) -> None:
     """The linker's alignment padding between pieces of data: zeros after
     one placed piece, up to the next placed piece at its section's alignment
@@ -1255,6 +1313,7 @@ def layout(jobs: int | None = None) -> tuple[Image, Placer]:
     placer.relocate()
     place_unreferenced_library(placer)
     placer.relocate()
+    place_crt_tables(placer)
     pad_data(placer)
     copy_unbuilt(img)
     return img, placer
