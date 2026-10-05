@@ -1,6 +1,6 @@
 // Decompiled by Opus. Names are provisional.
 // Draws an object's bitmap at its position: locks the screen surface
-// (LockPrimary), blits with the hand-written routine FUN_004cbbe0, then
+// (LockPrimary), blits with the hand-written routine BlitSurface, then
 // unlocks with the rectangle that was drawn. Without <windows.h> (or
 // <stdio.h>/<string.h>) MSVC schedules the rectangle stores differently.
 #include <windows.h>
@@ -27,7 +27,7 @@ struct Obj_004c23e0 {
 
 int __stdcall LockPrimary(Surface_004c23e0* s);
 int __stdcall UnlockPrimary(Surface_004c23e0* s, RECT* r, int b);
-void __cdecl FUN_004cbbe0(Surface_004c23e0* dst, Bitmap_004c23e0* src, int x, int y);
+void __cdecl BlitSurface(Surface_004c23e0* dst, Bitmap_004c23e0* src, int x, int y);
 
 // FUNCTION: 0x4c23e0
 void __stdcall FUN_004c23e0(Obj_004c23e0* obj)
@@ -36,7 +36,7 @@ void __stdcall FUN_004c23e0(Obj_004c23e0* obj)
         Bitmap_004c23e0* bmp = obj->bitmap;
         Surface_004c23e0 s;
         if (LockPrimary(&s)) {
-            FUN_004cbbe0(&s, bmp, obj->x, obj->y);
+            BlitSurface(&s, bmp, obj->x, obj->y);
             RECT r;
             r.left = obj->x;
             r.top = obj->y;

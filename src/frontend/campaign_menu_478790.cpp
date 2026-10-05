@@ -129,10 +129,10 @@ unsigned int __cdecl GetTicks();
 int __stdcall FUN_004b7f30(unsigned short* param_1, int param_2);
 void __stdcall FUN_004b7f90(void* surface, Frame_00478790* frame, int x, int y);
 char* __stdcall FUN_004c5740(const char* key);
-int FUN_004c13f0();
-void __stdcall FUN_004c13a0(int param_1, int param_2);
-void __stdcall FUN_004bf6f0(void* surface, Rect_00478790* rect, int colour);
-void __stdcall FUN_004c14f0(void* surface, const char* text, int x, int y,
+int GetTextKeyColor();
+void __stdcall SetTextColors(int param_1, int param_2);
+void __stdcall FillRectangle(void* surface, Rect_00478790* rect, int colour);
+void __stdcall DrawString(void* surface, const char* text, int x, int y,
                             int maxWidth);
 void* __stdcall FUN_004b8d40(void* gaf, const char* name);
 void __stdcall FUN_004aff00(void* menu);
@@ -162,18 +162,18 @@ void __stdcall FUN_00478790(Window_00478790* arg1, Item_00478790* arg2)
     rect.x2 = rect.x1 + g->w - 1;
     rect.y2 = rect.y1 + g->h - 1;
 
-    FUN_004bf6f0(surface, &rect, arg1->colour);
+    FillRectangle(surface, &rect, arg1->colour);
     FUN_004a1810(arg1->table->entries, i);
 
     char text[0x34];
     sprintf(text, "%s : %d", FUN_004c5740("Wind Speed"), DAT_0051e654);
-    FUN_004c13a0(DAT_00507b70[g_game->flag_37ef2].colour, FUN_004c13f0());
-    FUN_004c14f0(surface, text, rect.x1 + 0x50, rect.y1 + 0x14,
+    SetTextColors(DAT_00507b70[g_game->flag_37ef2].colour, GetTextKeyColor());
+    DrawString(surface, text, rect.x1 + 0x50, rect.y1 + 0x14,
                  rect.x2 - rect.x1 - 0x50);
 
     sprintf(text, "%s : %.1f", FUN_004c5740("Gravity"),
             (double)g_game->net->field_d3c * 0.008928571428571428);
-    FUN_004c14f0(surface, text, rect.x1 + 0x50, rect.y1 + 0x28,
+    DrawString(surface, text, rect.x1 + 0x50, rect.y1 + 0x28,
                  rect.x2 - rect.x1 - 0x50);
 
     FUN_004aff00(&g_game->menu);
@@ -209,7 +209,7 @@ void __stdcall FUN_00478790(Window_00478790* arg1, Item_00478790* arg2)
 
         unsigned char colour =
             ((unsigned char*)arg2->colours)[(int)arg1 + 0x8b2];
-        FUN_004bf6f0(surface, &rect2, colour);
+        FillRectangle(surface, &rect2, colour);
 
         int x = arg2->x - DAT_0051e674;
         int y = arg2->y;

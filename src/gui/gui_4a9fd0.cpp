@@ -180,13 +180,13 @@ int __stdcall FUN_004a4b50(Menu_004a9fd0*, int);
 void __stdcall FUN_004a5f40(Menu_004a9fd0*, int);
 void __stdcall FUN_004a5e50(Menu_004a9fd0*, int);
 void __stdcall FUN_004a4660(Menu_004a9fd0*, int);
-int FUN_004c13f0();
-void __stdcall FUN_004c13a0(int, int);
+int GetTextKeyColor();
+void __stdcall SetTextColors(int, int);
 int __stdcall FUN_004a1810(Entry_004a9fd0*, int);
 int __stdcall FUN_0049fc50(Menu_004a9fd0*, int);
 void __stdcall FUN_004ab6c0(Menu_004a9fd0*, int, char*, int, int);
 void FUN_004c1a40();
-void __stdcall FUN_004c1420(int);
+void __stdcall SetFont(int);
 char* __stdcall FUN_004c5740(void*);
 void FUN_004c2470();
 void FUN_004c2870();
@@ -206,7 +206,7 @@ static inline int FindEntry(Entry_004a9fd0* entries, char* name)
 static inline void SelectCurrentByName(Menu_004a9fd0* menu, Entry_004a9fd0* entries, int sel)
 {
     Entry_004a9fd0* entry = &entries[sel];
-    FUN_004c13a0(menu->palette[entry->u1f.colourIndex], FUN_004c13f0());
+    SetTextColors(menu->palette[entry->u1f.colourIndex], GetTextKeyColor());
     FUN_004a1810(entries, sel);
     FUN_0049fc50(menu, sel);
     menu->layer->current = sel;
@@ -253,21 +253,21 @@ static inline void FUN_004a7190(Menu_004a9fd0* obj, int index)
     Entry_004a9fd0* entries = obj->layer->entries;
     Entry_004a9fd0* target = &entries[index];
 
-    FUN_004c13a0(obj->palette[target->u1f.colourIndex], FUN_004c13f0());
+    SetTextColors(obj->palette[target->u1f.colourIndex], GetTextKeyColor());
 
     int n = 0;
     int i = 1;
     for (; i < entries->u_b6.anim.count + 1; i++) {
         if (entries[i].type == 7) {
             if (n == target->group) {
-                FUN_004c1420(entries[i].language);
+                SetFont(entries[i].language);
                 break;
             }
             n++;
         }
     }
     if (i == entries->u_b6.anim.count + 1)
-        FUN_004c1420(DAT_0051fba4->group);
+        SetFont(DAT_0051fba4->group);
 
     FUN_0049fc50(obj, index);
     obj->layer->current = index;

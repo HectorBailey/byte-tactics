@@ -2,7 +2,7 @@
 
 // Xor-fills `rect` on `surface` (or on the locked screen when `surface` is 0)
 // with the byte `value`, through FUN_004cce87. The rect is copied to a local
-// first because the clip helper FUN_004bf620 clips it in place. Returns the
+// first because the clip helper ClipRectangle clips it in place. Returns the
 // lock result on the screen path and `value` on the caller-surface path.
 //
 // check.py prints MATCH (167 bytes).
@@ -61,11 +61,11 @@ struct Surface_004bfd60 {
 
 int __stdcall LockScreen(Surface_004bfd60* out);
 int __stdcall FUN_004c5fa0(Surface_004bfd60* s);
-int __stdcall FUN_004bf620(Surface_004bfd60* s, Rect_004bfd60* r);
+int __stdcall ClipRectangle(Surface_004bfd60* s, Rect_004bfd60* r);
 void __cdecl FUN_004cce87(Surface_004bfd60* s, Rect_004bfd60* r, int value);
 
 // FUNCTION: 0x4bfd60
-int __stdcall FUN_004bfd60(Surface_004bfd60* surface, Rect_004bfd60* rect, int value)
+int __stdcall XorRectangle(Surface_004bfd60* surface, Rect_004bfd60* rect, int value)
 {
     Rect_004bfd60 r = *rect;
     int result;
@@ -73,12 +73,12 @@ int __stdcall FUN_004bfd60(Surface_004bfd60* surface, Rect_004bfd60* rect, int v
         Surface_004bfd60 screen;
         result = LockScreen(&screen);
         if (result != 0) {
-            if (FUN_004bf620(&screen, &r))
+            if (ClipRectangle(&screen, &r))
                 FUN_004cce87(&screen, &r, value);
             FUN_004c5fa0(&screen);
         }
     } else {
-        if (FUN_004bf620(surface, &r))
+        if (ClipRectangle(surface, &r))
             FUN_004cce87(surface, &r, value);
         result = ((int*)&surface)[2];
     }

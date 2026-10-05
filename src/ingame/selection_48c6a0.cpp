@@ -18,7 +18,7 @@ struct Point_0048c6a0 {
 
 void __stdcall FUN_004b6cc0(Vec3_0048c6a0* in, Vec3_0048c6a0* out, short* angles);
 void __stdcall FUN_004cb650(void* obj, Vec3_0048c6a0* lo, Vec3_0048c6a0* hi, int arg);
-int __stdcall FUN_004c1320(Point_0048c6a0* pts, int n, int px, int py);
+int __stdcall PointInPolygon(Point_0048c6a0* pts, int n, int px, int py);
 
 extern char* g_game;
 
@@ -68,5 +68,5 @@ int __stdcall FUN_0048c6a0(Object_0048c6a0* obj, Point_0048c6a0* p)
         pts[i].x = (short)((v.x + o.x) >> 16) + 0x80;
         pts[i].y = ((short)((o.z - v.z) >> 16) - ((short)((v.y + o.y) >> 16) >> 1)) + 0x20;
     }
-    return FUN_004c1320(pts, 4, p->x, p->y) != 0;
+    return PointInPolygon(pts, 4, p->x, p->y) != 0;
 }

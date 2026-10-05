@@ -15,11 +15,11 @@ struct Surface_004bf7b0 {
 
 Surface_004bf7b0* __stdcall LockScreen(Surface_004bf7b0* out);
 int __stdcall FUN_004c5fa0(Surface_004bf7b0* s);
-void __stdcall FUN_004bec70(Surface_004bf7b0* surface, int x0, int y0, int x1,
+void __stdcall DrawLitLine(Surface_004bf7b0* surface, int x0, int y0, int x1,
                             int y1, int color);
 
 // FUNCTION: 0x4bf7b0
-Surface_004bf7b0* __stdcall FUN_004bf7b0(Surface_004bf7b0* surface, int* rect,
+Surface_004bf7b0* __stdcall DrawLitRectangle(Surface_004bf7b0* surface, int* rect,
                                          int color)
 {
     Surface_004bf7b0* ret = 0;
@@ -27,17 +27,17 @@ Surface_004bf7b0* __stdcall FUN_004bf7b0(Surface_004bf7b0* surface, int* rect,
         Surface_004bf7b0 screen;
         ret = LockScreen(&screen);
         if (ret) {
-            FUN_004bec70(&screen, rect[0], rect[1], rect[2], rect[1], color);
-            FUN_004bec70(&screen, rect[2], rect[1], rect[2], rect[3], color);
-            FUN_004bec70(&screen, rect[0], rect[3], rect[2], rect[3], color);
-            FUN_004bec70(&screen, rect[0], rect[1], rect[0], rect[3], color);
+            DrawLitLine(&screen, rect[0], rect[1], rect[2], rect[1], color);
+            DrawLitLine(&screen, rect[2], rect[1], rect[2], rect[3], color);
+            DrawLitLine(&screen, rect[0], rect[3], rect[2], rect[3], color);
+            DrawLitLine(&screen, rect[0], rect[1], rect[0], rect[3], color);
             FUN_004c5fa0(&screen);
         }
     } else {
-        FUN_004bec70(surface, rect[0], rect[1], rect[2], rect[1], color);
-        FUN_004bec70(surface, rect[2], rect[1], rect[2], rect[3], color);
-        FUN_004bec70(surface, rect[0], rect[3], rect[2], rect[3], color);
-        FUN_004bec70(surface, rect[0], rect[1], rect[0], rect[3], color);
+        DrawLitLine(surface, rect[0], rect[1], rect[2], rect[1], color);
+        DrawLitLine(surface, rect[2], rect[1], rect[2], rect[3], color);
+        DrawLitLine(surface, rect[0], rect[3], rect[2], rect[3], color);
+        DrawLitLine(surface, rect[0], rect[1], rect[0], rect[3], color);
     }
     return ret;
 }

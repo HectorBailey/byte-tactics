@@ -34,10 +34,10 @@ struct Class_004aff00 {
 
 unsigned int GetTicks();
 int GetTickRate();
-int FUN_004c13f0();
+int GetTextKeyColor();
 void __stdcall FUN_004a1810(Entry_004a1810* entries, int index);
-void __stdcall FUN_004c13a0(int param_1, int param_2);
-void __stdcall FUN_004c14f0(void* surface, const char* text, int x, int y,
+void __stdcall SetTextColors(int param_1, int param_2);
+void __stdcall DrawString(void* surface, const char* text, int x, int y,
                             int maxWidth);
 
 // FUNCTION: 0x4aff00
@@ -70,11 +70,11 @@ void __stdcall FUN_004aff00(Class_004aff00* obj)
         }
 
         if (obj->words[i].field_98 != 0)
-            FUN_004c13a0(obj->words[i].field_90, FUN_004c13f0());
+            SetTextColors(obj->words[i].field_90, GetTextKeyColor());
         else
-            FUN_004c13a0(obj->words[i].field_88, FUN_004c13f0());
+            SetTextColors(obj->words[i].field_88, GetTextKeyColor());
 
-        FUN_004c14f0((void*)*(int*)(obj->field_18->field_4 + 0xbc),
+        DrawString((void*)*(int*)(obj->field_18->field_4 + 0xbc),
                      obj->words[i].text, obj->words[i].field_80,
                      obj->words[i].field_84, -1);
     }

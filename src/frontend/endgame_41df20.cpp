@@ -24,7 +24,7 @@ struct Game {
 extern Game* g_game;
 
 unsigned int __cdecl GetTicks();
-void __stdcall FUN_004bf4d0(Surface_0041df20* dst, Rect_0041df20* rect, int level);
+void __stdcall FadeRectangle(Surface_0041df20* dst, Rect_0041df20* rect, int level);
 
 // FUNCTION: 0x41df20
 void FUN_0041df20(void)
@@ -34,7 +34,7 @@ void FUN_0041df20(void)
     rect.right = g_game->width;
     rect.bottom = g_game->height;
     if (g_game->nextTime < GetTicks()) {
-        FUN_004bf4d0(0, &rect, g_game->steps - 0x1d);
+        FadeRectangle(0, &rect, g_game->steps - 0x1d);
         g_game->nextTime = GetTicks() + 1;
         g_game->steps--;
         if (g_game->steps == 0)

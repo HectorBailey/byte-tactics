@@ -1,7 +1,7 @@
 // Decompiled by space-bunny-free. Names are provisional.
 // Draws `text` horizontally centred, four times in colour `fore` one pixel to
 // each side and once on top in colour `back`: an outlined label. Each group of
-// draws first calls the setter FUN_004c13a0 with the getter FUN_004c13f0's value
+// draws first calls the setter SetTextColors with the getter GetTextKeyColor's value
 // (both inlined here), so field_0x210 is copied into field_0x20c each time and
 // only the two setters that are not -1 are stored. With a null `dst` the screen
 // rect is locked with LockScreen for the five draws and unlocked with
@@ -32,16 +32,16 @@ struct Rect_004c1830 {
 int GetDisplay(void);
 int __stdcall LockScreen(Rect_004c1830* out);
 int __stdcall FUN_004c5fa0(Rect_004c1830* buf);
-int __stdcall FUN_004c14f0(Rect_004c1830* dst, unsigned char* text, int x,
+int __stdcall DrawString(Rect_004c1830* dst, unsigned char* text, int x,
                            int a, int b);
 
-// FUN_004c13f0, inlined: the current value of field_0x210.
+// GetTextKeyColor, inlined: the current value of field_0x210.
 static inline int CurrentColour(void)
 {
     return *(int*)((unsigned char*)GetDisplay() + 0x210);
 }
 
-// FUN_004c13a0, inlined: field_0x208 then field_0x20c, each only if not -1.
+// SetTextColors, inlined: field_0x208 then field_0x20c, each only if not -1.
 static inline void SetColour(int a, int b)
 {
     unsigned char* obj = (unsigned char*)GetDisplay();
@@ -53,7 +53,7 @@ static inline void SetColour(int a, int b)
     }
 }
 
-// Width in pixels of a line of text in a bitmap font (FUN_004c1480, inlined).
+// Width in pixels of a line of text in a bitmap font (GetTextWidth, inlined).
 static inline int WidthText(Font_004c1830* font, unsigned char* text)
 {
     int width = 0;
@@ -73,7 +73,7 @@ static inline int WidthText(Font_004c1830* font, unsigned char* text)
 }
 
 // FUNCTION: 0x4c1830
-void __stdcall FUN_004c1830(Rect_004c1830* dst, unsigned char* text, int fore,
+void __stdcall DrawOutlinedString(Rect_004c1830* dst, unsigned char* text, int fore,
                             int back, int y)
 {
     Game_004c1830* game = (Game_004c1830*)GetDisplay();
@@ -83,23 +83,23 @@ void __stdcall FUN_004c1830(Rect_004c1830* dst, unsigned char* text, int fore,
         if (LockScreen(&r) != 0) {
             int x = (r.data[0] - width) >> 1;
             SetColour(fore, CurrentColour());
-            FUN_004c14f0(&r, text, x - 1, y, -1);
-            FUN_004c14f0(&r, text, x + 1, y, -1);
-            FUN_004c14f0(&r, text, x, y - 1, -1);
-            FUN_004c14f0(&r, text, x, y + 1, -1);
+            DrawString(&r, text, x - 1, y, -1);
+            DrawString(&r, text, x + 1, y, -1);
+            DrawString(&r, text, x, y - 1, -1);
+            DrawString(&r, text, x, y + 1, -1);
             SetColour(back, CurrentColour());
-            FUN_004c14f0(&r, text, x, y, -1);
+            DrawString(&r, text, x, y, -1);
             FUN_004c5fa0(&r);
             return;
         }
     } else {
         int x = (dst->data[0] - width) >> 1;
         SetColour(fore, CurrentColour());
-        FUN_004c14f0(dst, text, x - 1, y, -1);
-        FUN_004c14f0(dst, text, x + 1, y, -1);
-        FUN_004c14f0(dst, text, x, y - 1, -1);
-        FUN_004c14f0(dst, text, x, y + 1, -1);
+        DrawString(dst, text, x - 1, y, -1);
+        DrawString(dst, text, x + 1, y, -1);
+        DrawString(dst, text, x, y - 1, -1);
+        DrawString(dst, text, x, y + 1, -1);
         SetColour(back, CurrentColour());
-        FUN_004c14f0(dst, text, x, y, -1);
+        DrawString(dst, text, x, y, -1);
     }
 }

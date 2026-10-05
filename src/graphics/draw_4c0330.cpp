@@ -207,7 +207,7 @@ int __stdcall LockScreen(Class_004c6ae0* out);
 int __stdcall FUN_004c5fa0(Class_004c6ae0* s);
 
 // FUNCTION: 0x4c0330
-int __stdcall FUN_004c0330(Class_004c6ae0* surface, Point_004c0330* points, int n, unsigned char color)
+int __stdcall ScanFillPolygon(Class_004c6ae0* surface, Point_004c0330* points, int n, unsigned char color)
 {
     Class_004c6ae0 screen;
     Rect_004c0330 clip;

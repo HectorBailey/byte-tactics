@@ -142,21 +142,21 @@ extern LanguageRoot_004a1b40* DAT_0051fba4;
 
 void __stdcall FUN_004b0230(Class_004a1b40* obj, int index, void* bmp);
 void __stdcall CopySurfaceRect(void* dst, void* src, Rect_004a1b40* rect, Rect_004a1b40* pos);
-void __stdcall FUN_004c1420(int id);
-int FUN_004c1440();
-int __stdcall FUN_004c1480(int font, char* text);
-int FUN_004c1450();
+void __stdcall SetFont(int id);
+int GetFont();
+int __stdcall GetTextWidth(int font, char* text);
+int GetFontHeight();
 int __stdcall FUN_004b7f30(unsigned short* glyphs, int c);
-void __stdcall FUN_004c13a0(int colour, int font);
-int FUN_004c13f0();
+void __stdcall SetTextColors(int colour, int font);
+int GetTextKeyColor();
 char* __stdcall FUN_004b6af0(char* text, int line);
 void __stdcall FUN_004a50e0(void* surface, char* text, int x, int y, int maxw,
                             int style);
 void __stdcall FUN_004a51d0(void* surface, char* text, int x, int y, int maxw,
                             int rem, int style);
-void __stdcall FUN_004be950(void* surface, int x1, int y1, int x2, int y2,
+void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2,
                             int colour);
-void __stdcall FUN_004bf4d0(void* surface, Rect_004a1b40* rect, int id);
+void __stdcall FadeRectangle(void* surface, Rect_004a1b40* rect, int id);
 void __stdcall DrawFrameQuad(void* surface, void* bitmap, Quad_004a1b40* dst,
                             Quad_004a1b40* src);
 
@@ -166,7 +166,7 @@ static inline int Measure_004a1b40(char* text)
     if (0 == text)
         return 0;
     if (!DAT_0051fba4->language)
-        return FUN_004c1480(FUN_004c1440(), text);
+        return GetTextWidth(GetFont(), text);
     char* q = text;
     while (*q) {
         char ch = *q;
@@ -182,7 +182,7 @@ static inline int Measure_004a1b40(char* text)
 static inline int LineHeight_004a1b40()
 {
     if (0 == DAT_0051fba4->language)
-        return FUN_004c1450();
+        return GetFontHeight();
     return ((Glyph_004a1b40*)FUN_004b7f30(DAT_0051fba4->language->glyphs, 0x49))->height + 2;
 }
 
@@ -239,15 +239,15 @@ void __stdcall FUN_004a1b40(Class_004a1b40* obj, int index)
         for (i = 1; i < entries->count + 1; i++) {
             if (7 == entries[i].type) {
                 if (t == me->tab) {
-                    FUN_004c1420((int)entries[i].field_d6);
+                    SetFont((int)entries[i].field_d6);
                     break;
                 }
                 t++;
             }
         }
-        if (i == entries->count + 1) { FUN_004c1420(DAT_0051fba4->current); }
-        FUN_004c1440();
-        font = FUN_004c13f0();
+        if (i == entries->count + 1) { SetFont(DAT_0051fba4->current); }
+        GetFont();
+        font = GetTextKeyColor();
         char* q = FUN_004b6af0(me->text, me->field_bc);
         int line = 0;
         int y = me->field_bc;
@@ -289,17 +289,17 @@ void __stdcall FUN_004a1b40(Class_004a1b40* obj, int index)
             q = FUN_004b6af0(q, 1);
             if (flag) {
                 flag = 0;
-                FUN_004bf4d0(entries->surface, &rowRect, -0x13);
-                FUN_004bf4d0(entries->surface, &rowRect, -0x14);
-                FUN_004bf4d0(entries->surface, &rowRect, -0x15);
-                FUN_004bf4d0(entries->surface, &rowRect, -0x16);
+                FadeRectangle(entries->surface, &rowRect, -0x13);
+                FadeRectangle(entries->surface, &rowRect, -0x14);
+                FadeRectangle(entries->surface, &rowRect, -0x15);
+                FadeRectangle(entries->surface, &rowRect, -0x16);
             } else if (!(me->flags & 0x100) && me->field_ba == line + me->field_bc && me->field_c0) {
                 if (obj->holder->field_20 == index)
-                    FUN_004bf4d0(entries->surface, &rowRect, 0x1e);
+                    FadeRectangle(entries->surface, &rowRect, 0x1e);
                 else
-                    FUN_004bf4d0(entries->surface, &rowRect, 0x1e);
+                    FadeRectangle(entries->surface, &rowRect, 0x1e);
             } else {
-                FUN_004c13a0(col, font);
+                SetTextColors(col, font);
             }
             line += 1;
             yoff += step;
@@ -365,12 +365,12 @@ void __stdcall FUN_004a1b40(Class_004a1b40* obj, int index)
                 cellRect.bottom = dst.points[2].y;
                 unsigned char v = me->field_d6[k];
                 if (1 & v) {
-                    FUN_004bf4d0(surf, &cellRect, -0x14);
+                    FadeRectangle(surf, &cellRect, -0x14);
                 } else if ((2 & v) != 0) {
-                    FUN_004be950(surf, cellRect.left + 1, cellRect.bottom - 1, cellRect.right - 2, 1 + cellRect.top, obj->colour_8be);
-                    FUN_004be950(surf, 2 + cellRect.left, cellRect.bottom - 1, cellRect.right - 1, cellRect.top + 1, obj->colour_8be);
-                    FUN_004be950(surf, 1 + cellRect.left, cellRect.top + 2, cellRect.right - 1, cellRect.bottom - 2, obj->colour_8be);
-                    FUN_004be950(surf, cellRect.left + 2, cellRect.top + 2, cellRect.right - 2, cellRect.bottom - 2, obj->colour_8be);
+                    DrawLine(surf, cellRect.left + 1, cellRect.bottom - 1, cellRect.right - 2, 1 + cellRect.top, obj->colour_8be);
+                    DrawLine(surf, 2 + cellRect.left, cellRect.bottom - 1, cellRect.right - 1, cellRect.top + 1, obj->colour_8be);
+                    DrawLine(surf, 1 + cellRect.left, cellRect.top + 2, cellRect.right - 1, cellRect.bottom - 2, obj->colour_8be);
+                    DrawLine(surf, cellRect.left + 2, cellRect.top + 2, cellRect.right - 2, cellRect.bottom - 2, obj->colour_8be);
                 }
             }
             // A selected row reads cell->width/height even when cell is null
@@ -381,7 +381,7 @@ void __stdcall FUN_004a1b40(Class_004a1b40* obj, int index)
                 hl.top = yy;
                 hl.right = bounds.left + cell->width - 1;
                 hl.bottom = yy + cell->height - 1;
-                FUN_004bf4d0(surf, &hl, 0x14);
+                FadeRectangle(surf, &hl, 0x14);
             }
             k++;
             if (!bp)

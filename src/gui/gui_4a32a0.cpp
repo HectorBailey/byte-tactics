@@ -63,7 +63,7 @@ struct Class_004a32a0 {
 extern Root_004a32a0* DAT_0051fba4;
 
 void __stdcall FatalError(char* msg);
-int FUN_004c1450();
+int GetFontHeight();
 int __stdcall FUN_004b7f30(unsigned short* glyphs, int c);
 void __stdcall FUN_004a03f0(Root_004a32a0* menu, int index, int value);
 void __stdcall FUN_004a3ef0(Root_004a32a0* param_1, int param_2);
@@ -73,7 +73,7 @@ void __stdcall FUN_004a3ef0(Root_004a32a0* param_1, int param_2);
 // original evaluates it again in the second arm of the +0xda minimum.
 static inline int FontHeight_004a32a0() {
     if (DAT_0051fba4->language == 0)
-        return FUN_004c1450();
+        return GetFontHeight();
     return (int)((Glyph_004a32a0*)FUN_004b7f30(DAT_0051fba4->language->glyphs, 0x49))->height + 2;
 }
 

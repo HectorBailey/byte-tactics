@@ -61,9 +61,9 @@ void* __stdcall FUN_004b7f30(void* table, int index);
 void __stdcall FUN_004b7f90(void* surface, void* bmp, int x, int y);
 void __stdcall FUN_004b86e0(void* surface, void* bmp, int x, int y);
 void __stdcall FUN_004b88d0(void* surface, void* bmp, int x, int y, int color);
-void __stdcall FUN_004bf6f0(void* surface, Rect_004848e0* rect, int color);
-void __stdcall FUN_004bfe10(void* surface, Rect_004848e0* rect);
-void __stdcall FUN_004bff20(void* surface, Rect_004848e0* rect, int color);
+void __stdcall FillRectangle(void* surface, Rect_004848e0* rect, int color);
+void __stdcall GrayRectangle(void* surface, Rect_004848e0* rect);
+void __stdcall DitherRectangle(void* surface, Rect_004848e0* rect, int color);
 
 // The parity sum at 0x484943 is written with one operand read back through
 // g_game (g_game->scrollX) instead of the local. That read is CSE'd with the
@@ -102,7 +102,7 @@ void __stdcall FUN_004848e0(void* surface)
             r.right = r.left + 31;
             r.bottom = r.top + 31;
             if (cell->level0 == 0xf) {
-                FUN_004bf6f0(surface, &r, g_game->colors[0]);
+                FillRectangle(surface, &r, g_game->colors[0]);
             } else {
                 if (cell->level1 != 0) {
                     if (cell->level1 != 0xf) {
@@ -114,9 +114,9 @@ void __stdcall FUN_004848e0(void* surface)
                         }
                     } else {
                         if (g_game->flags_37f06.ditheredFog) {
-                            FUN_004bff20(surface, &r, parity);
+                            DitherRectangle(surface, &r, parity);
                         } else {
-                            FUN_004bfe10(surface, &r);
+                            GrayRectangle(surface, &r);
                         }
                     }
                 }

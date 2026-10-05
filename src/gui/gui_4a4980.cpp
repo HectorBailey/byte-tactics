@@ -63,7 +63,7 @@ struct Frame_004a4980 {
 
 void* __stdcall FUN_004b7f30(void* a, int b);
 void __stdcall FUN_004b7f90(void* surface, void* frame, int x, int y);
-void __stdcall FUN_004bf6f0(void* surface, Rect_004a4980* rect, int color);
+void __stdcall FillRectangle(void* surface, Rect_004a4980* rect, int color);
 void __stdcall DrawFrameQuad(void* surf, void* entry, Quad_004a4980* dst, Quad_004a4980* src);
 
 // FUNCTION: 0x4a4980
@@ -121,6 +121,6 @@ void __stdcall FUN_004a4980(Class_004a4980* obj, int index)
         src.p[3].y = ((Frame_004a4980*)e->field_c2)->h - 1;
         DrawFrameQuad(*(void**)((char*)entries + 0xbc), e->field_c2, &dst, &src);
     } else {
-        FUN_004bf6f0(*(void**)((char*)entries + 0xbc), &rect, obj->field_8b9);
+        FillRectangle(*(void**)((char*)entries + 0xbc), &rect, obj->field_8b9);
     }
 }

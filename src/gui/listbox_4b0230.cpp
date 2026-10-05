@@ -5,7 +5,7 @@
 // surface at entries+0xbc. When FUN_004a18c0 finds a background cell for the
 // entry, the area is tiled with it through DrawSurface and only the bevel
 // (FUN_004b0160) is drawn; with no cell and no bitmap the rectangle is filled
-// (FUN_004bf6f0) and bevelled; with a bitmap set of more than one child the
+// (FillRectangle) and bevelled; with a bitmap set of more than one child the
 // set is laid out as a 3x3 border around the rectangle, rows 0/3/6 and columns
 // 0/1/2 of the set, stepping by the first child's width and height, the last
 // row and column pinned to the far edges; with one child or less it is blitted
@@ -81,7 +81,7 @@ void __stdcall DrawSurface(Surface_004b0230* dst, Cell_004b0230* cell, int x, in
 Pic_004b0230* __stdcall FUN_004b7f30(Bits_004b0230* bits, int index);
 void __stdcall FUN_004b7f90(Surface_004b0230* dst, Pic_004b0230* pic, int x, int y);
 void __stdcall FUN_004b0160(Surface_004b0230* surface, Rect_004b0230* rect, int dark, int light, int fill);
-int __stdcall FUN_004bf6f0(Surface_004b0230* surface, Rect_004b0230* rect, int colour);
+int __stdcall FillRectangle(Surface_004b0230* surface, Rect_004b0230* rect, int colour);
 
 // FUNCTION: 0x4b0230
 void __stdcall FUN_004b0230(Object_004b0230* obj, int index, Bits_004b0230* bmp)
@@ -168,7 +168,7 @@ void __stdcall FUN_004b0230(Object_004b0230* obj, int index, Bits_004b0230* bmp)
             FUN_004b7f90(surface, p, 0, 0);
         }
     } else {
-        FUN_004bf6f0(surface, &rect, obj->fill);
+        FillRectangle(surface, &rect, obj->fill);
         FUN_004b0160(surface, &rect, obj->dark, obj->light, obj->fill);
     }
 }

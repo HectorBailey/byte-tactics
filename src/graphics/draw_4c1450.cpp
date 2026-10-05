@@ -3,7 +3,7 @@
 int GetDisplay();
 
 // FUNCTION: 0x4c1450
-int FUN_004c1450()
+int GetFontHeight()
 {
     int temp = GetDisplay();
     int ptr = *(int*)(temp + 0x204);

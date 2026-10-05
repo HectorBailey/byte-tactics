@@ -4,7 +4,7 @@
 // step = 0x10000 / n and draws the segment from the previous point to the
 // current point only when the counter `start` is odd (the caller passes 0 or
 // 1, see 0x4670fd). FUN_004b7123 / FUN_004b70ef are the sine and cosine table
-// lookups (angle, radius); FUN_004bea20 clips the segment and FUN_004cc7ab
+// lookups (angle, radius); ClipLine clips the segment and FUN_004cc7ab
 // draws it. When `surface` is null the screen is locked with LockScreen and
 // unlocked with FUN_004c5fa0.
 //
@@ -34,11 +34,11 @@ int __cdecl FUN_004b7123(int angle, int scale);
 int __cdecl FUN_004b70ef(int angle, int scale);
 int __stdcall LockScreen(Surface_004c01a0* out);
 int __stdcall FUN_004c5fa0(Surface_004c01a0* s);
-int __stdcall FUN_004bea20(Surface_004c01a0* dst, int* x0, int* y0, int* x1, int* y1);
+int __stdcall ClipLine(Surface_004c01a0* dst, int* x0, int* y0, int* x1, int* y1);
 void __cdecl FUN_004cc7ab(Surface_004c01a0* dst, int x0, int y0, int x1, int y1, int color);
 
 // FUNCTION: 0x4c01a0
-void __stdcall FUN_004c01a0(Surface_004c01a0* surface, int cx, int cy, int radius,
+void __stdcall DrawDashedCircle(Surface_004c01a0* surface, int cx, int cy, int radius,
                             int color, int n, int start)
 {
     Surface_004c01a0 screen;
@@ -60,12 +60,12 @@ void __stdcall FUN_004c01a0(Surface_004c01a0* surface, int cx, int cy, int radiu
             int x0 = px;
             if (surface == 0) {
                 if (LockScreen(&screen)) {
-                    if (FUN_004bea20(&screen, &x0, &y0, &x1, &y1))
+                    if (ClipLine(&screen, &x0, &y0, &x1, &y1))
                         FUN_004cc7ab(&screen, x0, y0, x1, y1, color);
                     FUN_004c5fa0(&screen);
                 }
             } else {
-                if (FUN_004bea20(surface, &x0, &y0, &x1, &y1))
+                if (ClipLine(surface, &x0, &y0, &x1, &y1))
                     FUN_004cc7ab(surface, x0, y0, x1, y1, color);
             }
         }

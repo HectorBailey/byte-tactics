@@ -18,7 +18,7 @@ struct Game {
 extern Game* g_game;
 
 void __stdcall DrawSurface(void* param_1, void* param_2, int param_3, int param_4);
-void __stdcall FUN_004bf8c0(void* param_1, void* param_2, int param_3);
+void __stdcall DrawRectangle(void* param_1, void* param_2, int param_3);
 
 // FUNCTION: 0x466b00
 void __stdcall FUN_00466b00(void* param_1)
@@ -26,6 +26,6 @@ void __stdcall FUN_00466b00(void* param_1)
     if (g_game->pending) {
         g_game->pending = 0;
         DrawSurface(param_1, g_game->unknown_142db, g_game->unknown_142e7, g_game->unknown_142e9);
-        FUN_004bf8c0(param_1, g_game->unknown_142cb, g_game->unknown_dd9);
+        DrawRectangle(param_1, g_game->unknown_142cb, g_game->unknown_dd9);
     }
 }

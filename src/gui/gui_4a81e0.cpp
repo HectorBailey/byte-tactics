@@ -185,7 +185,7 @@ int GetScreenWidth(void);
 int GetScreenHeight(void);
 int FUN_004c1ab0(void);
 unsigned int GetTicks(void);
-int FUN_004c1450(void);
+int GetFontHeight(void);
 
 void __stdcall FUN_004a05e0(void* obj, int index);
 void __stdcall FUN_004a16f0(void* obj, int index, int param3);
@@ -205,7 +205,7 @@ void* __stdcall FUN_004b8d40(void* gaf, const char* name);
 char* __stdcall ChangeExtension(char* a, char* b, char* c);
 long __stdcall FUN_004bbc40(char* name);
 char* __stdcall FUN_004bbe50(char* name, int* size);
-void __stdcall FUN_004c1420(int id);
+void __stdcall SetFont(int id);
 char* __stdcall FUN_004c5740(char* key);
 void* __stdcall AllocSurface(char* name, int width, int height);
 void __stdcall FreeSurface(void* obj);
@@ -634,16 +634,16 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
                     for (j = 1; j < base[0].u.count + 1; j++) {
                         if (base[j].type == 7) {
                             if (t == base[i].field_28) {
-                                FUN_004c1420((int)base[j].u.list.filebuf);
+                                SetFont((int)base[j].u.list.filebuf);
                                 break;
                             }
                             t++;
                         }
                     }
                     if (j == base[0].u.count + 1)
-                        FUN_004c1420(DAT_0051fba4->current);
+                        SetFont(DAT_0051fba4->current);
                     if (DAT_0051fba4->language == 0)
-                        fh = FUN_004c1450();
+                        fh = GetFontHeight();
                     else
                         fh = ((Glyph_004a81e0*)FUN_004b7f30(DAT_0051fba4->language->glyphs, 0x49))->h + 2;
                     int hh = base[i].h;

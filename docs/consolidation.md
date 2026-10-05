@@ -272,7 +272,7 @@ can disagree on types (a real link would fail). Known cases:
   declares it `unsigned int`. Settle on `unsigned int` when merging the
   pathfinder class.
 
-- FUN_004be950's colour parameter is declared `int` in 0x417c70.cpp,
+- DrawLine's colour parameter is declared `int` in 0x417c70.cpp,
   0x417e00.cpp and 0x4181d0.cpp so that `color & 0xff` is not folded, though
   the callee probably takes `unsigned char`. Settle it when 0x4be950 is
   decompiled. (0x4181d0.cpp also holds 0x417f60, defined above it as the

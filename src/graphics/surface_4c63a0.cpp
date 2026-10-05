@@ -80,7 +80,7 @@ int GetScreenHeight(void);
 int __stdcall LockScreen(Surface_004c63a0* out);
 void __stdcall DrawSurface(Surface_004c63a0* dst, Surface_004c63a0* bmp, int x, int y);
 void __stdcall DrawCursor(Display_004c63a0* obj, void* dst);
-void __cdecl FUN_004cbbe0(Surface_004c63a0* dst, Surface_004c63a0* src, int x, int y);
+void __cdecl BlitSurface(Surface_004c63a0* dst, Surface_004c63a0* src, int x, int y);
 
 static inline LONG Lock()
 {
@@ -134,7 +134,7 @@ static inline HRESULT RestoreSurfaces(Display_004c63a0* d)
         if (hr == 0) {
             Surface_004c63a0 screen;
             LockScreen(&screen);
-            FUN_004cbbe0(&screen, dd->field_98, 0, 0);
+            BlitSurface(&screen, dd->field_98, 0, 0);
             UnlockScreenInline();
         }
     }
@@ -187,7 +187,7 @@ void FlipScreen(void)
             out.data[2] = desc.lPitch;
             out.data[3] = (int)desc.lpSurface;
             DrawCursor(d, bmp);
-            FUN_004cbbe0(&out, bmp, 0, 0);
+            BlitSurface(&out, bmp, 0, 0);
             if (d->field_1ce != 0 && d->field_1d2 != 0)
                 DrawSurface(bmp, (Surface_004c63a0*)d->field_1be, d->field_1b6, d->field_1ba);
             d->screen.primary->Unlock(0);

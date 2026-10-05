@@ -16,7 +16,7 @@ int __stdcall LockScreen(Surface_004befe0* out);
 int __stdcall FUN_004c5fa0(Surface_004befe0* s);
 
 // FUNCTION: 0x4befe0
-unsigned int __stdcall FUN_004befe0(Surface_004befe0* surface, int x, int y)
+unsigned int __stdcall ReadPixel(Surface_004befe0* surface, int x, int y)
 {
     unsigned int color;
     if (surface == 0) {

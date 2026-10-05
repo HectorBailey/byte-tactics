@@ -3,7 +3,7 @@
 // `dst`, or into the locked screen when `dst` is null. When `maxWidth` is not
 // -1 and the text is wider, a copy is cut back one character at a time until
 // it fits. The text's rectangle is checked against the surface's clip rect
-// with FUN_004b6750 and only then drawn by the glyph blitter FUN_004ccf60,
+// with FUN_004b6750 and only then drawn by the glyph blitter BlitText,
 // which takes the surface's pixels and pitch, the font, the text, the
 // position and the game's three colour fields at +0x208, +0x20c, +0x210.
 //
@@ -88,7 +88,7 @@ Game_004c14f0* GetDisplay(void);
 int __stdcall FUN_004b6750(Rect_004c14f0* a, Rect_004c14f0* b);
 int __stdcall LockScreen(Class_004c6ae0* out);
 int __stdcall FUN_004c5fa0(Class_004c6ae0* s);
-void __cdecl FUN_004ccf60(unsigned char* pixels, int pitch, Font_004c14f0* font, unsigned char* text,
+void __cdecl BlitText(unsigned char* pixels, int pitch, Font_004c14f0* font, unsigned char* text,
                           int x, int y, int c1, int c2, int c3);
 
 static inline int WidthText(Font_004c14f0* font, unsigned char* text)
@@ -110,7 +110,7 @@ static inline int WidthText(Font_004c14f0* font, unsigned char* text)
 }
 
 // FUNCTION: 0x4c14f0
-void __stdcall FUN_004c14f0(Class_004c6ae0* dst, unsigned char* text, int x, int y, int maxWidth)
+void __stdcall DrawString(Class_004c6ae0* dst, unsigned char* text, int x, int y, int maxWidth)
 {
     Game_004c14f0* game = GetDisplay();
     int width = WidthText(game->font, text);
@@ -141,7 +141,7 @@ void __stdcall FUN_004c14f0(Class_004c6ae0* dst, unsigned char* text, int x, int
             Rect_004c14f0 clip;
             screen.GetClipRect(&clip);
             if (FUN_004b6750(&r, &clip))
-                FUN_004ccf60(screen.pixels, screen.pitch, game->font, text, x, y, game->colour1,
+                BlitText(screen.pixels, screen.pitch, game->font, text, x, y, game->colour1,
                              game->colour2, game->colour3);
             FUN_004c5fa0(&screen);
         }
@@ -149,7 +149,7 @@ void __stdcall FUN_004c14f0(Class_004c6ae0* dst, unsigned char* text, int x, int
         Rect_004c14f0 clip;
         dst->GetClipRect(&clip);
         if (FUN_004b6750(&r, &clip))
-            FUN_004ccf60(dst->pixels, dst->pitch, game->font, text, x, y, game->colour1,
+            BlitText(dst->pixels, dst->pitch, game->font, text, x, y, game->colour1,
                          game->colour2, game->colour3);
     }
 }

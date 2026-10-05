@@ -57,7 +57,7 @@ unsigned GetTicks();
 int GetTickRate();
 void __stdcall FUN_004c22d0(int);
 void FUN_00491a70();
-void __stdcall FUN_004bf4d0(void*,int*,int);
+void __stdcall FadeRectangle(void*,int*,int);
 char __stdcall FUN_0041d6a0(int);
 Layer* __stdcall FUN_004aa8f0(Menu*,const char*,int);
 void __stdcall FUN_0041f680(void*);
@@ -74,7 +74,7 @@ void FUN_0041e270();
 void FUN_00476ca0();
 void __stdcall FUN_004c2340(int*);
 int FUN_004c1ab0();
-void __stdcall FUN_004c1830(void*,const char*,int,int,int);
+void __stdcall DrawOutlinedString(void*,const char*,int,int,int);
 void __stdcall FUN_0049fa50(Menu*);
 void __stdcall FUN_00491c80(int);
 void __stdcall FUN_004a0570(Menu*,const char*,int);
@@ -150,7 +150,7 @@ void __stdcall FUN_0041f7f0()
             event[1]=0; event[0]=0;
             event[2]=g_game->width; event[3]=g_game->height;
             if(g_game->tick<GetTicks()) {
-                FUN_004bf4d0(0,event,g_game->fade-29);
+                FadeRectangle(0,event,g_game->fade-29);
                 g_game->tick=GetTicks()+1;
                 --g_game->fade;
                 if(!g_game->fade) g_game->complete=1;
@@ -211,7 +211,7 @@ void __stdcall FUN_0041f7f0()
                 }
                 unsigned deadline=GetTickRate()*5+g_game->deadline;
                 if(deadline<GetTicks())
-                    FUN_004c1830(g_game->surface,FUN_004c5740("Click to continue."),g_game->textColor,g_game->shadowColor,g_game->height-20);
+                    DrawOutlinedString(g_game->surface,FUN_004c5740("Click to continue."),g_game->textColor,g_game->shadowColor,g_game->height-20);
             }
         }
         break;

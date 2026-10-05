@@ -96,20 +96,20 @@ struct Class_0051fba4 {
 
 extern Class_0051fba4* DAT_0051fba4;
 
-void __stdcall FUN_004c1420(int id);
+void __stdcall SetFont(int id);
 void __stdcall FUN_004a23b0(Entry_004a2580* base, int index, int* r1, int* r2);
 void __stdcall FUN_004b0510(void* surface, int* r, int a, int b, int c);
 void __stdcall FUN_004b0590(void* surface, int* r, int a, int b, int c);
 Glyph_004a2580* __stdcall FUN_004b7f30(unsigned short* glyphs, int c);
 void __stdcall FUN_004b7f90(void* surface, void* glyph, int x, int y);
-int FUN_004c13f0();
-void __stdcall FUN_004c13a0(int a, int b);
-int FUN_004c1440();
-void __stdcall FUN_004c1480(Font_004a2580* font, char* text);
-int FUN_004c1450();
-void __stdcall FUN_004c14f0(void* surface, char* text, int x, int y, int maxw);
-void __stdcall FUN_004bfe10(void* surface, void* rect);
-void __stdcall FUN_004bf4d0(void* surface, void* rect, int a);
+int GetTextKeyColor();
+void __stdcall SetTextColors(int a, int b);
+int GetFont();
+void __stdcall GetTextWidth(Font_004a2580* font, char* text);
+int GetFontHeight();
+void __stdcall DrawString(void* surface, char* text, int x, int y, int maxw);
+void __stdcall GrayRectangle(void* surface, void* rect);
+void __stdcall FadeRectangle(void* surface, void* rect, int a);
 
 
 static inline void* Surface_004a2580(Object_004a2580* o)
@@ -188,14 +188,14 @@ void __stdcall FUN_004a2580(Object_004a2580* obj, int index)
     for (; i < entries->u.head.count + 1; i++) {
         if (entries[i].type == 7) {
             if (n == e->group) {
-                FUN_004c1420(*(int*)((char*)&entries[i] + 0xd6));
+                SetFont(*(int*)((char*)&entries[i] + 0xd6));
                 break;
             }
             n++;
         }
     }
     if (i == entries->u.head.count + 1)
-        FUN_004c1420(DAT_0051fba4->group);
+        SetFont(DAT_0051fba4->group);
 
     int r1[4];
     int r2[4];
@@ -272,8 +272,8 @@ void __stdcall FUN_004a2580(Object_004a2580* obj, int index)
     }
 
     if (e->flags & 4) {
-        int cur = FUN_004c13f0();
-        FUN_004c13a0(obj->field_8c1, cur);
+        int cur = GetTextKeyColor();
+        SetTextColors(obj->field_8c1, cur);
         char buf[0x10];
         // Original bug, kept as it is: the copy at 0x4a2a26 (strlen with repne
         // scasb, then rep movsd/rep movsb) is unbounded and the source field runs
@@ -294,7 +294,7 @@ void __stdcall FUN_004a2580(Object_004a2580* obj, int index)
         int total = 0;
         if (text != 0) {
             if (DAT_0051fba4->font == 0) {
-                FUN_004c1480((Font_004a2580*)FUN_004c1440(), text);
+                GetTextWidth((Font_004a2580*)GetFont(), text);
             } else {
                 char* p = text;
                 for (; *p != 0; p++) {
@@ -306,10 +306,10 @@ void __stdcall FUN_004a2580(Object_004a2580* obj, int index)
             }
         }
         if (DAT_0051fba4->font == 0)
-            FUN_004c1450();
+            GetFontHeight();
         else
             FUN_004b7f30((unsigned short*)DAT_0051fba4->font->glyphs, 0x49);
-        FUN_004c14f0(surface, buf, e->x + e->w + 2, e->y + 4, -1);
+        DrawString(surface, buf, e->x + e->w + 2, e->y + 4, -1);
     }
 
     if ((e->flags & 0x10) || e->field_157 != 0) {
@@ -323,7 +323,7 @@ void __stdcall FUN_004a2580(Object_004a2580* obj, int index)
         }
         rect[2] = e->w + rect[0] - 1;
         rect[3] = e->h + rect[1] - 1;
-        FUN_004bfe10(entries->u.head.surface, rect);
-        FUN_004bf4d0(entries->u.head.surface, rect, -0x14);
+        GrayRectangle(entries->u.head.surface, rect);
+        FadeRectangle(entries->u.head.surface, rect, -0x14);
     }
 }

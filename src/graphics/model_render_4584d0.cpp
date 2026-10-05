@@ -253,7 +253,7 @@ struct PieceInfo_4584d0 {
 
 void* __stdcall FUN_004b7ee0(Pic_4584d0* ref);
 void* __stdcall FUN_004b7f30(unsigned short* table, int index);
-void __stdcall FUN_004c0310(void* surface, Point_4584d0* points, int count, int flags);
+void __stdcall FillPolygon(void* surface, Point_4584d0* points, int count, int flags);
 void __stdcall DrawFrameQuad(void* surface, void* pic, Point_4584d0* points, void* src);
 
 class Class_004584d0 {
@@ -537,7 +537,7 @@ void Class_004584d0::FUN_004584d0(Model_4584d0* model, void* surface,
             DrawFrameQuad(surface, pic, poly, 0);
 skip0:;
         } else {
-            FUN_004c0310(surface, poly, face->count, face->unknown_0);
+            FillPolygon(surface, poly, face->count, face->unknown_0);
         }
         i++, face++;
     } while (i < info->faceCount);

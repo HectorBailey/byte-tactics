@@ -2,11 +2,11 @@
 
 // Draws the polyline points[0..count-1] into `surface`, or into the screen
 // (locked with LockScreen, unlocked with FUN_004c5fa0) when `surface` is
-// null. Every segment is clipped by FUN_004bea20 and drawn by FUN_004cc7ab.
+// null. Every segment is clipped by ClipLine and drawn by FUN_004cc7ab.
 // Returns the lock result on the screen path, so a failed lock returns 0
 // without ever unlocking; the caller-surface path returns 1.
 //
-// The locked branch carries a copy of the single segment drawer FUN_004be950
+// The locked branch carries a copy of the single segment drawer DrawLine
 // per segment, nested lock and all, which is what /Ob2 leaves behind when the
 // source calls it: the callee's own `if (surface == 0)` is the `if (&screen ==
 // 0)` below, tested on an address the compiler knows is not null, so the test
@@ -51,11 +51,11 @@ struct Segment_004bf060 {
 
 int __stdcall LockScreen(Surface_004bf060* out);
 int __stdcall FUN_004c5fa0(Surface_004bf060* s);
-int __stdcall FUN_004bea20(Surface_004bf060* dst, int* x0, int* y0, int* x1, int* y1);
+int __stdcall ClipLine(Surface_004bf060* dst, int* x0, int* y0, int* x1, int* y1);
 void __cdecl FUN_004cc7ab(Surface_004bf060* dst, int x0, int y0, int x1, int y1, int color);
 
 // FUNCTION: 0x4bf060
-int __stdcall FUN_004bf060(Surface_004bf060* surface, Point_004bf060* points,
+int __stdcall DrawPolyline(Surface_004bf060* surface, Point_004bf060* points,
                            int count, int color)
 {
     int result;
@@ -76,12 +76,12 @@ int __stdcall FUN_004bf060(Surface_004bf060* surface, Point_004bf060* points,
                 if (&screen == 0) {
                     Surface_004bf060 inner;
                     if (LockScreen(&inner)) {
-                        if (FUN_004bea20(&inner, &x0, &y0, &x1, &y1))
+                        if (ClipLine(&inner, &x0, &y0, &x1, &y1))
                             FUN_004cc7ab(&inner, x0, y0, x1, y1, color);
                         FUN_004c5fa0(&inner);
                     }
                 } else {
-                    if (FUN_004bea20(&screen, &x0, &y0, &x1, &y1))
+                    if (ClipLine(&screen, &x0, &y0, &x1, &y1))
                         FUN_004cc7ab(&screen, x0, y0, x1, y1, color);
                 }
                 seg.from++;
@@ -101,7 +101,7 @@ int __stdcall FUN_004bf060(Surface_004bf060* surface, Point_004bf060* points,
             x1 = seg.to->x;
             y0 = seg.from->y;
             x0 = seg.from->x;
-            if (FUN_004bea20(surface, &x0, &y0, &x1, &y1))
+            if (ClipLine(surface, &x0, &y0, &x1, &y1))
                 FUN_004cc7ab(surface, x0, y0, x1, y1, color);
             seg.from++;
             seg.to++;

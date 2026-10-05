@@ -61,7 +61,7 @@ struct Rect_004a5e50 {
 
 void __stdcall FUN_004b7f90(void* surface, void* glyph, int x, int y);
 void __stdcall FUN_004b8310(void* surface, void* glyph, int x, int y, int style);
-int __stdcall FUN_004bf4d0(Surface_004a5e50* surface, Rect_004a5e50* rect, int level);
+int __stdcall FadeRectangle(Surface_004a5e50* surface, Rect_004a5e50* rect, int level);
 
 // FUNCTION: 0x4a5e50
 void __stdcall FUN_004a5e50(Obj_004a5e50* obj, int index)
@@ -90,6 +90,6 @@ void __stdcall FUN_004a5e50(Obj_004a5e50* obj, int index)
         FUN_004b7f90(entries->surface, glyph, glyph->x + rect.left, glyph->y + rect.top);
     }
     if (e->flag & 1) {
-        FUN_004bf4d0(entries->surface, &rect, -0x1c);
+        FadeRectangle(entries->surface, &rect, -0x1c);
     }
 }

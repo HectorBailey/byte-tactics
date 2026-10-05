@@ -72,10 +72,10 @@ struct LanguageRoot_004a53c0 {
 
 extern LanguageRoot_004a53c0* DAT_0051fba4;
 
-void __stdcall FUN_004c1420(int param);
-int FUN_004c1440();
-int __stdcall FUN_004c1480(int font, char* text);
-int FUN_004c1450();
+void __stdcall SetFont(int param);
+int GetFont();
+int __stdcall GetTextWidth(int font, char* text);
+int GetFontHeight();
 int __stdcall FUN_004b7f30(unsigned short* glyphs, int c);
 
 static inline int Measure_004a53c0(char* text)
@@ -85,7 +85,7 @@ static inline int Measure_004a53c0(char* text)
     if (p == 0)
         return 0;
     if (DAT_0051fba4->language == 0)
-        return FUN_004c1480(FUN_004c1440(), text);
+        return GetTextWidth(GetFont(), text);
     while (*p != 0) {
         char ch = *p;
         Glyph_004a53c0* glyph = (Glyph_004a53c0*)FUN_004b7f30(DAT_0051fba4->language->glyphs, (unsigned char)ch);
@@ -106,19 +106,19 @@ void __stdcall FUN_004a53c0(Class_004a53c0* obj, int index)
     for (i = 1; i < entries[0].b6.count + 1; i++) {
         if (entries[i].type == 7) {
             if (t == entry->tab) {
-                FUN_004c1420(entries[i].language);
+                SetFont(entries[i].language);
                 break;
             }
             t++;
         }
     }
     if (i == entries[0].b6.count + 1)
-        FUN_004c1420(DAT_0051fba4->language0);
+        SetFont(DAT_0051fba4->language0);
     int x = !entry->type ? 0 : entry->x;
     int nx = x;
     int lh;
     if (DAT_0051fba4->language == 0)
-        lh = FUN_004c1450();
+        lh = GetFontHeight();
     else
         lh = ((Glyph_004a53c0*)FUN_004b7f30(DAT_0051fba4->language->glyphs, 0x49))->height + 2;
     if (entry->align & 4) {

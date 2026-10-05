@@ -107,8 +107,8 @@ struct Object_004a3780 {
 extern Holder_004a3780* DAT_0051fba4;
 extern char DAT_00502a20[];
 
-void __stdcall FUN_004c1420(int id);
-int FUN_004c1450();
+void __stdcall SetFont(int id);
+int GetFontHeight();
 int __stdcall FUN_004b7f30(unsigned short* param_1, int param_2);
 char* __stdcall FUN_004b6af0(char* text, int n);
 int GetTicks();
@@ -152,7 +152,7 @@ struct Glyph_004a3780 {
 static inline int LineHeight_004a3780()
 {
     if (0 == DAT_0051fba4->list)
-        return FUN_004c1450();
+        return GetFontHeight();
     return ((Glyph_004a3780*)FUN_004b7f30(DAT_0051fba4->list->field_0c, 0x49))->height + 2;
 }
 
@@ -179,14 +179,14 @@ int __stdcall FUN_004a3780(Object_004a3780* obj, int index, int param_3)
     for (i = 1; i < entries[0].count + 1; i++) {
         if (entries[i].type == 7) {
             if (n == me->group) {
-                FUN_004c1420(entries[i].field_d6);
+                SetFont(entries[i].field_d6);
                 break;
             }
             n++;
         }
     }
     if (i == entries[0].count + 1)
-        FUN_004c1420(DAT_0051fba4->current);
+        SetFont(DAT_0051fba4->current);
 
     int size = LineHeight_004a3780();
     short da = me->field_da;

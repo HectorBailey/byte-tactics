@@ -21,12 +21,12 @@ struct Surface_004bed70 {
 App_004bed70* GetDisplay();
 Surface_004bed70* __stdcall LockScreen(Surface_004bed70* out);
 int __stdcall FUN_004c5fa0(Surface_004bed70* s);
-int __stdcall FUN_004bea20(Surface_004bed70* dst, int* a, int* b, int* c, int* d);
+int __stdcall ClipLine(Surface_004bed70* dst, int* a, int* b, int* c, int* d);
 void __cdecl FUN_004cc8df(Surface_004bed70* dst, int a, int b, int c, int d, int e,
                           unsigned int* palette);
 
 // FUNCTION: 0x4bed70
-Surface_004bed70* __stdcall FUN_004bed70(Surface_004bed70* surface, int x0, int y0,
+Surface_004bed70* __stdcall DrawBlendedLine(Surface_004bed70* surface, int x0, int y0,
                                          int x1, int y1, int color)
 {
     App_004bed70* app = GetDisplay();
@@ -35,12 +35,12 @@ Surface_004bed70* __stdcall FUN_004bed70(Surface_004bed70* surface, int x0, int 
         Surface_004bed70 screen;
         ret = LockScreen(&screen);
         if (ret) {
-            if (FUN_004bea20(&screen, &x0, &y0, &x1, &y1))
+            if (ClipLine(&screen, &x0, &y0, &x1, &y1))
                 FUN_004cc8df(&screen, x0, y0, x1, y1, color, app->palette);
             FUN_004c5fa0(&screen);
         }
     } else {
-        if (FUN_004bea20(surface, &x0, &y0, &x1, &y1))
+        if (ClipLine(surface, &x0, &y0, &x1, &y1))
             FUN_004cc8df(surface, x0, y0, x1, y1, color, app->palette);
         ret = (Surface_004bed70*)1;
     }

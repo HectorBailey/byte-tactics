@@ -1,5 +1,5 @@
 // Decompiled by space-bunny-free. Names are provisional.
-// Draws one character of text: FUN_004bea20 clamps the position into the
+// Draws one character of text: ClipLine clamps the position into the
 // surface and FUN_004cc7ab draws the glyph, taking both the clamped and the
 // original coordinates. When `surface` is null the screen is locked with
 // LockScreen instead, and if that lock fails a second surface is tried.
@@ -20,11 +20,11 @@ struct Surface_004bee60 {
 
 int __stdcall LockScreen(Surface_004bee60* out);
 int __stdcall FUN_004c5fa0(Surface_004bee60* s);
-int __stdcall FUN_004bea20(Surface_004bee60* dst, int* x0, int* y0, int* x1, int* y1);
+int __stdcall ClipLine(Surface_004bee60* dst, int* x0, int* y0, int* x1, int* y1);
 void __cdecl FUN_004cc7ab(Surface_004bee60* dst, int x0, int y0, int x1, int y1, int ch);
 
 // FUNCTION: 0x4bee60
-int __stdcall FUN_004bee60(Surface_004bee60* surface, int x, int y, int ch)
+int __stdcall DrawPixel(Surface_004bee60* surface, int x, int y, int ch)
 {
     int ret;
     if (surface == 0) {
@@ -35,19 +35,19 @@ int __stdcall FUN_004bee60(Surface_004bee60* surface, int x, int y, int ch)
             if (&screen == 0) {
                 Surface_004bee60 other;
                 if (LockScreen(&other)) {
-                    if (FUN_004bea20(&other, &x0, &y0, &x1, &y1))
+                    if (ClipLine(&other, &x0, &y0, &x1, &y1))
                         FUN_004cc7ab(&other, x0, y0, x1, y1, ch);
                     FUN_004c5fa0(&other);
                 }
             } else {
-                if (FUN_004bea20(&screen, &x0, &y0, &x1, &y1))
+                if (ClipLine(&screen, &x0, &y0, &x1, &y1))
                     FUN_004cc7ab(&screen, x0, y0, x1, y1, ch);
             }
             FUN_004c5fa0(&screen);
         }
     } else {
         int y1 = y, x1 = x, y0 = y, x0 = x;
-        if (FUN_004bea20(surface, &x0, &y0, &x1, &y1))
+        if (ClipLine(surface, &x0, &y0, &x1, &y1))
             FUN_004cc7ab(surface, x0, y0, x1, y1, ch);
         ret = 1;
     }

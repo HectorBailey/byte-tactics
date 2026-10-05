@@ -204,7 +204,7 @@ inverted. Found by Space Bunny Free in #142.
 ## Segment vertices overflow a 25-entry stack buffer (likely)
 
 **0x45a610** copies `seg->count` 12-byte vertices into a `Vertex tmp[25]` on
-its stack and passes that count on to FUN_004c1000, with no bound; a segment
+its stack and passes that count on to FillFlatPolygon, with no bound; a segment
 with more than 25 vertices overruns `tmp` into the vertex array above it.
 Found by Space Bunny Free in #142.
 
@@ -534,7 +534,7 @@ Things that look wrong in the original but have no effect, kept for the record.
   #2284 and ozgb's deepseek-v4.1-flash in #2494.
 
 - **0x4a1b40**: both arms of `if (holder->field_20 == param_2)` (0x4a1fb3) call
-  FUN_004bf4d0 with the same surface, rectangle and colour 0x1e (0x4a1fb8,
+  FadeRectangle with the same surface, rectangle and colour 0x1e (0x4a1fb8,
   0x4a1fcb), so the selected row is drawn like the others; a different colour
   for the selection was probably meant. Found by ozgb's OpenCode /
   deepseek-v4.1 in #2152.

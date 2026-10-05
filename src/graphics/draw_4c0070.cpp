@@ -22,7 +22,7 @@ int __cdecl FUN_004b70ef(int angle, int distance);
 int __cdecl FUN_004b7123(int angle, int distance);
 int __stdcall LockScreen(Surface_004c0070* out);
 int __stdcall FUN_004c5fa0(Surface_004c0070* s);
-int __stdcall FUN_004bea20(Surface_004c0070* dst, int* a, int* b, int* c, int* d);
+int __stdcall ClipLine(Surface_004c0070* dst, int* a, int* b, int* c, int* d);
 void __cdecl FUN_004cc7ab(Surface_004c0070* dst, int a, int b, int c, int d, int color);
 
 static inline void Draw_004c0070(Surface_004c0070* surface, int x0, int y0,
@@ -31,18 +31,18 @@ static inline void Draw_004c0070(Surface_004c0070* surface, int x0, int y0,
     if (surface == 0) {
         Surface_004c0070 screen;
         if (LockScreen(&screen)) {
-            if (FUN_004bea20(&screen, &x0, &y0, &x1, &y1))
+            if (ClipLine(&screen, &x0, &y0, &x1, &y1))
                 FUN_004cc7ab(&screen, x0, y0, x1, y1, color);
             FUN_004c5fa0(&screen);
         }
     } else {
-        if (FUN_004bea20(surface, &x0, &y0, &x1, &y1))
+        if (ClipLine(surface, &x0, &y0, &x1, &y1))
             FUN_004cc7ab(surface, x0, y0, x1, y1, color);
     }
 }
 
 // FUNCTION: 0x4c0070
-void __stdcall FUN_004c0070(Surface_004c0070* surface, int xc, int yc, int radius,
+void __stdcall DrawCircle(Surface_004c0070* surface, int xc, int yc, int radius,
                             int color)
 {
     int x0 = xc + radius;

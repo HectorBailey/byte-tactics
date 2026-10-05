@@ -77,7 +77,7 @@ int __stdcall FUN_004c5fa0(Surface_004b8310* s);
 void __stdcall FUN_004b7e60(Rect_004b8310* other, Rect_004b8310* rect, Rect_004b8310* bounds);
 void __stdcall FUN_004b8500(Class_004c6ae0* p, Sprite_004b8310* s, int x, int y);
 void __cdecl FUN_004cbf2c(Class_004c6ae0* p, Src_004b8310* src, Rect_004b8310* srect, Rect_004b8310* drect, int colour, unsigned char* palette);
-void __cdecl FUN_004cc3d0(int linkid, int sprite, Rect_004b8310* drect, Sprite_004b8310** src, Rect_004b8310* srect, unsigned char* palette);
+void __cdecl BlitCompressedLit(int linkid, int sprite, Rect_004b8310* drect, Sprite_004b8310** src, Rect_004b8310* srect, unsigned char* palette);
 
 // FUNCTION: 0x4b8310
 void __stdcall FUN_004b8310(Class_004c6ae0* param_1, Sprite_004b8310* param_2, int x, int y, int param_5)
@@ -117,7 +117,7 @@ void __stdcall FUN_004b8310(Class_004c6ae0* param_1, Sprite_004b8310* param_2, i
                         src.field_3 = param_2->items;
                         FUN_004cbf2c(param_1, &src, &sprite_rect, &screen_rect, param_5, d->field_c8);
                     } else {
-                        FUN_004cc3d0(param_1->field_c, param_1->field_8, &screen_rect,
+                        BlitCompressedLit(param_1->field_c, param_1->field_8, &screen_rect,
                             param_2->items, &sprite_rect, d->field_c8 + (param_5 << 8));
                     }
                 }

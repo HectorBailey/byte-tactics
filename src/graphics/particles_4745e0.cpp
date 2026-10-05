@@ -99,7 +99,7 @@ struct Game {
 
 extern Game* g_game;
 
-void __stdcall FUN_004bf6f0(void* surface, Rect_004b0510* rect, int color);
+void __stdcall FillRectangle(void* surface, Rect_004b0510* rect, int color);
 
 // The pin the earlier passes were looking for: a helper that returns its
 // argument. It emits no instruction, but MSVC 5 allocates what it returns as a
@@ -177,5 +177,5 @@ void Class_004745e0::FUN_004745e0(void* surface, short px, short py)
     r.x2 = r.x1 + 1;
     r.y2 = r.y1 + 1;
     if (pos.Visible())
-        FUN_004bf6f0(surface, &r, color);
+        FillRectangle(surface, &r, color);
 }

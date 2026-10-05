@@ -83,15 +83,15 @@ int GetScreenHeight();
 int __stdcall PointInRect(int,int,int);
 int __stdcall FUN_004b7f30(int,int);
 int __stdcall FUN_004b7f90(int,int,int,int);
-int __stdcall FUN_004be950(int,int,int,int,int,int);
-int __stdcall FUN_004bf6f0(int,int,int);
-int __stdcall FUN_004bf8c0(int,int,int);
-int __stdcall FUN_004c13a0(int,int);
-int FUN_004c13f0();
-int __stdcall FUN_004c1420(int);
-int FUN_004c1450();
-int __stdcall FUN_004c1480(int,int);
-int __stdcall FUN_004c14f0(int,int,int,int,int);
+int __stdcall DrawLine(int,int,int,int,int,int);
+int __stdcall FillRectangle(int,int,int);
+int __stdcall DrawRectangle(int,int,int);
+int __stdcall SetTextColors(int,int);
+int GetTextKeyColor();
+int __stdcall SetFont(int);
+int GetFontHeight();
+int __stdcall GetTextWidth(int,int);
+int __stdcall DrawString(int,int,int,int,int);
 int __stdcall FUN_004c1b80(int);
 int FUN_004c2470();
 int FUN_004c2870();
@@ -164,10 +164,10 @@ static void DrawResourcePanel(Class_004c6b10 *ctx, int pl, Resources *res)
   char text[32];
   int side = *(byte *)(*(int *)(pl + 0x27) + 0x95);
   int sd = (int)g_game + 0x37f3d + side * 0x232;
-  FUN_004c1420(*(int *)(sd + 0x22e));
-  FUN_004c1450();
+  SetFont(*(int *)(sd + 0x22e));
+  GetFontHeight();
   byte *pal = (byte *)(g_game + 0xdcb);
-  FUN_004c13a0(pal[0xf], FUN_004c13f0());
+  SetTextColors(pal[0xf], GetTextKeyColor());
   int bx = 0x81;
   do {
     ushort *gaf = (ushort *)FUN_004b7f30(*(int *)(g_game + 0x1481f + (side + (bx > 0x81) * 5) * 4), 0);
@@ -179,57 +179,57 @@ static void DrawResourcePanel(Class_004c6b10 *ctx, int pl, Resources *res)
   bar = *r;
   if (*(float *)(pl + 0xa4) > 0.0f) {
     bar.right = (int)((bar.right - bar.left) * res->metal / *(float *)(pl + 0xa4) + bar.left);
-    FUN_004bf6f0((int)ctx, (int)&bar, *(int *)(sd + 0x222));
+    FillRectangle((int)ctx, (int)&bar, *(int *)(sd + 0x222));
     if (*(float *)(pl + 0xe8) > 0.0f && *(float *)(pl + 0x8c) > *(float *)(pl + 0xe8)) {
       box = *r;
       box.left = (int)((box.right - box.left) * *(float *)(pl + 0xe8) / *(float *)(pl + 0xa4) + box.left);
       box.right = box.left + 2;
-      FUN_004bf6f0((int)ctx, (int)&box, pal[0xc]);
+      FillRectangle((int)ctx, (int)&box, pal[0xc]);
     }
   }
   sprintf(text, "%d", (int)res->metal);
-  FUN_004c14f0((int)ctx, (int)text, *(int *)(sd + 0x62), *(int *)(sd + 0x66), -1);
-  FUN_004c14f0((int)ctx, (int)"0", *(int *)(sd + 0xd2), *(int *)(sd + 0xd6), -1);
+  DrawString((int)ctx, (int)text, *(int *)(sd + 0x62), *(int *)(sd + 0x66), -1);
+  DrawString((int)ctx, (int)"0", *(int *)(sd + 0xd2), *(int *)(sd + 0xd6), -1);
   sprintf(text, "%d", (int)*(float *)(pl + 0xa4));
-  int w = FUN_004c1480(*(int *)(sd + 0x22e), (int)text);
-  FUN_004c14f0((int)ctx, (int)text, *(int *)(sd + 0xb2) - w, *(int *)(sd + 0xb6), -1);
+  int w = GetTextWidth(*(int *)(sd + 0x22e), (int)text);
+  DrawString((int)ctx, (int)text, *(int *)(sd + 0xb2) - w, *(int *)(sd + 0xb6), -1);
   if (res->metalIncome > 99999.0f)
     sprintf(text, "%dK", (int)res->metalIncome / 1000);
   else
     sprintf(text, "%d", (int)res->metalIncome);
-  FUN_004c13a0(pal[0xa], FUN_004c13f0());
-  FUN_004c14f0((int)ctx, (int)text, *(int *)(sd + 0xf2), *(int *)(sd + 0xf6), -1);
+  SetTextColors(pal[0xa], GetTextKeyColor());
+  DrawString((int)ctx, (int)text, *(int *)(sd + 0xf2), *(int *)(sd + 0xf6), -1);
   if (res->metalUse < -99999.0f)
     sprintf(text, "%dK", (int)res->metalUse / 1000);
   else
     sprintf(text, "%d", abs((int)res->metalUse));
-  FUN_004c13a0(pal[0xc], FUN_004c13f0());
-  FUN_004c14f0((int)ctx, (int)text, *(int *)(sd + 0x102), *(int *)(sd + 0x106), -1);
+  SetTextColors(pal[0xc], GetTextKeyColor());
+  DrawString((int)ctx, (int)text, *(int *)(sd + 0x102), *(int *)(sd + 0x106), -1);
   r = (OverlayRect *)(sd + 0x72);
   bar = *r;
   if (*(float *)(pl + 0xa8) > 0.0f) {
     bar.right = (int)((bar.right - bar.left) * res->energy / *(float *)(pl + 0xa8) + bar.left);
-    FUN_004bf6f0((int)ctx, (int)&bar, *(int *)(sd + 0x226));
+    FillRectangle((int)ctx, (int)&bar, *(int *)(sd + 0x226));
     if (*(float *)(pl + 0xe4) > 0.0f && *(float *)(pl + 0x98) > *(float *)(pl + 0xe4)) {
       box = *r;
       box.left = (int)((box.right - box.left) * *(float *)(pl + 0xe4) / *(float *)(pl + 0xa8) + box.left);
       box.right = box.left + 2;
-      FUN_004bf6f0((int)ctx, (int)&box, pal[0xc]);
+      FillRectangle((int)ctx, (int)&box, pal[0xc]);
     }
   }
-  FUN_004c13a0(pal[0xf], FUN_004c13f0());
+  SetTextColors(pal[0xf], GetTextKeyColor());
   sprintf(text, "%d", (int)res->energy);
-  FUN_004c14f0((int)ctx, (int)text, *(int *)(sd + 0x82), *(int *)(sd + 0x86), -1);
-  FUN_004c14f0((int)ctx, (int)"0", *(int *)(sd + 0xe2), *(int *)(sd + 0xe6), -1);
+  DrawString((int)ctx, (int)text, *(int *)(sd + 0x82), *(int *)(sd + 0x86), -1);
+  DrawString((int)ctx, (int)"0", *(int *)(sd + 0xe2), *(int *)(sd + 0xe6), -1);
   sprintf(text, "%d", (int)*(float *)(pl + 0xa8));
-  w = FUN_004c1480(*(int *)(sd + 0x22e), (int)text);
-  FUN_004c14f0((int)ctx, (int)text, *(int *)(sd + 0xc2) - w, *(int *)(sd + 0xc6), -1);
+  w = GetTextWidth(*(int *)(sd + 0x22e), (int)text);
+  DrawString((int)ctx, (int)text, *(int *)(sd + 0xc2) - w, *(int *)(sd + 0xc6), -1);
   sprintf(text, "%.1f", res->energyIncome);
-  FUN_004c13a0(pal[0xa], FUN_004c13f0());
-  FUN_004c14f0((int)ctx, (int)text, *(int *)(sd + 0x112), *(int *)(sd + 0x116), -1);
+  SetTextColors(pal[0xa], GetTextKeyColor());
+  DrawString((int)ctx, (int)text, *(int *)(sd + 0x112), *(int *)(sd + 0x116), -1);
   sprintf(text, "%.1f", fabs(res->energyUse));
-  FUN_004c13a0(pal[0xc], FUN_004c13f0());
-  FUN_004c14f0((int)ctx, (int)text, *(int *)(sd + 0x122), *(int *)(sd + 0x126), -1);
+  SetTextColors(pal[0xc], GetTextKeyColor());
+  DrawString((int)ctx, (int)text, *(int *)(sd + 0x122), *(int *)(sd + 0x126), -1);
 }
 
 static inline int ShowSelectBox(int drawObjects)
@@ -277,8 +277,8 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
   int *viewY = (int *)(game + 0x14323);
   y = *(short *)(g_game + 0x2cb4) - (*(short *)(g_game + 0x2cb0) >> 1) - *viewY + 0x20;
   if (*(char *)(g_game + 0x14280) == '\x02') {
-    FUN_004be950((int)&ctx, x - 2, y, x + 2, y, colors[0xf]);
-    FUN_004be950((int)&ctx, x, y - 2, x, y + 2, colors[0xf]);
+    DrawLine((int)&ctx, x - 2, y, x + 2, y, colors[0xf]);
+    DrawLine((int)&ctx, x, y - 2, x, y + 2, colors[0xf]);
   }
   ResetClipRect((int)&ctx);
 
@@ -316,8 +316,8 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
   idx = *(byte *)(g_game + 0x2a43);
   mv = (MapGrid *)(g_game + 0x141fb);
   player = (int)g_game + idx * 0x14b + 0x1b63;
-  FUN_004c1420(*(int *)(g_game + 0x3816b + *(byte *)(*(int *)(player + 0x27) + 0x95) * 0x232));
-  FUN_004c13a0(*(byte *)(g_game + 0xdda), FUN_004c13f0());
+  SetFont(*(int *)(g_game + 0x3816b + *(byte *)(*(int *)(player + 0x27) + 0x95) * 0x232));
+  SetTextColors(*(byte *)(g_game + 0xdda), GetTextKeyColor());
   {
     int vx = *(int *)(g_game + 0x1431f) / 16, vy = *(int *)(g_game + 0x14323) / 16, h, w, x0, y0, skip;
     i = 0;
@@ -468,7 +468,7 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
             FUN_0046a430((int)&ctx, unit, x, y + 10);
           if (*(char *)(*(int *)(unit + 0x96) + 0x146) == (char)idx && *(int *)(unit + 0xac) != 0) {
             str[0] = *(char *)(unit + 0xac) + '0';
-            FUN_004c14f0((int)&ctx, (int)str, x, y + 0xe, -1);
+            DrawString((int)&ctx, (int)str, x, y + 0xe, -1);
           }
         }
       }
@@ -510,15 +510,15 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
     box.top = y1;
     box.right = x2;
     box.bottom = y2;
-    FUN_004bf8c0((int)&ctx, (int)&box, c);
+    DrawRectangle((int)&ctx, (int)&box, c);
     box.left++;
     box.top++;
     box.right--;
     box.bottom--;
     if (*(char *)(g_game + 0x2cc3) == '\x0e')
-      FUN_004bf8c0((int)&ctx, (int)&box, c);
+      DrawRectangle((int)&ctx, (int)&box, c);
     else
-      FUN_004bf8c0((int)&ctx, (int)&box, *colors);
+      DrawRectangle((int)&ctx, (int)&box, *colors);
   }
   if ((*(Class_00435100 **)(g_game + 0x391e9))->FUN_00435100() == 3 ||
       (*(Class_00435100 **)(g_game + 0x391e9))->FUN_00435100() == 2) {
@@ -532,19 +532,19 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
   if (param_1 != 0)
     DrawMessages((int)&ctx);
   if ((*(byte *)(g_game + 0x3923b) & 2) && param_1 != 0) {
-    FUN_004c13a0(colors[0xf], FUN_004c13f0());
-    FUN_004c1420(*(int *)(g_game + 0x391f9));
-    int ty = FUN_004c1450() * 3 - 10;
+    SetTextColors(colors[0xf], GetTextKeyColor());
+    SetFont(*(int *)(g_game + 0x391f9));
+    int ty = GetFontHeight() * 3 - 10;
     sprintf(debugText, "FRATE: %d\n", GetFrameRate());
-    FUN_004c14f0((int)&ctx, (int)debugText, 0x83, ty, -1);
-    FUN_004c14f0((int)&ctx, (int)"[Release]", 0xbc, ty, -1);
+    DrawString((int)&ctx, (int)debugText, 0x83, ty, -1);
+    DrawString((int)&ctx, (int)"[Release]", 0xbc, ty, -1);
     sprintf(debugText, "MODE %s INFO %s", ((Bits8 *)(g_game + 0x3923b))->b1 ? "DEBUG" : "NORMAL",
             ((Bits8 *)(g_game + 0x3923b))->b0 ? "ON" : "OFF");
-    FUN_004c14f0((int)&ctx, (int)debugText, 0x1ee, ty, -1);
-    ty += FUN_004c1450();
+    DrawString((int)&ctx, (int)debugText, 0x1ee, ty, -1);
+    ty += GetFontHeight();
     if (*(byte *)(g_game + 0x2a44) & 1) {
       FormatNetStats((int)debugText);
-      FUN_004c14f0((int)&ctx, (int)debugText, 0xbc, ty, -1);
+      DrawString((int)&ctx, (int)debugText, 0xbc, ty, -1);
     }
   }
   if (*(byte *)(g_game + 0x38a51) & 1)
@@ -562,8 +562,8 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
     int minutes = rest / 1800;
     int seconds = (rest - minutes * 1800) / 30;
     sprintf(gameTime, "%s : %02d:%02d:%02d", (char *)FUN_004c5740((int)"Game Time"), hours, minutes, seconds);
-    FUN_004c13a0(colors[0xf], FUN_004c13f0());
-    FUN_004c14f0((int)&ctx, (int)gameTime, 0x82, -0x22 - FUN_004c1450() + GetScreenHeight(), -1);
+    SetTextColors(colors[0xf], GetTextKeyColor());
+    DrawString((int)&ctx, (int)gameTime, 0x82, -0x22 - GetFontHeight() + GetScreenHeight(), -1);
   }
   if (((Bits8 *)(g_game + 0x38a51))->b1)
     FUN_004b7f90((int)&ctx, FUN_004b7f30(*(int *)(g_game + 0x148cf), 0), *(int *)(g_game + 0x37e1f) - 0x10, *(int *)(g_game + 0x37e23) - 0x50);

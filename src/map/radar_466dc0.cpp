@@ -232,9 +232,9 @@ extern Game* g_game;
 
 void* __stdcall FUN_004b7f30(void* a, int index);
 void __stdcall FUN_004b7f90(void* surface, void* bmp, int x, int y);
-void __stdcall FUN_004bee60(void* surface, int x, int y, int color);
-void __stdcall FUN_004c0070(void* surface, int x, int y, int radius, int color);
-void __stdcall FUN_004c01a0(void* surface, int x, int y, int radius, int color,
+void __stdcall DrawPixel(void* surface, int x, int y, int color);
+void __stdcall DrawCircle(void* surface, int x, int y, int radius, int color);
+void __stdcall DrawDashedCircle(void* surface, int x, int y, int radius, int color,
                             int a6, int a7);
 void __stdcall DrawSurface(void* dst, void* bmp, int x, int y);
 
@@ -324,19 +324,19 @@ void FUN_00466dc0(void)
                         if ((u->field_10e & 1) != 0 ||
                             (type->field_245 & 4) == 0) {
                             if (type->field_204 != 0)
-                                FUN_004c0070(surface, x, y,
+                                DrawCircle(surface, x, y,
                                     (int)g_game->field_142eb * type->field_204 /
                                     g_game->field_1422b, base[0xa]);
                             if (type->field_206 != 0)
-                                FUN_004c0070(surface, x, y,
+                                DrawCircle(surface, x, y,
                                     (int)g_game->field_142eb * type->field_206 /
                                     g_game->field_1422b, base[0xa]);
                             if (type->field_20a != 0)
-                                FUN_004c0070(surface, x, y,
+                                DrawCircle(surface, x, y,
                                     (int)g_game->field_142eb * type->field_20a /
                                     g_game->field_1422b, base[0xc]);
                             if (type->field_20c != 0)
-                                FUN_004c0070(surface, x, y,
+                                DrawCircle(surface, x, y,
                                     (int)g_game->field_142eb * type->field_20c /
                                     g_game->field_1422b, base[0xc]);
                         }
@@ -349,11 +349,11 @@ void FUN_00466dc0(void)
                                              (slot->shot->field_e0 - 0x200)) /
                                             g_game->field_1422b;
                                     if (slot->field_e != 0)
-                                        FUN_004c01a0(surface, x, y, r, base[0xf],
+                                        DrawDashedCircle(surface, x, y, r, base[0xf],
                                                      0x20,
                                                      g_game->field_142f0.b.hi & 1);
                                     else
-                                        FUN_004c0070(surface, x, y, r, base[0xf]);
+                                        DrawCircle(surface, x, y, r, base[0xf]);
                                 }
                                 slot++;
                                 n--;
@@ -385,7 +385,7 @@ void FUN_00466dc0(void)
                     if (OnRadar_00466dc0(px, py) ||
                         ((Tail_00466dc0*)q)->player ==
                             g_game->currentPlayer) {
-                        FUN_004bee60(surface, x, y, base[0xe]);
+                        DrawPixel(surface, x, y, base[0xe]);
                     }
                 }
             } else {

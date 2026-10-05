@@ -28,7 +28,7 @@
 //    `pt.z = start->z;` before `pt = *start;`, matches the same way; a second
 //    use after the rand() calls makes z live across calls and moves it to esi.
 // Earlier passes (still accurate):
-//  - Kind 0's two line arms each make both FUN_004be950 calls (colour2, then
+//  - Kind 0's two line arms each make both DrawLine calls (colour2, then
 //    colour1); one shared colour1 call after the arms swaps the colour slots.
 //  - Kinds 1, 3 and 6 pass a 3-short angle struct (the projectile's +0x34);
 //    kind 3 passes its own `rot3`, which is never written (docs/bugs.md).
@@ -174,7 +174,7 @@ void __stdcall FUN_004b8500(void* dest, void* src, int x, int y);
 void __stdcall FUN_0046bae0(void* dest, Vec3_0049be60* pos, void* sprite, void* rect);
 int __stdcall PointInRect(void* region, int x, int y);
 void __stdcall FUN_004b9360(void* dest, void* src, int x, int y);
-void __stdcall FUN_004be950(void* dest, int x1, int y1, int x2, int y2, unsigned int color);
+void __stdcall DrawLine(void* dest, int x1, int y1, int x2, int y2, unsigned int color);
 int __stdcall FUN_004b7f60(void* gaf);
 int __stdcall FUN_00408090(PlayerInfo_0049be60* pi, Vec3_0049be60* pos);
 
@@ -250,18 +250,18 @@ void __stdcall FUN_0049be60(void* surface)
                                 int t = x1; x1 = x2; x2 = t;
                                 t = y1; y1 = y2; y2 = t;
                             }
-                            FUN_004be950(surface, x1, y1 - 1, x2, y2 - 1, color2);
-                            FUN_004be950(surface, x1, y1, x2, y2, color1);
+                            DrawLine(surface, x1, y1 - 1, x2, y2 - 1, color2);
+                            DrawLine(surface, x1, y1, x2, y2, color1);
                         } else {
                             if (y1 > y2) {
                                 int t = x1; x1 = x2; x2 = t;
                                 t = y1; y1 = y2; y2 = t;
                             }
-                            FUN_004be950(surface, x1 - 1, y1, x2 + 1, y2, color2);
-                            FUN_004be950(surface, x1, y1, x2, y2, color1);
+                            DrawLine(surface, x1 - 1, y1, x2 + 1, y2, color2);
+                            DrawLine(surface, x1, y1, x2, y2, color1);
                         }
                     } else {
-                        FUN_004be950(surface, x1, y1, x2, y2, color1);
+                        DrawLine(surface, x1, y1, x2, y2, color1);
                     }
                 } else if (type->field_10c == 1) {
                     sp.x = pos->x - (g_game->scrollX << 16);
@@ -376,7 +376,7 @@ void __stdcall FUN_0049be60(void* surface)
                                             (short)((int)(((__int64)rand() * 11) / 0x8000) - 5);
                                         *(short*)((char*)&pt + 10) +=
                                             (short)((int)(((__int64)rand() * 11) / 0x8000) - 5);
-                                        FUN_004be950(surface,
+                                        DrawLine(surface,
                                             (int)*(short*)(2 + (char*)&prev) - (short)g_game->scrollX + 0x80,
                                             ((int)*(short*)(10 + (char*)&prev)
                                              - ((int)*(short*)((char*)&prev + 6) >> 1))

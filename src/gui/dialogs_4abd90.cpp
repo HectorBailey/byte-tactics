@@ -61,7 +61,7 @@ char* __stdcall FUN_004ac4c0(Menu_004abd90* menu, char* text, int width, int ind
 void __stdcall FUN_004a81e0(Menu_004abd90* menu, int flag);
 void __stdcall FUN_004ab1b0(Layer_004abd90* layer, char* type, char* text, int x, short y,
                             int width, int attr);
-int __stdcall FUN_004c1450();
+int __stdcall GetFontHeight();
 int __stdcall FUN_004a5030(char* text);
 int GetScreenWidth();
 int GetScreenHeight();
@@ -92,7 +92,7 @@ int __stdcall FUN_004abd90(Menu_004abd90* gui, char* text, int wrapWidth, int ce
         if (line) {
             do {
                 FUN_004ab1b0(layer, "TEXT", line, 0, y, -1, 2);
-                y += FUN_004c1450() + 5;
+                y += GetFontHeight() + 5;
                 line = strtok(0, "\n");
                 lines++;
             } while (line);

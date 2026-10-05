@@ -1,5 +1,5 @@
 // Decompiled by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
-// Blits a bitmap with the hand-written routine FUN_004cbbe0. If `dst` is
+// Blits a bitmap with the hand-written routine BlitSurface. If `dst` is
 // null the screen is locked with LockScreen and used as the destination;
 // if `bmp` is null the locked screen is used as the source instead. When one
 // of the two pointers is null the blit is offset by the bitmap's half width
@@ -16,7 +16,7 @@
 // edx/eax/ecx), which is what left it at 91.2%.
 #include <ddraw.h>
 
-// One layout for both the locked surface and the bitmap: FUN_004cbbe0 takes
+// One layout for both the locked surface and the bitmap: BlitSurface takes
 // a source that is either a bitmap (the half sizes at +0x18 and +0x1a) or a
 // locked surface.
 struct Image_004c6b70 {
@@ -46,7 +46,7 @@ extern int g_screenLockCount;
 
 Display_004c6b70* GetDisplay(void);
 int __stdcall LockScreen(Image_004c6b70* out);
-void __cdecl FUN_004cbbe0(Image_004c6b70* dst, Image_004c6b70* src, int x, int y);
+void __cdecl BlitSurface(Image_004c6b70* dst, Image_004c6b70* src, int x, int y);
 
 // 0x4c5fa0, inlined here.
 static inline int UnlockScreenInline(Image_004c6b70* s)
@@ -71,7 +71,7 @@ void __stdcall DrawSurface(Image_004c6b70* dst, Image_004c6b70* bmp, int x, int 
         Image_004c6b70 screen;
         if (LockScreen(&screen) == 0)
             return;
-        FUN_004cbbe0(&screen, bmp, x - bmp->half_width, y - bmp->half_height);
+        BlitSurface(&screen, bmp, x - bmp->half_width, y - bmp->half_height);
         UnlockScreenInline(0);
         return;
     }
@@ -79,9 +79,9 @@ void __stdcall DrawSurface(Image_004c6b70* dst, Image_004c6b70* bmp, int x, int 
         Image_004c6b70 screen;
         if (LockScreen(&screen) == 0)
             return;
-        FUN_004cbbe0(dst, &screen, x, y);
+        BlitSurface(dst, &screen, x, y);
         UnlockScreenInline(0);
         return;
     }
-    FUN_004cbbe0(dst, bmp, x - bmp->half_width, y - bmp->half_height);
+    BlitSurface(dst, bmp, x - bmp->half_width, y - bmp->half_height);
 }

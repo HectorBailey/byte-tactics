@@ -91,13 +91,13 @@ void __stdcall FUN_004ac7d0(Sub_004263b0* sub, int value, void* palette);
 void __cdecl FUN_004d85a0(void* palette);
 void __stdcall FUN_004a81e0(Sub_004263b0* sub, int value);
 void __stdcall FUN_0049fb10(Sub_004263b0* sub, int value);
-void __stdcall FUN_004c1420(void* param);
+void __stdcall SetFont(void* param);
 void __stdcall FUN_004a0570(Sub_004263b0* sub, const char* name, int value);
 void __stdcall FUN_004a07d0(Sub_004263b0* sub, const char* name, const char* text);
 int __stdcall FUN_004a5030(const char* text);
 int __stdcall FUN_0049fdf0(char* gadgets, const char* name, int type);
-int FUN_004c13f0();
-void __stdcall FUN_004c13a0(unsigned int a, int b);
+int GetTextKeyColor();
+void __stdcall SetTextColors(unsigned int a, int b);
 void FUN_004c2870();
 void FUN_004c2bb0();
 void* __cdecl FUN_004d83b0(const char* name, int size);
@@ -143,7 +143,7 @@ void __stdcall FUN_004263b0()
     FUN_004d85a0(palette);
     FUN_004a81e0(&g_game->sub, 0xc0);
     FUN_0049fb10(&g_game->sub, 1);
-    FUN_004c1420(g_game->field_391f9);
+    SetFont(g_game->field_391f9);
 
     strcpy(version, "v3.1");
     strcpy(palpath, version);
@@ -155,7 +155,7 @@ void __stdcall FUN_004263b0()
     short* px = (short*)(gadgets + 0x15b * FUN_0049fdf0(gadgets, "DebugString", 5) + 0x13);
     *px += -(width / 2);
 
-    FUN_004c13a0(g_game->field_dda, FUN_004c13f0());
+    SetTextColors(g_game->field_dda, GetTextKeyColor());
     FUN_004c2870();
     FUN_004c2bb0();
 

@@ -47,7 +47,7 @@ public:
 };
 
 // FUNCTION: 0x4bea20
-int __stdcall FUN_004bea20(Class_004c6ae0* dst, int* x0, int* y0, int* x1, int* y1)
+int __stdcall ClipLine(Class_004c6ae0* dst, int* x0, int* y0, int* x1, int* y1)
 {
     Rect_004bea20 r;
     int to_right = (*x0 <= *x1);

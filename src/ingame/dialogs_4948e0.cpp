@@ -102,7 +102,7 @@ unsigned int GetTicks();
 int GetScreenWidth();
 void __stdcall FUN_0047f1a0(char* name, int param_2);
 int __stdcall FUN_004c1b80(int key);
-void __stdcall FUN_004bf4d0(void* surface, Rect_004948e0* rect, int level);
+void __stdcall FadeRectangle(void* surface, Rect_004948e0* rect, int level);
 void __stdcall FUN_004a50e0(void* surface, char* text, int x, int y, int maxw, int style);
 int __stdcall FUN_004a5030(char* text);
 char* __stdcall FUN_004c5740(char* name);
@@ -157,7 +157,7 @@ void __stdcall FUN_004948e0(void* surface)
     panel.top = 0x20;
     panel.right = panel.left + 0x7d;
     panel.bottom = g_game->numPlayers * 0x28 + 0x2e;
-    FUN_004bf4d0(surface, &panel, -0x18);
+    FadeRectangle(surface, &panel, -0x18);
 
     panel.right = panel.left + 0x7d;
     int y = panel.top;
@@ -200,8 +200,8 @@ void __stdcall FUN_004948e0(void* surface)
             hr.top = y - 1;
             hr.bottom = y + 0x26;
             if (n == g_game->localPlayer) {
-                FUN_004bf4d0(surface, &hr, 0x1f);
-                FUN_004bf4d0(surface, &hr, 0x14);
+                FadeRectangle(surface, &hr, 0x1f);
+                FadeRectangle(surface, &hr, 0x14);
             }
             unsigned short* frame = (unsigned short*)FUN_004b7f30(
                 (void*)g_game->field_148db, p->data->field_96);

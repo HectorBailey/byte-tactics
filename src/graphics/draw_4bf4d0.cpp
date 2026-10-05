@@ -53,10 +53,10 @@ struct Engine_004bf4d0 {
 Engine_004bf4d0* GetDisplay();
 int __stdcall LockScreen(Surface_004bf4d0* out);
 int __stdcall FUN_004c5fa0(Surface_004bf4d0* s);
-int __stdcall FUN_004bf620(Surface_004bf4d0* s, Rect_004bf4d0* r);
+int __stdcall ClipRectangle(Surface_004bf4d0* s, Rect_004bf4d0* r);
 
 // FUNCTION: 0x4bf4d0
-int __stdcall FUN_004bf4d0(Surface_004bf4d0* surface, Rect_004bf4d0* rect, int level)
+int __stdcall FadeRectangle(Surface_004bf4d0* surface, Rect_004bf4d0* rect, int level)
 {
     Engine_004bf4d0* engine = GetDisplay();
     Surface_004bf4d0 screen;
@@ -74,7 +74,7 @@ int __stdcall FUN_004bf4d0(Surface_004bf4d0* surface, Rect_004bf4d0* rect, int l
         r.bottom = engine->height;
         rect = &r;
     }
-    int clipped = FUN_004bf620(&screen, rect) != 0;
+    int clipped = ClipRectangle(&screen, rect) != 0;
     if (clipped) {
         int height = rect->bottom - rect->top + 1;
         char* p = screen.pixels + screen.pitch * rect->top + rect->left;

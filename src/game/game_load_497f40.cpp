@@ -174,9 +174,9 @@ void __stdcall FUN_004b7f90(void*, void*, int, int);
 void* __stdcall FUN_004b8d40(int, char*);
 void __stdcall SetPaletteColors(void*, int, int);
 void* __stdcall FUN_004bbe50(void*, unsigned int*);
-void __stdcall FUN_004bf6f0(void*, void*, unsigned char);
-void __stdcall FUN_004c13a0(int, int);
-void __stdcall FUN_004c1420(int);
+void __stdcall FillRectangle(void*, void*, unsigned char);
+void __stdcall SetTextColors(int, int);
+void __stdcall SetFont(int);
 char* __stdcall FUN_004c5740(char*);
 int __stdcall LockScreen(void*);
 void __stdcall SetRestoreSurface(int);
@@ -190,8 +190,8 @@ class Class_004ce800 { public: int FUN_004ce800(); };
 
 int __cdecl GetScreenWidth();
 int __cdecl GetScreenHeight();
-int __cdecl FUN_004c13f0();
-int __cdecl FUN_004c1450();
+int __cdecl GetTextKeyColor();
+int __cdecl GetFontHeight();
 int __cdecl FUN_004568c0();
 unsigned int __cdecl GetTicks();
 char* __cdecl FUN_0049f580();
@@ -237,7 +237,7 @@ void FUN_00497f40(void)
             g_game->field_2cbe = 0x14;
             FUN_004ab400(&g_game->field_519, (void*)g_game->field_148cf);
         }
-        FUN_004c1420(g_game->field_391f9);
+        SetFont(g_game->field_391f9);
         SetPaletteColors(SURFACE_143a7, 0, 0x100);
         if (((Class_00435100*)g_game->field_391e9)->FUN_00435100() != 2) {
             FUN_00430f00();
@@ -362,10 +362,10 @@ void FUN_00497f40(void)
                 }
             }
         }
-        FUN_004c1420(g_game->field_391f9);
+        SetFont(g_game->field_391f9);
         DrawSurface(&gadget, (void*)g_game->field_11eb, 0, 0);
         if (((Class_00435100*)g_game->field_391e9)->FUN_00435100() != 1) {
-            FUN_004c13a0(color, 0xfe);
+            SetTextColors(color, 0xfe);
             char* name = ((Class_00435c30*)g_game->field_391e9)->FUN_00435c30();
             strncpy(namebuf, name, 100);
             namebuf[99] = 0;
@@ -377,7 +377,7 @@ void FUN_00497f40(void)
             {
                 int x = gadget.width / 2 - textWidth / 2;
                 FUN_004a50e0(&gadget, buf, x,
-                             (int)((double)gadget.height - (double)FUN_004c1450() * 1.5), -1, 0);
+                             (int)((double)gadget.height - (double)GetFontHeight() * 1.5), -1, 0);
             }
         }
         {
@@ -386,7 +386,7 @@ void FUN_00497f40(void)
             *((short*)lightbar + 3) = 0;
             *((short*)lightbar + 2) = 0;
             color = g_game->palette[g_game->progress[0] < 100 ? 12 : 10];
-            FUN_004c13a0(color, FUN_004c13f0());
+            SetTextColors(color, GetTextKeyColor());
             if(g_game->progress[0] == 100 && DAT_0051e820 != 100) {
                 ((unsigned char*)&DAT_0051e6c8)[0] = 0x1e;
             }
@@ -397,10 +397,10 @@ void FUN_00497f40(void)
             rect[2] = ((int)g_game->progress[0] * 7) / 2 + 0xcd;
             rect[1] = 0x87;
             rect[3] = 0x9b;
-            FUN_004bf6f0(&gadget, rect, color);
+            FillRectangle(&gadget, rect, color);
             FUN_004b7f90(&gadget, lightbar, rect[0], rect[1]);
             color = g_game->palette[g_game->progress[1] < 100 ? 12 : 10];
-            FUN_004c13a0(color, FUN_004c13f0());
+            SetTextColors(color, GetTextKeyColor());
             if(g_game->progress[1] == 100 && DAT_0051e821 != 100) {
                 ((unsigned char*)&DAT_0051e6c8)[1] = 0x1e;
             }
@@ -411,10 +411,10 @@ void FUN_00497f40(void)
             rect[2] = ((int)g_game->progress[1] * 7) / 2 + 0xcd;
             rect[1] = 0xb1;
             rect[3] = 0xc5;
-            FUN_004bf6f0(&gadget, rect, color);
+            FillRectangle(&gadget, rect, color);
             FUN_004b7f90(&gadget, lightbar, rect[0], rect[1]);
             color = g_game->palette[g_game->progress[2] < 100 ? 12 : 10];
-            FUN_004c13a0(color, FUN_004c13f0());
+            SetTextColors(color, GetTextKeyColor());
             if(g_game->progress[2] == 100 && DAT_0051e822 != 100) {
                 ((unsigned char*)&DAT_0051e6c8)[2] = 0x1e;
             }
@@ -425,10 +425,10 @@ void FUN_00497f40(void)
             rect[2] = ((int)g_game->progress[2] * 7) / 2 + 0xcd;
             rect[1] = 0xda;
             rect[3] = 0xee;
-            FUN_004bf6f0(&gadget, rect, color);
+            FillRectangle(&gadget, rect, color);
             FUN_004b7f90(&gadget, lightbar, rect[0], rect[1]);
             color = g_game->palette[g_game->progress[3] < 100 ? 12 : 10];
-            FUN_004c13a0(color, FUN_004c13f0());
+            SetTextColors(color, GetTextKeyColor());
             if(g_game->progress[3] == 100 && DAT_0051e823 != 100) {
                 ((unsigned char*)&DAT_0051e6c8)[3] = 0x1e;
             }
@@ -439,10 +439,10 @@ void FUN_00497f40(void)
             rect[2] = ((int)g_game->progress[3] * 7) / 2 + 0xcd;
             rect[1] = 0x106;
             rect[3] = 0x11a;
-            FUN_004bf6f0(&gadget, rect, color);
+            FillRectangle(&gadget, rect, color);
             FUN_004b7f90(&gadget, lightbar, rect[0], rect[1]);
             color = g_game->palette[g_game->progress[4] < 100 ? 12 : 10];
-            FUN_004c13a0(color, FUN_004c13f0());
+            SetTextColors(color, GetTextKeyColor());
             if(g_game->progress[4] == 100 && DAT_0051e824 != 100) {
                 ((unsigned char*)&DAT_0051e6cc)[0] = 0x1e;
             }
@@ -453,12 +453,12 @@ void FUN_00497f40(void)
             rect[2] = ((int)g_game->progress[4] * 7) / 2 + 0xcd;
             rect[1] = 0x130;
             rect[3] = 0x144;
-            FUN_004bf6f0(&gadget, rect, color);
+            FillRectangle(&gadget, rect, color);
             FUN_004b7f90(&gadget, lightbar, rect[0], rect[1]);
             FUN_004b7f90(&gadget, lightbar, rect[0] + *((short*)lightbar + 2),
                          rect[1] + *((short*)lightbar + 3));
             color = g_game->palette[g_game->progress[5] < 100 ? 12 : 10];
-            FUN_004c13a0(color, FUN_004c13f0());
+            SetTextColors(color, GetTextKeyColor());
             if(g_game->progress[5] == 100 && DAT_0051e825 != 100) {
                 ((unsigned char*)&DAT_0051e6cc)[1] = 0x1e;
             }
@@ -469,7 +469,7 @@ void FUN_00497f40(void)
             rect[2] = ((int)g_game->progress[5] * 7) / 2 + 0xcd;
             rect[1] = 0x15b;
             rect[3] = 0x16f;
-            FUN_004bf6f0(&gadget, rect, color);
+            FillRectangle(&gadget, rect, color);
             FUN_004b7f90(&gadget, lightbar, rect[0], rect[1]);
         }
         if (((Class_00435100*)g_game->field_391e9)->FUN_00435100() == 3) {

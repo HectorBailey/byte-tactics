@@ -118,7 +118,7 @@ public:
 };
 #pragma pack(pop)
 
-void __stdcall FUN_004bf6f0(void* surface, Rect_004b0510* rect, int color);
+void __stdcall FillRectangle(void* surface, Rect_004b0510* rect, int color);
 
 // FUNCTION: 0x473a00
 void Class_00473a00::FUN_00473a00(int param_1, short x, short y)
@@ -148,5 +148,5 @@ void Class_00473a00::FUN_00473a00(int param_1, short x, short y)
     }
 
     if (visible)
-        FUN_004bf6f0((void*)param_1, &r, this->color);
+        FillRectangle((void*)param_1, &r, this->color);
 }

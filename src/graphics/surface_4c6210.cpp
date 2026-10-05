@@ -72,7 +72,7 @@ extern int g_screenLockCount;
 
 Display_004c6210* GetDisplay(void);
 int __stdcall LockScreen(Surface_004c6210* out);
-void __cdecl FUN_004cbbe0(Surface_004c6210* dst, Surface_004c6210* src, int x, int y);
+void __cdecl BlitSurface(Surface_004c6210* dst, Surface_004c6210* src, int x, int y);
 
 // FUNCTION: 0x4c6210
 int __stdcall RestoreSurfaces(Arg_004c6210* arg)
@@ -87,7 +87,7 @@ int __stdcall RestoreSurfaces(Arg_004c6210* arg)
         if (r == 0) {
             Surface_004c6210 screen;
             LockScreen(&screen);
-            FUN_004cbbe0(&screen, d->field_98, r, r);
+            BlitSurface(&screen, d->field_98, r, r);
 
             Display_004c6210* d2 = GetDisplay();
             if (d2->field_44 == 0 && d2->field_dc == 0 && d2->screen.surface != 0) {

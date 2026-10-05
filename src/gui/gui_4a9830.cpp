@@ -72,9 +72,9 @@ struct Class_004a9830 {
 extern Holder_004a9830* DAT_0051fba4;
 extern char DAT_00502a20[];
 
-void __stdcall FUN_004c1420(int id);
+void __stdcall SetFont(int id);
 int __stdcall FUN_004b7f30(unsigned short* param_1, int param_2);
-int FUN_004c1450();
+int GetFontHeight();
 char* __stdcall FUN_004b6af0(char* text, int line);
 void __stdcall FUN_004a1b40(Class_004a9830* param_1, int param_2);
 void __stdcall FUN_004a2be0(Class_004a9830* param_1, int param_2);
@@ -90,18 +90,18 @@ void __stdcall FUN_004a9830(Class_004a9830* param_1, int index)
     for (; i < entries->count + 1; i++) {
         if (entries[i].type == 7) {
             if (n == me->group) {
-                FUN_004c1420(entries[i].id);
+                SetFont(entries[i].id);
                 break;
             }
             n++;
         }
     }
     if (i == entries->count + 1) {
-        FUN_004c1420(DAT_0051fba4->current);
+        SetFont(DAT_0051fba4->current);
     }
     int size;
     if (DAT_0051fba4->list == 0) {
-        size = FUN_004c1450();
+        size = GetFontHeight();
     } else {
         unsigned short* pg = (unsigned short*)FUN_004b7f30(DAT_0051fba4->list->field_0c, 0x49);
         size = pg[1] + 2;

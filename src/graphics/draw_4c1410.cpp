@@ -8,7 +8,7 @@ struct Obj {
 };
 
 // FUNCTION: 0x4c1410
-int FUN_004c1410()
+int GetTextBackColor()
 {
     Obj* obj = (Obj*)GetDisplay();
     return obj->field_20c;

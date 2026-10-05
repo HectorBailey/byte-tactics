@@ -75,7 +75,7 @@ extern char DAT_005074e8[];
 
 void __stdcall FUN_004b8ae0(Frame_004b8ae0* dst, void* src);
 void __stdcall FUN_004b95a0(Frame_004b8ae0* dst, Frame_004b8ae0* src);
-void __stdcall FUN_004bee60(void* picture, int x, int y, int pixel);
+void __stdcall DrawPixel(void* picture, int x, int y, int pixel);
 void* __stdcall AllocSurface(char* name, int width, int height);
 void __stdcall FreeSurface(void* picture);
 
@@ -119,7 +119,7 @@ void __stdcall FUN_00466780()
                 value = 0;
             }
             int pixel = g_game->iconSet->cell[value][y % 32][x % 32];
-            FUN_004bee60(temp, i, j, pixel);
+            DrawPixel(temp, i, j, pixel);
         }
     }
     Frame_004b8ae0 tempFrame;

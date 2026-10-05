@@ -105,20 +105,20 @@ struct Rect_004a5f40 { int left, top, right, bottom; };
 
 extern FontRoot_004a5f40* DAT_0051fba4;
 
-void __stdcall FUN_004c1420(int id);
-int FUN_004c1440();
-int __stdcall FUN_004c1480(int font, char* text);
-int FUN_004c1450();
-void __stdcall FUN_004c13a0(int colour, int font);
-int FUN_004c13f0();
+void __stdcall SetFont(int id);
+int GetFont();
+int __stdcall GetTextWidth(int font, char* text);
+int GetFontHeight();
+void __stdcall SetTextColors(int colour, int font);
+int GetTextKeyColor();
 Glyph_004a5f40* __stdcall FUN_004b7f30(GafEntry_004a5f40* table, int index);
 void __stdcall FUN_004b7f90(void* surface, Glyph_004a5f40* glyph, int x, int y);
 void __stdcall FUN_004b8310(void* surface, Glyph_004a5f40* glyph, int x, int y, int style);
 int __stdcall FUN_004a5d50(Menu_004a5f40* menu, int index);
 void __stdcall FUN_004a50e0(void* surface, char* text, int x, int y, int maxw, int style);
-void __stdcall FUN_004be950(void* surface, int x1, int y1, int x2, int y2, int colour);
-void __stdcall FUN_004bfe10(void* surface, Rect_004a5f40* rect);
-void __stdcall FUN_004bf4d0(void* surface, Rect_004a5f40* rect, int param);
+void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int colour);
+void __stdcall GrayRectangle(void* surface, Rect_004a5f40* rect);
+void __stdcall FadeRectangle(void* surface, Rect_004a5f40* rect, int param);
 void __stdcall FUN_004b04b0(void* surface, Rect_004a5f40* rect, unsigned int a, unsigned int b, unsigned int c);
 void __stdcall FUN_004b04e0(void* surface, Rect_004a5f40* rect, unsigned int a, unsigned int b, unsigned int c);
 
@@ -129,7 +129,7 @@ static inline int FUN_004a5030(char* text)
     if (text == 0)
         return 0;
     if (DAT_0051fba4->language == 0)
-        return FUN_004c1480(FUN_004c1440(), text);
+        return GetTextWidth(GetFont(), text);
     char* p = text;
     while (*p != 0) {
         char ch = *p;
@@ -145,7 +145,7 @@ static inline int FUN_004a5030(char* text)
 static inline int LineHeight_004a5f40()
 {
     if (DAT_0051fba4->language == 0)
-        return FUN_004c1450();
+        return GetFontHeight();
     Glyph_004a5f40* glyph = FUN_004b7f30(
         (GafEntry_004a5f40*)DAT_0051fba4->language->glyphs, 0x49);
     return glyph->height + 2;
@@ -192,14 +192,14 @@ void __stdcall FUN_004a5f40(Menu_004a5f40* menu, int index)
     for (i = 1; i < entries->u.list.count + 1; i++) {
         if (entries[i].type == 7) {
             if (tab == me->tab) {
-                FUN_004c1420(entries[i].language);
+                SetFont(entries[i].language);
                 break;
             }
             tab++;
         }
     }
     if (i == entries->u.list.count + 1)
-        FUN_004c1420(DAT_0051fba4->current);
+        SetFont(DAT_0051fba4->current);
 
     textw = FUN_004a5d50(menu, index);
     surface = entries->u.list.surface;
@@ -259,9 +259,9 @@ void __stdcall FUN_004a5f40(Menu_004a5f40* menu, int index)
     pass = 0;
     do {
         if (me->field_138 != 0)
-            FUN_004c13a0(menu->colours[0], FUN_004c13f0());
+            SetTextColors(menu->colours[0], GetTextKeyColor());
         else
-            FUN_004c13a0(menu->colours[me->colours], FUN_004c13f0());
+            SetTextColors(menu->colours[me->colours], GetTextKeyColor());
 
         p = text;
         if (me->field_136 != 0) {
@@ -298,31 +298,31 @@ void __stdcall FUN_004a5f40(Menu_004a5f40* menu, int index)
                 key1[1] = 0;
                 found = strstr(buf, key1);
                 if (found != 0) {
-                    FUN_004c1440();
+                    GetFont();
                     strcpy(buf, p);
                     *found = 0;
                     FUN_004a50e0(surface, buf, x, y, width, 0);
                     x += FUN_004a5030(buf);
                     saved = x;
                     if (me->field_138 != 0)
-                        FUN_004c13a0(menu->colours[0], FUN_004c13f0());
+                        SetTextColors(menu->colours[0], GetTextKeyColor());
                     else
-                        FUN_004c13a0(menu->colours[me->colours], FUN_004c13f0());
+                        SetTextColors(menu->colours[me->colours], GetTextKeyColor());
                     FUN_004a50e0(surface, key1, x, y, width, 0);
                     x += FUN_004a5030(key1);
                     if (me->field_138 != 0) {
-                        FUN_004be950(surface, saved, LineHeight_004a5f40() + y - 1,
+                        DrawLine(surface, saved, LineHeight_004a5f40() + y - 1,
                                      x - 1, LineHeight_004a5f40() + y - 1,
                                      menu->colours[0]);
                     } else {
-                        FUN_004be950(surface, saved, LineHeight_004a5f40() + y - 1,
+                        DrawLine(surface, saved, LineHeight_004a5f40() + y - 1,
                                      x - 1, LineHeight_004a5f40() + y - 1,
                                      menu->colours[2]);
                     }
                     if (me->field_138 != 0)
-                        FUN_004c13a0(menu->colours[0], FUN_004c13f0());
+                        SetTextColors(menu->colours[0], GetTextKeyColor());
                     else
-                        FUN_004c13a0(menu->colours[me->colours], FUN_004c13f0());
+                        SetTextColors(menu->colours[me->colours], GetTextKeyColor());
                     FUN_004a50e0(surface, found + 1, x, y, width, 0);
                 } else {
                     FUN_004a50e0(surface, p, x, y, width, 0);
@@ -339,7 +339,7 @@ void __stdcall FUN_004a5f40(Menu_004a5f40* menu, int index)
                 width = rect.right - rect.left + 1;
                 key2[0] = me->field_13a;
                 key2[1] = 0;
-                FUN_004c1440();
+                GetFont();
                 *found = 0;
                 FUN_004a50e0(surface, p, xb, ys, width, 0);
                 // Suspected original bug: this measures `text` (the first
@@ -347,10 +347,10 @@ void __stdcall FUN_004a5f40(Menu_004a5f40* menu, int index)
                 // so the underline is misplaced when field_136 selects a later
                 // string. The flags 2 branch measures its truncated copy.
                 xb += FUN_004a5030(text);
-                FUN_004c13a0(menu->colours[10], FUN_004c13f0());
+                SetTextColors(menu->colours[10], GetTextKeyColor());
                 FUN_004a50e0(surface, key2, xb, ys, width, 0);
                 xb += FUN_004a5030(key2);
-                FUN_004c13a0(menu->colours[me->colours], FUN_004c13f0());
+                SetTextColors(menu->colours[me->colours], GetTextKeyColor());
                 FUN_004a50e0(surface, found + 1, xb, ys, width, 0);
             } else {
                 FUN_004a50e0(surface, p, xb, ys, rect.right - rect.left + 1, 0);
@@ -360,7 +360,7 @@ void __stdcall FUN_004a5f40(Menu_004a5f40* menu, int index)
 
     menu->current = menu->values[0];
     if (border) {
-        FUN_004bfe10(surface, &rect);
-        FUN_004bf4d0(surface, &rect, -0x14);
+        GrayRectangle(surface, &rect);
+        FadeRectangle(surface, &rect, -0x14);
     }
 }

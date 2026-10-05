@@ -2,7 +2,7 @@
 
 // Sibling of 0x4bed70 and 0x4be950: draws into `surface`, or into the screen
 // (locked with LockScreen and unlocked with FUN_004c5fa0) when `surface` is
-// null. The rectangle is handed to FUN_004bea20 by address, so it can clip it
+// null. The rectangle is handed to ClipLine by address, so it can clip it
 // in place, and the clipped values go to FUN_004cc8df to draw. The state's
 // colour table at +0xc8 is both the guard and the last argument of the draw,
 // and the result is the surface that was drawn on, so a failed lock returns 0
@@ -23,12 +23,12 @@ struct Surface_004bec70 {
 App_004bec70* GetDisplay();
 Surface_004bec70* __stdcall LockScreen(Surface_004bec70* out);
 int __stdcall FUN_004c5fa0(Surface_004bec70* s);
-int __stdcall FUN_004bea20(Surface_004bec70* dst, int* a, int* b, int* c, int* d);
+int __stdcall ClipLine(Surface_004bec70* dst, int* a, int* b, int* c, int* d);
 void __cdecl FUN_004cc8df(Surface_004bec70* dst, int a, int b, int c, int d, int e,
                           unsigned int* palette);
 
 // FUNCTION: 0x4bec70
-Surface_004bec70* __stdcall FUN_004bec70(Surface_004bec70* surface, int x0, int y0,
+Surface_004bec70* __stdcall DrawLitLine(Surface_004bec70* surface, int x0, int y0,
                                          int x1, int y1, int color)
 {
     App_004bec70* app = GetDisplay();
@@ -39,12 +39,12 @@ Surface_004bec70* __stdcall FUN_004bec70(Surface_004bec70* surface, int x0, int 
         Surface_004bec70 screen;
         ret = LockScreen(&screen);
         if (ret) {
-            if (FUN_004bea20(&screen, &x0, &y0, &x1, &y1))
+            if (ClipLine(&screen, &x0, &y0, &x1, &y1))
                 FUN_004cc8df(&screen, x0, y0, x1, y1, color, app->palette);
             FUN_004c5fa0(&screen);
         }
     } else {
-        if (FUN_004bea20(surface, &x0, &y0, &x1, &y1))
+        if (ClipLine(surface, &x0, &y0, &x1, &y1))
             FUN_004cc8df(surface, x0, y0, x1, y1, color, app->palette);
         ret = (Surface_004bec70*)1;
     }

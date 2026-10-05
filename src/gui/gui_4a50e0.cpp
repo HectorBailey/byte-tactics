@@ -20,13 +20,13 @@ extern Class_0051fba4* DAT_0051fba4;
 void* __stdcall FUN_004b7f30(void* glyphs, int c);
 void __stdcall FUN_004b7f90(void* surface, void* glyph, int x, int y);
 void __stdcall FUN_004b8310(void* surface, void* glyph, int x, int y, int style);
-void __stdcall FUN_004c14f0(void* surface, char* text, int x, int y, int maxWidth);
+void __stdcall DrawString(void* surface, char* text, int x, int y, int maxWidth);
 
 // FUNCTION: 0x4a50e0
 void __stdcall FUN_004a50e0(void* surface, char* text, int x, int y, int maxw, int style)
 {
     if (DAT_0051fba4->font == 0) {
-        FUN_004c14f0(surface, text, x, y, -1);
+        DrawString(surface, text, x, y, -1);
         return;
     }
     unsigned char* s = (unsigned char*)text;

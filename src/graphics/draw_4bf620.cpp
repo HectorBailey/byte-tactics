@@ -16,7 +16,7 @@ public:
 };
 
 // FUNCTION: 0x4bf620
-int __stdcall FUN_004bf620(Class_004c6ae0* surface, Rect_004bf620* r)
+int __stdcall ClipRectangle(Class_004c6ae0* surface, Rect_004bf620* r)
 {
     Rect_004bf620 local;
     surface->GetClipRect(&local);

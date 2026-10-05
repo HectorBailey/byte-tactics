@@ -76,7 +76,7 @@ struct App_004c0b10 {
 App_004c0b10* GetDisplay();
 
 // FUNCTION: 0x4c0b10
-void __stdcall FUN_004c0b10(int row, Span_004c0b10* span, Surface_004c0b10* surf, unsigned char color)
+void __stdcall FillShadedSpan(int row, Span_004c0b10* span, Surface_004c0b10* surf, unsigned char color)
 {
     unsigned char* p = surf->bits;
     unsigned char* d = surf->depth;
