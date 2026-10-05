@@ -96,7 +96,6 @@ extern const char DAT_00504ab8[8];                                              
 extern char DAT_00504e98[8];                                                                  // 0x504e98, 8 bytes; 1 of 1 files
 extern char DAT_00504ea0[8];                                                                  // 0x504ea0, 8 bytes; 1 of 1 files
 extern char DAT_00504ea8[8];                                                                  // 0x504ea8, 8 bytes; 1 of 1 files
-extern signed char DAT_00505205[7];                                                           // 0x505205, 7 bytes; 2 of 2 files
 extern int DAT_00505490[6];                                                                   // 0x505490, 24 bytes; 1 of 1 files
 extern unsigned int DAT_005054a8;                                                             // 0x5054a8, 4 bytes; 1 of 1 files
 extern char* DAT_005054b0[23];                                                                // 0x5054b0, 92 bytes; 2 of 2 files
@@ -119,7 +118,7 @@ extern float DAT_005065f8;                                                      
 extern float DAT_005065fc;                                                                    // 0x5065fc, 4 bytes; 2 of 2 files
 extern float DAT_00506600;                                                                    // 0x506600, 4 bytes; 2 of 2 files
 extern int DAT_00506788;                                                                      // 0x506788, 4 bytes; 1 of 1 files
-extern char DAT_005067bc[8];                                                                  // 0x5067bc, 8 bytes; 1 of 1 files
+extern char DAT_005067bc[8];                                                                  // 0x5067bc, 8 bytes; 2 of 2 files
 extern char DAT_00506884[8];                                                                  // 0x506884, 8 bytes; 2 of 2 files
 extern char DAT_0050692c[12];                                                                 // 0x50692c, 12 bytes; 1 of 1 files
 extern char DAT_00506964[8];                                                                  // 0x506964, 8 bytes; 1 of 1 files
@@ -730,7 +729,7 @@ extern void* DAT_0052a4f8;                                                      
 extern long DAT_0052a4fc;                                                                     // 0x52a4fc, 4 bytes; 2 of 3 files (conflicting: signedness or const)
 extern unsigned char DAT_0052a500[1];                                                         // 0x52a500, 1 bytes; nothing refers to it
 
-// Not declared: 225 globals defined in src/data or whose type is not settled (see data/globals.csv).
+// Not declared: 238 globals defined in src/data or whose type is not settled (see data/globals.csv).
 //   0x513000 DAT_00513000: defined in src/unsorted/0x460e20.cpp
 //   0x5119c0 DAT_005119c0: Class_00409160*[] (7), void*[] (5), Owner*[] (3), Class_00409470*[] (2), and 5 more
 //   0x51fbd0 DAT_0051fbd0: void* (4), int (2), Display_004b4f50* (1), Display_004b5370* (1), and 14 more
@@ -833,6 +832,7 @@ extern unsigned char DAT_0052a500[1];                                           
 //   0x501d38 g_consoleCommands: defined in src/data/console_commands.cpp
 //   0x501f48 g_cheatCommands: defined in src/data/console_commands.cpp
 //   0x501fd0 g_debugCommands: defined in src/data/console_commands.cpp
+//   0x505205 DAT_00505205: defined in src/data/ballistics.cpp
 //   0x505510 DAT_00505510: unsigned char (1), int (1)
 //   0x507b70 DAT_00507b70: unsigned char[] (1), ColourEntry_00478790[] (1)
 //   0x5086e0 DAT_005086e0: defined in src/data/unit_messages.cpp
@@ -864,7 +864,9 @@ extern unsigned char DAT_0052a500[1];                                           
 //   0x528ad0 DAT_00528ad0: int (1), unsigned long (__stdcall*)(unsigned long) (1)
 //   0x529500 QBDUValue_004e17c0::PBDU?$pair::?$_Tree::_Nilrefs: defined in src/unsorted/0x4e17c0.cpp
 //   0x529df8 DAT_00529df8: void* (1), EventEntry* (1)
+//   0x4fc978 DAT_004fc978: defined in src/data/unused.cpp
 //   0x4fc980 DAT_004fc980: vtable
+//   0x4fcc48 DAT_004fcc48: defined in src/data/unused.cpp
 //   0x4fcca8 CLSID_DirectDraw: defined in src/data/guids.cpp
 //   0x4fccb8 CLSID_DirectDrawClipper: defined in src/data/guids.cpp
 //   0x4fccc8 IID_IDirectDraw: defined in src/data/guids.cpp
@@ -905,8 +907,18 @@ extern unsigned char DAT_0052a500[1];                                           
 //   0x4fcfd8 DAT_004fcfd8: defined in src/data/guids.cpp
 //   0x4fcfe8 DAT_004fcfe8: defined in src/data/guids.cpp
 //   0x4fcff8 DAT_004fcff8: defined in src/data/guids.cpp
+//   0x4fd2e4 DAT_004fd2e4: defined in src/data/unused.cpp
 //   0x4fd458 DAT_004fd458: vtable
+//   0x4fda70 DAT_004fda70: defined in src/data/unused.cpp
 //   0x501fcc DAT_00501fcc: defined in src/data/console_commands.cpp
+//   0x502f98 DAT_00502f98: defined in src/data/unused.cpp
+//   0x505200 g_rangeByPitch: defined in src/data/ballistics.cpp
+//   0x5066f8 DAT_005066f8: defined in src/data/unused.cpp
+//   0x506718 DAT_00506718: defined in src/data/unused.cpp
+//   0x506738 DAT_00506738: defined in src/data/unused.cpp
+//   0x506770 DAT_00506770: defined in src/data/unused.cpp
+//   0x507b64 DAT_00507b64: defined in src/data/unused.cpp
+//   0x507b68 DAT_00507b68: defined in src/data/unused.cpp
 //   0x5086d8 g_unitMessages: defined in src/data/unit_messages.cpp
 //   0x5086dc DAT_005086dc: defined in src/data/unit_messages.cpp
 //   0x5086fc DAT_005086fc: defined in src/data/unit_messages.cpp

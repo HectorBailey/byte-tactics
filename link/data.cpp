@@ -95,7 +95,6 @@ const char DAT_00504ab8[8] = "english";  // 0x504ab8 .data
 char DAT_00504e98[8] = "Hard";  // 0x504e98 .data
 char DAT_00504ea0[8] = "Medium";  // 0x504ea0 .data
 char DAT_00504ea8[8] = "Easy";  // 0x504ea8 .data
-signed char DAT_00505205[7] = {100, 75, 50, 25, 20, 15};  // 0x505205 .data
 int DAT_00505490[6] = {115200, 57600, 38400, 19200, 14400, 9600};  // 0x505490 .data
 unsigned int DAT_005054a8 = 16;  // 0x5054a8 .data
 // 0x5054b0 .data
