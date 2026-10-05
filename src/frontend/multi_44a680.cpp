@@ -105,7 +105,7 @@ struct Game {
 };
 #pragma pack(pop)
 
-struct Class_004358f0 { int FUN_004358f0(); };
+struct Net { int FUN_004358f0(); };
 struct Class_004373a0 { int ComputeMapChecksum(); };
 struct Class_00435a20 { void LoadMissionByName(PlayerInfo_0044a680* info); };
 struct Class_00435c30 { char* FUN_00435c30(); };
@@ -155,7 +155,7 @@ int __stdcall FUN_00456760();
 // The map check at 0x440cd0, which has no callers: /Ob2 inlined it.
 int CheckMapCrc()
 {
-    if (!((Class_004358f0*)g_game->map)->FUN_004358f0()) {
+    if (!((Net*)g_game->map)->FUN_004358f0()) {
         return 0;
     }
     unsigned char me = FindHostSlot();

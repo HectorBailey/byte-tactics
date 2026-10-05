@@ -9,7 +9,7 @@ public:
     int FUN_00435100();
 };
 
-class Class_00435980 {
+class Net {
 public:
     int MissionExists(int index);
 };
@@ -55,8 +55,8 @@ static inline int HasNextMission()
 {
     if (g_game->campaign->FUN_00435100() == 1 &&
         ((g_game->field_391af == 0 &&
-          ((Class_00435980*)g_game->campaign)->MissionExists(g_game->mission + 1) == 0) ||
-         ((Class_00435980*)g_game->campaign)->MissionExists(g_game->mission + 1) != 0)) {
+          ((Net*)g_game->campaign)->MissionExists(g_game->mission + 1) == 0) ||
+         ((Net*)g_game->campaign)->MissionExists(g_game->mission + 1) != 0)) {
         return 1;
     }
     return 0;

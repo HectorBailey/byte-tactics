@@ -18,7 +18,7 @@ public:
     int SelectRecord(char* name);
 };
 
-class Class_00435980 {
+class Net {
 public:
     int unknown_0;
     char name[0xa08 - 4];              // +0x4
@@ -28,7 +28,7 @@ public:
 };
 
 // FUNCTION: 0x435980
-int Class_00435980::MissionExists(int index)
+int Net::MissionExists(int index)
 {
     char buf[128];
     int n;

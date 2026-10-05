@@ -2,7 +2,7 @@
 #include <windows.h>
 #include <string.h>
 class Class_00435100 { public: int FUN_00435100(); };
-class Class_00435980 { public: int MissionExists(int); };
+class Net { public: int MissionExists(int); };
 class Class_004cfb40 { public: void StopStream(); };
 #pragma pack(push,1)
 struct Amount { int current,required; };
@@ -172,7 +172,7 @@ void __stdcall RunEndGameState()
         break;
     case 5: {
         SetUpEndMissionScreen();
-        int next=((Class_00435980*)g_game->campaign)->MissionExists(g_game->mission+1);
+        int next=((Net*)g_game->campaign)->MissionExists(g_game->mission+1);
         if(g_game->campaign->FUN_00435100()==1 && (g_game->flags&0x10) && !next && !g_game->skip) {
             if((unsigned char)GetDisplay()->network) {
                 if(!g_game->players[0].owner->flag) SetFrontendState(4,0x4ce,"c:\\cavedog\\wargame\\endgame.cpp");

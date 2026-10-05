@@ -5,7 +5,7 @@ public:
     int FUN_00435100();
 };
 
-class Class_00435980 {
+class Net {
 public:
     int MissionExists(int index);
 };
@@ -28,8 +28,8 @@ int FUN_0041f040()
 {
     if (((Class_00435100*)g_game->ptr_391e9)->FUN_00435100() == 1 &&
         ((g_game->value_391af == 0 &&
-          ((Class_00435980*)g_game->ptr_391e9)->MissionExists(g_game->value_391ab + 1) == 0) ||
-         ((Class_00435980*)g_game->ptr_391e9)->MissionExists(g_game->value_391ab + 1) != 0)) {
+          ((Net*)g_game->ptr_391e9)->MissionExists(g_game->value_391ab + 1) == 0) ||
+         ((Net*)g_game->ptr_391e9)->MissionExists(g_game->value_391ab + 1) != 0)) {
         return 1;
     }
     return 0;
