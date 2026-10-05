@@ -29,7 +29,7 @@
 // - The unit's resource account is a class at +0xbc whose owner pointer is at
 //   +0x30 (unit+0xec); 0x401180..0x4012a0 are its methods and 0x401320 is the
 //   end-of-tick update, all defined above without FUNCTION lines. The cost
-//   block is SpendMetal inlined.
+//   block is SpendEnergy inlined.
 // - UseEnergy's positive arm is a helper taking the unit whose `used` store
 //   goes through a float* (otherwise the backlog compare is scheduled above
 //   it). UseEnergyD's positive arm converts the amount to a double for the
@@ -66,9 +66,9 @@ public:
     Player_00401360* owner;            // +0x30
     int FUN_00401180(Econ_00401360* e, float amount);
     int FUN_004011c0(float energy, float metal);
-    int SpendMetal(float amount);
     int SpendEnergy(float amount);
-    int SpendMetalAndEnergy(float energy, float metal);
+    int SpendMetal(float amount);
+    int SpendEnergyAndMetal(float energy, float metal);
 };
 
 struct UnitDef_00401360 {
@@ -175,7 +175,7 @@ int Econ_00401360::FUN_004011c0(float energy, float metal)
     return 0;
 }
 
-int Econ_00401360::SpendMetal(float amount)
+int Econ_00401360::SpendEnergy(float amount)
 {
     if (owner->res[0].stored >= amount) {
         owner->res[0].stored -= amount;
@@ -185,7 +185,7 @@ int Econ_00401360::SpendMetal(float amount)
     return 0;
 }
 
-int Econ_00401360::SpendEnergy(float amount)
+int Econ_00401360::SpendMetal(float amount)
 {
     if (owner->res[1].stored >= amount) {
         owner->res[1].stored -= amount;
@@ -195,7 +195,7 @@ int Econ_00401360::SpendEnergy(float amount)
     return 0;
 }
 
-int Econ_00401360::SpendMetalAndEnergy(float energy, float metal)
+int Econ_00401360::SpendEnergyAndMetal(float energy, float metal)
 {
     if (owner->res[0].stored >= energy && owner->res[1].stored >= metal) {
         owner->res[0].stored -= energy;
@@ -387,7 +387,7 @@ void __stdcall UpdatePlayerEconomy(Player_00401360* p)
             if (u->bit11) {
                 if (!(u->flags & 0x1000) && u->nextTick <= g_game->ticks) {
                     int cost = (int)((u->flags & 0xc) > 0 ? u->def->costActive : u->def->cost);
-                    ((Class_0048b090*)u)->SetStateBits(4, u->econ.SpendMetal(cost));
+                    ((Class_0048b090*)u)->SetStateBits(4, u->econ.SpendEnergy(cost));
                 } else
                     ((Class_0048b090*)u)->SetStateBits(4, 0);
             } else

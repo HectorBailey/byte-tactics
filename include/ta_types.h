@@ -1750,7 +1750,7 @@ struct PlayerFlags_497180;
 struct PlayerGrid;
 struct PlayerInfo_00466dc0;
 struct PlayerInfo_0046dad0;
-class PlayerRef;
+class UnitResources;
 struct PlayerRes_00401360;
 struct PlayerSlots_00497f40;
 struct Player_00407ae0;
@@ -2143,14 +2143,14 @@ public:
     char unknown_0[1];
 };
 
-class PlayerRef {  // 0x34 bytes, 10 views
+class UnitResources {  // 0x34 bytes, 10 views
 public:
     int unknown[12];  // +0x0
     Player* store;  // +0x30
-    int FUN_00401180(PlayerRef*, float);
-    int SpendMetal(float);
+    int FUN_00401180(UnitResources*, float);
     int SpendEnergy(float);
-    int SpendMetalAndEnergy(float, float);
+    int SpendMetal(float);
+    int SpendEnergyAndMetal(float, float);
     void Reset(unsigned char);
     int FUN_004011c0(float, float);
 };
@@ -3106,7 +3106,7 @@ struct Player {  // 0x14b bytes, 312 views
     float height;  // +0xe0
     float share_metal;  // +0xe4
     float share_energy;  // +0xe8
-    PlayerRef* econ;  // +0xec
+    UnitResources* econ;  // +0xec
     int field_f0;  // +0xf0
     int ff4;  // +0xf4
     int ff8;  // +0xf8

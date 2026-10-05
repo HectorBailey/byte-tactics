@@ -49,7 +49,7 @@ struct Player_485a40 {
     unsigned char field_146;           // +0x146
 };
 
-class PlayerRef {
+class UnitResources {
 public:
     int unknown[12];
     void* player;
@@ -140,7 +140,7 @@ struct Unit {
     char unknown_b4[0xb8 - 0xb4];
     short field_b8;                    // +0xb8
     short field_ba;                    // +0xba
-    PlayerRef playerRef;               // +0xbc
+    UnitResources playerRef;           // +0xbc
     int field_f0;                      // +0xf0
     unsigned char field_f4;            // +0xf4
     char unknown_f5[1];
