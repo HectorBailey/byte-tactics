@@ -187,7 +187,7 @@ address,name
 0x40d7b0,Class_0040d7b0::FUN_0040d7b0
 0x40d880,Class_0040d880::FUN_0040d880
 0x40d8b0,Class_0040d8b0::FUN_0040d8b0
-0x40d900,Class_0040e9e0::FUN_0040d900
+0x40d900,Pathfinder::FUN_0040d900
 0x40d9c0,FUN_0040d9c0
 0x40da40,Class_0040da40::FUN_0040da40
 0x40da70,Class_0040da70::FUN_0040da70
@@ -197,7 +197,7 @@ address,name
 0x40e630,Class_0040e630::FUN_0040e630
 0x40e9a0,Class_0040e9a0::FUN_0040e9a0
 0x40e9c0,Class_0040e9c0::FUN_0040e9c0
-0x40e9e0,Class_0040e9e0::Class_0040e9e0
+0x40e9e0,Pathfinder::Pathfinder
 0x40eb30,Class_0040eb30::~Class_0040eb30
 0x40eb70,Class_0040eb70::FUN_0040eb70
 0x40ef20,Class_0040ef20::FUN_0040ef20
