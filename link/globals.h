@@ -699,10 +699,10 @@ extern void* DAT_0052a4f8;                                                      
 extern long DAT_0052a4fc;                                                                     // 0x52a4fc, 4 bytes; 2 of 3 files (conflicting: signedness or const)
 
 // Not declared: 241 globals defined in a data file or whose type is not settled (see data/globals.csv).
-//   0x513000 DAT_00513000: defined in src/unsorted/0x460e20.cpp
+//   0x513000 DAT_00513000: defined in src/network/packets_460e20.cpp
 //   0x5119c0 DAT_005119c0: Class_00409160*[] (7), void*[] (5), Owner*[] (3), Class_00409470*[] (2), and 5 more
 //   0x51fbd0 DAT_0051fbd0: void* (4), int (2), Display_004b4f50* (1), Display_004b5370* (1), and 14 more
-//   0x51e598 IURect_0046e160::IU?$pair::?$_Tree::_Nil: defined in src/unsorted/0x46c920.cpp
+//   0x51e598 IURect_0046e160::IU?$pair::?$_Tree::_Nil: defined in src/network/unit_sync_46c920.cpp
 //   0x528a54 std::IH::IU?$pair::?$_Tree::_Nil: defined in src/unsorted/0x4db610.cpp
 //   0x512344 DAT_00512344: part of another global: DAT_00512340$S5516+0x4
 //   0x51fbbc std::HH::HU?$pair::?$_Tree::_Nil: defined in src/unsorted/0x4b26f0.cpp
@@ -714,7 +714,7 @@ extern long DAT_0052a4fc;                                                       
 //   0x4fd3b8 DAT_004fd3b8: defined in src/data/vtables.cpp
 //   0x511df0 DAT_00511df0: Obj_00421170*[] (2), int[100] (1), void*[100] (1), Obj_00420f30*[100] (1), and 2 more
 //   0x512358 Class_00440290::DAT_00512358: defined in src/units/movement_class_440230.cpp
-//   0x51e59c IURect_0046e160::IU?$pair::?$_Tree::_Nilrefs: defined in src/unsorted/0x46c920.cpp
+//   0x51e59c IURect_0046e160::IU?$pair::?$_Tree::_Nilrefs: defined in src/network/unit_sync_46c920.cpp
 //   0x51f2e8 DAT_0051f2e8: char* (4), int (1), int* (1), void* (1)
 //   0x4fcd98 DPSPGUID_IPX: defined in src/data/guids.cpp
 //   0x4fcda8 DPSPGUID_TCPIP: defined in src/data/guids.cpp
@@ -744,7 +744,7 @@ extern long DAT_0052a4fc;                                                       
 //   0x512320 DAT_00512320: Point16_00437de0 (1), Point16_00438070 (1), Point16_00438180 (1), short (1)
 //   0x512334 DAT_00512334: Point16_00437de0 (1), Point16_00438070 (1), Point16_00438180 (1), short (1)
 //   0x512770 DAT_00512770: char[] (2), Serial_00441c30 (1), int (1)
-//   0x5129d0 DAT_005129d0: defined in src/unsorted/0x44f7e0.cpp
+//   0x5129d0 DAT_005129d0: defined in src/network/net_condenser_44f7e0.cpp
 //   0x512f2c DAT_00512f2c: part of another global: DAT_00512f18+0x14
 //   0x512f42 DAT_00512f42: part of another global: DAT_00512f18+0x2a
 //   0x512f46 DAT_00512f46: part of another global: DAT_00512f18+0x2e
@@ -817,7 +817,7 @@ extern long DAT_0052a4fc;                                                       
 //   0x512370 DAT_00512370: part of another global: Class_00440290::DAT_00512358+0x18
 //   0x512764 DAT_00512764: short (1), int (1)
 //   0x5129f1 DAT_005129f1: part of another global: DAT_005129d0+0x21
-//   0x5129f8 DAT_005129f8: defined in src/unsorted/0x44f720.cpp
+//   0x5129f8 DAT_005129f8: defined in src/network/net_condenser_44f720.cpp
 //   0x512c98 DAT_00512c98: part of another global: DAT_00512c80+0x18
 //   0x512d28 DAT_00512d28: part of another global: DAT_00512c80+0xa8
 //   0x51e548 DAT_0051e548: int (__stdcall*)(int, char*) (1), int (__stdcall*)(int, int) (1)
