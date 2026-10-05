@@ -679,9 +679,10 @@ class Placer:
                 if target != orig_target:
                     note = (f"{site:#x} in {piece.label}: {sym.name} resolves to {target:#x}, "
                             f"the original uses {orig_target:#x}")
-                    if not sec.is_code:
+                    if not sec.is_code and piece.source != DATASRC:
                         # A vtable or table of the source's own (partial) view of
-                        # a class: keep the original's entry.
+                        # a class: keep the original's entry. (src/data is the
+                        # data itself, so a wrong pointer there is an error.)
                         self.kept.append(note)
                         o = site - self.img.base
                         if self.pieces_own(piece, site):
@@ -780,8 +781,8 @@ def place_data_sources(placer: Placer, objects_by_src: dict[str, Obj]) -> None:
         obj.data = True
         for name, sym in sorted(obj.externals.items(), key=lambda kv: (kv[1].section, kv[1].value)):
             sec = obj.secs[sym.section - 1]
-            if sec.is_code or sec.name.startswith(SKIP_SECTIONS):
-                continue
+            if sec.is_code or sec.name.startswith(SKIP_SECTIONS) or name.startswith(("??_C@", "__real@")):
+                continue          # literals and constants go where the original's pointers point
             addr = address_of(name, placer.symbols)
             if addr is None:
                 placer.mismatches.append(f"{src}: {name} has no address (annotate it // GLOBAL: 0x...)")
@@ -1176,7 +1177,7 @@ def report(img: Image, placer: Placer, verbose: bool) -> int:
         parts = [f"{SOURCES[s]} {counts[(name, s)]:,}" for s in range(len(SOURCES)) if counts[(name, s)]]
         print(f"  {name:6} {max(vsize, rsize):>9,}: " + ", ".join(parts))
     limit = None if verbose else 15
-    for title, items in (("code relocations that disagree with the original", placer.mismatches),
+    for title, items in (("relocations in code and src/data that disagree with the original", placer.mismatches),
                          ("table entries in compiled data that disagree with the original (the original's kept)",
                           placer.kept),
                          ("pieces that differ from a piece already placed there", placer.clashes),

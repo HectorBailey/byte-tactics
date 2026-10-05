@@ -180,6 +180,12 @@ def build_data(symbols: dict[str, int]) -> tuple[list[Path], dict[int, str]]:
         if (DATA_DIR / obj.with_suffix(".cpp").name).exists():
             sources.update(defined_addresses(obj, symbols))
 
+    # A class's vtable the compiler emits (??_7...) is the one definition of
+    # its address: the files that store it by hand (DAT_004fc980) mean it too.
+    for name, addr in symbols.items():
+        if name.startswith("??_7") and addr not in sources:
+            sources[addr] = name
+
     # Extra globals: those globals.csv lists but neither data.cpp nor src/data defines.
     rows = global_rows()
     rows = {a: r for a, r in rows.items() if GLOBAL_LO <= a < GLOBAL_HI}
