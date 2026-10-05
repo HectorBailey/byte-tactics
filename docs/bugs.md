@@ -813,6 +813,12 @@ Things that look wrong in the original but have no effect, kept for the record.
   the message's value byte at `[esp+0x13]`, so SendPacketToPlayer sends a two-byte
   message whose second byte is uninitialised. Found by DeepSeek V4.1 Flash in
   #139.
+- **0x451df0** (possible): BroadcastPacket's per-group loop reads its "group
+  already sent" table DAT_00512b90 (eleven ints) at the player's group index
+  (+0xc, `mov ecx, [eax*4+0x512b90]` at 0x451f5f) before anything checks the
+  index; only the store after the send (0x451f90) tests `0 <= group < 10`. A
+  group outside 0 to 10 reads past the table. Harmless if the group is always
+  a slot index. Found by Claude Opus 5.5 while naming the network module.
 - **0x476830** (possible): its "lowercase" loop adds 0x20 to every non-zero
   byte, so `.` becomes `N` and `a` becomes 0x81; fine only if the input is
   always upper case. It also writes one byte past a `count * 30` buffer for a
