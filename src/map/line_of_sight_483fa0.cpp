@@ -2,7 +2,7 @@
 // MATCH. Draws the visible map tiles into `surface`: the partial tiles along
 // the left/right edges and then the top/bottom edges through FUN_004b8150
 // (a 32x32 Bitmap whose data points at the tile's icon), then the whole
-// interior tiles through FUN_004c6e70.
+// interior tiles through DrawTile.
 // opus rewrote the earlier 77.2% file from scratch. What it took:
 // * The edge and interior loops are index loops: the screen coordinate is
 //   written from the index (`screenY + j * 32 - offY`, `screenX + i * 32`),
@@ -62,7 +62,7 @@ struct Bitmap_00483fa0 {
 extern Game* g_game;
 
 void __stdcall FUN_004b8150(void* dst, Bitmap_00483fa0* bmp, int x, int y);
-void __stdcall FUN_004c6e70(void* dst, int x, int y, unsigned char* pix);
+void __stdcall DrawTile(void* dst, int x, int y, unsigned char* pix);
 
 // FUNCTION: 0x483fa0
 void __stdcall FUN_00483fa0(void* surface)
@@ -155,7 +155,7 @@ void __stdcall FUN_00483fa0(void* surface)
     for (int j = 0; j < tilesY; j++) {
         unsigned short* p = g_game->mapValues + (tileY + j) * (unsigned short)stride + tileX;
         for (int i = 0; i < tilesX; i++, p++) {
-            FUN_004c6e70(surface, screenX + i * 32, screenY + j * 32, g_game->iconSet->data + *p * 0x400);
+            DrawTile(surface, screenX + i * 32, screenY + j * 32, g_game->iconSet->data + *p * 0x400);
         }
     }
 }

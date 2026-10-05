@@ -254,7 +254,7 @@ struct PieceInfo_4584d0 {
 void* __stdcall FUN_004b7ee0(Pic_4584d0* ref);
 void* __stdcall FUN_004b7f30(unsigned short* table, int index);
 void __stdcall FUN_004c0310(void* surface, Point_4584d0* points, int count, int flags);
-void __stdcall FUN_004c7580(void* surface, void* pic, Point_4584d0* points, void* src);
+void __stdcall DrawFrameQuad(void* surface, void* pic, Point_4584d0* points, void* src);
 
 class Class_004584d0 {
 public:
@@ -534,7 +534,7 @@ void Class_004584d0::FUN_004584d0(Model_4584d0* model, void* surface,
                     pic = FUN_004b7f30(face->color, *(unsigned char*)(unit + 0x96));
                 } else pic = useColor ? FUN_004b7f30(face->color, 0) : FUN_004b7ee0(&face->pic);
             } else pic = face->pic.pic;
-            FUN_004c7580(surface, pic, poly, 0);
+            DrawFrameQuad(surface, pic, poly, 0);
 skip0:;
         } else {
             FUN_004c0310(surface, poly, face->count, face->unknown_0);

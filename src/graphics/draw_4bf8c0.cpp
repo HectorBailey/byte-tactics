@@ -2,7 +2,7 @@
 //
 // Draws the outline of `r` (top, right, bottom, left edges in that order) into
 // `surface`, or into the screen when `surface` is 0 (locked with
-// FUN_004c5e70, unlocked with FUN_004c5fa0). Each edge is a segment drawer of
+// LockScreen, unlocked with FUN_004c5fa0). Each edge is a segment drawer of
 // the same shape as FUN_004be950 (clip with FUN_004bea20, fill with
 // FUN_004cc7ab); the screen path carries four hand-inlined copies of it whose
 // null-surface lock arm survives because the compiler only tests the address
@@ -40,7 +40,7 @@ struct Rect_004bf8c0 {
     int bottom;                        // +0xc
 };
 
-int __stdcall FUN_004c5e70(Surface_004bf8c0* out);
+int __stdcall LockScreen(Surface_004bf8c0* out);
 int __stdcall FUN_004c5fa0(Surface_004bf8c0* s);
 int __stdcall FUN_004bea20(Surface_004bf8c0* dst, int* x0, int* y0, int* x1, int* y1);
 void __cdecl FUN_004cc7ab(Surface_004bf8c0* dst, int x0, int y0, int x1, int y1, int color);
@@ -53,13 +53,13 @@ int __stdcall FUN_004bf8c0(Surface_004bf8c0* surface, Rect_004bf8c0* r, int colo
     int result;
     if (surface == 0) {
         Surface_004bf8c0 screen;
-        result = FUN_004c5e70(&screen);
+        result = LockScreen(&screen);
         if (result != 0) {
             {
                 int x0, y0, x1, y1; y1 = r->top; x1 = r->right; y0 = r->top; x0 = r->left;
                 if (&screen == 0) {
                     Surface_004bf8c0 inner;
-                    if (FUN_004c5e70(&inner)) {
+                    if (LockScreen(&inner)) {
                         if (FUN_004bea20(&inner, &x0, &y0, &x1, &y1))
                             FUN_004cc7ab(&inner, x0, y0, x1, y1, color);
                         FUN_004c5fa0(&inner);
@@ -73,7 +73,7 @@ int __stdcall FUN_004bf8c0(Surface_004bf8c0* surface, Rect_004bf8c0* r, int colo
                 int x0, y0, x1, y1; y1 = r->bottom; x1 = r->right; y0 = r->top; x0 = r->right;
                 if (&screen == 0) {
                     Surface_004bf8c0 inner;
-                    if (FUN_004c5e70(&inner)) {
+                    if (LockScreen(&inner)) {
                         if (FUN_004bea20(&inner, &x0, &y0, &x1, &y1))
                             FUN_004cc7ab(&inner, x0, y0, x1, y1, color);
                         FUN_004c5fa0(&inner);
@@ -87,7 +87,7 @@ int __stdcall FUN_004bf8c0(Surface_004bf8c0* surface, Rect_004bf8c0* r, int colo
                 int x0, y0, x1, y1; y1 = r->bottom; x1 = r->right; y0 = r->bottom; x0 = r->left;
                 if (&screen == 0) {
                     Surface_004bf8c0 inner;
-                    if (FUN_004c5e70(&inner)) {
+                    if (LockScreen(&inner)) {
                         if (FUN_004bea20(&inner, &x0, &y0, &x1, &y1))
                             FUN_004cc7ab(&inner, x0, y0, x1, y1, color);
                         FUN_004c5fa0(&inner);
@@ -101,7 +101,7 @@ int __stdcall FUN_004bf8c0(Surface_004bf8c0* surface, Rect_004bf8c0* r, int colo
                 int x0, y0, x1, y1; y1 = r->bottom; x1 = r->left; y0 = r->top; x0 = r->left;
                 if (&screen == 0) {
                     Surface_004bf8c0 inner;
-                    if (FUN_004c5e70(&inner)) {
+                    if (LockScreen(&inner)) {
                         if (FUN_004bea20(&inner, &x0, &y0, &x1, &y1))
                             FUN_004cc7ab(&inner, x0, y0, x1, y1, color);
                         FUN_004c5fa0(&inner);

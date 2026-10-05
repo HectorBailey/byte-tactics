@@ -72,14 +72,14 @@ struct Display_004c63a0 {
 extern LONG DAT_0052a4e8;
 extern LONG DAT_0052a4ec;
 extern HANDLE DAT_0052a4f0;
-extern int DAT_0051fe00;
+extern int g_screenLockCount;
 
 Display_004c63a0* GetDisplay(void);
 int GetScreenWidth(void);
 int GetScreenHeight(void);
-int __stdcall FUN_004c5e70(Surface_004c63a0* out);
-void __stdcall FUN_004c6b70(Surface_004c63a0* dst, Surface_004c63a0* bmp, int x, int y);
-void __stdcall FUN_004c67c0(Display_004c63a0* obj, void* dst);
+int __stdcall LockScreen(Surface_004c63a0* out);
+void __stdcall DrawSurface(Surface_004c63a0* dst, Surface_004c63a0* bmp, int x, int y);
+void __stdcall DrawCursor(Display_004c63a0* obj, void* dst);
 void __cdecl FUN_004cbbe0(Surface_004c63a0* dst, Surface_004c63a0* src, int x, int y);
 
 static inline LONG Lock()
@@ -106,15 +106,15 @@ static inline void Unlock(LONG held)
 }
 
 // 0x4c5fa0, inlined here.
-static inline int UnlockScreen()
+static inline int UnlockScreenInline()
 {
     Display_004c63a0* d = GetDisplay();
     if (d->field_44 == 0 && d->field_dc == 0) {
         if (d->screen.surface == 0)
             return 0;
         d->screen.UnlockSurface();
-        if (DAT_0051fe00 > 0)
-            DAT_0051fe00--;
+        if (g_screenLockCount > 0)
+            g_screenLockCount--;
     }
     return 1;
 }
@@ -133,9 +133,9 @@ static inline HRESULT RestoreSurfaces(Display_004c63a0* d)
         hr = d->screen.surface->Restore();
         if (hr == 0) {
             Surface_004c63a0 screen;
-            FUN_004c5e70(&screen);
+            LockScreen(&screen);
             FUN_004cbbe0(&screen, dd->field_98, 0, 0);
-            UnlockScreen();
+            UnlockScreenInline();
         }
     }
     return hr;
@@ -150,7 +150,7 @@ struct Desc {
 };
 
 // FUNCTION: 0x4c63a0
-void FUN_004c63a0(void)
+void FlipScreen(void)
 {
     Display_004c63a0* d = GetDisplay();
     unsigned short flags = d->flags;
@@ -158,8 +158,8 @@ void FUN_004c63a0(void)
     if ((flags & 2) == 0) {
         LONG held = Lock();
         Out_004c63a0* p = &d->cached;
-        FUN_004c6b70((Surface_004c63a0*)p, d->field_bc, 0, 0);
-        FUN_004c67c0(d, p);
+        DrawSurface((Surface_004c63a0*)p, d->field_bc, 0, 0);
+        DrawCursor(d, p);
         HDC hdc = GetDC(d->hwnd);
         SelectPalette(hdc, d->palette, 0);
         RealizePalette(hdc);
@@ -186,10 +186,10 @@ void FUN_004c63a0(void)
             out.data[1] = d->field_d8;
             out.data[2] = desc.lPitch;
             out.data[3] = (int)desc.lpSurface;
-            FUN_004c67c0(d, bmp);
+            DrawCursor(d, bmp);
             FUN_004cbbe0(&out, bmp, 0, 0);
             if (d->field_1ce != 0 && d->field_1d2 != 0)
-                FUN_004c6b70(bmp, (Surface_004c63a0*)d->field_1be, d->field_1b6, d->field_1ba);
+                DrawSurface(bmp, (Surface_004c63a0*)d->field_1be, d->field_1b6, d->field_1ba);
             d->screen.primary->Unlock(0);
         } else if (lr == 0x887601c2) {
             RestoreSurfaces(d);

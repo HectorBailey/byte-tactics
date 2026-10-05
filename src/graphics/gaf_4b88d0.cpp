@@ -4,7 +4,7 @@
 // parity of the checkerboard is touched (parity comes from the last
 // argument). Like 0x4b7f90 it draws a bitmap (or a list of nested
 // bitmaps) into `dst`, or into the screen when `dst` is null: the screen
-// is then locked with FUN_004c5e70 and unlocked with FUN_004c5fa0 at the
+// is then locked with LockScreen and unlocked with FUN_004c5fa0 at the
 // end (which is why the unlock is guarded by a comparison of `dst` with
 // the address of the local surface). The whole body is skipped when the
 // byte at +9 is set. Suspected original bug: that test dereferences the
@@ -35,7 +35,7 @@ public:
     char unknown_10[0x1c - 0x10];
     Rect_004b88d0 field_1c;         // +0x1c
 
-    Rect_004b88d0* FUN_004c6ae0(Rect_004b88d0* out);
+    Rect_004b88d0* GetClipRect(Rect_004b88d0* out);
 };
 
 struct Bitmap_004b88d0 {
@@ -55,7 +55,7 @@ struct Surface_004b88d0 {
     int data[12];
 };
 
-int __stdcall FUN_004c5e70(Surface_004b88d0* out);
+int __stdcall LockScreen(Surface_004b88d0* out);
 int __stdcall FUN_004c5fa0(Surface_004b88d0* s);
 void __stdcall FUN_004b7e60(Rect_004b88d0* other, Rect_004b88d0* rect, Rect_004b88d0* bounds);
 
@@ -65,7 +65,7 @@ void __stdcall FUN_004b88d0(Class_004c6ae0* dst, Bitmap_004b88d0* bmp, int x, in
     Surface_004b88d0 screen;
     if (bmp->flag9 == 0) {
         if (dst == 0) {
-            int ok = FUN_004c5e70(&screen);
+            int ok = LockScreen(&screen);
             if (ok != 0)
                 dst = (Class_004c6ae0*)&screen;
         }
@@ -87,7 +87,7 @@ void __stdcall FUN_004b88d0(Class_004c6ae0* dst, Bitmap_004b88d0* bmp, int x, in
                 rect.top = y - bmp->dy;
                 rect.right = rect.left + bmp->width - 1;
                 rect.bottom = rect.top + bmp->height - 1;
-                dst->FUN_004c6ae0(&bounds);
+                dst->GetClipRect(&bounds);
                 FUN_004b7e60(&other, &rect, &bounds);
                 if (rect.right >= rect.left && rect.bottom >= rect.top &&
                     other.right >= other.left && other.bottom >= other.top) {

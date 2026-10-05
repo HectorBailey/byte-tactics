@@ -106,7 +106,7 @@ struct Rect_00495a30 {
 
 struct Class_004c6b10 {
     char unknown_0[0x1c];
-    void FUN_004c6b10(Rect_00495a30 r);
+    void SetClipRect(Rect_00495a30 r);
 };
 
 void __stdcall FUN_00495930(char* out, const char* dir, const char* name, const char* ext);
@@ -203,7 +203,7 @@ void __stdcall FUN_00495a30(char* dir, char* name, int x, int y, int w, int h)
                         box.top = 0;
                         box.right = right;
                         box.bottom = bh - 1;
-                        ((Class_004c6b10*)&surf)->FUN_004c6b10(box);
+                        ((Class_004c6b10*)&surf)->SetClipRect(box);
                         FUN_004b7f90(&surf, &pal, g_game->scrollX - x - off27,
                                      g_game->scrollY - row - y - off2b);
                     } while (((col += bw), (col < w)));

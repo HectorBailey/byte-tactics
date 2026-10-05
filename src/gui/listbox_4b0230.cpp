@@ -3,7 +3,7 @@
 // bitmap arrives, the "Listbox" piece is looked up in the object's GAF and, if
 // found, the rectangle is grown by 3 on every side. The destination is the
 // surface at entries+0xbc. When FUN_004a18c0 finds a background cell for the
-// entry, the area is tiled with it through FUN_004c6b70 and only the bevel
+// entry, the area is tiled with it through DrawSurface and only the bevel
 // (FUN_004b0160) is drawn; with no cell and no bitmap the rectangle is filled
 // (FUN_004bf6f0) and bevelled; with a bitmap set of more than one child the
 // set is laid out as a 3x3 border around the rectangle, rows 0/3/6 and columns
@@ -77,7 +77,7 @@ struct Object_004b0230 {
 void __stdcall FUN_004a15c0(char* entries, int index, Rect_004b0230* out);
 int __stdcall FUN_004a18c0(char* entries, int index);
 Bits_004b0230* __stdcall FUN_004b8d40(Gaf_004b0230* gaf, const char* name);
-void __stdcall FUN_004c6b70(Surface_004b0230* dst, Cell_004b0230* cell, int x, int y);
+void __stdcall DrawSurface(Surface_004b0230* dst, Cell_004b0230* cell, int x, int y);
 Pic_004b0230* __stdcall FUN_004b7f30(Bits_004b0230* bits, int index);
 void __stdcall FUN_004b7f90(Surface_004b0230* dst, Pic_004b0230* pic, int x, int y);
 void __stdcall FUN_004b0160(Surface_004b0230* surface, Rect_004b0230* rect, int dark, int light, int fill);
@@ -125,7 +125,7 @@ void __stdcall FUN_004b0230(Object_004b0230* obj, int index, Bits_004b0230* bmp)
     if (cell != 0) {
         for (x = 0; x < surface->tiles_x; x += cell->step_x) {
             for (y = 0; y < surface->tiles_y; y += cell->step_y) {
-                FUN_004c6b70(surface, cell, x, y);
+                DrawSurface(surface, cell, x, y);
             }
         }
         FUN_004b0160(surface, &rect, obj->dark, obj->light, obj->fill);

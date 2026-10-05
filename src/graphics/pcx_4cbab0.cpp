@@ -20,7 +20,7 @@ extern HANDLE DAT_0052a4f0;
 App_004cbab0* GetDisplay(void);
 void __cdecl FUN_004d8e60(int param_1, int param_2);
 void __stdcall ReleaseDirectDraw(App_004cbab0* app);
-void FUN_004c5df0(void);
+void UnlockAllScreens(void);
 
 static inline LONG Lock()
 {
@@ -53,7 +53,7 @@ int __stdcall FUN_004cbab0(int param_1, int param_2)
     if (app != 0) {
         LONG held = Lock();
         app->field_1b2 = 0;
-        FUN_004c5df0();
+        UnlockAllScreens();
         Unlock(held);
         ReleaseDirectDraw(app);
         if (app->hwnd != 0) {

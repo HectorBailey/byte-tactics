@@ -15,7 +15,7 @@ struct Obj_004c61b0 {
 extern Obj_004c61b0* GetDisplay(void);
 
 // FUNCTION: 0x4c61b0
-int __stdcall FUN_004c61b0(int enable)
+int __stdcall SetPageFlipping(int enable)
 {
     Obj_004c61b0* obj = GetDisplay();
     obj->flag0 = enable;

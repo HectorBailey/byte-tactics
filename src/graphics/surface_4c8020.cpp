@@ -25,7 +25,7 @@ void __cdecl FUN_004cd91e(unsigned char*, unsigned char*, int, int, int, int, in
 void __cdecl FUN_004cd962(unsigned char*, unsigned char*, int, int, int, int, int);
 
 // FUNCTION: 0x4c8020
-void __stdcall FUN_004c8020(int row, int* span, Surface_004c8020* target, Surface_004c8020* texture)
+void __stdcall DrawLitTexturedSpan(int row, int* span, Surface_004c8020* target, Surface_004c8020* texture)
 {
     unsigned char* dest = target->data;
     unsigned char* depth = target->depth;

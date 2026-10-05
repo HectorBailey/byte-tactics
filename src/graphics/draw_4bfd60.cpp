@@ -29,7 +29,7 @@
 //   lock failure branches to 0x4bfdfe and not to its own epilogue, so the
 //   result is one function-level variable assigned in both arms with the
 //   `return` outside them, not an early `return` per arm;
-// - the locked path copies the FUN_004c5e70 result into esi at once
+// - the locked path copies the LockScreen result into esi at once
 //   (`mov esi, eax; test esi, esi`), and the locked path's fill argument is
 //   reloaded from [esp+0x50] even though the value is also read in the else
 //   arm, so a parameter read in two arms is not a register variable.
@@ -59,7 +59,7 @@ struct Surface_004bfd60 {
     int unknown_10[8];
 };
 
-int __stdcall FUN_004c5e70(Surface_004bfd60* out);
+int __stdcall LockScreen(Surface_004bfd60* out);
 int __stdcall FUN_004c5fa0(Surface_004bfd60* s);
 int __stdcall FUN_004bf620(Surface_004bfd60* s, Rect_004bfd60* r);
 void __cdecl FUN_004cce87(Surface_004bfd60* s, Rect_004bfd60* r, int value);
@@ -71,7 +71,7 @@ int __stdcall FUN_004bfd60(Surface_004bfd60* surface, Rect_004bfd60* rect, int v
     int result;
     if (surface == 0) {
         Surface_004bfd60 screen;
-        result = FUN_004c5e70(&screen);
+        result = LockScreen(&screen);
         if (result != 0) {
             if (FUN_004bf620(&screen, &r))
                 FUN_004cce87(&screen, &r, value);

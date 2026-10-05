@@ -27,7 +27,7 @@ struct Input_004c2cc0 {
 
 Input_004c2cc0* GetDisplay(void);
 void __stdcall FUN_004b6b50(unsigned int param_1);
-void __stdcall FUN_004c6ac0(void* param_1);
+void __stdcall FreeSurface(void* param_1);
 void __cdecl FUN_004d85a0(void* p);
 
 // FUNCTION: 0x4c2cc0
@@ -50,9 +50,9 @@ void FUN_004c2cc0(void)
                 }
             }
         }
-        FUN_004c6ac0(o->obj_1c6);
-        FUN_004c6ac0(o->obj_1c2);
-        FUN_004c6ac0(o->obj_1be);
+        FreeSurface(o->obj_1c6);
+        FreeSurface(o->obj_1c2);
+        FreeSurface(o->obj_1be);
         FUN_004d85a0(o->entries);
         o->entries = 0;
     }

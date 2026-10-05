@@ -147,9 +147,9 @@ extern int DAT_0051e828[];
 
 int GetScreenWidth();
 int GetScreenHeight();
-int __stdcall FUN_004c69f0(const char* name, int width, int height);
-void __stdcall FUN_004c61f0(int param_1);
-void __stdcall FUN_004c61b0(int param_1);
+int __stdcall AllocSurface(const char* name, int width, int height);
+void __stdcall SetRestoreSurface(int param_1);
+void __stdcall SetPageFlipping(int param_1);
 void __stdcall FUN_00434ab0(int param_1);
 void FUN_00429870();
 void FUN_0047ed40();
@@ -201,9 +201,9 @@ void FUN_00491200()
     }
     g_game->field_37e1f = GetScreenWidth();
     g_game->field_37e23 = GetScreenHeight();
-    g_game->field_37e1b = FUN_004c69f0(DAT_005091d4, g_game->field_37e1f,
+    g_game->field_37e1b = AllocSurface(DAT_005091d4, g_game->field_37e1f,
                                       g_game->field_37e23);
-    FUN_004c61f0(g_game->field_37e1b);
+    SetRestoreSurface(g_game->field_37e1b);
     g_game->field_3923b &= 0xfffe;
     g_game->field_3923b &= 0xfffd;
     g_game->field_39249 = 0;
@@ -219,7 +219,7 @@ void FUN_00491200()
     g_game->field_37f2f &= 0xfdff;
     g_game->field_37f2f &= 0xff7f;
     g_game->field_37f2f &= 0xfeff;
-    FUN_004c61b0(0);
+    SetPageFlipping(0);
     FUN_00429870();
     FUN_0047ed40();
     FUN_004259b0();

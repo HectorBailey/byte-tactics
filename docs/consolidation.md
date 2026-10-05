@@ -315,7 +315,7 @@ can disagree on types (a real link would fail). Known cases:
   `Class_00437820::operator=` (`??4Class_00437820@@QAEAAV0@ABV0@@Z`, the
   compiler-generated assignment of `{Class_004c91a0 handle; int field_4;}`,
   27 bytes, called only from 0x437580's fill and copy_backward); 0x4c93b0
-  (`Class_004c93b0::FUN_004c93b0`) is the string handle's
+  (`Class_004c93b0::Assign`) is the string handle's
   `Class_004c91a0::operator=`. Rename both before 0x437580 can match; its twin
   at 0x488fb0 (with 0x489240) is the same instantiation for another vector
   (#428).

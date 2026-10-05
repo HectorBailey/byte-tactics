@@ -4992,8 +4992,8 @@ public:
     Class_004c9390(Class_004c9390&);
     ~Class_004c9390(void);
     Class_004c9390(void);
-    Class_004c9390* FUN_004c93b0(Class_004c9390*);
-    void FUN_004c9390(void);
+    Class_004c9390* Assign(Class_004c9390*);
+    void ReleaseRef(void);
     Class_004c9390& operator=(Class_004c9390&);
 };
 
@@ -8383,7 +8383,7 @@ struct Surface {  // 0x30 bytes, 69 views
     unsigned int flag0 : 1;  // +0x2c
     unsigned int flag1 : 1;
     unsigned int : 30;
-    Rect* FUN_004c6ae0(Rect*);
+    Rect* GetClipRect(Rect*);
     void Unlock(void);
 };
 
@@ -9963,7 +9963,7 @@ struct Game {  // 0x3924d bytes, 904 views
 
 struct Class_004c6b10 {  // 0x30 bytes, 4 views
     int data[12];  // +0x0
-    void FUN_004c6b10(Rect);
+    void SetClipRect(Rect);
 };
 
 struct MapGrid {  // 0x90 bytes, 1 view
@@ -16132,7 +16132,7 @@ struct Rec_004b7760 {  // 0xc bytes, 1 view
 class Class_004c9290 {  // 0x4 bytes, 2 views
 public:
     char* data;  // +0x0
-    Class_004c9290* FUN_004c9290(void);
+    Class_004c9290* MakeLower(void);
     char* GetUnique(void);
 };
 
@@ -17091,7 +17091,7 @@ struct Class_004c5c60 {  // 0xd bytes, 2 views
 class Class_004c93f0 {  // 0x4 bytes, 2 views
 public:
     char* ptr;  // +0x0
-    Class_004c93f0* FUN_004c93f0(char*);
+    Class_004c93f0* AssignText(char*);
 };
 
 struct Elem_004c5740 {  // 0x8 bytes, 1 view
@@ -17508,7 +17508,7 @@ class Class_004c90b0 {  // 0x4 bytes, 1 view
 public:
     char* ptr;  // +0x0
     unsigned char IsEmpty(void);
-    Class_004c90b0* FUN_004c90b0(Class_004c90b0&);
+    Class_004c90b0* Append(Class_004c90b0&);
 };
 
 class Class_004c9230 {  // 0x4 bytes, 1 view
@@ -17521,7 +17521,7 @@ class Class_004c9310 {  // 0x4 bytes, 1 view
 public:
     char* data;  // +0x0
     char* GetUnique(void);
-    Class_004c9310* FUN_004c9310(void);
+    Class_004c9310* MakeUpper(void);
 };
 
 class Class_004c9490 {  // 0x4 bytes, 1 view
@@ -17529,7 +17529,7 @@ public:
     char* ptr;  // +0x0
     Class_004c9490(char*, int);
     Class_004c9490(void);
-    Class_004c9490 FUN_004c9490(int, int);
+    Class_004c9490 SubString(int, int);
 };
 
 class DirectPlay_4c97b0 {  // 0x4 bytes, 1 view

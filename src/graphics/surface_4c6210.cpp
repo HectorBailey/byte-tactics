@@ -68,14 +68,14 @@ struct Arg_004c6210 {
     Intf_004c6210* field_8;            // +0x8
 };
 
-extern int DAT_0051fe00;
+extern int g_screenLockCount;
 
 Display_004c6210* GetDisplay(void);
-int __stdcall FUN_004c5e70(Surface_004c6210* out);
+int __stdcall LockScreen(Surface_004c6210* out);
 void __cdecl FUN_004cbbe0(Surface_004c6210* dst, Surface_004c6210* src, int x, int y);
 
 // FUNCTION: 0x4c6210
-int __stdcall FUN_004c6210(Arg_004c6210* arg)
+int __stdcall RestoreSurfaces(Arg_004c6210* arg)
 {
     Display_004c6210* d = GetDisplay();
     if (d->field_44 != 0)
@@ -86,14 +86,14 @@ int __stdcall FUN_004c6210(Arg_004c6210* arg)
         r = arg->field_8->Slot27();
         if (r == 0) {
             Surface_004c6210 screen;
-            FUN_004c5e70(&screen);
+            LockScreen(&screen);
             FUN_004cbbe0(&screen, d->field_98, r, r);
 
             Display_004c6210* d2 = GetDisplay();
             if (d2->field_44 == 0 && d2->field_dc == 0 && d2->screen.surface != 0) {
                 d2->screen.UnlockRect((LPRECT)r);
-                if (DAT_0051fe00 > 0)
-                    DAT_0051fe00--;
+                if (g_screenLockCount > 0)
+                    g_screenLockCount--;
             }
         }
     }

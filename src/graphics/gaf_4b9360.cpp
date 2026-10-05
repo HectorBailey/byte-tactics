@@ -46,8 +46,8 @@ struct Rect_4b9360 {
     int bottom;                  // +0xc
 };
 
-void __stdcall FUN_004c69c0(Surface_4b9360* surface);
-void __stdcall FUN_004c6d20(void* dst, void* src, Rect_4b9360* rect, Rect_4b9360* pos);
+void __stdcall ResetClipRect(Surface_4b9360* surface);
+void __stdcall CopySurfaceRect(void* dst, void* src, Rect_4b9360* rect, Rect_4b9360* pos);
 void __stdcall FUN_004b7f90(void* dst, Sprite_4b9360* sprite, int x, int y);
 
 static void SwapPtr(unsigned char*& a, unsigned char*& b)
@@ -73,7 +73,7 @@ void __stdcall FUN_004b9360(void* dst, Sprite_4b9360* sprite, int x, int y)
     surface.y = sprite->y;
     surface.flag0 = 1;
     surface.flag1 = 0;
-    FUN_004c69c0(&surface);
+    ResetClipRect(&surface);
 
     Rect_4b9360 srcRect;
     srcRect.left = 0;
@@ -87,7 +87,7 @@ void __stdcall FUN_004b9360(void* dst, Sprite_4b9360* sprite, int x, int y)
     dstRect.top = y - sprite->y;
     dstRect.bottom = y + surface.height - sprite->y - 1;
 
-    FUN_004c6d20(&surface, dst, &dstRect, &srcRect);
+    CopySurfaceRect(&surface, dst, &dstRect, &srcRect);
 
     SwapPtr(sprite->buffers[0], sprite->buffers[1]);
 

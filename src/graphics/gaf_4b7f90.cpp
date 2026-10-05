@@ -1,6 +1,6 @@
 // Decompiled by space-bunny-free. Names are provisional.
 // Draws a bitmap (or a list of nested bitmaps) into `dst`, or into the screen
-// when `dst` is null: the screen is then locked with FUN_004c5e70 and unlocked
+// when `dst` is null: the screen is then locked with LockScreen and unlocked
 // with FUN_004c5fa0 at the end (which is why the unlock is guarded by a
 // comparison of `dst` with the address of the local surface).
 // A record with a child count draws each child, through FUN_004b8500 when the
@@ -28,7 +28,7 @@ public:
     char unknown_10[0x1c - 0x10];
     Rect_004b7f90 field_1c;             // +0x1c
 
-    Rect_004b7f90* FUN_004c6ae0(Rect_004b7f90* out);
+    Rect_004b7f90* GetClipRect(Rect_004b7f90* out);
 };
 
 struct Bitmap_004b7f90 {
@@ -56,7 +56,7 @@ struct Desc_004b7f90 {
     char unknown_10[0x30 - 0x10];
 };
 
-int __stdcall FUN_004c5e70(Surface_004b7f90* out);
+int __stdcall LockScreen(Surface_004b7f90* out);
 int __stdcall FUN_004c5fa0(Surface_004b7f90* s);
 void __stdcall FUN_004b7e60(Rect_004b7f90* other, Rect_004b7f90* rect, Rect_004b7f90* bounds);
 void __cdecl FUN_004cbe70(Class_004c6ae0* dst, Desc_004b7f90* src, Rect_004b7f90* srect, Rect_004b7f90* drect, int colour);
@@ -68,7 +68,7 @@ void __stdcall FUN_004b7f90(Class_004c6ae0* dst, Bitmap_004b7f90* bmp, int x, in
 {
     Surface_004b7f90 screen;
     if (dst == 0) {
-        int ok = FUN_004c5e70(&screen);
+        int ok = LockScreen(&screen);
         if (ok != 0)
             dst = (Class_004c6ae0*)&screen;
     }
@@ -94,7 +94,7 @@ void __stdcall FUN_004b7f90(Class_004c6ae0* dst, Bitmap_004b7f90* bmp, int x, in
             rect.top = y - bmp->dy;
             rect.right = rect.left + bmp->width - 1;
             rect.bottom = rect.top + bmp->height - 1;
-            dst->FUN_004c6ae0(&bounds);
+            dst->GetClipRect(&bounds);
             FUN_004b7e60(&other, &rect, &bounds);
             if (rect.right >= rect.left && rect.bottom >= rect.top &&
                 other.right >= other.left && other.bottom >= other.top) {

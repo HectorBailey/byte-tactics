@@ -5,7 +5,7 @@
 // screen points, then draws each primitive in obj->prims (from index 1 when
 // obj->field_c is not -1, otherwise from 0). A primitive whose bit 0 is set
 // is a flat filled polygon (FUN_004c0310); otherwise a 4-vertex textured quad
-// (FUN_004c7580), whose texture is either the direct pointer at +0x10 or, when
+// (DrawFrameQuad), whose texture is either the direct pointer at +0x10 or, when
 // bit 1 is set, the entry FUN_004b7ee0 looks up from the reference at +0x10.
 //
 // MATCH. Two things the compiler only does when the per-iteration pointer
@@ -71,7 +71,7 @@ extern Game* g_game;
 void __stdcall FUN_004b6cc0(Vec3_0046bae0* in, Vec3_0046bae0* out, short* angles);
 int __stdcall FUN_004b7ee0(short* ref);
 void __stdcall FUN_004c0310(void* surface, Point_0046bae0* points, int count, int color);
-void __stdcall FUN_004c7580(void* surface, void* texture, Point_0046bae0* points, void* src);
+void __stdcall DrawFrameQuad(void* surface, void* texture, Point_0046bae0* points, void* src);
 
 // FUNCTION: 0x46bae0
 void __stdcall FUN_0046bae0(void* surface, Vec3_0046bae0* offset,
@@ -111,7 +111,7 @@ void __stdcall FUN_0046bae0(void* surface, Vec3_0046bae0* offset,
                     tex = (void*)FUN_004b7ee0((short*)((char*)e + 0x10));
                 else
                     tex = (void*)e->field_10;
-                FUN_004c7580(surface, tex, g_game->vertices, 0);
+                DrawFrameQuad(surface, tex, g_game->vertices, 0);
             }
         } else {
             FUN_004c0310(surface, g_game->vertices, e->count, e->field_0);

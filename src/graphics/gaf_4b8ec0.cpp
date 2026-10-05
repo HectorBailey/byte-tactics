@@ -1,7 +1,7 @@
 // Decompiled by mimo-v2.6-pro. Names are provisional.
 // Draws a shadow bitmap (or a list of nested shadow bitmaps) into `dst`, or
 // into the screen when `dst` is null: the screen is then locked with
-// FUN_004c5e70 and unlocked with FUN_004c5fa0 at the end (which is why the
+// LockScreen and unlocked with FUN_004c5fa0 at the end (which is why the
 // unlock is guarded by a comparison of `dst` with the address of the local
 // surface). The whole draw only happens when bit 7 of the display's byte at
 // +0xf0 is set (the cached object at +0xc8 exists). A record with a child
@@ -29,7 +29,7 @@ public:
     char unknown_10[0x1c - 0x10];
     Rect_004b8ec0 field_1c;             // +0x1c
 
-    Rect_004b8ec0* FUN_004c6ae0(Rect_004b8ec0* out);
+    Rect_004b8ec0* GetClipRect(Rect_004b8ec0* out);
 };
 
 struct Bitmap_004b8ec0 {
@@ -68,7 +68,7 @@ struct Display_004b8ec0 {
 };
 
 Display_004b8ec0* GetDisplay(void);
-int __stdcall FUN_004c5e70(Surface_004b8ec0* out);
+int __stdcall LockScreen(Surface_004b8ec0* out);
 int __stdcall FUN_004c5fa0(Surface_004b8ec0* s);
 void __stdcall FUN_004b7e60(Rect_004b8ec0* other, Rect_004b8ec0* rect, Rect_004b8ec0* bounds);
 void __cdecl FUN_004cc332(Class_004c6ae0* dst, Desc_004b8ec0* src, Rect_004b8ec0* srect, Rect_004b8ec0* drect, int colour, int param_6);
@@ -81,7 +81,7 @@ void __stdcall FUN_004b8ec0(Class_004c6ae0* dst, Bitmap_004b8ec0* bmp, int x, in
     if (d->has_obj_c8 == 1) {
         Surface_004b8ec0 screen;
         if (dst == 0) {
-            int ok = FUN_004c5e70(&screen);
+            int ok = LockScreen(&screen);
             if (ok != 0)
                 dst = (Class_004c6ae0*)&screen;
         }
@@ -104,7 +104,7 @@ void __stdcall FUN_004b8ec0(Class_004c6ae0* dst, Bitmap_004b8ec0* bmp, int x, in
                 rect.top = y - bmp->dy;
                 rect.right = rect.left + bmp->width - 1;
                 rect.bottom = rect.top + bmp->height - 1;
-                dst->FUN_004c6ae0(&bounds);
+                dst->GetClipRect(&bounds);
                 FUN_004b7e60(&other, &rect, &bounds);
                 if (rect.right >= rect.left && rect.bottom >= rect.top &&
                     other.right >= other.left && other.bottom >= other.top) {

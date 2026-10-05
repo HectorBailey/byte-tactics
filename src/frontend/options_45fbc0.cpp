@@ -17,11 +17,11 @@ struct Surface_0045fbc0 {
 extern Game* g_game;
 
 void __stdcall SetPaletteColors(unsigned char* palette, int first, int count);
-void __stdcall FUN_004c69a0(int param_1);
-int __stdcall FUN_004c5e70(Surface_0045fbc0* out);
-void __stdcall FUN_004c6890(Surface_0045fbc0* surface, int color);
+void __stdcall SetOffscreenSurface(int param_1);
+int __stdcall LockScreen(Surface_0045fbc0* out);
+void __stdcall FillSurface(Surface_0045fbc0* surface, int color);
 int __stdcall FUN_004c5fa0(Surface_0045fbc0* s);
-void FUN_004c63a0();
+void FlipScreen();
 
 // FUNCTION: 0x45fbc0
 void FUN_0045fbc0()
@@ -31,10 +31,10 @@ void FUN_0045fbc0()
 
     memset(palette, 0, sizeof(palette));
     SetPaletteColors(palette, 0, 0x100);
-    FUN_004c69a0(g_game->field_37e1b);
-    if (FUN_004c5e70(&screen)) {
-        FUN_004c6890(&screen, g_game->field_dcb);
+    SetOffscreenSurface(g_game->field_37e1b);
+    if (LockScreen(&screen)) {
+        FillSurface(&screen, g_game->field_dcb);
         FUN_004c5fa0(&screen);
-        FUN_004c63a0();
+        FlipScreen();
     }
 }

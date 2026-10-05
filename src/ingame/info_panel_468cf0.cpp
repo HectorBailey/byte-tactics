@@ -96,12 +96,12 @@ int __stdcall FUN_004c1b80(int);
 int FUN_004c2470();
 int FUN_004c2870();
 int __stdcall FUN_004c5740(int);
-int FUN_004c63a0();
-int __stdcall FUN_004c69a0(int);
-int __stdcall FUN_004c69c0(int);
+int FlipScreen();
+int __stdcall SetOffscreenSurface(int);
+int __stdcall ResetClipRect(int);
 
 struct OverlayRect { int left, top, right, bottom; };
-struct Class_004c6b10 { int data[12]; int FUN_004c6b10(OverlayRect); };
+struct Class_004c6b10 { int data[12]; int SetClipRect(OverlayRect); };
 
 // The frame-time profile at g_game+0x38d85 (Class_0046a400): last tick at +0,
 // one accumulator per phase at +0x2c. FUN_0046a400 itself is defined after
@@ -262,11 +262,11 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
 
   cx = (*(int *)(g_game + 0x37e1f) + 0x80) / 2;
   cy = *(int *)(g_game + 0x37e23) / 2;
-  FUN_004c69a0(*(int *)(g_game + 0x37e1b));
+  SetOffscreenSurface(*(int *)(g_game + 0x37e1b));
   ctx = **(Class_004c6b10 **)(g_game + 0x37e1b);
   colors = (byte *)(g_game + 0xdcb);
   FUN_004c2470();
-  ctx.FUN_004c6b10(*(OverlayRect *)(g_game + 0x37e27));
+  ctx.SetClipRect(*(OverlayRect *)(g_game + 0x37e27));
   ProfileMark((Class_0046a400 *)(g_game + 0x38d85), 8);
   FUN_00483fa0((int)&ctx);
   FUN_00418310((int)&ctx);
@@ -280,7 +280,7 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
     FUN_004be950((int)&ctx, x - 2, y, x + 2, y, colors[0xf]);
     FUN_004be950((int)&ctx, x, y - 2, x, y + 2, colors[0xf]);
   }
-  FUN_004c69c0((int)&ctx);
+  ResetClipRect((int)&ctx);
 
   // resource bars
   {
@@ -309,7 +309,7 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
   }
   FUN_0046a860((int)&ctx);
   FUN_00466b00((int)&ctx);
-  ctx.FUN_004c6b10(*(OverlayRect *)(g_game + 0x37e27));
+  ctx.SetClipRect(*(OverlayRect *)(g_game + 0x37e27));
   ProfileMark((Class_0046a400 *)(g_game + 0x38d85), 3);
 
   // features and units on the visible part of the map
@@ -522,9 +522,9 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
   }
   if ((*(Class_00435100 **)(g_game + 0x391e9))->FUN_00435100() == 3 ||
       (*(Class_00435100 **)(g_game + 0x391e9))->FUN_00435100() == 2) {
-    FUN_004c69c0((int)&ctx);
+    ResetClipRect((int)&ctx);
     FUN_004948e0((int)&ctx);
-    ctx.FUN_004c6b10(*(OverlayRect *)(g_game + 0x37e27));
+    ctx.SetClipRect(*(OverlayRect *)(g_game + 0x37e27));
   }
   FUN_004689c0((int)&ctx);
   if (*(int *)(g_game + 0x391c3) != 0)
@@ -567,7 +567,7 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
   }
   if (((Bits8 *)(g_game + 0x38a51))->b1)
     FUN_004b7f90((int)&ctx, FUN_004b7f30(*(int *)(g_game + 0x148cf), 0), *(int *)(g_game + 0x37e1f) - 0x10, *(int *)(g_game + 0x37e23) - 0x50);
-  FUN_004c69c0((int)&ctx);
+  ResetClipRect((int)&ctx);
   FUN_004ab170((int)(g_game + 0x519), (int)&ctx, (int)(g_game + 0x37e27));
   if (*(int *)(g_game + 0x38dd5) != 0 && param_1 != 0) {
     FUN_0046b900((int)&ctx, (int)"Network", 0);
@@ -583,6 +583,6 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
   FUN_0045ffb0((int)&ctx);
   FUN_004c2870();
   if (param_1 != 0 && param_2 != 0)
-    FUN_004c63a0();
+    FlipScreen();
   ((Class_0046a400 *)(g_game + 0x38d85))->FUN_0046a400(3);
 }

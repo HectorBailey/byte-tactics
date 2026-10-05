@@ -1,7 +1,7 @@
 // Decompiled by space-bunny-free. Names are provisional.
 
 // Draws the polyline points[0..count-1] into `surface`, or into the screen
-// (locked with FUN_004c5e70, unlocked with FUN_004c5fa0) when `surface` is
+// (locked with LockScreen, unlocked with FUN_004c5fa0) when `surface` is
 // null. Every segment is clipped by FUN_004bea20 and drawn by FUN_004cc7ab.
 // Returns the lock result on the screen path, so a failed lock returns 0
 // without ever unlocking; the caller-surface path returns 1.
@@ -49,7 +49,7 @@ struct Segment_004bf060 {
     Point_004bf060* to;
 };
 
-int __stdcall FUN_004c5e70(Surface_004bf060* out);
+int __stdcall LockScreen(Surface_004bf060* out);
 int __stdcall FUN_004c5fa0(Surface_004bf060* s);
 int __stdcall FUN_004bea20(Surface_004bf060* dst, int* x0, int* y0, int* x1, int* y1);
 void __cdecl FUN_004cc7ab(Surface_004bf060* dst, int x0, int y0, int x1, int y1, int color);
@@ -61,7 +61,7 @@ int __stdcall FUN_004bf060(Surface_004bf060* surface, Point_004bf060* points,
     int result;
     if (surface == 0) {
         Surface_004bf060 screen;
-        result = FUN_004c5e70(&screen);
+        result = LockScreen(&screen);
         if (result != 0) {
             Segment_004bf060 seg;
             seg.from = points;
@@ -75,7 +75,7 @@ int __stdcall FUN_004bf060(Surface_004bf060* surface, Point_004bf060* points,
                 x0 = seg.from->x;
                 if (&screen == 0) {
                     Surface_004bf060 inner;
-                    if (FUN_004c5e70(&inner)) {
+                    if (LockScreen(&inner)) {
                         if (FUN_004bea20(&inner, &x0, &y0, &x1, &y1))
                             FUN_004cc7ab(&inner, x0, y0, x1, y1, color);
                         FUN_004c5fa0(&inner);

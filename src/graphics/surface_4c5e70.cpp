@@ -1,7 +1,7 @@
 // Decompiled by GPT-5.6-Terra, finished by Sonnet 5.5. Names are provisional.
 // Locks the DirectDraw surface and fills a 0x30-byte surface descriptor,
-// registering it in the screen lock stack (DAT_0051fe00 entries at
-// DAT_0051fe08) so FUN_004c5df0 can unlock it later. When the display is
+// registering it in the screen lock stack (g_screenLockCount entries at
+// g_screenLocks) so UnlockAllScreens can unlock it later. When the display is
 // already locked (+0xdc) or using the cached descriptor (+0x44) it copies
 // the cached block instead.
 //
@@ -41,8 +41,8 @@ struct Out_004c5e70 {
     int field_2c;                    // +0x2c
 };
 
-extern int DAT_0051fe00;
-extern LockEntry_004c5e70 DAT_0051fe08[];
+extern int g_screenLockCount;
+extern LockEntry_004c5e70 g_screenLocks[];
 
 struct Display_004c5e70 {
     char unknown_0[0x44];
@@ -88,9 +88,9 @@ struct Display_004c5e70 {
         out->field_14 = -1;
         out->field_2c &= ~1;
         out->vec = vec;
-        if (DAT_0051fe00 < 10) {
-            DAT_0051fe08[DAT_0051fe00].surface = out;
-            DAT_0051fe08[DAT_0051fe00].flag = 0;
+        if (g_screenLockCount < 10) {
+            g_screenLocks[g_screenLockCount].surface = out;
+            g_screenLocks[g_screenLockCount].flag = 0;
         }
         return 1;
     }
@@ -99,7 +99,7 @@ struct Display_004c5e70 {
 Display_004c5e70* GetDisplay(void);
 
 // FUNCTION: 0x4c5e70
-int __stdcall FUN_004c5e70(Out_004c5e70* out)
+int __stdcall LockScreen(Out_004c5e70* out)
 {
     return GetDisplay()->LockMe(out);
 }

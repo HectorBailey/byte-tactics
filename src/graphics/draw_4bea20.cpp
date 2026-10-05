@@ -1,6 +1,6 @@
 // Decompiled by space-bunny-free. Names are provisional.
 // Clips the segment (x0, y0) - (x1, y1) to the rect the surface hands back
-// from Class_004c6ae0::FUN_004c6ae0 (the surface's own copy at +0x1c, fetched
+// from Class_004c6ae0::GetClipRect (the surface's own copy at +0x1c, fetched
 // into a local), moving each end point in turn against the four edges, and
 // returning 0 when an end point is on the wrong side of an edge or when the
 // delta of the axis being moved is zero.
@@ -43,7 +43,7 @@ public:
     char unknown_4[0x1c - 4];
     Rect_004bea20 field_1c;                // +0x1c
 
-    Rect_004bea20* FUN_004c6ae0(Rect_004bea20* out);
+    Rect_004bea20* GetClipRect(Rect_004bea20* out);
 };
 
 // FUNCTION: 0x4bea20
@@ -54,7 +54,7 @@ int __stdcall FUN_004bea20(Class_004c6ae0* dst, int* x0, int* y0, int* x1, int* 
     int downwards = (*y0 <= *y1);
     int dx = *x1 - *x0;
     int dy = *y1 - *y0;
-    dst->FUN_004c6ae0(&r);
+    dst->GetClipRect(&r);
     if (*x0 < r.left) {
         if (to_right == 0)
             return 0;

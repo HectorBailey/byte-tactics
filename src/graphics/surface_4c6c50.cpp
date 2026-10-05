@@ -1,7 +1,7 @@
 // Decompiled by space-bunny-free. Names are provisional.
 // Copies `src` to `dst` at (x, y) with a transparent colour through the blitter
 // at 0x4cbcd5, or, when `dst` is null, onto the screen: lock it with
-// FUN_004c5e70, blit, then unlock. The unlock is FUN_004c5fa0 inlined.
+// LockScreen, blit, then unlock. The unlock is FUN_004c5fa0 inlined.
 #include <ddraw.h>
 
 struct Surface_004c6c50 {
@@ -27,33 +27,33 @@ struct Display_004c6c50 {
     int field_dc;                      // +0xdc
 };
 
-extern int DAT_0051fe00;
+extern int g_screenLockCount;
 
 Display_004c6c50* GetDisplay(void);
-int __stdcall FUN_004c5e70(Surface_004c6c50* out);
+int __stdcall LockScreen(Surface_004c6c50* out);
 void __cdecl FUN_004cbcd5(Surface_004c6c50* dst, Surface_004c6c50* src, int x, int y, int color);
 
 // 0x4c5fa0, inlined here.
-static inline void UnlockScreen(Surface_004c6c50* s)
+static inline void UnlockScreenInline(Surface_004c6c50* s)
 {
     Display_004c6c50* d = GetDisplay();
     if (d->field_44 == 0 && d->field_dc == 0) {
         if (d->screen.surface == 0)
             return;
         d->screen.UnlockSurface();
-        if (DAT_0051fe00 > 0)
-            DAT_0051fe00--;
+        if (g_screenLockCount > 0)
+            g_screenLockCount--;
     }
 }
 
 // FUNCTION: 0x4c6c50
-void __stdcall FUN_004c6c50(Surface_004c6c50* dst, Surface_004c6c50* src, int x, int y, int color)
+void __stdcall DrawSurfaceKeyed(Surface_004c6c50* dst, Surface_004c6c50* src, int x, int y, int color)
 {
     if (dst == 0) {
         Surface_004c6c50 screen;
-        if (FUN_004c5e70(&screen)) {
+        if (LockScreen(&screen)) {
             FUN_004cbcd5(&screen, src, x - src->field_18, y - src->field_1a, color);
-            UnlockScreen(&screen);
+            UnlockScreenInline(&screen);
         }
     } else {
         FUN_004cbcd5(dst, src, x - src->field_18, y - src->field_1a, color);

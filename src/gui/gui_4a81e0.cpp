@@ -207,9 +207,9 @@ long __stdcall FUN_004bbc40(char* name);
 char* __stdcall FUN_004bbe50(char* name, int* size);
 void __stdcall FUN_004c1420(int id);
 char* __stdcall FUN_004c5740(char* key);
-void* __stdcall FUN_004c69f0(char* name, int width, int height);
-void __stdcall FUN_004c6ac0(void* obj);
-void __stdcall FUN_004c6b70(void* dst, void* bmp, int x, int y);
+void* __stdcall AllocSurface(char* name, int width, int height);
+void __stdcall FreeSurface(void* obj);
+void __stdcall DrawSurface(void* dst, void* bmp, int x, int y);
 void __cdecl FUN_004d85a0(int* param_1);
 
 // The real FUN_004a8150 (matched in 0x4a8150.cpp), inlined here by /Ob2.
@@ -591,11 +591,11 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
     name = entries[0].name;
     if (0 == name)
         name = "GUI SURFACE";
-    entries[0].u.assets.surface = FUN_004c69f0(name, entries[0].w, entries[0].h);
-    FUN_004c6b70(entries[0].u.assets.surface, 0, -entries[0].x, -entries[0].y);
+    entries[0].u.assets.surface = AllocSurface(name, entries[0].w, entries[0].h);
+    DrawSurface(entries[0].u.assets.surface, 0, -entries[0].x, -entries[0].y);
     if (!(flags & 0x20)) {
-        entries[0].u.assets.saveUnder = FUN_004c69f0("SAVE UNDER", entries[0].w, entries[0].h);
-        FUN_004c6b70(entries[0].u.assets.saveUnder, entries[0].u.assets.surface, 0, 0);
+        entries[0].u.assets.saveUnder = AllocSurface("SAVE UNDER", entries[0].w, entries[0].h);
+        DrawSurface(entries[0].u.assets.saveUnder, entries[0].u.assets.surface, 0, 0);
     } else {
         entries[0].u.assets.saveUnder = 0;
     }
@@ -604,7 +604,7 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
     if ((flags & 4) != 0 || force || (flags & 0x40)) {
         if (force || (flags & 0x40)) {
             if (menu->layer->field_24)
-                FUN_004c6b70(entries[0].u.assets.surface, menu->layer->field_24, 0, 0);
+                DrawSurface(entries[0].u.assets.surface, menu->layer->field_24, 0, 0);
             else if ((flags & 0x80) == 0)
                 FUN_004b0230(menu, 0, entries[0].u.assets.background);
         }
@@ -710,11 +710,11 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
 
     if (flags & 2) {
         if (entries[0].u.assets.saveUnder != 0) {
-            FUN_004c6b70(0, entries[0].u.assets.saveUnder, entries[0].x, entries[0].y);
-            FUN_004c6ac0(entries[0].u.assets.saveUnder);
+            DrawSurface(0, entries[0].u.assets.saveUnder, entries[0].x, entries[0].y);
+            FreeSurface(entries[0].u.assets.saveUnder);
             entries[0].u.assets.saveUnder = 0;
         }
-        FUN_004c6ac0(entries[0].u.assets.surface);
+        FreeSurface(entries[0].u.assets.surface);
         entries[0].u.assets.surface = 0;
         for (int j = 0; j < 1 + entries[0].u.count; j = j + 1) {
             if ((entries[j].resourceFlags & 1) && entries[j].archive)

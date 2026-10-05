@@ -36,18 +36,18 @@ struct Game {
 #pragma pack(pop)
 extern Game* g_game;
 extern int DAT_00511dec;
-void __stdcall FUN_004c69a0(void*);
+void __stdcall SetOffscreenSurface(void*);
 void HandleNetPackets();
 Engine* GetDisplay();
-void* __stdcall FUN_004c69f0(const char*,int,int);
-void __stdcall FUN_004c6b70(void*,void*,int,int);
+void* __stdcall AllocSurface(const char*,int,int);
+void __stdcall DrawSurface(void*,void*,int,int);
 void __stdcall ReportGameEvent(int);
 const char* __stdcall GetRejectReasonText(unsigned);
 const char* __stdcall FUN_004c5740(const char*);
 void __stdcall FUN_004abd90(Menu*,const char*,int,int,int);
 void __stdcall FUN_0049fa90(Menu*);
 void __stdcall FUN_0049fad0(Menu*);
-void FUN_004c63a0();
+void FlipScreen();
 int __stdcall FUN_004ab060(Menu*,const char*);
 void __stdcall DrawMessages(void*);
 void __stdcall FUN_004a9fd0(Menu*);
@@ -105,14 +105,14 @@ void __stdcall FUN_0041f7f0()
     char text[64];
     int event[6];
     unsigned palette[256];
-    FUN_004c69a0(g_game->surface);
+    SetOffscreenSurface(g_game->surface);
     HandleNetPackets();
     switch(g_game->state) {
     case 0:
         if(g_game->campaign->FUN_00435100()==3) {
             Engine* e=GetDisplay();
-            g_game->lastFrame=FUN_004c69f0("Copy of last game frame",e->width,e->height);
-            FUN_004c6b70(g_game->lastFrame,g_game->surface,e->width,e->height);
+            g_game->lastFrame=AllocSurface("Copy of last game frame",e->width,e->height);
+            DrawSurface(g_game->lastFrame,g_game->surface,e->width,e->height);
             ReportGameEvent(7);
             g_game->state=1;
             Player* player=&g_game->players[g_game->localPlayer];
@@ -129,12 +129,12 @@ void __stdcall FUN_0041f7f0()
         if(FUN_004ab060(&g_game->menu,"MSGBOX.GUI")) {
             if(g_game->state==1) {
                 Engine* e=GetDisplay();
-                FUN_004c6b70(g_game->surface,g_game->lastFrame,e->width,e->height);
+                DrawSurface(g_game->surface,g_game->lastFrame,e->width,e->height);
                 DrawMessages(g_game->surface);
                 FUN_004a9fd0(&g_game->menu);
                 FUN_004ab170(&g_game->menu,0,0);
                 FUN_004c2870();
-                FUN_004c63a0();
+                FlipScreen();
             }
         } else g_game->state=2;
         break;
@@ -157,7 +157,7 @@ void __stdcall FUN_0041f7f0()
             }
         } else {
             FUN_00491a70(); g_game->state=4;
-            FUN_004c69a0(g_game->surface);
+            SetOffscreenSurface(g_game->surface);
         }
         break;
     case 4:
@@ -184,7 +184,7 @@ void __stdcall FUN_0041f7f0()
             FUN_0041dfc0(g_game->palette,palette,5);
             g_game->tick=GetTicks()+1;
             g_game->state=6;
-            FUN_004c6b70(g_game->surface,g_game->image,0,0);
+            DrawSurface(g_game->surface,g_game->image,0,0);
         } else {
             FUN_0041f0a0(); FUN_0041e420(); FUN_0041f400();
             FUN_0049fad0(&g_game->menu); FUN_0049fa90(&g_game->menu);
@@ -255,9 +255,9 @@ void __stdcall FUN_0041f7f0()
         break;
     }
     case 8:
-        FUN_004c2470(); FUN_004a9fd0(&g_game->menu); FUN_004c2870(); FUN_004c63a0();
+        FUN_004c2470(); FUN_004a9fd0(&g_game->menu); FUN_004c2870(); FlipScreen();
         FUN_004c2470(); FUN_004ab170(&g_game->menu,0,0); FUN_004c2870();
         break;
     }
-    FUN_004c63a0();
+    FlipScreen();
 }

@@ -96,7 +96,7 @@ int __stdcall FUN_004b7f30(unsigned short* glyphs, int c);
 void __stdcall FUN_004c13a0(int colour, int font);
 int FUN_004c13f0();
 int __stdcall FUN_004b0230(Class_004a4d70* obj, int index, void* bmp);
-void __stdcall FUN_004c6d20(void* dst, void* src, Rect_004a4d70* rect, int* pos);
+void __stdcall CopySurfaceRect(void* dst, void* src, Rect_004a4d70* rect, int* pos);
 int __stdcall FUN_004bf6f0(void* surface, Rect_004a4d70* rect, int colour);
 int __stdcall FUN_004a50e0(void* surface, char* text, int x, int y, int maxw, int style);
 void __stdcall FUN_004be950(void* surface, int x1, int y1, int x2, int y2,
@@ -166,7 +166,7 @@ void __stdcall FUN_004a4d70(Class_004a4d70* obj, int index)
         if (surface == 0) {
             FUN_004b0230(obj, index, 0);
         } else {
-            FUN_004c6d20(entries->surface, surface, &rect, (int*)&rect);
+            CopySurfaceRect(entries->surface, surface, &rect, (int*)&rect);
         }
     }
 

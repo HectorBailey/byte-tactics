@@ -67,7 +67,7 @@ struct Language_004a4660 { char unknown_0[0xc]; unsigned short *glyphs; };
 struct LanguageRoot_004a4660 { char unknown_0[0x14]; Language_004a4660 *language; };
 
 extern LanguageRoot_004a4660 *DAT_0051fba4;
-void __stdcall FUN_004c5e70(void *);
+void __stdcall LockScreen(void *);
 void __stdcall FUN_004b04b0(void *, Rect_004a4660 *, unsigned int, unsigned int, unsigned int);
 void __stdcall FUN_004bf6f0(void *, Rect_004a4660 *, int);
 int __stdcall FUN_004a50e0(void *, char *, int, int, int, int);
@@ -108,7 +108,7 @@ void __stdcall FUN_004a4660(Class_004a4660 *obj, int index)
     void *surface = *(void **)((char *)entries + 0xbc);
     if (surface == 0)
         surface = *(void **)((char *)obj + 0xcd2);
-    FUN_004c5e70(surface);
+    LockScreen(surface);
 
     Rect_004a4660 rect;
     rect.left = entry->x;

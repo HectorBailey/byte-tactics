@@ -5,7 +5,7 @@
 // current point only when the counter `start` is odd (the caller passes 0 or
 // 1, see 0x4670fd). FUN_004b7123 / FUN_004b70ef are the sine and cosine table
 // lookups (angle, radius); FUN_004bea20 clips the segment and FUN_004cc7ab
-// draws it. When `surface` is null the screen is locked with FUN_004c5e70 and
+// draws it. When `surface` is null the screen is locked with LockScreen and
 // unlocked with FUN_004c5fa0.
 //
 // Three things get this to byte-identical (the 62.0% version had all three
@@ -32,7 +32,7 @@ struct Surface_004c01a0 {
 
 int __cdecl FUN_004b7123(int angle, int scale);
 int __cdecl FUN_004b70ef(int angle, int scale);
-int __stdcall FUN_004c5e70(Surface_004c01a0* out);
+int __stdcall LockScreen(Surface_004c01a0* out);
 int __stdcall FUN_004c5fa0(Surface_004c01a0* s);
 int __stdcall FUN_004bea20(Surface_004c01a0* dst, int* x0, int* y0, int* x1, int* y1);
 void __cdecl FUN_004cc7ab(Surface_004c01a0* dst, int x0, int y0, int x1, int y1, int color);
@@ -59,7 +59,7 @@ void __stdcall FUN_004c01a0(Surface_004c01a0* surface, int cx, int cy, int radiu
             int y0 = py;
             int x0 = px;
             if (surface == 0) {
-                if (FUN_004c5e70(&screen)) {
+                if (LockScreen(&screen)) {
                     if (FUN_004bea20(&screen, &x0, &y0, &x1, &y1))
                         FUN_004cc7ab(&screen, x0, y0, x1, y1, color);
                     FUN_004c5fa0(&screen);

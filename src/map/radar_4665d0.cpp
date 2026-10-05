@@ -39,8 +39,8 @@ struct Surface_4665d0 {
 void* __stdcall FUN_004b8da0(char* name, int width, int height);
 void __stdcall FUN_004b8a80(Surface_4665d0* surface, void* pic);
 void __stdcall FUN_004b7f90(Surface_4665d0* surface, short* frame, int x, int y);
-void __stdcall FUN_004c6890(Surface_4665d0* surface, int mode);
-void __stdcall FUN_004c7580(Surface_4665d0* surface, void* pic, Quad_4665d0* dst, Quad_4665d0* src);
+void __stdcall FillSurface(Surface_4665d0* surface, int mode);
+void __stdcall DrawFrameQuad(Surface_4665d0* surface, void* pic, Quad_4665d0* dst, Quad_4665d0* src);
 void __cdecl FUN_004d85a0(void* pic);
 
 // FUNCTION: 0x4665d0
@@ -81,7 +81,7 @@ void __stdcall FUN_004665d0(Pic_4665d0* pic, int x, int y, int w, int h)
     pic->w = x;
     pic->h = y;
     FUN_004b8a80(&surface, pic);
-    FUN_004c6890(&surface, 0);
+    FillSurface(&surface, 0);
 
     src.p[0].x = 0;
     src.p[0].y = 0;
@@ -101,6 +101,6 @@ void __stdcall FUN_004665d0(Pic_4665d0* pic, int x, int y, int w, int h)
     dst.p[3].x = ox;
     dst.p[3].y = oy + dhy;
 
-    FUN_004c7580(&surface, temp, &dst, &src);
+    DrawFrameQuad(&surface, temp, &dst, &src);
     FUN_004d85a0(temp);
 }

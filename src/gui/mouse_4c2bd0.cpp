@@ -27,7 +27,7 @@ struct Obj_004c2bd0 {
 void __cdecl FUN_004c2990(void* param_1);
 int GetDisplay(void);
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
-void* __stdcall FUN_004c69f0(char* name, int width, int height);
+void* __stdcall AllocSurface(char* name, int width, int height);
 int __stdcall FUN_004b6b20(void* param_1, unsigned int param_2, void* param_3);
 
 // FUNCTION: 0x4c2bd0
@@ -40,9 +40,9 @@ void __stdcall FUN_004c2bd0(int count, int start)
     q->head = 0;
     q->tail = 0;
     p->unknown_1b2 = 0;
-    p->obj_1be = (int)FUN_004c69f0("SAVEMOUSE 1", 0x640, 1);
-    p->obj_1c2 = (int)FUN_004c69f0("SAVEMOUSE 2", 0x640, 1);
-    p->obj_1c6 = (int)FUN_004c69f0("SAVEMOUSE 3", 0x640, 1);
+    p->obj_1be = (int)AllocSurface("SAVEMOUSE 1", 0x640, 1);
+    p->obj_1c2 = (int)AllocSurface("SAVEMOUSE 2", 0x640, 1);
+    p->obj_1c6 = (int)AllocSurface("SAVEMOUSE 3", 0x640, 1);
     p->active = 1;
     p->unknown_1d2 = 0;
     p->unknown_1ce = 0;

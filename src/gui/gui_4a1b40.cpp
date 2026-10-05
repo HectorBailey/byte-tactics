@@ -129,11 +129,11 @@ struct Item_004a1b40 {
 };
 
 struct Class_004c6ae0 {
-    void FUN_004c6ae0(Rect_004a1b40* rect);
+    void GetClipRect(Rect_004a1b40* rect);
 };
 
 struct Class_004c6b10 {
-    void FUN_004c6b10(Rect_004a1b40 rect);
+    void SetClipRect(Rect_004a1b40 rect);
 };
 
 #pragma pack(pop)
@@ -141,7 +141,7 @@ struct Class_004c6b10 {
 extern LanguageRoot_004a1b40* DAT_0051fba4;
 
 void __stdcall FUN_004b0230(Class_004a1b40* obj, int index, void* bmp);
-void __stdcall FUN_004c6d20(void* dst, void* src, Rect_004a1b40* rect, Rect_004a1b40* pos);
+void __stdcall CopySurfaceRect(void* dst, void* src, Rect_004a1b40* rect, Rect_004a1b40* pos);
 void __stdcall FUN_004c1420(int id);
 int FUN_004c1440();
 int __stdcall FUN_004c1480(int font, char* text);
@@ -157,7 +157,7 @@ void __stdcall FUN_004a51d0(void* surface, char* text, int x, int y, int maxw,
 void __stdcall FUN_004be950(void* surface, int x1, int y1, int x2, int y2,
                             int colour);
 void __stdcall FUN_004bf4d0(void* surface, Rect_004a1b40* rect, int id);
-void __stdcall FUN_004c7580(void* surface, void* bitmap, Quad_004a1b40* dst,
+void __stdcall DrawFrameQuad(void* surface, void* bitmap, Quad_004a1b40* dst,
                             Quad_004a1b40* src);
 
 static inline int Measure_004a1b40(char* text)
@@ -223,7 +223,7 @@ void __stdcall FUN_004a1b40(Class_004a1b40* obj, int index)
     if (surface == 0 && !(holder->field_10 & 0x80))
         FUN_004b0230(obj, index, surface);
     else if (surface != 0)
-        FUN_004c6d20(entries->surface, surface, &bounds, &bounds);
+        CopySurfaceRect(entries->surface, surface, &bounds, &bounds);
     int lh = LineHeight_004a1b40();
     int step;
     if (me->field_da == 0)
@@ -319,8 +319,8 @@ void __stdcall FUN_004a1b40(Class_004a1b40* obj, int index)
         Rect_004a1b40 clip;
         unsigned int bp = (flags >> 7) & 1;
         void* surf = entries->surface;
-        ((Class_004c6ae0*)surf)->FUN_004c6ae0(&clip);
-        ((Class_004c6b10*)surf)->FUN_004c6b10(bounds);
+        ((Class_004c6ae0*)surf)->GetClipRect(&clip);
+        ((Class_004c6b10*)surf)->SetClipRect(bounds);
         int k = me->field_bc;
         if (!bp) {
             colPtr = &((Item_004a1b40**)me->field_c6)[k];
@@ -358,7 +358,7 @@ void __stdcall FUN_004a1b40(Class_004a1b40* obj, int index)
                 dst.points[0].y = yy;
                 src.points[2].y = cell->height - 1;
                 src.points[3].y = cell->height - 1;
-                FUN_004c7580(surf, cell, &dst, &src);
+                DrawFrameQuad(surf, cell, &dst, &src);
                 cellRect.left = dst.points[0].x;
                 cellRect.right = dst.points[1].x;
                 cellRect.top = dst.points[0].y;
@@ -391,6 +391,6 @@ void __stdcall FUN_004a1b40(Class_004a1b40* obj, int index)
             if (yy >= bounds.bottom || k >= me->field_c0)
                 break;
         }
-        ((Class_004c6b10*)surf)->FUN_004c6b10(clip);
+        ((Class_004c6b10*)surf)->SetClipRect(clip);
     }
 }

@@ -189,7 +189,7 @@ public:
     unsigned char* pixels;             // +0xc
     int unknown_10[8];                 // 0x30 bytes, the lock descriptor
 
-    Rect_004c0330* FUN_004c6ae0(Rect_004c0330* out);
+    Rect_004c0330* GetClipRect(Rect_004c0330* out);
 };
 
 struct Point_004c0330 {
@@ -203,7 +203,7 @@ struct Span_004c0330 {
     int unknown_8[8];
 };
 
-int __stdcall FUN_004c5e70(Class_004c6ae0* out);
+int __stdcall LockScreen(Class_004c6ae0* out);
 int __stdcall FUN_004c5fa0(Class_004c6ae0* s);
 
 // FUNCTION: 0x4c0330
@@ -224,7 +224,7 @@ int __stdcall FUN_004c0330(Class_004c6ae0* surface, Point_004c0330* points, int 
     int dy;
 
     if (surface == 0) {
-        if (FUN_004c5e70(&screen) == 0)
+        if (LockScreen(&screen) == 0)
             return 0;
         locked = 1;
         surface = &screen;
@@ -252,7 +252,7 @@ int __stdcall FUN_004c0330(Class_004c6ae0* surface, Point_004c0330* points, int 
         if (x < minX)
             minX = x;
     }
-    surface->FUN_004c6ae0(&clip);
+    surface->GetClipRect(&clip);
     if (maxX < clip.left) {
         if (locked)
             FUN_004c5fa0(&screen);

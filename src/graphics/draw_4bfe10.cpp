@@ -1,7 +1,7 @@
 // Decompiled by deepseek-v4.1-flash, finished by space-bunny-free and claude-opus-5-5, verified by GPT-6.1-sol, finished by deepseek-v4.1-flash, finished by Space Bunny Free. Names are provisional.
 
 // Translates every pixel of `rect` in `surface` through the byte table at
-// g_game+0xcc (FUN_004cced5), or in the locked screen (FUN_004c5e70 /
+// g_game+0xcc (FUN_004cced5), or in the locked screen (LockScreen /
 // FUN_004c5fa0) when `surface` is 0. The rect is copied to a local first
 // because the clip helper FUN_004bf620 clips it in place. The locked path
 // returns the lock result.
@@ -87,7 +87,7 @@ struct Game_004bfe10 {
 };
 
 Game_004bfe10* GetDisplay();
-int __stdcall FUN_004c5e70(Surface_004bfe10* out);
+int __stdcall LockScreen(Surface_004bfe10* out);
 int __stdcall FUN_004c5fa0(Surface_004bfe10* s);
 int __stdcall FUN_004bf620(void* s, Rect_004bfe10* r);
 void __cdecl FUN_004cced5(int dst, int pitch, int w, int h, int table);
@@ -103,7 +103,7 @@ int __stdcall FUN_004bfe10(Surface_004bfe10* surface, Rect_004bfe10* rect)
     int result;
     int status;
     if (surface == 0) {
-        result = FUN_004c5e70(&screen);
+        result = LockScreen(&screen);
         if (result != 0) {
             if (FUN_004bf620(&screen, &r))
                 FUN_004cced5(r.top * screen.pitch + r.left + (int)screen.pixels,

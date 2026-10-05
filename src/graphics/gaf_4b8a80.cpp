@@ -1,7 +1,7 @@
 // Decompiled by Opus. Names are provisional.
 // Initialises a drawing surface description from a source record: width,
 // height, pitch (= width) and bits, then resets its clip rectangle through
-// FUN_004c69c0.
+// ResetClipRect.
 
 struct Src_004b8a80 {
     unsigned short width;           // +0x0
@@ -26,7 +26,7 @@ struct Surface_004b8a80 {
     unsigned int flag1 : 1;         // +0x2c bit 1
 };
 
-void __stdcall FUN_004c69c0(int* param_1);
+void __stdcall ResetClipRect(int* param_1);
 
 // FUNCTION: 0x4b8a80
 void __stdcall FUN_004b8a80(Surface_004b8a80* dst, Src_004b8a80* src)
@@ -41,5 +41,5 @@ void __stdcall FUN_004b8a80(Surface_004b8a80* dst, Src_004b8a80* src)
     dst->y = src->y;
     dst->flag1 = 0;
     dst->flag0 = 1;
-    FUN_004c69c0((int*)dst);
+    ResetClipRect((int*)dst);
 }

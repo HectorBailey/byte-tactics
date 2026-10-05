@@ -1,5 +1,5 @@
 // Decompiled by Opus. Names are provisional.
-// Unlocks the screen surface locked by FUN_004c5e70 (see 0x4c6d20, which
+// Unlocks the screen surface locked by LockScreen (see 0x4c6d20, which
 // inlines this function). The Unlock call goes through a method of the
 // embedded screen struct, which is why the surface pointer is re-read.
 #include <ddraw.h>
@@ -24,7 +24,7 @@ struct Display_004c5fa0 {
     int field_dc;                      // +0xdc
 };
 
-extern int DAT_0051fe00;
+extern int g_screenLockCount;
 
 Display_004c5fa0* GetDisplay(void);
 
@@ -36,8 +36,8 @@ int __stdcall FUN_004c5fa0(Surface_004c5fa0* s)
         if (d->screen.surface == 0)
             return 0;
         d->screen.UnlockSurface();
-        if (DAT_0051fe00 > 0)
-            DAT_0051fe00--;
+        if (g_screenLockCount > 0)
+            g_screenLockCount--;
     }
     return 1;
 }

@@ -81,12 +81,12 @@ public:
     unsigned char* pixels;              // +0xc
     int unknown_10[8];                  // 0x30 bytes, the lock descriptor
 
-    Rect_004c14f0* FUN_004c6ae0(Rect_004c14f0* out);
+    Rect_004c14f0* GetClipRect(Rect_004c14f0* out);
 };
 
 Game_004c14f0* GetDisplay(void);
 int __stdcall FUN_004b6750(Rect_004c14f0* a, Rect_004c14f0* b);
-int __stdcall FUN_004c5e70(Class_004c6ae0* out);
+int __stdcall LockScreen(Class_004c6ae0* out);
 int __stdcall FUN_004c5fa0(Class_004c6ae0* s);
 void __cdecl FUN_004ccf60(unsigned char* pixels, int pitch, Font_004c14f0* font, unsigned char* text,
                           int x, int y, int c1, int c2, int c3);
@@ -137,9 +137,9 @@ void __stdcall FUN_004c14f0(Class_004c6ae0* dst, unsigned char* text, int x, int
     r.bottom = r.top + GetDisplay()->font->glyphs[0];
     if (dst == 0) {
         Class_004c6ae0 screen;
-        if (FUN_004c5e70(&screen) != 0) {
+        if (LockScreen(&screen) != 0) {
             Rect_004c14f0 clip;
-            screen.FUN_004c6ae0(&clip);
+            screen.GetClipRect(&clip);
             if (FUN_004b6750(&r, &clip))
                 FUN_004ccf60(screen.pixels, screen.pitch, game->font, text, x, y, game->colour1,
                              game->colour2, game->colour3);
@@ -147,7 +147,7 @@ void __stdcall FUN_004c14f0(Class_004c6ae0* dst, unsigned char* text, int x, int
         }
     } else {
         Rect_004c14f0 clip;
-        dst->FUN_004c6ae0(&clip);
+        dst->GetClipRect(&clip);
         if (FUN_004b6750(&r, &clip))
             FUN_004ccf60(dst->pixels, dst->pitch, game->font, text, x, y, game->colour1,
                          game->colour2, game->colour3);

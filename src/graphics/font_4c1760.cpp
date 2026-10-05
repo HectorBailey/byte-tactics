@@ -2,7 +2,7 @@
 // Draws `text` horizontally centred: it sums the glyph widths from the font at
 // singleton+0x204 (the body of FUN_004c1480, inlined) and passes
 // (rect.width - width) / 2 to FUN_004c14f0. With a null `dst` it locks the
-// screen rect with FUN_004c5e70 and unlocks it with FUN_004c5fa0 afterwards.
+// screen rect with LockScreen and unlocks it with FUN_004c5fa0 afterwards.
 //
 // MATCH (201 of 201 bytes, Claude Sonnet 5.5 #694). The SIB base/index swap at
 // 0x4c17ba (`mov al, [edx + ecx]` against `[ecx + edx]`) was not compiler state
@@ -29,7 +29,7 @@ struct Rect_004c1760 {
 };
 
 int GetDisplay(void);
-int __stdcall FUN_004c5e70(Rect_004c1760* out);
+int __stdcall LockScreen(Rect_004c1760* out);
 int __stdcall FUN_004c14f0(Rect_004c1760* dst, unsigned char* text, int x,
                            int a, int b);
 int __stdcall FUN_004c5fa0(Rect_004c1760* buf);
@@ -60,7 +60,7 @@ void __stdcall FUN_004c1760(int* dst, unsigned char* text, int flag)
     int width = WidthText(*(Font_004c1760**)(single + 0x204), text);
     if (dst == 0) {
         Rect_004c1760 r;
-        if (FUN_004c5e70(&r) != 0) {
+        if (LockScreen(&r) != 0) {
             FUN_004c14f0(&r, text, (r.data[0] - width) >> 1, flag, -1);
             FUN_004c5fa0(&r);
         }

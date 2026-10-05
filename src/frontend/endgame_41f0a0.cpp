@@ -105,8 +105,8 @@ struct Game {
 extern Game* g_game;
 
 void FUN_004257a0();
-void __stdcall FUN_004c6890(int param_1, int param_2);
-void FUN_004c63a0();
+void __stdcall FillSurface(int param_1, int param_2);
+void FlipScreen();
 Layer_0041f0a0* __stdcall FUN_004aa8f0(Menu_0041f0a0* menu, const char* name, int flags);
 void __stdcall FUN_0041ec50(void* gadget);
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
@@ -141,8 +141,8 @@ static inline int HasNextMission()
 void __stdcall FUN_0041f0a0()
 {
     FUN_004257a0();
-    FUN_004c6890(g_game->surface, 0);
-    FUN_004c63a0();
+    FillSurface(g_game->surface, 0);
+    FlipScreen();
     Layer_0041f0a0* layer = FUN_004aa8f0(&g_game->menu, "ENDMSN.GUI", 0x80);
     layer->handler = FUN_0041ec50;
     Data_0041f0a0* data = (Data_0041f0a0*)FUN_004d83b0("EndMsnGUI", 0x20);

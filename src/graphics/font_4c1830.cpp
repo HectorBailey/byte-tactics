@@ -4,7 +4,7 @@
 // draws first calls the setter FUN_004c13a0 with the getter FUN_004c13f0's value
 // (both inlined here), so field_0x210 is copied into field_0x20c each time and
 // only the two setters that are not -1 are stored. With a null `dst` the screen
-// rect is locked with FUN_004c5e70 for the five draws and unlocked with
+// rect is locked with LockScreen for the five draws and unlocked with
 // FUN_004c5fa0 afterwards.
 // The glyph width has to be read through a `glyphs` byte array declared at
 // offset 0 of the font struct, and the font has to arrive as a typed field of a
@@ -30,7 +30,7 @@ struct Rect_004c1830 {
 };
 
 int GetDisplay(void);
-int __stdcall FUN_004c5e70(Rect_004c1830* out);
+int __stdcall LockScreen(Rect_004c1830* out);
 int __stdcall FUN_004c5fa0(Rect_004c1830* buf);
 int __stdcall FUN_004c14f0(Rect_004c1830* dst, unsigned char* text, int x,
                            int a, int b);
@@ -80,7 +80,7 @@ void __stdcall FUN_004c1830(Rect_004c1830* dst, unsigned char* text, int fore,
     int width = WidthText(game->font, text);
     if (dst == 0) {
         Rect_004c1830 r;
-        if (FUN_004c5e70(&r) != 0) {
+        if (LockScreen(&r) != 0) {
             int x = (r.data[0] - width) >> 1;
             SetColour(fore, CurrentColour());
             FUN_004c14f0(&r, text, x - 1, y, -1);

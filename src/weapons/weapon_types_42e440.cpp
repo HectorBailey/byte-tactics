@@ -81,7 +81,7 @@ class Class_004c45e0 {
 class Class_004c9390 {
   public:
     char* ptr;
-    void FUN_004c9390();
+    void ReleaseRef();
 };
 
 // A reference-counted string handle (0x4c91a0 copies, 0x4c9390 releases).
@@ -89,7 +89,7 @@ class Class_004c91a0 {
   public:
     char* ptr;
     Class_004c91a0(const Class_004c91a0& other);
-    ~Class_004c91a0() { ((Class_004c9390*)this)->FUN_004c9390(); }
+    ~Class_004c91a0() { ((Class_004c9390*)this)->ReleaseRef(); }
     Class_004c91a0& operator=(const Class_004c91a0& other);
 };
 

@@ -16,7 +16,7 @@
 //  - Each bar's rect is written left, right, top, bottom.
 //  - The two player loops index g_game->players[i]; the explicit offsets of
 //    the old version gave the reversed SIB base and index.
-//  - `int ok` for FUN_004c5e70's result (`cmp eax, ebp`) and a `name` local
+//  - `int ok` for LockScreen's result (`cmp eax, ebp`) and a `name` local
 //    for the strncpy source (the call comes before `push 100`).
 //  - <ddraw.h>: without it the map-name block's x87 schedule differs (97.3%);
 //    tools/headers.py found it, and the gadget is a DirectDraw surface lock.
@@ -150,8 +150,8 @@ void __cdecl FUN_0047f750();
 void __cdecl FUN_00496790();
 void __cdecl FUN_004c2870();
 void __stdcall FUN_004c5fa0(void*);
-void __cdecl FUN_004c62c0();
-void __cdecl FUN_004c63a0();
+void __cdecl RestoreScreen();
+void __cdecl FlipScreen();
 int __cdecl FUN_004ce800();
 void __cdecl FUN_004d85a0(void*);
 void __stdcall FUN_004288d0(char*, int, int, int);
@@ -178,11 +178,11 @@ void __stdcall FUN_004bf6f0(void*, void*, unsigned char);
 void __stdcall FUN_004c13a0(int, int);
 void __stdcall FUN_004c1420(int);
 char* __stdcall FUN_004c5740(char*);
-int __stdcall FUN_004c5e70(void*);
-void __stdcall FUN_004c61f0(int);
-void __stdcall FUN_004c69a0(void*);
-void* __stdcall FUN_004c69f0(char*, int, int);
-void __stdcall FUN_004c6b70(void*, void*, int, int);
+int __stdcall LockScreen(void*);
+void __stdcall SetRestoreSurface(int);
+void __stdcall SetOffscreenSurface(void*);
+void* __stdcall AllocSurface(char*, int, int);
+void __stdcall DrawSurface(void*, void*, int, int);
 void __stdcall HAPINET_guaranteepackets(int);
 class Class_004cdb40 { public: void FUN_004cdb40(); };
 class Class_004ce690 { public: void FUN_004ce690(int); };
@@ -251,13 +251,13 @@ void FUN_00497f40(void)
         if (GetScreenWidth() != 0x280 || GetScreenHeight() != 0x1e0) {
             FUN_004d85a0((void*)g_game->field_37e1b);
             g_game->field_37e1b = 0;
-            FUN_004c61f0(0);
-            FUN_004c62c0();
+            SetRestoreSurface(0);
+            RestoreScreen();
             SetWindowPos(*(HWND*)(g_game->field_c + 0x40), 0, 0, 0, 0x280, 0x1e0, 4);
             SetResolution(0x280, 0x1e0);
-            g_game->field_37e1b = (int)FUN_004c69f0("OFFSCREEN", g_game->field_37e1f, g_game->field_37e23);
-            FUN_004c61f0(g_game->field_37e1b);
-            FUN_004c69a0((void*)g_game->field_37e1b);
+            g_game->field_37e1b = (int)AllocSurface("OFFSCREEN", g_game->field_37e1f, g_game->field_37e23);
+            SetRestoreSurface(g_game->field_37e1b);
+            SetOffscreenSurface((void*)g_game->field_37e1b);
         }
         FUN_004290f0(aux, "palettes", "guipal", "PAL");
         surfaceHandle = FUN_004bbe50((unsigned int*)aux, 0);
@@ -304,13 +304,13 @@ void FUN_00497f40(void)
         if (GetScreenWidth() != g_game->field_37f1b || GetScreenHeight() != g_game->field_37f1f) {
             FUN_004d85a0((void*)g_game->field_37e1b);
             g_game->field_37e1b = 0;
-            FUN_004c61f0(0);
-            FUN_004c62c0();
+            SetRestoreSurface(0);
+            RestoreScreen();
             SetWindowPos(*(HWND*)(g_game->field_c + 0x40), 0, 0, 0, g_game->field_37f1b,
                          g_game->field_37f1f, 4);
             SetResolution(g_game->field_37f1b, g_game->field_37f1f);
-            g_game->field_37e1b = (int)FUN_004c69f0("OFFSCREEN", g_game->field_37e1f, g_game->field_37e23);
-            FUN_004c61f0(g_game->field_37e1b);
+            g_game->field_37e1b = (int)AllocSurface("OFFSCREEN", g_game->field_37e1f, g_game->field_37e23);
+            SetRestoreSurface(g_game->field_37e1b);
         }
         FUN_00467d70();
         FUN_00496790();
@@ -349,8 +349,8 @@ void FUN_00497f40(void)
     if (g_usePacketManager != 0) {
         ((PacketManager*)&g_packetManager)->SendAllQueued(1);
     }
-    FUN_004c69a0((void*)g_game->field_37e1b);
-    int ok = FUN_004c5e70(&gadget);
+    SetOffscreenSurface((void*)g_game->field_37e1b);
+    int ok = LockScreen(&gadget);
     if (ok != 0) {
         color = g_game->palette[15];
         stamp = GetTicks();
@@ -363,7 +363,7 @@ void FUN_00497f40(void)
             }
         }
         FUN_004c1420(g_game->field_391f9);
-        FUN_004c6b70(&gadget, (void*)g_game->field_11eb, 0, 0);
+        DrawSurface(&gadget, (void*)g_game->field_11eb, 0, 0);
         if (((Class_00435100*)g_game->field_391e9)->FUN_00435100() != 1) {
             FUN_004c13a0(color, 0xfe);
             char* name = ((Class_00435c30*)g_game->field_391e9)->FUN_00435c30();
@@ -477,7 +477,7 @@ void FUN_00497f40(void)
             SendLoadProgress();
         }
         FUN_004c5fa0(&gadget);
-        FUN_004c63a0();
+        FlipScreen();
     }
     FUN_004b6b50(200);
 }

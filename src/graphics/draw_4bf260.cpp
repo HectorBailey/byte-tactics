@@ -1,7 +1,7 @@
 // Decompiled by Sonnet 5.5, finished by space-bunny-free. Names are provisional.
 //
 // Draws a grid of connected lines into `surface`, or into the screen (locked
-// with FUN_004c5e70, unlocked with FUN_004c5fa0) when `surface` is null:
+// with LockScreen, unlocked with FUN_004c5fa0) when `surface` is null:
 // `rows` polylines, where counts[r] is the number of vertices of row r and
 // the vertices follow one another in `points`. Every segment is clipped by
 // FUN_004bea20 and drawn by FUN_004cc7ab. Like 0x4bf060 it returns the lock
@@ -39,7 +39,7 @@ struct Point_004bf260 {
     int y;                             // +0x4
 };
 
-int __stdcall FUN_004c5e70(Surface_004bf260* out);
+int __stdcall LockScreen(Surface_004bf260* out);
 int __stdcall FUN_004c5fa0(Surface_004bf260* s);
 int __stdcall FUN_004bea20(Surface_004bf260* dst, int* x0, int* y0, int* x1, int* y1);
 void __cdecl FUN_004cc7ab(Surface_004bf260* dst, int x0, int y0, int x1, int y1, int color);
@@ -51,7 +51,7 @@ int __stdcall FUN_004bf260(Surface_004bf260* surface, Point_004bf260* points, in
     int result;
     if (surface == 0) {
         Surface_004bf260 screen;
-        result = FUN_004c5e70(&screen);
+        result = LockScreen(&screen);
         if (result != 0) {
             int r = rows;
             int* c = counts;
@@ -66,7 +66,7 @@ int __stdcall FUN_004bf260(Surface_004bf260* surface, Point_004bf260* points, in
                     x0 = p[0].x;
                     if (&screen == 0) {
                         Surface_004bf260 inner;
-                        if (FUN_004c5e70(&inner)) {
+                        if (LockScreen(&inner)) {
                             if (FUN_004bea20(&inner, &x0, &y0, &x1, &y1))
                                 FUN_004cc7ab(&inner, x0, y0, x1, y1, color);
                             FUN_004c5fa0(&inner);

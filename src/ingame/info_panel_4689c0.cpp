@@ -25,7 +25,7 @@ class Class_004c6ae0 {
 public:
     char unknown_0[0x1c];
     Rect_004689c0 field_1c;              // +0x1c
-    Rect_004689c0* FUN_004c6ae0(Rect_004689c0* out);
+    Rect_004689c0* GetClipRect(Rect_004689c0* out);
 };
 
 struct Team_004689c0 {                  // 347 bytes
@@ -113,7 +113,7 @@ void __stdcall FUN_004689c0(Class_004c6ae0* win)
         return;
     g_game->field_52d = g_game->field_525;
     Rect_004689c0 bounds;
-    win->FUN_004c6ae0(&bounds);
+    win->GetClipRect(&bounds);
     int left = bounds.left;
     int bottom = bounds.bottom + v;
     FUN_004b7f90(win, g_game->sprite, left, bottom);

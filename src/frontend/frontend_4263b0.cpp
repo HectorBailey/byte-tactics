@@ -74,9 +74,9 @@ extern char* DAT_00512298;
 
 void __stdcall FUN_004a9660(Sub_004263b0* sub);
 void FUN_004c2470();
-void __stdcall FUN_004c69a0(int param);
-void __stdcall FUN_004c6890(int a, int b);
-void FUN_004c63a0();
+void __stdcall SetOffscreenSurface(int param);
+void __stdcall FillSurface(int a, int b);
+void FlipScreen();
 void FUN_00491a70();
 Dialog_004263b0* __stdcall FUN_004aa8f0(Sub_004263b0* sub, const char* name, int flags);
 void __stdcall FUN_004288d0(const char* name, int a, int b, int c);
@@ -115,9 +115,9 @@ void __stdcall FUN_004263b0()
     }
 
     FUN_004c2470();
-    FUN_004c69a0(g_game->field_37e1b);
-    FUN_004c6890(0, 0);
-    FUN_004c63a0();
+    SetOffscreenSurface(g_game->field_37e1b);
+    FillSurface(0, 0);
+    FlipScreen();
     FUN_00491a70();
 
     Dialog_004263b0* dialog = FUN_004aa8f0(&g_game->sub, "MAINMENU.GUI", 0x80);

@@ -1,7 +1,7 @@
 // Decompiled by space-bunny-free. Names are provisional.
 
 // Sibling of 0x4bed70 and 0x4be950: draws into `surface`, or into the screen
-// (locked with FUN_004c5e70 and unlocked with FUN_004c5fa0) when `surface` is
+// (locked with LockScreen and unlocked with FUN_004c5fa0) when `surface` is
 // null. The rectangle is handed to FUN_004bea20 by address, so it can clip it
 // in place, and the clipped values go to FUN_004cc8df to draw. The state's
 // colour table at +0xc8 is both the guard and the last argument of the draw,
@@ -21,7 +21,7 @@ struct Surface_004bec70 {
 };
 
 App_004bec70* GetDisplay();
-Surface_004bec70* __stdcall FUN_004c5e70(Surface_004bec70* out);
+Surface_004bec70* __stdcall LockScreen(Surface_004bec70* out);
 int __stdcall FUN_004c5fa0(Surface_004bec70* s);
 int __stdcall FUN_004bea20(Surface_004bec70* dst, int* a, int* b, int* c, int* d);
 void __cdecl FUN_004cc8df(Surface_004bec70* dst, int a, int b, int c, int d, int e,
@@ -37,7 +37,7 @@ Surface_004bec70* __stdcall FUN_004bec70(Surface_004bec70* surface, int x0, int 
     Surface_004bec70* ret;
     if (surface == 0) {
         Surface_004bec70 screen;
-        ret = FUN_004c5e70(&screen);
+        ret = LockScreen(&screen);
         if (ret) {
             if (FUN_004bea20(&screen, &x0, &y0, &x1, &y1))
                 FUN_004cc8df(&screen, x0, y0, x1, y1, color, app->palette);

@@ -26,7 +26,7 @@ public:
     char unknown_10[0x1c - 0x10];
     Rect_004b9a50 field_1c;             // +0x1c
 
-    Rect_004b9a50* FUN_004c6ae0(Rect_004b9a50* out);
+    Rect_004b9a50* GetClipRect(Rect_004b9a50* out);
 };
 
 struct Bitmap_004b9a50 {
@@ -46,7 +46,7 @@ struct Surface_004b9a50 {
     int data[12];
 };
 
-int __stdcall FUN_004c5e70(Surface_004b9a50* out);
+int __stdcall LockScreen(Surface_004b9a50* out);
 int __stdcall FUN_004c5fa0(Surface_004b9a50* s);
 void __stdcall FUN_004b9740(Class_004c6ae0* dst, Bitmap_004b9a50* bmp, int x, int y, double sx, double sy);
 void __stdcall FUN_004b7e60(Rect_004b9a50* other, Rect_004b9a50* rect, Rect_004b9a50* bounds);
@@ -56,7 +56,7 @@ void __stdcall FUN_004b9a50(Class_004c6ae0* dst, Bitmap_004b9a50* bmp, int x, in
 {
     Surface_004b9a50 screen;
     if (dst == 0) {
-        int ok = FUN_004c5e70(&screen);
+        int ok = LockScreen(&screen);
         if (ok != 0)
             dst = (Class_004c6ae0*)&screen;
     }
@@ -87,7 +87,7 @@ void __stdcall FUN_004b9a50(Class_004c6ae0* dst, Bitmap_004b9a50* bmp, int x, in
             src.bottom = h - 1;
             int stepX = (bmp->width << 16) / w;
             int stepY = (bmp->height << 16) / h;
-            dst->FUN_004c6ae0(&bounds);
+            dst->GetClipRect(&bounds);
             FUN_004b7e60(&src, &dest, &bounds);
             if (dest.right >= dest.left && dest.bottom >= dest.top && src.right >= src.left &&
                 src.bottom >= src.top) {

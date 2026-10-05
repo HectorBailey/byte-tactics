@@ -107,7 +107,7 @@ void __stdcall FUN_004a50e0(void* surface, char* text, int x, int y, int maxw, i
 int __stdcall FUN_004a5030(char* text);
 char* __stdcall FUN_004c5740(char* name);
 void* __stdcall FUN_004b7f30(void* glyphs, int c);
-void __stdcall FUN_004c7580(void* surface, void* pic, Quad_004948e0* dst, Quad_004948e0* src);
+void __stdcall DrawFrameQuad(void* surface, void* pic, Quad_004948e0* dst, Quad_004948e0* src);
 int __cdecl sprintf(char* buf, char* fmt, ...);
 
 // FUNCTION: 0x4948e0
@@ -210,7 +210,7 @@ void __stdcall FUN_004948e0(void* surface)
             src.p[2].x = frame[0] - 1;
             src.p[2].y = frame[1] - 1;
             src.p[3].y = frame[1] - 1;
-            FUN_004c7580(surface, frame, &dst, &src);
+            DrawFrameQuad(surface, frame, &dst, &src);
 
             FUN_004a50e0(surface, p->name, dst.p[0].x + 2, dst.p[0].y + 5, maxw, 0);
             int kills = g_game->field_37ef6 == 2 ? p->field_104 : p->field_fc;

@@ -1,7 +1,7 @@
 // Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by Sonnet 5.5. Names are provisional.
 // Moves an object towards the cursor: decrements the hide counter, reads the
 // cursor, stores it as the object's rectangle, offsets the object by the
-// bitmap's half size, blits it from the screen with FUN_004c6b70, then, if the
+// bitmap's half size, blits it from the screen with DrawSurface, then, if the
 // counter is still not positive, copies the rectangle and draws the bitmap
 // with FUN_004b7f90. GetRect is the inlined copy helper (memcpy of the 24 byte
 // rectangle at +0x196).
@@ -41,7 +41,7 @@ struct Obj_004c2870 {
 #pragma pack(pop)
 
 Obj_004c2870* GetDisplay(void);
-void __stdcall FUN_004c6b70(void* dst, void* bmp, int x, int y);
+void __stdcall DrawSurface(void* dst, void* bmp, int x, int y);
 void __stdcall FUN_004b7f90(void* dst, Bitmap_004c2870* bmp, int x, int y);
 
 static inline void GetRect(Rect_004c2870* out)
@@ -67,7 +67,7 @@ void __fastcall FUN_004c2870(void)
                 o->field_1be[1] = o->bmp->height;
                 o->field_1be[2] = o->bmp->width;
             }
-            FUN_004c6b70(o->field_1be, 0, -o->x, -o->y);
+            DrawSurface(o->field_1be, 0, -o->x, -o->y);
             Obj_004c2870* o2 = GetDisplay();
             if (o2->mode != 1 && o2->count <= 0) {
                 Rect_004c2870 r;

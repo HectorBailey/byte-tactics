@@ -49,7 +49,7 @@ void* __stdcall FUN_004b7ee0(void* pic);
 void* __stdcall FUN_004b7f30(unsigned short* table, int index);
 void __stdcall FUN_004b95a0(Bitmap_459c70* dst, Bitmap_459c70* src);
 void __stdcall FUN_004c1000(Bitmap_459c70* surface, void* poly, int count, int flag);
-void __stdcall FUN_004c8760(Bitmap_459c70* surface, void* pic, void* poly, int flag);
+void __stdcall DrawTexturedPolygon(Bitmap_459c70* surface, void* pic, void* poly, int flag);
 
 struct Bitmap_459c70 {
     unsigned short width;            // +0x00
@@ -223,7 +223,7 @@ void Class_004581e0::FUN_00459830(Bitmap_459c70* bitmap, List_459c70* list,
                             } else {
                                 pic = face->pic;
                             }
-                            FUN_004c8760(bitmap, pic, poly, 0);
+                            DrawTexturedPolygon(bitmap, pic, poly, 0);
                         }
                     } else {
                         FUN_004c1000(bitmap, poly, face->count, face->unknown_0);

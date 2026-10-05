@@ -51,7 +51,7 @@ struct Engine_004bf4d0 {
 };
 
 Engine_004bf4d0* GetDisplay();
-int __stdcall FUN_004c5e70(Surface_004bf4d0* out);
+int __stdcall LockScreen(Surface_004bf4d0* out);
 int __stdcall FUN_004c5fa0(Surface_004bf4d0* s);
 int __stdcall FUN_004bf620(Surface_004bf4d0* s, Rect_004bf4d0* r);
 
@@ -62,7 +62,7 @@ int __stdcall FUN_004bf4d0(Surface_004bf4d0* surface, Rect_004bf4d0* rect, int l
     Surface_004bf4d0 screen;
     Rect_004bf4d0 r;
     if (surface == 0) {
-        if (!FUN_004c5e70(&screen))
+        if (!LockScreen(&screen))
             return 0;
     } else {
         memcpy(&screen, surface, sizeof(screen));

@@ -65,8 +65,8 @@ extern Display_004b5510 *DAT_0051fbd0;
 
 int __stdcall FUN_0049f710(int guid, void *display, int zero);
 void __stdcall ReleaseDirectDraw(Display_004b5510 *d);
-void __stdcall FUN_004c6a60(Class_004c6a60 *s, int width, int height, int a, int b);
-int __stdcall FUN_004c5e70(Surface_004b5510 *s);
+void __stdcall InitSurface(Class_004c6a60 *s, int width, int height, int a, int b);
+int __stdcall LockScreen(Surface_004b5510 *s);
 void __cdecl FUN_004cbbe0(Surface_004b5510 *dst, void *src, int x, int y);
 int __stdcall FUN_004c5fa0(Surface_004b5510 *s);
 int __stdcall SetPaletteColors(PALETTEENTRY *entries, int start, int count);
@@ -157,7 +157,7 @@ int __stdcall SetFullScreen(int mode) {
                                         }
 
                                         if (DAT_0051fbd0->draw.field_98) {
-                                            FUN_004c5e70(&surf);
+                                            LockScreen(&surf);
                                             FUN_004cbbe0(&surf, DAT_0051fbd0->draw.field_98, 0, 0);
                                             FUN_004c5fa0(&surf);
                                         }
@@ -197,7 +197,7 @@ int __stdcall SetFullScreen(int mode) {
         ZeroMemory(bmi.bmiColors, sizeof(bmi.bmiColors));
         d->dib = CreateDIBSection(d->dc, (BITMAPINFO *)&bmi, DIB_RGB_COLORS, &bits,
                                   NULL, 0);
-        FUN_004c6a60((Class_004c6a60 *)&d->unknown_50[0], DAT_0051fbd0->width, DAT_0051fbd0->height,
+        InitSurface((Class_004c6a60 *)&d->unknown_50[0], DAT_0051fbd0->width, DAT_0051fbd0->height,
                      (DAT_0051fbd0->width + 3) & ~3, (int)bits);
         SelectObject(d->dc, d->dib);
         SetWindowPos(d->hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);

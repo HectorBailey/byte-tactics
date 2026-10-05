@@ -94,7 +94,7 @@ struct Game {
 extern Game* g_game;
 
 void FUN_004257a0();
-void __stdcall FUN_004c6ac0(void* image);
+void __stdcall FreeSurface(void* image);
 void __cdecl FUN_004d85a0(void* p);
 void LeaveNetGame();
 Display_0041ec50* GetDisplay();
@@ -123,9 +123,9 @@ void __stdcall FUN_0041ec50(Gadget_0041ec50* gadget)
     if (gadget->field_60 == -1) {
         FUN_004257a0();
         if (g_game->image_39077 != 0)
-            FUN_004c6ac0(g_game->image_39077);
+            FreeSurface(g_game->image_39077);
         if (g_game->image_3907b != 0)
-            FUN_004c6ac0(g_game->image_3907b);
+            FreeSurface(g_game->image_3907b);
         if (g_game->buffer_3907f != 0)
             FUN_004d85a0(g_game->buffer_3907f);
         if (g_game->buffer_39083 != 0)

@@ -54,8 +54,8 @@
 // `if (locked) { unlock_label: FUN_004c5fa0(&local); }` reached by `goto unlock_label` from
 // checks 1 and 4 only, with checks 2, 3 and 5 written as plain `if (locked) FUN_004c5fa0(&local);
 // return;` (compare 0x4c63a0 notes: its branch 1 also jumps into the single unlock body).
-// Also the FUN_004c5e70 check is `cmp eax, ebp` (ebp holds 0) in the original but `test eax,eax`
-// for us: storing the result first (`int ok = FUN_004c5e70(&local); if (ok == 0) return;`) is
+// Also the LockScreen check is `cmp eax, ebp` (ebp holds 0) in the original but `test eax,eax`
+// for us: storing the result first (`int ok = LockScreen(&local); if (ok == 0) return;`) is
 // what produced `cmp eax,ebx` in the matched near-copy 0x4b7f90, so try that spelling next.
 // Remaining diffs besides the tails: slot assignment (original y1=0x10 xmin/j=0x14 out=0x24
 // x=0x28 imin=0x34 imax=0x38 clip=0x3c; ours swaps the 0x10/0x14 and 0x24/0x28 pairs and puts
@@ -72,7 +72,7 @@
 // early-out tails (checks 1 and 4 should jump into the single final unlock body at 0x4c7a08,
 // checks 2/3/5 keep an inline unlock), the slot assignment pairs (0x10/0x14 and 0x24/0x28)
 // and the y1>clip.top reload in the edge loops. No variant attempted in this session.
-// Session deepseek-v4.1-flash (2nd): the suggested `int ok = FUN_004c5e70(&local);` spelling
+// Session deepseek-v4.1-flash (2nd): the suggested `int ok = LockScreen(&local);` spelling
 // (removing the function-scope `int ok;`) is byte-identical here at 64.3 percent / 1144 bytes,
 // so storing the result does not produce the original `cmp eax, ebp` at the first check.
 // Tried and reverted: reordering the stack locals (y0/y1 after xmax, out after x, clip before
@@ -158,14 +158,14 @@ public:
     char unknown_0[0x1c];
     int clip[4];             // +0x1c left, top, right, bottom
 
-    void FUN_004c6ae0(int* out);
+    void GetClipRect(int* out);
 };
 
-int __stdcall FUN_004c5e70(Surface_004c5e70* out);
-void __stdcall FUN_004c7310(int y, int* rect, void* surf, void* info);
+int __stdcall LockScreen(Surface_004c5e70* out);
+void __stdcall DrawQuadRow(int y, int* rect, void* surf, void* info);
 
 // FUNCTION: 0x4c7580
-void __stdcall FUN_004c7580(void* surf, Frame_004c7580* bmp,
+void __stdcall DrawFrameQuad(void* surf, Frame_004c7580* bmp,
                             Quad_004c7580* dst, Quad_004c7580* src)
 {
     if (bmp == 0)
@@ -176,7 +176,7 @@ void __stdcall FUN_004c7580(void* surf, Frame_004c7580* bmp,
     Surface_004c5e70 local;
     int locked;
     if (surf == 0) {
-        int ok = FUN_004c5e70(&local);
+        int ok = LockScreen(&local);
         if (ok == 0)
             return;
         locked = 1;
@@ -229,7 +229,7 @@ void __stdcall FUN_004c7580(void* surf, Frame_004c7580* bmp,
             xmin = xx;
     }
 
-    ((Class_004c6ae0*)surf)->FUN_004c6ae0(clip);
+    ((Class_004c6ae0*)surf)->GetClipRect(clip);
     if (xmax < clip[0]) {
         if (locked) FUN_004c5fa0(&local);
         return;
@@ -345,7 +345,7 @@ void __stdcall FUN_004c7580(void* surf, Frame_004c7580* bmp,
     out = recs;
     for (i = ymin; i < ymax; i++) {
         if (out->right - out->left > 0)
-            FUN_004c7310(i, (int*)out, surf, bmp);
+            DrawQuadRow(i, (int*)out, surf, bmp);
         out++;
     }
 

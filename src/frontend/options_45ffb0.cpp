@@ -61,7 +61,7 @@ void* __stdcall FUN_004b8d40(void* gaf, const char* name);
 void* __stdcall FUN_004b7f30(void* a, int b);
 void __stdcall FUN_004b7f90(int a, void* b, int c, int d);
 void __stdcall FUN_0049fa90(void* menu);
-void __stdcall FUN_004c7580(void* surf, void* entry, Quad_45ffb0* dst, Quad_45ffb0* src);
+void __stdcall DrawFrameQuad(void* surf, void* entry, Quad_45ffb0* dst, Quad_45ffb0* src);
 
 // FUNCTION: 0x45ffb0
 void __stdcall FUN_0045ffb0(void* surf)
@@ -116,7 +116,7 @@ void __stdcall FUN_0045ffb0(void* surf)
         src.p[2].x = DAT_00512ef8.w - 1;
         src.p[2].y = DAT_00512ef8.h - 1;
         src.p[3].y = DAT_00512ef8.h - 1;
-        FUN_004c7580(surf, &DAT_00512ef8, &dst, &src);
+        DrawFrameQuad(surf, &DAT_00512ef8, &dst, &src);
         FUN_0049fa90((char*)g_game + 0x519);
         g_game->flags |= 2;
         g_game->field_37e98 = 1;

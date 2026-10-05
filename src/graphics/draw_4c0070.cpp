@@ -7,7 +7,7 @@
 // per-segment draw lives in an inlined helper: it is that helper's parameters
 // that get the four coordinate slots, while the loop keeps the carried point
 // in registers, which is what produces the slot shuffle at the top of the
-// body. When `surface` is null the helper locks the screen with FUN_004c5e70
+// body. When `surface` is null the helper locks the screen with LockScreen
 // and unlocks it with FUN_004c5fa0, once per segment; a failed lock draws
 // nothing but the loop still runs to completion.
 
@@ -20,7 +20,7 @@ struct Surface_004c0070 {
 
 int __cdecl FUN_004b70ef(int angle, int distance);
 int __cdecl FUN_004b7123(int angle, int distance);
-int __stdcall FUN_004c5e70(Surface_004c0070* out);
+int __stdcall LockScreen(Surface_004c0070* out);
 int __stdcall FUN_004c5fa0(Surface_004c0070* s);
 int __stdcall FUN_004bea20(Surface_004c0070* dst, int* a, int* b, int* c, int* d);
 void __cdecl FUN_004cc7ab(Surface_004c0070* dst, int a, int b, int c, int d, int color);
@@ -30,7 +30,7 @@ static inline void Draw_004c0070(Surface_004c0070* surface, int x0, int y0,
 {
     if (surface == 0) {
         Surface_004c0070 screen;
-        if (FUN_004c5e70(&screen)) {
+        if (LockScreen(&screen)) {
             if (FUN_004bea20(&screen, &x0, &y0, &x1, &y1))
                 FUN_004cc7ab(&screen, x0, y0, x1, y1, color);
             FUN_004c5fa0(&screen);

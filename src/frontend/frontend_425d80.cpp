@@ -40,7 +40,7 @@ int FUN_00428bc0(void);
 void FUN_0041d4c0();
 char __stdcall FUN_0041d6a0(int param_1);
 int FUN_004c1ab0(void);
-void FUN_004c63a0();
+void FlipScreen();
 void __stdcall FUN_004290f0(char* out, const char* dir, const char* name, const char* ext);
 void __cdecl FUN_004d85a0(void* p);
 void __stdcall FUN_0047f1a0(char* name, int param_2);
@@ -49,8 +49,8 @@ int __stdcall FUN_0049fd60(Gadget_00425d80* gadget, char* name);
 void __stdcall FUN_004ab0a0(void* param_1);
 void __stdcall FUN_004abd90(char* dest, char* text, int param_3, int param_4, int param_5);
 char* __stdcall FUN_004c5740(char* text);
-void __stdcall FUN_004c6890(int param_1, int param_2);
-void __stdcall FUN_004c69a0(int param_1);
+void __stdcall FillSurface(int param_1, int param_2);
+void __stdcall SetOffscreenSurface(int param_1);
 Display_00425d80* GetDisplay(void);
 
 // FUNCTION: 0x425d80
@@ -76,9 +76,9 @@ void __stdcall FUN_00425d80(Gadget_00425d80* gadget)
         Class_004c2ea0 obj;
         if (((Class_004c2f60*)&obj)->FUN_004c2f60(buf) != 0) {
             g_game[0x2bc0] = 6;
-            FUN_004c69a0(*(int*)(g_game + 0x37e1b));
-            FUN_004c6890(0, 0);
-            FUN_004c63a0();
+            SetOffscreenSurface(*(int*)(g_game + 0x37e1b));
+            FillSurface(0, 0);
+            FlipScreen();
             return;
         }
         FUN_004abd90(g_game + 0x519,

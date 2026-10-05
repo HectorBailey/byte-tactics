@@ -125,9 +125,9 @@ int __stdcall CreateLocalPlayer(unsigned char playerIndex, int param2);
 int __stdcall JoinNetGame(V4i v, int idx);
 int __stdcall FUN_004a5030(char* param);
 void __stdcall AddNetPlayer(int param);
-void __stdcall FUN_004c69a0(int param);
-void __stdcall FUN_004c6890(int param1, int param2);
-void __stdcall FUN_004c63a0(void);
+void __stdcall SetOffscreenSurface(int param);
+void __stdcall FillSurface(int param1, int param2);
+void __stdcall FlipScreen(void);
 void __stdcall QuitApp(int param);
 void __stdcall HAPINET_guaranteepackets(int param);
 void __stdcall FUN_004a9660(int param);
@@ -248,17 +248,17 @@ void FUN_00425750()
 
 void FUN_004257a0()
 {
-    FUN_004c69a0(*(int*)(g_game + 0x37e1b));
-    FUN_004c6890(0, 0);
-    FUN_004c63a0();
+    SetOffscreenSurface(*(int*)(g_game + 0x37e1b));
+    FillSurface(0, 0);
+    FlipScreen();
 }
 
 void FUN_00425b60()
 {
-    FUN_004c69a0(*(int*)(g_game + 0x37e1b));
+    SetOffscreenSurface(*(int*)(g_game + 0x37e1b));
     FUN_004c2470();
     FUN_004c2870();
-    FUN_004c63a0();
+    FlipScreen();
 }
 
 // FUN_00426d20, as inlined in case 15 and in case 20.

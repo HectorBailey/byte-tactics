@@ -236,7 +236,7 @@ void __stdcall FUN_004bee60(void* surface, int x, int y, int color);
 void __stdcall FUN_004c0070(void* surface, int x, int y, int radius, int color);
 void __stdcall FUN_004c01a0(void* surface, int x, int y, int radius, int color,
                             int a6, int a7);
-void __stdcall FUN_004c6b70(void* dst, void* bmp, int x, int y);
+void __stdcall DrawSurface(void* dst, void* bmp, int x, int y);
 
 static PlayerInfo_00466dc0* PlayerInfo_00466dc0_Get(unsigned char p)
 {
@@ -288,7 +288,7 @@ void FUN_00466dc0(void)
 
     g_game->field_1436b = 0;
     void* surface = g_game->field_142db;
-    FUN_004c6b70(surface, g_game->field_142df, 0, 0);
+    DrawSurface(surface, g_game->field_142df, 0, 0);
 
     int enabled;
     if (g_game->field_14281.bits.bit0 || g_game->field_14281.bits.bit1)

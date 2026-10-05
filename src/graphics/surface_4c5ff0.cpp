@@ -81,7 +81,7 @@ Display_004c5ff0* GetDisplay(void);
 
 
 // FUNCTION: 0x4c5ff0
-int __stdcall FUN_004c5ff0(Out_004c5ff0* out)
+int __stdcall LockPrimary(Out_004c5ff0* out)
 {
     return GetDisplay()->LockMe(out);
 }

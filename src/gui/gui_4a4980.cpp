@@ -64,7 +64,7 @@ struct Frame_004a4980 {
 void* __stdcall FUN_004b7f30(void* a, int b);
 void __stdcall FUN_004b7f90(void* surface, void* frame, int x, int y);
 void __stdcall FUN_004bf6f0(void* surface, Rect_004a4980* rect, int color);
-void __stdcall FUN_004c7580(void* surf, void* entry, Quad_004a4980* dst, Quad_004a4980* src);
+void __stdcall DrawFrameQuad(void* surf, void* entry, Quad_004a4980* dst, Quad_004a4980* src);
 
 // FUNCTION: 0x4a4980
 void __stdcall FUN_004a4980(Class_004a4980* obj, int index)
@@ -108,7 +108,7 @@ void __stdcall FUN_004a4980(Class_004a4980* obj, int index)
             src.p[2].y = result->h - 1;
             src.p[3].y = result->h - 1;
             if (result->field_9 == 0) {
-                FUN_004c7580(*(void**)((char*)entries + 0xbc), result, &dst, &src);
+                DrawFrameQuad(*(void**)((char*)entries + 0xbc), result, &dst, &src);
                 return;
             }
             FUN_004b7f90(*(void**)((char*)entries + 0xbc), result, result->field_4 + rect.x1, result->field_6 + rect.y1);
@@ -119,7 +119,7 @@ void __stdcall FUN_004a4980(Class_004a4980* obj, int index)
         src.p[2].x = ((Frame_004a4980*)e->field_c2)->w - 1;
         src.p[2].y = ((Frame_004a4980*)e->field_c2)->h - 1;
         src.p[3].y = ((Frame_004a4980*)e->field_c2)->h - 1;
-        FUN_004c7580(*(void**)((char*)entries + 0xbc), e->field_c2, &dst, &src);
+        DrawFrameQuad(*(void**)((char*)entries + 0xbc), e->field_c2, &dst, &src);
     } else {
         FUN_004bf6f0(*(void**)((char*)entries + 0xbc), &rect, obj->field_8b9);
     }

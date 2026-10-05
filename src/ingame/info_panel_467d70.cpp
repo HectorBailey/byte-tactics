@@ -41,16 +41,16 @@ extern Game* g_game;
 int __stdcall FUN_004b7f30(unsigned short* frames, int frame);
 void __stdcall FUN_004b7f90(void* surf, short* frame, int x, int y);
 int GetScreenHeight();
-void __stdcall FUN_004c69a0(void* surf);
-void __stdcall FUN_004c6890(void* surf, int mode);
-void FUN_004c63a0();
+void __stdcall SetOffscreenSurface(void* surf);
+void __stdcall FillSurface(void* surf, int mode);
+void FlipScreen();
 
 // FUNCTION: 0x467d70
 void FUN_00467d70()
 {
     void* surf = g_game->surface;
-    FUN_004c69a0(surf);
-    FUN_004c6890(surf, 0);
+    SetOffscreenSurface(surf);
+    FillSurface(surf, 0);
 
     int side = g_game->players[g_game->playerIndex].unit->side;
 
@@ -64,5 +64,5 @@ void FUN_00467d70()
     bar = (short*)FUN_004b7f30(g_game->field_14847[side], 0);
     FUN_004b7f90(surf, bar, bar[2], bar[3]);
 
-    FUN_004c63a0();
+    FlipScreen();
 }
