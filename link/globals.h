@@ -713,7 +713,7 @@ extern long DAT_0052a4fc;                                                       
 //   0x4fcdb8 DPSPGUID_SERIAL: defined in src/data/guids.cpp
 //   0x4fd3b8 DAT_004fd3b8: defined in src/data/vtables.cpp
 //   0x511df0 DAT_00511df0: Obj_00421170*[] (2), int[100] (1), void*[100] (1), Obj_00420f30*[100] (1), and 2 more
-//   0x512358 MovementClassTable::DAT_00512358: defined in src/units/movement_class_440230.cpp
+//   0x512358 MovementClassTable::g_movementClasses: defined in src/units/movement_class_440230.cpp
 //   0x51e59c IURect_0046e160::IU?$pair::?$_Tree::_Nilrefs: defined in src/network/unit_sync_46c920.cpp
 //   0x51f2e8 DAT_0051f2e8: char* (4), int (1), int* (1), void* (1)
 //   0x4fcd98 DPSPGUID_IPX: defined in src/data/guids.cpp
@@ -814,7 +814,7 @@ extern long DAT_0052a4fc;                                                       
 //   0x5122d4 DAT_005122d4: void* (1), char* (1)
 //   0x512328 DAT_00512328: Player_00437cd0* (1), void* (1)
 //   0x512340 DAT_00512340$S5516: defined in src/map/meteors_438450.cpp
-//   0x512370 DAT_00512370: part of another global: MovementClassTable::DAT_00512358+0x18
+//   0x512370 DAT_00512370: part of another global: MovementClassTable::g_movementClasses+0x18
 //   0x512764 DAT_00512764: short (1), int (1)
 //   0x5129f1 DAT_005129f1: part of another global: DAT_005129d0+0x21
 //   0x5129f8 DAT_005129f8: defined in src/network/net_condenser_44f720.cpp

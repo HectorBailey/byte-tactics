@@ -52,16 +52,16 @@ struct MovementClassTable {
         } while (--n);
     }
 
-    static MovementClassTable DAT_00512358;
+    static MovementClassTable g_movementClasses;
 };
 
 // FUNCTION: 0x440420
 MovementClass* __stdcall FindMovementClass(char* name)
 {
     for (int i = 0; i < 32; i++) {
-        if (MovementClassTable::DAT_00512358.entries[i].field_0 != 0
-            && _strcmpi((char*)MovementClassTable::DAT_00512358.entries[i].field_0, name) == 0) {
-            return &MovementClassTable::DAT_00512358.entries[i];
+        if (MovementClassTable::g_movementClasses.entries[i].field_0 != 0
+            && _strcmpi((char*)MovementClassTable::g_movementClasses.entries[i].field_0, name) == 0) {
+            return &MovementClassTable::g_movementClasses.entries[i];
         }
     }
     return 0;

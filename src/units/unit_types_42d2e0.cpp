@@ -249,7 +249,7 @@ struct MovementClass {
 struct MovementClassTable {
     MovementClass entries[32];
 
-    static MovementClassTable DAT_00512358;
+    static MovementClassTable g_movementClasses;
 };
 
 struct Game {
@@ -313,8 +313,8 @@ void LoadUnitTypes() {
             FUN_004b6290("Can't load MOVEINFO.TDF");
 
         int i = 0;
-        MovementClass* cls = MovementClassTable::DAT_00512358.entries;
-        MovementClass* cls_end = &MovementClassTable::DAT_00512358.entries[32];
+        MovementClass* cls = MovementClassTable::g_movementClasses.entries;
+        MovementClass* cls_end = &MovementClassTable::g_movementClasses.entries[32];
         do {
             sprintf(classbuf, "CLASS%d", i);
             ((Class_004c3e10*)&parser)->FUN_004c3e10();

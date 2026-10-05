@@ -22,7 +22,7 @@ public:
 struct MovementClassTable {
     MovementClass entries[32];
 
-    static MovementClassTable DAT_00512358;
+    static MovementClassTable g_movementClasses;
 };
 
 #pragma pack(push, 2)
@@ -52,8 +52,8 @@ extern Game* g_game;
 static inline void UpdateAll(Point_00440a70 a, Point_00440a70 b)
 {
     for (int i = 0; i < 32; i++) {
-        if (MovementClassTable::DAT_00512358.entries[i].field_0 != 0) {
-            ((Class_00440830*)&MovementClassTable::DAT_00512358.entries[i])->RefreshPassMap(a, b);
+        if (MovementClassTable::g_movementClasses.entries[i].field_0 != 0) {
+            ((Class_00440830*)&MovementClassTable::g_movementClasses.entries[i])->RefreshPassMap(a, b);
         }
     }
 }
@@ -65,8 +65,8 @@ void __stdcall RefreshPassMapsForUnit(Struct_00440a70* p)
         unsigned int last = p->unit->lastTick;
         p->unit->lastTick = g_game->ticks;
         for (int i = 0; i < 32; i++) {
-            if (last < MovementClassTable::DAT_00512358.entries[i].field_1c) {
-                ((Class_00440830*)&MovementClassTable::DAT_00512358.entries[i])->RefreshPassMap(p->a, p->b);
+            if (last < MovementClassTable::g_movementClasses.entries[i].field_1c) {
+                ((Class_00440830*)&MovementClassTable::g_movementClasses.entries[i])->RefreshPassMap(p->a, p->b);
             }
         }
         return;
