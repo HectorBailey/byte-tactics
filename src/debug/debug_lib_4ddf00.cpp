@@ -11,7 +11,7 @@
 
 class Class_004e1590 {
 public:
-    void FUN_004e1590(const char* fileName);
+    void OpenMappedFile(const char* fileName);
 };
 
 class Class_004e1560 {
@@ -56,7 +56,7 @@ Class_004ddf00::Class_004ddf00(HMODULE m) : Class_004e1560(0)
         path[sizeof(path) - 1] = 0;
     else
         path[0] = 0;
-    ((Class_004e1590*)this)->FUN_004e1590(path);
+    ((Class_004e1590*)this)->OpenMappedFile(path);
     ntHeaders = (IMAGE_NT_HEADERS*)((char*)dosHeader + dosHeader->e_lfanew);
     numDebugDirs = ntHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_DEBUG].Size / sizeof(IMAGE_DEBUG_DIRECTORY);
     debugDirs = 0;

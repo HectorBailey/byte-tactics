@@ -4,7 +4,7 @@
 
 class Class_004e2d00 {
 public:
-    int FUN_004e2d00(const char* name, int minValue, int maxValue, int defaultValue);
+    int ReadInt(const char* name, int minValue, int maxValue, int defaultValue);
 };
 
 class Class_004e2cc0 {
@@ -25,7 +25,7 @@ public:
 // HKCU\Software\Cavedog Entertainment\Cavedog library\WindowPositions\<name>.
 // Edges of -500 are the "no saved value" sentinel; zoomX/zoomY of 1.0 with no
 // saved size resizes the window instead of moving it.
-unsigned char __cdecl FUN_004e3080(HWND hwnd, char* name, double zoomX, double zoomY, char doSize)
+unsigned char __cdecl RestoreWindowPosition(HWND hwnd, char* name, double zoomX, double zoomY, char doSize)
 {
     char buf[200];
     WINDOWPLACEMENT placement;
@@ -55,16 +55,16 @@ unsigned char __cdecl FUN_004e3080(HWND hwnd, char* name, double zoomX, double z
     strncat(buf, name, sizeof(buf) - 1 - strlen(buf));
 
     Class_004e2be0 key(1, buf, "Cavedog library");
-    x = ((Class_004e2d00*)&key)->FUN_004e2d00("LeftEdge", -500, 50000, -500);
-    y = ((Class_004e2d00*)&key)->FUN_004e2d00("TopEdge", -500, 50000, -500);
+    x = ((Class_004e2d00*)&key)->ReadInt("LeftEdge", -500, 50000, -500);
+    y = ((Class_004e2d00*)&key)->ReadInt("TopEdge", -500, 50000, -500);
 
     long style = GetWindowLongA(hwnd, GWL_STYLE);
     resizable = false;
     GetWindowRect(hwnd, &cur);
     if ((style & WS_THICKFRAME) == WS_THICKFRAME) {
         resizable = true;
-        w = ((Class_004e2d00*)&key)->FUN_004e2d00("Width", 0, work.right - work.left, 0);
-        h = ((Class_004e2d00*)&key)->FUN_004e2d00("Height", 0, work.bottom - work.top, 0);
+        w = ((Class_004e2d00*)&key)->ReadInt("Width", 0, work.right - work.left, 0);
+        h = ((Class_004e2d00*)&key)->ReadInt("Height", 0, work.bottom - work.top, 0);
         zoomed = ((Class_004e2cc0*)&key)->FUN_004e2cc0("Zoomed", 0);
         if (w < 100) {
             w = 100;
