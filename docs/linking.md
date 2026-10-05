@@ -591,11 +591,13 @@ every placed game function it reads each relocated field of
 map file (`link.py --carve --map`), and compares it with what the original's
 code holds in that field. A reference past the end of a global (an array's
 end, `&DAT_005119c0[10]`) agrees when its global does, and a function's own
-statics where the layout put them. It then compares the data: every named
+statics where the layout put them. A constructor's store of the vtable its
+own object defines is compared too, since another file's copy may be the
+one LINK keeps. It then compares the data: every named
 piece of data in the link (a global, a literal, a vtable, a run of
 `origdata.obj`) against the original's bytes at its address, pointer fields
 by where they lead, and it flags an address of the original's code held as
-a number. On 2026-10-05 all 26,466 references it can place, in all 3,308
+a number. On 2026-10-05 all 26,627 references it can place, in all 3,308
 placed functions (the gap regions' among them), agree, apart from 134 calls
 that reach the other copy of `std::_Lockit`; of 5,080 pieces of data, 20
 differ, all of them a pointer to a string the link folded into an identical
