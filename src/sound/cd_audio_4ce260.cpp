@@ -2,10 +2,10 @@
 #include <windows.h>
 #include <mmsystem.h>
 
-extern HWND DAT_0051ff18;
-extern void* DAT_0051ff14;
-extern int DAT_0050b540;
-extern int DAT_0050b544;
+extern HWND g_cdPlayerWindow;
+extern void* g_cdPlayer;
+extern int g_cdNextTrackTimer;
+extern int g_cdFadeTimer;
 
 extern void __stdcall RemoveTimer(int);
 extern void __stdcall FUN_004b6b60(void (__stdcall*)(int, int, int));
@@ -49,8 +49,8 @@ int Class_004ce260::OpenCdAudio()
     MCIERROR hr;
     if (open != 0)
         return 1;
-    DAT_0051ff18 = 0;
-    DAT_0051ff14 = this;
+    g_cdPlayerWindow = 0;
+    g_cdPlayer = this;
     arr_214[0] = 1;
     for (int i = 0; i < 100; i++)
         arr_214[i] = (i % 4) + 1;
@@ -74,10 +74,10 @@ int Class_004ce260::OpenCdAudio()
     field_20c = 0;
     field_208 = (field_200 != 0);
     field_284 = 0;
-    RemoveTimer(DAT_0050b540);
-    RemoveTimer(DAT_0050b544);
-    DAT_0050b544 = -1;
-    DAT_0050b540 = -1;
+    RemoveTimer(g_cdNextTrackTimer);
+    RemoveTimer(g_cdFadeTimer);
+    g_cdFadeTimer = -1;
+    g_cdNextTrackTimer = -1;
     hr = mciSendStringA("set cdaudio time format milliseconds", 0, 0, 0);
     if (hr != 0) {
         if (open != 0) {

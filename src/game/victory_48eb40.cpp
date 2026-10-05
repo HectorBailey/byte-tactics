@@ -12,7 +12,7 @@ struct Game {
 
 extern Game* g_game;
 
-void __stdcall FUN_0047f1a0(char* str, int flag);
+void __stdcall PlaySoundByName(char* str, int flag);
 
 class Class_0048eb40 {
 public:
@@ -27,7 +27,7 @@ int Class_0048eb40::FUN_0048ea00()
 {
     if (g_game->field_1df2 == 0) {
         if (announced == 0) {
-            FUN_0047f1a0("Victory Condition", 0);
+            PlaySoundByName("Victory Condition", 0);
             announced = 1;
         }
         return 1;

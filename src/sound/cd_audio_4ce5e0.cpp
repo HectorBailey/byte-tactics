@@ -9,7 +9,7 @@ struct Sound_004ce5e0 {
 
 class Class_004d00d0 {
 public:
-    void FUN_004d00d0(int level, int flag);
+    void SetAuxVolume(int level, int flag);
 };
 
 class Class_004cdb40 {
@@ -17,10 +17,10 @@ public:
     void PlayNextTrack();
 };
 
-extern Sound_004ce5e0* DAT_0051ff14;
-extern int DAT_0051ff10;
-extern int DAT_0050b544;
-extern int DAT_0050b540;
+extern Sound_004ce5e0* g_cdPlayer;
+extern int g_cdFadeVolume;
+extern int g_cdFadeTimer;
+extern int g_cdNextTrackTimer;
 
 void __stdcall RemoveTimer(int param_1);
 int __stdcall AddTimer(int delay, int param, void (__stdcall* callback)(void*));
@@ -31,18 +31,18 @@ void __stdcall OnNextTrackTimer(void*);
 // FUNCTION: 0x4ce5e0
 void __stdcall OnCdFadeTimer(void*)
 {
-    DAT_0051ff10 += DAT_0051ff14->step;
-    if (DAT_0051ff10 <= 0) {
-        RemoveTimer(DAT_0050b544);
-        DAT_0050b544 = -1;
-        DAT_0051ff10 = 0;
-        DAT_0051ff14->step = 0;
-        ((Class_004d00d0*)DAT_0051ff14)->FUN_004d00d0(DAT_0051ff10, 1);
-        if (DAT_0051ff14->field_278 == 0)
-            DAT_0050b540 = AddTimer(0x78, 0, OnNextTrackTimer);
+    g_cdFadeVolume += g_cdPlayer->step;
+    if (g_cdFadeVolume <= 0) {
+        RemoveTimer(g_cdFadeTimer);
+        g_cdFadeTimer = -1;
+        g_cdFadeVolume = 0;
+        g_cdPlayer->step = 0;
+        ((Class_004d00d0*)g_cdPlayer)->SetAuxVolume(g_cdFadeVolume, 1);
+        if (g_cdPlayer->field_278 == 0)
+            g_cdNextTrackTimer = AddTimer(0x78, 0, OnNextTrackTimer);
         else
-            ((Class_004cdb40*)DAT_0051ff14)->PlayNextTrack();
+            ((Class_004cdb40*)g_cdPlayer)->PlayNextTrack();
     } else {
-        ((Class_004d00d0*)DAT_0051ff14)->FUN_004d00d0(DAT_0051ff10, 1);
+        ((Class_004d00d0*)g_cdPlayer)->SetAuxVolume(g_cdFadeVolume, 1);
     }
 }

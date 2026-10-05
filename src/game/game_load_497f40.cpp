@@ -146,7 +146,7 @@ void __cdecl HandleNetPackets();
 void __cdecl SendLoadProgress();
 void __cdecl OnlineUnload();
 void __cdecl FUN_00467d70();
-void __cdecl FUN_0047f750();
+void __cdecl StopAllSounds();
 void __cdecl FUN_00496790();
 void __cdecl FUN_004c2870();
 void __stdcall UnlockScreen(void*);
@@ -298,7 +298,7 @@ void FUN_00497f40(void)
         OnlineUnload();
     }
     if (g_game->flags38d75.bits.loaded) {
-        FUN_0047f750();
+        StopAllSounds();
         FUN_004257a0();
         FUN_00428730();
         if (GetScreenWidth() != g_game->field_37f1b || GetScreenHeight() != g_game->field_37f1f) {

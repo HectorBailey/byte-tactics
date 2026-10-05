@@ -38,7 +38,7 @@ public:
 
 class Class_004d00d0 {
 public:
-    int FUN_004d00d0(int volume, int temporary);
+    int SetAuxVolume(int volume, int temporary);
 };
 
 class Class_004ceb60 {
@@ -88,7 +88,7 @@ int Class_004ceb60::PlayCdTrack(int index, int flag)
     field_208 = index;
     index += field_280;
     hwnd = GetDisplay()->hwnd;
-    ((Class_004d00d0*)this)->FUN_004d00d0(field_20, 1);
+    ((Class_004d00d0*)this)->SetAuxVolume(field_20, 1);
     if (mciSendStringA("set cdaudio time format tmsf", 0, 0, 0) != 0)
         return 0;
     sprintf(cmd, "play cdaudio from %i", index);

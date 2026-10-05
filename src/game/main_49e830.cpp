@@ -79,7 +79,7 @@ public:
 
 class Class_004cf0b0 {
 public:
-    void FUN_004cf0b0();
+    void ReapFinishedBuffers();
 };
 
 #pragma pack(push, 1)
@@ -309,7 +309,7 @@ int __stdcall FUN_0049e830(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             {
                 DWORD tick = GetTickCount();
                 if ((int)(tick - DAT_0051fb94) >= 100) {
-                    ((Class_004cf0b0*)g_game->field_10)->FUN_004cf0b0();
+                    ((Class_004cf0b0*)g_game->field_10)->ReapFinishedBuffers();
                     DAT_0051fb94 = tick;
                 }
             }

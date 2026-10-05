@@ -33,12 +33,12 @@ public:
 
 class Class_004d0070 {
 public:
-    void FUN_004d0070(int level);
+    void SetWaveVolume(int level);
 };
 
 class Class_004d00d0 {
 public:
-    void FUN_004d00d0(int level, int flag);
+    void SetAuxVolume(int level, int flag);
 };
 
 struct Gadget_0045fc60 {
@@ -103,7 +103,7 @@ void __stdcall FUN_004ab170(char* menu, int a, int b);
 void __stdcall SetOffscreenSurface(int value);
 void FlipScreen();
 int __stdcall IsCurrentGadgetNamed(Gadget_0045fc60* gadget, char* name);
-void __stdcall FUN_0047f1a0(char* str, int flag);
+void __stdcall PlaySoundByName(char* str, int flag);
 void FUN_0045ed50();
 void __stdcall FUN_0045e5e0(int flag);
 void FUN_0045d7c0();
@@ -132,21 +132,21 @@ void __stdcall FUN_0045fc60(Gadget_0045fc60* gadget)
             FlipScreen();
         }
         if (IsCurrentGadgetNamed(gadget, "SPEEDS")) {
-            FUN_0047f1a0("Options", 0);
+            PlaySoundByName("Options", 0);
             FUN_0045ed50();
         } else if (IsCurrentGadgetNamed(gadget, "VISUALS")) {
-            FUN_0047f1a0("Options", 0);
+            PlaySoundByName("Options", 0);
             FUN_0045e5e0(0);
         } else if (IsCurrentGadgetNamed(gadget, "MUSIC")) {
-            FUN_0047f1a0("Options", 0);
+            PlaySoundByName("Options", 0);
             FUN_0045d7c0();
         } else if (IsCurrentGadgetNamed(gadget, "PREV")) {
-            FUN_0047f1a0("Options", 0);
+            PlaySoundByName("Options", 0);
             FUN_00430f00();
             DAT_00506788 = 1;
             return;
         } else if (IsCurrentGadgetNamed(gadget, "CANCEL")) {
-            FUN_0047f1a0("Previous", 0);
+            PlaySoundByName("Previous", 0);
             FUN_0045c820();
             g_game->volume2 = DAT_00512f42;
             ((Class_004ce3e0*)g_game->field_10)->FUN_004ce3e0(&DAT_00512f75);
@@ -159,8 +159,8 @@ void __stdcall FUN_0045fc60(Gadget_0045fc60* gadget)
             g_game->flags = f ^ ((f ^ DAT_00512f46) & 1);
             ((Class_004ce580*)g_game->field_10)->FUN_004ce580(DAT_00512fd9);
             SetBrightness(0.5 - g_game->brightness * -0.041666668f);
-            ((Class_004d0070*)g_game->field_10)->FUN_004d0070(g_game->volume1 << 10);
-            ((Class_004d00d0*)g_game->field_10)->FUN_004d00d0(g_game->volume2 << 10, 0);
+            ((Class_004d0070*)g_game->field_10)->SetWaveVolume(g_game->volume1 << 10);
+            ((Class_004d00d0*)g_game->field_10)->SetAuxVolume(g_game->volume2 << 10, 0);
             g_game->field_37f23 = DAT_00512f55;
             g_game->field_38a4b = DAT_00512f6d;
             g_game->field_38a4d = DAT_00512f6d;
@@ -173,7 +173,7 @@ void __stdcall FUN_0045fc60(Gadget_0045fc60* gadget)
             DAT_00506788 = 1;
             return;
         } else if (IsCurrentGadgetNamed(gadget, "SOUND")) {
-            FUN_0047f1a0("Options", 0);
+            PlaySoundByName("Options", 0);
             FUN_0045de30();
         } else {
             if (gadget->field_60 != -1)

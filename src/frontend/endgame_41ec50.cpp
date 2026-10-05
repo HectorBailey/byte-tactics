@@ -99,7 +99,7 @@ void __cdecl FUN_004d85a0(void* p);
 void LeaveNetGame();
 Display_0041ec50* GetDisplay();
 int __stdcall IsCurrentGadgetNamed(Gadget_0041ec50* gadget, char* name);
-void __stdcall FUN_0047f1a0(char* name, int param_2);
+void __stdcall PlaySoundByName(char* name, int param_2);
 void FUN_004931d0();
 void FUN_00493060();
 void __stdcall FUN_004ab0a0(void* param_1);
@@ -152,14 +152,14 @@ void __stdcall FUN_0041ec50(Gadget_0041ec50* gadget)
     // LoadGame and SaveGame reset the gadget (FUN_004ab0a0) twice in a row;
     // the second call is redundant.
     if (IsCurrentGadgetNamed(gadget, "LoadGame")) {
-        FUN_0047f1a0("BigButton", 0);
+        PlaySoundByName("BigButton", 0);
         FUN_004931d0();
         FUN_004ab0a0(gadget);
         FUN_004ab0a0(gadget);
         return;
     }
     if (IsCurrentGadgetNamed(gadget, "SaveGame")) {
-        FUN_0047f1a0("BigButton", 0);
+        PlaySoundByName("BigButton", 0);
         FUN_00493060();
         FUN_004ab0a0(gadget);
         FUN_004ab0a0(gadget);
@@ -173,7 +173,7 @@ void __stdcall FUN_0041ec50(Gadget_0041ec50* gadget)
             FUN_004ab0a0(g_game->message);
         }
         FUN_0041d4c0();
-        FUN_0047f1a0("BigButton", 0);
+        PlaySoundByName("BigButton", 0);
         g_game->field_2bc0 = 10;
         FUN_004c22d0(1);
         FUN_00491c80(0x14);
@@ -190,14 +190,14 @@ void __stdcall FUN_0041ec50(Gadget_0041ec50* gadget)
             return;
         }
     } else if (IsCurrentGadgetNamed(gadget, "MainMenu")) {
-        FUN_0047f1a0("BigButton", 0);
+        PlaySoundByName("BigButton", 0);
         FUN_00425860(2, 770, "c:\\cavedog\\wargame\\endgame.cpp");
         FUN_00490b30(1);
         FUN_004c22d0(1);
         FUN_00491c80(0x14);
         return;
     } else if (IsCurrentGadgetNamed(gadget, "Difficulty")) {
-        FUN_0047f1a0("SKirmish", 0);
+        PlaySoundByName("SKirmish", 0);
         if (g_game->difficulty == 0) {
             g_game->options->difficulty = 1;
             g_game->difficulty = 1;

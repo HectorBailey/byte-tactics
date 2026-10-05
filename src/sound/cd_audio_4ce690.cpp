@@ -1,9 +1,9 @@
 // Decompiled by DeepSeek V4.1 Flash. Names are provisional.
 
-extern int DAT_0051ff10;
+extern int g_cdFadeVolume;
 extern int DAT_0051ff20[];
-extern int DAT_0050b544;
-extern int DAT_0050b540;
+extern int g_cdFadeTimer;
+extern int g_cdNextTrackTimer;
 
 extern int __stdcall RemoveTimer(int handle);
 extern int __stdcall AddTimer(int delay, int id, void (__stdcall* callback)(void*));
@@ -16,7 +16,7 @@ public:
 
 class Class_004d00d0 {
 public:
-    int FUN_004d00d0(int volume, int temporary);
+    int SetAuxVolume(int volume, int temporary);
 };
 
 class Class_004ce690 {
@@ -45,28 +45,28 @@ void Class_004ce690::SetTrackCategory(int mode)
         DAT_0051ff20[old] = field_208;
     field_278 = mode;
     if (field_1fc == 4 || mode == 2 || mode == 3) {
-        DAT_0051ff10 = field_20;
+        g_cdFadeVolume = field_20;
         if (old == 4) {
-            if (DAT_0050b544 >= 0) {
-                RemoveTimer(DAT_0050b544);
-                DAT_0050b544 = -1;
+            if (g_cdFadeTimer >= 0) {
+                RemoveTimer(g_cdFadeTimer);
+                g_cdFadeTimer = -1;
             }
-            if (DAT_0050b540 >= 0) {
-                RemoveTimer(DAT_0050b540);
-                DAT_0050b540 = -1;
+            if (g_cdNextTrackTimer >= 0) {
+                RemoveTimer(g_cdNextTrackTimer);
+                g_cdNextTrackTimer = -1;
             }
-            ((Class_004d00d0*)this)->FUN_004d00d0(field_20, 0);
+            ((Class_004d00d0*)this)->SetAuxVolume(field_20, 0);
             ((Class_004cdb40*)this)->PlayNextTrack();
         } else {
-            if (DAT_0050b544 >= 0) {
-                RemoveTimer(DAT_0050b544);
-                DAT_0050b544 = -1;
-                RemoveTimer(DAT_0050b540);
-                DAT_0050b540 = -1;
+            if (g_cdFadeTimer >= 0) {
+                RemoveTimer(g_cdFadeTimer);
+                g_cdFadeTimer = -1;
+                RemoveTimer(g_cdNextTrackTimer);
+                g_cdNextTrackTimer = -1;
                 ((Class_004cdb40*)this)->PlayNextTrack();
             } else {
                 field_284 = field_20 / -18;
-                DAT_0050b544 = AddTimer(2, 0, OnCdFadeTimer);
+                g_cdFadeTimer = AddTimer(2, 0, OnCdFadeTimer);
             }
         }
     }

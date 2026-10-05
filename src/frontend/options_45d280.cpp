@@ -144,12 +144,12 @@ public:
 
 class Class_004d0070 {
 public:
-    void FUN_004d0070(int level);
+    void SetWaveVolume(int level);
 };
 
 class Class_004d00d0 {
 public:
-    void FUN_004d00d0(int level, int flag);
+    void SetAuxVolume(int level, int flag);
 };
 
 extern Game* g_game;
@@ -175,7 +175,7 @@ int __stdcall IsCurrentGadgetNamed(void* obj, char* name);
 int __stdcall FindGadgetIndex(Entry_0045d280* entries, char* name, int type);
 int __stdcall GetButtonStageByName(void* obj, char* name);
 void __stdcall SetButtonStageByName(void* obj, char* name, int value);
-void __stdcall FUN_0047f1a0(char* name, int value);
+void __stdcall PlaySoundByName(char* name, int value);
 void __stdcall FUN_004ab0a0(void* obj);
 void __stdcall CloseTopScreen(void* obj);
 void __stdcall SetBrightness(float value);
@@ -187,8 +187,8 @@ void FUN_0045d7c0();
 void FUN_0045bcc0()
 {
     SetBrightness(0.5 - g_game->field_37f08 * -0.041666668f);
-    ((Class_004d0070*)g_game->sound)->FUN_004d0070(g_game->volume1 << 10);
-    ((Class_004d00d0*)g_game->sound)->FUN_004d00d0(g_game->volume2 << 10, 0);
+    ((Class_004d0070*)g_game->sound)->SetWaveVolume(g_game->volume1 << 10);
+    ((Class_004d00d0*)g_game->sound)->SetAuxVolume(g_game->volume2 << 10, 0);
 }
 
 // 0x45c510 (matched in its own file).
@@ -247,7 +247,7 @@ void __stdcall FUN_0045d280(Object_0045d280* obj)
     FUN_0049fa90(obj);
     int notrak = IsCurrentGadgetNamed(obj, DAT_005067bc);
     if (notrak != 0) {              // "NOTRAK"
-        FUN_0047f1a0(DAT_00502b38, 0);
+        PlaySoundByName(DAT_00502b38, 0);
         int v = GetButtonStageByName(obj, DAT_005067bc);
         unsigned short f = g_game->flags.word;
         g_game->flags.word = f ^ ((f ^ v) & 1);
@@ -255,7 +255,7 @@ void __stdcall FUN_0045d280(Object_0045d280* obj)
         FUN_004ab0a0(obj);
         FUN_0045d130();
     } else if (IsCurrentGadgetNamed(obj, DAT_00506984)) {  // "TRACKMODE"
-        FUN_0047f1a0(DAT_00502b38, 0);
+        PlaySoundByName(DAT_00502b38, 0);
         g_game->field_37f16 = GetButtonStageByName(obj, DAT_00506984) + 1;
         ((Class_004ce7a0*)g_game->sound)->SetPlaybackOrder(g_game->field_37f16);
         if (g_game->field_37f16 == 3) {
@@ -272,7 +272,7 @@ void __stdcall FUN_0045d280(Object_0045d280* obj)
         FUN_0045c3f0();
         return;
     } else if (IsCurrentGadgetNamed(obj, DAT_0050692c)) {  // "TRACKTYPE"
-        FUN_0047f1a0(DAT_00502b38, 0);
+        PlaySoundByName(DAT_00502b38, 0);
         int i = obj->field_60;
         ((Class_004ce7c0*)g_game->sound)->SetCategoryOfTrack(DAT_00512fe0, entries[i].value);
         FUN_0045c3f0();
@@ -280,12 +280,12 @@ void __stdcall FUN_0045d280(Object_0045d280* obj)
         return;
     }
     if (IsCurrentGadgetNamed(obj, DAT_0050696c)) {      // "CDPLAY"
-        FUN_0047f1a0(DAT_00502b38, 0);
+        PlaySoundByName(DAT_00502b38, 0);
         ((Class_004ceb60*)g_game->sound)->PlayCdTrack(DAT_00512fe0, 1);
         FUN_004ab0a0(obj);
         return;
     } else if (IsCurrentGadgetNamed(obj, DAT_00506964)) {  // "CDNEXT"
-        FUN_0047f1a0(DAT_00502b38, 0);
+        PlaySoundByName(DAT_00502b38, 0);
         DAT_00512fe0 = DAT_00512fe0 + 1;
         int n = ((Class_004ce450*)g_game->sound)->GetTrackCount();
         if (DAT_00512fe0 > n)
@@ -295,7 +295,7 @@ void __stdcall FUN_0045d280(Object_0045d280* obj)
         FUN_004ab0a0(obj);
         return;
     } else if (IsCurrentGadgetNamed(obj, DAT_0050697c)) {  // "CDPREV"
-        FUN_0047f1a0(DAT_00502b38, 0);
+        PlaySoundByName(DAT_00502b38, 0);
         DAT_00512fe0 = DAT_00512fe0 - 1;
         if (DAT_00512fe0 < 1)
             DAT_00512fe0 = ((Class_004ce450*)g_game->sound)->GetTrackCount();
@@ -304,7 +304,7 @@ void __stdcall FUN_0045d280(Object_0045d280* obj)
         FUN_004ab0a0(obj);
         return;
     } else if (IsCurrentGadgetNamed(obj, DAT_00506974)) {  // "CDSTOP"
-        FUN_0047f1a0(DAT_00502b38, 0);
+        PlaySoundByName(DAT_00502b38, 0);
         ((Class_004ced40*)g_game->sound)->StopCdAudio();
         DAT_00512fe0 = ((Class_004ce8c0*)g_game->sound)->SelectTrack(1);
         FUN_0045c3f0();
@@ -312,14 +312,14 @@ void __stdcall FUN_0045d280(Object_0045d280* obj)
         return;
     }
     if (IsCurrentGadgetNamed(obj, DAT_00506998)) {      // "UNDO"
-        FUN_0047f1a0(DAT_00502b38, 0);
+        PlaySoundByName(DAT_00502b38, 0);
         FUN_0045c950();
         CloseTopScreen(obj);
         FUN_0045d7c0();
         return;
     }
     if (IsCurrentGadgetNamed(obj, DAT_00506990)) {      // "RESTORE"
-        FUN_0047f1a0(DAT_00502b38, 0);
+        PlaySoundByName(DAT_00502b38, 0);
         FUN_0045c630();
         CloseTopScreen(obj);
         FUN_0045d7c0();

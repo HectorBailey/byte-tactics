@@ -4,17 +4,17 @@ extern Game* g_game;
 
 class Class_004cfea0 {
 public:
-    int FUN_004cfea0();
+    int Is3DEnabled();
 };
 
 class Class_004cfe90 {
 public:
-    void FUN_004cfe90();
+    void Disable3D();
 };
 
 class Class_004cfe80 {
 public:
-    void FUN_004cfe80();
+    void Enable3D();
 };
 
 void FUN_00430f00();
@@ -22,11 +22,11 @@ void FUN_00430f00();
 // FUNCTION: 0x416820
 void __stdcall FUN_00416820(int unused)
 {
-    if ((*(Class_004cfea0**)((char*)g_game + 0x10))->FUN_004cfea0()) {
-        (*(Class_004cfe90**)((char*)g_game + 0x10))->FUN_004cfe90();
+    if ((*(Class_004cfea0**)((char*)g_game + 0x10))->Is3DEnabled()) {
+        (*(Class_004cfe90**)((char*)g_game + 0x10))->Disable3D();
         FUN_00430f00();
     } else {
-        (*(Class_004cfe80**)((char*)g_game + 0x10))->FUN_004cfe80();
+        (*(Class_004cfe80**)((char*)g_game + 0x10))->Enable3D();
         FUN_00430f00();
     }
 }

@@ -31,7 +31,7 @@ struct Game {
 
 extern Game* g_game;
 
-void __stdcall FUN_0047f1a0(char* str, int flag);
+void __stdcall PlaySoundByName(char* str, int flag);
 int __stdcall IsGadgetNamed(int param1, int param2, char* name);
 void __stdcall FUN_004ab0a0(Gadget_00426190* gadget);
 
@@ -41,7 +41,7 @@ void __stdcall FUN_00426190(Gadget_00426190* gadget)
     int owner = gadget->owner->field_4;
     if (gadget->field_60 == -1)
         return;
-    FUN_0047f1a0("SmallButton", 0);
+    PlaySoundByName("SmallButton", 0);
     if (IsGadgetNamed(owner, gadget->field_60, "CHOICE1")) {
         g_game->field_10->CloseCdPlayerWindow();
     } else if (!IsGadgetNamed(owner, gadget->field_60, "CHOICE2")) {
