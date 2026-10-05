@@ -50,7 +50,7 @@ struct Point { short x, y; };
 struct UnitType { char pad0[0x14a]; Point origin; char pad14e[0x1ce-0x14e]; float value; };
 struct Net { char pad0[0xd30]; int threshold; };
 struct Game { char pad0[0x14223]; int width, height; char pad1422b[0x391e9-0x1422b]; Net* net; };
-class Class_0040a7b0 {
+class PlayerAI {
 public:
     char pad0[0x35]; Vec3 pos; char pad41[12]; char cells[16]; char pad5d[0x109-0x5d]; int range;
     bool FindCellNearFeatures(UnitType*, Vec3*, void*, int, Point*);
@@ -58,7 +58,7 @@ public:
 };
 #pragma pack(pop)
 extern Game* g_game;
-extern Class_0040a7b0* g_playerAI[];
+extern PlayerAI* g_playerAI[];
 int __stdcall RandomInt(int);
 static inline void CellToWorld(Vec3* out, Point p, Point origin) {
     out->x=(origin.x+p.x*2)<<19;
@@ -67,7 +67,7 @@ static inline void CellToWorld(Vec3* out, Point p, Point origin) {
 // FUNCTION: 0x40bfe0
 int __stdcall FindBuildPosition(int player, const Vec3* from, UnitType* type, Vec3* out)
 {
-    Class_0040a7b0* ai=g_playerAI[player];
+    PlayerAI* ai=g_playerAI[player];
     int maximum=g_game->width > g_game->height ? g_game->width : g_game->height;
     if (ai->range<maximum) ai->range+=160;
     Vec3 pos=MoveTowards(from,&ai->pos,ai->range<<16);

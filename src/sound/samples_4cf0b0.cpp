@@ -7,7 +7,7 @@ public:
     void ReleaseSampleSet(IDirectSoundBuffer** set);
 };
 
-class Class_004cfb40 {
+class Sound {
 public:
     void UpdateStream();
 };
@@ -48,5 +48,5 @@ void Class_004cf0b0::ReapFinishedBuffers()
         }
     }
     if (field_1e4 != 0)
-        ((Class_004cfb40*)this)->UpdateStream();
+        ((Sound*)this)->UpdateStream();
 }

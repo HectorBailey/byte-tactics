@@ -7,7 +7,7 @@ public:
     void PlaySampleSet(int a, int b, int c);
 };
 
-class Class_004cf540 {
+class Sound {
 public:
     void PlayLooping(int a, int b);
 };
@@ -15,7 +15,7 @@ public:
 extern int g_playBufferLooping;
 
 // FUNCTION: 0x4cf540
-void Class_004cf540::PlayLooping(int a, int b)
+void Sound::PlayLooping(int a, int b)
 {
     g_playBufferLooping = 1;
     ((Class_004cf570*)this)->PlaySampleSet(a, b, 0);

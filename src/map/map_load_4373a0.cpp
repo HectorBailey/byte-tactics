@@ -67,14 +67,14 @@ public:
     }
 };
 
-class Class_00437820 {
+class MapCacheEntry {
 public:
     Class_004c91a0 handle;             // +0x0
     int field_4;                       // +0x4
 
-    Class_00437820(const Class_004c91a0& other) : handle(other) {}
+    MapCacheEntry(const Class_004c91a0& other) : handle(other) {}
 
-    Class_00437820& SetChecksum(Class_004373a0* self)
+    MapCacheEntry& SetChecksum(Class_004373a0* self)
     {
         field_4 = self->field_c1c;
         return *this;
@@ -83,16 +83,16 @@ public:
 
 // The vector at 0x5122c0: MSVC 5 puts the empty allocator byte at +0, so
 // _First is DAT_005122c4 and _Last is DAT_005122c8.
-extern Class_00437820* DAT_005122c4;
-extern Class_00437820* DAT_005122c8;
+extern MapCacheEntry* DAT_005122c4;
+extern MapCacheEntry* DAT_005122c8;
 
-class Class_00437580 {
+class MapCache {
 public:
     char unknown_0[4];
-    void FUN_00437580(Class_00437820* pos, int count, const Class_00437820& val);
+    void FUN_00437580(MapCacheEntry* pos, int count, const MapCacheEntry& val);
 };
 
-extern Class_00437580 DAT_005122c0;
+extern MapCache DAT_005122c0;
 
 struct Header_004373a0 {
     int magic;                         // +0x00
@@ -122,7 +122,7 @@ int Class_004373a0::ComputeMapChecksum()
         return field_c20 ^ field_c1c;
     }
     char* name = GetName(1);
-    Class_00437820* it;
+    MapCacheEntry* it;
     for (it = DAT_005122c4; it != DAT_005122c8; it++) {
         if (_strcmpi(it->handle.data, name) == 0) {
             field_c1c = it->field_4;
@@ -154,6 +154,6 @@ int Class_004373a0::ComputeMapChecksum()
         FUN_004d85a0(data);
     }
     HAPI_CloseFile(file);
-    DAT_005122c0.FUN_00437580(DAT_005122c8, 1, Class_00437820(Class_004c91b0(name)).SetChecksum(this));
+    DAT_005122c0.FUN_00437580(DAT_005122c8, 1, MapCacheEntry(Class_004c91b0(name)).SetChecksum(this));
     return field_c20 ^ field_c1c;
 }

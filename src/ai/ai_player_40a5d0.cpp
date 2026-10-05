@@ -42,7 +42,7 @@ struct Game {
     Net* net;                          // +0x391e9
 };
 
-class Class_0040a7b0 {
+class PlayerAI {
 public:
     char unknown_0[0xf1];
     Point16 spacing0;                  // +0xf1
@@ -82,7 +82,7 @@ static inline Vec3 Direction(short angle, int scale)
 }
 
 // FUNCTION: 0x40a5d0
-bool Class_0040a7b0::FindRandomPlacementCell(UnitType* type, Vec3* pos, int range, Point16* out)
+bool PlayerAI::FindRandomPlacementCell(UnitType* type, Vec3* pos, int range, Point16* out)
 {
     int threshold = g_game->net->field_d30 * type->origin.y * type->origin.x * 2;
     Point16 spacing = type->field_1c0 < 0 ? spacing0 : spacing1;

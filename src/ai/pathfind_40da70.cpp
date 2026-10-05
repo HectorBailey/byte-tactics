@@ -193,7 +193,7 @@ public:
     }
 };
 
-class Class_0040d7b0 {
+class Pathfinder {
 public:
     unsigned int GetCellState(int x, int y);
 };
@@ -246,7 +246,7 @@ void Class_0040da70::ExpandNeighbour(NodeData_0040da70* from, Cell_0040da70* fro
     switch (cell->flags & 3) {
     case 0: {
         grid.dirty[i >> 8] |= 1 << ((i >> 3) & 0x1f);
-        unsigned int r = ((Class_0040d7b0*)this)->GetCellState(x, y);
+        unsigned int r = ((Pathfinder*)this)->GetCellState(x, y);
         if (r < 1 && !(cell->flags & 8)) {
             cell->flags |= 3;
             return;

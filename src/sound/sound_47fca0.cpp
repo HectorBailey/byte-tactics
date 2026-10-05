@@ -13,7 +13,7 @@ struct Entry_0047fca0 {                // 0x11 bytes
     char field_10;                     // +0x10
 };
 
-class Class_0047f960 {
+class SpeechQueue {
 public:
     char unknown_0[0x99];
     int count;                         // +0x99
@@ -48,10 +48,10 @@ void Class_0047fca0::PlayNextSpeechEntry()
         return;
     }
     if (g_game->field_38a47 >= field_a1 + field_9d) {
-        ((Class_0047f960*)this)->PlaySpeech(0, 1, 1);
+        ((SpeechQueue*)this)->PlaySpeech(0, 1, 1);
         field_9d = g_game->field_38a47;
     } else {
-        ((Class_0047f960*)this)->PlaySpeech(0, 0, 1);
+        ((SpeechQueue*)this)->PlaySpeech(0, 0, 1);
     }
     if (entries[0].data) {
         FUN_004d85a0(entries[0].data);

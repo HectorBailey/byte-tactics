@@ -6,7 +6,7 @@ struct Game {
     unsigned int ticks;                // +0x38a47
 };
 
-class Class_0040ad20 {
+class PlayerAI {
 public:
     char unknown_0[0xed];
     unsigned int lastTick;             // +0xed
@@ -29,7 +29,7 @@ public:
 };
 
 // FUNCTION: 0x40ad20
-void Class_0040ad20::UpdateEveryThirtyTicks()
+void PlayerAI::UpdateEveryThirtyTicks()
 {
     if (g_game->ticks >= lastTick + 0x1e) {
         ((Class_0040aa40*)this)->RefreshUnitLists();

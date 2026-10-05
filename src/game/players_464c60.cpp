@@ -16,7 +16,7 @@
 //   `amount + energy` path is then `fld amount; fadd [field]`, the other way
 //   round from a simple field destination.
 
-class Class_00401260;
+class PlayerRef;
 
 #pragma pack(push, 1)
 struct Player_00464c60 {
@@ -26,7 +26,7 @@ struct Player_00464c60 {
     char unknown_74[0x98 - 0x74];
     float energy;                      // +0x98
     char unknown_9c[0xec - 0x9c];
-    Class_00401260* econ;              // +0xec
+    PlayerRef* econ;                   // +0xec
     char unknown_f0[0x14b - 0xf0];
 };
 
@@ -38,7 +38,7 @@ struct Game {
 };
 #pragma pack(pop)
 
-class Class_00401260 {
+class PlayerRef {
 public:
     char unknown_0[0x18];
     float energy;                      // +0x18

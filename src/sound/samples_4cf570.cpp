@@ -54,7 +54,7 @@ struct IDirectSound3DBuffer : public IUnknown {
     virtual HRESULT __stdcall SetPosition(float x, float y, float z, DWORD apply) = 0;
 };
 
-class Class_004cf180 {
+class Sound {
 public:
     void StopOldestBuffer();
 };
@@ -94,7 +94,7 @@ int Class_004cf570::PlaySampleSet(IDirectSoundBuffer** set, LONG volume, Pos_004
         }
     }
     while (count >= field_2c)
-        ((Class_004cf180*)this)->StopOldestBuffer();
+        ((Sound*)this)->StopOldestBuffer();
     DWORD best = 0;
     if (set == 0)
         return 0;

@@ -156,7 +156,7 @@ int __stdcall GetWindowsUserName(void* buf);
 void __stdcall FUN_00434ab0(int mode);
 int __cdecl IsOnlineConfigLoaded();
 
-class Class_004cf210 {
+class Sound {
 public:
     void SetMaxBuffers(int value);
 };
@@ -304,9 +304,9 @@ void LoadSettings()
     }
     int ok14 = ReadRegistryDword("Total Annihilation", "MixingBuffers", &value);
     if (ok14 != 0) {
-        ((Class_004cf210*)g_game->sound)->SetMaxBuffers(value);
+        ((Sound*)g_game->sound)->SetMaxBuffers(value);
     } else {
-        ((Class_004cf210*)g_game->sound)->SetMaxBuffers(8);
+        ((Sound*)g_game->sound)->SetMaxBuffers(8);
     }
     int ok15 = ReadRegistryDword("Total Annihilation", "RestoreVolume", &value);
     if (ok15 != 0) {

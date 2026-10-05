@@ -134,7 +134,7 @@ public:
 };
 
 #pragma pack(push, 1)
-class Class_0040eb70 {
+class Pathfinder {
 public:
     Node_0040eb70* pool;               // +0x0
     Node_0040eb70** items;             // +0x4
@@ -189,7 +189,7 @@ static int IsPlaying(unsigned char i)
 }
 
 // FUNCTION: 0x40eb70
-void Class_0040eb70::RunSearches()
+void Pathfinder::RunSearches()
 {
     unsigned short players = g_game->field_2a3c;
     if (players == 0)

@@ -48,7 +48,7 @@ class Class_004c4630 {
   public:
     char* FindFieldValue(char* key);
 };
-class Class_00488e70 {
+class UnitType {
   public:
     void AddToCategories(char* category);
 };
@@ -501,7 +501,7 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
             else
                 unitdef->selfdestructcountdown = 5;
             ((TdfRecord*)parser.current)->GetFieldString(buf, "category", 100, DAT_005119b8);
-            ((Class_00488e70*)unitdef)->AddToCategories(buf);
+            ((UnitType*)unitdef)->AddToCategories(buf);
             int found = ((TdfRecord*)parser.current)
                     ->GetFieldString(buf, "soundcategory", 100, DAT_005119b8);
             if (found) {

@@ -7,12 +7,12 @@
 #ifndef LINK_GLOBALS_H
 #define LINK_GLOBALS_H
 
-class Class_00437820;
-class Class_004db000;
-class Class_004e17c0;
+class FreeBlockMap;
+class MapCacheEntry;
+class NameTable;
 class TranslationTable;
 struct Chunk;
-struct Class_0051fba4;
+struct Dialog;
 struct Entry_00443100;
 struct Game;
 struct List_0047f8c0;
@@ -289,9 +289,9 @@ extern int DAT_00512290;                                                        
 extern int DAT_00512294;                                                                      // 0x512294, 4 bytes; 1 of 1 files
 extern int DAT_0051229c;                                                                      // 0x51229c, 4 bytes; 1 of 1 files
 extern unsigned char DAT_005122a0[4];                                                         // 0x5122a0, 4 bytes; nothing refers to it
-extern unsigned char DAT_005122c0[4];                                                         // 0x5122c0, 4 bytes, DAT_005122c0$S4554; Class_00437580 by value in 1 of 1 files
-extern Class_00437820* DAT_005122c4;                                                          // 0x5122c4, 4 bytes; 1 of 1 files
-extern Class_00437820* DAT_005122c8;                                                          // 0x5122c8, 4 bytes; 1 of 1 files
+extern unsigned char DAT_005122c0[4];                                                         // 0x5122c0, 4 bytes, DAT_005122c0$S4554; MapCache by value in 1 of 1 files
+extern MapCacheEntry* DAT_005122c4;                                                           // 0x5122c4, 4 bytes; 1 of 1 files
+extern MapCacheEntry* DAT_005122c8;                                                           // 0x5122c8, 4 bytes; 1 of 1 files
 extern unsigned char DAT_005122cc[4];                                                         // 0x5122cc, 4 bytes; nothing refers to it
 extern int DAT_005122d8;                                                                      // 0x5122d8, 4 bytes; 2 of 2 files
 extern int DAT_005122dc;                                                                      // 0x5122dc, 4 bytes; 2 of 2 files
@@ -567,7 +567,7 @@ extern int DAT_0051fb90;                                                        
 extern unsigned long DAT_0051fb94;                                                            // 0x51fb94, 4 bytes; 1 of 1 files
 extern unsigned char DAT_0051fb98[4];                                                         // 0x51fb98, 4 bytes; nothing refers to it
 extern int* g_diskWav;                                                                        // 0x51fba0, 4 bytes; 2 of 2 files
-extern Class_0051fba4* g_guiContext;                                                          // 0x51fba4, 4 bytes; 15 of 31 files (conflicting: shape)
+extern Dialog* g_guiContext;                                                                  // 0x51fba4, 4 bytes; 15 of 31 files (conflicting: shape)
 extern int DAT_0051fba8;                                                                      // 0x51fba8, 4 bytes; 1 of 1 files
 extern int DAT_0051fbac;                                                                      // 0x51fbac, 4 bytes; 1 of 1 files
 extern int DAT_0051fbb0;                                                                      // 0x51fbb0, 4 bytes; 1 of 1 files
@@ -633,13 +633,13 @@ extern unsigned char DAT_00528a0c[4];                                           
 extern unsigned char DAT_00528a14[8];                                                         // 0x528a14, 8 bytes; nothing refers to it
 extern unsigned int DAT_00528a1c;                                                             // 0x528a1c, 4 bytes; 2 of 3 files (conflicting: signedness or const)
 extern unsigned char DAT_00528a20[8];                                                         // 0x528a20, 8 bytes; nothing refers to it
-extern Class_004db000* DAT_00528a40;                                                          // 0x528a40, 4 bytes; 1 of 1 files
+extern FreeBlockMap* DAT_00528a40;                                                            // 0x528a40, 4 bytes; 1 of 1 files
 extern void* DAT_00528a44;                                                                    // 0x528a44, 4 bytes; 1 of 1 files
 extern unsigned char DAT_00528a48[4];                                                         // 0x528a48, 4 bytes; Container_004da9f0<int, std::allocator<int> >* by value in 1 of 1 files
 extern int DAT_00528a4c;                                                                      // 0x528a4c, 4 bytes; 1 of 1 files
 extern Node_004dde70* DAT_00528a50;                                                           // 0x528a50, 4 bytes; 1 of 11 files (conflicting: struct names only)
 extern unsigned char DAT_00528a5c[4];                                                         // 0x528a5c, 4 bytes; nothing refers to it
-extern unsigned char DAT_00528a78[44];                                                        // 0x528a78, 44 bytes; Class_004e1650 by value in 1 of 1 files
+extern unsigned char DAT_00528a78[44];                                                        // 0x528a78, 44 bytes; MappedFile by value in 1 of 1 files
 extern void* DAT_00528aa4;                                                                    // 0x528aa4, 4 bytes; 1 of 1 files
 extern char DAT_00528aa8;                                                                     // 0x528aa8, 1 bytes; 1 of 1 files
 extern char DAT_00528aac;                                                                     // 0x528aac, 1 bytes; 1 of 1 files
@@ -683,7 +683,7 @@ extern unsigned char DAT_00529e6c;                                              
 extern unsigned char DAT_00529e70;                                                            // 0x529e70, 1 bytes; 1 of 1 files
 extern char DAT_00529e74;                                                                     // 0x529e74, 1 bytes; 1 of 1 files
 extern char DAT_00529e78;                                                                     // 0x529e78, 1 bytes; 1 of 1 files
-extern Class_004e17c0* DAT_00529e7c;                                                          // 0x529e7c, 4 bytes; 1 of 1 files
+extern NameTable* DAT_00529e7c;                                                               // 0x529e7c, 4 bytes; 1 of 1 files
 extern char* DAT_00529e80;                                                                    // 0x529e80, 4 bytes; 1 of 1 files
 extern unsigned char DAT_00529e84[4];                                                         // 0x529e84, 4 bytes; nothing refers to it
 extern char DAT_00529e88[13];                                                                 // 0x529e88, 13 bytes; 1 of 1 files
@@ -700,7 +700,7 @@ extern long DAT_0052a4fc;                                                       
 
 // Not declared: 241 globals defined in a data file or whose type is not settled (see data/globals.csv).
 //   0x513000 g_packetManager: defined in src/network/packets_460e20.cpp
-//   0x5119c0 g_playerAI: PlayerAI*[] (7), void*[] (5), Owner*[] (3), Class_00409470*[] (2), and 5 more
+//   0x5119c0 g_playerAI: PlayerAI*[] (9), void*[] (5), Owner*[] (3), Class_00409470*[] (2), and 3 more
 //   0x51fbd0 g_display: void* (4), int (2), Display_004b4f50* (1), Display_004b5370* (1), and 14 more
 //   0x51e598 IUUnitSyncEntry::IU?$pair::?$_Tree::_Nil: defined in src/network/unit_sync_46c920.cpp
 //   0x528a54 std::IH::IU?$pair::?$_Tree::_Nil: defined in src/debug/debug_lib_4db610.cpp

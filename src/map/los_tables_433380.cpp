@@ -42,13 +42,13 @@ struct Elem_00434360 {
     std::vector<Elem_00434020> v;      // +0x0
 };
 
-class Class_004336f0 {
+class LosLine {
 public:
     void LoadLosLine(Class_004c3410* file, short line, int col);
 };
 
 // One table: a vector of lines (see 0x4335f0.cpp).
-class Class_004335f0 : public std::vector<Elem_00434360> {
+class LosTable : public std::vector<Elem_00434360> {
 public:
     // Inline copy of GetLosLine.
     Elem_00434360* GetLine(short i) { return &(*this)[i]; }
@@ -74,12 +74,12 @@ public:
     void ResetCurrentRecord();
 };
 
-class Class_00433380 {
+class LosTables {
 public:
-    std::vector<Class_004335f0> tables; // +0x0
+    std::vector<LosTable> tables; // +0x0
 
     // Inline copy of GetLosTable: table number n, counted from 1.
-    Class_004335f0* GetTable(short n)
+    LosTable* GetTable(short n)
     {
         n--;
         return &tables[n];
@@ -88,22 +88,22 @@ public:
 };
 
 // FUNCTION: 0x433380
-void Class_00433380::LoadLosTable(Class_004c3410* file, short table)
+void LosTables::LoadLosTable(Class_004c3410* file, short table)
 {
     char name[32];
     sprintf(name, "TABLE%d", table + 1);
     ((Class_004c3e10*)file)->ResetCurrentRecord();
     if (file->SelectRecord(name)) {
-        Class_004335f0* t = GetTable(table + 1);
+        LosTable* t = GetTable(table + 1);
         short numlines = (short)file->current->GetFieldInt("numlines", 0);
         t->SetNumLines(numlines);
         short n2 = numlines * 2;
         short n3 = numlines * 3;
         for (short i = 0; i < numlines; i++) {
-            ((Class_004336f0*)t->GetLine(i))->LoadLosLine(file, i, 0);
-            ((Class_004336f0*)t->GetLine(numlines + i))->LoadLosLine(file, i, 1);
-            ((Class_004336f0*)t->GetLine(n2 + i))->LoadLosLine(file, i, 2);
-            ((Class_004336f0*)t->GetLine(n3 + i))->LoadLosLine(file, i, 3);
+            ((LosLine*)t->GetLine(i))->LoadLosLine(file, i, 0);
+            ((LosLine*)t->GetLine(numlines + i))->LoadLosLine(file, i, 1);
+            ((LosLine*)t->GetLine(n2 + i))->LoadLosLine(file, i, 2);
+            ((LosLine*)t->GetLine(n3 + i))->LoadLosLine(file, i, 3);
         }
     }
 }

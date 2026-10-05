@@ -32,7 +32,7 @@ public:
     int Is3DEnabled();
 };
 
-class Class_004cfeb0 {
+class Sound {
 public:
     void Set3DDistances(float a, float b);
 };
@@ -385,7 +385,7 @@ int __stdcall PlaySoundAt(int index, Pos_0047f300* pos, int param_3)
             p.z = g_game->scrollY + (g_game->screenTilesY / 2) * 16
                 + (pos->y >> 1) - pos->z;
             p.y = 0;
-            ((Class_004cfeb0*)g_game->sound)->Set3DDistances(
+            ((Sound*)g_game->sound)->Set3DDistances(
                 (float)(((g_game->screenTilesX + g_game->screenTilesY) / 2) * 16),
                 (float)((g_game->width + g_game->height) * 16));
             return g_game->sound->PlaySampleSet(sound, -585, &p);

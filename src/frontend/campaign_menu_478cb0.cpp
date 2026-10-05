@@ -3,7 +3,7 @@
 // ("Start", "SHUTUP", "PrevMenu", "TextRegion", "MOREBAR") and drives the
 // campaign menu from there.
 
-class Class_004cfb40 {
+class Sound {
 public:
     void StopStream();
 };
@@ -21,7 +21,7 @@ struct Menu_00478cb0 {
 #pragma pack(push, 1)
 struct Game {
     char unknown_0[0x10];
-    Class_004cfb40* input;             // +0x10
+    Sound* input;                      // +0x10
     char unknown_14[0x519 - 0x14];
     char menu[0x2bc0 - 0x519];         // +0x519
     unsigned char field_2bc0;          // +0x2bc0

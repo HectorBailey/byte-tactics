@@ -15,7 +15,7 @@ public:
     int GetIntegerItem(char* name, int def);
 };
 
-class Class_0048fe60 {
+class MissionConditions {
 public:
     void LoadConditions(HapiBank* file);
 };
@@ -29,7 +29,7 @@ struct Game {
     char unknown_37ec0[0x37eec - 0x37ec0];
     short maxUnits;                  // +0x37eec
     char unknown_37eee[0x391ed - 0x37eee];
-    Class_0048fe60* unknown_391ed;   // +0x391ed
+    MissionConditions* unknown_391ed;  // +0x391ed
 };
 #pragma pack(pop)
 

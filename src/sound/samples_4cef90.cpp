@@ -2,7 +2,7 @@
 #include <windows.h>
 #include <dsound.h>
 
-class Class_004ceee0 {
+class Sound {
 public:
     void ReleaseDirectSound();
 };
@@ -62,6 +62,6 @@ int Class_004cef90::InitDirectSound(int rate, int bits, int channels, HWND handl
 error:
     if (hr == (HRESULT)0x88780078)
         field_290 = 1;
-    ((Class_004ceee0*)this)->ReleaseDirectSound();
+    ((Sound*)this)->ReleaseDirectSound();
     return 0;
 }

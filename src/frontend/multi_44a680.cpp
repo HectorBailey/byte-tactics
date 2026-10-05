@@ -105,11 +105,11 @@ struct Game {
 };
 #pragma pack(pop)
 
-struct Class_004358f0 { int FUN_004358f0(); };
+struct Net { int FUN_004358f0(); };
 struct Class_004373a0 { int ComputeMapChecksum(); };
 struct Class_00435a20 { void LoadMissionByName(PlayerInfo_0044a680* info); };
 struct Class_00435c30 { char* FUN_00435c30(); };
-struct Class_0046e000 { int AllPlayersSynced(); };
+struct UnitSync { int AllPlayersSynced(); };
 struct Class_00463c60 { void SetType(int param); };
 class Class_0046d860 { public: void ProcessSync(); };
 
@@ -155,7 +155,7 @@ int __stdcall FUN_00456760();
 // The map check at 0x440cd0, which has no callers: /Ob2 inlined it.
 int CheckMapCrc()
 {
-    if (!((Class_004358f0*)g_game->map)->FUN_004358f0()) {
+    if (!((Net*)g_game->map)->FUN_004358f0()) {
         return 0;
     }
     unsigned char me = FindHostSlot();
@@ -322,7 +322,7 @@ void UpdateBattleRoom()
         g_game->dirty = 0;
         if (IsScreenNamed(&g_game->gui, "LOUNGE2.GUI") != 0) {
             if (pl->info->flags & 1) {
-                int synched = ((Class_0046e000*)g_game->net)->AllPlayersSynced();
+                int synched = ((UnitSync*)g_game->net)->AllPlayersSynced();
                 int ready = FUN_00456760();
                 Gadget_0044a680* start;
 
