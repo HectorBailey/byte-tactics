@@ -8,7 +8,7 @@
 #define LINK_GLOBALS_H
 
 class Class_00437820;
-class Class_004db000;
+class FreeBlockMap;
 class NameTable;
 class TranslationTable;
 struct Chunk;
@@ -633,7 +633,7 @@ extern unsigned char DAT_00528a0c[4];                                           
 extern unsigned char DAT_00528a14[8];                                                         // 0x528a14, 8 bytes; nothing refers to it
 extern unsigned int DAT_00528a1c;                                                             // 0x528a1c, 4 bytes; 2 of 3 files (conflicting: signedness or const)
 extern unsigned char DAT_00528a20[8];                                                         // 0x528a20, 8 bytes; nothing refers to it
-extern Class_004db000* DAT_00528a40;                                                          // 0x528a40, 4 bytes; 1 of 1 files
+extern FreeBlockMap* DAT_00528a40;                                                            // 0x528a40, 4 bytes; 1 of 1 files
 extern void* DAT_00528a44;                                                                    // 0x528a44, 4 bytes; 1 of 1 files
 extern unsigned char DAT_00528a48[4];                                                         // 0x528a48, 4 bytes; Container_004da9f0<int, std::allocator<int> >* by value in 1 of 1 files
 extern int DAT_00528a4c;                                                                      // 0x528a4c, 4 bytes; 1 of 1 files

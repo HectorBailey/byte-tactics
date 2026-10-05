@@ -779,7 +779,7 @@ class StackTrace;
 class Class_004d9ca0;
 class Class_004d9fe0;
 class Class_004da040;
-class Class_004db000;
+class FreeBlockMap;
 class Class_004db450;
 class Class_004dbd00;
 class Class_004dbd20;
@@ -831,7 +831,7 @@ class Class_004e1650_2;
 class NameTable;
 class Class_004e18c0;
 class Class_004e1990;
-class Class_004e1a30;
+class NameKey;
 class Class_004e1d20;
 class Class_004e1d60;
 class Class_004e1e30;
@@ -18942,7 +18942,7 @@ public:
     LiveNode*& _Root(void);
     static int& _Color(LiveNode*);
     static void* operator new(unsigned int);
-    static Class_004e1a30& _Key(LiveNode*);
+    static NameKey& _Key(LiveNode*);
     LiveNode*& _Lmost(void);
     static LiveNode*& _Left(LiveNode*);
     LiveNode*& _Rmost(void);
@@ -18952,7 +18952,7 @@ public:
     Class_004e0450 begin(void);
     static LiveNode*& _Right(LiveNode*);
     Class_004e0450 end(void);
-    static std::pair<Class_004e1a30, Value_004e2250>& _Value(LiveNode*);
+    static std::pair<NameKey, Value_004e2250>& _Value(LiveNode*);
     Class_004e0450 erase(Class_004e0450, Class_004e0450);
     static LiveNode* _Max(LiveNode*);
 };
@@ -19022,7 +19022,7 @@ struct Less_004db000 {  // 0x1 bytes, 1 view
     unsigned char operator()(unsigned int&, unsigned int&);
 };
 
-class Class_004db000 {  // 0x14 bytes, 5 views
+class FreeBlockMap {    // 0x14 bytes, 5 views
 public:
     Less_004db000 key_compare;  // +0x0
     char unknown_1[3];
@@ -19031,8 +19031,8 @@ public:
     char unknown_9[3];
     unsigned int count;  // +0xc
     unsigned int total;  // +0x10
-    Class_004db000(Class_004db000&);
-    Class_004db000(void);
+    FreeBlockMap(FreeBlockMap&);
+    FreeBlockMap(void);
     Class_004dd2a0 Begin(void);
     Class_004dd2a0 begin(void);
     Class_004dd2a0 End(void);
@@ -19787,17 +19787,17 @@ public:
     int* FUN_004e2240(int*);
 };
 
-class Class_004e1a30 {  // 0x4 bytes, 4 views
+class NameKey {         // 0x4 bytes, 4 views
 public:
     char* name;  // +0x0
-    int FUN_004e1a30(Class_004e1a30&);
+    int FUN_004e1a30(NameKey&);
 };
 
 class Class_004e2250 {  // 0x10 bytes, 2 views
 public:
     char unknown_0[16];
     Class_004e0450 begin(void);
-    Class_004e2a10 FUN_004e2250(std::pair<Class_004e1a30, Value_004e2250>&);
+    Class_004e2a10 FUN_004e2250(std::pair<NameKey, Value_004e2250>&);
 };
 
 class Class_004e2a10 {  // 0x8 bytes, 3 views
@@ -19812,7 +19812,7 @@ public:
 
 struct Less_004e1990 {  // 0x1 bytes, 1 view
     char unknown_0[1];
-    unsigned char operator()(Class_004e1a30&, Class_004e1a30&);
+    unsigned char operator()(NameKey&, NameKey&);
 };
 
 class Class_004e1990 {  // 0x14 bytes, 2 views
@@ -19826,8 +19826,8 @@ public:
     unsigned char changed;  // +0x10
     char unknown_11[3];
     Class_004e0450 End(void);
-    void FUN_004e1990(Class_004e1a30&);
-    Class_004e0450 Find(Class_004e1a30&);
+    void FUN_004e1990(NameKey&);
+    Class_004e0450 Find(NameKey&);
 };
 
 class Class_004e2e20 {  // 0x8 bytes, 2 views
@@ -19968,17 +19968,17 @@ public:
 class Class_004e2a30 : public Class_004e2950 {  // 0x10 bytes, 2 views
 public:
     LiveNode* FUN_004e2a30(int, int);
-    void _Consval(std::pair<Class_004e1a30, Value_004e2250>*, std::pair<Class_004e1a30, Value_004e2250>&);
+    void _Consval(std::pair<NameKey, Value_004e2250>*, std::pair<NameKey, Value_004e2250>&);
 };
 
 struct Kfn_004e2250 {  // 0x1 bytes, 1 view
     char unknown_0[1];
-    Class_004e1a30& operator()(std::pair<Class_004e1a30, Value_004e2250>&);
+    NameKey& operator()(std::pair<NameKey, Value_004e2250>&);
 };
 
 struct Less_004e2250 {  // 0x1 bytes, 1 view
     char unknown_0[1];
-    unsigned char operator()(Class_004e1a30&, Class_004e1a30&);
+    unsigned char operator()(NameKey&, NameKey&);
 };
 
 struct Value_004e2250 {  // 0x1f4 bytes, 1 view
@@ -20001,7 +20001,7 @@ public:
 
 struct Less_004e2620 {  // 0x1 bytes, 1 view
     char unknown_0[1];
-    unsigned char operator()(Class_004e1a30&, Class_004e1a30&);
+    unsigned char operator()(NameKey&, NameKey&);
 };
 
 class Class_004e2620 {  // 0x10 bytes, 2 views

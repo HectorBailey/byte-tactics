@@ -153,7 +153,7 @@ struct Class_004c6a60;
 class Class_004c6ae0;
 struct Class_004ca9d0;
 class Class_004d8820;
-class Class_004db000;
+class FreeBlockMap;
 class Class_004df1e0;
 class Class_004e0570;
 class NameTable;
@@ -3104,7 +3104,7 @@ void __cdecl FindBlocksAroundAddress(unsigned int, Class_004d8820*, Class_004d88
 void __cdecl DescribeAddress(unsigned int, char*, int);
 char __cdecl FUN_004dabb0(unsigned int, char*, unsigned int);
 unsigned int __cdecl AllocDebugBlock(unsigned int, unsigned int);
-Class_004db000* GetFreeBlockSet(void);
+FreeBlockMap* GetFreeBlockSet(void);
 char IsBackAlign(void);
 void FUN_004db7b0(void);
 int FUN_004db7c0(void);

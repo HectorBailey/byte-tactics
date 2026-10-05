@@ -15,18 +15,18 @@ public:
     TraceRecord(void);
 };
 
-class Class_004d8bd0 : public BlockInfo {
+class BlockHistory : public BlockInfo {
 public:
     char unknown_c[0x24];
     TraceRecord member_30;
     TraceRecord member_bc;
     char unknown_148[0x1];
 
-    Class_004d8bd0(void);
+    BlockHistory(void);
 };
 
 // FUNCTION: 0x4d8bd0
-Class_004d8bd0::Class_004d8bd0(void) :
+BlockHistory::BlockHistory(void) :
     BlockInfo(),
     member_30(),
     member_bc()

@@ -60,12 +60,12 @@ public:
 
 NameTable* GetNameTable();
 
-class Class_004e1ac0 {
+class CriticalSection {
 public:
     CRITICAL_SECTION cs;
 };
 
-Class_004e1ac0* FUN_004e1ac0();
+CriticalSection* FUN_004e1ac0();
 
 class Class_004e18c0 {
 public:
@@ -268,7 +268,7 @@ BOOL Class_004df590::HandlePerformanceMessage(UINT msg, WPARAM wParam, LPARAM lP
             top = rect.top;
             SaveWindowPosition(hwnd, DAT_0050d660);
         }
-        Class_004e1ac0* cs = FUN_004e1ac0();
+        CriticalSection* cs = FUN_004e1ac0();
         EnterCriticalSection(&cs->cs);
         NameTable* info = GetNameTable();
         if (info->names.changed) {

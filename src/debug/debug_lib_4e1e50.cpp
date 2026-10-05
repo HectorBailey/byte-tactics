@@ -25,12 +25,12 @@ extern char DAT_00529e20[];             // the indent of the current report
 extern char DAT_005119b8[];             // ""
 
 // A report for the log: its name and its text.
-class Class_004e1a30 {
+class NameKey {
 public:
     const char* name;                   // +0x0
     char text[500];                     // +0x4
 
-    Class_004e1a30(const char* name_)
+    NameKey(const char* name_)
     {
         name = name_;
         if (!name_)
@@ -44,7 +44,7 @@ NameTable* GetNameTable();
 
 class Class_004e1990 {
 public:
-    void FUN_004e1990(const Class_004e1a30& key);
+    void FUN_004e1990(const NameKey& key);
 };
 
 // A named timer that also reads the two performance counters.
@@ -108,7 +108,7 @@ void Timer::ReportElapsedTime(const char* label)
     if (DAT_00529ddc && (flags & 2))
         OutputDebugStringA(text);
     if (DAT_00529e64) {
-        Class_004e1a30 report(label);
+        NameKey report(label);
         strcpy(report.text, text);
         ((Class_004e1990*)GetNameTable())->FUN_004e1990(report);
     }

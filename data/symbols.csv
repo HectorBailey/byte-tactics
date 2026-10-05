@@ -3085,7 +3085,7 @@ address,name
 0x4d8ae0,RunningStats::RunningStats
 0x4d8b30,RunningStats::FUN_004d8b30
 0x4d8b60,RunningStats::FUN_004d8b60
-0x4d8bd0,Class_004d8bd0::Class_004d8bd0
+0x4d8bd0,BlockHistory::BlockHistory
 0x4d8c00,Class_004d8c00::Class_004d8c00
 0x4d8c50,BlockHistory::FormatBlockHistory
 0x4d8d40,BlockHistory::FUN_004d8d40
@@ -3126,8 +3126,8 @@ address,name
 0x4dab10,DescribeAddress
 0x4dabb0,FUN_004dabb0
 0x4dacf0,AllocDebugBlock
-0x4db000,Class_004db000::AddFreeBlock
-0x4db1c0,Class_004db000::TakeFreeBlock
+0x4db000,FreeBlockMap::AddFreeBlock
+0x4db1c0,FreeBlockMap::TakeFreeBlock
 0x4db450,Class_004db450::GrowReservation
 0x4db610,GetFreeBlockSet
 0x4db760,IsBackAlign
@@ -3171,7 +3171,7 @@ address,name
 0x4dddf0,Class_004dddf0::FUN_004dddf0
 0x4dde70,Class_004dde70::FUN_004dde70
 0x4ddf00,LoadedImage::LoadedImage
-0x4ddfa0,Class_004ddfa0::GetFpoRecords
+0x4ddfa0,LoadedImage::GetFpoRecords
 0x4ddfe0,Class_004ddfe0::GetFpoRecordCount
 0x4de020,Class_004de020::FindFpoRecord
 0x4de0a0,FUN_004de0a0
@@ -3229,7 +3229,7 @@ address,name
 0x4e17c0,NameTable::NameTable
 0x4e18c0,Class_004e18c0::FUN_004e18c0
 0x4e1990,Class_004e1990::FUN_004e1990
-0x4e1a30,Class_004e1a30::FUN_004e1a30
+0x4e1a30,NameKey::FUN_004e1a30
 0x4e1a80,FUN_004e1a80
 0x4e1a90,GetNameTable
 0x4e1ac0,FUN_004e1ac0

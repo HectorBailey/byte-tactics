@@ -730,7 +730,7 @@ unsigned char DAT_00528a0c[4];  // 0x528a0c .bss
 unsigned char DAT_00528a14[8];  // 0x528a14 .bss
 unsigned int DAT_00528a1c;  // 0x528a1c .bss
 unsigned char DAT_00528a20[8];  // 0x528a20 .bss
-Class_004db000* DAT_00528a40;  // 0x528a40 .bss
+FreeBlockMap* DAT_00528a40;  // 0x528a40 .bss
 void* DAT_00528a44;  // 0x528a44 .bss
 unsigned char DAT_00528a48[4];  // 0x528a48 .bss
 int DAT_00528a4c;  // 0x528a4c .bss
