@@ -763,19 +763,19 @@ class Class_004d06c0;
 class Class_004d0720;
 class Class_004d07f0;
 class Class_004d0910;
-class Class_004d87f0;
+class BlockInfo;
 class Class_004d87f0_2;
 class Class_004d8820;
 class Class_004d8850;
-class Class_004d8870;
+class TraceRecord;
 class Class_004d88d0;
-class Class_004d89b0;
+class CallSite;
 struct Class_004d8b30;
 class Class_004d8b60;
 class Class_004d8bd0;
 class Class_004d8c00;
-class Class_004d8d40;
-class Class_004d9c60;
+class BlockHistory;
+class StackTrace;
 class Class_004d9ca0;
 class Class_004d9fe0;
 class Class_004da040;
@@ -828,7 +828,7 @@ class Class_004e0b90;
 class MappedFile;
 class Class_004e1590;
 class Class_004e1650_2;
-class Class_004e17c0;
+class NameTable;
 class Class_004e18c0;
 class Class_004e1990;
 class Class_004e1a30;
@@ -18786,12 +18786,12 @@ public:
     Class_004d8820(void);
 };
 
-class Class_004d87f0 {  // 0xc bytes, 2 views
+class BlockInfo {       // 0xc bytes, 2 views
 public:
     int field_0;  // +0x0
     int field_4;  // +0x4
     int field_8;  // +0x8
-    Class_004d87f0(void);
+    BlockInfo(void);
 };
 
 class Class_004d8850 {  // 0x2c bytes, 3 views
@@ -18806,7 +18806,7 @@ struct Stack_004d89b0 {  // 0x3c bytes, 1 view
     int count;  // +0x38
 };
 
-class Class_004d89b0 {  // 0x80 bytes, 2 views
+class CallSite {        // 0x80 bytes, 2 views
 public:
     char name[64];  // +0x0
     int line;  // +0x40
@@ -18839,17 +18839,17 @@ public:
     void FUN_004d8b60(unsigned int);
 };
 
-class Class_004d8870 {  // 0x8c bytes, 2 views
+class TraceRecord {     // 0x8c bytes, 2 views
 public:
     char data[140];  // +0x0
-    Class_004d8870(void);
+    TraceRecord(void);
 };
 
-class Class_004d8bd0 : public Class_004d87f0 {  // 0x14c bytes, 1 view
+class Class_004d8bd0 : public BlockInfo {       // 0x14c bytes, 1 view
 public:
     char unknown_c[36];
-    Class_004d8870 member_30;  // +0x30
-    Class_004d8870 member_bc;  // +0xbc
+    TraceRecord member_30;     // +0x30
+    TraceRecord member_bc;     // +0xbc
     char unknown_148[4];
     Class_004d8bd0(void);
 };
@@ -18864,12 +18864,12 @@ class Class_004d8c00 {  // 0x149 bytes, 1 view
 public:
     char unknown_0[48];
     Class_004d88d0 field_30;  // +0x30
-    Class_004d8870 field_bc;  // +0xbc
+    TraceRecord field_bc;     // +0xbc
     char field_148;  // +0x148
     Class_004d8c00(Class_004d87f0_2&, char*, int, int);
 };
 
-class Class_004d8d40 {  // 0x148 bytes, 2 views
+class BlockHistory {    // 0x148 bytes, 2 views
 public:
     Class_004d8820 block;  // +0x0
     char unknown_30[280];
@@ -18887,7 +18887,7 @@ struct TlsBlock {  // 0xc bytes, 1 view
     void* limit;  // +0x8
 };
 
-class Class_004d9c60 {  // 0xc4d0 bytes, 2 views
+class StackTrace {      // 0xc4d0 bytes, 2 views
 public:
     char unknown_0[120];
     int field_78;  // +0x78
@@ -19591,11 +19591,11 @@ struct Map_004df590 {  // 0x14 bytes, 1 view
     char unknown_11[3];
 };
 
-class Class_004e17c0 {  // 0x14 bytes, 4 views
+class NameTable {       // 0x14 bytes, 4 views
 public:
     Map_004df590 names;  // +0x0
-    Class_004e17c0(Class_004e17c0&);
-    Class_004e17c0(void);
+    NameTable(NameTable&);
+    NameTable(void);
 };
 
 class Class_004df1e0 {  // 0x230 bytes, 2 views
@@ -19610,7 +19610,7 @@ public:
     char flag_20;  // +0x20
     char unknown_21[3];
     Id_004df1e0 ident;  // +0x24
-    Class_004e17c0 map;  // +0x21c
+    NameTable map;       // +0x21c
     Class_004df1e0(void);
     ~Class_004df1e0(void);
 };

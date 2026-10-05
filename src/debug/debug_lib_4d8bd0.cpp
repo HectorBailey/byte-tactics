@@ -1,25 +1,25 @@
 // Decompiled by Haiku. Names are provisional.
 
-class Class_004d87f0 {
+class BlockInfo {
 public:
     int field_0;
     int field_4;
     int field_8;
 
-    Class_004d87f0(void);
+    BlockInfo(void);
 };
 
-class Class_004d8870 {
+class TraceRecord {
 public:
     char data[0x8c];
-    Class_004d8870(void);
+    TraceRecord(void);
 };
 
-class Class_004d8bd0 : public Class_004d87f0 {
+class Class_004d8bd0 : public BlockInfo {
 public:
     char unknown_c[0x24];
-    Class_004d8870 member_30;
-    Class_004d8870 member_bc;
+    TraceRecord member_30;
+    TraceRecord member_bc;
     char unknown_148[0x1];
 
     Class_004d8bd0(void);
@@ -27,7 +27,7 @@ public:
 
 // FUNCTION: 0x4d8bd0
 Class_004d8bd0::Class_004d8bd0(void) :
-    Class_004d87f0(),
+    BlockInfo(),
     member_30(),
     member_bc()
 {

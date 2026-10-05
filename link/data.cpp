@@ -780,7 +780,7 @@ unsigned char DAT_00529e6c;  // 0x529e6c .bss
 unsigned char DAT_00529e70;  // 0x529e70 .bss
 char DAT_00529e74;  // 0x529e74 .bss
 char DAT_00529e78;  // 0x529e78 .bss
-Class_004e17c0* DAT_00529e7c;  // 0x529e7c .bss
+NameTable* DAT_00529e7c;  // 0x529e7c .bss
 char* DAT_00529e80;  // 0x529e80 .bss
 unsigned char DAT_00529e84[4];  // 0x529e84 .bss
 char DAT_00529e88[13];  // 0x529e88 .bss

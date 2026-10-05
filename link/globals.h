@@ -9,7 +9,7 @@
 
 class Class_00437820;
 class Class_004db000;
-class Class_004e17c0;
+class NameTable;
 class TranslationTable;
 struct Chunk;
 struct Class_0051fba4;
@@ -639,7 +639,7 @@ extern unsigned char DAT_00528a48[4];                                           
 extern int DAT_00528a4c;                                                                      // 0x528a4c, 4 bytes; 1 of 1 files
 extern Node_004dde70* DAT_00528a50;                                                           // 0x528a50, 4 bytes; 1 of 11 files (conflicting: struct names only)
 extern unsigned char DAT_00528a5c[4];                                                         // 0x528a5c, 4 bytes; nothing refers to it
-extern unsigned char DAT_00528a78[44];                                                        // 0x528a78, 44 bytes; Class_004e1650 by value in 1 of 1 files
+extern unsigned char DAT_00528a78[44];                                                        // 0x528a78, 44 bytes; MappedFile by value in 1 of 1 files
 extern void* DAT_00528aa4;                                                                    // 0x528aa4, 4 bytes; 1 of 1 files
 extern char DAT_00528aa8;                                                                     // 0x528aa8, 1 bytes; 1 of 1 files
 extern char DAT_00528aac;                                                                     // 0x528aac, 1 bytes; 1 of 1 files
@@ -683,7 +683,7 @@ extern unsigned char DAT_00529e6c;                                              
 extern unsigned char DAT_00529e70;                                                            // 0x529e70, 1 bytes; 1 of 1 files
 extern char DAT_00529e74;                                                                     // 0x529e74, 1 bytes; 1 of 1 files
 extern char DAT_00529e78;                                                                     // 0x529e78, 1 bytes; 1 of 1 files
-extern Class_004e17c0* DAT_00529e7c;                                                          // 0x529e7c, 4 bytes; 1 of 1 files
+extern NameTable* DAT_00529e7c;                                                               // 0x529e7c, 4 bytes; 1 of 1 files
 extern char* DAT_00529e80;                                                                    // 0x529e80, 4 bytes; 1 of 1 files
 extern unsigned char DAT_00529e84[4];                                                         // 0x529e84, 4 bytes; nothing refers to it
 extern char DAT_00529e88[13];                                                                 // 0x529e88, 13 bytes; 1 of 1 files

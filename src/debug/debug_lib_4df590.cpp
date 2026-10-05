@@ -53,12 +53,12 @@ struct Map_004df590 {
     char changed;                      // +0x10
 };
 
-class Class_004e17c0 {
+class NameTable {
 public:
     Map_004df590 names;                // +0x0
 };
 
-Class_004e17c0* GetNameTable();
+NameTable* GetNameTable();
 
 class Class_004e1ac0 {
 public:
@@ -270,7 +270,7 @@ BOOL Class_004df590::HandlePerformanceMessage(UINT msg, WPARAM wParam, LPARAM lP
         }
         Class_004e1ac0* cs = FUN_004e1ac0();
         EnterCriticalSection(&cs->cs);
-        Class_004e17c0* info = GetNameTable();
+        NameTable* info = GetNameTable();
         if (info->names.changed) {
             int sel = -1;
             int n = 0;

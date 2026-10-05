@@ -39,8 +39,8 @@ public:
     }
 };
 
-class Class_004e17c0;
-Class_004e17c0* GetNameTable();
+class NameTable;
+NameTable* GetNameTable();
 
 class Class_004e1990 {
 public:
