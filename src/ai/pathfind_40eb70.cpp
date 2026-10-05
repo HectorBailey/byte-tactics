@@ -130,7 +130,7 @@ extern int DAT_005119e8[10];
 
 class Dummy_00440be0 {
 public:
-    void FUN_00440be0(Unit* p);
+    void RefreshUnitIfStale(Unit* p);
 };
 
 #pragma pack(push, 1)
@@ -168,7 +168,7 @@ public:
     }
     void Release()
     {
-        owner->FUN_00440be0(object);
+        owner->RefreshUnitIfStale(object);
         object = 0;
         owner = 0;
     }

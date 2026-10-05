@@ -13,7 +13,7 @@ public:
     char* FUN_004b73c0(int index, char* fallback);
 };
 
-short __stdcall FUN_00488b10(char* name);
+short __stdcall FindUnitTypeId(char* name);
 void __stdcall KillUnitsOfType(short id);
 void __stdcall ReloadUnitType(unsigned short id);
 
@@ -21,7 +21,7 @@ void __stdcall ReloadUnitType(unsigned short id);
 void __stdcall FUN_00417490(Class_004b73c0* args)
 {
     if (args->count > 1) {
-        short id = FUN_00488b10(args->FUN_004b73c0(1, DAT_005119b8));
+        short id = FindUnitTypeId(args->FUN_004b73c0(1, DAT_005119b8));
         if (id) {
             KillUnitsOfType(id);
             ReloadUnitType(id);

@@ -30,7 +30,7 @@ public:
     int FUN_004b4c80(void* buf, int size);
 };
 
-Unit* __stdcall FUN_00487080(unsigned short index, void* file);
+Unit* __stdcall LoadUnit(unsigned short index, void* file);
 
 class Class_004895c0 {
 public:
@@ -108,8 +108,8 @@ Class_0044de80::Class_0044de80(int owner, Class_004b4ba0* file, char* name)
     file->FUN_004b4ba0(name);
     ((Class_004b4c10*)file)->FUN_004b4c10(0);
     if (((Class_004b4c80*)file)->FUN_004b4c80(&rec, 0x36) == 0x36) {
-        field_12 = FUN_00487080(rec.id1, file);
-        ref.SetUnit(FUN_00487080(rec.id2, file));
+        field_12 = LoadUnit(rec.id1, file);
+        ref.SetUnit(LoadUnit(rec.id2, file));
         field_8 = rec.f1;
         field_a = rec.f2;
         field_c = rec.f3;

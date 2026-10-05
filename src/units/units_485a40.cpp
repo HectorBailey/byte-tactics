@@ -175,7 +175,7 @@ struct Game {
 extern Game* g_game;
 
 void __stdcall ResetWeaponTarget(Unit* unit, int index);
-void __stdcall FUN_00480250(Unit* unit, int param_2);
+void __stdcall SetUnitSquad(Unit* unit, int param_2);
 int __stdcall FUN_004b6c30(int range);
 
 // FUNCTION: 0x485a40
@@ -258,5 +258,5 @@ void __stdcall InitUnitFromType(Unit* unit, Pos_485a40 pos, int param_5)
     unit->playerRef.Reset(unit->field_ff);
     unit->field_f9 = 0xff;
     unit->field_aa = (short)FUN_004b6c30(0x10000);
-    FUN_00480250(unit, 0);
+    SetUnitSquad(unit, 0);
 }

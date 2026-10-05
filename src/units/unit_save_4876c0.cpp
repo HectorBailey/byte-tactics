@@ -221,7 +221,7 @@ public:
 };
 
 // FUNCTION: 0x4876c0
-void __stdcall FUN_004876c0(Class_004b4560* file)
+void __stdcall SaveUnits(Class_004b4560* file)
 {
     int count = 0;
     Unit* end = 0;

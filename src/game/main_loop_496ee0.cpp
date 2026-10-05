@@ -18,7 +18,7 @@
 //   g_game+0x29a0: +0x4 and +0x14 the two copied bytes, +0xc and +0x10 the two
 //   sizes, +0x10 first stored to +0xdc.
 // - the name table at g_game+0x37f5f is 0x232 bytes per entry and the player
-//   index selects the entry, whose name is looked up by FUN_00488b10. MSVC 5
+//   index selects the entry, whose name is looked up by FindUnitTypeId. MSVC 5
 //   gives `Entry names[8]` a size of 0x1190, not 8 * 0x232, so the field after
 //   it starts at +0x390ef.
 // - the position is a Vec3 of 16.16 values; the view is centred on the whole
@@ -89,7 +89,7 @@ struct Game {
 
 extern Game* g_game;
 
-unsigned short __stdcall FUN_00488b10(const char* name);
+unsigned short __stdcall FindUnitTypeId(const char* name);
 void __stdcall FUN_004b6290(char* message);
 void __stdcall FUN_0041c4c0(int x, int y, int instant);
 
@@ -124,7 +124,7 @@ void __stdcall FUN_00496ee0(int team, int startpos)
 
     FixedPos_00496ee0 pos;
     if (g_game->net->FUN_00437320((Vec3_00437320*)&pos, startpos)) {
-        unsigned short id = FUN_00488b10(
+        unsigned short id = FindUnitTypeId(
             g_game->names[g_game->players[team].player->nameIndex].name);
         CreateUnit(team, id, pos, 1, 1, 0);
     } else {

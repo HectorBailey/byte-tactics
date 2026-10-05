@@ -21,7 +21,7 @@ static std::vector<Elem_00488a00> DAT_0051e6b0;
 extern int DAT_0051e6c0;
 
 // FUNCTION: 0x488bf0
-void FUN_00488bf0()
+void FreeUnitCategories()
 {
     for (std::vector<Elem_00488a00>::iterator it = DAT_0051e6b0.begin(); it != DAT_0051e6b0.end(); it++)
         delete it->value;

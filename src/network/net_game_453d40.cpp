@@ -260,7 +260,7 @@ void __stdcall FUN_004244b0(int, int, int, Feature*);
 void __stdcall FUN_0041b8d0(Class_0048b090*, Class_0048b090*);
 void __stdcall FUN_0047f0c0(int, int);
 void __stdcall FUN_0047f300(int, void*, int);
-void __stdcall FUN_00488570(Class_0048b090*, Player*, void*);
+void __stdcall GiveUnitToPlayer(Class_0048b090*, Player*, void*);
 void __stdcall FUN_00464b30(unsigned char, unsigned char, int, int);
 void __stdcall FUN_00464c60(unsigned char, unsigned char, int, int);
 void __stdcall ShareMapInfo(unsigned char, unsigned char);
@@ -789,7 +789,7 @@ int HandleNetPackets()
             // Original bug: p is 0 when the named player has left, and
             // IsConnected reads through it (docs/bugs.md).
             if (IsConnected(p))
-                FUN_00488570(unit, p, packet);
+                GiveUnitToPlayer(unit, p, packet);
             break;
         }
         case 21:
