@@ -357,6 +357,21 @@ argument (`button` itself lives in edi from 0x419bec), so the read gets the
 button pointer and the later tests read the button's bytes as the entry's
 state. It works by accident. Found by Claude Code / Opus 5.5 in #5276.
 
+## A long command line makes the tokenizer write past its object (likely)
+
+**0x4b7440** (`Tokenize`), which splits a console line or a line of an AI
+script into arguments. It copies each token into the 0x7e-byte text buffer at
++0x50 and stops when that buffer is full (`lea edx, [ebp+0xce]` /
+`cmp ebx, edx` / `jae` at 0x4b74c3), but it leaves the text pointer on the
+character it did not copy. The outer loop then finds that same character
+again, stores another terminating zero one byte further on and starts a new
+token there, so it never reaches the end of the text: every pass writes one
+more zero past the buffer, over the argument count at +0xd0 and on past the
+end of the object, until something faults. A line needs more than about 126
+bytes of token text to get there; the console's input line and the game's own
+scripts evidently stay below that. Found by Claude Code / Opus 5.5 while
+naming the util folder.
+
 ## Harmless oddities
 
 Things that look wrong in the original but have no effect, kept for the record.
@@ -574,6 +589,30 @@ Things that look wrong in the original but have no effect, kept for the record.
 
 - **0x4d89b0**: `out[0] = 0;` (0x4d89cd) just before `strcpy(out, "\n")`.
   Found by ozgb's Cline / deepseek-v4.1 in #2242.
+- **0x50b9e0** (likely): the table of SQUASHERR_ names that
+  `SquashErrorString` (0x4d1c60) indexes is missing a comma, so its sixth
+  string is "SQUASHERR_BADPACKTYPESQUASHERR_BADPARAMS" and the seventh entry,
+  which the function still accepts (`cmp eax, 7` at 0x4d1c64), is null. Code 5
+  (output buffer too small) would print the merged name and code 6 (bad
+  parameters) a null string, but only unpack errors (1 to 4) are ever printed.
+  Found by Claude Code / Opus 5.5 while naming the util folder.
+- **0x4b7540** (likely, dead code): `ShiftArgs`, which drops the first n
+  arguments of a command, has its test the wrong way round (`cmp eax, edi` /
+  `jl` at 0x4b754b): with at least n arguments it clears them all, and with
+  fewer it copies from `&args[n]` until it meets `&args[count]`, which lies
+  below the start, so the copy runs on through memory. Nothing in the exe calls
+  it. Found by Claude Code / Opus 5.5 while naming the util folder.
+- **0x4b39c0**: `SaveBank` keeps the packer's result in a local, and the path
+  where the compression buffer could not be allocated reads that local without
+  setting it (`mov eax, [esp+0x1c]` at 0x4b3bb2, which holds a leftover spill
+  from 0x4b3aba). The result is only tested when the buffer exists, and without
+  it the bank is written unpacked, so nothing goes wrong. Noted in
+  0x4b39c0.cpp by its decompilers.
+- **0x4bc120** (possible, dead code): `HAPI_LoadFileInto` reads a file into a
+  buffer the caller passes in, but when the read returns no bytes it frees
+  that buffer (0x4bc26c) as if it had allocated it, as its sibling
+  `HAPI_LoadFile` does with its own block. Nothing in the exe calls it. Found
+  by Claude Code / Opus 5.5 while naming the util folder.
 
 - **0x440940** (`BuildAllPassMaps`): the load progress starts at 100 and
   adds 100 before each store of `progress / count`, so after movement class k
@@ -585,7 +624,7 @@ Things that look wrong in the original but have no effect, kept for the record.
 - **0x42a8d0** (the unit type loader, a gap region; likely): when an FBI file
   has no UNITINFO section it returns 0 at once (`je 0x42b1bc` from 0x42ac78),
   freeing that file's buffer but not closing the file (the normal path calls
-  FUN_004bb5d0 at 0x42b173) and not freeing the weapon TDF table at
+  HAPI_CloseFile at 0x42b173) and not freeing the weapon TDF table at
   DAT_005122a0 (only the normal end does, from 0x42b20a). Found by a Claude
   Code / Opus 5.5 subagent in #2662.
 - **0x413470** (an order handler), state 3 (likely): after two misses it
@@ -610,7 +649,7 @@ Things that look wrong in the original but have no effect, kept for the record.
   3, so bit 0 and bits 6 to 31 keep stack garbage, and the whole structure is
   then copied into the spawned object (StartExplodePiece's inlined `rep movsd`).
   Harmless if nothing reads those bits. Found by DeepSeek V4.1 Flash in #22.
-- **0x43de30** (possible): its chunked read `FUN_004b4c80(buf, 0x23)` is not
+- **0x43de30** (possible): its chunked read `ReadBox(buf, 0x23)` is not
   checked, so a short read copies a partly uninitialised record into the unit
   type; its sibling loader 0x44d930 does check. Found by DeepSeek V4.1 Flash
   in #33.
@@ -779,7 +818,7 @@ Things that look wrong in the original but have no effect, kept for the record.
 - **0x45f8c0** (likely): when a line value does not start with '|', the
   split scans from `value + 1` for the next '|' with no test for '\0', so a
   value with no second '|' runs off the end of the 0x80-byte buffer. When it
-  does start with '|', the two `FUN_004b6af0(value, 0/1)` calls read
+  does start with '|', the two `SkipTextLines(value, 0/1)` calls read
   uninitialised stack at `value + 0x10` and `+0x14`. Read from the
   disassembly of a partial match. Found by Space Bunny Free in #411.
 - **0x45ffb0** (likely, from the compiler): the matched source is valid C++,
@@ -878,7 +917,7 @@ Things that look wrong in the original but have no effect, kept for the record.
   later glyph lookups (0x4a271a, 0x4a292b) are not tested at all. A font
   missing that glyph crashes the scrollbar draw. Found by ozgb's Codex / GPT-6
   in #1968 (the horizontal site was found while checking it).
-- **0x4aa8f0** (likely): when FUN_004bbc40 reports the GUI file missing or
+- **0x4aa8f0** (likely): when HAPI_FileLengthByName reports the GUI file missing or
   empty (returns 0), `je 0x4aac2d` at 0x4aaa17 skips both stores of the
   `layer` local (0x4aaa3b and 0x4aaa87), so the code at 0x4aac2d loads that
   stack slot uninitialised, writes its `+4`, `+0x1c`, `+0x24` and `+0x3b`, links
@@ -917,6 +956,14 @@ Things that look wrong in the original but have no effect, kept for the record.
   with the data pointer, so such chunks always fail with 3 and nothing is
   written. Harmless if HPI files only use methods 1 and 2. Found by ozgb's
   Cline / deepseek-v4.1 in #2242.
+- **0x4d1820** (possible): `SquashPack`, the packer that writes those chunks,
+  has the same hole. Its length variable also lives in the dead `data`
+  argument slot and only the method 1 and 2 arms write it, so methods 0 and 3
+  pass the `method >= 4` check (0x4d1873) and compute `length + 0x13`
+  (0x4d18a8) from the data pointer, which is far larger than any output buffer:
+  such packs fail with 5 (output too small). Harmless if only methods 1 and 2
+  are asked for: SaveBank and SaveAccount pass 1, HAPI_WriteArchiveData the
+  archive's compression type. Noted in 0x4d1820.cpp by deepseek-v4.1-flash.
 - **0x4da8d0** (possible, out of memory only): with no out-of-memory handler
   installed (0x5289bc), a failed GlobalAlloc in the inlined pool carve returns
   0 (`xor eax, eax` at 0x4da987), and the new node is then written through it
@@ -1001,7 +1048,7 @@ Things that look wrong in the original but have no effect, kept for the record.
   without the count check. Found by ozgb's Codex / GPT-6 in #1898.
 - **0x49be60** (likely): for a kind-3 projectile it passes a stack local
   (`lea ecx, [esp+0x38]` at 0x49c252) as the rotation argument of
-  FUN_0046bae0, which hands it to FUN_004b6cc0 for every vertex, and that reads
+  FUN_0046bae0, which hands it to RotateByAngles for every vertex, and that reads
   three angles from it (0x4b6cd6, 0x4b6cf6, 0x4b6d1b); nothing in 0x49be60
   writes those bytes, so the model is rotated by whatever the stack held. Kind
   1 builds its angles from the shot's +0x34 to +0x38 (0x49c0fd) and another arm
