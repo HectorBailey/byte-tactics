@@ -611,7 +611,7 @@ struct Class_004ab040;
 struct Class_004ab2b0;
 struct Class_004ac610;
 struct Class_004acc70;
-struct Class_004af5b0;
+struct FileRequester;
 struct Class_004afc60;
 struct Class_004aff00;
 class CobScript;
@@ -4554,7 +4554,7 @@ struct Amount {  // 0x8 bytes, 2 views
     int required;  // +0x4
 };
 
-struct Class_004af5b0 {  // 0x248 bytes, 8 views
+struct FileRequester {   // 0x248 bytes, 8 views
     void* gui;  // +0x0
     Mode_00446310* modes;  // +0x4
     char* field_8;  // +0x8

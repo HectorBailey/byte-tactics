@@ -2348,7 +2348,7 @@ address,name
 0x4af320,ScanDirectory
 0x4af5b0,FUN_004af5b0
 0x4af670,FileRequesterHandler
-0x4afa30,Class_004afa30::OpenFileRequester
+0x4afa30,Dialog::OpenFileRequester
 0x4afc60,AllocBlinkWords
 0x4afcf0,FUN_004afcf0
 0x4afd20,FUN_004afd20
