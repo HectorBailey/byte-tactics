@@ -104,7 +104,7 @@ public:
     char unknown_9e[0x110 - 0x9e];
     unsigned int flags_110;            // +0x110
     char unknown_114[4];
-    void FUN_0048b090(unsigned char, int);
+    void SetStateBits(unsigned char, int);
 };
 
 class Class_0046d500 {
@@ -246,11 +246,11 @@ void __stdcall AssignPlayerColor(int, int, int);
 void __stdcall SetAlliance(int, int, unsigned char, int);
 char* __stdcall FUN_004c5740(char*);
 void __stdcall FUN_0047f1a0(char*, int);
-void __stdcall FUN_004861d0(unsigned char, void*);
-void __stdcall FUN_0048b920(Player*, void*);
-void __stdcall FUN_0048ab70(void*);
-void __stdcall FUN_00489ce0(void*);
-void __stdcall FUN_004866d0(void*, int);
+void __stdcall CreateUnitFromPacket(unsigned char, void*);
+void __stdcall ReceiveUnitStates(Player*, void*);
+void __stdcall ApplyAttachUnit(void*);
+void __stdcall ApplyUnitDamage(void*);
+void __stdcall ApplyUnitDeath(void*, int);
 void __stdcall FUN_0049d270(Player*, void*);
 void __stdcall FUN_0049af90(Player*, void*);
 void __stdcall FUN_00423550(int, int, int);
@@ -263,7 +263,7 @@ void __stdcall FUN_0047f300(int, void*, int);
 void __stdcall FUN_00488570(Class_0048b090*, Player*, void*);
 void __stdcall FUN_00464b30(unsigned char, unsigned char, int, int);
 void __stdcall FUN_00464c60(unsigned char, unsigned char, int, int);
-void __stdcall FUN_00485420(unsigned char, unsigned char);
+void __stdcall ShareMapInfo(unsigned char, unsigned char);
 void __stdcall HandlePlayerEconomy(void*, Player*);
 void __stdcall FUN_00490df0(int, int);
 
@@ -711,19 +711,19 @@ int HandleNetPackets()
             g_game->flags_2a44 |= 4;
             break;
         case 9:
-            FUN_004861d0(from, packet);
+            CreateUnitFromPacket(from, packet);
             break;
         case 44:
-            FUN_0048b920(player, packet);
+            ReceiveUnitStates(player, packet);
             break;
         case 10:
-            FUN_0048ab70(packet);
+            ApplyAttachUnit(packet);
             break;
         case 11:
-            FUN_00489ce0(packet);
+            ApplyUnitDamage(packet);
             break;
         case 12:
-            FUN_004866d0(packet, 0);
+            ApplyUnitDeath(packet, 0);
             break;
         case 13:
             FUN_0049d270(player, packet);
@@ -760,8 +760,8 @@ int HandleNetPackets()
         case 17: {
             Class_0048b090* unit = UnitAt(*(unsigned short*)(packet + 1));
             if (unit->flags_110 & 0x10000000) {
-                unit->FUN_0048b090(packet[3], 1);
-                unit->FUN_0048b090(~packet[3], 0);
+                unit->SetStateBits(packet[3], 1);
+                unit->SetStateBits(~packet[3], 0);
             }
             break;
         }
@@ -809,7 +809,7 @@ int HandleNetPackets()
                 FUN_00464c60(a, b, *(int*)(packet + 13), 0);
                 break;
             case 3:
-                FUN_00485420(a, b);
+                ShareMapInfo(a, b);
                 break;
             }
             break;

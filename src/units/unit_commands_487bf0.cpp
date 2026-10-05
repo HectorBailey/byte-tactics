@@ -98,7 +98,7 @@ void __stdcall FUN_0043f0e0(Class_00438760* out, int mode, Unit* unit,
                             int target, Vec3_00487bf0* pos);
 int __stdcall FUN_00487af0(char* name, Table_00487bf0* table, int value);
 unsigned short __stdcall FUN_00488b10(char* name);
-void __stdcall FUN_0048aac0(Unit* unit, int target, int a, int b);
+void __stdcall AttachUnitToPiece(Unit* unit, int target, int a, int b);
 
 struct Outs_t {
     Class_00438760 g, a, m, u, p;
@@ -265,7 +265,7 @@ void __stdcall FUN_00487bf0(Unit* unit, char* text, Table_00487bf0* table)
             sscanf(buf + 1, " %[a-zA-Z0-9_.]", buf);
             int target = FUN_00487af0(buf, table, 0);
             if (target != 0)
-                FUN_0048aac0(unit, target, -1, 0);
+                AttachUnitToPiece(unit, target, -1, 0);
             break;
         }
         }

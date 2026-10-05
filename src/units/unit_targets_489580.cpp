@@ -18,11 +18,11 @@ public:
     Owner_00489540* owner;  // +4
     Class_00489540* next;   // +8
 
-    void FUN_00489580();
+    void UnlinkFromUnit();
 };
 
 // FUNCTION: 0x489580
-void Class_00489540::FUN_00489580()
+void Class_00489540::UnlinkFromUnit()
 {
     if (owner != 0) {
         Class_00489540** link = &owner->head;

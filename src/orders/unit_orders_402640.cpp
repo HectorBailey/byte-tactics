@@ -33,7 +33,7 @@ public:
     int value;                         // +0xc
 
     virtual ~Class_004895c0();
-    void FUN_00489690(Unit* o);
+    void SetUnit(Unit* o);
 };
 
 class Class_00439e80 {
@@ -43,12 +43,12 @@ public:
 
 class Class_004898b0 {
 public:
-    void FUN_004898b0(int param);
+    void ClaimWeapons(int param);
 };
 
 class Class_0048b090 {
 public:
-    void FUN_0048b090(int which, int on);
+    void SetStateBits(int which, int on);
 };
 
 class Class_004b0bc0 {
@@ -144,12 +144,12 @@ extern Game* g_game;
 void __stdcall FUN_0047f780(Unit* unit, int kind, char* text);
 void __stdcall FUN_0041c150(Unit* unit);
 void __stdcall FUN_0041b8d0(Unit* unit, Unit* target);
-void __stdcall FUN_00489bb0(Unit* unit, Unit* target, int n, int kind, int flag);
+void __stdcall DamageUnit(Unit* unit, Unit* target, int n, int kind, int flag);
 int __stdcall FUN_00438700(Unit* unit, Order* order, int flags);
 Vec3 __stdcall FUN_0043e060(Unit* unit, int piece);
 int __stdcall FUN_0047db70(UnitType* type, short a, Point16 cell, int b);
-Unit* __stdcall FUN_00485f50(unsigned char player, unsigned short type, Vec3 pos, int a, int b, int c);
-void __stdcall FUN_0048aac0(Unit* unit, Unit* builder, char piece, char p4);
+Unit* __stdcall CreateUnit(unsigned char player, unsigned short type, Vec3 pos, int a, int b, int c);
+void __stdcall AttachUnitToPiece(Unit* unit, Unit* builder, char piece, char p4);
 void __stdcall FUN_0043adc0(Class_00438760 kind, int remove, Unit* owner, Unit* id, int flags, int param_6, int param_7);
 int __stdcall FUN_0041bd10(Unit* builder, Unit* unit, float amount);
 int __stdcall FUN_0041ba60(Unit* unit, Unit* target, float amount);
@@ -171,7 +171,7 @@ int __stdcall FUN_00402430(Unit* unit, Order* order, int unused)
         if (!(order->target.owner->type->flags & 0x40))
             return 7;
         if (order->target.owner->buildLeft == 0.0f && (unit->flags10e & 1)) {
-            ((Class_004898b0*)unit)->FUN_004898b0(3);
+            ((Class_004898b0*)unit)->ClaimWeapons(3);
             return 1;
         }
         return 8;
@@ -242,9 +242,9 @@ int __stdcall FUN_00402640(Unit* unit, Order* order, int flags)
                 unit->metal += (double)refund;
             }
             FUN_0041b8d0(unit, order->target.owner);
-            FUN_00489bb0(unit, order->target.owner, 30000, 9, 0);
+            DamageUnit(unit, order->target.owner, 30000, 9, 0);
         }
-        ((Class_0048b090*)unit)->FUN_0048b090(9, 0);
+        ((Class_0048b090*)unit)->SetStateBits(9, 0);
         FUN_0041c150(unit);
         return 5;
     }
@@ -256,13 +256,13 @@ int __stdcall FUN_00402640(Unit* unit, Order* order, int flags)
     }
     switch (order->state) {
     case 0:
-        order->target.FUN_00489690(0);
+        order->target.SetUnit(0);
         if (unit->flags & 0x20000000) {
             if (order->count <= 0) {
-                ((Class_0048b090*)unit)->FUN_0048b090(1, 0);
+                ((Class_0048b090*)unit)->SetStateBits(1, 0);
                 return 5;
             }
-            ((Class_0048b090*)unit)->FUN_0048b090(1, 1);
+            ((Class_0048b090*)unit)->SetStateBits(1, 1);
             return 1;
         }
         break;
@@ -279,7 +279,7 @@ int __stdcall FUN_00402640(Unit* unit, Order* order, int flags)
             order->flags |= 2;
             return 2;
         }
-        order->target.FUN_00489690(FUN_00485f50(unit->playerIndex, order->unitType, order->pos, 0, 1, 0));
+        order->target.SetUnit(CreateUnit(unit->playerIndex, order->unitType, order->pos, 0, 1, 0));
         if (order->target.owner == 0) {
             FUN_0047f780(unit, 7, "Unable to create any more units");
             ((Class_00439e80*)order)->FUN_00439e80(300);
@@ -287,11 +287,11 @@ int __stdcall FUN_00402640(Unit* unit, Order* order, int flags)
             return 2;
         }
         FUN_0047f780(unit, 9, "Starting construction");
-        FUN_0048aac0(order->target.owner, unit, piece, 1);
+        AttachUnitToPiece(order->target.owner, unit, piece, 1);
         order->target.owner->bits.bits18 = unit->bits.bits18;
         order->target.owner->bits.bits20 = unit->bits.bits20;
         FUN_0043adc0("getbuilt", 1, order->target.owner, unit, 0, 0, 0);
-        ((Class_0048b090*)unit)->FUN_0048b090(8, 1);
+        ((Class_0048b090*)unit)->SetStateBits(8, 1);
         FUN_0041c150(unit);
         return 1;
     }
@@ -320,9 +320,9 @@ int __stdcall FUN_00402640(Unit* unit, Order* order, int flags)
         break;
     case 4:
         FUN_0047f780(unit, 8, 0);
-        ((Class_0048b090*)unit)->FUN_0048b090(8, 0);
+        ((Class_0048b090*)unit)->SetStateBits(8, 0);
         FUN_0041b8d0(unit, order->target.owner);
-        order->target.FUN_00489690(0);
+        order->target.SetUnit(0);
         order->count--;
         FUN_0041c150(unit);
         return 0;

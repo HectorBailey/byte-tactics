@@ -50,7 +50,7 @@ public:
 
 class Class_004898b0 {
 public:
-    void FUN_004898b0(int param);
+    void ClaimWeapons(int param);
 };
 
 #pragma pack(push, 1)
@@ -119,7 +119,7 @@ extern Game* g_game;
 
 void __stdcall FUN_0047f780(Unit* unit, int kind, char* text);
 int __stdcall FUN_004b6c30(int range);
-unsigned short __stdcall FUN_0048a980(Vec3* from, Vec3* to);
+unsigned short __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
 void __stdcall FUN_00438590(Unit* unit, Order* order, short turn);
 int __stdcall FUN_00438700(Unit* unit, Order* order, int flags);
 void __stdcall FUN_004385f0(Unit* unit, Order* order);
@@ -164,8 +164,8 @@ int __stdcall FUN_00405300(Unit* unit, Order* order, int flags)
             order->flags |= 0xe8;
             return 2;
         }
-        ((Class_004898b0*)unit)->FUN_004898b0(3);
-        FUN_00438590(unit, order, FUN_0048a980(&unit->pos, &order->target->pos) - unit->angle);
+        ((Class_004898b0*)unit)->ClaimWeapons(3);
+        FUN_00438590(unit, order, GetHeadingBetween(&unit->pos, &order->target->pos) - unit->angle);
         return 1;
     }
     case 2:

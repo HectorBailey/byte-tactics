@@ -1,5 +1,5 @@
 // Decompiled by Opus. Names are provisional.
-// Clears target entry `index` (the same reset as FUN_0048a160) unless it is
+// Clears target entry `index` (the same reset as ResetWeaponTarget) unless it is
 // already clear, then tells the unit's script "StartBuilding" and
 // "TargetCleared".
 class Class_004b07c0 {
@@ -32,7 +32,7 @@ struct Unit {
 #pragma pack(pop)
 
 // FUNCTION: 0x48a0f0
-void __stdcall FUN_0048a0f0(Unit* unit, int index)
+void __stdcall ClearWeaponTarget(Unit* unit, int index)
 {
     Point_0048a0f0* p = &unit->entries[index].point;
     if (p->a != 0 || p->b != (short)0x8000) {

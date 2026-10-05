@@ -19,7 +19,7 @@ struct Channel_004b0b00 {              // 0xa4 bytes, indexed from this + i*0xa4
     int stack[0x19];                   // +0x40
 };
 
-class Class_004b0b00_param2;
+class ScriptCallback;
 
 class Class_004b0b00 {
 public:
@@ -27,14 +27,14 @@ public:
     char unknown_520[0x1c];
     int activeCount;                   // +0x53c
 
-    int StartScriptWithArgsByIndex(int index, Class_004b0b00_param2* param_2, int param_3,
+    int StartScriptWithArgsByIndex(int index, ScriptCallback* param_2, int param_3,
                      int param_4, int param_5, int param_6, int param_7,
                      int param_8);
 };
 
-class Class_004b0b00_param2 {
+class ScriptCallback {
 public:
-    virtual void StartScriptWithArgsByIndex(int param);
+    virtual void Complete(int result);
 };
 
 class Class_004b08c0 {
@@ -53,14 +53,14 @@ public:
 };
 
 // FUNCTION: 0x4b0b00
-int Class_004b0b00::StartScriptWithArgsByIndex(int index, Class_004b0b00_param2* param_2,
+int Class_004b0b00::StartScriptWithArgsByIndex(int index, ScriptCallback* param_2,
                                  int param_3, int param_4, int param_5,
                                  int param_6, int param_7, int param_8)
 {
     int i = ((Class_004b08c0*)this)->StartThread(index);
     if (i < 0) {
         if (param_2)
-            param_2->StartScriptWithArgsByIndex(0);
+            param_2->Complete(0);
         return 0;
     }
     Channel_004b0b00* c = &channels[i];

@@ -621,7 +621,7 @@ class Class_004b08c0;
 class Class_004b0a10;
 class Class_004b0a70;
 class Class_004b0b00;
-class Class_004b0b00_param2;
+class ScriptCallback;
 class Class_004b0c40;
 class Class_004b0d20;
 class Class_004b0da0;
@@ -2322,7 +2322,7 @@ public:
     Class_004895c0(Unit*, int);
     virtual void Unknown_0(void);
     void SetValue(void*);
-    void FUN_00489690(Unit*);
+    void SetUnit(Unit*);
 };
 
 struct Order_004021f0 {  // 0x3e bytes, 1 view
@@ -2456,7 +2456,7 @@ struct Unit {  // 0x118 bytes, 462 views
     int Ready(void);
     unsigned char GetState(void);
     unsigned char PlayerIndex(void);
-    void FUN_0048b090(int, int);
+    void SetStateBits(int, int);
 };
 
 struct UnitDef {  // 0x249 bytes, 220 views
@@ -2764,7 +2764,7 @@ public:
     unsigned char flags_3b;  // +0x3b
     char unknown_3c[27];
     unsigned char flags_57;  // +0x57
-    unsigned char FUN_004897e0(void);
+    unsigned char ChooseWeapon(void);
 };
 
 struct Order_7 {  // 0x42 bytes, 1 view
@@ -2816,7 +2816,7 @@ struct UnitRef {  // 0x8 bytes, 5 views
 class Class_00489960 {  // 0x1 bytes, 5 views
 public:
     char unknown_0[1];
-    int FUN_00489960(void*);
+    int CanReclaim(void*);
 };
 
 struct Cell {  // 0x14 bytes, 52 views
@@ -6716,8 +6716,8 @@ public:
     float f104;  // +0x104
     char unknown_108[8];
     int f110;  // +0x110
-    int FUN_00489a70(void);
-    int FUN_00489a90(Class_00489a70*);
+    int CountCargo(void);
+    int CanLoad(Class_00489a70*);
 };
 
 struct Flags_0043e490 {  // 0x4 bytes, 2 views
@@ -12805,8 +12805,8 @@ public:
     char unknown_0[4];
     Owner_00489540* owner;  // +0x4
     Class_00489540* next;  // +0x8
-    void FUN_00489540(Owner_00489540*);
-    void FUN_00489580(void);
+    void LinkToUnit(Owner_00489540*);
+    void UnlinkFromUnit(void);
 };
 
 struct Owner_00489540 {  // 0xa8 bytes, 2 views
@@ -12821,7 +12821,7 @@ public:
     Owner_004896f0* owner;  // +0x4
     Class_004896f0* next;  // +0x8
     Listener_004896f0* listener;  // +0xc
-    void FUN_004896f0(void);
+    void ClearRef(void);
 };
 
 class Listener_004896f0 {  // 0x4 bytes, 1 view
@@ -12868,7 +12868,7 @@ public:
     Entry_004898b0 entries[5];  // +0x4
     char unknown_90[10];
     Class_004b0a70* script;  // +0x9a
-    void FUN_00489800(unsigned char);
+    void ReleaseWeapons(unsigned char);
 };
 
 union Flags_004898b0_2 {  // 0x1 bytes, 1 view
@@ -12887,7 +12887,7 @@ public:
     Entry_004898b0_2 entries[5];  // +0x4
     char unknown_90[10];
     Class_004b0a70* script;  // +0x9a
-    void FUN_004898b0(unsigned char);
+    void ClaimWeapons(unsigned char);
 };
 
 struct Def_004899b0 {  // 0x249 bytes, 1 view
@@ -15542,7 +15542,7 @@ struct Channel_004b0b00 {  // 0xa4 bytes, 1 view
     int stack[25];  // +0x40
 };
 
-class Class_004b0b00_param2 {  // 0x4 bytes, 1 view
+class ScriptCallback {         // 0x4 bytes, 1 view
 public:
     virtual void StartScriptWithArgsByIndex(int);
 };

@@ -1,5 +1,5 @@
 // Decompiled by space-bunny-free. Names are provisional.
-// Same class as 0x489a70 (its FUN_00489a70 is the owner count inlined below).
+// Same class as 0x489a70 (its CountCargo is the owner count inlined below).
 // A yes/no test between two units of that class: it returns 1 only when every
 // check below passes, and 0 from eight separate early returns, which is why
 // the epilogue is duplicated so often.
@@ -60,14 +60,14 @@ public:
     char unknown_108[0x110 - 0x108];
     int f110;                     // +0x110
 
-    int FUN_00489a90(Class_00489a70* other);
+    int CanLoad(Class_00489a70* other);
 };
 #pragma pack(pop)
 
 extern Game* g_game;
 
 // FUNCTION: 0x489a90
-int Class_00489a70::FUN_00489a90(Class_00489a70* other)
+int Class_00489a70::CanLoad(Class_00489a70* other)
 {
     Def_00489a90* theirDef = other->def;
     if (theirDef->f245.bits.flag19)

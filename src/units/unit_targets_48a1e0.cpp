@@ -68,7 +68,7 @@ struct Game {
 
 extern Game* g_game;
 
-int __stdcall FUN_00485070(Vec3_0048a1e0* pos);
+int __stdcall GetGroundHeight(Vec3_0048a1e0* pos);
 void __stdcall FUN_0043e3c0(UnitDef_0048a1e0* def, int pos);
 
 // The intact tail block was the last diff. Writing the three adds in their
@@ -89,13 +89,13 @@ static Vec3_0048a1e0 offset_0048a1e0(Muzzle_0048a1e0* m, __int64 s)
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 
 // FUNCTION: 0x48a1e0
-int __stdcall FUN_0048a1e0(Unit* unit, Vec3_0048a1e0* pos, int index)
+int __stdcall GetWeaponTargetPos(Unit* unit, Vec3_0048a1e0* pos, int index)
 {
     Entry_0048a1e0* e = &unit->entries[index];
     if (e->z != (short)0x8000) {
         pos->x = e->x << 16;
         pos->z = e->z << 16;
-        pos->y = max(FUN_00485070(pos), g_game->seaLevel) << 16;
+        pos->y = max(GetGroundHeight(pos), g_game->seaLevel) << 16;
         return 1;
     }
     if (e->x == 0) {

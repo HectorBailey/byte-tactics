@@ -153,7 +153,7 @@ struct Unit {
 
 Vec3 __stdcall FUN_0043e060(Path_0043d6d0* obj, int index);
 Short3 __stdcall FUN_0043e180(Path_0043d6d0* obj, int index);
-void __stdcall FUN_0048a9f0(Unit* unit, Vec3 pos, int mode);
+void __stdcall SetUnitPosition(Unit* unit, Vec3 pos, int mode);
 int __stdcall FUN_0047db70(UnitType_0043d6d0* type, short a8, Point cell, int mode);
 void __stdcall FUN_0047d0e0(Unit* unit);
 void __stdcall FUN_0047cc30(Unit* unit);
@@ -210,7 +210,7 @@ void Class_0043d6d0::FUN_0043d6d0(Unit* u)
         if (u->type->b19) {
             v.y = MAXM_0043d6d0(v.y, MakeFixed_0043d6d0(u->type->draft * 0xffff + g_game->seaLevel));
         }
-        FUN_0048a9f0(u, v, mode);
+        SetUnitPosition(u, v, mode);
         Short3 o = FUN_0043e180(u->obj, u->index);
         u->f64 = o;
         if (u->obj->field_0 != 0) {

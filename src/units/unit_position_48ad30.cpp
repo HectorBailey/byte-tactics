@@ -152,11 +152,11 @@ void __stdcall FUN_00437910(Unit* u);
 void __stdcall FUN_0049e1a0(Unit* u);
 void __stdcall FUN_0043b7c0(Unit* u);
 void __stdcall FUN_0043bad0(Unit* u);
-void __stdcall FUN_0048a870(Unit* u);
-void __stdcall FUN_004864b0(Unit* u, int n);
-void __stdcall FUN_00489bb0(int a, Unit* u, int damage, int kind, int flag);
+void __stdcall UpdateUnitHeight(Unit* u);
+void __stdcall KillUnit(Unit* u, int n);
+void __stdcall DamageUnit(int a, Unit* u, int damage, int kind, int flag);
 int __stdcall FUN_0041bd10(Unit* u, Unit* u2, float f);
-void __stdcall FUN_0048b710(Player_0048ad30* p);
+void __stdcall SendUnitStates(Player_0048ad30* p);
 void __stdcall FUN_0048d790(void);
 int __stdcall FUN_004c1b80(int n);
 void __stdcall FUN_0041c2e0(int n);
@@ -168,7 +168,7 @@ static inline int PlayerMore(unsigned char i)
 }
 
 // FUNCTION: 0x48ad30
-void __stdcall FUN_0048ad30(void)
+void __stdcall UpdateAllUnits(void)
 {
     int* cnt;
     unsigned char i;
@@ -233,7 +233,7 @@ void __stdcall FUN_0048ad30(void)
                                     && g_game->mode->waterDamage != 0
                                     && g_game->ticks % 30 == 0 && u->f70 <= g_game->seaLevel
                                     && !u->type->f241.bits.floats) {
-                                    FUN_00489bb0(0, u, g_game->mode->waterDamage, 0xb, 0);
+                                    DamageUnit(0, u, g_game->mode->waterDamage, 0xb, 0);
                                 }
                                 if (u->type->f200 != 0 && u->f108 < u->type->f1fa
                                     && (g_game->ticks & 7) == 0) {
@@ -244,12 +244,12 @@ void __stdcall FUN_0048ad30(void)
                                 FUN_0043bad0(u);
                                 if (u->def != 0) {
                                     u->def->FUN_0043dd20(u);
-                                    FUN_0048a870(u);
+                                    UpdateUnitHeight(u);
                                 }
                             }
                         }
                         if (u->f110.bits.b14) {
-                            FUN_004864b0(u, u->ff5);
+                            KillUnit(u, u->ff5);
                         }
                     }
                     u = (Unit*)((char*)u + 0x118);
@@ -258,7 +258,7 @@ void __stdcall FUN_0048ad30(void)
                     if (p->f0 != 0) {
                         unsigned char k4 = p->f73;
                         if (k4 == 1 || k4 == 2) {
-                            FUN_0048b710(p);
+                            SendUnitStates(p);
                         }
                     }
                 }

@@ -17,7 +17,7 @@ struct Object_0048a440 {
 };
 
 // FUNCTION: 0x48a440
-int __stdcall FUN_0048a440(Class_0048a440* list, Object_0048a440* obj)
+int __stdcall IsTargetingUnit(Class_0048a440* list, Object_0048a440* obj)
 {
     for (int i = 0; i < 3; i++) {
         if (list->entries[i].kind == -0x8000 && list->entries[i].id == obj->id) {

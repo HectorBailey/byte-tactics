@@ -87,7 +87,7 @@ class Class_00438880 { public: void FUN_00438880(const char*); };
 class Class_004388d0 { public: void FUN_004388d0(int); };
 class Class_00438930 { public: void FUN_00438930(Vec3*, int); };
 class Class_00439e80 { public: void FUN_00439e80(int); };
-class Class_00489800 { public: void FUN_00489800(int); };
+class Class_00489800 { public: void ReleaseWeapons(int); };
 #pragma pack(push, 1)
 struct WeaponDef { char pad0[0xdc]; int range; char pade0[0x111-0xe0]; unsigned int flags; };
 struct Weapon { char pad0[8]; WeaponDef* def; char padc[11]; unsigned char flags; char pad18[4]; };
@@ -108,7 +108,7 @@ struct Game { char pad0[0x1422b]; int width, height; char pad14233[0x142b7-0x142
 #pragma pack(pop)
 extern Game* g_game;
 class Class_0044e730 { public: void FUN_0044e730(int); };
-short __stdcall FUN_0048a980(Vec3*, Vec3*);
+short __stdcall GetHeadingBetween(Vec3*, Vec3*);
 Class_00438760 __stdcall FUN_0043f0e0(unsigned char, Unit*, Unit*, int);
 void __stdcall FUN_0043acb0(Unit*, Class_0043a1f0*);
 int __stdcall FUN_004b6c30(int);
@@ -184,7 +184,7 @@ int __stdcall FUN_00410850(Unit* unit, Order* order, int flags)
         Vec3 center;
         center.x=(g_game->width/2)<<16;
         center.z=(g_game->height/2)<<16;
-        short angle=FUN_0048a980(&unit->pos,&center);
+        short angle=GetHeadingBetween(&unit->pos,&center);
         Vec3 pos=FUN_0040f790(unit->pos,Direction(angle,0x3200000));
         Class_0044e2d0* move=new Class_0044e2d0(order,pos);
         ((Class_0044e730*)move)->FUN_0044e730(128);

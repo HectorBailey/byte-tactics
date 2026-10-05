@@ -7,7 +7,7 @@
 // down to the piece's height, state 4 ends the pickup (EndTransport when
 // cancelled) and state 5 finishes.
 // Match notes: the sea level test needs an inline helper that re-reads
-// order->target (see BelowSeaLevel), FUN_0048aac0 takes an int p3, and the
+// order->target (see BelowSeaLevel), AttachUnitToPiece takes an int p3, and the
 // sea level sum's register order needs a header before the declarations
 // (<math.h>, which the file's neighbours use for _hypot; tools/headers.py
 // lists the others that work, but <vector> alone does not).
@@ -26,8 +26,8 @@ public:
     unsigned char field_2e;            // +0x2e
     void FUN_0043d210(Unit* unit, int state);
 };
-class Class_004898b0 { public: void FUN_004898b0(int); };
-class Class_0048b090 { public: void FUN_0048b090(int, int); };
+class Class_004898b0 { public: void ClaimWeapons(int); };
+class Class_0048b090 { public: void SetStateBits(int, int); };
 class Class_004388d0 { public: void FUN_004388d0(int); };
 class Class_00438880 { public: void FUN_00438880(const char*); };
 class Class_0044e6c0 { public: void FUN_0044e6c0(int); };
@@ -81,17 +81,17 @@ extern Game* g_game;
 void __stdcall FUN_0047f780(Unit*, int, const char*);
 // p3 is int here (its own file says char): the original pushes order->piece
 // as a dword, which a char parameter would load as a byte.
-void __stdcall FUN_0048aac0(Unit* unit, Unit* target, int p3, char p4);
+void __stdcall AttachUnitToPiece(Unit* unit, Unit* target, int p3, char p4);
 int __stdcall SendScriptCallByName(Unit* unit, char* name, char p3, int p4, int p5, int p6, int p7);
 Vec3 __stdcall FUN_0043def0(Unit* unit, int piece);
 
 // 0x40f200, matched in 0x40f200.cpp; inlined into the state 0 case below.
 void __stdcall FUN_0040f200(Unit* unit, Order* order, unsigned int flags)
 {
-    ((Class_004898b0*)unit)->FUN_004898b0(3);
+    ((Class_004898b0*)unit)->ClaimWeapons(3);
     if (unit->field_86)
-        FUN_0048aac0(unit, 0, -1, 2);
-    ((Class_0048b090*)unit)->FUN_0048b090(1, 1);
+        AttachUnitToPiece(unit, 0, -1, 2);
+    ((Class_0048b090*)unit)->SetStateBits(1, 1);
     if ((unit->type->field_2e & 3) == 1) {
         unit->type->FUN_0043d210(unit, 2);
         Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);
@@ -165,7 +165,7 @@ int __stdcall FUN_004111b0(Unit* unit, Order* order, int flags)
                 ((Class_004b0940*)unit->script)->StartScript("EndTransport", 0, 0);
                 return 8;
             }
-            FUN_0048aac0(target, unit, order->piece, 0);
+            AttachUnitToPiece(target, unit, order->piece, 0);
             FUN_0047f780(unit, 12, 0);
             Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);
             ((Class_0044e6c0*)obj)->FUN_0044e6c0(unit->def->field_21c);

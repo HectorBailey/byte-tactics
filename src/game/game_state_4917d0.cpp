@@ -111,7 +111,7 @@ void FUN_00483610();
 void FUN_0041c2b0();
 void FUN_0042d2e0();
 void FUN_0042dcf0();
-void FUN_004854a0();
+void AllocateUnitMemory();
 void FUN_00422ea0();
 void FUN_004223e0();
 void FUN_00440940();
@@ -154,7 +154,7 @@ void FUN_004917d0()
     FUN_0041c2b0();
     FUN_0042d2e0();
     FUN_0042dcf0();
-    FUN_004854a0();
+    AllocateUnitMemory();
     FUN_00422ea0();
     FUN_004223e0();
     FUN_00440940();
