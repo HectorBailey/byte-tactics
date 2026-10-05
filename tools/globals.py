@@ -107,20 +107,25 @@ class Image:
         return self.orig.read(va, size)
 
 
+LIBRARY_REFS: set[int] = set()     # data addresses the runtime library's code refers to
+
+
 def referenced_addresses(img: Image) -> set[int]:
     """Every data address the original refers to directly: operands of every
     function's instructions, and pointers stored in .rdata and .data."""
     with (ROOT / "data/functions.csv").open() as fh:
-        funcs = [(int(r["address"], 16), int(r["size"] or 0)) for r in csv.DictReader(fh)]
+        funcs = [(int(r["address"], 16), int(r["size"] or 0), r["kind"]) for r in csv.DictReader(fh)]
     md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
     out = set()
     number = re.compile(r"0x([0-9a-f]{6,8})\b")
-    for va, size in funcs:
+    for va, size, kind in funcs:
         for _, _, _, op in md.disasm_lite(img.orig.read(va, size), va):
             for m in number.finditer(op):
                 v = int(m.group(1), 16)
                 if DATA_LO <= v < DATA_HI:
                     out.add(v)
+                    if kind == "library":
+                        LIBRARY_REFS.add(v)
     for lo, hi, raw_end, name in img.sections:
         if name not in (".rdata", ".data"):
             continue
@@ -402,7 +407,10 @@ def bss_tails(rows: list[dict], img: Image, ordered: list[int], labels: dict[int
         j = bisect.bisect_left(covered, (end, end))
         if j < len(covered) and covered[j][0] < nxt:
             nxt = covered[j][0]
-        if nxt - end < 1 or any(a <= end < b for a, b in covered[max(0, j - 2):j + 1]):
+        # Not a stretch shorter than a dword (padding), nor one the runtime
+        # library's code reaches (its own data, which its member defines).
+        if nxt - end < 4 or any(a <= end < b for a, b in covered[max(0, j - 2):j + 1]) \
+                or any(end <= a < nxt for a in LIBRARY_REFS):
             continue
         out.append({
             "address": f"{end:#x}", "name": f"DAT_{end:08x}", "section": ".bss", "size": nxt - end,

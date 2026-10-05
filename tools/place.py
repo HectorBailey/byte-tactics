@@ -1177,8 +1177,9 @@ def pad_data(placer: Placer) -> None:
         if p.sec.is_code:
             continue
         n = (p.sec.chars >> 20) & 0xF
-        # One global of a section that holds several: a dword's alignment.
-        align = (1 << (n - 1) if n else 16) if not p.lo else 4
+        # One global of a section that holds several: a dword's alignment, or
+        # a double's for an eight-byte global on an eight-byte boundary.
+        align = (1 << (n - 1) if n else 16) if not p.lo else (8 if p.hi - p.lo == 8 and not p.va % 8 else 4)
         o = p.va - img.base
         if align < 2 or p.va % align:
             continue

@@ -69,3 +69,34 @@ extern char DAT_005067bc[8];
 
 // GLOBAL: 0x506770
 const char* DAT_00506770[6] = {DAT_005067bc, "NORMTRAK", "RANDTRAK", "REPTTRAK", "SPECTRAK", 0};
+
+// The wave formats a sound device may support: its WAVEOUTCAPS.dwFormats bit
+// (WAVE_FORMAT_1M08 and the rest), a description, and the format itself,
+// ending with an empty entry. Among the sound driver's data (0x4ceb60 to
+// 0x4d01b0), which reads none of it.
+#pragma pack(push, 1)
+struct WaveFormatName {
+    unsigned int flag;
+    const char* name;
+    unsigned char bits;
+    unsigned char channels;
+    unsigned int rate;
+};
+#pragma pack(pop)
+
+// GLOBAL: 0x50b6e0
+WaveFormatName DAT_0050b6e0[13] = {
+    {0x1, "11.025 kHz, mono, 8-bit", 8, 1, 11025},
+    {0x4, "11.025 kHz, mono, 16-bit", 16, 1, 11025},
+    {0x2, "11.025 kHz, stereo, 8-bit", 8, 2, 11025},
+    {0x8, "11.025 kHz, stereo, 16-bit", 16, 2, 11025},
+    {0x10, "22.05 kHz, mono, 8-bit", 8, 1, 22050},
+    {0x40, "22.05 kHz, mono, 16-bit", 16, 1, 22050},
+    {0x20, "22.05 kHz, stereo, 8-bit", 8, 2, 22050},
+    {0x80, "22.05 kHz, stereo, 16-bit", 16, 2, 22050},
+    {0x100, "44.1 kHz, mono, 8-bit", 8, 1, 44100},
+    {0x400, "44.1 kHz, mono, 16-bit", 16, 1, 44100},
+    {0x200, "44.1 kHz, stereo, 8-bit", 8, 2, 44100},
+    {0x800, "44.1 kHz, stereo, 16-bit", 16, 2, 44100},
+    {0, 0, 0, 0, 0},
+};
