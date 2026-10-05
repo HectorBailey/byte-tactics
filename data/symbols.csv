@@ -1811,7 +1811,7 @@ address,name
 0x488bf0,FreeUnitCategories
 0x488c50,GetCategoryMask
 0x488d30,UnitTypeSet::AddTypeOrCategory
-0x488e70,Class_00488e70::AddToCategories
+0x488e70,UnitType::AddToCategories
 0x488f30,GetEnergyUse
 0x488fb0,VUnitCategory::?$vector::insert
 0x489240,Class_00489240::FUN_00489240

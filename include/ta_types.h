@@ -503,7 +503,7 @@ struct Class_00482110;
 class UnitScript;
 class Class_00488c50;
 class UnitTypeSet;
-struct Class_00488e70;
+struct UnitType;
 class Class_00489240;
 class UnitCategory;
 class Class_00489540;
@@ -5475,7 +5475,7 @@ struct MovementClass {   // 0x20 bytes, 9 views
     void ReadMoveInfo(Source_00440340*);
 };
 
-struct Class_00488e70 {  // 0x220 bytes, 2 views
+struct UnitType {        // 0x220 bytes, 2 views
     char unknown_0[542];
     unsigned short team;  // +0x21e
     void AddToCategories(char*);
