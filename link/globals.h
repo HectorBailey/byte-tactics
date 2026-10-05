@@ -700,7 +700,7 @@ extern long DAT_0052a4fc;                                                       
 
 // Not declared: 241 globals defined in a data file or whose type is not settled (see data/globals.csv).
 //   0x513000 g_packetManager: defined in src/network/packets_460e20.cpp
-//   0x5119c0 g_playerAI: PlayerAI*[] (7), void*[] (5), Owner*[] (3), Class_00409470*[] (2), and 5 more
+//   0x5119c0 g_playerAI: PlayerAI*[] (9), void*[] (5), Owner*[] (3), Class_00409470*[] (2), and 3 more
 //   0x51fbd0 g_display: void* (4), int (2), Display_004b4f50* (1), Display_004b5370* (1), and 14 more
 //   0x51e598 IUUnitSyncEntry::IU?$pair::?$_Tree::_Nil: defined in src/network/unit_sync_46c920.cpp
 //   0x528a54 std::IH::IU?$pair::?$_Tree::_Nil: defined in src/debug/debug_lib_4db610.cpp

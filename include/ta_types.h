@@ -137,7 +137,7 @@ class Class_00407d40;
 class Class_004085d0;
 class Class_00408620;
 class Class_00408810;
-class Class_00408830;
+class SquadManager;
 class Class_004089a0;
 class Class_00408bf0;
 class Class_00409730;
@@ -20243,7 +20243,7 @@ public:
     virtual void OnTimer(void);
 };
 
-class Class_00408830 {  // 0x4 bytes, 3 views
+class SquadManager {    // 0x4 bytes, 3 views
 public:
     Player* player;  // +0x0
     void AssignSquads(void);

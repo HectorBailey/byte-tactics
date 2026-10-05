@@ -55,7 +55,7 @@ void __stdcall MakeHeap(Elem_0040cc40* first, Elem_0040cc40* last, int*, Elem_00
 void __stdcall PopHeapFirst(Elem_0040cc40* first, Elem_0040cc40* last, Elem_0040cc40* dest,
                             Elem_0040cc40 val, int*);
 
-class Class_0040a7b0 {
+class PlayerAI {
 public:
     bool FindCellNearFeatures(UnitType* type, Vec3* pos, ElemVec* list, int range, Point16* out);
 };
@@ -84,7 +84,7 @@ static inline void PopHeap(Elem_0040cc40* f, Elem_0040cc40* l)
 // The object is the same class as 0x40a7b0's (its caller 0x40bfe0 passes
 // this + 0x4d, the vector 0x40a7b0 fills, as `list`); `this` is unused.
 // FUNCTION: 0x40a260
-bool Class_0040a7b0::FindCellNearFeatures(UnitType* type, Vec3* pos, ElemVec* list, int range, Point16* out)
+bool PlayerAI::FindCellNearFeatures(UnitType* type, Vec3* pos, ElemVec* list, int range, Point16* out)
 {
     if (list->empty())
         return false;

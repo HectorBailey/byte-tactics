@@ -18,7 +18,7 @@ struct Game {
 
 extern Game* g_game;
 
-class Class_00428f60 {
+class AIProfileParser {
 public:
     char unknown_0[0x8c];
     int errorReported;                 // +0x8c
@@ -27,7 +27,7 @@ public:
 };
 
 // FUNCTION: 0x428f60
-void Class_00428f60::ReportParseError(char* text)
+void AIProfileParser::ReportParseError(char* text)
 {
     char buffer[256];
     if (!errorReported) {

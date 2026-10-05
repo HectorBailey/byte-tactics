@@ -22,7 +22,7 @@ public:
 
 extern Game* g_game;
 
-class Class_00408830 {
+class SquadManager {
 public:
     void AssignSquads();
 };
@@ -51,7 +51,7 @@ void Class_00408c40::TickIfActive()
     if (target->unknown_0 != 0 && target->state == 2) {
         if (--countdown <= 0) {
             countdown = 30;
-            ((Class_00408830*)this)->AssignSquads();
+            ((SquadManager*)this)->AssignSquads();
         }
         for (int i = 0; i < 10; i++) {
             if (timers[i] != 0 && timers[i]->time <= g_game->now) {
