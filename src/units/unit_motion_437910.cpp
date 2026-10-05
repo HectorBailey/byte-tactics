@@ -33,7 +33,7 @@ struct Game {
 extern Game* g_game;
 
 // FUNCTION: 0x437910
-void __stdcall FUN_00437910(Unit* unit)
+void __stdcall UpdateWindGenerator(Unit* unit)
 {
     if (unit->type->field_1d2 > 0.0f && g_game->windEnabled) {
         unit->script->StartScriptWithArgs("SetDirection", 0, 0, 1, g_game->windDirection, 0, 0, 0);

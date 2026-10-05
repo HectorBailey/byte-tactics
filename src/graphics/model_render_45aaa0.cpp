@@ -4,7 +4,7 @@
 
 class Class_00437c90 {
 public:
-    void FUN_00437c90(int id);
+    void ReleaseHandle(int id);
 };
 
 #pragma pack(push, 1)
@@ -41,8 +41,8 @@ void __stdcall FUN_0045aaa0(ObjectState_0045aaa0* state)
         FUN_004d85a0(state->entries[i].ptr);
     }
     if (g_game->obj != 0) {
-        g_game->obj->FUN_00437c90((int)&state->field_10);
-        g_game->obj->FUN_00437c90((int)&state->field_14);
+        g_game->obj->ReleaseHandle((int)&state->field_10);
+        g_game->obj->ReleaseHandle((int)&state->field_14);
     }
     FUN_004d85a0(state);
 }

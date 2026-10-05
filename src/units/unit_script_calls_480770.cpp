@@ -69,7 +69,7 @@ struct Vec3_00480770 {
 
 extern Game* g_game;
 
-Vec3_00480770 __stdcall FUN_0043e060(Unit* obj, int param);
+Vec3_00480770 __stdcall GetPiecePosition(Unit* obj, int param);
 int __stdcall GetGroundHeight(Vec3_00480770* pos);
 int __cdecl FUN_004b715a(int a, int b);
 
@@ -107,12 +107,12 @@ int UnitScript::GetUnitValue(int which, int a, int b, int c, int d)
         return unit->bit1;
     case 7: {
         Vec3_00480770 v;
-        v = FUN_0043e060(unit, a);
+        v = GetPiecePosition(unit, a);
         return (v.x & 0xffff0000) + (v.z >> 16);
     }
     case 8: {
         Vec3_00480770 v;
-        v = FUN_0043e060(unit, a);
+        v = GetPiecePosition(unit, a);
         return v.y;
     }
     case 9: {

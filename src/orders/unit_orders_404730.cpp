@@ -55,7 +55,7 @@ short __stdcall GetHeadingBetween(Vec3*, Vec3*);
 void __stdcall FUN_00438590(Unit*, Order*, short);
 void __stdcall FUN_004385f0(Unit*, Order*);
 int __stdcall FUN_00438700(Unit*, Order*, int);
-void __stdcall FUN_0043e400(Unit*, Vec3*);
+void __stdcall GetNanoPiecePosition(Unit*, Vec3*);
 void __stdcall FUN_00472200(Vec3*, Vec3*, int);
 void __stdcall FUN_00488570(Unit*, void*, int);
 class Class_00489960 { public: int CanReclaim(Unit*); };
@@ -118,7 +118,7 @@ int __stdcall FUN_00404730(Unit* unit, Order* order, unsigned int flags)
             }
             unit->timeout = g_game->tick + 900;
             Vec3 start;
-            FUN_0043e400(order->source, &start);
+            GetNanoPiecePosition(order->source, &start);
             Vec3 bounds[2];
             bounds[1] = order->target.Get()->pos;
             bounds[0] = order->target.Get()->pos;

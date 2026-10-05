@@ -3,7 +3,7 @@
 // MATCH (3152 bytes). Returns the cursor/action code for an order of type
 // `mode` given by `unit` on `target` / `pos`; FUN_0043f0e0 is the sibling that
 // returns the action's name. What the earlier 68.2% version was missing:
-//  - case 1 recurses with `return FUN_0043e490(3/0xc, unit, target, pos)`. MSVC
+//  - case 1 recurses with `return GetOrderCursor(3/0xc, unit, target, pos)`. MSVC
 //    turns the self tail calls into `mov byte [esp+0x18], 3; jmp` back to the
 //    top, which is the original's loop; a hand-written goto loop allocates
 //    differently.
@@ -175,7 +175,7 @@ class Class_00489a70 {
   public:
     int CanLoad(Unit_0043e490* other);
 };
-int __stdcall FUN_0043e490(unsigned char mode, Unit_0043e490* unit, Unit_0043e490* target,
+int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e490* target,
                            Pos_0043e490* pos);
 
 // The same test as FUN_00408090: is the map square under pos in sight of the
@@ -232,7 +232,7 @@ static inline int Selectable(Unit_0043e490* t) {
 }
 
 // FUNCTION: 0x43e490
-int __stdcall FUN_0043e490(unsigned char mode, Unit_0043e490* unit, Unit_0043e490* target,
+int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e490* target,
                            Pos_0043e490* pos) {
     Def_0043e490* def;
     Node_0043e490* node;
@@ -337,9 +337,9 @@ int __stdcall FUN_0043e490(unsigned char mode, Unit_0043e490* unit, Unit_0043e49
             break;
         }
         if ((def->f245 & 0x10) && enemy)
-            return FUN_0043e490(3, unit, target, pos);
+            return GetOrderCursor(3, unit, target, pos);
         if ((def->f245 & 0x400) && enemy)
-            return FUN_0043e490(0xc, unit, target, pos);
+            return GetOrderCursor(0xc, unit, target, pos);
         if (target && ((Class_004899b0*)unit)->CanRepair(target) && target->f104 != 0.0f)
             return 6;
         if (Selectable(target))

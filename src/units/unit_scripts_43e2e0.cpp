@@ -3,7 +3,7 @@
 // unit's script for the "AimFrom" piece, and if the script has none
 // (-1), falls back to the "Query" piece. The unit's position is then
 // added to the piece offset. The two branches each build the
-// FUN_0043def0 call, which is how the original lays the code out.
+// GetPieceOffset call, which is how the original lays the code out.
 
 struct Vec3 {
     int x;
@@ -34,10 +34,10 @@ struct Object {
 };
 #pragma pack(pop)
 
-Vec3 __stdcall FUN_0043def0(Object* obj, int param);
+Vec3 __stdcall GetPieceOffset(Object* obj, int param);
 
 // FUNCTION: 0x43e2e0
-void __stdcall FUN_0043e2e0(Object* obj, Vec3* out, unsigned char weapon)
+void __stdcall GetAimFromPosition(Object* obj, Vec3* out, unsigned char weapon)
 {
     char* names[3] = { "AimFromPrimary", "AimFromSecondary", "AimFromTertiary" };
     int piece = -1;
@@ -46,8 +46,8 @@ void __stdcall FUN_0043e2e0(Object* obj, Vec3* out, unsigned char weapon)
         char* qnames[3] = { "QueryPrimary", "QuerySecondary", "QueryTertiary" };
         int q = 0;
         obj->script->QueryScript(qnames[weapon], &q, 0, 0, 0);
-        *out = obj->pos + FUN_0043def0(obj, q);
+        *out = obj->pos + GetPieceOffset(obj, q);
     } else {
-        *out = obj->pos + FUN_0043def0(obj, piece);
+        *out = obj->pos + GetPieceOffset(obj, piece);
     }
 }

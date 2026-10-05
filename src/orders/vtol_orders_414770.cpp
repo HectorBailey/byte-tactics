@@ -23,7 +23,7 @@ class Class_0043d210 {
 public:
     char unknown_0[0x2e];
     unsigned char field_2e;            // +0x2e
-    void FUN_0043d210(Unit* unit, int state);
+    void SetFlightMode(Unit* unit, int state);
 };
 class Class_004898b0 { public: void ClaimWeapons(int); };
 class Class_0048b090 { public: void SetStateBits(int, int); };
@@ -95,7 +95,7 @@ extern Game* g_game;
 unsigned short __stdcall FUN_00421da0(Vec3* pos, Point16* cell, Point16* size);
 void __stdcall FUN_0047f780(Unit* unit, int kind, char* text);
 int __stdcall GetGroundHeight(Vec3* pos);
-void __stdcall FUN_0043e400(Unit* unit, Vec3* out);
+void __stdcall GetNanoPiecePosition(Unit* unit, Vec3* out);
 void __stdcall FUN_00472200(Box* from, Vec3* to, int count);
 void __stdcall FUN_004237d0(Unit* unit, Vec3* pos);
 void __stdcall AttachUnitToPiece(Unit* unit, Unit* target, char p3, char p4);
@@ -108,7 +108,7 @@ void __stdcall FUN_0040f200(Unit* unit, Order* order, unsigned int flags)
         AttachUnitToPiece(unit, 0, -1, 2);
     ((Class_0048b090*)unit)->SetStateBits(1, 1);
     if ((unit->type->field_2e & 3) == 1) {
-        unit->type->FUN_0043d210(unit, 2);
+        unit->type->SetFlightMode(unit, 2);
         Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);
         ((Class_0044e6c0*)obj)->FUN_0044e6c0(unit->def->field_21c / 2);
         ((Class_004388d0*)order)->FUN_004388d0((int)obj);
@@ -159,7 +159,7 @@ int __stdcall FUN_00414770(Unit* unit, Order* order, int flags)
         unit->workTime = g_game->ticks + 300;
         if (order->time > 30) {
             Vec3 nano;
-            FUN_0043e400(unit, &nano);
+            GetNanoPiecePosition(unit, &nano);
             Box box;
             box.lo.x = cell.x << 20;
             box.lo.z = cell.z << 20;

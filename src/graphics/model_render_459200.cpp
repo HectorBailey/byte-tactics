@@ -156,7 +156,7 @@ union Vec3_459200 {
 extern Game* g_game;
 extern const float DAT_004fd4c0;
 
-struct Class_00437a30 { void FUN_0045a790(Model_459200*, int); };
+struct CMemoryCache { void FUN_0045a790(Model_459200*, int); };
 struct Class_0045a470 { void FUN_0045a470(int); };
 struct Class_004581e0 { void FUN_004586a0(Model_459200*,int,int); void FUN_00459830(int,Model_459200*,int,int); };
 struct Class_00458d30 { void FUN_00458dd0(int,Model_459200*); };
@@ -220,7 +220,7 @@ void Class_00459200::FUN_00459200(int param_2, Model_459200* model, Vec3_459200 
                     && (f.word & 0x40000000) == 0) {
                     if (model->owner->field_a6 != 0 || dx >= g_game->field_1427f) {
                         if (model->field_14 == 0)
-                            ((Class_00437a30*)this)->FUN_0045a790(model,bmp);
+                            ((CMemoryCache*)this)->FUN_0045a790(model,bmp);
                         FUN_004b8500(param_2, model->field_14, v.p.x.whole + 0x85, y);
                     }
                 } else {
@@ -276,7 +276,7 @@ void Class_00459200::FUN_00459200(int param_2, Model_459200* model, Vec3_459200 
                     if (model->owner->flags & 0x20000000) {
                         if (model->owner->field_a6 != 0 || dx >= g_game->field_1427f) {
                             if (model->field_14 == 0)
-                                ((Class_00437a30*)this)->FUN_0045a790(model,bmp);
+                                ((CMemoryCache*)this)->FUN_0045a790(model,bmp);
                             FUN_004b8500(param_2, model->field_14, v.p.x.whole + 0x85, y);
                         }
                     } else {

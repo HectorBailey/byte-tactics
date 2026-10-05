@@ -33,7 +33,7 @@ struct WeaponDef { char pad0[0xdc]; int range; char pade0[0x111-0xe0]; unsigned 
 struct Weapon { char pad0[8]; WeaponDef* def; char padc[11]; unsigned char flags; char pad18[4]; };
 struct UnitDef { char pad0[0x1fa]; unsigned int maxHealth; char pad1fe[0x21c-0x1fe]; short altitude; char pad21e[0x231-0x21e]; unsigned int* weaponCategories[3]; unsigned int* categories; unsigned int flags; };
 struct Owner { char pad0[0x108]; unsigned char allied[0x3e]; unsigned char index; };
-class Class_0043d210 { public: char pad0[0x2e]; unsigned char flags; void FUN_0043d210(Unit*, int); };
+class Class_0043d210 { public: char pad0[0x2e]; unsigned char flags; void SetFlightMode(Unit*, int); };
 struct Unit {
     Class_0043d210* motion; char pad4[4]; Weapon weapons[3]; Order* order;
     char pad60[10]; Vec3 pos; char pad76[8]; short width; short depth; int terrain; int busy;
@@ -100,7 +100,7 @@ int __stdcall FUN_0040fbe0(Unit* unit, Order* order, int flags)
                 if (unit->busy) AttachUnitToPiece(unit,0,-1,2);
                 ((Class_0048b090*)unit)->SetStateBits(1,1);
                 if ((unit->motion->flags&3)==1) {
-                    unit->motion->FUN_0043d210(unit,2);
+                    unit->motion->SetFlightMode(unit,2);
                     Class_0044e2d0* move=new Class_0044e2d0(order,unit->pos);
                     ((Class_0044e6c0*)move)->FUN_0044e6c0(unit->def->altitude/2);
                     ((Class_004388d0*)order)->FUN_004388d0((int)move);

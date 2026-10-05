@@ -32,7 +32,7 @@ struct Vec3 {
     }
 };
 struct Unit;
-class Class_0043d210 { public: char pad0[0x2e]; unsigned char flags; void FUN_0043d210(Unit*,int); };
+class Class_0043d210 { public: char pad0[0x2e]; unsigned char flags; void SetFlightMode(Unit*,int); };
 class Class_00438880 { public: void FUN_00438880(const char*); };
 class Class_004388d0 { public: void FUN_004388d0(int); };
 class Class_0044e730 { public: void FUN_0044e730(int); };
@@ -94,7 +94,7 @@ int __stdcall GetHeadingBetween(Vec3*, Vec3*);
 void __stdcall FUN_00438590(Unit*, Order*, short);
 int __stdcall FUN_00438700(Unit*, Order*, int);
 int __stdcall FUN_0041ba60(Unit*, Unit*, float);
-void __stdcall FUN_0043e400(Unit*, Vec3*);
+void __stdcall GetNanoPiecePosition(Unit*, Vec3*);
 void __stdcall FUN_004720d0(Vec3*, Vec3*, int);
 static inline Point WorldToCell(Vec3 v, Point origin)
 {
@@ -131,7 +131,7 @@ int __stdcall FUN_00414380(Unit* unit,Order* order,int flags)
                 if (unit->busy) AttachUnitToPiece(unit,0,-1,2);
                 ((Class_0048b090*)unit)->SetStateBits(1,1);
                 if ((unit->motion->flags&3)==1) {
-                    unit->motion->FUN_0043d210(unit,2);
+                    unit->motion->SetFlightMode(unit,2);
                     Class_0044e2d0* move=new Class_0044e2d0(order,unit->pos);
                     ((Class_0044e6c0*)move)->FUN_0044e6c0(unit->def->altitude/2);
                     ((Class_004388d0*)order)->FUN_004388d0((int)move);
@@ -169,7 +169,7 @@ int __stdcall FUN_00414380(Unit* unit,Order* order,int flags)
         int ok=FUN_0041ba60(unit,order->target.Get(),(float)(rate/30));
         if (ok) {
             Vec3 start;
-            FUN_0043e400(unit,&start);
+            GetNanoPiecePosition(unit,&start);
             Vec3 bounds[2];
             bounds[0]=order->target.Get()->pos+order->target.Get()->def->min;
             bounds[1]=order->target.Get()->pos+order->target.Get()->def->max;

@@ -7,11 +7,11 @@ public:
     char unknown_0[4];
     int* field_4;                      // +0x4
 
-    void FUN_00437a00();
+    void FreeCache();
 };
 
 // FUNCTION: 0x437a00
-void Class_00437a00::FUN_00437a00()
+void Class_00437a00::FreeCache()
 {
     if (field_4 != 0) {
         FUN_004d85a0(field_4);

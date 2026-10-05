@@ -106,7 +106,7 @@ struct Unit {
 class Class_0043dd20 {
 public:
     char unknown_0[0x8a];
-    void FUN_0043dd20(Unit* u);
+    void UpdateMotion(Unit* u);
 };
 
 struct Player_0048ad30 {
@@ -148,7 +148,7 @@ struct Game {
 #pragma pack(pop)
 
 
-void __stdcall FUN_00437910(Unit* u);
+void __stdcall UpdateWindGenerator(Unit* u);
 void __stdcall FUN_0049e1a0(Unit* u);
 void __stdcall FUN_0043b7c0(Unit* u);
 void __stdcall FUN_0043bad0(Unit* u);
@@ -192,7 +192,7 @@ void __stdcall UpdateAllUnits(void)
             while (u <= last) {
                     if (u->fa6 != 0) {
                         (*cnt)++;
-                        FUN_00437910(u);
+                        UpdateWindGenerator(u);
                         if (p->f0 != 0) {
                             unsigned char k2 = p->f73;
                             if (k2 == 1 || k2 == 2) {
@@ -243,7 +243,7 @@ void __stdcall UpdateAllUnits(void)
                                 FUN_0043b7c0(u);
                                 FUN_0043bad0(u);
                                 if (u->def != 0) {
-                                    u->def->FUN_0043dd20(u);
+                                    u->def->UpdateMotion(u);
                                     UpdateUnitHeight(u);
                                 }
                             }

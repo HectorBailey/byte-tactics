@@ -86,7 +86,7 @@ int __stdcall GetGroundHeight(Vec3* pos);
 unsigned short __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
 void __stdcall FUN_00438590(Unit* unit, Order* order, short turn);
 int __stdcall FUN_00438700(Unit* unit, Order* order, int flags);
-void __stdcall FUN_0043e400(Unit* unit, Vec3* out);
+void __stdcall GetNanoPiecePosition(Unit* unit, Vec3* out);
 void __stdcall FUN_00472200(Box* from, Vec3* to, int count);
 void __stdcall FUN_004237d0(Unit* unit, Vec3* pos);
 
@@ -136,7 +136,7 @@ int __stdcall FUN_00404ad0(Unit* unit, Order* order, int flags)
         unit->workTime = g_game->ticks + 300;
         if (order->time > 15) {
             Vec3 nano;
-            FUN_0043e400(unit, &nano);
+            GetNanoPiecePosition(unit, &nano);
             Box box;
             box.lo.x = cell.x << 20;
             box.lo.z = cell.z << 20;

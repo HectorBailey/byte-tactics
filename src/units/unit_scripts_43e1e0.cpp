@@ -15,7 +15,7 @@ struct Object {
 #pragma pack(pop)
 
 // FUNCTION: 0x43e1e0
-int __stdcall FUN_0043e1e0(Object* obj, unsigned char weapon)
+int __stdcall QueryWeaponPiece(Object* obj, unsigned char weapon)
 {
     char* names[3] = { "QueryPrimary", "QuerySecondary", "QueryTertiary" };
     int piece = 0;

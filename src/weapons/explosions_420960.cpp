@@ -11,7 +11,7 @@ public:
     char unknown_0[4];
     int* field_4;                      // +0x4
 
-    void FUN_00437a00();
+    void FreeCache();
 };
 
 struct Entry_00420960 {
@@ -41,7 +41,7 @@ void __cdecl FUN_004d85a0(void* p);
 void FUN_00420960(void)
 {
     if (g_game->field_1ab9b != 0) {
-        DAT_00511f80.FUN_00437a00();
+        DAT_00511f80.FreeCache();
         for (int i = 0; i < 3; i++) {
             if (g_game->lists[i] != 0) {
                 for (int j = 0; j < g_game->lists[i]->count; j++) {

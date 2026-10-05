@@ -68,7 +68,7 @@ public:
     void ReleaseWeapons(unsigned char index);
 };
 
-class Class_0043dc00;
+class UnitMotion;
 
 struct Pos_485a40 {
     int x, y, z;
@@ -115,7 +115,7 @@ union Flags114_485a40 {
 };
 
 struct Unit {
-    Class_0043dc00* obj;               // +0x0
+    UnitMotion* obj;                   // +0x0
     char unknown_4[0x64 - 0x4];
     short field_64;                    // +0x64
     unsigned short field_66;           // +0x66

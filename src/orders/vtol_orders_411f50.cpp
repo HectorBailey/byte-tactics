@@ -60,7 +60,7 @@ public:
     short field_22;                    // +0x22
     char unknown_24[0x2e - 0x24];
     unsigned char field_2e;            // +0x2e
-    void FUN_0043d210(Unit* unit, int state);
+    void SetFlightMode(Unit* unit, int state);
 };
 class Class_004895c0 {
 public:
@@ -169,7 +169,7 @@ void __stdcall FUN_0040f200(Unit* unit, Order* order, unsigned int flags)
         AttachUnitToPiece(unit, 0, -1, 2);
     ((Class_0048b090*)unit)->SetStateBits(1, 1);
     if ((unit->type->field_2e & 3) == 1) {
-        unit->type->FUN_0043d210(unit, 2);
+        unit->type->SetFlightMode(unit, 2);
         Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);
         ((Class_0044e6c0*)obj)->FUN_0044e6c0(unit->def->field_21c / 2);
         ((Class_004388d0*)order)->FUN_004388d0((int)obj);

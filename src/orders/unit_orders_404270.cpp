@@ -78,7 +78,7 @@ short __stdcall GetHeadingBetween(Vec3*, Vec3*);
 void __stdcall FUN_00438590(Unit*, Order*, short);
 int __stdcall FUN_00438700(Unit*, Order*, int);
 int __stdcall FUN_0041ba60(Unit*, Unit*, float);
-void __stdcall FUN_0043e400(Unit*, Vec3*);
+void __stdcall GetNanoPiecePosition(Unit*, Vec3*);
 void __stdcall FUN_004720d0(Vec3*, Vec3*, int);
 class Class_00438a00 { public: void FUN_00438a00(Vec3*, int, int); };
 static inline Point WorldToCell(Vec3 v, Point origin)
@@ -164,7 +164,7 @@ int __stdcall FUN_00403a20(Unit* unit, Order* order, int flags)
         rate = unit->def->buildRate;
         if (FUN_0041ba60(unit, order->target, (float)(rate / 30))) {
             Vec3 start;
-            FUN_0043e400(unit, &start);
+            GetNanoPiecePosition(unit, &start);
             Vec3 bounds[2];
             bounds[0] = order->target->pos + order->target->def->min;
             bounds[1] = order->target->pos + order->target->def->max;
@@ -225,7 +225,7 @@ int __stdcall FUN_00403f70(Unit* unit, Order* order, int flags)
         rate = unit->def->buildRate;
         if (FUN_0041ba60(unit, target, (float)(rate / 30))) {
             Vec3 start;
-            FUN_0043e400(unit, &start);
+            GetNanoPiecePosition(unit, &start);
             Vec3 bounds[2];
             bounds[0] = order->target->pos + order->target->def->min;
             bounds[1] = order->target->pos + order->target->def->max;
@@ -293,7 +293,7 @@ short __stdcall GetHeadingBetween(Vec3*, Vec3*);
 void __stdcall FUN_00438590(Unit*, Order*, short);
 void __stdcall FUN_004385f0(Unit*, Order*);
 int __stdcall FUN_00438700(Unit*, Order*, int);
-void __stdcall FUN_0043e400(Unit*, Vec3*);
+void __stdcall GetNanoPiecePosition(Unit*, Vec3*);
 void __stdcall FUN_00472200(Vec3*, Vec3*, int);
 void __stdcall FUN_00488570(Unit*, void*, int);
 // FUNCTION: 0x404270
@@ -356,7 +356,7 @@ int __stdcall FUN_00404270(Unit* unit, Order* order, unsigned int flags)
         }
         if (order->elapsed >= order->duration) return 1;
         Vec3 start;
-        FUN_0043e400(order->source, &start);
+        GetNanoPiecePosition(order->source, &start);
         Vec3 bounds[2];
         bounds[1] = order->target.Get()->pos;
         bounds[0] = order->target.Get()->pos;

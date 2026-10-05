@@ -249,7 +249,7 @@ struct UnitDef {
 
 
 // FUNCTION: 0x42bf40
-void __stdcall FUN_0042bf40(char* fbi_file, UnitDef* unitdef) {
+void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
     Class_004c2ea0 parser;
     char buf[100];
     char weapon[128];
