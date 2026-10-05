@@ -89,9 +89,9 @@ void __stdcall FUN_0041c110(Unit*);
 int __stdcall FUN_0047db70(UnitDef*, int, Point, int);
 void __stdcall FUN_0047ddc0(UnitDef*, Vec3*);
 Unit* __stdcall CreateUnit(unsigned char, short, Vec3, int, int, int);
-void __stdcall FUN_0043adc0(Class_00438760, int, Unit*, Unit*, Vec3*, int, int);
+void __stdcall AddOrder(Class_00438760, int, Unit*, Unit*, Vec3*, int, int);
 int __stdcall GetHeadingBetween(Vec3*, Vec3*);
-void __stdcall FUN_00438590(Unit*, Order*, short);
+void __stdcall StartBuildingScript(Unit*, Order*, short);
 int __stdcall FUN_00438700(Unit*, Order*, int);
 int __stdcall FUN_0041ba60(Unit*, Unit*, float);
 void __stdcall GetNanoPiecePosition(Unit*, Vec3*);
@@ -152,7 +152,7 @@ int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
     case 2:
         if (flags&0x40) return 8;
         if (order->target.Get()->progress==0.0f) return 5;
-        FUN_00438590(unit,order,(short)GetHeadingBetween(&unit->pos,&order->target.Get()->pos));
+        StartBuildingScript(unit,order,(short)GetHeadingBetween(&unit->pos,&order->target.Get()->pos));
         FUN_0041c110(unit);
         return 1;
     case 3: {

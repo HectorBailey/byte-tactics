@@ -43,7 +43,7 @@ struct Unit {
 #pragma pack(pop)
 
 void __stdcall ClearWeaponTarget(Unit* unit, int which);
-void __stdcall FUN_0043acb0(Unit* owner, Class_0043a1f0* node);
+void __stdcall AppendOrder(Unit* owner, Class_0043a1f0* node);
 
 // FUNCTION: 0x401c20
 int __stdcall StopOrder(Unit* unit, Class_00438880* order, int unused)
@@ -53,7 +53,7 @@ int __stdcall StopOrder(Unit* unit, Class_00438880* order, int unused)
     ClearWeaponTarget(unit, 1);
     ClearWeaponTarget(unit, 2);
     if ((unit->flags & 3) == 2 && (unit->def->flags & 0x800)) {
-        FUN_0043acb0(unit, new Class_0043a1f0("VTOL_LANDIFCAN", 0, &unit->pos, 0, 0, 0));
+        AppendOrder(unit, new Class_0043a1f0("VTOL_LANDIFCAN", 0, &unit->pos, 0, 0, 0));
     }
     return 5;
 }

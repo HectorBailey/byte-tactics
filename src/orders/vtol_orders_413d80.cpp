@@ -64,9 +64,9 @@ void __stdcall FUN_0041c110(Unit*);
 int __stdcall FUN_0047db70(UnitDef*, int, Point, int);
 void __stdcall FUN_0047ddc0(UnitDef*, Vec3*);
 Unit* __stdcall CreateUnit(unsigned char, short, Vec3, int, int, int);
-void __stdcall FUN_0043adc0(Class_00438760, int, Unit*, Unit*, Vec3*, int, int);
+void __stdcall AddOrder(Class_00438760, int, Unit*, Unit*, Vec3*, int, int);
 int __stdcall GetHeadingBetween(Vec3*, Vec3*);
-void __stdcall FUN_00438590(Unit*, Order*, short);
+void __stdcall StartBuildingScript(Unit*, Order*, short);
 int __stdcall FUN_00438700(Unit*, Order*, int);
 int __stdcall FUN_0041ba60(Unit*, Unit*, float);
 void __stdcall GetNanoPiecePosition(Unit*, Vec3*);
@@ -140,8 +140,8 @@ int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
         ((Class_004895c0*)((char*)order+0x12))->SetUnit(CreateUnit(unit->player,(short)order->type,order->pos,0,1,0));
         if (!order->target) { FUN_0047f780(unit,7,"Unable to create any more units"); return 8; }
         FUN_0047f780(unit,9,"Starting construction");
-        FUN_0043adc0("GETBUILT",1,order->target,unit,0,0,0);
-        FUN_00438590(unit,order,FUN_004b715a(unit->pos.x-order->target->pos.x,unit->pos.z-order->target->pos.z)-unit->angle);
+        AddOrder("GETBUILT",1,order->target,unit,0,0,0);
+        StartBuildingScript(unit,order,FUN_004b715a(unit->pos.x-order->target->pos.x,unit->pos.z-order->target->pos.z)-unit->angle);
         FUN_0041c110(unit);
         return 1;
     }

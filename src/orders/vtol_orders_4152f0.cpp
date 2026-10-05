@@ -9,7 +9,7 @@
 //  - The switch sits in a `for (;;)` loop, as in the matched RECLAIM handler
 //    0x405980 (no `continue`, so no back edge and every block keeps weight
 //    1). Only then do all four reclaim arms, each written with its own
-//    `FUN_0043acb0(unit, new ...); order->flags = 0; return 3;`, cross-jump
+//    `AppendOrder(unit, new ...); order->flags = 0; return 3;`, cross-jump
 //    into the last arm's constructor tail. Without the loop MSVC merges at
 //    most two arms into the last one; a loop around case 1's body or around
 //    the reclaim chain alone does not merge them either. Matched functions
@@ -118,7 +118,7 @@ public:
 int __stdcall FUN_004b6c30(int);
 void __stdcall FUN_0043a020(Unit*, Order*);
 void __stdcall AttachUnitToPiece(Unit* unit, Unit* target, char p3, char p4);
-void __stdcall FUN_0043acb0(Unit*, Class_0043a1f0*);
+void __stdcall AppendOrder(Unit*, Class_0043a1f0*);
 void __stdcall FUN_0040b530(int player, Vec3* pos, int range, std::vector<Unit*>* out);
 void __stdcall FUN_0047e890(Vec3*, int, const Class_004158d0&);
 int __stdcall FUN_0043b400(Unit*, Unit*, int);
@@ -148,7 +148,7 @@ static inline int Land(Unit* unit, Order* order)
         if (!pads.empty()) {
             ((Class_004388d0*)order)->FUN_004388d0(0);
             Unit* pad = pads[FUN_004b6c30(pads.size())];
-            FUN_0043acb0(unit, new Class_0043a1f0("VTOL_LANDING", pad, 0, 0, 0, 0));
+            AppendOrder(unit, new Class_0043a1f0("VTOL_LANDING", pad, 0, 0, 0, 0));
             order->flags = 0;
             return 1;
         }
@@ -206,7 +206,7 @@ int __stdcall VtolRepairPatrolOrder(Unit* unit, Order* order, unsigned int flags
                     }
                     if (((Class_004899b0*)unit)->CanRepair(target) && target->progress != 0.0f) {
                         ((Class_004388d0*)order)->FUN_004388d0(0);
-                        FUN_0043acb0(unit, new Class_0043a1f0("VTOL_HELPBUILD", target, 0, 0, 0, 0));
+                        AppendOrder(unit, new Class_0043a1f0("VTOL_HELPBUILD", target, 0, 0, 0, 0));
                         order->flags = 0;
                         return 3;
                     }
@@ -221,25 +221,25 @@ int __stdcall VtolRepairPatrolOrder(Unit* unit, Order* order, unsigned int flags
             if (FUN_0047ea40(&unit->pos, range, &energy, &energyAmount, &metal, &metalAmount)) {
                 if (unit->owner->GetMetal() < unit->owner->metalCapacity * 0.2 && metal) {
                     ((Class_004388d0*)order)->FUN_004388d0(0);
-                    FUN_0043acb0(unit, new Class_0043a1f0("VTOL_RECLAIM", 0, metal, 0, 0, 0));
+                    AppendOrder(unit, new Class_0043a1f0("VTOL_RECLAIM", 0, metal, 0, 0, 0));
                     order->flags = 0;
                     return 3;
                 }
                 if (unit->owner->GetEnergy() < unit->owner->energyCapacity * 0.2 && energy) {
                     ((Class_004388d0*)order)->FUN_004388d0(0);
-                    FUN_0043acb0(unit, new Class_0043a1f0("VTOL_RECLAIM", 0, energy, 0, 0, 0));
+                    AppendOrder(unit, new Class_0043a1f0("VTOL_RECLAIM", 0, energy, 0, 0, 0));
                     order->flags = 0;
                     return 3;
                 }
                 if (metal && Total(unit->owner->GetMetal(), metalAmount) <= unit->owner->metalCapacity) {
                     ((Class_004388d0*)order)->FUN_004388d0(0);
-                    FUN_0043acb0(unit, new Class_0043a1f0("VTOL_RECLAIM", 0, metal, 0, 0, 0));
+                    AppendOrder(unit, new Class_0043a1f0("VTOL_RECLAIM", 0, metal, 0, 0, 0));
                     order->flags = 0;
                     return 3;
                 }
                 if (energy && Total(unit->owner->GetEnergy(), energyAmount) <= unit->owner->energyCapacity) {
                     ((Class_004388d0*)order)->FUN_004388d0(0);
-                    FUN_0043acb0(unit, new Class_0043a1f0("VTOL_RECLAIM", 0, energy, 0, 0, 0));
+                    AppendOrder(unit, new Class_0043a1f0("VTOL_RECLAIM", 0, energy, 0, 0, 0));
                     order->flags = 0;
                     return 3;
                 }

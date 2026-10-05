@@ -56,9 +56,9 @@ void __stdcall FUN_0041c110(Unit*);
 int __stdcall FUN_0047db70(UnitDef*, int, Point, int);
 void __stdcall FUN_0047ddc0(UnitDef*, Vec3*);
 Unit* __stdcall CreateUnit(unsigned char, short, Vec3, int, int, int);
-void __stdcall FUN_0043adc0(Class_00438760, int, Unit*, Unit*, Vec3*, int, int);
+void __stdcall AddOrder(Class_00438760, int, Unit*, Unit*, Vec3*, int, int);
 short __stdcall GetHeadingBetween(Vec3*, Vec3*);
-void __stdcall FUN_00438590(Unit*, Order*, short);
+void __stdcall StartBuildingScript(Unit*, Order*, short);
 int __stdcall FUN_00438700(Unit*, Order*, int);
 int __stdcall FUN_0041ba60(Unit*, Unit*, float);
 void __stdcall GetNanoPiecePosition(Unit*, Vec3*);
@@ -135,8 +135,8 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
         }
         FUN_0047f780(unit, 9, "Starting construction");
         FUN_0041c110(unit);
-        FUN_0043adc0("getbuilt", 1, order->target, unit, 0, 0, 0);
-        FUN_00438590(unit, order, GetHeadingBetween(&unit->pos, &order->target->pos) - unit->angle);
+        AddOrder("getbuilt", 1, order->target, unit, 0, 0, 0);
+        StartBuildingScript(unit, order, GetHeadingBetween(&unit->pos, &order->target->pos) - unit->angle);
         return 1;
     }
     case 2:
