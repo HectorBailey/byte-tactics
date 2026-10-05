@@ -634,7 +634,7 @@ class Class_004b3590;
 class Class_004b3630;
 class Class_004b3750;
 class Class_004b3770;
-class Class_004b4560;
+class HapiBank;
 class Class_004b4630;
 class Class_004b46c0;
 class Class_004b4750;
@@ -2159,34 +2159,34 @@ class Class_004010b0 {  // 0x30 bytes, 2 views
 public:
     char acc0[24];  // +0x0
     char acc1[24];  // +0x18
-    void FUN_004010b0(Unit*, Class_004b4560*);
+    void FUN_004010b0(Unit*, HapiBank*);
 };
 
-class Class_004b4560 {  // 0x4 bytes, 106 views
+class HapiBank {        // 0x4 bytes, 106 views
 public:
     Table_004b3630* table;  // +0x0
-    int FUN_004b4560(char*);
-    int FUN_004b4ba0(char*);
-    int FUN_004b4c80(void*, int);
+    int OpenAccount(char*);
+    int OpenNamedBox(char*);
+    int ReadBox(void*, int);
 };
 
 class Class_004b4c10 {  // 0x4 bytes, 26 views
 public:
     Table_004b3630* table;  // +0x0
-    void FUN_004b4c10(int);
+    void SeekBox(int);
 };
 
 class Class_004b4cf0 {  // 0x4 bytes, 17 views
 public:
     Table_004b3630* table;  // +0x0
-    int FUN_004b4cf0(void*, int);
+    int WriteBox(void*, int);
 };
 
 class Class_00401110 {  // 0x30 bytes, 2 views
 public:
     char acc0[24];  // +0x0
     char acc1[24];  // +0x18
-    void FUN_00401110(Unit*, Class_004b4560*);
+    void FUN_00401110(Unit*, HapiBank*);
 };
 
 class Class_00401180 {  // 0x10 bytes, 2 views
@@ -2581,7 +2581,7 @@ struct Order {  // 0x56 bytes, 87 views
     Order(int, ListOwner_0043a1f0*, Vec3*, int, int, int);
     ~Order(void);
     Order(Order&);
-    Order(Unit*, Class_004b4560*, char*);
+    Order(Unit*, HapiBank*, char*);
     void FUN_0043a1e0(unsigned int);
     Unit* Target(void);
     int FUN_0043a970(Unit*, File_0043a970*, char*);
@@ -3801,7 +3801,7 @@ public:
     unsigned char rest : 5;
     void ApplyBankAndPitch(Unit*, Vec3*);
     void SetFlightMode(Unit*, int);
-    void LoadMotion(Unit*, Class_004b4560*);
+    void LoadMotion(Unit*, HapiBank*);
 };
 
 class Class_0044e6c0 {  // 0x32 bytes, 21 views
@@ -3978,7 +3978,7 @@ public:
     int FUN_00490230(void);
     void FUN_0048e010(Class_004c2ea0*);
     void FUN_0048fdf0(void*);
-    void FUN_0048fe60(Class_004b4560*);
+    void FUN_0048fe60(HapiBank*);
     void FUN_004904b0(void);
     void FUN_004904c0(int);
     void FUN_00490520(int);
@@ -4451,13 +4451,13 @@ struct Mouse_0041ce90 {  // 0x18 bytes, 1 view
 class Class_004b4800 {  // 0x4 bytes, 28 views
 public:
     File_004b4800* file;  // +0x0
-    int FUN_004b4800(char*, int);
+    int GetIntegerItem(char*, int);
 };
 
 class Class_004b4630 {  // 0x4 bytes, 25 views
 public:
     Table_004b3630* table;  // +0x0
-    int FUN_004b4630(char*, int);
+    int SetIntegerItem(char*, int);
 };
 
 struct FindData_0041d4c0 {  // 0x118 bytes, 1 view
@@ -5208,7 +5208,7 @@ struct Anim_00424890 {  // 0xa bytes, 2 views
 class Class_004b4bf0 {  // 0x4 bytes, 7 views
 public:
     Table_004b3630* table;  // +0x0
-    int FUN_004b4bf0(void);
+    int GetBoxSize(void);
 };
 
 struct FeatureName_00424890 {  // 0x80 bytes, 1 view
@@ -5751,24 +5751,24 @@ struct Side_00431a60 {  // 0x232 bytes, 1 view
 class Class_004b3630 {  // 0x4 bytes, 21 views
 public:
     int field_0;  // +0x0
-    Class_004b3630* FUN_004b3620(void);
-    char* FUN_004b48a0(char*, char*);
-    void FUN_004b3630(void);
+    Class_004b3630* InitBank(void);
+    char* GetStringItem(char*, char*);
+    void CloseBank(void);
 };
 
 class Class_004b3770 : public Class_004b3630 {  // 0xc bytes, 4 views
 public:
     char unknown_4[4];
     int field_8;  // +0x8
-    int FUN_004b3770(char*, char*, void*);
-    void FUN_004b4270(Class_004bbbe0*, int*, char*);
+    int OpenBank(char*, char*, void*);
+    void LoadAccount(Class_004bbbe0*, int*, char*);
 };
 
 class Class_004b48f0 {  // 0x4 bytes, 15 views
 public:
     File_004b4910* file;  // +0x0
-    int FUN_004b48f0(char*);
-    int FUN_004b4910(char*, int);
+    int HasItem(char*);
+    int FindItem(char*, int);
 };
 
 class Class_004352b0 {  // 0x5 bytes, 3 views
@@ -5783,15 +5783,15 @@ public:
     void* field_0;  // +0x0
     char unknown_4[4];
     int field_8;  // +0x8
-    int FUN_004b39c0(char*, char*, int, int);
-    void FUN_004b3750(void);
-    void FUN_004b3c60(int, _iobuf*, Buffer_004b39c0*, int);
+    int SaveBank(char*, char*, int, int);
+    void NewBank(void);
+    void SaveAccount(int, _iobuf*, Buffer_004b39c0*, int);
 };
 
 class Class_004b4750 {  // 0x4 bytes, 5 views
 public:
     Table_004b3630* table;  // +0x0
-    int FUN_004b4750(char*, char*);
+    int SetStringItem(char*, char*);
 };
 
 struct Elem_00432be0 {  // 0x4 bytes, 1 view
@@ -6669,7 +6669,7 @@ public:
     unsigned char f2 : 1;
     unsigned char : 5;
     char unknown_2f[1];
-    void SaveMotion(Unit*, Class_004b4560*);
+    void SaveMotion(Unit*, HapiBank*);
 };
 
 struct MobHdr_43dd70 {  // 0x24 bytes, 1 view
@@ -7133,8 +7133,8 @@ public:
     unsigned short heading;  // +0x24
     unsigned short value_26;  // +0x26
     Object_0044e880* self;  // +0x28
-    Class_0044e740(int, Class_004b4560*, char*);
-    int FUN_0044e880(int, Class_004b4560*, char*);
+    Class_0044e740(int, HapiBank*, char*);
+    int FUN_0044e880(int, HapiBank*, char*);
     int FUN_0044eb60(Object_0044e880*);
     void FUN_0044e930(BitWriter*);
     void FUN_0044ec10(int);
@@ -7158,15 +7158,15 @@ public:
 class Class_0044d010 : public Class_0044ce20 {  // 0x14 bytes, 3 views
 public:
     Vec3 v;  // +0x8
-    Class_0044d010(int, Class_004b4560*, char*);
-    int FUN_0044d090(int, Class_004b4560*, char*);
+    Class_0044d010(int, HapiBank*, char*);
+    int FUN_0044d090(int, HapiBank*, char*);
 };
 
 class Class_0044d930 : public Class_0044ce20 {  // 0x18 bytes, 3 views
 public:
     Rect r;  // +0x8
-    Class_0044d930(int, Class_004b4560*, char*);
-    int FUN_0044d9a0(int, Class_004b4560*, char*);
+    Class_0044d930(int, HapiBank*, char*);
+    int FUN_0044d9a0(int, HapiBank*, char*);
 };
 
 class Class_0044de80 : public Class_0044ce20 {  // 0x36 bytes, 2 views
@@ -7181,7 +7181,7 @@ public:
     Vec3 pos;  // +0x26
     int field_32;  // +0x32
     Class_0044de80(Class_0044de80&);
-    Class_0044de80(int, Class_004b4560*, char*);
+    Class_0044de80(int, HapiBank*, char*);
 };
 
 class Class_0044ce50 {  // 0x4 bytes, 1 view
@@ -7310,8 +7310,8 @@ struct Data_0044d470 {  // 0x14 bytes, 2 views
 class Class_0044d470 : public Class_0044ce20 {  // 0x1c bytes, 3 views
 public:
     Data_0044d470 data;  // +0x8
-    Class_0044d470(int, Class_004b4560*, char*);
-    int FUN_0044d500(int, Class_004b4560*, char*);
+    Class_0044d470(int, HapiBank*, char*);
+    int FUN_0044d500(int, HapiBank*, char*);
 };
 
 struct Header_0044d470 {  // 0x18 bytes, 1 view
@@ -7516,7 +7516,7 @@ public:
     int ref_value;  // +0x22
     Vec3 pos;  // +0x26
     int i4;  // +0x32
-    int FUN_0044dfb0(int, Class_004b4560*, char*);
+    int FUN_0044dfb0(int, HapiBank*, char*);
 };
 
 struct Rec_0044dfb0 {  // 0x36 bytes, 1 view
@@ -12184,7 +12184,7 @@ public:
     virtual int GetUnitValue(int, int, int, int, int);
     virtual int IsCarryingUnit(int);
     virtual int GetTransporterId(void);
-    int LoadScriptState(Class_004b4560*);
+    int LoadScriptState(HapiBank*);
     void SetCob(BuildList_0045a950*);
     void SaveScriptState(Class_004b4cf0*);
 };
@@ -12541,7 +12541,7 @@ struct Name_004866d0 {  // 0x232 bytes, 2 views
 class Class_004b4b50 {  // 0x4 bytes, 5 views
 public:
     Table_004b3630* table;  // +0x0
-    int FUN_004b4b50(int);
+    int OpenNumberedBox(int);
 };
 
 struct UnitRecord_00486fd0 {  // 0xb8 bytes, 1 view
@@ -12565,7 +12565,7 @@ public:
     char unknown_46[4];
     Class_0043a420* next;  // +0x4a
     char unknown_4e[8];
-    Class_0043a420(Unit*, Class_004b4560*, char*);
+    Class_0043a420(Unit*, HapiBank*, char*);
 };
 
 struct FlagBits_00487080 {  // 0x4 bytes, 1 view
@@ -13149,7 +13149,7 @@ public:
     char unknown_c[4];
     int FUN_0048ea00(void);
     int FUN_0048f7e0(void);
-    void FUN_0048f840(Class_004b4560*);
+    void FUN_0048f840(HapiBank*);
     void FUN_0048f880(void*);
     void FUN_0048f790(void*);
 };
@@ -13292,7 +13292,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048eac0(Class_004b4560*);
+    void FUN_0048eac0(HapiBank*);
 };
 
 class Class_0048eb00 {  // 0xc bytes, 1 view
@@ -13300,7 +13300,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048eb00(Class_004b4560*);
+    void FUN_0048eb00(HapiBank*);
 };
 
 class Class_0048eb80 {  // 0xc bytes, 1 view
@@ -13308,7 +13308,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048eb80(Class_004b4560*);
+    void FUN_0048eb80(HapiBank*);
 };
 
 class Class_0048ebc0 {  // 0xc bytes, 1 view
@@ -13316,7 +13316,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048ebc0(Class_004b4560*);
+    void FUN_0048ebc0(HapiBank*);
 };
 
 class Class_0048ec00 {  // 0x8 bytes, 1 view
@@ -13356,7 +13356,7 @@ public:
     int celebrated;  // +0x8
     char unknown_c[4];
     int numUnits;  // +0x10
-    void FUN_0048ecb0(Class_004b4560*);
+    void FUN_0048ecb0(HapiBank*);
 };
 
 class Class_0048ed00 {  // 0x14 bytes, 1 view
@@ -13366,7 +13366,7 @@ public:
     int celebrated;  // +0x8
     char unknown_c[4];
     int numUnits;  // +0x10
-    void FUN_0048ed00(Class_004b4560*);
+    void FUN_0048ed00(HapiBank*);
 };
 
 class Class_0048ed50 {  // 0x32 bytes, 1 view
@@ -13392,7 +13392,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048ee30(Class_004b4560*);
+    void FUN_0048ee30(HapiBank*);
 };
 
 class Class_0048ee70 {  // 0xc bytes, 1 view
@@ -13400,7 +13400,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048ee70(Class_004b4560*);
+    void FUN_0048ee70(HapiBank*);
 };
 
 struct Info_0048eeb0 {  // 0x40 bytes, 1 view
@@ -13420,7 +13420,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048ef00(Class_004b4560*);
+    void FUN_0048ef00(HapiBank*);
 };
 
 class Class_0048ef40 {  // 0xc bytes, 1 view
@@ -13428,7 +13428,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048ef40(Class_004b4560*);
+    void FUN_0048ef40(HapiBank*);
 };
 
 class Class_0048ef80 {  // 0x2a bytes, 1 view
@@ -13461,7 +13461,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048f070(Class_004b4560*);
+    void FUN_0048f070(HapiBank*);
 };
 
 class Class_0048f0b0 {  // 0xc bytes, 1 view
@@ -13469,7 +13469,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048f0b0(Class_004b4560*);
+    void FUN_0048f0b0(HapiBank*);
 };
 
 struct Info_0048f0f0 {  // 0x40 bytes, 1 view
@@ -13491,7 +13491,7 @@ public:
     int celebrated;  // +0x8
     char unknown_c[32];
     int numLeftToKill;  // +0x2c
-    void FUN_0048f160(Class_004b4560*);
+    void FUN_0048f160(HapiBank*);
 };
 
 class Class_0048f1b0 {  // 0x30 bytes, 1 view
@@ -13501,7 +13501,7 @@ public:
     int celebrated;  // +0x8
     char unknown_c[32];
     int numLeftToKill;  // +0x2c
-    void FUN_0048f1b0(Class_004b4560*);
+    void FUN_0048f1b0(HapiBank*);
 };
 
 class UnitVisitor_0048f200 {  // 0x4 bytes, 1 view
@@ -13519,7 +13519,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048f2f0(Class_004b4560*);
+    void FUN_0048f2f0(HapiBank*);
 };
 
 class Class_0048f330 {  // 0xc bytes, 1 view
@@ -13527,7 +13527,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048f330(Class_004b4560*);
+    void FUN_0048f330(HapiBank*);
 };
 
 class Class_0048f370 {  // 0x34 bytes, 1 view
@@ -13553,7 +13553,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048f440(Class_004b4560*);
+    void FUN_0048f440(HapiBank*);
 };
 
 class Class_0048f480 {  // 0xc bytes, 1 view
@@ -13561,7 +13561,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048f480(Class_004b4560*);
+    void FUN_0048f480(HapiBank*);
 };
 
 class Class_0048f4c0 {  // 0x34 bytes, 1 view
@@ -13587,7 +13587,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048f590(Class_004b4560*);
+    void FUN_0048f590(HapiBank*);
 };
 
 class Class_0048f5d0 {  // 0xc bytes, 1 view
@@ -13595,7 +13595,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048f5d0(Class_004b4560*);
+    void FUN_0048f5d0(HapiBank*);
 };
 
 class Class_0048f630 {  // 0xc bytes, 1 view
@@ -13603,7 +13603,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048f630(Class_004b4560*);
+    void FUN_0048f630(HapiBank*);
 };
 
 class Class_0048f670 {  // 0xc bytes, 1 view
@@ -13611,7 +13611,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048f670(Class_004b4560*);
+    void FUN_0048f670(HapiBank*);
 };
 
 class Class_0048f710 {  // 0xc bytes, 1 view
@@ -13619,7 +13619,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048f710(Class_004b4560*);
+    void FUN_0048f710(HapiBank*);
 };
 
 class Class_0048f750 {  // 0xc bytes, 1 view
@@ -13627,7 +13627,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048f750(Class_004b4560*);
+    void FUN_0048f750(HapiBank*);
 };
 
 class Class_0048f7e0 {  // 0x10 bytes, 2 views
@@ -13652,7 +13652,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048f880(Class_004b4560*);
+    void FUN_0048f880(HapiBank*);
 };
 
 struct Info_0048f8c0 {  // 0x40 bytes, 1 view
@@ -13672,7 +13672,7 @@ public:
     int celebrated;  // +0x8
     char unknown_c[32];
     int numLeftToKill;  // +0x2c
-    void FUN_0048f900(Class_004b4560*);
+    void FUN_0048f900(HapiBank*);
 };
 
 class Class_0048f950 {  // 0x30 bytes, 1 view
@@ -13682,7 +13682,7 @@ public:
     int celebrated;  // +0x8
     char unknown_c[32];
     int numLeftToKill;  // +0x2c
-    void FUN_0048f950(Class_004b4560*);
+    void FUN_0048f950(HapiBank*);
 };
 
 struct Class_0048f9a0 {  // 0x2a bytes, 1 view
@@ -13717,7 +13717,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048fab0(Class_004b4560*);
+    void FUN_0048fab0(HapiBank*);
 };
 
 class Class_0048faf0 {  // 0xc bytes, 1 view
@@ -13725,7 +13725,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048faf0(Class_004b4560*);
+    void FUN_0048faf0(HapiBank*);
 };
 
 struct Class_0048fb30 {  // 0x8 bytes, 1 view
@@ -13749,7 +13749,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048fbc0(Class_004b4560*);
+    void FUN_0048fbc0(HapiBank*);
 };
 
 class Class_0048fc00 {  // 0xc bytes, 1 view
@@ -13757,7 +13757,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048fc00(Class_004b4560*);
+    void FUN_0048fc00(HapiBank*);
 };
 
 struct Class_0048fc40 {  // 0x8 bytes, 1 view
@@ -13781,7 +13781,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048fcd0(Class_004b4560*);
+    void FUN_0048fcd0(HapiBank*);
 };
 
 class Class_0048fd10 {  // 0xc bytes, 1 view
@@ -13789,7 +13789,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048fd10(Class_004b4560*);
+    void FUN_0048fd10(HapiBank*);
 };
 
 class Class_0048fd70 {  // 0xc bytes, 1 view
@@ -13797,7 +13797,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048fd70(Class_004b4560*);
+    void FUN_0048fd70(HapiBank*);
 };
 
 class Class_0048fdb0 {  // 0xc bytes, 1 view
@@ -13805,7 +13805,7 @@ public:
     char unknown_0[4];
     int satisfied;  // +0x4
     int celebrated;  // +0x8
-    void FUN_0048fdb0(Class_004b4560*);
+    void FUN_0048fdb0(HapiBank*);
 };
 
 class Listener_0048ff40_2 {  // 0x4 bytes, 1 view
@@ -15784,7 +15784,7 @@ struct Buffer_004b39c0 {  // 0xc bytes, 2 views
 class Class_004b4d70 {  // 0x4 bytes, 2 views
 public:
     void* field_0;  // +0x0
-    void FUN_004b4d70(char*);
+    void WriteAuditFile(char*);
 };
 
 struct BlobRec_004b4270 {  // 0x10 bytes, 1 view
@@ -15797,19 +15797,19 @@ struct BlobRec_004b4270 {  // 0x10 bytes, 1 view
 class Class_004b46c0 {  // 0x4 bytes, 2 views
 public:
     Table_004b3630* table;  // +0x0
-    int FUN_004b46c0(char*, double);
+    int SetDoubleItem(char*, double);
 };
 
 class Class_004b49d0 {  // 0x4 bytes, 3 views
 public:
     Table_004b3630* table;  // +0x0
-    int FUN_004b49d0(int, int);
+    int FindNumberedBox(int, int);
 };
 
 class Class_004b4a80 {  // 0x4 bytes, 3 views
 public:
     Table_004b3630* table;  // +0x0
-    int FUN_004b4a80(char*, int);
+    int FindNamedBox(char*, int);
 };
 
 struct DblRec_004b4270 {  // 0xc bytes, 1 view
@@ -15837,7 +15837,7 @@ struct Section_004b4800 {  // 0x18 bytes, 1 view
 class Class_004b4850 {  // 0x4 bytes, 1 view
 public:
     File_004b4850* file;  // +0x0
-    double FUN_004b4850(char*, double);
+    double GetDoubleItem(char*, double);
 };
 
 struct File_004b4850 {  // 0xc bytes, 1 view
@@ -15867,7 +15867,7 @@ struct ArrayB {  // 0x14 bytes, 1 view
 class Class_004b4c50 {  // 0x4 bytes, 1 view
 public:
     BuildList_0045a950* data;  // +0x0
-    int FUN_004b4c50(void);
+    int SeekBoxEnd(void);
 };
 
 struct Account_004b4d70 {  // 0x18 bytes, 1 view

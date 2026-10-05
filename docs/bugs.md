@@ -610,7 +610,7 @@ Things that look wrong in the original but have no effect, kept for the record.
   3, so bit 0 and bits 6 to 31 keep stack garbage, and the whole structure is
   then copied into the spawned object (FUN_00421620's inlined `rep movsd`).
   Harmless if nothing reads those bits. Found by DeepSeek V4.1 Flash in #22.
-- **0x43de30** (possible): its chunked read `FUN_004b4c80(buf, 0x23)` is not
+- **0x43de30** (possible): its chunked read `ReadBox(buf, 0x23)` is not
   checked, so a short read copies a partly uninitialised record into the unit
   type; its sibling loader 0x44d930 does check. Found by DeepSeek V4.1 Flash
   in #33.

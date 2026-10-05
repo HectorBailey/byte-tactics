@@ -2,14 +2,14 @@
 // Reads the "any unit passes X" defeat condition's state from a section
 // (same shape as 0x48f0b0).
 
-class Class_004b4560 {
+class HapiBank {
 public:
-    void FUN_004b4560(const char* name);
+    void OpenAccount(const char* name);
 };
 
 class Class_004b4800 {
 public:
-    int FUN_004b4800(char* name, int def);
+    int GetIntegerItem(char* name, int def);
 };
 
 class Class_0048fb60 {
@@ -17,13 +17,13 @@ public:
     int satisfied;                       // +0x4
     int celebrated;                      // +0x8
 
-    virtual void FUN_0048f880(Class_004b4560* obj);
+    virtual void FUN_0048f880(HapiBank* obj);
 };
 
 // FUNCTION: 0x48fc00
-void Class_0048fb60::FUN_0048f880(Class_004b4560* obj)
+void Class_0048fb60::FUN_0048f880(HapiBank* obj)
 {
-    obj->FUN_004b4560("DefeatCondition_AnyUnitPassesX");
-    satisfied = ((Class_004b4800*)obj)->FUN_004b4800("Satisfied", 0);
-    celebrated = ((Class_004b4800*)obj)->FUN_004b4800("Celebrated", 0);
+    obj->OpenAccount("DefeatCondition_AnyUnitPassesX");
+    satisfied = ((Class_004b4800*)obj)->GetIntegerItem("Satisfied", 0);
+    celebrated = ((Class_004b4800*)obj)->GetIntegerItem("Celebrated", 0);
 }

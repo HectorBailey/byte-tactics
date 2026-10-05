@@ -121,19 +121,19 @@ public:
     void SendAllQueued(int a);
 };
 
-class Class_004b4560 {
+class HapiBank {
 public:
-    void FUN_004b4560(const char* name);
+    void OpenAccount(const char* name);
 };
 
 class Class_004b48f0 {
 public:
-    int FUN_004b48f0(const char* name);
+    int HasItem(const char* name);
 };
 
 class Class_004b3630 {
 public:
-    void FUN_004b3630();
+    void CloseBank();
 };
 
 extern char* g_game;
@@ -253,8 +253,8 @@ void __cdecl FUN_00497180(void*)
     }
 
     if (*(void**)(g_game + 0x38d6b) != 0) {
-        ((Class_004b4560*)*(void**)(g_game + 0x38d6b))->FUN_004b4560("summary");
-        if (((Class_004b48f0*)*(void**)(g_game + 0x38d6b))->FUN_004b48f0("BetweenMissions") ==
+        ((HapiBank*)*(void**)(g_game + 0x38d6b))->OpenAccount("summary");
+        if (((Class_004b48f0*)*(void**)(g_game + 0x38d6b))->HasItem("BetweenMissions") ==
             0) {
             FUN_00465fb0(*(void**)(g_game + 0x38d6b));
             if (((Class_00435100*)*(void**)(g_game + 0x391e9))->FUN_00435100() == 2) {
@@ -389,8 +389,8 @@ void __cdecl FUN_00497180(void*)
     FUN_004816a0(1);
 
     if (*(void**)(g_game + 0x38d6b) != 0) {
-        ((Class_004b4560*)*(void**)(g_game + 0x38d6b))->FUN_004b4560("summary");
-        if (((Class_004b48f0*)*(void**)(g_game + 0x38d6b))->FUN_004b48f0("BetweenMissions") ==
+        ((HapiBank*)*(void**)(g_game + 0x38d6b))->OpenAccount("summary");
+        if (((Class_004b48f0*)*(void**)(g_game + 0x38d6b))->HasItem("BetweenMissions") ==
             0) {
             FUN_00432610(*(void**)(g_game + 0x38d6b));
             goto tail;
@@ -424,7 +424,7 @@ tail:
 
     void* mission = *(void**)(g_game + 0x38d6b);
     if (mission != 0) {
-        ((Class_004b3630*)mission)->FUN_004b3630();
+        ((Class_004b3630*)mission)->CloseBank();
         operator delete(mission);
         *(void**)(g_game + 0x38d6b) = 0;
     }

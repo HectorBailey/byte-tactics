@@ -39,7 +39,7 @@
 // types, so a slot names the function its own file defines as
 // `Class_0048xxxx::<base name>`, or the base's own default in 0x48ea00 to
 // 0x48ea30 (tools/vtablecheck.py): IsSatisfied, the unit slots 1 to 3, Save
-// and Load (which take the Class_004b4560 section), and the visitor slot,
+// and Load (which take the HapiBank section), and the visitor slot,
 // which returns whether to keep visiting (Listener_0048f250's returns
 // nothing).
 
@@ -49,7 +49,7 @@
 extern void* DAT_005119b8;
 
 struct Unit;
-class Class_004b4560;
+class HapiBank;
 
 // Mission victory/defeat condition (6 virtual slots).
 class Condition_0048ff40 {
@@ -62,8 +62,8 @@ public:
     virtual void FUN_0048ea10(Unit* unit);   // Slot1
     virtual void FUN_0048ea20(Unit* unit);   // Slot2
     virtual void FUN_0048ea30(Unit* unit);   // Slot3
-    virtual void FUN_0048f840(Class_004b4560* file);   // Save
-    virtual void FUN_0048f880(Class_004b4560* file);   // Load
+    virtual void FUN_0048f840(HapiBank* file);         // Save
+    virtual void FUN_0048f880(HapiBank* file);         // Load
 };
 
 // Secondary interface of a condition that visits units (vtable 0x4fd940):
@@ -106,16 +106,16 @@ struct Vec3_0048f250 {
 class Class_0048ea00 : public Condition_0048ff40 {
 public:
     virtual void FUN_0048ea10(Unit* unit);
-    virtual void FUN_0048f840(Class_004b4560* file);
-    virtual void FUN_0048f880(Class_004b4560* file);
+    virtual void FUN_0048f840(HapiBank* file);
+    virtual void FUN_0048f880(HapiBank* file);
 };
 
 // DestroyAllUnits (vtable 0x4fd948).
 class Class_0048eb40 : public Condition_0048ff40 {
 public:
     virtual int FUN_0048ea00();
-    virtual void FUN_0048f840(Class_004b4560* file);
-    virtual void FUN_0048f880(Class_004b4560* file);
+    virtual void FUN_0048f840(HapiBank* file);
+    virtual void FUN_0048f880(HapiBank* file);
 };
 
 // KillAllMobileUnits (vtable 0x4fd928, listener vtable 0x4fd920).
@@ -125,8 +125,8 @@ public:
     int count;                           // +0x10
     Class_0048ec20() { count = 0; }
     virtual void FUN_0048ea10(Unit* unit);
-    virtual void FUN_0048f840(Class_004b4560* file);
-    virtual void FUN_0048f880(Class_004b4560* file);
+    virtual void FUN_0048f840(HapiBank* file);
+    virtual void FUN_0048f880(HapiBank* file);
 };
 
 // BuildUnitType (vtable 0x4fd908, listener vtable 0x4fd900).
@@ -143,8 +143,8 @@ public:
         field_30 = 0;
     }
     virtual int FUN_0048ea00();
-    virtual void FUN_0048f840(Class_004b4560* file);
-    virtual void FUN_0048f880(Class_004b4560* file);
+    virtual void FUN_0048f840(HapiBank* file);
+    virtual void FUN_0048f880(HapiBank* file);
 };
 #pragma pack(pop)
 
@@ -155,8 +155,8 @@ public:
 
     Class_0048eeb0(const char* text) { strcpy(name, text); }
     virtual void FUN_0048ea20(Unit* unit);
-    virtual void FUN_0048f840(Class_004b4560* file);
-    virtual void FUN_0048f880(Class_004b4560* file);
+    virtual void FUN_0048f840(HapiBank* file);
+    virtual void FUN_0048f880(HapiBank* file);
 };
 
 // KillAllOfType (vtable 0x4fd8d0, listener vtable 0x4fd8c8).
@@ -168,8 +168,8 @@ public:
 
     Class_0048efb0(const char* text) { strcpy(name, text); }
     virtual void FUN_0048ea10(Unit* unit);
-    virtual void FUN_0048f840(Class_004b4560* file);
-    virtual void FUN_0048f880(Class_004b4560* file);
+    virtual void FUN_0048f840(HapiBank* file);
+    virtual void FUN_0048f880(HapiBank* file);
 };
 #pragma pack(pop)
 
@@ -185,8 +185,8 @@ public:
         count = n;
     }
     virtual void FUN_0048ea10(Unit* unit);
-    virtual void FUN_0048f840(Class_004b4560* file);
-    virtual void FUN_0048f880(Class_004b4560* file);
+    virtual void FUN_0048f840(HapiBank* file);
+    virtual void FUN_0048f880(HapiBank* file);
 };
 
 // MoveUnitToRadius (vtable 0x4fd890, listener vtable 0x4fd888).
@@ -210,8 +210,8 @@ public:
         pos.y = 0x12345678;
     }
     virtual int FUN_0048ea00();
-    virtual void FUN_0048f840(Class_004b4560* file);
-    virtual void FUN_0048f880(Class_004b4560* file);
+    virtual void FUN_0048f840(HapiBank* file);
+    virtual void FUN_0048f880(HapiBank* file);
 };
 #pragma pack(pop)
 
@@ -232,8 +232,8 @@ public:
         field_30 = v >> 4;
     }
     virtual int FUN_0048ea00();
-    virtual void FUN_0048f840(Class_004b4560* file);
-    virtual void FUN_0048f880(Class_004b4560* file);
+    virtual void FUN_0048f840(HapiBank* file);
+    virtual void FUN_0048f880(HapiBank* file);
 };
 #pragma pack(pop)
 
@@ -254,8 +254,8 @@ public:
         field_30 = v >> 4;
     }
     virtual int FUN_0048ea00();
-    virtual void FUN_0048f840(Class_004b4560* file);
-    virtual void FUN_0048f880(Class_004b4560* file);
+    virtual void FUN_0048f840(HapiBank* file);
+    virtual void FUN_0048f880(HapiBank* file);
 };
 #pragma pack(pop)
 
@@ -266,24 +266,24 @@ public:
 
     Class_0048f610(int t) { field_c = t * 30; }
     virtual int FUN_0048ea00();
-    virtual void FUN_0048f840(Class_004b4560* file);
-    virtual void FUN_0048f880(Class_004b4560* file);
+    virtual void FUN_0048f840(HapiBank* file);
+    virtual void FUN_0048f880(HapiBank* file);
 };
 
 // CommanderKilled (vtable 0x4fd818).
 class Class_0048f6b0 : public Condition_0048ff40 {
 public:
     virtual void FUN_0048ea10(Unit* unit);
-    virtual void FUN_0048f840(Class_004b4560* file);
-    virtual void FUN_0048f880(Class_004b4560* file);
+    virtual void FUN_0048f840(HapiBank* file);
+    virtual void FUN_0048f880(HapiBank* file);
 };
 
 // AllUnitsKilled (vtable 0x4fd800, listener vtable 0x4fd7f8).
 class Class_0048f840 : public Condition_0048ff40, public Listener_0048ff40 {
 public:
     virtual int FUN_0048ea00();
-    virtual void FUN_0048f840(Class_004b4560* file);
-    virtual void FUN_0048f880(Class_004b4560* file);
+    virtual void FUN_0048f840(HapiBank* file);
+    virtual void FUN_0048f880(HapiBank* file);
     virtual int FUN_0048f790(Unit* unit);
 };
 
@@ -298,8 +298,8 @@ public:
 
     Class_0048f9d0(const char* text) { strcpy(name, text); }
     virtual void FUN_0048ea10(Unit* unit);
-    virtual void FUN_0048f840(Class_004b4560* file);
-    virtual void FUN_0048f880(Class_004b4560* file);
+    virtual void FUN_0048f840(HapiBank* file);
+    virtual void FUN_0048f880(HapiBank* file);
 };
 #pragma pack(pop)
 
@@ -315,8 +315,8 @@ public:
         numLeftToKill = n;
     }
     virtual void FUN_0048ea10(Unit* unit);
-    virtual void FUN_0048f840(Class_004b4560* file);
-    virtual void FUN_0048f880(Class_004b4560* file);
+    virtual void FUN_0048f840(HapiBank* file);
+    virtual void FUN_0048f880(HapiBank* file);
 };
 
 // DeathTimerRunsOut (vtable 0x4fd7a8).
@@ -326,8 +326,8 @@ public:
 
     Class_0048fd50(int t) { field_c = t * 30; }
     virtual int FUN_0048ea00();
-    virtual void FUN_0048f840(Class_004b4560* file);
-    virtual void FUN_0048f880(Class_004b4560* file);
+    virtual void FUN_0048f840(HapiBank* file);
+    virtual void FUN_0048f880(HapiBank* file);
 };
 
 // AnyUnitPassesX (vtable 0x4fd790, listener vtable 0x4fd788).
@@ -338,8 +338,8 @@ public:
 
     Class_0048fb60(int v) { field_10 = v >> 4; }
     virtual int FUN_0048ea00();
-    virtual void FUN_0048f840(Class_004b4560* file);
-    virtual void FUN_0048f880(Class_004b4560* file);
+    virtual void FUN_0048f840(HapiBank* file);
+    virtual void FUN_0048f880(HapiBank* file);
 };
 
 // AnyUnitPassesZ (vtable 0x4fd770, listener vtable 0x4fd768).
@@ -350,8 +350,8 @@ public:
 
     Class_0048fc70(int v) { field_10 = v >> 4; }
     virtual int FUN_0048ea00();
-    virtual void FUN_0048f840(Class_004b4560* file);
-    virtual void FUN_0048f880(Class_004b4560* file);
+    virtual void FUN_0048f840(HapiBank* file);
+    virtual void FUN_0048f880(HapiBank* file);
 };
 
 class Class_0048ff40 {

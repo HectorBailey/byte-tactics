@@ -43,7 +43,7 @@
 //                        0x4b3914 and 0x4b398e reload it, 0x4b396e takes &it)
 //   E0+0x04 img.size     (zeroed at 0x4b37ff, then only ever written: dsize at
 //                        0x4b3886, remaining at 0x4b38df.  Never read, so it
-//                        only survives because &img escapes to FUN_004b4270)
+//                        only survives because &img escapes to LoadAccount)
 //   E0+0x08 raw          (the decompression scratch: 0x4b3849 stores it,
 //                        0x4b38a5 frees it)
 //   E0+0x0c this         (spilled at the top by 0x4b3784, reloaded by
@@ -57,7 +57,7 @@
 // choices buy that, and both were needed:
 //   * `file` and `name` must be DIFFERENT parameters (param1 is the file name
 //     for the open and the bank name for the strcmpi, param2 is only ever the
-//     bank name, param3 goes to FUN_004b4270).  Reusing one variable for both
+//     bank name, param3 goes to LoadAccount).  Reusing one variable for both
 //     strings made it live across the whole function, and MSVC then hoisted it
 //     into ebp before the prologue and demoted the file to ebx.
 //   * `img.size = dsize;` has to come BEFORE the memcpy.  After the memcpy the
@@ -189,7 +189,7 @@
 //    have changed the operand's IR subtree size; a cast on the whole sum and
 //    on the base through a second type; `char*` for Image_004b3770::buf so
 //    the PTRADD carries no cast node at all (this needs the two allocator
-//    results cast and FUN_004b4270's second parameter declared `char**`);
+//    results cast and LoadAccount's second parameter declared `char**`);
 //    `int`/`unsigned`/`long` for the nameoff field; `(int)`, `(unsigned)`,
 //    `(long)` casts of either operand; `offset + base` and
 //    `base + offset` as plain int adds; `+(0 - off)` so the IR is a SUB;
@@ -282,15 +282,15 @@
 #include <string.h>
 #include <stdio.h>
 
-struct Table_004b3630 {
+struct AccountList {
     int count;
     void* slots;
 };
 
 class Class_004b3630 {
 public:
-    Table_004b3630* table;
-    void FUN_004b3630();
+    AccountList* table;
+    void CloseBank();
 };
 
 struct File_004bb5d0;
@@ -313,14 +313,14 @@ int __cdecl _strcmpi(const char* s1, const char* s2);
 int __cdecl sprintf(char* buf, const char* fmt, ...);
 
 // The 0x8-byte image handle the original keeps at the bottom of its frame and
-// hands by address to FUN_004b4270.
+// hands by address to LoadAccount.
 struct Image_004b3770 {          // 0x08 bytes
     void* buf;                   // +0x00
     int size;                    // +0x04
 };
 
 // The 0x24-byte bank header. 0x22 bytes of it are read from the file.
-struct Header_004b3770 {         // 0x24 bytes
+struct BankFileHeader {          // 0x24 bytes
     char magic[8];               // +0x00 "HAPIBANK"
     int nameoff;                 // +0x08, of the bank name inside the image
     int dataoff;                 // +0x0c, end of the compressed data
@@ -335,15 +335,15 @@ public:
     char unknown_4[4];
     int field_8;
 
-    void FUN_004b4270(File_004bb5d0* file, void** buf, void* arg3);
-    int FUN_004b3770(char* filename, char* name, void* arg3);
+    void LoadAccount(File_004bb5d0* file, void** buf, void* arg3);
+    int OpenBank(char* filename, char* name, void* arg3);
 };
 
 // FUNCTION: 0x4b3770
-int Class_004b3770::FUN_004b3770(char* filename, char* name, void* arg3)
+int Class_004b3770::OpenBank(char* filename, char* name, void* arg3)
 {
     void* raw;
-    Header_004b3770 h;
+    BankFileHeader h;
     Image_004b3770 img;
     char errmsg[0x80];
     File_004bb5d0* file;
@@ -409,15 +409,15 @@ int Class_004b3770::FUN_004b3770(char* filename, char* name, void* arg3)
         }
     }
 
-    FUN_004b3630();
-    table = (Table_004b3630*)FUN_004d8460(1, 0xc);
+    CloseBank();
+    table = (AccountList*)FUN_004d8460(1, 0xc);
     ((int*)table)[2] = -1;
 
     FUN_004bb710(file, h.seekoff);
     pos = FUN_004bb7a0(file);
     if (pos < h.dataoff) {
         do {
-            FUN_004b4270(file, &img.buf, arg3);
+            LoadAccount(file, &img.buf, arg3);
             pos = FUN_004bb7a0(file);
         } while (pos < h.dataoff);
     }

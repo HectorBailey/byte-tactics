@@ -1,7 +1,7 @@
 // Decompiled by Opus. Names are provisional.
 
 struct Unit;
-class Class_004b4560;
+class HapiBank;
 
 // Mission victory/defeat condition (6 virtual slots).
 class Condition_0048ff40 {
@@ -14,8 +14,8 @@ public:
     virtual void FUN_0048ea10(Unit* unit);   // Slot1
     virtual void FUN_0048ea20(Unit* unit);   // Slot2
     virtual void FUN_0048ea30(Unit* unit);   // Slot3
-    virtual void FUN_0048f840(Class_004b4560* file) = 0;   // Save
-    virtual void FUN_0048f880(Class_004b4560* file) = 0;   // Load
+    virtual void FUN_0048f840(HapiBank* file) = 0;         // Save
+    virtual void FUN_0048f880(HapiBank* file) = 0;         // Load
 };
 
 // Secondary interface of a condition that visits units.
@@ -28,8 +28,8 @@ public:
 class Class_0048f840 : public Condition_0048ff40, public Listener_0048ff40 {
 public:
     virtual int FUN_0048ea00();
-    virtual void FUN_0048f840(Class_004b4560* file);   // Save
-    virtual void FUN_0048f880(Class_004b4560* file);   // Load
+    virtual void FUN_0048f840(HapiBank* file);         // Save
+    virtual void FUN_0048f880(HapiBank* file);         // Load
     virtual int FUN_0048f790(Unit* unit);
 };
 

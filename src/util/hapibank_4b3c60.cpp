@@ -34,19 +34,19 @@
 #include <vector>
 #include <io.h>
 
-struct Table_004b3630 {
+struct AccountList {
     int count;
     void* slots;
 };
 
-struct Item1_004b3c60 {              // 0x10 bytes
+struct BankItem {                    // 0x10 bytes
     char* name;                      // +0x00
     int type;                        // +0x04
     int value;                       // +0x08 (int, double or char* depending on type)
     int unknown_c;                   // +0x0c
 };
 
-struct Item2_004b3c60 {              // 0x14 bytes
+struct SafeDepositBox {              // 0x14 bytes
     int flag;                        // +0x00
     char* name;                      // +0x04 (or the id as an int when flag == 0)
     int len;                         // +0x08
@@ -54,13 +54,13 @@ struct Item2_004b3c60 {              // 0x14 bytes
     char* buffer;                    // +0x10
 };
 
-struct Slot_004b3c60 {               // 0x18 bytes
+struct BankAccount {                 // 0x18 bytes
     char* name;                      // +0x00
     int count1;                      // +0x04
     int count2;                      // +0x08
     int unknown_c;                   // +0x0c
-    Item1_004b3c60* items1;          // +0x10
-    Item2_004b3c60* items2;          // +0x14
+    BankItem* items1;                // +0x10
+    SafeDepositBox* items2;          // +0x14
 };
 
 struct Buffer_004b3c60 {             // the shared string pool
@@ -69,7 +69,7 @@ struct Buffer_004b3c60 {             // the shared string pool
     int csize;                       // +0x08
 };
 
-struct Header_004b3c60 {             // 0x20 bytes
+struct AccountHeader {               // 0x20 bytes
     int size;                        // +0x00
     int strOffset;                   // +0x04
     int nInts;                       // +0x08
@@ -82,11 +82,11 @@ struct Header_004b3c60 {             // 0x20 bytes
 
 class Class_004b3750 {
 public:
-    Table_004b3630* field_0;
+    AccountList* field_0;
     char unknown_4[4];
     int field_8;
 
-    void FUN_004b3c60(int index, FILE* file, Buffer_004b3c60* buf, int compress);
+    void SaveAccount(int index, FILE* file, Buffer_004b3c60* buf, int compress);
 };
 
 void* __cdecl FUN_004d8450(int size);
@@ -97,15 +97,15 @@ int __stdcall FUN_004d1aa0(int size, int level);
 int __stdcall FUN_004d1820(void* dest, int* destSize, void* src, int srcSize, int param_5, int param_6);
 
 // FUNCTION: 0x4b3c60
-void Class_004b3750::FUN_004b3c60(int index, FILE* file, Buffer_004b3c60* buf, int compress)
+void Class_004b3750::SaveAccount(int index, FILE* file, Buffer_004b3c60* buf, int compress)
 {
-    Slot_004b3c60* slot = &((Slot_004b3c60*)field_0->slots)[index];
+    BankAccount* slot = &((BankAccount*)field_0->slots)[index];
     if (slot->count1 <= 0 && slot->count2 <= 0) {
         return;
     }
 
     int off = ftell(file);
-    Header_004b3c60 h;
+    AccountHeader h;
     memset(&h, 0, sizeof(h));
     fwrite(&h, sizeof(h), 1, file);
 

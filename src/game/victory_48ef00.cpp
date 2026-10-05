@@ -2,14 +2,14 @@
 // Writes the "capture unit type" victory condition's state to a section;
 // the reading counterpart is 0x48ef40, compare 0x48f840.
 
-class Class_004b4560 {
+class HapiBank {
 public:
-    void FUN_004b4560(const char* name);
+    void OpenAccount(const char* name);
 };
 
 class Class_004b4630 {
 public:
-    void FUN_004b4630(const char* name, int value);
+    void SetIntegerItem(const char* name, int value);
 };
 
 class Class_0048eeb0 {
@@ -17,13 +17,13 @@ public:
     int satisfied;                       // +0x4
     int celebrated;                      // +0x8
 
-    virtual void FUN_0048f840(Class_004b4560* obj);
+    virtual void FUN_0048f840(HapiBank* obj);
 };
 
 // FUNCTION: 0x48ef00
-void Class_0048eeb0::FUN_0048f840(Class_004b4560* obj)
+void Class_0048eeb0::FUN_0048f840(HapiBank* obj)
 {
-    obj->FUN_004b4560("VictoryCondition_CaptureUnitType");
-    ((Class_004b4630*)obj)->FUN_004b4630("Satisfied", satisfied);
-    ((Class_004b4630*)obj)->FUN_004b4630("Celebrated", celebrated);
+    obj->OpenAccount("VictoryCondition_CaptureUnitType");
+    ((Class_004b4630*)obj)->SetIntegerItem("Satisfied", satisfied);
+    ((Class_004b4630*)obj)->SetIntegerItem("Celebrated", celebrated);
 }

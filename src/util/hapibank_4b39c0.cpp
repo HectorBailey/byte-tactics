@@ -15,20 +15,20 @@
 // cbuf != 0. Kept as written so the code matches.
 #include <stdio.h>
 #include <string.h>
-struct Table_004b3630 { int count; void* slots; };
+struct AccountList { int count; void* slots; };
 #pragma pack(push, 1)
-struct Header_004b39c0 { char name[8]; int nameOffset; int dataOffset; int headerSize; int version; bool compressed; char unused_19[9]; };
+struct BankFileHeader { char name[8]; int nameOffset; int dataOffset; int headerSize; int version; bool compressed; char unused_19[9]; };
 #pragma pack(pop)
 struct Buffer_004b39c0 { char* data; int len; int csize; };
 class Class_004b3750 {
 public:
-    Table_004b3630* field_0;
+    AccountList* field_0;
     char unknown_4[4];
     int field_8;
-    int FUN_004b39c0(char* name, char* ext, int param_3, int param_4);
-    void FUN_004b3c60(int index, FILE* file, Buffer_004b39c0* buf, int param_3);
+    int SaveBank(char* name, char* ext, int param_3, int param_4);
+    void SaveAccount(int index, FILE* file, Buffer_004b39c0* buf, int param_3);
 };
-class Class_004b4d70 { public: void* field_0; void FUN_004b4d70(char* name); };
+class Class_004b4d70 { public: void* field_0; void WriteAuditFile(char* name); };
 char* __stdcall StripExtension(char* name);
 void* __cdecl FUN_004d8450(int size);
 void* __cdecl FUN_004d8580(void* ptr, int size);
@@ -37,10 +37,10 @@ int __cdecl FUN_004d8e50(int handle);
 int __stdcall FUN_004d1aa0(int size, int level);
 int __stdcall FUN_004d1820(void* dest, int* destSize, void* src, int srcSize, int param_5, int param_6);
 // FUNCTION: 0x4b39c0
-int Class_004b3750::FUN_004b39c0(char* name, char* ext, int param_3, int param_4)
+int Class_004b3750::SaveBank(char* name, char* ext, int param_3, int param_4)
 {
     char path[256];
-    Header_004b39c0 header;
+    BankFileHeader header;
     int noff;
     int err;
     Buffer_004b39c0 buf;
@@ -51,7 +51,7 @@ int Class_004b3750::FUN_004b39c0(char* name, char* ext, int param_3, int param_4
         strcpy(path, name);
         StripExtension(path);
         strcat(path, ".cpa");
-        ((Class_004b4d70*)this)->FUN_004b4d70(path);
+        ((Class_004b4d70*)this)->WriteAuditFile(path);
     }
     file = fopen(name, "w+b");
     if (file == 0) { return 0; }
@@ -67,7 +67,7 @@ int Class_004b3750::FUN_004b39c0(char* name, char* ext, int param_3, int param_4
     header.nameOffset = oldlen;
     header.headerSize = sizeof(header);
     fwrite(&header, sizeof(header), 1, file);
-    for (i = 0; i < field_0->count; i++) { FUN_004b3c60(i, file, &buf, param_3); }
+    for (i = 0; i < field_0->count; i++) { SaveAccount(i, file, &buf, param_3); }
     fseek(file, 0, 2);
     header.dataOffset = ftell(file);
     int dsize = buf.len;

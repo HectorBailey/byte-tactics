@@ -1,23 +1,23 @@
 // Decompiled by Opus. Names are provisional.
 
-class Class_004b4560 {
+class HapiBank {
 public:
-    void FUN_004b4560(char* section);
+    void OpenAccount(char* section);
 };
 
 class Class_004b48f0 {
 public:
-    int FUN_004b48f0(char* name);
+    int HasItem(char* name);
 };
 
 class Class_004b4800 {
 public:
-    int FUN_004b4800(char* name, int def);
+    int GetIntegerItem(char* name, int def);
 };
 
 class Class_0048fe60 {
 public:
-    void FUN_0048fe60(Class_004b4560* file);
+    void FUN_0048fe60(HapiBank* file);
 };
 
 #pragma pack(push, 1)
@@ -36,22 +36,22 @@ struct Game {
 extern Game* g_game;
 extern char* DAT_00503320;           // "Summary"
 
-void __stdcall FUN_00466050(Class_004b4560* file);
-void __stdcall FUN_0041d2b0(Class_004b4560* file);
-void __stdcall FUN_00424c00(Class_004b4560* file);
-void __stdcall FUN_00484d60(Class_004b4560* file);
-void __stdcall FUN_00484e80(Class_004b4560* file);
-void __stdcall FUN_00484fa0(Class_004b4560* file);
-void __stdcall LoadUnits(Class_004b4560* file);
-void __stdcall FUN_00438250(Class_004b4560* file);
+void __stdcall FUN_00466050(HapiBank* file);
+void __stdcall FUN_0041d2b0(HapiBank* file);
+void __stdcall FUN_00424c00(HapiBank* file);
+void __stdcall FUN_00484d60(HapiBank* file);
+void __stdcall FUN_00484e80(HapiBank* file);
+void __stdcall FUN_00484fa0(HapiBank* file);
+void __stdcall LoadUnits(HapiBank* file);
+void __stdcall FUN_00438250(HapiBank* file);
 
 // Reads the game summary section and every subsystem's saved state.
 // FUNCTION: 0x432610
-int __stdcall FUN_00432610(Class_004b4560* file)
+int __stdcall FUN_00432610(HapiBank* file)
 {
-    file->FUN_004b4560(DAT_00503320);
-    if (((Class_004b48f0*)file)->FUN_004b48f0("maxunits"))
-        g_game->maxUnits = ((Class_004b4800*)file)->FUN_004b4800("maxunits", 0);
+    file->OpenAccount(DAT_00503320);
+    if (((Class_004b48f0*)file)->HasItem("maxunits"))
+        g_game->maxUnits = ((Class_004b4800*)file)->GetIntegerItem("maxunits", 0);
     FUN_00466050(file);
     FUN_0041d2b0(file);
     FUN_00424c00(file);

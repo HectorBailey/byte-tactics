@@ -11,18 +11,18 @@
 
 class Class_004b3630 {
 public:
-    void FUN_004b3630();
+    void CloseBank();
 };
 
 class Class_004b48a0 {
 public:
-    char* FUN_004b48a0(char* name, char* def);
+    char* GetStringItem(char* name, char* def);
 };
 
 class Class_004b3620 {
 public:
     int field_0;
-    Class_004b3620* FUN_004b3620();
+    Class_004b3620* InitBank();
 };
 
 struct Game {
@@ -76,13 +76,13 @@ char* __stdcall FUN_00492b10(int* count)
         Class_004b3620* file = FUN_00432520(buf);
         char* desc = 0;
         if (file)
-            desc = ((Class_004b48a0*)file)->FUN_004b48a0("Description", 0);
+            desc = ((Class_004b48a0*)file)->GetStringItem("Description", 0);
         if (file && desc) {
             strcpy(buf, desc);
             strcpy(dp, buf);
             dp += strlen(buf) + 1;
             found++;
-            ((Class_004b3630*)file)->FUN_004b3630();
+            ((Class_004b3630*)file)->CloseBank();
             delete file;
         } else {
             char* d = FUN_004b6af0(DAT_0051f2e0, found);

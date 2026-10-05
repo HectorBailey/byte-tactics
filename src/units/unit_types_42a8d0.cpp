@@ -133,35 +133,35 @@ public:
 class Class_004b3620 {
 public:
     int field_0;
-    Class_004b3620* FUN_004b3620();
+    Class_004b3620* InitBank();
 };
 
 class Class_004b3630 {
 public:
-    void FUN_004b3630();
+    void CloseBank();
 };
 
 class Class_004b3770 {
 public:
-    int FUN_004b3770(char* path, char* type, int flag);
+    int OpenBank(char* path, char* type, int flag);
 };
 
-class Class_004b4560 {
+class HapiBank {
 public:
-    int FUN_004b4560(char* name);
+    int OpenAccount(char* name);
 };
 
 class Class_004b4800 {
 public:
-    int FUN_004b4800(char* name, int def);
+    int GetIntegerItem(char* name, int def);
 };
 
 // The override file object: 0x4b3620 builds it and 0x4b3630 frees it.
 class OvrFile {
 public:
     void* table;
-    OvrFile() { ((Class_004b3620*)this)->FUN_004b3620(); }
-    ~OvrFile() { ((Class_004b3630*)this)->FUN_004b3630(); }
+    OvrFile() { ((Class_004b3620*)this)->InitBank(); }
+    ~OvrFile() { ((Class_004b3630*)this)->CloseBank(); }
 };
 
 #pragma pack(push, 1)
@@ -311,11 +311,11 @@ int LoadUnitInfo()
             OvrFile ovr;
             char ovrpath[256];
             FUN_004290f0(ovrpath, "units", files[i - 1], "OVR");
-            if (((Class_004b3770*)&ovr)->FUN_004b3770(ovrpath, "TA Unit Override", 0)) {
-                if (((Class_004b4560*)&ovr)->FUN_004b4560("Compatability")) {
+            if (((Class_004b3770*)&ovr)->OpenBank(ovrpath, "TA Unit Override", 0)) {
+                if (((HapiBank*)&ovr)->OpenAccount("Compatability")) {
                     char num[16];
                     sprintf(num, "%u", u->checksum);
-                    u->checksum = ((Class_004b4800*)&ovr)->FUN_004b4800(num, u->checksum);
+                    u->checksum = ((Class_004b4800*)&ovr)->GetIntegerItem(num, u->checksum);
                 }
             }
             Class_004c2ea0 parser;
