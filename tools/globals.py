@@ -47,6 +47,7 @@ from dataclasses import dataclass
 import capstone
 
 from check import ROOT, Original, compile_source, load_symbols
+from link import data_source_extents, inside
 from coff import parse_object
 from linkcheck import (CRT_LIBS, address_of, data_symbol, declare, global_table, library_symbols,
                        load_objects, records, shape, type_size)
@@ -260,6 +261,7 @@ def row_element(t: tuple | None) -> int | None:
 
 def build(objects, img: Image) -> list[dict]:
     symbols = load_symbols()
+    extents = data_source_extents(symbols)
     table = global_table(objects, symbols)
     boundaries = set(table) | {a for a in symbols.values() if DATA_LO <= a < DATA_HI} | referenced_addresses(img)
     img.set_bss_start(sorted(boundaries))
@@ -325,9 +327,11 @@ def build(objects, img: Image) -> list[dict]:
         whole = img.read(addr, size)
         pointers = sum(1 for i in range(0, len(whole) - 3, 4)
                        if 0x401000 <= struct.unpack_from("<I", whole, i)[0] < DATA_HI)
-        # Where it is defined: src/data, or the tree files that define it.
-        defined = (sorted({f for f in g["defined_in"] if f.startswith("src/data/")})
-                   or sorted(set(g["defined_in"])))
+        # Where it is defined: src/data (the global itself, or one that holds
+        # it: a field or an entry the code reaches by its address), or the tree
+        # files that define it.
+        container = inside(extents, addr)
+        defined = ([container[3]] if container else []) or sorted(set(g["defined_in"]))
         rows.append({
             "address": f"{addr:#x}", "name": name, "section": section, "size": size,
             "defined": defined[0] if defined else "",

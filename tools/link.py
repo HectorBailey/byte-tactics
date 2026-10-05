@@ -175,10 +175,8 @@ def build_data(symbols: dict[str, int]) -> tuple[list[Path], dict[int, str]]:
         out = None
 
     # The data src/data defines (compiled with the rest of src/ by compile_all).
-    sources: dict[int, str] = {}
-    for obj in sorted((ROOT / "build/progress/data").glob("*.obj")):
-        if (DATA_DIR / obj.with_suffix(".cpp").name).exists():
-            sources.update(defined_addresses(obj, symbols))
+    extents = data_source_extents(symbols)
+    sources: dict[int, str] = {a: name for a, _, name, _ in extents}
 
     # A class's vtable the compiler emits (??_7...) is the one definition of
     # its address: the files that store it by hand (DAT_004fc980) mean it too.
@@ -190,6 +188,9 @@ def build_data(symbols: dict[str, int]) -> tuple[list[Path], dict[int, str]]:
     rows = global_rows()
     rows = {a: r for a, r in rows.items() if GLOBAL_LO <= a < GLOBAL_HI}
     have = (set(defined_addresses(out, symbols)) if out else set()) | set(sources)
+    # What the code reaches inside a src/data global (a field, an entry: the
+    # tree's DAT_005086e0 is a field of g_unitMessages[0]) is that global.
+    have |= {a for a in rows if inside(extents, a)}
     extra = {a: r for a, r in rows.items() if a not in have}
     if extra:
         lines = ['extern "C" {']
@@ -214,6 +215,36 @@ def build_data(symbols: dict[str, int]) -> tuple[list[Path], dict[int, str]]:
             by_addr[addr] = sym
     by_addr.update(sources)
     return objects, by_addr
+
+
+def data_source_extents(symbols: dict[str, int]) -> list[tuple[int, int, str, str]]:
+    """(address, size, symbol, source file) of every global src/data defines,
+    from its compiled object (tools/progress.py's cache, which compile_all
+    fills): a global runs from its symbol to the next one in its section."""
+    from place import parse
+    out = []
+    for obj_path in sorted((ROOT / "build/progress/data").glob("*.obj")):
+        src = DATA_DIR / obj_path.with_suffix(".cpp").name
+        if not src.exists():
+            continue
+        obj = parse(obj_path)
+        for name, sym in obj.externals.items():
+            sec = obj.secs[sym.section - 1]
+            if sec.is_code or name.startswith(("??_C@", "__real@")):
+                continue
+            addr = address_of(name, symbols)
+            if addr is not None:
+                lo, hi = sec.slice_at(sym.value)
+                out.append((addr, hi - lo, name, str(src.relative_to(ROOT))))
+    return sorted(out)
+
+
+def inside(extents: list[tuple[int, int, str, str]], addr: int) -> tuple[int, int, str, str] | None:
+    """The extent holding addr, if any."""
+    for e in extents:
+        if e[0] <= addr < e[0] + max(e[1], 1):
+            return e
+    return None
 
 
 def defined_addresses(obj: Path, symbols: dict[str, int]) -> dict[int, str]:

@@ -167,10 +167,6 @@ extern const char DAT_00508494[4];                                              
 extern const char DAT_00508498[4];                                                            // 0x508498, 4 bytes; 1 of 1 files
 extern char DAT_0050849c[16];                                                                 // 0x50849c, 16 bytes; 1 of 1 files
 extern char DAT_005084ac[16];                                                                 // 0x5084ac, 16 bytes; 1 of 1 files
-extern unsigned char DAT_005086dc[32];                                                        // 0x5086dc, 32 bytes; Message_0047fad0[] by value in 1 of 1 files
-extern unsigned char DAT_005086e0[596];                                                       // 0x5086e0, 596 bytes; Table_0047fd70[24] by value in 1 of 2 files (conflicting: struct names only)
-extern unsigned char DAT_005086e8[4];                                                         // 0x5086e8, 4 bytes; Message_0047f850[] by value in 1 of 3 files (conflicting: struct names only)
-extern unsigned char DAT_005086fc[560];                                                       // 0x5086fc, 560 bytes; SoundInfo_005086fc[] by value in 1 of 1 files
 extern char DAT_00508a78[44];                                                                 // 0x508a78, 44 bytes; 1 of 1 files
 extern char DAT_00508aa4[16];                                                                 // 0x508aa4, 16 bytes; 1 of 1 files
 extern char DAT_00508ab4[16];                                                                 // 0x508ab4, 16 bytes; 1 of 1 files
@@ -247,8 +243,6 @@ extern char* DAT_0050d4d0;                                                      
 extern char* DAT_0050d660;                                                                    // 0x50d660, 4 bytes; 2 of 2 files
 extern char DAT_0050d6b4[36];                                                                 // 0x50d6b4, 36 bytes; 1 of 1 files
 extern char* DAT_0050d72c;                                                                    // 0x50d72c, 4 bytes; 3 of 3 files
-extern unsigned char DAT_0050d980[128];                                                       // 0x50d980, 128 bytes; EventEntry[] by value in 1 of 1 files
-extern unsigned char DAT_0050da00[272];                                                       // 0x50da00, 272 bytes; EventEntry[] by value in 1 of 1 files
 extern char DAT_005119b8[8];                                                                  // 0x5119b8, 8 bytes; 77 of 82 files (conflicting: shape)
 extern int DAT_005119e8[10];                                                                  // 0x5119e8, 40 bytes; 2 of 2 files
 extern int DAT_00511a10[10];                                                                  // 0x511a10, 40 bytes; 1 of 1 files
@@ -730,7 +724,7 @@ extern int DAT_0052a4f4;                                                        
 extern void* DAT_0052a4f8;                                                                    // 0x52a4f8, 4 bytes; 3 of 3 files
 extern long DAT_0052a4fc;                                                                     // 0x52a4fc, 4 bytes; 2 of 3 files (conflicting: signedness or const)
 
-// Not declared: 92 globals defined in src/data or whose type is not settled (see data/globals.csv).
+// Not declared: 99 globals defined in src/data or whose type is not settled (see data/globals.csv).
 //   0x5119c0 DAT_005119c0: Class_00409160*[] (7), void*[] (5), Owner*[] (3), Class_00409470*[] (2), and 5 more
 //   0x51fbd0 DAT_0051fbd0: void* (4), int (2), Display_004b4f50* (1), Display_004b5370* (1), and 14 more
 //   0x51e598 IURect_0046e160::IU?$pair::?$_Tree::_Nil: template
@@ -778,6 +772,7 @@ extern long DAT_0052a4fc;                                                       
 //   0x4fd358 DAT_004fd358: defined in src/data/vtables.cpp
 //   0x4fd388 DAT_004fd388: defined in src/data/vtables.cpp
 //   0x502ae8 DAT_00502ae8: char[] (2), char (1)
+//   0x5086e8 DAT_005086e8: defined in src/data/unit_messages.cpp
 //   0x512298 DAT_00512298: Smoke_00425b80* (1), void* (1), char* (1)
 //   0x512348 DAT_00512348: Entry_00438760* (1), Entry_0043a420* (1), int (1)
 //   0x5129b8 DAT_005129b8: int* (2), int (1)
@@ -807,6 +802,9 @@ extern long DAT_0052a4fc;                                                       
 //   0x501fd0 g_debugCommands: defined in src/data/console_commands.cpp
 //   0x505510 DAT_00505510: unsigned char (1), int (1)
 //   0x507b70 DAT_00507b70: unsigned char[] (1), ColourEntry_00478790[] (1)
+//   0x5086e0 DAT_005086e0: defined in src/data/unit_messages.cpp
+//   0x50d980 g_pentiumEvents: defined in src/data/perf_counters.cpp
+//   0x50da00 g_pentiumProEvents: defined in src/data/perf_counters.cpp
 //   0x5122d4 DAT_005122d4: void* (1), char* (1)
 //   0x512328 DAT_00512328: Player_00437cd0* (1), void* (1)
 //   0x512764 DAT_00512764: short (1), int (1)
@@ -822,6 +820,9 @@ extern long DAT_0052a4fc;                                                       
 //   0x4fc980 DAT_004fc980: vtable
 //   0x4fd458 DAT_004fd458: vtable
 //   0x501fcc DAT_00501fcc: defined in src/data/console_commands.cpp
+//   0x5086d8 g_unitMessages: defined in src/data/unit_messages.cpp
+//   0x5086dc DAT_005086dc: defined in src/data/unit_messages.cpp
+//   0x5086fc DAT_005086fc: defined in src/data/unit_messages.cpp
 //   0x528a58 std::IH::IU?$pair::?$_Tree::_Nilrefs: template
 
 #endif
