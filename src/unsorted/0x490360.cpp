@@ -15,10 +15,10 @@ public:
     int celebrated;                      // +0x8
 
     Condition_0048ff40() { satisfied = celebrated = 0; }
-    virtual int FUN_0048f7e0() = 0;      // IsSatisfied
+    virtual int FUN_0048ea00();          // IsSatisfied
     virtual void FUN_0048ea10(Unit* unit);   // Slot1
     virtual void FUN_0048ea20(Unit* unit);   // Slot2
-    virtual void FUN_0048ea30();         // Slot3
+    virtual void FUN_0048ea30(Unit* unit);   // Slot3
     virtual void FUN_0048f840(Class_004b4560* file) = 0;   // Save
     virtual void FUN_0048f880(Class_004b4560* file) = 0;   // Load
 };
@@ -32,7 +32,7 @@ public:
 // DefeatCondition_AllUnitsKilled.
 class Class_0048f840 : public Condition_0048ff40, public Listener_0048ff40 {
 public:
-    virtual int FUN_0048f7e0();
+    virtual int FUN_0048ea00();
     virtual void FUN_0048f840(Class_004b4560* file);   // Save
     virtual void FUN_0048f880(Class_004b4560* file);   // Load
     virtual int FUN_0048f790(Unit* unit);
@@ -86,7 +86,7 @@ static inline int check_second(Class_00490360* self)
         self->secondCount++;
     }
     for (int i = 0; i < self->secondCount; i++) {
-        if (self->second[i]->FUN_0048f7e0())
+        if (self->second[i]->FUN_0048ea00())
             return 1;
     }
     return 0;

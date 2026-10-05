@@ -34,10 +34,11 @@
 // Class_0048f250's constructor must store pos.z and radius before
 // pos.y = 0x12345678.
 //
-// For the vtables' sake (not the bytes), the classes declare the slots they
-// override in the original with the base's name and parameter types, so a
-// slot names the function its own file defines as `Class_0048xxxx::<base
-// name>` (tools/vtablecheck.py): IsSatisfied, the unit slots 1 and 2, Save
+// For the vtables' sake (not the bytes), each class declares exactly the
+// slots it overrides in the original, with the base's name and parameter
+// types, so a slot names the function its own file defines as
+// `Class_0048xxxx::<base name>`, or the base's own default in 0x48ea00 to
+// 0x48ea30 (tools/vtablecheck.py): IsSatisfied, the unit slots 1 to 3, Save
 // and Load (which take the Class_004b4560 section), and the visitor slot,
 // which returns whether to keep visiting (Listener_0048f250's returns
 // nothing).
@@ -60,7 +61,7 @@ public:
     virtual int FUN_0048ea00();          // IsSatisfied
     virtual void FUN_0048ea10(Unit* unit);   // Slot1
     virtual void FUN_0048ea20(Unit* unit);   // Slot2
-    virtual void FUN_0048ea30();         // Slot3
+    virtual void FUN_0048ea30(Unit* unit);   // Slot3
     virtual void FUN_0048f840(Class_004b4560* file);   // Save
     virtual void FUN_0048f880(Class_004b4560* file);   // Load
 };
@@ -104,7 +105,6 @@ struct Vec3_0048f250 {
 // KillEnemyCommander (vtable 0x4fd960).
 class Class_0048ea00 : public Condition_0048ff40 {
 public:
-    virtual int FUN_0048ea00();
     virtual void FUN_0048ea10(Unit* unit);
     virtual void FUN_0048f840(Class_004b4560* file);
     virtual void FUN_0048f880(Class_004b4560* file);
@@ -114,6 +114,8 @@ public:
 class Class_0048eb40 : public Condition_0048ff40 {
 public:
     virtual int FUN_0048ea00();
+    virtual void FUN_0048f840(Class_004b4560* file);
+    virtual void FUN_0048f880(Class_004b4560* file);
 };
 
 // KillAllMobileUnits (vtable 0x4fd928, listener vtable 0x4fd920).
