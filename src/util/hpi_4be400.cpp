@@ -198,7 +198,7 @@
 #include <string.h>
 
 #pragma pack(push, 1)
-struct Find_004be400 {
+struct FindFiles {
     char dir[0x100];         // +0x000
     char pattern[0x100];     // +0x100
     int state;               // +0x200
@@ -207,20 +207,20 @@ struct Find_004be400 {
     int index;               // +0x209
 };
 
-struct Entry_004be400 {                // 9 bytes
+struct ArchiveEntry {                  // 9 bytes
     int field_0;
     int field_4;
     unsigned char flags;               // +0x8
 };
 
-struct Table_004be400 {
+struct ArchiveDirectory {
     int count;
-    Entry_004be400* entries;
+    ArchiveEntry* entries;
 };
 
 struct Header_004be400 {
     char unknown_0[0x10];
-    Table_004be400* table;             // +0x10
+    ArchiveDirectory* table;           // +0x10
 };
 
 struct OPENHAPIFILE {
@@ -236,7 +236,7 @@ struct Display_004be400 {
 #pragma pack(pop)
 
 Display_004be400* GetDisplay();
-Entry_004be400* __stdcall HAPI_FindEntry(Table_004be400* table, char* name);
+ArchiveEntry* __stdcall HAPI_FindEntry(ArchiveDirectory* table, char* name);
 int __stdcall HAPI_FindFirst(const char* path, struct _finddata_t* fd, int state, char recursive);
 int __stdcall HAPI_FindNext(int handle, struct _finddata_t* fd);
 void __cdecl FUN_004d85a0(void* p);
@@ -261,11 +261,11 @@ void __stdcall HAPI_MarkShadowedFiles(char* path, int state, int recursive)
                     strcpy(buf, path);
                     strcat(buf, fd.name);
                     strcat(buf, "\\");
-                    HAPI_MarkShadowedFiles(buf, ((Find_004be400*)h)->state, 0);
+                    HAPI_MarkShadowedFiles(buf, ((FindFiles*)h)->state, 0);
                 }
             }
         } else {
-            i = ((Find_004be400*)h)->state;
+            i = ((FindFiles*)h)->state;
             if (i < 0)
                 i = 0;
             else
@@ -273,13 +273,13 @@ void __stdcall HAPI_MarkShadowedFiles(char* path, int state, int recursive)
             for (; i < d->count; i++) {
                 strcpy(buf, path);
                 strcat(buf, fd.name);
-                Entry_004be400* e = HAPI_FindEntry(d->files[i]->header->table, buf);
+                ArchiveEntry* e = HAPI_FindEntry(d->files[i]->header->table, buf);
                 if (e && !(e->flags & 1))
                     e->flags |= 2;
             }
         }
     } while (HAPI_FindNext(h, &fd) != -1);
-    Find_004be400* f = (Find_004be400*)h;
+    FindFiles* f = (FindFiles*)h;
     if (f) {
         if (f->state < 0)
             _findclose(f->handle);

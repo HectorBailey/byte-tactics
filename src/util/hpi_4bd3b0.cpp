@@ -28,7 +28,7 @@
 #include <string.h>
 
 #pragma pack(push, 1)
-struct Find_004bd3b0 {
+struct FindFiles {
     char dir[0x100];     // +0x000
     char name[0x100];    // +0x100
     int state;           // +0x200
@@ -37,7 +37,7 @@ struct Find_004bd3b0 {
     int index;           // +0x209
 };
 
-struct Entry_004bd3b0 {
+struct ArchiveEntry {
     unsigned int name;   // +0
     unsigned int data;   // +4
     unsigned char isDir : 1; // +8
@@ -66,7 +66,7 @@ extern char DAT_00503374[];  // "\\"
 void* __cdecl FUN_004d84a0(void* p, const char* name, unsigned int size);
 void __cdecl FUN_004d85a0(void* p);
 int __stdcall HAPI_FindFirst(const char* path, struct _finddata_t* fd, int state, char recursive);
-int __stdcall HAPI_FindNext(Find_004bd3b0* f, struct _finddata_t* fd);
+int __stdcall HAPI_FindNext(FindFiles* f, struct _finddata_t* fd);
 unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf_004bd3b0* out, int* total);
 
 // Grows the buffer by n bytes and returns the offset of the new space.
@@ -112,10 +112,10 @@ unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf_004bd3b0* 
         do {
             if (strcmp(fd.name, DAT_00502910) != 0 && strcmp(fd.name, DAT_0050a548) != 0)
                 ++(*(unsigned int*)(base + root));
-        } while (HAPI_FindNext((Find_004bd3b0*)h, &fd) == 0);
+        } while (HAPI_FindNext((FindFiles*)h, &fd) == 0);
         if (h != 0) {
-            if (((Find_004bd3b0*)h)->state < 0)
-                _findclose(((Find_004bd3b0*)h)->handle);
+            if (((FindFiles*)h)->state < 0)
+                _findclose(((FindFiles*)h)->handle);
             FUN_004d85a0((void*)h);
         }
     }
@@ -130,7 +130,7 @@ unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf_004bd3b0* 
             if (strcmp(fd.name, DAT_00502910) != 0 && strcmp(fd.name, DAT_0050a548) != 0) {
                 unsigned int nameOff = Grow(out, strlen(fd.name) + 1);
                 strcpy(out->buf + nameOff, fd.name);
-                Entry_004bd3b0* e = (Entry_004bd3b0*)(out->buf + entries);
+                ArchiveEntry* e = (ArchiveEntry*)(out->buf + entries);
                 e += k;
                 e->name = nameOff;
                 e->spare = 0;
@@ -141,13 +141,13 @@ unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf_004bd3b0* 
                         strcat(buf, DAT_00503374);
                     strcat(buf, fd.name);
                     unsigned int sub = HAPI_BuildArchiveDirectory(buf, out, total);
-                    e = (Entry_004bd3b0*)(out->buf + entries);
+                    e = (ArchiveEntry*)(out->buf + entries);
                     e += k;
                     e->data = sub;
                 } else {
                     e->isDir = 0;
                     unsigned int nodeOff = Grow(out, 9);
-                    e = (Entry_004bd3b0*)(out->buf + entries);
+                    e = (ArchiveEntry*)(out->buf + entries);
                     e += k;
                     e->data = nodeOff;
                     Node_004bd3b0* node = (Node_004bd3b0*)(out->buf + e->data);
@@ -158,10 +158,10 @@ unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf_004bd3b0* 
                 }
                 k++;
             }
-        } while (HAPI_FindNext((Find_004bd3b0*)h, &fd) == 0);
+        } while (HAPI_FindNext((FindFiles*)h, &fd) == 0);
         if (h != 0) {
-            if (((Find_004bd3b0*)h)->state < 0)
-                _findclose(((Find_004bd3b0*)h)->handle);
+            if (((FindFiles*)h)->state < 0)
+                _findclose(((FindFiles*)h)->handle);
             FUN_004d85a0((void*)h);
         }
     }

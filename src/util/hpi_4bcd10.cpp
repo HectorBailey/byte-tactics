@@ -11,7 +11,7 @@ struct FindData_004bcd10 {
 
 // The opaque search state HAPI_FindFirst allocates (same layout as 0x4bc8d0).
 #pragma pack(push, 1)
-struct FindHandle_004bcd10 {
+struct FindFiles {
     char unknown_0[0x200];
     int state;                          // +0x200, negative while the handle is open
     char unknown_204;
@@ -19,9 +19,9 @@ struct FindHandle_004bcd10 {
 };
 #pragma pack(pop)
 
-FindHandle_004bcd10* __stdcall HAPI_FindFirst(const char* path, FindData_004bcd10* fd, int a, int b);
-int __stdcall HAPI_FindNext(FindHandle_004bcd10* handle, FindData_004bcd10* fd);
-void __cdecl FUN_004d85a0(FindHandle_004bcd10* p);
+FindFiles* __stdcall HAPI_FindFirst(const char* path, FindData_004bcd10* fd, int a, int b);
+int __stdcall HAPI_FindNext(FindFiles* handle, FindData_004bcd10* fd);
+void __cdecl FUN_004d85a0(FindFiles* p);
 
 // Walks the search opened by HAPI_FindFirst and stops on the `index`-th entry
 // that is neither "." nor ".." (skipping entries that fail the flag test when
@@ -30,8 +30,8 @@ void __cdecl FUN_004d85a0(FindHandle_004bcd10* p);
 void __stdcall GetDirectoryEntry(FindData_004bcd10* fd, int index, const char* pattern, int flag)
 {
     int count = 0;
-    FindHandle_004bcd10* handle = HAPI_FindFirst(pattern, fd, -1, 1);
-    if (handle != (FindHandle_004bcd10*)-1) {
+    FindFiles* handle = HAPI_FindFirst(pattern, fd, -1, 1);
+    if (handle != (FindFiles*)-1) {
         do {
             if (strcmp(fd->name, ".") != 0 && strcmp(fd->name, "..") != 0) {
                 if (flag == 0 || (fd->flags & 0x10) != 0) {

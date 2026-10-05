@@ -776,7 +776,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x51fcb0,DAT_0051fcb0,.bss,256,gap,data,unsigned char[],2,0,1,one type,2,,s__0051fcb0,,,
 0x51fdb0,DAT_0051fdb0,.bss,4,type,data,int,3,0,1,one type,3,,INT_0051fdb0,,,
 0x51fdb4,DAT_0051fdb4,.bss,4,gap,unreferenced,unsigned char[4],0,0,0,,0,,,,,
-0x51fdb8,g_translations,.bss,4,type,data,TranslationTable*,2,1,2,conflicting: struct names only,3,,DAT_0051fdb8,,,
+0x51fdb8,g_translations,.bss,4,type,data,TranslationTable*,3,0,1,one type,3,,DAT_0051fdb8,,,
 0x51fdbc,DAT_0051fdbc,.bss,4,gap,unreferenced,unsigned char[4],0,0,0,,0,,,,,
 0x51fdc0,g_language,.bss,304,parts,data,char[256],2,0,1,one type,2,,s__0051fdc0,,,
 0x51fe00,g_screenLockCount,.bss,4,type>gap,data,int,14,0,1,one type,14,,,,in g_language+0x40,

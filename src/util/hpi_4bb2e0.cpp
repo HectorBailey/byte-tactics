@@ -19,22 +19,22 @@
 #include <string.h>
 
 #pragma pack(push, 1)
-struct Entry_004bb2e0 {
+struct ArchiveEntry {
     char* name;                          // +0x0
     void* child;                         // +0x4
     unsigned char flags;                 // +0x8
 };
 #pragma pack(pop)
 
-struct List_004bb2e0 {
+struct ArchiveDirectory {
     int count;                           // +0x0
-    Entry_004bb2e0* entries;             // +0x4
+    ArchiveEntry* entries;               // +0x4
 };
 
 struct Node_004bb2e0 {
     char unknown_0[0xc];
     unsigned char obfuscate;             // +0xc
-    List_004bb2e0* list;                 // +0x10
+    ArchiveDirectory* list;              // +0x10
 };
 
 struct Tex_004bb2e0 {
@@ -72,7 +72,7 @@ struct FileHandle {
 State_004bb2e0* GetDisplay(void);
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
 void __cdecl FUN_004d85a0(void* p);
-Entry_004bb2e0* __stdcall HAPI_FindEntry(List_004bb2e0* list, char* name);
+ArchiveEntry* __stdcall HAPI_FindEntry(ArchiveDirectory* list, char* name);
 
 // Whole pixels of a 16.16 size, rounded up.
 static inline int nblocks(int w)
@@ -98,7 +98,7 @@ FileHandle* __stdcall HAPI_OpenFile(char* filename, const char* mode)
         return h;
     }
     for (int i = 0; i < state->itemCount; i++) {
-        Entry_004bb2e0* e = HAPI_FindEntry(state->items[i]->node->list, filename);
+        ArchiveEntry* e = HAPI_FindEntry(state->items[i]->node->list, filename);
         if (e == 0 || (e->flags & 1))
             continue;
         if (state->items[i]->fp == 0) {

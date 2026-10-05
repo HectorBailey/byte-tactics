@@ -41,20 +41,20 @@ struct Entries_004c51b0 {
     Inner_004c51b0 v;
 };
 
-class Class_004c42a0 {
+class TdfRecord {
 public:
     int* name;                                 // +0x0
-    std::vector<Class_004c42a0*> children;   // +0x4
+    std::vector<TdfRecord*> children;        // +0x4
     char unknown_14;                           // +0x14
     Entries_004c51b0 entries;                  // +0x15
 
-    Class_004c42a0* FUN_004c3e40(char* name, char* text, int flag, char* path);
+    TdfRecord* FUN_004c3e40(char* name, char* text, int flag, char* path);
 
-    ~Class_004c42a0()
+    ~TdfRecord()
     {
         if (name)
             FUN_004d85a0(name);
-        for (Class_004c42a0** p = children.begin(); p < children.end(); p++)
+        for (TdfRecord** p = children.begin(); p < children.end(); p++)
             delete *p;
     }
 };
@@ -67,7 +67,7 @@ public:
 
 class Class_004c2f60 {
 public:
-    Class_004c42a0* root;                // +0x0
+    TdfRecord* root;                     // +0x0
     int field_4;                           // +0x4
     int field_8;                           // +0x8
     void LoadBuffer(char* data, int size, int flag, char* path);
@@ -84,7 +84,7 @@ void Class_004c2f60::LoadBuffer(char* data, int size, int flag, char* path)
     memcpy(text, data, size);
     text[size] = 0;
     ((Class_004c33a0*)this)->StripComments(text);
-    Class_004c42a0* node = (Class_004c42a0*)operator new(0x29);
+    TdfRecord* node = (TdfRecord*)operator new(0x29);
     root = node ? node->FUN_004c3e40("root", text, 0, path) : 0;
     FUN_004d85a0((int*)text);
 }

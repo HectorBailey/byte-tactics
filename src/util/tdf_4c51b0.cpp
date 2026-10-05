@@ -45,18 +45,18 @@ struct Entries_004c51b0 {
     Inner_004c51b0 v;
 };
 
-class Class_004c42a0 {
+class TdfRecord {
 public:
     int* name;                                 // +0x0
-    std::vector<Class_004c42a0*> children;   // +0x4
+    std::vector<TdfRecord*> children;        // +0x4
     char unknown_14;                           // +0x14
     Entries_004c51b0 entries;                  // +0x15
 
-    ~Class_004c42a0()
+    ~TdfRecord()
     {
         if (name)
             FUN_004d85a0(name);
-        for (Class_004c42a0** p = children.begin(); p < children.end(); p++)
+        for (TdfRecord** p = children.begin(); p < children.end(); p++)
             delete *p;
     }
 };
@@ -64,7 +64,7 @@ public:
 
 class Class_004c2ea0 {
 public:
-    Class_004c42a0* root;
+    TdfRecord* root;
     int field_4;
     int field_8;
 

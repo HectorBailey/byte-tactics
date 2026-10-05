@@ -1030,7 +1030,7 @@ struct Elem_004b75d0;
 struct Elem_004b75d0_2;
 struct Elem_004b75d0_3;
 struct Elem_004b75d0_4;
-struct Elem_004be010;
+struct ArchiveEntry;
 struct Elem_004c5740;
 struct TdfField;
 struct Elem_004cb4c0;
@@ -16601,7 +16601,7 @@ struct Class_004be010 {  // 0x8 bytes, 1 view
     int base;  // +0x4
 };
 
-struct Elem_004be010 {  // 0xc bytes, 1 view
+struct ArchiveEntry {   // 0xc bytes, 1 view
     int a;  // +0x0
     int b;  // +0x4
     unsigned char flags;  // +0x8

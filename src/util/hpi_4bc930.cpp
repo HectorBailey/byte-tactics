@@ -9,7 +9,7 @@ struct FindData_004bc930 {
 };
 
 #pragma pack(push, 1)
-struct FindHandle_004bc930 {
+struct FindFiles {
     char unknown_0[0x200];
     int field_200;                     // +0x200
     unsigned char field_204;           // +0x204
@@ -36,7 +36,7 @@ int __stdcall CountDirectoryEntries(const char* path, int flag)
             }
         } while (HAPI_FindNext(handle, &fd) != -1);
         if (handle != 0) {
-            FindHandle_004bc930* h = (FindHandle_004bc930*)handle;
+            FindFiles* h = (FindFiles*)handle;
             if (h->field_200 < 0)
                 _findclose(h->field_205);
             FUN_004d85a0(h);

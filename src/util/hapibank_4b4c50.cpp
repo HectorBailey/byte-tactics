@@ -22,7 +22,7 @@ struct AccountList {
     int cur;                           // +0x8
 };
 
-class Class_004b4c50 {
+class HapiBank {
 public:
     AccountList* data;                 // +0x0
 
@@ -30,7 +30,7 @@ public:
 };
 
 // FUNCTION: 0x4b4c50
-int Class_004b4c50::SeekBoxEnd()
+int HapiBank::SeekBoxEnd()
 {
     BankAccount* e = &data->entries[data->cur];
     SafeDepositBox* it = &e->items[e->cur];

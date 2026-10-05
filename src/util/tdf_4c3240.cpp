@@ -36,18 +36,18 @@ struct TdfField {
 void __cdecl FUN_004d85a0(int* param_1);
 
 #pragma pack(push, 1)
-class Class_004c42a0 {
+class TdfRecord {
 public:
     int* name;                                 // +0x0
-    std::vector<Class_004c42a0*> children;   // +0x4 (_First at +0x8)
+    std::vector<TdfRecord*> children;        // +0x4 (_First at +0x8)
     char unknown_14;                           // +0x14
     std::vector<TdfField> entries;             // +0x15 (_First at +0x19)
 
-    ~Class_004c42a0()
+    ~TdfRecord()
     {
         if (name)
             FUN_004d85a0(name);
-        for (Class_004c42a0** p = children.begin(); p < children.end(); p++)
+        for (TdfRecord** p = children.begin(); p < children.end(); p++)
             delete *p;
     }
 };
@@ -55,7 +55,7 @@ public:
 
 class Class_004c3240 {
 public:
-    Class_004c42a0* root;            // +0x0
+    TdfRecord* root;                 // +0x0
     int field_4;                       // +0x4
     int field_8;                       // +0x8
 

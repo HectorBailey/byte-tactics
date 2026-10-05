@@ -13,15 +13,15 @@
 
 
 #pragma pack(push, 1)
-struct Entry_004bdd70 {                // 9 bytes
+struct ArchiveEntry {                  // 9 bytes
     int field_0;                       // +0x0
     int field_4;                       // +0x4
     unsigned char flags;               // +0x8
 };
 
-struct Table_004bdd70 {
+struct ArchiveDirectory {
     int count;                         // +0x0
-    Entry_004bdd70* entries;           // +0x4
+    ArchiveEntry* entries;             // +0x4
 };
 
 struct Header_004bdd70 {
@@ -30,7 +30,7 @@ struct Header_004bdd70 {
     unsigned int size;                 // +0x8
     unsigned char key;                 // +0xc
     char unknown_d[3];
-    Table_004bdd70* table;             // +0x10
+    ArchiveDirectory* table;           // +0x10
 };
 
 struct OPENHAPIFILE {                  // 0x118 bytes
@@ -111,12 +111,12 @@ OPENHAPIFILE* __stdcall HAPI_OpenArchive(const char* name, int mode)
         }
         }
         base = h->header;
-        base->table = (Table_004bdd70*)((char*)base->table + (int)base);
+        base->table = (ArchiveDirectory*)((char*)base->table + (int)base);
         Header_004bdd70* b = h->header;
-        Table_004bdd70* t = b->table;
-        t->entries = (Entry_004bdd70*)((char*)t->entries + (int)b);
+        ArchiveDirectory* t = b->table;
+        t->entries = (ArchiveEntry*)((char*)t->entries + (int)b);
         for (int i = t->count - 1; i >= 0; i--) {
-            Entry_004bdd70* e = &t->entries[i];
+            ArchiveEntry* e = &t->entries[i];
             e->field_0 += (int)b;
             e->field_4 += (int)b;
             if (e->flags & 1)

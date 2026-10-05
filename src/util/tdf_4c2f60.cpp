@@ -13,7 +13,7 @@
 //   * the section's entry vector is a std::vector<Elem_004c2f60> whose
 //     elements have no destructor, with a std::_Destroy overload that calls
 //     the out-of-line release function FUN_004c5170 on each one. That is what
-//     makes the destroy loop of the inlined ~Class_004c42a0 call
+//     makes the destroy loop of the inlined ~TdfRecord call
 //     FUN_004c5170 (0x4c5170) with the element pointer as a stack argument,
 //     as it does here, instead of TdfField::~TdfField (0x4c5190,
 //     0x4c3240) or its scalar deleting destructor ??_G (0x4c51b0,
@@ -61,20 +61,20 @@ void __cdecl operator delete(void* p);
 void* __cdecl FUN_004d83b0(char* name, int size);
 
 #pragma pack(push, 1)
-class Class_004c42a0 {
+class TdfRecord {
 public:
     int* name;                                 // +0x0
-    std::vector<Class_004c42a0*> children;   // +0x4 (_First at +0x8)
+    std::vector<TdfRecord*> children;        // +0x4 (_First at +0x8)
     char unknown_14;                           // +0x14
     std::vector<Elem_004c2f60> entries;        // +0x15 (_First at +0x19)
 
-    Class_004c42a0* FUN_004c3e40(char* name, char* text, int flag, char* path);
+    TdfRecord* FUN_004c3e40(char* name, char* text, int flag, char* path);
 
-    ~Class_004c42a0()
+    ~TdfRecord()
     {
         if (name)
             FUN_004d85a0(name);
-        for (Class_004c42a0** p = children.begin(); p < children.end(); p++)
+        for (TdfRecord** p = children.begin(); p < children.end(); p++)
             delete *p;
     }
 };
@@ -87,7 +87,7 @@ public:
 
 class Class_004c2f60 {
 public:
-    Class_004c42a0* root;                // +0x0
+    TdfRecord* root;                     // +0x0
     int field_4;                         // +0x4
     int field_8;                         // +0x8
 
@@ -125,7 +125,7 @@ int Class_004c2f60::LoadFile(char* path)
             memcpy(text, buf, size);
             text[size] = 0;
             ((Class_004c33a0*)this)->StripComments(text);
-            Class_004c42a0* node = (Class_004c42a0*)operator new(0x29);
+            TdfRecord* node = (TdfRecord*)operator new(0x29);
             root = node ? node->FUN_004c3e40("root", text, 0, path) : 0;
             FUN_004d85a0((int*)text);
             result = 1;

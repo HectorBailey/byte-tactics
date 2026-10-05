@@ -68,7 +68,7 @@ struct FileHandle {
     char name[0x100];                    // +0x18
 };
 
-struct Entry_004bd830 {
+struct ArchiveEntry {
     int name;                            // +0x0, offset of the name string
     int offset;                          // +0x4, offset of the record data
     unsigned char flags;                 // +0x8
@@ -110,7 +110,7 @@ void __stdcall HAPI_WriteArchiveData(char* path, char* base, int off, FILE* f,
 {
     Info_004bd830* info;
     int len;
-    Entry_004bd830* e;
+    ArchiveEntry* e;
     unsigned size;
     char name[260];
     char full[260];
@@ -131,7 +131,7 @@ void __stdcall HAPI_WriteArchiveData(char* path, char* base, int off, FILE* f,
     long pos2;
     long pos;
     for (i = 0; i < *(unsigned*)(off + base); i++) {
-        e = (Entry_004bd830*)(base + *(int*)(off + base + 4)) + i;
+        e = (ArchiveEntry*)(base + *(int*)(off + base + 4)) + i;
         strcpy(full, name);
         strcat(full, base + e->name);
         if ((e->flags & 1) != 0) {

@@ -2438,7 +2438,7 @@ address,name
 0x4b4ba0,Class_004b4ba0::OpenNamedBox
 0x4b4bf0,Class_004b4bf0::GetBoxSize
 0x4b4c10,Class_004b4c10::SeekBox
-0x4b4c50,Class_004b4c50::SeekBoxEnd
+0x4b4c50,HapiBank::SeekBoxEnd
 0x4b4c80,Class_004b4c80::ReadBox
 0x4b4cf0,Class_004b4cf0::WriteBox
 0x4b4d70,Class_004b4d70::WriteAuditFile
@@ -2736,7 +2736,7 @@ address,name
 0x4c2f60,Class_004c2f60::LoadFile
 0x4c3120,Class_004c2f60::LoadBuffer
 0x4c3240,Class_004c3240::Unload
-0x4c32f0,??_GClass_004c42a0@@QAEPAXI@Z
+0x4c32f0,??_GTdfRecord@@QAEPAXI@Z
 0x4c33a0,Class_004c33a0::StripComments
 0x4c3410,Class_004c3410::SelectRecord
 0x4c3490,Class_004c3490::SelectRecordAt
@@ -2750,16 +2750,16 @@ address,name
 0x4c3e10,Class_004c3e10::ResetCurrentRecord
 0x4c3e20,Class_004c3e20::GetCurrentRecord
 0x4c3e30,Class_004c3e30::SetCurrentRecord
-0x4c3e40,Class_004c3e40::Class_004c3e40
-0x4c42a0,Class_004c42a0::~Class_004c42a0
+0x4c3e40,TdfRecord::TdfRecord
+0x4c42a0,TdfRecord::~TdfRecord
 0x4c4340,Class_004c4340::MakeTrimmedString
-0x4c43f0,Class_004c43f0::ComputeRecordChecksum
+0x4c43f0,TdfRecord::ComputeRecordChecksum
 0x4c4420,Class_004c4420::CopyRecordName
 0x4c4440,Class_004c4440::GetRecordName
 0x4c4450,Class_004c4450::GetSubRecordCount
 0x4c4470,Class_004c4470::FindSubRecord
 0x4c44c0,Class_004c44c0::GetSubRecord
-0x4c45c0,Class_004c45c0::GetFieldCount
+0x4c45c0,TdfRecord::GetFieldCount
 0x4c45e0,Class_004c45e0::GetFieldName
 0x4c4630,Class_004c4630::FindFieldValue
 0x4c46c0,Class_004c46c0::GetFieldInt
@@ -2771,7 +2771,7 @@ address,name
 0x4c4b10,std::D::DU?$char_traits::?$basic_string::erase
 0x4c4c30,std::D::DU?$char_traits::?$basic_string::_Eos
 0x4c4c50,std::D::DU?$char_traits::?$basic_string::_Grow
-0x4c4d70,PAVClass_004c3e40::?$vector::insert
+0x4c4d70,PAVTdfRecord::?$vector::insert
 0x4c50a0,std::D::DU?$char_traits::?$basic_string::_Split
 0x4c5170,FUN_004c5170
 0x4c5190,TdfField::~TdfField

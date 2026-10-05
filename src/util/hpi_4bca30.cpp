@@ -14,7 +14,7 @@ struct FindData_004bca30 {
 };
 
 #pragma pack(push, 1)
-struct Find_004bc8d0 {
+struct FindFiles {
     char unknown_0[0x200];
     int state;                         // +0x200 (negative while a search is open)
     char unknown_204;
@@ -74,7 +74,7 @@ void __stdcall ListDirectory(const char* path, int param_2, Class_004be6c0* para
             }
         } while (HAPI_FindNext(h, &fd) != -1);
         if (h != 0) {
-            Find_004bc8d0* f = (Find_004bc8d0*)h;
+            FindFiles* f = (FindFiles*)h;
             if (f->state < 0)
                 _findclose(f->handle);
             FUN_004d85a0((int*)f);
