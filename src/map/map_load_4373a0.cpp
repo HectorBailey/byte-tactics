@@ -86,13 +86,13 @@ public:
 extern MapCacheEntry* DAT_005122c4;
 extern MapCacheEntry* DAT_005122c8;
 
-class Class_00437580 {
+class MapCache {
 public:
     char unknown_0[4];
     void FUN_00437580(MapCacheEntry* pos, int count, const MapCacheEntry& val);
 };
 
-extern Class_00437580 DAT_005122c0;
+extern MapCache DAT_005122c0;
 
 struct Header_004373a0 {
     int magic;                         // +0x00

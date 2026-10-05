@@ -289,7 +289,7 @@ extern int DAT_00512290;                                                        
 extern int DAT_00512294;                                                                      // 0x512294, 4 bytes; 1 of 1 files
 extern int DAT_0051229c;                                                                      // 0x51229c, 4 bytes; 1 of 1 files
 extern unsigned char DAT_005122a0[4];                                                         // 0x5122a0, 4 bytes; nothing refers to it
-extern unsigned char DAT_005122c0[4];                                                         // 0x5122c0, 4 bytes, DAT_005122c0$S4554; Class_00437580 by value in 1 of 1 files
+extern unsigned char DAT_005122c0[4];                                                         // 0x5122c0, 4 bytes, DAT_005122c0$S4554; MapCache by value in 1 of 1 files
 extern MapCacheEntry* DAT_005122c4;                                                           // 0x5122c4, 4 bytes; 1 of 1 files
 extern MapCacheEntry* DAT_005122c8;                                                           // 0x5122c8, 4 bytes; 1 of 1 files
 extern unsigned char DAT_005122cc[4];                                                         // 0x5122cc, 4 bytes; nothing refers to it

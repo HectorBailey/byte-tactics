@@ -202,7 +202,7 @@ class Class_00436c30;
 class Class_00437280;
 class Class_00437300;
 class Class_004373a0;
-class Class_00437580;
+class MapCache;
 class Class_00437800;
 class MapCacheEntry;
 class Class_004379a0;
@@ -6214,7 +6214,7 @@ public:
     char* GetName(int);
 };
 
-class Class_00437580 {  // 0x4 bytes, 1 view
+class MapCache {        // 0x4 bytes, 1 view
 public:
     char unknown_0[4];
     void FUN_00437580(MapCacheEntry*, int, MapCacheEntry&);
