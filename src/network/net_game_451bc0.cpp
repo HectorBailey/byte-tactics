@@ -33,13 +33,13 @@ struct Game {
 #pragma pack(pop)
 
 extern Game* g_game;
-extern int DAT_00506dbc;
+extern int g_usePacketManager;
 
 class Class_004619b0 {
 public:
-    int FUN_004619b0(int param_1, int param_2, void* param_3, unsigned int param_4);
+    int QueuePacket(int param_1, int param_2, void* param_3, unsigned int param_4);
 };
-extern Class_004619b0 DAT_00513000;
+extern Class_004619b0 g_packetManager;
 
 int __stdcall FUN_0044ffd0(unsigned char index);
 unsigned char __stdcall FUN_0044fe40(int id);
@@ -105,8 +105,8 @@ int __stdcall FUN_00451bc0(int from, int to, unsigned char* packet, int size)
         toPlayer->state == 3 && toPlayer->field_22 == 0) {
         Player_00451bc0* target = &g_game->players[FindPlayerIndex_00451bc0(to)];
         if (target->active == 0 || (target->state != 1 && target->state != 2)) {
-            if (DAT_00506dbc != 0)
-                return DAT_00513000.FUN_004619b0(from, to, packet, size);
+            if (g_usePacketManager != 0)
+                return g_packetManager.QueuePacket(from, to, packet, size);
             if (HAPINET_sendpacket((char*)g_game + 0x14, from, to, packet, size) != 0)
                 return 0;
             FUN_00415ef0(packet[0], size, 1);

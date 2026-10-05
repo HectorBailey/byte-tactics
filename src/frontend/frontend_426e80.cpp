@@ -133,7 +133,7 @@ void __stdcall HAPINET_guaranteepackets(int param);
 void __stdcall FUN_004a9660(int param);
 void __stdcall FUN_004ab0a0(int param);
 void __stdcall HAPINET_quitgame(int param);
-void __stdcall FUN_00461020(int param1, int param2);
+void __stdcall InitPacketManager(int param1, int param2);
 void __stdcall FUN_004c1ab0(void);
 Obj_00426e80* __stdcall FUN_004b6220(void);
 void __stdcall FUN_004263b0(void);
@@ -167,7 +167,7 @@ int __stdcall FUN_004436e0(void);
 void __stdcall FUN_0041f630(void);
 void __stdcall FUN_004c2470(void);
 void __stdcall FUN_004c2870(void);
-struct Class_00463c60 { void FUN_00463c60(int param); };
+struct Class_00463c60 { void SetType(int param); };
 struct Class_00435a20 { void FUN_00435a20(int param); };
 
 void __stdcall FUN_004256d0(int line, char* file);
@@ -716,7 +716,7 @@ void FUN_00426e80(void)
             char* p = g_game + 0x1b63;
             for (int i = 0; i < 10; i++) {
                 if (p[0x73] == 4)
-                    ((Class_00463c60*)p)->FUN_00463c60(0);
+                    ((Class_00463c60*)p)->SetType(0);
                 p += 0x14b;
             }
             FUN_0046ca60();
@@ -726,7 +726,7 @@ void FUN_00426e80(void)
         case 3:
             ((Bits_00426e80*)(g_game + 0x2a44))->b0 = 1;
             HAPINET_quitgame((int)(g_game + 0x14));
-            FUN_00461020(2, 100);
+            InitPacketManager(2, 100);
             FUN_0046c920();
             FUN_0046c620(8);
             FUN_0046c190();

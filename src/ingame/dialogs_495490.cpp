@@ -5,9 +5,9 @@
 
 unsigned int __cdecl FUN_004b6560(void);
 
-class Class_004618a0 {
+class PacketManager {
 public:
-    int FUN_004618a0(int param_1);
+    int SendAllQueued(int param_1);
 };
 
 class Class_0046a400 {                 // frame-time profile, embedded at g_game+0x38d85
@@ -47,8 +47,8 @@ struct Game {
 #pragma pack(pop)
 
 extern Game* g_game;
-extern int DAT_00506dbc;
-extern Class_004618a0 DAT_00513000;
+extern int g_usePacketManager;
+extern PacketManager g_packetManager;
 
 void FUN_00453d40(void);
 void FUN_0048ad30(void);
@@ -102,9 +102,9 @@ void __stdcall FUN_00495490(int showStats)
         FUN_00466580();
         g_game->prof.FUN_0046a400(8);
 
-        if (showStats && DAT_00506dbc != 0) {
+        if (showStats && g_usePacketManager != 0) {
             FUN_00457d30(&g_game->players[g_game->localPlayer]);
-            DAT_00513000.FUN_004618a0(0);
+            g_packetManager.SendAllQueued(0);
             g_game->prof.FUN_0046a400(0);
         }
     }

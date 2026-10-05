@@ -26,14 +26,14 @@ struct Game {
 };
 #pragma pack(pop)
 
-class Class_004618a0 {
+class PacketManager {
 public:
-    int FUN_004618a0(int param_1);
+    int SendAllQueued(int param_1);
 };
 
 extern Game* g_game;
-extern int DAT_00506dbc;
-extern Class_004618a0 DAT_00513000;
+extern int g_usePacketManager;
+extern PacketManager g_packetManager;
 
 void __stdcall FUN_00452cc0(int id);
 void FUN_0046c190();
@@ -53,8 +53,8 @@ static inline int IsPlaying(Player_00450e20* player)
 // FUNCTION: 0x450e20
 void FUN_00450e20()
 {
-    if (DAT_00506dbc != 0) {
-        DAT_00513000.FUN_004618a0(1);
+    if (g_usePacketManager != 0) {
+        g_packetManager.SendAllQueued(1);
     }
     if (g_game->flags_2a44 & 1) {
         for (int i = 0; i < 10; i++) {

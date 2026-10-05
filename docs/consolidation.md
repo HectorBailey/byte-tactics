@@ -299,7 +299,7 @@ can disagree on types (a real link would fail). Known cases:
 - FUN_004a11c0's third parameter is `short` in 0x4a11c0.cpp, but 0x41a120
   only matches with `int` (#175); it is probably `int`.
 
-- `Class_00460f60`, the object at DAT_00513000: eleven 0x1044-byte channels
+- `Class_00460f60`, the object at g_packetManager: eleven 0x1044-byte channels
   from +0x08, a {buffer, used, capacity} triple at +0xb2f4 and a
   `Class_00462d30` member at +0xb300; 0x460e20.cpp has the full class (#225).
   Its destructors 0x461340 and 0x461420 view each channel's items/count pair

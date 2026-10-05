@@ -91,7 +91,7 @@ struct Ring_00463790 {
     }
 };
 
-class Class_00463730 {
+class FrameQueue {
 public:
     int field_0;                       // +0x00
     unsigned int field_4;              // +0x04
@@ -103,11 +103,11 @@ public:
 
     int Count() { return buffer ? buffer->count : 0; }
 
-    int FUN_00463790(char* src, unsigned int size, int tick, int a4, int a5, int a6);
+    int QueueFrames(char* src, unsigned int size, int tick, int a4, int a5, int a6);
 };
 
 // FUNCTION: 0x463790
-int Class_00463730::FUN_00463790(char* src, unsigned int size, int tick, int a4, int a5, int a6)
+int FrameQueue::QueueFrames(char* src, unsigned int size, int tick, int a4, int a5, int a6)
 {
     if (size <= 0)
         return 1;

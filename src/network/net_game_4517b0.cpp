@@ -106,17 +106,17 @@ struct Obj_4517b0 {
     unsigned short flag : 1;           // +0xf0, mask 2
 };
 
-class Class_004618a0 {
+class PacketManager {
 public:
-    int FUN_004618a0(int param_1);
+    int SendAllQueued(int param_1);
 };
 
 extern Game* g_game;
 extern char DAT_00512d48;
 extern char DAT_005119b8;
 extern char DAT_00512d28;
-extern int DAT_00506dbc;
-extern Class_004618a0 DAT_00513000;
+extern int g_usePacketManager;
+extern PacketManager g_packetManager;
 
 int IsOnlineConfigLoaded(void);
 void FUN_004644d0(void);
@@ -229,13 +229,13 @@ int __stdcall FUN_004517b0(Guid_4517b0 guid, int player)
                         *(int*)(msg + 1) = q->id;
                         msg[5] = q->field_13f;
                         FUN_00451df0(q->id, msg, 6);
-                        if (DAT_00506dbc != 0)
-                            DAT_00513000.FUN_004618a0(1);
+                        if (g_usePacketManager != 0)
+                            g_packetManager.SendAllQueued(1);
                     }
                 }
             }
             FUN_00450530();
-            DAT_00513000.FUN_004618a0(1);
+            g_packetManager.SendAllQueued(1);
         }
 
         FUN_004526c0(0);

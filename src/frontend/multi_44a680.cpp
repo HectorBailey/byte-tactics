@@ -110,7 +110,7 @@ struct Class_004373a0 { int FUN_004373a0(); };
 struct Class_00435a20 { void FUN_00435a20(PlayerInfo_0044a680* info); };
 struct Class_00435c30 { char* FUN_00435c30(); };
 struct Class_0046e000 { int FUN_0046e000(); };
-struct Class_00463c60 { void FUN_00463c60(int param); };
+struct Class_00463c60 { void SetType(int param); };
 class Class_0046d860 { public: void FUN_0046dad0(); };
 
 
@@ -183,7 +183,7 @@ inline void __stdcall FUN_004453a0(Player_0044a680* param_1, Player_0044a680* pa
     Player_0044a680 tmp = *param_2;
     *param_2 = *param_1;
     *param_1 = tmp;
-    ((Class_00463c60*)param_1)->FUN_00463c60(0);
+    ((Class_00463c60*)param_1)->SetType(0);
     param_1->active = 0;
     for (int i = 0; i <= 10; i++) {
         Player_0044a680* p = &g_game->players[i];

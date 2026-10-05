@@ -52,17 +52,17 @@ public:
     int FUN_00436860(int type, Class_004c2ea0* parser, char* schema);
 };
 
-class Class_004618a0 {
+class PacketManager {
 public:
-    void FUN_004618a0(int param);
+    void SendAllQueued(int param);
 };
 
 extern char* DAT_005122d4;
 extern int DAT_005122d8;
 extern int DAT_005122dc;
 extern int DAT_005122e0;
-extern int DAT_00506dbc;
-extern Class_004618a0 DAT_00513000;
+extern int g_usePacketManager;
+extern PacketManager g_packetManager;
 extern char* g_game;
 
 void* __cdecl FUN_004d83b0(const char* name, unsigned int size);
@@ -138,8 +138,8 @@ int __stdcall FUN_00434bf0(void** param_1, int param_2, int param_3)
         }
         if (s.bFlag != 0) {
             FUN_00453d40();
-            if (DAT_00506dbc != 0)
-                DAT_00513000.FUN_004618a0(0);
+            if (g_usePacketManager != 0)
+                g_packetManager.SendAllQueued(0);
         }
     }
     FUN_00491c80(0x13);

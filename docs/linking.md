@@ -154,7 +154,7 @@ What stands out:
   `operator delete`s repeated in each file of a class family
   (`Class_00407350`'s constructor in 8 files, `Class_00471cc0`'s destructor and
   `operator delete` in 6). The 3 globals defined twice are `DAT_00512340`,
-  `DAT_00512358` and `DAT_00513000`.
+  `DAT_00512358` and `g_packetManager`.
 - **53 folds are silent hazards.** Inline functions and vtables that differ
   between objects link without complaint and the linker keeps any one. Most
   come from files standing in for a helper differently: `vector<Unit*>::_Ucopy`
@@ -692,7 +692,7 @@ of the tree's own objects. What makes that link run:
   external name, a static by a public name its object gets
   (`__static_<address>`), library data by its name. A name no object defines
   binds to that symbol; a name that points inside a global (a field the code
-  reaches by its address, `DAT_0051e2f4` in `DAT_00513000`; an entry,
+  reaches by its address, `DAT_0051e2f4` in `g_packetManager`; an entry,
   `DAT_005086e0` in `g_unitMessages`) has its references pointed at the
   global with the offset added (299 references), and the name itself then
   means the global, so it needs no stub. Every other definition of a placed

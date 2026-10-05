@@ -4,7 +4,7 @@
 // to `id` if that player is a live client. The player id search is the inlined
 // FindPlayer helper: it searches twice (once to decide whether the player
 // exists, once to take the address), which is what produces the two copies of
-// the id loop. When the net layer has no DirectPlay interface (DAT_00506dbc
+// the id loop. When the net layer has no DirectPlay interface (g_usePacketManager
 // clear) it goes through HAPINET_sendpacket on g_game + 0x14 and reports the packet
 // as forwarded with FUN_00415ef0/FUN_00415f40. If instead g_game + 0x299c is
 // non-zero this is a broadcast round: every in-use player in state 3 whose
@@ -41,17 +41,17 @@ struct Game {
 };
 #pragma pack(pop)
 
-class Class_00462710;
+class PacketChannel;
 
-class Class_00461990 {
+class PacketManager {
 public:
-    int FUN_00461990(int param_1, Class_00462710* param_2, int param_3, int param_4);
+    int QueueOnChannel(int param_1, PacketChannel* param_2, int param_3, int param_4);
 };
 
 extern Game* g_game;
-extern int DAT_00506dbc;
-extern Class_00462710 DAT_00513008;
-extern Class_00461990 DAT_00513000;
+extern int g_usePacketManager;
+extern PacketChannel DAT_00513008;
+extern PacketManager g_packetManager;
 extern int DAT_00512b90[11];
 
 int __stdcall FUN_0044ffd0(unsigned char index);
@@ -90,8 +90,8 @@ int __stdcall FUN_00451df0(int id, unsigned char* packet, int size)
         return 0;
     if ((g_game->flags_2a44 & 1) != 0) {
         if (g_game->field_299c == 0) {
-            if (DAT_00506dbc != 0)
-                return DAT_00513000.FUN_00461990(id, &DAT_00513008, (int)packet, size);
+            if (g_usePacketManager != 0)
+                return g_packetManager.QueueOnChannel(id, &DAT_00513008, (int)packet, size);
             if (HAPINET_sendpacket((char*)g_game + 0x14, id, 0, packet, size) != 0)
                 return 0;
             FUN_00415ef0(packet[0], size, 1);

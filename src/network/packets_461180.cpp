@@ -1,6 +1,6 @@
 // Decompiled by Opus. Names are provisional.
 
-void __cdecl FUN_00461170(const char* fmt, ...);
+void __cdecl PacketTrace(const char* fmt, ...);
 
 class NetCondenser {
 public:
@@ -24,9 +24,9 @@ extern int DAT_005129f1;
 // Storing the send result in a local first keeps `sete` (a direct
 // `== 0 ? 1 : 0` on the call folds to neg/sbb/inc).
 // FUNCTION: 0x461180
-int __stdcall FUN_00461180(int from, int to, void* data, int size)
+int __stdcall SendToDPID(int from, int to, void* data, int size)
 {
-    FUN_00461170("bytes to send to (DPID)(%ld): %ld\n", to, size);
+    PacketTrace("bytes to send to (DPID)(%ld): %ld\n", to, size);
     void* session = g_game->session;
     DAT_005129f1 = to;
     g_sendCondenser.Accumulate(data, size);

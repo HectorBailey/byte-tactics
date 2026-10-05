@@ -1,7 +1,7 @@
 // Decompiled by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
 // Receives one network packet into the shared buffer (g_game+0x2a38),
 // growing the buffer ("PACKET DATA AGAIN") while the receive call returns
-// 0x8877001e (buffer too small), through DAT_0051e300 when DAT_00506dbc is
+// 0x8877001e (buffer too small), through DAT_0051e300 when g_usePacketManager is
 // set, else through DirectPlay (HAPINET_receivepacket), and counts it in the
 // network statistics.
 //
@@ -25,11 +25,11 @@ struct Game {
 #pragma pack(pop)
 
 extern Game* g_game;
-extern int DAT_00506dbc;
+extern int g_usePacketManager;
 
 class Class_00462f30 {
 public:
-    int FUN_00462f30(void* net, unsigned char* data, int* size);
+    int ReceiveFrame(void* net, unsigned char* data, int* size);
 };
 
 extern Class_00462f30 DAT_0051e300;
@@ -48,9 +48,9 @@ int __stdcall FUN_004534e0(void)
         return 0;
 
     size = g_game->field_2a34;
-    if (DAT_00506dbc != 0) {
+    if (g_usePacketManager != 0) {
         while (1) {
-            int result = DAT_0051e300.FUN_00462f30((char*)g_game + 0x14, g_game->buffer, &size);
+            int result = DAT_0051e300.ReceiveFrame((char*)g_game + 0x14, g_game->buffer, &size);
             if (result == 0) {
                 FUN_00415ef0(*g_game->buffer, size, 0);
                 return 1;

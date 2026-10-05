@@ -35,7 +35,7 @@
 //   assigned once from the `||` keeps a test of the materialised value
 //   (99.0%). The earlier passes' C2 traces of that region (FUN_00438f79) are
 //   in the git history of this file.
-// - FUN_00463c60 is Class_00463c60's method in data/symbols.csv, so it is
+// - SetType is Class_00463c60's method in data/symbols.csv, so it is
 //   called through a cast of the player pointer, as 0x445450 does.
 #include <windows.h>
 #include <stdio.h>
@@ -125,7 +125,7 @@ struct Options_00447b10 {
 
 class Class_00463c60 {
 public:
-    void FUN_00463c60(int state);
+    void SetType(int state);
 };
 class Class_004358f0 {
 public:
@@ -143,9 +143,9 @@ class Class_0046df40 {
 public:
     char* FUN_0046df40();
 };
-class Class_004618a0 {
+class PacketManager {
 public:
-    int FUN_004618a0(int value);
+    int SendAllQueued(int value);
 };
 
 #pragma pack(push, 1)
@@ -189,9 +189,9 @@ struct Game {
 #pragma pack(pop)
 
 extern Game* g_game;
-extern int DAT_00506dbc;
+extern int g_usePacketManager;
 extern int DAT_00512994;
-extern Class_004618a0 DAT_00513000;
+extern PacketManager g_packetManager;
 
 void __cdecl FUN_004d85a0(void* data);
 void FUN_00430f00();
@@ -376,25 +376,25 @@ void __stdcall FUN_00447b10(Gadget_00447b10* gadget)
             FUN_0047f1a0("Multi", 0);
             char type = p->type;
             if (type == 0 && canAdd) {
-                ((Class_00463c60*)p)->FUN_00463c60(4);
+                ((Class_00463c60*)p)->SetType(4);
                 p->id = -1;
                 g_game->field_499--;
             } else if (type != 4 && type != 0) {
                 if (p->active != 0 && type == 2 && FUN_004b6340() - p->time > 30) {
                     FUN_00453010(p->id, 1);
-                    ((Class_00463c60*)p)->FUN_00463c60(0);
+                    ((Class_00463c60*)p)->SetType(0);
                 } else if (canAdd && p->active != 0 && p->type == 3) {
                     FUN_00446080(i);
                 }
             } else {
                 if (type == 4) {
-                    ((Class_00463c60*)p)->FUN_00463c60(0);
+                    ((Class_00463c60*)p)->SetType(0);
                     g_game->field_499++;
                     FUN_00451180();
                 }
                 if (g_game->players[FUN_00456850()].info->b.closed) {
                     FUN_004abd90(g_game->gui, FUN_004c5740("Can't add another player when game is closed."), 500, 1, 1);
-                    ((Class_00463c60*)p)->FUN_00463c60(0);
+                    ((Class_00463c60*)p)->SetType(0);
                     g_game->dirty = 1;
                     break;
                 }
@@ -524,8 +524,8 @@ void __stdcall FUN_00447b10(Gadget_00447b10* gadget)
                     FUN_00463ca0(s, 4, 0, 10);
             } else {
                 FUN_00463e50(me, msg, 4, 0);
-                if (DAT_00506dbc)
-                    DAT_00513000.FUN_004618a0(1);
+                if (g_usePacketManager)
+                    g_packetManager.SendAllQueued(1);
             }
             g_game->dirty = 1;
             strcpy(msg, "");

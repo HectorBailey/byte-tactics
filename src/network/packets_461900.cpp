@@ -1,6 +1,6 @@
 // Decompiled by Opus. Names are provisional.
 // Puts one dword (the message's field_10, or -1 when field_14 is set) in the
-// send buffer and sends it; the send is the body of FUN_00461180, inlined.
+// send buffer and sends it; the send is the body of SendToDPID, inlined.
 
 class NetCondenser {
 public:
@@ -21,11 +21,11 @@ extern Game* g_game;
 extern NetCondenser g_sendCondenser;  // net condenser
 extern int DAT_005129f1;
 
-void __cdecl FUN_00461170(const char* fmt, ...);
+void __cdecl PacketTrace(const char* fmt, ...);
 
 static inline int SendTo(int from, int to, void* data, int size)
 {
-    FUN_00461170("bytes to send to (DPID)(%ld): %ld\n", to, size);
+    PacketTrace("bytes to send to (DPID)(%ld): %ld\n", to, size);
     void* session = g_game->session;
     DAT_005129f1 = to;
     g_sendCondenser.Accumulate(data, size);
@@ -39,7 +39,7 @@ struct Msg_00461900 {
     int field_14;                    // +0x14
 };
 
-class Class_00461900 {
+class PacketManager {
 public:
     char unknown_0[0xb2f4];
     int* buffer;                     // +0xb2f4
@@ -49,7 +49,7 @@ public:
 };
 
 // FUNCTION: 0x461900
-int Class_00461900::FUN_00461900(int from, Msg_00461900* msg)
+int PacketManager::FUN_00461900(int from, Msg_00461900* msg)
 {
     *buffer = msg->field_14 ? -1 : msg->field_10;
     SendTo(from, msg->field_14, buffer, size);

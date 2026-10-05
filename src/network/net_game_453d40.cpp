@@ -182,9 +182,9 @@ struct Packet {
 
 #pragma pack(pop)
 
-class Class_004618a0 {
+class PacketManager {
 public:
-    void FUN_004618a0(int);
+    void SendAllQueued(int);
 };
 
 class Class_00461620 {
@@ -205,7 +205,7 @@ public:
 
 class Class_00463c60 {
 public:
-    void FUN_00463c60(int);
+    void SetType(int);
 };
 
 class Class_00456030 {
@@ -216,8 +216,8 @@ public:
 extern Game* g_game;
 extern char DAT_005119b8[];
 extern int DAT_00512bc0[];
-extern int DAT_00506dbc;
-extern Class_004618a0 DAT_00513000;
+extern int g_usePacketManager;
+extern PacketManager g_packetManager;
 extern char DAT_00505dc4[];
 extern char DAT_005065c4[];
 extern char DAT_0050658c[];
@@ -473,11 +473,11 @@ int FUN_00453d40()
                 if (!(g_game->flags_2a44 & 4) && (p->info->flags_97 & 1) && p->state == 3) {
                     FUN_00453010(p->id, 1);
                     FUN_00453010(LocalPlayer()->id, 10);
-                    ((Class_00463c60*)p)->FUN_00463c60(0);
-                    ((Class_00463c60*)LocalPlayer())->FUN_00463c60(0);
+                    ((Class_00463c60*)p)->SetType(0);
+                    ((Class_00463c60*)LocalPlayer())->SetType(0);
                 } else {
                     FUN_00453010(p->id, 1);
-                    ((Class_00463c60*)p)->FUN_00463c60(0);
+                    ((Class_00463c60*)p)->SetType(0);
                 }
                 g_game->dirty = 1;
                 if (LocalPlayer()->info->flags_97 & 1) {
@@ -595,8 +595,8 @@ int FUN_00453d40()
                     reply[0] = 0x18;
                     reply[1] = packet[1];
                     FUN_00451bc0(FirstJoinedId(), g_game->from_id, reply, 2);
-                    if (DAT_00506dbc)
-                        DAT_00513000.FUN_004618a0(1);
+                    if (g_usePacketManager)
+                        g_packetManager.SendAllQueued(1);
                 }
             }
             break;
@@ -612,7 +612,7 @@ int FUN_00453d40()
                     }
                 }
                 FUN_00450530();
-                DAT_00513000.FUN_004618a0(1);
+                g_packetManager.SendAllQueued(1);
             }
             g_game->dirty = 1;
             break;
@@ -835,8 +835,8 @@ int FUN_00453d40()
                 g_game->field_2a30->FUN_0046d500(packet, from);
             break;
         case 29:
-            if (DAT_00506dbc)
-                ((Class_00461620*)&DAT_00513000)
+            if (g_usePacketManager)
+                ((Class_00461620*)&g_packetManager)
                     ->FUN_00461620(g_game->from_id, *(int*)(packet + 1), *(int*)(packet + 5));
             break;
         case 33: {

@@ -116,9 +116,9 @@ public:
     int FUN_00437320(FixedPos_497180* pos, int id);
 };
 
-class Class_004618a0 {
+class PacketManager {
 public:
-    void FUN_004618a0(int a);
+    void SendAllQueued(int a);
 };
 
 class Class_004b4560 {
@@ -139,8 +139,8 @@ public:
 extern char* g_game;
 static inline ViewFlags_497180* g_game_view() { return (ViewFlags_497180*)(g_game + 0x14281); }
 extern int DAT_005091cc;
-extern int DAT_00506dbc;
-extern Class_004618a0 DAT_00513000;
+extern int g_usePacketManager;
+extern PacketManager g_packetManager;
 
 void __stdcall FUN_004b6ca0(int x);
 void __stdcall FUN_004b6b50(int x);
@@ -216,8 +216,8 @@ void __cdecl FUN_00497180(void*)
         if (*(unsigned char*)(g_game + 0x1b63 + 0x14b * cur + 0x21) & 2) {
             do {
                 char* p = *(char**)(g_game + 0x1b63 + 0x14b * *(unsigned char*)(g_game + 0x2a42) + 0x27);
-                if (DAT_00506dbc)
-                    DAT_00513000.FUN_004618a0(1);
+                if (g_usePacketManager)
+                    g_packetManager.SendAllQueued(1);
                 FUN_00453d40();
                 sel = FUN_00456850();
                 FUN_004b6b50(0x32);

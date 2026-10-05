@@ -50,7 +50,7 @@ public:
     char unknown_3b[0x73 - 0x3b];
     unsigned char field_73;                  // +0x73
     char unknown_74[0x14b - 0x74];
-    void FUN_00463c60(int value);
+    void SetType(int value);
 };
 
 struct Game {
@@ -99,7 +99,7 @@ int __stdcall FUN_00451220(unsigned char playerIndex, int flag)
     char buf[256];
 
     Class_00463c60* player = &g_game->players[playerIndex];
-    player->FUN_00463c60(flag);
+    player->SetType(flag);
 
     int same = (playerIndex == FindPlayerInUse());
 
@@ -126,7 +126,7 @@ int __stdcall FUN_00451220(unsigned char playerIndex, int flag)
     int r = HAPINET_addplayer(g_game->net_14, (unsigned long*)&player->field_4,
                          buf, buf, g_game->passWord, 0, 0x50);
     if (r == 0) {
-        g_game->players[playerIndex].FUN_00463c60(0);
+        g_game->players[playerIndex].SetType(0);
         unsigned char i = FindPlayerInUse();
         Class_00463c60* slot = &g_game->players[i];
         if (slot->field_0 != 0 && (slot->field_73 == 1 || slot->field_73 == 2)) {

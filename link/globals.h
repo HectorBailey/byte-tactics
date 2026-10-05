@@ -133,7 +133,7 @@ extern char DAT_005069c0[8];                                                    
 extern char DAT_005069c8[8];                                                                  // 0x5069c8, 8 bytes; 2 of 2 files
 extern char DAT_005069d0[8];                                                                  // 0x5069d0, 8 bytes; 2 of 2 files
 extern char DAT_005069d8[20];                                                                 // 0x5069d8, 20 bytes; 1 of 1 files
-extern int DAT_00506dbc;                                                                      // 0x506dbc, 4 bytes; 26 of 27 files (one type, plus extern "C" references)
+extern int g_usePacketManager;                                                                // 0x506dbc, 4 bytes; 26 of 27 files (one type, plus extern "C" references)
 extern char DAT_00507318[32];                                                                 // 0x507318, 32 bytes; 1 of 1 files
 extern char DAT_005074e8[16];                                                                 // 0x5074e8, 16 bytes; 1 of 1 files
 extern char DAT_005074f8[16];                                                                 // 0x5074f8, 16 bytes; 1 of 1 files
@@ -699,7 +699,7 @@ extern void* DAT_0052a4f8;                                                      
 extern long DAT_0052a4fc;                                                                     // 0x52a4fc, 4 bytes; 2 of 3 files (conflicting: signedness or const)
 
 // Not declared: 241 globals defined in a data file or whose type is not settled (see data/globals.csv).
-//   0x513000 DAT_00513000: defined in src/network/packets_460e20.cpp
+//   0x513000 g_packetManager: defined in src/network/packets_460e20.cpp
 //   0x5119c0 g_playerAI: PlayerAI*[] (7), void*[] (5), Owner*[] (3), Class_00409470*[] (2), and 5 more
 //   0x51fbd0 DAT_0051fbd0: void* (4), int (2), Display_004b4f50* (1), Display_004b5370* (1), and 14 more
 //   0x51e598 IURect_0046e160::IU?$pair::?$_Tree::_Nil: defined in src/network/unit_sync_46c920.cpp
@@ -917,15 +917,15 @@ extern long DAT_0052a4fc;                                                       
 //   0x512f4b DAT_00512f4b: part of another global: DAT_00512f18+0x33
 //   0x512f4d DAT_00512f4d: part of another global: DAT_00512f18+0x35
 //   0x512f51 DAT_00512f51: part of another global: DAT_00512f18+0x39
-//   0x513008 DAT_00513008: part of another global: DAT_00513000+0x8
-//   0x51e2f4 DAT_0051e2f4: part of another global: DAT_00513000+0xb2f4
-//   0x51e2f8 DAT_0051e2f8: part of another global: DAT_00513000+0xb2f8
-//   0x51e300 DAT_0051e300: part of another global: DAT_00513000+0xb300
-//   0x51e314 DAT_0051e314: part of another global: DAT_00513000+0xb314
-//   0x51e318 DAT_0051e318: part of another global: DAT_00513000+0xb318
-//   0x51e31c DAT_0051e31c: part of another global: DAT_00513000+0xb31c
-//   0x51e528 DAT_0051e528: part of another global: DAT_00513000+0xb528
-//   0x51e52c DAT_0051e52c: part of another global: DAT_00513000+0xb52c
+//   0x513008 DAT_00513008: part of another global: g_packetManager+0x8
+//   0x51e2f4 DAT_0051e2f4: part of another global: g_packetManager+0xb2f4
+//   0x51e2f8 DAT_0051e2f8: part of another global: g_packetManager+0xb2f8
+//   0x51e300 DAT_0051e300: part of another global: g_packetManager+0xb300
+//   0x51e314 DAT_0051e314: part of another global: g_packetManager+0xb314
+//   0x51e318 DAT_0051e318: part of another global: g_packetManager+0xb318
+//   0x51e31c DAT_0051e31c: part of another global: g_packetManager+0xb31c
+//   0x51e528 DAT_0051e528: part of another global: g_packetManager+0xb528
+//   0x51e52c DAT_0051e52c: part of another global: g_packetManager+0xb52c
 //   0x51e6cc DAT_0051e6cc: part of another global: DAT_0051e6c8+0x4
 //   0x51e821 DAT_0051e821: part of another global: DAT_0051e820+0x1
 //   0x51e822 DAT_0051e822: part of another global: DAT_0051e820+0x2

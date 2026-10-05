@@ -31,7 +31,7 @@
 
 class Class_00463c60 {
 public:
-    void FUN_00463c60(int param_1);
+    void SetType(int param_1);
 };
 
 class Class_00435100 {
@@ -148,7 +148,7 @@ static inline int IsType3(Player_00452cc0* p)
 
 static inline void Remove(Player_00452cc0* p)
 {
-    ((Class_00463c60*)p)->FUN_00463c60(0);
+    ((Class_00463c60*)p)->SetType(0);
     p->active = 0;
     p->id = -1;
     p->field_c = 0;

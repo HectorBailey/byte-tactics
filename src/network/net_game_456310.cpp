@@ -62,14 +62,14 @@ struct Msg20_00456310 {
 };
 #pragma pack(pop)
 
-class Class_004618a0 {
+class PacketManager {
 public:
-    int FUN_004618a0(int param_1);
+    int SendAllQueued(int param_1);
 };
 
 extern Game* g_game;
-extern int DAT_00506dbc;
-extern Class_004618a0 DAT_00513000;
+extern int g_usePacketManager;
+extern PacketManager g_packetManager;
 
 unsigned int FUN_004b6340();
 int __stdcall FUN_00451df0(int id, unsigned char* packet, int size);
@@ -88,8 +88,8 @@ void FUN_00456310()
     for (int i = 0; i < 10; i++) {
         Player_00456310* p = &g_game->players[i];
         if (p->active != 0 && (p->state == 1 || p->state == 2)) {
-            if (DAT_00506dbc != 0)
-                DAT_00513000.FUN_004618a0(1);
+            if (g_usePacketManager != 0)
+                g_packetManager.SendAllQueued(1);
 
             Msg13_00456310 msg;
             msg.type = 2;
@@ -99,8 +99,8 @@ void FUN_00456310()
 
             int was = HAPINET_guaranteepackets(0);
             FUN_00451df0(p->id, (unsigned char*)&msg, 0xd);
-            if (DAT_00506dbc != 0)
-                DAT_00513000.FUN_004618a0(1);
+            if (g_usePacketManager != 0)
+                g_packetManager.SendAllQueued(1);
             if (was != 0)
                 HAPINET_guaranteepackets(1);
 
@@ -147,13 +147,13 @@ void FUN_00456310()
                     *(int*)(buf2 + 1) = p->id;
                     buf2[5] = p->field_13f;
                     FUN_00451df0(p->id, buf2, 6);
-                    if (DAT_00506dbc != 0)
-                        DAT_00513000.FUN_004618a0(1);
+                    if (g_usePacketManager != 0)
+                        g_packetManager.SendAllQueued(1);
                 }
             }
         }
         FUN_00450530();
-        DAT_00513000.FUN_004618a0(1);
+        g_packetManager.SendAllQueued(1);
     }
 
     g_game->bit0_2bee = 1;
