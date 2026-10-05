@@ -112,7 +112,7 @@ struct Game {
 extern Game* g_game;
 
 void __stdcall FUN_0048b200(Class_00415c10* stream, Unit* u);
-int __stdcall FUN_00451df0(int player, void* data, int size);
+int __stdcall BroadcastPacket(int player, void* data, int size);
 
 // FUNCTION: 0x48b710
 void __stdcall FUN_0048b710(Player_0048b710* p)
@@ -156,6 +156,6 @@ void __stdcall FUN_0048b710(Player_0048b710* p)
         1, (char)(((stream.index + 7) >> 3) + (unsigned char)stream.bit * 4));
     ((Class_00415da0*)&stream)->FUN_00415da0(
         2, (char)((((stream.index + 7) >> 3) + stream.bit * 4) >> 8));
-    FUN_00451df0(p->id, stream.data, ((stream.index + 7) >> 3) + stream.bit * 4);
+    BroadcastPacket(p->id, stream.data, ((stream.index + 7) >> 3) + stream.bit * 4);
     ((Class_00415b90*)&stream)->FUN_00415b90();
 }

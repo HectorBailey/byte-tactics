@@ -142,8 +142,8 @@ void __cdecl FUN_004609a0(int);
 void __cdecl FUN_004257a0();
 void __cdecl FUN_00428730();
 void __cdecl FUN_00430f00();
-void __cdecl FUN_00453d40();
-void __cdecl FUN_00456de0();
+void __cdecl HandleNetPackets();
+void __cdecl SendLoadProgress();
 void __cdecl OnlineUnload();
 void __cdecl FUN_00467d70();
 void __cdecl FUN_0047f750();
@@ -338,7 +338,7 @@ void FUN_00497f40(void)
                 ((PacketManager*)&g_packetManager)->SendAllQueued(1);
         }
     }
-    FUN_00453d40();
+    HandleNetPackets();
     if (g_game->flags38d75.bits.b2) {
         if (FUN_004568c0() != 0) {
             g_game->flags38d75.bits.b2 = 0;
@@ -474,7 +474,7 @@ void FUN_00497f40(void)
         }
         if (((Class_00435100*)g_game->field_391e9)->FUN_00435100() == 3) {
             FUN_00497ce0(&gadget);
-            FUN_00456de0();
+            SendLoadProgress();
         }
         FUN_004c5fa0(&gadget);
         FUN_004c63a0();

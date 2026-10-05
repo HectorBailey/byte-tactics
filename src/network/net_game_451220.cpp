@@ -94,7 +94,7 @@ static inline unsigned char FindPlayerInUse()
 }
 
 // FUNCTION: 0x451220
-int __stdcall FUN_00451220(unsigned char playerIndex, int flag)
+int __stdcall CreateLocalPlayer(unsigned char playerIndex, int flag)
 {
     char buf[256];
 

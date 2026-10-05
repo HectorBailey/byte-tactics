@@ -186,13 +186,13 @@ void FUN_00445ed0();
 void FUN_00444a20();
 void FUN_00446a50();
 void FUN_00446c70();
-void FUN_00450f90();
-void FUN_00451180();
-unsigned char FUN_00456850();
-int FUN_00457a50();
+void BroadcastPlayerInfo();
+void UpdateNetGameInfo();
+unsigned char FindHostSlot();
+int IsHostLocal();
 int FUN_004b6340();
-int __stdcall FUN_0044ffd0(unsigned char player);
-void __stdcall FUN_00453010(int id, unsigned char msg);
+int __stdcall GetSlotDpid(unsigned char player);
+void __stdcall RejectPlayer(int id, unsigned char msg);
 void __stdcall FUN_00463e50(Player_00448c70* p, char* text, int a, int b);
 char* __stdcall FUN_004c5740(char* text);
 Gadget_00448c70* __stdcall FUN_0049ff90(char* entries, char* name);
@@ -252,7 +252,7 @@ int FUN_00440cd0()
     if (!g_game->map->FUN_004358f0()) {
         return 0;
     }
-    unsigned char me = FUN_00456850();
+    unsigned char me = FindHostSlot();
     PlayerInfo_00448c70* data = 0;
     int check = 0;
     if (me != 10) {
@@ -336,7 +336,7 @@ void FUN_00448c70()
                 me->info->b.ready = 0;
                 sprintf(name, "READY%d", g_game->localPlayer);
                 FUN_004a1110(g_game->gui, name, 0);
-                FUN_00450f90();
+                BroadcastPlayerInfo();
             }
             if (!g_game->players[g_game->localPlayer].info->f97_0)
                 FUN_004a1450(g_game->gui, "MAP", 1);
@@ -357,17 +357,17 @@ void FUN_00448c70()
         Player_00448c70* p = &g_game->players[i];
         if (g_game->players[g_game->localPlayer].info->b.commander == 2
             && (IsLocalAI_00448c70(p) || IsRemoteAI_00448c70(p))) {
-            FUN_00453010(p->id, 0xb);
-            FUN_00450f90();
+            RejectPlayer(p->id, 0xb);
+            BroadcastPlayerInfo();
         }
-        if (FUN_00456850() != 10
-            && !g_game->players[FUN_00456850()].info->b.watching
+        if (FindHostSlot() != 10
+            && !g_game->players[FindHostSlot()].info->b.watching
             && p->active != 0) {
             unsigned short flags = p->info->flags;
             if (flags & 0x40) {
                 p->info->flags = flags & ~0x40;
                 p->info->side = 0;
-                FUN_00450f90();
+                BroadcastPlayerInfo();
             }
         }
     }
@@ -494,8 +494,8 @@ void FUN_00448c70()
                 if (e) {
                     str = e->text;
                     _itoa(p->ping, str, 10);
-                    if (FUN_00457a50())
-                        strcat(str, g_game->net->FUN_0046e0b0(FUN_0044ffd0(n)) ? ":s" : "");
+                    if (IsHostLocal())
+                        strcat(str, g_game->net->FUN_0046e0b0(GetSlotDpid(n)) ? ":s" : "");
                     if (minPing >= p->ping)
                         minPing = p->ping;
                     e->visible = 1;
@@ -529,6 +529,6 @@ void FUN_00448c70()
     PlayerInfo_00448c70* info = me->info;
     if (info->f97_0 && minPing < info->pingLimit) {
         info->pingLimit = minPing;
-        FUN_00451180();
+        UpdateNetGameInfo();
     }
 }

@@ -40,7 +40,7 @@ static inline int PlayerDpid(Player_00450090* p)
 }
 
 // FUNCTION: 0x450090
-int __stdcall FUN_00450090(unsigned char index, char* shortName, char* longName)
+int __stdcall SetPlayerName(unsigned char index, char* shortName, char* longName)
 {
     Player_00450090* p = &g_game->players[index];
     strncpy(p->longName, longName, 30);

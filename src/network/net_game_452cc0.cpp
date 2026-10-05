@@ -6,10 +6,10 @@
 // host bit to the type 3 or type 1 player with the highest id.
 //
 // MATCH. What it took (from 87.7%):
-// - The player lookups are the real neighbours FUN_0044ffd0, FUN_0044fe40
-//   and FUN_0044fed0, defined here without FUNCTION lines and left to /Ob2.
-//   That alone gives the original's mix: the first FUN_0044fed0 inlines one
-//   FUN_0044fe40 (whose FUN_0044ffd0 stays a call) and calls the other, and
+// - The player lookups are the real neighbours GetSlotDpid, FindSlotByDpid
+//   and FindPlayerByDpid, defined here without FUNCTION lines and left to /Ob2.
+//   That alone gives the original's mix: the first FindPlayerByDpid inlines one
+//   FindSlotByDpid (whose GetSlotDpid stays a call) and calls the other, and
 //   the later lookups are inlined whole.
 // - The bit 2 test is an if/else that resets the player through one inline
 //   helper (Remove) written in both arms. With that, the cyclic register
@@ -92,7 +92,7 @@ void __stdcall FUN_0046c620(int msg);
 int __stdcall HAPINET_removeplayer(void* net, int id);
 
 // 0x44ffd0 (matched in its own file).
-int __stdcall FUN_0044ffd0(unsigned char index)
+int __stdcall GetSlotDpid(unsigned char index)
 {
     if (index != 10 && g_game->players[index].type != 0)
         return g_game->players[index].id;
@@ -100,11 +100,11 @@ int __stdcall FUN_0044ffd0(unsigned char index)
 }
 
 // 0x44fe40 (matched in its own file).
-unsigned char __stdcall FUN_0044fe40(int id)
+unsigned char __stdcall FindSlotByDpid(int id)
 {
     if (id != -1) {
         for (unsigned char i = 0; i < 10; i++) {
-            if (FUN_0044ffd0(i) == id)
+            if (GetSlotDpid(i) == id)
                 return i;
         }
     }
@@ -112,11 +112,11 @@ unsigned char __stdcall FUN_0044fe40(int id)
 }
 
 // 0x44fed0 (matched in its own file).
-Player_00452cc0* __stdcall FUN_0044fed0(int id)
+Player_00452cc0* __stdcall FindPlayerByDpid(int id)
 {
-    if (FUN_0044fe40(id) == 10)
+    if (FindSlotByDpid(id) == 10)
         return 0;
-    return &g_game->players[FUN_0044fe40(id)];
+    return &g_game->players[FindSlotByDpid(id)];
 }
 
 static inline int IsPlaying(Player_00452cc0* p)
@@ -155,9 +155,9 @@ static inline void Remove(Player_00452cc0* p)
 }
 
 // FUNCTION: 0x452cc0
-void __stdcall FUN_00452cc0(int id)
+void __stdcall RemovePlayer(int id)
 {
-    Player_00452cc0* p = FUN_0044fed0(id);
+    Player_00452cc0* p = FindPlayerByDpid(id);
     if (p == 0)
         return;
     if (p->active == 0)
@@ -180,7 +180,7 @@ void __stdcall FUN_00452cc0(int id)
         }
     }
 
-    FUN_00486f10(FUN_0044fe40(id));
+    FUN_00486f10(FindSlotByDpid(id));
 
     if (g_game->flags.b2) {
         if (!IsPlaying(p))
@@ -205,7 +205,7 @@ void __stdcall FUN_00452cc0(int id)
                     best = g_game->players[j].id;
             }
         }
-        Player_00452cc0* r = FUN_0044fed0(best);
+        Player_00452cc0* r = FindPlayerByDpid(best);
         if (r != 0)
             r->data->flags |= 1;
     }

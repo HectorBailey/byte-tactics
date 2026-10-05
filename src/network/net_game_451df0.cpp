@@ -54,8 +54,8 @@ extern PacketChannel DAT_00513008;
 extern PacketManager g_packetManager;
 extern int DAT_00512b90[11];
 
-int __stdcall FUN_0044ffd0(unsigned char index);
-int __stdcall FUN_00451bc0(int from, int to, void* packet, int size);
+int __stdcall GetSlotDpid(unsigned char index);
+int __stdcall SendPacketToPlayer(int from, int to, void* packet, int size);
 int __stdcall HAPINET_sendpacket(void* net, unsigned long from, unsigned long to, void* data, unsigned long size);
 void __stdcall FUN_00415ef0(unsigned char kind, int amount, int player);
 void __stdcall FUN_00415f40(int size, int overhead, int sent);
@@ -64,7 +64,7 @@ static inline unsigned char FindPlayerIndex(int id)
 {
     if (id != -1) {
         for (unsigned char i = 0; i < 10; i++) {
-            if (FUN_0044ffd0(i) == id)
+            if (GetSlotDpid(i) == id)
                 return i;
         }
     }
@@ -79,7 +79,7 @@ static inline Player_00451df0* FindPlayer(int id)
 }
 
 // FUNCTION: 0x451df0
-int __stdcall FUN_00451df0(int id, unsigned char* packet, int size)
+int __stdcall BroadcastPacket(int id, unsigned char* packet, int size)
 {
     Player_00451df0* p = FindPlayer(id);
     if (p == 0 || p->active == 0)
@@ -106,7 +106,7 @@ int __stdcall FUN_00451df0(int id, unsigned char* packet, int size)
                 continue;
             if (DAT_00512b90[g_game->players[i].field_c] != 0)
                 continue;
-            FUN_00451bc0(id, g_game->players[i].field_4, packet, size);
+            SendPacketToPlayer(id, g_game->players[i].field_4, packet, size);
             int c = g_game->players[i].field_c;
             if (c >= 0 && c < 10)
                 DAT_00512b90[c] = 1;

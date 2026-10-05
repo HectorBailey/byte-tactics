@@ -37,12 +37,12 @@ struct Game {
 extern Game* g_game;
 extern int DAT_00511dec;
 void __stdcall FUN_004c69a0(void*);
-void FUN_00453d40();
+void HandleNetPackets();
 Engine* FUN_004b6220();
 void* __stdcall FUN_004c69f0(const char*,int,int);
 void __stdcall FUN_004c6b70(void*,void*,int,int);
 void __stdcall FUN_0046c620(int);
-const char* __stdcall FUN_00452c40(unsigned);
+const char* __stdcall GetRejectReasonText(unsigned);
 const char* __stdcall FUN_004c5740(const char*);
 void __stdcall FUN_004abd90(Menu*,const char*,int,int,int);
 void __stdcall FUN_0049fa90(Menu*);
@@ -79,7 +79,7 @@ void __stdcall FUN_0049fa50(Menu*);
 void __stdcall FUN_00491c80(int);
 void __stdcall FUN_004a0570(Menu*,const char*,int);
 void __stdcall FUN_0047f1a0(const char*,int);
-void __stdcall FUN_004573d0(Player*,int,int);
+void __stdcall SendPlayerEconomy(Player*,int,int);
 void FUN_004c2470();
 #define ENABLE_BARS(name) \
     for(int i=0;i<10;++i) { \
@@ -106,7 +106,7 @@ void __stdcall FUN_0041f7f0()
     int event[6];
     unsigned palette[256];
     FUN_004c69a0(g_game->surface);
-    FUN_00453d40();
+    HandleNetPackets();
     switch(g_game->state) {
     case 0:
         if(g_game->campaign->FUN_00435100()==3) {
@@ -117,7 +117,7 @@ void __stdcall FUN_0041f7f0()
             g_game->state=1;
             Player* player=&g_game->players[g_game->localPlayer];
             if(player->message && player->message!=2) {
-                const char* name=FUN_00452c40(player->message);
+                const char* name=GetRejectReasonText(player->message);
                 FUN_004abd90(&g_game->menu,FUN_004c5740(name),320,1,1);
                 FUN_0049fa90(&g_game->menu);
                 FUN_0049fad0(&g_game->menu);
@@ -247,7 +247,7 @@ void __stdcall FUN_0041f7f0()
             }
             if(g_game->campaign->FUN_00435100()==3) {
                 Player* player=&g_game->players[g_game->localPlayer];
-                for(int j=0;j<2;++j) FUN_004573d0(player,0,0);
+                for(int j=0;j<2;++j) SendPlayerEconomy(player,0,0);
             }
             g_game->deadline=FUN_004b6340()+10;
             ++g_game->bar;

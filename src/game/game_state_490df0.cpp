@@ -13,8 +13,8 @@ struct Game {
 extern Game* g_game;
 
 char* __stdcall FUN_004c5740(char* text);
-int FUN_0044fdb0();
-int __stdcall FUN_00451df0(int player, void* data, int size);
+int GetLocalDpid();
+int __stdcall BroadcastPacket(int player, void* data, int size);
 void __stdcall FUN_00463ca0(char* text, int param_2, int param_3, int param_4);
 
 // FUNCTION: 0x490df0
@@ -42,6 +42,6 @@ void __stdcall FUN_00490df0(int speed, int param_2)
         data[0] = 0x19;
         data[1] = 1;
         data[2] = (char)speed;
-        FUN_00451df0(FUN_0044fdb0(), data, 3);
+        BroadcastPacket(GetLocalDpid(), data, 3);
     }
 }

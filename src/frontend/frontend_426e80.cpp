@@ -121,10 +121,10 @@ void __stdcall FUN_00478240(int param);
 void __stdcall FUN_00490b30(int param);
 void __stdcall FUN_0041d9f0(int param);
 int __stdcall FUN_00443ff0(int param);
-int __stdcall FUN_00451220(unsigned char playerIndex, int param2);
-int __stdcall FUN_004517b0(V4i v, int idx);
+int __stdcall CreateLocalPlayer(unsigned char playerIndex, int param2);
+int __stdcall JoinNetGame(V4i v, int idx);
 int __stdcall FUN_004a5030(char* param);
-void __stdcall FUN_00450a10(int param);
+void __stdcall AddNetPlayer(int param);
 void __stdcall FUN_004c69a0(int param);
 void __stdcall FUN_004c6890(int param1, int param2);
 void __stdcall FUN_004c63a0(void);
@@ -138,7 +138,7 @@ void __stdcall FUN_004c1ab0(void);
 Obj_00426e80* __stdcall FUN_004b6220(void);
 void __stdcall FUN_004263b0(void);
 void __stdcall FUN_00430f00(void);
-int __stdcall FUN_00457710(void);
+int __stdcall InitLobbiedConnection(void);
 void __stdcall FUN_004644d0(void);
 void __stdcall FUN_004777a0(void);
 void __stdcall FUN_0042f9a0(void);
@@ -149,11 +149,11 @@ void __stdcall FUN_00443100(void);
 void __stdcall FUN_00442560(void);
 void __stdcall FUN_004421f0(void);
 void __stdcall FUN_00443cb0(void);
-void __stdcall FUN_00450dd0(void);
-void __stdcall FUN_00451540(void);
-int __stdcall FUN_00450d80(void);
-void __stdcall FUN_00450e20(void);
-void __stdcall FUN_00450f90(void);
+void __stdcall CloseNetSession(void);
+void __stdcall CreateNetGame(void);
+int __stdcall InitNetConnection(void);
+void __stdcall LeaveNetGame(void);
+void __stdcall BroadcastPlayerInfo(void);
 void __stdcall FUN_00460160(void);
 void __stdcall FUN_0046ca60(void);
 void __stdcall FUN_00449bb0(void);
@@ -264,7 +264,7 @@ void FUN_00425b60()
 // FUN_00426d20, as inlined in case 15 and in case 20.
 static int UseService(void)
 {
-    if (FUN_00450d80()) {
+    if (InitNetConnection()) {
         ((Bits_00426e80*)(g_game + 0x2a44))->b0 = 1;
         return 1;
     }
@@ -276,7 +276,7 @@ static int UseService(void)
 
 static int UseServiceCalls(void)
 {
-    if (FUN_00450d80()) {
+    if (InitNetConnection()) {
         ((Bits_00426e80*)(g_game + 0x2a44))->b0 = 1;
         return 1;
     }
@@ -317,7 +317,7 @@ void FUN_00426e80(void)
         FUN_004c1ab0();
         switch ((unsigned char)g_game[0x2bbf]) {
         case 0:
-            if (FUN_00457710()) {
+            if (InitLobbiedConnection()) {
                 ((Bits_00426e80*)(g_game + 0x2a44))->b0 = 1;
                 ((Bits_00426e80*)(g_game + 0x2bee))->b4 = 1;
                 SetState(0x10, 0x403, DAT_00503004);
@@ -538,7 +538,7 @@ void FUN_00426e80(void)
         case 0:
             ((Bits_00426e80*)(g_game + 0x2aaf))->b1 = 0;
             ((Bits_00426e80*)(g_game + 0x2aaf))->b0 = 0;
-            if (FUN_00457710()) {
+            if (InitLobbiedConnection()) {
                 ((Bits_00426e80*)(g_game + 0x2a44))->b0 = 1;
                 SetState(0x10, 0x52d, DAT_00503004);
                 SetSubState(0x12, 0x52e, DAT_00503004);
@@ -630,15 +630,15 @@ void FUN_00426e80(void)
             FUN_00425750();
             return;
         case 17:
-            FUN_00451540();
-            if (FUN_00451220(g_game[0x2a42], 1))
-                FUN_00450a10(*(int*)(g_game + 0x14b * (unsigned char)g_game[0x2a42] + 0x1b67));
+            CreateNetGame();
+            if (CreateLocalPlayer(g_game[0x2a42], 1))
+                AddNetPlayer(*(int*)(g_game + 0x14b * (unsigned char)g_game[0x2a42] + 0x1b67));
             SetState(0x11, 0x5ab, DAT_00503004);
             return;
         case 19:
             ((Pd_00426e80*)(*(int*)(g_game + 0x14b * (unsigned char)g_game[0x2a42] + 0x1b8a)))->b6 = 1;
         case 18:
-            if (FUN_004517b0(*(V4i*)(g_game + 0x2ba2), (unsigned char)g_game[0x2a42]) == 0) {
+            if (JoinNetGame(*(V4i*)(g_game + 0x2ba2), (unsigned char)g_game[0x2a42]) == 0) {
                 SetSubState(0, 0x5b3, DAT_00503004);
                 return;
             }
@@ -672,7 +672,7 @@ void FUN_00426e80(void)
                     if (*(int*)(g_game + i * 0x14b + 0x1b63)) {
                         char t = g_game[i * 0x14b + 0x1bd6];
                         if (t == 1 || t == 2)
-                            FUN_00450a10(*(int*)(g_game + i * 0x14b + 0x1b67));
+                            AddNetPlayer(*(int*)(g_game + i * 0x14b + 0x1b67));
                     }
                 }
                 ((Bits_00426e80*)(g_game + 0x2a44))->b2 = 1;
@@ -682,7 +682,7 @@ void FUN_00426e80(void)
             return;
         }
         case 3:
-            FUN_00450dd0();
+            CloseNetSession();
             SetStateLogged(0xf, 0x5f0, DAT_00503004);
             return;
         }
@@ -696,12 +696,12 @@ void FUN_00426e80(void)
                 FUN_0046c620(1);
                 FUN_0046c620(2);
                 SetSubState(1, 0x5ff, DAT_00503004);
-                FUN_00450f90();
+                BroadcastPlayerInfo();
                 return;
             }
             FUN_0046ca60();
             SetSubState(0x11, 0x605, DAT_00503004);
-            FUN_00450f90();
+            BroadcastPlayerInfo();
             return;
         case 1:
             FUN_0044a680();
@@ -731,7 +731,7 @@ void FUN_00426e80(void)
             FUN_0046c620(8);
             FUN_0046c190();
             if (((Bits_00426e80*)(g_game + 0x2bee))->b4) {
-                FUN_00450e20();
+                LeaveNetGame();
                 return;
             }
             switch (FUN_00441bc0()) {

@@ -27,7 +27,7 @@ extern Game* g_game;
 extern int g_usePacketManager;
 extern PacketManager g_packetManager;
 
-int __stdcall FUN_00451df0(int player, void* data, int size);
+int __stdcall BroadcastPacket(int player, void* data, int size);
 
 // An inlined helper with one return per outcome: written as a plain
 // condition, MSVC moves the `return 0` path after the body.
@@ -50,7 +50,7 @@ int __stdcall FUN_00452bd0(Player_00452bd0* player)
     msg[0] = 0x24;
     *(int*)(msg + 1) = player->id;
     msg[5] = player->field_13f;
-    int result = FUN_00451df0(player->id, msg, 6);
+    int result = BroadcastPacket(player->id, msg, 6);
     if (g_usePacketManager != 0) {
         g_packetManager.SendAllQueued(1);
     }

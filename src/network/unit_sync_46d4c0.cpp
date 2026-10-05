@@ -1,8 +1,8 @@
 // Decompiled by Sonnet. Names are provisional.
 
-int __cdecl FUN_0044fe00();
-int __cdecl FUN_00450030();
-int __stdcall FUN_00451bc0(int a, int b, void* c, int d);
+int __cdecl GetLocalHumanDpid();
+int __cdecl GetHostDpid();
+int __stdcall SendPacketToPlayer(int a, int b, void* c, int d);
 
 #pragma pack(push, 1)
 struct ParamStruct_0046d4c0
@@ -28,8 +28,8 @@ void Class_0046d4c0::FUN_0046d4c0(unsigned int* param_1, ParamStruct_0046d4c0* p
     if (field_58 != 0)
         val = *param_1;
     else
-        val = FUN_00450030();
+        val = GetHostDpid();
 
     param_2->field_2 = 0;
-    FUN_00451bc0(FUN_0044fe00(), val, param_2, 14);
+    SendPacketToPlayer(GetLocalHumanDpid(), val, param_2, 14);
 }

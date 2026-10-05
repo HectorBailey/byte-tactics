@@ -55,8 +55,8 @@ void __stdcall FUN_004a7190(void* obj, int index);
 void __stdcall FUN_004a0bf0(void* obj, char* name, void* out, int flag);
 void __stdcall FUN_0049fb10(void* obj, int value);
 void __stdcall FUN_004a81e0(void* obj, int value);
-void __stdcall FUN_004538f0(void* gadget);
-void __stdcall FUN_00453640(void* gadget);
+void __stdcall HandleTimeoutDialog(void* gadget);
+void __stdcall UpdateTimeoutDialog(void* gadget);
 
 static __inline unsigned char FindSlot_00453a50(int id)
 {
@@ -76,7 +76,7 @@ static __inline unsigned char FindSlot_00453a50(int id)
 }
 
 // FUNCTION: 0x453a50
-void __stdcall FUN_00453a50(int id)
+void __stdcall OpenTimeoutDialog(int id)
 {
     if (FUN_004ab060((char*)g_game + 0x519, "TIMEOUT.GUI")) {
         if (id == -1) {
@@ -96,7 +96,7 @@ void __stdcall FUN_00453a50(int id)
     Gui_00453a50* gui = (Gui_00453a50*)FUN_004aa8f0((char*)g_game + 0x519,
                                                     "TIMEOUT.GUI", 0x800);
     void* entries = gui->entries;
-    gui->callback = &FUN_004538f0;
+    gui->callback = &HandleTimeoutDialog;
     DAT_005061d8 = id;
 
     void* p = FUN_004d83b0("LOUNGE CHATTER", 0xa00);
@@ -107,7 +107,7 @@ void __stdcall FUN_00453a50(int id)
     FUN_004a32a0((char*)g_game + 0x519, "OUTPUT", DAT_00512c74,
                  (int)out->field_19 / (FUN_004a50b0() + 2), 0);
 
-    gui->field_1c = &FUN_00453640;
+    gui->field_1c = &UpdateTimeoutDialog;
     FUN_004a7190((char*)g_game + 0x519, FUN_0049fdf0(entries, "TALK", 3));
 
     FUN_004a0bf0((char*)g_game + 0x519, "NAME",

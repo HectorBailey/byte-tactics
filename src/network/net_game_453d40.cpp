@@ -24,11 +24,11 @@
 // Shape facts from the earlier rounds that still hold:
 //  - The lookups are the real helpers next door (0x44fdb0 .. 0x450910);
 //    MSVC 5 inlines a helper only while its size budget lasts, so the same
-//    lookup appears inlined, half inlined (FUN_0044ffd0 called) or called
-//    (FUN_0044fe40). Each variant is spelled out below.
+//    lookup appears inlined, half inlined (GetSlotDpid called) or called
+//    (FindSlotByDpid). Each variant is spelled out below.
 //  - `int target = FindPlayerIndex(..)` (not unsigned char).
-//  - InGame(p) is one helper; FUN_00450030 (HostId) is a real function.
-//  - FUN_00453010's second parameter is an int.
+//  - InGame(p) is one helper; GetHostDpid (HostId) is a real function.
+//  - RejectPlayer's second parameter is an int.
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <string.h>
@@ -223,27 +223,27 @@ extern char DAT_005065c4[];
 extern char DAT_0050658c[];
 extern char DAT_00506290[];
 
-int FUN_004534e0();
+int ReceiveNetPacket();
 void FUN_00450980();
-void FUN_00453c20();
+void CheckPlayerTimeouts();
 int FUN_004b6340();
 void FUN_00450530();
 void FUN_00446fb0();
-int __stdcall FUN_0044ffd0(unsigned char);
-unsigned char __stdcall FUN_0044fe40(int);
-int __stdcall FUN_00450a10(int);
-int __stdcall FUN_00453010(int, int);
-void __stdcall FUN_00451090(char*, int*, int*, int*, int*);
+int __stdcall GetSlotDpid(unsigned char);
+unsigned char __stdcall FindSlotByDpid(int);
+int __stdcall AddNetPlayer(int);
+int __stdcall RejectPlayer(int, int);
+void __stdcall BuildGameInfo(char*, int*, int*, int*, int*);
 void __stdcall HAPINET_updategameinfo(void*, char*, char*, int, int, int, int);
-void __stdcall FUN_004565a0(void*);
+void __stdcall HandlePing(void*);
 void __stdcall FUN_00463ca0(void*, int, int, unsigned char);
-int __stdcall FUN_00451bc0(int, int, void*, int);
-int __stdcall FUN_00451df0(int, void*, int);
+int __stdcall SendPacketToPlayer(int, int, void*, int);
+int __stdcall BroadcastPacket(int, void*, int);
 void __stdcall FUN_00452bd0(Player*);
-void __stdcall FUN_00452cc0(int);
-int __stdcall FUN_00452570(int, int);
-void __stdcall FUN_004523e0(int, int, int);
-void __stdcall FUN_00452960(int, int, unsigned char, int);
+void __stdcall RemovePlayer(int);
+int __stdcall IsColorFree(int, int);
+void __stdcall AssignPlayerColor(int, int, int);
+void __stdcall SetAlliance(int, int, unsigned char, int);
 char* __stdcall FUN_004c5740(char*);
 void __stdcall FUN_0047f1a0(char*, int);
 void __stdcall FUN_004861d0(unsigned char, void*);
@@ -264,7 +264,7 @@ void __stdcall FUN_00488570(Class_0048b090*, Player*, void*);
 void __stdcall FUN_00464b30(unsigned char, unsigned char, int, int);
 void __stdcall FUN_00464c60(unsigned char, unsigned char, int, int);
 void __stdcall FUN_00485420(unsigned char, unsigned char);
-void __stdcall FUN_00457540(void*, Player*);
+void __stdcall HandlePlayerEconomy(void*, Player*);
 void __stdcall FUN_00490df0(int, int);
 
 static inline int GetPlayerId(unsigned char i)
@@ -290,7 +290,7 @@ static inline unsigned char FindPlayerSlot(int id)
     if (id == -1)
         return 10;
     for (unsigned char i = 0; i < 10; i++) {
-        if (FUN_0044ffd0(i) == id)
+        if (GetSlotDpid(i) == id)
             return i;
     }
     return 10;
@@ -300,7 +300,7 @@ static inline Player* PlayerById(int id)
 {
     if (FindPlayerSlot(id) == 10)
         return 0;
-    return &g_game->players[FUN_0044fe40(id)];
+    return &g_game->players[FindSlotByDpid(id)];
 }
 
 static inline Player* PlayerBySlot(int id)
@@ -328,7 +328,7 @@ static inline unsigned char FindHost()
     return 10;
 }
 
-int FUN_00450030()
+int GetHostDpid()
 {
     int i;
     for (i = 0; i < 10; i++) {
@@ -419,8 +419,8 @@ static inline void DropPlayer(int id)
     *(int*)(out + 1) = id;
     Player* p = &g_game->players[FindPlayerSlot(id)];
     if ((p->active && p->state == 3) || !(g_game->net_flags & 1) || (g_game->net_flags & 2))
-        FUN_00452cc0(id);
-    FUN_00451df0(LocalPlayer()->id, out, 5);
+        RemovePlayer(id);
+    BroadcastPacket(LocalPlayer()->id, out, 5);
 }
 
 static inline int CommandAllowed(unsigned char* bytes)
@@ -436,7 +436,7 @@ static inline int CommandAllowed(unsigned char* bytes)
 }
 
 // FUNCTION: 0x453d40
-int FUN_00453d40()
+int HandleNetPackets()
 {
     if (!(g_game->flags_2a44 & 1))
         return 0;
@@ -446,7 +446,7 @@ int FUN_00453d40()
     unsigned char* packet = g_game->packet;
     int more = 1;
     while (more) {
-        more = FUN_004534e0();
+        more = ReceiveNetPacket();
         if (!more)
             continue;
         int sender = g_game->from_id;
@@ -471,19 +471,19 @@ int FUN_00453d40()
                 if (!InGame(p))
                     break;
                 if (!(g_game->flags_2a44 & 4) && (p->info->flags_97 & 1) && p->state == 3) {
-                    FUN_00453010(p->id, 1);
-                    FUN_00453010(LocalPlayer()->id, 10);
+                    RejectPlayer(p->id, 1);
+                    RejectPlayer(LocalPlayer()->id, 10);
                     ((Class_00463c60*)p)->SetType(0);
                     ((Class_00463c60*)LocalPlayer())->SetType(0);
                 } else {
-                    FUN_00453010(p->id, 1);
+                    RejectPlayer(p->id, 1);
                     ((Class_00463c60*)p)->SetType(0);
                 }
                 g_game->dirty = 1;
                 if (LocalPlayer()->info->flags_97 & 1) {
                     char name[32];
                     int a, b, c, d;
-                    FUN_00451090(name, &d, &c, &b, &a);
+                    BuildGameInfo(name, &d, &c, &b, &a);
                     if (LocalPlayer()->info->b9b.bit4)
                         g_game->settings.flags_475 |= 0x20;
                     HAPINET_updategameinfo(g_game->field_14, name, DAT_005119b8, d, c, b, a);
@@ -491,7 +491,7 @@ int FUN_00453d40()
                 break;
             }
             case 3: {
-                if (!FUN_00450a10(msg->id))
+                if (!AddNetPlayer(msg->id))
                     break;
                 PlayerById(msg->id);
                 int target = FindPlayerIndex(msg->id);
@@ -500,22 +500,22 @@ int FUN_00453d40()
                 PlayerInfo* info = LocalPlayer()->info;
                 char* payload = msg->field_10;
                 if (info->w9b.bit15) {
-                    FUN_00453010(GetPlayerId(target), 3);
+                    RejectPlayer(GetPlayerId(target), 3);
                     break;
                 }
                 if (msg->field_14 != 0x15) {
-                    FUN_00453010(GetPlayerId(target), 8);
+                    RejectPlayer(GetPlayerId(target), 8);
                     break;
                 }
                 if (*(short*)(payload + 0x11) != 0 || *(short*)(payload + 0x13) != 0x50) {
-                    FUN_00453010(GetPlayerId(target), 8);
+                    RejectPlayer(GetPlayerId(target), 8);
                     break;
                 }
                 if (!(info->flags_9d & 1))
                     break;
                 if (payload && !_strcmpi(g_game->password, payload))
                     break;
-                FUN_00453010(GetPlayerId(target), 4);
+                RejectPlayer(GetPlayerId(target), 4);
                 break;
             }
             case 0x102: {
@@ -533,7 +533,7 @@ int FUN_00453d40()
                     memcpy(g_game->players[target].info, payload, 0xb9);
                     if (FindHost() == g_game->local && !(LocalPlayer()->info->flags_9b & 0x80)
                         && (payload[0x9b] & 0x40))
-                        FUN_00453010(p->id, 9);
+                        RejectPlayer(p->id, 9);
                 }
                 ((Class_00463c40*)&temp)->FUN_00463c40();
                 break;
@@ -560,13 +560,13 @@ int FUN_00453d40()
         if (IsConnected(player))
             continue;
         if (!InGame(player)) {
-            FUN_00453010(sender, 6);
+            RejectPlayer(sender, 6);
             continue;
         }
         // Original bug: a command byte is never <= 1 and >= 0x2d at once, so
         // this error reply is dead (`||` was meant; docs/bugs.md).
         if (packet[0] <= 1 && packet[0] >= 0x2d) {
-            FUN_00453010(sender, 6);
+            RejectPlayer(sender, 6);
             continue;
         }
         if (player->state != 1 && player->state != 2 && player->state != 3)
@@ -588,13 +588,13 @@ int FUN_00453d40()
         }
         case 23:
             if (LocalPlayer()->info->flags_97 & 1) {
-                if (!FUN_00452570(g_game->from_id, (signed char)packet[1])) {
-                    FUN_004523e0(FirstJoinedId(), g_game->from_id, (signed char)packet[1]);
+                if (!IsColorFree(g_game->from_id, (signed char)packet[1])) {
+                    AssignPlayerColor(FirstJoinedId(), g_game->from_id, (signed char)packet[1]);
                 } else {
                     unsigned char reply[2];
                     reply[0] = 0x18;
                     reply[1] = packet[1];
-                    FUN_00451bc0(FirstJoinedId(), g_game->from_id, reply, 2);
+                    SendPacketToPlayer(FirstJoinedId(), g_game->from_id, reply, 2);
                     if (g_usePacketManager)
                         g_packetManager.SendAllQueued(1);
                 }
@@ -607,7 +607,7 @@ int FUN_00453d40()
                     Player* p = &g_game->players[i];
                     unsigned char reply[0xba];
                     if (IsConnected(p)) {
-                        FUN_00451df0(p->id, InfoPacket(reply, p), 0xba);
+                        BroadcastPacket(p->id, InfoPacket(reply, p), 0xba);
                         FUN_00452bd0(p);
                     }
                 }
@@ -617,7 +617,7 @@ int FUN_00453d40()
             g_game->dirty = 1;
             break;
         case 2:
-            FUN_004565a0(packet);
+            HandlePing(packet);
             break;
         case 38:
             memcpy(g_game->field_2c28, packet + 1, 40);
@@ -631,7 +631,7 @@ int FUN_00453d40()
             if (packet[9])
                 FUN_0047f1a0(DAT_00505dc4, 0);
             if (IsConnected(b)) {
-                FUN_00452960(*(int*)(packet + 1), *(int*)(packet + 5), packet[9],
+                SetAlliance(*(int*)(packet + 1), *(int*)(packet + 5), packet[9],
                              *(int*)(packet + 10));
                 if (!(g_game->flags_2a44 & 4))
                     g_game->dirty = 1;
@@ -652,7 +652,7 @@ int FUN_00453d40()
         case 27: {
             Player* p = PlayerBySlot(*(int*)(packet + 1));
             if (p)
-                FUN_00453010(p->id, packet[5]);
+                RejectPlayer(p->id, packet[5]);
             break;
         }
         case 28: {
@@ -674,7 +674,7 @@ int FUN_00453d40()
             reply[0] = 0x1f;
             recipient->field_147 = packet[1];
             *(int*)(reply + 1) = recipient->id;
-            FUN_00451bc0(recipient->id, player->id, reply, 5);
+            SendPacketToPlayer(recipient->id, player->id, reply, 5);
             break;
         }
         case 31: {
@@ -700,7 +700,7 @@ int FUN_00453d40()
         }
         case 6: {
             unsigned char reply = 7;
-            FUN_00451bc0(FirstConnectedId(), g_game->from_id, &reply, 1);
+            SendPacketToPlayer(FirstConnectedId(), g_game->from_id, &reply, 1);
             break;
         }
         case 7:
@@ -815,7 +815,7 @@ int FUN_00453d40()
             break;
         }
         case 40:
-            FUN_00457540(packet, player);
+            HandlePlayerEconomy(packet, player);
             break;
         case 41:
             if (packet[1]) {
@@ -855,7 +855,7 @@ int FUN_00453d40()
                 reply[5] = a->team;
                 if (!reply[5])
                     break;
-                FUN_00451df0(FUN_00450030(), reply, 6);
+                BroadcastPacket(GetHostDpid(), reply, 6);
             } else {
                 if (b) {
                     *(int*)(reply + 1) = a->id;
@@ -869,7 +869,7 @@ int FUN_00453d40()
                 if (!reply[5])
                     break;
                 a->team = reply[5];
-                FUN_00451df0(FUN_00450030(), reply, 6);
+                BroadcastPacket(GetHostDpid(), reply, 6);
             }
             break;
         }
@@ -885,6 +885,6 @@ int FUN_00453d40()
         }
     }
     FUN_00450980();
-    FUN_00453c20();
+    CheckPlayerTimeouts();
     return messages;
 }

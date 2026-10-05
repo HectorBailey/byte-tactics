@@ -66,7 +66,7 @@ void __stdcall FUN_0049fa90(void* obj);
 char* __stdcall FUN_004c5740(char* text);
 void __stdcall FUN_004a0bf0(void* obj, char* name, char* text, int param_4);
 void __stdcall FUN_004a9660(void* obj);
-void __stdcall FUN_00453010(int param_1, int param_2);
+void __stdcall RejectPlayer(int param_1, int param_2);
 
 static inline int GetPlayerId_00453640(unsigned char i)
 {
@@ -87,7 +87,7 @@ static inline unsigned char FindPlayerIndex_00453640(int id)
 }
 
 // FUNCTION: 0x453640
-void FUN_00453640()
+void UpdateTimeoutDialog()
 {
     Entry_00453640* entry = FUN_0049ff90(g_game->holder->entries, "OUTPUT");
 
@@ -138,7 +138,7 @@ void FUN_00453640()
         FUN_0049fa90(g_game->message);
         if (elapsed < g_game->field_37f31 + 0x78)
             return;
-        FUN_00453010(DAT_005061d8, 6);
+        RejectPlayer(DAT_005061d8, 6);
         FUN_004a9660(g_game->message);
     }
 }

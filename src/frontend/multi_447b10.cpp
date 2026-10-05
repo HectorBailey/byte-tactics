@@ -204,18 +204,18 @@ void FUN_00446a50();
 void FUN_00446c70();
 void __stdcall FUN_00446e90(Player_00447b10* player);
 void FUN_0044c7e0();
-void FUN_00450f90();
-void FUN_00451180();
-int __stdcall FUN_00451220(unsigned char player, int state);
-void __stdcall FUN_004526c0(int slot);
-void __stdcall FUN_00452960(int a, int b, unsigned char allied, int d);
+void BroadcastPlayerInfo();
+void UpdateNetGameInfo();
+int __stdcall CreateLocalPlayer(unsigned char player, int state);
+void __stdcall RequestPlayerColor(int slot);
+void __stdcall SetAlliance(int a, int b, unsigned char allied, int d);
 void __stdcall FUN_00452bd0(Player_00447b10* player);
-void __stdcall FUN_00453010(int id, unsigned char msg);
-unsigned char FUN_00456850();
-int FUN_00457a50();
-int FUN_00457af0();
-int FUN_00457b40();
-int FUN_00457b90();
+void __stdcall RejectPlayer(int id, unsigned char msg);
+unsigned char FindHostSlot();
+int IsHostLocal();
+int CountHumanPlayers();
+int CountComputerPlayers();
+int CountLocalComputerPlayers();
 unsigned int FUN_004b6340();
 void __stdcall FUN_00463ca0(char* text, int a, int b, int c);
 void __stdcall FUN_00463e50(Player_00447b10* p, char* text, int a, int b);
@@ -312,7 +312,7 @@ int FUN_00440cd0()
     if (!g_game->map->FUN_004358f0()) {
         return 0;
     }
-    unsigned char me = FUN_00456850();
+    unsigned char me = FindHostSlot();
     PlayerInfo_00447b10* data = 0;
     int check = 0;
     if (me != 10) {
@@ -358,7 +358,7 @@ void __stdcall FUN_00447b10(Gadget_00447b10* gadget)
 
     int lp = g_game->localPlayer;
     Player_00447b10* me = &g_game->players[lp];
-    int canAdd = FUN_00457a50();
+    int canAdd = IsHostLocal();
     int i = 0;
     while (1) {
         Player_00447b10* p = &g_game->players[i];
@@ -366,9 +366,9 @@ void __stdcall FUN_00447b10(Gadget_00447b10* gadget)
         sprintf(text, "LOGO%d", i);
         if (FUN_0049fd60(gadget, text) && IsLocal_00447b10(p)) {
             FUN_0047f1a0("Multi", 0);
-            FUN_004526c0(p->info->slot + 1);
+            RequestPlayerColor(p->info->slot + 1);
             g_game->dirty = 1;
-            FUN_00450f90();
+            BroadcastPlayerInfo();
         }
 
         sprintf(text, "PLAYER%d", i);
@@ -381,7 +381,7 @@ void __stdcall FUN_00447b10(Gadget_00447b10* gadget)
                 g_game->field_499--;
             } else if (type != 4 && type != 0) {
                 if (p->active != 0 && type == 2 && FUN_004b6340() - p->time > 30) {
-                    FUN_00453010(p->id, 1);
+                    RejectPlayer(p->id, 1);
                     ((Class_00463c60*)p)->SetType(0);
                 } else if (canAdd && p->active != 0 && p->type == 3) {
                     FUN_00446080(i);
@@ -390,22 +390,22 @@ void __stdcall FUN_00447b10(Gadget_00447b10* gadget)
                 if (type == 4) {
                     ((Class_00463c60*)p)->SetType(0);
                     g_game->field_499++;
-                    FUN_00451180();
+                    UpdateNetGameInfo();
                 }
-                if (g_game->players[FUN_00456850()].info->b.closed) {
+                if (g_game->players[FindHostSlot()].info->b.closed) {
                     FUN_004abd90(g_game->gui, FUN_004c5740("Can't add another player when game is closed."), 500, 1, 1);
                     ((Class_00463c60*)p)->SetType(0);
                     g_game->dirty = 1;
                     break;
                 }
-                if (g_game->players[FUN_00456850()].info->b.commander != 2 && !FUN_00457b90()) {
-                    FUN_00451220(i, 2);
+                if (g_game->players[FindHostSlot()].info->b.commander != 2 && !CountLocalComputerPlayers()) {
+                    CreateLocalPlayer(i, 2);
                     p->info->slot = FUN_00440c10();
                 }
             }
             g_game->dirty = 1;
-            FUN_00451180();
-            FUN_00450f90();
+            UpdateNetGameInfo();
+            BroadcastPlayerInfo();
         }
 
         sprintf(text, "SIDE%d", i);
@@ -418,7 +418,7 @@ void __stdcall FUN_00447b10(Gadget_00447b10* gadget)
                 p->info->side++;
                 if (p->info->side >= g_game->sides) {
                     p->info->side = 0;
-                    if (g_game->players[FUN_00456850()].info->b.watching
+                    if (g_game->players[FindHostSlot()].info->b.watching
                         && p->active != 0 && p->type == 1) {
                         p->info->b.bit6 = 1;
                     } else {
@@ -429,13 +429,13 @@ void __stdcall FUN_00447b10(Gadget_00447b10* gadget)
             }
             g_game->dirty = 1;
             FUN_0046c620(4);
-            FUN_00450f90();
+            BroadcastPlayerInfo();
         }
 
         sprintf(text, "ALLY%d", i);
         if (FUN_0049fd60(gadget, text)) {
             me->ally[i] ^= 1;
-            FUN_00452960(me->id, p->id, me->ally[i], 0);
+            SetAlliance(me->id, p->id, me->ally[i], 0);
             char same;
             if (me->colour == 5)
                 same = 0;
@@ -458,7 +458,7 @@ void __stdcall FUN_00447b10(Gadget_00447b10* gadget)
                     g_game->players[i].name);
             FUN_00463e50(me, text, 4, 0);
             g_game->dirty = 1;
-            FUN_00450f90();
+            BroadcastPlayerInfo();
         }
 
         sprintf(text, "TEAMICONS%d", i);
@@ -492,7 +492,7 @@ void __stdcall FUN_00447b10(Gadget_00447b10* gadget)
                         q->info->b.ready = g_game->players[g_game->localPlayer].info->b.ready;
                 }
                 g_game->dirty = 1;
-                FUN_00450f90();
+                BroadcastPlayerInfo();
             } else {
                 FUN_004a1110(g_game->gui, text, 0);
             }
@@ -509,7 +509,7 @@ void __stdcall FUN_00447b10(Gadget_00447b10* gadget)
         for (int j = 0; j < 10; j++) {
             Player_00447b10* q = &g_game->players[j];
             if (IsLocal_00447b10(q))
-                FUN_00453010(q->id, 2);
+                RejectPlayer(q->id, 2);
         }
         g_game->state = 3;
         return;
@@ -536,8 +536,8 @@ void __stdcall FUN_00447b10(Gadget_00447b10* gadget)
         me->info->b.commander++;
         if (me->info->b.commander > 2)
             me->info->b.commander = 0;
-        FUN_00450f90();
-        FUN_00451180();
+        BroadcastPlayerInfo();
+        UpdateNetGameInfo();
         g_game->dirty = 1;
     } else if (FUN_0049fd60(gadget, "LOSTYPE")) {
         FUN_0047f1a0("Multi", 0);
@@ -549,32 +549,32 @@ void __stdcall FUN_00447b10(Gadget_00447b10* gadget)
         } else {
             me->info->b.los = 0;
         }
-        FUN_00450f90();
-        FUN_00451180();
+        BroadcastPlayerInfo();
+        UpdateNetGameInfo();
         g_game->dirty = 1;
     } else if (FUN_0049fd60(gadget, "WATCHING")) {
         FUN_0047f1a0("Multi", 0);
         me->info->b.watching = !me->info->b.watching;
         if (!me->info->b.watching && me->active != 0 && me->info->b.bit6)
             me->info->b.bit6 = 0;
-        FUN_00450f90();
-        FUN_00451180();
+        BroadcastPlayerInfo();
+        UpdateNetGameInfo();
         g_game->dirty = 1;
     } else if (FUN_0049fd60(gadget, "CHEATING")) {
         FUN_0047f1a0("Multi", 0);
         me->info->b.cheating = !me->info->b.cheating;
-        FUN_00450f90();
+        BroadcastPlayerInfo();
         g_game->dirty = 1;
     } else if (FUN_0049fd60(gadget, "FIXEDLOC")) {
         FUN_0047f1a0("Multi", 0);
         me->info->b.fixedloc = !me->info->b.fixedloc;
-        FUN_00450f90();
+        BroadcastPlayerInfo();
         g_game->dirty = 1;
     } else if (FUN_0049fd60(gadget, "MAPPING")) {
         FUN_0047f1a0("Multi", 0);
         me->info->b.mapping = FUN_004a0f60(gadget, "MAPPING") == 0;
-        FUN_00450f90();
-        FUN_00451180();
+        BroadcastPlayerInfo();
+        UpdateNetGameInfo();
         g_game->dirty = 1;
     } else if (FUN_0049fd60(gadget, "START")) {
         int count = 0;
@@ -584,12 +584,12 @@ void __stdcall FUN_00447b10(Gadget_00447b10* gadget)
             if ((IsLocalHuman_00447b10(q) || IsRemoteHuman_00447b10(q)) && q->info->f9d_2)
                 count++;
         }
-        if (count < 1 || (count < 2 && FUN_00457af0() > 3) || (count < 3 && FUN_00457af0() > 6)) {
+        if (count < 1 || (count < 2 && CountHumanPlayers() > 3) || (count < 3 && CountHumanPlayers() > 6)) {
             FUN_004ab0a0(g_game->gui);
             FUN_004abd90(gadget, FUN_004c5740("There are not enough game CDs present to play"), 200, 1, 1);
             return;
         }
-        int total = FUN_00457b40() + FUN_00457af0();
+        int total = CountComputerPlayers() + CountHumanPlayers();
         for (int t = 0; t < 5; t++) {
             if (CountAlliance_00447b10(t) == total) {
                 FUN_004ab0a0(g_game->gui);
@@ -606,12 +606,12 @@ void __stdcall FUN_00447b10(Gadget_00447b10* gadget)
             for (int j = 0; j < 10; j++) {
                 Player_00447b10* q = &g_game->players[j];
                 if (q->active != 0 && q->type == 3 && (q->info->flags_9b & 0x40))
-                    FUN_00453010(q->id, 9);
+                    RejectPlayer(q->id, 9);
             }
         }
         g_game->state = 0x11;
         me->info->b.started = 1;
-        FUN_00451180();
+        UpdateNetGameInfo();
         g_game->los = me->info->b.los;
         g_game->losType = me->info->b.losType;
         g_game->commander = me->info->b.commander;
@@ -623,8 +623,8 @@ void __stdcall FUN_00447b10(Gadget_00447b10* gadget)
     } else if (FUN_0049fd60(gadget, "GAMEOPEN")) {
         FUN_0047f1a0("Multi", 0);
         me->info->b.closed = FUN_004a0f60(gadget, "GAMEOPEN") == 0;
-        FUN_00450f90();
-        FUN_00451180();
+        BroadcastPlayerInfo();
+        UpdateNetGameInfo();
         g_game->dirty = 1;
     } else if (FUN_0049fd60(gadget, "RESTRICTIONS")) {
         FUN_0047f1a0("Options", 0);

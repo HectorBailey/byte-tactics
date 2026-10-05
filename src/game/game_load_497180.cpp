@@ -145,9 +145,9 @@ extern PacketManager g_packetManager;
 void __stdcall FUN_004b6ca0(int x);
 void __stdcall FUN_004b6b50(int x);
 int __stdcall FUN_004b6c30(int x);
-unsigned char __stdcall FUN_00456850();
+unsigned char __stdcall FindHostSlot();
 void FUN_00431740();
-void FUN_00453d40();
+void HandleNetPackets();
 void __stdcall FUN_00465fb0(void* mission);
 void FUN_0047a760();
 void FUN_004917d0();
@@ -157,8 +157,8 @@ void __stdcall FUN_00432610(void* mission);
 void FUN_00488310();
 void FUN_0041d1f0();
 void __stdcall FUN_004288d0(int a, int b, int c, int d);
-void FUN_00450f90();
-void FUN_00451180();
+void BroadcastPlayerInfo();
+void UpdateNetGameInfo();
 void FUN_00464f80();
 void __stdcall FUN_0046c620(int x);
 void FUN_004649d0();
@@ -211,15 +211,15 @@ void __cdecl FUN_00497180(void*)
         DAT_005091cc = 1;
         *(unsigned short*)(g_game + 0x38a51) &= 0xfffe;
 
-        int sel = FUN_00456850();
+        int sel = FindHostSlot();
         unsigned char cur = *(unsigned char*)(g_game + 0x2a42);
         if (*(unsigned char*)(g_game + 0x1b63 + 0x14b * cur + 0x21) & 2) {
             do {
                 char* p = *(char**)(g_game + 0x1b63 + 0x14b * *(unsigned char*)(g_game + 0x2a42) + 0x27);
                 if (g_usePacketManager)
                     g_packetManager.SendAllQueued(1);
-                FUN_00453d40();
-                sel = FUN_00456850();
+                HandleNetPackets();
+                sel = FindHostSlot();
                 FUN_004b6b50(0x32);
                 if (sel == 10)
                     continue;
@@ -234,10 +234,10 @@ void __cdecl FUN_00497180(void*)
 
         ((Class_00435a20*)*(void**)(g_game + 0x391e9))
             ->FUN_00435a20(*(void**)(g_game + 0x1b63 + 0x14b * sel + 0x27));
-        if (FUN_00456850() == 10)
+        if (FindHostSlot() == 10)
             break;
 
-        int sel2 = FUN_00456850();
+        int sel2 = FindHostSlot();
         char* p2 = *(char**)(g_game + 0x1b63 + 0x14b * sel2 + 0x27);
         PlayerFlags_497180* pf = (PlayerFlags_497180*)(p2 + 0x9b);
         DAT_005091cc = pf->b13;
@@ -284,7 +284,7 @@ void __cdecl FUN_00497180(void*)
             while ((*(unsigned short*)(g_game + 0x38d75) & 8) == 0)
                 FUN_004b6b50(0x32);
 
-            int sel = FUN_00456850();
+            int sel = FindHostSlot();
             char* pl = *(char**)(g_game + 0x1b63 + 0x14b * sel + 0x27);
             PlayerFlags_497180* pf = (PlayerFlags_497180*)(pl + 0x9b);
             g_game_view()->bit0 = pf->b8;
@@ -417,8 +417,8 @@ tail:
 
     char* currec = g_game + 0x1b63 + 0x14b * *(unsigned char*)(g_game + 0x2a42);
     *(unsigned char*)(*(char**)(currec + 0x27) + 0x9b) |= 0x10;
-    FUN_00450f90();
-    FUN_00451180();
+    BroadcastPlayerInfo();
+    UpdateNetGameInfo();
     FUN_00464f80();
     FUN_00465e30();
 

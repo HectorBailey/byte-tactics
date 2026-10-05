@@ -7967,7 +7967,7 @@ public:
 class Class_0044fda0 {  // 0x1 bytes, 1 view
 public:
     char unknown_0[1];
-    void FUN_0044fda0(void);
+    void DispatchPacket(void);
 };
 
 struct Player_0044feb0 {  // 0x147 bytes, 1 view

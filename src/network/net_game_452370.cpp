@@ -29,7 +29,7 @@ void __stdcall HAPINET_uninitmultiplay(void* param_1);
 void __cdecl FUN_004d85a0(int* param_1);
 
 // FUNCTION: 0x452370
-void __stdcall FUN_00452370(Class_00452370* obj)
+void __stdcall ReleasePacketData(Class_00452370* obj)
 {
     if (obj->buffer) {
         FUN_004d85a0(obj->buffer);

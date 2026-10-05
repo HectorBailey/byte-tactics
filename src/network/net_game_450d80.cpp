@@ -17,7 +17,7 @@ int __stdcall InitPacketManager(int a, int b);
 void __stdcall HAPINET_initconnection(void* net, void* connection);
 
 // FUNCTION: 0x450d80
-void FUN_00450d80()
+void InitNetConnection()
 {
     HAPINET_initmultiplaydefaults(g_game->net);
     g_game->netMode = 10;

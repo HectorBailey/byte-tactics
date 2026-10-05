@@ -38,14 +38,14 @@ int IsOnlineConfigLoaded(void);
 void* __cdecl FUN_004d83b0(char* tag, int size);
 void __stdcall FUN_00491c80(int n);
 void __cdecl FUN_004d85a0(void* p);
-unsigned __stdcall FUN_00451770(void* args);
+unsigned __stdcall JoinLobbyGameThread(void* args);
 Obj_00451640* FUN_004b6220();
 void FUN_004b5910();
 char* __stdcall FUN_004c5740(char* s);
 void __stdcall FUN_004b6290(char* msg);
 
 // FUNCTION: 0x451640
-int __stdcall FUN_00451640(Player_00451640* p)
+int __stdcall JoinLobbyGame(Player_00451640* p)
 {
     int result = 0;
     char* name = 0;
@@ -73,7 +73,7 @@ int __stdcall FUN_00451640(Player_00451640* p)
 
         unsigned int tid = 0;
         FUN_00491c80(0x14);
-        unsigned long h = _beginthreadex(0, 0x8000, FUN_00451770, args, 0, &tid);
+        unsigned long h = _beginthreadex(0, 0x8000, JoinLobbyGameThread, args, 0, &tid);
         if (h != 0) {
             if (WaitForSingleObject((HANDLE)h, 40000) == WAIT_TIMEOUT) {
                 FUN_00491c80(0x13);

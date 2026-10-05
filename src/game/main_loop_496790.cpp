@@ -141,9 +141,9 @@ void FUN_00428c30();
 void FUN_00428c40();
 void FUN_00428c50();
 int FUN_004568c0();
-void FUN_00453d40();
+void HandleNetPackets();
 unsigned int FUN_004b6340();
-int FUN_0044fdb0();
+int GetLocalDpid();
 void __stdcall FUN_00453320(int a, int b);
 void FUN_00495e90();
 void FUN_0041ce90();
@@ -194,10 +194,10 @@ void FUN_00496790()
         } else if (g_game->paused) {
             if (g_usePacketManager)
                 g_packetManager.SendAllQueued(0);
-            FUN_00453d40();
+            HandleNetPackets();
             if ((int)FUN_004b6340() > DAT_0051f300) {
                 DAT_0051f300 = FUN_004b6340() + 60;
-                FUN_00453320(FUN_0044fdb0(), 0);
+                FUN_00453320(GetLocalDpid(), 0);
             }
             CHARGE(0);
         }

@@ -35,7 +35,7 @@ extern Game* g_game;
 extern int g_usePacketManager;
 extern PacketManager g_packetManager;
 
-void __stdcall FUN_00452cc0(int id);
+void __stdcall RemovePlayer(int id);
 void FUN_0046c190();
 int __stdcall HAPINET_quitgame(void* net);
 void __stdcall FUN_004b4fd0(void (__cdecl *callback)(int), int param);
@@ -51,7 +51,7 @@ static inline int IsPlaying(Player_00450e20* player)
 }
 
 // FUNCTION: 0x450e20
-void FUN_00450e20()
+void LeaveNetGame()
 {
     if (g_usePacketManager != 0) {
         g_packetManager.SendAllQueued(1);
@@ -59,7 +59,7 @@ void FUN_00450e20()
     if (g_game->flags_2a44 & 1) {
         for (int i = 0; i < 10; i++) {
             if (IsPlaying(&g_game->players[i])) {
-                FUN_00452cc0(g_game->players[i].id);
+                RemovePlayer(g_game->players[i].id);
             }
         }
         FUN_0046c190();

@@ -100,7 +100,7 @@ void FUN_0044bc10();
 void FUN_0044b990();
 void __stdcall FUN_004c6ac0(Struct_004c6ac0* obj);
 void __cdecl FUN_004d85a0(void* p);
-int FUN_00457a50();
+int IsHostLocal();
 
 // FUNCTION: 0x44c420
 void __stdcall FUN_0044c420(Menu_0044c420* menu)
@@ -130,7 +130,7 @@ void __stdcall FUN_0044c420(Menu_0044c420* menu)
         DAT_005129b8 = 0;
         FUN_004d85a0(desc->field_c2);
         FUN_004ab190((int)menu, 1);
-        if (FUN_00457a50() != 0) {
+        if (IsHostLocal() != 0) {
             for (i = 0; i < g_game->count; i++) {
                 type = DAT_005129b4[i].field_52;
                 if (type != 0) {

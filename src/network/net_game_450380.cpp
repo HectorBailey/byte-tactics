@@ -52,7 +52,7 @@ static inline unsigned char FindPlayerIndex_00450380(int id)
 }
 
 // FUNCTION: 0x450380
-void __stdcall FUN_00450380(int id)
+void __stdcall AnnouncePlayerLeft(int id)
 {
     char buf[200];
     if (g_game->players[g_game->localPlayer].field_22 == 1)

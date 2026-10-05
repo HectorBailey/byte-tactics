@@ -14,7 +14,7 @@ int __stdcall InitPacketManager(int a, int b);
 void __stdcall FUN_00434ab0(int a);
 
 // FUNCTION: 0x457710
-int FUN_00457710()
+int InitLobbiedConnection()
 {
     if (*(int*)(g_game + 0x4e5) != 0)
         return 1;

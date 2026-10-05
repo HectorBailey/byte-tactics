@@ -26,10 +26,10 @@ extern Game* g_game;
 extern int g_usePacketManager;
 extern PacketManager g_packetManager;
 
-int __stdcall FUN_00451bc0(int from, int to, void* packet, int size);
+int __stdcall SendPacketToPlayer(int from, int to, void* packet, int size);
 
 // FUNCTION: 0x452b70
-int __stdcall FUN_00452b70(int from, int to, char value, int extra)
+int __stdcall SendAlliance(int from, int to, char value, int extra)
 {
     Packet_00452b70* msg = (Packet_00452b70*)g_game->buffer;
     msg->value = value;
@@ -37,7 +37,7 @@ int __stdcall FUN_00452b70(int from, int to, char value, int extra)
     msg->from = from;
     msg->to = to;
     msg->extra = extra;
-    int result = FUN_00451bc0(from, to, msg, 0xe);
+    int result = SendPacketToPlayer(from, to, msg, 0xe);
     if (g_usePacketManager != 0) {
         g_packetManager.SendAllQueued(1);
     }

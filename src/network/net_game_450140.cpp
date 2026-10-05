@@ -13,7 +13,7 @@ extern char* g_game;
 int __stdcall HAPINET_getplayername(void* net, unsigned long id, void* data, unsigned long* size);
 
 // FUNCTION: 0x450140
-int __stdcall FUN_00450140(int dpid, char* shortName, char* longName)
+int __stdcall GetPlayerName(int dpid, char* shortName, char* longName)
 {
     int r;
     if (dpid != -1) {

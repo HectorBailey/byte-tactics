@@ -72,7 +72,7 @@ void __stdcall FUN_004bca30(const char* pattern, int flags, std::vector<Class_00
 char* __stdcall FUN_004290f0(char* out, const char* dir, const char* name, const char* ext);
 char* __stdcall FUN_004bb0f0(char* name);
 char* __stdcall FUN_004c5740(char* text);
-void FUN_00453d40();
+void HandleNetPackets();
 
 // FUNCTION: 0x434bf0
 int __stdcall FUN_00434bf0(void** param_1, int param_2, int param_3)
@@ -137,7 +137,7 @@ int __stdcall FUN_00434bf0(void** param_1, int param_2, int param_3)
                 break;
         }
         if (s.bFlag != 0) {
-            FUN_00453d40();
+            HandleNetPackets();
             if (g_usePacketManager != 0)
                 g_packetManager.SendAllQueued(0);
         }

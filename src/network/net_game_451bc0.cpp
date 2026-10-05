@@ -41,8 +41,8 @@ public:
 };
 extern Class_004619b0 g_packetManager;
 
-int __stdcall FUN_0044ffd0(unsigned char index);
-unsigned char __stdcall FUN_0044fe40(int id);
+int __stdcall GetSlotDpid(unsigned char index);
+unsigned char __stdcall FindSlotByDpid(int id);
 int __stdcall HAPINET_sendpacket(void* net, unsigned long from, unsigned long to, void* data, unsigned long size);
 void __stdcall FUN_00415ef0(unsigned char kind, int amount, int player);
 void __stdcall FUN_00415f40(int size, int overhead, int sent);
@@ -50,7 +50,7 @@ void __stdcall FUN_00415f40(int size, int overhead, int sent);
 static inline unsigned char FindIndex_00451bc0(int id)
 {
     for (unsigned char i = 0; i < 10; i++) {
-        if (FUN_0044ffd0(i) == id)
+        if (GetSlotDpid(i) == id)
             return i;
     }
     return 10;
@@ -75,7 +75,7 @@ static inline unsigned char FindPlayerIndex_00451bc0(int id)
 }
 
 // FUNCTION: 0x451bc0
-int __stdcall FUN_00451bc0(int from, int to, unsigned char* packet, int size)
+int __stdcall SendPacketToPlayer(int from, int to, unsigned char* packet, int size)
 {
     unsigned char fi;
     if (from == -1)
@@ -86,7 +86,7 @@ int __stdcall FUN_00451bc0(int from, int to, unsigned char* packet, int size)
     if (fi == 10)
         fromPlayer = 0;
     else
-        fromPlayer = &g_game->players[FUN_0044fe40(from)];
+        fromPlayer = &g_game->players[FindSlotByDpid(from)];
 
     unsigned char ti;
     if (to == -1)
@@ -97,7 +97,7 @@ int __stdcall FUN_00451bc0(int from, int to, unsigned char* packet, int size)
     if (ti == 10)
         toPlayer = 0;
     else
-        toPlayer = &g_game->players[FUN_0044fe40(to)];
+        toPlayer = &g_game->players[FindSlotByDpid(to)];
 
     if ((g_game->flags & 1) && fromPlayer != 0 && fromPlayer->active != 0 &&
         (fromPlayer->state == 1 || fromPlayer->state == 2) &&

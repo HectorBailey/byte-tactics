@@ -3,7 +3,7 @@
 // it returns to the "Previous" menu and frees DAT_00512c74; TALK sends the
 // typed text from the local player (FUN_00463e50), marks the game flag and
 // clears the field, then refreshes the message area; REJECT calls
-// FUN_00453010(DAT_005061d8, 6).
+// RejectPlayer(DAT_005061d8, 6).
 #include <string.h>
 
 #pragma pack(push, 1)
@@ -55,10 +55,10 @@ int __stdcall FUN_0049fdf0(void* gadgets, const char* name, int flag);
 void __stdcall FUN_004a7190(void* menu, int index);
 void __stdcall FUN_004ab0a0(void* param_1);
 void __stdcall FUN_0049fa90(void* menu);
-void __stdcall FUN_00453010(int param_1, int param_2);
+void __stdcall RejectPlayer(int param_1, int param_2);
 
 // FUNCTION: 0x4538f0
-void __stdcall FUN_004538f0(Gadget_004538f0* gadget)
+void __stdcall HandleTimeoutDialog(Gadget_004538f0* gadget)
 {
     Entry_004538f0* entries = gadget->layer->entries;
 
@@ -82,7 +82,7 @@ void __stdcall FUN_004538f0(Gadget_004538f0* gadget)
         return;
     }
     if (FUN_0049fd60(gadget, "REJECT")) {
-        FUN_00453010(DAT_005061d8, 6);
+        RejectPlayer(DAT_005061d8, 6);
         return;
     }
     FUN_004ab0a0(gadget);

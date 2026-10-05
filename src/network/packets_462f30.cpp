@@ -184,7 +184,7 @@ public:
 };
 extern NetCondenser g_receiveCondenser;
 
-void __stdcall FUN_004568b0(int a, int b, int c);
+void __stdcall ReportPacketGap(int a, int b, int c);
 void __cdecl PacketTrace(const char* fmt, ...);
 void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* p);
@@ -360,18 +360,18 @@ int Class_00462f30::ReceiveFrame(void* net, unsigned char* data, int* size)
                                         prev = Prev_00462f30(entry->field_8);
                                         if (*(int*)entry->field_14 <= cur) {
                                             if (prev != cur)
-                                                FUN_004568b0(field_c, prev, Next_00462f30(cur));
+                                                ReportPacketGap(field_c, prev, Next_00462f30(cur));
                                             int p2 = Prev_00462f30(*(int*)buffer);
                                             if (p2 != *(int*)entry->field_14)
-                                                FUN_004568b0(field_c, p2, Next_00462f30(*(int*)entry->field_14));
+                                                ReportPacketGap(field_c, p2, Next_00462f30(*(int*)entry->field_14));
                                             flag = 0;
                                             field_14 = entry;
                                         } else {
                                             if (prev != *(int*)entry->field_14)
-                                                FUN_004568b0(field_c, prev, Next_00462f30(*(int*)entry->field_14));
+                                                ReportPacketGap(field_c, prev, Next_00462f30(*(int*)entry->field_14));
                                             int p2 = Prev_00462f30(*(int*)entry->field_14);
                                             if (p2 != *(int*)buffer)
-                                                FUN_004568b0(field_c, p2, Next_00462f30(*(int*)buffer));
+                                                ReportPacketGap(field_c, p2, Next_00462f30(*(int*)buffer));
                                         }
                                     }
                                     if (flag && entry->field_c > 0) {

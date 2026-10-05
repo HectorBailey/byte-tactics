@@ -19,7 +19,7 @@ bool FUN_0046bf20();
 void __stdcall HAPINET_uninitmultiplay(void* param_1);
 
 // FUNCTION: 0x450dd0
-void FUN_00450dd0()
+void CloseNetSession()
 {
     if (g_game->flags_2a44 & 1) {
         if (g_usePacketManager != 0) {

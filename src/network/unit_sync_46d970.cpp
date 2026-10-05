@@ -102,7 +102,7 @@ public:
 };
 
 int __stdcall FUN_0042a610(Def_0046d970* def);
-Player_0046d970* __stdcall FUN_0044fed0(int id);
+Player_0046d970* __stdcall FindPlayerByDpid(int id);
 
 // FUNCTION: 0x46d970
 void Class_0046d860::FUN_0046d970(unsigned int key, int y)
@@ -137,7 +137,7 @@ void Class_0046d860::FUN_0046d970(unsigned int key, int y)
         for (Entry_0046d970* e = begin; e != end; e++) {
             int flag;
             if (y != 0) {
-                Player_0046d970* pl = FUN_0044fed0(e->id);
+                Player_0046d970* pl = FindPlayerByDpid(e->id);
                 if (pl == 0)
                     break;
                 flag = pl->data->count_0 >= 2 ? 1 : (pl->data->count_0 == 1 && pl->data->count_1 >= 2 ? 1 : 0);

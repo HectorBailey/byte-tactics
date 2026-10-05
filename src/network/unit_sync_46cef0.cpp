@@ -16,8 +16,8 @@ struct Packet_0046cef0 {         // 0xe bytes
 };
 #pragma pack(pop)
 
-int __cdecl FUN_0044fe00();
-void __stdcall FUN_00451bc0(int a, unsigned int b, void* c, int d);
+int __cdecl GetLocalHumanDpid();
+void __stdcall SendPacketToPlayer(int a, unsigned int b, void* c, int d);
 
 class Class_0046eba0 {
 public:
@@ -49,7 +49,7 @@ void Class_0046cef0::FUN_0046cef0(Packet_0046cef0* packet, int param_2, void* pa
     if (packet->arg == 0x65) {
         for (Packet_0046cef0* p = sent.first; p != sent.last; p++) {
             if (p->id == packet->id) {
-                FUN_00451bc0(FUN_0044fe00(), target, p, 0xe);
+                SendPacketToPlayer(GetLocalHumanDpid(), target, p, 0xe);
                 break;
             }
         }
@@ -89,7 +89,7 @@ void Class_0046cef0::FUN_0046cef0(Packet_0046cef0* packet, int param_2, void* pa
             msg.type = 0x1a;
             msg.arg = 0x65;
             msg.id = i;
-            FUN_00451bc0(FUN_0044fe00(), target, &msg, 0xe);
+            SendPacketToPlayer(GetLocalHumanDpid(), target, &msg, 0xe);
         }
     }
 }

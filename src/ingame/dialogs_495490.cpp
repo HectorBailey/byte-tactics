@@ -50,7 +50,7 @@ extern Game* g_game;
 extern int g_usePacketManager;
 extern PacketManager g_packetManager;
 
-void FUN_00453d40(void);
+void HandleNetPackets(void);
 void FUN_0048ad30(void);
 void FUN_0049b720(void);
 void FUN_00420f30(void);
@@ -67,7 +67,7 @@ void FUN_00428be0(void);
 void FUN_00428bf0(void);
 void FUN_00463ef0(void);
 void FUN_00482130(void);
-void __stdcall FUN_00457d30(Player_495490* player);
+void __stdcall UpdateResourceSharing(Player_495490* player);
 
 // FUNCTION: 0x495490
 void __stdcall FUN_00495490(int showStats)
@@ -78,7 +78,7 @@ void __stdcall FUN_00495490(int showStats)
         g_game->ticks++;
 
         if (showStats) {
-            FUN_00453d40();
+            HandleNetPackets();
             g_game->prof.FUN_0046a400(0);
         }
         FUN_0048ad30();
@@ -103,7 +103,7 @@ void __stdcall FUN_00495490(int showStats)
         g_game->prof.FUN_0046a400(8);
 
         if (showStats && g_usePacketManager != 0) {
-            FUN_00457d30(&g_game->players[g_game->localPlayer]);
+            UpdateResourceSharing(&g_game->players[g_game->localPlayer]);
             g_packetManager.SendAllQueued(0);
             g_game->prof.FUN_0046a400(0);
         }

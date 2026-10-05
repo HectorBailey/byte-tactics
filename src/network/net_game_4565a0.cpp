@@ -53,7 +53,7 @@ extern Game* g_game;
 extern int g_usePacketManager;
 extern PacketManager g_packetManager;
 
-int __stdcall FUN_00451bc0(int from, int to, void* packet, int size);
+int __stdcall SendPacketToPlayer(int from, int to, void* packet, int size);
 int __stdcall HAPINET_guaranteepackets(int param_1);
 
 static inline int GetPlayerId(unsigned char i)
@@ -75,7 +75,7 @@ static inline unsigned char FindPlayerIndex(int id)
 }
 
 // FUNCTION: 0x4565a0
-void __stdcall FUN_004565a0(Message_004565a0* p)
+void __stdcall HandlePing(Message_004565a0* p)
 {
     if (p->sent_tick == 0) {                       // not sent yet
         if (g_usePacketManager != 0) {
@@ -83,7 +83,7 @@ void __stdcall FUN_004565a0(Message_004565a0* p)
         }
         p->sent_tick = GetTickCount();
         int packets_were_guaranteed = HAPINET_guaranteepackets(0);
-        FUN_00451bc0(g_game->lobby1, p->id, p, 0xd);
+        SendPacketToPlayer(g_game->lobby1, p->id, p, 0xd);
         if (g_usePacketManager != 0) {
             g_packetManager.SendAllQueued(1);
         }

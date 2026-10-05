@@ -4,7 +4,7 @@
 //   arg-4 packet last), with `for (n = 0; n < 4;) { ...; n++; field_60++; }`
 //   whose first statement re-reads g_game and returns when field_60 >= count.
 // - The loop's direct send is an inlined copy of FUN_0046cec0 (Class_0046cec0::Inl:
-//   field_2 = 0, then FUN_00451bc0(FUN_0044fe00(), id, &packet, 0xe)); all other
+//   field_2 = 0, then SendPacketToPlayer(GetLocalHumanDpid(), id, &packet, 0xe)); all other
 //   sends are real FUN_0046cec0 calls with the id read into a local first.
 // - key and y are read into locals (y first) before the `disabled` test.
 // - The vector members of Class_0046eaa0 are the classes symbols.csv names:
@@ -132,16 +132,16 @@ struct Class_0046eaa0 {    // 0x5c bytes, one vector element
     Class_0046eaa0& operator=(const Class_0046eaa0& src);
 };
 
-int __cdecl FUN_0044fe00();
-int __cdecl FUN_00450030();
-void __stdcall FUN_00451bc0(int a, unsigned int b, void* c, int d);
+int __cdecl GetLocalHumanDpid();
+int __cdecl GetHostDpid();
+void __stdcall SendPacketToPlayer(int a, unsigned int b, void* c, int d);
 
 class Class_0046cec0 {
   public:
     void FUN_0046cec0(unsigned int param_1, void* param_2);
     void Inl(unsigned int param_1, void* param_2) {
         *(int*)((char*)param_2 + 2) = 0;
-        FUN_00451bc0(FUN_0044fe00(), param_1, param_2, 0xe);
+        SendPacketToPlayer(GetLocalHumanDpid(), param_1, param_2, 0xe);
     }
 };
 
@@ -256,7 +256,7 @@ void Class_0046d860::FUN_0046dad0() {
     if (field_5c > 0) {
         if (field_60 < ((Game*)g_game)->count) {
             if (field_60 == 0) {
-                if (FUN_00450030() == -1)
+                if (GetHostDpid() == -1)
                     return;
                 int v = ((Game*)g_game)->count - 1;
                 if (disabled == 0) {
@@ -268,7 +268,7 @@ void Class_0046d860::FUN_0046dad0() {
                     if (direct != 0) {
                         ((Class_0046cec0*)((char*)this + 0x2c))->FUN_0046cec0(DAT_00000000, &packet);
                     } else {
-                        unsigned int id = FUN_00450030();
+                        unsigned int id = GetHostDpid();
                         ((Class_0046cec0*)((char*)this + 0x2c))->FUN_0046cec0(id, &packet);
                     }
                 }
@@ -293,7 +293,7 @@ void Class_0046d860::FUN_0046dad0() {
                     if (direct != 0) {
                         ((Class_0046cec0*)((char*)this + 0x2c))->Inl(DAT_00000000, &packet);
                     } else {
-                        unsigned int id = FUN_00450030();
+                        unsigned int id = GetHostDpid();
                         ((Class_0046cec0*)((char*)this + 0x2c))->FUN_0046cec0(id, &packet);
                     }
                 }
@@ -306,7 +306,7 @@ void Class_0046d860::FUN_0046dad0() {
             packet.arg = 4;
             packet.field_6 = 0;
             packet.field_a = field_5c;
-            unsigned int id = FUN_00450030();
+            unsigned int id = GetHostDpid();
             ((Class_0046cec0*)((char*)this + 0x2c))->FUN_0046cec0(id, &packet);
         }
     }

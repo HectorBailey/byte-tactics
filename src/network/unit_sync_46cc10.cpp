@@ -71,8 +71,8 @@ struct Elem_0046faf0 {
 };
 #pragma pack(pop)
 
-extern "C" int __cdecl FUN_0044fe00();
-extern "C" void __stdcall FUN_00451bc0(int a, unsigned int b, void* c, int d);
+extern "C" int __cdecl GetLocalHumanDpid();
+extern "C" void __stdcall SendPacketToPlayer(int a, unsigned int b, void* c, int d);
 
 class Class_0046cc10 {
 public:
@@ -92,5 +92,5 @@ void Class_0046cc10::FUN_0046cc10(Elem_0046faf0* param_1, Elem_0046faf0* param_2
 	param_2->id = ++field_0;
 	std::vector<Elem_0046faf0>& _v = vec;
 	_v.insert(_v.end(), 1, *param_2);
-	FUN_00451bc0(FUN_0044fe00(), (unsigned int)param_1, param_2, 0xe);
+	SendPacketToPlayer(GetLocalHumanDpid(), (unsigned int)param_1, param_2, 0xe);
 }

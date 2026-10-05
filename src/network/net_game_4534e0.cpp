@@ -40,7 +40,7 @@ void __stdcall FUN_00415f40(int size, int overhead, int sent);
 void* __cdecl FUN_004d84a0(void* param_1, const char* name, unsigned int param_3);
 
 // FUNCTION: 0x4534e0
-int __stdcall FUN_004534e0(void)
+int __stdcall ReceiveNetPacket(void)
 {
     int size;
 

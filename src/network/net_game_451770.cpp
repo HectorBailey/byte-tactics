@@ -17,7 +17,7 @@ extern char* g_game;
 extern int __stdcall HAPINET_createorjoinlobbygame(void* obj, char* name, int a, int b, int c, int d, int e);
 
 // FUNCTION: 0x451770
-void __stdcall FUN_00451770(Args_00451770* args)
+void __stdcall JoinLobbyGameThread(Args_00451770* args)
 {
     args->result = HAPINET_createorjoinlobbygame(g_game + 0x14, args->name, args->arg_4, args->arg_8,
                                 args->arg_c, args->arg_10, args->arg_14);

@@ -56,7 +56,7 @@ public:
     int FUN_0046e000();
 };
 
-Player_0046e000* __stdcall FUN_0044fed0(int id);
+Player_0046e000* __stdcall FindPlayerByDpid(int id);
 
 // FUNCTION: 0x46e000
 int Class_0046e000::FUN_0046e000()
@@ -70,7 +70,7 @@ int Class_0046e000::FUN_0046e000()
         return 1;
     Sub_0046e000* s = (Sub_0046e000*)((char*)p + 8);
     for (; p != end; p++, s++) {
-        Player_0046e000* pl = FUN_0044fed0(p->id);
+        Player_0046e000* pl = FindPlayerByDpid(p->id);
         if (pl != 0) {
             // pl->field_0 is tested again in the second test: the original
             // reloads it rather than reusing the first test's result.
