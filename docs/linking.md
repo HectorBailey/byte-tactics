@@ -171,8 +171,8 @@ What stands out:
 `tools/globals.py` builds three files from the same objects.
 
 **`data/globals.csv`**: one row per global the source refers to by address,
-and one per stretch of `.bss` after a global that nothing names (946 rows:
-637 in `.bss`, 223 in `.data`, 86 in `.rdata`).
+and one per stretch of `.bss` after a global that nothing names (916 rows:
+606 in `.bss`, 224 in `.data`, 86 in `.rdata`).
 
 | Column | Meaning |
 | --- | --- |
@@ -189,7 +189,7 @@ and one per stretch of `.bss` after a global that nothing names (946 rows:
 | `pointers` | aligned dwords in its initial bytes that point into the exe: initial values that need symbols, not numbers, before relinking |
 | `init` | its first 64 bytes in the exe, in hex (empty for `.bss`) |
 
-**`link/globals.h`** declares 708 of the 946 globals once, with the type most
+**`link/globals.h`** declares 677 of the 916 globals once, with the type most
 files give them, when that type is settled: every view agrees up to struct
 names or signedness, three quarters of the files agree on it, or three
 quarters agree on its shape and it is the commonest type of that shape (so
@@ -381,8 +381,8 @@ counts where each section's bytes came from. On 2026-10-05:
 | Section | Bytes | Built | Copied |
 | --- | ---: | --- | --- |
 | `.text` | 1,026,560 | 850,853 game code, 24,762 gap code, 120,848 runtime library and import thunks, 30,097 padding | none |
-| `.rdata` | 18,432 | 3,234 compiled data, 3,771 library data, 2,953 `src/data`, 324 `link/` globals, 966 padding | 6,666 import tables, 518 other data |
-| `.data` | 173,660 | 82,982 compiled data (with the tree's own globals), 24,635 library data, 7,218 `src/data`, 48,820 `link/` globals, 4,140 padding | 8 linker tables, 5,857 other data |
+| `.rdata` | 18,432 | 3,234 compiled data, 3,771 library data, 2,953 `src/data`, 324 `link/` globals, 986 padding | 6,666 import tables, 498 other data |
+| `.data` | 173,660 | 82,982 compiled data (with the tree's own globals), 24,915 library data, 7,694 `src/data`, 48,458 `link/` globals, 4,243 padding | 8 linker tables, 5,360 other data |
 
 Before the data was defined in `src/data` (#2662), 34,662 bytes of `.data`
 and 1,546 of `.rdata` were copied: tables whose pointers `link/data.cpp` held
@@ -471,7 +471,7 @@ none, so `carve.py` finds them itself:
   `_WinMain@16` (WinMain's region, 0x49eda0, now has source, which defines
   it).
 - **`origdata.obj`** holds the runs of the original's `.rdata` and `.data`
-  that no object defines, the bytes `place.py` copies (7,527 bytes in 99
+  that no object defines, the bytes `place.py` copies (7,010 bytes in 95
   runs, down from the whole 192 KB of both sections), the vtables it takes
   over (below), and whatever those runs point at that no symbol names (a
   closure: none at present). Each run is a section of its own named for its
