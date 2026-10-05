@@ -379,9 +379,6 @@ char* DAT_0050c908[19] = {
     (char*)"-dprinton", (char*)"-dprintoff", (char*)"-dprintfile", (char*)DAT_0050d220, (char*)"-performancestatus", (char*)"-disableimagehlp", (char*)"-enableimagehlp", (char*)"-disableimagehlplines",
     (char*)"-enableimagehlplines", (char*)"-debughelper", (char*)"-saveresources"
 };
-char DAT_0050c958 = -64;  // 0x50c958 .data
-char DAT_0050cd38 = -64;  // 0x50cd38 .data
-char DAT_0050ced8 = -64;  // 0x50ced8 .data
 char DAT_0050d220[16] = "-memorystatus";  // 0x50d220 .data
 const char DAT_0050d2d0[28] = "Global Exception Handler";  // 0x50d2d0 .data
 char* DAT_0050d4d0 = (char*)"Library date stamp: Jun 30 1998 16:08:53";  // 0x50d4d0 .data
@@ -392,11 +389,13 @@ char DAT_005119b8[8];  // 0x5119b8 .bss
 int DAT_005119e8[10];  // 0x5119e8 .bss
 int DAT_00511a10[10];  // 0x511a10 .bss
 int DAT_00511a38;  // 0x511a38 .bss
+unsigned char DAT_00511a3c[4];  // 0x511a3c .bss
 int DAT_00511a40;  // 0x511a40 .bss
 int DAT_00511a44;  // 0x511a44 .bss
 unsigned int DAT_00511a48;  // 0x511a48 .bss
 int DAT_00511a4c;  // 0x511a4c .bss
 unsigned int DAT_00511a50;  // 0x511a50 .bss
+unsigned char DAT_00511a54[4];  // 0x511a54 .bss
 int DAT_00511a58[45][2];  // 0x511a58 .bss (the type runs past the next known address, 0x511a58+0x4)
 int DAT_00511bc0;  // 0x511bc0 .bss
 int DAT_00511bc4;  // 0x511bc4 .bss
@@ -416,6 +415,7 @@ int DAT_00511c44;  // 0x511c44 .bss
 int DAT_00511c48;  // 0x511c48 .bss
 unsigned int DAT_00511c4c;  // 0x511c4c .bss
 int DAT_00511c50;  // 0x511c50 .bss
+unsigned char DAT_00511c54[4];  // 0x511c54 .bss
 int DAT_00511c58[45][2];  // 0x511c58 .bss (the type runs past the next known address, 0x511c58+0x8)
 unsigned int DAT_00511dc0;  // 0x511dc0 .bss
 unsigned int DAT_00511dc4;  // 0x511dc4 .bss
@@ -446,13 +446,17 @@ int DAT_0051228c;  // 0x51228c .bss
 int DAT_00512290;  // 0x512290 .bss
 int DAT_00512294;  // 0x512294 .bss
 int DAT_0051229c;  // 0x51229c .bss
+unsigned char DAT_005122a0[4];  // 0x5122a0 .bss
 unsigned char DAT_005122c0[4];  // 0x5122c0 .bss
 Class_00437820* DAT_005122c4;  // 0x5122c4 .bss
 Class_00437820* DAT_005122c8;  // 0x5122c8 .bss
+unsigned char DAT_005122cc[4];  // 0x5122cc .bss
 int DAT_005122d8;  // 0x5122d8 .bss
 int DAT_005122dc;  // 0x5122dc .bss
 int DAT_005122e0;  // 0x5122e0 .bss
+unsigned char DAT_005122e4[4];  // 0x5122e4 .bss
 int DAT_005122e8;  // 0x5122e8 .bss
+unsigned char DAT_005122ec[4];  // 0x5122ec .bss
 char DAT_005122f0[32];  // 0x5122f0 .bss
 int DAT_00512310;  // 0x512310 .bss
 int DAT_00512314;  // 0x512314 .bss
@@ -462,10 +466,15 @@ int DAT_00512324;  // 0x512324 .bss
 int DAT_0051232c;  // 0x51232c .bss
 int DAT_00512330;  // 0x512330 .bss
 int DAT_00512338;  // 0x512338 .bss
+unsigned char DAT_0051233c[4];  // 0x51233c .bss
+unsigned char DAT_00512350[8];  // 0x512350 .bss
+unsigned char DAT_00512758[8];  // 0x512758 .bss
 int DAT_00512760;  // 0x512760 .bss
 int DAT_00512768;  // 0x512768 .bss
 int DAT_0051276c;  // 0x51276c .bss
+unsigned char DAT_00512780[8];  // 0x512780 .bss
 unsigned int DAT_00512788;  // 0x512788 .bss
+unsigned char DAT_0051278c[60];  // 0x51278c .bss
 unsigned char DAT_005127c8[432];  // 0x5127c8 .bss
 int DAT_00512978;  // 0x512978 .bss
 int DAT_0051297c;  // 0x51297c .bss
@@ -475,16 +484,22 @@ Entry_00443100* DAT_00512988;  // 0x512988 .bss
 char* DAT_0051298c;  // 0x51298c .bss
 char* DAT_00512990;  // 0x512990 .bss
 int DAT_00512994;  // 0x512994 .bss
+unsigned char DAT_00512998[12];  // 0x512998 .bss
 int DAT_005129a4;  // 0x5129a4 .bss
 unsigned int DAT_005129a8;  // 0x5129a8 .bss
 char* DAT_005129b0;  // 0x5129b0 .bss
 Record_005129b4* DAT_005129b4;  // 0x5129b4 .bss
+unsigned char DAT_005129bc[4];  // 0x5129bc .bss
 int DAT_005129c0;  // 0x5129c0 .bss
 int* DAT_005129c4;  // 0x5129c4 .bss
 int DAT_005129c8;  // 0x5129c8 .bss
+unsigned char DAT_005129cc[4];  // 0x5129cc .bss
+unsigned char DAT_005129f5[3];  // 0x5129f5 .bss
+unsigned char DAT_00512a1d[3];  // 0x512a1d .bss
 void (__stdcall* DAT_00512a20[2])(void*);  // 0x512a20 .bss
 int (__stdcall* DAT_00512a28)(int);  // 0x512a28 .bss
 int (__stdcall* DAT_00512a2c)(int);  // 0x512a2c .bss
+unsigned char DAT_00512a30[4];  // 0x512a30 .bss
 int (__stdcall* DAT_00512a34)(int);  // 0x512a34 .bss
 int (__stdcall* DAT_00512a38)(int);  // 0x512a38 .bss
 int (__stdcall* DAT_00512a3c)(int);  // 0x512a3c .bss
@@ -523,11 +538,14 @@ int (__stdcall* DAT_00512abc)(int);  // 0x512abc .bss
 int (__stdcall* DAT_00512ac0)(int);  // 0x512ac0 .bss
 int (__stdcall* DAT_00512ac4)(int);  // 0x512ac4 .bss
 int (__stdcall* DAT_00512ac8)(int);  // 0x512ac8 .bss
+unsigned char DAT_00512acc[4];  // 0x512acc .bss
 int (__stdcall* DAT_00512ad0)(int);  // 0x512ad0 .bss
+unsigned char DAT_00512ad4[4];  // 0x512ad4 .bss
 unsigned short DAT_00512ad8[2][2];  // 0x512ad8 .bss
 int DAT_00512adc;  // 0x512adc .bss
 int DAT_00512ae0;  // 0x512ae0 .bss
 int DAT_00512ae4;  // 0x512ae4 .bss
+unsigned char DAT_00512ae8[4];  // 0x512ae8 .bss
 int DAT_00512aec;  // 0x512aec .bss
 int DAT_00512af0;  // 0x512af0 .bss
 int DAT_00512af4;  // 0x512af4 .bss
@@ -566,11 +584,14 @@ int DAT_00512b74;  // 0x512b74 .bss
 int DAT_00512b78;  // 0x512b78 .bss
 int DAT_00512b7c;  // 0x512b7c .bss
 int DAT_00512b80;  // 0x512b80 .bss
+unsigned char DAT_00512b84[4];  // 0x512b84 .bss
 int DAT_00512b88;  // 0x512b88 .bss
+unsigned char DAT_00512b8c[4];  // 0x512b8c .bss
 int DAT_00512b90[12];  // 0x512b90 .bss
 int DAT_00512bc0[2];  // 0x512bc0 .bss
 int DAT_00512bc8;  // 0x512bc8 .bss
 int DAT_00512bcc;  // 0x512bcc .bss
+unsigned char DAT_00512bd0[4];  // 0x512bd0 .bss
 int DAT_00512bd4;  // 0x512bd4 .bss
 int DAT_00512bd8;  // 0x512bd8 .bss
 int DAT_00512bdc;  // 0x512bdc .bss
@@ -595,6 +616,7 @@ int DAT_00512c24;  // 0x512c24 .bss
 int DAT_00512c28;  // 0x512c28 .bss
 int DAT_00512c2c;  // 0x512c2c .bss
 int DAT_00512c30;  // 0x512c30 .bss
+unsigned char DAT_00512c34[4];  // 0x512c34 .bss
 int DAT_00512c38;  // 0x512c38 .bss
 int DAT_00512c3c;  // 0x512c3c .bss
 int DAT_00512c40;  // 0x512c40 .bss
@@ -608,31 +630,37 @@ int DAT_00512c5c;  // 0x512c5c .bss
 int DAT_00512c60;  // 0x512c60 .bss
 int DAT_00512c64;  // 0x512c64 .bss
 int DAT_00512c68;  // 0x512c68 .bss
+unsigned char DAT_00512c6c[4];  // 0x512c6c .bss
 int DAT_00512c70;  // 0x512c70 .bss
 int DAT_00512c78;  // 0x512c78 .bss
 unsigned int DAT_00512c7c;  // 0x512c7c .bss
 unsigned char DAT_00512c80[336];  // 0x512c80 .bss (the type runs past the next known address, 0x512c80+0x4)
 char DAT_00512dd0[260];  // 0x512dd0 .bss
+unsigned char DAT_00512ed4[20];  // 0x512ed4 .bss
 int DAT_00512ee8;  // 0x512ee8 .bss
 void* DAT_00512eec;  // 0x512eec .bss
 int DAT_00512ef0;  // 0x512ef0 .bss
+unsigned char DAT_00512ef4[4];  // 0x512ef4 .bss
 unsigned char DAT_00512ef8[24];  // 0x512ef8 .bss
 int DAT_00512f10;  // 0x512f10 .bss
 int DAT_00512f14;  // 0x512f14 .bss
 unsigned char DAT_00512f18[85];  // 0x512f18 .bss
 int DAT_00512f6d;  // 0x512f6d .bss
 int DAT_00512fd9;  // 0x512fd9 .bss
+unsigned char DAT_00512fdd[3];  // 0x512fdd .bss
 int DAT_00512fe0;  // 0x512fe0 .bss
 int DAT_00512fe4;  // 0x512fe4 .bss
 int DAT_00512fec;  // 0x512fec .bss
 int DAT_00512ff0;  // 0x512ff0 .bss
 int DAT_00512ff8;  // 0x512ff8 .bss
+unsigned char DAT_00512ffc[4];  // 0x512ffc .bss
 int DAT_0051e53c;  // 0x51e53c .bss
 int DAT_0051e540;  // 0x51e540 .bss
 int DAT_0051e544;  // 0x51e544 .bss
 int (__stdcall* DAT_0051e54c)(int*, int);  // 0x51e54c .bss
 int (__stdcall* DAT_0051e554)(char*);  // 0x51e554 .bss
 void (__cdecl* DAT_0051e558)(void);  // 0x51e558 .bss
+unsigned char DAT_0051e55c[4];  // 0x51e55c .bss
 unsigned char DAT_0051e560[20];  // 0x51e560 .bss
 void (__stdcall* DAT_0051e578)(void (__stdcall*)(int), int (__stdcall*)(char*, int));  // 0x51e578 .bss
 int (__stdcall* DAT_0051e588)(int);  // 0x51e588 .bss
@@ -640,17 +668,23 @@ int DAT_0051e590;  // 0x51e590 .bss
 int DAT_0051e594;  // 0x51e594 .bss
 char DAT_0051e5a0[104];  // 0x51e5a0 .bss
 char DAT_0051e608;  // 0x51e608 .bss
+unsigned char DAT_0051e609[7];  // 0x51e609 .bss
 unsigned char DAT_0051e610[36];  // 0x51e610 .bss
 unsigned char DAT_0051e634;  // 0x51e634 .bss
+unsigned char DAT_0051e635[7];  // 0x51e635 .bss
 char* DAT_0051e63c;  // 0x51e63c .bss
+unsigned char DAT_0051e644[8];  // 0x51e644 .bss
 int DAT_0051e64c;  // 0x51e64c .bss
 int DAT_0051e650;  // 0x51e650 .bss
 int DAT_0051e654;  // 0x51e654 .bss
+unsigned char DAT_0051e658[4];  // 0x51e658 .bss
 int* DAT_0051e65c;  // 0x51e65c .bss
+unsigned char DAT_0051e664[4];  // 0x51e664 .bss
 int DAT_0051e668;  // 0x51e668 .bss
 int DAT_0051e66c;  // 0x51e66c .bss
 int DAT_0051e670;  // 0x51e670 .bss
 short DAT_0051e674;  // 0x51e674 .bss
+unsigned char DAT_0051e676[2];  // 0x51e676 .bss
 int DAT_0051e678;  // 0x51e678 .bss
 unsigned int DAT_0051e67c;  // 0x51e67c .bss
 unsigned int DAT_0051e680;  // 0x51e680 .bss
@@ -662,6 +696,7 @@ int DAT_0051e694;  // 0x51e694 .bss
 int DAT_0051e698;  // 0x51e698 .bss
 int DAT_0051e69c;  // 0x51e69c .bss
 unsigned char DAT_0051e6b0[12];  // 0x51e6b0 .bss
+unsigned char DAT_0051e6bc[4];  // 0x51e6bc .bss
 int DAT_0051e6c0;  // 0x51e6c0 .bss
 unsigned int DAT_0051e6c4;  // 0x51e6c4 .bss
 unsigned char DAT_0051e6c8[8];  // 0x51e6c8 .bss
@@ -670,9 +705,11 @@ char DAT_0051e6f8[24];  // 0x51e6f8 .bss
 int DAT_0051e710[30];  // 0x51e710 .bss
 char DAT_0051e788[136];  // 0x51e788 .bss
 unsigned char DAT_0051e810[10];  // 0x51e810 .bss (the type runs past the next known address, 0x51e810+0x8)
+unsigned char DAT_0051e81a[6];  // 0x51e81a .bss
 unsigned char DAT_0051e820[5];  // 0x51e820 .bss
 unsigned char DAT_0051e825[3];  // 0x51e825 .bss
 unsigned char DAT_0051f2c8[10];  // 0x51f2c8 .bss (the type runs past the next known address, 0x51f2c8+0x8)
+unsigned char DAT_0051f2d2[6];  // 0x51f2d2 .bss
 unsigned int DAT_0051f2d8;  // 0x51f2d8 .bss
 int DAT_0051f2dc;  // 0x51f2dc .bss
 char* DAT_0051f2e0;  // 0x51f2e0 .bss
@@ -685,10 +722,13 @@ int DAT_0051f300;  // 0x51f300 .bss
 int DAT_0051f304;  // 0x51f304 .bss
 unsigned char DAT_0051f308[8];  // 0x51f308 .bss
 unsigned char DAT_0051f31c;  // 0x51f31c .bss
+unsigned char DAT_0051f31d[3];  // 0x51f31d .bss
 unsigned char DAT_0051f320[2088];  // 0x51f320 .bss
 int DAT_0051fb48;  // 0x51fb48 .bss
+unsigned char DAT_0051fb4c[4];  // 0x51fb4c .bss
 int DAT_0051fb90;  // 0x51fb90 .bss
 unsigned long DAT_0051fb94;  // 0x51fb94 .bss
+unsigned char DAT_0051fb98[4];  // 0x51fb98 .bss
 int* DAT_0051fba0;  // 0x51fba0 .bss
 Class_0051fba4* DAT_0051fba4;  // 0x51fba4 .bss
 int DAT_0051fba8;  // 0x51fba8 .bss
@@ -696,14 +736,19 @@ int DAT_0051fbac;  // 0x51fbac .bss
 int DAT_0051fbb0;  // 0x51fbb0 .bss
 int DAT_0051fbb4;  // 0x51fbb4 .bss
 int DAT_0051fbb8;  // 0x51fbb8 .bss
+unsigned char DAT_0051fbd4[4];  // 0x51fbd4 .bss
 unsigned char DAT_0051fbd8[172];  // 0x51fbd8 .bss
 unsigned int DAT_0051fc84;  // 0x51fc84 .bss
 unsigned int DAT_0051fc88;  // 0x51fc88 .bss
+unsigned char DAT_0051fc8c[4];  // 0x51fc8c .bss
 int DAT_0051fc90;  // 0x51fc90 .bss
 int DAT_0051fc94;  // 0x51fc94 .bss
+unsigned char DAT_0051fc98[1];  // 0x51fc98 .bss
 unsigned char DAT_0051fcb0[256];  // 0x51fcb0 .bss
 int DAT_0051fdb0;  // 0x51fdb0 .bss
+unsigned char DAT_0051fdb4[4];  // 0x51fdb4 .bss
 Class_004c5840* DAT_0051fdb8;  // 0x51fdb8 .bss
+unsigned char DAT_0051fdbc[4];  // 0x51fdbc .bss
 char DAT_0051fdc0[304];  // 0x51fdc0 .bss
 int DAT_0051fef0;  // 0x51fef0 .bss
 int DAT_0051fef4;  // 0x51fef4 .bss
@@ -715,83 +760,129 @@ int DAT_0051ff08;  // 0x51ff08 .bss
 int DAT_0051ff0c;  // 0x51ff0c .bss
 int DAT_0051ff10;  // 0x51ff10 .bss
 void* DAT_0051ff18;  // 0x51ff18 .bss
+unsigned char DAT_0051ff1c[4];  // 0x51ff1c .bss
 int DAT_0051ff20[10];  // 0x51ff20 .bss
 int DAT_0051ff48;  // 0x51ff48 .bss
+unsigned char DAT_0051ff4c[12];  // 0x51ff4c .bss
 int DAT_0051ff58;  // 0x51ff58 .bss
+unsigned char DAT_0051ff5c[4];  // 0x51ff5c .bss
 char DAT_0051ff60[112];  // 0x51ff60 .bss
 char DAT_0051ffd0[176];  // 0x51ffd0 .bss
+unsigned char DAT_00520080[3944];  // 0x520080 .bss
 char DAT_00520fe8[24584];  // 0x520fe8 .bss
 Struct_00526ff0* DAT_00526ff0;  // 0x526ff0 .bss
 int DAT_00526ff8;  // 0x526ff8 .bss
 int DAT_00526ffc;  // 0x526ffc .bss (the type runs past the next known address, 0x526ffc+0x3)
+unsigned char DAT_00527000[256];  // 0x527000 .bss
 char DAT_005289b4;  // 0x5289b4 .bss
+unsigned char DAT_005289b5[3];  // 0x5289b5 .bss
 char DAT_005289b8;  // 0x5289b8 .bss
+unsigned char DAT_005289b9[3];  // 0x5289b9 .bss
 void (__stdcall* DAT_005289bc)(void);  // 0x5289bc .bss
 int DAT_005289c0;  // 0x5289c0 .bss
 int DAT_005289c4;  // 0x5289c4 .bss
 unsigned char DAT_005289c8;  // 0x5289c8 .bss
+unsigned char DAT_005289c9[3];  // 0x5289c9 .bss
 unsigned char DAT_005289cc;  // 0x5289cc .bss
+unsigned char DAT_005289cd[3];  // 0x5289cd .bss
 unsigned int DAT_005289d0;  // 0x5289d0 .bss
 unsigned int DAT_005289d4;  // 0x5289d4 .bss
 unsigned int DAT_005289d8;  // 0x5289d8 .bss
 unsigned int DAT_005289dc;  // 0x5289dc .bss
 void* DAT_005289e0;  // 0x5289e0 .bss
+unsigned char DAT_005289e4[8];  // 0x5289e4 .bss
 unsigned int DAT_005289f0;  // 0x5289f0 .bss
+unsigned char DAT_005289f4[4];  // 0x5289f4 .bss
 unsigned int DAT_005289f8;  // 0x5289f8 .bss
 unsigned int DAT_005289fc;  // 0x5289fc .bss
 unsigned int DAT_00528a00;  // 0x528a00 .bss
 unsigned int DAT_00528a04;  // 0x528a04 .bss
 unsigned int DAT_00528a08;  // 0x528a08 .bss
+unsigned char DAT_00528a0c[4];  // 0x528a0c .bss
+unsigned char DAT_00528a14[8];  // 0x528a14 .bss
 unsigned int DAT_00528a1c;  // 0x528a1c .bss
+unsigned char DAT_00528a20[8];  // 0x528a20 .bss
 Class_004db000* DAT_00528a40;  // 0x528a40 .bss
 void* DAT_00528a44;  // 0x528a44 .bss
 unsigned char DAT_00528a48[4];  // 0x528a48 .bss
 int DAT_00528a4c;  // 0x528a4c .bss
 Node_004dde70* DAT_00528a50;  // 0x528a50 .bss
+unsigned char DAT_00528a5c[4];  // 0x528a5c .bss
 unsigned char DAT_00528a78[44];  // 0x528a78 .bss
 void* DAT_00528aa4;  // 0x528aa4 .bss
 char DAT_00528aa8;  // 0x528aa8 .bss
+unsigned char DAT_00528aa9[3];  // 0x528aa9 .bss
 char DAT_00528aac;  // 0x528aac .bss
+unsigned char DAT_00528aad[3];  // 0x528aad .bss
 void* DAT_00528ab0;  // 0x528ab0 .bss
 char DAT_00528ad8;  // 0x528ad8 .bss
+unsigned char DAT_00528ad9[3];  // 0x528ad9 .bss
 char DAT_00528adc;  // 0x528adc .bss
+unsigned char DAT_00528add[3];  // 0x528add .bss
 void* DAT_00528ae0;  // 0x528ae0 .bss
 char DAT_00528ae4;  // 0x528ae4 .bss
+unsigned char DAT_00528ae5[3];  // 0x528ae5 .bss
 char DAT_00528ae8[1000];  // 0x528ae8 .bss
 char DAT_00528ed0[1000];  // 0x528ed0 .bss
+unsigned char DAT_005292b8[4];  // 0x5292b8 .bss
+unsigned char DAT_005292c8[8];  // 0x5292c8 .bss
+unsigned char DAT_00529504[4];  // 0x529504 .bss
 int DAT_00529508;  // 0x529508 .bss
+unsigned char DAT_0052950c[4];  // 0x52950c .bss
 int DAT_00529528;  // 0x529528 .bss
+unsigned char DAT_0052952c[4];  // 0x52952c .bss
 void* DAT_00529530;  // 0x529530 .bss
+unsigned char DAT_00529534[4];  // 0x529534 .bss
 int DAT_005295b8;  // 0x5295b8 .bss
 void* DAT_005295bc;  // 0x5295bc .bss
 int DAT_005295c0;  // 0x5295c0 .bss
+unsigned char DAT_005295c4[4];  // 0x5295c4 .bss
 int DAT_005295c8;  // 0x5295c8 .bss
 char DAT_005295cc;  // 0x5295cc .bss
+unsigned char DAT_005295cd[3];  // 0x5295cd .bss
 int DAT_005295d0;  // 0x5295d0 .bss
 int DAT_005295d4;  // 0x5295d4 .bss
 char DAT_005295d8[2000];  // 0x5295d8 .bss
+unsigned char DAT_00529da8[24];  // 0x529da8 .bss
 unsigned char DAT_00529dc8;  // 0x529dc8 .bss
+unsigned char DAT_00529dc9[3];  // 0x529dc9 .bss
 int DAT_00529dcc;  // 0x529dcc .bss
 int DAT_00529dd0;  // 0x529dd0 .bss
 unsigned char DAT_00529dd4;  // 0x529dd4 .bss
+unsigned char DAT_00529dd5[3];  // 0x529dd5 .bss
 unsigned char DAT_00529dd8;  // 0x529dd8 .bss
+unsigned char DAT_00529dd9[3];  // 0x529dd9 .bss
 unsigned char DAT_00529ddc;  // 0x529ddc .bss
+unsigned char DAT_00529ddd[3];  // 0x529ddd .bss
+unsigned char DAT_00529dfc[4];  // 0x529dfc .bss
 char DAT_00529e20[56];  // 0x529e20 .bss
 void* DAT_00529e58;  // 0x529e58 .bss
+unsigned char DAT_00529e5c[8];  // 0x529e5c .bss
 unsigned char DAT_00529e64;  // 0x529e64 .bss
+unsigned char DAT_00529e65[3];  // 0x529e65 .bss
 unsigned char DAT_00529e6c;  // 0x529e6c .bss
+unsigned char DAT_00529e6d[3];  // 0x529e6d .bss
 unsigned char DAT_00529e70;  // 0x529e70 .bss
+unsigned char DAT_00529e71[3];  // 0x529e71 .bss
 char DAT_00529e74;  // 0x529e74 .bss
+unsigned char DAT_00529e75[3];  // 0x529e75 .bss
 char DAT_00529e78;  // 0x529e78 .bss
+unsigned char DAT_00529e79[3];  // 0x529e79 .bss
 Class_004e17c0* DAT_00529e7c;  // 0x529e7c .bss
 char* DAT_00529e80;  // 0x529e80 .bss
+unsigned char DAT_00529e84[4];  // 0x529e84 .bss
 char DAT_00529e88[13];  // 0x529e88 .bss
+unsigned char DAT_00529e95[3];  // 0x529e95 .bss
 void* DAT_00529e98;  // 0x529e98 .bss
+unsigned char DAT_00529e9d[3];  // 0x529e9d .bss
 int DAT_00529ea0;  // 0x529ea0 .bss
+unsigned char DAT_00529ea4[4];  // 0x529ea4 .bss
 char DAT_0052a4e4;  // 0x52a4e4 .bss
+unsigned char DAT_0052a4e5[3];  // 0x52a4e5 .bss
 long DAT_0052a4e8;  // 0x52a4e8 .bss
 long DAT_0052a4ec;  // 0x52a4ec .bss
 void* DAT_0052a4f0;  // 0x52a4f0 .bss
 int DAT_0052a4f4;  // 0x52a4f4 .bss
 void* DAT_0052a4f8;  // 0x52a4f8 .bss
 long DAT_0052a4fc;  // 0x52a4fc .bss
+unsigned char DAT_0052a500[1];  // 0x52a500 .bss

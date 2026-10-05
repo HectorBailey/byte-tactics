@@ -760,27 +760,45 @@ def retargets(img: Image, placer: Placer, namer: Namer,
     return out
 
 
-def duplicate_data(img: Image, placer: Placer) -> dict[str, set[int]]:
-    """Object file name -> the data symbols to make references: every other
-    file's definition of a global a tree file defines, beside the one the
-    layout placed (the largest: 0x460e20's DAT_00513000, not 0x460f60's
-    smaller view of the class). LINK would keep whichever came first."""
-    placed = {}
-    for p in placer.pieces:
-        if p.source == OBJDATA and not p.obj.library:
-            name = external_at(p, p.lo)
-            if name:
-                placed[name] = p.obj
-    out: dict[str, set[int]] = defaultdict(set)
+def second_definitions(img: Image, placer: Placer, namer: Namer
+                       ) -> tuple[dict[str, set[int]], dict[str, list[tuple[int, int, str, int]]]]:
+    """Every other definition of a global the layout placed from one file:
+    the same name in another file (0x460f60's smaller view of DAT_00513000's
+    class), or another spelling of it (the `_Nil` node of a std::map that two
+    files instantiate with different views of its value type). Linked as they
+    are, each would be a variable of its own, and a map whose `_Nil` one file
+    set up would be empty in another. Returns object file name -> the symbols
+    to make static, and -> the references to point at the placed definition."""
+    hide: dict[str, set[int]] = defaultdict(set)
+    sites: dict[str, list] = defaultdict(list)
+    placed_ids = {(id(p.obj), p.sec.index, p.lo) for p in placer.pieces}
     for obj in placer.objects:
         if obj.library or obj.data:
             continue
+        mine = {}
         for name, sym in obj.externals.items():
             sec = obj.secs[sym.section - 1]
-            if (name in placed and placed[name] is not obj and not sec.is_code
-                    and not sec.chars & 0x1000):             # a COMDAT folds anyway
-                out[obj.path.name].add(sym.index)
-    return out
+            if sec.is_code or name.startswith(("??_7", "??_C@", "__real@", "__TI", "__CT", "__CTA")) \
+                    or sec.name.startswith((".tls", ".CRT", ".xdata")):
+                continue
+            addr = address_of(name, placer.symbols)
+            if addr is None or not namer.sections[".rdata"][0] <= addr:
+                continue
+            if (id(obj), sym.section, sec.slice_at(sym.value)[0]) in placed_ids:
+                continue                       # the definition the layout placed
+            named = namer.name(addr, f"the global {name}")
+            if not named or named[1] or named[0].startswith("__orig_"):
+                continue
+            hide[obj.path.name].add(sym.index)
+            mine[sym.index] = named[0]
+        if not mine:
+            continue
+        for sec in obj.secs:
+            for off, symidx, rtype in sec.relocs:
+                if symidx in mine and rtype == REL_DIR32 and off + 4 <= len(sec.data):
+                    (addend,) = struct.unpack_from("<i", sec.data, off)
+                    sites[obj.path.name].append((sec.index, off, mine[symidx], addend))
+    return hide, sites
 
 
 def private_copies(placer: Placer) -> dict[str, set[int]]:
@@ -900,10 +918,17 @@ def carve(objects: list[Path], verbose: bool = False) -> Carved:
         runs = kept_runs(img, placer, compiled_data, namer.wanted, runs)
     aliases = {n: (t[0] if isinstance(t, tuple) else data_names[t]) for n, t in truth.items()
                if isinstance(t, tuple) or t in data_names}
+    # One definition of each global: the others become statics nothing uses,
+    # their files' references going to the placed one.
+    private = private_copies(placer)
+    hide, shared = second_definitions(img, placer, namer)
+    for name, symbols in hide.items():
+        private[name] = private.get(name, set()) | symbols
+    for name, more in shared.items():
+        moved[name] = moved.get(name, []) + more
     carved = Carved([OUT / "origdata.obj", OUT / "gaps.obj"], gap_sources, gap_names, data_names,
                     {start: name for start, _, name in namer.spans if start in namer.library_starts},
-                    aliases, moved, private_copies(placer), dict(namer.published), inner,
-                    duplicate_data(img, placer), data_pieces(placer))
+                    aliases, moved, private, dict(namer.published), inner, {}, data_pieces(placer))
     print(f"carve: {len(namer.gaps):,} regions carved, {len(gap_sources):,} gap regions built from source; "
           f"{len(copies):,} identical copies of placed functions, {len(aliases):,} names "
           f"resolved by the layout, {len(inner):,} as parts of globals", file=sys.stderr)

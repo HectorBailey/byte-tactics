@@ -380,7 +380,41 @@ def build(objects, img: Image) -> list[dict]:
             continue
         if addr + int(row["size"]) > end:
             end, outer = addr + int(row["size"]), row
-    return rows
+    return sorted(rows + bss_tails(rows, img, ordered, labels), key=lambda r: int(r["address"], 16))
+
+
+def bss_tails(rows: list[dict], img: Image, ordered: list[int], labels: dict[int, str]) -> list[dict]:
+    """The uninitialised space after a global, up to the next address the
+    image or the source refers to: storage nothing names (padding, or a
+    variable nothing uses), defined as a byte array DAT_<address> so that the
+    data around it keeps its place and nothing of .bss is copied."""
+    out = []
+    covered = sorted((int(r["address"], 16), int(r["address"], 16) + int(r["size"])) for r in rows)
+    for row in rows:
+        addr = int(row["address"], 16)
+        if row["section"] != ".bss" or row["defined"].startswith("in ") or row["kind"] == "library":
+            continue
+        end = addr + int(row["size"])
+        i = bisect.bisect_right(ordered, end)
+        nxt = ordered[i] if i < len(ordered) else img.section_end(addr)
+        nxt = min(nxt, img.section_end(addr))
+        # Not into another global (a row that starts before the boundary).
+        j = bisect.bisect_left(covered, (end, end))
+        if j < len(covered) and covered[j][0] < nxt:
+            nxt = covered[j][0]
+        if nxt - end < 1 or any(a <= end < b for a, b in covered[max(0, j - 2):j + 1]):
+            continue
+        out.append({
+            "address": f"{end:#x}", "name": f"DAT_{end:08x}", "section": ".bss", "size": nxt - end,
+            "size_from": "gap", "kind": "unreferenced", "type": f"unsigned char[{nxt - end}]",
+            "type_files": 0, "other_files": 0, "types": 0, "verdict": "", "files": 0, "max_offset": "",
+            "ghidra": labels.get(end, ""), "pointers": "", "defined": "", "init": "",
+            "_t": ("arr", [nxt - end], ("prim", "unsigned char")),
+            "_g": {"verdict": "one type", "types": Counter(), "typed": {}, "files": set(), "defined_in": [],
+                   "spellings": Counter()},
+            "_gap": nxt - end,
+        })
+    return out
 
 
 def definition_size(src: str, g: dict) -> int | None:
@@ -437,6 +471,8 @@ def header_entry(row: dict) -> Entry | None:
     g, t = row["_g"], row["_t"]
     if row["kind"] in ("template", "library", "vtable") or row["defined"]:
         return None
+    if row["kind"] == "unreferenced":
+        return Entry(row, identifier(row), t, "", f"{row['address']}, {row['size']} bytes; nothing refers to it")
     if not settled(g, row["type"], row["type_files"], row["other_files"]):
         return None
     name = identifier(row)
