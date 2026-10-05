@@ -288,7 +288,8 @@ class Image:
         for entry in self.pe.DIRECTORY_ENTRY_IMPORT:
             for t in (entry.struct.OriginalFirstThunk, entry.struct.FirstThunk):
                 out.append((self.base + t, 4 * (len(entry.imports) + 1)))
-            out.append((self.base + entry.struct.Name, len(entry.dll) + 1))
+            # The DLL's name and its NUL, padded to an even length too.
+            out.append((self.base + entry.struct.Name, (len(entry.dll) + 2) & ~1))
             for imp in entry.imports:
                 if imp.name:
                     # A hint, the name and its NUL, padded to an even length.
@@ -1001,6 +1002,93 @@ def place_unreferenced_library(placer: Placer) -> None:
             break
 
 
+def place_section_rest(placer: Placer) -> None:
+    """The slices nothing refers to of a data section placed in one piece
+    or several at one base: each where its offset puts it, when the original
+    holds its bytes there (zlib's copyright strings, the runtime library's
+    constants). LINK keeps a section whole, whatever its symbols."""
+    img = placer.img
+    for (_, index), pieces in list(placer.placed.items()):
+        p0 = pieces[0]
+        sec, obj = p0.sec, p0.obj
+        if sec.is_code or sec.name.startswith(SKIP_SECTIONS) or obj.data:
+            continue
+        base = p0.va - p0.lo
+        if any(p.va - p.lo != base for p in pieces):
+            continue
+        bounds = sorted(set(sec.starts) | {0, len(sec.data)})
+        for lo, hi in zip(bounds, bounds[1:]):
+            if lo >= hi or placer.address_in(obj, index, lo) is not None:
+                continue
+            va = base + lo
+            if not all(img.free(v) for v in range(va, va + hi - lo)):
+                continue
+            if sec.chars & SCN_UNINIT:
+                o = va - img.base
+                if any(img.pristine[o:o + hi - lo]):
+                    continue
+            elif not masked_match(img, Sec(index, sec.name, sec.chars, sec.data[lo:hi],
+                                           [(off - lo, s, r) for off, s, r in sec.relocs if lo <= off < hi]),
+                                  va, hi - lo):
+                continue
+            placer.place(obj, sec, lo, hi, va, p0.source, f"{sec.name} of {obj.path.stem} (+{lo:#x})")
+            placer.stats["data placed with the rest of its section"] += 1
+
+
+def place_member_data(placer: Placer) -> None:
+    """The initialised data sections nothing refers to of the library members
+    placed (throw.obj's and frame.obj's pointers to the unhandled exception
+    filter): each where the original holds its bytes among the data nothing
+    defines yet, its pointers leading where the member's lead. Members that
+    hold the same bytes take the places in turn. A section of only zeros
+    could go anywhere, and is left; so is one whose bytes the original holds
+    in more than one place, unless a pointer in it says where it belongs."""
+    img = placer.img
+    rdata = next(s for s in img.sections if s[0] == ".rdata")
+    data = next(s for s in img.sections if s[0] == ".data")
+    lo, hi = rdata[1] - img.base, data[1] + data[3] - img.base
+    tables = bytearray(img.size)
+    for va, n in img.fixed_ranges():
+        tables[va - img.base:va - img.base + n] = b"\1" * n
+    open_ = bytearray(int(img.src[o] == UNSET and not tables[o]) for o in range(img.size))
+    placed_objs = {key[0] for key in placer.placed}
+    for obj in placer.objects:
+        if not obj.library or id(obj) not in placed_objs:
+            continue
+        for sec in obj.secs:
+            if (sec.is_code or sec.chars & SCN_UNINIT or (id(obj), sec.index) in placer.placed
+                    or sec.name.startswith(SKIP_SECTIONS + (".CRT", ".xdata", ".tls"))
+                    or not sec.data or not (any(sec.data) or sec.relocs)):
+                continue
+            n = (sec.chars >> 20) & 0xF
+            align = 1 << (n - 1) if n else 16
+            size = len(sec.data)
+            found = []                         # (address, pointers that agree)
+            for o in range(lo + (-(img.base + lo)) % align, hi - size + 1, align):
+                if 0 in open_[o:o + size]:
+                    continue
+                va = img.base + o
+                if not masked_match(img, sec, va, size):
+                    continue
+                pointers = 0
+                for off, symidx, rtype in sec.relocs:
+                    sym = obj.syms[symidx]
+                    target = placer.globals.get(sym.name) if rtype == REL_DIR32 and sym.section <= 0 else None
+                    if target is None:
+                        continue
+                    (addend,) = struct.unpack_from("<I", sec.data, off)
+                    if (target + addend) & 0xFFFFFFFF != img.u32(va + off):
+                        break
+                    pointers += 1
+                else:
+                    found.append((va, pointers))
+            if len(found) == 1 or (found and found[0][1]):
+                va = found[0][0]
+                placer.place(obj, sec, 0, size, va, LIBDATA, f"{sec.name} of {obj.path.stem}")
+                open_[va - img.base:va - img.base + size] = bytes(size)
+                placer.stats["library data placed by its bytes, with nothing referring to it"] += 1
+
+
 def import_libraries() -> list[Path]:
     """The import libraries the original was linked with: the toolchain's,
     and for the DLLs it imports by ordinal, LIB.EXE's from link/*.def (built
@@ -1184,6 +1272,16 @@ def place_commons(placer: Placer) -> None:
         source = LIBDATA if name in library else OBJDATA
         if img.write(addr, bytes(size), source) == 0:
             placer.stats["communal variables placed where the original has them"] += 1
+        # LINK aligns each to its size, up to 32 bytes (___pioinfo's 256 bytes
+        # follow __crtheap's 4 after 24 bytes of zeros).
+        align = 1 << min(5, size.bit_length() - 1)
+        o = addr - img.base
+        run = o
+        while run > o - align + 1 and img.src[run - 1] == UNSET:
+            run -= 1
+        if not addr % align and run < o and img.src[run - 1] != UNSET and not any(img.pristine[run:o]):
+            for i in range(run, o):
+                img.out[i], img.src[i] = 0, PADDING
 
 
 def pad_data(placer: Placer) -> None:
@@ -1201,6 +1299,24 @@ def pad_data(placer: Placer) -> None:
         o = p.va - img.base
         if align < 2 or p.va % align:
             continue
+        run = o
+        while run > o - align + 1 and img.src[run - 1] == UNSET and not img.pristine[run - 1]:
+            run -= 1
+        if run < o and img.src[run - 1] != UNSET:
+            for i in range(run, o):
+                img.out[i], img.src[i] = 0, PADDING
+    # Zeros before a piece of the game's data at an eight- or sixteen-byte
+    # boundary, fewer than that: the original's sections there began at that
+    # alignment (most of the DirectX setup code's strings start on eight-byte
+    # boundaries), and the tree's objects, one function each, cannot say
+    # where they began.
+    for p in sorted(placer.pieces, key=lambda p: p.va):
+        if p.sec.is_code or p.obj.library:
+            continue
+        align = min(16, p.va & -p.va)
+        if align < 8:
+            continue
+        o = p.va - img.base
         run = o
         while run > o - align + 1 and img.src[run - 1] == UNSET and not img.pristine[run - 1]:
             run -= 1
@@ -1329,6 +1445,10 @@ def layout(jobs: int | None = None) -> tuple[Image, Placer]:
     place_globals(placer, data_objs, data_addr)
     placer.relocate()
     place_unreferenced_library(placer)
+    placer.relocate()
+    place_section_rest(placer)
+    placer.relocate()
+    place_member_data(placer)
     placer.relocate()
     place_crt_tables(placer)
     place_commons(placer)
