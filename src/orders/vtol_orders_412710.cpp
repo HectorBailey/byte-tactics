@@ -164,7 +164,7 @@ void __stdcall FUN_0040f200(Unit* unit, Order* order, unsigned int flags)
 }
 
 // FUNCTION: 0x412710
-int __stdcall FUN_00412710(Unit* unit, Order* order, int flags)
+int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
 {
     int speed = GetSpeed(unit);
     if (flags & 0x1000a) {

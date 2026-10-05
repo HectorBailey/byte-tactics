@@ -68,7 +68,7 @@ static inline int SquaredDistance(int dx, int dz)
     return (int)((x * x) >> 32) + (int)((z * z) >> 32);
 }
 // FUNCTION: 0x404730
-int __stdcall FUN_00404730(Unit* unit, Order* order, unsigned int flags)
+int __stdcall ReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
 {
     Unit* target = order->target.Get();
     if (!target || (flags & 0x10008)) return 5;

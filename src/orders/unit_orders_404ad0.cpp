@@ -93,7 +93,7 @@ void __stdcall FUN_004237d0(Unit* unit, Vec3* pos);
 // Order handler "Reclaiming" for a feature (wreck, tree, rock) at the order
 // position.
 // FUNCTION: 0x404ad0
-int __stdcall FUN_00404ad0(Unit* unit, Order* order, int flags)
+int __stdcall ReclaimOrder(Unit* unit, Order* order, int flags)
 {
     Point16 cell;
     Point16 size;

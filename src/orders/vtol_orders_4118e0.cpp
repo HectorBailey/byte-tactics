@@ -156,7 +156,7 @@ int __stdcall FUN_00411840(Unit* unit, int pad)
 }
 
 // FUNCTION: 0x4118e0
-int __stdcall FUN_004118e0(Unit* unit, Order* order, int flags)
+int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
 {
     int radius = unit->field_10->field_dc;
     Unit* host = order->target.owner;

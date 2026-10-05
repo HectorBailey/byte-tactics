@@ -52,7 +52,7 @@ int __stdcall FUN_0047ea40(Vec3*, int, Vec3**, float*, Vec3**, float*);
 void __stdcall FUN_0043acb0(Unit*, Class_0043a1f0*);
 
 // FUNCTION: 0x405980
-int __stdcall FUN_00405980(Unit* unit, Order* order, int flags)
+int __stdcall RepairPatrolOrder(Unit* unit, Order* order, int flags)
 {
     for (;;) {
         switch (order->state) {

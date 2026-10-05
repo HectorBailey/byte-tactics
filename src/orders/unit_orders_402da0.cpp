@@ -68,7 +68,7 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char, Unit*, Unit*, void*);
 void __stdcall FUN_0043adc0(Class_00438760, int, Unit*, Unit*, void*, int, int);
 void __stdcall FUN_0041bcd0(Unit*, int);
 // FUNCTION: 0x402da0
-int __stdcall FUN_00402da0(Unit* unit, Order* order, unsigned int flags)
+int __stdcall GetBuiltOrder(Unit* unit, Order* order, unsigned int flags)
 {
     if (unit->progress == 0.0f) {
         FUN_0041c110(unit);

@@ -69,7 +69,7 @@ class Class_00438a00 { public: void FUN_00438a00(Vec3*, int, int); };
 // The original radius expression adds the second dimension twice rather than
 // squaring it: fld x; fld y; fld st(1); fmul st(2); fadd st(1); fadd st(1).
 // FUNCTION: 0x403f70
-int __stdcall FUN_00403f70(Unit* unit, Order* order, int flags)
+int __stdcall HelpBuildOrder(Unit* unit, Order* order, int flags)
 {
     if (flags & 2) { FUN_0041c110(unit); return 5; }
     Unit* target = order->target;

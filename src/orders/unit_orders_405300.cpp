@@ -130,7 +130,7 @@ void __stdcall EmitNanoParticles(Vec3* from, Box* to, int count);
 // Order handler "Repair" of a builder: walks up to the target unit, then
 // spends worker time on it until its health is full.
 // FUNCTION: 0x405300
-int __stdcall FUN_00405300(Unit* unit, Order* order, int flags)
+int __stdcall RepairUnitOrder(Unit* unit, Order* order, int flags)
 {
     if (!order->target) {
         FUN_0047f780(unit, 7, "Repairs unsuccessful.");

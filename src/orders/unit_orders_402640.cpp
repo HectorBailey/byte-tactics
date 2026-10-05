@@ -160,7 +160,7 @@ void __stdcall EmitNanoParticles(Vec3* from, Box* to, int count);
 // `unit`, spending its worker time and drawing nano particles from its nano
 // piece to the unit's bounding box.
 // FUNCTION: 0x402430
-int __stdcall FUN_00402430(Unit* unit, Order* order, int unused)
+int __stdcall SelfRepairOrder(Unit* unit, Order* order, int unused)
 {
     if (order->target.owner == 0) {
         FUN_0047f780(unit, 7, "Repair aborted.");
@@ -221,7 +221,7 @@ static inline Point16 GridCell(Vec3 pos, Point16 size)
 // `refund` on the FP stack in that path (fld; fadd st, st(1); fstp; fstp st(0))
 // instead of adding it straight to the field.
 // FUNCTION: 0x402640
-int __stdcall FUN_00402640(Unit* unit, Order* order, int flags)
+int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
 {
     if (flags & 2) {
         if (order->target.owner != 0) {

@@ -76,7 +76,7 @@ static inline Vec3 Offset(short angle, int distance)
 }
 
 // FUNCTION: 0x40f7d0
-int __stdcall FUN_0040f7d0(Unit* unit, Order* order, int flags)
+int __stdcall VtolStandbyOrder(Unit* unit, Order* order, int flags)
 {
     unsigned int state = 0;
     state = order->state;

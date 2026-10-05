@@ -92,7 +92,7 @@ short __cdecl FUN_004b715a(int,int);
 static inline Vec3 Offset(short angle,int distance) { Vec3 v; v.x=-FUN_004b70ef(angle,distance); v.y=0; v.z=-FUN_004b7123(angle,distance); return v; }
 static inline short Angle(Vec3* a,Vec3* b) { return FUN_004b715a(a->x-b->x,a->z-b->z); }
 // FUNCTION: 0x413d80
-int __stdcall FUN_00413d80(Unit* unit,Order* order,int flags)
+int __stdcall VtolMobileBuildOrder(Unit* unit,Order* order,int flags)
 {
     if (flags&2) { FUN_0041c110(unit); return 5; }
     if (flags&8) { FUN_0047f780(unit,7,"Construction terminated"); FUN_0041c110(unit); return 8; }

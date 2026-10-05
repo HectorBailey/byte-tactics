@@ -161,7 +161,7 @@ static inline int IsAhead(Unit* unit, Order* order)
 }
 
 // FUNCTION: 0x412d40
-int __stdcall FUN_00412d40(Unit* unit, Order* order, int flags)
+int __stdcall AirToAirOrder(Unit* unit, Order* order, int flags)
 {
     if (flags & 0x10008) {
         if (order->field_4a == 0 && (unit->flags & 0x300000))

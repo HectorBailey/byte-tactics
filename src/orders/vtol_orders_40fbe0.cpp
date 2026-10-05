@@ -75,7 +75,7 @@ static inline Vec3 Offset(short angle, int distance) { Vec3 v; v.x=-FUN_004b70ef
 static inline Unit* OrderTarget(Order*order) { return order->target; }
 
 // FUNCTION: 0x40fbe0
-int __stdcall FUN_0040fbe0(Unit* unit, Order* order, int flags)
+int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
 {
     if (order->target && !(flags&0x48)) {
         if (unit->terrain==g_game->water) {

@@ -16,7 +16,7 @@ class Class_00439e80 { public: void FUN_00439e80(int); };
 void __stdcall FUN_0047f780(Unit*,int,void*);
 void __stdcall FUN_0043acb0(Unit*,Class_0043a1f0*);
 // FUNCTION: 0x403260
-int __stdcall FUN_00403260(Unit* unit,Order* order,unsigned flags)
+int __stdcall AttackKamikazeOrder(Unit* unit,Order* order,unsigned flags)
 {
     if(flags&0x10008) return 5;
     if(order->target) order->pos=order->target->pos;

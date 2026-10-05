@@ -125,7 +125,7 @@ void __stdcall FUN_0040f200(Unit* unit, Order* order, unsigned int flags)
 
 static inline void Dummy(void) {}
 // FUNCTION: 0x410e70
-int __stdcall FUN_00410e70(Unit* unit, Order* order, int flags)
+int __stdcall VtolPatrolOrder(Unit* unit, Order* order, int flags)
 {
     unsigned int state = 0;
     state = order->state;

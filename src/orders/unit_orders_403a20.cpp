@@ -76,7 +76,7 @@ static inline void CellToWorld(Point origin, Point c, Vec3* v)
     v->z = (origin.y + c.y * 2) << 19;
 }
 // FUNCTION: 0x403a20
-int __stdcall FUN_00403a20(Unit* unit, Order* order, int flags)
+int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
 {
     if (flags & 8) {
         FUN_0047f780(unit, 7, "Construction terminated");

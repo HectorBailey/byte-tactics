@@ -192,7 +192,7 @@ int __cdecl FUN_004b7123(short, int);
 static inline int Contains(unsigned int* bits, unsigned short index) { return bits[index >> 5] & (1 << (index & 31)); }
 static inline Vec3 Offset(short angle, int distance) { Vec3 v; v.x=-FUN_004b70ef(angle,distance); v.y=0; v.z=-FUN_004b7123(angle,distance); return v; }
 // FUNCTION: 0x406300
-int __stdcall FUN_00406300(Unit* unit, Order* order, int flags)
+int __stdcall FollowGroundOrder(Unit* unit, Order* order, int flags)
 {
     if (!order->target) return 5;
     if (unit->busy) return 7;

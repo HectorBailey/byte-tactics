@@ -181,7 +181,7 @@ void __stdcall FUN_0043acb0(Unit* owner, Class_0043a1f0* node);
 // MSVC then keeps x in bx with a 16-bit move and stores both fields late;
 // a plain short or int local gives `mov ebx, edx`.
 // FUNCTION: 0x404db0
-int __stdcall FUN_00404db0(Unit* unit, Order* order, int flags)
+int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
 {
     Point16 cell;
     Point16 size;

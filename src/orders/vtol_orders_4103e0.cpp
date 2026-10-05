@@ -74,7 +74,7 @@ class Class_00410830 : public std::vector<Unit*> { public: Class_00410830(); };
 void __stdcall FUN_0040b530(int, Vec3*, int, std::vector<Unit*>*);
 Unit* __stdcall FUN_0043b700(Unit*);
 // FUNCTION: 0x4103e0
-int __stdcall FUN_004103e0(Unit* unit, Order* order, int flags)
+int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
 {
     if (flags & 0x40) return 5;
     if (unit->terrain == g_game->water) {

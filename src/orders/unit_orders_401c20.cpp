@@ -46,7 +46,7 @@ void __stdcall ClearWeaponTarget(Unit* unit, int which);
 void __stdcall FUN_0043acb0(Unit* owner, Class_0043a1f0* node);
 
 // FUNCTION: 0x401c20
-int __stdcall FUN_00401c20(Unit* unit, Class_00438880* order, int unused)
+int __stdcall StopOrder(Unit* unit, Class_00438880* order, int unused)
 {
     order->FUN_00438880(0);
     ClearWeaponTarget(unit, 0);

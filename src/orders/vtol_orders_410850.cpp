@@ -177,7 +177,7 @@ static inline int Patrol(Unit* unit, Order* order, int flags)
     return 2;
 }
 // FUNCTION: 0x410850
-int __stdcall FUN_00410850(Unit* unit, Order* order, int flags)
+int __stdcall VtolSeekGuardOrder(Unit* unit, Order* order, int flags)
 {
     if (flags&0x40) return 5;
     if (unit->terrain==g_game->water) {

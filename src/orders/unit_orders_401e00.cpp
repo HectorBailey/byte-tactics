@@ -71,7 +71,7 @@ Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit* unit,
 void __stdcall FUN_0043acb0(Unit* owner, Class_0043a1f0* node);
 
 // FUNCTION: 0x401e00
-int __stdcall FUN_00401e00(Unit* unit, Order_00401e00* order, int unused)
+int __stdcall AttackUTypeOrder(Unit* unit, Order_00401e00* order, int unused)
 {
     unsigned int s = 0;
     s = order->state;

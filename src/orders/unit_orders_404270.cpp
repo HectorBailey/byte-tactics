@@ -94,7 +94,7 @@ static inline void CellToWorld(Point origin, Point c, Vec3* v)
     v->z = (origin.y + c.y * 2) << 19;
 }
 // 0x403a20, matched in 0x403a20.cpp
-int __stdcall FUN_00403a20(Unit* unit, Order* order, int flags)
+int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
 {
     if (flags & 8) {
         FUN_0047f780(unit, 7, "Construction terminated");
@@ -186,7 +186,7 @@ int __stdcall FUN_00403a20(Unit* unit, Order* order, int flags)
 }
 
 // 0x403f70, matched in 0x403f70.cpp
-int __stdcall FUN_00403f70(Unit* unit, Order* order, int flags)
+int __stdcall HelpBuildOrder(Unit* unit, Order* order, int flags)
 {
     if (flags & 2) { FUN_0041c110(unit); return 5; }
     Unit* target = order->target;
@@ -297,7 +297,7 @@ void __stdcall GetNanoPiecePosition(Unit*, Vec3*);
 void __stdcall EmitReverseNanoParticles(Vec3*, Vec3*, int);
 void __stdcall GiveUnitToPlayer(Unit*, void*, int);
 // FUNCTION: 0x404270
-int __stdcall FUN_00404270(Unit* unit, Order* order, unsigned int flags)
+int __stdcall CaptureOrder(Unit* unit, Order* order, unsigned int flags)
 {
     Unit* target = order->target.Get();
     if (!target || (flags & 0x10008)) {

@@ -165,7 +165,7 @@ void __stdcall FUN_0040f200(Unit* unit, Order* order, unsigned int flags)
 }
 
 // FUNCTION: 0x413470
-int __stdcall FUN_00413470(Unit* unit, Order* order, int flags)
+int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
 {
     if (flags & 0x10008) {
         if (order->field_4a == 0 && (unit->flags & 0x300000))

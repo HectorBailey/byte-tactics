@@ -25,7 +25,7 @@
 //    (89.1%). `(unsigned int)flags & 0xe0` gives the same MATCH.
 //  - Land returns 1 or 0 and has an empty `do {} while (0);` (a debug macro
 //    that compiled to nothing) after the health test, with FUN_0040f200
-//    `inline` so nothing is compiled before FUN_004152f0. The landed test
+//    `inline` so nothing is compiled before VtolRepairPatrolOrder. The landed test
 //    then folds away and the landed path returns 0 straight after ~vector.
 //    Any function compiled first in the file (FUN_0040f200 out of line
 //    included) brings the test back (1520 bytes). Land's /Ob2 share keeps the
@@ -165,7 +165,7 @@ static inline float Total(float base, float amount)
 }
 
 // FUNCTION: 0x4152f0
-int __stdcall FUN_004152f0(Unit* unit, Order* order, unsigned int flags)
+int __stdcall VtolRepairPatrolOrder(Unit* unit, Order* order, unsigned int flags)
 {
     if ((flags & 0x48) != 0) {
         ((Class_00439e80*)order)->FUN_00439e80(0x1e);

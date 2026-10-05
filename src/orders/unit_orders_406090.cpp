@@ -13,7 +13,7 @@ Unit* __stdcall FUN_0043b700(Unit*);
 void __stdcall FUN_0043acb0(Unit*, Class_0043a1f0*);
 int __stdcall FUN_004b6c30(int);
 // FUNCTION: 0x406090
-int __stdcall FUN_00406090(Unit* unit, Order* order, int unused)
+int __stdcall StandbyMineOrder(Unit* unit, Order* order, int unused)
 {
     switch (order->state) {
     case 0:

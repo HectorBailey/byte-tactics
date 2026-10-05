@@ -178,7 +178,7 @@ void __stdcall FUN_0040f200(Unit* unit, Order* order, unsigned int flags)
 }
 
 // FUNCTION: 0x411f50
-int __stdcall FUN_00411f50(Unit* unit, Order* order, unsigned int flags)
+int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
 {
     if (flags & 0x1000a) {
         if (!order->field_4a && (unit->flags & 0x300000))
