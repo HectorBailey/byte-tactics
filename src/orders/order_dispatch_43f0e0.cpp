@@ -1,9 +1,9 @@
 // Decompiled by Claude Sonnet 5.5, finished by DeepSeek V4.1 Flash and GPT-6, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by claude-sonnet-5-5, finished by claude-opus-5-5. Names are provisional.
 //
 // MATCH (4420 bytes). Returns the order type (Class_00438760, built from its name) for an order of
-// type `mode` given by `unit` on `target` / `pos`. FUN_0043e490, the function just before this one
+// type `mode` given by `unit` on `target` / `pos`. GetOrderCursor, the function just before this one
 // in the exe, is its sibling that returns the cursor code. What took it from 65.6% to MATCH:
-//  - The real FUN_0043e490 is compiled first in this file: an unannotated copy of 0x43e490.cpp
+//  - The real GetOrderCursor is compiled first in this file: an unannotated copy of 0x43e490.cpp
 //    (which stays the annotated, canonical file), with g_game's struct and the two callee classes
 //    shared between the two functions. The compiler state it leaves is what lets MSVC cross-jump
 //    case 1's two identical `return FUN_0043f0e0(3, ...)` blocks into the original's single block
@@ -329,7 +329,7 @@ class Class_00489a70 {
 Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_0043f0e0* unit,
                                       Unit_0043f0e0* target, Pos_0043f0e0* pos);
 
-// FUN_0043e490 as in 0x43e490.cpp (the annotated copy). It precedes FUN_0043f0e0 in the
+// GetOrderCursor as in 0x43e490.cpp (the annotated copy). It precedes FUN_0043f0e0 in the
 // original file and is compiled first here for the compiler state it leaves; see the top.
 Cell_0043e490* __stdcall FUN_004815a0(Pos_0043e490* pos);
 int __stdcall FUN_0049aa80(Unit_0043e490* unit, void* slot, Pos_0043e490* pos, int which);
@@ -338,7 +338,7 @@ class Class_00489960 {
   public:
     int CanReclaim(Unit_0043e490* other);
 };
-int __stdcall FUN_0043e490(unsigned char mode, Unit_0043e490* unit, Unit_0043e490* target,
+int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e490* target,
                            Pos_0043e490* pos);
 
 // The same test as FUN_00408090: is the map square under pos in sight of the
@@ -394,7 +394,7 @@ static inline int Selectable(Unit_0043e490* t) {
            (t->f86 == 0 || (t->f86->f110 & 0x40000000));
 }
 
-int __stdcall FUN_0043e490(unsigned char mode, Unit_0043e490* unit, Unit_0043e490* target,
+int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e490* target,
                            Pos_0043e490* pos) {
     Def_0043e490* def;
     Node_0043e490* node;
@@ -499,9 +499,9 @@ int __stdcall FUN_0043e490(unsigned char mode, Unit_0043e490* unit, Unit_0043e49
             break;
         }
         if ((def->f245 & 0x10) && enemy)
-            return FUN_0043e490(3, unit, target, pos);
+            return GetOrderCursor(3, unit, target, pos);
         if ((def->f245 & 0x400) && enemy)
-            return FUN_0043e490(0xc, unit, target, pos);
+            return GetOrderCursor(0xc, unit, target, pos);
         if (target && ((Class_004899b0*)unit)->CanRepair(target) && target->f104 != 0.0f)
             return 6;
         if (Selectable(target))

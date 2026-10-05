@@ -4,7 +4,7 @@
 
 class Class_004379b0 {
 public:
-    int FUN_004379b0(unsigned int size);
+    int InitCache(unsigned int size);
 };
 
 void* __stdcall FUN_004b8e00(const char* name, int width, int height);
@@ -20,7 +20,7 @@ public:
 // FUNCTION: 0x458180
 int Class_00458180::FUN_00458180(unsigned int size)
 {
-    if (!((Class_004379b0*)this)->FUN_004379b0(size))
+    if (!((Class_004379b0*)this)->InitCache(size))
         return 0;
     buffer = FUN_004b8e00("CompositeBuffer", 600, 600);
     return buffer != 0;

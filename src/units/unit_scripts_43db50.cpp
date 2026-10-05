@@ -36,11 +36,11 @@ extern Game* g_game;
 
 class Class_0043db50 {
 public:
-    void FUN_0043db50(Unit* unit);
+    void UpdateSfxOccupy(Unit* unit);
 };
 
 // FUNCTION: 0x43db50
-void Class_0043db50::FUN_0043db50(Unit* unit)
+void Class_0043db50::UpdateSfxOccupy(Unit* unit)
 {
     int seaLevel = g_game->seaLevel;
     int y = unit->field_70;

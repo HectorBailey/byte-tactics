@@ -31,12 +31,12 @@ struct Object {
 };
 #pragma pack(pop)
 
-Vec3 __stdcall FUN_0043def0(Object* obj, int param);
+Vec3 __stdcall GetPieceOffset(Object* obj, int param);
 
 // FUNCTION: 0x43e400
-void __stdcall FUN_0043e400(Object* obj, Vec3* out)
+void __stdcall GetNanoPiecePosition(Object* obj, Vec3* out)
 {
     int piece = 0;
     obj->script->QueryScript("QueryNanoPiece", &piece, 0, 0, 0);
-    *out = obj->pos + FUN_0043def0(obj, piece);
+    *out = obj->pos + GetPieceOffset(obj, piece);
 }

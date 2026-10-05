@@ -55,7 +55,7 @@ struct Unit;
 class Class_0043dd20 {
 public:
     Iface_0048b920* iface;             // +0x0, see src/units/unit_scripts_43dd20.cpp
-    void FUN_0043dd20(Unit* u);
+    void UpdateMotion(Unit* u);
 };
 
 #pragma pack(push, 1)
@@ -142,7 +142,7 @@ void __stdcall ReceiveUnitStates(Player_0048b920* p, unsigned int* data)
     for (Unit* u = p->units_begin; u <= p->units_end;
          u = (Unit*)((char*)u + 0x118)) {
         if ((u->flags & 0x10000000) && u->owner) {
-            u->owner->FUN_0043dd20(u);
+            u->owner->UpdateMotion(u);
             UpdateUnitHeight(u);
         }
     }

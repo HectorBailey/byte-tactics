@@ -278,7 +278,7 @@ extern Game* g_game;
 extern char DAT_005119b8[];
 
 void __stdcall FUN_004290f0(char* out, const char* dir, const char* name, const char* ext);
-void __stdcall FUN_0042bf40(char* path, Class_0042b370* type);
+void __stdcall LoadUnitFbi(char* path, Class_0042b370* type);
 void __stdcall FUN_0042a140(void* obj, char* name);
 int __stdcall FUN_004bbc40(char* path);
 void* __stdcall FUN_004cb560(char* path);
@@ -295,10 +295,10 @@ void __cdecl FUN_004d8780(void* p);
 void __cdecl FUN_004d8710(void* p);
 void __stdcall FUN_00432fb0(void* start, void* end, void* cmp, int param);
 void __stdcall FUN_00432d40(void* start, void* end, void* cmp, int param);
-int __stdcall FUN_0042db60(const char* a, const char* b);
+int __stdcall CompareUnitTypeNames(const char* a, const char* b);
 
 // FUNCTION: 0x42d2e0
-void FUN_0042d2e0() {
+void LoadUnitTypes() {
     char namebuf[32];
     char section[32];
     char path[256];
@@ -376,11 +376,11 @@ void FUN_0042d2e0() {
     start = g_game->field_1439b + 1;
     Class_0042b370* last = d;
     if (last - start <= 0x10) {
-        FUN_00432fb0(start, last, (void*)FUN_0042db60, 0);
+        FUN_00432fb0(start, last, (void*)CompareUnitTypeNames, 0);
     } else {
-        FUN_00432d40(start, last, (void*)FUN_0042db60, 0);
+        FUN_00432d40(start, last, (void*)CompareUnitTypeNames, 0);
         Class_0042b370* q = start + 0x10;
-        FUN_00432fb0(start, q, (void*)FUN_0042db60, 0);
+        FUN_00432fb0(start, q, (void*)CompareUnitTypeNames, 0);
         for (; q != last; q++) {
             Class_0042b370 tmp = *q;
             Class_0042b370* r = q - 1;
@@ -421,7 +421,7 @@ void FUN_0042d2e0() {
         type->field_21e = u;
         FUN_004290f0(path, "units", type->name, "FBI");
         if (FUN_004bbc40(path))
-            FUN_0042bf40(path, type);
+            LoadUnitFbi(path, type);
 
         strncpy(namebuf, type->model, 0x20);
         namebuf[0x1f] = 0;

@@ -27,12 +27,12 @@ public:
     short field_24;                // +0x24
     char unknown_26[0x2e - 0x26];
     unsigned char field_2e;        // +0x2e
-    void FUN_0043da70(Unit* unit);
+    void UpdateMoveRate(Unit* unit);
 };
 #pragma pack(pop)
 
 // FUNCTION: 0x43da70
-void Class_0043da70::FUN_0043da70(Unit* unit)
+void Class_0043da70::UpdateMoveRate(Unit* unit)
 {
     int rate;
     if ((field_2e & 4) == 0 && unit->field_86 == 0

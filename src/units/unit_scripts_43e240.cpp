@@ -32,7 +32,7 @@ struct Object {
 };
 #pragma pack(pop)
 
-Vec3 __stdcall FUN_0043def0(Object* obj, int param);
+Vec3 __stdcall GetPieceOffset(Object* obj, int param);
 
 static inline int QueryWeaponPiece(Object* obj, unsigned char weapon)
 {
@@ -43,9 +43,9 @@ static inline int QueryWeaponPiece(Object* obj, unsigned char weapon)
 }
 
 // FUNCTION: 0x43e240
-void __stdcall FUN_0043e240(Object* obj, Vec3* out, unsigned char weapon, int piece)
+void __stdcall GetWeaponPiecePosition(Object* obj, Vec3* out, unsigned char weapon, int piece)
 {
     if (piece < 0)
         piece = QueryWeaponPiece(obj, weapon);
-    *out = obj->pos + FUN_0043def0(obj, piece);
+    *out = obj->pos + GetPieceOffset(obj, piece);
 }

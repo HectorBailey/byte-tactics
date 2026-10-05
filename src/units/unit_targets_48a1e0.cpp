@@ -69,7 +69,7 @@ struct Game {
 extern Game* g_game;
 
 int __stdcall GetGroundHeight(Vec3_0048a1e0* pos);
-void __stdcall FUN_0043e3c0(UnitDef_0048a1e0* def, int pos);
+void __stdcall GetSweetSpot(UnitDef_0048a1e0* def, int pos);
 
 // The intact tail block was the last diff. Writing the three adds in their
 // natural x,y,z order made MSVC sink the first product to its use (products
@@ -112,7 +112,7 @@ int __stdcall GetWeaponTargetPos(Unit* unit, Vec3_0048a1e0* pos, int index)
         }
         return 0;
     }
-    FUN_0043e3c0(def, (int)pos);
+    GetSweetSpot(def, (int)pos);
     if ((e->flags & 2) && !(e->target->field_111 & 0x2000000) && def->muzzle != 0
         && unit->field_b8 > 5 && e->target->radius != 0) {
         Vec3_0048a1e0 d;

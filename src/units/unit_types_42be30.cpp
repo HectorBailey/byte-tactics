@@ -37,7 +37,7 @@ void __cdecl FUN_004d8710(void* p);
 void __cdecl FUN_004d8780(void* p);
 
 // FUNCTION: 0x42be30
-void FUN_0042be30()
+void AddDownloadBuildOptions()
 {
     FUN_004d8780(g_game->entries);
     Entry_0042be30* e = g_game->entries;

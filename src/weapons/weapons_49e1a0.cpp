@@ -124,7 +124,7 @@ extern char* DAT_00509688[3];
 
 int __stdcall GetWeaponTargetPos(Unit* unit, Vec3_0049e1a0* pos, int index);
 Unit* __stdcall GetWeaponTargetUnit(Unit* obj, int index);
-void __stdcall FUN_0043e2e0(Unit* unit, Vec3_0049e1a0* out, unsigned char weapon);
+void __stdcall GetAimFromPosition(Unit* unit, Vec3_0049e1a0* out, unsigned char weapon);
 void __stdcall FUN_0049e570(Vec3_0049e1a0* a, Vec3_0049e1a0* b, int* dx, int* dy, int* dz);
 short __cdecl FUN_004b715a(int x, int z);
 unsigned short __stdcall FUN_0049a890(int a, int b, int c, int d, float e);
@@ -167,7 +167,7 @@ void __stdcall FUN_0049e1a0(Unit* unit) {
                 unsigned short angle;
                 int ok;
                 if (t->f_111.b1) {
-                    FUN_0043e2e0(unit, &aim, (unsigned char)((e->flags >> 2) & 3));
+                    GetAimFromPosition(unit, &aim, (unsigned char)((e->flags >> 2) & 3));
                     FUN_0049e570(&aim, &pos, &dx, &dy, &dz);
                     heading = (unsigned short)(FUN_004b715a(dx, dz) - unit->heading);
                     angle = FUN_0049a890(dx, dy, dz, t->f_68, t->f_c8);
