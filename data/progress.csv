@@ -723,7 +723,7 @@ address,size,file,symbol,status,similarity
 0x438700,39,src/orders/order_queue_438700.cpp,?FUN_00438700@@YGIPAX0I@Z,matched,100.0
 0x438730,42,src/orders/order_queue_438730.cpp,?FUN_00438730@@YGHPAD0I@Z,matched,100.0
 0x438760,198,src/orders/order_queue_438760.cpp,??0Class_00438760@@QAE@PBD@Z,matched,100.0
-0x438830,19,src/orders/order_queue_438830.cpp,?FUN_00438830@Class_00438830@@QAEHXZ,matched,100.0
+0x438830,19,src/orders/order_queue_438830.cpp,?FUN_00438830@OrderType@@QAEHXZ,matched,100.0
 0x438850,19,src/orders/order_queue_438850.cpp,?FUN_00438850@@YIHPAE@Z,matched,100.0
 0x438870,15,src/orders/order_queue_438870.cpp,?FUN_0043a1e0@Class_0043a1f0@@UAEXI@Z,matched,100.0
 0x438880,33,src/orders/order_queue_438880.cpp,?FUN_00438880@Class_00438880@@QAEXPAD@Z,matched,100.0
@@ -1352,7 +1352,7 @@ address,size,file,symbol,status,similarity
 0x466c20,402,src/map/radar_466c20.cpp,?UpdateRadarMapped@@YGXXZ,matched,100.0
 0x466dc0,1662,src/map/radar_466dc0.cpp,?DrawRadarUnits@@YGXXZ,matched,100.0
 0x467440,1015,src/ingame/info_panel_467440.cpp,?FUN_00467440@@YGXXZ,matched,100.0
-0x467840,272,src/ingame/info_panel_467840.cpp,?FUN_00467840@Class_00467840@@QAEXPAUUnit@@@Z,matched,100.0
+0x467840,272,src/ingame/info_panel_467840.cpp,?FUN_00467840@DetectionVisitor@@QAEXPAUUnit@@@Z,matched,100.0
 0x467950,14,src/ingame/info_panel_467950.cpp,?FUN_00467950@@YGXPAX@Z,matched,100.0
 0x467960,25,src/ingame/info_panel_467960.cpp,?FUN_00467960@@YGXPAUUnit_00467960@@@Z,matched,100.0
 0x467980,25,src/ingame/info_panel_467980.cpp,?FUN_00467980@@YGXPAUUnit@@@Z,matched,100.0
@@ -1369,7 +1369,7 @@ address,size,file,symbol,status,similarity
 0x4685a0,1045,src/ingame/info_panel_4685a0.cpp,?DrawUnitBuilderProbe@@YGHPAX@Z,matched,100.0
 0x4689c0,803,src/ingame/info_panel_4689c0.cpp,?DrawStatusPanel@@YGXPAVSurface@@@Z,matched,100.0
 0x468cf0,5904,src/ingame/info_panel_468cf0.cpp,?FUN_00468cf0@@YGXHH@Z,matched,100.0
-0x46a400,36,src/ingame/info_panel_46a400.cpp,?AccumulateProfileTime@Class_0046a400@@QAEXH@Z,matched,100.0
+0x46a400,36,src/ingame/info_panel_46a400.cpp,?AccumulateProfileTime@FrameTimers@@QAEXH@Z,matched,100.0
 0x46a430,256,src/ingame/info_panel_46a430.cpp,?DrawHitPointBar@@YGXPAXPAUUnit@@HH@Z,matched,100.0
 0x46a530,216,src/ingame/info_panel_46a530.cpp,?DrawSelectionBox@@YGXPAUVec3_0046a530@@PAUUnit@@@Z,matched,100.0
 0x46a610,589,src/ingame/info_panel_46a610.cpp,?FUN_0046a610@@YGXPAXPAUCell@@HH@Z,matched,100.0
@@ -1883,7 +1883,7 @@ address,size,file,symbol,status,similarity
 0x48ca20,513,src/ingame/selection_48ca20.cpp,?CollectSelectedUnits@@YGXPAV?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@@Z,matched,100.0
 0x48cc30,323,src/ingame/selection_48cc30.cpp,?FUN_0048cc30@@YGXPAXPAPAUUnit@@@Z,matched,100.0
 0x48cd80,428,src/ingame/selection_48cd80.cpp,?FUN_0048cd80@@YGGXZ,matched,100.0
-0x48cf30,742,src/ingame/selection_48cf30.cpp,?IssueOrderToSelection@@YGXPAUUnitType_0048cf30@@EVClass_00438830@@PAHHH@Z,matched,100.0
+0x48cf30,742,src/ingame/selection_48cf30.cpp,?IssueOrderToSelection@@YGXPAUUnitType_0048cf30@@EVOrderType@@PAHHH@Z,matched,100.0
 0x48d220,499,src/ingame/selection_48d220.cpp,?FUN_0048d220@@YGHD@Z,matched,100.0
 0x48d420,175,src/ingame/selection_48d420.cpp,?FUN_0048d420@@YGPAUUnit@@XZ,matched,100.0
 0x48d4d0,348,src/ingame/selection_48d4d0.cpp,?FUN_0048d4d0@@YGXXZ,matched,100.0

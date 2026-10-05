@@ -368,10 +368,10 @@ struct Class_00463730;
 class Class_00463be0;
 class Class_00463c40;
 struct Class_00464ac0;
-class Class_00467840;
-class Class_00467960;
-class Class_00467980;
-struct Class_0046a400;
+class DetectionVisitor;
+class RadarJamVisitor;
+class SonarJamVisitor;
+struct FrameTimers;
 struct Class_0046c620;
 class Class_0046cc10;
 class Class_0046cec0;
@@ -9403,7 +9403,7 @@ struct Player_00466dc0 {  // 0x97 bytes, 1 view
     unsigned char field_96;  // +0x96
 };
 
-class Class_00467840 {  // 0x18 bytes, 2 views
+class DetectionVisitor {  // 0x18 bytes, 2 views
 public:
     int field_4;  // +0x4
     int field_8;  // +0x8
@@ -9411,12 +9411,12 @@ public:
     virtual void FUN_00467840(Unit*);
 };
 
-class Class_00467960 {  // 0x4 bytes, 1 view
+class RadarJamVisitor {  // 0x4 bytes, 1 view
 public:
     virtual void FUN_00467960(Unit*);
 };
 
-class Class_00467980 {  // 0x4 bytes, 1 view
+class SonarJamVisitor {  // 0x4 bytes, 1 view
 public:
     virtual void FUN_00467980(Unit*);
 };
@@ -9489,7 +9489,7 @@ struct Player_004689c0 {  // 0x14b bytes, 1 view
     char unknown_11b[48];
 };
 
-struct Class_0046a400 {  // 0x50 bytes, 4 views
+struct FrameTimers {     // 0x50 bytes, 4 views
     int last;  // +0x0
     int total;  // +0x4
     int values[9];  // +0x8
@@ -9899,7 +9899,7 @@ struct Game {  // 0x3924d bytes, 904 views
     void* field_38d7b;  // +0x38d7b
     unsigned short flags_38d7f;  // +0x38d7f
     int playerCount;  // +0x38d81
-    Class_0046a400 timers;  // +0x38d85
+    FrameTimers timers;     // +0x38d85
     int field_38dd5;  // +0x38dd5
     Slot_0041e420 slots_38dd9[10];  // +0x38dd9
     char unknown_3901d[58];

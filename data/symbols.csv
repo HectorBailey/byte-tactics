@@ -724,7 +724,7 @@ address,name
 0x438700,FUN_00438700
 0x438730,FUN_00438730
 0x438760,Class_00438760::Class_00438760
-0x438830,Class_00438830::FUN_00438830
+0x438830,OrderType::FUN_00438830
 0x438850,FUN_00438850
 0x438870,Class_0043a1f0::FUN_0043a1e0
 0x438880,Class_00438880::FUN_00438880
@@ -1347,7 +1347,7 @@ address,name
 0x466c20,UpdateRadarMapped
 0x466dc0,DrawRadarUnits
 0x467440,FUN_00467440
-0x467840,Class_00467840::FUN_00467840
+0x467840,DetectionVisitor::FUN_00467840
 0x467950,FUN_00467950
 0x467960,FUN_00467960
 0x467980,FUN_00467980
@@ -1364,7 +1364,7 @@ address,name
 0x4685a0,DrawUnitBuilderProbe
 0x4689c0,DrawStatusPanel
 0x468cf0,FUN_00468cf0
-0x46a400,Class_0046a400::AccumulateProfileTime
+0x46a400,FrameTimers::AccumulateProfileTime
 0x46a430,DrawHitPointBar
 0x46a530,DrawSelectionBox
 0x46a610,FUN_0046a610
@@ -4063,9 +4063,9 @@ address,name
 0x4fd4cc,DAT_004fd4cc
 0x4fd514,??_7PacketManager@@6B@
 0x4fd518,??_7PacketReceiver@@6B@
-0x4fd554,??_7Class_00467980@@6B@
-0x4fd558,??_7Class_00467960@@6B@
-0x4fd55c,??_7Class_00467840@@6B@
+0x4fd554,??_7SonarJamVisitor@@6B@
+0x4fd558,??_7RadarJamVisitor@@6B@
+0x4fd55c,??_7DetectionVisitor@@6B@
 0x4fd580,??_7ObjectPool@@6B@
 0x4fd588,??_7TeleportParticles@@6B@
 0x4fd5a8,??_7ParticleSystem@@6B@
