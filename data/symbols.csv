@@ -692,9 +692,9 @@ address,name
 0x437300,Class_00437300::CountStartPositions
 0x437320,Class_00437320::GetStartPosition
 0x4373a0,Class_004373a0::ComputeMapChecksum
-0x437580,VClass_00437820::?$vector::insert
+0x437580,VMapCacheEntry::?$vector::insert
 0x437800,Class_00437800::Class_00437800
-0x437820,Class_00437820::Class_00437820
+0x437820,MapCacheEntry::MapCacheEntry
 0x437840,UpdateMetalExtraction
 0x437910,UpdateWindGenerator
 0x4379a0,CMemoryCache::FUN_004379a0

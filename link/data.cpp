@@ -387,8 +387,8 @@ int DAT_00512294;  // 0x512294 .bss
 int DAT_0051229c;  // 0x51229c .bss
 unsigned char DAT_005122a0[4];  // 0x5122a0 .bss
 unsigned char DAT_005122c0[4];  // 0x5122c0 .bss
-Class_00437820* DAT_005122c4;  // 0x5122c4 .bss
-Class_00437820* DAT_005122c8;  // 0x5122c8 .bss
+MapCacheEntry* DAT_005122c4;  // 0x5122c4 .bss
+MapCacheEntry* DAT_005122c8;  // 0x5122c8 .bss
 unsigned char DAT_005122cc[4];  // 0x5122cc .bss
 int DAT_005122d8;  // 0x5122d8 .bss
 int DAT_005122dc;  // 0x5122dc .bss

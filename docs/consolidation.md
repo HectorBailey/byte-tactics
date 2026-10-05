@@ -312,7 +312,7 @@ can disagree on types (a real link would fail). Known cases:
   with `unsigned short`, so settle on that.
 
 - 0x437800 is recorded as `Class_00437800::Class_00437800` but is
-  `Class_00437820::operator=` (`??4Class_00437820@@QAEAAV0@ABV0@@Z`, the
+  `MapCacheEntry::operator=` (`??4Class_00437820@@QAEAAV0@ABV0@@Z`, the
   compiler-generated assignment of `{Class_004c91a0 handle; int field_4;}`,
   27 bytes, called only from 0x437580's fill and copy_backward); 0x4c93b0
   (`Class_004c93b0::Assign`) is the string handle's

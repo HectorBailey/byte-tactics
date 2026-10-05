@@ -204,7 +204,7 @@ class Class_00437300;
 class Class_004373a0;
 class Class_00437580;
 class Class_00437800;
-class Class_00437820;
+class MapCacheEntry;
 class Class_004379a0;
 class Class_004379a0_2;
 class Class_004379b0;
@@ -6217,16 +6217,16 @@ public:
 class Class_00437580 {  // 0x4 bytes, 1 view
 public:
     char unknown_0[4];
-    void FUN_00437580(Class_00437820*, int, Class_00437820&);
+    void FUN_00437580(MapCacheEntry*, int, MapCacheEntry&);
 };
 
-class Class_00437820 {  // 0x8 bytes, 3 views
+class MapCacheEntry {   // 0x8 bytes, 3 views
 public:
     Class_004c9390 handle;  // +0x0
     int field_4;  // +0x4
-    Class_00437820(Class_00437820&);
-    Class_00437820& operator=(Class_00437820&);
-    Class_00437820& SetChecksum(Class_004373a0*);
+    MapCacheEntry(MapCacheEntry&);
+    MapCacheEntry& operator=(MapCacheEntry&);
+    MapCacheEntry& SetChecksum(Class_004373a0*);
 };
 
 class Class_00437800 {  // 0x8 bytes, 1 view

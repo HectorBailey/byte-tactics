@@ -7,9 +7,9 @@
 #ifndef LINK_GLOBALS_H
 #define LINK_GLOBALS_H
 
-class Class_00437820;
 class Class_004db000;
 class Class_004e17c0;
+class MapCacheEntry;
 class TranslationTable;
 struct Chunk;
 struct Class_0051fba4;
@@ -290,8 +290,8 @@ extern int DAT_00512294;                                                        
 extern int DAT_0051229c;                                                                      // 0x51229c, 4 bytes; 1 of 1 files
 extern unsigned char DAT_005122a0[4];                                                         // 0x5122a0, 4 bytes; nothing refers to it
 extern unsigned char DAT_005122c0[4];                                                         // 0x5122c0, 4 bytes, DAT_005122c0$S4554; Class_00437580 by value in 1 of 1 files
-extern Class_00437820* DAT_005122c4;                                                          // 0x5122c4, 4 bytes; 1 of 1 files
-extern Class_00437820* DAT_005122c8;                                                          // 0x5122c8, 4 bytes; 1 of 1 files
+extern MapCacheEntry* DAT_005122c4;                                                           // 0x5122c4, 4 bytes; 1 of 1 files
+extern MapCacheEntry* DAT_005122c8;                                                           // 0x5122c8, 4 bytes; 1 of 1 files
 extern unsigned char DAT_005122cc[4];                                                         // 0x5122cc, 4 bytes; nothing refers to it
 extern int DAT_005122d8;                                                                      // 0x5122d8, 4 bytes; 2 of 2 files
 extern int DAT_005122dc;                                                                      // 0x5122dc, 4 bytes; 2 of 2 files

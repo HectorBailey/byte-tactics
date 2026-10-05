@@ -689,9 +689,9 @@ address,size,file,symbol,status,similarity
 0x437300,31,src/map/map_load_437300.cpp,?CountStartPositions@Class_00437300@@QAEHXZ,matched,100.0
 0x437320,116,src/map/map_load_437320.cpp,?GetStartPosition@Class_00437320@@QAEHPAUVec3_00437320@@H@Z,matched,100.0
 0x4373a0,477,src/map/map_load_4373a0.cpp,?ComputeMapChecksum@Class_004373a0@@QAEHXZ,matched,100.0
-0x437580,639,src/map/map_load_437580.cpp,?insert@?$vector@VClass_00437820@@V?$allocator@VClass_00437820@@@std@@@std@@QAEXPAVClass_00437820@@IABV3@@Z,matched,100.0
+0x437580,639,src/map/map_load_437580.cpp,?insert@?$vector@VMapCacheEntry@@V?$allocator@VMapCacheEntry@@@std@@@std@@QAEXPAVMapCacheEntry@@IABV3@@Z,matched,100.0
 0x437800,27,src/map/map_load_437800.cpp,??0Class_00437800@@QAE@PAH@Z,matched,100.0
-0x437820,27,src/map/map_load_437820.cpp,??0Class_00437820@@QAE@ABV0@@Z,matched,100.0
+0x437820,27,src/map/map_load_437820.cpp,??0MapCacheEntry@@QAE@ABV0@@Z,matched,100.0
 0x437840,207,src/units/unit_motion_437840.cpp,?UpdateMetalExtraction@@YGXPAUUnit@@@Z,matched,100.0
 0x437910,131,src/units/unit_motion_437910.cpp,?UpdateWindGenerator@@YGXPAUUnit@@@Z,matched,100.0
 0x4379a0,11,src/units/unit_motion_4379a0.cpp,?FUN_004379a0@CMemoryCache@@QAEPAV1@XZ,matched,100.0
