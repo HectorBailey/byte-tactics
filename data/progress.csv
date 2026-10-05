@@ -2315,7 +2315,7 @@ address,size,file,symbol,status,similarity
 0x4aca20,181,src/gui/dialogs_4aca20.cpp,?ShowPaletteEntryRgb@@YGXPAUObject_004aca20@@PAEH@Z,matched,100.0
 0x4acae0,246,src/gui/dialogs_4acae0.cpp,?FUN_004acae0@@YGXPAEHH@Z,matched,100.0
 0x4acbe0,142,src/gui/dialogs_4acbe0.cpp,?GetColorCellAt@@YGHPAUObject_004acbe0@@HH@Z,matched,100.0
-0x4acc70,93,src/gui/dialogs_4acc70.cpp,?ApplySlidersToPaletteEntry@@YGXPAUClass_004acc70@@PAUColor_004acc70@@@Z,matched,100.0
+0x4acc70,93,src/gui/dialogs_4acc70.cpp,?ApplySlidersToPaletteEntry@@YGXPAUDialog@@PAUColor_004acc70@@@Z,matched,100.0
 0x4accd0,42,src/gui/dialogs_4accd0.cpp,?WriteTabs@@YGXPAUFileHandle@@H@Z,matched,100.0
 0x4acd00,159,src/gui/gui_file_4acd00.cpp,?WriteSectionHeader@@YGXPAUFileHandle@@PADH@Z,matched,100.0
 0x4acda0,55,src/gui/gui_file_4acda0.cpp,?WriteSectionEnd@@YGXPAUFileHandle@@H@Z,matched,100.0
