@@ -37,10 +37,10 @@ public:
     int waterDamage;                   // +0xd50
 };
 
-class Class_0043dd20;
+class UnitMotion;
 struct Player_0048ad30;
 
-class Class_004b0d60 {
+class CobScript {
 public:
     char unknown_0[8];
     void RunScripts(int n);
@@ -77,7 +77,7 @@ union F110_0048ad30 {
 };
 
 struct Unit {
-    Class_0043dd20* def;                // +0x00
+    UnitMotion* def;                    // +0x00
     char unknown_4[0x70 - 4];
     short f70;                         // +0x70
     char unknown_72[0x86 - 0x72];
@@ -85,7 +85,7 @@ struct Unit {
     char unknown_8a[0x92 - 0x8a];
     Type_0048ad30* type;               // +0x92
     Player_0048ad30* player;           // +0x96
-    Class_004b0d60* f9a;                // +0x9a
+    CobScript* f9a;                     // +0x9a
     char unknown_9e[0xa6 - 0x9e];
     unsigned short fa6;                // +0xa6
     char unknown_a8[0xf5 - 0xa8];
@@ -103,7 +103,7 @@ struct Unit {
     char unknown_114[0x118 - 0x114];
 };
 
-class Class_0043dd20 {
+class UnitMotion {
 public:
     char unknown_0[0x8a];
     void UpdateMotion(Unit* u);

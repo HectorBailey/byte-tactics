@@ -2,7 +2,7 @@
 // Frees the entries of an object state block (one 0x36-byte entry per piece),
 // clears its two ids from the global id-registry buffer, then frees the block.
 
-class Class_00437c90 {
+class CMemoryCache {
 public:
     void ReleaseHandle(int id);
 };
@@ -10,7 +10,7 @@ public:
 #pragma pack(push, 1)
 struct Game {
     char unknown_0[0x1437b];
-    Class_00437c90* obj;       // +0x1437b
+    CMemoryCache* obj;         // +0x1437b
 };
 #pragma pack(pop)
 

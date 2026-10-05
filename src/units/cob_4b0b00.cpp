@@ -37,7 +37,7 @@ public:
     virtual void Complete(int result);
 };
 
-class Class_004b08c0 {
+class CobScript {
 public:
     int StartThread(int id);
 };
@@ -57,7 +57,7 @@ int Class_004b0b00::StartScriptWithArgsByIndex(int index, ScriptCallback* param_
                                  int param_3, int param_4, int param_5,
                                  int param_6, int param_7, int param_8)
 {
-    int i = ((Class_004b08c0*)this)->StartThread(index);
+    int i = ((CobScript*)this)->StartThread(index);
     if (i < 0) {
         if (param_2)
             param_2->Complete(0);

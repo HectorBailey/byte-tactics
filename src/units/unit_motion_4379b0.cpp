@@ -11,7 +11,7 @@ struct Chunk_004379b0 {
     unsigned int size;                 // +0x4
 };
 
-class Class_004379b0 {
+class CMemoryCache {
 public:
     unsigned int size;                 // +0x0
     int* block;                        // +0x4
@@ -21,7 +21,7 @@ public:
 };
 
 // FUNCTION: 0x4379b0
-int Class_004379b0::InitCache(unsigned int newSize)
+int CMemoryCache::InitCache(unsigned int newSize)
 {
     if (block != 0) {
         FUN_004d85a0(block);

@@ -136,7 +136,7 @@ struct Object_0040e630 {
 };
 #pragma pack(pop)
 
-class Dummy_00440be0 {
+class MovementClass {
 public:
     void RefreshUnitIfStale(Object_0040e630* p);
 };
@@ -207,7 +207,7 @@ public:
     Object_0040e630* object;           // +0x58
     Class_0044f010* path;              // +0x5c
     Target_0040e630* target;           // +0x60
-    Dummy_00440be0* owner;             // +0x64
+    MovementClass* owner;              // +0x64
     Table_0040e630 table;              // +0x68
     Pair_0040e630 pairs[4];            // +0x70
 
@@ -245,7 +245,7 @@ public:
 // FUNCTION: 0x40e630
 void Class_0040e630::FUN_0040e630(Target_0040e630* t)
 {
-    owner = (Dummy_00440be0*)object->unit->field_4;
+    owner = (MovementClass*)object->unit->field_4;
     target = t;
     start = object->pos;
     ((Class_00440af0*)owner)->RefreshMovedUnits(object);

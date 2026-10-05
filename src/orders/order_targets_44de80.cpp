@@ -43,7 +43,7 @@ public:
     int value;                         // +0xc
 };
 
-class Class_00489650 {
+class UnitRef {
 public:
     void FUN_00489650();
 };
@@ -118,5 +118,5 @@ Class_0044de80::Class_0044de80(int owner, Class_004b4ba0* file, char* name)
         pos = rec.pos;
         field_32 = rec.i4;
     }
-    ((Class_00489650*)&rec.ref_vt)->FUN_00489650();
+    ((UnitRef*)&rec.ref_vt)->FUN_00489650();
 }

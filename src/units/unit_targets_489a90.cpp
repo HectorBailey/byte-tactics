@@ -8,7 +8,7 @@
 // to test it), while bit 8 of the same word is tested as a plain mask, so the
 // word is a union of a bitfield and an int.
 #pragma pack(push, 1)
-class Class_00489a70;
+class Unit;
 
 union Flags_00489a90 {
     struct {
@@ -36,7 +36,7 @@ struct Def_00489a90 {
 
 struct Node_00489a90 {
     char unknown_0[0x86];
-    Class_00489a70* owner;        // +0x86
+    Unit* owner;                  // +0x86
     char unknown_8a[4];
     Node_00489a90* next;          // +0x8e
 };
@@ -46,7 +46,7 @@ struct Game {
     unsigned char f1427f;         // +0x1427f
 };
 
-class Class_00489a70 {
+class Unit {
 public:
     int f0;                       // +0x0
     char unknown_4[0x6e - 4];
@@ -60,14 +60,14 @@ public:
     char unknown_108[0x110 - 0x108];
     int f110;                     // +0x110
 
-    int CanLoad(Class_00489a70* other);
+    int CanLoad(Unit* other);
 };
 #pragma pack(pop)
 
 extern Game* g_game;
 
 // FUNCTION: 0x489a90
-int Class_00489a70::CanLoad(Class_00489a70* other)
+int Unit::CanLoad(Unit* other)
 {
     Def_00489a90* theirDef = other->def;
     if (theirDef->f245.bits.flag19)

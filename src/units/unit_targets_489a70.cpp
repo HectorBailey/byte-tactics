@@ -1,7 +1,7 @@
 // Decompiled by Haiku. Names are provisional.
 
 #pragma pack(push, 1)
-class Class_00489a70 {
+class Unit {
 public:
     char unknown_0[0x8a];
     int field_8a;
@@ -11,7 +11,7 @@ public:
 #pragma pack(pop)
 
 // FUNCTION: 0x489a70
-int Class_00489a70::CountCargo() {
+int Unit::CountCargo() {
     int count = 0;
     int node = field_8a;
     while (node != 0) {

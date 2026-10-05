@@ -19,7 +19,7 @@ struct Vec3_0049e1a0 {
     int z;
 };
 
-class Class_004b0a70 {
+class CobScript {
   public:
     int StartScriptWithArgs(char* name, void* param_2, int param_3, int param_4, int param_5, int param_6,
                      int param_7, int param_8);
@@ -104,7 +104,7 @@ struct Unit {
     char unknown_76[0x92 - 0x76];
     UnitType_0049e1a0* type; // +0x92
     char unknown_96[0x9a - 0x96];
-    Class_004b0a70* script; // +0x9a
+    CobScript* script; // +0x9a
     char unknown_9e[0xb8 - 0x9e];
     unsigned short f_b8; // +0xb8
     union {              // +0xba

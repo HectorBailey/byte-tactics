@@ -10,7 +10,7 @@ public:
     void FUN_0040e9a0();
 };
 
-class Dummy_00440be0 {
+class MovementClass {
 public:
     void RefreshUnitIfStale(int arg);
 };
@@ -18,7 +18,7 @@ public:
 // FUNCTION: 0x40e9a0
 void Class_0040e9a0::FUN_0040e9a0()
 {
-    ((Dummy_00440be0*)field_0x64)->RefreshUnitIfStale((int)field_0x58);
+    ((MovementClass*)field_0x64)->RefreshUnitIfStale((int)field_0x58);
     field_0x58 = 0;
     field_0x64 = 0;
 }

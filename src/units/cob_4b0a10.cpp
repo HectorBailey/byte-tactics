@@ -20,7 +20,7 @@ public:
     int StartScriptByIndex(int id, int value, int update);
 };
 
-class Class_004b08c0 {
+class CobScript {
 public:
     int StartThread(int id);
 };
@@ -38,7 +38,7 @@ public:
 // FUNCTION: 0x4b0a10
 int Class_004b0a10::StartScriptByIndex(int id, int value, int update)
 {
-    int i = ((Class_004b08c0*)this)->StartThread(id);
+    int i = ((CobScript*)this)->StartThread(id);
     if (i < 0)
         return 0;
     channels[i].value = value;

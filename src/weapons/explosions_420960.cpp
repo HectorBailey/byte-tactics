@@ -6,7 +6,7 @@
 #include <math.h>
 #include <ddraw.h>
 
-class Class_00437a00 {
+class CMemoryCache {
 public:
     char unknown_0[4];
     int* field_4;                      // +0x4
@@ -34,7 +34,7 @@ struct Game {
 #pragma pack(pop)
 
 extern Game* g_game;
-extern Class_00437a00 DAT_00511f80;
+extern CMemoryCache DAT_00511f80;
 void __cdecl FUN_004d85a0(void* p);
 
 // FUNCTION: 0x420960

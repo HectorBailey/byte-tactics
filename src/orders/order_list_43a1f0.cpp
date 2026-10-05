@@ -14,7 +14,7 @@ public:
     int StartScriptWithArgsByIndex(int index, void* param_2, int param_3, int param_4, int param_5, int param_6, int param_7, int param_8);
 };
 
-class Class_00489650 {
+class UnitRef {
 public:
     void FUN_00489650();
 };
@@ -115,5 +115,5 @@ Class_0043a1f0::~Class_0043a1f0()
     if (!(flags & 0x10000)) {
         ((Class_00489800*)unit)->ReleaseWeapons(3);
     }
-    ((Class_00489650*)((char*)this + 0x12))->FUN_00489650();
+    ((UnitRef*)((char*)this + 0x12))->FUN_00489650();
 }

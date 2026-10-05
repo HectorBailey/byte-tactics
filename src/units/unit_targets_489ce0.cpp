@@ -21,7 +21,7 @@ public:
 };
 #pragma pack(pop)
 
-class Class_004b0a70 {
+class CobScript {
 public:
     int StartScriptWithArgs(char* name, void* param_2, int param_3, int param_4, int param_5,
                     int param_6, int param_7, int param_8);
@@ -47,7 +47,7 @@ struct Unit {
     char unknown_60[0x92 - 0x60];
     UnitDef_00489ce0* def;             // +0x92
     Player_00489ce0* owner;            // +0x96
-    Class_004b0a70* anims;             // +0x9a
+    CobScript* anims;                  // +0x9a
     char unknown_9e[0xf0 - 0x9e];
     void* last;                       // +0xf0
     char unknown_f4;
