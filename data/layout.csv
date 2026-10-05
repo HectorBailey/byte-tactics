@@ -3967,10 +3967,10 @@ piece,0x509ce8,57,src/util/hapi_bank.cpp,19,0,game data
 piece,0x509ce0,5,src/util/hapi_bank.cpp,14,0,game data
 piece,0x509cd4,9,src/util/hapi_bank.cpp,10,0,game data
 piece,0x509ca4,45,src/util/hapi_bank.cpp,9,0,game data
-piece,0x509c94,13,src/units/cob_4b2040.cpp,3,0,game data
-piece,0x509c84,14,src/units/cob_4b0720.cpp,4,0,game data
-piece,0x509c74,16,src/units/cob_4b0720.cpp,3,0,game data
-piece,0x4fdb00,84,src/units/cob_4b0610.cpp,3,0,game data
+piece,0x509c94,13,src/units/cob_script.cpp,66,0,game data
+piece,0x509c84,14,src/units/cob_script.cpp,23,0,game data
+piece,0x509c74,16,src/units/cob_script.cpp,22,0,game data
+piece,0x4fdb00,84,src/units/cob_script.cpp,3,0,game data
 piece,0x509c6c,8,src/gui/listbox_4b0230.cpp,3,0,game data
 piece,0x509c60,11,src/gui/file_list_4afc60.cpp,3,0,game data
 piece,0x509c54,12,src/gui/file_list_4afa30.cpp,12,0,game data
@@ -4297,8 +4297,8 @@ piece,0x508d1c,8,src/units/unit_targets_489280.cpp,5,0,game data
 piece,0x508d18,4,src/units/unit_targets_489280.cpp,4,0,game data
 piece,0x4fd720,8,src/units/unit_commands_488f30.cpp,3,0,game data
 piece,0x4fd728,4,src/units/unit_commands_488f30.cpp,3,8,game data
-piece,0x508d10,7,src/units/unit_commands_488e70.cpp,4,0,game data
-piece,0x507c14,4,src/units/unit_commands_488e70.cpp,3,0,game data
+piece,0x508d10,7,src/units/unit_def.cpp,6,0,game data
+piece,0x507c14,4,src/units/unit_def.cpp,5,0,game data
 piece,0x508ce8,37,src/units/unit_commands_488310.cpp,3,0,game data
 piece,0x508ce4,2,src/units/unit_commands_487bf0.cpp,20,0,game data
 piece,0x508cdc,7,src/units/unit_commands_487bf0.cpp,19,0,game data
@@ -4347,8 +4347,8 @@ piece,0x508b28,15,src/map/line_of_sight_483610.cpp,6,0,game data
 piece,0x508b18,13,src/map/line_of_sight_483610.cpp,5,0,game data
 piece,0x508b08,16,src/map/line_of_sight_483610.cpp,4,0,game data
 piece,0x508af8,15,src/map/line_of_sight_483610.cpp,3,0,game data
-piece,0x4fd668,4,src/units/unit_script_calls_480770.cpp,4,0,game data
-piece,0x4fd66c,4,src/units/unit_script_calls_480770.cpp,4,4,game data
+piece,0x4fd668,4,src/units/unit_script.cpp,4,0,game data
+piece,0x4fd66c,4,src/units/unit_script.cpp,4,4,game data
 piece,0x508af0,7,src/units/squads_480190.cpp,3,0,game data
 piece,0x508ae8,5,src/sound/sound_47fd70.cpp,7,0,game data
 piece,0x508ae0,5,src/sound/sound_47fd70.cpp,6,0,game data
@@ -4800,7 +4800,7 @@ piece,0x506898,8,src/frontend/options_45bf60.cpp,3,0,game data
 piece,0x506624,11,src/graphics/model_render_45aec0.cpp,3,0,game data
 piece,0x506614,13,src/graphics/model_render_45a950.cpp,3,0,game data
 piece,0x4fd4c8,4,src/graphics/model_render_4597f0.cpp,3,0,game data
-piece,0x4fd4c4,4,src/graphics/model_render_458dd0.cpp,3,4,game data
+piece,0x4fd4c4,4,src/graphics/model_render_458d30.cpp,5,4,game data
 piece,0x506604,16,src/graphics/model_render_458180.cpp,3,0,game data
 piece,0x4fd4b8,4,src/network/net_game_457d30.cpp,3,0,game data
 piece,0x4fd4bc,4,src/network/net_game_457d30.cpp,3,4,game data
@@ -5190,8 +5190,8 @@ piece,0x503378,9,src/map/mission.cpp,25,0,game data
 piece,0x504a30,49,src/map/mission.cpp,9,0,game data
 piece,0x504a24,11,src/map/map_list_434bf0.cpp,6,0,game data
 piece,0x504a18,11,src/map/map_list_434bf0.cpp,5,0,game data
-piece,0x504a04,7,src/map/los_tables_4336f0.cpp,4,0,game data
-piece,0x504a00,3,src/map/los_tables_4336f0.cpp,3,0,game data
+piece,0x504a04,7,src/map/los_line.cpp,4,0,game data
+piece,0x504a00,3,src/map/los_line.cpp,3,0,game data
 piece,0x5049f8,8,src/map/los_tables_433380.cpp,4,0,game data
 piece,0x5049ec,9,src/map/los_tables_433380.cpp,3,0,game data
 piece,0x5049e8,4,src/map/los_tables_433130.cpp,6,0,game data
@@ -5862,13 +5862,13 @@ piece,0x4fc9c4,4,src/ai/ai_player_409730.cpp,5,12,game data
 piece,0x4fc9c8,4,src/ai/ai_player_409730.cpp,5,16,game data
 piece,0x4fc9d0,4,src/ai/ai_player_409730.cpp,5,24,game data
 piece,0x4fc9d4,4,src/ai/ai_player_409730.cpp,5,28,game data
-piece,0x4fc9b0,8,src/ai/ai_player_408cb0.cpp,34,0,game data
-piece,0x4fc9a8,8,src/ai/ai_player_408cb0.cpp,29,0,game data
-piece,0x4fc980,8,src/ai/ai_player_408cb0.cpp,3,0,game data
-piece,0x4fc988,8,src/ai/ai_player_408cb0.cpp,8,0,game data
-piece,0x4fc990,8,src/ai/ai_player_408cb0.cpp,13,0,game data
-piece,0x4fc998,8,src/ai/ai_player_408cb0.cpp,18,0,game data
-piece,0x4fc968,4,src/ai/ai_player_4089a0.cpp,5,0,game data
+piece,0x4fc9b0,8,src/ai/squad_manager.cpp,36,0,game data
+piece,0x4fc9a8,8,src/ai/squad_manager.cpp,31,0,game data
+piece,0x4fc980,8,src/ai/squad_manager.cpp,5,0,game data
+piece,0x4fc988,8,src/ai/squad_manager.cpp,10,0,game data
+piece,0x4fc990,8,src/ai/squad_manager.cpp,15,0,game data
+piece,0x4fc998,8,src/ai/squad_manager.cpp,20,0,game data
+piece,0x4fc968,4,src/ai/squad_manager.cpp,26,8,game data
 piece,0x4fc970,8,src/ai/ai_player_407d40.cpp,8,0,game data
 piece,0x5017a4,5,src/ai/ai_player_406f00.cpp,5,0,game data
 piece,0x50179c,7,src/ai/ai_player_406f00.cpp,4,0,game data
@@ -11933,7 +11933,7 @@ same,0x4fc920,8,src/orders/unit_orders_405300.cpp,4,0,
 same,0x4fc920,4,src/orders/unit_orders_405740.cpp,3,0,
 same,0x4fc968,4,src/ai/ai_player_406f80.cpp,3,0,
 same,0x4fc968,4,src/ai/ai_player_408670.cpp,3,4,
-same,0x4fc968,4,src/ai/ai_player_4086d0.cpp,3,4,
+same,0x4fc968,4,src/ai/ai_player_4086d0.cpp,8,4,
 same,0x4fc9b8,4,src/ai/ai_player_4095d0.cpp,3,0,
 same,0x4fc9bc,4,src/ai/ai_player_4095d0.cpp,3,4,
 same,0x4fc9c0,4,src/ai/ai_player_4095d0.cpp,3,8,
@@ -12091,7 +12091,7 @@ same,0x506578,5,src/network/net_game_4538f0.cpp,4,0,
 same,0x506578,5,src/network/net_game_453a50.cpp,4,0,
 same,0x4fd4c0,4,src/graphics/model_render_4586a0.cpp,3,0,
 same,0x4fd4c0,4,src/graphics/model_render_458810.cpp,5,0,
-same,0x4fd4c0,4,src/graphics/model_render_458dd0.cpp,3,0,
+same,0x4fd4c0,4,src/graphics/model_render_458d30.cpp,5,0,
 same,0x4fd4c0,4,src/graphics/model_render_459830.cpp,3,0,
 same,0x4fd4c0,4,src/graphics/model_render_459c70.cpp,3,0,
 same,0x4fd4e0,8,src/frontend/options_45b9b0.cpp,3,0,

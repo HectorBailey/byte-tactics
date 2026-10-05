@@ -1,7 +1,7 @@
-// Decompiled by deepseek-v4.1-flash. Names are provisional.
-// UnitDef::operator= for the 0x249-byte UnitDef element. Hand-written:
-// char arrays are copied with byte loops, plain ints/shorts/structs member by
-// member, and the two flag words at +0x241/+0x245 bit by bit.
+// Decompiled by deepseek-v4.1-flash and space-bunny-free. Names are provisional.
+
+#include <stdio.h>
+
 #pragma pack(push, 1)
 
 // Flags word at +0x241: 2 + 2 + 27 one-bit fields + 1.
@@ -67,6 +67,8 @@ struct Vec3i_0042b370 {
     int x, y, z;
 };
 
+void* __stdcall GetCategoryMask(char* name);
+
 class UnitDef {
 public:
     char f000[0x20];                    // +0x000
@@ -93,7 +95,7 @@ public:
     short f206, f208, f20a, f20c;
     short f20e, f210, f212, f214;
     short f216, f218, f21a, f21c;
-    short f21e;
+    short team;
     int f220, f224;                     // +0x220
     char f228, f229, f22a, f22b;        // +0x228
     char f22c, f22d, f22e, f22f;
@@ -104,9 +106,13 @@ public:
     Flags245_0042b370 f245;             // +0x245
 
     UnitDef& operator=(const UnitDef& src);
+    void AddToCategories(char* names);
 };
 #pragma pack(pop)
 
+// UnitDef::operator= for the 0x249-byte UnitDef element. Hand-written:
+// char arrays are copied with byte loops, plain ints/shorts/structs member by
+// member, and the two flag words at +0x241/+0x245 bit by bit.
 // FUNCTION: 0x42b370 ??4UnitDef@@QAEAAV0@ABV0@@Z
 UnitDef& UnitDef::operator=(const UnitDef& src)
 {
@@ -137,7 +143,7 @@ UnitDef& UnitDef::operator=(const UnitDef& src)
     f206 = src.f206; f208 = src.f208; f20a = src.f20a; f20c = src.f20c;
     f20e = src.f20e; f210 = src.f210; f212 = src.f212; f214 = src.f214;
     f216 = src.f216; f218 = src.f218; f21a = src.f21a; f21c = src.f21c;
-    f21e = src.f21e;
+    team = src.team;
     f220 = src.f220; f224 = src.f224;
     f228 = src.f228; f229 = src.f229; f22a = src.f22a; f22b = src.f22b;
     f22c = src.f22c; f22d = src.f22d; f22e = src.f22e; f22f = src.f22f;
@@ -174,4 +180,29 @@ UnitDef& UnitDef::operator=(const UnitDef& src)
     f245.b20 = src.f245.b20;
 
     return *this;
+}
+
+// Walks the whitespace separated names in the argument string. Each name is
+// looked up in the name to mask table (GetCategoryMask) and this object's team bit
+// is set in the mask that name maps to, then the same is done for "ALL", so the
+// team always ends up in the ALL mask.
+// The first test sits outside the loop (a do/while): that is what puts the
+// loop's register save between the test and the body, and it is also what wins
+// ebx for `this` instead of edi.
+// FUNCTION: 0x488e70
+void UnitDef::AddToCategories(char* names)
+{
+    int n;
+    char buf[256];
+    if (sscanf(names, " %s %n", buf, &n) == 1) {
+        do {
+            names += n;
+            unsigned short team = this->team;
+            unsigned int* mask = (unsigned int*)GetCategoryMask(buf);
+            mask[team >> 5] |= 1 << (team & 0x1f);
+        } while (sscanf(names, " %s %n", buf, &n) == 1);
+    }
+    unsigned short team = this->team;
+    unsigned int* all = (unsigned int*)GetCategoryMask("ALL");
+    all[team >> 5] |= 1 << (team & 0x1f);
 }

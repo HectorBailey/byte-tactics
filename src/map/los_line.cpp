@@ -1,16 +1,5 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by space-bunny-free, finished by mimo-v2.6-pro, finished by Claude Opus 5.5. Names are provisional.
-// Claude Opus 5.5 rebuilt the loops from the disassembly and matched it:
-// - Each arm is a plain `for (i = 0; i < n; i++)` with a `short i`. MSVC turns
-//   it into the original's countdown (ebp = (int)n, shared with resize's
-//   conversion) plus a byte offset in edi, guarded by `test di, di`. An `int i`
-//   keeps i as a scaled index instead, and the old hand-written
-//   `do {} while (--count)` arms got the registers one step round.
-// - `atoi(tok = strtok(0, ", "))` evaluates strtok before the element address,
-//   so _First is reloaded after the strtok call as in the original. A separate
-//   `tok = strtok(...);` statement gives the same order but adds 5 IL per
-//   site; with all eight the function's IL passes 556, its /Ob2 budget grows
-//   and the failed path's resize(0) inlines vector::_Destroy, which the
-//   original calls.
+// Decompiled by deepseek-v4.1-flash, space-bunny-free, deepseek-v4.1, mimo-v2.6-pro, Claude Opus 5.5 and Haiku. Names are provisional.
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -38,9 +27,22 @@ extern char DAT_005119b8[];
 
 class LosLine : public Vec_004336f0 {
 public:
+    int GetLosLineStepCount();
     void LoadLosLine(TdfFile* obj, short line, short mode);
 };
 
+// Claude Opus 5.5 rebuilt the loops from the disassembly and matched it:
+// - Each arm is a plain `for (i = 0; i < n; i++)` with a `short i`. MSVC turns
+//   it into the original's countdown (ebp = (int)n, shared with resize's
+//   conversion) plus a byte offset in edi, guarded by `test di, di`. An `int i`
+//   keeps i as a scaled index instead, and the old hand-written
+//   `do {} while (--count)` arms got the registers one step round.
+// - `atoi(tok = strtok(0, ", "))` evaluates strtok before the element address,
+//   so _First is reloaded after the strtok call as in the original. A separate
+//   `tok = strtok(...);` statement gives the same order but adds 5 IL per
+//   site; with all eight the function's IL passes 556, its /Ob2 budget grows
+//   and the failed path's resize(0) inlines vector::_Destroy, which the
+//   original calls.
 // FUNCTION: 0x4336f0
 void LosLine::LoadLosLine(TdfFile* obj, short line, short mode)
 {
@@ -86,4 +88,10 @@ void LosLine::LoadLosLine(TdfFile* obj, short line, short mode)
         Elem_00434020 x;
         resize(0, x);
     }
+}
+
+// FUNCTION: 0x4339c0
+int LosLine::GetLosLineStepCount()
+{
+    return size();
 }

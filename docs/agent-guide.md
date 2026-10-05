@@ -1060,7 +1060,7 @@ name (`std::_Lockit::_Lockit` is 0x4e39b0).
   earlier function): define the real preceding function (`ctx.py` on the
   address just before yours) in the same file, above yours. That is how the
   original file was laid out, so it is not a trick; never define made-up
-  functions for this. See `src/units/cob_4b0830.cpp`. If that function
+  functions for this. See `src/units/cob_script.cpp` (StartThreadByName). If that function
   already has its own file under `src/`, define it **without** a
   `// FUNCTION:` line: an address annotated in two files stops the progress
   check ("duplicate of"). 0x43f0e0 (copying 0x43e490), 0x49b720 (0x49b6e0)

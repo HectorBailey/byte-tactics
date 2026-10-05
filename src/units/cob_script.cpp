@@ -1,4 +1,420 @@
-// Decompiled by GPT-6, finished by space-bunny-free, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
+// Decompiled by Sonnet, Haiku, Opus, deepseek-v4.1-flash, GPT-6, space-bunny-free, deepseek-v4.1 and GPT-5.6-Terra. Names are provisional.
+// CobScript: the interpreter of a unit's COB script, an abstract base class
+// of 0x540 bytes (vtable 0x4fdb00, 21 slots). Slots 0-6 are pure; each is
+// named after the one override that fills it, in the vtable of the only
+// derived class, UnitScript (src/units/unit_script.cpp). Slot 20 is the
+// virtual destructor (the vtable holds its scalar deleting destructor).
+
+#include <string.h>
+#include <stdlib.h>
+
+// The compiled COB script of a unit type.
+struct ScriptTable {
+    int unknown_0;                     // +0x00
+    int count;                         // +0x04, of the scripts
+    int pieceCount;                    // +0x08
+    int unknown_c;                     // +0x0c
+    int staticCount;                   // +0x10
+    char unknown_14[0x18 - 0x14];
+    int* entries;                      // +0x18, each script's code offset
+    char** names;                      // +0x1c
+    char unknown_20[0x24 - 0x20];
+    int* code;                         // +0x24
+};
+
+// Told when a script started with one finishes.
+struct Callback
+{
+    virtual void Complete(int) = 0;
+};
+
+// One script thread.
+struct Channel
+{
+    unsigned int state;
+    int pc;
+    int sp;
+    int delay;
+    int piece;
+    int axis;
+    int waiting;
+    int signal;
+    Callback *callback;
+    int stack[32];
+    int Pop()
+    {
+        return stack[sp--];
+    }
+    void Push(int value)
+    {
+        stack[++sp] = value;
+    }
+    void XorOp()
+    {
+        int a = Pop();
+        Push(a ^ Pop());
+    }
+};
+
+// The script's state of one piece: where it is moving and turning to.
+struct Piece
+{
+    int active;
+    int move[3];
+    int moveSpeed[3];
+    int turn[3];
+    int turnSpeed[3];
+    int spin[3];
+    int acceleration[3];
+};
+
+// The saved state of a script (0x528 bytes) and of one piece (0x6c bytes).
+struct SavedScript {
+    int checksum;
+    Channel channels[8];
+    int activeCount;
+};
+
+struct SavedPiece {
+    int move[3];
+    int moveSpeed[3];
+    int turn[3];
+    int turnSpeed[3];
+    int spin[3];
+    int acceleration[3];
+    int translation[3];
+    int rotation[3];
+    int visible;
+    int cached;
+    int shaded;
+};
+
+class HapiBank {
+public:
+    void SeekBox(int pos);
+    int WriteBox(void* src, int len);
+    int GetBoxSize();
+    int ReadBox(void* dst, int len);
+};
+
+extern int GetTickRate();
+void __cdecl FUN_004d85a0(void* p);
+int __stdcall GetCobChecksum(void* param);
+void* __cdecl FUN_004d84a0(void* param_1, const char* name, unsigned int param_3);
+char* __cdecl FUN_004d83b0(const char* text, int value);
+int __stdcall RandomInt(int);
+
+class CobScript
+{
+  public:
+    int scale;                         // +0x004
+    ScriptTable *table;                // +0x008
+    int unknown_c;                     // +0x00c, the script's checksum
+    int *statics;                      // +0x010
+    Piece *pieces;                     // +0x014
+    int changed;                       // +0x018, a piece is still moving
+    Channel channels[8];               // +0x01c
+    int activeCount;                   // +0x53c
+
+    CobScript();
+
+    virtual void SetPieceTranslation(int, int, int) = 0;  // slot 0
+    virtual void SetPieceRotation(int, int, int) = 0;  // slot 1
+    virtual void SetPieceVisible(int, int) = 0;       // slot 2
+    virtual void SetPieceCached(int, int) = 0;        // slot 3
+    virtual void SetPieceShaded(int, int) = 0;        // slot 4
+    virtual int GetPieceTranslation(int, int) = 0;    // slot 5
+    virtual int GetPieceRotation(int, int) = 0;       // slot 6
+    virtual int IsPieceVisible(int);                  // slot 7
+    virtual int IsPieceCached(int);                   // slot 8
+    virtual int IsPieceShaded(int);                   // slot 9
+    virtual void FUN_004b1e80(int, int, int);         // slot 10
+    virtual void FUN_004b1e90(int);                   // slot 11
+    virtual void EmitSfx(int, int);                   // slot 12
+    virtual void ExplodePiece(int, unsigned int);     // slot 13
+    virtual void AttachUnit(unsigned short, int, int); // slot 14
+    virtual void DropUnit(unsigned short);            // slot 15
+    virtual void SetUnitValue(int, int);              // slot 16
+    virtual int GetUnitValue(int, int, int, int, int); // slot 17
+    virtual int IsCarryingUnit(int);                  // slot 18
+    virtual int GetTransporterId();                   // slot 19
+    virtual ~CobScript();                             // slot 20
+
+    void SetCob(ScriptTable* data);
+    ScriptTable* GetCob();
+    int FindScript(const char* name);
+    int StartThreadByName(const char* name);
+    int StartThread(int id);
+    int StartScript(const char* name, Callback* callback, int update);
+    int StartScriptByIndex(int id, Callback* callback, int update);
+    int StartScriptWithArgs(char* name, Callback* callback, int update, int count, int a, int b, int c, int d);
+    int StartScriptWithArgsByIndex(int index, Callback* callback, int update, int count, int a, int b, int c, int d);
+    int QueryScript(char* name, int* param_2, int* param_3, int* param_4, int* param_5);
+    // 0x4b0c40, in cob_4b0c40.cpp: it matches only addressing the channels
+    // from `this + i * 0xa4`, as its own view of the class does.
+    int QueryScriptByIndex(int index, int* p2, int* p3, int* p4, int* p5);
+    void RemoveCallback(Callback* callback);
+    void RunScripts(int param_1);
+    void RunThread(unsigned int channel, int elapsed);
+    void Wake(unsigned int index)
+    {
+        for (int i = 0; i < 8; i++)
+            if ((channels[i].state & 0xfff00000) == 0x2800000 && channels[i].waiting == index)
+                channels[i].state = 0x1000000;
+    }
+    // 0x4b1c00, in cob_4b1c00.cpp: it matches only with <windows.h> before
+    // its own view of the class, and RunThread only without it.
+    void AnimatePieces(int param_1);
+    void SaveScriptState(HapiBank* file);
+    int LoadScriptState(HapiBank* file);
+};
+
+// FUNCTION: 0x4b0610
+CobScript::CobScript()
+{
+    table = 0;
+    pieces = 0;
+    statics = 0;
+    for (int i = 0; i < 8; i++) {
+        channels[i].state = 0;
+    }
+    activeCount = 0;
+    scale = GetTickRate();
+}
+
+// FUNCTION: 0x4b0650
+void CobScript::AttachUnit(unsigned short, int, int)
+{
+}
+
+// FUNCTION: 0x4b0660
+void CobScript::DropUnit(unsigned short)
+{
+}
+
+// FUNCTION: 0x4b0670
+void CobScript::SetUnitValue(int, int)
+{
+}
+
+// FUNCTION: 0x4b0680
+int CobScript::GetUnitValue(int, int, int, int, int)
+{
+    return 0;
+}
+
+// FUNCTION: 0x4b0690
+int CobScript::IsCarryingUnit(int)
+{
+    return 0;
+}
+
+// FUNCTION: 0x4b06a0
+int CobScript::GetTransporterId()
+{
+    return 0;
+}
+
+// The compiler-generated scalar deleting destructor (0x4b06b0, vtable slot
+// 20) comes from the destructor definition below, with its body inlined.
+// FUNCTION: 0x4b06b0 ??_GCobScript@@UAEPAXI@Z
+// FUNCTION: 0x4b06f0
+CobScript::~CobScript()
+{
+    if (pieces) {
+        FUN_004d85a0((int*)pieces);
+    }
+    if (statics) {
+        FUN_004d85a0((int*)statics);
+    }
+}
+
+// SetCob attaches the
+// object's state data: it stores the data block, looks up its runtime state,
+// reallocates the "Object States" and "Static Varibles" tables and clears the
+// state table. Called from 0x485d40 with unit->type->field_18e.
+// FUNCTION: 0x4b0720
+void CobScript::SetCob(ScriptTable* data)
+{
+    table = data;
+    if (data != 0) {
+        unknown_c = GetCobChecksum(data);
+        pieces = (Piece*)FUN_004d84a0(pieces, "Object States", data->pieceCount * 0x4c);
+        statics = (int*)FUN_004d84a0(statics, "Static Varibles", data->staticCount * 4);
+        memset(pieces, 0, data->pieceCount * 0x4c);
+    }
+}
+
+// FUNCTION: 0x4b07a0
+ScriptTable* CobScript::GetCob()
+{
+    return table;
+}
+
+// Looks a name up in the table at +8 and claims a channel slot for its index
+// (StartThread, see 0x4b0a10.cpp); -1 when there is no table.
+//
+// The name lookup at 0x4b07c0 (the function just before this one in the
+// original file), defined here so /Ob2 inlines it as the original did. With
+// only a static inline helper, and no function compiled before this one, MSVC
+// gives the loop guard its own copy of the "-1" call instead of sharing the
+// loop exit.
+// FUNCTION: 0x4b07c0
+int CobScript::FindScript(const char* name)
+{
+    for (int i = 0; i < table->count; i++) {
+        if (strcmp(name, table->names[i]) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+// FUNCTION: 0x4b0830
+int CobScript::StartThreadByName(const char* name)
+{
+    if (table == 0) {
+        return -1;
+    }
+    return StartThread(FindScript(name));
+}
+
+// Claims the first free one of 8 channel slots for entry `id` of the table
+// at +8 and returns its index; -1 when `id` is out of range or no slot is
+// free (see 0x4b0830.cpp and 0x4b0a10.cpp).
+// FUNCTION: 0x4b08c0
+int CobScript::StartThread(int id)
+{
+    if (id < 0 || id >= table->count)
+        return -1;
+    for (int i = 0; i < 8; i++) {
+        if (channels[i].state == 0) {
+            channels[i].state = 0x1000000;
+            channels[i].pc = table->entries[id];
+            channels[i].sp = -1;
+            channels[i].callback = 0;
+            channels[i].signal = 1;
+            activeCount++;
+            return i;
+        }
+    }
+    return -1;
+}
+
+// Looks a name up in the table at +8 (the lookup at 0x4b07c0, inlined here),
+// claims a channel slot for its index with 0x4b08c0, stores the value and
+// refreshes the channels when asked. Compare 0x4b0a10, its index-taking twin.
+// FUNCTION: 0x4b0940
+int CobScript::StartScript(const char* name, Callback* callback, int update)
+{
+    int i = StartThread(FindScript(name));
+    if (i < 0)
+        return 0;
+    channels[i].callback = callback;
+    if (update) {
+        if (activeCount) {
+            for (int j = 0; j < 8; j++)
+                RunThread(j, 0);
+        }
+        AnimatePieces(0);
+    }
+    return 1;
+}
+
+// StartThread claims one of the 8 channel slots for an id and returns its
+// index (or -1); this one then stores a value in the new slot.
+// FUNCTION: 0x4b0a10
+int CobScript::StartScriptByIndex(int id, Callback* callback, int update)
+{
+    int i = StartThread(id);
+    if (i < 0)
+        return 0;
+    channels[i].callback = callback;
+    if (update) {
+        if (activeCount) {
+            for (int j = 0; j < 8; j++)
+                RunThread(j, 0);
+        }
+        AnimatePieces(0);
+    }
+    return 1;
+}
+
+// FUNCTION: 0x4b0a70
+int CobScript::StartScriptWithArgs(char* name, Callback* callback, int update, int count, int a, int b, int c, int d)
+{
+    return StartScriptWithArgsByIndex(FindScript(name), callback, update, count, a, b, c, d);
+}
+
+// Index-taking twin of 0x4b0a70 (the name lookup version): StartThread claims
+// one of the 8 channel slots, this stores the value plus a four-deep call
+// frame on the slot's own stack, truncates the slot's stack pointer to
+// param_4 - 1 and refreshes the channels when asked. Compare 0x4b0a10 (same
+// shape without the frame) and 0x4b0c40.
+//
+// The channel array is viewed from `this + i * 0xa4` because that is the base
+// register the original uses (`lea eax, [edi + edx*4]`) with the fields at
+// +0x24 (stack pointer, starts at -1), +0x3c (value) and +0x40 (stack). The
+// real 0x1c-byte channel header sits 0x1c before this view, which is why the
+// array is declared at offset 0 here; the offsets are what the code reads.
+// FUNCTION: 0x4b0b00
+int CobScript::StartScriptWithArgsByIndex(int index, Callback* callback, int update,
+                                           int count, int a, int b, int c, int d)
+{
+    int i = StartThread(index);
+    if (i < 0) {
+        if (callback)
+            callback->Complete(0);
+        return 0;
+    }
+    Channel* ch = &channels[i];
+    ch->callback = callback;
+    ch->stack[++ch->sp] = a;
+    ch->stack[++ch->sp] = b;
+    ch->stack[++ch->sp] = c;
+    ch->stack[++ch->sp] = d;
+    // Spelled through channels[i] (not ch) so MSVC keeps the fourth push's
+    // increment instead of folding it into the array store.
+    channels[i].sp = count - 1;
+    if (update) {
+        if (activeCount) {
+            for (int j = 0; j < 8; j++)
+                RunThread(j, 0);
+        }
+        AnimatePieces(0);
+    }
+    return 1;
+}
+
+// FUNCTION: 0x4b0bc0
+int CobScript::QueryScript(char* name, int* param_2, int* param_3, int* param_4, int* param_5)
+{
+    return QueryScriptByIndex(FindScript(name), param_2, param_3, param_4, param_5);
+}
+
+// FUNCTION: 0x4b0d20
+void CobScript::RemoveCallback(Callback* callback)
+{
+    if (activeCount != 0) {
+        for (int i = 0; i < 8; i++) {
+            if ((channels[i].state & 0xff000000) != 0 && channels[i].callback == callback) {
+                channels[i].callback = 0;
+            }
+        }
+    }
+}
+
+// Updates every channel with the value (compare the tail of 0x4b0a10).
+// FUNCTION: 0x4b0d60
+void CobScript::RunScripts(int param_1)
+{
+    if (activeCount) {
+        for (int j = 0; j < 8; j++)
+            RunThread(j, param_1);
+    }
+    AnimatePieces(param_1);
+}
+
 // Body started by GPT-6, continued by space-bunny-free, edited by deepseek-v4.1.
 // deepseek-v4.1-flash #2072: MATCH. The last hunk in case 0x10001000 was the
 // packer swapping the pieces base and the move[] offset between [esp+0x10] and
@@ -74,95 +490,6 @@
 // stores (81.6%), `Piece *p = pieces;` between the two stores (99.4%).
 // The emitted instruction stream is identical apart from the slot numbers, so
 // the pick is made by a global pass, not by the shape of this case.
-#include <stdlib.h>
-
-struct ScriptTable
-{
-    char pad[0x24];
-    int *code;
-};
-struct Callback
-{
-    virtual void Complete(int) = 0;
-};
-struct Channel
-{
-    unsigned int state;
-    int pc;
-    int sp;
-    int delay;
-    int piece;
-    int axis;
-    int waiting;
-    int signal;
-    Callback *callback;
-    int stack[32];
-    int Pop()
-    {
-        return stack[sp--];
-    }
-    void Push(int value)
-    {
-        stack[++sp] = value;
-    }
-    void XorOp()
-    {
-        int a = Pop();
-        Push(a ^ Pop());
-    }
-};
-struct Piece
-{
-    int active;
-    int move[3];
-    int moveSpeed[3];
-    int turn[3];
-    int turnSpeed[3];
-    int spin[3];
-    int acceleration[3];
-};
-int __stdcall RandomInt(int);
-class CobScript
-{
-  public:
-    int scale;
-    ScriptTable *table;
-    int unknown_c;
-    int *statics;
-    Piece *pieces;
-    int changed;
-    Channel channels[8];
-    int activeCount;
-    virtual void SetPieceTranslation(int, int, int) = 0;
-    virtual void SetPieceRotation(int, int, int) = 0;
-    virtual void SetPieceVisible(int, int) = 0;
-    virtual void SetPieceCached(int, int) = 0;
-    virtual void SetPieceShaded(int, int) = 0;
-    virtual int GetPieceTranslation(int, int) = 0;
-    virtual int GetPieceRotation(int, int) = 0;
-    virtual int IsPieceVisible(int);
-    virtual int IsPieceCached(int);
-    virtual int IsPieceShaded(int);
-    virtual void FUN_004b1e80(int, int, int);
-    virtual void FUN_004b1e90(int);
-    virtual void EmitSfx(int, int);
-    virtual void ExplodePiece(int, unsigned int);
-    virtual void AttachUnit(unsigned short, int, int);
-    virtual void DropUnit(unsigned short);
-    virtual void SetUnitValue(int, int);
-    virtual int GetUnitValue(int, int, int, int, int);
-    virtual int IsCarryingUnit(int);
-    virtual int GetTransporterId();
-    void RunThread(unsigned int channel, int elapsed);
-    void Wake(unsigned int index)
-    {
-        for (int i = 0; i < 8; i++)
-            if ((channels[i].state & 0xfff00000) == 0x2800000 && channels[i].waiting == index)
-                channels[i].state = 0x1000000;
-    }
-    int StartThread(int);
-};
-
 // FUNCTION: 0x4b0da0
 void CobScript::RunThread(unsigned int channel, int elapsed)
 {
@@ -676,4 +1003,138 @@ void CobScript::RunThread(unsigned int channel, int elapsed)
             }
         } while (running);
     }
+}
+
+// Vtable slots 7-13 of CobScript.
+// FUNCTION: 0x4b1e50
+int CobScript::IsPieceVisible(int)
+{
+    return 0;
+}
+
+// FUNCTION: 0x4b1e60
+int CobScript::IsPieceCached(int)
+{
+    return 0;
+}
+
+// FUNCTION: 0x4b1e70
+int CobScript::IsPieceShaded(int)
+{
+    return 0;
+}
+
+// FUNCTION: 0x4b1e80
+void CobScript::FUN_004b1e80(int, int, int)
+{
+}
+
+// FUNCTION: 0x4b1e90
+void CobScript::FUN_004b1e90(int)
+{
+}
+
+// FUNCTION: 0x4b1ea0
+void CobScript::EmitSfx(int, int)
+{
+}
+
+// FUNCTION: 0x4b1eb0
+void CobScript::ExplodePiece(int, unsigned int)
+{
+}
+
+// Save method of CobScript (the object at Unit+0x9a), the counterpart of
+// the loader 0x4b2040. Writes the eight 0xa4-byte records at +0x1c, the block
+// at ptr10, then one 0x6c-byte record per element of the array at ptr14.
+// FUNCTION: 0x4b1ec0
+void CobScript::SaveScriptState(HapiBank* file)
+{
+    file->SeekBox(0);
+
+    SavedScript big;
+    big.checksum = unknown_c;
+    for (int n = 0; n < 8; n++) {
+        big.channels[n] = channels[n];
+        big.channels[n].callback = 0;
+    }
+    big.activeCount = activeCount;
+    file->WriteBox(&big, 0x528);
+    file->WriteBox(statics, table->staticCount * 4);
+
+    for (int i = 0; i < table->pieceCount; i++) {
+        SavedPiece rec;
+        rec.visible = IsPieceVisible(i);
+        rec.cached = IsPieceCached(i);
+        rec.shaded = IsPieceShaded(i);
+        for (int j = 0; j <= 2; j++) {
+            rec.move[j] = pieces[i].move[j];
+            rec.moveSpeed[j] = pieces[i].moveSpeed[j];
+            rec.turn[j] = pieces[i].turn[j];
+            rec.turnSpeed[j] = pieces[i].turnSpeed[j];
+            rec.spin[j] = pieces[i].spin[j];
+            rec.acceleration[j] = pieces[i].acceleration[j];
+            rec.translation[j] = GetPieceTranslation(i, j);
+            rec.rotation[j] = GetPieceRotation(i, j);
+        }
+        file->WriteBox(&rec, 0x6c);
+    }
+}
+
+// Finishing note (deepseek-v4.1-flash): the loader walks the source buffer with an INDEX
+// (buffer[i]), not with a walking pointer.  As a pointer the two loop-carried values came
+// out in the other stack slots and MSVC picked e[2] (0x18) as the block pivot, giving
+// "add esi,-0x4c"; as an index the record is the plain 0x6c struct (int e[6][3] at 0,
+// a[3] at 0x48, b[3] at 0x54, h[3] at 0x60), MSVC picks e[1] at 0x0c and emits the
+// original's "add esi,-0x58".  The esi bias is per outer iteration only: the latch stores
+// the unbiased buffer pointer back into [esp+0x10], so the j loop's "+4" never carries.
+// The three virtual calls before the j loop read the record's h[3] at 0x60; the two in the
+// j loop read a[j] at 0x48 and b[j] at 0x54.
+// FUNCTION: 0x4b2040
+int CobScript::LoadScriptState(HapiBank* file)
+{
+    int size = table->staticCount * 4;
+    int bytes = table->pieceCount * 0x6c;
+    if (file->GetBoxSize() != bytes + 0x528 + size) {
+        return 0;
+    }
+    file->SeekBox(0);
+    SavedScript big;
+    if (file->ReadBox(&big, 0x528) != 0x528) {
+        return 0;
+    }
+    if (unknown_c != big.checksum) {
+        return 0;
+    }
+    for (int n = 0; n < 8; n++) {
+        channels[n] = big.channels[n];
+        channels[n].callback = 0;
+    }
+    activeCount = big.activeCount;
+    if (file->ReadBox(statics, size) != size) {
+        return 0;
+    }
+    SavedPiece* buffer = (SavedPiece*)FUN_004d83b0("Piece States", bytes);
+    if (file->ReadBox(buffer, bytes) != bytes) {
+        return 0;
+    }
+    for (int i = 0; i < table->pieceCount; i++) {
+        pieces[i].active = 1;
+        SetPieceVisible(i, buffer[i].visible);
+        SetPieceCached(i, buffer[i].cached);
+        SetPieceShaded(i, buffer[i].shaded);
+        for (int j = 0; j <= 2; j++) {
+            pieces[i].move[j] = buffer[i].move[j];
+            pieces[i].moveSpeed[j] = buffer[i].moveSpeed[j];
+            pieces[i].turn[j] = buffer[i].turn[j];
+            pieces[i].turnSpeed[j] = buffer[i].turnSpeed[j];
+            pieces[i].spin[j] = buffer[i].spin[j];
+            pieces[i].acceleration[j] = buffer[i].acceleration[j];
+            SetPieceTranslation(i, j, buffer[i].translation[j]);
+            SetPieceRotation(i, j, buffer[i].rotation[j]);
+        }
+    }
+    changed = 1;
+    FUN_004d85a0(buffer);
+    return 1;
 }

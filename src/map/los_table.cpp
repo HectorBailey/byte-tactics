@@ -1,4 +1,28 @@
-// Decompiled by DeepSeek V4.1 Flash. Names are provisional.
+// Decompiled by Haiku and DeepSeek V4.1 Flash. Names are provisional.
+
+#include <vector>
+
+struct Elem_00434020 {
+    unsigned short a;                  // +0x0
+    unsigned short b;                  // +0x2
+};
+
+struct Elem_00434360 {
+    std::vector<Elem_00434020> v;      // +0x0
+};
+
+class LosTable : public std::vector<Elem_00434360> {
+public:
+    int GetLosLineCount();
+    void FUN_004335f0(short n);
+};
+
+// FUNCTION: 0x4335c0
+int LosTable::GetLosLineCount()
+{
+    return size();
+}
+
 //
 // Inlined std::vector<Elem_00434360>::resize(_N, _X) for the table code built
 // by 0x433130/0x433380: the object at +0 is the vector (its _First at +4), the
@@ -16,22 +40,6 @@
 //
 // The sibling 0x433270 is the same wrapper for the next element level up
 // (`vector<vector<Elem_00434360>>`), where `resize(n, x)` has no `* 4`.
-#include <vector>
-
-struct Elem_00434020 {
-    unsigned short a;                  // +0x0
-    unsigned short b;                  // +0x2
-};
-
-struct Elem_00434360 {
-    std::vector<Elem_00434020> v;      // +0x0
-};
-
-class LosTable : public std::vector<Elem_00434360> {
-public:
-    void FUN_004335f0(short n);
-};
-
 // FUNCTION: 0x4335f0
 void LosTable::FUN_004335f0(short n)
 {
