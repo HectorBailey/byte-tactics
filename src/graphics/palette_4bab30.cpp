@@ -17,7 +17,7 @@ struct Obj_004bab30 {
 extern Obj_004bab30* GetDisplay(void);
 
 // FUNCTION: 0x4bab30
-void __stdcall FUN_004bab30(unsigned int* param_1)
+void __stdcall SetLightTable(unsigned int* param_1)
 {
     Obj_004bab30* obj = GetDisplay();
     if (obj->flag7) {

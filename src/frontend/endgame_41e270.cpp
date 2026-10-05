@@ -22,7 +22,7 @@ struct Game {
 extern Game* g_game;
 
 unsigned int __cdecl GetTicks();
-void __stdcall FUN_004ba200(unsigned char* palette, int first, int count);
+void __stdcall SetPaletteColors(unsigned char* palette, int first, int count);
 
 #define FADE_TICK(k)                                                        \
     {                                                                       \
@@ -44,7 +44,7 @@ void FUN_0041e270(void)
         }
         if (memcmp(g_game->current, g_game->target, 0x400) == 0)
             g_game->done = 1;
-        FUN_004ba200(g_game->current, 0, 0x100);
+        SetPaletteColors(g_game->current, 0, 0x100);
         g_game->nextTime = GetTicks() + 1;
     }
 }

@@ -65,7 +65,7 @@ static inline void Unlock(LONG held)
 }
 
 // FUNCTION: 0x4ba200
-int __stdcall FUN_004ba200(unsigned char* src, int start, int count)
+int __stdcall SetPaletteColors(unsigned char* src, int start, int count)
 {
     LONG held = Lock();
     float brightness;

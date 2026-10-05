@@ -202,7 +202,7 @@ void __stdcall FUN_004b0230(void* obj, int index, void* bmp);
 void* __stdcall FUN_004b7f30(void* gaf, int index);
 void* __stdcall FUN_004b8c60(char* name);
 void* __stdcall FUN_004b8d40(void* gaf, const char* name);
-char* __stdcall FUN_004baff0(char* a, char* b, char* c);
+char* __stdcall ChangeExtension(char* a, char* b, char* c);
 long __stdcall FUN_004bbc40(char* name);
 char* __stdcall FUN_004bbe50(char* name, int* size);
 void __stdcall FUN_004c1420(int id);
@@ -311,7 +311,7 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
             FUN_004a81b0(menu, buf1);
             strcat(buf1, entries[i].name);
             strcat(buf1, "_gadget");
-            FUN_004baff0(buf1, buf1, "GAF");
+            ChangeExtension(buf1, buf1, "GAF");
             if (FUN_004bbc40(buf1)) {
                 entries[i].archive = FUN_004b8c60(buf1);
                 if (entries[i].archive)
@@ -327,7 +327,7 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
             strncpy(textbuf, entries[0].name, 0x10);
             textbuf[0x10] = 0;
             strcat(buf1, textbuf);
-            FUN_004baff0(buf1, buf1, "GAF");
+            ChangeExtension(buf1, buf1, "GAF");
             if (!entries[0].u.assets.archive) {
                 if (FUN_004bbc40(buf1))
                     entries[0].u.assets.archive = FUN_004b8c60(buf1);

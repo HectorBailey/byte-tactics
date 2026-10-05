@@ -17,7 +17,7 @@ struct Obj {
 extern int GetDisplay(void);
 
 // FUNCTION: 0x4bab00
-void __stdcall FUN_004bab00(unsigned int* param_1)
+void __stdcall SetShadeTable(unsigned int* param_1)
 {
     Obj* obj = (Obj*)GetDisplay();
     if (obj->flag6) {

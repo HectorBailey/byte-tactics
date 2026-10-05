@@ -17,7 +17,7 @@ struct Obj_004bab60 {
 extern Obj_004bab60* GetDisplay(void);
 
 // FUNCTION: 0x4bab60
-void __stdcall FUN_004bab60(unsigned int* param_1)
+void __stdcall SetGrayTable(unsigned int* param_1)
 {
     Obj_004bab60* obj = GetDisplay();
     if (obj->flag8) {

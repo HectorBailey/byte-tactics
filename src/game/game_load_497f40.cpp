@@ -172,7 +172,7 @@ void __stdcall FUN_004b6b50(int);
 void* __stdcall FUN_004b7f30(void*, int);
 void __stdcall FUN_004b7f90(void*, void*, int, int);
 void* __stdcall FUN_004b8d40(int, char*);
-void __stdcall FUN_004ba200(void*, int, int);
+void __stdcall SetPaletteColors(void*, int, int);
 void* __stdcall FUN_004bbe50(void*, unsigned int*);
 void __stdcall FUN_004bf6f0(void*, void*, unsigned char);
 void __stdcall FUN_004c13a0(int, int);
@@ -238,7 +238,7 @@ void FUN_00497f40(void)
             FUN_004ab400(&g_game->field_519, (void*)g_game->field_148cf);
         }
         FUN_004c1420(g_game->field_391f9);
-        FUN_004ba200(SURFACE_143a7, 0, 0x100);
+        SetPaletteColors(SURFACE_143a7, 0, 0x100);
         if (((Class_00435100*)g_game->field_391e9)->FUN_00435100() != 2) {
             FUN_00430f00();
         }

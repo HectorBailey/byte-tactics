@@ -20,7 +20,7 @@ struct Obj_004a75d0 {
     char name[0x100];                  // +0xab6
 };
 
-void __stdcall FUN_004baff0(char* out, char* in, const char* ext);
+void __stdcall ChangeExtension(char* out, char* in, const char* ext);
 int __stdcall FUN_004bbc40(char* path);
 void* __stdcall FUN_004b8c60(char* path);
 
@@ -32,7 +32,7 @@ int __stdcall FUN_004a75d0(Obj_004a75d0* obj, char* name)
     if (obj->name[0] != 0)
         strncpy(path, obj->name, 0x100);
     strcat(path, name);
-    FUN_004baff0(path, path, "GAF");
+    ChangeExtension(path, path, "GAF");
     if (FUN_004bbc40(path)) {
         obj->screen->holder->gaf = FUN_004b8c60(path);
         if (obj->screen->holder->gaf != 0)

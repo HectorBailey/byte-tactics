@@ -27,7 +27,7 @@ void __cdecl FUN_004d85a0(int* param_1);
 void* __cdecl FUN_004d83b0(const char* name, unsigned int size);
 void* __stdcall FUN_00429290(const char* name, int param_2);
 int __stdcall FUN_004ab290(int param_1, int param_2);
-int __stdcall FUN_004ba200(unsigned char* palette, int first, int count);
+int __stdcall SetPaletteColors(unsigned char* palette, int first, int count);
 
 // FUNCTION: 0x4288d0
 int __stdcall FUN_004288d0(const char* name, int param_2, int param_3, int param_4)
@@ -80,7 +80,7 @@ after:
         if (*(int*)(g_game + 0x531) != 0) {
             FUN_004ab290((int)(g_game + 0x519), (int)surface);
             if (param_3 != 0)
-                FUN_004ba200((unsigned char*)data, 0, 0x100);
+                SetPaletteColors((unsigned char*)data, 0, 0x100);
         } else {
             *(void**)(g_game + 0x11eb) = surface;
             if (name != 0)

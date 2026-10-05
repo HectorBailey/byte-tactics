@@ -286,7 +286,7 @@ void __stdcall FUN_004cb590(void* obj);
 int __stdcall FUN_004cb5f0(void* obj);
 void __stdcall FatalError(const char* msg);
 void* __stdcall FUN_004b2450(char* path);
-void __stdcall FUN_004bb0f0(char* text);
+void __stdcall StripExtension(char* text);
 short __stdcall FindUnitTypeId(char* text);
 int __cdecl FUN_004d8610(char* name);
 void* __cdecl FUN_004d83b0(const char* name, int size);
@@ -437,7 +437,7 @@ void LoadUnitTypes() {
         type->field_17a = type->field_16e - type->field_162;
 
         strcpy(namebuf, type->name);
-        FUN_004bb0f0(namebuf);
+        StripExtension(namebuf);
         sprintf(section, "%s0", namebuf);
         FUN_004290f0(path, "guis", section, "GUI");
         if (FUN_004bbc40(path))

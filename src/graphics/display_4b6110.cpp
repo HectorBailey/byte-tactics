@@ -28,11 +28,11 @@ extern int DAT_0051fbd0;
 
 void FUN_004c1aa0(void);
 void FUN_004c2cc0(void);
-void __stdcall FUN_004ba5f0(Display_004b6110* obj);
-void __stdcall FUN_004ba640(Display_004b6110* obj);
-void __stdcall FUN_004ba690(Display_004b6110* obj);
-void __stdcall FUN_004ba6e0(Display_004b6110* obj);
-void __stdcall FUN_004ba730(Display_004b6110* obj);
+void __stdcall FreeAlphaTable(Display_004b6110* obj);
+void __stdcall FreeShadeTable(Display_004b6110* obj);
+void __stdcall FreeLightTable(Display_004b6110* obj);
+void __stdcall FreeGrayTable(Display_004b6110* obj);
+void __stdcall FreeBlueTable(Display_004b6110* obj);
 void __stdcall FUN_004be070(void* item);
 void __stdcall ReleaseDirectDraw(Display_004b6110* obj);
 void __cdecl FUN_004d85a0(void* p);
@@ -47,15 +47,15 @@ void __stdcall ShutdownEnvironment(Display_004b6110* d)
     if (d->items)
         FUN_004d85a0(d->items);
     if (d->has_obj_c4)
-        FUN_004ba640(d);
+        FreeShadeTable(d);
     if (d->has_obj_c0)
-        FUN_004ba5f0(d);
+        FreeAlphaTable(d);
     if (d->has_obj_c8)
-        FUN_004ba690(d);
+        FreeLightTable(d);
     if (d->has_obj_cc)
-        FUN_004ba6e0(d);
+        FreeGrayTable(d);
     if (d->has_obj_d0)
-        FUN_004ba730(d);
+        FreeBlueTable(d);
     ReleaseDirectDraw(d);
     if (d->dc)
         DeleteDC(d->dc);

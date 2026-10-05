@@ -26,17 +26,17 @@ struct RGBA {
 };
 
 extern Obj_004ba750* GetDisplay(void);
-void __stdcall FUN_004ba920(unsigned char* data, int* sums, unsigned char* idx);
-unsigned char __stdcall FUN_004ba9d0(PALETTEENTRY* palette, int* band, unsigned char* order, PALETTEENTRY color);
+void __stdcall SortByBrightness(unsigned char* data, int* sums, unsigned char* idx);
+unsigned char __stdcall NearestColorInBand(PALETTEENTRY* palette, int* band, unsigned char* order, PALETTEENTRY color);
 
 // FUNCTION: 0x4ba750
-unsigned int* __stdcall FUN_004ba750(unsigned char* data)
+unsigned int* __stdcall BuildAlphaTable(unsigned char* data)
 {
     Obj_004ba750* obj = GetDisplay();
     if (obj->flag5) {
         int sums[256];
         unsigned char idx[256];
-        FUN_004ba920(data, sums, idx);
+        SortByBrightness(data, sums, idx);
         RGBA* pal = (RGBA*)data;
         int row = 0;
         int off = 0;
@@ -49,7 +49,7 @@ unsigned int* __stdcall FUN_004ba750(unsigned char* data)
                     color.peRed = (pal[row].r + pal[col].r) / 2;
                     color.peGreen = (pal[row].g + pal[col].g) / 2;
                     color.peBlue = (pal[row].b + pal[col].b) / 2;
-                    ((unsigned char*)obj->buffer)[off + col] = FUN_004ba9d0((PALETTEENTRY*)data, sums, idx, color);
+                    ((unsigned char*)obj->buffer)[off + col] = NearestColorInBand((PALETTEENTRY*)data, sums, idx, color);
                 }
             }
         }

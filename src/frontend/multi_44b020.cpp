@@ -31,7 +31,7 @@ extern Game* g_game;
 
 void FUN_004257a0();
 void* __stdcall FUN_00429290(char* name, unsigned char* palette);
-void __stdcall FUN_004ba200(unsigned char* palette, int first, int count);
+void __stdcall SetPaletteColors(unsigned char* palette, int first, int count);
 void __stdcall FUN_004c69a0(int param_1);
 void __stdcall FUN_004c6b70(void* dest, void* image, int x, int y);
 void __stdcall FUN_004c6ac0(void* image);
@@ -51,7 +51,7 @@ void FUN_0044b020()
 
     FUN_004257a0();
     image = FUN_00429290("Mission02WinBW", palette);
-    FUN_004ba200(palette, 0, 0x100);
+    SetPaletteColors(palette, 0, 0x100);
     FUN_004c69a0(g_game->field_37e1b);
     FUN_004c6b70(0, image, 0, 0);
     FUN_004c6ac0(image);

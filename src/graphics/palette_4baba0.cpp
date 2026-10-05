@@ -17,7 +17,7 @@ struct Obj_004baba0 {
 extern Obj_004baba0* GetDisplay(void);
 
 // FUNCTION: 0x4baba0
-void __stdcall FUN_004baba0(unsigned int* param_1)
+void __stdcall SetBlueTable(unsigned int* param_1)
 {
     Obj_004baba0* obj = GetDisplay();
     if (obj->flag9) {

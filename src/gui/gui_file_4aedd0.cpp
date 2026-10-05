@@ -20,7 +20,7 @@ struct Object_004aedd0 {
     char dir[0x100];                   // +0xab6
 };
 
-void __stdcall FUN_004baff0(char* out, char* in, const char* ext);
+void __stdcall ChangeExtension(char* out, char* in, const char* ext);
 int __stdcall FUN_004bbc40(char* path);
 void* __stdcall FUN_004b8c60(char* path);
 void* __stdcall FUN_004b7f30(void* table, int index);
@@ -35,7 +35,7 @@ void __stdcall FUN_004aedd0(Object_004aedd0* obj, char* name, int index)
     char path[256];
     strncpy(path, obj->dir, 0x100);
     strcat(path, name);
-    FUN_004baff0(path, path, "GAF");
+    ChangeExtension(path, path, "GAF");
     if (FUN_004bbc40(path)) {
         void* gaf = FUN_004b8c60(path);
         obj->items[index] = gaf;

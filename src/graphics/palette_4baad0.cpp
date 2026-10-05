@@ -17,7 +17,7 @@ struct Obj_004baad0 {
 extern Obj_004baad0* GetDisplay(void);
 
 // FUNCTION: 0x4baad0
-void __stdcall FUN_004baad0(unsigned int* param_1)
+void __stdcall SetAlphaTable(unsigned int* param_1)
 {
     Obj_004baad0* obj = GetDisplay();
     if (obj->flag5) {

@@ -97,8 +97,8 @@ struct Menu_004aa8f0 {
 #pragma pack(pop)
 
 extern void __stdcall FUN_004bf4d0(int handle, int* rect, int mode);
-extern char* __stdcall FUN_004bb150(char* path);
-extern char* __stdcall FUN_004baff0(char* out, char* in, char* ext);
+extern char* __stdcall StripPath(char* path);
+extern char* __stdcall ChangeExtension(char* out, char* in, char* ext);
 extern int __stdcall FUN_004bbc40(char* path);
 extern void* __cdecl FUN_004d83b0(const char* path, unsigned int size);
 extern int __stdcall FUN_004aeac0(void* entry, char* path);
@@ -162,8 +162,8 @@ Layer_004aa8f0* __stdcall FUN_004aa8f0(Menu_004aa8f0* menu, const char* name,
     strncpy(layerName, menu->name, 0x100);
     strcat(layerName, name);
     strncpy(guiName, name, 0x100);
-    FUN_004bb150(guiName);
-    FUN_004baff0(layerName, layerName, "GUI");
+    StripPath(guiName);
+    ChangeExtension(layerName, layerName, "GUI");
     if (FUN_004bbc40(layerName) != 0) {
         int mask = flags & 0x200;
         if (mask != 0) {

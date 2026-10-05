@@ -28,7 +28,7 @@ struct RGBX_004ba4c0 {
 Display_004ba4c0* GetDisplay(void);
 
 // FUNCTION: 0x4ba4c0
-int __stdcall FUN_004ba4c0(unsigned char* dest, int first, int count)
+int __stdcall GetPaletteColors(unsigned char* dest, int first, int count)
 {
     PALETTEENTRY pal[256];
     Display_004ba4c0* d = GetDisplay();
