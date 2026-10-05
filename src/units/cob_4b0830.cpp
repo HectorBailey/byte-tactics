@@ -18,7 +18,7 @@ public:
     int FindScript(const char* name);
 };
 
-class Class_004b08c0 {
+class CobScript {
 public:
     int StartThread(int id);
 };
@@ -53,5 +53,5 @@ int Class_004b0830::StartThreadByName(const char* name)
     if (table == 0) {
         return -1;
     }
-    return ((Class_004b08c0*)this)->StartThread(((Class_004b07c0*)this)->FindScript(name));
+    return ((CobScript*)this)->StartThread(((Class_004b07c0*)this)->FindScript(name));
 }

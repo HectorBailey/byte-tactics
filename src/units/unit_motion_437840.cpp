@@ -18,7 +18,7 @@ struct Point16_437840 {
     short y;
 };
 
-class Class_004b0a70 {
+class CobScript {
 public:
     int StartScriptWithArgs(char* name, void* param_2, int param_3, int param_4,
                      int param_5, int param_6, int param_7, int param_8);
@@ -40,7 +40,7 @@ struct Unit {
     char unknown_82[0x92 - 0x82];
     UnitType_437840* type;             // +0x92
     char unknown_96[0x9a - 0x96];
-    Class_004b0a70* script;            // +0x9a
+    CobScript* script;                 // +0x9a
 };
 #pragma pack(pop)
 

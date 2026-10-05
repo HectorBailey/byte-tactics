@@ -30,7 +30,7 @@ struct Kind_00489bb0 {
     unsigned char f73;             // +0x73, 3 lets the damage spread to the kind
 };
 
-class Class_00489a70 {
+class Unit {
 public:
     char unknown_0[0x92];
     Def_00489bb0* def;             // +0x92
@@ -58,7 +58,7 @@ void __stdcall BroadcastPacket(int who, Dmg_00489bb0* dmg, int size);
 int __cdecl GetLocalDpid(void);
 
 // FUNCTION: 0x489bb0
-void __stdcall DamageUnit(Class_00489a70* source, Class_00489a70* target, int amount, int type, unsigned short extra)
+void __stdcall DamageUnit(Unit* source, Unit* target, int amount, int type, unsigned short extra)
 {
     int dmg;
     if (type != 10) {

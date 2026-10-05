@@ -52,12 +52,12 @@ public:
     int FUN_00435100();
 };
 
-class Class_0043dd10 {
+class UnitMotion {
 public:
     void FUN_0043dd10();
 };
 
-class Class_004b0a70 {
+class CobScript {
 public:
     int StartScriptWithArgs(char* name, void* a, int b, int c, int d, int e, int f, int g);
 };
@@ -142,7 +142,7 @@ struct UnitInfo_004866d0 {
 };
 
 struct Unit {
-    Class_0043dd10* head;               // +0x0
+    UnitMotion* head;                   // +0x0
     char unknown_4[0x66];
     char pos[0x1c];                     // +0x6a
     int x86;                            // +0x86
@@ -262,7 +262,7 @@ void __stdcall ApplyUnitDeath(Cmd_004866d0* cmd, int local)
     if ((g_game->x14281 & 2) == 2)
         FUN_00482090(unit);
     if (local == 0 && cmd->amount > 0)
-        ((Class_004b0a70*)unit->script)->StartScriptWithArgs(DAT_00508be8, 0, 1, 1, cmd->amount, 0, 0, 0);
+        ((CobScript*)unit->script)->StartScriptWithArgs(DAT_00508be8, 0, 1, 1, cmd->amount, 0, 0, 0);
 
     int credited = 0;
     switch (cmd->kind) {
@@ -388,7 +388,7 @@ void __stdcall ApplyUnitDeath(Cmd_004866d0* cmd, int local)
         FUN_0045aaa0(unit->x9e);
         unit->x9e = 0;
     }
-    Class_0043dd10* head = unit->head;
+    UnitMotion* head = unit->head;
     if (head != 0) {
         head->FUN_0043dd10();
         operator delete(head);

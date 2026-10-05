@@ -57,7 +57,7 @@ struct Shot_0049cde0 {
     unsigned char field_1b;            // +0x1b
 };
 
-class Class_004b0a70 {
+class CobScript {
 public:
     int StartScriptWithArgs(char* name, void* param_2, int param_3, int param_4, int param_5, int param_6, int param_7, int param_8);
 };
@@ -81,7 +81,7 @@ struct Unit {
         Heading_0049cde0 heading;      // +0x1a
     };
     char unknown_8a[0x9a - 0x8a];
-    Class_004b0a70* anims;             // +0x9a
+    CobScript* anims;                  // +0x9a
 };
 
 struct Proj_0049cde0 {

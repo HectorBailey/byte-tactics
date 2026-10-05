@@ -27,7 +27,7 @@ public:
     int QueryScriptByIndex(int index, int* p2, int* p3, int* p4, int* p5);
 };
 
-class Class_004b08c0 {
+class CobScript {
 public:
     int StartThread(int id);
 };
@@ -40,7 +40,7 @@ public:
 // FUNCTION: 0x4b0c40
 int Class_004b0c40::QueryScriptByIndex(int index, int* p2, int* p3, int* p4, int* p5)
 {
-    int i = ((Class_004b08c0*)this)->StartThread(index);
+    int i = ((CobScript*)this)->StartThread(index);
     if (i < 0)
         return 0;
     Channel_004b0c40* c = &channels[i];

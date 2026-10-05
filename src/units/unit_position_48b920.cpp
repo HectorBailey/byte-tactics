@@ -52,7 +52,7 @@ public:
 
 struct Unit;
 
-class Class_0043dd20 {
+class UnitMotion {
 public:
     Iface_0048b920* iface;             // +0x0, see src/units/unit_scripts_43dd20.cpp
     void UpdateMotion(Unit* u);
@@ -71,7 +71,7 @@ struct Spawn_0048b920 {
 };
 
 struct Unit {                          // 0x118 bytes
-    Class_0043dd20* owner;             // +0x0
+    UnitMotion* owner;                 // +0x0
     char unknown_4[0x64 - 4];
     Tail_0048b920 tail;                // +0x64
     Pos_0048b920 pos;                  // +0x6a

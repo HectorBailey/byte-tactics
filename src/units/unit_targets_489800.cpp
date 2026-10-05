@@ -16,7 +16,7 @@ public:
     int FindScript(char* name);
 };
 
-class Class_004b0a70 {
+class CobScript {
 public:
     int StartScriptWithArgs(char* name, void* param_2, int param_3, int param_4, int param_5, int param_6, int param_7, int param_8);
 };
@@ -73,7 +73,7 @@ void Class_00489800::ReleaseWeapons(unsigned char index)
             p->a = 0;
             p->b = (short)0x8000;
             script->FindScript("StartBuilding");
-            ((Class_004b0a70*)script)->StartScriptWithArgs("TargetCleared", 0, 0, 1, i, 0, 0, 0);
+            ((CobScript*)script)->StartScriptWithArgs("TargetCleared", 0, 0, 1, i, 0, 0, 0);
         }
     }
     // The guard only fires when bit 4 is *set* and then clears it, so this

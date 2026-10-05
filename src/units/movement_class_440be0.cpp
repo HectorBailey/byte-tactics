@@ -27,7 +27,7 @@ struct Struct_00440be0 {
 };
 #pragma pack(pop)
 
-class Dummy_00440be0 {
+class MovementClass {
 public:
     int* field_0;                      // +0x0
     char unknown_4[0x1c - 0x4];
@@ -37,7 +37,7 @@ public:
 };
 
 // FUNCTION: 0x440be0
-void Dummy_00440be0::RefreshUnitIfStale(Struct_00440be0* p)
+void MovementClass::RefreshUnitIfStale(Struct_00440be0* p)
 {
     if (p->unit->lastTick < field_1c) {
         ((Class_00440830*)this)->RefreshPassMap(p->a, p->b);

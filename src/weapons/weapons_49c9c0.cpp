@@ -42,7 +42,7 @@ public:
     int StartScript(char* name, int param_2, int param_3);
 };
 
-class Class_004b0a70 {
+class CobScript {
 public:
     int StartScriptWithArgs(char* name, void* param_2, int param_3, int param_4, int param_5,
                     int param_6, int param_7, int param_8);
@@ -191,7 +191,7 @@ int __stdcall FUN_0049c9c0(Fire_0049c9c0* fire, Unit* unit,
     short angle = unit->f_1a[((fire->f_1b >> 2) & 3) * 7].angle - unit->heading;
     int a = -FUN_004b70ef(angle, 800);
     int b = -FUN_004b7123(angle, 800);
-    ((Class_004b0a70*)unit->anims)->StartScriptWithArgs("RockUnit", 0, 0, 2, b, a, 0, 0);
+    ((CobScript*)unit->anims)->StartScriptWithArgs("RockUnit", 0, 0, 2, b, a, 0, 0);
 
     if (fire->shot->f_bit9)
         FUN_004729d0(p3, 9);
