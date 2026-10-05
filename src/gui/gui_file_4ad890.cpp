@@ -10,7 +10,7 @@ public:
     int GetFieldString(char* dst, char* key, unsigned size, char* def);
 };
 
-class Class_004c3410 {
+class TdfFile {
 public:
     int SelectRecord(char* name);
 };
@@ -45,7 +45,7 @@ void __stdcall ReadPanelFields(Obj_004ad890* obj, Source_004ad890* src)
     src->tdf->GetFieldString(obj->crdefault, "crdefault", 0x10, DAT_005119b8);
     src->tdf->GetFieldString(obj->escdefault, "escdefault", 0x10, DAT_005119b8);
     src->tdf->GetFieldString(obj->defaultfocus, "defaultfocus", 0x10, DAT_005119b8);
-    if (((Class_004c3410*)src)->SelectRecord("VERSION") == 1) {
+    if (((TdfFile*)src)->SelectRecord("VERSION") == 1) {
         obj->major = (char)((Class_004c46c0*)src->tdf)->GetFieldInt("major", 0);
         obj->minor = (char)((Class_004c46c0*)src->tdf)->GetFieldInt("minor", 0);
         obj->revision = (char)((Class_004c46c0*)src->tdf)->GetFieldInt("revision", 0);

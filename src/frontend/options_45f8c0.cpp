@@ -78,7 +78,7 @@ public:
     int LoadFile(char* file);
 };
 
-class Class_004c3410 {
+class TdfFile {
 public:
     int SelectRecord(char* name);
 };
@@ -123,7 +123,7 @@ void __stdcall FillHelpPage(Sub_0045f8c0* sub, int page, int lineCount)
     BuildDataPath(path, "gamedata", "help", "TDF");
     if (((Class_004c2f60*)&parser)->LoadFile(path)) {
         int y = 0x32;
-        if (((Class_004c3410*)&parser)->SelectRecord("Help")) {
+        if (((TdfFile*)&parser)->SelectRecord("Help")) {
             Page_0045f8c0 lines;
             Page_0045f8c0* pp = &lines;
             int p2 = (page ? page : page);

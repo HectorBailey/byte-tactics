@@ -2738,7 +2738,7 @@ address,name
 0x4c3240,Class_004c3240::Unload
 0x4c32f0,??_GTdfRecord@@QAEPAXI@Z
 0x4c33a0,Class_004c33a0::StripComments
-0x4c3410,Class_004c3410::SelectRecord
+0x4c3410,TdfFile::SelectRecord
 0x4c3490,Class_004c3490::SelectRecordAt
 0x4c35c0,std::logic_error::logic_error
 0x4c3730,std::logic_error::what

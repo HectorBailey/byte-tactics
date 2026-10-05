@@ -15,7 +15,7 @@ public:
     void ResetCurrentRecord();
 };
 
-class Class_004c3410 {
+class TdfFile {
 public:
     int SelectRecord(char* name);
 };
@@ -48,7 +48,7 @@ int Class_00435760::BuildMissionList(int* param_1)
         while (1) {
             sprintf(buf, "MISSION%d", m);
             list.ResetCurrentRecord();
-            if (((Class_004c3410*)&list)->SelectRecord(buf) == 0)
+            if (((TdfFile*)&list)->SelectRecord(buf) == 0)
                 break;
             m++;
         }
@@ -61,7 +61,7 @@ int Class_00435760::BuildMissionList(int* param_1)
         for (int i = 0; i < n; i++) {
             sprintf(buf, "MISSION%d", i);
             list.ResetCurrentRecord();
-            if (((Class_004c3410*)&list)->SelectRecord(buf) == 0)
+            if (((TdfFile*)&list)->SelectRecord(buf) == 0)
                 return 0;
             if (GetLocalizedString(&list, temp, "missionname", 0x100, 0) != 0)
                 strcpy(SkipTextLines(*param_1, i), temp);

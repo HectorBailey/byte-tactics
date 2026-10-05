@@ -81,7 +81,7 @@ public:
     void LoadBuffer(char* data, int size, int flag, char* name);
 };
 
-class Class_004c3410 {
+class TdfFile {
 public:
     int SelectRecord(char* name);
 };
@@ -264,7 +264,7 @@ static inline int FindWeapon(char* name)
         for (int k = 0; k < DAT_005122a4; k++) {
             Class_004c2ea0* tdf = &DAT_005122a0[k];
             ((Class_004c3e10*)tdf)->ResetCurrentRecord();
-            if (((Class_004c3410*)tdf)->SelectRecord(name))
+            if (((TdfFile*)tdf)->SelectRecord(name))
                 return *(int*)((char*)tdf->current + 0x25);
         }
         return 0;
@@ -320,7 +320,7 @@ int LoadUnitInfo()
             }
             Class_004c2ea0 parser;
             ((Class_004c2f60*)&parser)->LoadBuffer(buf, len, 0, "<NO FILE>");
-            if (!((Class_004c3410*)&parser)->SelectRecord("UNITINFO")) {
+            if (!((TdfFile*)&parser)->SelectRecord("UNITINFO")) {
                 // Original bug: this exit leaves the FBI file open (no
                 // HAPI_CloseFile), the weapon TDF table allocated and the unit
                 // table locked (no ProtectBlockReadOnly).

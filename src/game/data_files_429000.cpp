@@ -15,7 +15,7 @@ public:
     int LoadFile(char* file);
 };
 
-class Class_004c3410 {
+class TdfFile {
 public:
     int SelectRecord(char* name);
 };
@@ -42,7 +42,7 @@ void CheckGpfVersion()
 
     BuildDataPath(path, "gamedata", "version", "tdf");
     if (((Class_004c2f60*)&parser)->LoadFile(path)) {
-        if (((Class_004c3410*)&parser)->SelectRecord("Version")) {
+        if (((TdfFile*)&parser)->SelectRecord("Version")) {
             if (((TdfRecord*)parser.current)->GetFieldString(buf, "GPFVersion", 0x40, DAT_005119b8)) {
                 found = 1;
                 if (_strcmpi("v3.0", buf) != 0) {

@@ -82,7 +82,7 @@ class Class_004c2f60 {
     int LoadFile(char* file);
 };
 
-class Class_004c3410 {
+class TdfFile {
   public:
     int SelectRecord(char* name);
 };
@@ -256,7 +256,7 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
     char yard[1024];
 
     if (((Class_004c2f60*)&parser)->LoadFile(fbi_file)) {
-        if (!((Class_004c3410*)&parser)->SelectRecord("UNITINFO")) {
+        if (!((TdfFile*)&parser)->SelectRecord("UNITINFO")) {
             ((Class_004c3240*)&parser)->Unload();
             goto FINISH;
         }

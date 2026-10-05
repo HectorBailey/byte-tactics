@@ -13,7 +13,7 @@ public:
     void ResetCurrentRecord();
 };
 
-class Class_004c3410 {
+class TdfFile {
 public:
     int SelectRecord(char* name);
 };
@@ -38,7 +38,7 @@ int Class_00435980::MissionExists(int index)
         n = 0;
         sprintf(buf, "MISSION%d", n);
         list.ResetCurrentRecord();
-        while (((Class_004c3410*)&list)->SelectRecord(buf)) {
+        while (((TdfFile*)&list)->SelectRecord(buf)) {
             n++;
             sprintf(buf, "MISSION%d", n);
             list.ResetCurrentRecord();

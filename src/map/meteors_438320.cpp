@@ -27,7 +27,7 @@ public:
     int LoadFile(char* file);
 };
 
-class Class_004c3410 {
+class TdfFile {
 public:
     int SelectRecord(char* name);
 };
@@ -58,7 +58,7 @@ void Class_00438320::LoadMeteorDefaults()
     char path[256];
     BuildDataPath(path, "gamedata", "meteor", DAT_0050310c);
     if (((Class_004c2f60*)&parser)->LoadFile(path)
-        && ((Class_004c3410*)&parser)->SelectRecord("Default")) {
+        && ((TdfFile*)&parser)->SelectRecord("Default")) {
         if (((TdfRecord*)parser.current)->GetFieldString((char*)this, "MeteorWeapon", 0x20, DAT_005119b8)) {
             radius = parser.current->GetFieldInt("MeteorRadius", 0);
             density = (float)((Class_004c4760*)parser.current)->GetFieldDouble("MeteorDensity", 0.0);

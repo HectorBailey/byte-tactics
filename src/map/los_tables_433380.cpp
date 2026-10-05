@@ -35,7 +35,7 @@ struct Elem_00434020 {
     unsigned short b;                  // +0x2
 };
 
-class Class_004c3410;
+class TdfFile;
 
 // A line of a table, read from the TDF file.
 struct Elem_00434360 {
@@ -44,7 +44,7 @@ struct Elem_00434360 {
 
 class Class_004336f0 {
 public:
-    void LoadLosLine(Class_004c3410* file, short line, int col);
+    void LoadLosLine(TdfFile* file, short line, int col);
 };
 
 // One table: a vector of lines (see 0x4335f0.cpp).
@@ -61,7 +61,7 @@ public:
     int GetFieldInt(const char* name, int def);
 };
 
-class Class_004c3410 {
+class TdfFile {
 public:
     void* root;                        // +0x0
     Class_004c46c0* current;           // +0x4
@@ -84,11 +84,11 @@ public:
         n--;
         return &tables[n];
     }
-    void LoadLosTable(Class_004c3410* file, short table);
+    void LoadLosTable(TdfFile* file, short table);
 };
 
 // FUNCTION: 0x433380
-void Class_00433380::LoadLosTable(Class_004c3410* file, short table)
+void Class_00433380::LoadLosTable(TdfFile* file, short table)
 {
     char name[32];
     sprintf(name, "TABLE%d", table + 1);

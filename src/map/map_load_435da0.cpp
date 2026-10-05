@@ -69,7 +69,7 @@ public:
     int LoadFile(char* file);
 };
 
-class Class_004c3410 {
+class TdfFile {
 public:
     int SelectRecord(char* name);
 };
@@ -261,7 +261,7 @@ int Class_00435c00::LoadMission(char* map)
         char key[0x100];
         sprintf(key, "MISSION%d", missionIndex);
         ((Class_004c3e10*)&list)->ResetCurrentRecord();
-        if (!((Class_004c3410*)&list)->SelectRecord(key)) {
+        if (!((TdfFile*)&list)->SelectRecord(key)) {
             char msg[0x100];
             wsprintfA(msg, "The requested mission file, %s, does not exist.", key);
             OpenMessageBox(g_game->messages, msg, 0x1e0, 1, 1);
@@ -279,7 +279,7 @@ int Class_00435c00::LoadMission(char* map)
                 return 0;
             }
             ((Class_004c3e10*)&parser)->ResetCurrentRecord();
-            if (((Class_004c3410*)&parser)->SelectRecord("GlobalHeader")) {
+            if (((TdfFile*)&parser)->SelectRecord("GlobalHeader")) {
                 g_game->maxUnits = parser.current->GetFieldInt("maxunits", 200);
                 ((Class_004c3e10*)&parser)->ResetCurrentRecord();
                 BuildCampaignFilePath(1, "Maps", path, "TNT");
@@ -319,7 +319,7 @@ int Class_00435c00::LoadMission(char* map)
         return 0;
     }
 
-    if (!((Class_004c3410*)&parser)->SelectRecord("GlobalHeader")) {
+    if (!((TdfFile*)&parser)->SelectRecord("GlobalHeader")) {
         OpenMessageBox(g_game->messages, "No GlobalHeader block in mission file!", 0x1e0, 1, 1);
         return 0;
     }

@@ -135,7 +135,7 @@ class Class_004c3e10 {
     void ResetCurrentRecord();
 };
 
-class Class_004c3410 {
+class TdfFile {
   public:
     int SelectRecord(char* name);
 };
@@ -318,7 +318,7 @@ void LoadUnitTypes() {
         do {
             sprintf(classbuf, "CLASS%d", i);
             ((Class_004c3e10*)&parser)->ResetCurrentRecord();
-            if (((Class_004c3410*)&parser)->SelectRecord(classbuf)) {
+            if (((TdfFile*)&parser)->SelectRecord(classbuf)) {
                 ((TdfRecord*)parser.current)
                     ->GetFieldString(classbuf, "name", 100, DAT_005119b8);
                 cls->field_0 = (int*)GameStrdup(classbuf);
@@ -483,8 +483,8 @@ void LoadUnitTypes() {
             type->field_156 = 0;
             if (type->flags.bits.canbuild) {
                 ((Class_004c3e10*)&parser2)->ResetCurrentRecord();
-                if (((Class_004c3410*)&parser2)->SelectRecord("CANBUILD") &&
-                    ((Class_004c3410*)&parser2)->SelectRecord(type->name)) {
+                if (((TdfFile*)&parser2)->SelectRecord("CANBUILD") &&
+                    ((TdfFile*)&parser2)->SelectRecord(type->name)) {
                     int count = 0;
                     int k = 1;
                     sprintf(objpath, "canbuild%d", k);

@@ -10,7 +10,7 @@ public:
     void ResetCurrentRecord();
 };
 
-class Class_004c3410 {
+class TdfFile {
 public:
     int SelectRecord(char* name);
 };
@@ -28,7 +28,7 @@ Class_004c3e10* __stdcall FindFeatureFile(char* name)
 {
     for (Class_004c3e10** p = DAT_00511fb4->first; p < DAT_00511fb4->last; p++) {
         (*p)->ResetCurrentRecord();
-        if (((Class_004c3410*)*p)->SelectRecord(name))
+        if (((TdfFile*)*p)->SelectRecord(name))
             return *p;
     }
     return 0;

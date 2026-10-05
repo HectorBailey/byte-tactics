@@ -85,7 +85,7 @@ public:
     void Unload();
 };
 
-class Class_004c3410 {
+class TdfFile {
 public:
     int SelectRecord(char* name);
 };
@@ -215,7 +215,7 @@ void __stdcall LoadSideData(void)
         s->sideNumber = side;
         sprintf(name, "SIDE%d", side);
         ((Class_004c3e10*)&parser)->ResetCurrentRecord();
-        if (!((Class_004c3410*)&parser)->SelectRecord(name))
+        if (!((TdfFile*)&parser)->SelectRecord(name))
             break;
         if (((TdfRecord*)parser.current)->GetFieldString(name, "name", 0x1e, DAT_005119b8))
             strcpy(s->name, name);
@@ -235,7 +235,7 @@ void __stdcall LoadSideData(void)
         s->metalColor = ((Class_004c46c0*)parser.current)->GetFieldInt("metalcolor", 0);
 
         saved = ((Class_004c3e20*)&parser)->GetCurrentRecord();
-        if (!((Class_004c3410*)&parser)->SelectRecord("LOGO")) {
+        if (!((TdfFile*)&parser)->SelectRecord("LOGO")) {
             sprintf(msgLogo, "No [%s] in GAMEDATA/SIDEDATA.TDF for side:%s", "LOGO", s->name);
             FatalError(msgLogo);
         } else {
@@ -248,7 +248,7 @@ void __stdcall LoadSideData(void)
         ((Class_004c3e30*)&parser)->SetCurrentRecord(saved);
 
         saved = ((Class_004c3e20*)&parser)->GetCurrentRecord();
-        if (!((Class_004c3410*)&parser)->SelectRecord("ENERGYBAR")) {
+        if (!((TdfFile*)&parser)->SelectRecord("ENERGYBAR")) {
             sprintf(msgEnergybar, "No [%s] in GAMEDATA/SIDEDATA.TDF for side:%s", "ENERGYBAR", s->name);
             FatalError(msgEnergybar);
         } else {
@@ -261,7 +261,7 @@ void __stdcall LoadSideData(void)
         ((Class_004c3e30*)&parser)->SetCurrentRecord(saved);
 
         saved = ((Class_004c3e20*)&parser)->GetCurrentRecord();
-        if (!((Class_004c3410*)&parser)->SelectRecord("ENERGYNUM")) {
+        if (!((TdfFile*)&parser)->SelectRecord("ENERGYNUM")) {
             sprintf(msgEnergynum, "No [%s] in GAMEDATA/SIDEDATA.TDF for side:%s", "ENERGYNUM", s->name);
             FatalError(msgEnergynum);
         } else {
@@ -274,7 +274,7 @@ void __stdcall LoadSideData(void)
         ((Class_004c3e30*)&parser)->SetCurrentRecord(saved);
 
         saved = ((Class_004c3e20*)&parser)->GetCurrentRecord();
-        if (!((Class_004c3410*)&parser)->SelectRecord("METALBAR")) {
+        if (!((TdfFile*)&parser)->SelectRecord("METALBAR")) {
             sprintf(msgMetalbar, "No [%s] in GAMEDATA/SIDEDATA.TDF for side:%s", "METALBAR", s->name);
             FatalError(msgMetalbar);
         } else {
@@ -287,7 +287,7 @@ void __stdcall LoadSideData(void)
         ((Class_004c3e30*)&parser)->SetCurrentRecord(saved);
 
         saved = ((Class_004c3e20*)&parser)->GetCurrentRecord();
-        if (!((Class_004c3410*)&parser)->SelectRecord("METALNUM")) {
+        if (!((TdfFile*)&parser)->SelectRecord("METALNUM")) {
             sprintf(msgMetalnum, "No [%s] in GAMEDATA/SIDEDATA.TDF for side:%s", "METALNUM", s->name);
             FatalError(msgMetalnum);
         } else {
@@ -300,7 +300,7 @@ void __stdcall LoadSideData(void)
         ((Class_004c3e30*)&parser)->SetCurrentRecord(saved);
 
         saved = ((Class_004c3e20*)&parser)->GetCurrentRecord();
-        if (!((Class_004c3410*)&parser)->SelectRecord("TOTALUNITS")) {
+        if (!((TdfFile*)&parser)->SelectRecord("TOTALUNITS")) {
             sprintf(msgTotalunits, "No [%s] in GAMEDATA/SIDEDATA.TDF for side:%s", "TOTALUNITS", s->name);
             FatalError(msgTotalunits);
         } else {
@@ -313,7 +313,7 @@ void __stdcall LoadSideData(void)
         ((Class_004c3e30*)&parser)->SetCurrentRecord(saved);
 
         saved = ((Class_004c3e20*)&parser)->GetCurrentRecord();
-        if (!((Class_004c3410*)&parser)->SelectRecord("TOTALTIME")) {
+        if (!((TdfFile*)&parser)->SelectRecord("TOTALTIME")) {
             sprintf(msgTotaltime, "No [%s] in GAMEDATA/SIDEDATA.TDF for side:%s", "TOTALTIME", s->name);
             FatalError(msgTotaltime);
         } else {
@@ -326,7 +326,7 @@ void __stdcall LoadSideData(void)
         ((Class_004c3e30*)&parser)->SetCurrentRecord(saved);
 
         saved = ((Class_004c3e20*)&parser)->GetCurrentRecord();
-        if (!((Class_004c3410*)&parser)->SelectRecord("ENERGY0")) {
+        if (!((TdfFile*)&parser)->SelectRecord("ENERGY0")) {
             sprintf(msgEnergy0, "No [%s] in GAMEDATA/SIDEDATA.TDF for side:%s", "ENERGY0", s->name);
             FatalError(msgEnergy0);
         } else {
@@ -339,7 +339,7 @@ void __stdcall LoadSideData(void)
         ((Class_004c3e30*)&parser)->SetCurrentRecord(saved);
 
         saved = ((Class_004c3e20*)&parser)->GetCurrentRecord();
-        if (!((Class_004c3410*)&parser)->SelectRecord("METAL0")) {
+        if (!((TdfFile*)&parser)->SelectRecord("METAL0")) {
             sprintf(msgMetal0, "No [%s] in GAMEDATA/SIDEDATA.TDF for side:%s", "METAL0", s->name);
             FatalError(msgMetal0);
         } else {
@@ -352,7 +352,7 @@ void __stdcall LoadSideData(void)
         ((Class_004c3e30*)&parser)->SetCurrentRecord(saved);
 
         saved = ((Class_004c3e20*)&parser)->GetCurrentRecord();
-        if (!((Class_004c3410*)&parser)->SelectRecord("ENERGYMAX")) {
+        if (!((TdfFile*)&parser)->SelectRecord("ENERGYMAX")) {
             sprintf(msgEnergymax, "No [%s] in GAMEDATA/SIDEDATA.TDF for side:%s", "ENERGYMAX", s->name);
             FatalError(msgEnergymax);
         } else {
@@ -365,7 +365,7 @@ void __stdcall LoadSideData(void)
         ((Class_004c3e30*)&parser)->SetCurrentRecord(saved);
 
         saved = ((Class_004c3e20*)&parser)->GetCurrentRecord();
-        if (!((Class_004c3410*)&parser)->SelectRecord("METALMAX")) {
+        if (!((TdfFile*)&parser)->SelectRecord("METALMAX")) {
             sprintf(msgMetalmax, "No [%s] in GAMEDATA/SIDEDATA.TDF for side:%s", "METALMAX", s->name);
             FatalError(msgMetalmax);
         } else {

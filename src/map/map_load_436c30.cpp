@@ -16,7 +16,7 @@ public:
     void ResetCurrentRecord();
 };
 
-class Class_004c3410 {
+class TdfFile {
 public:
     int SelectRecord(char* name);
 };
@@ -116,9 +116,9 @@ void Class_00436c30::LoadMissionData(char* name, Parser_00436c30* parser)
     int total = 0;
 
     ((Class_004c3e10*)parser)->ResetCurrentRecord();
-    if (!((Class_004c3410*)parser)->SelectRecord("globalheader"))
+    if (!((TdfFile*)parser)->SelectRecord("globalheader"))
         return;
-    if (!((Class_004c3410*)parser)->SelectRecord(name))
+    if (!((TdfFile*)parser)->SelectRecord(name))
         return;
     Section_00436c30* root = parser->current;
 

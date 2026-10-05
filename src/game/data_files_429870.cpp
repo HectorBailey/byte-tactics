@@ -116,7 +116,7 @@ public:
     void ResetCurrentRecord();
 };
 
-class Class_004c3410 {
+class TdfFile {
 public:
     int SelectRecord(char* name);
 };
@@ -234,7 +234,7 @@ void LoadGameResources()
     ((Class_004c2f60*)&parser)->LoadFile(buf);
     sprintf(buf, "GENERAL");
     ((Class_004c3e10*)&parser)->ResetCurrentRecord();
-    if (((Class_004c3410*)&parser)->SelectRecord(buf) == 1) {
+    if (((TdfFile*)&parser)->SelectRecord(buf) == 1) {
         g_game->baseHeight = ((Class_004c46c0*)parser.current)->GetFieldInt("baseheight", 0x1e0);
     } else {
         g_game->baseHeight = 0x1e0;
@@ -244,7 +244,7 @@ void LoadGameResources()
     while (1) {
         sprintf(buf, "SIDE%d", i);
         ((Class_004c3e10*)&parser)->ResetCurrentRecord();
-        if (!((Class_004c3410*)&parser)->SelectRecord(buf))
+        if (!((TdfFile*)&parser)->SelectRecord(buf))
             break;
         int intgaf = ((TdfRecord*)parser.current)->GetFieldString(buf, "intgaf", 0x1e, DAT_005119b8);
         if (intgaf != 0) {

@@ -41,7 +41,7 @@ public:
     TdfRecord* GetSubRecord(int index);
 };
 
-class Class_004c3410 {
+class TdfFile {
 public:
     int SelectRecord(char* name);
 };
@@ -139,10 +139,10 @@ int Class_00435c00::FUN_00436860(int type, Class_004c2ea0* parser, char* schema)
             break;
         for (int n = 0; ; n++) {
             ((Class_004c3e10*)parser)->ResetCurrentRecord();
-            if (!((Class_004c3410*)parser)->SelectRecord("GlobalHeader"))
+            if (!((TdfFile*)parser)->SelectRecord("GlobalHeader"))
                 FatalError("Very bad news!  No MSG!");
             sprintf(name, "Schema %i", n);
-            if (!((Class_004c3410*)parser)->SelectRecord(name))
+            if (!((TdfFile*)parser)->SelectRecord(name))
                 break;
             if (!parser->current->GetFieldString(kind, "type", 0x20, DAT_005119b8))
                 continue;
@@ -155,7 +155,7 @@ int Class_00435c00::FUN_00436860(int type, Class_004c2ea0* parser, char* schema)
             }
             TdfRecord* section = parser->current;
             int count = 0;
-            if (((Class_004c3410*)parser)->SelectRecord("specials")) {
+            if (((TdfFile*)parser)->SelectRecord("specials")) {
                 Class_004c44c0* specials = (Class_004c44c0*)parser->current;
                 TdfRecord* s;
                 for (int i = 0; (s = specials->GetSubRecord(i)) != 0; i++) {

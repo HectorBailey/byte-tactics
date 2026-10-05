@@ -13,7 +13,7 @@ public:
     void SetCurrentRecord(int val);
 };
 
-class Class_004c3410 {
+class TdfFile {
 public:
     int SelectRecord(char* name);
 };
@@ -34,7 +34,7 @@ void __stdcall FatalError(char* message);
 void __stdcall ReadSideRect(Obj_00431950* obj, int* out, char* name, char* side)
 {
     int saved = ((Class_004c3e20*)obj)->GetCurrentRecord();
-    if (!((Class_004c3410*)obj)->SelectRecord(name)) {
+    if (!((TdfFile*)obj)->SelectRecord(name)) {
         char buf[256];
         sprintf(buf, "No [%s] in GAMEDATA/SIDEDATA.TDF for side:%s", name, side);
         FatalError(buf);

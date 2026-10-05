@@ -12,7 +12,7 @@ public:
     void ResetCurrentRecord();
 };
 
-class Class_004c3410 {
+class TdfFile {
 public:
     int SelectRecord(char* name);
 };
@@ -36,7 +36,7 @@ int Net::CountMissions()
     while (1) {
         sprintf(buf, "MISSION%d", n);
         list.ResetCurrentRecord();
-        if (((Class_004c3410*)&list)->SelectRecord(buf) == 0)
+        if (((TdfFile*)&list)->SelectRecord(buf) == 0)
             break;
         n++;
     }
