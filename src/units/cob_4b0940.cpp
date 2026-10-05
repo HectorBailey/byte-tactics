@@ -38,7 +38,7 @@ public:
     int FindScript(const char* name);
 };
 
-class Class_004b08c0 {
+class CobScript {
 public:
     int StartThread(int id);
 };
@@ -68,7 +68,7 @@ int Class_004b07c0::FindScript(const char* name)
 // FUNCTION: 0x4b0940
 int Class_004b0940::StartScript(const char* name, int value, int update)
 {
-    int i = ((Class_004b08c0*)this)->StartThread(((Class_004b07c0*)this)->FindScript(name));
+    int i = ((CobScript*)this)->StartThread(((Class_004b07c0*)this)->FindScript(name));
     if (i < 0)
         return 0;
     channels[i].value = value;

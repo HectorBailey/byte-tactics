@@ -26,14 +26,14 @@ class Class_0043d6d0 { public: void UpdatePosition(Unit* u); };
 class Class_0043da70 { public: void UpdateMoveRate(Unit* u); };
 class Class_0043db50 { public: void UpdateSfxOccupy(Unit* u); };
 
-class Class_0043dd20 {
+class UnitMotion {
 public:
     Iface_0043dd20* iface;             // +0x0
     void UpdateMotion(Unit* u);
 };
 
 // FUNCTION: 0x43dd20
-void Class_0043dd20::UpdateMotion(Unit* u)
+void UnitMotion::UpdateMotion(Unit* u)
 {
     iface->v2();
     if (u->type->flag_800)

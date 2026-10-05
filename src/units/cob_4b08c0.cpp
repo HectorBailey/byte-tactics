@@ -20,7 +20,7 @@ struct Channel_004b08c0 {              // 0xa4 bytes
     char unknown_24[0xa4 - 0x24];
 };
 
-class Class_004b08c0 {
+class CobScript {
 public:
     char unknown_0[8];
     Table_004b08c0* table;             // +0x8
@@ -32,7 +32,7 @@ public:
 };
 
 // FUNCTION: 0x4b08c0
-int Class_004b08c0::StartThread(int id)
+int CobScript::StartThread(int id)
 {
     if (id < 0 || id >= table->count)
         return -1;

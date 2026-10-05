@@ -1,6 +1,6 @@
 // Decompiled by Opus. Names are provisional.
 
-class Class_004b0a70 {
+class CobScript {
 public:
     int StartScriptWithArgs(char* name, void* param_2, int param_3, int param_4, int param_5, int param_6, int param_7, int param_8);
 };
@@ -10,7 +10,7 @@ struct Object_00499c10 {
     char unknown_0[0x66];
     short heading;                     // +0x66
     char unknown_68[0x9a - 0x68];
-    Class_004b0a70* anims;             // +0x9a
+    CobScript* anims;                  // +0x9a
 };
 #pragma pack(pop)
 

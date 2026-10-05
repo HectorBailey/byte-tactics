@@ -171,7 +171,7 @@ class Class_004899b0 {
   public:
     int CanRepair(Unit_0043e490* other);
 };
-class Class_00489a70 {
+class Unit {
   public:
     int CanLoad(Unit_0043e490* other);
 };
@@ -283,7 +283,7 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
             return 4;
         break;
     case 6:
-        if (!target || !((Class_00489a70*)unit)->CanLoad(target))
+        if (!target || !((Unit*)unit)->CanLoad(target))
             break;
         return def->f241b.b11 ? 8 : 0xc;
     case 5:
@@ -319,7 +319,7 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
             return 6;
         if ((def->f241 & 0x800) && (target->def->f241 & 0x200))
             return 0xd;
-        if (((Class_00489a70*)unit)->CanLoad(target))
+        if (((Unit*)unit)->CanLoad(target))
             return def->f241b.b11 ? 8 : 0xc;
         if ((def->f245 & 0x20) && friendly)
             return 5;

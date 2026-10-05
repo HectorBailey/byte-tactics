@@ -36,11 +36,11 @@ public:
     ~UnitCategory() { name.FUN_004c9390(); }
 };
 
-class Class_00488c50 {
+class UnitTypeSet {
 public:
     int unknown_0[0x10];               // the object is 0x40 bytes
 
-    Class_00488c50() { memset(this, 0, sizeof(Class_00488c50)); }
+    UnitTypeSet() { memset(this, 0, sizeof(UnitTypeSet)); }
 };
 
 // The global std::vector<UnitCategory>, written by hand so that insert
@@ -80,7 +80,7 @@ void* __stdcall GetCategoryMask(char* name)
     if (first != DAT_0051e6b0.end() && _strcmpi(first->name.data, name) == 0)
         return first->value;
 
-    Class_00488c50* p = new Class_00488c50;
+    UnitTypeSet* p = new UnitTypeSet;
     DAT_0051e6b0.insert(first, 1, UnitCategory(Class_004c91b0(name), p));
     return p;
 }

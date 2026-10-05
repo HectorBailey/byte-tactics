@@ -121,7 +121,7 @@ struct Piece
     int spin[3];
     int acceleration[3];
 };
-class Class_004b08c0
+class CobScript
 {
   public:
     int StartThread(int);
@@ -552,7 +552,7 @@ void Class_004b0da0::RunThread(unsigned int channel, int elapsed)
             }
             case 0x10061000: {
                 int count = table->code[c->pc + 2];
-                int child = ((Class_004b08c0 *)this)->StartThread(table->code[c->pc + 1]);
+                int child = ((CobScript *)this)->StartThread(table->code[c->pc + 1]);
                 if (child >= 0)
                 {
                     if (count > 0)
@@ -574,7 +574,7 @@ void Class_004b0da0::RunThread(unsigned int channel, int elapsed)
             }
             case 0x10062000: {
                 int count = table->code[c->pc + 2];
-                int child = ((Class_004b08c0 *)this)->StartThread(table->code[c->pc + 1]);
+                int child = ((CobScript *)this)->StartThread(table->code[c->pc + 1]);
                 if (child >= 0)
                 {
                     if (count > 0)

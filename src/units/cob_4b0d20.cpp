@@ -7,7 +7,7 @@ struct Entry_004b0d20 {
     char unknown_24[0xa4 - 0x24];
 };
 
-class Class_004b0d20 {
+class CobScript {
 public:
     char unknown_0[0x1c];
     Entry_004b0d20 entries[8];
@@ -17,7 +17,7 @@ public:
 };
 
 // FUNCTION: 0x4b0d20
-void Class_004b0d20::RemoveCallback(int handle)
+void CobScript::RemoveCallback(int handle)
 {
     if (guard_53c != 0) {
         for (int i = 0; i < 8; i++) {

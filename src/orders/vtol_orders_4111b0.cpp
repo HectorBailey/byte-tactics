@@ -34,7 +34,7 @@ class Class_0044e6c0 { public: void FUN_0044e6c0(int); };
 class Class_0044e730 { public: void FUN_0044e730(short); };
 class Class_004b0940 { public: void StartScript(const char*, int, int); };
 class Class_004b0bc0 { public: int QueryScript(char* name, int* p2, int* p3, int* p4, int* p5); };
-class Class_004b0a70 { public: int StartScriptWithArgs(char*, void*, int, int, int, int, int, int); };
+class CobScript { public: int StartScriptWithArgs(char*, void*, int, int, int, int, int, int); };
 
 #pragma pack(push, 1)
 struct UnitDef {
@@ -49,7 +49,7 @@ struct Unit {
     char pad76[0x7e - 0x76]; short size;
     char pad80[0x86 - 0x80]; int field_86; int field_8a;
     char pad8e[4]; UnitDef* def;
-    char pad96[4]; Class_004b0a70* script;
+    char pad96[4]; CobScript* script;
 };
 struct Order {
     char pad0[5]; unsigned char state; unsigned int flags;

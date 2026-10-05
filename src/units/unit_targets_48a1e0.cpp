@@ -6,7 +6,7 @@ public:
     int FindScript(char* name);
 };
 
-class Class_004b0a70 {
+class CobScript {
 public:
     int StartScriptWithArgs(char* name, void* param_2, int param_3, int param_4,
                      int param_5, int param_6, int param_7, int param_8);
@@ -108,7 +108,7 @@ int __stdcall GetWeaponTargetPos(Unit* unit, Vec3_0048a1e0* pos, int index)
             e->x = 0;
             e->z = (short)0x8000;
             unit->script->FindScript("StartBuilding");
-            ((Class_004b0a70*)unit->script)->StartScriptWithArgs("TargetCleared", 0, 0, 1, index, 0, 0, 0);
+            ((CobScript*)unit->script)->StartScriptWithArgs("TargetCleared", 0, 0, 1, index, 0, 0, 0);
         }
         return 0;
     }
