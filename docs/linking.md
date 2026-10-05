@@ -15,6 +15,7 @@ uv run tools/globals.py                # rebuild data/globals.csv, link/globals.
 uv run tools/globals.py --check        # also compile link/data.cpp and compare it with the exe
 uv run tools/stateprobe.py HEADER --rename   # how many matches a shared header would break
 uv run tools/place.py                  # link at the original's addresses: build/place/TotalA.exe
+uv run tools/resources.py              # compile src/res/ and compare it with the original's .rsrc
 uv run tools/link.py --carve           # an ordinary LINK.EXE link that runs: build/link/TotalA.exe
 uv run tools/linkcmp.py                # does every reference in it reach what the original's does?
 uv run tools/gapcheck.py [0x...]       # the gap regions' source (src/gap/) against the original
@@ -432,10 +433,29 @@ How it places things:
   library code, before the library members, and `tools/link.py` links the
   object like any other (`tools/progress.py` leaves `src/lib/` out: these are
   not `game` rows).
+- **The resources** are `src/res/TotalA.rc` (the icon, the cursor and the
+  version resource), which `tools/resources.py --extract` wrote out of the
+  original once, and the icon and cursor it names. Those two are Cavedog's
+  art, which the repository does not hold: `tools/resources.py` takes them
+  from a directory given with `--art` or `BT_ART_DIR` (CI supplies them so),
+  or else extracts them from the player's own `orig/TotalA.exe` into
+  `build/res/art/`, and stops with a message saying so when it has neither.
+  It compiles the script with the toolchain's `RC.EXE` (5.00.1472, which
+  `tools/setup_toolchain.sh` takes from the CD's `SHAREDIDE/BIN`), finding
+  the art through RC's include path, and converts the `.res` with SP3's
+  `CVTRES.EXE` (5.00.1668, the build the exe's Rich header names), with
+  `/MACHINE:IX86 /READONLY` as LINK runs it on a `.res` file. CVTRES lays out
+  the whole resource directory itself (`.rsrc$01`), with the data after it in
+  the script's order (`.rsrc$02`), so `place.py` puts the two sections at the
+  start of `.rsrc` and resolves their relocations like any other object's.
+  The script is plain ASCII: the copyright sign is an octal escape (`\251`)
+  read through `#pragma code_page(1252)`. Each version string ends in an
+  explicit `\0`, as Developer Studio wrote them, which is what makes the
+  lengths the original's. `tools/link.py` links the same object.
 - **What has no source** is copied from the original and counted as copied:
   the gap regions without matching source, data no object defines, the
-  headers (with the debug directory) and the resources. No runtime library
-  code and no data are copied any more.
+  headers (with the debug directory). No runtime library code and no data
+  are copied any more.
 
 Every relocation is checked against the address the original's bytes give at
 that spot, and the finished image is compared with the original byte for
@@ -615,6 +635,8 @@ and `link.py` applies that to patched copies of the objects under
   initialiser for a `locale::id` guard).
 - zlib comes from the objects `tools/setup_toolchain.sh` builds, and the
   runtime library from `LIBCMT.LIB` and `LIBCPMT.LIB`, as LINK picks them.
+- The resources (the icon, the cursor and the version) come from `src/res/`,
+  compiled as for the placement link.
 - GOG's no-CD music fix has two parts, and the link makes both. The exe
   imports WINMM's functions from `WIN32.dll`, GOG's winmm that plays the CD
   tracks from `music/*.mp3`, so the link takes them from `WIN32.LIB`, a copy

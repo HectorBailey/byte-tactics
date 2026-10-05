@@ -37,9 +37,11 @@ they expect it, and every call reaches the one function at its address:
     zlib that the original links, each where the original holds its bytes and
     refers to the same functions, imports and data contents, and from
     src/lib/ (the basic_string members compiled with the game's options);
+  * the resources are compiled from src/res/TotalA.rc and the game's icon
+    and cursor with RC.EXE and CVTRES.EXE (tools/resources.py) and placed at
+    the start of .rsrc;
   * what has no source yet is copied from the original and counted as copied:
-    the other gap regions, data no object defines, the headers and the
-    resources.
+    the other gap regions, data no object defines and the headers.
 
 Every relocation is checked against the address the original uses at that
 spot, and the image is compared with the original byte for byte (the
@@ -1541,6 +1543,27 @@ def pad_data(placer: Placer) -> None:
                 img.out[i], img.src[i] = 0, PADDING
 
 
+def place_resources(placer: Placer) -> None:
+    """The resources, compiled from src/res/TotalA.rc and the game's icon and
+    cursor (tools/resources.py: from --art or BT_ART_DIR, or extracted from
+    orig/TotalA.exe). CVTRES's object holds the resource directory as
+    .rsrc$01 and the data as .rsrc$02,
+    which LINK puts at the start of .rsrc in that order, each at its
+    alignment. Their relocations are the data entries' addresses."""
+    from resources import build
+    obj = parse(build())
+    placer.objects.append(obj)
+    va = next(start for name, start, *_ in placer.img.sections if name == ".rsrc")
+    for sec in sorted((s for s in obj.secs if s.name.startswith(".rsrc$")), key=lambda s: s.name):
+        n = (sec.chars >> 20) & 0xF
+        align = 1 << (n - 1) if n else 16
+        start = (va + align - 1) & ~(align - 1)
+        placer.img.write(va, bytes(start - va), PADDING)
+        placer.place(obj, sec, 0, len(sec.data), start, RESOURCES, f"{sec.name} of {obj.path.name}")
+        placer.stats["resource sections placed from src/res"] += 1
+        va = start + len(sec.data)
+
+
 def write_exe(img: Image, out: Path) -> None:
     raw = bytearray(img.pe.__data__[:img.pe.OPTIONAL_HEADER.SizeOfHeaders])
     for name, start, vsize, rsize, s in img.sections:
@@ -1671,6 +1694,8 @@ def layout(jobs: int | None = None) -> tuple[Image, Placer]:
     place_crt_tables(placer)
     place_commons(placer)
     pad_data(placer)
+    place_resources(placer)
+    placer.relocate()
     copy_unbuilt(img)
     return img, placer
 
@@ -1682,8 +1707,14 @@ def main() -> None:
     ap.add_argument("--strict", action="store_true", help="exit non-zero if any built byte differs")
     ap.add_argument("--no-exe-patches", action="store_true",
                     help="leave out data/exe_patches.csv (GOG's no-CD music patch): the compiler's bytes")
+    ap.add_argument("--art", type=Path,
+                    help="the directory with the game's icon and cursor (TotalA.ico, TotalA.cur) for the "
+                         "resources (default: BT_ART_DIR, or extracted from orig/TotalA.exe)")
     ap.add_argument("--verbose", "-v", action="store_true")
     args = ap.parse_args()
+    if args.art:
+        import os
+        os.environ["BT_ART_DIR"] = str(args.art.resolve())
     output = args.output if args.output.is_absolute() else ROOT / args.output
 
     img, placer = layout(args.jobs)
