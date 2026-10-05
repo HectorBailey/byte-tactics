@@ -269,7 +269,7 @@ extern unsigned int g_netStatsTick;                                             
 extern unsigned int g_byteRatesTick;                                                          // 0x511ddc, 4 bytes; 1 of 1 files
 extern int DAT_00511de0;                                                                      // 0x511de0, 4 bytes; 2 of 2 files
 extern int DAT_00511de4;                                                                      // 0x511de4, 4 bytes; 2 of 2 files
-extern Game* g_game;                                                                          // 0x511de8, 4 bytes; 897 of 1031 files (conflicting: shape)
+extern Game* g_game;                                                                          // 0x511de8, 4 bytes; 895 of 1028 files (conflicting: shape)
 extern int DAT_00511dec;                                                                      // 0x511dec, 4 bytes; 1 of 1 files
 extern unsigned char DAT_00511f80[16];                                                        // 0x511f80, 16 bytes; CMemoryCache by value in 5 of 5 files
 extern int DAT_00511f90;                                                                      // 0x511f90, 4 bytes; 1 of 1 files
@@ -508,7 +508,7 @@ extern int g_reportFlags;                                                       
 extern char g_unitSyncStatusText[104];                                                        // 0x51e5a0, 104 bytes; 1 of 1 files
 extern char DAT_0051e608;                                                                     // 0x51e608, 1 bytes; 21 of 21 files
 extern unsigned char DAT_0051e609[7];                                                         // 0x51e609, 7 bytes; nothing refers to it
-extern unsigned char DAT_0051e610[36];                                                        // 0x51e610, 36 bytes; Class_00470ed0 by value in 26 of 28 files (conflicting: struct names only)
+extern unsigned char DAT_0051e610[36];                                                        // 0x51e610, 36 bytes; Class_00470ed0 by value in 24 of 26 files (conflicting: struct names only)
 extern unsigned char DAT_0051e634;                                                            // 0x51e634, 1 bytes; 1 of 1 files
 extern unsigned char DAT_0051e635[7];                                                         // 0x51e635, 7 bytes; nothing refers to it
 extern char* DAT_0051e63c;                                                                    // 0x51e63c, 4 bytes; 3 of 3 files

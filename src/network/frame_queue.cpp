@@ -1,4 +1,123 @@
-// Decompiled by deepseek-v4.1-flash, finished by GPT-6, finished by deepseek-v4.1-flash, finished by space-bunny-free, finished by deepseek-v4.1-flash, finished by space-bunny-free, finished by deepseek-v4.1-flash, finished by deepseek-v4.1-flash, finished by fledge-alpha-free, finished by Opus. Names are provisional.
+// Decompiled by Opus, deepseek-v4.1-flash, GPT-6, space-bunny-free and fledge-alpha-free. Names are provisional.
+
+#include <string.h>
+
+void* __cdecl operator new(unsigned int size);
+void __cdecl operator delete(void* p);
+
+// Bit reader, see src/network/bit_reader.cpp.
+class BitReader {
+public:
+    unsigned int* data;                // +0x00
+    int index;                         // +0x04
+    int bit;                           // +0x08
+    int ReadBits(int bits);
+};
+
+// Length of each packet command, one word per 4-byte entry.
+extern unsigned short DAT_00512ad8[][2];
+
+// One queued frame of a player's ring: the tick it is due, the data and size.
+struct Frame_00463790 {
+    int tick;                          // +0x0
+    void* data;                        // +0x4
+    int size;                          // +0x8
+};
+
+// The queued frames, a ring of 0x200.
+struct FrameRing {                     // 0x180c bytes
+    int count;                         // +0x0
+    int head;                          // +0x4
+    int tail;                          // +0x8
+    Frame_00463790 frames[0x200];      // +0xc
+
+    FrameRing() { count = 0; head = 0; tail = -1; }
+
+    Frame_00463790* Pop()
+    {
+        if (count > 0) {
+            count--;
+            Frame_00463790* f = &frames[head];
+            if (++head >= 0x200)
+                head = 0;
+            return f;
+        }
+        return 0;
+    }
+
+    int Push(int tick, void* data, int size)
+    {
+        if (count >= 0x200)
+            return 0;
+        if (++tail >= 0x200)
+            tail = 0;
+        frames[tail].data = data;
+        frames[tail].tick = tick;
+        frames[tail].size = size;
+        count++;
+        return 1;
+    }
+};
+
+class FrameQueue {
+public:
+    int field_0;                       // +0x00
+    unsigned int field_4;              // +0x04
+    int field_8;                       // +0x08
+    char* field_c;                     // +0x0c
+    FrameRing* buffer;                 // +0x10
+    int field_14;                      // +0x14
+    int field_18;                      // +0x18
+
+    int Count() { return buffer ? buffer->count : 0; }
+
+    ~FrameQueue();
+    FrameQueue();
+    int ResetFrames();
+    int QueueFrames(char* src, unsigned int size, int tick, int a4, int a5, int a6);
+};
+
+// FUNCTION: 0x4636b0
+FrameQueue::FrameQueue()
+{
+    buffer = 0;
+    field_0 = 0;
+    field_4 = 0;
+    field_8 = 0;
+    field_c = 0;
+    field_14 = -1;
+    field_18 = -1;
+    buffer = new FrameRing;
+}
+
+// Destructor of the class built by 0x4636b0 (the same layout as the
+// FrameQueue member of PlayerFrameInfo, whose fields 0x463680 frees in the
+// same order): frees the buffer at +0x10, then the block at +0xc.
+// FUNCTION: 0x463710
+FrameQueue::~FrameQueue()
+{
+    operator delete(buffer);
+    operator delete(field_c);
+}
+
+// Resets the object and allocates its 0x180c-byte buffer if it has none;
+// returns 1 when the buffer already existed.
+// FUNCTION: 0x463730
+int FrameQueue::ResetFrames()
+{
+    field_0 = 0;
+    field_4 = 0;
+    field_8 = 0;
+    field_c = 0;
+    field_14 = -1;
+    field_18 = -1;
+    if (!buffer) {
+        buffer = new FrameRing;
+        return 0;
+    }
+    return 1;
+}
+
 // Rewritten (pass 14, Opus): 75.0% -> 85.2%; pass 15: 86.6%; pass 16 (#5358): 88.8%;
 // pass 17 (#5515): 89.3%; pass 18 (Opus, #5559): MATCH.
 // Queues one received packet's commands in the ring at +0x10. If frames are
@@ -34,78 +153,6 @@
 //    x, progress, i, q are defined in that order after the spacing computation.
 //  * The a6 == 0 loop's exits are `break` (to the one `return 1` after it), which
 //    puts its back edge's `xor edx, edx` block before the loop head.
-#include <string.h>
-
-void* __cdecl operator new(unsigned int size);
-void __cdecl operator delete(void* p);
-
-// Bit reader, see src/network/bit_reader.cpp.
-class BitReader {
-public:
-    unsigned int* data;                // +0x00
-    int index;                         // +0x04
-    int bit;                           // +0x08
-    int ReadBits(int bits);
-};
-
-// Length of each packet command, one word per 4-byte entry.
-extern unsigned short DAT_00512ad8[][2];
-
-// One queued frame of a player's ring: the tick it is due, the data and size.
-struct Frame_00463790 {
-    int tick;                          // +0x0
-    void* data;                        // +0x4
-    int size;                          // +0x8
-};
-
-// 0x180c-byte ring of 0x200 frames.
-struct Ring_00463790 {
-    int count;                         // +0x0
-    int head;                          // +0x4
-    int tail;                          // +0x8
-    Frame_00463790 frames[0x200];      // +0xc
-
-    Frame_00463790* Pop()
-    {
-        if (count > 0) {
-            count--;
-            Frame_00463790* f = &frames[head];
-            if (++head >= 0x200)
-                head = 0;
-            return f;
-        }
-        return 0;
-    }
-
-    int Push(int tick, void* data, int size)
-    {
-        if (count >= 0x200)
-            return 0;
-        if (++tail >= 0x200)
-            tail = 0;
-        frames[tail].data = data;
-        frames[tail].tick = tick;
-        frames[tail].size = size;
-        count++;
-        return 1;
-    }
-};
-
-class FrameQueue {
-public:
-    int field_0;                       // +0x00
-    unsigned int field_4;              // +0x04
-    int field_8;                       // +0x08
-    char* field_c;                     // +0x0c
-    Ring_00463790* buffer;             // +0x10
-    int field_14;                      // +0x14
-    int field_18;                      // +0x18
-
-    int Count() { return buffer ? buffer->count : 0; }
-
-    int QueueFrames(char* src, unsigned int size, int tick, int a4, int a5, int a6);
-};
-
 // FUNCTION: 0x463790
 int FrameQueue::QueueFrames(char* src, unsigned int size, int tick, int a4, int a5, int a6)
 {
