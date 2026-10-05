@@ -53,8 +53,8 @@ struct MovementClassTable {
         } while (--n);
     }
 
-    static MovementClassTable DAT_00512358;
+    static MovementClassTable g_movementClasses;
 };
 
 // FUNCTION: 0x440290 _$E3
-MovementClassTable MovementClassTable::DAT_00512358;
+MovementClassTable MovementClassTable::g_movementClasses;

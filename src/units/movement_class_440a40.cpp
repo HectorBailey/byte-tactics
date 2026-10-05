@@ -20,15 +20,15 @@ public:
 struct MovementClassTable {
     MovementClass entries[32];
 
-    static MovementClassTable DAT_00512358;
+    static MovementClassTable g_movementClasses;
 };
 
 // FUNCTION: 0x440a40
 void __stdcall RefreshAllPassMaps(Point_00440a40 a, Point_00440a40 b)
 {
     for (int i = 0; i < 32; i++) {
-        if (MovementClassTable::DAT_00512358.entries[i].field_0 != 0) {
-            ((Class_00440830*)&MovementClassTable::DAT_00512358.entries[i])->RefreshPassMap(a, b);
+        if (MovementClassTable::g_movementClasses.entries[i].field_0 != 0) {
+            ((Class_00440830*)&MovementClassTable::g_movementClasses.entries[i])->RefreshPassMap(a, b);
         }
     }
 }

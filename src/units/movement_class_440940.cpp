@@ -48,7 +48,7 @@ public:
 struct MovementClassTable {
     MovementClass entries[32];
 
-    static MovementClassTable DAT_00512358;
+    static MovementClassTable g_movementClasses;
 };
 
 // FUNCTION: 0x440940
@@ -56,13 +56,13 @@ void BuildAllPassMaps(void)
 {
     int count = 0;
     unsigned int n;
-    int p = (int)&MovementClassTable::DAT_00512358;
+    int p = (int)&MovementClassTable::g_movementClasses;
     do {
         if (*(int*)p != 0) {
             count++;
         }
         p += 0x20;
-    } while (p < (int)&MovementClassTable::DAT_00512358 + 0x400);
+    } while (p < (int)&MovementClassTable::g_movementClasses + 0x400);
 
     int progress = 100;
     unsigned int* q = (unsigned int*)DAT_00512370;

@@ -5529,7 +5529,7 @@ struct CobFile_0042d1f0 {  // 0x194 bytes, 2 views
 struct MovementClassTable {  // 0x400 bytes, 7 views
     MovementClass entries[32];   // +0x0
     ~MovementClassTable(void);
-    static MovementClassTable DAT_00512358;
+    static MovementClassTable g_movementClasses;
 };
 
 class Class_00458180 {  // 0x14 bytes, 2 views
