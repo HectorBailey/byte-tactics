@@ -22,7 +22,7 @@ Gadget_004931d0* __stdcall FUN_004aa8f0(char* sub, const char* name, int flags);
 void __stdcall FUN_004288d0(const char* name, int a, int b, int c);
 int __stdcall FUN_00492b10(int* out);
 void __stdcall FUN_004a9660(char* sub);
-char* __stdcall FUN_004c5740(char* text);
+char* __stdcall Translate(char* text);
 void __stdcall FUN_004abd90(char* dest, char* text, int a, int b, int c);
 char* FUN_00476830();
 void __stdcall FUN_004a32a0(char* menu, char* name, void* text, int count, int flag);
@@ -47,7 +47,7 @@ void FUN_004931d0()
     if (FUN_00492b10(&count) == 0) {
         FUN_004a9660(g_game + 0x519);
         FUN_004abd90(g_game + 0x519,
-                     FUN_004c5740("There are no saved games to choose from"),
+                     Translate("There are no saved games to choose from"),
                      0x140, 1, 1);
         return;
     }

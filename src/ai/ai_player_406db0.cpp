@@ -24,12 +24,12 @@ extern char DAT_005119b8[];
 
 class Class_004b73c0 {
 public:
-    char* FUN_004b73c0(int index, char* fallback);
+    char* GetArg(int index, char* fallback);
 };
 
 class Class_004b7410 {
 public:
-    float FUN_004b7410(int index, float default_val);
+    float GetFloatArg(int index, float default_val);
 };
 
 // 0x40-byte set (512 bits).
@@ -48,8 +48,8 @@ void __stdcall FUN_00406db0(Class_004b7410* args)
         int count;
         UnitTypeSet set;
         memset(&set, 0, sizeof(set));
-        set.AddTypeOrCategory(((Class_004b73c0*)args)->FUN_004b73c0(1, DAT_005119b8), &count);
-        float value = args->FUN_004b7410(2, 0);
+        set.AddTypeOrCategory(((Class_004b73c0*)args)->GetArg(1, DAT_005119b8), &count);
+        float value = args->GetFloatArg(2, 0);
         // A narrow index, as in 0x406e40: MSVC then counts the loop down in a
         // separate register.
         for (char i = 0; i < 10; i++) {

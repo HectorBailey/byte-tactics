@@ -44,7 +44,7 @@ public:
 
 class Class_004c2f60 {
 public:
-    int FUN_004c2f60(char* file);
+    int LoadFile(char* file);
 };
 
 class Class_00435c00 {
@@ -71,7 +71,7 @@ void __stdcall FUN_00491c80(int n);
 void __stdcall ListDirectory(const char* pattern, int flags, std::vector<Class_004c91a0>* out);
 char* __stdcall FUN_004290f0(char* out, const char* dir, const char* name, const char* ext);
 char* __stdcall StripExtension(char* name);
-char* __stdcall FUN_004c5740(char* text);
+char* __stdcall Translate(char* text);
 void HandleNetPackets();
 
 // FUNCTION: 0x434bf0
@@ -115,14 +115,14 @@ int __stdcall FUN_00434bf0(void** param_1, int param_2, int param_3)
         struct A { char name[256]; char lower[256]; char path[256]; } a;
         FUN_004290f0(a.path, "Maps", files[s.i].ptr, "OTA");
         Class_004c2ea0 parser;
-        if (((Class_004c2f60*)&parser)->FUN_004c2f60(a.path) != 0
+        if (((Class_004c2f60*)&parser)->LoadFile(a.path) != 0
             && ((Class_00435c00*)(*(int*)(g_game + 0x391e9)))
                    ->FUN_00436860(3, &parser, 0) != 0) {
             strcpy(a.name, files[s.i].ptr);
             StripExtension(a.name);
             strcpy(a.lower, a.name);
             _strlwr(a.lower);
-            char* src = FUN_004c5740(a.lower);
+            char* src = Translate(a.lower);
             if (_strcmpi(src, a.lower) == 0)
                 src = a.name;
             int len = strlen(src) + 1;

@@ -50,7 +50,7 @@ Entry_00440d70* __stdcall FUN_004a0010(Entry_00440d70* entries, const char* name
 void __stdcall FUN_004a9660(Gadget_00440d70* gadget);
 void FUN_00443cb0();
 int FUN_004436e0();
-char* __stdcall FUN_004c5740(const char* text);
+char* __stdcall Translate(const char* text);
 void __stdcall FUN_004abd90(char* dest, const char* text, int a, int b, int c);
 
 // FUNCTION: 0x440d70
@@ -98,7 +98,7 @@ void __stdcall FUN_00440d70(Gadget_00440d70* gadget)
         if (strlen(namebuf) == 0) {
             FUN_004a7190(gadget, gi);
             FUN_004ab0a0(gadget);
-            FUN_004abd90((char*)gadget, FUN_004c5740("You must enter a game name"), 0x140, 1, 1);
+            FUN_004abd90((char*)gadget, Translate("You must enter a game name"), 0x140, 1, 1);
             return;
         }
         ni = FUN_0049fdf0(entries, "NICKNAME", 3);
@@ -106,7 +106,7 @@ void __stdcall FUN_00440d70(Gadget_00440d70* gadget)
         if (strlen(nickbuf) == 0) {
             FUN_004a7190(gadget, ni);
             FUN_004ab0a0(gadget);
-            FUN_004abd90((char*)gadget, FUN_004c5740("You must enter your name"), 0x140, 1, 1);
+            FUN_004abd90((char*)gadget, Translate("You must enter your name"), 0x140, 1, 1);
             return;
         }
         strcpy(g_game->gameName, namebuf);

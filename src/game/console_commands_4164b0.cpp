@@ -9,7 +9,7 @@ struct Class_004b73e0 {
     char unknown_0[0xd0];
     int field_d0;                      // +0xd0
 
-    int FUN_004b73e0(int param_1, int param_2);
+    int GetIntArg(int param_1, int param_2);
 };
 
 class Class_004904b0 {
@@ -34,7 +34,7 @@ void __stdcall FUN_004164b0(Class_004b73e0* args)
     if (args->field_d0 == 1) {
         KillAllUnits();
     } else {
-        KillPlayerUnits(args->FUN_004b73e0(1, 0));
+        KillPlayerUnits(args->GetIntArg(1, 0));
     }
     g_game->field_391ed->FUN_004904b0();
 }

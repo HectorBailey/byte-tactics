@@ -47,7 +47,7 @@ Gadget_0044bc10* __stdcall FUN_004aa8f0(Menu_0044bc10* menu, const char* name, i
 void __stdcall FUN_004288d0(const char* name, int a, int b, int c);
 void* __stdcall FUN_0044b4e0(int* out);
 void __stdcall FUN_004a9660(Menu_0044bc10* menu);
-char* __stdcall FUN_004c5740(const char* text);
+char* __stdcall Translate(const char* text);
 int __stdcall FUN_004abd90(Menu_0044bc10* menu, const char* text, int a, int b, int c);
 char* __stdcall SkipTextLines(char* text, int n);
 void __stdcall FUN_004a32a0(Menu_0044bc10* menu, char* name, void* text, int count, int flag);
@@ -74,7 +74,7 @@ void FUN_0044bc10()
     if (FUN_0044b4e0(&count) == 0) {
         FUN_004a9660(&g_game->menu);
         FUN_004abd90(&g_game->menu,
-                     FUN_004c5740("There are no saved lists to choose from"),
+                     Translate("There are no saved lists to choose from"),
                      0x140, 1, 1);
         return;
     }

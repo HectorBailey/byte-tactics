@@ -41,7 +41,7 @@ char __stdcall FUN_0041d6a0(int param_1);
 void FUN_0041d4c0();
 void __stdcall FUN_00491c80(int param_1);
 void FUN_004257a0();
-char* __stdcall FUN_004c5740(char* text);
+char* __stdcall Translate(char* text);
 void __stdcall FUN_004abd90(char* menu, char* text, int param_3, int param_4, int param_5);
 void __stdcall FUN_004ab0a0(void* menu);
 int __stdcall FUN_004a0f60(Menu_00478cb0* menu, char* name);
@@ -71,7 +71,7 @@ void __stdcall FUN_00478cb0(Menu_00478cb0* menu)
             return;
         }
         FUN_004abd90(g_game->menu,
-                     FUN_004c5740("Please insert the Campaign CD (Disc 2) and try again"),
+                     Translate("Please insert the Campaign CD (Disc 2) and try again"),
                      200, 1, 1);
         FUN_004ab0a0(g_game->menu);
         return;

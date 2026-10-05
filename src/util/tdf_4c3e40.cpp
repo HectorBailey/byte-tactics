@@ -135,7 +135,7 @@ public:
 
 class Class_004c4340 {
 public:
-    Class_004c91a0 FUN_004c4340(char* start, char* end);
+    Class_004c91a0 MakeTrimmedString(char* start, char* end);
 };
 
 // A section of a .TDF file: its name, its sub-sections and its entries.
@@ -176,7 +176,7 @@ Class_004c3e40::Class_004c3e40(char* name, char* text, char** nextblock, char* f
                 strcat(error, "Sub-record - closing ']' not found");
                 goto fail;
             }
-            Class_004c91a0 subname = ((Class_004c4340*)this)->FUN_004c4340(current + 1, close);
+            Class_004c91a0 subname = ((Class_004c4340*)this)->MakeTrimmedString(current + 1, close);
             current = SkipSpace(close + 1);
             if (*current != '{') {
                 strcat(error, "Sub-record - opening '{' not found");
@@ -213,14 +213,14 @@ Class_004c3e40::Class_004c3e40(char* name, char* text, char** nextblock, char* f
                 strcat(error, "Data field - '=' not found");
                 goto fail;
             }
-            Class_004c91a0 key = ((Class_004c4340*)this)->FUN_004c4340(current, eq);
+            Class_004c91a0 key = ((Class_004c4340*)this)->MakeTrimmedString(current, eq);
             current = eq + 1;
             char* semi = strchr(eq + 1, ';');
             if (!semi) {
                 strcat(error, "Data field - ';' not found");
                 goto fail;
             }
-            Class_004c91a0 value = ((Class_004c4340*)this)->FUN_004c4340(current, semi);
+            Class_004c91a0 value = ((Class_004c4340*)this)->MakeTrimmedString(current, semi);
             current = semi + 1;
             Class_004c54a0* e = entries.LowerBound(key.ptr);
             Class_004c91a0* r;

@@ -118,7 +118,7 @@ struct Rec_004b7760 {
 };
 
 // FUNCTION: 0x4b7760
-void __stdcall FUN_004b7760(Rec_004b7760* rec)
+void __stdcall RegisterCommands(Rec_004b7760* rec)
 {
     for (; rec->name; rec++) {
         int mask = rec->mask;

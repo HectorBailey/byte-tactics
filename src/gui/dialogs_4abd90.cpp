@@ -56,7 +56,7 @@ struct Menu_004abd90 {
 };
 
 Layer_004abd90* __stdcall FUN_004aa8f0(Menu_004abd90* menu, const char* name, int flags);
-char* __stdcall FUN_004c5740(char* text);
+char* __stdcall Translate(char* text);
 char* __stdcall FUN_004ac4c0(Menu_004abd90* menu, char* text, int width, int index);
 void __stdcall FUN_004a81e0(Menu_004abd90* menu, int flag);
 void __stdcall FUN_004ab1b0(Layer_004abd90* layer, char* type, char* text, int x, short y,
@@ -80,7 +80,7 @@ int __stdcall FUN_004abd90(Menu_004abd90* gui, char* text, int wrapWidth, int ce
     if (layer) {
         char name[0x100];
         char buf[0x100];
-        strcpy(name, FUN_004c5740(text));
+        strcpy(name, Translate(text));
         char* wrapped = FUN_004ac4c0(gui, name, wrapWidth, -1);
         FUN_004a81e0(gui, 2);
         strncpy(buf, wrapped, 0xfe);

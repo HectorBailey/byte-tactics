@@ -22,7 +22,7 @@ struct Class_004c5740 {
 extern Class_004c5740* DAT_0051fdb8;
 
 // FUNCTION: 0x4c5740
-char* __stdcall FUN_004c5740(char* key)
+char* __stdcall Translate(char* key)
 {
     if (key == 0)
         return 0;

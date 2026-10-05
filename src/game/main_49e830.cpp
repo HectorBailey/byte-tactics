@@ -196,7 +196,7 @@ void FUN_004916a0();
 int __stdcall FUN_0049ee30(char* param_1, char* param_2);
 void __stdcall FUN_0042f980(const char* param_1, void* param_2, int* param_3);
 void __stdcall FUN_0042f960(const char* param_1, void* param_2, int param_3);
-void __stdcall FUN_004c54f0(const char* param_1, char* param_2);
+void __stdcall LoadTranslations(const char* param_1, char* param_2);
 
 // FUNCTION: 0x49e830
 int __stdcall FUN_0049e830(HINSTANCE hInstance, HINSTANCE hPrevInstance,
@@ -260,7 +260,7 @@ int __stdcall FUN_0049e830(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         if (DAT_0051fb50[0] == 0)
             strcpy(DAT_0051fb50, DAT_00504ab8);
     }
-    FUN_004c54f0(DAT_005097d0, DAT_0051fb50);
+    LoadTranslations(DAT_005097d0, DAT_0051fb50);
     g_game->field_10 = new Class_004cee50;
     FUN_00428bb0();
     FUN_00491200();

@@ -3,12 +3,12 @@
 
 class Class_004c46c0 {
 public:
-    int FUN_004c46c0(const char* name, int def);
+    int GetFieldInt(const char* name, int def);
 };
 
 class Class_004c48c0 {
 public:
-    int FUN_004c48c0(char* dst, char* key, size_t size, char* def);
+    int GetFieldString(char* dst, char* key, size_t size, char* def);
 };
 
 struct Source_004ae170 {
@@ -31,16 +31,16 @@ struct Obj_004ae170 {
 
 extern char DAT_005119b8[];
 
-char* __stdcall FUN_004c5740(char* text);
+char* __stdcall Translate(char* text);
 
 // FUNCTION: 0x4ae170
 void __stdcall FUN_004ae170(Obj_004ae170* obj, Source_004ae170* src)
 {
-    obj->range = ((Class_004c46c0*)src->tdf)->FUN_004c46c0("range", 0);
-    obj->thick = (short)((Class_004c46c0*)src->tdf)->FUN_004c46c0("thick", 0);
-    obj->knobpos = ((Class_004c46c0*)src->tdf)->FUN_004c46c0("knobpos", 0);
-    obj->knobsize = ((Class_004c46c0*)src->tdf)->FUN_004c46c0("knobsize", 0);
+    obj->range = ((Class_004c46c0*)src->tdf)->GetFieldInt("range", 0);
+    obj->thick = (short)((Class_004c46c0*)src->tdf)->GetFieldInt("thick", 0);
+    obj->knobpos = ((Class_004c46c0*)src->tdf)->GetFieldInt("knobpos", 0);
+    obj->knobsize = ((Class_004c46c0*)src->tdf)->GetFieldInt("knobsize", 0);
     obj->field_144 = 0;
-    src->tdf->FUN_004c48c0(obj->text, "text", 0x80, DAT_005119b8);
-    strcpy(obj->text, FUN_004c5740(obj->text));
+    src->tdf->GetFieldString(obj->text, "text", 0x80, DAT_005119b8);
+    strcpy(obj->text, Translate(obj->text));
 }

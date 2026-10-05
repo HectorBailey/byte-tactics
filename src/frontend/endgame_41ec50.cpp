@@ -108,7 +108,7 @@ void __stdcall FUN_00490b30(int a);
 void __stdcall FUN_004c22d0(int param);
 void __stdcall FUN_00491c80(int n);
 char __stdcall FUN_0041d6a0(int param_1);
-char* __stdcall FUN_004c5740(char* text);
+char* __stdcall Translate(char* text);
 void __stdcall FUN_004abd90(char* dest, char* text, int param_3, int param_4, int param_5);
 void FUN_0041d4c0();
 Entry_0041ec50* __stdcall FUN_0049ff90(Entry_0041ec50* entries, char* name);
@@ -168,7 +168,7 @@ void __stdcall FUN_0041ec50(Gadget_0041ec50* gadget)
     if (FUN_0049fd60(gadget, "Start") || FUN_0049fd60(gadget, "Missions")) {
         if (!FUN_0041d6a0(0)) {
             FUN_004abd90(g_game->message,
-                         FUN_004c5740("Please insert the Campaign CD (Disc 2) and try again"),
+                         Translate("Please insert the Campaign CD (Disc 2) and try again"),
                          200, 1, 1);
             FUN_004ab0a0(g_game->message);
         }

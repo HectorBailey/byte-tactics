@@ -4,7 +4,7 @@
 
 class Class_004c48c0 {
 public:
-    int FUN_004c48c0(char* dst, char* key, size_t size, char* def);
+    int GetFieldString(char* dst, char* key, size_t size, char* def);
 };
 
 struct Source_004ae550 {
@@ -24,5 +24,5 @@ extern char DAT_005119b8[];
 // FUNCTION: 0x4ae550
 void __stdcall FUN_004ae550(Obj_004ae550* obj, Source_004ae550* src)
 {
-    src->tdf->FUN_004c48c0(obj->text, "filename", 0x20, DAT_005119b8);
+    src->tdf->GetFieldString(obj->text, "filename", 0x20, DAT_005119b8);
 }

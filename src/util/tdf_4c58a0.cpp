@@ -11,7 +11,7 @@
 class Class_004c48c0 {
 public:
     char unknown_0[0x19];
-    int FUN_004c48c0(char* dst, char* key, size_t size, char* def);
+    int GetFieldString(char* dst, char* key, size_t size, char* def);
 };
 
 class Class_004c2ea0 {
@@ -25,7 +25,7 @@ extern char DAT_0051fdc0[256];
 extern char DAT_005119b8[];
 
 // FUNCTION: 0x4c58a0
-int __stdcall FUN_004c58a0(Class_004c2ea0* file, char* dst, char* key, size_t size,
+int __stdcall GetLocalizedString(Class_004c2ea0* file, char* dst, char* key, size_t size,
                            char* def)
 {
     char full[256];
@@ -33,11 +33,11 @@ int __stdcall FUN_004c58a0(Class_004c2ea0* file, char* dst, char* key, size_t si
     strcat(full, key);
     int r;
     if (def) {
-        r = file->current->FUN_004c48c0(dst, full, size, def);
+        r = file->current->GetFieldString(dst, full, size, def);
         if (r) return 1;
-        return file->current->FUN_004c48c0(dst, key, size, def);
+        return file->current->GetFieldString(dst, key, size, def);
     }
-    r = file->current->FUN_004c48c0(dst, full, size, DAT_005119b8);
+    r = file->current->GetFieldString(dst, full, size, DAT_005119b8);
     if (r) return 1;
-    return file->current->FUN_004c48c0(dst, key, size, DAT_005119b8);
+    return file->current->GetFieldString(dst, key, size, DAT_005119b8);
 }

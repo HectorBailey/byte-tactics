@@ -103,7 +103,7 @@ void FUN_004c2bb0();
 void* __cdecl FUN_004d83b0(const char* name, int size);
 void __stdcall FUN_00426200();
 int __stdcall CheckDirectXVersion(int a, int b, int c, int d, int e);
-char* __stdcall FUN_004c5740(const char* text);
+char* __stdcall Translate(const char* text);
 void __stdcall FUN_004abd90(Sub_004263b0* sub, char* text, int a, int b, int c);
 void __stdcall FUN_00429000();
 
@@ -172,7 +172,7 @@ void __stdcall FUN_004263b0()
     if (DAT_0051228c == 0) {
         DAT_0051228c = 1;
         if (CheckDirectXVersion(4, 5, 0, 0x9b, 3) == 0) {
-            if (_snprintf(text, 300, FUN_004c5740(DAT_004fd050), "\n", "\n", "\n", "\n") < 0) {
+            if (_snprintf(text, 300, Translate(DAT_004fd050), "\n", "\n", "\n", "\n") < 0) {
                 text[299] = 0;
             }
             FUN_004abd90(&g_game->sub, text, 200, 1, 1);
@@ -181,7 +181,7 @@ void __stdcall FUN_004263b0()
 
     if (DAT_00512294 == 0) {
         if (((Class_004cff20*)g_game->field_10)->FUN_004cff20()) {
-            FUN_004abd90(&g_game->sub, FUN_004c5740("No sound driver is available for use.\n"), 500, 1, 1);
+            FUN_004abd90(&g_game->sub, Translate("No sound driver is available for use.\n"), 500, 1, 1);
             DAT_00512294 = 1;
         }
     }

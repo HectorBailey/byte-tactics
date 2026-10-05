@@ -102,7 +102,7 @@ void __stdcall FUN_004a0bf0(Menu_0047ae60* menu, char* key, char* value, int fla
 void __stdcall FUN_004ab0a0(void* param_1);
 void __stdcall FUN_004abd90(void* menu, char* text, int width, int a, int b);
 void __stdcall FUN_004c2340(int* out);
-char* __stdcall FUN_004c5740(char* text);
+char* __stdcall Translate(char* text);
 
 // FUNCTION: 0x47ae60
 void __stdcall FUN_0047ae60(Menu_0047ae60* menu)
@@ -125,7 +125,7 @@ void __stdcall FUN_0047ae60(Menu_0047ae60* menu)
         FUN_0047f1a0("BigButton", 0);
         if (!FUN_0041d6a0(1)) {
             FUN_004abd90(g_game + 0x519,
-                         FUN_004c5740("Please insert the Multiplayer CD (Disc 1) and try again"),
+                         Translate("Please insert the Multiplayer CD (Disc 1) and try again"),
                          0xc8, 1, 1);
             FUN_004ab0a0(g_game + 0x519);
         }
@@ -145,7 +145,7 @@ void __stdcall FUN_0047ae60(Menu_0047ae60* menu)
 
         if ((*(Class_00435a20**)(g_game + 0x391e9))->FUN_00435a20((*(Table_0047ae60**)(g_game + 0x29a0))->mapName) == 0) {
             FUN_004abd90(g_game + 0x519,
-                         FUN_004c5740("The terrain for the selected map does not exist."),
+                         Translate("The terrain for the selected map does not exist."),
                          0x1e0, 1, 1);
             FUN_004ab0a0(menu);
             return;
@@ -175,7 +175,7 @@ void __stdcall FUN_0047ae60(Menu_0047ae60* menu)
                 int maxPlayers = (*(Class_00437300**)(g_game + 0x391e9))->FUN_00437300();
                 if ((int)(unsigned short)*(short*)(g_game + 0x2a3c) > maxPlayers) {
                     FUN_004abd90(g_game + 0x519,
-                                 FUN_004c5740("There are too many players enabled for this map"),
+                                 Translate("There are too many players enabled for this map"),
                                  0x1e0, 1, 1);
                     FUN_004ab0a0(menu);
                     return;
@@ -183,7 +183,7 @@ void __stdcall FUN_0047ae60(Menu_0047ae60* menu)
 
                 if (FUN_00479760() != 0) {
                     FUN_004abd90(g_game + 0x519,
-                                 FUN_004c5740("All players may not be in the same allied group."),
+                                 Translate("All players may not be in the same allied group."),
                                  0x1e0, 1, 1);
                     FUN_004ab0a0(menu);
                     return;
@@ -219,7 +219,7 @@ void __stdcall FUN_0047ae60(Menu_0047ae60* menu)
             }
         }
         FUN_004abd90(g_game + 0x519,
-                     FUN_004c5740("There must be at least one player and one computer opponent"),
+                     Translate("There must be at least one player and one computer opponent"),
                      0x1e0, 1, 1);
         FUN_004ab0a0(menu);
         return;
@@ -310,9 +310,9 @@ void __stdcall FUN_0047ae60(Menu_0047ae60* menu)
         int index = FUN_0049fdf0(entries, "CommanderDeath", 1);
         Entry_0047ae60* e = &entries[index];
         if ((*(Table_0047ae60**)(g_game + 0x29a0))->field_108 != 0)
-            strcpy(e->text, FUN_004c5740("Game ends when commander is destroyed."));
+            strcpy(e->text, Translate("Game ends when commander is destroyed."));
         else
-            strcpy(e->text, FUN_004c5740("Game continues after Commander is destroyed."));
+            strcpy(e->text, Translate("Game continues after Commander is destroyed."));
         FUN_004a0090(g_game + 0x519);
     } else if (FUN_0049fd60(menu, "StartLocation")) {
         FUN_0047f1a0("Skirmish", 0);
@@ -321,9 +321,9 @@ void __stdcall FUN_0047ae60(Menu_0047ae60* menu)
         int index = FUN_0049fdf0(entries, "StartLocation", 1);
         Entry_0047ae60* e = &entries[index];
         if ((*(Table_0047ae60**)(g_game + 0x29a0))->field_118 != 0)
-            strcpy(e->text, FUN_004c5740("Commanders are placed at pre-determined locations."));
+            strcpy(e->text, Translate("Commanders are placed at pre-determined locations."));
         else
-            strcpy(e->text, FUN_004c5740("Commanders are randomly placed on the battle field."));
+            strcpy(e->text, Translate("Commanders are randomly placed on the battle field."));
         FUN_004a0090(g_game + 0x519);
     } else if (FUN_0049fd60(menu, "Mapping")) {
         FUN_0047f1a0("Skirmish", 0);
@@ -332,9 +332,9 @@ void __stdcall FUN_0047ae60(Menu_0047ae60* menu)
         int index = FUN_0049fdf0(entries, "Mapping", 1);
         Entry_0047ae60* e = &entries[index];
         if ((*(Table_0047ae60**)(g_game + 0x29a0))->field_10c != 0)
-            strcpy(e->text, FUN_004c5740("Terrain is blacked out until explored."));
+            strcpy(e->text, Translate("Terrain is blacked out until explored."));
         else
-            strcpy(e->text, FUN_004c5740("Terrain is visible."));
+            strcpy(e->text, Translate("Terrain is visible."));
         FUN_004a0090(g_game + 0x519);
     } else if (FUN_0049fd60(menu, "LineOfSight")) {
         FUN_0047f1a0("Skirmish", 0);
@@ -344,14 +344,14 @@ void __stdcall FUN_0047ae60(Menu_0047ae60* menu)
         if (t->field_110 == 0) {
             t->field_110 = 1;
             (*(Table_0047ae60**)(g_game + 0x29a0))->field_114 = 1;
-            strcpy(e->text, FUN_004c5740("Terrain elevations affect a unit's view."));
+            strcpy(e->text, Translate("Terrain elevations affect a unit's view."));
         } else if (t->field_114 == 1) {
             t->field_114 = 0;
-            strcpy(e->text, FUN_004c5740("Terrain elevations do not affect a unit's view."));
+            strcpy(e->text, Translate("Terrain elevations do not affect a unit's view."));
         } else {
             t->field_110 = 0;
             (*(Table_0047ae60**)(g_game + 0x29a0))->field_114 = 1;
-            strcpy(e->text, FUN_004c5740("All mapped terrain is visible."));
+            strcpy(e->text, Translate("All mapped terrain is visible."));
         }
         FUN_004a0090(g_game + 0x519);
     } else if (FUN_0049fd60(menu, "SelectMap")) {

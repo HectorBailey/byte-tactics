@@ -102,7 +102,7 @@ void __stdcall FUN_004a81e0(Sub_00443cb0* sub, int value);
 void __stdcall FUN_004a9660(Sub_00443cb0* sub);
 Gadget_00443cb0* __stdcall FUN_004aa8f0(Sub_00443cb0* sub, const char* name, int flags);
 void __stdcall FUN_004abd90(Sub_00443cb0* sub, const char* text, int a, int b, int c);
-char* __stdcall FUN_004c5740(const char* text);
+char* __stdcall Translate(const char* text);
 void* __cdecl FUN_004d83b0(const char* name, unsigned int size);
 void __stdcall FUN_00441220(void* gadget);
 
@@ -142,7 +142,7 @@ void FUN_00443cb0()
     FUN_004a81e0(&g_game->sub, 0x40);
     if (!FUN_00441460(gadget)) {
         FUN_004a9660(&g_game->sub);
-        FUN_004abd90(&g_game->sub, FUN_004c5740("Invalid TCP/IP Address"), 0xc8, 1, 1);
+        FUN_004abd90(&g_game->sub, Translate("Invalid TCP/IP Address"), 0xc8, 1, 1);
         g_game->field_2bc0 = 3;
         return;
     }
@@ -154,7 +154,7 @@ void FUN_00443cb0()
     if (conn->status != 0 && conn->status != 2) {
         FUN_004a81e0(&g_game->sub, 0x40);
         char* msg = GetRejectReasonText(conn->status);
-        FUN_004abd90(&g_game->sub, FUN_004c5740(msg), 0x140, 1, 1);
+        FUN_004abd90(&g_game->sub, Translate(msg), 0x140, 1, 1);
         FUN_0049fa90(&g_game->sub);
         FUN_0049fad0(&g_game->sub);
         conn->status = 0;

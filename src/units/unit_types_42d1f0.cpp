@@ -29,8 +29,8 @@ extern Game* g_game;
 void __stdcall FUN_004290f0(char* out, const char* dir, const char* name, const char* ext);
 int __stdcall HAPI_FileLengthByName(char* path);
 void __stdcall LoadUnitFbi(char* path, UnitType_0042d1f0* type);
-void __stdcall FUN_004b2540(CobFile_0042d1f0* cob);
-CobFile_0042d1f0* __stdcall FUN_004b2450(char* path);
+void __stdcall FreeCobScript(CobFile_0042d1f0* cob);
+CobFile_0042d1f0* __stdcall LoadCobScript(char* path);
 void __cdecl FUN_004d8780(void* param_1);
 void __cdecl FUN_004d8710(void* param_1);
 
@@ -47,9 +47,9 @@ void __stdcall ReloadUnitType(unsigned short index)
     FUN_004290f0(path, "units", type->name, "FBI");
     if (HAPI_FileLengthByName(path)) {
         LoadUnitFbi(path, type);
-        FUN_004b2540(*(CobFile_0042d1f0**)((char*)type + 0x18e));
+        FreeCobScript(*(CobFile_0042d1f0**)((char*)type + 0x18e));
         FUN_004290f0(path, "scripts", type->name, "COB");
-        CobFile_0042d1f0* cob = FUN_004b2450(path);
+        CobFile_0042d1f0* cob = LoadCobScript(path);
         *(CobFile_0042d1f0**)((char*)type + 0x18e) = cob;
         FUN_004d8710(g_game->unitTypes);
     } else {

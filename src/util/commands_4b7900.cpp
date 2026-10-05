@@ -51,7 +51,7 @@ class Class_004b73c0 {
 public:
     char* args[0x34];                  // +0x0
     int count;                         // +0xd0
-    char* FUN_004b73c0(int index, const char* def);
+    char* GetArg(int index, const char* def);
 };
 
 typedef void (__stdcall *Handler_004b7900)(void*);
@@ -86,11 +86,11 @@ static inline HandlerSlot_004b7900* Find_004b7900(const char* key)
 }
 
 // FUNCTION: 0x4b7900
-int __stdcall FUN_004b7900(Class_004b73c0* obj, int param_2)
+int __stdcall ExecuteCommand(Class_004b73c0* obj, int param_2)
 {
     int result = 0;
     if (obj->count >= 1) {
-        Class_004c91b0 key(obj->FUN_004b73c0(0, DAT_005119b8));
+        Class_004c91b0 key(obj->GetArg(0, DAT_005119b8));
         ((Class_004c9290*)&key)->MakeLower();
         HandlerSlot_004b7900* h = Find_004b7900(key.data);
         if (h != 0 && (h->mask & param_2)) {

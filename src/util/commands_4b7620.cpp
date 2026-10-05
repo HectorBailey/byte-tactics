@@ -101,7 +101,7 @@ struct NameNe_004b7620 {
 typedef void (__stdcall *Handler_004b7620)(void*);
 
 // FUNCTION: 0x4b7620
-void __stdcall FUN_004b7620(const char* name, Handler_004b7620 fn, int mask)
+void __stdcall RegisterCommand(const char* name, Handler_004b7620 fn, int mask)
 {
     Pair_004b7620 p((int)fn, mask);
     Class_004c91b0 key(name);

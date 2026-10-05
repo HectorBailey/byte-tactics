@@ -77,38 +77,38 @@ void __stdcall ListDirectory(const char* pattern, int dirs, FileList* out);
 
 class Class_004c2f60 {
 public:
-    int FUN_004c2f60(char* path);
-    void FUN_004c3120(char* data, int size, int flag, char* name);
+    int LoadFile(char* path);
+    void LoadBuffer(char* data, int size, int flag, char* name);
 };
 
 class Class_004c3410 {
 public:
-    int FUN_004c3410(char* name);
+    int SelectRecord(char* name);
 };
 
 class Class_004c3e10 {
 public:
-    void FUN_004c3e10();
+    void ResetCurrentRecord();
 };
 
 class Class_004c4630 {
 public:
-    char* FUN_004c4630(char* key);
+    char* FindFieldValue(char* key);
 };
 
 class Class_004c46c0 {
 public:
-    int FUN_004c46c0(char* key, int def);
+    int GetFieldInt(char* key, int def);
 };
 
 class Class_004c4760 {
 public:
-    double FUN_004c4760(char* key, double def);
+    double GetFieldDouble(char* key, double def);
 };
 
 class Class_004c48c0 {
 public:
-    int FUN_004c48c0(char* dst, char* key, int size, char* def);
+    int GetFieldString(char* dst, char* key, int size, char* def);
 };
 
 // A parsed TDF file; the getters read the current section.
@@ -122,11 +122,11 @@ public:
 
     int GetString(char* dst, char* key, int size, char* def)
     {
-        return ((Class_004c48c0*)current)->FUN_004c48c0(dst, key, size, def);
+        return ((Class_004c48c0*)current)->GetFieldString(dst, key, size, def);
     }
-    int GetInt(char* key, int def) { return ((Class_004c46c0*)current)->FUN_004c46c0(key, def); }
-    double GetDouble(char* key, double def) { return ((Class_004c4760*)current)->FUN_004c4760(key, def); }
-    char* GetValue(char* key) { return ((Class_004c4630*)current)->FUN_004c4630(key); }
+    int GetInt(char* key, int def) { return ((Class_004c46c0*)current)->GetFieldInt(key, def); }
+    double GetDouble(char* key, double def) { return ((Class_004c4760*)current)->GetFieldDouble(key, def); }
+    char* GetValue(char* key) { return ((Class_004c4630*)current)->FindFieldValue(key); }
 };
 
 // The override file (units\NAME.OVR).
@@ -232,8 +232,8 @@ int __stdcall HAPI_readfromfile(void* file, void* buf, int size);
 int __stdcall HAPI_FileLength(void* file);
 unsigned int __stdcall ComputeChecksum(char* data, int len);
 void __stdcall ShowErrorBox(const char* text, const char* caption);
-char* __stdcall FUN_004c5740(char* text);
-void __stdcall FUN_004c58a0(void* parser, char* dst, char* key, int size, char* def);
+char* __stdcall Translate(char* text);
+void __stdcall GetLocalizedString(void* parser, char* dst, char* key, int size, char* def);
 
 #define COPYRIGHT "Copyright 0000 Humongous Entertainment. All rights reserved."
 
@@ -250,7 +250,7 @@ static inline void LoadWeaponTDFs()
         char path[256];
         Class_004c2ea0* tdf = &DAT_005122a0[DAT_005122a4];
         FUN_004290f0(path, "Weapons", it->data, "TDF");
-        if (((Class_004c2f60*)tdf)->FUN_004c2f60(path)) {
+        if (((Class_004c2f60*)tdf)->LoadFile(path)) {
             if (tdf->field_8 != 0 || FUN_0041d8a0() == 0)
                 DAT_005122a4++;
         }
@@ -263,8 +263,8 @@ static inline int FindWeapon(char* name)
     if (name != 0 && *name != 0) {
         for (int k = 0; k < DAT_005122a4; k++) {
             Class_004c2ea0* tdf = &DAT_005122a0[k];
-            ((Class_004c3e10*)tdf)->FUN_004c3e10();
-            if (((Class_004c3410*)tdf)->FUN_004c3410(name))
+            ((Class_004c3e10*)tdf)->ResetCurrentRecord();
+            if (((Class_004c3410*)tdf)->SelectRecord(name))
                 return *(int*)((char*)tdf->current + 0x25);
         }
         return 0;
@@ -319,15 +319,15 @@ int LoadUnitInfo()
                 }
             }
             Class_004c2ea0 parser;
-            ((Class_004c2f60*)&parser)->FUN_004c3120(buf, len, 0, "<NO FILE>");
-            if (!((Class_004c3410*)&parser)->FUN_004c3410("UNITINFO")) {
+            ((Class_004c2f60*)&parser)->LoadBuffer(buf, len, 0, "<NO FILE>");
+            if (!((Class_004c3410*)&parser)->SelectRecord("UNITINFO")) {
                 // Original bug: this exit leaves the FBI file open (no
                 // HAPI_CloseFile), the weapon TDF table allocated and the unit
                 // table locked (no FUN_004d8710).
                 FUN_004d85a0(buf);
                 return 0;
             }
-            FUN_004c58a0(&parser, u->name, "name", 0x20, 0);
+            GetLocalizedString(&parser, u->name, "name", 0x20, 0);
             parser.GetString(u->unitname, "unitname", 0x20, DAT_005119b8);
             parser.GetString(u->side, "side", 0x1e, DAT_005119b8);
             parser.GetString(u->ai_weight, "ai_weight", 0x40, DAT_005119b8);
@@ -390,7 +390,7 @@ int LoadUnitInfo()
     }
     g_game->unit_count = count;
     if (oldcount != count && !bad)
-        ShowErrorBox(FUN_004c5740("Incompatible units found.  They will be ignored.  Please download the latest version of the game."), DAT_005119b8);
+        ShowErrorBox(Translate("Incompatible units found.  They will be ignored.  Please download the latest version of the game."), DAT_005119b8);
     FUN_004d8710(g_game->unitinfo);
     return 1;
 }

@@ -29,7 +29,7 @@ extern Game* g_game;
 // Command arguments.
 class Class_004b73e0 {
 public:
-    int FUN_004b73e0(int index, int fallback);
+    int GetIntArg(int index, int fallback);
 };
 
 void __stdcall AddMessage(char* param_1, int param_2, int param_3, int param_4);
@@ -43,8 +43,8 @@ void __stdcall FUN_00419400(Class_004b73e0* args)
     char buf[256];
     if (g_game->flags & 1) {
         Player_00419400* p = &g_game->players[g_game->local_player];
-        p->share_energy = __min(p->field_a4, (float)args->FUN_004b73e0(1, 0));
-        sprintf(buf, "OK.  Will share energy if above %d", args->FUN_004b73e0(1, 0));
+        p->share_energy = __min(p->field_a4, (float)args->GetIntArg(1, 0));
+        sprintf(buf, "OK.  Will share energy if above %d", args->GetIntArg(1, 0));
         AddMessage(buf, 2, 0, 10);
     }
 }

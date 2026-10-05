@@ -18,7 +18,7 @@ public:
 extern Class_004c5840* DAT_0051fdb8;
 
 // FUNCTION: 0x4c5840
-int __stdcall FUN_004c5840(char* name)
+int __stdcall FindTranslation(char* name)
 {
     if (name == 0 || DAT_0051fdb8 == 0)
         return 0;

@@ -22,17 +22,17 @@ public:
 
 class Class_004c2f60 {
 public:
-    int FUN_004c2f60(char* file);
+    int LoadFile(char* file);
 };
 
 class Class_004c3410 {
 public:
-    int FUN_004c3410(char* name);
+    int SelectRecord(char* name);
 };
 
 class Class_004c48c0 {
 public:
-    int FUN_004c48c0(char* dst, char* key, int size, char* def);
+    int GetFieldString(char* dst, char* key, int size, char* def);
 };
 
 #pragma pack(push, 1)
@@ -75,9 +75,9 @@ int __stdcall FUN_00476a60(char** out, int side)
     char* p = *out;
     for (int i = 0; i < n; i++) {
         FUN_004290f0(path, "camps", q, "tdf");
-        if (((Class_004c2f60*)&parser)->FUN_004c2f60(path)) {
-            if (((Class_004c3410*)&parser)->FUN_004c3410("HEADER")) {
-                ((Class_004c48c0*)parser.current)->FUN_004c48c0(name, "campaignside", 0x40, DAT_005119b8);
+        if (((Class_004c2f60*)&parser)->LoadFile(path)) {
+            if (((Class_004c3410*)&parser)->SelectRecord("HEADER")) {
+                ((Class_004c48c0*)parser.current)->GetFieldString(name, "campaignside", 0x40, DAT_005119b8);
                 if (strcmp(g_game->names[side], name) == 0 || strcmp("ALL", name) == 0) {
                     found++;
                     p = AppendName_00476a60(p, q);

@@ -4,7 +4,7 @@
 
 class Class_004c48c0 {
 public:
-    int FUN_004c48c0(char* dst, char* key, size_t size, char* def);
+    int GetFieldString(char* dst, char* key, size_t size, char* def);
 };
 
 struct Source_0042f450 {
@@ -24,9 +24,9 @@ int __stdcall FUN_0042f450(Source_0042f450* param_1, char* param_2, int* param_3
     char local_140[0x40];
     char local_100[0x100];
 
-    if (param_1->tdf->FUN_004c48c0(local_140, param_2, 0x40, DAT_005119b8) != 0) {
+    if (param_1->tdf->GetFieldString(local_140, param_2, 0x40, DAT_005119b8) != 0) {
         sprintf(local_100, "%s%s", param_2, "text");
-        if (param_1->tdf->FUN_004c48c0(local_180, local_100, 0x40, DAT_005119b8) == 0)
+        if (param_1->tdf->GetFieldString(local_180, local_100, 0x40, DAT_005119b8) == 0)
             local_180[0] = 0;
         param_3[1] = FUN_004d84a0(param_3[1], DAT_00504314, (param_3[0] + 1) * 0x40);
         param_3[2] = FUN_004d84a0(param_3[2], DAT_00504314, (param_3[0] + 1) * 0x40);

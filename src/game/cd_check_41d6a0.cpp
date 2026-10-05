@@ -14,17 +14,17 @@ public:
 
 class Class_004c2f60 {
 public:
-    int FUN_004c2f60(char* file);
+    int LoadFile(char* file);
 };
 
 class Class_004c3410 {
 public:
-    int FUN_004c3410(char* name);
+    int SelectRecord(char* name);
 };
 
 class Class_004c46c0 {
 public:
-    int FUN_004c46c0(const char* name, int def);
+    int GetFieldInt(const char* name, int def);
 };
 
 extern int DAT_0050289c;
@@ -62,9 +62,9 @@ char __stdcall FUN_0041d6a0(int side)
         if (path[0] != drive)
             DAT_00511de4 = 1;
         Class_004c2ea0 parser;
-        if (((Class_004c2f60*)&parser)->FUN_004c2f60(path)
-            && ((Class_004c3410*)&parser)->FUN_004c3410("Contents")
-            && parser.current->FUN_004c46c0(name, 0))
+        if (((Class_004c2f60*)&parser)->LoadFile(path)
+            && ((Class_004c3410*)&parser)->SelectRecord("Contents")
+            && parser.current->GetFieldInt(name, 0))
             return drive;
     } while (drive);
     return 0;

@@ -13,7 +13,7 @@ extern Game* g_game;
 // Command arguments.
 class Class_004b73e0 {
 public:
-    int FUN_004b73e0(int index, int fallback);
+    int GetIntArg(int index, int fallback);
 };
 
 void __stdcall SetBrightness(float value);
@@ -22,7 +22,7 @@ void FUN_00430f00();
 // FUNCTION: 0x417290
 void __stdcall FUN_00417290(Class_004b73e0* args)
 {
-    SetBrightness(args->FUN_004b73e0(1, 0) * 0.1f);
-    g_game->brightness = args->FUN_004b73e0(1, 0);
+    SetBrightness(args->GetIntArg(1, 0) * 0.1f);
+    g_game->brightness = args->GetIntArg(1, 0);
     FUN_00430f00();
 }

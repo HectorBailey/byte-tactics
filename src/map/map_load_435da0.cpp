@@ -51,32 +51,32 @@ extern char DAT_005119b8[];
 
 class Class_004c46c0 {
 public:
-    int FUN_004c46c0(const char* name, int def);
+    int GetFieldInt(const char* name, int def);
 };
 
 class Class_004c48c0 {
 public:
-    int FUN_004c48c0(char* dst, char* key, size_t size, char* def);
+    int GetFieldString(char* dst, char* key, size_t size, char* def);
 };
 
 class Class_004c4760 {
 public:
-    double FUN_004c4760(const char* name, double def);
+    double GetFieldDouble(const char* name, double def);
 };
 
 class Class_004c2f60 {
 public:
-    int FUN_004c2f60(char* file);
+    int LoadFile(char* file);
 };
 
 class Class_004c3410 {
 public:
-    int FUN_004c3410(char* name);
+    int SelectRecord(char* name);
 };
 
 class Class_004c3e10 {
 public:
-    void FUN_004c3e10();
+    void ResetCurrentRecord();
 };
 
 class Class_004c2ea0 {
@@ -125,9 +125,9 @@ void __stdcall FUN_004abd90(char* dest, char* text, int param_3, int param_4, in
 void __stdcall ShowErrorBox(const char* text, const char* caption);
 int __stdcall HAPI_FileLengthByName(char* path);
 void __stdcall HAPI_ReadFileAt(char* filename, void* buffer, int offset, int size);
-char* __stdcall FUN_004c5740(char* text);
-char* __stdcall FUN_004c5840(char* name);
-int __stdcall FUN_004c58a0(Class_004c2ea0* obj, char* buf, const char* key, int size, char* def);
+char* __stdcall Translate(char* text);
+char* __stdcall FindTranslation(char* name);
+int __stdcall GetLocalizedString(Class_004c2ea0* obj, char* buf, const char* key, int size, char* def);
 void* __cdecl FUN_004d83b0(const char* tag, int size);
 void __cdecl FUN_004d85a0(void* p);
 void FUN_00437d40();
@@ -212,7 +212,7 @@ public:
 
 static inline float GetFloat(Class_004c46c0* section, const char* key)
 {
-    double value = ((Class_004c4760*)section)->FUN_004c4760(key, 0.0);
+    double value = ((Class_004c4760*)section)->GetFieldDouble(key, 0.0);
     float result = (float)value;
     return result;
 }
@@ -260,28 +260,28 @@ int Class_00435c00::FUN_00435da0(char* map)
     case 1: {
         char key[0x100];
         sprintf(key, "MISSION%d", missionIndex);
-        ((Class_004c3e10*)&list)->FUN_004c3e10();
-        if (!((Class_004c3410*)&list)->FUN_004c3410(key)) {
+        ((Class_004c3e10*)&list)->ResetCurrentRecord();
+        if (!((Class_004c3410*)&list)->SelectRecord(key)) {
             char msg[0x100];
             wsprintfA(msg, "The requested mission file, %s, does not exist.", key);
             FUN_004abd90(g_game->messages, msg, 0x1e0, 1, 1);
             return 0;
         }
-        FUN_004c58a0(&list, missionName, "missionname", 0x100, 0);
-        int found = ((Class_004c48c0*)list.current)->FUN_004c48c0(path, "missionfile", 0x100, DAT_005119b8);
+        GetLocalizedString(&list, missionName, "missionname", 0x100, 0);
+        int found = ((Class_004c48c0*)list.current)->GetFieldString(path, "missionfile", 0x100, DAT_005119b8);
         if (found) {
             char file[0x100];
             FUN_004290f0(file, "Maps", path, "OTA");
-            if (!((Class_004c2f60*)&parser)->FUN_004c2f60(file)) {
+            if (!((Class_004c2f60*)&parser)->LoadFile(file)) {
                 char msg[0x100];
                 sprintf(msg, "Hey, joker!  There is no mission defintion for this mission: %s", path);
                 FUN_004abd90(g_game->messages, msg, 0x1e0, 1, 1);
                 return 0;
             }
-            ((Class_004c3e10*)&parser)->FUN_004c3e10();
-            if (((Class_004c3410*)&parser)->FUN_004c3410("GlobalHeader")) {
-                g_game->maxUnits = parser.current->FUN_004c46c0("maxunits", 200);
-                ((Class_004c3e10*)&parser)->FUN_004c3e10();
+            ((Class_004c3e10*)&parser)->ResetCurrentRecord();
+            if (((Class_004c3410*)&parser)->SelectRecord("GlobalHeader")) {
+                g_game->maxUnits = parser.current->GetFieldInt("maxunits", 200);
+                ((Class_004c3e10*)&parser)->ResetCurrentRecord();
                 FUN_00435430(1, "Maps", path, "TNT");
             } else {
                 char msg[0x100];
@@ -300,16 +300,16 @@ int Class_00435c00::FUN_00435da0(char* map)
         exists = 0;
         strcpy(missionName, map);
         FUN_004290f0(path, "Maps", map, "OTA");
-        if (((Class_004c2f60*)&parser)->FUN_004c2f60(path)) {
+        if (((Class_004c2f60*)&parser)->LoadFile(path)) {
             FUN_00435430(1, "Maps", map, "TNT");
             break;
         }
-        map = FUN_004c5840(map);
+        map = FindTranslation(map);
         if (map == 0)
             return 0;
         strcpy(missionName, map);
         FUN_004290f0(path, "Maps", map, "OTA");
-        if (!((Class_004c2f60*)&parser)->FUN_004c2f60(path))
+        if (!((Class_004c2f60*)&parser)->LoadFile(path))
             return 0;
         FUN_00435430(1, "Maps", map, "TNT");
         break;
@@ -319,46 +319,46 @@ int Class_00435c00::FUN_00435da0(char* map)
         return 0;
     }
 
-    if (!((Class_004c3410*)&parser)->FUN_004c3410("GlobalHeader")) {
+    if (!((Class_004c3410*)&parser)->SelectRecord("GlobalHeader")) {
         FUN_004abd90(g_game->messages, "No GlobalHeader block in mission file!", 0x1e0, 1, 1);
         return 0;
     }
     field_c20 = *(int*)((char*)parser.current + 0x25);
-    FUN_004c58a0(&parser, value, "brief", 0x100, DAT_005119b8);
+    GetLocalizedString(&parser, value, "brief", 0x100, DAT_005119b8);
     FUN_00435430(2, "camps\\briefs", value, "TXT");
     LoadBriefing();
-    FUN_004c58a0(&parser, value, "narration", 0x100, DAT_005119b8);
+    GetLocalizedString(&parser, value, "narration", 0x100, DAT_005119b8);
     FUN_00435430(3, "camps\\briefs", value, "WAV");
-    FUN_004c58a0(&parser, value, "missionhint", 0x100, DAT_005119b8);
+    GetLocalizedString(&parser, value, "missionhint", 0x100, DAT_005119b8);
     FUN_00435430(4, "camps\\hints", value, "TXT");
-    ((Class_004c48c0*)parser.current)->FUN_004c48c0(value, "glamour", 0x100, DAT_005119b8);
+    ((Class_004c48c0*)parser.current)->GetFieldString(value, "glamour", 0x100, DAT_005119b8);
     FUN_00435430(5, DAT_005119b8, value, "PCX");
-    ((Class_004c48c0*)parser.current)->FUN_004c48c0(value, "glamoursound", 0x100, DAT_005119b8);
+    ((Class_004c48c0*)parser.current)->GetFieldString(value, "glamoursound", 0x100, DAT_005119b8);
     FUN_00435430(8, "camps\\briefs", value, "WAV");
-    ((Class_004c48c0*)parser.current)->FUN_004c48c0(value, "UseOnlyUnits", 0x100, DAT_005119b8);
+    ((Class_004c48c0*)parser.current)->GetFieldString(value, "UseOnlyUnits", 0x100, DAT_005119b8);
     FUN_00435430(6, "camps\\useonly", value, "TDF");
-    g_game->mapping = parser.current->FUN_004c46c0("mapping", 0);
-    g_game->lineOfSight = parser.current->FUN_004c46c0("lineofsight", 0);
+    g_game->mapping = parser.current->GetFieldInt("mapping", 0);
+    g_game->lineOfSight = parser.current->GetFieldInt("lineofsight", 0);
     g_game->field_39225 = 1;
     g_game->field_39219 = 0;
-    ((Class_004c48c0*)parser.current)->FUN_004c48c0(memory, "memory", 0x80, DAT_005119b8);
-    ((Class_004c48c0*)parser.current)->FUN_004c48c0(numPlayers, "numplayers", 0x80, DAT_005119b8);
-    ((Class_004c48c0*)parser.current)->FUN_004c48c0(planet, "Planet", 0x80, DAT_005119b8);
-    g_game->noMovie = parser.current->FUN_004c46c0("nomovie", 0);
-    ((Class_004c48c0*)parser.current)->FUN_004c48c0(desc, "missiondescription", 0x80, "No description available");
+    ((Class_004c48c0*)parser.current)->GetFieldString(memory, "memory", 0x80, DAT_005119b8);
+    ((Class_004c48c0*)parser.current)->GetFieldString(numPlayers, "numplayers", 0x80, DAT_005119b8);
+    ((Class_004c48c0*)parser.current)->GetFieldString(planet, "Planet", 0x80, DAT_005119b8);
+    g_game->noMovie = parser.current->GetFieldInt("nomovie", 0);
+    ((Class_004c48c0*)parser.current)->GetFieldString(desc, "missiondescription", 0x80, "No description available");
     strcpy(lower, desc);
     _strlwr(lower);
-    strcpy(description, FUN_004c5740(lower));
+    strcpy(description, Translate(lower));
     if (_strcmpi(description, lower) == 0)
         strcpy(description, desc);
-    minWindSpeed = parser.current->FUN_004c46c0("minwindspeed", 0);
-    maxWindSpeed = parser.current->FUN_004c46c0("maxwindspeed", 0);
-    gravity = parser.current->FUN_004c46c0("gravity", 0);
+    minWindSpeed = parser.current->GetFieldInt("minwindspeed", 0);
+    maxWindSpeed = parser.current->GetFieldInt("maxwindspeed", 0);
+    gravity = parser.current->GetFieldInt("gravity", 0);
     tidalStrength = GetFloat(parser.current, "tidalstrength");
-    lavaWorld = parser.current->FUN_004c46c0("lavaworld", 0);
-    noSeaLevelTrigger = parser.current->FUN_004c46c0("nosealeveltrigger", 0);
-    waterDoesDamage = parser.current->FUN_004c46c0("waterdoesdamage", 0);
-    waterDamage = parser.current->FUN_004c46c0("waterdamage", 0);
+    lavaWorld = parser.current->GetFieldInt("lavaworld", 0);
+    noSeaLevelTrigger = parser.current->GetFieldInt("nosealeveltrigger", 0);
+    waterDoesDamage = parser.current->GetFieldInt("waterdoesdamage", 0);
+    waterDamage = parser.current->GetFieldInt("waterdamage", 0);
     ((Class_0048ff40*)g_game->field_391ed)->FUN_0048e010(&parser);
     killMul = GetFloat(parser.current, "killmul");
     timeMul = GetFloat(parser.current, "timemul");
@@ -366,18 +366,18 @@ int Class_00435c00::FUN_00435da0(char* map)
         ShowErrorBox("No suitable schema type in mission file!", "Map error");
         return 0;
     }
-    humanMetal = (float)parser.current->FUN_004c46c0("HumanMetal", 0);
-    humanEnergy = (float)parser.current->FUN_004c46c0("HumanEnergy", 0);
-    computerMetal = (float)parser.current->FUN_004c46c0("ComputerMetal", 0);
-    computerEnergy = (float)parser.current->FUN_004c46c0("ComputerEnergy", 0);
-    surfaceMetal = parser.current->FUN_004c46c0("SurfaceMetal", 0);
-    ((Class_004c48c0*)parser.current)->FUN_004c48c0(value, "aiprofile", 0x100, DAT_005119b8);
+    humanMetal = (float)parser.current->GetFieldInt("HumanMetal", 0);
+    humanEnergy = (float)parser.current->GetFieldInt("HumanEnergy", 0);
+    computerMetal = (float)parser.current->GetFieldInt("ComputerMetal", 0);
+    computerEnergy = (float)parser.current->GetFieldInt("ComputerEnergy", 0);
+    surfaceMetal = parser.current->GetFieldInt("SurfaceMetal", 0);
+    ((Class_004c48c0*)parser.current)->GetFieldString(value, "aiprofile", 0x100, DAT_005119b8);
     FUN_00435430(7, "ai", value, "txt");
     if (!GetName(7))
         FUN_00435430(7, "ai", "default", "txt");
-    ((Class_004c48c0*)parser.current)->FUN_004c48c0(meteor.name, "MeteorWeapon", 0x20, DAT_005119b8);
+    ((Class_004c48c0*)parser.current)->GetFieldString(meteor.name, "MeteorWeapon", 0x20, DAT_005119b8);
     if (strlen(meteor.name) != 0) {
-        meteor.radius = parser.current->FUN_004c46c0("MeteorRadius", 0);
+        meteor.radius = parser.current->GetFieldInt("MeteorRadius", 0);
         meteor.density = GetFloat(parser.current, "MeteorDensity");
         meteor.duration = GetFloat(parser.current, "MeteorDuration");
         meteor.interval = GetFloat(parser.current, "MeteorInterval");

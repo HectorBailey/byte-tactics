@@ -639,7 +639,7 @@ effect, the missing piece is usually a helper that was inlined:
   inlining five zero-caller neighbours (0x440cd0, 0x445450, 0x4453a0,
   0x445d60, 0x445e20), and the two with loops needed the keyword (#5472).
 - **A helper returning a fixed-point value by value**: 0x42bf40's shared frame
-  slot at `[esp+0x1c]` came out right only once FUN_004c4800 returned its
+  slot at `[esp+0x1c]` came out right only once GetFieldFixed returned its
   16.16 value by value through a hidden pointer (#5473).
 - **Case order in a big switch decides ties elsewhere**: in 0x4df590 the
   order of the cases in the source decided register and stack-slot ties in

@@ -177,7 +177,7 @@ void* __stdcall HAPI_LoadFile(void*, unsigned int*);
 void __stdcall FillRectangle(void*, void*, unsigned char);
 void __stdcall SetTextColors(int, int);
 void __stdcall SetFont(int);
-char* __stdcall FUN_004c5740(char*);
+char* __stdcall Translate(char*);
 int __stdcall LockScreen(void*);
 void __stdcall SetRestoreSurface(int);
 void __stdcall SetOffscreenSurface(void*);
@@ -372,7 +372,7 @@ void FUN_00497f40(void)
             if (FUN_0049f580() != 0 && _strcmpi((const char*)FUN_0049f580(), "english") != 0) {
                 _strlwr(namebuf);
             }
-            wsprintfA(buf, "%s: %s", (char*)FUN_004c5740("Map"), (char*)FUN_004c5740(namebuf));
+            wsprintfA(buf, "%s: %s", (char*)Translate("Map"), (char*)Translate(namebuf));
             textWidth = FUN_004a5030(buf);
             {
                 int x = gadget.width / 2 - textWidth / 2;
@@ -392,7 +392,7 @@ void FUN_00497f40(void)
             }
             flash = ((unsigned char*)&DAT_0051e6c8)[0];
             DAT_0051e820 = g_game->progress[0];
-            FUN_004a50e0(&gadget, (char*)FUN_004c5740("Textures"), 0x5a, 0x87, -1, flash);
+            FUN_004a50e0(&gadget, (char*)Translate("Textures"), 0x5a, 0x87, -1, flash);
             rect[0] = 0xcd;
             rect[2] = ((int)g_game->progress[0] * 7) / 2 + 0xcd;
             rect[1] = 0x87;
@@ -406,7 +406,7 @@ void FUN_00497f40(void)
             }
             flash = ((unsigned char*)&DAT_0051e6c8)[1];
             DAT_0051e821 = g_game->progress[1];
-            FUN_004a50e0(&gadget, (char*)FUN_004c5740("Terrain"), 0x5a, 0xb1, -1, flash);
+            FUN_004a50e0(&gadget, (char*)Translate("Terrain"), 0x5a, 0xb1, -1, flash);
             rect[0] = 0xcd;
             rect[2] = ((int)g_game->progress[1] * 7) / 2 + 0xcd;
             rect[1] = 0xb1;
@@ -420,7 +420,7 @@ void FUN_00497f40(void)
             }
             flash = ((unsigned char*)&DAT_0051e6c8)[2];
             DAT_0051e822 = g_game->progress[2];
-            FUN_004a50e0(&gadget, (char*)FUN_004c5740("Units"), 0x5a, 0xda, -1, flash);
+            FUN_004a50e0(&gadget, (char*)Translate("Units"), 0x5a, 0xda, -1, flash);
             rect[0] = 0xcd;
             rect[2] = ((int)g_game->progress[2] * 7) / 2 + 0xcd;
             rect[1] = 0xda;
@@ -434,7 +434,7 @@ void FUN_00497f40(void)
             }
             flash = ((unsigned char*)&DAT_0051e6c8)[3];
             DAT_0051e823 = g_game->progress[3];
-            FUN_004a50e0(&gadget, (char*)FUN_004c5740("Animation"), 0x5a, 0x106, -1, flash);
+            FUN_004a50e0(&gadget, (char*)Translate("Animation"), 0x5a, 0x106, -1, flash);
             rect[0] = 0xcd;
             rect[2] = ((int)g_game->progress[3] * 7) / 2 + 0xcd;
             rect[1] = 0x106;
@@ -448,7 +448,7 @@ void FUN_00497f40(void)
             }
             flash = ((unsigned char*)&DAT_0051e6cc)[0];
             DAT_0051e824 = g_game->progress[4];
-            FUN_004a50e0(&gadget, (char*)FUN_004c5740("3D Data"), 0x5a, 0x130, -1, flash);
+            FUN_004a50e0(&gadget, (char*)Translate("3D Data"), 0x5a, 0x130, -1, flash);
             rect[0] = 0xcd;
             rect[2] = ((int)g_game->progress[4] * 7) / 2 + 0xcd;
             rect[1] = 0x130;
@@ -464,7 +464,7 @@ void FUN_00497f40(void)
             }
             flash = ((unsigned char*)&DAT_0051e6cc)[1];
             DAT_0051e825 = g_game->progress[5];
-            FUN_004a50e0(&gadget, (char*)FUN_004c5740("Explosions"), 0x5a, 0x15b, -1, flash);
+            FUN_004a50e0(&gadget, (char*)Translate("Explosions"), 0x5a, 0x15b, -1, flash);
             rect[0] = 0xcd;
             rect[2] = ((int)g_game->progress[5] * 7) / 2 + 0xcd;
             rect[1] = 0x15b;

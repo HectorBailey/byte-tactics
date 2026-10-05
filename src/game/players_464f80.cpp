@@ -495,7 +495,7 @@ void* __stdcall FUN_004aa8f0(char* gui, const char* file, int flags);
 void __stdcall FUN_0049fb10(char* gui, int a);
 void __stdcall FUN_004a0bf0(char* gui, const char* gadget, const char* text, int a);
 void __stdcall FUN_004a81e0(char* gui, int a);
-const char* __stdcall FUN_004c5740(const char* text);
+const char* __stdcall Translate(const char* text);
 void __stdcall FUN_004abd90(char* gui, const char* text, int a, int b, int c);
 void __stdcall FUN_00464de0(void* gadget);
 
@@ -780,7 +780,7 @@ void __stdcall FUN_00464f80()
                     if (FUN_00457cb0() <= 0)
                         goto skip508;
                     FUN_004abd90(g_game->gui,
-                                 FUN_004c5740("You are placed in watch mode because you are hosting AI players which are still alive.  If you exit, they will be terminated."),
+                                 Translate("You are placed in watch mode because you are hosting AI players which are still alive.  If you exit, they will be terminated."),
                                  500, 1, 1);
                     g_game->flags_3923b.w &= 0xffef;
                     goto skip508;

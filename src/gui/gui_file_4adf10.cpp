@@ -3,12 +3,12 @@
 
 class Class_004c46c0 {
 public:
-    int FUN_004c46c0(const char* name, int def);
+    int GetFieldInt(const char* name, int def);
 };
 
 class Class_004c48c0 {
 public:
-    int FUN_004c48c0(char* dst, char* key, size_t size, char* def);
+    int GetFieldString(char* dst, char* key, size_t size, char* def);
 };
 
 struct Source_004adf10 {
@@ -26,14 +26,14 @@ struct Obj_004adf10 {
 
 extern char DAT_005119b8[];
 
-char* __stdcall FUN_004c5740(char* text);
+char* __stdcall Translate(char* text);
 
 // FUNCTION: 0x4adf10
 void __stdcall FUN_004adf10(Obj_004adf10* obj, Source_004adf10* src)
 {
-    obj->maxchars = ((Class_004c46c0*)src->tdf)->FUN_004c46c0("maxchars", 0);
+    obj->maxchars = ((Class_004c46c0*)src->tdf)->GetFieldInt("maxchars", 0);
     if (obj->maxchars > 0x80)
         obj->maxchars = 0x80;
-    src->tdf->FUN_004c48c0(obj->text, "text", 0x80, DAT_005119b8);
-    strcpy(obj->text, FUN_004c5740(obj->text));
+    src->tdf->GetFieldString(obj->text, "text", 0x80, DAT_005119b8);
+    strcpy(obj->text, Translate(obj->text));
 }

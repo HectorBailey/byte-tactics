@@ -194,7 +194,7 @@ int GetTicks();
 int __stdcall GetSlotDpid(unsigned char player);
 void __stdcall RejectPlayer(int id, unsigned char msg);
 void __stdcall SendChatMessage(Player_00448c70* p, char* text, int a, int b);
-char* __stdcall FUN_004c5740(char* text);
+char* __stdcall Translate(char* text);
 Gadget_00448c70* __stdcall FUN_0049ff90(char* entries, char* name);
 Gadget_00448c70* __stdcall FUN_0049ff10(char* entries, char* name);
 Gadget_00448c70* __stdcall FUN_004a0180(char* entries, char* name);
@@ -332,7 +332,7 @@ void FUN_00448c70()
         if (!CheckMapCrc()) {
             mapname->colour = (GetTicks() / 30 & 1) ? 0xc : 0;
             if (differs) {
-                SendChatMessage(me, FUN_004c5740("does not have this map"), 4, 0);
+                SendChatMessage(me, Translate("does not have this map"), 4, 0);
                 me->info->b.ready = 0;
                 sprintf(name, "READY%d", g_game->localPlayer);
                 FUN_004a1110(g_game->gui, name, 0);
@@ -389,7 +389,7 @@ void FUN_00448c70()
             sprintf(name, "PLAYER%d", n);
             char* s = "UNUSED";
             if (p->type == 4) {
-                sprintf(blocked, "[%s]", FUN_004c5740("BLOCKED"));
+                sprintf(blocked, "[%s]", Translate("BLOCKED"));
                 s = blocked;
             }
             strncpy(text, s, 0x1e);

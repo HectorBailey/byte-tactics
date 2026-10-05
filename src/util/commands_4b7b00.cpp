@@ -15,7 +15,7 @@ public:
 class Class_004b7e00 {
 public:
     char unknown_0[12];
-    void* FUN_004b7e00(int* param_1);
+    void* AssignEntry(int* param_1);
 };
 
 class Class_004b7e30 {
@@ -27,7 +27,7 @@ public:
     Class_004b7e30(const Class_004b7e30& other);
     Class_004b7e30& operator=(const Class_004b7e30& other)
     {
-        ((Class_004b7e00*)this)->FUN_004b7e00((int*)&other);
+        ((Class_004b7e00*)this)->AssignEntry((int*)&other);
         return *this;
     }
     ~Class_004b7e30() { name.ReleaseRef(); }

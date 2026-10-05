@@ -68,7 +68,7 @@ void __stdcall FUN_0049fa90(Gadget_00442a30* gadget);
 void __stdcall FUN_004a0d00(void* menu, const char* key, void* out);
 void __stdcall FUN_004a7830(Gadget_00442a30* gadget, int value);
 void __stdcall FUN_004ab0a0(Gadget_00442a30* gadget);
-char* __stdcall FUN_004c5740(const char* text);
+char* __stdcall Translate(const char* text);
 void __stdcall FUN_004abd90(Gadget_00442a30* gadget, char* text, int a,
                             int b, int c);
 void __cdecl FUN_004d85a0(void* data);
@@ -178,6 +178,6 @@ void __stdcall FUN_00442a30(Gadget_00442a30* gadget)
     g_game->bit0 = 0;
     TryConnect_00442a30();
     FUN_0047f1a0("SMLBUTTON", 0);
-    FUN_004abd90(gadget, FUN_004c5740("Connecting... press ESC to abort"),
+    FUN_004abd90(gadget, Translate("Connecting... press ESC to abort"),
                  0xfa, 1, 1);
 }

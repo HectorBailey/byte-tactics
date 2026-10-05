@@ -127,27 +127,27 @@ class Class_004c2ea0 {
 
 class Class_004c2f60 {
   public:
-    int FUN_004c2f60(char* file);
+    int LoadFile(char* file);
 };
 
 class Class_004c3e10 {
   public:
-    void FUN_004c3e10();
+    void ResetCurrentRecord();
 };
 
 class Class_004c3410 {
   public:
-    int FUN_004c3410(char* name);
+    int SelectRecord(char* name);
 };
 
 class Class_004c3240 {
   public:
-    void FUN_004c3240();
+    void Unload();
 };
 
 class Class_004c48c0 {
   public:
-    int FUN_004c48c0(char* dst, char* key, int size, char* def);
+    int GetFieldString(char* dst, char* key, int size, char* def);
 };
 
 class Class_00458160 {
@@ -285,7 +285,7 @@ void* __stdcall Load3do(char* path);
 void __stdcall MirrorObject(void* obj);
 int __stdcall GetObjectHeight(void* obj);
 void __stdcall FatalError(const char* msg);
-void* __stdcall FUN_004b2450(char* path);
+void* __stdcall LoadCobScript(char* path);
 void __stdcall StripExtension(char* text);
 short __stdcall FindUnitTypeId(char* text);
 int __cdecl FUN_004d8610(char* name);
@@ -309,7 +309,7 @@ void LoadUnitTypes() {
     {
         Class_004c2ea0 parser;
         FUN_004290f0(path, "gamedata", "moveinfo", "TDF");
-        if (!((Class_004c2f60*)&parser)->FUN_004c2f60(path))
+        if (!((Class_004c2f60*)&parser)->LoadFile(path))
             FatalError("Can't load MOVEINFO.TDF");
 
         int i = 0;
@@ -317,17 +317,17 @@ void LoadUnitTypes() {
         MovementClass* cls_end = &MovementClassTable::g_movementClasses.entries[32];
         do {
             sprintf(classbuf, "CLASS%d", i);
-            ((Class_004c3e10*)&parser)->FUN_004c3e10();
-            if (((Class_004c3410*)&parser)->FUN_004c3410(classbuf)) {
+            ((Class_004c3e10*)&parser)->ResetCurrentRecord();
+            if (((Class_004c3410*)&parser)->SelectRecord(classbuf)) {
                 ((Class_004c48c0*)parser.current)
-                    ->FUN_004c48c0(classbuf, "name", 100, DAT_005119b8);
+                    ->GetFieldString(classbuf, "name", 100, DAT_005119b8);
                 cls->field_0 = (int*)FUN_004d8610(classbuf);
                 cls->ReadMoveInfo(&parser);
             }
             cls++;
             i++;
         } while ((int)cls < (int)cls_end);
-        ((Class_004c3240*)&parser)->FUN_004c3240();
+        ((Class_004c3240*)&parser)->Unload();
     }
 
     Class_00458160* obj = (Class_00458160*)operator new(0x14);
@@ -466,14 +466,14 @@ void LoadUnitTypes() {
             type->field_22e = 0;
 
         FUN_004290f0(path, "scripts", type->name, "COB");
-        type->field_18e = FUN_004b2450(path);
+        type->field_18e = LoadCobScript(path);
     }
 
     FUN_004d8710(g_game->field_14377);
 
     Class_004c2ea0 parser2;
     FUN_004290f0(path, "gamedata", "sidedata", "TDF");
-    if (!((Class_004c2f60*)&parser2)->FUN_004c2f60(path)) {
+    if (!((Class_004c2f60*)&parser2)->LoadFile(path)) {
         FatalError("Can't load GAMEDATA.TDF");
     } else {
         short* list = (short*)FUN_004d83b0("TEMP UTYPE LIST", 0x3c);
@@ -482,14 +482,14 @@ void LoadUnitTypes() {
             type->field_152 = 0;
             type->field_156 = 0;
             if (type->flags.bits.canbuild) {
-                ((Class_004c3e10*)&parser2)->FUN_004c3e10();
-                if (((Class_004c3410*)&parser2)->FUN_004c3410("CANBUILD") &&
-                    ((Class_004c3410*)&parser2)->FUN_004c3410(type->name)) {
+                ((Class_004c3e10*)&parser2)->ResetCurrentRecord();
+                if (((Class_004c3410*)&parser2)->SelectRecord("CANBUILD") &&
+                    ((Class_004c3410*)&parser2)->SelectRecord(type->name)) {
                     int count = 0;
                     int k = 1;
                     sprintf(objpath, "canbuild%d", k);
                     while (((Class_004c48c0*)parser2.current)
-                               ->FUN_004c48c0(valbuf, objpath, 0x20, DAT_005119b8)) {
+                               ->GetFieldString(valbuf, objpath, 0x20, DAT_005119b8)) {
                         short val = FindUnitTypeId(valbuf);
                         if (val != 0) {
                             list[count] = val;
@@ -506,7 +506,7 @@ void LoadUnitTypes() {
             }
         }
         FUN_004d85a0(list);
-        ((Class_004c3240*)&parser2)->FUN_004c3240();
+        ((Class_004c3240*)&parser2)->Unload();
     }
 
     g_game->field_38d71 = 100;

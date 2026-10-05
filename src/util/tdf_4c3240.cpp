@@ -59,11 +59,11 @@ public:
     int field_4;                       // +0x4
     int field_8;                       // +0x8
 
-    void FUN_004c3240();
+    void Unload();
 };
 
 // FUNCTION: 0x4c3240
-void Class_004c3240::FUN_004c3240()
+void Class_004c3240::Unload()
 {
     if (root)
         delete root;

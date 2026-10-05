@@ -20,7 +20,7 @@ struct Elem_004b75d0 {
 static std::vector<Elem_004b75d0> DAT_0051fc99;
 
 // FUNCTION: 0x4b7ad0
-void FUN_004b7ad0()
+void ClearCommandTable()
 {
     DAT_0051fc99.clear();
 }

@@ -33,22 +33,22 @@ void __stdcall FatalError(char* text);
 
 class Class_004c48c0 {
 public:
-    int FUN_004c48c0(char* dst, char* key, size_t size, char* def);
+    int GetFieldString(char* dst, char* key, size_t size, char* def);
 };
 
 class Class_004c44c0 {
 public:
-    Class_004c48c0* FUN_004c44c0(int index);
+    Class_004c48c0* GetSubRecord(int index);
 };
 
 class Class_004c3410 {
 public:
-    int FUN_004c3410(char* name);
+    int SelectRecord(char* name);
 };
 
 class Class_004c3e10 {
 public:
-    void FUN_004c3e10();
+    void ResetCurrentRecord();
 };
 
 class Class_004c2ea0 {
@@ -138,13 +138,13 @@ int Class_00435c00::FUN_00436860(int type, Class_004c2ea0* parser, char* schema)
         if (d == -1)
             break;
         for (int n = 0; ; n++) {
-            ((Class_004c3e10*)parser)->FUN_004c3e10();
-            if (!((Class_004c3410*)parser)->FUN_004c3410("GlobalHeader"))
+            ((Class_004c3e10*)parser)->ResetCurrentRecord();
+            if (!((Class_004c3410*)parser)->SelectRecord("GlobalHeader"))
                 FatalError("Very bad news!  No MSG!");
             sprintf(name, "Schema %i", n);
-            if (!((Class_004c3410*)parser)->FUN_004c3410(name))
+            if (!((Class_004c3410*)parser)->SelectRecord(name))
                 break;
-            if (!parser->current->FUN_004c48c0(kind, "type", 0x20, DAT_005119b8))
+            if (!parser->current->GetFieldString(kind, "type", 0x20, DAT_005119b8))
                 continue;
             if (_strcmpi(kind, names[d]) != 0)
                 continue;
@@ -155,11 +155,11 @@ int Class_00435c00::FUN_00436860(int type, Class_004c2ea0* parser, char* schema)
             }
             Class_004c48c0* section = parser->current;
             int count = 0;
-            if (((Class_004c3410*)parser)->FUN_004c3410("specials")) {
+            if (((Class_004c3410*)parser)->SelectRecord("specials")) {
                 Class_004c44c0* specials = (Class_004c44c0*)parser->current;
                 Class_004c48c0* s;
-                for (int i = 0; (s = specials->FUN_004c44c0(i)) != 0; i++) {
-                    if (s->FUN_004c48c0(what, "specialwhat", 0x10, DAT_005119b8)) {
+                for (int i = 0; (s = specials->GetSubRecord(i)) != 0; i++) {
+                    if (s->GetFieldString(what, "specialwhat", 0x10, DAT_005119b8)) {
                         static int len = strlen("StartPos");
                         if (_strnicmp(what, "StartPos", len) == 0)
                             count++;

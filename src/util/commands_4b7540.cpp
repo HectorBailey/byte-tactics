@@ -6,11 +6,11 @@ public:
     char* args[0x34];                  // +0x00
     int count;                         // +0xd0
 
-    void FUN_004b7540(int n);
+    void ShiftArgs(int n);
 };
 
 // FUNCTION: 0x4b7540
-void Class_004b7540::FUN_004b7540(int n)
+void Class_004b7540::ShiftArgs(int n)
 {
     if (count >= n) {
         count = 0;

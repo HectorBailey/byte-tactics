@@ -206,7 +206,7 @@ char* __stdcall ChangeExtension(char* a, char* b, char* c);
 long __stdcall HAPI_FileLengthByName(char* name);
 char* __stdcall HAPI_LoadFile(char* name, int* size);
 void __stdcall SetFont(int id);
-char* __stdcall FUN_004c5740(char* key);
+char* __stdcall Translate(char* key);
 void* __stdcall AllocSurface(char* name, int width, int height);
 void __stdcall FreeSurface(void* obj);
 void __stdcall DrawSurface(void* dst, void* bmp, int x, int y);
@@ -546,7 +546,7 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
                 char* src = cur->u.text;
                 int k = 0;
                 for (; k < cur->stage; k++) {
-                    strcpy(dst, FUN_004c5740(src));
+                    strcpy(dst, Translate(src));
                     dst += strlen(dst) + 1;
                     src += strlen(src) + 1;
                 }

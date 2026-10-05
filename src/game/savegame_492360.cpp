@@ -140,7 +140,7 @@ void __stdcall FUN_004abd90(void* menu, char* message, int a, int b, int c);
 void __stdcall SetCloseHandler(void (__cdecl *callback)(int), int param);
 char* __stdcall SkipTextLines(char* text, int n);
 void __cdecl LeaveNetGameCallback(int param);
-char* __stdcall FUN_004c5740(char* text);
+char* __stdcall Translate(char* text);
 void __cdecl FUN_004d85a0(void* p);
 
 __inline void DeleteSave_00492360(Class_004b3630* obj)
@@ -193,7 +193,7 @@ void __stdcall FUN_00492360(Gadget_00492360* gadget)
         case 1:
             if (!FUN_0041d6a0(0)) {
                 FUN_004abd90(g_game->message,
-                    FUN_004c5740("Please insert the Campaign CD (Disc 2) and try again"),
+                    Translate("Please insert the Campaign CD (Disc 2) and try again"),
                     200, 1, 1);
                 FUN_004ab0a0((Gadget_00492360*)g_game->message);
                 return;
@@ -202,7 +202,7 @@ void __stdcall FUN_00492360(Gadget_00492360* gadget)
         case 2:
             if (!FUN_0041d6a0(1)) {
                 FUN_004abd90(g_game->message,
-                    FUN_004c5740("Please insert the Multiplayer CD (Disc 1) and try again"),
+                    Translate("Please insert the Multiplayer CD (Disc 1) and try again"),
                     200, 1, 1);
                 FUN_004ab0a0((Gadget_00492360*)g_game->message);
                 return;
@@ -311,6 +311,6 @@ invalid:
         DeleteSave_00492360((Class_004b3630*)g_game->p38d6b);
     }
     g_game->p38d6b = 0;
-    FUN_004abd90(gadget, FUN_004c5740("Invalid savegame file"), 0x140, 1, 1);
+    FUN_004abd90(gadget, Translate("Invalid savegame file"), 0x140, 1, 1);
     FUN_004ab0a0(gadget);
 }

@@ -17,7 +17,7 @@
 // order inside the two inlined strcpy bodies:
 //
 //   original                         ours
-//   call FUN_004c5740                call FUN_004c5740
+//   call Translate                call Translate
 //   mov edi, eax                     mov ecx, [esp + 0x10]   <-
 //   xor eax, eax                     mov edi, eax
 //   mov ecx, [esp + 0x10]   <-       xor eax, eax
@@ -68,7 +68,7 @@ int __stdcall FUN_0049fdf0(char* entries, const char* name, int type);
 void __stdcall FUN_004a0bf0(char* sub, const char* name, const char* text, int param_4);
 void __stdcall FUN_004a76b0(char* sub, const char* name);
 void __stdcall FUN_004a81e0(char* sub, int value);
-char* __stdcall FUN_004c5740(char* text);
+char* __stdcall Translate(char* text);
 void __stdcall FUN_00426190(void* gadget);
 
 // FUNCTION: 0x426200
@@ -82,9 +82,9 @@ void __stdcall FUN_00426200()
         char* choice2 = entries + 0x15b * FUN_0049fdf0(entries, "CHOICE2", 1);
         strcpy(entries + 0xcc, "CHOICE1");
         strcpy(entries + 0xdc, "CHOICE2");
-        strcpy(choice1 + 0xb6, FUN_004c5740("Yes"));
-        strcpy(choice2 + 0xb6, FUN_004c5740("No"));
-        FUN_004a0bf0(g_game + 0x519, "TITLE", FUN_004c5740("Close Windows CD Player?"), 0);
+        strcpy(choice1 + 0xb6, Translate("Yes"));
+        strcpy(choice2 + 0xb6, Translate("No"));
+        FUN_004a0bf0(g_game + 0x519, "TITLE", Translate("Close Windows CD Player?"), 0);
         FUN_004a76b0(g_game + 0x519, "CHOICE1");
         gadget->handler = FUN_00426190;
         FUN_004a81e0(g_game + 0x519, 0x40);

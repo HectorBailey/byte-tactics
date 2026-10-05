@@ -29,11 +29,11 @@ public:
     Class_004c42a0* root;                           // +0x0
     Class_004c42a0* current;                        // +0x4
 
-    int FUN_004c3490(int index);
+    int SelectRecordAt(int index);
 };
 
 // FUNCTION: 0x4c3490
-int Class_004c3490::FUN_004c3490(int index)
+int Class_004c3490::SelectRecordAt(int index)
 {
     Class_004c42a0* n = current ? current : root;
     Class_004c42a0* node = n->GetChild(index);

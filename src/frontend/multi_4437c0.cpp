@@ -113,7 +113,7 @@ void FUN_004257a0();
 void FUN_00441080();
 void __stdcall FUN_004a9660(Sub_004437c0* sub);
 void __stdcall FUN_004a7190(Sub_004437c0* sub, char* text);
-char* __stdcall FUN_004c5740(char* text);
+char* __stdcall Translate(char* text);
 void __stdcall FUN_004abd90(Sub_004437c0* sub, char* text, int a, int b, int c);
 unsigned char FindHostSlot();
 int __stdcall FUN_0049fd60(Sub_004437c0* sub, const char* name);
@@ -188,7 +188,7 @@ void __stdcall FUN_004437c0(Sub_004437c0* param_1)
             if (strlen(g_game->nickname) == 0) {
                 FUN_004a7190(param_1, (char*)FUN_0049fdf0(entries, "NICKNAME", 3));
                 FUN_004ab0a0(param_1);
-                FUN_004abd90(param_1, FUN_004c5740("You must enter your name"), 0xc8, 1, 1);
+                FUN_004abd90(param_1, Translate("You must enter your name"), 0xc8, 1, 1);
                 return;
             }
             pass = FUN_004a0010(entries, "PASSWORD");

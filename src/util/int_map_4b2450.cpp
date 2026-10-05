@@ -55,7 +55,7 @@ extern int __stdcall ComputeChecksum(unsigned char* data, int len);
 // map::operator[] but left _Tree::insert (0x4b2850) out of line, so the
 // insert is called explicitly here instead of through <map>.
 // FUNCTION: 0x4b2450
-Data_004b2450* __stdcall FUN_004b2450(char* name)
+Data_004b2450* __stdcall LoadCobScript(char* name)
 {
     Data_004b2450* data = HAPI_LoadFile(name, 0);
     if (data == 0)

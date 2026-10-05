@@ -25,7 +25,7 @@ typedef std::vector<Elem_00434020> Vec_004336f0;
 
 class Class_004c48c0 {
 public:
-    int FUN_004c48c0(char* dst, char* key, int size, char* def);
+    int GetFieldString(char* dst, char* key, int size, char* def);
 };
 
 class Class_004c3e10 {
@@ -48,7 +48,7 @@ void Class_004336f0::FUN_004336f0(Class_004c3e10* obj, short line, short mode)
     char buf[0x200];
 
     sprintf(name, "line%d", line + 1);
-    if (obj->parser->FUN_004c48c0(buf, name, 0x200, DAT_005119b8) != 0) {
+    if (obj->parser->GetFieldString(buf, name, 0x200, DAT_005119b8) != 0) {
         char* tok = strtok(buf, ", ");
         if (tok == 0)
             return;

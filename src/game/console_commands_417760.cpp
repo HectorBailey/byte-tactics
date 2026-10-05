@@ -7,7 +7,7 @@ class Class_004b73e0 {
 public:
     char* args[0x34];                  // +0x00
     int count;                         // +0xd0
-    int FUN_004b73e0(int index, int fallback);
+    int GetIntArg(int index, int fallback);
 };
 
 void FUN_00437d40();
@@ -18,7 +18,7 @@ void FUN_00438070();
 void __stdcall FUN_00417760(Class_004b73e0* args)
 {
     if (args->count > 1) {
-        if (args->FUN_004b73e0(1, 0))
+        if (args->GetIntArg(1, 0))
             FUN_00437d40();
         else
             FUN_00437d50();

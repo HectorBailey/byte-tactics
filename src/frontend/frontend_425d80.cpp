@@ -18,7 +18,7 @@ public:
 
 class Class_004c2f60 {
 public:
-    int FUN_004c2f60(char* file);
+    int LoadFile(char* file);
 };
 
 struct Gadget_00425d80 {
@@ -48,7 +48,7 @@ void __stdcall FUN_00491c80(int param_1);
 int __stdcall FUN_0049fd60(Gadget_00425d80* gadget, char* name);
 void __stdcall FUN_004ab0a0(void* param_1);
 void __stdcall FUN_004abd90(char* dest, char* text, int param_3, int param_4, int param_5);
-char* __stdcall FUN_004c5740(char* text);
+char* __stdcall Translate(char* text);
 void __stdcall FillSurface(int param_1, int param_2);
 void __stdcall SetOffscreenSurface(int param_1);
 Display_00425d80* GetDisplay(void);
@@ -74,7 +74,7 @@ void __stdcall FUN_00425d80(Gadget_00425d80* gadget)
         FUN_0041d4c0();
         FUN_004290f0(buf, "maps", "multiplay", "tdf");
         Class_004c2ea0 obj;
-        if (((Class_004c2f60*)&obj)->FUN_004c2f60(buf) != 0) {
+        if (((Class_004c2f60*)&obj)->LoadFile(buf) != 0) {
             g_game[0x2bc0] = 6;
             SetOffscreenSurface(*(int*)(g_game + 0x37e1b));
             FillSurface(0, 0);
@@ -82,7 +82,7 @@ void __stdcall FUN_00425d80(Gadget_00425d80* gadget)
             return;
         }
         FUN_004abd90(g_game + 0x519,
-                     FUN_004c5740("Please insert the Multiplayer CD (Disc 1) and try again"),
+                     Translate("Please insert the Multiplayer CD (Disc 1) and try again"),
                      200, 1, 1);
         FUN_004ab0a0(g_game + 0x519);
         return;
@@ -99,7 +99,7 @@ void __stdcall FUN_00425d80(Gadget_00425d80* gadget)
         }
         if (!FUN_0041d6a0(0) && !FUN_0041d6a0(1)) {
             FUN_004abd90(g_game + 0x519,
-                         FUN_004c5740("Please insert a Total Annihilation CD and try again"),
+                         Translate("Please insert a Total Annihilation CD and try again"),
                          200, 1, 1);
             FUN_004ab0a0(g_game + 0x519);
             return;
@@ -145,7 +145,7 @@ void __stdcall FUN_00425d80(Gadget_00425d80* gadget)
         }
         if (!FUN_0041d6a0(0) && !FUN_0041d6a0(1)) {
             FUN_004abd90(g_game + 0x519,
-                         FUN_004c5740("Please insert a Total Annihilation CD and try again"),
+                         Translate("Please insert a Total Annihilation CD and try again"),
                          200, 1, 1);
             FUN_004ab0a0(g_game + 0x519);
             return;

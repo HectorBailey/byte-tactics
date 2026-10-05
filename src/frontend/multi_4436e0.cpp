@@ -11,7 +11,7 @@ void __stdcall FUN_004abd90(void* p, char* text, int a, int b, int c);
 void __stdcall FUN_004288d0(char* name, int a, int b, int c);
 void __stdcall FUN_0049f9c0(void* p, char* name);
 int __stdcall FUN_0046bf30(unsigned int* a, unsigned int* b);
-char* __stdcall FUN_004c5740(char* text);
+char* __stdcall Translate(char* text);
 void __stdcall SetOffscreenSurface(int x);
 
 extern char* g_game;
@@ -35,7 +35,7 @@ int FUN_004436e0(void)
         }
     } else if (r != 4) {
         SetOffscreenSurface(*(int*)(g_game + 0x37e1b));
-        FUN_004abd90(g_game + 0x519, FUN_004c5740("Unable to initialize scores reporting."), 0x190, 1, 0);
+        FUN_004abd90(g_game + 0x519, Translate("Unable to initialize scores reporting."), 0x190, 1, 0);
         FUN_004288d0("ReportError", 0, 1, 0);
         FUN_0049f9c0(g_game + 0x519, "MSGBOX.GUI");
     }

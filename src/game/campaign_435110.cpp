@@ -33,12 +33,12 @@ public:
 
 class Class_004c2f60 {
 public:
-    int FUN_004c2f60(char* file);
+    int LoadFile(char* file);
 };
 
 class Class_004c3240 {
 public:
-    void FUN_004c3240();
+    void Unload();
 };
 
 class Class_00435c00 {
@@ -87,14 +87,14 @@ void Class_00435110::FUN_00435110(char* file)
 {
     char msg[0x80];
 
-    ((Class_004c3240*)&list)->FUN_004c3240();
+    ((Class_004c3240*)&list)->Unload();
     strcpy(campaign, file);
     for (int i = 0; i < 9; i++)
         SetName(i, DAT_005119b8);
     if (strlen(file) != 0) {
         FUN_00435430(0, "camps", campaign, "TDF");
         if (strlen(file) != 0) {
-            if (!((Class_004c2f60*)&list)->FUN_004c2f60(GetName(0))) {
+            if (!((Class_004c2f60*)&list)->LoadFile(GetName(0))) {
                 wsprintfA(msg, "The requested campaign file, %s, does not exist.", GetName(0));
                 FUN_004abd90(g_game + 0x519, msg, 0x1e0, 1, 1);
                 FUN_00435110(DAT_005119b8);

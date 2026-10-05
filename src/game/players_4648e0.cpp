@@ -34,13 +34,13 @@ class Class_004b73b0 {
 public:
     char unknown_0[0xd0];
     int field_d0;
-    Class_004b73b0* FUN_004b73b0();
+    Class_004b73b0* InitArgs();
 };
 
 extern Game* g_game;
 
 char* __stdcall HAPI_LoadFile(const char* name, int* size);
-int __stdcall FUN_004b7a30(char* text, int len, Class_004b74f0* vars, int param_4);
+int __stdcall ExecuteCommandText(char* text, int len, Class_004b74f0* vars, int param_4);
 void __cdecl FUN_004d85a0(char* text);
 void __stdcall FUN_00409f80(int player);
 void __stdcall FUN_0040a040(int player);
@@ -56,8 +56,8 @@ void FUN_004648e0()
     }
     if (text != 0) {
         Class_004b74f0 vars;
-        ((Class_004b73b0*)&vars)->FUN_004b73b0();
-        FUN_004b7a30(text, size, &vars, -1);
+        ((Class_004b73b0*)&vars)->InitArgs();
+        ExecuteCommandText(text, size, &vars, -1);
         FUN_004d85a0(text);
     }
     for (int i = 0; i < 10; i++) {

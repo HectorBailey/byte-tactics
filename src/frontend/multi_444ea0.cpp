@@ -75,7 +75,7 @@ extern char* DAT_00512990;
 
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
 int __stdcall FUN_00434bf0(char** out, int param_2, int param_3);
-char* __stdcall FUN_004c5740(char* text);
+char* __stdcall Translate(char* text);
 void __stdcall FUN_004abd90(Menu_00444ea0* menu, char* text, int width, int a, int b);
 Layer_00444ea0* __stdcall FUN_004aa8f0(Menu_00444ea0* menu, const char* name, int flags);
 void __stdcall FUN_00444cb0(void* gadget);
@@ -106,7 +106,7 @@ void FUN_00444ea0()
 
     if (!((Class_00435c40*)g_game->field_391e9)->FUN_00435c40()) {
         FUN_004abd90(&g_game->menu,
-                     FUN_004c5740("There are no multiplayer maps to choose from"),
+                     Translate("There are no multiplayer maps to choose from"),
                      0x140, 1, 1);
         return;
     }
@@ -118,7 +118,7 @@ void FUN_00444ea0()
     int n = FUN_00434bf0(0, 0, 0);
     if (n == 0) {
         FUN_004abd90(&g_game->menu,
-                     FUN_004c5740("There are no multiplayer maps to choose from"),
+                     Translate("There are no multiplayer maps to choose from"),
                      0x140, 1, 1);
         return;
     }

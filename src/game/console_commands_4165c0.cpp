@@ -14,7 +14,7 @@ class Class_004b73e0 {
 public:
     char* args[0x34];                  // +0x00
     int count;                         // +0xd0
-    unsigned char FUN_004b73e0(int index, int fallback);
+    unsigned char GetIntArg(int index, int fallback);
 };
 
 void FUN_00430f00(void);
@@ -28,5 +28,5 @@ void __stdcall FUN_004165c0(Class_004b73e0* args)
         FUN_00430f00();
         return;
     }
-    ((Flags_004165c0*)((char*)g_game + 0x37f06))->flag = args->FUN_004b73e0(1, 0);
+    ((Flags_004165c0*)((char*)g_game + 0x37f06))->flag = args->GetIntArg(1, 0);
 }

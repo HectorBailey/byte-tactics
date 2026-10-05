@@ -7,12 +7,12 @@ class Class_004c43f0 {
 public:
     char unknown_0[0x25];
     int field_25;                       // +0x25
-    void FUN_004c43f0(unsigned int param_1, unsigned int param_2);
+    void ComputeRecordChecksum(unsigned int param_1, unsigned int param_2);
 };
 #pragma pack(pop)
 
 // FUNCTION: 0x4c43f0
-void Class_004c43f0::FUN_004c43f0(unsigned int param_1, unsigned int param_2)
+void Class_004c43f0::ComputeRecordChecksum(unsigned int param_1, unsigned int param_2)
 {
     if (param_1 <= param_2) {
         field_25 = ComputeChecksum(param_1, param_2 - param_1 - 1);

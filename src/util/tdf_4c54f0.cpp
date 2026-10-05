@@ -137,7 +137,7 @@ public:
     Elem_004c5bc0* first;               // +0x5
     Elem_004c5bc0* last;                // +0x9
 
-    Elem_004c5bc0* FUN_004c5c60(const char* key);
+    Elem_004c5bc0* FindLowerBound(const char* key);
 };
 
 class Class_004c5840 {
@@ -172,14 +172,14 @@ class Class_004c4420 {
 public:
     const char* name;                    // +0x0
 
-    void FUN_004c4420(char* dest, size_t count);
+    void CopyRecordName(char* dest, size_t count);
 };
 
 class Class_004c48c0 {
 public:
     char unknown_0[0x19];
 
-    int FUN_004c48c0(char* dst, const char* key, size_t size, const char* def);
+    int GetFieldString(char* dst, const char* key, size_t size, const char* def);
 };
 
 class Class_004c2ea0 {
@@ -197,7 +197,7 @@ public:
     char unknown_0[4];
     int field_4;
 
-    int FUN_004c2f60(char* filename);
+    int LoadFile(char* filename);
 };
 
 class Class_004c3490 {
@@ -205,7 +205,7 @@ public:
     char unknown_0[4];
     int field_4;
 
-    Class_004c4420* FUN_004c3490(int index);
+    Class_004c4420* SelectRecordAt(int index);
 };
 
 class Class_004c3e10 {
@@ -213,7 +213,7 @@ public:
     char unknown_0[4];
     int field_4;
 
-    void FUN_004c3e10();
+    void ResetCurrentRecord();
 };
 
 class Class_004c3240 {
@@ -222,7 +222,7 @@ public:
     int field_4;
     int field_8;
 
-    void FUN_004c3240();
+    void Unload();
 };
 
 static inline void LoadMap(char flag, char* section)
@@ -233,7 +233,7 @@ static inline void LoadMap(char flag, char* section)
 }
 
 // FUNCTION: 0x4c54f0
-void __stdcall FUN_004c54f0(char* filename, char* section)
+void __stdcall LoadTranslations(char* filename, char* section)
 {
     char flag;
     Class_004c5840* s;
@@ -250,17 +250,17 @@ void __stdcall FUN_004c54f0(char* filename, char* section)
         Class_004c2ea0 f;
         char value[256];
         char name[256];
-        if (((Class_004c2f60*)&f)->FUN_004c2f60(filename)) {
+        if (((Class_004c2f60*)&f)->LoadFile(filename)) {
             int index;
             index = 0;
-            while (((Class_004c3490*)&f)->FUN_004c3490(index)) {
-                f.current->FUN_004c4420(name, 0xff);
-                ((Class_004c48c0*)f.current)->FUN_004c48c0(value, DAT_0051fdc0, 0xff, DAT_005119b8);
+            while (((Class_004c3490*)&f)->SelectRecordAt(index)) {
+                f.current->CopyRecordName(name, 0xff);
+                ((Class_004c48c0*)f.current)->GetFieldString(value, DAT_0051fdc0, 0xff, DAT_005119b8);
                 if (strlen(value) != 0) {
                     Class_004c91b0 key(name);
                     Elem_004c5bc0* e;
                     s = DAT_0051fdb8;
-                    e = ((Class_004c5c60*)DAT_0051fdb8)->FUN_004c5c60(key.ptr);
+                    e = ((Class_004c5c60*)DAT_0051fdb8)->FindLowerBound(key.ptr);
                     Class_004c93f0* r;
                     if (e == ((Class_004c5c60*)s)->last || Ne(e->key, key)) {
                         r = InsertNew(s, e, key);
@@ -269,10 +269,10 @@ void __stdcall FUN_004c54f0(char* filename, char* section)
                     }
                     r->AssignText(value);
                 }
-                ((Class_004c3e10*)&f)->FUN_004c3e10();
+                ((Class_004c3e10*)&f)->ResetCurrentRecord();
                 index++;
             }
-            ((Class_004c3240*)&f)->FUN_004c3240();
+            ((Class_004c3240*)&f)->Unload();
         }
     }
 }

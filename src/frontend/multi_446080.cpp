@@ -36,7 +36,7 @@ void __stdcall FUN_0049fb10(Sub_00446080* sub, int value);
 void __stdcall FUN_0049fdf0(void* entries, const char* name, int type);
 void __stdcall FUN_004a0bf0(Sub_00446080* sub, const char* name, const char* text, int param_4);
 void __stdcall FUN_004a81e0(Sub_00446080* sub, int value);
-char* __stdcall FUN_004c5740(char* text);
+char* __stdcall Translate(char* text);
 void __stdcall FUN_00446020(void* gadget);
 
 // FUNCTION: 0x446080
@@ -53,7 +53,7 @@ void __stdcall FUN_00446080(int player)
         FUN_0049fdf0(entries, "TITLE", 5);
         FUN_004a0bf0(&g_game->sub, "CHOICE1", "Yes", 0);
         FUN_004a0bf0(&g_game->sub, "CHOICE2", "No", 0);
-        sprintf(buf, "%s %s?", FUN_004c5740("Reject"),
+        sprintf(buf, "%s %s?", Translate("Reject"),
                 g_game->players[DAT_00505510].name);
         FUN_004a0bf0(&g_game->sub, "TITLE", buf, 0);
         gadget->handler = FUN_00446020;

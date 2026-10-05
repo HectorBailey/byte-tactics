@@ -24,12 +24,12 @@ extern char DAT_005119b8[];
 
 class Class_004b73e0 {
 public:
-    int FUN_004b73e0(int index, int fallback);
+    int GetIntArg(int index, int fallback);
 };
 
 class Class_004b73c0 {
 public:
-    char* FUN_004b73c0(int index, char* fallback);
+    char* GetArg(int index, char* fallback);
 };
 
 void __stdcall FUN_00464c60(unsigned char a, int b, float c, int d);
@@ -38,18 +38,18 @@ void __stdcall FUN_00464b30(unsigned char a, int b, float c, int d);
 // FUNCTION: 0x416bd0
 void __stdcall FUN_00416bd0(Class_004b73e0* args)
 {
-    unsigned char i = args->FUN_004b73e0(1, 0);
+    unsigned char i = args->GetIntArg(1, 0);
     if (i < 10) {
         Player_00416bd0* p = &g_game->players[i];
         if (p->active != 0 && (p->type == 1 || p->type == 2 || p->type == 3)
             && p->field_146 != 10) {
-            if (_strcmpi(((Class_004b73c0*)args)->FUN_004b73c0(3, DAT_005119b8), "metal") == 0) {
-                FUN_00464c60(g_game->localPlayer, args->FUN_004b73e0(1, 0),
-                             (float)args->FUN_004b73e0(2, 0), 1);
+            if (_strcmpi(((Class_004b73c0*)args)->GetArg(3, DAT_005119b8), "metal") == 0) {
+                FUN_00464c60(g_game->localPlayer, args->GetIntArg(1, 0),
+                             (float)args->GetIntArg(2, 0), 1);
             }
-            if (_strcmpi(((Class_004b73c0*)args)->FUN_004b73c0(3, DAT_005119b8), "energy") == 0) {
-                FUN_00464b30(g_game->localPlayer, args->FUN_004b73e0(1, 0),
-                             (float)args->FUN_004b73e0(2, 0), 1);
+            if (_strcmpi(((Class_004b73c0*)args)->GetArg(3, DAT_005119b8), "energy") == 0) {
+                FUN_00464b30(g_game->localPlayer, args->GetIntArg(1, 0),
+                             (float)args->GetIntArg(2, 0), 1);
             }
         }
     }

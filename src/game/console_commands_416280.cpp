@@ -23,7 +23,7 @@ extern Game* g_game;
 // Command arguments.
 class Class_004b73e0 {
 public:
-    int FUN_004b73e0(int index, int fallback);
+    int GetIntArg(int index, int fallback);
 };
 
 class Class_00463c60 {
@@ -34,7 +34,7 @@ public:
 // FUNCTION: 0x416280
 void __stdcall FUN_00416280(Class_004b73e0* args)
 {
-    unsigned char i = args->FUN_004b73e0(1, g_game->field_2a42);
+    unsigned char i = args->GetIntArg(1, g_game->field_2a42);
     if (i < 10) {
         Player_00416280* p = &g_game->players[i];
         if (p->active != 0 && (p->type == 1 || p->type == 2 || p->type == 3)
