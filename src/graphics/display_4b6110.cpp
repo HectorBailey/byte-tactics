@@ -24,7 +24,7 @@ struct Display_004b6110 {
 };
 #pragma pack(pop)
 
-extern int DAT_0051fbd0;
+extern int g_display;
 
 void FUN_004c1aa0(void);
 void FUN_004c2cc0(void);
@@ -66,5 +66,5 @@ void __stdcall ShutdownEnvironment(Display_004b6110* d)
     d->dc = 0;
     d->bitmap = 0;
     d->old_palette = 0;
-    SystemParametersInfoA(0x5d, (unsigned int)*(int*)((char*)DAT_0051fbd0 + 0xec), 0, 1);
+    SystemParametersInfoA(0x5d, (unsigned int)*(int*)((char*)g_display + 0xec), 0, 1);
 }

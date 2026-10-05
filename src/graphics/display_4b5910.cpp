@@ -6,13 +6,13 @@ struct Obj {
     unsigned short flag : 1;  // +0xf0, mask 2
 };
 
-extern Obj* DAT_0051fbd0;
+extern Obj* g_display;
 extern void __stdcall SetFullScreen(int);
 
 // FUNCTION: 0x4b5910
 void ToggleFullScreen()
 {
-    if (DAT_0051fbd0->flag) {
+    if (g_display->flag) {
         SetFullScreen(0);
     } else {
         SetFullScreen(1);

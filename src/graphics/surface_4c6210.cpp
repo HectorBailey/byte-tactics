@@ -7,7 +7,7 @@
 // as the zero arguments.
 #include <ddraw.h>
 
-struct Surface_004c6210 {
+struct Surface {
     int data[12];
 };
 
@@ -57,7 +57,7 @@ struct Display_004c6210 {
     char unknown_48[0x80 - 0x48];
     Screen_004c6210 screen;            // +0x80
     char unknown_90[0x98 - 0x90];
-    Surface_004c6210* field_98;        // +0x98
+    Surface* field_98;                 // +0x98
     char unknown_9c[0xdc - 0x9c];
     int field_dc;                      // +0xdc
 };
@@ -71,8 +71,8 @@ struct Arg_004c6210 {
 extern int g_screenLockCount;
 
 Display_004c6210* GetDisplay(void);
-int __stdcall LockScreen(Surface_004c6210* out);
-void __cdecl BlitSurface(Surface_004c6210* dst, Surface_004c6210* src, int x, int y);
+int __stdcall LockScreen(Surface* out);
+void __cdecl BlitSurface(Surface* dst, Surface* src, int x, int y);
 
 // FUNCTION: 0x4c6210
 int __stdcall RestoreSurfaces(Arg_004c6210* arg)
@@ -85,7 +85,7 @@ int __stdcall RestoreSurfaces(Arg_004c6210* arg)
     if (r == 0) {
         r = arg->field_8->Slot27();
         if (r == 0) {
-            Surface_004c6210 screen;
+            Surface screen;
             LockScreen(&screen);
             BlitSurface(&screen, d->field_98, r, r);
 

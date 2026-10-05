@@ -32,7 +32,7 @@ struct Rect_004bf4d0 {
     int bottom;                        // +0xc
 };
 
-struct Surface_004bf4d0 {
+struct Surface {
     int pitch;                         // +0x0
     char unknown_4[0x8];
     char* pixels;                      // +0xc
@@ -51,15 +51,15 @@ struct Engine_004bf4d0 {
 };
 
 Engine_004bf4d0* GetDisplay();
-int __stdcall LockScreen(Surface_004bf4d0* out);
-int __stdcall UnlockScreen(Surface_004bf4d0* s);
-int __stdcall ClipRectangle(Surface_004bf4d0* s, Rect_004bf4d0* r);
+int __stdcall LockScreen(Surface* out);
+int __stdcall UnlockScreen(Surface* s);
+int __stdcall ClipRectangle(Surface* s, Rect_004bf4d0* r);
 
 // FUNCTION: 0x4bf4d0
-int __stdcall FadeRectangle(Surface_004bf4d0* surface, Rect_004bf4d0* rect, int level)
+int __stdcall FadeRectangle(Surface* surface, Rect_004bf4d0* rect, int level)
 {
     Engine_004bf4d0* engine = GetDisplay();
-    Surface_004bf4d0 screen;
+    Surface screen;
     Rect_004bf4d0 r;
     if (surface == 0) {
         if (!LockScreen(&screen))

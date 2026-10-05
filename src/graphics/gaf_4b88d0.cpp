@@ -27,7 +27,7 @@ struct Rect_004b88d0 {
     int bottom;
 };
 
-class Class_004c6ae0 {
+class Surface {
 public:
     char unknown_0[8];
     int field_8;                    // pitch
@@ -60,14 +60,14 @@ int __stdcall UnlockScreen(Surface_004b88d0* s);
 void __stdcall ClipRects(Rect_004b88d0* other, Rect_004b88d0* rect, Rect_004b88d0* bounds);
 
 // FUNCTION: 0x4b88d0
-void __stdcall EraseFrameDithered(Class_004c6ae0* dst, Bitmap_004b88d0* bmp, int x, int y, int parity)
+void __stdcall EraseFrameDithered(Surface* dst, Bitmap_004b88d0* bmp, int x, int y, int parity)
 {
     Surface_004b88d0 screen;
     if (bmp->flag9 == 0) {
         if (dst == 0) {
             int ok = LockScreen(&screen);
             if (ok != 0)
-                dst = (Class_004c6ae0*)&screen;
+                dst = (Surface*)&screen;
         }
         if (bmp != 0) {
             if (bmp->count > 0) {
@@ -111,7 +111,7 @@ void __stdcall EraseFrameDithered(Class_004c6ae0* dst, Bitmap_004b88d0* bmp, int
                 }
             }
         }
-        if (dst == (Class_004c6ae0*)&screen)
+        if (dst == (Surface*)&screen)
             UnlockScreen(&screen);
     }
 }

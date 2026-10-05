@@ -20,7 +20,7 @@ struct Rect_004b9740 {
     int bottom;
 };
 
-class Class_004c6ae0 {
+class Surface {
 public:
     char unknown_0[8];
     int pitch;                          // +0x8
@@ -59,14 +59,14 @@ int __stdcall UnlockScreen(Surface_004b9740* s);
 void __stdcall ClipRects(Rect_004b9740* other, Rect_004b9740* rect, Rect_004b9740* bounds);
 
 // FUNCTION: 0x4b9740
-void __stdcall DrawFrameScaledBlended(Class_004c6ae0* dst, Bitmap_004b9740* bmp, int x, int y, double sx, double sy)
+void __stdcall DrawFrameScaledBlended(Surface* dst, Bitmap_004b9740* bmp, int x, int y, double sx, double sy)
 {
     Display_004b9740* d = GetDisplay();
     Surface_004b9740 screen;
     if (dst == 0) {
         int ok = LockScreen(&screen);
         if (ok != 0)
-            dst = (Class_004c6ae0*)&screen;
+            dst = (Surface*)&screen;
     }
     if (bmp->count > 0) {
         for (int i = 0; i < (int)bmp->count; i++)
@@ -114,6 +114,6 @@ void __stdcall DrawFrameScaledBlended(Class_004c6ae0* dst, Bitmap_004b9740* bmp,
             }
         }
     }
-    if (dst == (Class_004c6ae0*)&screen)
+    if (dst == (Surface*)&screen)
         UnlockScreen(&screen);
 }

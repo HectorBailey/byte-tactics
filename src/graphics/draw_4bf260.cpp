@@ -27,7 +27,7 @@
 //   `inc edi` and then `add esi, 8`; a `for` header increment is emitted after
 //   the body's last statement, so the two come out the wrong way round.
 
-struct Surface_004bf260 {
+struct Surface {
     int unknown_0[2];
     int pitch;                         // +0x8
     unsigned char* pixels;             // +0xc
@@ -39,18 +39,18 @@ struct Point_004bf260 {
     int y;                             // +0x4
 };
 
-int __stdcall LockScreen(Surface_004bf260* out);
-int __stdcall UnlockScreen(Surface_004bf260* s);
-int __stdcall ClipLine(Surface_004bf260* dst, int* x0, int* y0, int* x1, int* y1);
-void __cdecl FUN_004cc7ab(Surface_004bf260* dst, int x0, int y0, int x1, int y1, int color);
+int __stdcall LockScreen(Surface* out);
+int __stdcall UnlockScreen(Surface* s);
+int __stdcall ClipLine(Surface* dst, int* x0, int* y0, int* x1, int* y1);
+void __cdecl FUN_004cc7ab(Surface* dst, int x0, int y0, int x1, int y1, int color);
 
 // FUNCTION: 0x4bf260
-int __stdcall DrawPolylines(Surface_004bf260* surface, Point_004bf260* points, int* counts,
+int __stdcall DrawPolylines(Surface* surface, Point_004bf260* points, int* counts,
                            int rows, int color)
 {
     int result;
     if (surface == 0) {
-        Surface_004bf260 screen;
+        Surface screen;
         result = LockScreen(&screen);
         if (result != 0) {
             int r = rows;
@@ -65,7 +65,7 @@ int __stdcall DrawPolylines(Surface_004bf260* surface, Point_004bf260* points, i
                     y0 = p[0].y;
                     x0 = p[0].x;
                     if (&screen == 0) {
-                        Surface_004bf260 inner;
+                        Surface inner;
                         if (LockScreen(&inner)) {
                             if (ClipLine(&inner, &x0, &y0, &x1, &y1))
                                 FUN_004cc7ab(&inner, x0, y0, x1, y1, color);

@@ -24,15 +24,15 @@ struct Font_004c1760 {
     unsigned short offsets[1];         // +0x4, glyph offsets from the font start
 };
 
-struct Rect_004c1760 {
+struct Surface {
     int data[12];
 };
 
 int GetDisplay(void);
-int __stdcall LockScreen(Rect_004c1760* out);
-int __stdcall DrawString(Rect_004c1760* dst, unsigned char* text, int x,
+int __stdcall LockScreen(Surface* out);
+int __stdcall DrawString(Surface* dst, unsigned char* text, int x,
                            int a, int b);
-int __stdcall UnlockScreen(Rect_004c1760* buf);
+int __stdcall UnlockScreen(Surface* buf);
 
 // Width in pixels of a line of text in a bitmap font (GetTextWidth, inlined).
 static inline int WidthText(Font_004c1760* font, unsigned char* text)
@@ -59,12 +59,12 @@ void __stdcall DrawStringCentered(int* dst, unsigned char* text, int flag)
     char* single = (char*)GetDisplay();
     int width = WidthText(*(Font_004c1760**)(single + 0x204), text);
     if (dst == 0) {
-        Rect_004c1760 r;
+        Surface r;
         if (LockScreen(&r) != 0) {
             DrawString(&r, text, (r.data[0] - width) >> 1, flag, -1);
             UnlockScreen(&r);
         }
     } else {
-        DrawString((Rect_004c1760*)dst, text, (*dst - width) >> 1, flag, -1);
+        DrawString((Surface*)dst, text, (*dst - width) >> 1, flag, -1);
     }
 }

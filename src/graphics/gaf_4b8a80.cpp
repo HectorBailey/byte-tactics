@@ -12,7 +12,7 @@ struct Src_004b8a80 {
     int bits;                       // +0x10
 };
 
-struct Surface_004b8a80 {
+struct Surface {
     int width;                      // +0x0
     int height;                     // +0x4
     int pitch;                      // +0x8
@@ -29,7 +29,7 @@ struct Surface_004b8a80 {
 void __stdcall ResetClipRect(int* param_1);
 
 // FUNCTION: 0x4b8a80
-void __stdcall SurfaceFromFrame(Surface_004b8a80* dst, Src_004b8a80* src)
+void __stdcall SurfaceFromFrame(Surface* dst, Src_004b8a80* src)
 {
     dst->width = src->width;
     dst->height = src->height;

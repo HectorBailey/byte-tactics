@@ -9,13 +9,13 @@ struct Obj_004b5940 {
     unsigned char flag : 1;            // +0xf0, mask 2
 };
 
-extern Obj_004b5940* DAT_0051fbd0;
+extern Obj_004b5940* g_display;
 extern void __stdcall SetFullScreen(int);
 
 // FUNCTION: 0x4b5940
 void __stdcall SetResolution(int x, int y)
 {
-    DAT_0051fbd0->x = x;
-    DAT_0051fbd0->y = y;
-    SetFullScreen(DAT_0051fbd0->flag);
+    g_display->x = x;
+    g_display->y = y;
+    SetFullScreen(g_display->flag);
 }

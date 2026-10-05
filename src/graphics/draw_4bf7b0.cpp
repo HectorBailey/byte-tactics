@@ -6,25 +6,25 @@
 // returns 0 without ever unlocking. Called from 0x4a16f0 with a rect and a
 // palette level.
 
-struct Surface_004bf7b0 {
+struct Surface {
     int unknown_0[2];
     int pitch;                         // +0x8
     unsigned char* pixels;             // +0xc
     int unknown_10[8];
 };
 
-Surface_004bf7b0* __stdcall LockScreen(Surface_004bf7b0* out);
-int __stdcall UnlockScreen(Surface_004bf7b0* s);
-void __stdcall DrawLitLine(Surface_004bf7b0* surface, int x0, int y0, int x1,
+Surface* __stdcall LockScreen(Surface* out);
+int __stdcall UnlockScreen(Surface* s);
+void __stdcall DrawLitLine(Surface* surface, int x0, int y0, int x1,
                             int y1, int color);
 
 // FUNCTION: 0x4bf7b0
-Surface_004bf7b0* __stdcall DrawLitRectangle(Surface_004bf7b0* surface, int* rect,
+Surface* __stdcall DrawLitRectangle(Surface* surface, int* rect,
                                          int color)
 {
-    Surface_004bf7b0* ret = 0;
+    Surface* ret = 0;
     if (surface == 0) {
-        Surface_004bf7b0 screen;
+        Surface screen;
         ret = LockScreen(&screen);
         if (ret) {
             DrawLitLine(&screen, rect[0], rect[1], rect[2], rect[1], color);

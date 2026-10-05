@@ -23,7 +23,7 @@ struct Info_4c7310 {
     unsigned char* data;
 };
 
-class Class_004c6ae0 {
+class Surface {
 public:
     char unknown_0[8];
     int field_8;
@@ -40,7 +40,7 @@ void __cdecl FUN_004cd91e(unsigned char* dest, unsigned char* src, int width, in
 void __cdecl FUN_004cd962(unsigned char* dest, unsigned char* src, int width, int y, int x, int rowstep, int colstep);
 
 // FUNCTION: 0x4c7310
-void __stdcall DrawQuadRow(int param_1, int* rect, Class_004c6ae0* surf, Info_4c7310* info)
+void __stdcall DrawQuadRow(int param_1, int* rect, Surface* surf, Info_4c7310* info)
 {
     unsigned char* dest = (unsigned char*)surf->field_c;
     unsigned char* src = info->data;

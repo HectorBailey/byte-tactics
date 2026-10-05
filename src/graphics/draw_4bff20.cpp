@@ -25,21 +25,21 @@ struct Rect_004bff20 {
     int bottom;                        // +0xc
 };
 
-struct Surface_004bff20 {
+struct Surface {
     int unknown_0[2];
     int pitch;                         // +0x8
     unsigned char* pixels;             // +0xc
     int unknown_10[8];
 };
 
-int __stdcall LockScreen(Surface_004bff20* out);
-int __stdcall UnlockScreen(Surface_004bff20* s);
-int __stdcall ClipRectangle(Surface_004bff20* s, Rect_004bff20* r);
+int __stdcall LockScreen(Surface* out);
+int __stdcall UnlockScreen(Surface* s);
+int __stdcall ClipRectangle(Surface* s, Rect_004bff20* r);
 
 // FUNCTION: 0x4bff20
-int __stdcall DitherRectangle(Surface_004bff20* surface, Rect_004bff20* rect, int phase)
+int __stdcall DitherRectangle(Surface* surface, Rect_004bff20* rect, int phase)
 {
-    Surface_004bff20 screen;
+    Surface screen;
     if (surface == 0) {
         if (LockScreen(&screen))
             surface = &screen;

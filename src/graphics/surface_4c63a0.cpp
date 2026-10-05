@@ -16,7 +16,7 @@
 #include <windows.h>
 #include <ddraw.h>
 
-struct Surface_004c63a0 {
+struct Surface {
     int data[12];
 };
 
@@ -46,10 +46,10 @@ struct Display_004c63a0 {
     HPALETTE palette;                  // +0x4c
     Out_004c63a0 cached;               // +0x50
     Screen_004c63a0 screen;            // +0x80
-    Surface_004c63a0* field_98;        // +0x98
+    Surface* field_98;                 // +0x98
     int field_9c;                      // +0x9c
     char unknown_a0[0xbc - 0xa0];
-    Surface_004c63a0* field_bc;        // +0xbc
+    Surface* field_bc;                 // +0xbc
     char unknown_c0[0xd4 - 0xc0];
     int field_d4;                      // +0xd4
     int field_d8;                      // +0xd8
@@ -59,7 +59,7 @@ struct Display_004c63a0 {
     char unknown_f2[0x196 - 0xf2];
     int field_196;                     // +0x196
     char unknown_19a[0x1b2 - 0x19a];
-    Surface_004c63a0* field_1b2;       // +0x1b2
+    Surface* field_1b2;                // +0x1b2
     int field_1b6;                     // +0x1b6
     int field_1ba;                     // +0x1ba
     int* field_1be;                    // +0x1be
@@ -77,10 +77,10 @@ extern int g_screenLockCount;
 Display_004c63a0* GetDisplay(void);
 int GetScreenWidth(void);
 int GetScreenHeight(void);
-int __stdcall LockScreen(Surface_004c63a0* out);
-void __stdcall DrawSurface(Surface_004c63a0* dst, Surface_004c63a0* bmp, int x, int y);
+int __stdcall LockScreen(Surface* out);
+void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y);
 void __stdcall DrawCursor(Display_004c63a0* obj, void* dst);
-void __cdecl BlitSurface(Surface_004c63a0* dst, Surface_004c63a0* src, int x, int y);
+void __cdecl BlitSurface(Surface* dst, Surface* src, int x, int y);
 
 static inline LONG Lock()
 {
@@ -132,7 +132,7 @@ static inline HRESULT RestoreSurfaces(Display_004c63a0* d)
     if (hr == 0) {
         hr = d->screen.surface->Restore();
         if (hr == 0) {
-            Surface_004c63a0 screen;
+            Surface screen;
             LockScreen(&screen);
             BlitSurface(&screen, dd->field_98, 0, 0);
             UnlockScreenInline();
@@ -158,7 +158,7 @@ void FlipScreen(void)
     if ((flags & 2) == 0) {
         LONG held = Lock();
         Out_004c63a0* p = &d->cached;
-        DrawSurface((Surface_004c63a0*)p, d->field_bc, 0, 0);
+        DrawSurface((Surface*)p, d->field_bc, 0, 0);
         DrawCursor(d, p);
         HDC hdc = GetDC(d->hwnd);
         SelectPalette(hdc, d->palette, 0);
@@ -171,8 +171,8 @@ void FlipScreen(void)
 
     if (d->field_dc != 0) {
         Desc desc;
-        Surface_004c63a0 out;
-        Surface_004c63a0* bmp = d->field_bc;
+        Surface out;
+        Surface* bmp = d->field_bc;
         if (bmp->data[0] != GetScreenWidth())
             return;
         if (bmp->data[1] != GetScreenHeight())
@@ -189,7 +189,7 @@ void FlipScreen(void)
             DrawCursor(d, bmp);
             BlitSurface(&out, bmp, 0, 0);
             if (d->field_1ce != 0 && d->field_1d2 != 0)
-                DrawSurface(bmp, (Surface_004c63a0*)d->field_1be, d->field_1b6, d->field_1ba);
+                DrawSurface(bmp, (Surface*)d->field_1be, d->field_1b6, d->field_1ba);
             d->screen.primary->Unlock(0);
         } else if (lr == 0x887601c2) {
             RestoreSurfaces(d);

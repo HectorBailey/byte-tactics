@@ -405,7 +405,7 @@ class Class_00470c10;
 class Class_00470e50;
 class Class_00470eb0;
 class Class_00470ed0;
-class Class_00470fb0;
+class ParticleLists;
 class Class_00471120;
 class Class_00471340;
 class Class_00471430;
@@ -10734,12 +10734,12 @@ public:
     int AllocSlot(int);
 };
 
-class Class_00470fb0 {  // 0xa0 bytes, 4 views
+class ParticleLists {   // 0xa0 bytes, 4 views
 public:
     std::vector<Listener_00470fb0*> lists[10];  // +0x0
-    Class_00470fb0(Class_00470fb0&);
-    ~Class_00470fb0(void);
-    Class_00470fb0(void);
+    ParticleLists(ParticleLists&);
+    ~ParticleLists(void);
+    ParticleLists(void);
     void UpdateAll(void);
     void DrawAll(void*);
 };

@@ -4,7 +4,7 @@
 // LockScreen, blit, then unlock. The unlock is UnlockScreen inlined.
 #include <ddraw.h>
 
-struct Surface_004c6c50 {
+struct Surface {
     int unknown_0[6];                  // +0x00
     short field_18;                    // +0x18
     short field_1a;                    // +0x1a
@@ -30,11 +30,11 @@ struct Display_004c6c50 {
 extern int g_screenLockCount;
 
 Display_004c6c50* GetDisplay(void);
-int __stdcall LockScreen(Surface_004c6c50* out);
-void __cdecl FUN_004cbcd5(Surface_004c6c50* dst, Surface_004c6c50* src, int x, int y, int color);
+int __stdcall LockScreen(Surface* out);
+void __cdecl FUN_004cbcd5(Surface* dst, Surface* src, int x, int y, int color);
 
 // 0x4c5fa0, inlined here.
-static inline void UnlockScreenInline(Surface_004c6c50* s)
+static inline void UnlockScreenInline(Surface* s)
 {
     Display_004c6c50* d = GetDisplay();
     if (d->field_44 == 0 && d->field_dc == 0) {
@@ -47,10 +47,10 @@ static inline void UnlockScreenInline(Surface_004c6c50* s)
 }
 
 // FUNCTION: 0x4c6c50
-void __stdcall DrawSurfaceKeyed(Surface_004c6c50* dst, Surface_004c6c50* src, int x, int y, int color)
+void __stdcall DrawSurfaceKeyed(Surface* dst, Surface* src, int x, int y, int color)
 {
     if (dst == 0) {
-        Surface_004c6c50 screen;
+        Surface screen;
         if (LockScreen(&screen)) {
             FUN_004cbcd5(&screen, src, x - src->field_18, y - src->field_1a, color);
             UnlockScreenInline(&screen);

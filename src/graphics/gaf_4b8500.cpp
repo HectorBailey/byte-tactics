@@ -17,7 +17,7 @@ struct Rect_004b8500 {
     int bottom;
 };
 
-class Class_004c6ae0 {
+class Surface {
 public:
     int field_0;
     int field_4;
@@ -73,12 +73,12 @@ Display_004b8500* GetDisplay(void);
 int __stdcall LockScreen(Surface_004b8500* out);
 int __stdcall UnlockScreen(Surface_004b8500* s);
 void __stdcall ClipRects(Rect_004b8500* other, Rect_004b8500* rect, Rect_004b8500* bounds);
-void __stdcall DrawFrameBlended(Class_004c6ae0* p, Sprite_004b8500* s, int x, int y);
-void __cdecl FUN_004cbf2c(Class_004c6ae0* p, Src_004b8500* src, Rect_004b8500* srect, Rect_004b8500* drect, int colour, unsigned char* palette);
+void __stdcall DrawFrameBlended(Surface* p, Sprite_004b8500* s, int x, int y);
+void __cdecl FUN_004cbf2c(Surface* p, Src_004b8500* src, Rect_004b8500* srect, Rect_004b8500* drect, int colour, unsigned char* palette);
 void __cdecl FUN_004cc057(int linkid, int sprite, Rect_004b8500* drect, Sprite_004b8500** src, Rect_004b8500* srect, unsigned char* palette);
 
 // FUNCTION: 0x4b8500
-void __stdcall DrawFrameBlended(Class_004c6ae0* param_1, Sprite_004b8500* param_2, int x, int y)
+void __stdcall DrawFrameBlended(Surface* param_1, Sprite_004b8500* param_2, int x, int y)
 {
     Display_004b8500* d = GetDisplay();
     if ((d->flags & 0x20) != 0) {
@@ -86,7 +86,7 @@ void __stdcall DrawFrameBlended(Class_004c6ae0* param_1, Sprite_004b8500* param_
         if (param_1 == 0) {
             int locked = LockScreen(&screen.surf);
             if (locked != 0)
-                param_1 = (Class_004c6ae0*)&screen.surf;
+                param_1 = (Surface*)&screen.surf;
         }
 
         if (param_2 != 0) {
@@ -123,7 +123,7 @@ void __stdcall DrawFrameBlended(Class_004c6ae0* param_1, Sprite_004b8500* param_
             }
         }
 
-        if (param_1 == (Class_004c6ae0*)&screen.surf)
+        if (param_1 == (Surface*)&screen.surf)
             UnlockScreen(&screen.surf);
     }
 }

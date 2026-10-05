@@ -13,7 +13,7 @@ struct Timer_4b63f0 {
     int countdown;                     // +0xc
 };
 
-extern GameCtx_4b63f0* DAT_0051fbd0;
+extern GameCtx_4b63f0* g_display;
 extern Timer_4b63f0 DAT_0051fbd8[];    // 10 slots, then g_timerCount counts them
 extern int DAT_0051fbe0;               // the interval field of the first slot
 extern int g_timerCount;
@@ -24,9 +24,9 @@ typedef void (__stdcall *TimerCb_4b63f0)(int);
 // FUNCTION: 0x4b63f0
 int __stdcall AddTimer(int interval, int id, TimerCb_4b63f0 callback)
 {
-    unsigned int now = (GetTickCount() * DAT_0051fbd0->rate) / 1000;
+    unsigned int now = (GetTickCount() * g_display->rate) / 1000;
     int diff = (int)now - DAT_0051fc84;
-    DAT_0051fc84 = (GetTickCount() * DAT_0051fbd0->rate) / 1000;
+    DAT_0051fc84 = (GetTickCount() * g_display->rate) / 1000;
 
     int* p = &DAT_0051fbe0;
     do {

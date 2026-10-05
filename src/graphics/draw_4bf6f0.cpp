@@ -13,25 +13,25 @@ struct Rect_004bf6f0 {
     int bottom;                        // +0xc
 };
 
-struct Surface_004bf6f0 {
+struct Surface {
     int unknown_0[2];
     int pitch;                         // +0x8
     unsigned char* pixels;             // +0xc
     int unknown_10[8];
 };
 
-int __stdcall LockScreen(Surface_004bf6f0* out);
-int __stdcall UnlockScreen(Surface_004bf6f0* s);
-int __stdcall ClipRectangle(Surface_004bf6f0* s, Rect_004bf6f0* r);
-void __cdecl FUN_004ccdea(Surface_004bf6f0* s, Rect_004bf6f0* r, int color);
+int __stdcall LockScreen(Surface* out);
+int __stdcall UnlockScreen(Surface* s);
+int __stdcall ClipRectangle(Surface* s, Rect_004bf6f0* r);
+void __cdecl FUN_004ccdea(Surface* s, Rect_004bf6f0* r, int color);
 
 // FUNCTION: 0x4bf6f0
-int __stdcall FillRectangle(Surface_004bf6f0* surface, Rect_004bf6f0* rect, int color)
+int __stdcall FillRectangle(Surface* surface, Rect_004bf6f0* rect, int color)
 {
     Rect_004bf6f0 r = *rect;
     int result;
     if (surface == 0) {
-        Surface_004bf6f0 screen;
+        Surface screen;
         result = LockScreen(&screen);
         if (result != 0) {
             result = ClipRectangle(&screen, &r) != 0;

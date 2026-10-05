@@ -11,29 +11,29 @@
 // argument slots that are dead by then (the `surface` slot, and the `x`/`y`
 // slots whose copies become self-stores).
 
-struct Surface_004bee60 {
+struct Surface {
     int unknown_0[2];
     int pitch;                         // +0x8
     unsigned char* pixels;             // +0xc
     int unknown_10[8];
 };
 
-int __stdcall LockScreen(Surface_004bee60* out);
-int __stdcall UnlockScreen(Surface_004bee60* s);
-int __stdcall ClipLine(Surface_004bee60* dst, int* x0, int* y0, int* x1, int* y1);
-void __cdecl FUN_004cc7ab(Surface_004bee60* dst, int x0, int y0, int x1, int y1, int ch);
+int __stdcall LockScreen(Surface* out);
+int __stdcall UnlockScreen(Surface* s);
+int __stdcall ClipLine(Surface* dst, int* x0, int* y0, int* x1, int* y1);
+void __cdecl FUN_004cc7ab(Surface* dst, int x0, int y0, int x1, int y1, int ch);
 
 // FUNCTION: 0x4bee60
-int __stdcall DrawPixel(Surface_004bee60* surface, int x, int y, int ch)
+int __stdcall DrawPixel(Surface* surface, int x, int y, int ch)
 {
     int ret;
     if (surface == 0) {
-        Surface_004bee60 screen;
+        Surface screen;
         ret = LockScreen(&screen);
         if (ret) {
             int y1 = y, x1 = x, y0 = y, x0 = x;
             if (&screen == 0) {
-                Surface_004bee60 other;
+                Surface other;
                 if (LockScreen(&other)) {
                     if (ClipLine(&other, &x0, &y0, &x1, &y1))
                         FUN_004cc7ab(&other, x0, y0, x1, y1, ch);

@@ -22,7 +22,7 @@ struct Display_004b5370 {
     LPDIRECTDRAW2 ddraw;               // +0x84, set in DirectDraw mode
 };
 
-extern Display_004b5370* DAT_0051fbd0;
+extern Display_004b5370* g_display;
 
 HRESULT __stdcall EnumModesCallback(DDSURFACEDESC* desc, void* context);
 
@@ -32,7 +32,7 @@ HRESULT __stdcall EnumModesCallback(DDSURFACEDESC* desc, void* context);
 // enough; in DirectDraw mode they come from EnumDisplayModes. Returns 1.
 int __stdcall GetDisplayModes(ModeList_004b5330* list)
 {
-    if (DAT_0051fbd0->old_palette) {
+    if (g_display->old_palette) {
         int width;
         int height;
         list->count = 0;
@@ -69,7 +69,7 @@ int __stdcall GetDisplayModes(ModeList_004b5330* list)
     int result = 1;
     DWORD hr;
     list->count = 0;
-    hr = DAT_0051fbd0->ddraw->QueryInterface(IID_IDirectDraw2, (LPVOID*)&ddraw2);
+    hr = g_display->ddraw->QueryInterface(IID_IDirectDraw2, (LPVOID*)&ddraw2);
     if (hr == 0) {
         hr = ddraw2->EnumDisplayModes(0, 0, list, (LPDDENUMMODESCALLBACK)EnumModesCallback);
         if (hr != 0)

@@ -31,7 +31,7 @@
 //   y0, x0, which is the order the original loads them in. The other 23 orders
 //   all score 0.90 to 0.95.
 
-struct Surface_004bf060 {
+struct Surface {
     int unknown_0[2];
     int pitch;                         // +0x8
     unsigned char* pixels;             // +0xc
@@ -49,18 +49,18 @@ struct Segment_004bf060 {
     Point_004bf060* to;
 };
 
-int __stdcall LockScreen(Surface_004bf060* out);
-int __stdcall UnlockScreen(Surface_004bf060* s);
-int __stdcall ClipLine(Surface_004bf060* dst, int* x0, int* y0, int* x1, int* y1);
-void __cdecl FUN_004cc7ab(Surface_004bf060* dst, int x0, int y0, int x1, int y1, int color);
+int __stdcall LockScreen(Surface* out);
+int __stdcall UnlockScreen(Surface* s);
+int __stdcall ClipLine(Surface* dst, int* x0, int* y0, int* x1, int* y1);
+void __cdecl FUN_004cc7ab(Surface* dst, int x0, int y0, int x1, int y1, int color);
 
 // FUNCTION: 0x4bf060
-int __stdcall DrawPolyline(Surface_004bf060* surface, Point_004bf060* points,
+int __stdcall DrawPolyline(Surface* surface, Point_004bf060* points,
                            int count, int color)
 {
     int result;
     if (surface == 0) {
-        Surface_004bf060 screen;
+        Surface screen;
         result = LockScreen(&screen);
         if (result != 0) {
             Segment_004bf060 seg;
@@ -74,7 +74,7 @@ int __stdcall DrawPolyline(Surface_004bf060* surface, Point_004bf060* points,
                 y0 = seg.from->y;
                 x0 = seg.from->x;
                 if (&screen == 0) {
-                    Surface_004bf060 inner;
+                    Surface inner;
                     if (LockScreen(&inner)) {
                         if (ClipLine(&inner, &x0, &y0, &x1, &y1))
                             FUN_004cc7ab(&inner, x0, y0, x1, y1, color);

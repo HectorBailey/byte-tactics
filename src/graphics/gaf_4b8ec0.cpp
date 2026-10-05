@@ -21,7 +21,7 @@ struct Rect_004b8ec0 {
     int bottom;
 };
 
-class Class_004c6ae0 {
+class Surface {
 public:
     char unknown_0[8];
     int field_8;
@@ -71,11 +71,11 @@ Display_004b8ec0* GetDisplay(void);
 int __stdcall LockScreen(Surface_004b8ec0* out);
 int __stdcall UnlockScreen(Surface_004b8ec0* s);
 void __stdcall ClipRects(Rect_004b8ec0* other, Rect_004b8ec0* rect, Rect_004b8ec0* bounds);
-void __cdecl FUN_004cc332(Class_004c6ae0* dst, Desc_004b8ec0* src, Rect_004b8ec0* srect, Rect_004b8ec0* drect, int colour, int param_6);
+void __cdecl FUN_004cc332(Surface* dst, Desc_004b8ec0* src, Rect_004b8ec0* srect, Rect_004b8ec0* drect, int colour, int param_6);
 void __cdecl FUN_004cc1bf(int param_1, int param_2, Rect_004b8ec0* rect, void* plane, Rect_004b8ec0* other, int param_6);
 
 // FUNCTION: 0x4b8ec0
-void __stdcall DrawFrameShadow(Class_004c6ae0* dst, Bitmap_004b8ec0* bmp, int x, int y)
+void __stdcall DrawFrameShadow(Surface* dst, Bitmap_004b8ec0* bmp, int x, int y)
 {
     Display_004b8ec0* d = GetDisplay();
     if (d->has_obj_c8 == 1) {
@@ -83,7 +83,7 @@ void __stdcall DrawFrameShadow(Class_004c6ae0* dst, Bitmap_004b8ec0* bmp, int x,
         if (dst == 0) {
             int ok = LockScreen(&screen);
             if (ok != 0)
-                dst = (Class_004c6ae0*)&screen;
+                dst = (Surface*)&screen;
         }
         if (bmp != 0) {
             if (bmp->count > 0) {
@@ -120,7 +120,7 @@ void __stdcall DrawFrameShadow(Class_004c6ae0* dst, Bitmap_004b8ec0* bmp, int x,
                 }
             }
         }
-        if (dst == (Class_004c6ae0*)&screen)
+        if (dst == (Surface*)&screen)
             UnlockScreen(&screen);
     }
 }

@@ -16,18 +16,18 @@ struct App_004b6230 {
     unsigned short quitting : 1;       // +0xf1, mask 8
 };
 
-extern App_004b6230* DAT_0051fbd0;
+extern App_004b6230* g_display;
 extern void __stdcall SetFullScreen(int);
 
 // FUNCTION: 0x4b6230
 void __stdcall QuitApp(char* message)
 {
-    DAT_0051fbd0->quitting = 1;
-    if (DAT_0051fbd0->flag) {
+    g_display->quitting = 1;
+    if (g_display->flag) {
         SetFullScreen(0);
     }
     if (message) {
-        MessageBoxA(DAT_0051fbd0->hwnd, message, DAT_0051fbd0->title, 0);
+        MessageBoxA(g_display->hwnd, message, g_display->title, 0);
     }
-    PostMessageA(DAT_0051fbd0->hwnd, WM_DESTROY, 0, 0);
+    PostMessageA(g_display->hwnd, WM_DESTROY, 0, 0);
 }

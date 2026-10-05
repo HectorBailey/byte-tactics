@@ -19,7 +19,7 @@ struct Rect_004b8310 {
     int bottom;
 };
 
-class Class_004c6ae0 {
+class Surface {
 public:
     int field_0;
     int field_4;
@@ -75,12 +75,12 @@ Display_004b8310* GetDisplay(void);
 int __stdcall LockScreen(Surface_004b8310* out);
 int __stdcall UnlockScreen(Surface_004b8310* s);
 void __stdcall ClipRects(Rect_004b8310* other, Rect_004b8310* rect, Rect_004b8310* bounds);
-void __stdcall DrawFrameBlended(Class_004c6ae0* p, Sprite_004b8310* s, int x, int y);
-void __cdecl FUN_004cbf2c(Class_004c6ae0* p, Src_004b8310* src, Rect_004b8310* srect, Rect_004b8310* drect, int colour, unsigned char* palette);
+void __stdcall DrawFrameBlended(Surface* p, Sprite_004b8310* s, int x, int y);
+void __cdecl FUN_004cbf2c(Surface* p, Src_004b8310* src, Rect_004b8310* srect, Rect_004b8310* drect, int colour, unsigned char* palette);
 void __cdecl BlitCompressedLit(int linkid, int sprite, Rect_004b8310* drect, Sprite_004b8310** src, Rect_004b8310* srect, unsigned char* palette);
 
 // FUNCTION: 0x4b8310
-void __stdcall DrawFrameLit(Class_004c6ae0* param_1, Sprite_004b8310* param_2, int x, int y, int param_5)
+void __stdcall DrawFrameLit(Surface* param_1, Sprite_004b8310* param_2, int x, int y, int param_5)
 {
     Display_004b8310* d = GetDisplay();
     if ((d->flags & 0x80) == 0x80) {
@@ -88,7 +88,7 @@ void __stdcall DrawFrameLit(Class_004c6ae0* param_1, Sprite_004b8310* param_2, i
         if (param_1 == 0) {
             int locked = LockScreen(&screen.surf);
             if (locked != 0)
-                param_1 = (Class_004c6ae0*)&screen.surf;
+                param_1 = (Surface*)&screen.surf;
         }
 
         if (param_2 != 0) {
@@ -124,7 +124,7 @@ void __stdcall DrawFrameLit(Class_004c6ae0* param_1, Sprite_004b8310* param_2, i
             }
         }
 
-        if (param_1 == (Class_004c6ae0*)&screen.surf)
+        if (param_1 == (Surface*)&screen.surf)
             UnlockScreen(&screen.surf);
     }
 }

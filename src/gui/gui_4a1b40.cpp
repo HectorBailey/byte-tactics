@@ -128,7 +128,7 @@ struct Item_004a1b40 {
     Cell_004a1b40* cell;                // +0x28
 };
 
-struct Class_004c6ae0 {
+struct Surface {
     void GetClipRect(Rect_004a1b40* rect);
 };
 
@@ -319,7 +319,7 @@ void __stdcall FUN_004a1b40(Class_004a1b40* obj, int index)
         Rect_004a1b40 clip;
         unsigned int bp = (flags >> 7) & 1;
         void* surf = entries->surface;
-        ((Class_004c6ae0*)surf)->GetClipRect(&clip);
+        ((Surface*)surf)->GetClipRect(&clip);
         ((Class_004c6b10*)surf)->SetClipRect(bounds);
         int k = me->field_bc;
         if (!bp) {

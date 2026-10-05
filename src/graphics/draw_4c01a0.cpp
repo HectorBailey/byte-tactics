@@ -23,7 +23,7 @@
 //    i++; angle += step; reproduces the original's `mov [esp+0x68], edi` /
 //    `mov [esp+0x10], eax` order and the tail's `mov ecx,[step]; mov edx,[i]`.
 
-struct Surface_004c01a0 {
+struct Surface {
     int unknown_0[2];
     int pitch;                         // +0x8
     unsigned char* pixels;             // +0xc
@@ -32,16 +32,16 @@ struct Surface_004c01a0 {
 
 int __cdecl FUN_004b7123(int angle, int scale);
 int __cdecl FUN_004b70ef(int angle, int scale);
-int __stdcall LockScreen(Surface_004c01a0* out);
-int __stdcall UnlockScreen(Surface_004c01a0* s);
-int __stdcall ClipLine(Surface_004c01a0* dst, int* x0, int* y0, int* x1, int* y1);
-void __cdecl FUN_004cc7ab(Surface_004c01a0* dst, int x0, int y0, int x1, int y1, int color);
+int __stdcall LockScreen(Surface* out);
+int __stdcall UnlockScreen(Surface* s);
+int __stdcall ClipLine(Surface* dst, int* x0, int* y0, int* x1, int* y1);
+void __cdecl FUN_004cc7ab(Surface* dst, int x0, int y0, int x1, int y1, int color);
 
 // FUNCTION: 0x4c01a0
-void __stdcall DrawDashedCircle(Surface_004c01a0* surface, int cx, int cy, int radius,
+void __stdcall DrawDashedCircle(Surface* surface, int cx, int cy, int radius,
                             int color, int n, int start)
 {
-    Surface_004c01a0 screen;
+    Surface screen;
     int px = cx + radius;
     int py = cy;
     int angle = 0x10000 / n;

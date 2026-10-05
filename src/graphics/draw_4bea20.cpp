@@ -1,6 +1,6 @@
 // Decompiled by space-bunny-free. Names are provisional.
 // Clips the segment (x0, y0) - (x1, y1) to the rect the surface hands back
-// from Class_004c6ae0::GetClipRect (the surface's own copy at +0x1c, fetched
+// from Surface::GetClipRect (the surface's own copy at +0x1c, fetched
 // into a local), moving each end point in turn against the four edges, and
 // returning 0 when an end point is on the wrong side of an edge or when the
 // delta of the axis being moved is zero.
@@ -37,7 +37,7 @@ struct Rect_004bea20 {
     int bottom;
 };
 
-class Class_004c6ae0 {
+class Surface {
 public:
     int field_0;
     char unknown_4[0x1c - 4];
@@ -47,7 +47,7 @@ public:
 };
 
 // FUNCTION: 0x4bea20
-int __stdcall ClipLine(Class_004c6ae0* dst, int* x0, int* y0, int* x1, int* y1)
+int __stdcall ClipLine(Surface* dst, int* x0, int* y0, int* x1, int* y1)
 {
     Rect_004bea20 r;
     int to_right = (*x0 <= *x1);

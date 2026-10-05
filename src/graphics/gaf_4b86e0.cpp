@@ -20,7 +20,7 @@ struct Rect_004b86e0 {
     int bottom;                        // +0xc
 };
 
-class Class_004c6ae0 {
+class Surface {
 public:
     char unknown_0[8];
     int field_8;
@@ -70,12 +70,12 @@ int __stdcall LockScreen(Surface_004b86e0* out);
 int __stdcall UnlockScreen(Surface_004b86e0* s);
 void __stdcall ClipRects(Rect_004b86e0* other, Rect_004b86e0* rect, Rect_004b86e0* bounds);
 void __stdcall ResetClipRect(int* param_1);
-void __cdecl FUN_004cbfc4(Class_004c6ae0* p, Surface_004b86e0* s, Rect_004b86e0* srect,
+void __cdecl FUN_004cbfc4(Surface* p, Surface_004b86e0* s, Rect_004b86e0* srect,
                           Rect_004b86e0* drect, int colour, unsigned char* palette);
-void __stdcall DrawFrameGray(Class_004c6ae0* param_1, Bitmap_004b86e0* param_2, int x, int y);
+void __stdcall DrawFrameGray(Surface* param_1, Bitmap_004b86e0* param_2, int x, int y);
 
 // FUNCTION: 0x4b86e0
-void __stdcall DrawFrameGray(Class_004c6ae0* param_1, Bitmap_004b86e0* param_2, int x, int y)
+void __stdcall DrawFrameGray(Surface* param_1, Bitmap_004b86e0* param_2, int x, int y)
 {
     Display_004b86e0* d = GetDisplay();
     if ((d->flags & 0x100) != 0 && param_2->flag9 == 0) {
@@ -83,7 +83,7 @@ void __stdcall DrawFrameGray(Class_004c6ae0* param_1, Bitmap_004b86e0* param_2, 
         if (param_1 == 0) {
             int locked = LockScreen(&screen);
             if (locked != 0)
-                param_1 = (Class_004c6ae0*)&screen;
+                param_1 = (Surface*)&screen;
         }
         if (param_2 != 0) {
             if (param_2->count > 0) {
@@ -121,7 +121,7 @@ void __stdcall DrawFrameGray(Class_004c6ae0* param_1, Bitmap_004b86e0* param_2, 
                 }
             }
         }
-        if (param_1 == (Class_004c6ae0*)&screen)
+        if (param_1 == (Surface*)&screen)
             UnlockScreen(&screen);
     }
 }

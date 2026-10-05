@@ -182,7 +182,7 @@ struct Rect_004c0330 {
     int bottom;
 };
 
-class Class_004c6ae0 {
+class Surface {
 public:
     int unknown_0[2];
     int pitch;                         // +0x8
@@ -203,13 +203,13 @@ struct Span_004c0330 {
     int unknown_8[8];
 };
 
-int __stdcall LockScreen(Class_004c6ae0* out);
-int __stdcall UnlockScreen(Class_004c6ae0* s);
+int __stdcall LockScreen(Surface* out);
+int __stdcall UnlockScreen(Surface* s);
 
 // FUNCTION: 0x4c0330
-int __stdcall ScanFillPolygon(Class_004c6ae0* surface, Point_004c0330* points, int n, unsigned char color)
+int __stdcall ScanFillPolygon(Surface* surface, Point_004c0330* points, int n, unsigned char color)
 {
-    Class_004c6ae0 screen;
+    Surface screen;
     Rect_004c0330 clip;
     Span_004c0330 span[0x800];
     int locked;

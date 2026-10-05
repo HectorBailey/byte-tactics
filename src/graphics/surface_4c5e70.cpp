@@ -28,7 +28,7 @@ struct Vec16_004c5e70 {
     int w;
 };
 
-struct Out_004c5e70 {
+struct Surface {
     int field_0;                     // +0x00
     int field_4;                     // +0x04
     int field_8;                     // +0x08
@@ -48,7 +48,7 @@ struct Display_004c5e70 {
     char unknown_0[0x44];
     int field_44;                    // +0x44
     char unknown_48[0x8];
-    Out_004c5e70 cached;             // +0x50
+    Surface cached;                  // +0x50
     struct Screen {
         char unknown_0[0xc];
         IDirectDrawSurface* surface; // +0x8c
@@ -57,13 +57,13 @@ struct Display_004c5e70 {
     char unknown_90[0x10];
     Vec16_004c5e70 vec;              // +0xa0
     char unknown_b0[0xc];
-    Out_004c5e70* field_bc;          // +0xbc
+    Surface* field_bc;               // +0xbc
     char unknown_c0[0x14];
     int field_d4;                    // +0xd4
     int field_d8;                    // +0xd8
     int field_dc;                    // +0xdc
 
-    int LockMe(Out_004c5e70* out)
+    int LockMe(Surface* out)
     {
         if (field_dc != 0) {
             *out = *field_bc;
@@ -99,7 +99,7 @@ struct Display_004c5e70 {
 Display_004c5e70* GetDisplay(void);
 
 // FUNCTION: 0x4c5e70
-int __stdcall LockScreen(Out_004c5e70* out)
+int __stdcall LockScreen(Surface* out)
 {
     return GetDisplay()->LockMe(out);
 }

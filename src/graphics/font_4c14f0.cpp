@@ -74,7 +74,7 @@ struct Rect_004c14f0 {
     int bottom;
 };
 
-class Class_004c6ae0 {
+class Surface {
 public:
     int unknown_0[2];
     int pitch;                          // +0x8
@@ -86,8 +86,8 @@ public:
 
 Game_004c14f0* GetDisplay(void);
 int __stdcall FUN_004b6750(Rect_004c14f0* a, Rect_004c14f0* b);
-int __stdcall LockScreen(Class_004c6ae0* out);
-int __stdcall UnlockScreen(Class_004c6ae0* s);
+int __stdcall LockScreen(Surface* out);
+int __stdcall UnlockScreen(Surface* s);
 void __cdecl BlitText(unsigned char* pixels, int pitch, Font_004c14f0* font, unsigned char* text,
                           int x, int y, int c1, int c2, int c3);
 
@@ -110,7 +110,7 @@ static inline int WidthText(Font_004c14f0* font, unsigned char* text)
 }
 
 // FUNCTION: 0x4c14f0
-void __stdcall DrawString(Class_004c6ae0* dst, unsigned char* text, int x, int y, int maxWidth)
+void __stdcall DrawString(Surface* dst, unsigned char* text, int x, int y, int maxWidth)
 {
     Game_004c14f0* game = GetDisplay();
     int width = WidthText(game->font, text);
@@ -136,7 +136,7 @@ void __stdcall DrawString(Class_004c6ae0* dst, unsigned char* text, int x, int y
     r.right = x + width;
     r.bottom = r.top + GetDisplay()->font->glyphs[0];
     if (dst == 0) {
-        Class_004c6ae0 screen;
+        Surface screen;
         if (LockScreen(&screen) != 0) {
             Rect_004c14f0 clip;
             screen.GetClipRect(&clip);

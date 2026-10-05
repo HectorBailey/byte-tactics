@@ -16,7 +16,7 @@ struct App_004ce910 {
     HWND hwnd;                         // +0x40
 };
 
-extern App_004ce910* DAT_0051fbd0;
+extern App_004ce910* g_display;
 extern App_004ce910* GetDisplay();
 
 class Class_004ce910 {

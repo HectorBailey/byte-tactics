@@ -5,22 +5,22 @@
 // When the screen cannot be locked the colour is returned uninitialised: its
 // stack home is y's slot, which is why that path returns y.
 
-struct Surface_004befe0 {
+struct Surface {
     int unknown_0[2];
     int pitch;                         // +0x8
     unsigned char* pixels;             // +0xc
     int unknown_10[8];
 };
 
-int __stdcall LockScreen(Surface_004befe0* out);
-int __stdcall UnlockScreen(Surface_004befe0* s);
+int __stdcall LockScreen(Surface* out);
+int __stdcall UnlockScreen(Surface* s);
 
 // FUNCTION: 0x4befe0
-unsigned int __stdcall ReadPixel(Surface_004befe0* surface, int x, int y)
+unsigned int __stdcall ReadPixel(Surface* surface, int x, int y)
 {
     unsigned int color;
     if (surface == 0) {
-        Surface_004befe0 screen;
+        Surface screen;
         if (LockScreen(&screen)) {
             color = screen.pixels[screen.pitch * y + x];
             UnlockScreen(&screen);

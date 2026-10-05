@@ -20,7 +20,7 @@ struct Rect_004b7f90 {
     int bottom;
 };
 
-class Class_004c6ae0 {
+class Surface {
 public:
     char unknown_0[8];
     int field_8;
@@ -59,18 +59,18 @@ struct Desc_004b7f90 {
 int __stdcall LockScreen(Surface_004b7f90* out);
 int __stdcall UnlockScreen(Surface_004b7f90* s);
 void __stdcall ClipRects(Rect_004b7f90* other, Rect_004b7f90* rect, Rect_004b7f90* bounds);
-void __cdecl FUN_004cbe70(Class_004c6ae0* dst, Desc_004b7f90* src, Rect_004b7f90* srect, Rect_004b7f90* drect, int colour);
+void __cdecl FUN_004cbe70(Surface* dst, Desc_004b7f90* src, Rect_004b7f90* srect, Rect_004b7f90* drect, int colour);
 void __cdecl FUN_004cc51d(int param_1, int param_2, Rect_004b7f90* rect, void* plane, Rect_004b7f90* other);
-void __stdcall DrawFrameBlended(Class_004c6ae0* dst, Bitmap_004b7f90* bmp, int x, int y);
+void __stdcall DrawFrameBlended(Surface* dst, Bitmap_004b7f90* bmp, int x, int y);
 
 // FUNCTION: 0x4b7f90
-void __stdcall DrawFrame(Class_004c6ae0* dst, Bitmap_004b7f90* bmp, int x, int y)
+void __stdcall DrawFrame(Surface* dst, Bitmap_004b7f90* bmp, int x, int y)
 {
     Surface_004b7f90 screen;
     if (dst == 0) {
         int ok = LockScreen(&screen);
         if (ok != 0)
-            dst = (Class_004c6ae0*)&screen;
+            dst = (Surface*)&screen;
     }
     if (bmp != 0) {
         if (bmp->count > 0) {
@@ -110,6 +110,6 @@ void __stdcall DrawFrame(Class_004c6ae0* dst, Bitmap_004b7f90* bmp, int x, int y
             }
         }
     }
-    if (dst == (Class_004c6ae0*)&screen)
+    if (dst == (Surface*)&screen)
         UnlockScreen(&screen);
 }

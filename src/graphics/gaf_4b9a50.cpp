@@ -18,7 +18,7 @@ struct Rect_004b9a50 {
     int bottom;
 };
 
-class Class_004c6ae0 {
+class Surface {
 public:
     char unknown_0[8];
     int pitch;                          // +0x8
@@ -48,17 +48,17 @@ struct Surface_004b9a50 {
 
 int __stdcall LockScreen(Surface_004b9a50* out);
 int __stdcall UnlockScreen(Surface_004b9a50* s);
-void __stdcall DrawFrameScaledBlended(Class_004c6ae0* dst, Bitmap_004b9a50* bmp, int x, int y, double sx, double sy);
+void __stdcall DrawFrameScaledBlended(Surface* dst, Bitmap_004b9a50* bmp, int x, int y, double sx, double sy);
 void __stdcall ClipRects(Rect_004b9a50* other, Rect_004b9a50* rect, Rect_004b9a50* bounds);
 
 // FUNCTION: 0x4b9a50
-void __stdcall DrawFrameScaled(Class_004c6ae0* dst, Bitmap_004b9a50* bmp, int x, int y, double sx, double sy)
+void __stdcall DrawFrameScaled(Surface* dst, Bitmap_004b9a50* bmp, int x, int y, double sx, double sy)
 {
     Surface_004b9a50 screen;
     if (dst == 0) {
         int ok = LockScreen(&screen);
         if (ok != 0)
-            dst = (Class_004c6ae0*)&screen;
+            dst = (Surface*)&screen;
     }
     if (bmp->count > 0) {
         for (int i = 0; i < (int)bmp->count; i++) {
@@ -115,6 +115,6 @@ void __stdcall DrawFrameScaled(Class_004c6ae0* dst, Bitmap_004b9a50* bmp, int x,
             }
         }
     }
-    if (dst == (Class_004c6ae0*)&screen)
+    if (dst == (Surface*)&screen)
         UnlockScreen(&screen);
 }

@@ -4,7 +4,7 @@
 // embedded screen struct, which is why the surface pointer is re-read.
 #include <ddraw.h>
 
-struct Surface_004c5fa0 {
+struct Surface {
     int data[12];
 };
 
@@ -29,7 +29,7 @@ extern int g_screenLockCount;
 Display_004c5fa0* GetDisplay(void);
 
 // FUNCTION: 0x4c5fa0
-int __stdcall UnlockScreen(Surface_004c5fa0* s)
+int __stdcall UnlockScreen(Surface* s)
 {
     Display_004c5fa0* d = GetDisplay();
     if (d->field_44 == 0 && d->field_dc == 0) {

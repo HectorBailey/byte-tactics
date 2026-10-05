@@ -15,7 +15,7 @@ struct Timer_4b6510 {
     int unknown_c;
 };
 
-extern GameCtx_4b6510* DAT_0051fbd0;
+extern GameCtx_4b6510* g_display;
 extern Timer_4b6510 DAT_0051fbe0[10];
 extern int g_timerCount;
 extern unsigned int DAT_0051fc84;
@@ -27,5 +27,5 @@ void ResetTimers()
     for (int i = 0; i < 10; i++) {
         DAT_0051fbe0[i].period = -1;
     }
-    DAT_0051fc84 = GetTickCount() * DAT_0051fbd0->rate / 1000;
+    DAT_0051fc84 = GetTickCount() * g_display->rate / 1000;
 }

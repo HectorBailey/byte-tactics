@@ -7,7 +7,7 @@
 // surface pointer is copied.
 #include <ddraw.h>
 
-struct Surface_004c6dc0 {
+struct Surface {
     int data[12];
 };
 
@@ -33,11 +33,11 @@ struct Display_004c6dc0 {
 extern int g_screenLockCount;
 
 Display_004c6dc0* GetDisplay(void);
-int __stdcall LockScreen(Surface_004c6dc0* out);
-void __cdecl FUN_004cbe70(Surface_004c6dc0* dst, Surface_004c6dc0* src, Rect_004c6dc0* rect, Point_004c6dc0* pos, unsigned char transparent);
+int __stdcall LockScreen(Surface* out);
+void __cdecl FUN_004cbe70(Surface* dst, Surface* src, Rect_004c6dc0* rect, Point_004c6dc0* pos, unsigned char transparent);
 
 // 0x4c5fa0, inlined here.
-static inline int UnlockScreenInline(Surface_004c6dc0* s)
+static inline int UnlockScreenInline(Surface* s)
 {
     Display_004c6dc0* d = GetDisplay();
     if (d->field_44 == 0 && d->field_dc == 0) {
@@ -51,10 +51,10 @@ static inline int UnlockScreenInline(Surface_004c6dc0* s)
 }
 
 // FUNCTION: 0x4c6dc0
-void __stdcall CopySurfaceRectKeyed(Surface_004c6dc0* dst, Surface_004c6dc0* src, Rect_004c6dc0* rect, Point_004c6dc0* pos, unsigned char transparent)
+void __stdcall CopySurfaceRectKeyed(Surface* dst, Surface* src, Rect_004c6dc0* rect, Point_004c6dc0* pos, unsigned char transparent)
 {
     if (dst == 0) {
-        Surface_004c6dc0 screen;
+        Surface screen;
         if (LockScreen(&screen)) {
             FUN_004cbe70(&screen, src, rect, pos, transparent);
             UnlockScreenInline(&screen);

@@ -10,7 +10,7 @@ struct Sprite_004b94c0 {
     unsigned char* bits;         // +0x10
 };
 
-struct Surface_004b94c0 {
+struct Surface {
     int width;                   // +0x0
     int height;                  // +0x4
     int pitch;                   // +0x8
@@ -31,13 +31,13 @@ struct Rect_004b94c0 {
     int bottom;                  // +0xc
 };
 
-void __stdcall ResetClipRect(Surface_004b94c0* surface);
+void __stdcall ResetClipRect(Surface* surface);
 void __stdcall CopySurfaceRect(void* dst, void* src, Rect_004b94c0* rect, Rect_004b94c0* pos);
 
 // FUNCTION: 0x4b94c0
 void __stdcall GrabBackground(void* dst, Sprite_004b94c0* sprite, int x, int y)
 {
-    Surface_004b94c0 surface;
+    Surface surface;
     surface.width = sprite->width;
     surface.height = sprite->height;
     surface.pitch = sprite->width;

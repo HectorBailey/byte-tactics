@@ -153,7 +153,7 @@ struct Surface_004c5e70 {
     void Unlock() { UnlockScreen(this); }
 };
 
-class Class_004c6ae0 {
+class Surface {
 public:
     char unknown_0[0x1c];
     int clip[4];             // +0x1c left, top, right, bottom
@@ -229,7 +229,7 @@ void __stdcall DrawFrameQuad(void* surf, Frame_004c7580* bmp,
             xmin = xx;
     }
 
-    ((Class_004c6ae0*)surf)->GetClipRect(clip);
+    ((Surface*)surf)->GetClipRect(clip);
     if (xmax < clip[0]) {
         if (locked) UnlockScreen(&local);
         return;

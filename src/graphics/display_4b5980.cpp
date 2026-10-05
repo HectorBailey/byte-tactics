@@ -122,7 +122,7 @@ struct App_4b5980 {
 
 #pragma pack(pop)
 
-extern App_4b5980* DAT_0051fbd0;
+extern App_4b5980* g_display;
 
 void FUN_004bce10(void);
 void __stdcall FUN_004c2360(int* p);
@@ -140,12 +140,12 @@ long __stdcall WindowProc(HWND hwnd, unsigned int msg, unsigned int wparam, long
 // FUNCTION: 0x4b5980
 int __stdcall InitEnvironment(App_4b5980* d)
 {
-    DAT_0051fbd0 = d;
+    g_display = d;
     MEMORYSTATUS mem;
     mem.dwLength = 0x20;
     GlobalMemoryStatus(&mem);
     d->availPhys = mem.dwTotalPhys;
-    SystemParametersInfoA(0x5e, 0, (LPRECT)&DAT_0051fbd0->wa_left, TRUE);
+    SystemParametersInfoA(0x5e, 0, (LPRECT)&g_display->wa_left, TRUE);
     SystemParametersInfoA(0x5d, 0, 0, TRUE);
     d->accum = 0;
     d->lastTick = GetTickCount();

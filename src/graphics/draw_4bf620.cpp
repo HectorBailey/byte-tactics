@@ -7,7 +7,7 @@ struct Rect_004bf620 {
     int bottom;                        // +0xc
 };
 
-class Class_004c6ae0 {
+class Surface {
 public:
     char unknown_0[0x1c];
     Rect_004bf620 field_1c;            // +0x1c
@@ -16,7 +16,7 @@ public:
 };
 
 // FUNCTION: 0x4bf620
-int __stdcall ClipRectangle(Class_004c6ae0* surface, Rect_004bf620* r)
+int __stdcall ClipRectangle(Surface* surface, Rect_004bf620* r)
 {
     Rect_004bf620 local;
     surface->GetClipRect(&local);

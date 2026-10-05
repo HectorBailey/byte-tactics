@@ -25,7 +25,7 @@ struct Sprite_4b9360 {
     unsigned char* buffers[2];   // +0x10, the two interchangeable scratch buffers
 };
 
-struct Surface_4b9360 {
+struct Surface {
     int width;                   // +0x0
     int height;                  // +0x4
     int pitch;                   // +0x8
@@ -46,7 +46,7 @@ struct Rect_4b9360 {
     int bottom;                  // +0xc
 };
 
-void __stdcall ResetClipRect(Surface_4b9360* surface);
+void __stdcall ResetClipRect(Surface* surface);
 void __stdcall CopySurfaceRect(void* dst, void* src, Rect_4b9360* rect, Rect_4b9360* pos);
 void __stdcall DrawFrame(void* dst, Sprite_4b9360* sprite, int x, int y);
 
@@ -62,7 +62,7 @@ void __stdcall DrawLens(void* dst, Sprite_4b9360* sprite, int x, int y)
 {
     SwapPtr(sprite->buffers[0], sprite->buffers[1]);
 
-    Surface_4b9360 surface;
+    Surface surface;
     surface.width = sprite->width;
     surface.pitch = sprite->width;
     surface.height = sprite->height;

@@ -21,7 +21,7 @@ struct Rect_004689c0 {
     int bottom;
 };
 
-class Class_004c6ae0 {
+class Surface {
 public:
     char unknown_0[0x1c];
     Rect_004689c0 field_1c;              // +0x1c
@@ -76,7 +76,7 @@ char* __stdcall FUN_004c5740(char* text);
 void __stdcall FUN_004a50e0(void* surf, void* text, int x, int y, int color, int just);
 
 // FUNCTION: 0x4689c0
-void __stdcall FUN_004689c0(Class_004c6ae0* win)
+void __stdcall FUN_004689c0(Surface* win)
 {
     char buf[0x100];
     char num[0x34];

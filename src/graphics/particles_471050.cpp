@@ -12,7 +12,7 @@ public:
     virtual int IsDone();              // vtable +0xc
 };
 
-class Class_00470fb0 {
+class ParticleLists {
 public:
     std::vector<Listener_00470fb0*> lists[10];
 
@@ -20,7 +20,7 @@ public:
 };
 
 // FUNCTION: 0x471050
-void Class_00470fb0::UpdateAll()
+void ParticleLists::UpdateAll()
 {
     for (int i = 0; i < 10; i++) {
         std::vector<Listener_00470fb0*>::iterator it = lists[i].begin();

@@ -25,14 +25,14 @@ struct Game_004c1830 {
     Font_004c1830* font;                // +0x204
 };
 
-struct Rect_004c1830 {
+struct Surface {
     int data[12];
 };
 
 int GetDisplay(void);
-int __stdcall LockScreen(Rect_004c1830* out);
-int __stdcall UnlockScreen(Rect_004c1830* buf);
-int __stdcall DrawString(Rect_004c1830* dst, unsigned char* text, int x,
+int __stdcall LockScreen(Surface* out);
+int __stdcall UnlockScreen(Surface* buf);
+int __stdcall DrawString(Surface* dst, unsigned char* text, int x,
                            int a, int b);
 
 // GetTextKeyColor, inlined: the current value of field_0x210.
@@ -73,13 +73,13 @@ static inline int WidthText(Font_004c1830* font, unsigned char* text)
 }
 
 // FUNCTION: 0x4c1830
-void __stdcall DrawOutlinedString(Rect_004c1830* dst, unsigned char* text, int fore,
+void __stdcall DrawOutlinedString(Surface* dst, unsigned char* text, int fore,
                             int back, int y)
 {
     Game_004c1830* game = (Game_004c1830*)GetDisplay();
     int width = WidthText(game->font, text);
     if (dst == 0) {
-        Rect_004c1830 r;
+        Surface r;
         if (LockScreen(&r) != 0) {
             int x = (r.data[0] - width) >> 1;
             SetColour(fore, CurrentColour());

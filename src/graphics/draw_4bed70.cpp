@@ -11,7 +11,7 @@ struct App_004bed70 {
     unsigned int* palette;            // +0xc0
 };
 
-struct Surface_004bed70 {
+struct Surface {
     int unknown_0[2];
     int pitch;                         // +0x8
     unsigned char* pixels;             // +0xc
@@ -19,20 +19,20 @@ struct Surface_004bed70 {
 };
 
 App_004bed70* GetDisplay();
-Surface_004bed70* __stdcall LockScreen(Surface_004bed70* out);
-int __stdcall UnlockScreen(Surface_004bed70* s);
-int __stdcall ClipLine(Surface_004bed70* dst, int* a, int* b, int* c, int* d);
-void __cdecl FUN_004cc8df(Surface_004bed70* dst, int a, int b, int c, int d, int e,
+Surface* __stdcall LockScreen(Surface* out);
+int __stdcall UnlockScreen(Surface* s);
+int __stdcall ClipLine(Surface* dst, int* a, int* b, int* c, int* d);
+void __cdecl FUN_004cc8df(Surface* dst, int a, int b, int c, int d, int e,
                           unsigned int* palette);
 
 // FUNCTION: 0x4bed70
-Surface_004bed70* __stdcall DrawBlendedLine(Surface_004bed70* surface, int x0, int y0,
+Surface* __stdcall DrawBlendedLine(Surface* surface, int x0, int y0,
                                          int x1, int y1, int color)
 {
     App_004bed70* app = GetDisplay();
-    Surface_004bed70* ret;
+    Surface* ret;
     if (surface == 0) {
-        Surface_004bed70 screen;
+        Surface screen;
         ret = LockScreen(&screen);
         if (ret) {
             if (ClipLine(&screen, &x0, &y0, &x1, &y1))
@@ -42,7 +42,7 @@ Surface_004bed70* __stdcall DrawBlendedLine(Surface_004bed70* surface, int x0, i
     } else {
         if (ClipLine(surface, &x0, &y0, &x1, &y1))
             FUN_004cc8df(surface, x0, y0, x1, y1, color, app->palette);
-        ret = (Surface_004bed70*)1;
+        ret = (Surface*)1;
     }
     return ret;
 }

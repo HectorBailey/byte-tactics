@@ -26,7 +26,7 @@
 // r->bottom by the right edge's inlined body) into eax, because `r` is dead
 // after being copied to esi; the screen path returns the lock result from ebx.
 
-struct Surface_004bf8c0 {
+struct Surface {
     int unknown_0[2];
     int pitch;                         // +0x8
     unsigned char* pixels;             // +0xc
@@ -40,25 +40,25 @@ struct Rect_004bf8c0 {
     int bottom;                        // +0xc
 };
 
-int __stdcall LockScreen(Surface_004bf8c0* out);
-int __stdcall UnlockScreen(Surface_004bf8c0* s);
-int __stdcall ClipLine(Surface_004bf8c0* dst, int* x0, int* y0, int* x1, int* y1);
-void __cdecl FUN_004cc7ab(Surface_004bf8c0* dst, int x0, int y0, int x1, int y1, int color);
-int __stdcall DrawLine(Surface_004bf8c0* surface, int x0, int y0, int x1, int y1,
+int __stdcall LockScreen(Surface* out);
+int __stdcall UnlockScreen(Surface* s);
+int __stdcall ClipLine(Surface* dst, int* x0, int* y0, int* x1, int* y1);
+void __cdecl FUN_004cc7ab(Surface* dst, int x0, int y0, int x1, int y1, int color);
+int __stdcall DrawLine(Surface* surface, int x0, int y0, int x1, int y1,
                            int color);
 
 // FUNCTION: 0x4bf8c0
-int __stdcall DrawRectangle(Surface_004bf8c0* surface, Rect_004bf8c0* r, int color)
+int __stdcall DrawRectangle(Surface* surface, Rect_004bf8c0* r, int color)
 {
     int result;
     if (surface == 0) {
-        Surface_004bf8c0 screen;
+        Surface screen;
         result = LockScreen(&screen);
         if (result != 0) {
             {
                 int x0, y0, x1, y1; y1 = r->top; x1 = r->right; y0 = r->top; x0 = r->left;
                 if (&screen == 0) {
-                    Surface_004bf8c0 inner;
+                    Surface inner;
                     if (LockScreen(&inner)) {
                         if (ClipLine(&inner, &x0, &y0, &x1, &y1))
                             FUN_004cc7ab(&inner, x0, y0, x1, y1, color);
@@ -72,7 +72,7 @@ int __stdcall DrawRectangle(Surface_004bf8c0* surface, Rect_004bf8c0* r, int col
             {
                 int x0, y0, x1, y1; y1 = r->bottom; x1 = r->right; y0 = r->top; x0 = r->right;
                 if (&screen == 0) {
-                    Surface_004bf8c0 inner;
+                    Surface inner;
                     if (LockScreen(&inner)) {
                         if (ClipLine(&inner, &x0, &y0, &x1, &y1))
                             FUN_004cc7ab(&inner, x0, y0, x1, y1, color);
@@ -86,7 +86,7 @@ int __stdcall DrawRectangle(Surface_004bf8c0* surface, Rect_004bf8c0* r, int col
             {
                 int x0, y0, x1, y1; y1 = r->bottom; x1 = r->right; y0 = r->bottom; x0 = r->left;
                 if (&screen == 0) {
-                    Surface_004bf8c0 inner;
+                    Surface inner;
                     if (LockScreen(&inner)) {
                         if (ClipLine(&inner, &x0, &y0, &x1, &y1))
                             FUN_004cc7ab(&inner, x0, y0, x1, y1, color);
@@ -100,7 +100,7 @@ int __stdcall DrawRectangle(Surface_004bf8c0* surface, Rect_004bf8c0* r, int col
             {
                 int x0, y0, x1, y1; y1 = r->bottom; x1 = r->left; y0 = r->top; x0 = r->left;
                 if (&screen == 0) {
-                    Surface_004bf8c0 inner;
+                    Surface inner;
                     if (LockScreen(&inner)) {
                         if (ClipLine(&inner, &x0, &y0, &x1, &y1))
                             FUN_004cc7ab(&inner, x0, y0, x1, y1, color);

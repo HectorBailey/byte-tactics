@@ -52,25 +52,25 @@ struct Rect_004bfd60 {
     int bottom;                        // +0xc
 };
 
-struct Surface_004bfd60 {
+struct Surface {
     int unknown_0[2];
     int pitch;                         // +0x8
     unsigned char* pixels;             // +0xc
     int unknown_10[8];
 };
 
-int __stdcall LockScreen(Surface_004bfd60* out);
-int __stdcall UnlockScreen(Surface_004bfd60* s);
-int __stdcall ClipRectangle(Surface_004bfd60* s, Rect_004bfd60* r);
-void __cdecl FUN_004cce87(Surface_004bfd60* s, Rect_004bfd60* r, int value);
+int __stdcall LockScreen(Surface* out);
+int __stdcall UnlockScreen(Surface* s);
+int __stdcall ClipRectangle(Surface* s, Rect_004bfd60* r);
+void __cdecl FUN_004cce87(Surface* s, Rect_004bfd60* r, int value);
 
 // FUNCTION: 0x4bfd60
-int __stdcall XorRectangle(Surface_004bfd60* surface, Rect_004bfd60* rect, int value)
+int __stdcall XorRectangle(Surface* surface, Rect_004bfd60* rect, int value)
 {
     Rect_004bfd60 r = *rect;
     int result;
     if (surface == 0) {
-        Surface_004bfd60 screen;
+        Surface screen;
         result = LockScreen(&screen);
         if (result != 0) {
             if (ClipRectangle(&screen, &r))
