@@ -57,7 +57,7 @@ struct Class_004a2e40 {
 extern Holder_004a2e40* DAT_0051fba4;
 
 void __stdcall SetFont(int id);
-int __stdcall FUN_004b7f30(unsigned short* glyphs, int c);
+int __stdcall GetGafFrame(unsigned short* glyphs, int c);
 int GetFontHeight();
 
 static inline int FindEntry(Entry_004a2e40* entries, char* name) {
@@ -106,7 +106,7 @@ void __stdcall FUN_004a2e40(Class_004a2e40* param_1, char* param_2, int param_3)
     if (DAT_0051fba4->list == 0)
         size = GetFontHeight();
     else
-        size = *(unsigned short*)(FUN_004b7f30(DAT_0051fba4->list->glyphs, 0x49) + 2) + 2;
+        size = *(unsigned short*)(GetGafFrame(DAT_0051fba4->list->glyphs, 0x49) + 2) + 2;
     int step = (me->field_19 - 2) / (size + 1);
     short last = me->field_bc;
     short sel = me->field_ba;

@@ -5,7 +5,7 @@
 // (both inlined here), so field_0x210 is copied into field_0x20c each time and
 // only the two setters that are not -1 are stored. With a null `dst` the screen
 // rect is locked with LockScreen for the five draws and unlocked with
-// FUN_004c5fa0 afterwards.
+// UnlockScreen afterwards.
 // The glyph width has to be read through a `glyphs` byte array declared at
 // offset 0 of the font struct, and the font has to arrive as a typed field of a
 // typed game struct: reading it as `((unsigned char*)font)[off]` off a font
@@ -31,7 +31,7 @@ struct Rect_004c1830 {
 
 int GetDisplay(void);
 int __stdcall LockScreen(Rect_004c1830* out);
-int __stdcall FUN_004c5fa0(Rect_004c1830* buf);
+int __stdcall UnlockScreen(Rect_004c1830* buf);
 int __stdcall DrawString(Rect_004c1830* dst, unsigned char* text, int x,
                            int a, int b);
 
@@ -89,7 +89,7 @@ void __stdcall DrawOutlinedString(Rect_004c1830* dst, unsigned char* text, int f
             DrawString(&r, text, x, y + 1, -1);
             SetColour(back, CurrentColour());
             DrawString(&r, text, x, y, -1);
-            FUN_004c5fa0(&r);
+            UnlockScreen(&r);
             return;
         }
     } else {

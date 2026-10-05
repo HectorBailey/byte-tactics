@@ -29,8 +29,8 @@
 #include <stddef.h>
 #include <vector>
 
-void* __stdcall FUN_004b7f30(void* a, int b);
-void __stdcall FUN_004b8500(void* dest, void* src, int x, int y);
+void* __stdcall GetGafFrame(void* a, int b);
+void __stdcall DrawFrameBlended(void* dest, void* src, int x, int y);
 
 struct Position_00475470 {             // 16.16 fixed point; only high words read
     short xFrac;
@@ -138,7 +138,7 @@ struct Record_00475470 {
         short sx = pos.x - px + 0x80;
         short sy = pos.z - (pos.y >> 1) - py + 0x20;
         if (IsVisible(&g_game->players[g_game->playerIndex], &pos))
-            FUN_004b8500(dest, FUN_004b7f30(data, field_14), sx, sy);
+            DrawFrameBlended(dest, GetGafFrame(data, field_14), sx, sy);
     }
 };
 

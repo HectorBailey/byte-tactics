@@ -52,7 +52,7 @@ struct Engine_004bf4d0 {
 
 Engine_004bf4d0* GetDisplay();
 int __stdcall LockScreen(Surface_004bf4d0* out);
-int __stdcall FUN_004c5fa0(Surface_004bf4d0* s);
+int __stdcall UnlockScreen(Surface_004bf4d0* s);
 int __stdcall ClipRectangle(Surface_004bf4d0* s, Rect_004bf4d0* r);
 
 // FUNCTION: 0x4bf4d0
@@ -109,6 +109,6 @@ int __stdcall FadeRectangle(Surface_004bf4d0* surface, Rect_004bf4d0* rect, int 
         }
     }
     if (surface == 0)
-        FUN_004c5fa0(&screen);
+        UnlockScreen(&screen);
     return 1;
 }

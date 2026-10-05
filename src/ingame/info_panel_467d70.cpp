@@ -38,8 +38,8 @@ struct Game {
 
 extern Game* g_game;
 
-int __stdcall FUN_004b7f30(unsigned short* frames, int frame);
-void __stdcall FUN_004b7f90(void* surf, short* frame, int x, int y);
+int __stdcall GetGafFrame(unsigned short* frames, int frame);
+void __stdcall DrawFrame(void* surf, short* frame, int x, int y);
 int GetScreenHeight();
 void __stdcall SetOffscreenSurface(void* surf);
 void __stdcall FillSurface(void* surf, int mode);
@@ -54,15 +54,15 @@ void FUN_00467d70()
 
     int side = g_game->players[g_game->playerIndex].unit->side;
 
-    short* bar = (short*)FUN_004b7f30(g_game->field_1481f[side], 0);
-    FUN_004b7f90(surf, bar, bar[2] + 0x81, bar[3]);
+    short* bar = (short*)GetGafFrame(g_game->field_1481f[side], 0);
+    DrawFrame(surf, bar, bar[2] + 0x81, bar[3]);
 
     int dy = GetScreenHeight() - 0x20;
-    bar = (short*)FUN_004b7f30(g_game->field_14833[side], 0);
-    FUN_004b7f90(surf, bar, bar[2] + 0x81, bar[3] + dy);
+    bar = (short*)GetGafFrame(g_game->field_14833[side], 0);
+    DrawFrame(surf, bar, bar[2] + 0x81, bar[3] + dy);
 
-    bar = (short*)FUN_004b7f30(g_game->field_14847[side], 0);
-    FUN_004b7f90(surf, bar, bar[2], bar[3]);
+    bar = (short*)GetGafFrame(g_game->field_14847[side], 0);
+    DrawFrame(surf, bar, bar[2], bar[3]);
 
     FlipScreen();
 }

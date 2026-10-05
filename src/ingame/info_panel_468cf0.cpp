@@ -81,8 +81,8 @@ int __stdcall FUN_004ab170(int,int,int);
 int GetFrameRate();
 int GetScreenHeight();
 int __stdcall PointInRect(int,int,int);
-int __stdcall FUN_004b7f30(int,int);
-int __stdcall FUN_004b7f90(int,int,int,int);
+int __stdcall GetGafFrame(int,int);
+int __stdcall DrawFrame(int,int,int,int);
 int __stdcall DrawLine(int,int,int,int,int,int);
 int __stdcall FillRectangle(int,int,int);
 int __stdcall DrawRectangle(int,int,int);
@@ -170,7 +170,7 @@ static void DrawResourcePanel(Class_004c6b10 *ctx, int pl, Resources *res)
   SetTextColors(pal[0xf], GetTextKeyColor());
   int bx = 0x81;
   do {
-    ushort *gaf = (ushort *)FUN_004b7f30(*(int *)(g_game + 0x1481f + (side + (bx > 0x81) * 5) * 4), 0);
+    ushort *gaf = (ushort *)GetGafFrame(*(int *)(g_game + 0x1481f + (side + (bx > 0x81) * 5) * 4), 0);
     FUN_00467a20((int)ctx, (int)gaf, bx, 0);
     bx += *gaf;
   } while (bx < *(int *)(g_game + 0x37e1f));
@@ -548,12 +548,12 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
     }
   }
   if (*(byte *)(g_game + 0x38a51) & 1)
-    FUN_004b7f90((int)&ctx, FUN_004b7f30(*(int *)(g_game + 0x1481b), 0), cx, cy);
+    DrawFrame((int)&ctx, GetGafFrame(*(int *)(g_game + 0x1481b), 0), cx, cy);
   if ((*(byte *)(*(int *)(g_game + *(byte *)(g_game + 0x2a42) * 0x14b + 0x1b8a) + 0x9b) & 0x40) == 0) {
     if (((Bits8 *)(g_game + 0x3923b))->b5)
-      FUN_004b7f90((int)&ctx, FUN_004b7f30(*(int *)(g_game + 0x14813), 0), cx, cy);
+      DrawFrame((int)&ctx, GetGafFrame(*(int *)(g_game + 0x14813), 0), cx, cy);
     if (((Bits8 *)(g_game + 0x3923b))->b6)
-      FUN_004b7f90((int)&ctx, FUN_004b7f30(*(int *)(g_game + 0x14817), 0), cx, cy);
+      DrawFrame((int)&ctx, GetGafFrame(*(int *)(g_game + 0x14817), 0), cx, cy);
   }
   if (((Bits8 *)(g_game + 0x37f2f))->b6) {
     uint ticks = *(uint *)(g_game + 0x38a47);
@@ -566,7 +566,7 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
     DrawString((int)&ctx, (int)gameTime, 0x82, -0x22 - GetFontHeight() + GetScreenHeight(), -1);
   }
   if (((Bits8 *)(g_game + 0x38a51))->b1)
-    FUN_004b7f90((int)&ctx, FUN_004b7f30(*(int *)(g_game + 0x148cf), 0), *(int *)(g_game + 0x37e1f) - 0x10, *(int *)(g_game + 0x37e23) - 0x50);
+    DrawFrame((int)&ctx, GetGafFrame(*(int *)(g_game + 0x148cf), 0), *(int *)(g_game + 0x37e1f) - 0x10, *(int *)(g_game + 0x37e23) - 0x50);
   ResetClipRect((int)&ctx);
   FUN_004ab170((int)(g_game + 0x519), (int)&ctx, (int)(g_game + 0x37e27));
   if (*(int *)(g_game + 0x38dd5) != 0 && param_1 != 0) {

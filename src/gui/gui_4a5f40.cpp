@@ -111,9 +111,9 @@ int __stdcall GetTextWidth(int font, char* text);
 int GetFontHeight();
 void __stdcall SetTextColors(int colour, int font);
 int GetTextKeyColor();
-Glyph_004a5f40* __stdcall FUN_004b7f30(GafEntry_004a5f40* table, int index);
-void __stdcall FUN_004b7f90(void* surface, Glyph_004a5f40* glyph, int x, int y);
-void __stdcall FUN_004b8310(void* surface, Glyph_004a5f40* glyph, int x, int y, int style);
+Glyph_004a5f40* __stdcall GetGafFrame(GafEntry_004a5f40* table, int index);
+void __stdcall DrawFrame(void* surface, Glyph_004a5f40* glyph, int x, int y);
+void __stdcall DrawFrameLit(void* surface, Glyph_004a5f40* glyph, int x, int y, int style);
 int __stdcall FUN_004a5d50(Menu_004a5f40* menu, int index);
 void __stdcall FUN_004a50e0(void* surface, char* text, int x, int y, int maxw, int style);
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int colour);
@@ -133,7 +133,7 @@ static inline int FUN_004a5030(char* text)
     char* p = text;
     while (*p != 0) {
         char ch = *p;
-        Glyph_004a5f40* glyph = (Glyph_004a5f40*)FUN_004b7f30(
+        Glyph_004a5f40* glyph = (Glyph_004a5f40*)GetGafFrame(
             (GafEntry_004a5f40*)DAT_0051fba4->language->glyphs, (unsigned char)ch);
         if (glyph != 0)
             width += glyph->width;
@@ -146,7 +146,7 @@ static inline int LineHeight_004a5f40()
 {
     if (DAT_0051fba4->language == 0)
         return GetFontHeight();
-    Glyph_004a5f40* glyph = FUN_004b7f30(
+    Glyph_004a5f40* glyph = GetGafFrame(
         (GafEntry_004a5f40*)DAT_0051fba4->language->glyphs, 0x49);
     return glyph->height + 2;
 }
@@ -207,37 +207,37 @@ void __stdcall FUN_004a5f40(Menu_004a5f40* menu, int index)
         Glyph_004a5f40* glyph;
         if (me->field_13c & 1) {
             if (me->flags & 0x100) {
-                glyph = FUN_004b7f30(me->gaf, me->gaf->count - 1);
+                glyph = GetGafFrame(me->gaf, me->gaf->count - 1);
             } else if (me->field_136 != 0) {
-                glyph = FUN_004b7f30(me->gaf, me->field_137);
+                glyph = GetGafFrame(me->gaf, me->field_137);
                 border = 1;
             } else if (me->flags & 0x1800) {
-                glyph = FUN_004b7f30(me->gaf, me->field_13b);
+                glyph = GetGafFrame(me->gaf, me->field_13b);
                 border = 1;
             } else {
                 int val = me->gaf->count - 1;
                 if (me->field_138 + 2 < val)
                     val = me->field_138 + 2;
-                glyph = FUN_004b7f30(me->gaf, val + me->field_13b);
+                glyph = GetGafFrame(me->gaf, val + me->field_13b);
                 if (!(me->flags & 0x80))
                     border = 1;
             }
         } else {
             if (me->field_138 != 0 && (unsigned short)me->gaf->count > (unsigned short)me->field_136) {
                 if (me->field_136 != 0)
-                    glyph = FUN_004b7f30(me->gaf, me->gaf->count - 2);
+                    glyph = GetGafFrame(me->gaf, me->gaf->count - 2);
                 else
-                    glyph = FUN_004b7f30(me->gaf, me->field_13b + me->field_138);
+                    glyph = GetGafFrame(me->gaf, me->field_13b + me->field_138);
             } else if (me->field_136 != 0)
-                glyph = FUN_004b7f30(me->gaf, me->field_137);
+                glyph = GetGafFrame(me->gaf, me->field_137);
             else
-                glyph = FUN_004b7f30(me->gaf, me->field_13b);
+                glyph = GetGafFrame(me->gaf, me->field_13b);
         }
         if (glyph != 0) {
             if (me->colours != 0)
-                FUN_004b8310(surface, glyph, glyph->xoff + rect.left, glyph->yoff + rect.top, me->colours);
+                DrawFrameLit(surface, glyph, glyph->xoff + rect.left, glyph->yoff + rect.top, me->colours);
             else
-                FUN_004b7f90(surface, glyph, glyph->xoff + rect.left, glyph->yoff + rect.top);
+                DrawFrame(surface, glyph, glyph->xoff + rect.left, glyph->yoff + rect.top);
         }
     } else {
         if (me->field_13c & 1) {

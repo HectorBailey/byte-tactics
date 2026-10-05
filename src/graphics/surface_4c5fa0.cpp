@@ -29,7 +29,7 @@ extern int g_screenLockCount;
 Display_004c5fa0* GetDisplay(void);
 
 // FUNCTION: 0x4c5fa0
-int __stdcall FUN_004c5fa0(Surface_004c5fa0* s)
+int __stdcall UnlockScreen(Surface_004c5fa0* s)
 {
     Display_004c5fa0* d = GetDisplay();
     if (d->field_44 == 0 && d->field_dc == 0) {

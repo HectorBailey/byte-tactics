@@ -1,7 +1,7 @@
 // Decompiled by Sonnet 5.5, finished by space-bunny-free. Names are provisional.
 //
 // Draws a grid of connected lines into `surface`, or into the screen (locked
-// with LockScreen, unlocked with FUN_004c5fa0) when `surface` is null:
+// with LockScreen, unlocked with UnlockScreen) when `surface` is null:
 // `rows` polylines, where counts[r] is the number of vertices of row r and
 // the vertices follow one another in `points`. Every segment is clipped by
 // ClipLine and drawn by FUN_004cc7ab. Like 0x4bf060 it returns the lock
@@ -40,7 +40,7 @@ struct Point_004bf260 {
 };
 
 int __stdcall LockScreen(Surface_004bf260* out);
-int __stdcall FUN_004c5fa0(Surface_004bf260* s);
+int __stdcall UnlockScreen(Surface_004bf260* s);
 int __stdcall ClipLine(Surface_004bf260* dst, int* x0, int* y0, int* x1, int* y1);
 void __cdecl FUN_004cc7ab(Surface_004bf260* dst, int x0, int y0, int x1, int y1, int color);
 
@@ -69,7 +69,7 @@ int __stdcall DrawPolylines(Surface_004bf260* surface, Point_004bf260* points, i
                         if (LockScreen(&inner)) {
                             if (ClipLine(&inner, &x0, &y0, &x1, &y1))
                                 FUN_004cc7ab(&inner, x0, y0, x1, y1, color);
-                            FUN_004c5fa0(&inner);
+                            UnlockScreen(&inner);
                         }
                     } else {
                         if (ClipLine(&screen, &x0, &y0, &x1, &y1))
@@ -82,7 +82,7 @@ int __stdcall DrawPolylines(Surface_004bf260* surface, Point_004bf260* points, i
                 c++;
                 r--;
             }
-            FUN_004c5fa0(&screen);
+            UnlockScreen(&screen);
         }
     } else {
         int r = rows;

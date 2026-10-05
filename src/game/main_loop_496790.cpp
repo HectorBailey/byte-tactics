@@ -150,7 +150,7 @@ void FUN_0041ce90();
 void FUN_0048bae0();
 void FUN_0041b2e0();
 void __stdcall FUN_00468cf0(int a, int b);
-void __stdcall FUN_004cb170(char* buf, char* name);
+void __stdcall SaveScreenshot(char* buf, char* name);
 
 static inline void Charge(int bucket)
 {
@@ -229,7 +229,7 @@ void FUN_00496790()
     CHARGE(8);
     FUN_00428c40();
     if (g_game->field_38c53 > 0 && g_game->field_38c5b <= g_game->leadTick) {
-        FUN_004cb170(g_game->text_38b53, "FRAM");
+        SaveScreenshot(g_game->text_38b53, "FRAM");
         g_game->field_38c5b += 30 / g_game->field_38c57;
         g_game->lastTick = GetTicks();
     }

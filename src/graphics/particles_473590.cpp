@@ -321,8 +321,8 @@
 // `visible = 0` spelling tried so far.
 #include <stddef.h>
 
-void* __stdcall FUN_004b7f30(void* a, int b);
-void __stdcall FUN_004b8500(void* dest, void* src, int x, int y);
+void* __stdcall GetGafFrame(void* a, int b);
+void __stdcall DrawFrameBlended(void* dest, void* src, int x, int y);
 
 #pragma pack(push, 1)
 struct Pos_00473590 {
@@ -420,5 +420,5 @@ void Class_00473590::FUN_00473590(void* dest, short px, short py)
         visible = Identity_00473590(IsSeen_00473590(p, p2, col, row));
     }
     if (visible)
-        FUN_004b8500(dest, FUN_004b7f30(data, field_2c), sx, sy);
+        DrawFrameBlended(dest, GetGafFrame(data, field_2c), sx, sy);
 }

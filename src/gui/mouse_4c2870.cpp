@@ -3,7 +3,7 @@
 // cursor, stores it as the object's rectangle, offsets the object by the
 // bitmap's half size, blits it from the screen with DrawSurface, then, if the
 // counter is still not positive, copies the rectangle and draws the bitmap
-// with FUN_004b7f90. GetRect is the inlined copy helper (memcpy of the 24 byte
+// with DrawFrame. GetRect is the inlined copy helper (memcpy of the 24 byte
 // rectangle at +0x196).
 //
 // The whole difference (the null test of the bitmap scheduled before the two
@@ -42,7 +42,7 @@ struct Obj_004c2870 {
 
 Obj_004c2870* GetDisplay(void);
 void __stdcall DrawSurface(void* dst, void* bmp, int x, int y);
-void __stdcall FUN_004b7f90(void* dst, Bitmap_004c2870* bmp, int x, int y);
+void __stdcall DrawFrame(void* dst, Bitmap_004c2870* bmp, int x, int y);
 
 static inline void GetRect(Rect_004c2870* out)
 {
@@ -72,7 +72,7 @@ void __fastcall FUN_004c2870(void)
             if (o2->mode != 1 && o2->count <= 0) {
                 Rect_004c2870 r;
                 GetRect(&r);
-                FUN_004b7f90(0, o2->bmp, r.x, r.y);
+                DrawFrame(0, o2->bmp, r.x, r.y);
             }
         }
     }

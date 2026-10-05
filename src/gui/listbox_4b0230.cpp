@@ -13,7 +13,7 @@
 // (light) and +0x8c6 (fill).
 //
 // What matched it (opus, #5479), after many passes stuck at 82.9%:
-//  * `y0 + yoff` is written in the FUN_004b7f90 call, not kept in a local:
+//  * `y0 + yoff` is written in the DrawFrame call, not kept in a local:
 //    the original's [esp+0x18] is MSVC's hoisted loop invariant, computed
 //    after the inner loop's `width > 0` guard (86.4%).
 //  * Both extents follow the x0/y0 branch, height first, then `yoff = 0`, and
@@ -76,10 +76,10 @@ struct Object_004b0230 {
 
 void __stdcall FUN_004a15c0(char* entries, int index, Rect_004b0230* out);
 int __stdcall FUN_004a18c0(char* entries, int index);
-Bits_004b0230* __stdcall FUN_004b8d40(Gaf_004b0230* gaf, const char* name);
+Bits_004b0230* __stdcall FindGafEntry(Gaf_004b0230* gaf, const char* name);
 void __stdcall DrawSurface(Surface_004b0230* dst, Cell_004b0230* cell, int x, int y);
-Pic_004b0230* __stdcall FUN_004b7f30(Bits_004b0230* bits, int index);
-void __stdcall FUN_004b7f90(Surface_004b0230* dst, Pic_004b0230* pic, int x, int y);
+Pic_004b0230* __stdcall GetGafFrame(Bits_004b0230* bits, int index);
+void __stdcall DrawFrame(Surface_004b0230* dst, Pic_004b0230* pic, int x, int y);
 void __stdcall FUN_004b0160(Surface_004b0230* surface, Rect_004b0230* rect, int dark, int light, int fill);
 int __stdcall FillRectangle(Surface_004b0230* surface, Rect_004b0230* rect, int colour);
 
@@ -110,7 +110,7 @@ void __stdcall FUN_004b0230(Object_004b0230* obj, int index, Bits_004b0230* bmp)
     if (bmp == 0) {
         if (obj->gaf == 0)
             return;
-        bmp = FUN_004b8d40(obj->gaf, "Listbox");
+        bmp = FindGafEntry(obj->gaf, "Listbox");
         if (bmp == 0)
             return;
         rect.x0 -= 3;
@@ -131,7 +131,7 @@ void __stdcall FUN_004b0230(Object_004b0230* obj, int index, Bits_004b0230* bmp)
         FUN_004b0160(surface, &rect, obj->dark, obj->light, obj->fill);
     } else if (bmp != 0) {
         if (bmp->count > 1) {
-            sub = FUN_004b7f30(bmp, 0);
+            sub = GetGafFrame(bmp, 0);
             w = sub->width;
             h = sub->height;
             if (index != 0) {
@@ -158,14 +158,14 @@ void __stdcall FUN_004b0230(Object_004b0230* obj, int index, Bits_004b0230* bmp)
                     } else {
                         col = (x != 0) ? 1 : 0;
                     }
-                    tile = FUN_004b7f30(bmp, row + col);
-                    FUN_004b7f90(surface, tile, x0 + x, y0 + yoff);
+                    tile = GetGafFrame(bmp, row + col);
+                    DrawFrame(surface, tile, x0 + x, y0 + yoff);
                 }
                 yoff += h;
             }
         } else {
-            p = FUN_004b7f30(bmp, 0);
-            FUN_004b7f90(surface, p, 0, 0);
+            p = GetGafFrame(bmp, 0);
+            DrawFrame(surface, p, 0, 0);
         }
     } else {
         FillRectangle(surface, &rect, obj->fill);

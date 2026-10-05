@@ -71,7 +71,7 @@ extern int DAT_0051e544;
 void __stdcall FUN_0047f1a0(char* name, int param_2);
 int __stdcall FUN_004c1b80(int key);
 int GetMilliseconds();
-void __stdcall FUN_004b7f90(void* dst, void* bmp, int x, int y);
+void __stdcall DrawFrame(void* dst, void* bmp, int x, int y);
 char* __stdcall FUN_004c5740(char* text);
 void __stdcall FUN_004a50e0(void* surf, void* text, int x, int y, int color, int just);
 
@@ -116,7 +116,7 @@ void __stdcall FUN_004689c0(Class_004c6ae0* win)
     win->GetClipRect(&bounds);
     int left = bounds.left;
     int bottom = bounds.bottom + v;
-    FUN_004b7f90(win, g_game->sprite, left, bottom);
+    DrawFrame(win, g_game->sprite, left, bottom);
     unsigned int tick = g_game->tick;
     int hours = tick / 108000;
     int rest = tick - hours * 108000;

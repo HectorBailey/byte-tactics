@@ -60,7 +60,7 @@ struct Surface_004bfd60 {
 };
 
 int __stdcall LockScreen(Surface_004bfd60* out);
-int __stdcall FUN_004c5fa0(Surface_004bfd60* s);
+int __stdcall UnlockScreen(Surface_004bfd60* s);
 int __stdcall ClipRectangle(Surface_004bfd60* s, Rect_004bfd60* r);
 void __cdecl FUN_004cce87(Surface_004bfd60* s, Rect_004bfd60* r, int value);
 
@@ -75,7 +75,7 @@ int __stdcall XorRectangle(Surface_004bfd60* surface, Rect_004bfd60* rect, int v
         if (result != 0) {
             if (ClipRectangle(&screen, &r))
                 FUN_004cce87(&screen, &r, value);
-            FUN_004c5fa0(&screen);
+            UnlockScreen(&screen);
         }
     } else {
         if (ClipRectangle(surface, &r))

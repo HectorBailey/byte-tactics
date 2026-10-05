@@ -149,7 +149,7 @@ void __cdecl FUN_00467d70();
 void __cdecl FUN_0047f750();
 void __cdecl FUN_00496790();
 void __cdecl FUN_004c2870();
-void __stdcall FUN_004c5fa0(void*);
+void __stdcall UnlockScreen(void*);
 void __cdecl RestoreScreen();
 void __cdecl FlipScreen();
 int __cdecl FUN_004ce800();
@@ -169,9 +169,9 @@ void __stdcall SetResolution(int, int);
 void __stdcall FatalError(char*);
 int __stdcall FUN_004b6b20(void (*)(void), int, int);
 void __stdcall FUN_004b6b50(int);
-void* __stdcall FUN_004b7f30(void*, int);
-void __stdcall FUN_004b7f90(void*, void*, int, int);
-void* __stdcall FUN_004b8d40(int, char*);
+void* __stdcall GetGafFrame(void*, int);
+void __stdcall DrawFrame(void*, void*, int, int);
+void* __stdcall FindGafEntry(int, char*);
 void __stdcall SetPaletteColors(void*, int, int);
 void* __stdcall FUN_004bbe50(void*, unsigned int*);
 void __stdcall FillRectangle(void*, void*, unsigned char);
@@ -381,8 +381,8 @@ void FUN_00497f40(void)
             }
         }
         {
-            void* light = FUN_004b8d40(g_game->field_51d, "LIGHTBAR");
-            void* lightbar = FUN_004b7f30(light, 0);
+            void* light = FindGafEntry(g_game->field_51d, "LIGHTBAR");
+            void* lightbar = GetGafFrame(light, 0);
             *((short*)lightbar + 3) = 0;
             *((short*)lightbar + 2) = 0;
             color = g_game->palette[g_game->progress[0] < 100 ? 12 : 10];
@@ -398,7 +398,7 @@ void FUN_00497f40(void)
             rect[1] = 0x87;
             rect[3] = 0x9b;
             FillRectangle(&gadget, rect, color);
-            FUN_004b7f90(&gadget, lightbar, rect[0], rect[1]);
+            DrawFrame(&gadget, lightbar, rect[0], rect[1]);
             color = g_game->palette[g_game->progress[1] < 100 ? 12 : 10];
             SetTextColors(color, GetTextKeyColor());
             if(g_game->progress[1] == 100 && DAT_0051e821 != 100) {
@@ -412,7 +412,7 @@ void FUN_00497f40(void)
             rect[1] = 0xb1;
             rect[3] = 0xc5;
             FillRectangle(&gadget, rect, color);
-            FUN_004b7f90(&gadget, lightbar, rect[0], rect[1]);
+            DrawFrame(&gadget, lightbar, rect[0], rect[1]);
             color = g_game->palette[g_game->progress[2] < 100 ? 12 : 10];
             SetTextColors(color, GetTextKeyColor());
             if(g_game->progress[2] == 100 && DAT_0051e822 != 100) {
@@ -426,7 +426,7 @@ void FUN_00497f40(void)
             rect[1] = 0xda;
             rect[3] = 0xee;
             FillRectangle(&gadget, rect, color);
-            FUN_004b7f90(&gadget, lightbar, rect[0], rect[1]);
+            DrawFrame(&gadget, lightbar, rect[0], rect[1]);
             color = g_game->palette[g_game->progress[3] < 100 ? 12 : 10];
             SetTextColors(color, GetTextKeyColor());
             if(g_game->progress[3] == 100 && DAT_0051e823 != 100) {
@@ -440,7 +440,7 @@ void FUN_00497f40(void)
             rect[1] = 0x106;
             rect[3] = 0x11a;
             FillRectangle(&gadget, rect, color);
-            FUN_004b7f90(&gadget, lightbar, rect[0], rect[1]);
+            DrawFrame(&gadget, lightbar, rect[0], rect[1]);
             color = g_game->palette[g_game->progress[4] < 100 ? 12 : 10];
             SetTextColors(color, GetTextKeyColor());
             if(g_game->progress[4] == 100 && DAT_0051e824 != 100) {
@@ -454,8 +454,8 @@ void FUN_00497f40(void)
             rect[1] = 0x130;
             rect[3] = 0x144;
             FillRectangle(&gadget, rect, color);
-            FUN_004b7f90(&gadget, lightbar, rect[0], rect[1]);
-            FUN_004b7f90(&gadget, lightbar, rect[0] + *((short*)lightbar + 2),
+            DrawFrame(&gadget, lightbar, rect[0], rect[1]);
+            DrawFrame(&gadget, lightbar, rect[0] + *((short*)lightbar + 2),
                          rect[1] + *((short*)lightbar + 3));
             color = g_game->palette[g_game->progress[5] < 100 ? 12 : 10];
             SetTextColors(color, GetTextKeyColor());
@@ -470,13 +470,13 @@ void FUN_00497f40(void)
             rect[1] = 0x15b;
             rect[3] = 0x16f;
             FillRectangle(&gadget, rect, color);
-            FUN_004b7f90(&gadget, lightbar, rect[0], rect[1]);
+            DrawFrame(&gadget, lightbar, rect[0], rect[1]);
         }
         if (((Class_00435100*)g_game->field_391e9)->FUN_00435100() == 3) {
             FUN_00497ce0(&gadget);
             SendLoadProgress();
         }
-        FUN_004c5fa0(&gadget);
+        UnlockScreen(&gadget);
         FlipScreen();
     }
     FUN_004b6b50(200);

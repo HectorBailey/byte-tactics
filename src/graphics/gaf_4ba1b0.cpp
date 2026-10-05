@@ -17,7 +17,7 @@ struct Image_004ba1b0 {
 Palette_004ba1b0* GetDisplay();
 
 // FUNCTION: 0x4ba1b0
-void __stdcall FUN_004ba1b0(Image_004ba1b0* image, unsigned char level)
+void __stdcall CutFrameBelow(Image_004ba1b0* image, unsigned char level)
 {
     unsigned char* p = image->data;
     unsigned char* m = image->mask;

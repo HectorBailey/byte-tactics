@@ -251,8 +251,8 @@ struct PieceInfo_4584d0 {
     Face_4584d0* faces;                      // +0x28
 };
 
-void* __stdcall FUN_004b7ee0(Pic_4584d0* ref);
-void* __stdcall FUN_004b7f30(unsigned short* table, int index);
+void* __stdcall GetGafSequenceFrame(Pic_4584d0* ref);
+void* __stdcall GetGafFrame(unsigned short* table, int index);
 void __stdcall FillPolygon(void* surface, Point_4584d0* points, int count, int flags);
 void __stdcall DrawFrameQuad(void* surface, void* pic, Point_4584d0* points, void* src);
 
@@ -531,8 +531,8 @@ void Class_004584d0::FUN_004584d0(Model_4584d0* model, void* surface,
             if (flags.bits.b) {
                 if (flags.bits.c) {
                     unit = *(int*)(((char*)g_game + 0x1b8a) + ((palette & 0xff) * 0x14b));
-                    pic = FUN_004b7f30(face->color, *(unsigned char*)(unit + 0x96));
-                } else pic = useColor ? FUN_004b7f30(face->color, 0) : FUN_004b7ee0(&face->pic);
+                    pic = GetGafFrame(face->color, *(unsigned char*)(unit + 0x96));
+                } else pic = useColor ? GetGafFrame(face->color, 0) : GetGafSequenceFrame(&face->pic);
             } else pic = face->pic.pic;
             DrawFrameQuad(surface, pic, poly, 0);
 skip0:;

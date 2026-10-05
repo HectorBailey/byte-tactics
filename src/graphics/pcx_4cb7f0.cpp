@@ -52,11 +52,11 @@ public:
     int height;                 // +0x4
     int dataOffset;             // +0x8
     FILE* file;                 // +0xc
-    bool FUN_004cb7f0(const char* name, int w, int h);
+    bool Open(const char* name, int w, int h);
 };
 
 // FUNCTION: 0x4cb7f0
-bool Class_004cb7f0::FUN_004cb7f0(const char* name, int w, int h)
+bool Class_004cb7f0::Open(const char* name, int w, int h)
 {
     void* palbase = GetDisplay();
 

@@ -40,7 +40,7 @@ struct Game {
 
 extern Game* g_game;
 
-extern "C" int __stdcall FUN_004b7f60(void* ptr);
+extern "C" int __stdcall GetGafFrameCount(void* ptr);
 
 class Class_00473590 {                   // one element, 0x34 bytes
 public:
@@ -99,7 +99,7 @@ void Class_00471430::FUN_004737c0()
         e.dir = dir;
         e.field_30 = g_game->field_38a47 + field_1c;
         e.field_0 = g_game->unknown_147f3;
-        e.field_28 = FUN_004b7f60(g_game->unknown_147f3) - 1;
+        e.field_28 = GetGafFrameCount(g_game->unknown_147f3) - 1;
         e.field_2c = (int)(((__int64)rand() * e.field_28) / 0x8000);
         List_004737c0* v = (List_004737c0*)&items;
         v->FUN_004758c0(v->last, 1, e);

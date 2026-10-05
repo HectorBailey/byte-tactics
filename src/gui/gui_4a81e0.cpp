@@ -47,7 +47,7 @@ struct GafEntry_004a81e0 {              // 4 bytes: frame table header
     unsigned short unknown_2;           // +0x02
 };
 
-struct Glyph_004a81e0 {                 // 8 bytes, returned by FUN_004b7f30
+struct Glyph_004a81e0 {                 // 8 bytes, returned by GetGafFrame
     unsigned short w;                    // +0x00
     unsigned short h;                    // +0x02
     short xoff;                         // +0x04
@@ -199,9 +199,9 @@ void __stdcall FUN_004a56b0(void* obj, int index);
 void __stdcall FUN_004a5e50(void* obj, int index);
 void __stdcall FUN_004a5f40(void* obj, int index);
 void __stdcall FUN_004b0230(void* obj, int index, void* bmp);
-void* __stdcall FUN_004b7f30(void* gaf, int index);
-void* __stdcall FUN_004b8c60(char* name);
-void* __stdcall FUN_004b8d40(void* gaf, const char* name);
+void* __stdcall GetGafFrame(void* gaf, int index);
+void* __stdcall LoadGaf(char* name);
+void* __stdcall FindGafEntry(void* gaf, const char* name);
 char* __stdcall ChangeExtension(char* a, char* b, char* c);
 long __stdcall FUN_004bbc40(char* name);
 char* __stdcall FUN_004bbe50(char* name, int* size);
@@ -313,9 +313,9 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
             strcat(buf1, "_gadget");
             ChangeExtension(buf1, buf1, "GAF");
             if (FUN_004bbc40(buf1)) {
-                entries[i].archive = FUN_004b8c60(buf1);
+                entries[i].archive = LoadGaf(buf1);
                 if (entries[i].archive)
-                    entries[i].gaf = (GafEntry_004a81e0*)FUN_004b8d40(entries[i].archive, entries[i].name);
+                    entries[i].gaf = (GafEntry_004a81e0*)FindGafEntry(entries[i].archive, entries[i].name);
             }
         }
         switch (entries[i].type) {
@@ -330,20 +330,20 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
             ChangeExtension(buf1, buf1, "GAF");
             if (!entries[0].u.assets.archive) {
                 if (FUN_004bbc40(buf1))
-                    entries[0].u.assets.archive = FUN_004b8c60(buf1);
+                    entries[0].u.assets.archive = LoadGaf(buf1);
             }
             strncpy(textbuf, entries[0].u.text + 0x46, 0x10);
             textbuf[0x10] = 0;
             if (entries[0].u.assets.archive)
-                g = (GafEntry_004a81e0*)FUN_004b8d40(entries[0].u.assets.archive, textbuf);
+                g = (GafEntry_004a81e0*)FindGafEntry(entries[0].u.assets.archive, textbuf);
             if (g == 0) {
                 if (0 != menu->gaf) {
-                    g = (GafEntry_004a81e0*)FUN_004b8d40(menu->gaf, textbuf);
+                    g = (GafEntry_004a81e0*)FindGafEntry(menu->gaf, textbuf);
                     if (g == 0) {
-                        g = (GafEntry_004a81e0*)FUN_004b8d40(menu->gaf, "BackTile");
+                        g = (GafEntry_004a81e0*)FindGafEntry(menu->gaf, "BackTile");
                         if (g != 0) {
                             for (int frameIndex = 0; frameIndex < g->count; frameIndex++) {
-                                Glyph_004a81e0* frame = (Glyph_004a81e0*)FUN_004b7f30(g, frameIndex);
+                                Glyph_004a81e0* frame = (Glyph_004a81e0*)GetGafFrame(g, frameIndex);
                                 frame->yoff = 0;
                                 frame->xoff = 0;
                             }
@@ -358,17 +358,17 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
         case 4: {
             entries[i].field_13b = 0;
             if (entries[0].u.assets.archive)
-                g = (GafEntry_004a81e0*)FUN_004b8d40(entries[0].u.assets.archive, "SLIDERS");
+                g = (GafEntry_004a81e0*)FindGafEntry(entries[0].u.assets.archive, "SLIDERS");
             if (g == 0 && menu->gaf != 0) {
-                g = (GafEntry_004a81e0*)FUN_004b8d40(menu->gaf, "SLIDERS");
+                g = (GafEntry_004a81e0*)FindGafEntry(menu->gaf, "SLIDERS");
                 if (g != 0) {
                     for (int f = 0; f < g->count; f++) {
-                        Glyph_004a81e0* frame = (Glyph_004a81e0*)FUN_004b7f30(g, f);
+                        Glyph_004a81e0* frame = (Glyph_004a81e0*)GetGafFrame(g, f);
                         frame->yoff = 0;
                         frame->xoff = 0;
                     }
                     orientation = entries[i].w > entries[i].h ? 10 : 0;
-                    Glyph_004a81e0* frame = (Glyph_004a81e0*)FUN_004b7f30(g, orientation);
+                    Glyph_004a81e0* frame = (Glyph_004a81e0*)GetGafFrame(g, orientation);
                     if (entries[i].w < entries[i].h)
                         entries[i].w = frame->w;
                     else
@@ -384,14 +384,14 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
                 firstEnd->gaf = g;
                 firstEnd->field_13b = entries[i].sliderStyle + 6;
                 firstEnd->group = entries[i].group;
-                Glyph_004a81e0* frame = (Glyph_004a81e0*)FUN_004b7f30(g, entries[i].sliderStyle + 6);
+                Glyph_004a81e0* frame = (Glyph_004a81e0*)GetGafFrame(g, entries[i].sliderStyle + 6);
                 firstEnd->w = frame->w;
                 firstEnd->h = frame->h;
                 firstEnd->flags = 0x3400;
                 firstEnd->field_29 = entries[i].field_29;
                 Entry_004a81e0* secondEnd = &entries[FUN_004a8150(menu, 1)];
                 secondEnd->field_29 = entries[i].field_29;
-                frame = (Glyph_004a81e0*)FUN_004b7f30(g, entries[i].sliderStyle + 8);
+                frame = (Glyph_004a81e0*)GetGafFrame(g, entries[i].sliderStyle + 8);
                 secondEnd->y = entries[i].y;
                 secondEnd->gaf = g;
                 secondEnd->field_13b = entries[i].sliderStyle + 8;
@@ -399,12 +399,12 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
                 secondEnd->flags = 0x2c00;
                 secondEnd->w = frame->w;
                 secondEnd->h = frame->h;
-                frame = (Glyph_004a81e0*)FUN_004b7f30(g, entries[i].sliderStyle + 6);
+                frame = (Glyph_004a81e0*)GetGafFrame(g, entries[i].sliderStyle + 6);
                 if (entries[i].w > entries[i].h) {
                     secondEnd->x = entries[i].x - (frame->w - entries[i].w);
                     entries[i].w += (short)(frame->w * -2);
                     entries[i].x += frame->w;
-                    frame = (Glyph_004a81e0*)FUN_004b7f30(g, entries[i].sliderStyle + 5);
+                    frame = (Glyph_004a81e0*)GetGafFrame(g, entries[i].sliderStyle + 5);
                     entries[i].sliderThumb = frame->w;
                     entries[i].field_136 = entries[i].w - entries[i].sliderThumb - 4;
                 } else {
@@ -420,10 +420,10 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
         }
 
         case 3: {
-            GafEntry_004a81e0* input = menu->gaf ? (GafEntry_004a81e0*)FUN_004b8d40(menu->gaf, "TEXTINPUT") : 0;
+            GafEntry_004a81e0* input = menu->gaf ? (GafEntry_004a81e0*)FindGafEntry(menu->gaf, "TEXTINPUT") : 0;
             if (input != 0) {
                 for (int f = 0; f < input->count; f++) {
-                    Glyph_004a81e0* frame = (Glyph_004a81e0*)FUN_004b7f30(input, f);
+                    Glyph_004a81e0* frame = (Glyph_004a81e0*)GetGafFrame(input, f);
                     frame->yoff = 0;
                     frame->xoff = 0;
                 }
@@ -435,10 +435,10 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
             break;
         }
         case 2: {
-            GafEntry_004a81e0* list = menu->gaf ? (GafEntry_004a81e0*)FUN_004b8d40(menu->gaf, "LISTBOX") : 0;
+            GafEntry_004a81e0* list = menu->gaf ? (GafEntry_004a81e0*)FindGafEntry(menu->gaf, "LISTBOX") : 0;
             if (list != 0) {
                 for (int f = 0; f < list->count; f++) {
-                    Glyph_004a81e0* frame = (Glyph_004a81e0*)FUN_004b7f30(list, f);
+                    Glyph_004a81e0* frame = (Glyph_004a81e0*)GetGafFrame(list, f);
                     frame->yoff = 0;
                     frame->xoff = 0;
                 }
@@ -465,11 +465,11 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
             textbuf[0x10] = 0;
             entries[i].u.animation.firstFrame = 0;
             if (entries[0].u.assets.archive != 0)
-                g = (GafEntry_004a81e0*)FUN_004b8d40(entries[0].u.assets.archive, textbuf);
+                g = (GafEntry_004a81e0*)FindGafEntry(entries[0].u.assets.archive, textbuf);
             if (0 == g)
-                g = (GafEntry_004a81e0*)FUN_004b8d40(menu->gaf, textbuf);
+                g = (GafEntry_004a81e0*)FindGafEntry(menu->gaf, textbuf);
             if (g != 0)
-                entries[i].u.animation.firstFrame = (Glyph_004a81e0*)FUN_004b7f30(g, 0);
+                entries[i].u.animation.firstFrame = (Glyph_004a81e0*)GetGafFrame(g, 0);
             break;
         }
 
@@ -484,13 +484,13 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
             entries[i].field_13b = 0;
             textbuf[0x10] = 0;
             if (entries[0].u.assets.archive)
-                g = (GafEntry_004a81e0*)FUN_004b8d40(entries[0].u.assets.archive, textbuf);
+                g = (GafEntry_004a81e0*)FindGafEntry(entries[0].u.assets.archive, textbuf);
             if (g == 0) {
                 if (menu->gaf != 0) {
-                    g = (GafEntry_004a81e0*)FUN_004b8d40(menu->gaf, textbuf);
+                    g = (GafEntry_004a81e0*)FindGafEntry(menu->gaf, textbuf);
                     if (0 == g) {
                         if (0x80 & entries[i].flags) {
-                            g = (GafEntry_004a81e0*)FUN_004b8d40(menu->gaf, "CHECKBOX");
+                            g = (GafEntry_004a81e0*)FindGafEntry(menu->gaf, "CHECKBOX");
                         } else if (entries[i].stage != 0) {
                             if (strcmp(entries[i].u.text, "Off|On") != 0 && entries[i].stage != 1 && 0 == (*pf & 0x4000)) {
                                 int n = entries[i].stage < 4 ? entries[i].stage : 4;
@@ -500,22 +500,22 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
                                 strcpy(stagebuf, "stagebuttn1");
                                 *pf |= 0x4000;
                             }
-                            g = (GafEntry_004a81e0*)FUN_004b8d40(menu->gaf, stagebuf);
+                            g = (GafEntry_004a81e0*)FindGafEntry(menu->gaf, stagebuf);
                         } else {
                             strcpy(stagebuf, "BUTTONS0");
-                            g = (GafEntry_004a81e0*)FUN_004b8d40(menu->gaf, stagebuf);
+                            g = (GafEntry_004a81e0*)FindGafEntry(menu->gaf, stagebuf);
                         }
                         if (g) {
                             int best = 1000;
                             for (int f = 0; f < g->count; ++f) {
-                                Glyph_004a81e0* frame = (Glyph_004a81e0*)FUN_004b7f30(g, f);
+                                Glyph_004a81e0* frame = (Glyph_004a81e0*)GetGafFrame(g, f);
                                 if (frame != 0) {
                                     frame->yoff = 0;
                                     frame->xoff = 0;
                                 }
                             }
                             for (int j = 0; j < g->count; j += 4) {
-                                Glyph_004a81e0* frame = (Glyph_004a81e0*)FUN_004b7f30(g, j);
+                                Glyph_004a81e0* frame = (Glyph_004a81e0*)GetGafFrame(g, j);
                                 int distance = abs(entries[i].h - frame->h) + abs(entries[i].w - frame->w);
                                 if (distance < best) {
                                     entries[i].field_13b = (unsigned char)j;
@@ -528,7 +528,7 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
             }
             entries[i].gaf = g;
             if (g != 0) {
-                Glyph_004a81e0* frame = (Glyph_004a81e0*)FUN_004b7f30(g, entries[i].field_13b);
+                Glyph_004a81e0* frame = (Glyph_004a81e0*)GetGafFrame(g, entries[i].field_13b);
                 if (frame != 0) {
                     entries[i].w = frame->w;
                     entries[i].h = frame->h;
@@ -645,7 +645,7 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
                     if (DAT_0051fba4->language == 0)
                         fh = GetFontHeight();
                     else
-                        fh = ((Glyph_004a81e0*)FUN_004b7f30(DAT_0051fba4->language->glyphs, 0x49))->h + 2;
+                        fh = ((Glyph_004a81e0*)GetGafFrame(DAT_0051fba4->language->glyphs, 0x49))->h + 2;
                     int hh = base[i].h;
                     base[i].h = (short)(hh - ((int)base[i].h) % (fh + 2));
                     base[i].u.list.field_0 = GetTicks();

@@ -146,7 +146,7 @@ void __stdcall SetFont(int id);
 int GetFont();
 int __stdcall GetTextWidth(int font, char* text);
 int GetFontHeight();
-int __stdcall FUN_004b7f30(unsigned short* glyphs, int c);
+int __stdcall GetGafFrame(unsigned short* glyphs, int c);
 void __stdcall SetTextColors(int colour, int font);
 int GetTextKeyColor();
 char* __stdcall FUN_004b6af0(char* text, int line);
@@ -170,7 +170,7 @@ static inline int Measure_004a1b40(char* text)
     char* q = text;
     while (*q) {
         char ch = *q;
-        Glyph_004a1b40* glyph = (Glyph_004a1b40*)FUN_004b7f30(
+        Glyph_004a1b40* glyph = (Glyph_004a1b40*)GetGafFrame(
             DAT_0051fba4->language->glyphs, (unsigned char)ch);
         if (0 != glyph)
             width += glyph->width;
@@ -183,7 +183,7 @@ static inline int LineHeight_004a1b40()
 {
     if (0 == DAT_0051fba4->language)
         return GetFontHeight();
-    return ((Glyph_004a1b40*)FUN_004b7f30(DAT_0051fba4->language->glyphs, 0x49))->height + 2;
+    return ((Glyph_004a1b40*)GetGafFrame(DAT_0051fba4->language->glyphs, 0x49))->height + 2;
 }
 
 void __stdcall FUN_004a1630(Entry_004a1b40* entry, Rect_004a1b40* rect)

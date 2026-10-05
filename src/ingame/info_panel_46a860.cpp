@@ -25,8 +25,8 @@
 extern char* g_game;
 
 int GetScreenHeight();
-int __stdcall FUN_004b7f30(unsigned short* param_1, int param_2);
-void __stdcall FUN_004b7f90(void* dst, void* bmp, int x, int y);
+int __stdcall GetGafFrame(unsigned short* param_1, int param_2);
+void __stdcall DrawFrame(void* dst, void* bmp, int x, int y);
 void __stdcall SetTextColors(int param_1, int param_2);
 int GetTextKeyColor();
 void __stdcall SetFont(int param_1);
@@ -107,8 +107,8 @@ void __stdcall FUN_0046a860(void* surface) {
         do {
             int dy = GetScreenHeight() - 0x20;
             unsigned short* icon = *(unsigned short**)(g_game + idx * 4 + 0x14833);
-            int bmp = FUN_004b7f30(icon, 0);
-            FUN_004b7f90(surface, (void*)bmp, (short)*(unsigned short*)(bmp + 4) + y,
+            int bmp = GetGafFrame(icon, 0);
+            DrawFrame(surface, (void*)bmp, (short)*(unsigned short*)(bmp + 4) + y,
                          (short)*(unsigned short*)(bmp + 6) + dy);
             y += *(unsigned short*)bmp;
         } while (y < *(int*)(g_game + 0x37e1f));
@@ -217,8 +217,8 @@ void __stdcall FUN_0046a860(void* surface) {
         char* loopInfo = playerInfo->info;
         int loopSide = *(unsigned char*)(loopInfo + 0x95);
         unsigned short* icon = *(unsigned short**)(g_game + loopSide * 4 + 0x14833);
-        int bmp = FUN_004b7f30(icon, 0);
-        FUN_004b7f90(surface, (void*)bmp, (short)*(unsigned short*)(bmp + 4) + y,
+        int bmp = GetGafFrame(icon, 0);
+        DrawFrame(surface, (void*)bmp, (short)*(unsigned short*)(bmp + 4) + y,
                      (short)*(unsigned short*)(bmp + 6) + dy);
         y += *(unsigned short*)bmp;
     } while (y < *(int*)(g_game + 0x37e1f));

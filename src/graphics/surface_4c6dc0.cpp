@@ -2,7 +2,7 @@
 // Sibling of 0x4c6d20 / 0x4c6e70, drawing with the cdecl blitter at 0x4cbe70
 // (which takes one extra byte argument, the transparent colour). Draws into
 // `dst`, or, when `dst` is null, into the screen: lock it with LockScreen,
-// draw, then unlock. The unlock is FUN_004c5fa0 inlined; its Unlock call goes
+// draw, then unlock. The unlock is UnlockScreen inlined; its Unlock call goes
 // through a method of the embedded screen struct, which is why the tested
 // surface pointer is copied.
 #include <ddraw.h>

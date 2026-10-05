@@ -2,7 +2,7 @@
 // Locks the screen into a local surface, blits the bitmap at display+0x98
 // into it at (0, 0), then unlocks. Both objects at arg+4 and arg+8 are
 // COM-like interfaces; slot 27 (+0x6c) is tested first and its non-zero
-// result aborts the blit. The unlock is FUN_004c5fa0 inlined (see
+// result aborts the blit. The unlock is UnlockScreen inlined (see
 // 0x4c6c50.cpp); the result variable, zero on the success path, is reused
 // as the zero arguments.
 #include <ddraw.h>

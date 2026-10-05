@@ -6,7 +6,7 @@
 // obj->field_c is not -1, otherwise from 0). A primitive whose bit 0 is set
 // is a flat filled polygon (FillPolygon); otherwise a 4-vertex textured quad
 // (DrawFrameQuad), whose texture is either the direct pointer at +0x10 or, when
-// bit 1 is set, the entry FUN_004b7ee0 looks up from the reference at +0x10.
+// bit 1 is set, the entry GetGafSequenceFrame looks up from the reference at +0x10.
 //
 // MATCH. Two things the compiler only does when the per-iteration pointer
 // updates sit in the loop's increment clause:
@@ -69,7 +69,7 @@ struct Game {
 extern Game* g_game;
 
 void __stdcall FUN_004b6cc0(Vec3_0046bae0* in, Vec3_0046bae0* out, short* angles);
-int __stdcall FUN_004b7ee0(short* ref);
+int __stdcall GetGafSequenceFrame(short* ref);
 void __stdcall FillPolygon(void* surface, Point_0046bae0* points, int count, int color);
 void __stdcall DrawFrameQuad(void* surface, void* texture, Point_0046bae0* points, void* src);
 
@@ -108,7 +108,7 @@ void __stdcall FUN_0046bae0(void* surface, Vec3_0046bae0* offset,
             if (e->count == 4) {
                 void* tex;
                 if (e->texIndexed)
-                    tex = (void*)FUN_004b7ee0((short*)((char*)e + 0x10));
+                    tex = (void*)GetGafSequenceFrame((short*)((char*)e + 0x10));
                 else
                     tex = (void*)e->field_10;
                 DrawFrameQuad(surface, tex, g_game->vertices, 0);

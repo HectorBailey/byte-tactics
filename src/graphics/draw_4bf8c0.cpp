@@ -2,7 +2,7 @@
 //
 // Draws the outline of `r` (top, right, bottom, left edges in that order) into
 // `surface`, or into the screen when `surface` is 0 (locked with
-// LockScreen, unlocked with FUN_004c5fa0). Each edge is a segment drawer of
+// LockScreen, unlocked with UnlockScreen). Each edge is a segment drawer of
 // the same shape as DrawLine (clip with ClipLine, fill with
 // FUN_004cc7ab); the screen path carries four hand-inlined copies of it whose
 // null-surface lock arm survives because the compiler only tests the address
@@ -41,7 +41,7 @@ struct Rect_004bf8c0 {
 };
 
 int __stdcall LockScreen(Surface_004bf8c0* out);
-int __stdcall FUN_004c5fa0(Surface_004bf8c0* s);
+int __stdcall UnlockScreen(Surface_004bf8c0* s);
 int __stdcall ClipLine(Surface_004bf8c0* dst, int* x0, int* y0, int* x1, int* y1);
 void __cdecl FUN_004cc7ab(Surface_004bf8c0* dst, int x0, int y0, int x1, int y1, int color);
 int __stdcall DrawLine(Surface_004bf8c0* surface, int x0, int y0, int x1, int y1,
@@ -62,7 +62,7 @@ int __stdcall DrawRectangle(Surface_004bf8c0* surface, Rect_004bf8c0* r, int col
                     if (LockScreen(&inner)) {
                         if (ClipLine(&inner, &x0, &y0, &x1, &y1))
                             FUN_004cc7ab(&inner, x0, y0, x1, y1, color);
-                        FUN_004c5fa0(&inner);
+                        UnlockScreen(&inner);
                     }
                 } else {
                     if (ClipLine(&screen, &x0, &y0, &x1, &y1))
@@ -76,7 +76,7 @@ int __stdcall DrawRectangle(Surface_004bf8c0* surface, Rect_004bf8c0* r, int col
                     if (LockScreen(&inner)) {
                         if (ClipLine(&inner, &x0, &y0, &x1, &y1))
                             FUN_004cc7ab(&inner, x0, y0, x1, y1, color);
-                        FUN_004c5fa0(&inner);
+                        UnlockScreen(&inner);
                     }
                 } else {
                     if (ClipLine(&screen, &x0, &y0, &x1, &y1))
@@ -90,7 +90,7 @@ int __stdcall DrawRectangle(Surface_004bf8c0* surface, Rect_004bf8c0* r, int col
                     if (LockScreen(&inner)) {
                         if (ClipLine(&inner, &x0, &y0, &x1, &y1))
                             FUN_004cc7ab(&inner, x0, y0, x1, y1, color);
-                        FUN_004c5fa0(&inner);
+                        UnlockScreen(&inner);
                     }
                 } else {
                     if (ClipLine(&screen, &x0, &y0, &x1, &y1))
@@ -104,14 +104,14 @@ int __stdcall DrawRectangle(Surface_004bf8c0* surface, Rect_004bf8c0* r, int col
                     if (LockScreen(&inner)) {
                         if (ClipLine(&inner, &x0, &y0, &x1, &y1))
                             FUN_004cc7ab(&inner, x0, y0, x1, y1, color);
-                        FUN_004c5fa0(&inner);
+                        UnlockScreen(&inner);
                     }
                 } else {
                     if (ClipLine(&screen, &x0, &y0, &x1, &y1))
                         FUN_004cc7ab(&screen, x0, y0, x1, y1, color);
                 }
             }
-            FUN_004c5fa0(&screen);
+            UnlockScreen(&screen);
         }
     } else {
         {

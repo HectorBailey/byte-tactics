@@ -71,11 +71,11 @@ void __stdcall LockScreen(void *);
 void __stdcall FUN_004b04b0(void *, Rect_004a4660 *, unsigned int, unsigned int, unsigned int);
 void __stdcall FillRectangle(void *, Rect_004a4660 *, int);
 int __stdcall FUN_004a50e0(void *, char *, int, int, int, int);
-int __stdcall FUN_004b7f30(unsigned short *, int);
+int __stdcall GetGafFrame(unsigned short *, int);
 int GetFont();
 int __stdcall GetTextWidth(int, char *);
 int GetFontHeight();
-void __stdcall FUN_004c5fa0(void *);
+void __stdcall UnlockScreen(void *);
 
 
 static inline int Measure_004a4660(char *text)
@@ -89,7 +89,7 @@ static inline int Measure_004a4660(char *text)
     char *q = text;
     while (*q != 0) {
         char ch = *q;
-        Glyph_004a4660 *glyph = (Glyph_004a4660 *)FUN_004b7f30(
+        Glyph_004a4660 *glyph = (Glyph_004a4660 *)GetGafFrame(
             DAT_0051fba4->language->glyphs, (unsigned char)ch);
         if (glyph != 0)
             width += glyph->width;
@@ -135,7 +135,7 @@ void __stdcall FUN_004a4660(Class_004a4660 *obj, int index)
         if (DAT_0051fba4->language == 0) {
             height = GetFontHeight();
         } else {
-            Glyph_004a4660 *glyph = (Glyph_004a4660 *)FUN_004b7f30(
+            Glyph_004a4660 *glyph = (Glyph_004a4660 *)GetGafFrame(
                 DAT_0051fba4->language->glyphs, 0x49);
             height = glyph->height + 2;
         }
@@ -145,5 +145,5 @@ void __stdcall FUN_004a4660(Class_004a4660 *obj, int index)
     }
 
     obj->oldSurface = *(void **)((char *)obj + 8);
-    FUN_004c5fa0(surface);
+    UnlockScreen(surface);
 }

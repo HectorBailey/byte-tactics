@@ -1,6 +1,6 @@
 // Decompiled by GPT-6-Luna. Names are provisional.
 // Draws one gadget entry: builds the entry's bounding rect and a destination
-// quad, then either blits a texture (field_be via FUN_004b7f30, or field_c2)
+// quad, then either blits a texture (field_be via GetGafFrame, or field_c2)
 // onto it, or fills the rect with the colour at obj+0x8b9.
 
 #pragma pack(push, 1)
@@ -61,8 +61,8 @@ struct Frame_004a4980 {
     unsigned char field_9;            // +0x09
 };
 
-void* __stdcall FUN_004b7f30(void* a, int b);
-void __stdcall FUN_004b7f90(void* surface, void* frame, int x, int y);
+void* __stdcall GetGafFrame(void* a, int b);
+void __stdcall DrawFrame(void* surface, void* frame, int x, int y);
 void __stdcall FillRectangle(void* surface, Rect_004a4980* rect, int color);
 void __stdcall DrawFrameQuad(void* surf, void* entry, Quad_004a4980* dst, Quad_004a4980* src);
 
@@ -101,7 +101,7 @@ void __stdcall FUN_004a4980(Class_004a4980* obj, int index)
 
     void* field_be = *(void**)((char*)e + 0xbe);
     if (field_be != 0) {
-        Frame_004a4980* result = (Frame_004a4980*)FUN_004b7f30(field_be, e->field_c6);
+        Frame_004a4980* result = (Frame_004a4980*)GetGafFrame(field_be, e->field_c6);
         if (result != 0) {
             src.p[1].x = result->w - 1;
             src.p[2].x = result->w - 1;
@@ -111,7 +111,7 @@ void __stdcall FUN_004a4980(Class_004a4980* obj, int index)
                 DrawFrameQuad(*(void**)((char*)entries + 0xbc), result, &dst, &src);
                 return;
             }
-            FUN_004b7f90(*(void**)((char*)entries + 0xbc), result, result->field_4 + rect.x1, result->field_6 + rect.y1);
+            DrawFrame(*(void**)((char*)entries + 0xbc), result, result->field_4 + rect.x1, result->field_6 + rect.y1);
             return;
         }
     } else if (e->field_c2 != 0) {

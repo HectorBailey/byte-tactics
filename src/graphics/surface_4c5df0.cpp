@@ -1,7 +1,7 @@
 // Decompiled by Opus. Names are provisional.
 // Pops every entry of the screen lock stack (count g_screenLockCount, entries
 // written by LockScreen at g_screenLocks), unlocking each one. The screen
-// unlock is FUN_004c5fa0 inlined (see 0x4c6d20.cpp).
+// unlock is UnlockScreen inlined (see 0x4c6d20.cpp).
 #include <ddraw.h>
 
 struct Surface_004c5df0 {

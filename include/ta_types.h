@@ -14006,7 +14006,7 @@ struct Class_004cb7d0 {  // 0x10 bytes, 2 views
 
 class Class_004cb7f0 : public Class_004cb7c0 {  // 0x10 bytes, 3 views
 public:
-    bool FUN_004cb7f0(char*, int, int);
+    bool Open(char*, int, int);
 };
 
 struct Class_004cb940 {  // 0x10 bytes, 2 views
@@ -14014,7 +14014,7 @@ struct Class_004cb940 {  // 0x10 bytes, 2 views
     int height;  // +0x4
     int dataOffset;  // +0x8
     _iobuf* file;  // +0xc
-    bool FUN_004cb940(Image_004cb940*, int, int, int, int, int, int);
+    bool WriteRows(Image_004cb940*, int, int, int, int, int, int);
 };
 
 struct Flags_00495e90_38a51 {  // 0x2 bytes, 1 view

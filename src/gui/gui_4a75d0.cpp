@@ -22,7 +22,7 @@ struct Obj_004a75d0 {
 
 void __stdcall ChangeExtension(char* out, char* in, const char* ext);
 int __stdcall FUN_004bbc40(char* path);
-void* __stdcall FUN_004b8c60(char* path);
+void* __stdcall LoadGaf(char* path);
 
 // FUNCTION: 0x4a75d0
 int __stdcall FUN_004a75d0(Obj_004a75d0* obj, char* name)
@@ -34,7 +34,7 @@ int __stdcall FUN_004a75d0(Obj_004a75d0* obj, char* name)
     strcat(path, name);
     ChangeExtension(path, path, "GAF");
     if (FUN_004bbc40(path)) {
-        obj->screen->holder->gaf = FUN_004b8c60(path);
+        obj->screen->holder->gaf = LoadGaf(path);
         if (obj->screen->holder->gaf != 0)
             return 1;
     }

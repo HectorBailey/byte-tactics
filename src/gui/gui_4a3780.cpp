@@ -109,7 +109,7 @@ extern char DAT_00502a20[];
 
 void __stdcall SetFont(int id);
 int GetFontHeight();
-int __stdcall FUN_004b7f30(unsigned short* param_1, int param_2);
+int __stdcall GetGafFrame(unsigned short* param_1, int param_2);
 char* __stdcall FUN_004b6af0(char* text, int n);
 int GetTicks();
 int __stdcall FUN_004ab570(Object_004a3780* obj, unsigned char buttons);
@@ -153,7 +153,7 @@ static inline int LineHeight_004a3780()
 {
     if (0 == DAT_0051fba4->list)
         return GetFontHeight();
-    return ((Glyph_004a3780*)FUN_004b7f30(DAT_0051fba4->list->field_0c, 0x49))->height + 2;
+    return ((Glyph_004a3780*)GetGafFrame(DAT_0051fba4->list->field_0c, 0x49))->height + 2;
 }
 
 // FUNCTION: 0x4a3780

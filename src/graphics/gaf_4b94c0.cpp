@@ -35,7 +35,7 @@ void __stdcall ResetClipRect(Surface_004b94c0* surface);
 void __stdcall CopySurfaceRect(void* dst, void* src, Rect_004b94c0* rect, Rect_004b94c0* pos);
 
 // FUNCTION: 0x4b94c0
-void __stdcall FUN_004b94c0(void* dst, Sprite_004b94c0* sprite, int x, int y)
+void __stdcall GrabBackground(void* dst, Sprite_004b94c0* sprite, int x, int y)
 {
     Surface_004b94c0 surface;
     surface.width = sprite->width;

@@ -88,9 +88,9 @@ extern unsigned int DAT_0051e67c;
 extern unsigned int DAT_0051e680;
 
 unsigned int __cdecl GetTicks();
-int __stdcall FUN_004b8b90(Anim_00478b40* anim);
-int __stdcall FUN_004b7f30(void* gaf, int frame);
-void __stdcall FUN_004b7f90(void* surface, void* frame, int x, int y);
+int __stdcall StepGafSequence(Anim_00478b40* anim);
+int __stdcall GetGafFrame(void* gaf, int frame);
+void __stdcall DrawFrame(void* surface, void* frame, int x, int y);
 void __stdcall FillRectangle(void* surface, Rect_00478b40* rect, int colour);
 void __stdcall FUN_0049fa90(Window_00478b40* window);
 void __stdcall FUN_0049fad0(Window_00478b40* window);
@@ -123,10 +123,10 @@ void __stdcall FUN_00478b40(Window_00478b40* arg1, Item_00478b40* arg2)
             rect.y2 = y2;
 
             if (GetTicks() != DAT_0051e67c) {
-                FUN_004b8b90(&DAT_0051e640);
+                StepGafSequence(&DAT_0051e640);
                 arg2->frame = DAT_0051e640.index;
             }
-            Frame_00478b40* frame = (Frame_00478b40*)FUN_004b7f30(arg2->gaf, arg2->frame);
+            Frame_00478b40* frame = (Frame_00478b40*)GetGafFrame(arg2->gaf, arg2->frame);
             if (frame == 0) {
                 return;
             }
@@ -137,7 +137,7 @@ void __stdcall FUN_00478b40(Window_00478b40* arg1, Item_00478b40* arg2)
             unsigned char colour =
                 ((unsigned char*)arg2->colours)[(int)arg1 + 0x8b2];
             FillRectangle(surface, &rect, colour);
-            FUN_004b7f90(surface, frame, px, py);
+            DrawFrame(surface, frame, px, py);
         } else {
             FUN_0049fa90(arg1);
         }

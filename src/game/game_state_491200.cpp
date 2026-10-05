@@ -177,7 +177,7 @@ void __stdcall FUN_0049fba0(void* param_1, const char* name);
 void __stdcall FUN_0049fbf0(void* param_1, const char* name);
 void __stdcall FUN_0049fb50(void* param_1, const char* name);
 void __stdcall FUN_004aa8e0(void* param_1, int param_2);
-void* __stdcall FUN_004b7f30(void* param_1, int param_2);
+void* __stdcall GetGafFrame(void* param_1, int param_2);
 void __stdcall FUN_004ab4e0(void* param_1, void* param_2);
 void __stdcall FUN_004aeee0(void* param_1, const char* name);
 void __stdcall FUN_004aedd0(void* param_1, const char* name, int param_3);
@@ -253,7 +253,7 @@ void FUN_00491200()
     FUN_0049fbf0(g_game->field_519, DAT_00502e30);
     FUN_0049fb50(g_game->field_519, DAT_0050338c);
     FUN_004aa8e0(g_game->field_519, g_game->field_391f9);
-    FUN_004ab4e0(g_game->field_519, FUN_004b7f30(g_game->field_148cb, 0));
+    FUN_004ab4e0(g_game->field_519, GetGafFrame(g_game->field_148cb, 0));
     FUN_004aeee0(g_game->field_519, DAT_0050925c);
     FUN_004aedd0(g_game->field_519, DAT_00509250, 0);
     FUN_004aedd0(g_game->field_519, DAT_00509244, 1);

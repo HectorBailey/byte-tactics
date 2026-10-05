@@ -76,7 +76,7 @@ void __stdcall SetFont(int param);
 int GetFont();
 int __stdcall GetTextWidth(int font, char* text);
 int GetFontHeight();
-int __stdcall FUN_004b7f30(unsigned short* glyphs, int c);
+int __stdcall GetGafFrame(unsigned short* glyphs, int c);
 
 static inline int Measure_004a53c0(char* text)
 {
@@ -88,7 +88,7 @@ static inline int Measure_004a53c0(char* text)
         return GetTextWidth(GetFont(), text);
     while (*p != 0) {
         char ch = *p;
-        Glyph_004a53c0* glyph = (Glyph_004a53c0*)FUN_004b7f30(DAT_0051fba4->language->glyphs, (unsigned char)ch);
+        Glyph_004a53c0* glyph = (Glyph_004a53c0*)GetGafFrame(DAT_0051fba4->language->glyphs, (unsigned char)ch);
         if (glyph != 0)
             width += glyph->width;
         ++p;
@@ -120,7 +120,7 @@ void __stdcall FUN_004a53c0(Class_004a53c0* obj, int index)
     if (DAT_0051fba4->language == 0)
         lh = GetFontHeight();
     else
-        lh = ((Glyph_004a53c0*)FUN_004b7f30(DAT_0051fba4->language->glyphs, 0x49))->height + 2;
+        lh = ((Glyph_004a53c0*)GetGafFrame(DAT_0051fba4->language->glyphs, 0x49))->height + 2;
     if (entry->align & 4) {
         nx = entry->w + x;
         nx -= Measure_004a53c0(entry->b6.text);

@@ -59,8 +59,8 @@ struct Rect_004a5e50 {
     int bottom;                        // +0xc
 };
 
-void __stdcall FUN_004b7f90(void* surface, void* glyph, int x, int y);
-void __stdcall FUN_004b8310(void* surface, void* glyph, int x, int y, int style);
+void __stdcall DrawFrame(void* surface, void* glyph, int x, int y);
+void __stdcall DrawFrameLit(void* surface, void* glyph, int x, int y, int style);
 int __stdcall FadeRectangle(Surface_004a5e50* surface, Rect_004a5e50* rect, int level);
 
 // FUNCTION: 0x4a5e50
@@ -85,9 +85,9 @@ void __stdcall FUN_004a5e50(Obj_004a5e50* obj, int index)
     rect.bottom = e->height + rect.top - 1;
     int count = e->count;
     if (count > 0) {
-        FUN_004b8310(entries->surface, glyph, glyph->x + rect.left, glyph->y + rect.top, count);
+        DrawFrameLit(entries->surface, glyph, glyph->x + rect.left, glyph->y + rect.top, count);
     } else {
-        FUN_004b7f90(entries->surface, glyph, glyph->x + rect.left, glyph->y + rect.top);
+        DrawFrame(entries->surface, glyph, glyph->x + rect.left, glyph->y + rect.top);
     }
     if (e->flag & 1) {
         FadeRectangle(entries->surface, &rect, -0x1c);

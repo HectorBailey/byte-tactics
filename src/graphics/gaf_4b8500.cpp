@@ -2,12 +2,12 @@
 // Draws one bitmap (`param_2`, a BITMAPINFO: width/height shorts, x/y origin
 // shorts, two flag bytes, a texture count and a texture array) at x, y, either
 // into `param_1` or, when that is null, into the screen locked with
-// LockScreen and unlocked with FUN_004c5fa0 at the end (which is why the
+// LockScreen and unlocked with UnlockScreen at the end (which is why the
 // unlock is guarded by a comparison of `param_1` with the address of the local
 // surface). A record with a child count draws each child through this same
 // function (recursion). A leaf builds the source rect (0, 0, w - 1, h - 1) and
 // the destination rect (x - dx, y - dy, ...), clips the destination to the
-// destination's own clip rect with FUN_004b7e60 and blits through
+// destination's own clip rect with ClipRects and blits through
 // FUN_004cbf2c, or, when the mode byte at +9 is set, through FUN_004cc057.
 
 struct Rect_004b8500 {
@@ -71,14 +71,14 @@ struct Display_004b8500 {
 
 Display_004b8500* GetDisplay(void);
 int __stdcall LockScreen(Surface_004b8500* out);
-int __stdcall FUN_004c5fa0(Surface_004b8500* s);
-void __stdcall FUN_004b7e60(Rect_004b8500* other, Rect_004b8500* rect, Rect_004b8500* bounds);
-void __stdcall FUN_004b8500(Class_004c6ae0* p, Sprite_004b8500* s, int x, int y);
+int __stdcall UnlockScreen(Surface_004b8500* s);
+void __stdcall ClipRects(Rect_004b8500* other, Rect_004b8500* rect, Rect_004b8500* bounds);
+void __stdcall DrawFrameBlended(Class_004c6ae0* p, Sprite_004b8500* s, int x, int y);
 void __cdecl FUN_004cbf2c(Class_004c6ae0* p, Src_004b8500* src, Rect_004b8500* srect, Rect_004b8500* drect, int colour, unsigned char* palette);
 void __cdecl FUN_004cc057(int linkid, int sprite, Rect_004b8500* drect, Sprite_004b8500** src, Rect_004b8500* srect, unsigned char* palette);
 
 // FUNCTION: 0x4b8500
-void __stdcall FUN_004b8500(Class_004c6ae0* param_1, Sprite_004b8500* param_2, int x, int y)
+void __stdcall DrawFrameBlended(Class_004c6ae0* param_1, Sprite_004b8500* param_2, int x, int y)
 {
     Display_004b8500* d = GetDisplay();
     if ((d->flags & 0x20) != 0) {
@@ -92,7 +92,7 @@ void __stdcall FUN_004b8500(Class_004c6ae0* param_1, Sprite_004b8500* param_2, i
         if (param_2 != 0) {
             if (param_2->count > 0) {
                 for (int i = 0; i < param_2->count; i++)
-                    FUN_004b8500(param_1, param_2->items[i], x, y);
+                    DrawFrameBlended(param_1, param_2->items[i], x, y);
             } else {
                 Rect_004b8500 screen_rect;
                 Rect_004b8500 sprite_rect = { 0, 0, param_2->width - 1, param_2->height - 1 };
@@ -104,7 +104,7 @@ void __stdcall FUN_004b8500(Class_004c6ae0* param_1, Sprite_004b8500* param_2, i
                 screen_rect.bottom = h + screen_rect.top - 1;
                 Bounds_src_004b8500 bs;
                 param_1->GetClipRect(&bs.bounds);
-                FUN_004b7e60(&sprite_rect, &screen_rect, &bs.bounds);
+                ClipRects(&sprite_rect, &screen_rect, &bs.bounds);
                 if (screen_rect.right >= screen_rect.left && screen_rect.bottom >= screen_rect.top
                     && sprite_rect.right >= sprite_rect.left && sprite_rect.bottom >= sprite_rect.top) {
                     if (param_2->flag_9 == 0) {
@@ -124,6 +124,6 @@ void __stdcall FUN_004b8500(Class_004c6ae0* param_1, Sprite_004b8500* param_2, i
         }
 
         if (param_1 == (Class_004c6ae0*)&screen.surf)
-            FUN_004c5fa0(&screen.surf);
+            UnlockScreen(&screen.surf);
     }
 }

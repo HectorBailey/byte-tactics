@@ -62,7 +62,7 @@ void FUN_00494e70();
 void FUN_0047f680();
 void __stdcall FUN_004c2d60(int*);
 void UpdateTimers();
-void __stdcall FUN_004cb170(char*, char*);
+void __stdcall SaveScreenshot(char*, char*);
 
 // FUNCTION: 0x499890
 void FUN_00499890()
@@ -90,7 +90,7 @@ void FUN_00499890()
         FUN_004bcf00(g_game->path);
         sprintf(path, DAT_005024fc, g_game->path);
         FUN_004bcf00(path);
-        FUN_004cb170(path, DAT_0050966c);
+        SaveScreenshot(path, DAT_0050966c);
         g_game->screenshot = GetTicks();
     }
     FUN_004c2de0(&first);

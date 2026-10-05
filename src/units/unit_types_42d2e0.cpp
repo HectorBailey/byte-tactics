@@ -281,9 +281,9 @@ void __stdcall FUN_004290f0(char* out, const char* dir, const char* name, const 
 void __stdcall LoadUnitFbi(char* path, Class_0042b370* type);
 void __stdcall FUN_0042a140(void* obj, char* name);
 int __stdcall FUN_004bbc40(char* path);
-void* __stdcall FUN_004cb560(char* path);
-void __stdcall FUN_004cb590(void* obj);
-int __stdcall FUN_004cb5f0(void* obj);
+void* __stdcall Load3do(char* path);
+void __stdcall MirrorObject(void* obj);
+int __stdcall GetObjectHeight(void* obj);
 void __stdcall FatalError(const char* msg);
 void* __stdcall FUN_004b2450(char* path);
 void __stdcall StripExtension(char* text);
@@ -426,14 +426,14 @@ void LoadUnitTypes() {
         strncpy(namebuf, type->model, 0x20);
         namebuf[0x1f] = 0;
         FUN_004290f0(objpath, "objects3d", namebuf, "3DO");
-        void* model = FUN_004cb560(objpath);
+        void* model = Load3do(objpath);
         if (model == 0)
             FatalError(objpath);
-        FUN_004cb590(model);
+        MirrorObject(model);
         FUN_0042a140(model, namebuf);
         g_game->field_14377[u] = model;
         type->field_162 = 0;
-        type->field_16e = FUN_004cb5f0(g_game->field_14377[u]);
+        type->field_16e = GetObjectHeight(g_game->field_14377[u]);
         type->field_17a = type->field_16e - type->field_162;
 
         strcpy(namebuf, type->name);

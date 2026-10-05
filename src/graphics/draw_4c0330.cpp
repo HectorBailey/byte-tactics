@@ -204,7 +204,7 @@ struct Span_004c0330 {
 };
 
 int __stdcall LockScreen(Class_004c6ae0* out);
-int __stdcall FUN_004c5fa0(Class_004c6ae0* s);
+int __stdcall UnlockScreen(Class_004c6ae0* s);
 
 // FUNCTION: 0x4c0330
 int __stdcall ScanFillPolygon(Class_004c6ae0* surface, Point_004c0330* points, int n, unsigned char color)
@@ -255,22 +255,22 @@ int __stdcall ScanFillPolygon(Class_004c6ae0* surface, Point_004c0330* points, i
     surface->GetClipRect(&clip);
     if (maxX < clip.left) {
         if (locked)
-            FUN_004c5fa0(&screen);
+            UnlockScreen(&screen);
         return 0;
     }
     if (minX > clip.right) {
         if (locked)
-            FUN_004c5fa0(&screen);
+            UnlockScreen(&screen);
         return 0;
     }
     if (maxY < clip.top) {
         if (locked)
-            FUN_004c5fa0(&screen);
+            UnlockScreen(&screen);
         return 0;
     }
     if (minY > clip.bottom) {
         if (locked)
-            FUN_004c5fa0(&screen);
+            UnlockScreen(&screen);
         return 0;
     }
     if (minY < clip.top)
@@ -279,7 +279,7 @@ int __stdcall ScanFillPolygon(Class_004c6ae0* surface, Point_004c0330* points, i
         maxY = clip.bottom;
     if (maxY == minY) {
         if (locked)
-            FUN_004c5fa0(&screen);
+            UnlockScreen(&screen);
         return 0;
     }
 
@@ -357,6 +357,6 @@ int __stdcall ScanFillPolygon(Class_004c6ae0* surface, Point_004c0330* points, i
         s++;
     }
     if (locked)
-        FUN_004c5fa0(&screen);
+        UnlockScreen(&screen);
     return 1;
 }

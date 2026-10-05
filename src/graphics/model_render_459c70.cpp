@@ -69,9 +69,9 @@ struct Vec3f { float x; float y; float z; };
 Vec3f __stdcall FUN_004b6f00(Vec3 a, Vec3 b);
 Vec3f __stdcall FUN_004b6f70(Vec3f a, Vec3f b);
 Vec3f __stdcall FUN_004b6ff0(Vec3f v);
-void* __stdcall FUN_004b7ee0(void* pic);
-void* __stdcall FUN_004b7f30(unsigned short* table, int index);
-void __stdcall FUN_004b95a0(Bitmap_459c70* dst, Bitmap_459c70* src);
+void* __stdcall GetGafSequenceFrame(void* pic);
+void* __stdcall GetGafFrame(unsigned short* table, int index);
+void __stdcall DownsampleFrame(Bitmap_459c70* dst, Bitmap_459c70* src);
 void __stdcall FillShadedPolygon(Bitmap_459c70* surface, void* poly, int count, int flag);
 void __stdcall DrawLitTexturedPolygon(Bitmap_459c70* surface, void* pic, void* poly, int flag);
 
@@ -314,12 +314,12 @@ void Class_004581e0::FUN_00459c70(Bitmap_459c70* bitmap, List_459c70* list,
                             if (face->flags.usePic) {
                                 if (face->flags.shaded) {
                                     int unit = *(int*)(g_game + 0x1b8a + kind * 0x14b);
-                                    pic = FUN_004b7f30(face->color,
+                                    pic = GetGafFrame(face->color,
                                         *(unsigned char*)(unit + 0x96));
                                 } else if (useColor) {
-                                    pic = FUN_004b7f30(face->color, 0);
+                                    pic = GetGafFrame(face->color, 0);
                                 } else {
-                                    pic = FUN_004b7ee0(&face->pic);
+                                    pic = GetGafSequenceFrame(&face->pic);
                                 }
                             } else {
                                 pic = face->pic;
@@ -336,7 +336,7 @@ void Class_004581e0::FUN_00459c70(Bitmap_459c70* bitmap, List_459c70* list,
 
     if (((Flags_37f06*)(g_game + 0x37f06))->antiAlias) {
         if (mode != 0) {
-            FUN_004b95a0(bitmap, src);
+            DownsampleFrame(bitmap, src);
             unsigned char* s = (unsigned char*)src->data2;
             if (s != 0) {
                 unsigned char* d = (unsigned char*)bitmap->data2;

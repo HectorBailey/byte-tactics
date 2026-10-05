@@ -230,8 +230,8 @@ struct Game {
 
 extern Game* g_game;
 
-void* __stdcall FUN_004b7f30(void* a, int index);
-void __stdcall FUN_004b7f90(void* surface, void* bmp, int x, int y);
+void* __stdcall GetGafFrame(void* a, int index);
+void __stdcall DrawFrame(void* surface, void* bmp, int x, int y);
 void __stdcall DrawPixel(void* surface, int x, int y, int color);
 void __stdcall DrawCircle(void* surface, int x, int y, int radius, int color);
 void __stdcall DrawDashedCircle(void* surface, int x, int y, int radius, int color,
@@ -311,14 +311,14 @@ void FUN_00466dc0(void)
                     int y = ScaleY_00466dc0(u) / g_game->field_1422f;
                     if (u->field_fa == 0 ||
                         (g_game->field_142f0.b.hi & 1) != 0) {
-                        FUN_004b7f90(surface,
-                            FUN_004b7f30(g_game->field_147df,
+                        DrawFrame(surface,
+                            GetGafFrame(g_game->field_147df,
                                 PlayerInfo_00466dc0_Get(u->field_ff)->data->field_96),
                             x, y);
                     }
                     if (u->field_a8 == g_game->field_2cba) {
-                        FUN_004b7f90(surface,
-                            FUN_004b7f30(g_game->field_147e3, 0), x, y);
+                        DrawFrame(surface,
+                            GetGafFrame(g_game->field_147e3, 0), x, y);
                     }
                     if (u->flags_110.bits.bit4) {
                         if ((u->field_10e & 1) != 0 ||
@@ -392,8 +392,8 @@ void FUN_00466dc0(void)
                 if (OnRadar_00466dc0(px, py) ||
                     ((Tail_00466dc0*)((char*)q))->owner->field_ff ==
                         g_game->currentPlayer) {
-                    FUN_004b7f90(surface,
-                        FUN_004b7f30(g_game->field_147e7,
+                    DrawFrame(surface,
+                        GetGafFrame(g_game->field_147e7,
                             PlayerInfo_00466dc0_Get(
                                 ((Tail_00466dc0*)q)->player)->data->field_96),
                         x, y);

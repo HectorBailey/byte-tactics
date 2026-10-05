@@ -68,7 +68,7 @@ void __stdcall ReleaseDirectDraw(Display_004b5510 *d);
 void __stdcall InitSurface(Class_004c6a60 *s, int width, int height, int a, int b);
 int __stdcall LockScreen(Surface_004b5510 *s);
 void __cdecl BlitSurface(Surface_004b5510 *dst, void *src, int x, int y);
-int __stdcall FUN_004c5fa0(Surface_004b5510 *s);
+int __stdcall UnlockScreen(Surface_004b5510 *s);
 int __stdcall SetPaletteColors(PALETTEENTRY *entries, int start, int count);
 
 static inline void FreeGdi_004b5510(Display_004b5510 *d, HDC &dc)
@@ -159,7 +159,7 @@ int __stdcall SetFullScreen(int mode) {
                                         if (DAT_0051fbd0->draw.field_98) {
                                             LockScreen(&surf);
                                             BlitSurface(&surf, DAT_0051fbd0->draw.field_98, 0, 0);
-                                            FUN_004c5fa0(&surf);
+                                            UnlockScreen(&surf);
                                         }
                                     } else
                                         goto fail;

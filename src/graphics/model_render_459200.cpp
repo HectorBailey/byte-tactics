@@ -171,11 +171,11 @@ public:
 };
 
 int __stdcall GetGroundHeight(Pos_459200* p);
-void __stdcall FUN_004b7f90(int param_1, int param_2, int x, int y);
-void __stdcall FUN_004b8500(int param_1, int param_2, int x, int y);
-void __stdcall FUN_004b90a0(int bmp, int param_2, int x, int y, int z);
-void __stdcall FUN_004b96e0(int param_1, int value);
-void __stdcall FUN_004ba1b0(int param_1, int value);
+void __stdcall DrawFrame(int param_1, int param_2, int x, int y);
+void __stdcall DrawFrameBlended(int param_1, int param_2, int x, int y);
+void __stdcall DrawFrameDepth(int bmp, int param_2, int x, int y, int z);
+void __stdcall TintFrameBelow(int param_1, int value);
+void __stdcall CutFrameBelow(int param_1, int value);
 
 static inline int team_bias(Model_459200* model)
 {
@@ -221,13 +221,13 @@ void Class_00459200::FUN_00459200(int param_2, Model_459200* model, Vec3_459200 
                     if (model->owner->field_a6 != 0 || dx >= g_game->field_1427f) {
                         if (model->field_14 == 0)
                             ((CMemoryCache*)this)->FUN_0045a790(model,bmp);
-                        FUN_004b8500(param_2, model->field_14, v.p.x.whole + 0x85, y);
+                        DrawFrameBlended(param_2, model->field_14, v.p.x.whole + 0x85, y);
                     }
                 } else {
                     if (gameFlags.bits.b3) {
                         if ((f.word & 0x81000) == 0) {
                             ((Class_0045a470*)this)->FUN_0045a470(bmp);
-                            FUN_004b8500(param_2, this->bitmap, v.p.x.whole + 0x85, y);
+                            DrawFrameBlended(param_2, this->bitmap, v.p.x.whole + 0x85, y);
                         }
                     }
                 }
@@ -238,9 +238,9 @@ void Class_00459200::FUN_00459200(int param_2, Model_459200* model, Vec3_459200 
             bmp = model->bitmap;
         }
         if (!(model->owner->field_10e & 4) && g_game->field_14280 == 0)
-            FUN_004b7f90(param_2, bmp, v.p.x.whole + 0x80, z);
+            DrawFrame(param_2, bmp, v.p.x.whole + 0x80, z);
         else
-            FUN_004b8500(param_2, bmp, v.p.x.whole + 0x80, z);
+            DrawFrameBlended(param_2, bmp, v.p.x.whole + 0x80, z);
         for (int i = model->count - 1; i >= 0; i--) {
             if ((1 & model->pieces[i].flags) && !(model->pieces[i].flags & 2)) {
                     ((Class_004584d0*)this)->FUN_004584d0(model, param_2, &cv, model->pieces[i].field_0,
@@ -270,14 +270,14 @@ void Class_00459200::FUN_00459200(int param_2, Model_459200* model, Vec3_459200 
             if ((f.word & 0x2000000) == 0) {
                 if (f.bits.b30) {
                     ((Class_0045a470*)this)->FUN_0045a470(bmp);
-                    FUN_004ba1b0(this->bitmap, team_bias(model));
-                    FUN_004b8500(param_2, this->bitmap, v.p.x.whole + 0x85, y);
+                    CutFrameBelow(this->bitmap, team_bias(model));
+                    DrawFrameBlended(param_2, this->bitmap, v.p.x.whole + 0x85, y);
                 } else {
                     if (model->owner->flags & 0x20000000) {
                         if (model->owner->field_a6 != 0 || dx >= g_game->field_1427f) {
                             if (model->field_14 == 0)
                                 ((CMemoryCache*)this)->FUN_0045a790(model,bmp);
-                            FUN_004b8500(param_2, model->field_14, v.p.x.whole + 0x85, y);
+                            DrawFrameBlended(param_2, model->field_14, v.p.x.whole + 0x85, y);
                         }
                     } else {
                         if (gameFlags.bits.b3) {
@@ -287,9 +287,9 @@ void Class_00459200::FUN_00459200(int param_2, Model_459200* model, Vec3_459200 
                                 if (diff > 0) {
                                     diff += shade_bias(model);
                                     do {} while (0);    // no code: see the notes at the top
-                                    FUN_004ba1b0(this->bitmap, diff);
+                                    CutFrameBelow(this->bitmap, diff);
                                 }
-                                FUN_004b8500(param_2, this->bitmap, v.p.x.whole + 0x85, y);
+                                DrawFrameBlended(param_2, this->bitmap, v.p.x.whole + 0x85, y);
                             }
                         }
                     }
@@ -315,7 +315,7 @@ void Class_00459200::FUN_00459200(int param_2, Model_459200* model, Vec3_459200 
                     d.v[2] = unit->pos_z - op[2];
                     int ddy = d.p.y.whole;
                     int ddz = d.p.z.whole;
-                    FUN_004b90a0(unit->sprites->bitmap, this->bitmap, d.p.x.whole, ddz - (ddy >> 1), ddy);
+                    DrawFrameDepth(unit->sprites->bitmap, this->bitmap, d.p.x.whole, ddz - (ddy >> 1), ddy);
                 }
             }
             unit = unit->list_next;
@@ -324,16 +324,16 @@ void Class_00459200::FUN_00459200(int param_2, Model_459200* model, Vec3_459200 
         if (diff > 0) {
             diff += shade_bias(model);
             if ((model->owner->flags & 0x200) == 0 && model->owner->kind != g_game->field_2a43) {
-                FUN_004ba1b0(this->bitmap, diff);
+                CutFrameBelow(this->bitmap, diff);
             } else {
-                FUN_004b96e0(this->bitmap, diff);
+                TintFrameBelow(this->bitmap, diff);
             }
         }
         if (model->owner->field_92->flags.bits.b30)
-            FUN_004ba1b0(this->bitmap, 0x7d);
+            CutFrameBelow(this->bitmap, 0x7d);
         if (!(model->owner->field_10e & 4) && g_game->field_14280 == 0)
-            FUN_004b7f90(param_2, this->bitmap, v.p.x.whole + 0x80, z);
+            DrawFrame(param_2, this->bitmap, v.p.x.whole + 0x80, z);
         else
-            FUN_004b8500(param_2, this->bitmap, v.p.x.whole + 0x80, z);
+            DrawFrameBlended(param_2, this->bitmap, v.p.x.whole + 0x80, z);
     }
 }

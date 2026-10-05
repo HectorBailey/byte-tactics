@@ -87,7 +87,7 @@ public:
 Game_004c14f0* GetDisplay(void);
 int __stdcall FUN_004b6750(Rect_004c14f0* a, Rect_004c14f0* b);
 int __stdcall LockScreen(Class_004c6ae0* out);
-int __stdcall FUN_004c5fa0(Class_004c6ae0* s);
+int __stdcall UnlockScreen(Class_004c6ae0* s);
 void __cdecl BlitText(unsigned char* pixels, int pitch, Font_004c14f0* font, unsigned char* text,
                           int x, int y, int c1, int c2, int c3);
 
@@ -143,7 +143,7 @@ void __stdcall DrawString(Class_004c6ae0* dst, unsigned char* text, int x, int y
             if (FUN_004b6750(&r, &clip))
                 BlitText(screen.pixels, screen.pitch, game->font, text, x, y, game->colour1,
                              game->colour2, game->colour3);
-            FUN_004c5fa0(&screen);
+            UnlockScreen(&screen);
         }
     } else {
         Rect_004c14f0 clip;

@@ -110,7 +110,7 @@ int __stdcall FUN_0045fc60(void* gadget);
 void __stdcall FUN_0047f1a0(char* str, int flag);
 void __stdcall FUN_0049fb10(Menu_00460160* menu, int value);
 void __stdcall FUN_004a81e0(Menu_00460160* menu, int value);
-void __stdcall FUN_004b8ae0(Dst_004b8ae0* dst, Class_004c6a60* src);
+void __stdcall FrameFromSurface(Dst_004b8ae0* dst, Class_004c6a60* src);
 Class_004c6a60* __stdcall AllocSurface(char* name, int width, int height);
 void __stdcall DrawSurface(Class_004c6a60* surface, int a, int b, int c);
 
@@ -124,7 +124,7 @@ void FUN_00460160()
     DAT_00512fe8 = AllocSurface("FLIPSURFACE", holder->field_4->field_17, holder->field_4->field_19);
     memcpy(DAT_00512fe8->pixels, holder->field_4->field_bc->pixels,
            holder->field_4->field_17 * holder->field_4->field_19);
-    FUN_004b8ae0(&DAT_00512ef8, DAT_00512fe8);
+    FrameFromSurface(&DAT_00512ef8, DAT_00512fe8);
     DAT_00512fec = 0;
     DAT_00512f14 = holder->field_4->field_17 - 1;
     DAT_00512f10 = holder->field_4->field_15;

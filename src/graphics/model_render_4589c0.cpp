@@ -125,8 +125,8 @@ struct Bitmap_4589c0 {
     void* field_10;                 // +0x10
 };
 
-void __stdcall FUN_004b8a80(Surface_4589c0* dst, Src_4589c0* src);
-void __stdcall FUN_004b7f90(Class_004c6ae0* dst, Bitmap_4589c0* bmp, int x, int y);
+void __stdcall SurfaceFromFrame(Surface_4589c0* dst, Src_4589c0* src);
+void __stdcall DrawFrame(Class_004c6ae0* dst, Bitmap_4589c0* bmp, int x, int y);
 
 class Class_00459200 {
 public:
@@ -212,15 +212,15 @@ void Class_00459200::FUN_004589c0(Image_4589c0* bmp, Model_4589c0* model)
         Swap(bmp->dx, sdx);
         Swap(bmp->dy, sdy);
         Surface_4589c0 surface;
-        FUN_004b8a80(&surface, (Src_4589c0*)this->bitmap);
+        SurfaceFromFrame(&surface, (Src_4589c0*)this->bitmap);
         memset(this->bitmap->pixels, this->bitmap->colour,
                this->bitmap->height * this->bitmap->width);
         memset(this->bitmap->shade, 0, this->bitmap->height * this->bitmap->width);
-        FUN_004b7f90((Class_004c6ae0*)&surface, (Bitmap_4589c0*)bmp,
+        DrawFrame((Class_004c6ae0*)&surface, (Bitmap_4589c0*)bmp,
                      this->bitmap->dx - sdx, this->bitmap->dy - sdy);
         surface.bits = this->bitmap->shade;
         Swap(bmp->pixels, bmp->shade);
-        FUN_004b7f90((Class_004c6ae0*)&surface, (Bitmap_4589c0*)bmp,
+        DrawFrame((Class_004c6ae0*)&surface, (Bitmap_4589c0*)bmp,
                      this->bitmap->dx - sdx, this->bitmap->dy - sdy);
         Swap(bmp->pixels, bmp->shade);
         Swap(bmp->dx, sdx);

@@ -16,7 +16,7 @@ struct Game {
 extern Game* g_game;
 
 // Declared returning int: the original uses the full eax without masking it.
-int __stdcall FUN_004b7f60(void* ptr);
+int __stdcall GetGafFrameCount(void* ptr);
 
 class Class_00471d70 {
 public:
@@ -44,7 +44,7 @@ void Class_00475150::FUN_00475150(Vec3_00475150* p, int a, int b, int c)
     ((Class_00471d70*)this)->FUN_00471d70(c);
     pos = *p;
     unknown_1c = a;
-    unknown_24 = FUN_004b7f60(g_game->unknown_147cf) - 1;
+    unknown_24 = GetGafFrameCount(g_game->unknown_147cf) - 1;
     if (b != 0)
         unknown_20 = b;
     else

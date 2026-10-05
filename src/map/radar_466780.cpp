@@ -73,8 +73,8 @@ extern Game* g_game;
 extern char DAT_005074f8[];
 extern char DAT_005074e8[];
 
-void __stdcall FUN_004b8ae0(Frame_004b8ae0* dst, void* src);
-void __stdcall FUN_004b95a0(Frame_004b8ae0* dst, Frame_004b8ae0* src);
+void __stdcall FrameFromSurface(Frame_004b8ae0* dst, void* src);
+void __stdcall DownsampleFrame(Frame_004b8ae0* dst, Frame_004b8ae0* src);
 void __stdcall DrawPixel(void* picture, int x, int y, int pixel);
 void* __stdcall AllocSurface(char* name, int width, int height);
 void __stdcall FreeSurface(void* picture);
@@ -101,9 +101,9 @@ void __stdcall FUN_00466780()
     g_game->height = height;
     g_game->picture = AllocSurface(DAT_005074f8, width, height);
     Frame_004b8ae0 frame;
-    FUN_004b8ae0(&frame, g_game->picture);
+    FrameFromSurface(&frame, g_game->picture);
     if (g_game->radarFrame) {
-        FUN_004b95a0(g_game->radarFrame, &frame);
+        DownsampleFrame(g_game->radarFrame, &frame);
         return;
     }
     int h2 = height * 2;
@@ -123,7 +123,7 @@ void __stdcall FUN_00466780()
         }
     }
     Frame_004b8ae0 tempFrame;
-    FUN_004b8ae0(&tempFrame, temp);
-    FUN_004b95a0(&tempFrame, &frame);
+    FrameFromSurface(&tempFrame, temp);
+    DownsampleFrame(&tempFrame, &frame);
     FreeSurface(temp);
 }

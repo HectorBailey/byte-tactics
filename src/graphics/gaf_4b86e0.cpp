@@ -7,7 +7,7 @@
 // is read). A record with a child count
 // draws every child through this same function; a leaf builds the source rect
 // (0, 0, w - 1, h - 1) and the dest rect (x - dx, y - dy, ...), clips them with
-// FUN_004b7e60, and when nothing is clipped off builds a 0x30-byte surface
+// ClipRects, and when nothing is clipped off builds a 0x30-byte surface
 // description from the record (width, height, pitch = width, bits, 10000, -1,
 // dx, dy, flag bits), resets its clip rect with ResetClipRect and blits with
 // FUN_004cbfc4 using the palette at display +0xcc.
@@ -67,15 +67,15 @@ struct Display_004b86e0 {
 
 Display_004b86e0* GetDisplay(void);
 int __stdcall LockScreen(Surface_004b86e0* out);
-int __stdcall FUN_004c5fa0(Surface_004b86e0* s);
-void __stdcall FUN_004b7e60(Rect_004b86e0* other, Rect_004b86e0* rect, Rect_004b86e0* bounds);
+int __stdcall UnlockScreen(Surface_004b86e0* s);
+void __stdcall ClipRects(Rect_004b86e0* other, Rect_004b86e0* rect, Rect_004b86e0* bounds);
 void __stdcall ResetClipRect(int* param_1);
 void __cdecl FUN_004cbfc4(Class_004c6ae0* p, Surface_004b86e0* s, Rect_004b86e0* srect,
                           Rect_004b86e0* drect, int colour, unsigned char* palette);
-void __stdcall FUN_004b86e0(Class_004c6ae0* param_1, Bitmap_004b86e0* param_2, int x, int y);
+void __stdcall DrawFrameGray(Class_004c6ae0* param_1, Bitmap_004b86e0* param_2, int x, int y);
 
 // FUNCTION: 0x4b86e0
-void __stdcall FUN_004b86e0(Class_004c6ae0* param_1, Bitmap_004b86e0* param_2, int x, int y)
+void __stdcall DrawFrameGray(Class_004c6ae0* param_1, Bitmap_004b86e0* param_2, int x, int y)
 {
     Display_004b86e0* d = GetDisplay();
     if ((d->flags & 0x100) != 0 && param_2->flag9 == 0) {
@@ -88,7 +88,7 @@ void __stdcall FUN_004b86e0(Class_004c6ae0* param_1, Bitmap_004b86e0* param_2, i
         if (param_2 != 0) {
             if (param_2->count > 0) {
                 for (int i = 0; i < param_2->count; i++)
-                    FUN_004b86e0(param_1, param_2->items[i], x, y);
+                    DrawFrameGray(param_1, param_2->items[i], x, y);
             } else {
                 Rect_004b86e0 other;
                 Rect_004b86e0 rect;
@@ -102,7 +102,7 @@ void __stdcall FUN_004b86e0(Class_004c6ae0* param_1, Bitmap_004b86e0* param_2, i
                 rect.bottom = rect.top + param_2->height - 1;
                 Rect_004b86e0 bounds;
                 param_1->GetClipRect(&bounds);
-                FUN_004b7e60(&other, &rect, &bounds);
+                ClipRects(&other, &rect, &bounds);
                 if (rect.right >= rect.left && rect.bottom >= rect.top &&
                     other.right >= other.left && other.bottom >= other.top) {
                     Surface_004b86e0 s;
@@ -122,6 +122,6 @@ void __stdcall FUN_004b86e0(Class_004c6ae0* param_1, Bitmap_004b86e0* param_2, i
             }
         }
         if (param_1 == (Class_004c6ae0*)&screen)
-            FUN_004c5fa0(&screen);
+            UnlockScreen(&screen);
     }
 }

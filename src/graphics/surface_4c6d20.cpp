@@ -1,7 +1,7 @@
 // Decompiled by Opus. Names are provisional.
 // Draws through the blitter at 0x4cbdd1 (hand-written assembly in a gap
 // region) into `dst`, or, when `dst` is null, into the screen: lock it with
-// LockScreen, draw, then unlock. The unlock is FUN_004c5fa0 inlined; its
+// LockScreen, draw, then unlock. The unlock is UnlockScreen inlined; its
 // Unlock call goes through a method of the embedded screen struct, which is
 // why the tested surface pointer is copied (and re-read in 0x4c5fa0 itself).
 #include <ddraw.h>

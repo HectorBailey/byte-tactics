@@ -20,7 +20,7 @@
 //     `<stdlib.h>` or `<stdio.h>` together with `<string.h>` reach it, so the file
 //     includes `<stdlib.h>` too (it is a guess which of them the original had).
 //  2. Source shape, only visible inside the window: the 16-bit read is
-//     `unsigned short* pg = (unsigned short*)FUN_004b7f30(...); size = pg[1] + 2;`.
+//     `unsigned short* pg = (unsigned short*)GetGafFrame(...); size = pg[1] + 2;`.
 //     That gives `xor ecx, ecx; mov cx, word ptr [eax + 2]; mov eax, ecx; add eax, 2`
 //     of the original. The old `unsigned short g = *(unsigned short*)(call + 2)`
 //     gives `mov ax, ...; and eax, 0xffff`, a bare `*(unsigned short*)(call + 2) + 2`
@@ -73,7 +73,7 @@ extern Holder_004a9830* DAT_0051fba4;
 extern char DAT_00502a20[];
 
 void __stdcall SetFont(int id);
-int __stdcall FUN_004b7f30(unsigned short* param_1, int param_2);
+int __stdcall GetGafFrame(unsigned short* param_1, int param_2);
 int GetFontHeight();
 char* __stdcall FUN_004b6af0(char* text, int line);
 void __stdcall FUN_004a1b40(Class_004a9830* param_1, int param_2);
@@ -103,7 +103,7 @@ void __stdcall FUN_004a9830(Class_004a9830* param_1, int index)
     if (DAT_0051fba4->list == 0) {
         size = GetFontHeight();
     } else {
-        unsigned short* pg = (unsigned short*)FUN_004b7f30(DAT_0051fba4->list->field_0c, 0x49);
+        unsigned short* pg = (unsigned short*)GetGafFrame(DAT_0051fba4->list->field_0c, 0x49);
         size = pg[1] + 2;
     }
     size++;

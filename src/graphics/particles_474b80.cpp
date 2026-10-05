@@ -29,7 +29,7 @@
 // 0x473590's folds the pointer into the add; the Get() spelling is what keeps the
 // load materialised here. Both keep the same register roles.
 //
-// Draws the sprite of the record's data (through FUN_004b7f30) at
+// Draws the sprite of the record's data (through GetGafFrame) at
 // (dest, sx, sy), offset by the caller's px/py, when the position is visible to
 // the local player: the explored byte map when bit 1 of the fog flags byte at
 // g_game+0x14281 is set, the shared per-player visibility mask otherwise.
@@ -308,8 +308,8 @@
 // some allocator state we cannot reach from source is doing the pinning.
 #include <stddef.h>
 
-void* __stdcall FUN_004b7f30(void* a, int b);
-void __stdcall FUN_004b8500(void* dest, void* src, int x, int y);
+void* __stdcall GetGafFrame(void* a, int b);
+void __stdcall DrawFrameBlended(void* dest, void* src, int x, int y);
 
 #pragma pack(push, 1)
 struct Pos_00474b80 {
@@ -406,5 +406,5 @@ void Record_00474b80::FUN_00474b80(void* dest, short px, short py)
         visible = Identity_00474b80(IsSeen_00474b80(p, p2, col, row));
     }
     if (visible)
-        FUN_004b8500(dest, FUN_004b7f30(data, field_14), sx, sy);
+        DrawFrameBlended(dest, GetGafFrame(data, field_14), sx, sy);
 }

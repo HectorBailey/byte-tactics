@@ -6,7 +6,7 @@
 // 1, see 0x4670fd). FUN_004b7123 / FUN_004b70ef are the sine and cosine table
 // lookups (angle, radius); ClipLine clips the segment and FUN_004cc7ab
 // draws it. When `surface` is null the screen is locked with LockScreen and
-// unlocked with FUN_004c5fa0.
+// unlocked with UnlockScreen.
 //
 // Three things get this to byte-identical (the 62.0% version had all three
 // wrong):
@@ -33,7 +33,7 @@ struct Surface_004c01a0 {
 int __cdecl FUN_004b7123(int angle, int scale);
 int __cdecl FUN_004b70ef(int angle, int scale);
 int __stdcall LockScreen(Surface_004c01a0* out);
-int __stdcall FUN_004c5fa0(Surface_004c01a0* s);
+int __stdcall UnlockScreen(Surface_004c01a0* s);
 int __stdcall ClipLine(Surface_004c01a0* dst, int* x0, int* y0, int* x1, int* y1);
 void __cdecl FUN_004cc7ab(Surface_004c01a0* dst, int x0, int y0, int x1, int y1, int color);
 
@@ -62,7 +62,7 @@ void __stdcall DrawDashedCircle(Surface_004c01a0* surface, int cx, int cy, int r
                 if (LockScreen(&screen)) {
                     if (ClipLine(&screen, &x0, &y0, &x1, &y1))
                         FUN_004cc7ab(&screen, x0, y0, x1, y1, color);
-                    FUN_004c5fa0(&screen);
+                    UnlockScreen(&screen);
                 }
             } else {
                 if (ClipLine(surface, &x0, &y0, &x1, &y1))

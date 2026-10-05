@@ -2,7 +2,7 @@
 // Draws a sprite with a colour-remap effect: the destination surface is blitted
 // into the sprite's scratch buffer, the sprite's index table is remapped through
 // that buffer (32000 uses the sprite's flat colour), and the result is drawn
-// with FUN_004b7f90.
+// with DrawFrame.
 //
 // The two scratch buffers are swapped twice around the blit. That swap must go
 // through a reference-taking helper: written inline, MSVC 5 forwards the
@@ -48,7 +48,7 @@ struct Rect_4b9360 {
 
 void __stdcall ResetClipRect(Surface_4b9360* surface);
 void __stdcall CopySurfaceRect(void* dst, void* src, Rect_4b9360* rect, Rect_4b9360* pos);
-void __stdcall FUN_004b7f90(void* dst, Sprite_4b9360* sprite, int x, int y);
+void __stdcall DrawFrame(void* dst, Sprite_4b9360* sprite, int x, int y);
 
 static void SwapPtr(unsigned char*& a, unsigned char*& b)
 {
@@ -58,7 +58,7 @@ static void SwapPtr(unsigned char*& a, unsigned char*& b)
 }
 
 // FUNCTION: 0x4b9360
-void __stdcall FUN_004b9360(void* dst, Sprite_4b9360* sprite, int x, int y)
+void __stdcall DrawLens(void* dst, Sprite_4b9360* sprite, int x, int y)
 {
     SwapPtr(sprite->buffers[0], sprite->buffers[1]);
 
@@ -113,6 +113,6 @@ void __stdcall FUN_004b9360(void* dst, Sprite_4b9360* sprite, int x, int y)
     int m = sprite->width * sprite->height;
     int saved = (int)sprite->buffers[0];
     sprite->buffers[0] = sprite->buffers[1] + m;
-    FUN_004b7f90(dst, sprite, x, y);
+    DrawFrame(dst, sprite, x, y);
     sprite->buffers[0] = (unsigned char*)saved;
 }

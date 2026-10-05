@@ -3,7 +3,7 @@
 // null the screen is locked with LockScreen and used as the destination;
 // if `bmp` is null the locked screen is used as the source instead. When one
 // of the two pointers is null the blit is offset by the bitmap's half width
-// and half height (the shorts at +0x18 and +0x1a). The unlock is FUN_004c5fa0
+// and half height (the shorts at +0x18 and +0x1a). The unlock is UnlockScreen
 // inlined; its Unlock call goes through a method of the embedded screen
 // struct, which is why the tested surface pointer is copied.
 //

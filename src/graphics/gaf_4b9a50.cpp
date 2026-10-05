@@ -47,12 +47,12 @@ struct Surface_004b9a50 {
 };
 
 int __stdcall LockScreen(Surface_004b9a50* out);
-int __stdcall FUN_004c5fa0(Surface_004b9a50* s);
-void __stdcall FUN_004b9740(Class_004c6ae0* dst, Bitmap_004b9a50* bmp, int x, int y, double sx, double sy);
-void __stdcall FUN_004b7e60(Rect_004b9a50* other, Rect_004b9a50* rect, Rect_004b9a50* bounds);
+int __stdcall UnlockScreen(Surface_004b9a50* s);
+void __stdcall DrawFrameScaledBlended(Class_004c6ae0* dst, Bitmap_004b9a50* bmp, int x, int y, double sx, double sy);
+void __stdcall ClipRects(Rect_004b9a50* other, Rect_004b9a50* rect, Rect_004b9a50* bounds);
 
 // FUNCTION: 0x4b9a50
-void __stdcall FUN_004b9a50(Class_004c6ae0* dst, Bitmap_004b9a50* bmp, int x, int y, double sx, double sy)
+void __stdcall DrawFrameScaled(Class_004c6ae0* dst, Bitmap_004b9a50* bmp, int x, int y, double sx, double sy)
 {
     Surface_004b9a50 screen;
     if (dst == 0) {
@@ -64,9 +64,9 @@ void __stdcall FUN_004b9a50(Class_004c6ae0* dst, Bitmap_004b9a50* bmp, int x, in
         for (int i = 0; i < (int)bmp->count; i++) {
             Bitmap_004b9a50* e = ((Bitmap_004b9a50**)bmp->field_10)[i];
             if (e->kind > 0)
-                FUN_004b9740(dst, e, x, y, sx, sy);
+                DrawFrameScaledBlended(dst, e, x, y, sx, sy);
             else
-                FUN_004b9a50(dst, e, x, y, sx, sy);
+                DrawFrameScaled(dst, e, x, y, sx, sy);
         }
     } else {
         Rect_004b9a50 src;
@@ -88,7 +88,7 @@ void __stdcall FUN_004b9a50(Class_004c6ae0* dst, Bitmap_004b9a50* bmp, int x, in
             int stepX = (bmp->width << 16) / w;
             int stepY = (bmp->height << 16) / h;
             dst->GetClipRect(&bounds);
-            FUN_004b7e60(&src, &dest, &bounds);
+            ClipRects(&src, &dest, &bounds);
             if (dest.right >= dest.left && dest.bottom >= dest.top && src.right >= src.left &&
                 src.bottom >= src.top) {
                 src.left = (int)(src.left / sx);
@@ -116,5 +116,5 @@ void __stdcall FUN_004b9a50(Class_004c6ae0* dst, Bitmap_004b9a50* bmp, int x, in
         }
     }
     if (dst == (Class_004c6ae0*)&screen)
-        FUN_004c5fa0(&screen);
+        UnlockScreen(&screen);
 }

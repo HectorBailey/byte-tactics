@@ -3,7 +3,7 @@
 // of the state, the scratch image at this->field_10 is cleared to its key
 // colour and the pieces are drawn into it (FUN_0045a610), the background image
 // is blitted over it, and the run length compressed result becomes the state's
-// sprite (FUN_004b9e60, then a one plane bitmap from the arena).
+// sprite (CompressFrame, then a one plane bitmap from the arena).
 #include <string.h>
 
 struct Image_0045a790 {
@@ -54,8 +54,8 @@ public:
     void FUN_0045a610(Image_0045a790* img, void* obj);
 };
 
-void __stdcall FUN_004b9d70(Image_0045a790* dst, Image_0045a790* src, int x, int y);
-int __stdcall FUN_004b9e60(unsigned char* dest, Image_0045a790* img);
+void __stdcall CutOutFrame(Image_0045a790* dst, Image_0045a790* src, int x, int y);
+int __stdcall CompressFrame(unsigned char* dest, Image_0045a790* img);
 
 // FUNCTION: 0x45a790
 void CMemoryCache::FUN_0045a790(State_0045a790* obj, Image_0045a790* dest)
@@ -69,8 +69,8 @@ void CMemoryCache::FUN_0045a790(State_0045a790* obj, Image_0045a790* dest)
     memset(scratch->pixels, scratch->key, h * w);
     memset(scratch->compressed, 0, h * w);
     ((Class_0045a610*)this)->FUN_0045a610(scratch, obj);
-    FUN_004b9d70(dest, scratch, 5, 0);
-    int size = FUN_004b9e60(scratch->compressed, scratch);
+    CutOutFrame(dest, scratch, 5, 0);
+    int size = CompressFrame(scratch->compressed, scratch);
     AllocBitmap(&obj->sprite, size, 1);
     Bitmap_00437b50* bmp = obj->sprite;
     memcpy(bmp->pixels, scratch->compressed, size);

@@ -8,7 +8,7 @@ int __stdcall FUN_004bbc40(char* path);
 void* __stdcall FUN_004bbe50(char* path, int flags);
 void __stdcall FatalError(char* path);
 void* __cdecl FUN_004d83b0(const char* name, int size);
-int __stdcall FUN_004cb080(char* path, void* data);
+int __stdcall LoadPcxPalette(char* path, void* data);
 int __stdcall FUN_004bc290(char* filename, void* data, int size);
 void __stdcall FUN_004bbc30(char* path);
 
@@ -31,7 +31,7 @@ void* __stdcall FUN_00429330(char* name)
     else {
         result = FUN_004d83b0("PALETTE", 0x400);
         FUN_004290f0(path, "palettes", name, "PCX");
-        if (FUN_004cb080(path, result) == 0) {
+        if (LoadPcxPalette(path, result) == 0) {
             FatalError(path);
         }
         FUN_004bc290(namepath, result, 0x400);

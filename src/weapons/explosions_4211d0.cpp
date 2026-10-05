@@ -171,8 +171,8 @@ struct Game {
 extern Game* g_game;
 
 int __stdcall PointInRect(void* rect, int x, int y);
-void* __stdcall FUN_004b7ee0(Pic_004211d0* pic);
-void* __stdcall FUN_004b7f30(unsigned short* table, int index);
+void* __stdcall GetGafSequenceFrame(Pic_004211d0* pic);
+void* __stdcall GetGafFrame(unsigned short* table, int index);
 void __stdcall FillPolygon(void* surface, Point_004211d0* points, int count, int flags);
 void __stdcall DrawFrameQuad(void* surface, void* pic, Point_004211d0* points, void* src);
 
@@ -231,10 +231,10 @@ void __stdcall FUN_004211d0(void* surface, Obj_00421170* obj, Inner_00421550* in
                 if (flags.bits.b) {
                     if (flags.bits.c) {
                         int player = *(int*)(*(int*)(obj->f0 + 0x96) + 0x27);
-                        pic = FUN_004b7f30(face->color,
+                        pic = GetGafFrame(face->color,
                             *(unsigned char*)(player + 0x96));
                     } else {
-                        pic = FUN_004b7ee0(&face->pic);
+                        pic = GetGafSequenceFrame(&face->pic);
                     }
                 } else {
                     pic = face->pic.pic;

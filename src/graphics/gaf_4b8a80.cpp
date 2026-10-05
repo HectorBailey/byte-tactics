@@ -29,7 +29,7 @@ struct Surface_004b8a80 {
 void __stdcall ResetClipRect(int* param_1);
 
 // FUNCTION: 0x4b8a80
-void __stdcall FUN_004b8a80(Surface_004b8a80* dst, Src_004b8a80* src)
+void __stdcall SurfaceFromFrame(Surface_004b8a80* dst, Src_004b8a80* src)
 {
     dst->width = src->width;
     dst->height = src->height;

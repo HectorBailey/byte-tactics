@@ -2,7 +2,7 @@
 
 // Fills a rectangle of `surface` with a solid `color` (FUN_004ccdea does the
 // fill). When `surface` is null the screen is locked with LockScreen,
-// drawn on and unlocked with FUN_004c5fa0. The rectangle is copied to a local
+// drawn on and unlocked with UnlockScreen. The rectangle is copied to a local
 // first, because ClipRectangle clips it in place. Sibling of 0x4bec70 and
 // 0x4bed70.
 
@@ -21,7 +21,7 @@ struct Surface_004bf6f0 {
 };
 
 int __stdcall LockScreen(Surface_004bf6f0* out);
-int __stdcall FUN_004c5fa0(Surface_004bf6f0* s);
+int __stdcall UnlockScreen(Surface_004bf6f0* s);
 int __stdcall ClipRectangle(Surface_004bf6f0* s, Rect_004bf6f0* r);
 void __cdecl FUN_004ccdea(Surface_004bf6f0* s, Rect_004bf6f0* r, int color);
 
@@ -37,7 +37,7 @@ int __stdcall FillRectangle(Surface_004bf6f0* surface, Rect_004bf6f0* rect, int 
             result = ClipRectangle(&screen, &r) != 0;
             if (result)
                 FUN_004ccdea(&screen, &r, color);
-            FUN_004c5fa0(&screen);
+            UnlockScreen(&screen);
         }
     } else {
         result = ClipRectangle(surface, &r) != 0;

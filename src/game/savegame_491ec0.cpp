@@ -92,7 +92,7 @@ Entry_00491ec0* __stdcall FUN_004a0280(Entry_00491ec0* entries, char* name);
 void __stdcall FUN_004a0570(Menu_00491ec0* menu, char* name, int value);
 void __stdcall FUN_004a0bf0(Menu_00491ec0* menu, char* name, char* text, int param_4);
 char* __stdcall FUN_004b6af0(char* table, int index);
-void __stdcall FUN_004b8ae0(void* dst, void* src);
+void __stdcall FrameFromSurface(void* dst, void* src);
 void __stdcall FreeSurface(void* image);
 void* __stdcall LoadSurface(Class_004b48a0* obj);
 Class_004b48a0* __stdcall FUN_00432520(char* name);
@@ -130,7 +130,7 @@ void __stdcall FUN_00491ec0()
                 FreeSurface(DAT_0051f2ec);
             DAT_0051f2ec = (char*)LoadSurface(file);
             if (DAT_0051f2ec != 0) {
-                FUN_004b8ae0(DAT_0051e6f8, DAT_0051f2ec);
+                FrameFromSurface(DAT_0051e6f8, DAT_0051f2ec);
                 radar->field_c2 = DAT_0051e6f8;
             }
             FUN_004a0570(menu, "RADAR", DAT_0051f2ec != 0);

@@ -1,7 +1,7 @@
 // Decompiled by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
 
 // Clears a dither pattern inside the clipped rectangle `rect` of `surface`, or
-// of the screen (locked with LockScreen and unlocked with FUN_004c5fa0) when
+// of the screen (locked with LockScreen and unlocked with UnlockScreen) when
 // `surface` is null. The rect is copied to a local first because the clip
 // helper ClipRectangle clips it in place. Rows alternate between the two byte
 // masks (which half of each dword is kept) according to the phase parity
@@ -33,7 +33,7 @@ struct Surface_004bff20 {
 };
 
 int __stdcall LockScreen(Surface_004bff20* out);
-int __stdcall FUN_004c5fa0(Surface_004bff20* s);
+int __stdcall UnlockScreen(Surface_004bff20* s);
 int __stdcall ClipRectangle(Surface_004bff20* s, Rect_004bff20* r);
 
 // FUNCTION: 0x4bff20
@@ -86,6 +86,6 @@ int __stdcall DitherRectangle(Surface_004bff20* surface, Rect_004bff20* rect, in
         }
     }
     if (surface == &screen)
-        FUN_004c5fa0(&screen);
+        UnlockScreen(&screen);
     return 1;
 }

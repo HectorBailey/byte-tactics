@@ -3,16 +3,16 @@
 // was check 5's branch (`jle` from the `locked > 0` spelling) versus the original's `je`. Every plain
 // spelling that emits `je` (`if (locked)`, `!= 0`, pointer/union aliases, literal types, wrappers)
 // let MSVC's tail merger cross-jump check 5's body into check 2's and drop a call site. The fix:
-// give Surface_004c5e70 an inlined method `void Unlock() { FUN_004c5fa0(this); }` and write check 5
+// give Surface_004c5e70 an inlined method `void Unlock() { UnlockScreen(this); }` and write check 5
 // as `if (locked) local.Unlock();`. The call still compiles to the original's `lea edx,[esp+0x6c];
-// push edx; call FUN_004c5fa0`, but the method's distinct IL body stops the merge, so check 5 keeps
+// push edx; call UnlockScreen`, but the method's distinct IL body stops the merge, so check 5 keeps
 // its own tail and the branch is `mov eax,[locked]; test eax,eax; je`. Check 2 stays a direct
-// `FUN_004c5fa0(&local)` call. (A method wrapper was the one construct that survived inlining as a
+// `UnlockScreen(&local)` call. (A method wrapper was the one construct that survived inlining as a
 // different-enough IL block; free-function wrappers, casts, self-assignments and union aliases all
 // collapsed back to the direct call and merged.)
 // Session claude-sonnet-5-5 (issue 4530): 86.3 -> 99.7 percent, 1183 of 1183 bytes. Four changes:
 // (1) Check 5 spelled `if (locked > 0)`: gives the original's `mov eax,[locked]; test eax,eax` AND keeps
-//     the fourth FUN_004c5fa0 call site (plain `if (locked)`, `!= 0`, `!locked`, `?:`, `&&` forms all let
+//     the fourth UnlockScreen call site (plain `if (locked)`, `!= 0`, `!locked`, `?:`, `&&` forms all let
 //     MSVC cross-jump the tail into check 2; `== 1` gave `cmp [locked],1`). The signed `> 0` is a
 //     different compare to the tail merger, but it emits `jle` where the original has `je`.
 // (2) The first walk ends `i = i - 1; if (i < 0) i = 3;` (not `i = j;`) and the second ends
@@ -49,10 +49,10 @@
 // five early-outs and the final unlock are the main gap. In the original, checks 1 (xmax<left)
 // and 4 (ymin>bottom) compile to `mov eax,[esp+0x18]; test eax,eax; je 0x4c7a12; jmp 0x4c7a08`
 // (test the locked flag, then jump INTO the final unlock body, which is `lea ecx,[esp+0x6c];
-// push ecx; call FUN_004c5fa0` at 0x4c7a08), while checks 2, 3 and 5 keep a full inline
+// push ecx; call UnlockScreen` at 0x4c7a08), while checks 2, 3 and 5 keep a full inline
 // unlock+epilogue (lea edx / lea eax / lea edx). That is the shape of jump threading through
-// `if (locked) { unlock_label: FUN_004c5fa0(&local); }` reached by `goto unlock_label` from
-// checks 1 and 4 only, with checks 2, 3 and 5 written as plain `if (locked) FUN_004c5fa0(&local);
+// `if (locked) { unlock_label: UnlockScreen(&local); }` reached by `goto unlock_label` from
+// checks 1 and 4 only, with checks 2, 3 and 5 written as plain `if (locked) UnlockScreen(&local);
 // return;` (compare 0x4c63a0 notes: its branch 1 also jumps into the single unlock body).
 // Also the LockScreen check is `cmp eax, ebp` (ebp holds 0) in the original but `test eax,eax`
 // for us: storing the result first (`int ok = LockScreen(&local); if (ok == 0) return;`) is
@@ -80,7 +80,7 @@
 // timebox; the declaration block is unchanged from the 64.3 percent version.
 // Session deepseek-v4.1-flash (3rd): the check-1/check-4 tails ARE reachable via a shared
 // block: writing them as `if (!locked) return; goto unlock_call;` with the label placed at the
-// FUN_004c5fa0 call inside the final `if (locked) { ... }` reproduces the original pair exactly
+// UnlockScreen call inside the final `if (locked) { ... }` reproduces the original pair exactly
 // (`test eax,eax / je <epilogue> / jmp <unlock_call>`, targets 0xa apart); it scores 63.1 percent
 // / 1161 bytes though, because the original also keeps full inline epilogues for checks 2, 3 and
 // 5 (2 more copies than we emit, the 22 remaining bytes), so the 64.3 percent form stays.
@@ -100,9 +100,9 @@
 // so the zero stores are dead; keeping them costs two extra `mov [esp+0x38/0x34], ebp` and
 // also moved clip out of 0x3c). 81.8 -> 83.7 percent, and the frame map now matches exactly.
 // (4) Checks 1 and 4 as `goto unlock;` with the label inside the final
-// `if (locked) { unlock: FUN_004c5fa0(&local); }`, and check 5 as a plain early-out spelled
+// `if (locked) { unlock: UnlockScreen(&local); }`, and check 5 as a plain early-out spelled
 // `if (locked == 1)`. The `== 1` is what keeps check 5's tail from being cross-jumped into
-// the shared unlock body: the original keeps FOUR FUN_004c5fa0 call sites (checks 2, 3, 5 and
+// the shared unlock body: the original keeps FOUR UnlockScreen call sites (checks 2, 3, 5 and
 // the final one) and threads only checks 1 and 4, which is exactly this shape.
 // Still open, 1182 vs 1183 bytes. Two hunks, both about which unlock tail check 5 keeps:
 // (a) Ours emits `cmp dword ptr [esp+0x18], 1 / jne` for check 5 where the original has
@@ -115,7 +115,7 @@
 // have, so it is not kept here; it is the strongest lead for whoever picks this up, and the
 // register rotation it papers over is the one the guide notes at 0x402da0 ("the loop has one
 // temporary more or fewer earlier on"). A fast filter (compile only, count the
-// FUN_004c5fa0 call sites, which the original has 4 of) over the 9^5 spellings of the five
+// UnlockScreen call sites, which the original has 4 of) over the 9^5 spellings of the five
 // early-outs is what found (4); 1137 of 59049 keep 4 calls and scoring all of them tops out
 // at this file.
 #include <windows.h>
@@ -147,10 +147,10 @@ struct Frame_004c7580 {
 };
 
 struct Surface_004c5e70;
-int __stdcall FUN_004c5fa0(Surface_004c5e70* s);
+int __stdcall UnlockScreen(Surface_004c5e70* s);
 struct Surface_004c5e70 {
     int data[12];
-    void Unlock() { FUN_004c5fa0(this); }
+    void Unlock() { UnlockScreen(this); }
 };
 
 class Class_004c6ae0 {
@@ -231,19 +231,19 @@ void __stdcall DrawFrameQuad(void* surf, Frame_004c7580* bmp,
 
     ((Class_004c6ae0*)surf)->GetClipRect(clip);
     if (xmax < clip[0]) {
-        if (locked) FUN_004c5fa0(&local);
+        if (locked) UnlockScreen(&local);
         return;
     }
     if (xmin > clip[2]) {
-        if (locked) FUN_004c5fa0(&local);
+        if (locked) UnlockScreen(&local);
         return;
     }
     if (ymax < clip[1]) {
-        if (locked) FUN_004c5fa0(&local);
+        if (locked) UnlockScreen(&local);
         return;
     }
     if (ymin > clip[3]) {
-        if (locked) FUN_004c5fa0(&local);
+        if (locked) UnlockScreen(&local);
         return;
     }
     if (ymin < clip[1])
@@ -351,6 +351,6 @@ void __stdcall DrawFrameQuad(void* surf, Frame_004c7580* bmp,
 
     if (locked) {
 unlock:
-        FUN_004c5fa0(&local);
+        UnlockScreen(&local);
     }
 }

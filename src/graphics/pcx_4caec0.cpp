@@ -18,10 +18,10 @@ struct Game_004caec0 {
 #pragma pack(pop)
 
 Game_004caec0* GetDisplay();
-int __stdcall FUN_004cac40(char* name, unsigned char* data, int width, int height, unsigned char* palette);
+int __stdcall WritePcx(char* name, unsigned char* data, int width, int height, unsigned char* palette);
 
 // FUNCTION: 0x4caec0
-void __stdcall FUN_004caec0(char* name, Bitmap_004caec0* bitmap)
+void __stdcall SaveSurfacePcx(char* name, Bitmap_004caec0* bitmap)
 {
     unsigned char pal[256 * 3];
     Game_004caec0* game = GetDisplay();
@@ -30,5 +30,5 @@ void __stdcall FUN_004caec0(char* name, Bitmap_004caec0* bitmap)
         pal[i * 3 + 1] = game->palette[i].peGreen;
         pal[i * 3 + 2] = game->palette[i].peBlue;
     }
-    FUN_004cac40(name, bitmap->data, bitmap->width, bitmap->height, pal);
+    WritePcx(name, bitmap->data, bitmap->width, bitmap->height, pal);
 }

@@ -57,10 +57,10 @@ struct Game {
 extern Game* g_game;
 
 void FUN_004843c0();
-void* __stdcall FUN_004b7f30(void* table, int index);
-void __stdcall FUN_004b7f90(void* surface, void* bmp, int x, int y);
-void __stdcall FUN_004b86e0(void* surface, void* bmp, int x, int y);
-void __stdcall FUN_004b88d0(void* surface, void* bmp, int x, int y, int color);
+void* __stdcall GetGafFrame(void* table, int index);
+void __stdcall DrawFrame(void* surface, void* bmp, int x, int y);
+void __stdcall DrawFrameGray(void* surface, void* bmp, int x, int y);
+void __stdcall EraseFrameDithered(void* surface, void* bmp, int x, int y, int color);
 void __stdcall FillRectangle(void* surface, Rect_004848e0* rect, int color);
 void __stdcall GrayRectangle(void* surface, Rect_004848e0* rect);
 void __stdcall DitherRectangle(void* surface, Rect_004848e0* rect, int color);
@@ -106,11 +106,11 @@ void __stdcall FUN_004848e0(void* surface)
             } else {
                 if (cell->level1 != 0) {
                     if (cell->level1 != 0xf) {
-                        void* bmp = FUN_004b7f30(g_game->gray[(i + j + q) & 3], cell->level1 - 1);
+                        void* bmp = GetGafFrame(g_game->gray[(i + j + q) & 3], cell->level1 - 1);
                         if (g_game->flags_37f06.ditheredFog) {
-                            FUN_004b88d0(surface, bmp, r.left, r.top, parity);
+                            EraseFrameDithered(surface, bmp, r.left, r.top, parity);
                         } else {
-                            FUN_004b86e0(surface, bmp, r.left, r.top);
+                            DrawFrameGray(surface, bmp, r.left, r.top);
                         }
                     } else {
                         if (g_game->flags_37f06.ditheredFog) {
@@ -121,8 +121,8 @@ void __stdcall FUN_004848e0(void* surface)
                     }
                 }
                 if (cell->level0 > 0) {
-                    void* bmp = FUN_004b7f30(g_game->black[(i + j + q) & 3], cell->level0 - 1);
-                    FUN_004b7f90(surface, bmp, r.left, r.top);
+                    void* bmp = GetGafFrame(g_game->black[(i + j + q) & 3], cell->level0 - 1);
+                    DrawFrame(surface, bmp, r.left, r.top);
                 }
             }
         }

@@ -59,7 +59,7 @@ struct Info_004c25e0 {
 int __stdcall LockPrimary(Info_004c25e0* info);
 void __cdecl BlitSurface(void* a, void* b, int x, int y);
 void __stdcall ResetClipRect(Desc_004c25e0* d);
-void __stdcall FUN_004b7f90(Desc_004c25e0* d, Sprite_004c25e0* s, int x, int y);
+void __stdcall DrawFrame(Desc_004c25e0* d, Sprite_004c25e0* s, int x, int y);
 int __stdcall UnlockPrimary(void* out, Rect_004c25e0* a, Rect_004c25e0* b);
 
 // FUNCTION: 0x4c25e0
@@ -90,7 +90,7 @@ void __stdcall FUN_004c25e0(App_004c25e0* app)
     BlitSurface(app->under, app->saved, app->savedX - x, app->savedY - y);
     BlitSurface(app->work, app->under, 0, 0);
     ResetClipRect(app->work);
-    FUN_004b7f90(app->work, app->sprite, app->sprite->dx, app->sprite->dy);
+    DrawFrame(app->work, app->sprite, app->sprite->dx, app->sprite->dy);
     BlitSurface(app->saved, app->work, x - app->savedX, y - app->savedY);
     r1.left = app->savedX;
     r1.top = app->savedY;

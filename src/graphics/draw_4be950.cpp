@@ -1,7 +1,7 @@
 // Decompiled by space-bunny-free. Names are provisional.
 
 // Draws into `surface`, or into the screen (locked with LockScreen and
-// unlocked with FUN_004c5fa0) when `surface` is null. ClipLine clips the
+// unlocked with UnlockScreen) when `surface` is null. ClipLine clips the
 // rectangle and FUN_004cc7ab fills it. Returns the lock result on the screen
 // path, so a failed lock returns 0 without ever unlocking.
 
@@ -13,7 +13,7 @@ struct Surface_004be950 {
 };
 
 int __stdcall LockScreen(Surface_004be950* out);
-int __stdcall FUN_004c5fa0(Surface_004be950* s);
+int __stdcall UnlockScreen(Surface_004be950* s);
 int __stdcall ClipLine(Surface_004be950* dst, int* a, int* b, int* c, int* d);
 void __cdecl FUN_004cc7ab(Surface_004be950* dst, int a, int b, int c, int d, int e);
 
@@ -28,7 +28,7 @@ int __stdcall DrawLine(Surface_004be950* surface, int x0, int y0, int x1, int y1
         if (ret) {
             if (ClipLine(&screen, &x0, &y0, &x1, &y1))
                 FUN_004cc7ab(&screen, x0, y0, x1, y1, color);
-            FUN_004c5fa0(&screen);
+            UnlockScreen(&screen);
         }
     } else {
         if (ClipLine(surface, &x0, &y0, &x1, &y1))

@@ -29,7 +29,7 @@ struct Obj_004c67c0 {
 #pragma pack(pop)
 
 void __stdcall DrawSurface(void* dst, void* bmp, int x, int y);
-void __stdcall FUN_004b7f90(void* dst, Bitmap_004c67c0* bmp, int x, int y);
+void __stdcall DrawFrame(void* dst, Bitmap_004c67c0* bmp, int x, int y);
 
 // FUNCTION: 0x4c67c0
 void __stdcall DrawCursor(Obj_004c67c0* obj, void* dst)
@@ -41,6 +41,6 @@ void __stdcall DrawCursor(Obj_004c67c0* obj, void* dst)
         obj->x = obj->rect_x - obj->bmp->dx;
         obj->y = obj->rect_y - obj->bmp->dy;
         DrawSurface(obj->field_1be, dst, -obj->x, -obj->y);
-        FUN_004b7f90(dst, obj->bmp, obj->rect_x, obj->rect_y);
+        DrawFrame(dst, obj->bmp, obj->rect_x, obj->rect_y);
     }
 }

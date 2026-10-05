@@ -2,7 +2,7 @@
 
 // Translates every pixel of `rect` in `surface` through the byte table at
 // g_game+0xcc (FUN_004cced5), or in the locked screen (LockScreen /
-// FUN_004c5fa0) when `surface` is 0. The rect is copied to a local first
+// UnlockScreen) when `surface` is 0. The rect is copied to a local first
 // because the clip helper ClipRectangle clips it in place. The locked path
 // returns the lock result.
 //
@@ -88,7 +88,7 @@ struct Game_004bfe10 {
 
 Game_004bfe10* GetDisplay();
 int __stdcall LockScreen(Surface_004bfe10* out);
-int __stdcall FUN_004c5fa0(Surface_004bfe10* s);
+int __stdcall UnlockScreen(Surface_004bfe10* s);
 int __stdcall ClipRectangle(void* s, Rect_004bfe10* r);
 void __cdecl FUN_004cced5(int dst, int pitch, int w, int h, int table);
 
@@ -109,7 +109,7 @@ int __stdcall GrayRectangle(Surface_004bfe10* surface, Rect_004bfe10* rect)
                 FUN_004cced5(r.top * screen.pitch + r.left + (int)screen.pixels,
                              screen.pitch, r.right - r.left + 1,
                              r.bottom - r.top + 1, g->field_cc);
-            FUN_004c5fa0(&screen);
+            UnlockScreen(&screen);
         }
     } else {
         if (ClipRectangle(surface, &r))

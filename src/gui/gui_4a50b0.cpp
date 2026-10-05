@@ -19,7 +19,7 @@ struct Class_0051fba4 {
 
 extern Class_0051fba4* DAT_0051fba4;
 
-void* __stdcall FUN_004b7f30(void* a, int b);
+void* __stdcall GetGafFrame(void* a, int b);
 int GetFontHeight();
 
 // FUNCTION: 0x4a50b0
@@ -28,5 +28,5 @@ int FUN_004a50b0()
     if (DAT_0051fba4->font == 0) {
         return GetFontHeight();
     }
-    return ((Glyph_004a50b0*)FUN_004b7f30(DAT_0051fba4->font->glyphs, 'I'))->height + 2;
+    return ((Glyph_004a50b0*)GetGafFrame(DAT_0051fba4->font->glyphs, 'I'))->height + 2;
 }

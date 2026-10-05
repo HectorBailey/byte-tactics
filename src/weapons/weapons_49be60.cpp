@@ -168,14 +168,14 @@ struct Game {
 
 extern Game* g_game;
 
-void* __stdcall FUN_004b7f30(void* gaf, int frame);
-void __stdcall FUN_004b7f90(void* dest, void* src, int x, int y);
-void __stdcall FUN_004b8500(void* dest, void* src, int x, int y);
+void* __stdcall GetGafFrame(void* gaf, int frame);
+void __stdcall DrawFrame(void* dest, void* src, int x, int y);
+void __stdcall DrawFrameBlended(void* dest, void* src, int x, int y);
 void __stdcall FUN_0046bae0(void* dest, Vec3_0049be60* pos, void* sprite, void* rect);
 int __stdcall PointInRect(void* region, int x, int y);
-void __stdcall FUN_004b9360(void* dest, void* src, int x, int y);
+void __stdcall DrawLens(void* dest, void* src, int x, int y);
 void __stdcall DrawLine(void* dest, int x1, int y1, int x2, int y2, unsigned int color);
-int __stdcall FUN_004b7f60(void* gaf);
+int __stdcall GetGafFrameCount(void* gaf);
 int __stdcall FUN_00408090(PlayerInfo_0049be60* pi, Vec3_0049be60* pos);
 
 
@@ -203,7 +203,7 @@ void __stdcall FUN_0049be60(void* surface)
     Vec3_0049be60 d;
     __int64 n64;
     int time = g_game->time;
-    void* frame0 = FUN_004b7f30(g_game->gaf_1480f, 0);
+    void* frame0 = GetGafFrame(g_game->gaf_1480f, 0);
     int index = 0;
     int visible;
     if (g_game->projectileCount <= 0)
@@ -269,7 +269,7 @@ void __stdcall FUN_0049be60(void* surface)
                     sp.z = p->pos.z - (g_game->scrollY << 16);
                     int sx = 0x80 + (int)*(short*)((char*)&sp + 2);
                     int sy = (int)*(short*)((char*)&sp + 10) - ((unsigned short)p->field_5e >> 1) + 0x20;
-                    FUN_004b8500(surface, frame0, sx, sy);
+                    DrawFrameBlended(surface, frame0, sx, sy);
                     Angles_0049be60 rot = p->angles;
                     rot.y += 0x8000;
                     rot.z += 0x8000;
@@ -290,14 +290,14 @@ void __stdcall FUN_0049be60(void* surface)
                              - (short)g_game->scrollY + 0x20;
                     if (PointInRect(g_game->field_37e27, sx, sy) == 0)
                         return;
-                    FUN_004b9360(surface, g_game->field_1ab9b, sx, sy);
+                    DrawLens(surface, g_game->field_1ab9b, sx, sy);
                 } else if (type->field_10c == 3) {
                     sp.x = pos->x - (g_game->scrollX << 16);
                     sp.y = p->pos.y;
                     sp.z = p->pos.z - (g_game->scrollY << 16);
                     int sx = (int)*(short*)((char*)&sp + 2) + 0x80;
                     int sy = (int)*(short*)((char*)&sp + 10) - ((unsigned short)p->field_5e >> 1) + 0x20;
-                    FUN_004b8500(surface, frame0, sx, sy);
+                    DrawFrameBlended(surface, frame0, sx, sy);
                     Angles_0049be60 rot3;
                     FUN_0046bae0(surface, &sp, type->field_74, &rot3);
                 } else if (type->field_10c == 4) {
@@ -306,7 +306,7 @@ void __stdcall FUN_0049be60(void* surface)
                         sp.x = pos->x - (g_game->scrollX << 16);
                         sp.y = p->pos.y;
                         sp.z = p->pos.z - (g_game->scrollY << 16);
-                        FUN_004b8500(surface, frame0,
+                        DrawFrameBlended(surface, frame0,
                                      (int)*(short*)((char*)&sp + 2) + 0x80,
                                      (int)*(short*)((char*)&sp + 10) - ((unsigned short)p->field_5e >> 1) + 0x20);
                         int sy = ((int)*(short*)((char*)&sp + 10)
@@ -321,7 +321,7 @@ void __stdcall FUN_0049be60(void* surface)
                         }
                         if (gaf) {
                             int n = *(unsigned short*)gaf;
-                            FUN_004b7f90(surface, FUN_004b7f30(gaf, (time - p->field_42) % n), sx, sy);
+                            DrawFrame(surface, GetGafFrame(gaf, (time - p->field_42) % n), sx, sy);
                         }
                     }
                 } else if (type->field_10c == 5) {
@@ -330,10 +330,10 @@ void __stdcall FUN_0049be60(void* surface)
                               - ((int)*(short*)((char*)pos + 6) >> 1))
                              - (short)g_game->scrollY + 0x20;
                     void* gaf = g_game->gaf_147f3;
-                    int n = FUN_004b7f60(gaf);
+                    int n = GetGafFrameCount(gaf);
                     fr = n - ((p->field_46 - time) * n) / (int)type->field_e6;
                     if (fr >= 0 && fr < n) {
-                        FUN_004b8500(surface, FUN_004b7f30(gaf, fr), sx, sy);
+                        DrawFrameBlended(surface, GetGafFrame(gaf, fr), sx, sy);
                     }
                 } else if (type->field_10c == 6) {
                     sp.x = pos->x - (g_game->scrollX << 16);
@@ -341,7 +341,7 @@ void __stdcall FUN_0049be60(void* surface)
                     sp.z = p->pos.z - (g_game->scrollY << 16);
                     int sy = (int)*(short*)((char*)&sp + 10) - ((unsigned short)p->field_5e >> 1) + 0x20;
                     int sx = (int)*(short*)((char*)&sp + 2) + 0x80;
-                    FUN_004b8500(surface, frame0, sx, sy);
+                    DrawFrameBlended(surface, frame0, sx, sy);
                     FUN_0046bae0(surface, &sp, type->field_74, &p->angles);
                 } else if (type->field_10c == 7) {
                     unsigned int color = g_game->palette[type->field_10d];

@@ -126,15 +126,15 @@ int __stdcall FUN_004a1810(Entry_00478790* entries, int index);
 void __stdcall FUN_0049fa90(Window_00478790* window);
 void __stdcall FUN_0049fad0(Window_00478790* window);
 unsigned int __cdecl GetTicks();
-int __stdcall FUN_004b7f30(unsigned short* param_1, int param_2);
-void __stdcall FUN_004b7f90(void* surface, Frame_00478790* frame, int x, int y);
+int __stdcall GetGafFrame(unsigned short* param_1, int param_2);
+void __stdcall DrawFrame(void* surface, Frame_00478790* frame, int x, int y);
 char* __stdcall FUN_004c5740(const char* key);
 int GetTextKeyColor();
 void __stdcall SetTextColors(int param_1, int param_2);
 void __stdcall FillRectangle(void* surface, Rect_00478790* rect, int colour);
 void __stdcall DrawString(void* surface, const char* text, int x, int y,
                             int maxWidth);
-void* __stdcall FUN_004b8d40(void* gaf, const char* name);
+void* __stdcall FindGafEntry(void* gaf, const char* name);
 void __stdcall FUN_004aff00(void* menu);
 
 // FUNCTION: 0x478790
@@ -181,7 +181,7 @@ void __stdcall FUN_00478790(Window_00478790* arg1, Item_00478790* arg2)
     if (arg2->gaf != 0) {
         int total = 0;
         for (int j = 0; j < *(unsigned short*)arg2->gaf; j++)
-            total += ((Frame_00478790*)FUN_004b7f30((unsigned short*)arg2->gaf, j))->width;
+            total += ((Frame_00478790*)GetGafFrame((unsigned short*)arg2->gaf, j))->width;
 
         if (DAT_0051e678 < (int)GetTicks()) {
             DAT_0051e674++;
@@ -203,7 +203,7 @@ void __stdcall FUN_00478790(Window_00478790* arg1, Item_00478790* arg2)
         int now = (int)GetTicks();
         int idx = now / 3 % *(unsigned short*)gaf;
         arg2->frame = (short)idx;
-        Frame_00478790* f = (Frame_00478790*)FUN_004b7f30((unsigned short*)gaf, arg2->frame);
+        Frame_00478790* f = (Frame_00478790*)GetGafFrame((unsigned short*)gaf, arg2->frame);
         if (f == 0)
             return;
 
@@ -216,22 +216,22 @@ void __stdcall FUN_00478790(Window_00478790* arg1, Item_00478790* arg2)
         int n = *(unsigned short*)arg2->gaf;
         for (int k = 0; k <= n; k++) {
             Frame_00478790* fr =
-                (Frame_00478790*)FUN_004b7f30((unsigned short*)arg2->gaf, k % n);
+                (Frame_00478790*)GetGafFrame((unsigned short*)arg2->gaf, k % n);
             fr->xoffset = 0;
             fr->yoffset = 0;
-            FUN_004b7f90(surface, fr, x, y);
+            DrawFrame(surface, fr, x, y);
             x += fr->width;
             n = *(unsigned short*)arg2->gaf;
         }
 
         void* panGaf = arg1->table->entries->gaf;
-        void* pan = FUN_004b8d40(panGaf, "Panmask");
+        void* pan = FindGafEntry(panGaf, "Panmask");
         Unit* unit =
             g_game->players[g_game->localPlayer].unit;
-        Frame_00478790* pf = (Frame_00478790*)FUN_004b7f30((unsigned short*)pan, unit->side);
+        Frame_00478790* pf = (Frame_00478790*)GetGafFrame((unsigned short*)pan, unit->side);
         pf->yoffset = 0;
         pf->xoffset = 0;
-        FUN_004b7f90(surface, pf, 0, 0);
+        DrawFrame(surface, pf, 0, 0);
     } else {
         FUN_0049fa90(arg1);
     }

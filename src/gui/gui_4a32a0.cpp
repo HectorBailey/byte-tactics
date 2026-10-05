@@ -64,7 +64,7 @@ extern Root_004a32a0* DAT_0051fba4;
 
 void __stdcall FatalError(char* msg);
 int GetFontHeight();
-int __stdcall FUN_004b7f30(unsigned short* glyphs, int c);
+int __stdcall GetGafFrame(unsigned short* glyphs, int c);
 void __stdcall FUN_004a03f0(Root_004a32a0* menu, int index, int value);
 void __stdcall FUN_004a3ef0(Root_004a32a0* param_1, int param_2);
 
@@ -74,7 +74,7 @@ void __stdcall FUN_004a3ef0(Root_004a32a0* param_1, int param_2);
 static inline int FontHeight_004a32a0() {
     if (DAT_0051fba4->language == 0)
         return GetFontHeight();
-    return (int)((Glyph_004a32a0*)FUN_004b7f30(DAT_0051fba4->language->glyphs, 0x49))->height + 2;
+    return (int)((Glyph_004a32a0*)GetGafFrame(DAT_0051fba4->language->glyphs, 0x49))->height + 2;
 }
 
 // The entry search of 0x4a0180, 0x4a0200, 0x4a0280 and 0x4a35a0.

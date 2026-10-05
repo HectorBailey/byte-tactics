@@ -29,7 +29,7 @@ struct Obj_004c24b0 {
 
 int __stdcall LockPrimary(Surface_004c24b0* s);
 void __cdecl BlitSurface(void* dst, void* src, int x, int y);
-void __stdcall FUN_004b7f90(void* dst, Bitmap_004c24b0* bmp, int x, int y);
+void __stdcall DrawFrame(void* dst, Bitmap_004c24b0* bmp, int x, int y);
 int __stdcall UnlockPrimary(Surface_004c24b0* s, RECT* r, int b);
 
 // FUNCTION: 0x4c24b0
@@ -49,7 +49,7 @@ void __stdcall FUN_004c24b0(Obj_004c24b0* obj)
             obj->field_1be[1] = obj->bmp->height;
             obj->field_1be[2] = obj->bmp->width;
             BlitSurface(obj->field_1be, &s, -obj->x, -obj->y);
-            FUN_004b7f90(&s, obj->bmp, obj->rect_x, obj->rect_y);
+            DrawFrame(&s, obj->bmp, obj->rect_x, obj->rect_y);
             r.left = obj->x;
             r.top = obj->y;
             r.right = r.left + obj->bmp->width;

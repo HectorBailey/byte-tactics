@@ -106,7 +106,7 @@ void __stdcall FadeRectangle(void* surface, Rect_004948e0* rect, int level);
 void __stdcall FUN_004a50e0(void* surface, char* text, int x, int y, int maxw, int style);
 int __stdcall FUN_004a5030(char* text);
 char* __stdcall FUN_004c5740(char* name);
-void* __stdcall FUN_004b7f30(void* glyphs, int c);
+void* __stdcall GetGafFrame(void* glyphs, int c);
 void __stdcall DrawFrameQuad(void* surface, void* pic, Quad_004948e0* dst, Quad_004948e0* src);
 int __cdecl sprintf(char* buf, char* fmt, ...);
 
@@ -203,7 +203,7 @@ void __stdcall FUN_004948e0(void* surface)
                 FadeRectangle(surface, &hr, 0x1f);
                 FadeRectangle(surface, &hr, 0x14);
             }
-            unsigned short* frame = (unsigned short*)FUN_004b7f30(
+            unsigned short* frame = (unsigned short*)GetGafFrame(
                 (void*)g_game->field_148db, p->data->field_96);
 
             src.p[1].x = frame[0] - 1;

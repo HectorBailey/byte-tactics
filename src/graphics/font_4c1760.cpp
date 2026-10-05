@@ -2,7 +2,7 @@
 // Draws `text` horizontally centred: it sums the glyph widths from the font at
 // singleton+0x204 (the body of GetTextWidth, inlined) and passes
 // (rect.width - width) / 2 to DrawString. With a null `dst` it locks the
-// screen rect with LockScreen and unlocks it with FUN_004c5fa0 afterwards.
+// screen rect with LockScreen and unlocks it with UnlockScreen afterwards.
 //
 // MATCH (201 of 201 bytes, Claude Sonnet 5.5 #694). The SIB base/index swap at
 // 0x4c17ba (`mov al, [edx + ecx]` against `[ecx + edx]`) was not compiler state
@@ -32,7 +32,7 @@ int GetDisplay(void);
 int __stdcall LockScreen(Rect_004c1760* out);
 int __stdcall DrawString(Rect_004c1760* dst, unsigned char* text, int x,
                            int a, int b);
-int __stdcall FUN_004c5fa0(Rect_004c1760* buf);
+int __stdcall UnlockScreen(Rect_004c1760* buf);
 
 // Width in pixels of a line of text in a bitmap font (GetTextWidth, inlined).
 static inline int WidthText(Font_004c1760* font, unsigned char* text)
@@ -62,7 +62,7 @@ void __stdcall DrawStringCentered(int* dst, unsigned char* text, int flag)
         Rect_004c1760 r;
         if (LockScreen(&r) != 0) {
             DrawString(&r, text, (r.data[0] - width) >> 1, flag, -1);
-            FUN_004c5fa0(&r);
+            UnlockScreen(&r);
         }
     } else {
         DrawString((Rect_004c1760*)dst, text, (*dst - width) >> 1, flag, -1);

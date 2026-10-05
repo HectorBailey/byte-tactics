@@ -2,7 +2,7 @@
 // Sibling of 0x4c6d20 using the blitter at 0x4cbef1 (hand-written assembly
 // in the gap region starting at 0x4cbbe0): draws into `dst`, or, when `dst`
 // is null, into the screen: lock it with LockScreen, draw, then unlock.
-// The unlock is FUN_004c5fa0 inlined; its Unlock call goes through a method
+// The unlock is UnlockScreen inlined; its Unlock call goes through a method
 // of the embedded screen struct, which is why the tested surface pointer is
 // copied (and re-read in 0x4c5fa0 itself).
 #include <ddraw.h>

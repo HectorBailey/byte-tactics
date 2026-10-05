@@ -20,7 +20,7 @@ struct Obj_004c2380 {
 #pragma pack(pop)
 
 Obj_004c2380* GetDisplay();
-void __stdcall FUN_004b7f90(void* param_1, short* param_2, int x, int y);
+void __stdcall DrawFrame(void* param_1, short* param_2, int x, int y);
 
 static inline void GetRect(Rect_004c2380* out)
 {
@@ -35,6 +35,6 @@ void FUN_004c2380()
     if (obj->mode != 1 && obj->count <= 0) {
         Rect_004c2380 r;
         GetRect(&r);
-        FUN_004b7f90(0, obj->image, r.x, r.y);
+        DrawFrame(0, obj->image, r.x, r.y);
     }
 }

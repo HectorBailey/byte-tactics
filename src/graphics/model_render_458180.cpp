@@ -7,7 +7,7 @@ public:
     int InitCache(unsigned int size);
 };
 
-void* __stdcall FUN_004b8e00(const char* name, int width, int height);
+void* __stdcall AllocDepthFrame(const char* name, int width, int height);
 
 class Class_00458180 {
 public:
@@ -22,6 +22,6 @@ int Class_00458180::FUN_00458180(unsigned int size)
 {
     if (!((CMemoryCache*)this)->InitCache(size))
         return 0;
-    buffer = FUN_004b8e00("CompositeBuffer", 600, 600);
+    buffer = AllocDepthFrame("CompositeBuffer", 600, 600);
     return buffer != 0;
 }

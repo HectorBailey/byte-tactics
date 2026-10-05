@@ -100,8 +100,8 @@ void __stdcall SetFont(int id);
 void __stdcall FUN_004a23b0(Entry_004a2580* base, int index, int* r1, int* r2);
 void __stdcall FUN_004b0510(void* surface, int* r, int a, int b, int c);
 void __stdcall FUN_004b0590(void* surface, int* r, int a, int b, int c);
-Glyph_004a2580* __stdcall FUN_004b7f30(unsigned short* glyphs, int c);
-void __stdcall FUN_004b7f90(void* surface, void* glyph, int x, int y);
+Glyph_004a2580* __stdcall GetGafFrame(unsigned short* glyphs, int c);
+void __stdcall DrawFrame(void* surface, void* glyph, int x, int y);
 int GetTextKeyColor();
 void __stdcall SetTextColors(int a, int b);
 int GetFont();
@@ -153,7 +153,7 @@ void __stdcall FUN_004a2480(Class_004a2480* param_1, int index)
     void* surface = base->surface;
     Entry_004a2480* e = &base[index];
     unsigned short* glyphs = e->glyphs;
-    Glyph_004a2580* glyph = FUN_004b7f30(glyphs, 0);
+    Glyph_004a2580* glyph = GetGafFrame(glyphs, 0);
     int x = e->x;
     int y = e->y + e->h / 2;
     if (glyph != 0)
@@ -162,17 +162,17 @@ void __stdcall FUN_004a2480(Class_004a2480* param_1, int index)
         y = e->y;
     int limit = e->x + e->w;
     if (glyph != 0)
-        FUN_004b7f90(surface, glyph, x, y);
+        DrawFrame(surface, glyph, x, y);
     x += glyph->width;
-    Glyph_004a2580* mid = FUN_004b7f30(glyphs, 1);
+    Glyph_004a2580* mid = GetGafFrame(glyphs, 1);
     if (x + mid->width < limit) {
         do {
-            FUN_004b7f90(surface, mid, x, y);
+            DrawFrame(surface, mid, x, y);
             x += mid->width;
         } while (x + mid->width < limit);
     }
-    Glyph_004a2580* last = FUN_004b7f30(glyphs, 2);
-    FUN_004b7f90(surface, last, limit - last->width, y);
+    Glyph_004a2580* last = GetGafFrame(glyphs, 2);
+    DrawFrame(surface, last, limit - last->width, y);
 }
 
 // FUNCTION: 0x4a2580
@@ -213,19 +213,19 @@ void __stdcall FUN_004a2580(Object_004a2580* obj, int index)
             int y = e->y;
             int x = e->x;
             int limit = y + e->h - 1;
-            g = FUN_004b7f30(e->glyphs, e->field_152);
+            g = GetGafFrame(e->glyphs, e->field_152);
             if (g != 0)
-                FUN_004b7f90(surf, g, x, y);
+                DrawFrame(surf, g, x, y);
             y += g->height;
-            g = FUN_004b7f30(e->glyphs, e->field_152 + 1);
+            g = GetGafFrame(e->glyphs, e->field_152 + 1);
             while (y + g->height <= limit) {
-                FUN_004b7f90(surf, g, x, y);
+                DrawFrame(surf, g, x, y);
                 y += g->height;
             }
-            g = FUN_004b7f30(e->glyphs, e->field_152 + 2);
-            FUN_004b7f90(surf, g, x, limit - g->height + 1);
+            g = GetGafFrame(e->glyphs, e->field_152 + 2);
+            DrawFrame(surf, g, x, limit - g->height + 1);
             x += g->width / 2;
-            g = FUN_004b7f30(e->glyphs, e->field_152 + 3);
+            g = GetGafFrame(e->glyphs, e->field_152 + 3);
             x -= g->width / 2;
             int ybase = e->off + e->y + 3;
             int lc = min(e->h - 6, e->size);
@@ -234,40 +234,40 @@ void __stdcall FUN_004a2580(Object_004a2580* obj, int index)
             limit = min(limit, t);
             if (ybase > limit - lc + 1)
                 ybase = limit - lc + 1;
-            FUN_004b7f90(surf, g, x, ybase);
+            DrawFrame(surf, g, x, ybase);
             lc -= g->height;
             ybase += g->height;
-            g = FUN_004b7f30(e->glyphs, e->field_152 + 4);
+            g = GetGafFrame(e->glyphs, e->field_152 + 4);
             while (ybase <= limit - g->height) {
-                FUN_004b7f90(surf, g, x, ybase);
+                DrawFrame(surf, g, x, ybase);
                 ybase += g->height;
                 lc -= g->height;
             }
-            FUN_004b7f90(surf, g, x, limit - g->height);
-            g = FUN_004b7f30(e->glyphs, e->field_152 + 5);
-            FUN_004b7f90(surf, g, x, limit - g->height + 1);
+            DrawFrame(surf, g, x, limit - g->height);
+            g = GetGafFrame(e->glyphs, e->field_152 + 5);
+            DrawFrame(surf, g, x, limit - g->height + 1);
         } else {
             void* surf = Surface_004a2580(obj);
             int x = e->x;
             int y = e->y;
             int limit = x + e->w - 1;
-            g = FUN_004b7f30(e->glyphs, e->field_152);
+            g = GetGafFrame(e->glyphs, e->field_152);
             if (g != 0)
-                FUN_004b7f90(surf, g, x, y);
+                DrawFrame(surf, g, x, y);
             x += g->width;
-            g = FUN_004b7f30(e->glyphs, e->field_152 + 1);
+            g = GetGafFrame(e->glyphs, e->field_152 + 1);
             while (x + g->width <= limit) {
-                FUN_004b7f90(surf, g, x, y);
+                DrawFrame(surf, g, x, y);
                 x += g->width;
             }
-            g = FUN_004b7f30(e->glyphs, e->field_152 + 2);
-            FUN_004b7f90(surf, g, limit - g->width + 1, y);
+            g = GetGafFrame(e->glyphs, e->field_152 + 2);
+            DrawFrame(surf, g, limit - g->width + 1, y);
             y += g->height / 2;
-            g = FUN_004b7f30(e->glyphs, e->field_152 + 3);
+            g = GetGafFrame(e->glyphs, e->field_152 + 3);
             y -= g->height / 2;
             int a = e->off + e->x + 3;
             a = min(a, limit - g->width - 2);
-            FUN_004b7f90(surf, g, a, y);
+            DrawFrame(surf, g, a, y);
         }
     }
 
@@ -299,7 +299,7 @@ void __stdcall FUN_004a2580(Object_004a2580* obj, int index)
                 char* p = text;
                 for (; *p != 0; p++) {
                     unsigned char c = *p;
-                    g = FUN_004b7f30((unsigned short*)DAT_0051fba4->font->glyphs, c);
+                    g = GetGafFrame((unsigned short*)DAT_0051fba4->font->glyphs, c);
                     if (g != 0)
                         total += g->width;
                 }
@@ -308,7 +308,7 @@ void __stdcall FUN_004a2580(Object_004a2580* obj, int index)
         if (DAT_0051fba4->font == 0)
             GetFontHeight();
         else
-            FUN_004b7f30((unsigned short*)DAT_0051fba4->font->glyphs, 0x49);
+            GetGafFrame((unsigned short*)DAT_0051fba4->font->glyphs, 0x49);
         DrawString(surface, buf, e->x + e->w + 2, e->y + 4, -1);
     }
 

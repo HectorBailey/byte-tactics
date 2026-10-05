@@ -34,10 +34,10 @@ Game_004cb170* GetDisplay();
 int __stdcall FUN_004bc4b0(const char* path, FindData_004cb170* fd, int a, int b);
 int __stdcall FUN_004bc640(int handle, FindData_004cb170* fd);
 void __stdcall FUN_004bc8d0(int handle);
-int __stdcall FUN_004cac40(char* name, unsigned char* data, int width, int height, unsigned char* palette);
+int __stdcall WritePcx(char* name, unsigned char* data, int width, int height, unsigned char* palette);
 
 // FUNCTION: 0x4cb170
-int __stdcall FUN_004cb170(char* param_1, char* param_2)
+int __stdcall SaveScreenshot(char* param_1, char* param_2)
 {
     Game_004cb170* game = GetDisplay();
     int flag = 0;
@@ -78,5 +78,5 @@ int __stdcall FUN_004cb170(char* param_1, char* param_2)
         pal[i * 3 + 1] = g->palette[i].peGreen;
         pal[i * 3 + 2] = g->palette[i].peBlue;
     }
-    return FUN_004cac40(filename, bitmap->data, bitmap->width, bitmap->height, pal);
+    return WritePcx(filename, bitmap->data, bitmap->width, bitmap->height, pal);
 }

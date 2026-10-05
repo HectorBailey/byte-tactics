@@ -244,7 +244,7 @@ void __stdcall FUN_004a81e0(Gui_00449bb0* gui, int value);
 Layer_00449bb0* __stdcall FUN_004aa8f0(Gui_00449bb0* gui, const char* name, int size);
 int __stdcall FUN_004ab060(Gui_00449bb0* gui, char* name);
 void __stdcall FatalError(char* message);
-void* __stdcall FUN_004b8d40(void* gaf, const char* name);
+void* __stdcall FindGafEntry(void* gaf, const char* name);
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
 
 // The ENERGY slider handler at 0x445d60, which has no callers: /Ob2 inlined it.
@@ -442,7 +442,7 @@ void FUN_00449bb0()
 
     if (FUN_004ab060(&g_game->gui, "LOUNGE2.GUI")) {
         Gadget_00449bb0* start = FUN_004a0280(layer->entries, "battlestart");
-        start->anim.frames = FUN_004b8d40(layer->entries->head.gaf, "battlestart");
+        start->anim.frames = FindGafEntry(layer->entries->head.gaf, "battlestart");
         start->frame = 0;
         start->c8_0 = 1;
         FUN_004a0570(&g_game->gui, "battlestart", 1);

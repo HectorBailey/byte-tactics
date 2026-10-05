@@ -117,8 +117,8 @@ void __stdcall FUN_004a32a0(Menu_0041f0a0* menu, char* name, int items, int coun
 Entry_0041f0a0* __stdcall FUN_004a0200(char* entries, char* name);
 void __stdcall FUN_004a2e40(Menu_0041f0a0* menu, char* name, int index);
 void FUN_00477410();
-int __stdcall FUN_004b7f30(unsigned short* param_1, int param_2);
-void __stdcall FUN_004b7f90(void* param_1, int param_2, int x, int y);
+int __stdcall GetGafFrame(unsigned short* param_1, int param_2);
+void __stdcall DrawFrame(void* param_1, int param_2, int x, int y);
 void __stdcall FUN_004a0bf0(Menu_0041f0a0* menu, char* name, char* text, int param_4);
 void __stdcall FUN_0049fb10(Menu_0041f0a0* menu, int value);
 void __stdcall FUN_004a81e0(Menu_0041f0a0* menu, int value);
@@ -180,9 +180,9 @@ void __stdcall FUN_0041f0a0()
     Player_0041f0a0* player = &g_game->players[g_game->localPlayer];
     int x = g_game->width / 2;
     if (g_game->field_391af != 0 && (player->active == 0 || !(player->owner->flags & 0x40))) {
-        FUN_004b7f90(layer->surface, FUN_004b7f30(g_game->image_14813, 0), x, 0x1c);
+        DrawFrame(layer->surface, GetGafFrame(g_game->image_14813, 0), x, 0x1c);
     } else {
-        FUN_004b7f90(layer->surface, FUN_004b7f30(g_game->image_14817, 0), x, 0x1c);
+        DrawFrame(layer->surface, GetGafFrame(g_game->image_14817, 0), x, 0x1c);
     }
     if (g_game->flag4)
         FUN_004a0bf0(&g_game->menu, "MainMenu", "OK", 0);

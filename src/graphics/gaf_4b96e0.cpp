@@ -20,7 +20,7 @@ struct Image_004b96e0 {
 Palette_004b96e0* GetDisplay();
 
 // FUNCTION: 0x4b96e0
-void __stdcall FUN_004b96e0(Image_004b96e0* image, unsigned char level)
+void __stdcall TintFrameBelow(Image_004b96e0* image, unsigned char level)
 {
     unsigned char* p = image->data;
     unsigned char* m = image->mask;

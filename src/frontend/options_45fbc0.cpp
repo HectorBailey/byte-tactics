@@ -20,7 +20,7 @@ void __stdcall SetPaletteColors(unsigned char* palette, int first, int count);
 void __stdcall SetOffscreenSurface(int param_1);
 int __stdcall LockScreen(Surface_0045fbc0* out);
 void __stdcall FillSurface(Surface_0045fbc0* surface, int color);
-int __stdcall FUN_004c5fa0(Surface_0045fbc0* s);
+int __stdcall UnlockScreen(Surface_0045fbc0* s);
 void FlipScreen();
 
 // FUNCTION: 0x45fbc0
@@ -34,7 +34,7 @@ void FUN_0045fbc0()
     SetOffscreenSurface(g_game->field_37e1b);
     if (LockScreen(&screen)) {
         FillSurface(&screen, g_game->field_dcb);
-        FUN_004c5fa0(&screen);
+        UnlockScreen(&screen);
         FlipScreen();
     }
 }

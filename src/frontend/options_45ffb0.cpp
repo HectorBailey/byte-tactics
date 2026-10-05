@@ -57,9 +57,9 @@ extern int DAT_00512fec;
 extern int DAT_00512ff0;
 
 void __stdcall FUN_0047f1a0(char* name, int flag);
-void* __stdcall FUN_004b8d40(void* gaf, const char* name);
-void* __stdcall FUN_004b7f30(void* a, int b);
-void __stdcall FUN_004b7f90(int a, void* b, int c, int d);
+void* __stdcall FindGafEntry(void* gaf, const char* name);
+void* __stdcall GetGafFrame(void* a, int b);
+void __stdcall DrawFrame(int a, void* b, int c, int d);
 void __stdcall FUN_0049fa90(void* menu);
 void __stdcall DrawFrameQuad(void* surf, void* entry, Quad_45ffb0* dst, Quad_45ffb0* src);
 
@@ -75,9 +75,9 @@ void __stdcall FUN_0045ffb0(void* surf)
                 DAT_00512fec = 0x115;
             }
             if (DAT_00512fec > DAT_00512f14 && old < DAT_00512f14) {
-                void* snd = FUN_004b8d40(g_game->logos32, "LIGHTBAR");
-                Sound_45ffb0* s = (Sound_45ffb0*)FUN_004b7f30(snd, 2);
-                FUN_004b7f90(DAT_00512fe8, s, s->start, s->end);
+                void* snd = FindGafEntry(g_game->logos32, "LIGHTBAR");
+                Sound_45ffb0* s = (Sound_45ffb0*)GetGafFrame(snd, 2);
+                DrawFrame(DAT_00512fe8, s, s->start, s->end);
             }
         }
         if (DAT_00512fec < DAT_00512f14) {

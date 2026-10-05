@@ -46,7 +46,7 @@ static inline void Unlock(LONG held)
 }
 
 // FUNCTION: 0x4cbab0
-int __stdcall FUN_004cbab0(int param_1, int param_2)
+int __stdcall ExceptionFilter(int param_1, int param_2)
 {
     FUN_004d8e60(param_1, param_2);
     App_004cbab0* app = GetDisplay();

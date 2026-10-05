@@ -9,8 +9,8 @@
 #include <stddef.h>
 #include <vector>
 
-void* __stdcall FUN_004b7f30(void* a, int b);
-void __stdcall FUN_004b8500(void* dest, void* src, int x, int y);
+void* __stdcall GetGafFrame(void* a, int b);
+void __stdcall DrawFrameBlended(void* dest, void* src, int x, int y);
 
 #pragma pack(push, 1)
 struct Game {
@@ -54,7 +54,7 @@ struct Record_004750b0 {
     {
         short sy = y - (height >> 1) - py + 0x20;
         short sx = x - px + 0x80;
-        FUN_004b8500(dest, FUN_004b7f30(data, field_14), sx, sy);
+        DrawFrameBlended(dest, GetGafFrame(data, field_14), sx, sy);
     }
 };
 

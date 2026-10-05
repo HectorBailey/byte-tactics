@@ -39,7 +39,7 @@ struct Class_0051fba4 {
 extern Class_0051fba4* DAT_0051fba4;
 
 char* __stdcall FUN_004a0d00(Menu_004a5d50* menu, char* name, char* buf);
-void* __stdcall FUN_004b7f30(void* glyphs, int c);
+void* __stdcall GetGafFrame(void* glyphs, int c);
 int GetFont();
 int __stdcall GetTextWidth(int param_1, unsigned char* text);
 
@@ -50,7 +50,7 @@ static inline int Width_004a5d50(char* text)
         return GetTextWidth(GetFont(), (unsigned char*)text);
     for (char* p = text; *p; p++) {
         unsigned char c = *p;
-        unsigned short* g = (unsigned short*)FUN_004b7f30(DAT_0051fba4->font->glyphs, c);
+        unsigned short* g = (unsigned short*)GetGafFrame(DAT_0051fba4->font->glyphs, c);
         if (g)
             w += *g;
     }

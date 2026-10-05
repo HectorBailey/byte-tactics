@@ -123,7 +123,7 @@ piece's origin. The maximums are unaffected. Found by Space Bunny Free in #34.
 **0x42a140**, a model texture pass. Its `entry` variable is only set inside the
 first lookup loop; when `g_game->blockCount` (+0x148df) is 0 or less the loop
 is skipped and `entry` still holds the model pointer, which is then treated as
-a GAF entry (compared with 10 and 1, passed to FUN_004b8b30 and stored). With
+a GAF entry (compared with 10 and 1, passed to InitGafSequence and stored). With
 exactly one texture GAF loaded, 0x42a440 sets blockCount to 0, so the path is
 reachable. Found by DeepSeek V4.1 Flash in #26.
 
@@ -799,7 +799,7 @@ Things that look wrong in the original but have no effect, kept for the record.
   message. Found by Space Bunny Free in #408.
 - **0x4743a0** (possible): the record's third position is copied to the
   stack and its z component is then overwritten with
-  `FUN_004b7f60(g_game+0x147f3) - 1` (0x47454a), and `field_4` is stored one
+  `GetGafFrameCount(g_game+0x147f3) - 1` (0x47454a), and `field_4` is stored one
   dword past the 0x3c-byte record that 0x475bd0 appends, so it is never
   stored. Read from the disassembly of a partial match. Found by Space Bunny
   Free in #419.
@@ -870,7 +870,7 @@ Things that look wrong in the original but have no effect, kept for the record.
   test the first character. Found by CubeB's OpenCode / deepseek-v4.1-flash
   in #1690.
 - **0x4a2580** (likely): the same slip as the recorded 0x4a2480, twice. In the
-  vertical branch the first arrow glyph from FUN_004b7f30 is tested
+  vertical branch the first arrow glyph from GetGafFrame is tested
   (`test eax, eax` at 0x4a26ec) and a null result skips only the draw
   (`je 0x4a2701`), after which `mov cx, word ptr [eax+2]` at 0x4a2705 reads its
   height through the null pointer; the horizontal branch does the same with

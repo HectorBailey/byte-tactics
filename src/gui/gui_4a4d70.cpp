@@ -11,7 +11,7 @@
 //     a local optimum at 99.1% that could never fix the cursor call's surface
 //     load.
 //  2. Every glyph fetch goes through one inline helper, GetGlyph, which wraps
-//     FUN_004b7f30 on the current language's glyph table. Used for the line
+//     GetGafFrame on the current language's glyph table. Used for the line
 //     height, it is what keeps the text width in esi (so the zero register
 //     appears in the inlined Measure) while the glyph table still loads into
 //     ecx; spelling the height fetch out in full gives 87.9% with this
@@ -92,7 +92,7 @@ void __stdcall SetFont(int id);
 int GetFont();
 int __stdcall GetTextWidth(int font, char* text);
 int GetFontHeight();
-int __stdcall FUN_004b7f30(unsigned short* glyphs, int c);
+int __stdcall GetGafFrame(unsigned short* glyphs, int c);
 void __stdcall SetTextColors(int colour, int font);
 int GetTextKeyColor();
 int __stdcall FUN_004b0230(Class_004a4d70* obj, int index, void* bmp);
@@ -104,7 +104,7 @@ void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2,
 
 static inline Glyph_004a4d70* GetGlyph_004a4d70(unsigned char c)
 {
-    return (Glyph_004a4d70*)FUN_004b7f30(DAT_0051fba4->language->glyphs, c);
+    return (Glyph_004a4d70*)GetGafFrame(DAT_0051fba4->language->glyphs, c);
 }
 
 static inline int Measure_004a4d70(char* text)

@@ -1,7 +1,7 @@
 // Decompiled by space-bunny-free. Names are provisional.
 // Copies `src` to `dst` at (x, y) with a transparent colour through the blitter
 // at 0x4cbcd5, or, when `dst` is null, onto the screen: lock it with
-// LockScreen, blit, then unlock. The unlock is FUN_004c5fa0 inlined.
+// LockScreen, blit, then unlock. The unlock is UnlockScreen inlined.
 #include <ddraw.h>
 
 struct Surface_004c6c50 {
