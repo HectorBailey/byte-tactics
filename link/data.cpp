@@ -307,7 +307,7 @@ char DAT_0050a57c[4] = "\\*";  // 0x50a57c .data
 char DAT_0050a5c0[16] = "HAPIFILE array";  // 0x50a5c0 .data
 int DAT_0050a778 = 1;  // 0x50a778 .data
 void* DAT_0050a77c = 0;  // 0x50a77c .data
-int DAT_0050a780 = 1;  // 0x50a780 .data
+int g_guaranteePackets = 1;  // 0x50a780 .data
 int DAT_0050b540 = -1;  // 0x50b540 .data
 int DAT_0050b544 = -1;  // 0x50b544 .data
 void* DAT_0050b9e0[7] = {(void*)"SQUASHERR_OK", (void*)"SQUASHERR_BADHEADER", (void*)"SQUASHERR_BADCHECKSUM", (void*)"SQUASHERR_BADUNPACKSIZE", (void*)"SQUASHERR_BADUNPACKTYPE", (void*)"SQUASHERR_BADPACKTYPESQUASHERR_BADPARAMS"};  // 0x50b9e0 .data
@@ -574,8 +574,8 @@ unsigned int DAT_00512c7c;  // 0x512c7c .bss
 unsigned char DAT_00512c80[336];  // 0x512c80 .bss (the type runs past the next known address, 0x512c80+0x4)
 char DAT_00512dd0[260];  // 0x512dd0 .bss
 unsigned char DAT_00512ed4[20];  // 0x512ed4 .bss
-int DAT_00512ee8;  // 0x512ee8 .bss
-void* DAT_00512eec;  // 0x512eec .bss
+int g_onlineConfigLoaded;  // 0x512ee8 .bss
+void* g_onlineDll;  // 0x512eec .bss
 int DAT_00512ef0;  // 0x512ef0 .bss
 unsigned char DAT_00512ef4[4];  // 0x512ef4 .bss
 unsigned char DAT_00512ef8[24];  // 0x512ef8 .bss
@@ -690,7 +690,7 @@ int DAT_0051fefc;  // 0x51fefc .bss
 int DAT_0051ff00;  // 0x51ff00 .bss
 int DAT_0051ff04;  // 0x51ff04 .bss
 int DAT_0051ff08;  // 0x51ff08 .bss
-int DAT_0051ff0c;  // 0x51ff0c .bss
+int g_enumSessionsResult;  // 0x51ff0c .bss
 int DAT_0051ff10;  // 0x51ff10 .bss
 void* DAT_0051ff18;  // 0x51ff18 .bss
 unsigned char DAT_0051ff1c[4];  // 0x51ff1c .bss

@@ -54,7 +54,7 @@ extern int DAT_0051e594;
 Rect_0046c620* __stdcall FUN_004ca9e0(Class_0046c620* p);
 int __stdcall FUN_004ca9d0(Class_0046c620* p);
 int __stdcall FUN_004ca9f0(int mode);
-int __stdcall FUN_004caa10(int, Rect_0046c620*, void*, int, Name_0046c620*, int,
+int __stdcall RIReport(int, Rect_0046c620*, void*, int, Name_0046c620*, int,
                            int, int, void*, void*);
 int FUN_0046c2a0();
 
@@ -85,7 +85,7 @@ int __stdcall FUN_0046c620(int msg)
             // its own statement, not an argument: the call has to be emitted
             // ahead of the other nine arguments being set up
             int team = g_game->field_391e9->FUN_00435c30();
-            if (FUN_004caa10(msg, &rect, (char*)&g_game->field_39201, thing, &DAT_0051e560,
+            if (RIReport(msg, &rect, (char*)&g_game->field_39201, thing, &DAT_0051e560,
                              team, g_game->player,
                              id, DAT_0051e574, DAT_0051e57c))
                 DAT_0051e590 = 0;

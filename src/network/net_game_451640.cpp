@@ -33,8 +33,8 @@ struct Args_00451640 {
 extern char* g_game;
 extern int DAT_00512c8c;
 
-int __stdcall FUN_004ca450(void* net);
-int FUN_0045b660(void);
+int __stdcall HAPINET_passwordrequired(void* net);
+int IsOnlineConfigLoaded(void);
 void* __cdecl FUN_004d83b0(char* tag, int size);
 void __stdcall FUN_00491c80(int n);
 void __cdecl FUN_004d85a0(void* p);
@@ -50,11 +50,11 @@ int __stdcall FUN_00451640(Player_00451640* p)
     int result = 0;
     char* name = 0;
 
-    if (FUN_004ca450(g_game + 0x14) != 0)
+    if (HAPINET_passwordrequired(g_game + 0x14) != 0)
         name = (char*)p->info + 0x80;
 
     int count = 10;
-    if (FUN_0045b660() != 0 && DAT_00512c8c > 1) {
+    if (IsOnlineConfigLoaded() != 0 && DAT_00512c8c > 1) {
         unsigned int n = DAT_00512c8c;
         count = n < 10 ? n : 10;
         *(int*)(g_game + 0x4f1) = count;

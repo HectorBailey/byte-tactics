@@ -81,7 +81,7 @@ extern Game* g_game;
 extern int DAT_00506dbc;
 extern Class_004618a0 DAT_00513000;
 
-int __stdcall FUN_004ca7c0(void* net, unsigned long id, void* data, unsigned long* size);
+int __stdcall HAPINET_getplayername(void* net, unsigned long id, void* data, unsigned long* size);
 int __stdcall FUN_00451df0(int player, void* data, int size);
 void __stdcall FUN_00464290(unsigned char player, char type);
 void FUN_00450530();
@@ -156,7 +156,7 @@ int __stdcall FUN_00450a10(int param_1)
     char* d_name = p->name;
     if (param_1 != -1) {
         size = 0x400;
-        result = FUN_004ca7c0(g_game->net, param_1, buf, &size);
+        result = HAPINET_getplayername(g_game->net, param_1, buf, &size);
         if (result == 0) {
             strcpy(d_full, ((DPNAME*)buf)->lpszShortNameA);
             strcpy(d_name, ((DPNAME*)buf)->lpszLongNameA);

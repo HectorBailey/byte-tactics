@@ -5,7 +5,7 @@
 // FindPlayer helper: it searches twice (once to decide whether the player
 // exists, once to take the address), which is what produces the two copies of
 // the id loop. When the net layer has no DirectPlay interface (DAT_00506dbc
-// clear) it goes through FUN_004c97b0 on g_game + 0x14 and reports the packet
+// clear) it goes through HAPINET_sendpacket on g_game + 0x14 and reports the packet
 // as forwarded with FUN_00415ef0/FUN_00415f40. If instead g_game + 0x299c is
 // non-zero this is a broadcast round: every in-use player in state 3 whose
 // target group has not been told yet gets the packet, and the group is marked
@@ -56,7 +56,7 @@ extern int DAT_00512b90[11];
 
 int __stdcall FUN_0044ffd0(unsigned char index);
 int __stdcall FUN_00451bc0(int from, int to, void* packet, int size);
-int __stdcall FUN_004c97b0(void* net, unsigned long from, unsigned long to, void* data, unsigned long size);
+int __stdcall HAPINET_sendpacket(void* net, unsigned long from, unsigned long to, void* data, unsigned long size);
 void __stdcall FUN_00415ef0(unsigned char kind, int amount, int player);
 void __stdcall FUN_00415f40(int size, int overhead, int sent);
 
@@ -92,7 +92,7 @@ int __stdcall FUN_00451df0(int id, unsigned char* packet, int size)
         if (g_game->field_299c == 0) {
             if (DAT_00506dbc != 0)
                 return DAT_00513000.FUN_00461990(id, &DAT_00513008, (int)packet, size);
-            if (FUN_004c97b0((char*)g_game + 0x14, id, 0, packet, size) != 0)
+            if (HAPINET_sendpacket((char*)g_game + 0x14, id, 0, packet, size) != 0)
                 return 0;
             FUN_00415ef0(packet[0], size, 1);
             FUN_00415f40(size, 0, 1);

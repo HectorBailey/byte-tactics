@@ -234,7 +234,7 @@ unsigned char __stdcall FUN_0044fe40(int);
 int __stdcall FUN_00450a10(int);
 int __stdcall FUN_00453010(int, int);
 void __stdcall FUN_00451090(char*, int*, int*, int*, int*);
-void __stdcall FUN_004c9890(void*, char*, char*, int, int, int, int);
+void __stdcall HAPINET_updategameinfo(void*, char*, char*, int, int, int, int);
 void __stdcall FUN_004565a0(void*);
 void __stdcall FUN_00463ca0(void*, int, int, unsigned char);
 int __stdcall FUN_00451bc0(int, int, void*, int);
@@ -486,7 +486,7 @@ int FUN_00453d40()
                     FUN_00451090(name, &d, &c, &b, &a);
                     if (LocalPlayer()->info->b9b.bit4)
                         g_game->settings.flags_475 |= 0x20;
-                    FUN_004c9890(g_game->field_14, name, DAT_005119b8, d, c, b, a);
+                    HAPINET_updategameinfo(g_game->field_14, name, DAT_005119b8, d, c, b, a);
                 }
                 break;
             }

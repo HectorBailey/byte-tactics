@@ -215,7 +215,7 @@ extern char DAT_0050a57c[4];                                                    
 extern char DAT_0050a5c0[16];                                                                 // 0x50a5c0, 16 bytes; 1 of 1 files
 extern int DAT_0050a778;                                                                      // 0x50a778, 4 bytes; 5 of 5 files
 extern void* DAT_0050a77c;                                                                    // 0x50a77c, 4 bytes; 5 of 5 files
-extern int DAT_0050a780;                                                                      // 0x50a780, 4 bytes; 4 of 4 files
+extern int g_guaranteePackets;                                                                // 0x50a780, 4 bytes; 4 of 4 files
 extern int DAT_0050b540;                                                                      // 0x50b540, 4 bytes; 8 of 8 files
 extern int DAT_0050b544;                                                                      // 0x50b544, 4 bytes; 7 of 7 files
 extern void* DAT_0050b9e0[7];                                                                 // 0x50b9e0, 28 bytes; 1 of 1 files
@@ -477,8 +477,8 @@ extern unsigned int DAT_00512c7c;                                               
 extern unsigned char DAT_00512c80[336];                                                       // 0x512c80, 336 bytes; int in 3 of 4 files (conflicting: shape), but used past its end
 extern char DAT_00512dd0[260];                                                                // 0x512dd0, 260 bytes; 3 of 3 files
 extern unsigned char DAT_00512ed4[20];                                                        // 0x512ed4, 20 bytes; nothing refers to it
-extern int DAT_00512ee8;                                                                      // 0x512ee8, 4 bytes; 2 of 2 files
-extern void* DAT_00512eec;                                                                    // 0x512eec, 4 bytes; 4 of 4 files
+extern int g_onlineConfigLoaded;                                                              // 0x512ee8, 4 bytes; 2 of 2 files
+extern void* g_onlineDll;                                                                     // 0x512eec, 4 bytes; 4 of 4 files
 extern int DAT_00512ef0;                                                                      // 0x512ef0, 4 bytes; 3 of 3 files
 extern unsigned char DAT_00512ef4[4];                                                         // 0x512ef4, 4 bytes; nothing refers to it
 extern unsigned char DAT_00512ef8[24];                                                        // 0x512ef8, 24 bytes; Entry_45ffb0 by value in 1 of 2 files (conflicting: struct names only)
@@ -593,7 +593,7 @@ extern int DAT_0051fefc;                                                        
 extern int DAT_0051ff00;                                                                      // 0x51ff00, 4 bytes; 1 of 1 files
 extern int DAT_0051ff04;                                                                      // 0x51ff04, 4 bytes; 1 of 1 files
 extern int DAT_0051ff08;                                                                      // 0x51ff08, 4 bytes; 1 of 1 files
-extern int DAT_0051ff0c;                                                                      // 0x51ff0c, 4 bytes; 2 of 2 files
+extern int g_enumSessionsResult;                                                              // 0x51ff0c, 4 bytes; 2 of 2 files
 extern int DAT_0051ff10;                                                                      // 0x51ff10, 4 bytes; 2 of 2 files
 extern void* DAT_0051ff18;                                                                    // 0x51ff18, 4 bytes; 3 of 4 files (conflicting: shape)
 extern unsigned char DAT_0051ff1c[4];                                                         // 0x51ff1c, 4 bytes; nothing refers to it
@@ -744,7 +744,7 @@ extern long DAT_0052a4fc;                                                       
 //   0x512320 DAT_00512320: Point16_00437de0 (1), Point16_00438070 (1), Point16_00438180 (1), short (1)
 //   0x512334 DAT_00512334: Point16_00437de0 (1), Point16_00438070 (1), Point16_00438180 (1), short (1)
 //   0x512770 DAT_00512770: char[] (2), Serial_00441c30 (1), int (1)
-//   0x5129d0 DAT_005129d0: defined in src/network/net_condenser_44f7e0.cpp
+//   0x5129d0 g_sendCondenser: defined in src/network/net_condenser_44f7e0.cpp
 //   0x512f2c DAT_00512f2c: part of another global: DAT_00512f18+0x14
 //   0x512f42 DAT_00512f42: part of another global: DAT_00512f18+0x2a
 //   0x512f46 DAT_00512f46: part of another global: DAT_00512f18+0x2e
@@ -816,8 +816,8 @@ extern long DAT_0052a4fc;                                                       
 //   0x512340 DAT_00512340$S5516: defined in src/map/meteors_438450.cpp
 //   0x512370 DAT_00512370: part of another global: Class_00440290::DAT_00512358+0x18
 //   0x512764 DAT_00512764: short (1), int (1)
-//   0x5129f1 DAT_005129f1: part of another global: DAT_005129d0+0x21
-//   0x5129f8 DAT_005129f8: defined in src/network/net_condenser_44f720.cpp
+//   0x5129f1 DAT_005129f1: part of another global: g_sendCondenser+0x21
+//   0x5129f8 g_receiveCondenser: defined in src/network/net_condenser_44f720.cpp
 //   0x512c98 DAT_00512c98: part of another global: DAT_00512c80+0x18
 //   0x512d28 DAT_00512d28: part of another global: DAT_00512c80+0xa8
 //   0x51e548 DAT_0051e548: int (__stdcall*)(int, char*) (1), int (__stdcall*)(int, int) (1)

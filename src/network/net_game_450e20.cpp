@@ -37,7 +37,7 @@ extern Class_004618a0 DAT_00513000;
 
 void __stdcall FUN_00452cc0(int id);
 void FUN_0046c190();
-int __stdcall FUN_004c9f90(void* net);
+int __stdcall HAPINET_quitgame(void* net);
 void __stdcall FUN_004b4fd0(void (__cdecl *callback)(int), int param);
 void __stdcall FUN_004b6230(char* message);
 
@@ -64,7 +64,7 @@ void FUN_00450e20()
         }
         FUN_0046c190();
     }
-    FUN_004c9f90(g_game->field_14);
+    HAPINET_quitgame(g_game->field_14);
     FUN_004b4fd0(0, 0);
     g_game->field_3923b |= 4;
     int reason = g_game->players[g_game->local_player].reason;

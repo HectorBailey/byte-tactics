@@ -223,7 +223,7 @@ void FUN_00450f90();
 void FUN_00451180();
 int FUN_00456760();
 int FUN_00457a50();
-int FUN_0045b660();
+int IsOnlineConfigLoaded();
 void __stdcall FUN_0045b9b0(Gadget_00449bb0* gadget, int value);
 int __stdcall FUN_0045ba20(Gadget_00449bb0* gadget);
 void __stdcall FUN_0046c8e0(int param_1);
@@ -331,7 +331,7 @@ void FUN_00449bb0()
         }
     }
 
-    if (FUN_0045b660()) {
+    if (IsOnlineConfigLoaded()) {
         if (DAT_00512d6c) {
             info->maxUnits = DAT_00512d6c;
             g_game->maxUnits = DAT_00512d6c;
@@ -420,7 +420,7 @@ void FUN_00449bb0()
     FUN_00445e50("ENERGY", 0x2711, energy, FUN_00445d60);
 
     ((Class_00435d30*)g_game->map)->FUN_00435d30(1);
-    if (isHost && FUN_0045b660() && DAT_00512ce8[0])
+    if (isHost && IsOnlineConfigLoaded() && DAT_00512ce8[0])
         ((Class_00435a20*)g_game->map)->FUN_00435a20(DAT_00512ce8);
     if (!((Class_00435c40*)g_game->map)->FUN_00435c40())
         FUN_004b6290("Could not find the multiplayer map!!");

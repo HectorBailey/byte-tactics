@@ -3,7 +3,7 @@
 // Sends one player's queued packets: every packet whose frame matches the
 // queue head's is appended to the outgoing buffer (DAT_00513000, whose
 // buffer and size fields are DAT_0051e2f4 and DAT_0051e2f8), the others go
-// back on the queue, and the buffer is handed to DAT_005129d0 with the frame
+// back on the queue, and the buffer is handed to g_sendCondenser with the frame
 // and the player's DPID.
 //
 // What matched it (opus, #4310), rebuilt from the disassembly instead of the
@@ -31,11 +31,11 @@ public:
 
 class Class_004626e0 {
 public:
-    void FUN_004626e0(void* session, int from, int value, void* data, int size);
+    void SendPacketTo(void* session, int from, int value, void* data, int size);
 };
 
 extern Class_004614e0 DAT_00513000;
-extern Class_004626e0 DAT_005129d0;
+extern Class_004626e0 g_sendCondenser;
 
 struct Buffer_004624a0 {
     char unknown_0[0x14];
@@ -148,7 +148,7 @@ int Class_004624a0::FUN_004624a0(int force)
                 int id = dpid;
                 int* data = DAT_0051e2f4;
                 FUN_00461170("bytes to send to (DPID)(%ld): %ld\n", id, nbytes);
-                DAT_005129d0.FUN_004626e0(g_game + 0x14, headFrame, id, data, nbytes);
+                g_sendCondenser.SendPacketTo(g_game + 0x14, headFrame, id, data, nbytes);
                 DAT_0051e2f8 = DAT_0051e2f4 != 0 ? 4 : 0;
                 frame--;
                 if (frame >= -1)

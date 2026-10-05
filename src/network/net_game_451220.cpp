@@ -77,7 +77,7 @@ struct Game {
 
 extern Game* g_game;
 
-int __stdcall FUN_004ca6a0(void* net, unsigned long* id, char* shortName,
+int __stdcall HAPINET_addplayer(void* net, unsigned long* id, char* shortName,
                            char* longName, char* name, short field_11, short field_13);
 void __stdcall FUN_004abd90(void* menu, const char* text, int a, int b, int c);
 char* __stdcall FUN_004c5740(const char* text);
@@ -123,7 +123,7 @@ int __stdcall FUN_00451220(unsigned char playerIndex, int flag)
     info->field_a7 = g_game->field_1;
     info->field_a8 = g_game->field_2;
 
-    int r = FUN_004ca6a0(g_game->net_14, (unsigned long*)&player->field_4,
+    int r = HAPINET_addplayer(g_game->net_14, (unsigned long*)&player->field_4,
                          buf, buf, g_game->passWord, 0, 0x50);
     if (r == 0) {
         g_game->players[playerIndex].FUN_00463c60(0);

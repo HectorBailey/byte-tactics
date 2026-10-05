@@ -292,7 +292,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x50a5c0,DAT_0050a5c0,.data,16,gap,string,char[],1,0,1,one type,1,,,,,4841504946494c452061727261790000
 0x50a778,DAT_0050a778,.data,4,type,data,int,5,0,1,one type,5,,INT_0050a778,,,01000000
 0x50a77c,DAT_0050a77c,.data,4,type,data,void*,5,0,1,one type,5,,PTR_0050a77c,,,00000000
-0x50a780,DAT_0050a780,.data,4,type,data,int,4,0,1,one type,4,,INT_0050a780,,,01000000
+0x50a780,g_guaranteePackets,.data,4,type,data,int,4,0,1,one type,4,,INT_0050a780,,,01000000
 0x50a788,DAT_0050a788,.data,16,type,data,const _GUID**,1,1,2,conflicting: array or pointer,2,0x10,PTR_DAT_0050a788,4,src/data/guids.cpp,c8cf4f00d8cf4f00e8cf4f00f8cf4f00
 0x50b540,DAT_0050b540,.data,4,type,data,int,8,0,1,one type,8,,INT_0050b540,,,ffffffff
 0x50b544,DAT_0050b544,.data,4,type,data,int,7,0,1,one type,7,,INT_0050b544,,,ffffffff
@@ -443,9 +443,9 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x5129c4,DAT_005129c4,.bss,4,type,data,int*,2,0,1,one type,2,,PTR_005129c4,,,
 0x5129c8,DAT_005129c8,.bss,4,type,data,int,1,0,1,one type,1,,INT_005129c8,,,
 0x5129cc,DAT_005129cc,.bss,4,gap,unreferenced,unsigned char[4],0,0,0,,0,,,,,
-0x5129d0,DAT_005129d0,.bss,37,definition,data,Class_0044f940,2,2,3,conflicting: struct names only,4,0x21,DAT_005129d0,,src/network/net_condenser_44f7e0.cpp,
-0x5129f1,DAT_005129f1,.bss,4,type,data,int,2,0,1,one type,2,,INT_005129f1,,in DAT_005129d0+0x21,
-0x5129f8,DAT_005129f8,.bss,37,definition,data,Class_005129f8,1,1,2,conflicting: struct names only,2,0x21,DAT_005129f8,,src/network/net_condenser_44f720.cpp,
+0x5129d0,g_sendCondenser,.bss,37,definition,data,NetCondenser,3,1,2,conflicting: struct names only,4,0x21,DAT_005129d0,,src/network/net_condenser_44f7e0.cpp,
+0x5129f1,DAT_005129f1,.bss,4,type,data,int,2,0,1,one type,2,,INT_005129f1,,in g_sendCondenser+0x21,
+0x5129f8,g_receiveCondenser,.bss,37,definition,data,NetCondenser,2,0,1,one type,2,0x21,DAT_005129f8,,src/network/net_condenser_44f720.cpp,
 0x512a20,DAT_00512a20,.bss,8,gap,data,void (__stdcall*[])(void*),1,0,1,one type,1,,DAT_00512a20,,,
 0x512a28,DAT_00512a28,.bss,4,type,data,int (__stdcall*)(int),1,0,1,one type,1,,_DAT_00512a28,,,
 0x512a2c,DAT_00512a2c,.bss,4,type,data,int (__stdcall*)(int),1,0,1,one type,1,,_DAT_00512a2c,,,
@@ -607,8 +607,8 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x512d90,DAT_00512d90,.bss,63,gap,data,char[],3,2,2,conflicting: shape,5,,DAT_00512d90,,in DAT_00512c80+0x110,
 0x512dd0,DAT_00512dd0,.bss,260,gap,data,char[],3,0,1,one type,3,0x104,,,,
 0x512ed4,DAT_00512ed4,.bss,20,gap,unreferenced,unsigned char[20],0,0,0,,0,,,,,
-0x512ee8,DAT_00512ee8,.bss,4,type,data,int,2,0,1,one type,2,,INT_00512ee8,,,
-0x512eec,DAT_00512eec,.bss,4,type,data,void*,4,0,1,one type,4,,PTR_00512eec,,,
+0x512ee8,g_onlineConfigLoaded,.bss,4,type,data,int,2,0,1,one type,2,,INT_00512ee8,,,
+0x512eec,g_onlineDll,.bss,4,type,data,void*,4,0,1,one type,4,,PTR_00512eec,,,
 0x512ef0,DAT_00512ef0,.bss,4,type,data,int,3,0,1,one type,3,,INT_00512ef0,,,
 0x512ef4,DAT_00512ef4,.bss,4,gap,unreferenced,unsigned char[4],0,0,0,,0,,,,,
 0x512ef8,DAT_00512ef8,.bss,24,gap,data,Entry_45ffb0,1,1,2,conflicting: struct names only,2,0x2,DAT_00512ef8,,,
@@ -792,7 +792,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x51ff00,DAT_0051ff00,.bss,4,type,data,int,1,0,1,one type,1,,INT_0051ff00,,,
 0x51ff04,DAT_0051ff04,.bss,4,type,data,int,1,0,1,one type,1,,INT_0051ff04,,,
 0x51ff08,DAT_0051ff08,.bss,4,type,data,int,1,0,1,one type,1,,INT_0051ff08,,,
-0x51ff0c,DAT_0051ff0c,.bss,4,type,data,int,2,0,1,one type,2,,INT_0051ff0c,,,
+0x51ff0c,g_enumSessionsResult,.bss,4,type,data,int,2,0,1,one type,2,,INT_0051ff0c,,,
 0x51ff10,DAT_0051ff10,.bss,4,type,data,int,2,0,1,one type,2,,INT_0051ff10,,,
 0x51ff14,DAT_0051ff14,.bss,4,type,data,void*,2,3,4,conflicting: shape,5,,DAT_0051ff14,,,
 0x51ff18,DAT_0051ff18,.bss,4,type,data,void*,3,1,2,conflicting: shape,4,,DAT_0051ff18,,,

@@ -2,7 +2,7 @@
 // Receives one network packet into the shared buffer (g_game+0x2a38),
 // growing the buffer ("PACKET DATA AGAIN") while the receive call returns
 // 0x8877001e (buffer too small), through DAT_0051e300 when DAT_00506dbc is
-// set, else through DirectPlay (FUN_004c9840), and counts it in the
+// set, else through DirectPlay (HAPINET_receivepacket), and counts it in the
 // network statistics.
 //
 // MATCH. The one instruction that used to be out of place is fixed by
@@ -34,7 +34,7 @@ public:
 
 extern Class_00462f30 DAT_0051e300;
 
-int __stdcall FUN_004c9840(void* net, void* data, int* size);
+int __stdcall HAPINET_receivepacket(void* net, void* data, int* size);
 void __stdcall FUN_00415ef0(unsigned char kind, int amount, int player);
 void __stdcall FUN_00415f40(int size, int overhead, int sent);
 void* __cdecl FUN_004d84a0(void* param_1, const char* name, unsigned int param_3);
@@ -64,7 +64,7 @@ int __stdcall FUN_004534e0(void)
         }
     } else {
         while (1) {
-            int result = FUN_004c9840((char*)g_game + 0x14, g_game->buffer, &size);
+            int result = HAPINET_receivepacket((char*)g_game + 0x14, g_game->buffer, &size);
             if (result == 0) {
                 FUN_00415ef0(*g_game->buffer, size, 0);
                 FUN_00415f40(size, 0, 0);

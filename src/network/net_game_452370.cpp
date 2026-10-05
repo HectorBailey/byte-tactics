@@ -25,7 +25,7 @@ extern int DAT_00506dbc;
 extern Class_004618a0 DAT_00513000;
 
 bool FUN_0046bf20();
-void __stdcall FUN_004c9b70(void* param_1);
+void __stdcall HAPINET_uninitmultiplay(void* param_1);
 void __cdecl FUN_004d85a0(int* param_1);
 
 // FUNCTION: 0x452370
@@ -40,7 +40,7 @@ void __stdcall FUN_00452370(Class_00452370* obj)
             DAT_00513000.FUN_004618a0(1);
         }
         if (!FUN_0046bf20()) {
-            FUN_004c9b70(g_game->field_14);
+            HAPINET_uninitmultiplay(g_game->field_14);
         }
         g_game->flags_2a44 &= 0xfffe;
     }

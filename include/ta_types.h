@@ -7961,7 +7961,7 @@ public:
     unsigned char flag_1c;  // +0x1c
     int size_1d;  // +0x1d
     int to_21;  // +0x21
-    int FUN_0044fc10(void*, int);
+    int SendPacket(void*, int);
 };
 
 class Class_0044fda0 {  // 0x1 bytes, 1 view
@@ -8736,8 +8736,8 @@ struct Buffer_461020 {  // 0x10 bytes, 1 view
 class Class_0044f940 {  // 0x1 bytes, 3 views
 public:
     char unknown_0[1];
-    void FUN_0044f940(void*, int);
-    void FUN_004626e0(void*, int, int, void*, int);
+    void Accumulate(void*, int);
+    void SendPacketTo(void*, int, int, void*, int);
 };
 
 struct Buffer_00462d30 {  // 0x180c bytes, 6 views
@@ -9194,7 +9194,7 @@ struct Link_00462ed0 {  // 0x10 bytes, 1 view
 class Class_0044f9c0_2 {  // 0x1 bytes, 1 view
 public:
     char unknown_0[1];
-    int FUN_0044f9c0(void*, char*, int*);
+    int ReceivePacket(void*, char*, int*);
 };
 
 class Class_00462f30_2 {  // 0x23c bytes, 1 view

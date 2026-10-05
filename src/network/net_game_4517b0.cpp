@@ -4,8 +4,8 @@
 // network object or the two default strings), fills in the player's info block
 // and, depending on whether a DirectPlay interface is present, either joins the
 // lobby in a worker thread (FUN_00451640) or connects through the local net
-// object (FUN_004c9fd0). On success it starts the game (FUN_00451220,
-// FUN_004ca840), broadcasts every playing player's 0xb9-byte data block and
+// object (HAPINET_joingame). On success it starts the game (FUN_00451220,
+// HAPINET_enumplayers), broadcasts every playing player's 0xb9-byte data block and
 // 6-byte message (the same code as FUN_00450f90), and finishes with
 // FUN_004526c0(0).
 //
@@ -118,15 +118,15 @@ extern char DAT_00512d28;
 extern int DAT_00506dbc;
 extern Class_004618a0 DAT_00513000;
 
-int FUN_0045b660(void);
+int IsOnlineConfigLoaded(void);
 void FUN_004644d0(void);
 void FUN_00450530(void);
 int __stdcall FUN_00451640(Player_4517b0* p);
 int __stdcall FUN_00451df0(int player, void* data, int size);
 int __stdcall FUN_004526c0(int param);
 int __stdcall FUN_00451220(int player, int param);
-int __stdcall FUN_004c9fd0(void* net, Guid_4517b0 guid);
-int __stdcall FUN_004ca840(void* net, void* session, void* callback, void* context,
+int __stdcall HAPINET_joingame(void* net, Guid_4517b0 guid);
+int __stdcall HAPINET_enumplayers(void* net, void* session, void* callback, void* context,
                            unsigned long flags);
 void __stdcall FUN_004515d0(int, int, int, int, int);
 Obj_4517b0* FUN_004b6220(void);
@@ -146,7 +146,7 @@ int __stdcall FUN_004517b0(Guid_4517b0 guid, int player)
 
         Net_4517b0* net = g_game->field_4e5;
         if (net != 0) {
-            int v = FUN_0045b660();
+            int v = IsOnlineConfigLoaded();
             char* s = &DAT_00512d48;
             if (v == 0)
                 s = &DAT_005119b8;
@@ -208,13 +208,13 @@ int __stdcall FUN_004517b0(Guid_4517b0 guid, int player)
                 FUN_004b6290(FUN_004c5740("Unable to connect to DirectPlay lobby."));
             }
         } else {
-            result = FUN_004c9fd0((Net_4517b0*)((char*)g_game + 0x14), guid);
+            result = HAPINET_joingame((Net_4517b0*)((char*)g_game + 0x14), guid);
         }
         if (result == 0)
             return 0;
 
         FUN_00451220(player, 1);
-        FUN_004ca840((Net_4517b0*)((char*)g_game + 0x14), 0, (void*)FUN_004515d0, 0, 0);
+        HAPINET_enumplayers((Net_4517b0*)((char*)g_game + 0x14), 0, (void*)FUN_004515d0, 0, 0);
         if (g_game->flags_2a44 & 1) {
             for (int i = 0; i < 10; i++) {
                 Player_4517b0* q = &g_game->players[i];

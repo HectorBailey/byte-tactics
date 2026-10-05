@@ -43,7 +43,7 @@ extern Class_004619b0 DAT_00513000;
 
 int __stdcall FUN_0044ffd0(unsigned char index);
 unsigned char __stdcall FUN_0044fe40(int id);
-int __stdcall FUN_004c97b0(void* net, unsigned long from, unsigned long to, void* data, unsigned long size);
+int __stdcall HAPINET_sendpacket(void* net, unsigned long from, unsigned long to, void* data, unsigned long size);
 void __stdcall FUN_00415ef0(unsigned char kind, int amount, int player);
 void __stdcall FUN_00415f40(int size, int overhead, int sent);
 
@@ -107,7 +107,7 @@ int __stdcall FUN_00451bc0(int from, int to, unsigned char* packet, int size)
         if (target->active == 0 || (target->state != 1 && target->state != 2)) {
             if (DAT_00506dbc != 0)
                 return DAT_00513000.FUN_004619b0(from, to, packet, size);
-            if (FUN_004c97b0((char*)g_game + 0x14, from, to, packet, size) != 0)
+            if (HAPINET_sendpacket((char*)g_game + 0x14, from, to, packet, size) != 0)
                 return 0;
             FUN_00415ef0(packet[0], size, 1);
             FUN_00415f40(size, 0, 1);

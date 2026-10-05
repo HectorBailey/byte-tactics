@@ -178,17 +178,17 @@ struct Game {
 
 extern Game* g_game;
 
-class Class_0044f9c0 {
+class NetCondenser {
 public:
-    int FUN_0044f9c0(void* net, char* data, int* size);
+    int ReceivePacket(void* net, char* data, int* size);
 };
-extern Class_0044f9c0 DAT_005129f8;
+extern NetCondenser g_receiveCondenser;
 
 void __stdcall FUN_004568b0(int a, int b, int c);
 void __cdecl FUN_00461170(const char* fmt, ...);
 void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* p);
-char* __stdcall FUN_004c9530(int error);
+char* __stdcall HAPINET_GetDPErrorString(int error);
 
 // The sequence numbers next to n, held below -1 (-1 or more becomes -2).
 static int Prev_00462f30(int n)
@@ -293,7 +293,7 @@ int Class_00462f30::FUN_00462f30(void* net, unsigned char* data, int* size)
         }
         if (n == 0) {
             length = capacity;
-            rc = DAT_005129f8.FUN_0044f9c0((char*)g_game + 0x14, buffer, &length);
+            rc = g_receiveCondenser.ReceivePacket((char*)g_game + 0x14, buffer, &length);
             while (rc != 0) {
                 if (rc == (int)0x887700be) {    // DPERR_NOMESSAGES
                     length = 0;
@@ -310,7 +310,7 @@ int Class_00462f30::FUN_00462f30(void* net, unsigned char* data, int* size)
                     return (int)0x8007000e;
                 }
                 length = capacity;
-                rc = DAT_005129f8.FUN_0044f9c0((char*)g_game + 0x14, buffer, &length);
+                rc = g_receiveCondenser.ReceivePacket((char*)g_game + 0x14, buffer, &length);
             }
             // Always true here (the enclosing test), so MSVC emits no test; the error
             // block stays after B only as this if's else arm.
@@ -410,7 +410,7 @@ int Class_00462f30::FUN_00462f30(void* net, unsigned char* data, int* size)
                 }
             } else {
             error:
-                FUN_00461170("HAPINET_receivepacket failed (%s)\n", FUN_004c9530(rc));
+                FUN_00461170("HAPINET_receivepacket failed (%s)\n", HAPINET_GetDPErrorString(rc));
                 length = 0;
                 return rc;
             }

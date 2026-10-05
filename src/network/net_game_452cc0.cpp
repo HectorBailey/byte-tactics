@@ -89,7 +89,7 @@ extern Game* g_game;
 
 void __stdcall FUN_00486f10(unsigned char player);
 void __stdcall FUN_0046c620(int msg);
-int __stdcall FUN_004ca780(void* net, int id);
+int __stdcall HAPINET_removeplayer(void* net, int id);
 
 // 0x44ffd0 (matched in its own file).
 int __stdcall FUN_0044ffd0(unsigned char index)
@@ -187,7 +187,7 @@ void __stdcall FUN_00452cc0(int id)
             Remove(p);
     } else {
         if (IsPlaying(p))
-            FUN_004ca780((char*)g_game + 0x14, p->id);
+            HAPINET_removeplayer((char*)g_game + 0x14, p->id);
         Remove(p);
     }
     g_game->field_2a3c--;

@@ -144,7 +144,7 @@ void __cdecl FUN_00428730();
 void __cdecl FUN_00430f00();
 void __cdecl FUN_00453d40();
 void __cdecl FUN_00456de0();
-void __cdecl FUN_0045b640();
+void __cdecl OnlineUnload();
 void __cdecl FUN_00467d70();
 void __cdecl FUN_0047f750();
 void __cdecl FUN_00496790();
@@ -183,7 +183,7 @@ void __stdcall FUN_004c61f0(int);
 void __stdcall FUN_004c69a0(void*);
 void* __stdcall FUN_004c69f0(char*, int, int);
 void __stdcall FUN_004c6b70(void*, void*, int, int);
-void __stdcall FUN_004c9790(int);
+void __stdcall HAPINET_guaranteepackets(int);
 class Class_004cdb40 { public: void FUN_004cdb40(); };
 class Class_004ce690 { public: void FUN_004ce690(int); };
 class Class_004ce800 { public: int FUN_004ce800(); };
@@ -295,7 +295,7 @@ void FUN_00497f40(void)
         memset(&DAT_0051e6c8, 0, 6);
         memset(&DAT_0051e820, 0, 6);
         g_game->flags38d75.bits.started = 1;
-        FUN_0045b640();
+        OnlineUnload();
     }
     if (g_game->flags38d75.bits.loaded) {
         FUN_0047f750();
@@ -343,7 +343,7 @@ void FUN_00497f40(void)
         if (FUN_004568c0() != 0) {
             g_game->flags38d75.bits.b2 = 0;
             g_game->flags38d75.bits.b3 = 1;
-            FUN_004c9790(0);
+            HAPINET_guaranteepackets(0);
         }
     }
     if (DAT_00506dbc != 0) {

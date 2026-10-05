@@ -73,7 +73,7 @@ extern Class_004618a0 DAT_00513000;
 
 unsigned int FUN_004b6340();
 int __stdcall FUN_00451df0(int id, unsigned char* packet, int size);
-int __stdcall FUN_004c9790(int param_1);
+int __stdcall HAPINET_guaranteepackets(int param_1);
 int __stdcall FUN_004526c0(int param_1);
 void FUN_00450530();
 
@@ -97,12 +97,12 @@ void FUN_00456310()
             msg.sent_tick = 0;
             msg.id = p->id;
 
-            int was = FUN_004c9790(0);
+            int was = HAPINET_guaranteepackets(0);
             FUN_00451df0(p->id, (unsigned char*)&msg, 0xd);
             if (DAT_00506dbc != 0)
                 DAT_00513000.FUN_004618a0(1);
             if (was != 0)
-                FUN_004c9790(1);
+                HAPINET_guaranteepackets(1);
 
             int id = p->id;
             unsigned char* buf = g_game->buffer;

@@ -62,7 +62,7 @@ extern Game* g_game;
 
 void __stdcall FUN_00452cc0(int dpid);
 void FUN_0046c190();
-int __stdcall FUN_004c9f90(Net_4c9f90* net);
+int __stdcall HAPINET_quitgame(Net_4c9f90* net);
 void __stdcall FUN_004b4fd0(void (__cdecl *callback)(int), int param);
 void __stdcall FUN_004b6230(char* message);
 
@@ -77,7 +77,7 @@ void __cdecl FUN_004578f0(int)
         }
         FUN_0046c190();
     }
-    FUN_004c9f90(&g_game->net);
+    HAPINET_quitgame(&g_game->net);
     FUN_004b4fd0(0, 0);
     g_game->flag2 = 1;
     int reason = g_game->players[g_game->localPlayer].rejectReason;

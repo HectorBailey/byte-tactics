@@ -129,10 +129,10 @@ void __stdcall FUN_004c69a0(int param);
 void __stdcall FUN_004c6890(int param1, int param2);
 void __stdcall FUN_004c63a0(void);
 void __stdcall FUN_004b6230(int param);
-void __stdcall FUN_004c9790(int param);
+void __stdcall HAPINET_guaranteepackets(int param);
 void __stdcall FUN_004a9660(int param);
 void __stdcall FUN_004ab0a0(int param);
-void __stdcall FUN_004c9f90(int param);
+void __stdcall HAPINET_quitgame(int param);
 void __stdcall FUN_00461020(int param1, int param2);
 void __stdcall FUN_004c1ab0(void);
 Obj_00426e80* __stdcall FUN_004b6220(void);
@@ -611,7 +611,7 @@ void FUN_00426e80(void)
         FUN_004c1ab0();
         switch ((unsigned char)g_game[0x2bbf]) {
         case 0:
-            FUN_004c9790(1);
+            HAPINET_guaranteepackets(1);
             SetSubState(1, 0x587, DAT_00503004);
             FUN_004644d0();
             if (memcmp(g_game + 0x39201, DAT_004fcdc8, 0x10) == 0 ||
@@ -725,7 +725,7 @@ void FUN_00426e80(void)
         }
         case 3:
             ((Bits_00426e80*)(g_game + 0x2a44))->b0 = 1;
-            FUN_004c9f90((int)(g_game + 0x14));
+            HAPINET_quitgame((int)(g_game + 0x14));
             FUN_00461020(2, 100);
             FUN_0046c920();
             FUN_0046c620(8);
