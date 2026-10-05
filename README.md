@@ -9,6 +9,7 @@
 <p align="center">
   <a href="#progress">Progress</a> ·
   <a href="#quick-start">Quick start</a> ·
+  <a href="#building-the-exe">Building the exe</a> ·
   <a href="#how-a-match-works">How a match works</a> ·
   <a href="#the-target">The target</a> ·
   <a href="#contributing">Contributing</a> ·
@@ -36,8 +37,6 @@ The project is complete. All 3,267 game functions match.
 **100.00% of Cavedog's code matched** (850,853 of 850,853 bytes)
 
 `[########################################]`
-
-By count that is 3,267 of the game's 3,267 functions (100.0%). The headline counts bytes, because the functions left are mostly the longest ones.
 
 | | Functions | Bytes |
 | --- | ---: | ---: |
@@ -100,13 +99,49 @@ everything works:
 uv run tools/check.py 0x401070      # should print MATCH
 ```
 
+## Building the exe
+
+With the toolchain set up, the whole game builds from `src/`:
+
+```sh
+uv run tools/place.py            # build/place/TotalA.exe, compared byte for byte with orig/TotalA.exe
+uv run tools/place.py --no-orig  # the same without reading the original exe
+uv run tools/link.py --carve     # an ordinary LINK.EXE build, build/link/TotalA.exe
+```
+
+`place.py` compiles every source file with the original compiler and puts each
+function and each piece of data at its original address. The result is the
+shipped v3.1 exe, byte for byte:
+
+```
+MD5 8e74a1dffa1f5988624c52048f5b20cd
+SHA-256 3b9c0fadabf3dc67ed5f05a70f1e1505a0c65deadd1a3c930adfe30e2a84995e
+```
+
+It takes about a minute on a fast machine. The one input that is not in the
+repository is Cavedog's art, the icon and the cursor: `place.py` takes them
+from `orig/TotalA.exe`, or from a folder given with `--art DIR` (or
+`BT_ART_DIR`) when the original is not there (the MD5 matches only with
+Cavedog's own). Without a copy of the game,
+`BT_NO_ORIG=1 BT_NO_GHIDRA=1 tools/setup_toolchain.sh` sets up the compiler
+alone.
+
+`link.py --carve` links the same objects the ordinary way, so functions land
+wherever LINK.EXE puts them and the bytes differ, but that exe plays the game
+too (`tools/playtest.py` runs scripted games on both builds).
+
+GitHub Actions builds the exe from source on every change to the code and
+fails unless its MD5 is the shipped one (`.github/workflows/build.yml`).
+[docs/linking.md](docs/linking.md) explains how both builds work.
+
 ## How a match works
 
 ```sh
-uv run tools/check.py 0x401070 src/pilot.cpp --sym Reset
+uv run tools/check.py 0x401070
 ```
 
-1. Compiles the file with `/O2 /Ob2 /MT /Gz`.
+1. Finds the function's file (here `src/game/economy_401070.cpp`, which
+   defines `PlayerRef::Reset`) and compiles it with `/O2 /Ob2 /MT /Gz`.
 2. Extracts the function from the object file.
 3. Compares it with the original, ignoring bytes the linker fills in.
 
