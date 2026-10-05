@@ -135,14 +135,18 @@ def code_of(text: str) -> str:
 
 class Renamer:
     """Every pair at once: one regex for whole words, one for names inside
-    decorated symbols (after a non-word character, or after the code of a
-    class V, struct U, union T or enum W4: `PAUUnit@@`, `IURect_0046e160::`)."""
+    decorated symbols (after a non-word character, after the code of a
+    class V, struct U, union T or enum W4: `PAUUnit@@`, `IURect_0046e160::`,
+    or after a special member's code: `??0Unit@@` (constructor), `??1`
+    (destructor), `??_GUnit@@` (scalar deleting destructor), `??_7Unit@@`
+    (vtable))."""
 
     def __init__(self, pairs: list[tuple[str, str]]):
         self.table = dict(pairs)
         names = "|".join(re.escape(o) for o in sorted(self.table, key=len, reverse=True))
         self.word = re.compile(rf"(?<!{WORD})(?:{names})(?!{WORD})")
-        self.decorated = re.compile(rf"(?:(?<!{WORD})|(?<=[UVT4]))(?:{names})(?!{WORD})")
+        self.decorated = re.compile(rf"(?:(?<!{WORD})|(?<=[UVT4])|(?<=\?\?[0-9])|(?<=\?\?_[0-9A-Z]))"
+                                    rf"(?:{names})(?!{WORD})")
 
     def words(self, text: str) -> str:
         return self.word.sub(lambda m: self.table[m.group(0)], text)
