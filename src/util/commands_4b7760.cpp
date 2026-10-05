@@ -1,6 +1,6 @@
 // Decompiled by deepseek-v4.1-flash, finished by space-bunny-free, finished by GPT-6.1-sol, finished by mimo-v2.6-pro. Names are provisional.
 // MATCH, 370/370 bytes and every reference (mimo-v2.6-pro). The last fix was
-// the compiler-generated name of the file-local vector, DAT_0051fc99$S4554:
+// the compiler-generated name of the file-local vector, s_commandTable$S4554:
 // that $S number counts every declaration the compiler processes before the
 // vector, so the whole preamble must be counter-equivalent to the original's.
 // 0x4b75a0/0x4b75d0/0x4b7900 reach $S4554 with a simpler preamble (a
@@ -63,7 +63,7 @@ public:
     ~Class_004b7e30();
 };
 
-static std::vector<Class_004b7e30> DAT_0051fc99;
+static std::vector<Class_004b7e30> s_commandTable;
 
 extern "C" int __cdecl _strcmpi(const char* str1, const char* str2);
 
@@ -124,8 +124,8 @@ void __stdcall RegisterCommands(Rec_004b7760* rec)
         int mask = rec->mask;
         Handler_004b7760 fn = rec->fn;
         Class_004c91b0 key(rec->name);
-        Class_004b7e30* first = DAT_0051fc99.begin();
-        Class_004b7e30* last = DAT_0051fc99.end();
+        Class_004b7e30* first = s_commandTable.begin();
+        Class_004b7e30* last = s_commandTable.end();
         NameLess_004b7760 less;
         const char* k = key.data;
         while (first != last) {
@@ -136,11 +136,11 @@ void __stdcall RegisterCommands(Rec_004b7760* rec)
                 last = mid;
         }
         int* slot;
-        if (first == DAT_0051fc99.end() || NameNe_004b7760()(first->handle, key)) {
+        if (first == s_commandTable.end() || NameNe_004b7760()(first->handle, key)) {
             Class_004b7e30 e(key, Pair_004b7760(0, 0));
-            int index = first - DAT_0051fc99.begin();
-            DAT_0051fc99.insert(first, e);
-            slot = &(DAT_0051fc99.begin() + index)->value1;
+            int index = first - s_commandTable.begin();
+            s_commandTable.insert(first, e);
+            slot = &(s_commandTable.begin() + index)->value1;
         } else {
             slot = &first->value1;
         }

@@ -26,10 +26,10 @@ struct Tree_004d0f60 {
 extern HANDLE DAT_0052a4f8;
 extern long DAT_0052a4fc;
 extern int DAT_0052a4f4;
-extern int DAT_00526ff8;
-extern int DAT_00526ffc;
-extern char DAT_0051ffd0[];
-extern char DAT_00520fe8[];
+extern int g_lzssPresetReady;
+extern int g_lzssUsePreset;
+extern char g_lzssPresetWindow[];
+extern char g_lzssPresetTree[];
 extern char *DAT_00526ff4;
 extern Tree_004d0f60 *DAT_00526ff0;
 
@@ -100,9 +100,9 @@ int __stdcall LzssCompress(unsigned char *dest, unsigned char *src, int len) {
         return -1;
     }
     state.pos = 1;
-    if (DAT_00526ff8 != 0 && DAT_00526ffc != 0) {
-        memcpy(DAT_00526ff4, DAT_0051ffd0, 0x1011);
-        memcpy(DAT_00526ff0, DAT_00520fe8, 0x6006);
+    if (g_lzssPresetReady != 0 && g_lzssUsePreset != 0) {
+        memcpy(DAT_00526ff4, g_lzssPresetWindow, 0x1011);
+        memcpy(DAT_00526ff0, g_lzssPresetTree, 0x6006);
     } else {
         DAT_00526ff0->nodes[0x1000].parent = 0;
         DAT_00526ff0->nodes[0x1000].larger = 1;

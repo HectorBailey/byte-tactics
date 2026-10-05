@@ -25,7 +25,7 @@
 //
 // Load-bearing details kept from earlier passes (see 0x4b7760.cpp for the
 // declaration-counter work): the whole preamble must stay counter-equivalent
-// to the original's so the file-local vector mangles as DAT_0051fc99$S4554;
+// to the original's so the file-local vector mangles as s_commandTable$S4554;
 // std::vector<Class_004b7e30> lifts the index division above the insert; the
 // NameLess functor spelling puts the lower_bound result in edx; the `int* slot`
 // pointer gives `lea esi, [eax+edx*4+4]` with stores [esi]/[esi+4].
@@ -52,7 +52,7 @@ public:
     ~Class_004b7e30();
 };
 
-static std::vector<Class_004b7e30> DAT_0051fc99;
+static std::vector<Class_004b7e30> s_commandTable;
 
 extern "C" int __cdecl _strcmpi(const char* str1, const char* str2);
 
@@ -105,8 +105,8 @@ void __stdcall RegisterCommand(const char* name, Handler_004b7620 fn, int mask)
 {
     Pair_004b7620 p((int)fn, mask);
     Class_004c91b0 key(name);
-    Class_004b7e30* first = DAT_0051fc99.begin();
-    Class_004b7e30* last = DAT_0051fc99.end();
+    Class_004b7e30* first = s_commandTable.begin();
+    Class_004b7e30* last = s_commandTable.end();
     NameLess_004b7620 less;
     const char* k = key.data;
     while (first != last) {
@@ -117,11 +117,11 @@ void __stdcall RegisterCommand(const char* name, Handler_004b7620 fn, int mask)
             last = mid;
     }
     int* slot;
-    if (first == DAT_0051fc99.end() || NameNe_004b7620()(first->handle, key)) {
+    if (first == s_commandTable.end() || NameNe_004b7620()(first->handle, key)) {
         Class_004b7e30 e(key, Pair_004b7620(0, 0));
-        int index = first - DAT_0051fc99.begin();
-        DAT_0051fc99.insert(first, e);
-        slot = &(DAT_0051fc99.begin() + index)->value1;
+        int index = first - s_commandTable.begin();
+        s_commandTable.insert(first, e);
+        slot = &(s_commandTable.begin() + index)->value1;
     } else {
         slot = &first->value1;
     }

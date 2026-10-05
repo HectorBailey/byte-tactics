@@ -7,7 +7,7 @@
 //
 // The element is declared with plain ints at +4/+8 exactly as 0x4b7ad0.cpp
 // does, which is also what fixes the compiler's file-local name for the vector
-// (DAT_0051fc99$S4554): only the declarations above the vector affect it, so
+// (s_commandTable$S4554): only the declarations above the vector affect it, so
 // every other class is declared after it. The handler is called through a
 // reinterpreted HandlerSlot view of those two fields.
 #include <string.h>
@@ -27,11 +27,11 @@ struct Elem_004b75d0 {
     ~Elem_004b75d0() { name.ReleaseRef(); }
 };
 
-static std::vector<Elem_004b75d0> DAT_0051fc99;
+static std::vector<Elem_004b75d0> s_commandTable;
 
 extern char DAT_005119b8[];
-extern int DAT_0051fc90;
-extern int DAT_0051fc94;
+extern int g_defaultCommandHandler;
+extern int g_defaultCommandMask;
 
 class Class_004c91a0 : public Class_004c9390 {
 public:
@@ -71,8 +71,8 @@ struct NameLess_004b7900 {
 static inline HandlerSlot_004b7900* Find_004b7900(const char* key)
 {
     NameLess_004b7900 less;
-    Elem_004b75d0* first = DAT_0051fc99.begin();
-    Elem_004b75d0* last = DAT_0051fc99.end();
+    Elem_004b75d0* first = s_commandTable.begin();
+    Elem_004b75d0* last = s_commandTable.end();
     while (first != last) {
         Elem_004b75d0* mid = first + (last - first) / 2;
         if (less(mid->name.data, key))
@@ -80,7 +80,7 @@ static inline HandlerSlot_004b7900* Find_004b7900(const char* key)
         else
             last = mid;
     }
-    if (first == DAT_0051fc99.end() || less(key, first->name.data))
+    if (first == s_commandTable.end() || less(key, first->name.data))
         return 0;
     return (HandlerSlot_004b7900*)&first->value1;
 }
@@ -96,9 +96,9 @@ int __stdcall ExecuteCommand(Class_004b73c0* obj, int param_2)
         if (h != 0 && (h->mask & param_2)) {
             result = h->mask;
             h->fn(obj);
-        } else if (DAT_0051fc90 != 0 && (DAT_0051fc94 & param_2)) {
-            result = DAT_0051fc94;
-            ((void (__stdcall *)(void*))DAT_0051fc90)(obj);
+        } else if (g_defaultCommandHandler != 0 && (g_defaultCommandMask & param_2)) {
+            result = g_defaultCommandMask;
+            ((void (__stdcall *)(void*))g_defaultCommandHandler)(obj);
         }
     }
     return result;

@@ -43,7 +43,7 @@ struct File_004bdd70 {                 // 0x118 bytes
 };
 #pragma pack(pop)
 
-extern char DAT_004fdbf0[];            // "Copyright 0000 Cavedog Entertainment"
+extern char g_hapiCopyright[];         // "Copyright 0000 Cavedog Entertainment"
 
 void* __cdecl FUN_004d83b0(const char* name, unsigned int size);
 void __cdecl FUN_004d85a0(void* p);
@@ -54,12 +54,12 @@ static inline int Bad_004bdd70(FILE* f, Header_004bdd70* hdr, char* copyright)
     if (strncmp(hdr->magic, "HAPI", 4) != 0 || hdr->version[0] != 0 || hdr->version[1] != 0 ||
         hdr->version[2] != 1 || hdr->version[3] != 0)
         return 1;
-    int len = strlen(DAT_004fdbf0);
+    int len = strlen(g_hapiCopyright);
     fseek(f, -len, 2);
     fread(copyright, 1, len, f);
     copyright[len] = 0;
-    strncpy(copyright + (strstr(DAT_004fdbf0, "0000") - DAT_004fdbf0), "0000", 4);
-    if (strcmp(copyright, DAT_004fdbf0) == 0)
+    strncpy(copyright + (strstr(g_hapiCopyright, "0000") - g_hapiCopyright), "0000", 4);
+    if (strcmp(copyright, g_hapiCopyright) == 0)
         return 0;
     return 1;
 }

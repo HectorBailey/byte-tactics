@@ -1,6 +1,6 @@
 // Decompiled by deepseek-v4.1-flash. Names are provisional.
 // Looks a key up in a TDF section: builds the key by prepending the current
-// section name (DAT_0051fdc0), tries that first and falls back to the plain
+// section name (g_language), tries that first and falls back to the plain
 // key. param_5 (or the empty default DAT_005119b8) is the TDF default value.
 // param_1 is the open file object, its section parser at +4. The intermediate
 // int is what makes MSVC 5 keep each argument in the original's register.
@@ -21,7 +21,7 @@ public:
     int file;                            // +0x8
 };
 
-extern char DAT_0051fdc0[256];
+extern char g_language[256];
 extern char DAT_005119b8[];
 
 // FUNCTION: 0x4c58a0
@@ -29,7 +29,7 @@ int __stdcall GetLocalizedString(Class_004c2ea0* file, char* dst, char* key, siz
                            char* def)
 {
     char full[256];
-    strcpy(full, DAT_0051fdc0);
+    strcpy(full, g_language);
     strcat(full, key);
     int r;
     if (def) {

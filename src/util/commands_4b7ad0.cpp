@@ -17,10 +17,10 @@ struct Elem_004b75d0 {
     ~Elem_004b75d0() { name.ReleaseRef(); }
 };
 
-static std::vector<Elem_004b75d0> DAT_0051fc99;
+static std::vector<Elem_004b75d0> s_commandTable;
 
 // FUNCTION: 0x4b7ad0
 void ClearCommandTable()
 {
-    DAT_0051fc99.clear();
+    s_commandTable.clear();
 }

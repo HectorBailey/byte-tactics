@@ -19,14 +19,14 @@ struct Class_004c5740 {
 };
 #pragma pack(pop)
 
-extern Class_004c5740* DAT_0051fdb8;
+extern Class_004c5740* g_translations;
 
 // FUNCTION: 0x4c5740
 char* __stdcall Translate(char* key)
 {
     if (key == 0)
         return 0;
-    Class_004c5740* c = DAT_0051fdb8;
+    Class_004c5740* c = g_translations;
     if (c == 0)
         return key;
 

@@ -22,4 +22,4 @@ struct Elem_004b75d0 {
 };
 
 // FUNCTION: 0x4b75d0 _$E3
-static std::vector<Elem_004b75d0> DAT_0051fc99;
+static std::vector<Elem_004b75d0> s_commandTable;

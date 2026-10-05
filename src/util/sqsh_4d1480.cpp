@@ -2,11 +2,13 @@
 // LZ decompressor. It first takes the window lock: a spinlock on DAT_0052a4fc
 // holding the owning thread id, with DAT_0052a4f4 naming the owner and
 // DAT_0052a4f8 the event that releases the waiters. Then it allocates the
-// 0x1011 byte sliding window, and reloads it from the template at DAT_0051ffd0
-// unless a re-entrant call is in progress (DAT_00526ffc) or the template was
-// never set up (DAT_00526ff8). The bit stream that follows is read through a
-// mask that counts 1, 2, 4 ... 0x80 and then reloads a fresh flag byte: a clear
-// bit is a literal byte, a set bit is a 16 bit word whose high 12 bits are the
+// 0x1011 byte sliding window, and reloads it from the template at g_lzssPresetWindow
+// when the template was set up (g_lzssPresetReady) and the caller switched it on
+// (g_lzssUsePreset, set around each call by the net condenser through
+// LzssEnablePreset / LzssDisablePreset). The bit stream that follows is read
+// through a mask that counts 1, 2, 4 ... 0x80 and then reloads a fresh flag
+// byte: a clear bit is a literal byte, a set bit is a 16 bit word whose high
+// 12 bits are the
 // distance back into the window and whose low four bits are the length minus
 // two, and a distance of zero ends the stream. Every output byte also goes
 // into the window at the current position, which starts at 1 and wraps at
@@ -28,9 +30,9 @@
 extern HANDLE DAT_0052a4f8;
 extern long DAT_0052a4fc;
 extern int DAT_0052a4f4;
-extern int DAT_00526ff8;
-extern int DAT_00526ffc;
-extern char DAT_0051ffd0[];
+extern int g_lzssPresetReady;
+extern int g_lzssUsePreset;
+extern char g_lzssPresetWindow[];
 extern char* DAT_00526ff4;
 
 // FUNCTION: 0x4d1480
@@ -67,8 +69,8 @@ int __stdcall LzssExpand(unsigned char* dest, unsigned char* src)
         }
         return -1;
     }
-    if (DAT_00526ff8 && DAT_00526ffc)
-        memcpy(DAT_00526ff4, DAT_0051ffd0, 0x1011);
+    if (g_lzssPresetReady && g_lzssUsePreset)
+        memcpy(DAT_00526ff4, g_lzssPresetWindow, 0x1011);
     pos = 1;
     flags = *src++;
     mask = 1;
