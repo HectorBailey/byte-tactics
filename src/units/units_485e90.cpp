@@ -60,14 +60,14 @@ public:
     Class_0043dc00(Unit* unit);
 };
 
-void __stdcall FUN_00485a40(Unit* unit, Pos_00485e90 pos, int param_5);
+void __stdcall InitUnitFromType(Unit* unit, Pos_00485e90 pos, int param_5);
 void __stdcall InitUnitScript(Unit* unit);
 void __stdcall FUN_0049e070(Unit* unit);
 void __stdcall FUN_00437840(Unit* unit);
 void* __cdecl operator new(unsigned int size);
 
 // FUNCTION: 0x485e90
-void __stdcall FUN_00485e90(int unitType, Pos_00485e90 pos, int param_5, Unit* unit)
+void __stdcall InitUnit(int unitType, Pos_00485e90 pos, int param_5, Unit* unit)
 {
     UnitType_00485e90* type = &g_game->unitTypes[(unsigned short)unitType];
     if (unit) {
@@ -78,7 +78,7 @@ void __stdcall FUN_00485e90(int unitType, Pos_00485e90 pos, int param_5, Unit* u
         }
     }
     unit->field_a6 = (short)unitType;
-    FUN_00485a40(unit, pos, param_5);
+    InitUnitFromType(unit, pos, param_5);
     InitUnitScript(unit);
     FUN_0049e070(unit);
     FUN_00437840(unit);

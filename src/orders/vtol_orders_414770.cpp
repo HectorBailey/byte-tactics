@@ -25,8 +25,8 @@ public:
     unsigned char field_2e;            // +0x2e
     void FUN_0043d210(Unit* unit, int state);
 };
-class Class_004898b0 { public: void FUN_004898b0(int); };
-class Class_0048b090 { public: void FUN_0048b090(int, int); };
+class Class_004898b0 { public: void ClaimWeapons(int); };
+class Class_0048b090 { public: void SetStateBits(int, int); };
 class Class_004388d0 { public: void FUN_004388d0(int); };
 class Class_00438880 { public: void FUN_00438880(const char*); };
 class Class_0044e6c0 { public: void FUN_0044e6c0(int); };
@@ -94,19 +94,19 @@ extern Game* g_game;
 
 unsigned short __stdcall FUN_00421da0(Vec3* pos, Point16* cell, Point16* size);
 void __stdcall FUN_0047f780(Unit* unit, int kind, char* text);
-int __stdcall FUN_00485070(Vec3* pos);
+int __stdcall GetGroundHeight(Vec3* pos);
 void __stdcall FUN_0043e400(Unit* unit, Vec3* out);
 void __stdcall FUN_00472200(Box* from, Vec3* to, int count);
 void __stdcall FUN_004237d0(Unit* unit, Vec3* pos);
-void __stdcall FUN_0048aac0(Unit* unit, Unit* target, char p3, char p4);
+void __stdcall AttachUnitToPiece(Unit* unit, Unit* target, char p3, char p4);
 
 // 0x40f200, matched in 0x40f200.cpp; inlined into the state 0 case below.
 void __stdcall FUN_0040f200(Unit* unit, Order* order, unsigned int flags)
 {
-    ((Class_004898b0*)unit)->FUN_004898b0(3);
+    ((Class_004898b0*)unit)->ClaimWeapons(3);
     if (unit->field_86)
-        FUN_0048aac0(unit, 0, -1, 2);
-    ((Class_0048b090*)unit)->FUN_0048b090(1, 1);
+        AttachUnitToPiece(unit, 0, -1, 2);
+    ((Class_0048b090*)unit)->SetStateBits(1, 1);
     if ((unit->type->field_2e & 3) == 1) {
         unit->type->FUN_0043d210(unit, 2);
         Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);
@@ -163,7 +163,7 @@ int __stdcall FUN_00414770(Unit* unit, Order* order, int flags)
             Box box;
             box.lo.x = cell.x << 20;
             box.lo.z = cell.z << 20;
-            box.lo.y = FUN_00485070(&box.lo) << 16;
+            box.lo.y = GetGroundHeight(&box.lo) << 16;
             box.hi = box.lo;
             box.hi.x += f->footprint.x << 20;
             box.hi.z += f->footprint.z << 20;

@@ -4,7 +4,7 @@
 // player object, the two sizes in the definition are clamped to a minimum of
 // 200 and stored as floats, the start position is looked up in the campaign's
 // entry table (16.16 fixed point), and the team number, the player's own unit
-// type and the position go to FUN_00485f50. When the team is the local one the
+// type and the position go to CreateUnit. When the team is the local one the
 // view is centred on the position afterwards.
 //
 // Layout notes, for whoever reads the neighbours of this code:
@@ -107,7 +107,7 @@ struct FixedPos_00496ee0 {
     Fixed_00496ee0 z;
 };
 
-void __stdcall FUN_00485f50(int team, unsigned short id, FixedPos_00496ee0 pos, int a, int b,
+void __stdcall CreateUnit(int team, unsigned short id, FixedPos_00496ee0 pos, int a, int b,
     int c);
 
 // FUNCTION: 0x496ee0
@@ -126,7 +126,7 @@ void __stdcall FUN_00496ee0(int team, int startpos)
     if (g_game->net->FUN_00437320((Vec3_00437320*)&pos, startpos)) {
         unsigned short id = FUN_00488b10(
             g_game->names[g_game->players[team].player->nameIndex].name);
-        FUN_00485f50(team, id, pos, 1, 1, 0);
+        CreateUnit(team, id, pos, 1, 1, 0);
     } else {
         char buf[128];
         sprintf(buf,

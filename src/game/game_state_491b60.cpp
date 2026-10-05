@@ -34,7 +34,7 @@ extern Game* g_game;
 
 void __cdecl FUN_0041dc20();
 void FUN_00437d30();
-void FUN_00485980();
+void FreeUnitMemory();
 void FUN_00471de0();
 void FUN_00420960();
 void FUN_0044f6e0();
@@ -59,7 +59,7 @@ void FUN_00491b60()
     g_game->field_10->FUN_004ce690(4);
     FUN_0041dc20();
     FUN_00437d30();
-    FUN_00485980();
+    FreeUnitMemory();
     FUN_00471de0();
     FUN_00420960();
     FUN_0044f6e0();

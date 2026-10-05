@@ -16,11 +16,11 @@ public:
     Owner_00489540* owner;  // +4
     Class_00489540* next;   // +8
 
-    void FUN_00489540(Owner_00489540* o);
+    void LinkToUnit(Owner_00489540* o);
 };
 
 // FUNCTION: 0x489540
-void Class_00489540::FUN_00489540(Owner_00489540* o)
+void Class_00489540::LinkToUnit(Owner_00489540* o)
 {
     if (o != 0 && o->flag != 0) {
         owner = o;

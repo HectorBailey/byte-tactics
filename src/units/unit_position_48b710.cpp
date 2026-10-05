@@ -111,11 +111,11 @@ struct Game {
 
 extern Game* g_game;
 
-void __stdcall FUN_0048b200(Class_00415c10* stream, Unit* u);
+void __stdcall WriteUnitState(Class_00415c10* stream, Unit* u);
 int __stdcall FUN_00451df0(int player, void* data, int size);
 
 // FUNCTION: 0x48b710
-void __stdcall FUN_0048b710(Player_0048b710* p)
+void __stdcall SendUnitStates(Player_0048b710* p)
 {
     Class_00415c10 stream;
     stream.FUN_00415c10(0x2c, 8);
@@ -148,7 +148,7 @@ void __stdcall FUN_0048b710(Player_0048b710* p)
             stream.FUN_00415bb0();
         stream.data[stream.bit] = 0;
     }
-    FUN_0048b200(&stream, &p->units_begin[i]);
+    WriteUnitState(&stream, &p->units_begin[i]);
     // The packet's length, little-endian at bytes 1 and 2, is only known here.
     // The `char` cast is what makes MSVC 5 narrow the first sum to a byte and
     // push the register unmasked; the second is pushed as a dword.

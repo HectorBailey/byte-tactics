@@ -411,7 +411,7 @@ public:
 
     unsigned char GetState() { return state; }
 
-    void FUN_0048b090(int mask, int set);
+    void SetStateBits(int mask, int set);
 };
 #pragma pack(pop)
 
@@ -428,7 +428,7 @@ static inline unsigned char GainedBits(unsigned char was, int is) { return (unsi
 static inline unsigned char AsByte(unsigned char bits) { return (unsigned char)bits; }
 
 // FUNCTION: 0x48b090
-void Class_0048b090::FUN_0048b090(int mask, int set)
+void Class_0048b090::SetStateBits(int mask, int set)
 {
     unsigned char lost, gained, old = GetState();
     int isOne, active;

@@ -32,7 +32,7 @@ struct Player_004813b0 {
 };
 
 int __stdcall FUN_0047db70(void* type, short a, int position, int b);
-void __stdcall FUN_0048aac0(Unit* unit, int player, int a, int b);
+void __stdcall AttachUnitToPiece(Unit* unit, int player, int a, int b);
 
 static inline Unit* GetUnit(unsigned short id)
 {
@@ -114,7 +114,7 @@ void UnitScript::DropUnit(unsigned short id)
     Unit* u = GetUnit(id);
     if (u != 0 && (u->flags & 0x10000000) && u->owner == player->id) {
         if (FUN_0047db70(u->type, u->field_a8, u->position, 1)) {
-            FUN_0048aac0(u, 0, -1, 1);
+            AttachUnitToPiece(u, 0, -1, 1);
         }
     }
 }

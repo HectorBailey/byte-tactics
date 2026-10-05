@@ -2,7 +2,7 @@
 // Creates a unit of a given type for a player: refuses when the type is not
 // buildable or the player already has its limit of that type, takes the
 // requested unit slot (or the first free one) from the player's unit list,
-// initialises it (FUN_00485e90 inlined) and registers it.
+// initialises it (InitUnit inlined) and registers it.
 //
 // Two spellings decide the match, and neither is arbitrary:
 // - #include <windows.h>. With no header the 2-bit store at +0x110 costs one
@@ -36,7 +36,7 @@ public:
 
 class Class_0048b090 {                  // the unit's own method, under its own name
 public:
-    void FUN_0048b090(int a, int b);
+    void SetStateBits(int a, int b);
 };
 
 struct Pos_00485f50 {
@@ -112,11 +112,11 @@ struct Game {
 extern Game* g_game;
 extern void* DAT_004fd6f0[];
 
-void __stdcall FUN_00485a40(Unit* unit, Pos_00485f50 pos, int param_5);
+void __stdcall InitUnitFromType(Unit* unit, Pos_00485f50 pos, int param_5);
 void __stdcall InitUnitScript(Unit* unit);
 void __stdcall FUN_0049e070(Unit* unit);
 void __stdcall FUN_00437840(Unit* unit);
-void __stdcall FUN_0048a870(Unit* unit);
+void __stdcall UpdateUnitHeight(Unit* unit);
 void __stdcall FUN_0047cc30(Unit* unit);
 void __stdcall FUN_00456050(Unit* unit);
 void __stdcall FUN_004560c0(Unit* a, Unit* b);
@@ -135,7 +135,7 @@ static inline void __stdcall InitUnit_00485e90(unsigned short unitType, Pos_0048
         }
     }
     unit->field_a6 = unitType;
-    FUN_00485a40(unit, pos, param_5);
+    InitUnitFromType(unit, pos, param_5);
     InitUnitScript(unit);
     FUN_0049e070(unit);
     FUN_00437840(unit);
@@ -146,7 +146,7 @@ static inline void __stdcall InitUnit_00485e90(unsigned short unitType, Pos_0048
 }
 
 // FUNCTION: 0x485f50
-Unit* __stdcall FUN_00485f50(unsigned char player, unsigned short typeId, Pos_00485f50 pos,
+Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId, Pos_00485f50 pos,
                                       int param_5, int mode, unsigned short id)
 {
     int off = player * 0x14b;
@@ -181,14 +181,14 @@ Unit* __stdcall FUN_00485f50(unsigned char player, unsigned short typeId, Pos_00
 found:
     InitUnit_00485e90(typeId, pos, param_5, unit);
     unit->mode = mode;
-    FUN_0048a870(unit);
+    UpdateUnitHeight(unit);
     FUN_0047cc30(unit);
     FUN_00456050(unit);
     if (param_5) {
         if (type->field_22f == 0)
             FUN_004560c0(unit, unit);
         if (unit->type->bit18)
-            ((Class_0048b090*)unit)->FUN_0048b090(1, 1);
+            ((Class_0048b090*)unit)->SetStateBits(1, 1);
         if (unit->type->bit24) {
             unit->field_f5 = 7;
             unit->bit14 = 1;

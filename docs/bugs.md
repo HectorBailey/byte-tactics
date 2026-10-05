@@ -491,7 +491,7 @@ Things that look wrong in the original but have no effect, kept for the record.
   deepseek-v4.1-flash in #2274.
 
 - **0x43e490** (case 2, 0x43ea36 to 0x43ea7c): calls the predicate
-  FUN_004899b0 and returns 6 if it holds and `target->field_104 != 0`, then
+  CanRepair and returns 6 if it holds and `target->field_104 != 0`, then
   calls it again and returns 6 if it holds, so the first test adds nothing; the
   predicate only reads. Found by ozgb's Cline / deepseek-v4.1 in #2142.
 
@@ -832,7 +832,7 @@ Things that look wrong in the original but have no effect, kept for the record.
 - **0x4861d0** (possible): when a spawn record's id is 0 the unit pointer is
   null, but `unit->field_a6` is still read (`cmp word ptr [esi+0xa6], 0` right
   after `xor esi, esi`), then written, and the null pointer is passed to every
-  callee; only the loop inlined from FUN_00485e90 checks for null. Harmless if
+  callee; only the loop inlined from InitUnit checks for null. Harmless if
   id 0 never occurs. Found by Claude Opus 5.5 in #333.
 - **0x421700** (possible): increments the debris counter at g_game+0x1491b
   and writes the entry's position before searching the 300-slot object pool;

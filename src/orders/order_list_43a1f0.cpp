@@ -21,7 +21,7 @@ public:
 
 class Class_00489800 {
 public:
-    void FUN_00489800(int param_1);
+    void ReleaseWeapons(int param_1);
 };
 
 // Object at +0x52, deleted through its virtual destructor.
@@ -113,7 +113,7 @@ Class_0043a1f0::~Class_0043a1f0()
         }
     }
     if (!(flags & 0x10000)) {
-        ((Class_00489800*)unit)->FUN_00489800(3);
+        ((Class_00489800*)unit)->ReleaseWeapons(3);
     }
     ((Class_00489650*)((char*)this + 0x12))->FUN_00489650();
 }

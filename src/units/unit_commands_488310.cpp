@@ -138,7 +138,7 @@ extern Game* g_game;
 
 Item_00488310* __stdcall FUN_00488a50(const char* name);
 void __stdcall FUN_0047ddc0(Item_00488310* type, Pos_00488310* pos);
-Unit* __stdcall FUN_00485f50(unsigned char player, unsigned short id,
+Unit* __stdcall CreateUnit(unsigned char player, unsigned short id,
                                       Pos_00488310 pos, int a, int b, int c);
 void __stdcall FUN_00487bf0(Unit* unit, char* text, Table_00488310* table);
 void __stdcall FUN_004b6290(char* message);
@@ -166,7 +166,7 @@ void __cdecl FUN_00488310()
             FUN_004b6290(buf);
         }
         FUN_0047ddc0(item, &e->pos);
-        Unit* u = FUN_00485f50((unsigned char)(e->player - 1), item->id, e->pos, 1, 1, 0);
+        Unit* u = CreateUnit((unsigned char)(e->player - 1), item->id, e->pos, 1, 1, 0);
         if (u) {
             u->flags = (u->flags & ~0x8000) | ((e->flags & 0xffffff80) << 8);
             u->f108 = (unsigned short)((unsigned)(u->def->f1fa * e->f1a) / 100);

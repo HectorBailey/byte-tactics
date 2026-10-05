@@ -309,7 +309,7 @@ struct Class_00435100 {
 };
 struct Class_0048ff40 { int FUN_00490230(); };
 struct Class_00490360 { int FUN_00490360(); };
-class Class_0048b090 { public: void FUN_0048b090(int which, int on); };
+class Class_0048b090 { public: void SetStateBits(int which, int on); };
 
 #pragma pack(push, 1)
 
@@ -480,8 +480,8 @@ unsigned short __stdcall FUN_00488b10(const char* name);
 int __stdcall FUN_004b6c30(int range);
 int __stdcall FUN_0047db70(UnitDef_00464f80* type, int a, Point16 cell, int c);
 short __stdcall FUN_00421da0(Pos_00464f80* pos, int a, int b);
-int __stdcall FUN_00485140(Pos_00464f80* pos);
-Unit* __stdcall FUN_00485f50(unsigned char player, unsigned short typeId,
+int __stdcall GetCellMeanHeight(Pos_00464f80* pos);
+Unit* __stdcall CreateUnit(unsigned char player, unsigned short typeId,
                                      Pos_00464f80 pos, int a, int b, int c);
 void __stdcall FUN_00496e90(Struct_00496e90* obj, int height, int width);
 void __stdcall FUN_004816a0(int on);
@@ -661,14 +661,14 @@ void __stdcall FUN_00464f80()
                                 if (hits >= 9 && FUN_00421da0(&pos, 0, 0) == -1) {
                                     if (g_game->mode->field_d44 == 0)
                                         break;
-                                    if (FUN_00485140(&pos) >
+                                    if (GetCellMeanHeight(&pos) >
                                         (int)g_game->field_1427f)
                                         break;
                                 }
                             } while (--bound > 0);
 
                             {
-                                Unit* unit = FUN_00485f50(
+                                Unit* unit = CreateUnit(
                                     g_game->localPlayer, typeId, pos, 1, 1, 0);
                                 FUN_00496e90((Struct_00496e90*)pi,
                                              self->field_a3 * 100,

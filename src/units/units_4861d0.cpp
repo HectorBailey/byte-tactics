@@ -3,11 +3,11 @@
 // placement code fills in: player, unit type, unit id, position). It takes the
 // unit slot for the record's id out of the unit array, refuses to go on when
 // that player has no unit list, clears the slot when it is still in use,
-// initialises the unit (the matched FUN_00485e90, inlined), then registers it
-// with FUN_0048a870, FUN_0047cc30, FUN_00482ac0 and the list manager and bumps
+// initialises the unit (the matched InitUnit, inlined), then registers it
+// with UpdateUnitHeight, FUN_0047cc30, FUN_00482ac0 and the list manager and bumps
 // the player's counters at +0x144 and +0x140.
 //
-// The middle of the function is FUN_00485e90 (src/units/units_485e90.cpp)
+// The middle of the function is InitUnit (src/units/units_485e90.cpp)
 // inlined by /Ob2: the 12-byte local frame is its by-value position argument,
 // and its type argument stays in dx because it is an unsigned short. Written
 // out in the body, or with an int type parameter as 0x485e90.cpp has it, the
@@ -96,17 +96,17 @@ struct Game {
 extern Game* g_game;
 extern void* DAT_004fd6f0[];
 
-void __stdcall FUN_004864b0(Unit* unit, int param_2);
-void __stdcall FUN_00485a40(Unit* unit, Pos_004861d0 pos, int param_5);
+void __stdcall KillUnit(Unit* unit, int param_2);
+void __stdcall InitUnitFromType(Unit* unit, Pos_004861d0 pos, int param_5);
 void __stdcall InitUnitScript(Unit* unit);
 void __stdcall FUN_0049e070(Unit* unit);
 void __stdcall FUN_00437840(Unit* unit);
-void __stdcall FUN_0048a870(Unit* unit);
+void __stdcall UpdateUnitHeight(Unit* unit);
 void __stdcall FUN_0047cc30(Unit* unit);
 void __stdcall FUN_00482ac0(Unit* unit);
 void* __cdecl operator new(unsigned int size);
 
-// Inlined copy of FUN_00485e90. As there, the three vtable stores are guarded
+// Inlined copy of InitUnit. As there, the three vtable stores are guarded
 // by `if (unit)` but the +0xa6 store and the new expression are not.
 static inline void __stdcall InitUnit_00485e90(unsigned short unitType, Pos_004861d0 pos,
                                                int param_5, Unit* unit)
@@ -120,7 +120,7 @@ static inline void __stdcall InitUnit_00485e90(unsigned short unitType, Pos_0048
         }
     }
     unit->field_a6 = unitType;
-    FUN_00485a40(unit, pos, param_5);
+    InitUnitFromType(unit, pos, param_5);
     InitUnitScript(unit);
     FUN_0049e070(unit);
     FUN_00437840(unit);
@@ -131,7 +131,7 @@ static inline void __stdcall InitUnit_00485e90(unsigned short unitType, Pos_0048
 }
 
 // FUNCTION: 0x4861d0
-Unit* __stdcall FUN_004861d0(unsigned char player, Spawn_004861d0* spawn)
+Unit* __stdcall CreateUnitFromPacket(unsigned char player, Spawn_004861d0* spawn)
 {
     Player_004861d0* pl = &g_game->players[player];
     Unit* unit;
@@ -144,10 +144,10 @@ Unit* __stdcall FUN_004861d0(unsigned char player, Spawn_004861d0* spawn)
         return 0;
     }
     if (unit->field_a6 != 0) {
-        FUN_004864b0(unit, 0);
+        KillUnit(unit, 0);
     }
     InitUnit_00485e90(spawn->type, spawn->pos, 0, unit);
-    FUN_0048a870(unit);
+    UpdateUnitHeight(unit);
     FUN_0047cc30(unit);
     FUN_00482ac0(unit);
     g_game->players[player].field_144++;

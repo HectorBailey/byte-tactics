@@ -12,7 +12,7 @@ struct Vec3 {
 
 class Class_0048b090 {
 public:
-    void FUN_0048b090(int param_1, int param_2);
+    void SetStateBits(int param_1, int param_2);
 };
 
 class Class_0043d210 {
@@ -39,9 +39,9 @@ void Class_0043d210::FUN_0043d210(Class_0048b090* owner, int newState)
             Vec3 zero(0, 0, 0);
             velocity = zero;
             FUN_0043d0d0(owner, &zero);
-            owner->FUN_0048b090(1, 0);
+            owner->SetStateBits(1, 0);
         } else {
-            owner->FUN_0048b090(1, 1);
+            owner->SetStateBits(1, 1);
         }
         state = newState;
     }

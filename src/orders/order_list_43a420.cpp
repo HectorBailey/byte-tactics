@@ -138,7 +138,7 @@ public:
     void SetValue(void* v) { value = v; }
 
     Class_004895c0(void* o, int v);
-    void FUN_00489690(void* v);
+    void SetUnit(void* v);
 };
 
 class Class_0044de80 {
@@ -258,7 +258,7 @@ Class_0043a1f0::Class_0043a1f0(Unit* punit, Class_004b4ba0* file, char* name)
     : link(0, 0)
 {
     link.SetValue(this);
-    link.FUN_00489690(0);
+    link.SetUnit(0);
     field_4a = 0;
     attached = 0;
     created = g_game->ticks;
@@ -296,7 +296,7 @@ Class_0043a1f0::Class_0043a1f0(Unit* punit, Class_004b4ba0* file, char* name)
         return;
 
     unit = punit;
-    link.FUN_00489690(FUN_00487080(desc.ownerType, file));
+    link.SetUnit(FUN_00487080(desc.ownerType, file));
 
     kind = desc.kind;
     flag5 = desc.flag5;

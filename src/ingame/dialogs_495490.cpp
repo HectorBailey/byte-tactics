@@ -51,7 +51,7 @@ extern int DAT_00506dbc;
 extern Class_004618a0 DAT_00513000;
 
 void FUN_00453d40(void);
-void FUN_0048ad30(void);
+void UpdateAllUnits(void);
 void FUN_0049b720(void);
 void FUN_00420f30(void);
 void FUN_00464f80(void);
@@ -81,7 +81,7 @@ void __stdcall FUN_00495490(int showStats)
             FUN_00453d40();
             g_game->prof.FUN_0046a400(0);
         }
-        FUN_0048ad30();
+        UpdateAllUnits();
         g_game->prof.FUN_0046a400(1);
         FUN_0049b720();
         g_game->prof.FUN_0046a400(7);
