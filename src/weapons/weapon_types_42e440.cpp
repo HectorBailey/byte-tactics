@@ -140,7 +140,7 @@ class Map_0042e440 {
 };
 #pragma pack(pop)
 
-void __stdcall FUN_0049e010(void*);
+void __stdcall SetWeaponFireHandler(void*);
 
 
 #pragma pack(push, 1)
@@ -416,5 +416,5 @@ model_done:
     } else {
         w->damage = 0;
     }
-    FUN_0049e010(w);
+    SetWeaponFireHandler(w);
 }

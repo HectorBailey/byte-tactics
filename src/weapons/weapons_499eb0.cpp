@@ -82,11 +82,11 @@ void __stdcall FUN_0041c640(int a, int b, int c);
 void __stdcall AddExplosionEffect(Vec3_00499eb0* position, void* value, int a, int b);
 void __stdcall EmitWhiteSmoke(Vec3_00499eb0* position, int value);
 void __stdcall FUN_0047f300(unsigned int sound, Vec3_00499eb0* position, int value);
-int __stdcall FUN_00499cd0(Projectile_00499eb0* projectile, Unit* unit, float scale);
-void __stdcall FUN_0049a120(Projectile_00499eb0* projectile, Vec3_00499eb0* position);
+int __stdcall ApplyWeaponDamage(Projectile_00499eb0* projectile, Unit* unit, float scale);
+void __stdcall ApplyAreaDamage(Projectile_00499eb0* projectile, Vec3_00499eb0* position);
 
 // FUNCTION: 0x499eb0
-void __stdcall FUN_00499eb0(Projectile_00499eb0* projectile, Unit* unit)
+void __stdcall DetonateProjectile(Projectile_00499eb0* projectile, Unit* unit)
 {
     int hostile = 0;
     ProjectileType_00499eb0* type = projectile->type;
@@ -126,7 +126,7 @@ void __stdcall FUN_00499eb0(Projectile_00499eb0* projectile, Unit* unit)
     Player_00499eb0* record = (Player_00499eb0*)(g_game + player * 0x14b + 0x1b63);
     if (!record->field_0 || record->state != 3) {
         if (type->field_d6 <= 0x10 && unit) {
-            int damage = FUN_00499cd0(projectile, unit, 1.0f);
+            int damage = ApplyWeaponDamage(projectile, unit, 1.0f);
             Unit* source = projectile->unit;
             if (source) {
                 int a = 0;
@@ -139,7 +139,7 @@ void __stdcall FUN_00499eb0(Projectile_00499eb0* projectile, Unit* unit)
                 return;
             }
         } else {
-            FUN_0049a120(projectile, position);
+            ApplyAreaDamage(projectile, position);
         }
     }
 }
