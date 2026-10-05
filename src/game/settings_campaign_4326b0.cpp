@@ -103,23 +103,11 @@ public:
     int OpenNamedBox(const char* name);
 };
 
-class Class_00435100 {
+class Mission {
 public:
     int FUN_00435100();
-};
-
-class Class_004352b0 {
-public:
     char* FUN_004352b0();
-};
-
-class Class_00435c30 {
-public:
     char* FUN_00435c30();
-};
-
-class Class_00435c00 {
-public:
     void AdvanceMission();
     int FUN_00435c00(int param_1);
 };
@@ -173,18 +161,18 @@ int __stdcall SaveGameFile(char* param_1, char* param_2, int param_3)
     sprintf(file.buf, DAT_0050499c, g_game->buildTime);
     ((Class_004b4630*)&file)->SetIntegerItem(file.buf, 0);
     ((Class_004b4630*)&file)->SetIntegerItem(DAT_005048f8, g_game->maxUnits);
-    ((Class_004b4750*)&file)->SetStringItem(DAT_005028f8, ((Class_004352b0*)g_game->campaign)->FUN_004352b0());
+    ((Class_004b4750*)&file)->SetStringItem(DAT_005028f8, ((Mission*)g_game->campaign)->FUN_004352b0());
     if (g_game->state != 6) {
-        ((Class_00435c00*)g_game->campaign)->AdvanceMission();
+        ((Mission*)g_game->campaign)->AdvanceMission();
     }
-    ((Class_004b4750*)&file)->SetStringItem(DAT_00504994, ((Class_00435c30*)g_game->campaign)->FUN_00435c30());
-    ((Class_004b4750*)&file)->SetStringItem(DAT_00504990, ((Class_00435c30*)g_game->campaign)->FUN_00435c30());
+    ((Class_004b4750*)&file)->SetStringItem(DAT_00504994, ((Mission*)g_game->campaign)->FUN_00435c30());
+    ((Class_004b4750*)&file)->SetStringItem(DAT_00504990, ((Mission*)g_game->campaign)->FUN_00435c30());
     ((Class_004b4630*)&file)->SetIntegerItem(DAT_00502a78, g_game->difficulty);
     ((Class_004b4630*)&file)->SetIntegerItem(DAT_00504988, g_game->players[g_game->localPlayer].unit->side);
     ((Class_004b4630*)&file)->SetIntegerItem(DAT_00504980, g_game->numPlayers);
-    ((Class_004b4630*)&file)->SetIntegerItem(DAT_00504974, ((Class_00435100*)g_game->campaign)->FUN_00435100());
+    ((Class_004b4630*)&file)->SetIntegerItem(DAT_00504974, ((Mission*)g_game->campaign)->FUN_00435100());
     ((Class_004b4750*)&file)->SetStringItem(DAT_0050496c, g_game->thumbs);
-    if (((Class_00435100*)g_game->campaign)->FUN_00435100() == 2) {
+    if (((Mission*)g_game->campaign)->FUN_00435100() == 2) {
         ((Class_004b4630*)&file)->SetIntegerItem(DAT_0050495c, g_game->options->commanderDeath);
         ((Class_004b4630*)&file)->SetIntegerItem(DAT_00504950, g_game->options->location);
         ((Class_004b4630*)&file)->SetIntegerItem(DAT_00502288, g_game->options->mapping);
@@ -193,7 +181,7 @@ int __stdcall SaveGameFile(char* param_1, char* param_2, int param_3)
     }
     if (g_game->state != 6) {
         ((Class_004b4630*)&file)->SetIntegerItem(DAT_00504924, 1);
-        ((Class_00435c00*)g_game->campaign)->FUN_00435c00(g_game->mission);
+        ((Mission*)g_game->campaign)->FUN_00435c00(g_game->mission);
     }
     if (param_2 != 0) {
         ((Class_004b4750*)&file)->SetStringItem(DAT_00502e78, param_2);

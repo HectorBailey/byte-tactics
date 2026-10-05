@@ -47,7 +47,7 @@ public:
     void NotifyUnitDied(void* unit);
 };
 
-class Class_00435100 {
+class Mission {
 public:
     int FUN_00435100();
 };
@@ -197,7 +197,7 @@ struct Game {
     char unknown_37f08[0x37f5f - 0x37f08];
     Name_004866d0 names[8];             // +0x37f5f
     char unknown_390ef[0x391e9 - 0x390ef];
-    Class_00435100* x391e9;             // +0x391e9
+    Mission* x391e9;                    // +0x391e9
     MissionConditions* x391ed;          // +0x391ed
 };
 #pragma pack(pop)

@@ -105,10 +105,7 @@ struct Game {
 };
 #pragma pack(pop)
 
-struct Mission { int FUN_004358f0(); };
-struct Class_004373a0 { int ComputeMapChecksum(); };
-struct Class_00435a20 { void LoadMissionByName(PlayerInfo_0044a680* info); };
-struct Class_00435c30 { char* FUN_00435c30(); };
+struct Mission { int FUN_004358f0(); int ComputeMapChecksum(); void LoadMissionByName(PlayerInfo_0044a680* info); char* FUN_00435c30(); };
 struct UnitSync { int AllPlayersSynced(); };
 struct Class_00463c60 { void SetType(int param); };
 class Class_0046d860 { public: void ProcessSync(); };
@@ -171,7 +168,7 @@ int CheckMapCrc()
     if (!check) {
         return 1;
     }
-    if (((Class_004373a0*)g_game->map)->ComputeMapChecksum() != data->mapCrc)
+    if (((Mission*)g_game->map)->ComputeMapChecksum() != data->mapCrc)
         return 0;
     return 1;
 }
@@ -302,7 +299,7 @@ void UpdateBattleRoom()
             if (host != 10) {
                 if (IsScreenNamed(&g_game->gui, "LOUNGE2.GUI") != 0) {
                     PlayerInfo_0044a680* info = g_game->players[host].info;
-                    ((Class_00435a20*)g_game->map)->LoadMissionByName(info);
+                    ((Mission*)g_game->map)->LoadMissionByName(info);
                     FUN_00445e20(&g_game->gui, "MAXUNITS", g_game->players[host].info->maxUnits - 0x14);
                     FUN_00445e20(&g_game->gui, "METAL", g_game->players[host].info->metal * 100);
                     FUN_00445e20(&g_game->gui, "ENERGY", g_game->players[host].info->energy * 100);
@@ -311,8 +308,8 @@ void UpdateBattleRoom()
                     UpdateMetalText(&g_game->gui, 0);
                 } else if (IsScreenNamed(&g_game->gui, "viewmap.gui") != 0) {
                     PlayerInfo_0044a680* info = g_game->players[host].info;
-                    if (strcmp(((Class_00435c30*)g_game->map)->FUN_00435c30(), info->map) != 0) {
-                        ((Class_00435a20*)g_game->map)->LoadMissionByName(g_game->players[host].info);
+                    if (strcmp(((Mission*)g_game->map)->FUN_00435c30(), info->map) != 0) {
+                        ((Mission*)g_game->map)->LoadMissionByName(g_game->players[host].info);
                         ShowSelectedMapInfo();
                         FUN_0049fad0(&g_game->gui);
                     }

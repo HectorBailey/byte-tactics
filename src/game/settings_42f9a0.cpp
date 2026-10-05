@@ -159,20 +159,8 @@ int __cdecl IsOnlineConfigLoaded();
 class Sound {
 public:
     void SetMaxBuffers(int value);
-};
-
-class Class_004cfe80 {
-public:
     void Enable3D();
-};
-
-class Class_004cfe90 {
-public:
     void Disable3D();
-};
-
-class Class_004cfea0 {
-public:
     int Is3DEnabled();
 };
 
@@ -186,13 +174,9 @@ public:
     int SetAuxVolume(int value, int flag);
 };
 
-class Class_00435c30 {
+class Mission {
 public:
     char* FUN_00435c30();
-};
-
-class Class_00435d30 {
-public:
     void FUN_00435d30(int arg);
 };
 
@@ -292,14 +276,14 @@ void LoadSettings()
     int ok13 = ReadRegistryDword("Total Annihilation", "Sound Mode", &value);
     if (ok13 != 0) {
         if (value == 2) {
-            ((Class_004cfe80*)g_game->sound)->Enable3D();
+            ((Sound*)g_game->sound)->Enable3D();
         } else {
-            ((Class_004cfe90*)g_game->sound)->Disable3D();
+            ((Sound*)g_game->sound)->Disable3D();
         }
         g_game->soundFlags.soundMode = value;
     } else {
         WriteRegistryDword("Total Annihilation", "Sound Mode",
-                     (((Class_004cfea0*)g_game->sound)->Is3DEnabled() != 0) + 1);
+                     (((Sound*)g_game->sound)->Is3DEnabled() != 0) + 1);
         g_game->soundFlags.soundMode = 1;
     }
     int ok14 = ReadRegistryDword("Total Annihilation", "MixingBuffers", &value);
@@ -566,9 +550,9 @@ void LoadSettings()
     if (ReadRegistryData("Total Annihilation", "SkirmishMap",
                      g_game->options->skirmishMap, &value) == 0) {
         FUN_00434ab0(2);
-        ((Class_00435d30*)g_game->campaign)->FUN_00435d30(0);
+        ((Mission*)g_game->campaign)->FUN_00435d30(0);
         strncpy(g_game->options->skirmishMap,
-                ((Class_00435c30*)g_game->campaign)->FUN_00435c30(), 0x100);
+                ((Mission*)g_game->campaign)->FUN_00435c30(), 0x100);
         FUN_00434ab0(0);
         WriteRegistryString("Total Annihilation", "SkirmishMap", g_game->options->skirmishMap);
     }

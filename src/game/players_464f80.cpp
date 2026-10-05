@@ -301,8 +301,8 @@ struct Unit;
 struct Player_00464f80;
 
 struct Pathfinder { void RunSearches(); };
-struct Class_00408c40 { void TickIfActive(); };
-struct Class_00435100 {
+struct SquadManager { void TickIfActive(); };
+struct Mission {
     char unknown_0[0xd44];
     int field_d44;                     // +0xd44
     int FUN_00435100();
@@ -382,7 +382,7 @@ struct PlayerInfo_00464f80 {           // +0x1b63, stride 0x14b
     Unit* units_end;                   // +0x6b
     char unknown_6f[0x73 - 0x6f];
     unsigned char type;                // +0x73
-    Class_00408c40* field_74;          // +0x74
+    SquadManager* field_74;            // +0x74
     char unknown_78[0xf0 - 0x78];
     int field_f0;                      // +0xf0
     char unknown_f4[0x140 - 0xf4];
@@ -447,7 +447,7 @@ struct Game {
     char startPos[0x38a47 - 0x37f5f];  // +0x37f5f, 0x232-byte records
     unsigned int tick;                 // +0x38a47
     char unknown_38a4b[0x391e9 - 0x38a4b];
-    Class_00435100* mode;              // +0x391e9
+    Mission* mode;                     // +0x391e9
     MissionConditions* list;           // +0x391ed
     char unknown_391f1[0x39239 - 0x391f1];
     short field_39239;                 // +0x39239

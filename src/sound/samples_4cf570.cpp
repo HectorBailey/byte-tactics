@@ -56,11 +56,6 @@ struct IDirectSound3DBuffer : public IUnknown {
 
 class Sound {
 public:
-    void StopOldestBuffer();
-};
-
-class Class_004cf570 {
-public:
     int field_0;
     int field_4;
     float field_8;
@@ -80,10 +75,11 @@ public:
     int flags[0x20];                        // +0x138
 
     int PlaySampleSet(IDirectSoundBuffer** set, LONG volume, Pos_004cf570* pos);
+    void StopOldestBuffer();
 };
 
 // FUNCTION: 0x4cf570
-int Class_004cf570::PlaySampleSet(IDirectSoundBuffer** set, LONG volume, Pos_004cf570* pos)
+int Sound::PlaySampleSet(IDirectSoundBuffer** set, LONG volume, Pos_004cf570* pos)
 {
     IDirectSoundBuffer* unit = 0;
     int slot = 0;

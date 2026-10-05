@@ -50,28 +50,16 @@ public:
     int GetFieldInt(const char* name, int def);
 };
 
-class Class_004c2ea0 {
+class TdfFile {
 public:
     int field_0;                       // +0x0
     TdfRecord* current;                // +0x4
     int field_8;                       // +0x8
 
-    Class_004c2ea0();
-    ~Class_004c2ea0();
-};
-
-class Class_004c2f60 {
-public:
+    TdfFile();
+    ~TdfFile();
     int LoadFile(char* file);
-};
-
-class Class_004c3e10 {
-public:
     void ResetCurrentRecord();
-};
-
-class Class_004c3490 {
-public:
     int SelectRecordAt(int index);
 };
 
@@ -141,13 +129,13 @@ void LoadDownloadMenus()
     g_game->buildLists = (BuildList_0042dcf0*)FUN_004d83b0("DOWNLOADMENU", n * 0xbd);
 
     for (i = 0; i < n; i++) {
-        Class_004c2ea0 parser;
+        TdfFile parser;
         BuildDataPath(path, "download", files[i].p, "TDF");
-        if (((Class_004c2f60*)&parser)->LoadFile(path)) {
+        if (((TdfFile*)&parser)->LoadFile(path)) {
             int j = 0;
             while (1) {
-                ((Class_004c3e10*)&parser)->ResetCurrentRecord();
-                if (!((Class_004c3490*)&parser)->SelectRecordAt(j))
+                ((TdfFile*)&parser)->ResetCurrentRecord();
+                if (!((TdfFile*)&parser)->SelectRecordAt(j))
                     break;
                 g_game->buildLists[i].count = j + 1;
                 char* buf = unitbuf;

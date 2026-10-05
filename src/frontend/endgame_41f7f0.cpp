@@ -1,8 +1,13 @@
 // Decompiled by GPT-6. Names are provisional.
 #include <windows.h>
 #include <string.h>
-class Class_00435100 { public: int FUN_00435100(); };
-class Class_00435980 { public: int MissionExists(int); };
+class Mission {
+public:
+    int FUN_00435100();
+    int MissionExists(int);
+    // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
+    void LoadCampaign(char* name);
+};
 class Sound { public: void StopStream(); };
 #pragma pack(push,1)
 struct Amount { int current,required; };
@@ -30,7 +35,7 @@ struct Game {
     char pad3901d[0x39057-0x3901d]; int state; unsigned deadline,tick; int complete,fade,bar;
     int unknown3906f,skip; void* lastFrame; void* image; void* palette;
     char pad39083[0x391ab-0x39083]; int mission;
-    char pad391af[0x391e9-0x391af]; Class_00435100* campaign;
+    char pad391af[0x391e9-0x391af]; Mission* campaign;
     char pad391ed[0x3923b-0x391ed]; unsigned char flags;
 };
 #pragma pack(pop)
@@ -172,7 +177,7 @@ void __stdcall RunEndGameState()
         break;
     case 5: {
         SetUpEndMissionScreen();
-        int next=((Class_00435980*)g_game->campaign)->MissionExists(g_game->mission+1);
+        int next=((Mission*)g_game->campaign)->MissionExists(g_game->mission+1);
         if(g_game->campaign->FUN_00435100()==1 && (g_game->flags&0x10) && !next && !g_game->skip) {
             if((unsigned char)GetDisplay()->network) {
                 if(!g_game->players[0].owner->flag) SetFrontendState(4,0x4ce,"c:\\cavedog\\wargame\\endgame.cpp");

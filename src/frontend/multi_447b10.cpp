@@ -130,13 +130,7 @@ public:
 class Mission {
 public:
     int FUN_004358f0();
-};
-class Class_00435c40 {
-public:
     bool FUN_00435c40();
-};
-class Class_004373a0 {
-public:
     unsigned int ComputeMapChecksum();
 };
 class UnitSync {
@@ -325,7 +319,7 @@ int CheckMapCrc()
     if (!check) {
         return 1;
     }
-    if (((Class_004373a0*)g_game->map)->ComputeMapChecksum() != data->mapCrc)
+    if (((Mission*)g_game->map)->ComputeMapChecksum() != data->mapCrc)
         return 0;
     return 1;
 }
@@ -597,7 +591,7 @@ void __stdcall HandleBattleRoomClick(Gadget_00447b10* gadget)
                 return;
             }
         }
-        if (!((Class_00435c40*)g_game->map)->FUN_00435c40()) {
+        if (!((Mission*)g_game->map)->FUN_00435c40()) {
             PlaySoundByName("Multi", 0);
             OpenMultiMapSelector();
             goto done;

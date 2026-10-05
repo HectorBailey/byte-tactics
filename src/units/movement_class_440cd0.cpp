@@ -3,10 +3,6 @@
 class Mission {
 public:
     int FUN_004358f0();
-};
-
-class Class_004373a0 {
-public:
     unsigned int ComputeMapChecksum();
 };
 
@@ -54,5 +50,5 @@ int CheckMapCrc()
     if (!check) {
         return 1;
     }
-    return ((Class_004373a0*)g_game->field_391e9)->ComputeMapChecksum() == data->field_a9;
+    return ((Mission*)g_game->field_391e9)->ComputeMapChecksum() == data->field_a9;
 }

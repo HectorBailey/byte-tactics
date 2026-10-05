@@ -7,14 +7,14 @@
 
 struct Dialog;
 
-class Class_004ce7f0 {
+class Sound {
 public:
     int GetCurrentTrack();
 };
 
 struct Game {
     char unknown_0[0x10];
-    Class_004ce7f0* x10;               // +0x10
+    Sound* x10;                        // +0x10
     char unknown_14[0x519 - 0x14];
     char settings[1];                  // +0x519
 };

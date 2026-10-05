@@ -1,6 +1,6 @@
 // Decompiled by space-bunny-free. Names are provisional.
 // Map cache lookup for the campaign object (`this` is the campaign at
-// g_game+0x391e9, the class 0x435c00.cpp calls Class_00435c00). +0xc1c is
+// g_game+0x391e9, the class 0x435c00.cpp calls Mission). +0xc1c is
 // both the running checksum and the "already loaded" flag, so a second call
 // returns straight away. Otherwise name slot 1 is searched in the file-local
 // vector of {name, checksum} pairs at 0x5122c0 (its initialiser and atexit
@@ -45,7 +45,7 @@ public:
     Class_004c91b0(const char* text);
 };
 
-class Class_004373a0 {
+class Mission {
 public:
     int type;                          // +0x0
     char campaign[0x100];              // +0x4
@@ -74,7 +74,7 @@ public:
 
     MapCacheEntry(const Class_004c91a0& other) : handle(other) {}
 
-    MapCacheEntry& SetChecksum(Class_004373a0* self)
+    MapCacheEntry& SetChecksum(Mission* self)
     {
         field_4 = self->field_c1c;
         return *this;
@@ -116,7 +116,7 @@ void* __cdecl FUN_004d83b0(const char* tag, int size);
 void __cdecl FUN_004d85a0(void* p);
 
 // FUNCTION: 0x4373a0
-int Class_004373a0::ComputeMapChecksum()
+int Mission::ComputeMapChecksum()
 {
     if (field_c1c != 0) {
         return field_c20 ^ field_c1c;

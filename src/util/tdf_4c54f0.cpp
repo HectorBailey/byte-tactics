@@ -182,46 +182,17 @@ public:
     int GetFieldString(char* dst, const char* key, size_t size, const char* def);
 };
 
-class Class_004c2ea0 {
+class TdfFile {
 public:
     int root;                            // +0x0
     Class_004c4420* current;             // +0x4
     int file;                            // +0x8
 
-    Class_004c2ea0();
-    ~Class_004c2ea0();
-};
-
-class Class_004c2f60 {
-public:
-    char unknown_0[4];
-    int field_4;
-
+    TdfFile();
+    ~TdfFile();
     int LoadFile(char* filename);
-};
-
-class Class_004c3490 {
-public:
-    char unknown_0[4];
-    int field_4;
-
     Class_004c4420* SelectRecordAt(int index);
-};
-
-class Class_004c3e10 {
-public:
-    char unknown_0[4];
-    int field_4;
-
     void ResetCurrentRecord();
-};
-
-class Class_004c3240 {
-public:
-    char unknown_0[4];
-    int field_4;
-    int field_8;
-
     void Unload();
 };
 
@@ -247,13 +218,13 @@ void __stdcall LoadTranslations(char* filename, char* section)
     }
     LoadMap(flag, section);
     {
-        Class_004c2ea0 f;
+        TdfFile f;
         char value[256];
         char name[256];
-        if (((Class_004c2f60*)&f)->LoadFile(filename)) {
+        if (((TdfFile*)&f)->LoadFile(filename)) {
             int index;
             index = 0;
-            while (((Class_004c3490*)&f)->SelectRecordAt(index)) {
+            while (((TdfFile*)&f)->SelectRecordAt(index)) {
                 f.current->CopyRecordName(name, 0xff);
                 ((TdfRecord*)f.current)->GetFieldString(value, g_language, 0xff, DAT_005119b8);
                 if (strlen(value) != 0) {
@@ -269,10 +240,10 @@ void __stdcall LoadTranslations(char* filename, char* section)
                     }
                     r->AssignText(value);
                 }
-                ((Class_004c3e10*)&f)->ResetCurrentRecord();
+                ((TdfFile*)&f)->ResetCurrentRecord();
                 index++;
             }
-            ((Class_004c3240*)&f)->Unload();
+            ((TdfFile*)&f)->Unload();
         }
     }
 }

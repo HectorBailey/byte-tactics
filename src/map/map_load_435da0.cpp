@@ -64,28 +64,16 @@ public:
     double GetFieldDouble(const char* name, double def);
 };
 
-class Class_004c2f60 {
-public:
-    int LoadFile(char* file);
-};
-
-class Class_004c3410 {
-public:
-    int SelectRecord(char* name);
-};
-
-class Class_004c3e10 {
-public:
-    void ResetCurrentRecord();
-};
-
-class Class_004c2ea0 {
+class TdfFile {
 public:
     int field_0;
     Class_004c46c0* current;            // +0x4
     int field_8;
-    Class_004c2ea0();
-    ~Class_004c2ea0();
+    TdfFile();
+    ~TdfFile();
+    int LoadFile(char* file);
+    int SelectRecord(char* name);
+    void ResetCurrentRecord();
 };
 
 class Class_0048dfb0 {
@@ -102,7 +90,7 @@ struct Class_0048df90 {
 
 class MissionConditions {
 public:
-    void RegisterConditions(Class_004c2ea0* parser);
+    void RegisterConditions(TdfFile* parser);
 };
 
 class MeteorParams {
@@ -115,11 +103,6 @@ public:
     void LoadMeteorDefaults();
 };
 
-class Class_00436c30 {
-public:
-    void LoadMissionData(char* schema, Class_004c2ea0* parser);
-};
-
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
 void __stdcall OpenMessageBox(char* dest, char* text, int param_3, int param_4, int param_5);
 void __stdcall ShowErrorBox(const char* text, const char* caption);
@@ -127,7 +110,7 @@ int __stdcall HAPI_FileLengthByName(char* path);
 void __stdcall HAPI_ReadFileAt(char* filename, void* buffer, int offset, int size);
 char* __stdcall Translate(char* text);
 char* __stdcall FindTranslation(char* name);
-int __stdcall GetLocalizedString(Class_004c2ea0* obj, char* buf, const char* key, int size, char* def);
+int __stdcall GetLocalizedString(TdfFile* obj, char* buf, const char* key, int size, char* def);
 void* __cdecl FUN_004d83b0(const char* tag, int size);
 void __cdecl FUN_004d85a0(void* p);
 void EnableMeteors();
@@ -139,13 +122,13 @@ struct Buffer_00435da0 {
     int size;                          // +0x4
 };
 
-class Class_00435c00 {
+class Mission {
 public:
     int type;                          // +0x0
     char campaign[0x100];              // +0x4
     char names[9][0x100];              // +0x104
     int exists;                        // +0xa04
-    Class_004c2ea0 list;               // +0xa08
+    TdfFile list;                      // +0xa08
     char missionName[0x100];           // +0xa14
     char text_b14[0x100];              // +0xb14
     char* briefing;                    // +0xc14
@@ -206,8 +189,9 @@ public:
     }
 
     void BuildCampaignFilePath(int index, char* dir, char* name, char* ext);
-    int FUN_00436860(int type, Class_004c2ea0* parser, char* schema);
+    int FUN_00436860(int type, TdfFile* parser, char* schema);
     int LoadMission(char* map);
+    void LoadMissionData(char* schema, TdfFile* parser);
 };
 
 static inline float GetFloat(Class_004c46c0* section, const char* key)
@@ -218,9 +202,9 @@ static inline float GetFloat(Class_004c46c0* section, const char* key)
 }
 
 // FUNCTION: 0x435da0
-int Class_00435c00::LoadMission(char* map)
+int Mission::LoadMission(char* map)
 {
-    Class_004c2ea0 parser;
+    TdfFile parser;
     char schema[0x20];
     char value[0x100];
     char path[0x100];
@@ -260,8 +244,8 @@ int Class_00435c00::LoadMission(char* map)
     case 1: {
         char key[0x100];
         sprintf(key, "MISSION%d", missionIndex);
-        ((Class_004c3e10*)&list)->ResetCurrentRecord();
-        if (!((Class_004c3410*)&list)->SelectRecord(key)) {
+        ((TdfFile*)&list)->ResetCurrentRecord();
+        if (!((TdfFile*)&list)->SelectRecord(key)) {
             char msg[0x100];
             wsprintfA(msg, "The requested mission file, %s, does not exist.", key);
             OpenMessageBox(g_game->messages, msg, 0x1e0, 1, 1);
@@ -272,16 +256,16 @@ int Class_00435c00::LoadMission(char* map)
         if (found) {
             char file[0x100];
             BuildDataPath(file, "Maps", path, "OTA");
-            if (!((Class_004c2f60*)&parser)->LoadFile(file)) {
+            if (!((TdfFile*)&parser)->LoadFile(file)) {
                 char msg[0x100];
                 sprintf(msg, "Hey, joker!  There is no mission defintion for this mission: %s", path);
                 OpenMessageBox(g_game->messages, msg, 0x1e0, 1, 1);
                 return 0;
             }
-            ((Class_004c3e10*)&parser)->ResetCurrentRecord();
-            if (((Class_004c3410*)&parser)->SelectRecord("GlobalHeader")) {
+            ((TdfFile*)&parser)->ResetCurrentRecord();
+            if (((TdfFile*)&parser)->SelectRecord("GlobalHeader")) {
                 g_game->maxUnits = parser.current->GetFieldInt("maxunits", 200);
-                ((Class_004c3e10*)&parser)->ResetCurrentRecord();
+                ((TdfFile*)&parser)->ResetCurrentRecord();
                 BuildCampaignFilePath(1, "Maps", path, "TNT");
             } else {
                 char msg[0x100];
@@ -300,7 +284,7 @@ int Class_00435c00::LoadMission(char* map)
         exists = 0;
         strcpy(missionName, map);
         BuildDataPath(path, "Maps", map, "OTA");
-        if (((Class_004c2f60*)&parser)->LoadFile(path)) {
+        if (((TdfFile*)&parser)->LoadFile(path)) {
             BuildCampaignFilePath(1, "Maps", map, "TNT");
             break;
         }
@@ -309,7 +293,7 @@ int Class_00435c00::LoadMission(char* map)
             return 0;
         strcpy(missionName, map);
         BuildDataPath(path, "Maps", map, "OTA");
-        if (!((Class_004c2f60*)&parser)->LoadFile(path))
+        if (!((TdfFile*)&parser)->LoadFile(path))
             return 0;
         BuildCampaignFilePath(1, "Maps", map, "TNT");
         break;
@@ -319,7 +303,7 @@ int Class_00435c00::LoadMission(char* map)
         return 0;
     }
 
-    if (!((Class_004c3410*)&parser)->SelectRecord("GlobalHeader")) {
+    if (!((TdfFile*)&parser)->SelectRecord("GlobalHeader")) {
         OpenMessageBox(g_game->messages, "No GlobalHeader block in mission file!", 0x1e0, 1, 1);
         return 0;
     }
@@ -389,7 +373,7 @@ int Class_00435c00::LoadMission(char* map)
         meteor.LoadMeteorDefaults();
     }
     SetMeteorParams(&meteor);
-    ((Class_00436c30*)this)->LoadMissionData(schema, &parser);
+    ((Mission*)this)->LoadMissionData(schema, &parser);
     return 1;
 }
 

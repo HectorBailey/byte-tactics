@@ -64,27 +64,15 @@ void* __stdcall FindMovementClass(char* name);
 char* __stdcall FindWeaponByName(char* name);
 void* __cdecl FUN_004d83b0(char* name, int size);
 
-class Class_004c2ea0 {
+class TdfFile {
   public:
     int field_0;
     void* current; // +0x4
     int field_8;
-    Class_004c2ea0();
-    ~Class_004c2ea0();
-};
-
-class Class_004c2f60 {
-  public:
+    TdfFile();
+    ~TdfFile();
     int LoadFile(char* file);
-};
-
-class Class_004c3410 {
-  public:
     int SelectRecord(char* name);
-};
-
-class Class_004c3240 {
-  public:
     void Unload();
 };
 
@@ -248,14 +236,14 @@ struct UnitDef {
 
 // FUNCTION: 0x42bf40
 void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
-    Class_004c2ea0 parser;
+    TdfFile parser;
     char buf[100];
     char weapon[128];
     char yard[1024];
 
-    if (((Class_004c2f60*)&parser)->LoadFile(fbi_file)) {
-        if (!((Class_004c3410*)&parser)->SelectRecord("UNITINFO")) {
-            ((Class_004c3240*)&parser)->Unload();
+    if (((TdfFile*)&parser)->LoadFile(fbi_file)) {
+        if (!((TdfFile*)&parser)->SelectRecord("UNITINFO")) {
+            ((TdfFile*)&parser)->Unload();
             goto FINISH;
         }
         {
@@ -622,7 +610,7 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
             unitdef->extentmax.z = (unitdef->footprintz << 20) / 2;
             unitdef->extentsize = unitdef->extentmax - unitdef->extentmin;
             unitdef->radius = (unitdef->extentsize.z + unitdef->extentsize.x) / 3;
-            ((Class_004c3240*)&parser)->Unload();
+            ((TdfFile*)&parser)->Unload();
             // cancloak with no mincloakdistance: default to 80
             if ((unitdef->flags2 & 0x2000) && unitdef->mincloakdistance == 0)
                 unitdef->mincloakdistance = 80;

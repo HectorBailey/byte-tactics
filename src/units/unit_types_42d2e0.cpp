@@ -116,33 +116,23 @@
 
 #pragma pack(push, 1)
 
-class Class_004c2ea0 {
+class TdfFile {
   public:
     int field_0;
     void* current;
     int field_8;
-    Class_004c2ea0();
-    ~Class_004c2ea0();
-};
-
-class Class_004c2f60 {
-  public:
+    TdfFile();
+    ~TdfFile();
     int LoadFile(char* file);
-};
-
-class Class_004c3e10 {
-  public:
     void ResetCurrentRecord();
-};
-
-class Class_004c3410 {
-  public:
     int SelectRecord(char* name);
-};
-
-class Class_004c3240 {
-  public:
     void Unload();
+    // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
+    int GetCurrentRecord();
+    void StripComments(char* text);
+    int SelectRecordAt(int index);
+    void SetCurrentRecord(int record);
+    void LoadBuffer(char* buffer, int size, int flags, char* name);
 };
 
 class TdfRecord {
@@ -307,9 +297,9 @@ void LoadUnitTypes() {
     char valbuf[256];
 
     {
-        Class_004c2ea0 parser;
+        TdfFile parser;
         BuildDataPath(path, "gamedata", "moveinfo", "TDF");
-        if (!((Class_004c2f60*)&parser)->LoadFile(path))
+        if (!((TdfFile*)&parser)->LoadFile(path))
             FatalError("Can't load MOVEINFO.TDF");
 
         int i = 0;
@@ -317,8 +307,8 @@ void LoadUnitTypes() {
         MovementClass* cls_end = &MovementClassTable::g_movementClasses.entries[32];
         do {
             sprintf(classbuf, "CLASS%d", i);
-            ((Class_004c3e10*)&parser)->ResetCurrentRecord();
-            if (((Class_004c3410*)&parser)->SelectRecord(classbuf)) {
+            ((TdfFile*)&parser)->ResetCurrentRecord();
+            if (((TdfFile*)&parser)->SelectRecord(classbuf)) {
                 ((TdfRecord*)parser.current)
                     ->GetFieldString(classbuf, "name", 100, DAT_005119b8);
                 cls->field_0 = (int*)GameStrdup(classbuf);
@@ -327,7 +317,7 @@ void LoadUnitTypes() {
             cls++;
             i++;
         } while ((int)cls < (int)cls_end);
-        ((Class_004c3240*)&parser)->Unload();
+        ((TdfFile*)&parser)->Unload();
     }
 
     Class_00458160* obj = (Class_00458160*)operator new(0x14);
@@ -471,9 +461,9 @@ void LoadUnitTypes() {
 
     ProtectBlockReadOnly(g_game->field_14377);
 
-    Class_004c2ea0 parser2;
+    TdfFile parser2;
     BuildDataPath(path, "gamedata", "sidedata", "TDF");
-    if (!((Class_004c2f60*)&parser2)->LoadFile(path)) {
+    if (!((TdfFile*)&parser2)->LoadFile(path)) {
         FatalError("Can't load GAMEDATA.TDF");
     } else {
         short* list = (short*)FUN_004d83b0("TEMP UTYPE LIST", 0x3c);
@@ -482,9 +472,9 @@ void LoadUnitTypes() {
             type->field_152 = 0;
             type->field_156 = 0;
             if (type->flags.bits.canbuild) {
-                ((Class_004c3e10*)&parser2)->ResetCurrentRecord();
-                if (((Class_004c3410*)&parser2)->SelectRecord("CANBUILD") &&
-                    ((Class_004c3410*)&parser2)->SelectRecord(type->name)) {
+                ((TdfFile*)&parser2)->ResetCurrentRecord();
+                if (((TdfFile*)&parser2)->SelectRecord("CANBUILD") &&
+                    ((TdfFile*)&parser2)->SelectRecord(type->name)) {
                     int count = 0;
                     int k = 1;
                     sprintf(objpath, "canbuild%d", k);
@@ -506,7 +496,7 @@ void LoadUnitTypes() {
             }
         }
         FUN_004d85a0(list);
-        ((Class_004c3240*)&parser2)->Unload();
+        ((TdfFile*)&parser2)->Unload();
     }
 
     g_game->field_38d71 = 100;

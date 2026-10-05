@@ -2,14 +2,10 @@
 // Calls PlaySampleSet on the same object with the global flag at 0x51ff48 set
 // for the duration of the call.
 
-class Class_004cf570 {
-public:
-    void PlaySampleSet(int a, int b, int c);
-};
-
 class Sound {
 public:
     void PlayLooping(int a, int b);
+    void PlaySampleSet(int a, int b, int c);
 };
 
 extern int g_playBufferLooping;
@@ -18,6 +14,6 @@ extern int g_playBufferLooping;
 void Sound::PlayLooping(int a, int b)
 {
     g_playBufferLooping = 1;
-    ((Class_004cf570*)this)->PlaySampleSet(a, b, 0);
+    ((Sound*)this)->PlaySampleSet(a, b, 0);
     g_playBufferLooping = 0;
 }

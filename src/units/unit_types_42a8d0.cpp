@@ -75,22 +75,6 @@ typedef std::vector<Elem_00432be0> FileList;
 
 void __stdcall ListDirectory(const char* pattern, int dirs, FileList* out);
 
-class Class_004c2f60 {
-public:
-    int LoadFile(char* path);
-    void LoadBuffer(char* data, int size, int flag, char* name);
-};
-
-class Class_004c3410 {
-public:
-    int SelectRecord(char* name);
-};
-
-class Class_004c3e10 {
-public:
-    void ResetCurrentRecord();
-};
-
 class Class_004c4630 {
 public:
     char* FindFieldValue(char* key);
@@ -112,13 +96,13 @@ public:
 };
 
 // A parsed TDF file; the getters read the current section.
-class Class_004c2ea0 {
+class TdfFile {
 public:
     int field_0;
     void* current;                     // +0x4, the current section
     int field_8;                       // +0x8
-    Class_004c2ea0();
-    ~Class_004c2ea0();
+    TdfFile();
+    ~TdfFile();
 
     int GetString(char* dst, char* key, int size, char* def)
     {
@@ -127,6 +111,16 @@ public:
     int GetInt(char* key, int def) { return ((Class_004c46c0*)current)->GetFieldInt(key, def); }
     double GetDouble(char* key, double def) { return ((Class_004c4760*)current)->GetFieldDouble(key, def); }
     char* GetValue(char* key) { return ((Class_004c4630*)current)->FindFieldValue(key); }
+    int LoadFile(char* path);
+    void LoadBuffer(char* data, int size, int flag, char* name);
+    int SelectRecord(char* name);
+    void ResetCurrentRecord();
+    // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
+    void Unload();
+    int GetCurrentRecord();
+    void StripComments(char* text);
+    int SelectRecordAt(int index);
+    void SetCurrentRecord(int record);
 };
 
 // The override file (units\NAME.OVR).
@@ -212,7 +206,7 @@ struct Game {
 #pragma pack(pop)
 
 extern Game* g_game;
-static Class_004c2ea0* DAT_005122a0;
+static TdfFile* DAT_005122a0;
 static int DAT_005122a4;
 static int DAT_005122a8;
 
@@ -245,12 +239,12 @@ static inline void LoadWeaponTDFs()
     if (files.size() == 0)
         return;
     DAT_005122a8 = files.size();
-    DAT_005122a0 = new Class_004c2ea0[DAT_005122a8];
+    DAT_005122a0 = new TdfFile[DAT_005122a8];
     for (Elem_00432be0* it = files.begin(); it < files.end(); it++) {
         char path[256];
-        Class_004c2ea0* tdf = &DAT_005122a0[DAT_005122a4];
+        TdfFile* tdf = &DAT_005122a0[DAT_005122a4];
         BuildDataPath(path, "Weapons", it->data, "TDF");
-        if (((Class_004c2f60*)tdf)->LoadFile(path)) {
+        if (((TdfFile*)tdf)->LoadFile(path)) {
             if (tdf->field_8 != 0 || FUN_0041d8a0() == 0)
                 DAT_005122a4++;
         }
@@ -262,9 +256,9 @@ static inline int FindWeapon(char* name)
 {
     if (name != 0 && *name != 0) {
         for (int k = 0; k < DAT_005122a4; k++) {
-            Class_004c2ea0* tdf = &DAT_005122a0[k];
-            ((Class_004c3e10*)tdf)->ResetCurrentRecord();
-            if (((Class_004c3410*)tdf)->SelectRecord(name))
+            TdfFile* tdf = &DAT_005122a0[k];
+            ((TdfFile*)tdf)->ResetCurrentRecord();
+            if (((TdfFile*)tdf)->SelectRecord(name))
                 return *(int*)((char*)tdf->current + 0x25);
         }
         return 0;
@@ -318,9 +312,9 @@ int LoadUnitInfo()
                     u->checksum = ((Class_004b4800*)&ovr)->GetIntegerItem(num, u->checksum);
                 }
             }
-            Class_004c2ea0 parser;
-            ((Class_004c2f60*)&parser)->LoadBuffer(buf, len, 0, "<NO FILE>");
-            if (!((Class_004c3410*)&parser)->SelectRecord("UNITINFO")) {
+            TdfFile parser;
+            ((TdfFile*)&parser)->LoadBuffer(buf, len, 0, "<NO FILE>");
+            if (!((TdfFile*)&parser)->SelectRecord("UNITINFO")) {
                 // Original bug: this exit leaves the FBI file open (no
                 // HAPI_CloseFile), the weapon TDF table allocated and the unit
                 // table locked (no ProtectBlockReadOnly).

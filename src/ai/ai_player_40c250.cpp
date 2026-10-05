@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <vector>
-class Class_004356c0 { public: const char* FUN_004356c0(int); };
+class Mission { public: const char* FUN_004356c0(int); };
 #pragma pack(push, 1)
 struct Player { char name[0x48]; unsigned char control; char pad49[331-0x49]; };
 struct UnitDef { char name[32]; char description[585-32]; };
@@ -16,7 +16,7 @@ struct Game {
     char padPlayers[0x1438f-0x1b8e-3310]; int typeCount; char pad14393[8]; UnitDef* types;
     char pad1439f[0x37eee-0x1439f]; int difficulty;
     char pad37ef2[0x38a47-0x37ef2]; unsigned int tick;
-    char pad38a4b[0x391e9-0x38a4b]; Class_004356c0* net;
+    char pad38a4b[0x391e9-0x38a4b]; Mission* net;
 };
 #pragma pack(pop)
 extern Game* g_game;

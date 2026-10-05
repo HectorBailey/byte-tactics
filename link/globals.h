@@ -281,7 +281,7 @@ extern int DAT_00511fa4;                                                        
 extern int DAT_00511fa8;                                                                      // 0x511fa8, 4 bytes; 1 of 1 files
 extern int DAT_00511fac;                                                                      // 0x511fac, 4 bytes; 1 of 1 files
 extern int DAT_00511fb0;                                                                      // 0x511fb0, 4 bytes; 1 of 1 files
-extern unsigned char DAT_00511fb4[4];                                                         // 0x511fb4, 4 bytes, DAT_00511fb4$S4411; std::vector<Class_004c2ea0*, std::allocator<Class_004c2ea0*> >* by value in 1 of 4 files (conflicting: struct names only)
+extern unsigned char DAT_00511fb4[4];                                                         // 0x511fb4, 4 bytes, DAT_00511fb4$S4411; std::vector<TdfFile*, std::allocator<TdfFile*> >* by value in 1 of 4 files (conflicting: struct names only)
 extern char DAT_00511fb8[256];                                                                // 0x511fb8, 256 bytes; 5 of 5 files
 extern int DAT_00512288;                                                                      // 0x512288, 4 bytes; 1 of 1 files
 extern int DAT_0051228c;                                                                      // 0x51228c, 4 bytes; 1 of 1 files

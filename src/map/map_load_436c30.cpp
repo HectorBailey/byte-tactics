@@ -11,13 +11,9 @@
 
 class Section_00436c30;
 
-class Class_004c3e10 {
+class TdfFile {
 public:
     void ResetCurrentRecord();
-};
-
-class Class_004c3410 {
-public:
     int SelectRecord(char* name);
 };
 
@@ -93,7 +89,7 @@ extern char DAT_005119b8[];
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
 void __cdecl FUN_004d85a0(void* p);
 
-class Class_00436c30 {
+class Mission {
 public:
     char unknown_0[0xdac];
     MissionUnit_00436c30* units;       // +0xdac
@@ -107,7 +103,7 @@ public:
 };
 
 // FUNCTION: 0x436c30
-void Class_00436c30::LoadMissionData(char* name, Parser_00436c30* parser)
+void Mission::LoadMissionData(char* name, Parser_00436c30* parser)
 {
     char text[0x100];
     char buf[0x400];
@@ -115,10 +111,10 @@ void Class_00436c30::LoadMissionData(char* name, Parser_00436c30* parser)
     int count;
     int total = 0;
 
-    ((Class_004c3e10*)parser)->ResetCurrentRecord();
-    if (!((Class_004c3410*)parser)->SelectRecord("globalheader"))
+    ((TdfFile*)parser)->ResetCurrentRecord();
+    if (!((TdfFile*)parser)->SelectRecord("globalheader"))
         return;
-    if (!((Class_004c3410*)parser)->SelectRecord(name))
+    if (!((TdfFile*)parser)->SelectRecord(name))
         return;
     Section_00436c30* root = parser->current;
 

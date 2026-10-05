@@ -14,16 +14,12 @@ struct Packet_0047f0c0 {
 class Sound {
 public:
     int PlayLooping(int a, int b);
-};
-
-class Class_004cf570 {
-public:
     int PlaySampleSet(int a, int b, int c);
 };
 
 struct Game {
     char unknown_0[0x10];
-    Class_004cf570* sound;             // +0x10
+    Sound* sound;             // +0x10
     char unknown_14[0x33a13 - 0x14];
     char soundIds[0x37f0c - 0x33a13];  // +0x33a13
     int field_37f0c;                   // +0x37f0c

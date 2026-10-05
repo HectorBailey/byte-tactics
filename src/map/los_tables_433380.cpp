@@ -35,7 +35,7 @@ struct Elem_00434020 {
     unsigned short b;                  // +0x2
 };
 
-class Class_004c3410;
+class TdfFile;
 
 // A line of a table, read from the TDF file.
 struct Elem_00434360 {
@@ -44,7 +44,7 @@ struct Elem_00434360 {
 
 class LosLine {
 public:
-    void LoadLosLine(Class_004c3410* file, short line, int col);
+    void LoadLosLine(TdfFile* file, short line, int col);
 };
 
 // One table: a vector of lines (see 0x4335f0.cpp).
@@ -61,17 +61,18 @@ public:
     int GetFieldInt(const char* name, int def);
 };
 
-class Class_004c3410 {
+class TdfFile {
 public:
     void* root;                        // +0x0
     Class_004c46c0* current;           // +0x4
 
     int SelectRecord(char* name);
-};
-
-class Class_004c3e10 {
-public:
     void ResetCurrentRecord();
+    // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
+    int LoadFile(char* path);
+    void StripComments(char* text);
+    int SelectRecordAt(int index);
+    void LoadBuffer(char* buffer, int size, int flags, char* name);
 };
 
 class LosTables {
@@ -84,15 +85,15 @@ public:
         n--;
         return &tables[n];
     }
-    void LoadLosTable(Class_004c3410* file, short table);
+    void LoadLosTable(TdfFile* file, short table);
 };
 
 // FUNCTION: 0x433380
-void LosTables::LoadLosTable(Class_004c3410* file, short table)
+void LosTables::LoadLosTable(TdfFile* file, short table)
 {
     char name[32];
     sprintf(name, "TABLE%d", table + 1);
-    ((Class_004c3e10*)file)->ResetCurrentRecord();
+    ((TdfFile*)file)->ResetCurrentRecord();
     if (file->SelectRecord(name)) {
         LosTable* t = GetTable(table + 1);
         short numlines = (short)file->current->GetFieldInt("numlines", 0);

@@ -738,7 +738,7 @@ class Class_004cf0b0;
 struct Class_004cf150;
 class Class_004cf180;
 class Class_004cf210;
-class Class_004cf220;
+class Sound;
 class Class_004cf230;
 class Class_004cf370;
 class Class_004cf540;
@@ -5667,7 +5667,7 @@ struct SkirmishPlayer {  // 0x18 bytes, 2 views
     int color;  // +0x14
 };
 
-class Class_004cf220 {  // 0x1 bytes, 2 views
+class Sound {           // 0x1 bytes, 2 views
 public:
     char unknown_0[1];
     int GetMaxBuffers(void);

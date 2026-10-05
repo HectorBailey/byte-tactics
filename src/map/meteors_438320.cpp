@@ -22,23 +22,15 @@ public:
     double GetFieldDouble(const char* name, double def);
 };
 
-class Class_004c2f60 {
-public:
-    int LoadFile(char* file);
-};
-
-class Class_004c3410 {
-public:
-    int SelectRecord(char* name);
-};
-
-class Class_004c2ea0 {
+class TdfFile {
 public:
     int field_0;
     Class_004c46c0* current;            // +0x4
     int field_8;
-    Class_004c2ea0();
-    ~Class_004c2ea0();
+    TdfFile();
+    ~TdfFile();
+    int LoadFile(char* file);
+    int SelectRecord(char* name);
 };
 
 class MeteorParams {
@@ -54,11 +46,11 @@ public:
 // FUNCTION: 0x438320
 void MeteorParams::LoadMeteorDefaults()
 {
-    Class_004c2ea0 parser;
+    TdfFile parser;
     char path[256];
     BuildDataPath(path, "gamedata", "meteor", DAT_0050310c);
-    if (((Class_004c2f60*)&parser)->LoadFile(path)
-        && ((Class_004c3410*)&parser)->SelectRecord("Default")) {
+    if (((TdfFile*)&parser)->LoadFile(path)
+        && ((TdfFile*)&parser)->SelectRecord("Default")) {
         if (((TdfRecord*)parser.current)->GetFieldString((char*)this, "MeteorWeapon", 0x20, DAT_005119b8)) {
             radius = parser.current->GetFieldInt("MeteorRadius", 0);
             density = (float)((Class_004c4760*)parser.current)->GetFieldDouble("MeteorDensity", 0.0);

@@ -8,7 +8,7 @@ public:
     void StopStream();
 };
 
-class Class_004356c0 {
+class Mission {
 public:
     int FUN_004356c0(int param_1);
 };
@@ -26,7 +26,7 @@ struct Game {
     char menu[0x2bc0 - 0x519];         // +0x519
     unsigned char field_2bc0;          // +0x2bc0
     char unknown_2bc1[0x391e9 - 0x2bc1];
-    Class_004356c0* net;               // +0x391e9
+    Mission* net;                      // +0x391e9
     char unknown_391ed[0x391f1 - 0x391ed];
     int field_391f1;                   // +0x391f1
 };
