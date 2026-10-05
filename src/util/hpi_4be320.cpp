@@ -34,11 +34,11 @@ struct State_004be320 {
 extern char DAT_005119b8[];
 
 State_004be320* GetDisplay(void);
-void __stdcall FUN_004be3b0(List_004be3b0* list);
-void __stdcall FUN_004be400(char* name, int a, int b);
+void __stdcall HAPI_ClearShadowFlags(List_004be3b0* list);
+void __stdcall HAPI_MarkShadowedFiles(char* name, int a, int b);
 
 // FUNCTION: 0x4be320
-void FUN_004be320(void)
+void HAPI_ResolveShadowedFiles(void)
 {
     State_004be320* state = GetDisplay();
     if (state->itemCount > 0) {
@@ -47,9 +47,9 @@ void FUN_004be320(void)
             for (int j = list->count - 1; j >= 0; j--) {
                 list->entries[j].flags &= ~2;
                 if (list->entries[j].flags & 1)
-                    FUN_004be3b0(list->entries[j].child);
+                    HAPI_ClearShadowFlags(list->entries[j].child);
             }
         }
-        FUN_004be400(DAT_005119b8, -1, 1);
+        HAPI_MarkShadowedFiles(DAT_005119b8, -1, 1);
     }
 }

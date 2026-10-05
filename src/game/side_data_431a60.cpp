@@ -183,7 +183,7 @@ extern char DAT_005119b8[];
 
 void __stdcall FUN_004290f0(char* out, const char* dir, const char* name, const char* ext);
 void __stdcall FatalError(char* message);
-void* __stdcall FUN_004bbe50(char* path, int flags);
+void* __stdcall HAPI_LoadFile(char* path, int flags);
 void __stdcall FUN_00431950(void* parser, int* out, const char* name, const char* side);
 
 // FUNCTION: 0x431a60
@@ -226,7 +226,7 @@ void __stdcall FUN_00431a60(void)
         if (((Class_004c48c0*)parser.current)->FUN_004c48c0(name, "font", 0x100, DAT_005119b8)) {
             void* font;
             FUN_004290f0(fontPath, "fonts", name, "FNT");
-            font = FUN_004bbe50(fontPath, 0);
+            font = HAPI_LoadFile(fontPath, 0);
             if (font == 0)
                 FatalError(fontPath);
             s->font = font;

@@ -295,19 +295,19 @@ public:
 
 struct File_004bb5d0;
 
-void* __stdcall FUN_004bb5b0(void* param1);
-int __stdcall FUN_004bb5d0(File_004bb5d0* file);
-long __stdcall FUN_004bb710(File_004bb5d0* file, long pos);
-long __stdcall FUN_004bb7a0(File_004bb5d0* file);
-void __stdcall FUN_004bb7c0(File_004bb5d0* file, void* buf, int size);
-long __stdcall FUN_004bbd00(File_004bb5d0* file);
+void* __stdcall HAPI_OpenFileRead(void* param1);
+int __stdcall HAPI_CloseFile(File_004bb5d0* file);
+long __stdcall HAPI_SeekFile(File_004bb5d0* file, long pos);
+long __stdcall HAPI_TellFile(File_004bb5d0* file);
+void __stdcall HAPI_readfromfile(File_004bb5d0* file, void* buf, int size);
+long __stdcall HAPI_FileLength(File_004bb5d0* file);
 void* __cdecl FUN_004d8450(unsigned int size);
 void* __cdecl FUN_004d8460(unsigned int count, unsigned int size);
 void* __cdecl FUN_004d8580(void* ptr, unsigned int size);
 void __cdecl FUN_004d85a0(void* p);
-int __stdcall FUN_004d1b40(unsigned char* src);
-int __stdcall FUN_004d1970(void* dest, void* source);
-void* __stdcall FUN_004d1c60(int code);
+int __stdcall SquashUnpackedSize(unsigned char* src);
+int __stdcall SquashUnpack(void* dest, void* source);
+void* __stdcall SquashErrorString(int code);
 void __stdcall FatalError(char* message);
 int __cdecl _strcmpi(const char* s1, const char* s2);
 int __cdecl sprintf(char* buf, const char* fmt, ...);
@@ -350,39 +350,39 @@ int Class_004b3770::OpenBank(char* filename, char* name, void* arg3)
     long remaining;
     long pos;
 
-    file = (File_004bb5d0*)FUN_004bb5b0(filename);
+    file = (File_004bb5d0*)HAPI_OpenFileRead(filename);
     if (file == 0) {
         return 0;
     }
 
-    FUN_004bb7c0(file, &h, 0x22);
+    HAPI_readfromfile(file, &h, 0x22);
     if (strncmp(h.magic, "HAPIBANK", 8) != 0) {
-        FUN_004bb5d0(file);
+        HAPI_CloseFile(file);
         return 0;
     }
 
     if (h.version != 1) {
-        FUN_004bb5d0(file);
+        HAPI_CloseFile(file);
         return 0;
     }
 
     img.buf = 0;
     img.size = 0;
-    remaining = FUN_004bbd00(file) - h.dataoff;
-    FUN_004bb710(file, h.dataoff);
+    remaining = HAPI_FileLength(file) - h.dataoff;
+    HAPI_SeekFile(file, h.dataoff);
 
     if (h.compressed != 0) {
         void* src = FUN_004d8450(remaining);
         int dsize;
         int err;
 
-        FUN_004bb7c0(file, src, remaining);
-        dsize = FUN_004d1b40((unsigned char*)src);
+        HAPI_readfromfile(file, src, remaining);
+        dsize = SquashUnpackedSize((unsigned char*)src);
         raw = FUN_004d8450(dsize);
-        err = FUN_004d1970(raw, src);
+        err = SquashUnpack(raw, src);
         if (err != 0) {
             sprintf(errmsg, "[HapiBank::OpenBank] Decompression Error: %s",
-                    (char*)FUN_004d1c60(err));
+                    (char*)SquashErrorString(err));
             FatalError(errmsg);
         }
         img.buf = FUN_004d8580(img.buf, dsize);
@@ -396,12 +396,12 @@ int Class_004b3770::OpenBank(char* filename, char* name, void* arg3)
         }
         img.buf = FUN_004d8450(remaining);
         img.size = remaining;
-        FUN_004bb7c0(file, img.buf, remaining);
+        HAPI_readfromfile(file, img.buf, remaining);
     }
 
     if (name != 0) {
         if (_strcmpi(name, (char*)img.buf + h.nameoff) != 0) {
-            FUN_004bb5d0(file);
+            HAPI_CloseFile(file);
             if (img.buf != 0) {
                 FUN_004d85a0(img.buf);
             }
@@ -413,16 +413,16 @@ int Class_004b3770::OpenBank(char* filename, char* name, void* arg3)
     table = (AccountList*)FUN_004d8460(1, 0xc);
     ((int*)table)[2] = -1;
 
-    FUN_004bb710(file, h.seekoff);
-    pos = FUN_004bb7a0(file);
+    HAPI_SeekFile(file, h.seekoff);
+    pos = HAPI_TellFile(file);
     if (pos < h.dataoff) {
         do {
             LoadAccount(file, &img.buf, arg3);
-            pos = FUN_004bb7a0(file);
+            pos = HAPI_TellFile(file);
         } while (pos < h.dataoff);
     }
 
-    FUN_004bb5d0(file);
+    HAPI_CloseFile(file);
     if (img.buf != 0) {
         FUN_004d85a0(img.buf);
     }

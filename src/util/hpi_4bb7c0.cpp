@@ -46,9 +46,9 @@ struct File_004bb7c0 {
 
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
 void __cdecl FUN_004d85a0(void* p);
-long __stdcall FUN_004bb710(File_004bb7c0* file, long pos);
-int __stdcall FUN_004d1970(unsigned char* dst, unsigned char* src);
-char* __stdcall FUN_004d1c60(int code);
+long __stdcall HAPI_SeekFile(File_004bb7c0* file, long pos);
+int __stdcall SquashUnpack(unsigned char* dst, unsigned char* src);
+char* __stdcall SquashErrorString(int code);
 void __stdcall FatalError(char* text);
 
 static inline int nblocks(int w)
@@ -66,7 +66,7 @@ static inline int BlockOffset(File_004bb7c0* file, int& counter, int b, int tabl
 
 
 // FUNCTION: 0x4bb7c0
-int __stdcall FUN_004bb7c0(File_004bb7c0* file, unsigned char* buf, int size)
+int __stdcall HAPI_readfromfile(File_004bb7c0* file, unsigned char* buf, int size)
 {
     int n;
     unsigned char* dst;
@@ -111,10 +111,10 @@ int __stdcall FUN_004bb7c0(File_004bb7c0* file, unsigned char* buf, int size)
                         for (int k = 0; k < got; k++)
                             comp[k] = (unsigned char)(comp[k] ^ 0xff ^ (unsigned char)(k + off) ^ key);
                     }
-                    int err = FUN_004d1970(file->buffer2, comp);
+                    int err = SquashUnpack(file->buffer2, comp);
                     if (err) {
                         char msg[1000];
-                        sprintf(msg, "[HAPI_readfromfile] Decompression Error: %s\n", FUN_004d1c60(err));
+                        sprintf(msg, "[HAPI_readfromfile] Decompression Error: %s\n", SquashErrorString(err));
                         sprintf(msg + strlen(msg), "block %d of %d\n", i, blocks);
                         sprintf(msg + strlen(msg), "base name '%s'\n", file->shared->name);
                         sprintf(msg + strlen(msg), "length = %d\n", size);
@@ -132,7 +132,7 @@ int __stdcall FUN_004bb7c0(File_004bb7c0* file, unsigned char* buf, int size)
                 else
                     memcpy(dst, file->buffer2 + o, chunk);
                 dst += chunk;
-                FUN_004bb710(file, file->pos + chunk);
+                HAPI_SeekFile(file, file->pos + chunk);
                 remaining -= chunk;
                 i++;
             }

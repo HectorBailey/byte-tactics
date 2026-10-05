@@ -94,27 +94,27 @@ public:
     int FUN_004c2f60(char* path);
 };
 
-char* __stdcall FUN_004bb5b0(char* path);
-int __stdcall FUN_004bb5d0(char* file);
-int __stdcall FUN_004bb650(char* file);
-int __stdcall FUN_004bb710(char* file, int pos);
-int __stdcall FUN_004bb7c0(char* file, void* buf, int size);
-int __stdcall FUN_004bbd00(char* file);
+char* __stdcall HAPI_OpenFileRead(char* path);
+int __stdcall HAPI_CloseFile(char* file);
+int __stdcall HAPI_IsInArchive(char* file);
+int __stdcall HAPI_SeekFile(char* file, int pos);
+int __stdcall HAPI_readfromfile(char* file, void* buf, int size);
+int __stdcall HAPI_FileLength(char* file);
 
 // FUNCTION: 0x4c2f60
 int Class_004c2f60::FUN_004c2f60(char* path)
 {
-    char* file = FUN_004bb5b0(path);
+    char* file = HAPI_OpenFileRead(path);
     if (!file)
         return 0;
-    int size = FUN_004bbd00(file);
+    int size = HAPI_FileLength(file);
     int result = 0;
     if (size > 0) {
         char* buf = (char*)FUN_004d83b0(path, size);
-        FUN_004bb710(file, 0);
-        int got = FUN_004bb7c0(file, buf, size);
+        HAPI_SeekFile(file, 0);
+        int got = HAPI_readfromfile(file, buf, size);
         if (got >= 0) {
-            int flag = FUN_004bb650(file);
+            int flag = HAPI_IsInArchive(file);
             result = flag;
             if (root)
                 delete root;
@@ -132,6 +132,6 @@ int Class_004c2f60::FUN_004c2f60(char* path)
         }
         FUN_004d85a0((int*)buf);
     }
-    FUN_004bb5d0(file);
+    HAPI_CloseFile(file);
     return result;
 }

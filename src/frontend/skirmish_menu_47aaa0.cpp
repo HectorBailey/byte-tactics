@@ -34,7 +34,7 @@ struct Game {
 extern Game* g_game;
 
 Gadget_0047aaa0* __stdcall FUN_0049ff90(void* gadgets, char* name);
-char* __stdcall FUN_004b6af0(char* text, int n);
+char* __stdcall SkipTextLines(char* text, int n);
 void FUN_00444a20();
 
 // Like 0x444c40, without the MAPPIC update.
@@ -42,7 +42,7 @@ void FUN_00444a20();
 void __stdcall FUN_0047aaa0(Menu_0047aaa0* menu, int unused)
 {
     Gadget_0047aaa0* g = FUN_0049ff90(menu->inner->gadgets, "MAPNAMES");
-    if (g_game->field_391e9->FUN_00435a20(FUN_004b6af0(g->text, g->selected)) != 0) {
+    if (g_game->field_391e9->FUN_00435a20(SkipTextLines(g->text, g->selected)) != 0) {
         FUN_00444a20();
     }
 }

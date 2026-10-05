@@ -41,7 +41,7 @@ public:
     int FUN_004b73e0(int index, int fallback);
 };
 
-void __stdcall FUN_004bcf00(char* path);
+void __stdcall MakeDirectoryPath(char* path);
 void __stdcall FUN_00495a30(char* name, char* description, int x, int y, int w, int h);
 unsigned int GetTicks();
 
@@ -72,7 +72,7 @@ void __stdcall FUN_00417600(Class_004b73c0* args)
     y = min(y, g_game->mapHeight - h);
     char buf[256];
     sprintf(buf, "%s\\screenshots", g_game->installPath);
-    FUN_004bcf00(buf);
+    MakeDirectoryPath(buf);
     FUN_00495a30(buf, "BIGSHOT", x, y, w, h);
     g_game->lastShotTime = GetTicks();
 }

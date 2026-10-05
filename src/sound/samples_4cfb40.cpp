@@ -7,7 +7,7 @@
 struct File_004bb5d0;
 
 int __stdcall RemoveTimer(int i);
-int __stdcall FUN_004bb5d0(File_004bb5d0* file);
+int __stdcall HAPI_CloseFile(File_004bb5d0* file);
 
 class Class_004cfb40 {
 public:
@@ -31,6 +31,6 @@ void Class_004cfb40::FUN_004cfb40()
         stream->Stop();
         stream->Release();
         stream = 0;
-        FUN_004bb5d0(file);
+        HAPI_CloseFile(file);
     }
 }

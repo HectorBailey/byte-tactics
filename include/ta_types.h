@@ -16469,7 +16469,7 @@ class Class_004bb670 {  // 0x118 bytes, 1 view
 public:
     char unknown_0[24];
     char name[256];  // +0x18
-    void FUN_004bb670(char*);
+    void SetFileName(char*);
 };
 
 struct Class_004bbc40 {  // 0x18 bytes, 1 view

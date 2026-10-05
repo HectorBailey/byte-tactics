@@ -307,7 +307,7 @@ struct Game {
 extern Game* g_game;
 
 void __stdcall FUN_004290f0(char* out, const char* dir, const char* name, const char* ext);
-int __stdcall FUN_004bbc40(char* path);
+int __stdcall HAPI_FileLengthByName(char* path);
 Layer_0041ace0* __stdcall FUN_004aa8f0(Menu_0041ace0* menu, const char* name, int flags);
 void __stdcall FUN_0041aa00(void* menu);
 void __stdcall FUN_004a81e0(Menu_0041ace0* menu, int value);
@@ -360,7 +360,7 @@ void __stdcall FUN_0041ace0(Unit* unit, char* guiName, int page)
         char path[256];
         char name[256];
         FUN_004290f0(path, "guis", guiName, "GUI");
-        if (FUN_004bbc40(path) == 0)
+        if (HAPI_FileLengthByName(path) == 0)
             sprintf(name, "%sDL", g_game->sideNames[player->owner->playerIndex]);
         else
             strcpy(name, guiName);

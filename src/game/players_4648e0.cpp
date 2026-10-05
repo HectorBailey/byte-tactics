@@ -39,7 +39,7 @@ public:
 
 extern Game* g_game;
 
-char* __stdcall FUN_004bbe50(const char* name, int* size);
+char* __stdcall HAPI_LoadFile(const char* name, int* size);
 int __stdcall FUN_004b7a30(char* text, int len, Class_004b74f0* vars, int param_4);
 void __cdecl FUN_004d85a0(char* text);
 void __stdcall FUN_00409f80(int player);
@@ -50,9 +50,9 @@ void FUN_004648e0()
 {
     int size;
     char* name = g_game->net->FUN_004356c0(7);
-    char* text = FUN_004bbe50(name, &size);
+    char* text = HAPI_LoadFile(name, &size);
     if (text == 0) {
-        text = FUN_004bbe50("ai\\default.txt", &size);
+        text = HAPI_LoadFile("ai\\default.txt", &size);
     }
     if (text != 0) {
         Class_004b74f0 vars;

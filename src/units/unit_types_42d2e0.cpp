@@ -86,14 +86,14 @@
 // stored around every operator= call). What still differs is only the cursor/end register swap:
 // ours keeps the cursor in ebp and `end` in edi, the original has d in edi and `end` in ebp,
 // which cascades into the unit-loop hunks. Rejected this pass: `for(;;) { ...; if
-// (!FUN_004bbc40(path)) break; ... }` for the suffix loop (rotated, 2240 bytes, 87.2), inert
+// (!HAPI_FileLengthByName(path)) break; ... }` for the suffix loop (rotated, 2240 bytes, 87.2), inert
 // file-scope extern declarations (16 / 48 / 80 -> 91.2 / 90.8 / 91.2), moving the w or end
 // declaration, `end` declared last (87.7), making w span both branches with `d = w` after the
 // if/else (91.2), `d += 1`, `d = 0` initialiser, `last` alias removed, while-copy with s
 // declared outside.
 // Best 91.2% (2183 bytes against 2173) shape: the GUI suffix loop must be written as a do-while
-// whose condition re-reads the FUN_004bbc40 result from a local:
-//   more = FUN_004bbc40(path); if (more) { suffix++; found = 1; } while (more);
+// whose condition re-reads the HAPI_FileLengthByName result from a local:
+//   more = HAPI_FileLengthByName(path); if (more) { suffix++; found = 1; } while (more);
 // That stops /O2 from peeling the first iteration; for(;;), while(1) and a goto loop all score
 // 86.2 (2240 bytes) because MSVC duplicates the loop body ahead of a rotated loop.
 // The compaction keeps the earlier winning shape: keep bit-23-set elements, scan loop and copy
@@ -280,7 +280,7 @@ extern char DAT_005119b8[];
 void __stdcall FUN_004290f0(char* out, const char* dir, const char* name, const char* ext);
 void __stdcall LoadUnitFbi(char* path, Class_0042b370* type);
 void __stdcall FUN_0042a140(void* obj, char* name);
-int __stdcall FUN_004bbc40(char* path);
+int __stdcall HAPI_FileLengthByName(char* path);
 void* __stdcall Load3do(char* path);
 void __stdcall MirrorObject(void* obj);
 int __stdcall GetObjectHeight(void* obj);
@@ -420,7 +420,7 @@ void LoadUnitTypes() {
         g_game->field_38d71 = (unsigned char)((u * 100) / gp->field_1438f);
         type->field_21e = u;
         FUN_004290f0(path, "units", type->name, "FBI");
-        if (FUN_004bbc40(path))
+        if (HAPI_FileLengthByName(path))
             LoadUnitFbi(path, type);
 
         strncpy(namebuf, type->model, 0x20);
@@ -440,7 +440,7 @@ void LoadUnitTypes() {
         StripExtension(namebuf);
         sprintf(section, "%s0", namebuf);
         FUN_004290f0(path, "guis", section, "GUI");
-        if (FUN_004bbc40(path))
+        if (HAPI_FileLengthByName(path))
             type->flags.bits.gui = 1;
         else
             type->flags.bits.gui = 0;
@@ -451,7 +451,7 @@ void LoadUnitTypes() {
         do {
             sprintf(section, "%s%d", namebuf, suffix);
             FUN_004290f0(path, "guis", section, "GUI");
-            more = FUN_004bbc40(path);
+            more = HAPI_FileLengthByName(path);
             if (more) {
                 suffix++;
                 found = 1;

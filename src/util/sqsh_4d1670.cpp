@@ -26,10 +26,10 @@ extern int DAT_00526ff8;
 extern char DAT_0051ffd0[];
 extern char DAT_00520fe8[];
 
-int __stdcall FUN_004d0de0(int pos, int* out);
+int __stdcall LzssAddString(int pos, int* out);
 
 // FUNCTION: 0x4d1670
-int __stdcall FUN_004d1670(unsigned char* src, int len)
+int __stdcall LzssSetPreset(unsigned char* src, int len)
 {
     int out;
     int n;
@@ -57,7 +57,7 @@ int __stdcall FUN_004d1670(unsigned char* src, int len)
     memcpy(DAT_00526ff4 + 0x13, src, n);
     memcpy(DAT_0051ffd0, DAT_00526ff4, 0x1011);
     for (i = 0; i < n; i++)
-        FUN_004d0de0(i + 0x13, &out);
+        LzssAddString(i + 0x13, &out);
     memcpy(DAT_00520fe8, DAT_00526ff0, 0x6006);
     DAT_00526ff8 = 1;
     if (DAT_00526ff4 == 0) {

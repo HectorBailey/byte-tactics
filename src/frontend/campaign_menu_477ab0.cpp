@@ -66,7 +66,7 @@ void __stdcall FUN_0047f1a0(char* name, int param_2);
 void __stdcall FUN_00491c80(int value);
 Entry_00477ab0* __stdcall FUN_0049ff90(Entry_00477ab0* entries, char* name);
 int __stdcall FUN_0049fdf0(Entry_00477ab0* entries, char* name, int type);
-char* __stdcall FUN_004b6af0(char* text, int line);
+char* __stdcall SkipTextLines(char* text, int line);
 void __stdcall FUN_004a2be0(void* menu, int index);
 void __stdcall FUN_0049fa90(void* menu);
 void __stdcall FUN_004a1110(void* menu, char* name, int flag);
@@ -103,7 +103,7 @@ void __stdcall FUN_004779e0(Menu_00477ab0* menu, Entry_00477ab0* unused)
     Entry_00477ab0* layout =
         FUN_0049ff90((*(Holder_00477ab0**)(g_game + 0x531))->entries, "Campaign");
     ((Class_00435110*)*(void**)(g_game + 0x391e9))->FUN_00435110(
-        FUN_004b6af0(layout->text, layout->selected));
+        SkipTextLines(layout->text, layout->selected));
     int count = ((Class_00435760*)*(void**)(g_game + 0x391e9))->FUN_00435760(&DAT_0051e660);
     FUN_004a32a0(menu, "Missions", DAT_0051e660, count, 0);
     FUN_004a2be0(g_game + 0x519,
@@ -143,7 +143,7 @@ void __stdcall FUN_00477ab0(Menu_00477ab0* menu)
             char* name;
             if (DAT_00507b6c == 0) {
                 Entry_00477ab0* e = FUN_0049ff90(entries, "Campaign");
-                name = FUN_004b6af0(e->text, e->selected);
+                name = SkipTextLines(e->text, e->selected);
                 ((Class_00435110*)*(void**)(g_game + 0x391e9))->FUN_00435110(name);
             } else if (*(unsigned char*)(*(int*)(playerInfo + 0x1b8a) + 0x95) == 0) {
                 ((Class_00435110*)*(void**)(g_game + 0x391e9))->FUN_00435110("Arm Campaign");

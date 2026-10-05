@@ -167,13 +167,13 @@ void __stdcall FUN_004ac7d0(void*, void*, void*);
 void __stdcall SetCloseHandler(void (__cdecl *)(int), int);
 void __stdcall SetResolution(int, int);
 void __stdcall FatalError(char*);
-int __stdcall FUN_004b6b20(void (*)(void), int, int);
-void __stdcall FUN_004b6b50(int);
+int __stdcall StartThread(void (*)(void), int, int);
+void __stdcall SleepMilliseconds(int);
 void* __stdcall GetGafFrame(void*, int);
 void __stdcall DrawFrame(void*, void*, int, int);
 void* __stdcall FindGafEntry(int, char*);
 void __stdcall SetPaletteColors(void*, int, int);
-void* __stdcall FUN_004bbe50(void*, unsigned int*);
+void* __stdcall HAPI_LoadFile(void*, unsigned int*);
 void __stdcall FillRectangle(void*, void*, unsigned char);
 void __stdcall SetTextColors(int, int);
 void __stdcall SetFont(int);
@@ -260,7 +260,7 @@ void FUN_00497f40(void)
             SetOffscreenSurface((void*)g_game->field_37e1b);
         }
         FUN_004290f0(aux, "palettes", "guipal", "PAL");
-        surfaceHandle = FUN_004bbe50((unsigned int*)aux, 0);
+        surfaceHandle = HAPI_LoadFile((unsigned int*)aux, 0);
         FUN_004ac7d0(&g_game->field_519, SURFACE_143a7, surfaceHandle);
         FUN_004d85a0(surfaceHandle);
         g_game->field_38a37 = GetTicks();
@@ -287,7 +287,7 @@ void FUN_00497f40(void)
             }
             g_game->slots.flag40[i] = (pi->active != 0 && (pi->data->flags & 0x40) != 0) ? 1 : 0;
         }
-        if (!FUN_004b6b20(FUN_00497c70, 0, 0)) {
+        if (!StartThread(FUN_00497c70, 0, 0)) {
             FatalError("Unable to start the loading thread!");
         }
         memset(DAT_0051f2c8, 0, 10);
@@ -479,5 +479,5 @@ void FUN_00497f40(void)
         UnlockScreen(&gadget);
         FlipScreen();
     }
-    FUN_004b6b50(200);
+    SleepMilliseconds(200);
 }

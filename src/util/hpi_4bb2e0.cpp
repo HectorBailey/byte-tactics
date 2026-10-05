@@ -72,7 +72,7 @@ struct File_004bb2e0 {
 State_004bb2e0* GetDisplay(void);
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
 void __cdecl FUN_004d85a0(void* p);
-Entry_004bb2e0* __stdcall FUN_004bb4e0(List_004bb2e0* list, char* name);
+Entry_004bb2e0* __stdcall HAPI_FindEntry(List_004bb2e0* list, char* name);
 
 // Whole pixels of a 16.16 size, rounded up.
 static inline int nblocks(int w)
@@ -81,7 +81,7 @@ static inline int nblocks(int w)
 }
 
 // FUNCTION: 0x4bb2e0
-File_004bb2e0* __stdcall FUN_004bb2e0(char* filename, const char* mode)
+File_004bb2e0* __stdcall HAPI_OpenFile(char* filename, const char* mode)
 {
     int size;
     int off;
@@ -98,7 +98,7 @@ File_004bb2e0* __stdcall FUN_004bb2e0(char* filename, const char* mode)
         return h;
     }
     for (int i = 0; i < state->itemCount; i++) {
-        Entry_004bb2e0* e = FUN_004bb4e0(state->items[i]->node->list, filename);
+        Entry_004bb2e0* e = HAPI_FindEntry(state->items[i]->node->list, filename);
         if (e == 0 || (e->flags & 1))
             continue;
         if (state->items[i]->fp == 0) {

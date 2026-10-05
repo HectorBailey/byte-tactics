@@ -1,7 +1,7 @@
 // Decompiled by deepseek-v4.1-flash. Names are provisional.
 // Creates a DirectSound buffer for a block of a sound file. FP exceptions are
 // masked while the buffer is created, the buffer is locked, its contents are
-// read from the file with FUN_004bb7c0, and it is unlocked again. The buffer
+// read from the file with HAPI_readfromfile, and it is unlocked again. The buffer
 // is then wrapped in a 4-slot set (only slot 0 is used) allocated with the
 // tagged allocator. Releases the buffer and returns 0 on any failure.
 #include <windows.h>
@@ -11,7 +11,7 @@
 struct File_004bb5d0;
 
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
-int __stdcall FUN_004bb7c0(File_004bb5d0* file, void* buf, int size);
+int __stdcall HAPI_readfromfile(File_004bb5d0* file, void* buf, int size);
 
 class Class_004cf370 {
 public:
@@ -56,7 +56,7 @@ IDirectSoundBuffer** Class_004cf370::FUN_004cf370(File_004bb5d0* file, DWORD byt
         hr = buf->Lock(0, bytes, &ptr, &size, 0, 0, 0);
         if (hr != 0)
             goto error;
-        unsigned copied = (unsigned)FUN_004bb7c0(file, ptr, size);
+        unsigned copied = (unsigned)HAPI_readfromfile(file, ptr, size);
         hr = buf->Unlock(ptr, size, 0, 0);
         if (hr != 0)
             goto error;

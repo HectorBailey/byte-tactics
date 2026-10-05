@@ -12,7 +12,7 @@
 // block. It is dead in the source (nothing reads the slot again) and MSVC
 // deletes such a store, so it has to be kept by making the variable's ADDRESS
 // escape. The only addresses of locals that escape in this function are the
-// path buffer (sprintf and FUN_004bbc30) and the count (FUN_00492b10), and
+// path buffer (sprintf and RemoveFile) and the count (FUN_00492b10), and
 // the store is at frame+0 while `&count` is at frame+4 and the buffer at
 // frame+8, so all three cannot be separate locals: they are ONE local
 // aggregate, {int, int, char[0x100]}, and taking the buffer's address
@@ -24,7 +24,7 @@
 //   * `int` + `int` + `char[0x100]` as separate locals: 0x104 frame, no store.
 //   * the same with the path padded to 0x104: 0x108 frame, no store (98.4%).
 //   * one local struct {int, int, char[0x100]}, `&save.count` to
-//     FUN_00492b10, `save.path` to sprintf and FUN_004bbc30: MATCH.
+//     FUN_00492b10, `save.path` to sprintf and RemoveFile: MATCH.
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -83,8 +83,8 @@ void __stdcall FUN_0049fa70(void* menu);
 void __stdcall FUN_0047f1a0(char* name, int param_2);
 Entry_00492df0* __stdcall FUN_0049ff90(Entry_00492df0* entries, char* name);
 int __stdcall FUN_0049fdf0(Entry_00492df0* entries, char* name, int type);
-char* __stdcall FUN_004b6af0(char* text, int n);
-void __stdcall FUN_004bbc30(char* path);
+char* __stdcall SkipTextLines(char* text, int n);
+void __stdcall RemoveFile(char* path);
 char* __stdcall FUN_00492b10(int* count);
 void __stdcall FUN_004ab0a0(Gadget_00492df0* menu);
 void FUN_00491ec0();
@@ -121,8 +121,8 @@ void __stdcall FUN_00492df0(Gadget_00492df0* gadget)
     if (FUN_0049fd60(gadget, "DELETE")) {
         FUN_0047f1a0("SmallButton", 0);
         Entry_00492df0* e = FUN_0049ff90(entries, "GAMES");
-        sprintf(save.path, "%s\\%s", DAT_005091c8, FUN_004b6af0(DAT_0051f2e0, e->field_ba));
-        FUN_004bbc30(save.path);
+        sprintf(save.path, "%s\\%s", DAT_005091c8, SkipTextLines(DAT_0051f2e0, e->field_ba));
+        RemoveFile(save.path);
         FUN_00492b10(&save.count);
         FUN_004ab0a0(gadget);
         FUN_00491ec0();

@@ -35,7 +35,7 @@ struct Common_004ad350 {
 
 extern int DAT_0051fba8;
 
-unsigned int __stdcall FUN_004bbbe0(Class_004bbbe0* out, void* buf, unsigned int len);
+unsigned int __stdcall HAPI_WriteFile(Class_004bbbe0* out, void* buf, unsigned int len);
 void __stdcall FUN_004accd0(Class_004bbbe0* out, int indent);
 void __stdcall FUN_004acde0(Class_004bbbe0* out, char* name, char* value, int indent);
 
@@ -51,29 +51,29 @@ void __stdcall FUN_004ace50(Common_004ad350* obj, Class_004bbbe0* out, int inden
     value = _itoa(obj->id, num, 10);
     tab = '\t';
     for (i = 0; i < indent; i++)
-        FUN_004bbbe0(out, &tab, 1);
+        HAPI_WriteFile(out, &tab, 1);
     sprintf(line, "%s=%s;\n", "id", value);
-    FUN_004bbbe0(out, line, strlen(line));
+    HAPI_WriteFile(out, line, strlen(line));
 
     value = _itoa(obj->assoc, num, 10);
     tab = '\t';
     for (i = 0; i < indent; i++)
-        FUN_004bbbe0(out, &tab, 1);
+        HAPI_WriteFile(out, &tab, 1);
     sprintf(line, "%s=%s;\n", "assoc", value);
-    FUN_004bbbe0(out, line, strlen(line));
+    HAPI_WriteFile(out, line, strlen(line));
 
     strncpy(num, obj->name, 16);
     num[16] = 0;
     tab = '\t';
     for (i = 0; i < indent; i++)
-        FUN_004bbbe0(out, &tab, 1);
+        HAPI_WriteFile(out, &tab, 1);
     sprintf(line, "%s=%s;\n", "name", num);
-    FUN_004bbbe0(out, line, strlen(line));
+    HAPI_WriteFile(out, line, strlen(line));
 
     value = _itoa(obj->xpos, num, 10);
     FUN_004accd0(out, indent);
     sprintf(line, "%s=%s;\n", "xpos", value);
-    FUN_004bbbe0(out, line, strlen(line));
+    HAPI_WriteFile(out, line, strlen(line));
 
     if (obj->id == 0 && DAT_0051fba8 != 0 && obj->ypos >= 0)
         obj->ypos -= 0x1e0;
@@ -81,47 +81,47 @@ void __stdcall FUN_004ace50(Common_004ad350* obj, Class_004bbbe0* out, int inden
     value = _itoa(obj->ypos, num, 10);
     FUN_004accd0(out, indent);
     sprintf(line, "%s=%s;\n", "ypos", value);
-    FUN_004bbbe0(out, line, strlen(line));
+    HAPI_WriteFile(out, line, strlen(line));
 
     value = _itoa(obj->width, num, 10);
     FUN_004accd0(out, indent);
     sprintf(line, "%s=%s;\n", "width", value);
-    FUN_004bbbe0(out, line, strlen(line));
+    HAPI_WriteFile(out, line, strlen(line));
 
     value = _itoa(obj->height, num, 10);
     FUN_004accd0(out, indent);
     sprintf(line, "%s=%s;\n", "height", value);
-    FUN_004bbbe0(out, line, strlen(line));
+    HAPI_WriteFile(out, line, strlen(line));
 
     value = _itoa(obj->attribs, num, 10);
     FUN_004accd0(out, indent);
     sprintf(line, "%s=%s;\n", "attribs", value);
-    FUN_004bbbe0(out, line, strlen(line));
+    HAPI_WriteFile(out, line, strlen(line));
 
     value = _itoa(obj->colorf, num, 10);
     FUN_004accd0(out, indent);
     sprintf(line, "%s=%s;\n", "colorf", value);
-    FUN_004bbbe0(out, line, strlen(line));
+    HAPI_WriteFile(out, line, strlen(line));
 
     value = _itoa(obj->colorb, num, 10);
     FUN_004accd0(out, indent);
     sprintf(line, "%s=%s;\n", "colorb", value);
-    FUN_004bbbe0(out, line, strlen(line));
+    HAPI_WriteFile(out, line, strlen(line));
 
     value = _itoa((signed char)obj->texturenumber, num, 10);
     FUN_004accd0(out, indent);
     sprintf(line, "%s=%s;\n", "texturenumber", value);
-    FUN_004bbbe0(out, line, strlen(line));
+    HAPI_WriteFile(out, line, strlen(line));
 
     value = _itoa((signed char)obj->fontnumber, num, 10);
     FUN_004accd0(out, indent);
     sprintf(line, "%s=%s;\n", "fontnumber", value);
-    FUN_004bbbe0(out, line, strlen(line));
+    HAPI_WriteFile(out, line, strlen(line));
 
     value = _itoa((signed char)obj->active, num, 10);
     FUN_004accd0(out, indent);
     sprintf(line, "%s=%s;\n", "active", value);
-    FUN_004bbbe0(out, line, strlen(line));
+    HAPI_WriteFile(out, line, strlen(line));
 
     FUN_004acde0(out, "commonattribs", _itoa((signed char)obj->commonattribs, num, 10), indent);
     FUN_004acde0(out, "help", obj->help, indent);

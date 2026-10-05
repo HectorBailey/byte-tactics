@@ -64,13 +64,13 @@ struct Find_004bc640 {
 #pragma pack(pop)
 
 int GetDisplay(void);
-int __stdcall FUN_004bc370(const char* str, const char* pat);
-int __stdcall FUN_004bc800(List_004bc640* list, Find_004bc640* f);
+int __stdcall MatchWildcard(const char* str, const char* pat);
+int __stdcall HAPI_FindDirectory(List_004bc640* list, Find_004bc640* f);
 
 // The state +0x205 doubles as the raw _findnext handle and as the group list
 // the walk is reading, so it only holds a group list once the state is >= 0.
 // FUNCTION: 0x4bc640
-int __stdcall FUN_004bc640(Find_004bc640* f, struct _finddata_t* fd)
+int __stdcall HAPI_FindNext(Find_004bc640* f, struct _finddata_t* fd)
 {
     if (f == (Find_004bc640*)-1 || f == 0)
         return -1;
@@ -86,14 +86,14 @@ int __stdcall FUN_004bc640(Find_004bc640* f, struct _finddata_t* fd)
     Groups_004bc640* g = (Groups_004bc640*)GetDisplay();
     for (; f->state < g->count; f->index = -1, f->state++) {
         if (f->index < 0) {
-            f->handle = (long)FUN_004bc800(((Path_004bc640*)((Group_004bc640*)g->group[f->state])->path)->list, f);
+            f->handle = (long)HAPI_FindDirectory(((Path_004bc640*)((Group_004bc640*)g->group[f->state])->path)->list, f);
             if (f->handle == 0)
                 continue;
         }
         while (++f->index < ((List_004bc640*)f->handle)->count) {
             int i = f->index;
             Entry_004bc640* e = &((List_004bc640*)f->handle)->entries[i];
-            if (FUN_004bc370(e->name, f->pattern) && !(e->flags & 2)) {
+            if (MatchWildcard(e->name, f->pattern) && !(e->flags & 2)) {
                 if (e->flags & 1) {
                     fd->attrib = 0x11;
                     fd->size = 0;

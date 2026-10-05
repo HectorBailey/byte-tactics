@@ -34,7 +34,7 @@
 struct File_004bb5d0;
 
 int __stdcall RemoveTimer(int i);
-int __stdcall FUN_004bb5d0(File_004bb5d0* file);
+int __stdcall HAPI_CloseFile(File_004bb5d0* file);
 
 class Class_004cfb40 {
 public:
@@ -71,7 +71,7 @@ void Class_004cfb40::FUN_004cf940(File_004bb5d0* file, int sampleRate, int bits,
         stream->Stop();
         stream->Release();
         stream = 0;
-        FUN_004bb5d0(this->file);
+        HAPI_CloseFile(this->file);
     }
     if (handle != -1) {
         RemoveTimer(handle);
@@ -112,7 +112,7 @@ void Class_004cfb40::FUN_004cf940(File_004bb5d0* file, int sampleRate, int bits,
             stream->Stop();
             stream->Release();
             stream = 0;
-            FUN_004bb5d0(this->file);
+            HAPI_CloseFile(this->file);
         }
         return;
     }
@@ -125,7 +125,7 @@ void Class_004cfb40::FUN_004cf940(File_004bb5d0* file, int sampleRate, int bits,
             stream->Stop();
             stream->Release();
             stream = 0;
-            FUN_004bb5d0(this->file);
+            HAPI_CloseFile(this->file);
         }
     }
 }

@@ -12,7 +12,7 @@ struct Elem_004be010 {
 };
 
 // FUNCTION: 0x4be010
-void __stdcall FUN_004be010(Class_004be010* h, int delta)
+void __stdcall HAPI_RelocateDirectory(Class_004be010* h, int delta)
 {
     h->base += delta;
     for (int i = h->count - 1; i >= 0; i--) {
@@ -20,6 +20,6 @@ void __stdcall FUN_004be010(Class_004be010* h, int delta)
         p->a += delta;
         p->b += delta;
         if (p->flags & 1)
-            FUN_004be010((Class_004be010*)p->b, delta);
+            HAPI_RelocateDirectory((Class_004be010*)p->b, delta);
     }
 }

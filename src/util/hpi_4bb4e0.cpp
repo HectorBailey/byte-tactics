@@ -26,7 +26,7 @@ struct List_004bb2e0 {
 // local makes `name` a copy with few references of its own, so `buf` and `i`
 // are coloured before `path`.
 // FUNCTION: 0x4bb4e0
-Entry_004bb2e0* __stdcall FUN_004bb4e0(List_004bb2e0* list, char* path)
+Entry_004bb2e0* __stdcall HAPI_FindEntry(List_004bb2e0* list, char* path)
 {
     int len;
     char* name;

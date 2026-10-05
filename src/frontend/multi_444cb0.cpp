@@ -78,7 +78,7 @@ extern char* DAT_00512990;
 int __stdcall FUN_0049fd60(Gadget_00444cb0* gadget, char* name);
 Entry_00444cb0* __stdcall FUN_0049ff90(void* entries, char* name);
 Entry_00444cb0* __stdcall FUN_004a0280(void* entries, char* name);
-char* __stdcall FUN_004b6af0(char* text, int n);
+char* __stdcall SkipTextLines(char* text, int n);
 void __stdcall FUN_0047f1a0(char* str, int flag);
 void __stdcall FUN_004ab0a0(Gadget_00444cb0* gadget);
 void __stdcall ReportGameEvent(int msg);
@@ -109,7 +109,7 @@ void __stdcall FUN_00444cb0(Gadget_00444cb0* param_1)
         FUN_0047f1a0("Multi", 0);
         Entry_00444cb0* g = FUN_0049ff90(entries, "MAPNAMES");
         ((Class_00435a20*)g_game->field_391e9)->FUN_00435a20(
-            FUN_004b6af0(g->text, g->selected));
+            SkipTextLines(g->text, g->selected));
 
         Player_00444cb0* player = &g_game->players[g_game->localPlayer];
         strcpy(player->data->name,

@@ -21,7 +21,7 @@
 extern char DAT_005119b8[];
 extern char* g_game;
 
-int __stdcall FUN_004bbc40(char* path);
+int __stdcall HAPI_FileLengthByName(char* path);
 void __stdcall FUN_004abd90(char* dest, char* text, int param_3, int param_4, int param_5);
 
 class Class_004c2ea0 {
@@ -58,7 +58,7 @@ public:
         strcpy(names[index], text);
         if (index == 1) {
             if (strlen(text) != 0)
-                exists = FUN_004bbc40(text);
+                exists = HAPI_FileLengthByName(text);
             else
                 exists = 0;
         }

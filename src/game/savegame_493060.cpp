@@ -38,7 +38,7 @@ extern char* DAT_0051f2e8;
 Layer_00493060* __stdcall FUN_004aa8f0(Menu_00493060* menu, const char* name, int flags);
 void __stdcall FUN_00492df0(int a, int b);
 void __stdcall FUN_004288d0(const char* name, int a, int b, int c);
-void __stdcall FUN_004bcf00(char* path);
+void __stdcall MakeDirectoryPath(char* path);
 void __stdcall FUN_00492b10(int* out);
 void __stdcall FUN_004a0bf0(Menu_00493060* menu, char* name, char* text, int param_4);
 void __stdcall FUN_004a0570(Menu_00493060* menu, char* name, int param_3);
@@ -63,7 +63,7 @@ void FUN_00493060()
     layer->handler = FUN_00492df0;
     layer->data = g_game;
     FUN_004288d0("DSAVEGAME2", 0, 0, 0);
-    FUN_004bcf00(DAT_005091c8);
+    MakeDirectoryPath(DAT_005091c8);
     FUN_00492b10(&local);
     FUN_004a0bf0(&g_game->menu, "TITLE", "Save Game", 0);
     if (local == 0) {

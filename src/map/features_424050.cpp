@@ -150,7 +150,7 @@ struct Game {
 extern Game* g_game;
 
 int __stdcall StepGafSequence(Anim_00424050* anim);
-int __stdcall FUN_004b6c30(int range);
+int __stdcall RandomInt(int range);
 Cell_00424050* __stdcall FUN_00481550(int x, int y);
 void* __stdcall FUN_00423c50(Cell_00424050* cell, unsigned short feature, void* pos, void* rot,
                              unsigned char owner);
@@ -230,11 +230,11 @@ void __stdcall FUN_00424050()
         Cell_00424050* c = &g_game->cells[g_game->scanIndex];
         if (c->feature < 0xfffb && !(c->flags & 1)) {
             Feature_00424050* f = &g_game->features[c->feature];
-            if (FUN_004b6c30(100) < f->seedChance) {
+            if (RandomInt(100) < f->seedChance) {
                 int x = g_game->scanIndex % g_game->width;
                 int z = g_game->scanIndex / g_game->height;
-                x += FUN_004b6c30(f->seedSpread) - f->seedSpread / 2;
-                z += FUN_004b6c30(f->seedSpread) - f->seedSpread / 2;
+                x += RandomInt(f->seedSpread) - f->seedSpread / 2;
+                z += RandomInt(f->seedSpread) - f->seedSpread / 2;
                 Cell_00424050* t = FUN_00481550(x, z);
                 if (t && c->unknown_0 == 0 && t->feature == 0xffff)
                     FUN_00423c50(t, c->feature, 0, 0, 10);

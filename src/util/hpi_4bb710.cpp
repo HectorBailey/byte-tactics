@@ -18,7 +18,7 @@ struct File_004bb710 {
 void __cdecl FUN_004d85a0(int* param_1);
 
 // FUNCTION: 0x4bb710
-long __stdcall FUN_004bb710(File_004bb710* file, long pos)
+long __stdcall HAPI_SeekFile(File_004bb710* file, long pos)
 {
     if (file->shared != 0) {
         unsigned int old = file->pos;

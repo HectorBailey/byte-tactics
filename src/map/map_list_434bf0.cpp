@@ -68,7 +68,7 @@ extern char* g_game;
 void* __cdecl FUN_004d83b0(const char* name, unsigned int size);
 void* __cdecl FUN_004d84a0(void* p, const char* name, unsigned int size);
 void __stdcall FUN_00491c80(int n);
-void __stdcall FUN_004bca30(const char* pattern, int flags, std::vector<Class_004c91a0>* out);
+void __stdcall ListDirectory(const char* pattern, int flags, std::vector<Class_004c91a0>* out);
 char* __stdcall FUN_004290f0(char* out, const char* dir, const char* name, const char* ext);
 char* __stdcall StripExtension(char* name);
 char* __stdcall FUN_004c5740(char* text);
@@ -107,7 +107,7 @@ int __stdcall FUN_00434bf0(void** param_1, int param_2, int param_3)
     *(char*)DAT_005122d4 = 0;
 
     std::vector<Class_004c91a0> files;
-    FUN_004bca30("Maps\\*.ota", 0, &files);
+    ListDirectory("Maps\\*.ota", 0, &files);
     DAT_005122e0 = 0;
 
     s.count = files.size();

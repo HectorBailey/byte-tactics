@@ -20,22 +20,22 @@ struct File_004bbd30 {
     int* buffer2;                      // +0x14
 };
 
-File_004bbd30* __stdcall FUN_004bb2e0(const char* name, const char* mode);
-long __stdcall FUN_004bb710(File_004bbd30* file, long pos);
-int __stdcall FUN_004bb7c0(File_004bbd30* file, void* buffer, unsigned int size);
+File_004bbd30* __stdcall HAPI_OpenFile(const char* name, const char* mode);
+long __stdcall HAPI_SeekFile(File_004bbd30* file, long pos);
+int __stdcall HAPI_readfromfile(File_004bbd30* file, void* buffer, unsigned int size);
 void __cdecl FUN_004d85a0(int* param_1);
 
 // FUNCTION: 0x4bbd30
-void* __stdcall FUN_004bbd30(char* name, void* buffer, long pos, unsigned int size)
+void* __stdcall HAPI_ReadFileAt(char* name, void* buffer, long pos, unsigned int size)
 {
-    File_004bbd30* file = FUN_004bb2e0(name, "rb");
+    File_004bbd30* file = HAPI_OpenFile(name, "rb");
     if (file == 0) {
         return 0;
     }
-    if (FUN_004bb710(file, pos) == -1) {
+    if (HAPI_SeekFile(file, pos) == -1) {
         goto fail;
     }
-    if (FUN_004bb7c0(file, buffer, size) <= 0) {
+    if (HAPI_readfromfile(file, buffer, size) <= 0) {
         goto fail;
     }
     if (file->shared != 0) {

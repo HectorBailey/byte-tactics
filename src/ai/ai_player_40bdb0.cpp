@@ -24,7 +24,7 @@ struct Game {
 extern Game* g_game;
 
 int __stdcall FUN_0040bb00(unsigned int player, unsigned short id);
-int __stdcall FUN_004b6c30(int range);
+int __stdcall RandomInt(int range);
 
 // FUNCTION: 0x40bdb0
 unsigned short __stdcall FUN_0040bdb0(unsigned int player, Unit* unit)
@@ -36,7 +36,7 @@ unsigned short __stdcall FUN_0040bdb0(unsigned int player, Unit* unit)
         int r = FUN_0040bb00(player, id);
         if (r > 0) {
             total += r;
-            if (FUN_004b6c30(total) < r)
+            if (RandomInt(total) < r)
                 chosen = id;
         }
     }

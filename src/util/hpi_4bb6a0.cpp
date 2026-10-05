@@ -17,7 +17,7 @@ struct File_004bb6a0 {
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
 
 // FUNCTION: 0x4bb6a0
-File_004bb6a0* __stdcall FUN_004bb6a0(char* path)
+File_004bb6a0* __stdcall HAPI_CreateFile(char* path)
 {
     FILE* fp = fopen(path, "w+b");
     if (fp) {

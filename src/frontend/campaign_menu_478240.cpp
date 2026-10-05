@@ -81,7 +81,7 @@ Layer_00478240* __stdcall FUN_004aa8f0(void* menu, const char* name, int flags);
 void __stdcall FUN_004290f0(char* out, const char* dir, const char* name,
                             const char* ext);
 void __stdcall FUN_004288d0(const char* name, int a, int b, int c);
-int __stdcall FUN_004bc930(char* name, int flag);
+int __stdcall CountDirectoryEntries(char* name, int flag);
 int __stdcall FUN_0049fdf0(Entry_00478240* entries, const char* name, int type);
 void FUN_004c2470();
 void __stdcall FUN_004a81e0(void* menu, int value);
@@ -102,7 +102,7 @@ int __stdcall FUN_00476a60(int** p, int value);
 void __stdcall FUN_004a32a0(void* menu, const char* name, int* data, int count,
                             int flag);
 void __stdcall FUN_004a2be0(void* menu, int index);
-char* __stdcall FUN_004b6af0(char* text, int line);
+char* __stdcall SkipTextLines(char* text, int line);
 
 class Class_00435110 {
 public:
@@ -138,7 +138,7 @@ void __stdcall FUN_00478240(int param_1)
         DAT_00507b6c = 0;
     } else {
         FUN_004290f0(buf, "camps", "*", "TDF");
-        if (FUN_004bc930(buf, 0) <= 2) {
+        if (CountDirectoryEntries(buf, 0) <= 2) {
             FUN_004288d0("newcampaign4x", 0, 0, 0);
             DAT_00507b6c = 1;
         } else {
@@ -241,7 +241,7 @@ void __stdcall FUN_00478240(int param_1)
             }
             Entry_00478240* m = FUN_0049ff90(g_game->menu.layer->entries,
                                              "Campaign");
-            char* text = FUN_004b6af0(m->text, m->line);
+            char* text = SkipTextLines(m->text, m->line);
             ((Class_00435110*)g_game->net)->FUN_00435110(text);
             int mc = ((Class_00435760*)g_game->net)->FUN_00435760(
                 (int*)&DAT_0051e660);

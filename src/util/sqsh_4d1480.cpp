@@ -34,7 +34,7 @@ extern char DAT_0051ffd0[];
 extern char* DAT_00526ff4;
 
 // FUNCTION: 0x4d1480
-int __stdcall FUN_004d1480(unsigned char* dest, unsigned char* src)
+int __stdcall LzssExpand(unsigned char* dest, unsigned char* src)
 {
     unsigned char* base;
     int own;

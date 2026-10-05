@@ -93,8 +93,8 @@ void* __cdecl FUN_004d8450(int size);
 void* __cdecl FUN_004d8580(void* ptr, int size);
 void __cdecl FUN_004d85a0(void* ptr);
 int __cdecl FUN_004d8e50(int handle);
-int __stdcall FUN_004d1aa0(int size, int level);
-int __stdcall FUN_004d1820(void* dest, int* destSize, void* src, int srcSize, int param_5, int param_6);
+int __stdcall SquashMaxPackedSize(int size, int level);
+int __stdcall SquashPack(void* dest, int* destSize, void* src, int srcSize, int param_5, int param_6);
 
 // FUNCTION: 0x4b3c60
 void Class_004b3750::SaveAccount(int index, FILE* file, Buffer_004b3c60* buf, int compress)
@@ -217,10 +217,10 @@ void Class_004b3750::SaveAccount(int index, FILE* file, Buffer_004b3c60* buf, in
         if (raw != 0) {
             fseek(file, off + 0x20, 0);
             fread(raw, len, 1, file);
-            int csize = FUN_004d1aa0(len, 1);
+            int csize = SquashMaxPackedSize(len, 1);
             char* cbuf = (char*)FUN_004d8450(csize);
             if (cbuf != 0) {
-                int err = FUN_004d1820(cbuf, &csize, raw, len, 1, 0);
+                int err = SquashPack(cbuf, &csize, raw, len, 1, 0);
                 if (err == 0 && csize < len) {
                     fseek(file, off + 0x20, 0);
                     fwrite(cbuf, csize, 1, file);

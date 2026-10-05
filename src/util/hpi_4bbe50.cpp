@@ -1,12 +1,12 @@
 // Decompiled by space-bunny-free. Names are provisional.
 // Loads a whole file into a named heap block: opens the name (falling back to
-// an already loaded item through FUN_004bb2e0), takes the length from the
+// an already loaded item through HAPI_OpenFile), takes the length from the
 // shared item's info block or from the file descriptor, rewinds, copies the
 // name into a local buffer, strips the directory from it (the same in-place
 // strip as 0x4bb150, so the leaf name is what names the block), allocates the
 // block, reads into it and stores the length through `size`. `size` is set to
 // -1 first, and again after the open, so a caller that only wanted the size
-// sees a failure. The tail is FUN_004bb5d0 (close, release the two block
+// sees a failure. The tail is HAPI_CloseFile (close, release the two block
 // pointers, free the handle) written out inline, with its fclose results dead
 // because the return value is the block.
 // Two shapes had to be spelled exactly this way:
@@ -47,14 +47,14 @@ struct File_004bbe50 {
     void* buffer2;            // +0x14
 };
 
-File_004bbe50* __stdcall FUN_004bb2e0(char* filename, const char* mode);
-long __stdcall FUN_004bb710(File_004bbe50* file, long pos);
-int __stdcall FUN_004bb7c0(void* file, void* buf, int size);
+File_004bbe50* __stdcall HAPI_OpenFile(char* filename, const char* mode);
+long __stdcall HAPI_SeekFile(File_004bbe50* file, long pos);
+int __stdcall HAPI_readfromfile(void* file, void* buf, int size);
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
 void __cdecl FUN_004d85a0(void* p);
 
 // FUNCTION: 0x4bbe50
-char* __stdcall FUN_004bbe50(char* name, int* size)
+char* __stdcall HAPI_LoadFile(char* name, int* size)
 {
     char buf[0x100];
     char* data = 0;
@@ -64,7 +64,7 @@ char* __stdcall FUN_004bbe50(char* name, int* size)
     if (size) {
         *size = -1;
     }
-    f = FUN_004bb2e0(name, "rb");
+    f = HAPI_OpenFile(name, "rb");
     if (!f) {
         return 0;
     }
@@ -80,7 +80,7 @@ char* __stdcall FUN_004bbe50(char* name, int* size)
     }
     if (len <= 0) {
         data = 0;
-    } else if (FUN_004bb710(f, 0) == -1) {
+    } else if (HAPI_SeekFile(f, 0) == -1) {
         data = 0;
     } else {
         strcpy(buf, name);
@@ -98,7 +98,7 @@ char* __stdcall FUN_004bbe50(char* name, int* size)
             } while (buf[j++] != 0);
         }
         data = (char*)FUN_004d83b0(buf, len);
-        if (FUN_004bb7c0(f, data, len) <= 0) {
+        if (HAPI_readfromfile(f, data, len) <= 0) {
             FUN_004d85a0(data);
             data = 0;
             goto close;

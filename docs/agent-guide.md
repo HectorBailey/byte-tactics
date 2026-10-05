@@ -1544,7 +1544,7 @@ name (`std::_Lockit::_Lockit` is 0x4e39b0).
 - **`fild` operands from a Vec3 temporary in memory**, with a literal 0 stored
   for one component: the length helper takes `const Vec3&` and is called on a
   temporary, `Length(a - b)` (0x408100).
-- **`field = g_game->ticks + FUN_004b6c30(n) + K` folds into `lea eax,
+- **`field = g_game->ticks + RandomInt(n) + K` folds into `lea eax,
   [eax+edx+K]`**: when the original does `add eax, K; mov edx, [ticks]; add
   edx, eax`, compute the delay into a local first (0x407ae0, 0x407e90).
 - **A comparison with an inlined `vector::size()` on the right is evaluated
@@ -2478,7 +2478,7 @@ name (`std::_Lockit::_Lockit` is 0x4e39b0).
 - **Two values tied for a register can be separated by one more use**: when
   the original gives a handle ebx and a path ebp and yours swaps them, a
   trivial inline wrapper around a call that takes the handle
-  (`static inline int Next(int h, ...) { int r = FUN_004bc640(h, ...); return r; }`)
+  (`static inline int Next(int h, ...) { int r = HAPI_FindNext(h, ...); return r; }`)
   adds a use without adding bytes and flips the tie (0x4bcb50). Dummy uses
   such as `h = h` are folded away first and do nothing.
 - **Byte-wide `xor cl, cl` and `not cl`** come from an `unsigned char` local

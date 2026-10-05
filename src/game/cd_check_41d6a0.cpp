@@ -31,7 +31,7 @@ extern int DAT_0050289c;
 extern int DAT_00511de0;
 extern int DAT_00511de4;
 
-char __stdcall FUN_004bb190(char c);
+char __stdcall FindNextCdDrive(char c);
 
 // FUNCTION: 0x41d6a0
 char __stdcall FUN_0041d6a0(int side)
@@ -54,7 +54,7 @@ char __stdcall FUN_0041d6a0(int side)
         if (DAT_00511de0 != 0)
             drive = drive ? '\0' : 'h';
         else
-            drive = FUN_004bb190(drive);
+            drive = FindNextCdDrive(drive);
         if (drive == 0)
             continue;
         char path[256];

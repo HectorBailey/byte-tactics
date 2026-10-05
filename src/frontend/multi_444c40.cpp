@@ -34,7 +34,7 @@ struct Game {
 extern Game* g_game;
 
 Gadget_00444c40* __stdcall FUN_0049ff90(void* gadgets, char* name);
-char* __stdcall FUN_004b6af0(char* text, int n);
+char* __stdcall SkipTextLines(char* text, int n);
 void __stdcall FUN_004a0570(Menu_00444c40* menu, char* name, int value);
 void FUN_00444a20();
 
@@ -42,7 +42,7 @@ void FUN_00444a20();
 void __stdcall FUN_00444c40(Menu_00444c40* menu, int unused)
 {
     Gadget_00444c40* g = FUN_0049ff90(menu->inner->gadgets, "MAPNAMES");
-    if (g_game->field_391e9->FUN_00435a20(FUN_004b6af0(g->text, g->selected)) == 0) {
+    if (g_game->field_391e9->FUN_00435a20(SkipTextLines(g->text, g->selected)) == 0) {
         FUN_004a0570(menu, "MAPPIC", 0);
     } else {
         FUN_004a0570(menu, "MAPPIC", 1);

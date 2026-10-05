@@ -151,7 +151,7 @@ public:
 #pragma pack(pop)
 
 char* __cdecl FUN_004d8610(char* text);
-char* FUN_004b6ba0(char* text, int len);
+char* ComputeChecksum(char* text, int len);
 void FatalError(char* text);
 
 static inline char* SkipSpace(char* p)
@@ -190,7 +190,7 @@ Class_004c3e40::Class_004c3e40(char* name, char* text, char** nextblock, char* f
                 *nextblock = current + 1;
             char* end = current - 1;
             if (text <= end)
-                this->text = FUN_004b6ba0(text, end - text - 1);
+                this->text = ComputeChecksum(text, end - text - 1);
             else
                 this->text = 0;
             return;
@@ -202,7 +202,7 @@ Class_004c3e40::Class_004c3e40(char* name, char* text, char** nextblock, char* f
             }
             char* end = current - 1;
             if (text <= end)
-                this->text = FUN_004b6ba0(text, end - text - 1);
+                this->text = ComputeChecksum(text, end - text - 1);
             else
                 this->text = 0;
             return;

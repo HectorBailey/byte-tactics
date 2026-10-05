@@ -8,7 +8,7 @@ public:
 };
 
 // FUNCTION: 0x4bb650
-bool __stdcall FUN_004bb650(Class_004bb650* obj)
+bool __stdcall HAPI_IsInArchive(Class_004bb650* obj)
 {
     return obj->field_4 != 0;
 }

@@ -23,7 +23,7 @@ State_004be270* GetDisplay(void);
 void __cdecl FUN_004d85a0(void* p);
 
 // FUNCTION: 0x4be270
-void __stdcall FUN_004be270(Record_004be270* pRecord)
+void __stdcall HAPI_RemoveArchive(Record_004be270* pRecord)
 {
     State_004be270* state = GetDisplay();
     int i;

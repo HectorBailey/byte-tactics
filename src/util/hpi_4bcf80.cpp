@@ -46,9 +46,9 @@ struct File_004bcf80 {
     char name[0x100];                  // +0x18
 };
 
-File_004bcf80* __stdcall FUN_004bb2e0(char* filename, const char* mode);
-long __stdcall FUN_004bb710(File_004bcf80* file, long pos);
-int __stdcall FUN_004bb7c0(File_004bcf80* file, void* buf, int size);
+File_004bcf80* __stdcall HAPI_OpenFile(char* filename, const char* mode);
+long __stdcall HAPI_SeekFile(File_004bcf80* file, long pos);
+int __stdcall HAPI_readfromfile(File_004bcf80* file, void* buf, int size);
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
 void __cdecl FUN_004d85a0(void* p);
 
@@ -72,14 +72,14 @@ static void Close_004bcf80(File_004bcf80* f)
 }
 
 // FUNCTION: 0x4bcf80
-int __stdcall FUN_004bcf80(File_004bcf80* dst, char* name)
+int __stdcall HAPI_CopyIntoFile(File_004bcf80* dst, char* name)
 {
     int len;
     int left;
     int got;
     int written;
     void* buf = 0;
-    File_004bcf80* f = FUN_004bb2e0(name, "rb");
+    File_004bcf80* f = HAPI_OpenFile(name, "rb");
     if (f == 0)
         return 0;
     if (f->shared)
@@ -90,12 +90,12 @@ int __stdcall FUN_004bcf80(File_004bcf80* dst, char* name)
         len = 0;
     if (len == 0)
         goto fail;
-    if (FUN_004bb710(f, 0) == -1)
+    if (HAPI_SeekFile(f, 0) == -1)
         goto fail;
     buf = FUN_004d83b0("COPY BUFFER", 0x19000);
     left = len;
     while (left != 0) {
-        got = FUN_004bb7c0(f, buf, 0x19000);
+        got = HAPI_readfromfile(f, buf, 0x19000);
         if (got <= 0)
             goto fail;
         if (dst->shared)

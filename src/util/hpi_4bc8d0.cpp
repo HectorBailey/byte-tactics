@@ -15,7 +15,7 @@ void __cdecl FUN_004d85a0(int* param_1);
 
 // Closes the search handle (if open) and frees the search; -1 for no search.
 // FUNCTION: 0x4bc8d0
-int __stdcall FUN_004bc8d0(Find_004bc8d0* f)
+int __stdcall HAPI_FindClose(Find_004bc8d0* f)
 {
     if (f == (Find_004bc8d0*)-1 || f == 0)
         return -1;

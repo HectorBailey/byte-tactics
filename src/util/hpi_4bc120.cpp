@@ -3,8 +3,8 @@
 // to the start and read that many bytes. The buffer is returned when the read
 // succeeds; a read of zero bytes frees it and returns null. On any failure the
 // file is closed and null is returned. The refcount/fclose/buffer-free block is
-// the inlined body of FUN_004bb5d0, and the size block the inlined body of
-// FUN_004bbd00, so both appear twice.
+// the inlined body of HAPI_CloseFile, and the size block the inlined body of
+// HAPI_FileLength, so both appear twice.
 #include <stdio.h>
 #include <io.h>
 
@@ -30,14 +30,14 @@ struct File_004bc120 {
 };
 
 void __cdecl FUN_004d85a0(void* param_1);
-File_004bc120* __stdcall FUN_004bb2e0(char* param_1, const char* param_2);
-long __stdcall FUN_004bb710(File_004bc120* param_1, long param_2);
-long __stdcall FUN_004bb7c0(File_004bc120* param_1, void* param_2, long param_3);
+File_004bc120* __stdcall HAPI_OpenFile(char* param_1, const char* param_2);
+long __stdcall HAPI_SeekFile(File_004bc120* param_1, long param_2);
+long __stdcall HAPI_readfromfile(File_004bc120* param_1, void* param_2, long param_3);
 
 // FUNCTION: 0x4bc120
-int* __stdcall FUN_004bc120(char* param_1, int* param_2)
+int* __stdcall HAPI_LoadFileInto(char* param_1, int* param_2)
 {
-    File_004bc120* file = FUN_004bb2e0(param_1, "rb");
+    File_004bc120* file = HAPI_OpenFile(param_1, "rb");
     long size;
     if (file == 0)
         goto fail;
@@ -49,9 +49,9 @@ int* __stdcall FUN_004bc120(char* param_1, int* param_2)
         size = 0;
     if (size <= 0)
         goto fail;
-    if (FUN_004bb710(file, 0) < 0)
+    if (HAPI_SeekFile(file, 0) < 0)
         goto fail;
-    size = FUN_004bb7c0(file, param_2, size);
+    size = HAPI_readfromfile(file, param_2, size);
     if (size < 0)
         goto fail;
     if (file->shared != 0) {

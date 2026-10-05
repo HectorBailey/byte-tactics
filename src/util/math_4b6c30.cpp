@@ -214,7 +214,7 @@ extern unsigned int DAT_0051fc88;
 //     lea chain and the original schedule; its two-instruction tail (`sub edx,
 //     ecx; sub eax, edx` vs our `add ecx, edx; add eax, ecx`) remains.
 // FUNCTION: 0x4b6c30
-int __stdcall FUN_004b6c30(int range)
+int __stdcall RandomInt(int range)
 {
     if (range < 2)
         return 0;

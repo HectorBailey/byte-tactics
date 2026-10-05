@@ -122,9 +122,9 @@ public:
 
 void __stdcall FUN_004290f0(char* out, const char* dir, const char* name, const char* ext);
 void __stdcall FUN_004abd90(char* dest, char* text, int param_3, int param_4, int param_5);
-void __stdcall FUN_004b6b80(const char* text, const char* caption);
-int __stdcall FUN_004bbc40(char* path);
-void __stdcall FUN_004bbd30(char* filename, void* buffer, int offset, int size);
+void __stdcall ShowErrorBox(const char* text, const char* caption);
+int __stdcall HAPI_FileLengthByName(char* path);
+void __stdcall HAPI_ReadFileAt(char* filename, void* buffer, int offset, int size);
 char* __stdcall FUN_004c5740(char* text);
 char* __stdcall FUN_004c5840(char* name);
 int __stdcall FUN_004c58a0(Class_004c2ea0* obj, char* buf, const char* key, int size, char* def);
@@ -197,10 +197,10 @@ public:
             briefing = 0;
             return;
         }
-        int size = FUN_004bbc40(name);
+        int size = HAPI_FileLengthByName(name);
         if (size != 0) {
             briefing = (char*)FUN_004d83b0("Briefing", size + 1);
-            FUN_004bbd30(name, briefing, 0, size);
+            HAPI_ReadFileAt(name, briefing, 0, size);
             briefing[size] = 0;
         }
     }
@@ -363,7 +363,7 @@ int Class_00435c00::FUN_00435da0(char* map)
     killMul = GetFloat(parser.current, "killmul");
     timeMul = GetFloat(parser.current, "timemul");
     if (!FUN_00436860(type, &parser, schema)) {
-        FUN_004b6b80("No suitable schema type in mission file!", "Map error");
+        ShowErrorBox("No suitable schema type in mission file!", "Map error");
         return 0;
     }
     humanMetal = (float)parser.current->FUN_004c46c0("HumanMetal", 0);

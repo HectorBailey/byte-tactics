@@ -38,13 +38,13 @@ struct File_004b4270 {            // the open archive
     char name[0x100];             // +0x18
 };
 
-long __stdcall FUN_004bb7a0(File_004b4270* file);
-void __stdcall FUN_004bb7c0(File_004b4270* file, void* buf, int size);
-void __stdcall FUN_004bb710(File_004b4270* file, long pos);
+long __stdcall HAPI_TellFile(File_004b4270* file);
+void __stdcall HAPI_readfromfile(File_004b4270* file, void* buf, int size);
+void __stdcall HAPI_SeekFile(File_004b4270* file, long pos);
 void* __cdecl FUN_004d8450(unsigned int size);
-int __stdcall FUN_004d1b40(unsigned char* src);
-int __stdcall FUN_004d1970(void* dest, void* src);
-char* __stdcall FUN_004d1c60(int code);
+int __stdcall SquashUnpackedSize(unsigned char* src);
+int __stdcall SquashUnpack(void* dest, void* src);
+char* __stdcall SquashErrorString(int code);
 void* __cdecl FUN_004d8580(void* ptr, unsigned int size);
 void __cdecl FUN_004d85a0(void* p);
 void __stdcall FatalError(char* message);
@@ -179,29 +179,29 @@ void Class_004b3770::LoadAccount(File_004b4270* fh, int* image, char* name)
     AccountHeader h;
     char message[1000];
 
-    base = (int)FUN_004bb7a0(fh);
-    FUN_004bb7c0(fh, &h, 0x20);
+    base = (int)HAPI_TellFile(fh);
+    HAPI_readfromfile(fh, &h, 0x20);
     end = base + h.size;
     if (name != 0 && _strcmpi(name, h.strOffset + *image) != 0) {
-        FUN_004bb710(fh, end);
+        HAPI_SeekFile(fh, end);
         return;
     }
     len = h.size - 0x20;
     if (len > 0) {
         if (h.compressed == 1) {
             char* tmp = (char*)FUN_004d8450(len);
-            FUN_004bb7c0(fh, tmp, len);
-            buf = (int)FUN_004d8450(FUN_004d1b40((unsigned char*)tmp));
-            int err = FUN_004d1970((void*)buf, tmp);
+            HAPI_readfromfile(fh, tmp, len);
+            buf = (int)FUN_004d8450(SquashUnpackedSize((unsigned char*)tmp));
+            int err = SquashUnpack((void*)buf, tmp);
             if (err != 0) {
                 sprintf(message, "[HapiBank::LoadAccount] Decompression Error: %s\nFile: %s",
-                        FUN_004d1c60(err), fh->name);
+                        SquashErrorString(err), fh->name);
                 FatalError(message);
             }
             FUN_004d85a0(tmp);
         } else {
             buf = (int)FUN_004d8450(len);
-            FUN_004bb7c0(fh, (void*)buf, len);
+            HAPI_readfromfile(fh, (void*)buf, len);
         }
         ((HapiBank*)this)->OpenAccount(h.strOffset + *image);
         p = (int*)buf;
@@ -240,7 +240,7 @@ void Class_004b3770::LoadAccount(File_004b4270* fh, int* image, char* name)
                 ((Class_004b4c10*)this)->SeekBox(0);
             }
         }
-        FUN_004bb710(fh, end);
+        HAPI_SeekFile(fh, end);
         FUN_004d85a0((void*)buf);
     }
 }

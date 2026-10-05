@@ -91,7 +91,7 @@ void __stdcall FUN_004a0880(Menu_00491ec0* menu, int index, char* text);
 Entry_00491ec0* __stdcall FUN_004a0280(Entry_00491ec0* entries, char* name);
 void __stdcall FUN_004a0570(Menu_00491ec0* menu, char* name, int value);
 void __stdcall FUN_004a0bf0(Menu_00491ec0* menu, char* name, char* text, int param_4);
-char* __stdcall FUN_004b6af0(char* table, int index);
+char* __stdcall SkipTextLines(char* table, int index);
 void __stdcall FrameFromSurface(void* dst, void* src);
 void __stdcall FreeSurface(void* image);
 void* __stdcall LoadSurface(Class_004b48a0* obj);
@@ -117,10 +117,10 @@ void __stdcall FUN_00491ec0()
 
     char* desc;
     if (games->field_ba > -1
-        && (desc = FUN_004b6af0(DAT_0051f2e4, games->field_ba)) != 0
+        && (desc = SkipTextLines(DAT_0051f2e4, games->field_ba)) != 0
         && strlen(desc) != 0) {
         FUN_004a0880(menu, index, desc);
-        char* fname = FUN_004b6af0(DAT_0051f2e0, games->field_ba);
+        char* fname = SkipTextLines(DAT_0051f2e0, games->field_ba);
         sprintf(path, "%s\\%s", DAT_005091c8, fname);
         Class_004b48a0* file = FUN_00432520(path);
         if (file != 0) {
@@ -177,7 +177,7 @@ void __stdcall FUN_00491ec0()
 
             if (DAT_0051f2e8 != 0) {
                 int side = ((Class_004b4800*)file)->GetIntegerItem("Side", 0);
-                strcpy(name, FUN_004b6af0(DAT_0051f2e8, side));
+                strcpy(name, SkipTextLines(DAT_0051f2e8, side));
             } else {
                 strcpy(name, "???");
             }

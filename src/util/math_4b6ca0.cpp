@@ -4,7 +4,7 @@
 extern unsigned int DAT_0051fc88;
 
 // FUNCTION: 0x4b6ca0
-void __stdcall FUN_004b6ca0(unsigned int seed)
+void __stdcall SeedRandom(unsigned int seed)
 {
     DAT_0051fc88 = (seed ^ 0x66e29572) | 1;
 }

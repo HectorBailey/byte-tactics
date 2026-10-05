@@ -86,7 +86,7 @@
 #include <windows.h>
 
 // FUNCTION: 0x4b6880
-int __stdcall FUN_004b6880(char* subKey, char* valueName, LPBYTE data, LPDWORD size,
+int __stdcall AccessRegistryValue(char* subKey, char* valueName, LPBYTE data, LPDWORD size,
                            DWORD type, DWORD read)
 {
     int result;

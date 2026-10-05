@@ -477,7 +477,7 @@ void FUN_00467440();
 void FUN_00466c20();
 unsigned char __stdcall FindHostSlot();
 unsigned short __stdcall FindUnitTypeId(const char* name);
-int __stdcall FUN_004b6c30(int range);
+int __stdcall RandomInt(int range);
 int __stdcall FUN_0047db70(UnitDef_00464f80* type, int a, Point16 cell, int c);
 short __stdcall FUN_00421da0(Pos_00464f80* pos, int a, int b);
 int __stdcall GetCellMeanHeight(Pos_00464f80* pos);
@@ -633,9 +633,9 @@ void __stdcall FUN_00464f80()
                             do {
                                 int cx = g_game->screen_x / 10;
                                 int cy = g_game->screen_y / 10;
-                                pos.x = (FUN_004b6c30(g_game->screen_x - 2 * cx) + cx) << 16;
+                                pos.x = (RandomInt(g_game->screen_x - 2 * cx) + cx) << 16;
                                 pos.y = 0;
-                                pos.z = (FUN_004b6c30(g_game->screen_y - 2 * cy) + cy) << 16;
+                                pos.z = (RandomInt(g_game->screen_y - 2 * cy) + cy) << 16;
                                 int hh = g_game->screen_hh << 16;
                                 int hits = 0;
                                 unsigned int zacc =

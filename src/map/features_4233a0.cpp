@@ -83,7 +83,7 @@ extern Game* g_game;
 Cell_004233a0* __stdcall FUN_00481550(int x, int y);
 void __stdcall FUN_004232f0(int index, int* head);
 void __stdcall InitGafSequence(AnimRef_004233a0* ref, AnimSrc_004233a0* src, int index);
-int __stdcall FUN_004b6c30(int range);
+int __stdcall RandomInt(int range);
 void __stdcall FUN_0047f610(char* name, Vec3_004233a0* pos, int param_3);
 int GetLocalDpid();
 int __stdcall BroadcastPacket(int player, void* data, int size);
@@ -130,7 +130,7 @@ void __stdcall FUN_004233a0(int x, int z, int flag)
     s->used = 1;
     s->x = x;
     s->z = z;
-    s->burnTime = FUN_004b6c30(f->burnTime >> 1) + (f->burnTime >> 1);
+    s->burnTime = RandomInt(f->burnTime >> 1) + (f->burnTime >> 1);
     s->noSend = flag;
     Vec3_004233a0 pos;
     pos.x = x << 20;

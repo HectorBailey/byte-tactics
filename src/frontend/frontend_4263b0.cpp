@@ -86,7 +86,7 @@ void __stdcall FUN_00425d80(void* gadget);
 void __stdcall FUN_00425b80();
 
 void __stdcall FUN_004290f0(char* dest, const char* a, const char* b, const char* c);
-void* __stdcall FUN_004bbe50(char* name, int flag);
+void* __stdcall HAPI_LoadFile(char* name, int flag);
 void __stdcall FUN_004ac7d0(Sub_004263b0* sub, int value, void* palette);
 void __cdecl FUN_004d85a0(void* palette);
 void __stdcall FUN_004a81e0(Sub_004263b0* sub, int value);
@@ -138,7 +138,7 @@ void __stdcall FUN_004263b0()
     char text[300];
 
     FUN_004290f0(palpath, "palettes", "guipal", "PAL");
-    void* palette = FUN_004bbe50(palpath, 0);
+    void* palette = HAPI_LoadFile(palpath, 0);
     FUN_004ac7d0(&g_game->sub, (int)found, palette);
     FUN_004d85a0(palette);
     FUN_004a81e0(&g_game->sub, 0xc0);

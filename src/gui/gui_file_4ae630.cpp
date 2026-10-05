@@ -14,12 +14,12 @@
 
 struct Class_004bbbe0;
 char* __stdcall ChangeExtension(char*, char*, const char*);
-int __stdcall FUN_004bbc40(char*);
-void __stdcall FUN_004bbc30(char*);
-void __stdcall FUN_004bbc10(char*, char*);
-Class_004bbbe0* __stdcall FUN_004bb6a0(char*);
-void __stdcall FUN_004bb5d0(Class_004bbbe0*);
-unsigned int __stdcall FUN_004bbbe0(Class_004bbbe0*, void*, unsigned int);
+int __stdcall HAPI_FileLengthByName(char*);
+void __stdcall RemoveFile(char*);
+void __stdcall RenameFile(char*, char*);
+Class_004bbbe0* __stdcall HAPI_CreateFile(char*);
+void __stdcall HAPI_CloseFile(Class_004bbbe0*);
+unsigned int __stdcall HAPI_WriteFile(Class_004bbbe0*, void*, unsigned int);
 void __stdcall FUN_004accd0(Class_004bbbe0*, int);
 void __stdcall FUN_004acde0(Class_004bbbe0*, char*, char*, int);
 void __stdcall FUN_004ace50(void*, Class_004bbbe0*, int);
@@ -41,36 +41,36 @@ void __stdcall FUN_004ae630(char* obj, char* name)
     char empty[100];
     char list[100];
     ChangeExtension(name, path, "GUI");
-    if (FUN_004bbc40(path)) {
+    if (HAPI_FileLengthByName(path)) {
         ChangeExtension(name, backup, "BGU");
-        FUN_004bbc30(backup);
-        FUN_004bbc10(path, backup);
+        RemoveFile(backup);
+        RenameFile(path, backup);
     }
-    Class_004bbbe0* out = FUN_004bb6a0(path);
+    Class_004bbbe0* out = HAPI_CreateFile(path);
     char* p = obj;
     for (index = 0; index < *(short*)(obj + 0xb6) + 1; index++, p += 0x15b) {
         sprintf(gadget, "GADGET%d", index);
         sprintf(header, "[%s]", gadget);
-        FUN_004bbbe0(out, header, strlen(header));
-        FUN_004bbbe0(out, "\n", 1);
+        HAPI_WriteFile(out, header, strlen(header));
+        HAPI_WriteFile(out, "\n", 1);
         FUN_004accd0(out, 1);
-        FUN_004bbbe0(out, "{\n", 2);
+        HAPI_WriteFile(out, "{\n", 2);
         sprintf(common, "[%s]", "COMMON");
         {
             char t1 = '\t';
-            for (int i = 0; i < 1; i++) FUN_004bbbe0(out, &t1, 1);
+            for (int i = 0; i < 1; i++) HAPI_WriteFile(out, &t1, 1);
         }
-        FUN_004bbbe0(out, common, strlen(common));
-        FUN_004bbbe0(out, "\n", 1);
+        HAPI_WriteFile(out, common, strlen(common));
+        HAPI_WriteFile(out, "\n", 1);
         FUN_004accd0(out, 2);
-        FUN_004bbbe0(out, "{\n", 2);
+        HAPI_WriteFile(out, "{\n", 2);
         FUN_004ace50(p, out, 2);
         {
             int j = 2;
             char t2 = '\t';
-            do { FUN_004bbbe0(out, &t2, 1); } while (--j);
+            do { HAPI_WriteFile(out, &t2, 1); } while (--j);
         }
-        FUN_004bbbe0(out, "}\n", 2);
+        HAPI_WriteFile(out, "}\n", 2);
         switch (*(unsigned char*)p) {
         case 0:
             FUN_004ad4f0(p, out, 1);
@@ -114,9 +114,9 @@ void __stdcall FUN_004ae630(char* obj, char* name)
         }
         {
             char t3 = '\t';
-            for (int i = 0; i < 1; i++) FUN_004bbbe0(out, &t3, 1);
+            for (int i = 0; i < 1; i++) HAPI_WriteFile(out, &t3, 1);
         }
-        FUN_004bbbe0(out, "}\n", 2);
+        HAPI_WriteFile(out, "}\n", 2);
     }
-    FUN_004bb5d0(out);
+    HAPI_CloseFile(out);
 }

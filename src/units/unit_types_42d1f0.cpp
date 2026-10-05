@@ -27,7 +27,7 @@ struct CobFile_0042d1f0 {
 extern Game* g_game;
 
 void __stdcall FUN_004290f0(char* out, const char* dir, const char* name, const char* ext);
-int __stdcall FUN_004bbc40(char* path);
+int __stdcall HAPI_FileLengthByName(char* path);
 void __stdcall LoadUnitFbi(char* path, UnitType_0042d1f0* type);
 void __stdcall FUN_004b2540(CobFile_0042d1f0* cob);
 CobFile_0042d1f0* __stdcall FUN_004b2450(char* path);
@@ -45,7 +45,7 @@ void __stdcall ReloadUnitType(unsigned short index)
     FUN_004d8780(g_game->unitTypes);
     char path[256];
     FUN_004290f0(path, "units", type->name, "FBI");
-    if (FUN_004bbc40(path)) {
+    if (HAPI_FileLengthByName(path)) {
         LoadUnitFbi(path, type);
         FUN_004b2540(*(CobFile_0042d1f0**)((char*)type + 0x18e));
         FUN_004290f0(path, "scripts", type->name, "COB");

@@ -60,7 +60,7 @@ struct Game {
 extern Game* g_game;
 
 void __stdcall FUN_004290f0(char* out, const char* dir, const char* name, const char* ext);
-void __stdcall FUN_004bca30(const char* pattern, int flags, std::vector<Class_004c91a0>* out);
+void __stdcall ListDirectory(const char* pattern, int flags, std::vector<Class_004c91a0>* out);
 void __stdcall FUN_0042e440(int section);
 int FUN_0041d8a0(void);
 
@@ -76,7 +76,7 @@ void FUN_0042e310()
 
     char path[256];
     std::vector<Class_004c91a0> files;
-    FUN_004bca30("Weapons\\*.tdf", 0, &files);
+    ListDirectory("Weapons\\*.tdf", 0, &files);
 
     for (Class_004c91a0* p = files.begin(); p < files.end(); p++) {
         Class_004c2ea0 parser;

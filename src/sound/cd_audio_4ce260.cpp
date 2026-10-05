@@ -8,7 +8,7 @@ extern int DAT_0050b540;
 extern int DAT_0050b544;
 
 extern void __stdcall RemoveTimer(int);
-extern void __stdcall FUN_004b6b60(void (__stdcall*)(int, int, int));
+extern void __stdcall SetMediaNotifyCallback(void (__stdcall*)(int, int, int));
 extern void __stdcall FUN_004ce030(int, int, int);
 extern BOOL __stdcall FUN_004ce1e0(HWND, LPARAM);
 
@@ -89,7 +89,7 @@ int Class_004ce260::FUN_004ce260()
     }
     field_210 = 0;
     field_200 = ((Class_004cda00*)this)->FUN_004cda00();
-    FUN_004b6b60(FUN_004ce030);
+    SetMediaNotifyCallback(FUN_004ce030);
     open = 1;
     field_204 = 1;
     field_208 = 0;

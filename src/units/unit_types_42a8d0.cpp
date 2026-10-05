@@ -63,7 +63,7 @@ public:
     void ReleaseRef();
 };
 
-// One file name of FUN_004bca30's list (a reference-counted string handle).
+// One file name of ListDirectory's list (a reference-counted string handle).
 struct Elem_00432be0 {
     char* data;                        // +0x0
 
@@ -73,7 +73,7 @@ struct Elem_00432be0 {
 
 typedef std::vector<Elem_00432be0> FileList;
 
-void __stdcall FUN_004bca30(const char* pattern, int dirs, FileList* out);
+void __stdcall ListDirectory(const char* pattern, int dirs, FileList* out);
 
 class Class_004c2f60 {
 public:
@@ -225,13 +225,13 @@ void* __cdecl FUN_004d83b0(char* name, int size);
 void __cdecl FUN_004d85a0(void* p);
 void __cdecl FUN_004d8710(void* p);
 void __cdecl FUN_004d8780(void* p);
-void* __stdcall FUN_004bb5b0(char* path);
-int __stdcall FUN_004bb5d0(void* file);
-int __stdcall FUN_004bb650(void* file);
-int __stdcall FUN_004bb7c0(void* file, void* buf, int size);
-int __stdcall FUN_004bbd00(void* file);
-unsigned int __stdcall FUN_004b6ba0(char* data, int len);
-void __stdcall FUN_004b6b80(const char* text, const char* caption);
+void* __stdcall HAPI_OpenFileRead(char* path);
+int __stdcall HAPI_CloseFile(void* file);
+int __stdcall HAPI_IsInArchive(void* file);
+int __stdcall HAPI_readfromfile(void* file, void* buf, int size);
+int __stdcall HAPI_FileLength(void* file);
+unsigned int __stdcall ComputeChecksum(char* data, int len);
+void __stdcall ShowErrorBox(const char* text, const char* caption);
 char* __stdcall FUN_004c5740(char* text);
 void __stdcall FUN_004c58a0(void* parser, char* dst, char* key, int size, char* def);
 
@@ -241,7 +241,7 @@ void __stdcall FUN_004c58a0(void* parser, char* dst, char* key, int size, char* 
 static inline void LoadWeaponTDFs()
 {
     FileList files;
-    FUN_004bca30("Weapons\\*.tdf", 0, &files);
+    ListDirectory("Weapons\\*.tdf", 0, &files);
     if (files.size() == 0)
         return;
     DAT_005122a8 = files.size();
@@ -288,7 +288,7 @@ int LoadUnitInfo()
 
     FUN_004290f0(path, "units", "*", "FBI");
     FileList files;
-    FUN_004bca30(path, 0, &files);
+    ListDirectory(path, 0, &files);
     int count = files.size() + 1;
     g_game->unit_count = count;
     int size = count * sizeof(Class_0042b370);
@@ -302,12 +302,12 @@ int LoadUnitInfo()
         Class_0042b370* u = &g_game->unitinfo[i];
         u->id = i;
         FUN_004290f0(path, "units", files[i - 1], "FBI");
-        void* f = FUN_004bb5b0(path);
+        void* f = HAPI_OpenFileRead(path);
         if (f) {
-            int len = FUN_004bbd00(f);
+            int len = HAPI_FileLength(f);
             char* buf = (char*)FUN_004d83b0(path, len);
-            FUN_004bb7c0(f, buf, len);
-            u->checksum = FUN_004b6ba0(buf, len);
+            HAPI_readfromfile(f, buf, len);
+            u->checksum = ComputeChecksum(buf, len);
             OvrFile ovr;
             char ovrpath[256];
             FUN_004290f0(ovrpath, "units", files[i - 1], "OVR");
@@ -322,7 +322,7 @@ int LoadUnitInfo()
             ((Class_004c2f60*)&parser)->FUN_004c3120(buf, len, 0, "<NO FILE>");
             if (!((Class_004c3410*)&parser)->FUN_004c3410("UNITINFO")) {
                 // Original bug: this exit leaves the FBI file open (no
-                // FUN_004bb5d0), the weapon TDF table allocated and the unit
+                // HAPI_CloseFile), the weapon TDF table allocated and the unit
                 // table locked (no FUN_004d8710).
                 FUN_004d85a0(buf);
                 return 0;
@@ -352,7 +352,7 @@ int LoadUnitInfo()
                 u->flags1 |= 0x800000;
             else
                 u->flags1 &= ~0x800000;
-            if ((FUN_004bb650(f) == 0 && FUN_0041d8a0() != 0) || FUN_0041d8b0() != 0) {
+            if ((HAPI_IsInArchive(f) == 0 && FUN_0041d8a0() != 0) || FUN_0041d8b0() != 0) {
                 u->flags1 &= ~0x800000;
                 bad = 1;
             }
@@ -364,7 +364,7 @@ int LoadUnitInfo()
                 bad = 1;
             }
             u->field_15a = -1;
-            FUN_004bb5d0(f);
+            HAPI_CloseFile(f);
             FUN_004d85a0(buf);
         }
     }
@@ -390,7 +390,7 @@ int LoadUnitInfo()
     }
     g_game->unit_count = count;
     if (oldcount != count && !bad)
-        FUN_004b6b80(FUN_004c5740("Incompatible units found.  They will be ignored.  Please download the latest version of the game."), DAT_005119b8);
+        ShowErrorBox(FUN_004c5740("Incompatible units found.  They will be ignored.  Please download the latest version of the game."), DAT_005119b8);
     FUN_004d8710(g_game->unitinfo);
     return 1;
 }

@@ -138,7 +138,7 @@ void __stdcall FUN_004ab0a0(Gadget_00492360* menu);
 void __stdcall FUN_004ab400(void* menu, void* data);
 void __stdcall FUN_004abd90(void* menu, char* message, int a, int b, int c);
 void __stdcall SetCloseHandler(void (__cdecl *callback)(int), int param);
-char* __stdcall FUN_004b6af0(char* text, int n);
+char* __stdcall SkipTextLines(char* text, int n);
 void __cdecl LeaveNetGameCallback(int param);
 char* __stdcall FUN_004c5740(char* text);
 void __cdecl FUN_004d85a0(void* p);
@@ -184,7 +184,7 @@ void __stdcall FUN_00492360(Gadget_00492360* gadget)
         return;
     }
     Entry_00492360* e = FUN_0049ff90(entries, "GAMES");
-    sprintf(buf, "%s\\%s", DAT_005091c8, FUN_004b6af0(DAT_0051f2e0, e->field_ba));
+    sprintf(buf, "%s\\%s", DAT_005091c8, SkipTextLines(DAT_0051f2e0, e->field_ba));
     void* save = FUN_00432520(buf);
     if (save != 0) {
         int type = ((Class_004b4800*)save)->GetIntegerItem("Gametype", 0);
@@ -222,7 +222,7 @@ void __stdcall FUN_00492360(Gadget_00492360* gadget)
         FUN_0047f1a0("SMLBUTTON", 0);
         e = FUN_0049ff90(entries, "GAMES");
         sprintf(g_game->saveName, "%s\\%s", DAT_005091c8,
-                FUN_004b6af0(DAT_0051f2e0, e->field_ba));
+                SkipTextLines(DAT_0051f2e0, e->field_ba));
         if (g_game->flags_2a44.b2)
             FUN_00491b60();
         g_game->flags_3923b.b3 = 1;

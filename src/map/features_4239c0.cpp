@@ -46,7 +46,7 @@ struct Game {
 extern Game* g_game;
 
 Cell_004239c0* __stdcall FUN_00481550(int x, int y);
-int __stdcall FUN_004b6c30(int range);
+int __stdcall RandomInt(int range);
 void __stdcall FUN_004233a0(int x, int z, int flag);
 int __stdcall GetGroundHeight(Vec3_004239c0* pos);
 void __stdcall FUN_0049a0c0(void* owner, Vec3_004239c0* pos);
@@ -92,7 +92,7 @@ void __stdcall FUN_004239c0(Feature_004239c0* f, Point16_004239c0* cell)
                 if (c && c->feature < 0xfffb && !(c->flags & 1)) {
                     Feature_004239c0* g = &g_game->features[c->feature];
                     if (g->flammable) {
-                        if (FUN_004b6c30(100) < g->spreadChance)
+                        if (RandomInt(100) < g->spreadChance)
                             FUN_004233a0(x, z, 0);
                     }
                 }
@@ -115,7 +115,7 @@ void __stdcall FUN_004239c0(Feature_004239c0* f, Point16_004239c0* cell)
             if (c && c->feature < 0xfffb && !(c->flags & 1)) {
                 Feature_004239c0* g = &g_game->features[c->feature];
                 if (g->flammable) {
-                    if (FUN_004b6c30(100) < g->spreadChance)
+                    if (RandomInt(100) < g->spreadChance)
                         FUN_004233a0(x, z, 0);
                 }
             }

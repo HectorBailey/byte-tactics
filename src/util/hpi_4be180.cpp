@@ -38,7 +38,7 @@ static void FreeRecord_004be180(Record_004be180* p)
 }
 
 // FUNCTION: 0x4be180
-void FUN_004be180(void)
+void HAPI_DropMissingArchives(void)
 {
     State_004be180* state = GetDisplay();
     int i;

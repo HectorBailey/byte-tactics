@@ -84,7 +84,7 @@ void __stdcall FUN_004aefa0(char* items, int b, int c, int count);
 void __stdcall FUN_004a32a0(Menu_00444ea0* menu, char* name, char* items, int count, int flag);
 Entry_00444ea0* __stdcall FUN_0049ff90(Entry_00444ea0* entries, char* name);
 void __stdcall FUN_00444c40(void* menu, int unused);
-char* __stdcall FUN_004b6af0(char* text, int line);
+char* __stdcall SkipTextLines(char* text, int line);
 void __stdcall FUN_004a2e40(Menu_00444ea0* menu, char* name, int index);
 void FUN_00444a20();
 void __stdcall FUN_0049fb10(Menu_00444ea0* menu, int value);
@@ -134,7 +134,7 @@ void FUN_00444ea0()
     FUN_0049ff90(layer->entries, "MAPNAMES")->onSelect = FUN_00444c40;
 
     for (int i = 0; i < n; i++) {
-        if (strcmp(DAT_00512990, FUN_004b6af0(data->items, i)) == 0) {
+        if (strcmp(DAT_00512990, SkipTextLines(data->items, i)) == 0) {
             FUN_004a2e40(&g_game->menu, "MAPNAMES", i);
             break;
         }
@@ -143,7 +143,7 @@ void FUN_00444ea0()
     Menu_00444ea0* menu = &g_game->menu;
     Entry_00444ea0* g = FUN_0049ff90(menu->holder->entries, "MAPNAMES");
     if (((Class_00435a20*)g_game->field_391e9)->FUN_00435a20(
-            FUN_004b6af0(g->text, g->selected)) == 0) {
+            SkipTextLines(g->text, g->selected)) == 0) {
         FUN_004a0570(menu, "MAPPIC", 0);
     } else {
         FUN_004a0570(menu, "MAPPIC", 1);

@@ -128,7 +128,7 @@ int __stdcall FUN_0049c9c0(Unit* fire, Unit* unit, Vec3_0049d580* p3,
                            Vec3_0049d580* point, Unit* target);
 int __stdcall FUN_0049cde0(Unit* shot, Unit* unit, Vec3_0049d580* pos,
                            Vec3_0049d580* aim, Unit* target);
-int __stdcall FUN_004b6c30(int range);
+int __stdcall RandomInt(int range);
 int __stdcall BroadcastPacket(int player, void* data, int size);
 
 // FUNCTION: 0x49d580
@@ -173,8 +173,8 @@ int __stdcall FUN_0049d580(Unit* fire, Unit* unit,
             spread = (unsigned short)spread / parts;
         if (spread) {
             unsigned short range = spread;
-            unit->f_16 += (short)(FUN_004b6c30(range) - (range >> 1));
-            unit->f_18 += (short)(FUN_004b6c30(range) - (range >> 1));
+            unit->f_16 += (short)(RandomInt(range) - (range >> 1));
+            unit->f_18 += (short)(RandomInt(range) - (range >> 1));
         }
         int fired = 0;
         if ((unit->f_c->flags.value & 1) || (unit->f_c->flags.value & 0x100000))

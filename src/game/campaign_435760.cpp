@@ -20,7 +20,7 @@ public:
     int FUN_004c3410(char* name);
 };
 
-char* __stdcall FUN_004b6af0(int list, int index);
+char* __stdcall SkipTextLines(int list, int index);
 int __stdcall FUN_004c58a0(Class_004c3e10* obj, char* buf, const char* key, int size, int def);
 void* __cdecl FUN_004d83b0(const char* name, int size);
 
@@ -64,9 +64,9 @@ int Class_00435760::FUN_00435760(int* param_1)
             if (((Class_004c3410*)&list)->FUN_004c3410(buf) == 0)
                 return 0;
             if (FUN_004c58a0(&list, temp, "missionname", 0x100, 0) != 0)
-                strcpy(FUN_004b6af0(*param_1, i), temp);
+                strcpy(SkipTextLines(*param_1, i), temp);
             else
-                strcpy(FUN_004b6af0(*param_1, i), "Error -- Unnamed Mission");
+                strcpy(SkipTextLines(*param_1, i), "Error -- Unnamed Mission");
         }
     }
     return n;

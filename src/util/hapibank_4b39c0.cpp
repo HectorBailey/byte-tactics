@@ -34,8 +34,8 @@ void* __cdecl FUN_004d8450(int size);
 void* __cdecl FUN_004d8580(void* ptr, int size);
 void __cdecl FUN_004d85a0(void* ptr);
 int __cdecl FUN_004d8e50(int handle);
-int __stdcall FUN_004d1aa0(int size, int level);
-int __stdcall FUN_004d1820(void* dest, int* destSize, void* src, int srcSize, int param_5, int param_6);
+int __stdcall SquashMaxPackedSize(int size, int level);
+int __stdcall SquashPack(void* dest, int* destSize, void* src, int srcSize, int param_5, int param_6);
 // FUNCTION: 0x4b39c0
 int Class_004b3750::SaveBank(char* name, char* ext, int param_3, int param_4)
 {
@@ -71,11 +71,11 @@ int Class_004b3750::SaveBank(char* name, char* ext, int param_3, int param_4)
     fseek(file, 0, 2);
     header.dataOffset = ftell(file);
     int dsize = buf.len;
-    buf.csize = FUN_004d1aa0(dsize, 2);
+    buf.csize = SquashMaxPackedSize(dsize, 2);
     int handle = FUN_004d8e50(0);
     char* cbuf = (char*)FUN_004d8450(buf.csize);
     FUN_004d8e50(handle);
-    if (cbuf != 0) { err = FUN_004d1820(cbuf, &buf.csize, buf.data, dsize, 1, 0); }
+    if (cbuf != 0) { err = SquashPack(cbuf, &buf.csize, buf.data, dsize, 1, 0); }
     else { err = noff; }   // noff is never assigned; see the note at the top
     if (cbuf != 0 && err == 0 && buf.csize < dsize) {
         fwrite(cbuf, buf.csize, 1, file);

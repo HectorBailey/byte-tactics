@@ -49,7 +49,7 @@ void* __stdcall FUN_0044b4e0(int* out);
 void __stdcall FUN_004a9660(Menu_0044bc10* menu);
 char* __stdcall FUN_004c5740(const char* text);
 int __stdcall FUN_004abd90(Menu_0044bc10* menu, const char* text, int a, int b, int c);
-char* __stdcall FUN_004b6af0(char* text, int n);
+char* __stdcall SkipTextLines(char* text, int n);
 void __stdcall FUN_004a32a0(Menu_0044bc10* menu, char* name, void* text, int count, int flag);
 void __stdcall FUN_004a0570(Menu_0044bc10* menu, const char* name, int value);
 Entry_0044bc10* __stdcall FUN_0049ff90(void* gadgets, char* name);
@@ -80,8 +80,8 @@ void FUN_0044bc10()
     }
     char* p = DAT_005129b0;
     for (int i = 0; i < count; i++) {
-        strcpy(p, FUN_004b6af0(DAT_005129ac, i));
-        p += strlen(FUN_004b6af0(DAT_005129ac, i));
+        strcpy(p, SkipTextLines(DAT_005129ac, i));
+        p += strlen(SkipTextLines(DAT_005129ac, i));
         char c = *p;
         while (c != '.') {
             c = *--p;
@@ -101,7 +101,7 @@ void FUN_0044bc10()
     Entry_0044bc10* games = FUN_0049ff90(gadgets, "GAMES");
     int index = FUN_0049fdf0(gadgets, "GAMENAME", 3);
     char* name;
-    if (games->selected > -1 && (name = FUN_004b6af0(DAT_005129b0, games->selected)) != 0 && strlen(name) != 0)
+    if (games->selected > -1 && (name = SkipTextLines(DAT_005129b0, games->selected)) != 0 && strlen(name) != 0)
         FUN_004a0880(menu, index, name);
     else
         FUN_004a0880(menu, index, DAT_005119b8);

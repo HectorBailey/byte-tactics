@@ -19,7 +19,7 @@ struct File_004bb5d0 {
 void __cdecl FUN_004d85a0(int* param_1);
 
 // FUNCTION: 0x4bb5d0
-int __stdcall FUN_004bb5d0(File_004bb5d0* file)
+int __stdcall HAPI_CloseFile(File_004bb5d0* file)
 {
     int result;
     if (file->shared != 0) {

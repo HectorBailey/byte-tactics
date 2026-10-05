@@ -47,7 +47,7 @@ extern char DAT_004fdbf0[];            // "Copyright 0000 Cavedog Entertainment"
 
 void* __cdecl FUN_004d83b0(const char* name, unsigned int size);
 void __cdecl FUN_004d85a0(void* p);
-void __stdcall FUN_004be010(int name, int base);
+void __stdcall HAPI_RelocateDirectory(int name, int base);
 
 static inline int Bad_004bdd70(FILE* f, Header_004bdd70* hdr, char* copyright)
 {
@@ -65,7 +65,7 @@ static inline int Bad_004bdd70(FILE* f, Header_004bdd70* hdr, char* copyright)
 }
 
 // FUNCTION: 0x4bdd70
-File_004bdd70* __stdcall FUN_004bdd70(const char* name, int mode)
+File_004bdd70* __stdcall HAPI_OpenArchive(const char* name, int mode)
 {
     FILE* f = fopen(name, "rb");
     if (f == 0)
@@ -120,7 +120,7 @@ File_004bdd70* __stdcall FUN_004bdd70(const char* name, int mode)
             e->field_0 += (int)b;
             e->field_4 += (int)b;
             if (e->flags & 1)
-                FUN_004be010(e->field_4, (int)b);
+                HAPI_RelocateDirectory(e->field_4, (int)b);
         }
     }
     if (mode == 0) {

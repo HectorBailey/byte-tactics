@@ -18,7 +18,7 @@ struct Obj_004ae580 {
 };
 #pragma pack(pop)
 
-unsigned int __stdcall FUN_004bbbe0(Class_004bbbe0* param_1, void* param_2, unsigned int param_3);
+unsigned int __stdcall HAPI_WriteFile(Class_004bbbe0* param_1, void* param_2, unsigned int param_3);
 
 // FUNCTION: 0x4ae580
 void __stdcall FUN_004ae580(Obj_004ae580* obj, Class_004bbbe0* out, int indent)
@@ -29,7 +29,7 @@ void __stdcall FUN_004ae580(Obj_004ae580* obj, Class_004bbbe0* out, int indent)
     char* value = _itoa(obj->field_b6, num, 10);
     tab = '\t';
     for (int i = 0; i < indent; i++)
-        FUN_004bbbe0(out, &tab, 1);
+        HAPI_WriteFile(out, &tab, 1);
     sprintf(line, "%s=%s;\n", "nuttin", value);
-    FUN_004bbbe0(out, line, strlen(line));
+    HAPI_WriteFile(out, line, strlen(line));
 }

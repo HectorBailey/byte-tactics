@@ -21,7 +21,7 @@ public:
 };
 
 int __stdcall RemoveTimer(int i);
-int __stdcall FUN_004bb5d0(File_004bb5d0* file);
+int __stdcall HAPI_CloseFile(File_004bb5d0* file);
 
 class Class_004ceee0 {
 public:
@@ -56,7 +56,7 @@ void Class_004ceee0::FUN_004ceee0()
         stream->Stop();
         stream->Release();
         stream = 0;
-        FUN_004bb5d0(file);
+        HAPI_CloseFile(file);
     }
     ((Class_004ce410*)this)->FUN_004ce410();
     if (field_28 != 0)

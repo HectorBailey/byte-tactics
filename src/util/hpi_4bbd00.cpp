@@ -21,7 +21,7 @@ struct Class_004bbd00
 };
 
 // FUNCTION: 0x4bbd00
-long __stdcall FUN_004bbd00(Class_004bbd00* param_1)
+long __stdcall HAPI_FileLength(Class_004bbd00* param_1)
 {
     if (param_1->flag != 0)
         return param_1->other->value;

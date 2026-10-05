@@ -119,7 +119,7 @@ extern Game* g_game;
 extern char DAT_005119b8[];
 
 void __stdcall FUN_004290f0(char* out, const char* dir, const char* name, const char* ext);
-void __stdcall FUN_004bca30(const char* pattern, int flags, std::vector<Class_004c91a0>* out);
+void __stdcall ListDirectory(const char* pattern, int flags, std::vector<Class_004c91a0>* out);
 void* __cdecl FUN_004d83b0(const char* name, int size);
 void __cdecl FUN_004d8780(void* p);
 void __cdecl FUN_004d8710(void* p);
@@ -134,7 +134,7 @@ void LoadDownloadMenus()
     char unitbuf[256];
     std::vector<Class_004c91a0> files;
     FUN_004290f0(path, "download", "*", "TDF");
-    FUN_004bca30(path, 0, &files);
+    ListDirectory(path, 0, &files);
 
     int n = files.size();
     g_game->buildListCount = n;

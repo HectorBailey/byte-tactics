@@ -43,7 +43,7 @@ extern Game* g_game;
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
 Display_0041da60* GetDisplay();
 void __stdcall FUN_004290f0(char* out, const char* dir, const char* name, const char* ext);
-int __stdcall FUN_004bbc40(char* path);
+int __stdcall HAPI_FileLengthByName(char* path);
 void* __stdcall FUN_00429290(char* name, unsigned char* palette);
 void __stdcall FUN_004288d0(const char* name, int a, int b, int c);
 
@@ -64,7 +64,7 @@ void FUN_0041da60()
     if (((Class_00435100*)g_game->campaign)->FUN_00435100() == 1
         && (g_game->flags_3923b & 0x10) && name != 0) {
         FUN_004290f0(path, "bitmaps\\glamour", name + 1, "PCX");
-        if (FUN_004bbc40(path) == 0)
+        if (HAPI_FileLengthByName(path) == 0)
             strncpy(g_game->glamour, "glamour\\Arm01.PCX", 0x100);
         else
             strncpy(g_game->glamour, path + 8, 0x100);

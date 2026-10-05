@@ -181,7 +181,7 @@ struct Game {
 extern Game* g_game;
 
 int FUN_004a50b0();
-char* __stdcall FUN_004b6af0(int list, int index);
+char* __stdcall SkipTextLines(int list, int index);
 void FUN_00445ed0();
 void FUN_00444a20();
 void FUN_00446a50();
@@ -303,7 +303,7 @@ void FUN_00448c70()
     }
     if (g_game->scrollEnd != g_game->scrollStart) {
         for (int i = g_game->scrollStart; g_game->scrollEnd != i; ) {
-            char* line = FUN_004b6af0(g_game->list, count);
+            char* line = SkipTextLines(g_game->list, count);
             strcpy(line, g_game->messages[i]);
             count++;
             i++;

@@ -4,7 +4,7 @@ extern int DAT_0051e690;
 extern int DAT_0051e694;
 
 void __stdcall FUN_004290f0(char* out, const char* dir, const char* name, const char* ext);
-void* __stdcall FUN_004bbe50(char* path, int flags);
+void* __stdcall HAPI_LoadFile(char* path, int flags);
 
 class Class_004d0620 {
 public:
@@ -28,7 +28,7 @@ void* __stdcall FUN_0047efe0(const char* name)
     }
     FUN_004290f0(path, "sounds", name, "WAV");
     if (DAT_0051e694 != 0) {
-        return FUN_004bbe50(path, 0);
+        return HAPI_LoadFile(path, 0);
     }
     return g_game->sound->FUN_004d0620(path);
 }

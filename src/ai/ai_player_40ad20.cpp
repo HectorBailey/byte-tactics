@@ -16,7 +16,7 @@ public:
 
 extern Game* g_game;
 
-int __stdcall FUN_004b6c30(int range);
+int __stdcall RandomInt(int range);
 
 class Class_0040aa40 {
 public:
@@ -34,7 +34,7 @@ void Class_0040ad20::FUN_0040ad20()
     if (g_game->ticks >= lastTick + 0x1e) {
         ((Class_0040aa40*)this)->FUN_0040aa40();
         lastTick = g_game->ticks;
-        if (FUN_004b6c30(0x1e) == 0) {
+        if (RandomInt(0x1e) == 0) {
             ((Class_00409730*)this)->FUN_00409730();
         }
     }

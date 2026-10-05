@@ -46,7 +46,7 @@ extern Game* g_game;
 extern char DAT_005119b8[];             // ""
 
 void __stdcall FUN_004290f0(char* out, const char* dir, const char* name, const char* ext);
-int __stdcall FUN_004bc930(const char* path, int flag);
+int __stdcall CountDirectoryEntries(const char* path, int flag);
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
 void __cdecl FUN_004d85a0(void* data);
 int __stdcall FUN_004af320(char* path, char* buffer, char* p3, int p4, int p5, int p6);
@@ -67,7 +67,7 @@ int __stdcall FUN_00476a60(char** out, int side)
     char path[0x100];
     name[0] = '0';
     FUN_004290f0(path, "camps", "*", "TDF");
-    int n = FUN_004bc930(path, 0);
+    int n = CountDirectoryEntries(path, 0);
     char* names = (char*)FUN_004d83b0("CAMPAIGN NAMES1", n << 8);
     *out = (char*)FUN_004d83b0("CAMPAIGN NAMES2", n << 8);
     FUN_004af320(path, names, 0, 0, 1, 2);
