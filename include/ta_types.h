@@ -673,7 +673,7 @@ class Class_004c2ea0;
 class Class_004c2f60;
 class Class_004c3240;
 class Class_004c33a0;
-class Class_004c3490;
+class TdfFile;
 class Class_004c3e10;
 class Class_004c3e10_2;
 class Class_004c3e20;
@@ -5547,7 +5547,7 @@ union UType_0042b370_flags {  // 0x4 bytes, 3 views
     unsigned int bits_29 : 3;
 };
 
-class Class_004c3490 {  // 0x8 bytes, 8 views
+class TdfFile {         // 0x8 bytes, 8 views
 public:
     Class_004c42a0* root;  // +0x0
     int field_4;  // +0x4

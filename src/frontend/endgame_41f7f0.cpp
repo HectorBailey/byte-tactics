@@ -3,7 +3,7 @@
 #include <string.h>
 class Class_00435100 { public: int FUN_00435100(); };
 class Class_00435980 { public: int MissionExists(int); };
-class Class_004cfb40 { public: void StopStream(); };
+class Sound { public: void StopStream(); };
 #pragma pack(push,1)
 struct Amount { int current,required; };
 struct Entry {
@@ -18,7 +18,7 @@ struct Player { char pad[0x22]; unsigned char message; char pad23[4]; Owner* own
 struct Slot { unsigned char active; char pad[0x39]; };
 struct Engine { char pad[0xd4]; int width,height; char paddc[0xf0-0xdc]; unsigned short low:1; unsigned short network:1; unsigned short high:14; };
 struct Game {
-    char pad[0x10]; Class_004cfb40* input;
+    char pad[0x10]; Sound* input;
     char pad14[0x519-0x14]; Menu menu;
     char pad535[0xdcb-0x535]; unsigned char textColor;
     char paddcc[0xdda-0xdcc]; unsigned char shadowColor;

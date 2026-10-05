@@ -11,7 +11,7 @@ struct Packet_0047f0c0 {
     int unknown_6[3];                  // +0x6
 };
 
-class Class_004cf540 {
+class Sound {
 public:
     int PlayLooping(int a, int b);
 };
@@ -62,7 +62,7 @@ int __stdcall PlaySoundByIndex(int index, int param_2)
                 BroadcastPacket(GetLocalDpid(), &packet, sizeof(packet));
             }
             if (g_playLooping)
-                return ((Class_004cf540*)g_game->sound)->PlayLooping(sound, -585);
+                return ((Sound*)g_game->sound)->PlayLooping(sound, -585);
             return g_game->sound->PlaySampleSet(sound, -585, 0);
         }
     }

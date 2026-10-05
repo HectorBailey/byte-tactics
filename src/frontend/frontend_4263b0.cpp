@@ -12,7 +12,7 @@ public:
     void SetTrackCategory(int value);
 };
 
-class Class_004cff20 {
+class Sound {
 public:
     int HasNoDriver();
 };
@@ -180,7 +180,7 @@ void __stdcall OpenMainMenu()
     }
 
     if (DAT_00512294 == 0) {
-        if (((Class_004cff20*)g_game->field_10)->HasNoDriver()) {
+        if (((Sound*)g_game->field_10)->HasNoDriver()) {
             OpenMessageBox(&g_game->sub, Translate("No sound driver is available for use.\n"), 500, 1, 1);
             DAT_00512294 = 1;
         }

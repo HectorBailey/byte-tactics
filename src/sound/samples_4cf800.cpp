@@ -10,7 +10,7 @@ public:
     void ReapFinishedBuffers();
 };
 
-class Class_004cf230 {
+class Sound {
 public:
     IDirectSoundBuffer** CreateSampleFromMemory(int a, int b, int c, int d, int e);
 };
@@ -39,7 +39,7 @@ int Class_004cf800::PlayMemorySample(int a, int b, int c, int d, int e, int f, i
     ((Class_004cf0b0*)this)->ReapFinishedBuffers();
     for (int i = 0; i < 8; i++) {
         if (sets[i] == 0) {
-            sets[i] = ((Class_004cf230*)this)->CreateSampleFromMemory(a, b, c, d, e);
+            sets[i] = ((Sound*)this)->CreateSampleFromMemory(a, b, c, d, e);
             if (sets[i] == 0)
                 return 0;
             if (((Class_004cf570*)this)->PlaySampleSet(sets[i], f, g) == 0) {

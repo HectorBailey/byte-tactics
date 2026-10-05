@@ -27,7 +27,7 @@ class Class_004cf8a0 {
     int PlayFileSample(FileHandle* file, int bytes, int sampleRate, int bits, int channels, int f,
                      int g);
 };
-class Class_004cfb40 {
+class Sound {
   public:
     void StartStream(FileHandle* file, int sampleRate, int bits, int channels, int volume);
 };
@@ -92,7 +92,7 @@ int Class_004d02a0::OpenSample(char* path, int mode, int p3, int p4) {
             result = ((Class_004cf8a0*)this)->PlayFileSample(file, size, 0x2b11, 8, 1, p3, p4);
             break;
         case 2:
-            ((Class_004cfb40*)this)->StartStream(file, 0x2b11, 8, 1, p3);
+            ((Sound*)this)->StartStream(file, 0x2b11, 8, 1, p3);
             return 1;
         }
         break;
@@ -111,7 +111,7 @@ int Class_004d02a0::OpenSample(char* path, int mode, int p3, int p4) {
             result = ((Class_004cf8a0*)this)->PlayFileSample(file, size - 0x28, x, 8, 1, p3, p4);
             break;
         case 2:
-            ((Class_004cfb40*)this)->StartStream(file, x, 8, 1, p3);
+            ((Sound*)this)->StartStream(file, x, 8, 1, p3);
             return 1;
         }
         break;
@@ -137,7 +137,7 @@ int Class_004d02a0::OpenSample(char* path, int mode, int p3, int p4) {
                          ->PlayFileSample(file, len, wfx.nSamplesPerSec, bits, chans, p3, p4);
             break;
         case 2:
-            ((Class_004cfb40*)this)->StartStream(file, wfx.nSamplesPerSec, bits, chans, p3);
+            ((Sound*)this)->StartStream(file, wfx.nSamplesPerSec, bits, chans, p3);
             return 1;
         }
         break;

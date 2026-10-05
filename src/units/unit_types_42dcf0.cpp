@@ -70,7 +70,7 @@ public:
     void ResetCurrentRecord();
 };
 
-class Class_004c3490 {
+class TdfFile {
 public:
     int SelectRecordAt(int index);
 };
@@ -147,7 +147,7 @@ void LoadDownloadMenus()
             int j = 0;
             while (1) {
                 ((Class_004c3e10*)&parser)->ResetCurrentRecord();
-                if (!((Class_004c3490*)&parser)->SelectRecordAt(j))
+                if (!((TdfFile*)&parser)->SelectRecordAt(j))
                     break;
                 g_game->buildLists[i].count = j + 1;
                 char* buf = unitbuf;

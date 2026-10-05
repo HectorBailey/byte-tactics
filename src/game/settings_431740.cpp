@@ -26,7 +26,7 @@ public:
     void ResetCurrentRecord();
 };
 
-class Class_004c3490 {
+class TdfFile {
 public:
     int SelectRecordAt(int index);
 };
@@ -80,7 +80,7 @@ void FUN_00431740()
         for (int i = 1; i < g_game->count; i++)
             g_game->defs[i].flags &= 0xff7fffff;
         ((Class_004c3e10*)&parser)->ResetCurrentRecord();
-        for (int j = 0; ((Class_004c3490*)&parser)->SelectRecordAt(j); j++, ((Class_004c3e10*)&parser)->ResetCurrentRecord()) {
+        for (int j = 0; ((TdfFile*)&parser)->SelectRecordAt(j); j++, ((Class_004c3e10*)&parser)->ResetCurrentRecord()) {
             ((Class_004c4420*)parser.current)->CopyRecordName(name, 0x100);
             for (int k = 0; k < g_game->count; k++) {
                 if (_strcmpi(g_game->defs[k].name, name) == 0) {

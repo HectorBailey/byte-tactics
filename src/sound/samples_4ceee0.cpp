@@ -23,7 +23,7 @@ public:
 int __stdcall RemoveTimer(int i);
 int __stdcall HAPI_CloseFile(FileHandle* file);
 
-class Class_004ceee0 {
+class Sound {
 public:
     char unknown_0[0x24];
     IDirectSoundBuffer* field_24;      // +0x24
@@ -39,7 +39,7 @@ public:
 };
 
 // FUNCTION: 0x4ceee0
-void Class_004ceee0::ReleaseDirectSound()
+void Sound::ReleaseDirectSound()
 {
     int i;
     for (i = 0; i < 8; i++) {

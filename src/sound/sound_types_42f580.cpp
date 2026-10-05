@@ -33,7 +33,7 @@ public:
     void Unload();
 };
 
-class Class_004c3490 {
+class TdfFile {
 public:
     int SelectRecordAt(int index);
 };
@@ -84,7 +84,7 @@ void LoadSoundCategories()
         for (int i = 0; i < *(int*)(g_game + 0x37e17); i++) {
             char* rec = (char*)*(int*)(g_game + 0x37e13) + i * 0x160;
             ((Class_004c3e10*)&obj)->ResetCurrentRecord();
-            if (((Class_004c3490*)&obj)->SelectRecordAt(i)) {
+            if (((TdfFile*)&obj)->SelectRecordAt(i)) {
                 ((Class_004c4420*)obj.field_4)->CopyRecordName(rec, 0x3f);
                 p = DAT_005086fc;
                 int* vals = (int*)(rec + 0x4c);

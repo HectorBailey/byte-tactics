@@ -14,7 +14,7 @@ public:
     void OpenCdAudio();
 };
 
-class Class_004cff20 {
+class Sound {
 public:
     int HasNoDriver();
 };
@@ -82,7 +82,7 @@ void InitSound(void)
     if (!g_noDirectSound) {
         int hr = g_game->field_10->InitDirectSound(0x2b11, 0x10, 2, g_game->field_0c->field_40);
         if (hr == 0) {
-            if (((Class_004cff20*)g_game->field_10)->HasNoDriver())
+            if (((Sound*)g_game->field_10)->HasNoDriver())
                 g_noDirectSound = 1;
             else
                 FatalError(DAT_00508a78);

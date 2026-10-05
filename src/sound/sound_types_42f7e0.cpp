@@ -17,7 +17,7 @@ public:
     int LoadFile(char* path);
 };
 
-class Class_004c3490 {
+class TdfFile {
 public:
     int SelectRecordAt(int index);
 };
@@ -66,14 +66,14 @@ void LoadAllSound()
     BuildDataPath(path, "gamedata", "allsound", "TDF");
     if (((Class_004c2f60*)&obj)->LoadFile(path)) {
         int i = 0;
-        int more = ((Class_004c3490*)&obj)->SelectRecordAt(i);
+        int more = ((TdfFile*)&obj)->SelectRecordAt(i);
         while (more) {
             ((Class_004c4420*)obj.field_4)->CopyRecordName(name, 0x20);
             if (((TdfRecord*)obj.field_4)->GetFieldString(value, "sound", 0x100, DAT_005119b8))
                 FUN_00429470(name, value);
             i++;
             ((Class_004c3e10*)&obj)->ResetCurrentRecord();
-            more = ((Class_004c3490*)&obj)->SelectRecordAt(i);
+            more = ((TdfFile*)&obj)->SelectRecordAt(i);
         }
         ((Class_004c3240*)&obj)->Unload();
     }

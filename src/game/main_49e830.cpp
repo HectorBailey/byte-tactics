@@ -36,10 +36,10 @@
 #include <time.h>
 #include <new>
 
-class Class_004cee50 {
+class Sound {
 public:
     char pad[0x294];
-    Class_004cee50();
+    Sound();
 };
 
 class Class_004ce680 {
@@ -261,7 +261,7 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             strcpy(DAT_0051fb50, DAT_00504ab8);
     }
     LoadTranslations(DAT_005097d0, DAT_0051fb50);
-    g_game->field_10 = new Class_004cee50;
+    g_game->field_10 = new Sound;
     FUN_00428bb0();
     InitGame();
 

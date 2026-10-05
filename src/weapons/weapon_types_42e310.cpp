@@ -38,7 +38,7 @@ public:
     void ResetCurrentRecord();
 };
 
-class Class_004c3490 {
+class TdfFile {
 public:
     int SelectRecordAt(int index);
 };
@@ -86,7 +86,7 @@ void LoadWeaponTypes()
             int i = 0;
             while (1) {
                 ((Class_004c3e10*)&parser)->ResetCurrentRecord();
-                if (!((Class_004c3490*)&parser)->SelectRecordAt(i))
+                if (!((TdfFile*)&parser)->SelectRecordAt(i))
                     break;
                 LoadWeaponType(parser.current);
                 i++;

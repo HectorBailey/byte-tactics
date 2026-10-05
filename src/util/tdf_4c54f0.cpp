@@ -200,7 +200,7 @@ public:
     int LoadFile(char* filename);
 };
 
-class Class_004c3490 {
+class TdfFile {
 public:
     char unknown_0[4];
     int field_4;
@@ -253,7 +253,7 @@ void __stdcall LoadTranslations(char* filename, char* section)
         if (((Class_004c2f60*)&f)->LoadFile(filename)) {
             int index;
             index = 0;
-            while (((Class_004c3490*)&f)->SelectRecordAt(index)) {
+            while (((TdfFile*)&f)->SelectRecordAt(index)) {
                 f.current->CopyRecordName(name, 0xff);
                 ((TdfRecord*)f.current)->GetFieldString(value, g_language, 0xff, DAT_005119b8);
                 if (strlen(value) != 0) {
