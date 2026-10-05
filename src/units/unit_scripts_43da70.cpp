@@ -1,6 +1,6 @@
 // Decompiled by DeepSeek V4.1 Flash. Names are provisional.
 
-class Class_004b0940 { public: void FUN_004b0940(const char*, int, int); };
+class Class_004b0940 { public: void StartScript(const char*, int, int); };
 
 #pragma pack(push, 1)
 struct Type_0043da70 {
@@ -48,19 +48,19 @@ void Class_0043da70::FUN_0043da70(Unit* unit)
     if (rate == (int)((unit->flags >> 2) & 3))
         return;
     if (rate == 0) {
-        unit->script->FUN_004b0940("StopMoving", rate, 1);
+        unit->script->StartScript("StopMoving", rate, 1);
     } else if ((unit->flags & 0xc) == 0) {
-        unit->script->FUN_004b0940("StartMoving", 0, 1);
+        unit->script->StartScript("StartMoving", 0, 1);
     }
     switch (rate) {
     case 1:
-        unit->script->FUN_004b0940("MoveRate1", 0, 1);
+        unit->script->StartScript("MoveRate1", 0, 1);
         break;
     case 2:
-        unit->script->FUN_004b0940("MoveRate2", 0, 1);
+        unit->script->StartScript("MoveRate2", 0, 1);
         break;
     case 3:
-        unit->script->FUN_004b0940("MoveRate3", 0, 1);
+        unit->script->StartScript("MoveRate3", 0, 1);
         break;
     }
     unit->flags = (unit->flags & 0xfffffff3) | ((rate & 3) << 2);

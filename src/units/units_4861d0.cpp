@@ -98,7 +98,7 @@ extern void* DAT_004fd6f0[];
 
 void __stdcall FUN_004864b0(Unit* unit, int param_2);
 void __stdcall FUN_00485a40(Unit* unit, Pos_004861d0 pos, int param_5);
-void __stdcall FUN_00485d40(Unit* unit);
+void __stdcall InitUnitScript(Unit* unit);
 void __stdcall FUN_0049e070(Unit* unit);
 void __stdcall FUN_00437840(Unit* unit);
 void __stdcall FUN_0048a870(Unit* unit);
@@ -121,7 +121,7 @@ static inline void __stdcall InitUnit_00485e90(unsigned short unitType, Pos_0048
     }
     unit->field_a6 = unitType;
     FUN_00485a40(unit, pos, param_5);
-    FUN_00485d40(unit);
+    InitUnitScript(unit);
     FUN_0049e070(unit);
     FUN_00437840(unit);
     if (type->field_22f == 1) {

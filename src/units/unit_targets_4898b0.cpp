@@ -13,12 +13,12 @@
 // address (`lea ecx, [edi + eax*4 + 0x1f]`, `mov [ecx], al`) instead.
 class Class_004b07c0 {
 public:
-    int FUN_004b07c0(char* name);
+    int FindScript(char* name);
 };
 
 class Class_004b0a70 {
 public:
-    int FUN_004b0a70(char* name, void* param_2, int param_3, int param_4, int param_5, int param_6, int param_7, int param_8);
+    int StartScriptWithArgs(char* name, void* param_2, int param_3, int param_4, int param_5, int param_6, int param_7, int param_8);
 };
 
 #pragma pack(push, 1)
@@ -72,8 +72,8 @@ void Class_004898b0::FUN_004898b0(unsigned char index)
         if (p->a != 0 || p->b != (short)0x8000) {
             p->a = 0;
             p->b = (short)0x8000;
-            script->FUN_004b07c0("StartBuilding");
-            ((Class_004b0a70*)script)->FUN_004b0a70("TargetCleared", 0, 0, 1, i, 0, 0, 0);
+            script->FindScript("StartBuilding");
+            ((Class_004b0a70*)script)->StartScriptWithArgs("TargetCleared", 0, 0, 1, i, 0, 0, 0);
         }
     }
     // The guard only fires when bit 4 is *set* and then clears it, so this

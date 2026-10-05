@@ -53,7 +53,7 @@ public:
 
 class Class_004b0bc0 {
 public:
-    int FUN_004b0bc0(char* name, int* param_2, int* param_3, int* param_4, int* param_5);
+    int QueryScript(char* name, int* param_2, int* param_3, int* param_4, int* param_5);
 };
 
 class Class_00438760 {
@@ -270,7 +270,7 @@ int __stdcall FUN_00402640(Unit* unit, Order* order, int flags)
         return FUN_00438700(unit, order, 2);
     case 2: {
         int piece = -1;
-        unit->script->FUN_004b0bc0("QueryBuildInfo", &piece, 0, 0, 0);
+        unit->script->QueryScript("QueryBuildInfo", &piece, 0, 0, 0);
         order->pos = FUN_0043e060(unit, piece);
         UnitType* ut = &g_game->unitTypes[order->unitType];
         Point16 cell = GridCell(order->pos, ut->footprint);

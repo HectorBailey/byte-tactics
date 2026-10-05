@@ -3,12 +3,12 @@
 
 class Class_004b07c0 {
 public:
-    int FUN_004b07c0(char* name);
+    int FindScript(char* name);
 };
 
 class Class_004b0a70 {
 public:
-    int FUN_004b0a70(char* name, void* param_2, int param_3, int param_4,
+    int StartScriptWithArgs(char* name, void* param_2, int param_3, int param_4,
                      int param_5, int param_6, int param_7, int param_8);
 };
 
@@ -107,8 +107,8 @@ int __stdcall FUN_0048a1e0(Unit* unit, Vec3_0048a1e0* pos, int index)
         if (f->x != 0 || f->z != (short)0x8000) {
             e->x = 0;
             e->z = (short)0x8000;
-            unit->script->FUN_004b07c0("StartBuilding");
-            ((Class_004b0a70*)unit->script)->FUN_004b0a70("TargetCleared", 0, 0, 1, index, 0, 0, 0);
+            unit->script->FindScript("StartBuilding");
+            ((Class_004b0a70*)unit->script)->StartScriptWithArgs("TargetCleared", 0, 0, 1, index, 0, 0, 0);
         }
         return 0;
     }

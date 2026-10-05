@@ -1,5 +1,5 @@
 // Decompiled by deepseek-v4.1-flash. Names are provisional.
-// Slot 17 of Class_00485e30 (vtable 0x4fd698), the derived class in
+// Slot 17 of UnitScript (vtable 0x4fd698), the derived class in
 // src/units/units_485e30.cpp; the data at +0x540 holds the unit pointer at
 // +0xc. The switch over the property id 1 to 20 matches the COB script "get"
 // list (ACTIVATION, STANDINGMOVEORDERS, ..., ARMORED), with the property
@@ -80,16 +80,16 @@ static inline Unit* GetUnit(unsigned short id)
     return &g_game->units[id];
 }
 
-class Class_00485e30 {
+class UnitScript {
 public:
     char unknown_0[0x540];
     Data_00480770* data;                // +0x540
 
-    int FUN_004b0680(int which, int a, int b, int c, int d);
+    int GetUnitValue(int which, int a, int b, int c, int d);
 };
 
 // FUNCTION: 0x480770
-int Class_00485e30::FUN_004b0680(int which, int a, int b, int c, int d)
+int UnitScript::GetUnitValue(int which, int a, int b, int c, int d)
 {
     Unit* unit = data->unit;
     switch (which) {

@@ -32,9 +32,9 @@ class Class_004388d0 { public: void FUN_004388d0(int); };
 class Class_00438880 { public: void FUN_00438880(const char*); };
 class Class_0044e6c0 { public: void FUN_0044e6c0(int); };
 class Class_0044e730 { public: void FUN_0044e730(short); };
-class Class_004b0940 { public: void FUN_004b0940(const char*, int, int); };
-class Class_004b0bc0 { public: int FUN_004b0bc0(char* name, int* p2, int* p3, int* p4, int* p5); };
-class Class_004b0a70 { public: int FUN_004b0a70(char*, void*, int, int, int, int, int, int); };
+class Class_004b0940 { public: void StartScript(const char*, int, int); };
+class Class_004b0bc0 { public: int QueryScript(char* name, int* p2, int* p3, int* p4, int* p5); };
+class Class_004b0a70 { public: int StartScriptWithArgs(char*, void*, int, int, int, int, int, int); };
 
 #pragma pack(push, 1)
 struct UnitDef {
@@ -144,12 +144,12 @@ int __stdcall FUN_004111b0(Unit* unit, Order* order, int flags)
         case 2:
             ((Class_00438880*)order)->FUN_00438880("Preparing for transport");
             order->piece = -1;
-            ((Class_004b0bc0*)unit->script)->FUN_004b0bc0("QueryTransport", &order->piece, 0, 0, 0);
+            ((Class_004b0bc0*)unit->script)->QueryScript("QueryTransport", &order->piece, 0, 0, 0);
             order->flags = 0x100e8;
             return 1;
         case 3: {
             int height = target->def->field_16e;
-            unit->script->FUN_004b0a70("BeginTransport", 0, 1, 1, height, 0, 0, 0);
+            unit->script->StartScriptWithArgs("BeginTransport", 0, 1, 1, height, 0, 0, 0);
             FUN_00456200(unit, "BeginTransport", 1, height, 0, 0, 0);
             Vec3 offset = FUN_0043def0(unit, order->piece);
             Class_0044e250* obj = new Class_0044e250(order, order->target, -1);
@@ -162,7 +162,7 @@ int __stdcall FUN_004111b0(Unit* unit, Order* order, int flags)
             // Suspected original bug: the waypoint built below is never
             // handed to the order (no FUN_004388d0 call), so it leaks.
             if (flags & 0x42) {
-                ((Class_004b0940*)unit->script)->FUN_004b0940("EndTransport", 0, 0);
+                ((Class_004b0940*)unit->script)->StartScript("EndTransport", 0, 0);
                 return 8;
             }
             FUN_0048aac0(target, unit, order->piece, 0);

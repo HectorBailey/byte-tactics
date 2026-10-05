@@ -13,11 +13,11 @@ public:
     Entry_004b0d20 entries[8];
     int guard_53c;
 
-    void FUN_004b0d20(int handle);
+    void RemoveCallback(int handle);
 };
 
 // FUNCTION: 0x4b0d20
-void Class_004b0d20::FUN_004b0d20(int handle)
+void Class_004b0d20::RemoveCallback(int handle)
 {
     if (guard_53c != 0) {
         for (int i = 0; i < 8; i++) {

@@ -48,10 +48,10 @@ class Class_0044e6c0 { public: void FUN_0044e6c0(int); };
 class Class_0044e730 { public: void FUN_0044e730(short); };
 class Class_004898b0 { public: void FUN_004898b0(int); };
 class Class_0048b090 { public: void FUN_0048b090(int, int); };
-class Class_004b0940 { public: void FUN_004b0940(const char*, int, int); };
+class Class_004b0940 { public: void StartScript(const char*, int, int); };
 class Class_004b0bc0 {
 public:
-    int FUN_004b0bc0(char* name, int* param_2, int* param_3, int* param_4, int* param_5);
+    int QueryScript(char* name, int* param_2, int* param_3, int* param_4, int* param_5);
 };
 
 #pragma pack(push, 1)
@@ -146,7 +146,7 @@ int __stdcall FUN_00411840(Unit* unit, int pad)
     pads[1] = -1;
     pads[2] = -1;
     pads[3] = -1;
-    ((Class_004b0bc0*)unit->script)->FUN_004b0bc0("QueryLandingPad", &pads[0], &pads[1], &pads[2], &pads[3]);
+    ((Class_004b0bc0*)unit->script)->QueryScript("QueryLandingPad", &pads[0], &pads[1], &pads[2], &pads[3]);
     for (int i = 0; i < 4; i++) {
         if (pads[i] != -1 && FUN_0047e570(unit, pads[i])) {
             return pads[i];
@@ -225,7 +225,7 @@ int __stdcall FUN_004118e0(Unit* unit, Order* order, int flags)
             ((Class_0044e6c0*)obj)->FUN_0044e6c0(unit->cargo->def->field_170);
         else
             ((Class_0044e6c0*)obj)->FUN_0044e6c0(0);
-        unit->script->FUN_004b0940("EndTransport", 0, 1);
+        unit->script->StartScript("EndTransport", 0, 1);
         ((Class_004388d0*)order)->FUN_004388d0((int)obj);
         ((Class_00439e80*)order)->FUN_00439e80(0xf);
         order->state = 5;
@@ -241,7 +241,7 @@ int __stdcall FUN_004118e0(Unit* unit, Order* order, int flags)
             return 0;
         }
         if (unit->cargo) {
-            unit->script->FUN_004b0940("EndTransport", 0, 0);
+            unit->script->StartScript("EndTransport", 0, 0);
             FUN_0048aac0(unit->cargo, order->target.owner, order->angle, 0);
             dropped = 1;
         } else {

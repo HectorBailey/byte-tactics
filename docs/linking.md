@@ -507,7 +507,7 @@ placeholder class. Each override is now named after the virtual it
 overrides, with the base's parameter types and declared virtual, which binds
 the slot with no function's bytes changed (`Class_0043a1f0`, the
 `Class_00471cc0`, `Class_0044ef20` and condition families,
-`Class_00485e30`); `tools/vtablecheck.py` checks a file's slots so. The compiled image differs from the
+`UnitScript`); `tools/vtablecheck.py` checks a file's slots so. The compiled image differs from the
 original only under the two rows of `data/exe_patches.csv`, where it has the
 compiler's bytes rather than GOG's no-CD music patch, and after the link
 `tools/exepatch.py` writes the patch over them, so `build/place/TotalA.exe` is

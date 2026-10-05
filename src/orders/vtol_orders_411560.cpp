@@ -25,7 +25,7 @@ class Class_00438880 { public: void FUN_00438880(const char*); };
 class Class_004388d0 { public: void FUN_004388d0(int); };
 class Class_0044e6c0 { public: void FUN_0044e6c0(int); };
 class Class_0044e730 { public: void FUN_0044e730(short); };
-class Class_004b0940 { public: void FUN_004b0940(const char*, int, int); };
+class Class_004b0940 { public: void StartScript(const char*, int, int); };
 
 #pragma pack(push, 1)
 struct UnitDef {
@@ -106,7 +106,7 @@ int __stdcall FUN_00411560(Unit* unit, Order* order, int flags)
             FUN_0047f780(unit, 7, "Unable to unload unit");
             return 9;
         }
-        unit->script->FUN_004b0940("EndTransport", 0, 0);
+        unit->script->StartScript("EndTransport", 0, 0);
         FUN_0048aac0(unit->cargo, 0, -1, 1);
         Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);
         ((Class_0044e6c0*)obj)->FUN_0044e6c0(unit->def->field_21c);
