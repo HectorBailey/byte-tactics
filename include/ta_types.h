@@ -311,7 +311,7 @@ class Class_0044f650;
 class Class_0044f8a0;
 class Class_0044f940;
 class Class_0044f9c0_2;
-class Class_0044fc10;
+class NetCondenser;
 class Class_0044fda0;
 class Class_00451fd0;
 struct Class_00452370;
@@ -335,7 +335,7 @@ struct Class_004615f0;
 class Class_00461620;
 class Class_00461630;
 class Class_00461750;
-class Class_00461820;
+class PacketManager;
 class Class_00461860;
 class Class_004618a0;
 class Class_00461900;
@@ -480,7 +480,7 @@ class Class_0047db20;
 class Class_0047f960;
 class Class_0047f990;
 class Class_0047fa30;
-class Class_0047fca0;
+class SpeechQueue;
 class Class_0047ffa0;
 class Class_00480020;
 class Class_004800c0;
@@ -7952,7 +7952,7 @@ public:
     ~Class_0044f8a0(void);
 };
 
-class Class_0044fc10 {  // 0x25 bytes, 4 views
+class NetCondenser {    // 0x25 bytes, 4 views
 public:
     char unknown_0[16];
     char* sendBuffer;  // +0x10
@@ -8891,7 +8891,7 @@ struct Class_004615f0 {  // 0xb2fc bytes, 1 view
     void ClearSendBuffer(void);
 };
 
-class Class_00461820 {  // 0x1 bytes, 1 view
+class PacketManager {   // 0x1 bytes, 1 view
 public:
     char unknown_0[1];
     void ReleaseChannel(int);
@@ -12043,7 +12043,7 @@ struct Entry_0047fca0 {  // 0x11 bytes, 1 view
     char field_10;  // +0x10
 };
 
-class Class_0047fca0 {  // 0xa5 bytes, 1 view
+class SpeechQueue {     // 0xa5 bytes, 1 view
 public:
     Entry_0047fca0 entries[9];  // +0x0
     int count;  // +0x99

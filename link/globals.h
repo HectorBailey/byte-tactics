@@ -10,12 +10,12 @@
 class FreeBlockMap;
 class MapCacheEntry;
 class NameTable;
+class SpeechQueue;
 class TranslationTable;
 struct Chunk;
 struct Dialog;
 struct Entry_00443100;
 struct Game;
-struct List_0047f8c0;
 struct Node_004dde70;
 struct Record_005129b4;
 struct Struct_00526ff0;
@@ -528,7 +528,7 @@ extern unsigned int DAT_0051e67c;                                               
 extern unsigned int DAT_0051e680;                                                             // 0x51e680, 4 bytes; 1 of 1 files
 extern int DAT_0051e684;                                                                      // 0x51e684, 4 bytes; 2 of 2 files
 extern int DAT_0051e688;                                                                      // 0x51e688, 4 bytes; 2 of 2 files
-extern List_0047f8c0* DAT_0051e68c;                                                           // 0x51e68c, 4 bytes; 3 of 8 files (conflicting: struct names only)
+extern SpeechQueue* DAT_0051e68c;                                                             // 0x51e68c, 4 bytes; 4 of 8 files (conflicting: struct names only)
 extern int g_noDirectSound;                                                                   // 0x51e690, 4 bytes; 8 of 10 files (conflicting: shape)
 extern int g_useWindowsSound;                                                                 // 0x51e694, 4 bytes; 9 of 10 files (conflicting: shape)
 extern int DAT_0051e698;                                                                      // 0x51e698, 4 bytes; 2 of 2 files
@@ -700,7 +700,7 @@ extern long DAT_0052a4fc;                                                       
 
 // Not declared: 241 globals defined in a data file or whose type is not settled (see data/globals.csv).
 //   0x513000 g_packetManager: defined in src/network/packets_460e20.cpp
-//   0x5119c0 g_playerAI: PlayerAI*[] (9), void*[] (5), Owner*[] (3), Class_00409470*[] (2), and 3 more
+//   0x5119c0 g_playerAI: PlayerAI*[] (11), void*[] (5), Owner*[] (3), Player_40b0d0*[] (1), and 2 more
 //   0x51fbd0 g_display: void* (4), int (2), Display_004b4f50* (1), Display_004b5370* (1), and 14 more
 //   0x51e598 IUUnitSyncEntry::IU?$pair::?$_Tree::_Nil: defined in src/network/unit_sync_46c920.cpp
 //   0x528a54 std::IH::IU?$pair::?$_Tree::_Nil: defined in src/debug/debug_lib_4db610.cpp

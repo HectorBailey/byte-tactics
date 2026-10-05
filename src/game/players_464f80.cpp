@@ -307,10 +307,7 @@ struct Mission {
     int field_d44;                     // +0xd44
     int FUN_00435100();
 };
-struct MissionConditions { int CheckVictory(); };
-struct Class_00490360 { int CheckDefeat(); };
-class Class_0048b090 { public: void SetStateBits(int which, int on); };
-
+struct MissionConditions { int CheckVictory(); int CheckDefeat(); };
 #pragma pack(push, 1)
 
 // The player-controlled object (g_game+0x1b8a+0x14b*n), stored in
@@ -369,6 +366,7 @@ struct Unit {
     char unknown_f0[0x110 - 0xf0];
     unsigned int flags_110;            // +0x110
     char unknown_114[0x118 - 0x114];
+    void SetStateBits(int which, int on);
 };
 
 struct PlayerInfo_00464f80 {           // +0x1b63, stride 0x14b
@@ -581,7 +579,7 @@ void __stdcall FUN_00464f80()
         if (bl == g_game->localPlayer) {
             if (g_game->mode->FUN_00435100() == 1) {
                 if (g_game->list->CheckVictory() == 0) {
-                    if (((Class_00490360*)g_game->list)->CheckDefeat() != 0) {
+                    if (((MissionConditions*)g_game->list)->CheckDefeat() != 0) {
                         if (g_game->field_39239 < 0) {
                             g_game->field_39239 = 4;
                         } else {
@@ -614,7 +612,7 @@ void __stdcall FUN_00464f80()
                 }
             } else if ((pi->active == 0 ||
                         (pi->data->flags_9b & 0x40) == 0) &&
-                       ((Class_00490360*)g_game->list)->CheckDefeat() != 0) {
+                       ((MissionConditions*)g_game->list)->CheckDefeat() != 0) {
                 if (g_game->field_39239 < 0) {
                     g_game->field_39239 = 4;
                 } else {

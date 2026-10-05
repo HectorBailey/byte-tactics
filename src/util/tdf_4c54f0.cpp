@@ -168,30 +168,24 @@ static inline Class_004c93f0* InsertNew(TranslationTable* s, TdfField* e, const 
 }
 
 // A TDF section: its name and the entries under it.
-class Class_004c4420 {
+class TdfRecord {
 public:
     const char* name;                    // +0x0
 
     void CopyRecordName(char* dest, size_t count);
-};
-
-class TdfRecord {
-public:
-    char unknown_0[0x19];
-
     int GetFieldString(char* dst, const char* key, size_t size, const char* def);
 };
 
 class TdfFile {
 public:
     int root;                            // +0x0
-    Class_004c4420* current;             // +0x4
+    TdfRecord* current;                  // +0x4
     int file;                            // +0x8
 
     TdfFile();
     ~TdfFile();
     int LoadFile(char* filename);
-    Class_004c4420* SelectRecordAt(int index);
+    TdfRecord* SelectRecordAt(int index);
     void ResetCurrentRecord();
     void Unload();
 };

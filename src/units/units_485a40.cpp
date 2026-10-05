@@ -63,11 +63,6 @@ public:
     void FUN_0047cb00(void* node);
 };
 
-class Class_00489800 {
-public:
-    void ReleaseWeapons(unsigned char index);
-};
-
 class UnitMotion;
 
 struct Pos_485a40 {
@@ -162,6 +157,7 @@ struct Unit {
     } field_10f;
     Flags_485a40 flags;                // +0x110
     Flags114_485a40 field_114;         // +0x114
+    void ReleaseWeapons(unsigned char index);
 };
 
 struct Game {
@@ -235,7 +231,7 @@ void __stdcall InitUnitFromType(Unit* unit, Pos_485a40 pos, int param_5)
 
     for (int i = 0; i < 3; i++) {
         ResetWeaponTarget(unit, i);
-        ((Class_00489800*)unit)->ReleaseWeapons(i);
+        ((Unit*)unit)->ReleaseWeapons(i);
     }
 
     unit->field_ba = 0;

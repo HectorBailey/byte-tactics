@@ -44,11 +44,6 @@
 struct Unit;
 struct Player_00401360;
 
-class Class_0048b090 {
-public:
-    void SetStateBits(int which, int on);
-};
-
 #pragma pack(push, 1)
 struct Res_00401360 {
     float produced;                    // +0x0
@@ -136,6 +131,12 @@ struct Unit {
         };
     };
     char unknown_114[0x118 - 0x114];
+    void SetStateBits(int which, int on);
+    // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
+    int CountCargo();
+    int CanReclaim(void*);
+    void ClaimWeapons(unsigned char);
+    void ReleaseWeapons(unsigned char);
 };
 
 struct Game {
@@ -387,11 +388,11 @@ void __stdcall UpdatePlayerEconomy(Player_00401360* p)
             if (u->bit11) {
                 if (!(u->flags & 0x1000) && u->nextTick <= g_game->ticks) {
                     int cost = (int)((u->flags & 0xc) > 0 ? u->def->costActive : u->def->cost);
-                    ((Class_0048b090*)u)->SetStateBits(4, u->econ.SpendEnergy(cost));
+                    ((Unit*)u)->SetStateBits(4, u->econ.SpendEnergy(cost));
                 } else
-                    ((Class_0048b090*)u)->SetStateBits(4, 0);
+                    ((Unit*)u)->SetStateBits(4, 0);
             } else
-                ((Class_0048b090*)u)->SetStateBits(4, 0);
+                ((Unit*)u)->SetStateBits(4, 0);
         }
         producedA[0] += u->econ.res[0].produced;
         usedA[0] += u->econ.res[0].used;

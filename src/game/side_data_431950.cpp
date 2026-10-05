@@ -10,14 +10,14 @@ public:
     int SelectRecord(char* name);
 };
 
-class Class_004c46c0 {
+class TdfRecord {
 public:
     int GetFieldInt(const char* name, int def);
 };
 
 struct Obj_00431950 {
     char unknown_0[4];
-    Class_004c46c0* table;              // +0x4
+    TdfRecord* table;                   // +0x4
 };
 
 void __stdcall FatalError(char* message);

@@ -45,7 +45,7 @@ struct Entry_004898b0 {                // 0x1c bytes
     Flags_004898b0 flags;              // +0x1b
 };
 
-class Class_004898b0 {
+class Unit {
 public:
     int unknown_0;
     Entry_004898b0 entries[5];          // +0x4
@@ -57,7 +57,7 @@ public:
 #pragma pack(pop)
 
 // FUNCTION: 0x4898b0
-void Class_004898b0::ClaimWeapons(unsigned char index)
+void Unit::ClaimWeapons(unsigned char index)
 {
     if (index == 3) {
         this->ClaimWeapons(0);

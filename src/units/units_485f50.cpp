@@ -34,11 +34,6 @@ public:
     void NotifyUnitCreated(Unit* unit);
 };
 
-class Class_0048b090 {                  // the unit's own method, under its own name
-public:
-    void SetStateBits(int a, int b);
-};
-
 struct Pos_00485f50 {
     int x, y, z;
 };
@@ -85,6 +80,7 @@ struct Unit {                            // 0x118 bytes
     unsigned int bit14 : 1;
     unsigned int unknown_bits2 : 17;
     char unknown_114[0x118 - 0x114];
+    void SetStateBits(int a, int b);
 };
 
 struct Player_00485f50 {                 // 0x14b bytes
@@ -188,7 +184,7 @@ found:
         if (type->field_22f == 0)
             FUN_004560c0(unit, unit);
         if (unit->type->bit18)
-            ((Class_0048b090*)unit)->SetStateBits(1, 1);
+            ((Unit*)unit)->SetStateBits(1, 1);
         if (unit->type->bit24) {
             unit->field_f5 = 7;
             unit->bit14 = 1;

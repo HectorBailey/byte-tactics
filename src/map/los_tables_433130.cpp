@@ -66,7 +66,7 @@ public:
     void Unload();
 };
 
-class Class_004c46c0 {
+class TdfRecord {
 public:
     int GetFieldInt(const char* name, int def);
 };
@@ -93,7 +93,7 @@ void Class_00433130::LoadLosTables()
     BuildDataPath(path, "gamedata", "los", "TDF");
     if (((TdfFile*)&tdf)->LoadFile(path) != 0) {
         if (((TdfFile*)&tdf)->SelectRecord("TABLEINFO") != 0) {
-            short numtables = (short)((Class_004c46c0*)tdf.field_4)->GetFieldInt("numtables", 0);
+            short numtables = (short)((TdfRecord*)tdf.field_4)->GetFieldInt("numtables", 0);
             {
                 W1_00433130 temp;
                 unsigned n = (unsigned)numtables;

@@ -625,7 +625,7 @@ unsigned int DAT_0051e67c;  // 0x51e67c .bss
 unsigned int DAT_0051e680;  // 0x51e680 .bss
 int DAT_0051e684;  // 0x51e684 .bss
 int DAT_0051e688;  // 0x51e688 .bss
-List_0047f8c0* DAT_0051e68c;  // 0x51e68c .bss
+SpeechQueue* DAT_0051e68c;  // 0x51e68c .bss
 int g_noDirectSound;  // 0x51e690 .bss
 int g_useWindowsSound;  // 0x51e694 .bss
 int DAT_0051e698;  // 0x51e698 .bss

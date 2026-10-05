@@ -130,9 +130,6 @@ struct Item_004a1b40 {
 
 struct Surface {
     void GetClipRect(Rect_004a1b40* rect);
-};
-
-struct Class_004c6b10 {
     void SetClipRect(Rect_004a1b40 rect);
 };
 
@@ -320,7 +317,7 @@ void __stdcall DrawListBox(Dialog* obj, int index)
         unsigned int bp = (flags >> 7) & 1;
         void* surf = entries->surface;
         ((Surface*)surf)->GetClipRect(&clip);
-        ((Class_004c6b10*)surf)->SetClipRect(bounds);
+        ((Surface*)surf)->SetClipRect(bounds);
         int k = me->field_bc;
         if (!bp) {
             colPtr = &((Item_004a1b40**)me->field_c6)[k];
@@ -391,6 +388,6 @@ void __stdcall DrawListBox(Dialog* obj, int index)
             if (yy >= bounds.bottom || k >= me->field_c0)
                 break;
         }
-        ((Class_004c6b10*)surf)->SetClipRect(clip);
+        ((Surface*)surf)->SetClipRect(clip);
     }
 }

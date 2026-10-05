@@ -56,7 +56,7 @@ public:
     void SetNumLines(short n) { resize(n * 4); }
 };
 
-class Class_004c46c0 {
+class TdfRecord {
 public:
     int GetFieldInt(const char* name, int def);
 };
@@ -64,7 +64,7 @@ public:
 class TdfFile {
 public:
     void* root;                        // +0x0
-    Class_004c46c0* current;           // +0x4
+    TdfRecord* current;                // +0x4
 
     int SelectRecord(char* name);
     void ResetCurrentRecord();

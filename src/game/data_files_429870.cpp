@@ -110,14 +110,10 @@ public:
     void Unload();
 };
 
-class Class_004c46c0 {
-public:
-    int GetFieldInt(const char* name, int def);
-};
-
 class TdfRecord {
 public:
     int GetFieldString(char* dst, char* key, int size, char* def);
+    int GetFieldInt(const char* name, int def);
 };
 
 struct Frame_00429870 {
@@ -219,7 +215,7 @@ void LoadGameResources()
     sprintf(buf, "GENERAL");
     ((TdfFile*)&parser)->ResetCurrentRecord();
     if (((TdfFile*)&parser)->SelectRecord(buf) == 1) {
-        g_game->baseHeight = ((Class_004c46c0*)parser.current)->GetFieldInt("baseheight", 0x1e0);
+        g_game->baseHeight = ((TdfRecord*)parser.current)->GetFieldInt("baseheight", 0x1e0);
     } else {
         g_game->baseHeight = 0x1e0;
     }

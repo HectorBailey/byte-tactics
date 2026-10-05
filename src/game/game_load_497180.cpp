@@ -124,16 +124,13 @@ public:
 class HapiBank {
 public:
     void OpenAccount(const char* name);
-};
-
-class Class_004b48f0 {
-public:
     int HasItem(const char* name);
-};
-
-class Class_004b3630 {
-public:
     void CloseBank();
+    // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
+    char* GetStringItem(char*, char*);
+    double GetDoubleItem(char*, double);
+    int OpenBank(char*, char*, void*);
+    int SaveBank(char*, char*, int, int);
 };
 
 extern char* g_game;
@@ -254,7 +251,7 @@ void __cdecl LoadMatch(void*)
 
     if (*(void**)(g_game + 0x38d6b) != 0) {
         ((HapiBank*)*(void**)(g_game + 0x38d6b))->OpenAccount("summary");
-        if (((Class_004b48f0*)*(void**)(g_game + 0x38d6b))->HasItem("BetweenMissions") ==
+        if (((HapiBank*)*(void**)(g_game + 0x38d6b))->HasItem("BetweenMissions") ==
             0) {
             LoadPlayerControllers(*(void**)(g_game + 0x38d6b));
             if (((Mission*)*(void**)(g_game + 0x391e9))->FUN_00435100() == 2) {
@@ -390,7 +387,7 @@ void __cdecl LoadMatch(void*)
 
     if (*(void**)(g_game + 0x38d6b) != 0) {
         ((HapiBank*)*(void**)(g_game + 0x38d6b))->OpenAccount("summary");
-        if (((Class_004b48f0*)*(void**)(g_game + 0x38d6b))->HasItem("BetweenMissions") ==
+        if (((HapiBank*)*(void**)(g_game + 0x38d6b))->HasItem("BetweenMissions") ==
             0) {
             LoadSavedGameState(*(void**)(g_game + 0x38d6b));
             goto tail;
@@ -424,7 +421,7 @@ tail:
 
     void* mission = *(void**)(g_game + 0x38d6b);
     if (mission != 0) {
-        ((Class_004b3630*)mission)->CloseBank();
+        ((HapiBank*)mission)->CloseBank();
         operator delete(mission);
         *(void**)(g_game + 0x38d6b) = 0;
     }

@@ -3,15 +3,7 @@
 class HapiBank {
 public:
     void OpenAccount(char* section);
-};
-
-class Class_004b48f0 {
-public:
     int HasItem(char* name);
-};
-
-class Class_004b4800 {
-public:
     int GetIntegerItem(char* name, int def);
 };
 
@@ -50,8 +42,8 @@ void __stdcall LoadMeteors(HapiBank* file);
 int __stdcall LoadSavedGameState(HapiBank* file)
 {
     file->OpenAccount(DAT_00503320);
-    if (((Class_004b48f0*)file)->HasItem("maxunits"))
-        g_game->maxUnits = ((Class_004b4800*)file)->GetIntegerItem("maxunits", 0);
+    if (((HapiBank*)file)->HasItem("maxunits"))
+        g_game->maxUnits = ((HapiBank*)file)->GetIntegerItem("maxunits", 0);
     LoadPlayers(file);
     ReadCameraPosition(file);
     LoadFeatures(file);

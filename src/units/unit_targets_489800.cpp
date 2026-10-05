@@ -45,7 +45,7 @@ struct Entry_004898b0 {                // 0x1c bytes
     Flags_004898b0 flags;              // +0x1b
 };
 
-class Class_00489800 {
+class Unit {
 public:
     int unknown_0;
     Entry_004898b0 entries[5];          // +0x4
@@ -57,7 +57,7 @@ public:
 #pragma pack(pop)
 
 // FUNCTION: 0x489800
-void Class_00489800::ReleaseWeapons(unsigned char index)
+void Unit::ReleaseWeapons(unsigned char index)
 {
     if (index == 3) {
         this->ReleaseWeapons(0);

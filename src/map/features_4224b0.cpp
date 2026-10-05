@@ -19,15 +19,7 @@ public:
 class TdfRecord {
 public:
     int GetFieldString(char* dst, char* key, int size, char* def);
-};
-
-class Class_004c46c0 {
-public:
     int GetFieldInt(const char* name, int def);
-};
-
-class Class_004c4760 {
-public:
     double GetFieldDouble(const char* name, double def);
 };
 
@@ -167,9 +159,9 @@ int __stdcall LoadFeatureType(char* name)
     FeatureDef_004224b0* def = &g_game->features[g_game->featureCount];
     strncpy(def->name, name, 0x80);
     ((TdfRecord*)entry->parser)->GetFieldString(def->description, "Description", 0x14, DAT_005119b8);
-    def->footprintx = ((Class_004c46c0*)entry->parser)->GetFieldInt("footprintx", 0);
-    def->footprintz = ((Class_004c46c0*)entry->parser)->GetFieldInt("footprintz", 0);
-    def->height = ((Class_004c46c0*)entry->parser)->GetFieldInt("height", 0);
+    def->footprintx = ((TdfRecord*)entry->parser)->GetFieldInt("footprintx", 0);
+    def->footprintz = ((TdfRecord*)entry->parser)->GetFieldInt("footprintz", 0);
+    def->height = ((TdfRecord*)entry->parser)->GetFieldInt("height", 0);
     ok = ((TdfRecord*)entry->parser)->GetFieldString(file, "object", 0x100, DAT_005119b8);
     if (ok) {
         def->noobject = 0;
@@ -250,23 +242,23 @@ int __stdcall LoadFeatureType(char* name)
             def->seqreclamateshad = 0;
         }
     }
-    def->spreadchance = ((Class_004c46c0*)entry->parser)->GetFieldInt("spreadchance", 0);
-    def->reproduce = ((Class_004c46c0*)entry->parser)->GetFieldInt("reproduce", 0);
-    def->reproducearea = ((Class_004c46c0*)entry->parser)->GetFieldInt("reproducearea", 0);
-    def->metal = (unsigned short)((Class_004c46c0*)entry->parser)->GetFieldInt("metal", 0);
-    def->energy = (unsigned short)((Class_004c46c0*)entry->parser)->GetFieldInt("energy", 0);
-    def->damage = ((Class_004c46c0*)entry->parser)->GetFieldInt("damage", 0);
-    def->animating = ((Class_004c46c0*)entry->parser)->GetFieldInt("animating", 0);
-    def->animtrans = ((Class_004c46c0*)entry->parser)->GetFieldInt("animtrans", 0);
-    def->shadtrans = ((Class_004c46c0*)entry->parser)->GetFieldInt("shadtrans", 0);
-    def->flamable = ((Class_004c46c0*)entry->parser)->GetFieldInt("flamable", 0);
-    def->geothermal = ((Class_004c46c0*)entry->parser)->GetFieldInt("geothermal", 0);
-    def->blocking = ((Class_004c46c0*)entry->parser)->GetFieldInt("blocking", 0);
-    def->reclaimable = ((Class_004c46c0*)entry->parser)->GetFieldInt("reclaimable", 0);
-    def->autoreclaimable = ((Class_004c46c0*)entry->parser)->GetFieldInt("autoreclaimable", 1);
-    def->indestructible = ((Class_004c46c0*)entry->parser)->GetFieldInt("indestructible", 0);
-    def->nodisplayinfo = ((Class_004c46c0*)entry->parser)->GetFieldInt("nodisplayinfo", 0);
-    def->nodrawundergray = ((Class_004c46c0*)entry->parser)->GetFieldInt("nodrawundergray", 0);
+    def->spreadchance = ((TdfRecord*)entry->parser)->GetFieldInt("spreadchance", 0);
+    def->reproduce = ((TdfRecord*)entry->parser)->GetFieldInt("reproduce", 0);
+    def->reproducearea = ((TdfRecord*)entry->parser)->GetFieldInt("reproducearea", 0);
+    def->metal = (unsigned short)((TdfRecord*)entry->parser)->GetFieldInt("metal", 0);
+    def->energy = (unsigned short)((TdfRecord*)entry->parser)->GetFieldInt("energy", 0);
+    def->damage = ((TdfRecord*)entry->parser)->GetFieldInt("damage", 0);
+    def->animating = ((TdfRecord*)entry->parser)->GetFieldInt("animating", 0);
+    def->animtrans = ((TdfRecord*)entry->parser)->GetFieldInt("animtrans", 0);
+    def->shadtrans = ((TdfRecord*)entry->parser)->GetFieldInt("shadtrans", 0);
+    def->flamable = ((TdfRecord*)entry->parser)->GetFieldInt("flamable", 0);
+    def->geothermal = ((TdfRecord*)entry->parser)->GetFieldInt("geothermal", 0);
+    def->blocking = ((TdfRecord*)entry->parser)->GetFieldInt("blocking", 0);
+    def->reclaimable = ((TdfRecord*)entry->parser)->GetFieldInt("reclaimable", 0);
+    def->autoreclaimable = ((TdfRecord*)entry->parser)->GetFieldInt("autoreclaimable", 1);
+    def->indestructible = ((TdfRecord*)entry->parser)->GetFieldInt("indestructible", 0);
+    def->nodisplayinfo = ((TdfRecord*)entry->parser)->GetFieldInt("nodisplayinfo", 0);
+    def->nodrawundergray = ((TdfRecord*)entry->parser)->GetFieldInt("nodrawundergray", 0);
     if (_strcmpi(name, "DragonsTeeth") == 0)
         def->nodrawundergray = 1;
     if (_strcmpi(name, "DragonsTeeth_Core") == 0)
@@ -275,7 +267,7 @@ int __stdcall LoadFeatureType(char* name)
         def->nodrawundergray = 1;
     if (_strcmpi(name, "Fortification_Core") == 0)
         def->nodrawundergray = 1;
-    def->sparktime = (short)(((Class_004c4760*)entry->parser)->GetFieldDouble("sparktime", 0.0) * 30.0);
+    def->sparktime = (short)(((TdfRecord*)entry->parser)->GetFieldDouble("sparktime", 0.0) * 30.0);
     ((TdfRecord*)entry->parser)->GetFieldString(seqname, "burnweapon", 0x100, DAT_005119b8);
     def->burnweapon = FindWeaponByName(seqname);
     def->ref.index = 0;

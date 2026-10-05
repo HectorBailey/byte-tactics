@@ -1,12 +1,12 @@
 // Decompiled by deepseek-v4.1-flash. Names are provisional.
 #include <stdio.h>
 
-class Class_004c46c0;
+class TdfRecord;
 
 class TdfFile {
 public:
     int field_0;
-    Class_004c46c0* current;            // +0x4
+    TdfRecord* current;                 // +0x4
     int field_8;
     TdfFile();
     ~TdfFile();
@@ -14,7 +14,7 @@ public:
     int SelectRecord(char* name);
 };
 
-class Class_004c46c0 {
+class TdfRecord {
 public:
     int GetFieldInt(const char* name, int def);
 };

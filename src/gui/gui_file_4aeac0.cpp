@@ -126,20 +126,16 @@ void __stdcall WriteGuiFile(char* obj, char* name)
     HAPI_CloseFile(out);
 }
 
-class Class_004c46c0 {
-public:
-    int GetFieldInt(const char* name, int def);
-};
-
 class TdfRecord {
 public:
     int GetFieldString(char* dst, char* key, size_t size, char* def);
+    int GetFieldInt(const char* name, int def);
 };
 
 class TdfFile {
 public:
     void* field_0;
-    Class_004c46c0* current;            // +0x4
+    TdfRecord* current;            // +0x4
     void* field_8;
     TdfFile();
     ~TdfFile();

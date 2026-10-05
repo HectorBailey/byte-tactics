@@ -17,7 +17,7 @@ public:
     int SelectRecordAt(int index);
 };
 
-class Class_004c4420 {
+class TdfRecord {
 public:
     const char* field_0;
     void CopyRecordName(char* dest, size_t count);
@@ -67,7 +67,7 @@ void FUN_00431740()
             g_game->defs[i].flags &= 0xff7fffff;
         ((TdfFile*)&parser)->ResetCurrentRecord();
         for (int j = 0; ((TdfFile*)&parser)->SelectRecordAt(j); j++, ((TdfFile*)&parser)->ResetCurrentRecord()) {
-            ((Class_004c4420*)parser.current)->CopyRecordName(name, 0x100);
+            ((TdfRecord*)parser.current)->CopyRecordName(name, 0x100);
             for (int k = 0; k < g_game->count; k++) {
                 if (_strcmpi(g_game->defs[k].name, name) == 0) {
                     g_game->defs[k].flags |= 0x800000;

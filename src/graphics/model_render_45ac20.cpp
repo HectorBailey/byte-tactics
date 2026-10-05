@@ -107,7 +107,7 @@ int __fastcall RestorePieceVertices(Entry_0045ac20* piece, int force)
 
 void __fastcall PoseModel(State_0045ac20* state, Entry_0045ac20* entry, int flag);
 
-class Class_00437c80 {
+class CMemoryCache {
 public:
     void DrawObjectState(State_0045ac20* state, void* context);
 };
@@ -115,7 +115,7 @@ public:
 #pragma pack(push, 1)
 struct Game {
     char pad0[0x1437b];
-    Class_00437c80* obj;                // +0x1437b
+    CMemoryCache* obj;                  // +0x1437b
 };
 #pragma pack(pop)
 

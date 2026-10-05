@@ -7,25 +7,17 @@ void __stdcall FatalError(char* text);
 extern char DAT_0050310c[];
 extern char DAT_005119b8[];
 
-class Class_004c46c0 {
-public:
-    int GetFieldInt(const char* name, int def);
-};
-
 class TdfRecord {
 public:
     int GetFieldString(char* dst, char* key, size_t size, char* def);
-};
-
-class Class_004c4760 {
-public:
+    int GetFieldInt(const char* name, int def);
     double GetFieldDouble(const char* name, double def);
 };
 
 class TdfFile {
 public:
     int field_0;
-    Class_004c46c0* current;            // +0x4
+    TdfRecord* current;            // +0x4
     int field_8;
     TdfFile();
     ~TdfFile();
@@ -53,9 +45,9 @@ void MeteorParams::LoadMeteorDefaults()
         && ((TdfFile*)&parser)->SelectRecord("Default")) {
         if (((TdfRecord*)parser.current)->GetFieldString((char*)this, "MeteorWeapon", 0x20, DAT_005119b8)) {
             radius = parser.current->GetFieldInt("MeteorRadius", 0);
-            density = (float)((Class_004c4760*)parser.current)->GetFieldDouble("MeteorDensity", 0.0);
-            duration = (float)((Class_004c4760*)parser.current)->GetFieldDouble("MeteorDuration", 0.0);
-            float intervalTime = (float)((Class_004c4760*)parser.current)->GetFieldDouble("MeteorInterval", 0.0);
+            density = (float)((TdfRecord*)parser.current)->GetFieldDouble("MeteorDensity", 0.0);
+            duration = (float)((TdfRecord*)parser.current)->GetFieldDouble("MeteorDuration", 0.0);
+            float intervalTime = (float)((TdfRecord*)parser.current)->GetFieldDouble("MeteorInterval", 0.0);
             interval = intervalTime;
             if (radius != 0 && density != 0.0f && duration != 0.0f && intervalTime != 0.0f)
                 return;

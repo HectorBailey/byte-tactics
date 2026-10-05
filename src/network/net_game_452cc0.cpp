@@ -29,7 +29,7 @@
 
 #pragma pack(push, 1)
 
-class Class_00463c60 {
+class Player {
 public:
     void SetType(int param_1);
 };
@@ -148,7 +148,7 @@ static inline int IsType3(Player_00452cc0* p)
 
 static inline void Remove(Player_00452cc0* p)
 {
-    ((Class_00463c60*)p)->SetType(0);
+    ((Player*)p)->SetType(0);
     p->active = 0;
     p->id = -1;
     p->field_c = 0;

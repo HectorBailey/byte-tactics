@@ -27,7 +27,7 @@ public:
     void ResetCurrentRecord();
 };
 
-class Class_004c4420 {
+class TdfRecord {
 public:
     void CopyRecordName(char* dest, unsigned int count);
 };
@@ -69,7 +69,7 @@ void LoadSoundCategories()
             char* rec = (char*)*(int*)(g_game + 0x37e13) + i * 0x160;
             ((TdfFile*)&obj)->ResetCurrentRecord();
             if (((TdfFile*)&obj)->SelectRecordAt(i)) {
-                ((Class_004c4420*)obj.field_4)->CopyRecordName(rec, 0x3f);
+                ((TdfRecord*)obj.field_4)->CopyRecordName(rec, 0x3f);
                 p = DAT_005086fc;
                 int* vals = (int*)(rec + 0x4c);
                 while ((int)p < (int)(DAT_005086fc + 23)) {

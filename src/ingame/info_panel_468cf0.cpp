@@ -101,7 +101,7 @@ int __stdcall SetOffscreenSurface(int);
 int __stdcall ResetClipRect(int);
 
 struct OverlayRect { int left, top, right, bottom; };
-struct Class_004c6b10 { int data[12]; int SetClipRect(OverlayRect); };
+struct Surface { int data[12]; int SetClipRect(OverlayRect); };
 
 // The frame-time profile at g_game+0x38d85 (FrameTimers): last tick at +0,
 // one accumulator per phase at +0x2c. AccumulateProfileTime itself is defined after
@@ -158,7 +158,7 @@ static inline float Approach(float fcur, float ftarget)
   return (float)(d + cur);
 }
 
-static void DrawResourcePanel(Class_004c6b10 *ctx, int pl, Resources *res)
+static void DrawResourcePanel(Surface *ctx, int pl, Resources *res)
 {
   OverlayRect bar, box;
   char text[32];
@@ -248,7 +248,7 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
 {
   char debugText[80];
   int y2;
-  Class_004c6b10 ctx;
+  Surface ctx;
   char gameTime[256];
   int y;
   byte idx;
@@ -263,7 +263,7 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
   cx = (*(int *)(g_game + 0x37e1f) + 0x80) / 2;
   cy = *(int *)(g_game + 0x37e23) / 2;
   SetOffscreenSurface(*(int *)(g_game + 0x37e1b));
-  ctx = **(Class_004c6b10 **)(g_game + 0x37e1b);
+  ctx = **(Surface **)(g_game + 0x37e1b);
   colors = (byte *)(g_game + 0xdcb);
   FUN_004c2470();
   ctx.SetClipRect(*(OverlayRect *)(g_game + 0x37e27));

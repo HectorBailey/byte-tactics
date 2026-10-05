@@ -20,7 +20,7 @@ struct Unit {
     unsigned int flags;            // +0x110
 };
 
-class Class_0043da70 {
+class UnitMotion {
 public:
     char unknown_0[0x20];
     int field_20;                  // +0x20
@@ -32,7 +32,7 @@ public:
 #pragma pack(pop)
 
 // FUNCTION: 0x43da70
-void Class_0043da70::UpdateMoveRate(Unit* unit)
+void UnitMotion::UpdateMoveRate(Unit* unit)
 {
     int rate;
     if ((field_2e & 4) == 0 && unit->field_86 == 0

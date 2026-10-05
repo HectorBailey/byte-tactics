@@ -48,11 +48,6 @@ public:
     void FUN_00438880(char* text);
 };
 
-class Class_004898b0 {
-public:
-    void ClaimWeapons(int param);
-};
-
 #pragma pack(push, 1)
 struct UnitDef {
     char unknown_0[0x15e];
@@ -93,6 +88,7 @@ struct Unit {
             unsigned int unknown_2 : 30;
         } bits;
     };
+    void ClaimWeapons(int param);
 };
 
 struct Order {
@@ -164,7 +160,7 @@ int __stdcall RepairUnitOrder(Unit* unit, Order* order, int flags)
             order->flags |= 0xe8;
             return 2;
         }
-        ((Class_004898b0*)unit)->ClaimWeapons(3);
+        ((Unit*)unit)->ClaimWeapons(3);
         StartBuildingScript(unit, order, GetHeadingBetween(&unit->pos, &order->target->pos) - unit->angle);
         return 1;
     }

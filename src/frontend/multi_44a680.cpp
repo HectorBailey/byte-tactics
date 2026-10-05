@@ -106,10 +106,14 @@ struct Game {
 #pragma pack(pop)
 
 struct Mission { int FUN_004358f0(); int ComputeMapChecksum(); void LoadMissionByName(PlayerInfo_0044a680* info); char* FUN_00435c30(); };
-struct UnitSync { int AllPlayersSynced(); };
-struct Class_00463c60 { void SetType(int param); };
-class Class_0046d860 { public: void ProcessSync(); };
-
+struct UnitSync {
+    int AllPlayersSynced();
+    void ProcessSync();
+    // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
+    char* GetSyncStatusText();
+    void CheckUnitAvailable(unsigned int, int);
+};
+struct Player { void SetType(int param); };
 
 extern Game* g_game;
 extern int DAT_00512994;
@@ -180,7 +184,7 @@ inline void __stdcall SwapPlayerSlots(Player_0044a680* param_1, Player_0044a680*
     Player_0044a680 tmp = *param_2;
     *param_2 = *param_1;
     *param_1 = tmp;
-    ((Class_00463c60*)param_1)->SetType(0);
+    ((Player*)param_1)->SetType(0);
     param_1->active = 0;
     for (int i = 0; i <= 10; i++) {
         Player_0044a680* p = &g_game->players[i];
@@ -392,7 +396,7 @@ void UpdateBattleRoom()
         FUN_004a5d30(&g_game->gui, 0);
     }
 
-    ((Class_0046d860*)g_game->net)->ProcessSync();
+    ((UnitSync*)g_game->net)->ProcessSync();
     if (DAT_005129a8 < (unsigned int)GetTicks()) {
         unsigned char r;
         PlayerInfo_0044a680* info;

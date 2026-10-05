@@ -20,14 +20,12 @@ struct Vec3 {
 };
 
 struct Unit;
-class Class_0043d210 {
+class UnitMotion {
 public:
     char unknown_0[0x2e];
     unsigned char field_2e;            // +0x2e
     void SetFlightMode(Unit* unit, int state);
 };
-class Class_004898b0 { public: void ClaimWeapons(int); };
-class Class_0048b090 { public: void SetStateBits(int, int); };
 class Class_004388d0 { public: void FUN_004388d0(int); };
 class Class_00438880 { public: void FUN_00438880(const char*); };
 class Class_0044e6c0 { public: void FUN_0044e6c0(int); };
@@ -44,12 +42,14 @@ struct UnitDef {
     char pad22b[0x241 - 0x22b]; unsigned int flags;
 };
 struct Unit {
-    Class_0043d210* type;
+    UnitMotion* type;
     char pad4[0x6a - 4]; Vec3 pos;
     char pad76[0x7e - 0x76]; short size;
     char pad80[0x86 - 0x80]; int field_86; int field_8a;
     char pad8e[4]; UnitDef* def;
     char pad96[4]; CobScript* script;
+    void ClaimWeapons(int);
+    void SetStateBits(int, int);
 };
 struct Order {
     char pad0[5]; unsigned char state; unsigned int flags;
@@ -88,10 +88,10 @@ Vec3 __stdcall GetPieceOffset(Unit* unit, int piece);
 // 0x40f200, matched in 0x40f200.cpp; inlined into the state 0 case below.
 void __stdcall FUN_0040f200(Unit* unit, Order* order, unsigned int flags)
 {
-    ((Class_004898b0*)unit)->ClaimWeapons(3);
+    ((Unit*)unit)->ClaimWeapons(3);
     if (unit->field_86)
         AttachUnitToPiece(unit, 0, -1, 2);
-    ((Class_0048b090*)unit)->SetStateBits(1, 1);
+    ((Unit*)unit)->SetStateBits(1, 1);
     if ((unit->type->field_2e & 3) == 1) {
         unit->type->SetFlightMode(unit, 2);
         Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);

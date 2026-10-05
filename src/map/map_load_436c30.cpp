@@ -17,11 +17,6 @@ public:
     int SelectRecord(char* name);
 };
 
-class Class_004c4470 {
-public:
-    Section_00436c30* FindSubRecord(const char* name);
-};
-
 class Class_004c4450 {
 public:
     int GetSubRecordCount();
@@ -35,10 +30,7 @@ public:
 class TdfRecord {
 public:
     int GetFieldString(char* dst, char* key, size_t size, char* def);
-};
-
-class Class_004c46c0 {
-public:
+    Section_00436c30* FindSubRecord(const char* name);
     int GetFieldInt(const char* name, int def);
 };
 
@@ -118,7 +110,7 @@ void Mission::LoadMissionData(char* name, Parser_00436c30* parser)
         return;
     Section_00436c30* root = parser->current;
 
-    Section_00436c30* list = ((Class_004c4470*)root)->FindSubRecord("units");
+    Section_00436c30* list = ((TdfRecord*)root)->FindSubRecord("units");
     if (list)
         count = ((Class_004c4450*)list)->GetSubRecordCount();
     else
@@ -158,24 +150,24 @@ void Mission::LoadMissionData(char* name, Parser_00436c30* parser)
         } else {
             u->initialMission = 0;
         }
-        u->x = ((Class_004c46c0*)s)->GetFieldInt("XPos", 0) << 16;
-        u->y = ((Class_004c46c0*)s)->GetFieldInt("YPos", 0) << 16;
-        u->z = ((Class_004c46c0*)s)->GetFieldInt("ZPos", 0) << 16;
-        u->angle = (((Class_004c46c0*)s)->GetFieldInt("Angle", 0) << 16) / 360;
-        u->player = ((Class_004c46c0*)s)->GetFieldInt("Player", 0);
+        u->x = ((TdfRecord*)s)->GetFieldInt("XPos", 0) << 16;
+        u->y = ((TdfRecord*)s)->GetFieldInt("YPos", 0) << 16;
+        u->z = ((TdfRecord*)s)->GetFieldInt("ZPos", 0) << 16;
+        u->angle = (((TdfRecord*)s)->GetFieldInt("Angle", 0) << 16) / 360;
+        u->player = ((TdfRecord*)s)->GetFieldInt("Player", 0);
         if (!u->player)
             u->player = 1;
-        u->health = ((Class_004c46c0*)s)->GetFieldInt("HealthPercentage", 100);
-        u->buildPriority = ((Class_004c46c0*)s)->GetFieldInt("BuildPriority", 0);
-        u->creationCountdown = ((Class_004c46c0*)s)->GetFieldInt("CreationCountdown", 0);
-        u->missionCritical = ((Class_004c46c0*)s)->GetFieldInt("MissionCriticalUnit", 0);
-        u->aiIgnore = ((Class_004c46c0*)s)->GetFieldInt("AiIgnore", 0);
-        u->aiPriorityTarget = ((Class_004c46c0*)s)->GetFieldInt("AiPriorityTarget", 0);
-        u->initialGroup = ((Class_004c46c0*)s)->GetFieldInt("InitialGroup", 0);
-        u->immunity = ((Class_004c46c0*)s)->GetFieldInt("Immunity", 0);
+        u->health = ((TdfRecord*)s)->GetFieldInt("HealthPercentage", 100);
+        u->buildPriority = ((TdfRecord*)s)->GetFieldInt("BuildPriority", 0);
+        u->creationCountdown = ((TdfRecord*)s)->GetFieldInt("CreationCountdown", 0);
+        u->missionCritical = ((TdfRecord*)s)->GetFieldInt("MissionCriticalUnit", 0);
+        u->aiIgnore = ((TdfRecord*)s)->GetFieldInt("AiIgnore", 0);
+        u->aiPriorityTarget = ((TdfRecord*)s)->GetFieldInt("AiPriorityTarget", 0);
+        u->initialGroup = ((TdfRecord*)s)->GetFieldInt("InitialGroup", 0);
+        u->immunity = ((TdfRecord*)s)->GetFieldInt("Immunity", 0);
     }
 
-    list = ((Class_004c4470*)root)->FindSubRecord("specials");
+    list = ((TdfRecord*)root)->FindSubRecord("specials");
     if (list)
         count = ((Class_004c4450*)list)->GetSubRecordCount();
     else
@@ -191,8 +183,8 @@ void Mission::LoadMissionData(char* name, Parser_00436c30* parser)
             static int len = strlen("StartPos");
             if (_strnicmp(text, "StartPos", len) == 0) {
                 r->type = 1;
-                r->x = ((Class_004c46c0*)s)->GetFieldInt("XPos", 0);
-                r->z = ((Class_004c46c0*)s)->GetFieldInt("ZPos", 0);
+                r->x = ((TdfRecord*)s)->GetFieldInt("XPos", 0);
+                r->z = ((TdfRecord*)s)->GetFieldInt("ZPos", 0);
                 int id;
                 if (!isdigit(text[len]))
                     id = ++startPos;
@@ -205,7 +197,7 @@ void Mission::LoadMissionData(char* name, Parser_00436c30* parser)
         }
     }
 
-    list = ((Class_004c4470*)root)->FindSubRecord("features");
+    list = ((TdfRecord*)root)->FindSubRecord("features");
     if (list)
         count = ((Class_004c4450*)list)->GetSubRecordCount();
     else
@@ -219,8 +211,8 @@ void Mission::LoadMissionData(char* name, Parser_00436c30* parser)
         Section_00436c30* s = ((Class_004c44c0*)list)->GetSubRecord(i);
         if (!((TdfRecord*)s)->GetFieldString(f->name, "Featurename", 0x80, DAT_005119b8))
             f->name[0] = 0;
-        f->x = ((Class_004c46c0*)s)->GetFieldInt("XPos", -1);
-        f->z = ((Class_004c46c0*)s)->GetFieldInt("ZPos", -1);
+        f->x = ((TdfRecord*)s)->GetFieldInt("XPos", -1);
+        f->z = ((TdfRecord*)s)->GetFieldInt("ZPos", -1);
         if (f->x < 0 || f->z < 0)
             f->name[0] = 0;
     }

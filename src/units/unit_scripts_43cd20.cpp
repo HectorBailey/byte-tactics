@@ -543,21 +543,14 @@ static inline void ClampToZero(int& value)
 
 class UnitMotion {
 public:
-    char unknown_0[8];
+    Iface_0043dd20* obj;               // +0x0
+    char unknown_4[0x8 - 0x4];
     Vec3_0043cc20 pos;                 // +0x8
     char unknown_14[0x20 - 0x14];
     int field_20;                      // +0x20
+    short turn;                        // +0x24
 
     void FUN_0043cc20(Unit* unit, int amount);
-};
-
-class Class_0043cd20 {
-public:
-    Iface_0043dd20* obj;              // +0x0
-    char unknown_4[0x20 - 0x4];
-    int field_20;                     // +0x20
-    short turn;                       // +0x24
-
     void SteerGroundUnit(Unit* unit);
 };
 
@@ -591,12 +584,12 @@ void UnitMotion::FUN_0043cc20(Unit* unit, int amount)
 }
 
 // FUNCTION: 0x43cd20
-void Class_0043cd20::SteerGroundUnit(Unit* unit)
+void UnitMotion::SteerGroundUnit(Unit* unit)
 {
     if (obj->v5() == 0) {
         turn = 0;
         const int& amount = -unit->type->field_19a;
-        ((UnitMotion*)this)->FUN_0043cc20(unit, amount);
+        FUN_0043cc20(unit, amount);
         return;
     }
 
@@ -660,8 +653,8 @@ void Class_0043cd20::SteerGroundUnit(Unit* unit)
     int lim = (int)(((__int64)turned * turned) >> 32) * 4;
 
     if (d1 > lim && d2 > r)
-        ((UnitMotion*)this)->FUN_0043cc20(unit, unit->type->field_19e);
+        FUN_0043cc20(unit, unit->type->field_19e);
     else
-        ((UnitMotion*)this)->FUN_0043cc20(unit, -rate);
+        FUN_0043cc20(unit, -rate);
 }
 

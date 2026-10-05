@@ -25,9 +25,9 @@
 // trigger was not found.
 //
 // Ruled out for it, each compiled and scored: a redundant cast on the receiver,
-// `&parser` plus a field, an explicit `*(Class_004c46c0**)&parser.current`, a
-// `Class_004c46c0* cur` local (which drops the file to 89.1%, so it changes
-// other things too), a reference `Class_004c46c0*&`, `*(r+n)` instead of
+// `&parser` plus a field, an explicit `*(TdfRecord**)&parser.current`, a
+// `TdfRecord* cur` local (which drops the file to 89.1%, so it changes
+// other things too), a reference `TdfRecord*&`, `*(r+n)` instead of
 // `r[n]`, reading the four values into temporaries first, a `static inline`
 // getter for the current node, a `static inline` helper that performs the whole
 // call, and a `static inline LoadRect(parser, int* r)` helper. That last one
@@ -75,20 +75,16 @@
 #include <stdio.h>
 #include <string.h>
 
-class Class_004c46c0 {
-public:
-    int GetFieldInt(const char* name, int def);
-};
-
 class TdfRecord {
 public:
     int GetFieldString(char* dst, const char* key, size_t size, const char* def);
+    int GetFieldInt(const char* name, int def);
 };
 
 class TdfFile {
 public:
     int field_0;
-    Class_004c46c0* current;            // +0x4
+    TdfRecord* current;            // +0x4
     int field_8;
     TdfFile();
     ~TdfFile();
@@ -207,8 +203,8 @@ void __stdcall LoadSideData(void)
                 FatalError(fontPath);
             s->font = font;
         }
-        s->energyColor = ((Class_004c46c0*)parser.current)->GetFieldInt("energycolor", 0);
-        s->metalColor = ((Class_004c46c0*)parser.current)->GetFieldInt("metalcolor", 0);
+        s->energyColor = ((TdfRecord*)parser.current)->GetFieldInt("energycolor", 0);
+        s->metalColor = ((TdfRecord*)parser.current)->GetFieldInt("metalcolor", 0);
 
         saved = ((TdfFile*)&parser)->GetCurrentRecord();
         if (!((TdfFile*)&parser)->SelectRecord("LOGO")) {
@@ -216,10 +212,10 @@ void __stdcall LoadSideData(void)
             FatalError(msgLogo);
         } else {
             int* r = &s->logo.x1;
-            r[0] = ((Class_004c46c0*)parser.current)->GetFieldInt("x1", 0);
-            r[1] = ((Class_004c46c0*)parser.current)->GetFieldInt("y1", 0);
-            r[2] = ((Class_004c46c0*)parser.current)->GetFieldInt("x2", 0);
-            r[3] = ((Class_004c46c0*)parser.current)->GetFieldInt("y2", 0);
+            r[0] = ((TdfRecord*)parser.current)->GetFieldInt("x1", 0);
+            r[1] = ((TdfRecord*)parser.current)->GetFieldInt("y1", 0);
+            r[2] = ((TdfRecord*)parser.current)->GetFieldInt("x2", 0);
+            r[3] = ((TdfRecord*)parser.current)->GetFieldInt("y2", 0);
         }
         ((TdfFile*)&parser)->SetCurrentRecord(saved);
 
@@ -229,10 +225,10 @@ void __stdcall LoadSideData(void)
             FatalError(msgEnergybar);
         } else {
             int* r = &s->energyBar.x1;
-            r[0] = ((Class_004c46c0*)parser.current)->GetFieldInt("x1", 0);
-            r[1] = ((Class_004c46c0*)parser.current)->GetFieldInt("y1", 0);
-            r[2] = ((Class_004c46c0*)parser.current)->GetFieldInt("x2", 0);
-            r[3] = ((Class_004c46c0*)parser.current)->GetFieldInt("y2", 0);
+            r[0] = ((TdfRecord*)parser.current)->GetFieldInt("x1", 0);
+            r[1] = ((TdfRecord*)parser.current)->GetFieldInt("y1", 0);
+            r[2] = ((TdfRecord*)parser.current)->GetFieldInt("x2", 0);
+            r[3] = ((TdfRecord*)parser.current)->GetFieldInt("y2", 0);
         }
         ((TdfFile*)&parser)->SetCurrentRecord(saved);
 
@@ -242,10 +238,10 @@ void __stdcall LoadSideData(void)
             FatalError(msgEnergynum);
         } else {
             int* r = &s->energyNum.x1;
-            r[0] = ((Class_004c46c0*)parser.current)->GetFieldInt("x1", 0);
-            r[1] = ((Class_004c46c0*)parser.current)->GetFieldInt("y1", 0);
-            r[2] = ((Class_004c46c0*)parser.current)->GetFieldInt("x2", 0);
-            r[3] = ((Class_004c46c0*)parser.current)->GetFieldInt("y2", 0);
+            r[0] = ((TdfRecord*)parser.current)->GetFieldInt("x1", 0);
+            r[1] = ((TdfRecord*)parser.current)->GetFieldInt("y1", 0);
+            r[2] = ((TdfRecord*)parser.current)->GetFieldInt("x2", 0);
+            r[3] = ((TdfRecord*)parser.current)->GetFieldInt("y2", 0);
         }
         ((TdfFile*)&parser)->SetCurrentRecord(saved);
 
@@ -255,10 +251,10 @@ void __stdcall LoadSideData(void)
             FatalError(msgMetalbar);
         } else {
             int* r = &s->metalBar.x1;
-            r[0] = ((Class_004c46c0*)parser.current)->GetFieldInt("x1", 0);
-            r[1] = ((Class_004c46c0*)parser.current)->GetFieldInt("y1", 0);
-            r[2] = ((Class_004c46c0*)parser.current)->GetFieldInt("x2", 0);
-            r[3] = ((Class_004c46c0*)parser.current)->GetFieldInt("y2", 0);
+            r[0] = ((TdfRecord*)parser.current)->GetFieldInt("x1", 0);
+            r[1] = ((TdfRecord*)parser.current)->GetFieldInt("y1", 0);
+            r[2] = ((TdfRecord*)parser.current)->GetFieldInt("x2", 0);
+            r[3] = ((TdfRecord*)parser.current)->GetFieldInt("y2", 0);
         }
         ((TdfFile*)&parser)->SetCurrentRecord(saved);
 
@@ -268,10 +264,10 @@ void __stdcall LoadSideData(void)
             FatalError(msgMetalnum);
         } else {
             int* r = &s->metalNum.x1;
-            r[0] = ((Class_004c46c0*)parser.current)->GetFieldInt("x1", 0);
-            r[1] = ((Class_004c46c0*)parser.current)->GetFieldInt("y1", 0);
-            r[2] = ((Class_004c46c0*)parser.current)->GetFieldInt("x2", 0);
-            r[3] = ((Class_004c46c0*)parser.current)->GetFieldInt("y2", 0);
+            r[0] = ((TdfRecord*)parser.current)->GetFieldInt("x1", 0);
+            r[1] = ((TdfRecord*)parser.current)->GetFieldInt("y1", 0);
+            r[2] = ((TdfRecord*)parser.current)->GetFieldInt("x2", 0);
+            r[3] = ((TdfRecord*)parser.current)->GetFieldInt("y2", 0);
         }
         ((TdfFile*)&parser)->SetCurrentRecord(saved);
 
@@ -281,10 +277,10 @@ void __stdcall LoadSideData(void)
             FatalError(msgTotalunits);
         } else {
             int* r = &s->totalUnits.x1;
-            r[0] = ((Class_004c46c0*)parser.current)->GetFieldInt("x1", 0);
-            r[1] = ((Class_004c46c0*)parser.current)->GetFieldInt("y1", 0);
-            r[2] = ((Class_004c46c0*)parser.current)->GetFieldInt("x2", 0);
-            r[3] = ((Class_004c46c0*)parser.current)->GetFieldInt("y2", 0);
+            r[0] = ((TdfRecord*)parser.current)->GetFieldInt("x1", 0);
+            r[1] = ((TdfRecord*)parser.current)->GetFieldInt("y1", 0);
+            r[2] = ((TdfRecord*)parser.current)->GetFieldInt("x2", 0);
+            r[3] = ((TdfRecord*)parser.current)->GetFieldInt("y2", 0);
         }
         ((TdfFile*)&parser)->SetCurrentRecord(saved);
 
@@ -294,10 +290,10 @@ void __stdcall LoadSideData(void)
             FatalError(msgTotaltime);
         } else {
             int* r = &s->totalTime.x1;
-            r[0] = ((Class_004c46c0*)parser.current)->GetFieldInt("x1", 0);
-            r[1] = ((Class_004c46c0*)parser.current)->GetFieldInt("y1", 0);
-            r[2] = ((Class_004c46c0*)parser.current)->GetFieldInt("x2", 0);
-            r[3] = ((Class_004c46c0*)parser.current)->GetFieldInt("y2", 0);
+            r[0] = ((TdfRecord*)parser.current)->GetFieldInt("x1", 0);
+            r[1] = ((TdfRecord*)parser.current)->GetFieldInt("y1", 0);
+            r[2] = ((TdfRecord*)parser.current)->GetFieldInt("x2", 0);
+            r[3] = ((TdfRecord*)parser.current)->GetFieldInt("y2", 0);
         }
         ((TdfFile*)&parser)->SetCurrentRecord(saved);
 
@@ -307,10 +303,10 @@ void __stdcall LoadSideData(void)
             FatalError(msgEnergy0);
         } else {
             int* r = &s->energy0.x1;
-            r[0] = ((Class_004c46c0*)parser.current)->GetFieldInt("x1", 0);
-            r[1] = ((Class_004c46c0*)parser.current)->GetFieldInt("y1", 0);
-            r[2] = ((Class_004c46c0*)parser.current)->GetFieldInt("x2", 0);
-            r[3] = ((Class_004c46c0*)parser.current)->GetFieldInt("y2", 0);
+            r[0] = ((TdfRecord*)parser.current)->GetFieldInt("x1", 0);
+            r[1] = ((TdfRecord*)parser.current)->GetFieldInt("y1", 0);
+            r[2] = ((TdfRecord*)parser.current)->GetFieldInt("x2", 0);
+            r[3] = ((TdfRecord*)parser.current)->GetFieldInt("y2", 0);
         }
         ((TdfFile*)&parser)->SetCurrentRecord(saved);
 
@@ -320,10 +316,10 @@ void __stdcall LoadSideData(void)
             FatalError(msgMetal0);
         } else {
             int* r = &s->metal0.x1;
-            r[0] = ((Class_004c46c0*)parser.current)->GetFieldInt("x1", 0);
-            r[1] = ((Class_004c46c0*)parser.current)->GetFieldInt("y1", 0);
-            r[2] = ((Class_004c46c0*)parser.current)->GetFieldInt("x2", 0);
-            r[3] = ((Class_004c46c0*)parser.current)->GetFieldInt("y2", 0);
+            r[0] = ((TdfRecord*)parser.current)->GetFieldInt("x1", 0);
+            r[1] = ((TdfRecord*)parser.current)->GetFieldInt("y1", 0);
+            r[2] = ((TdfRecord*)parser.current)->GetFieldInt("x2", 0);
+            r[3] = ((TdfRecord*)parser.current)->GetFieldInt("y2", 0);
         }
         ((TdfFile*)&parser)->SetCurrentRecord(saved);
 
@@ -333,10 +329,10 @@ void __stdcall LoadSideData(void)
             FatalError(msgEnergymax);
         } else {
             int* r = &s->energyMax.x1;
-            r[0] = ((Class_004c46c0*)parser.current)->GetFieldInt("x1", 0);
-            r[1] = ((Class_004c46c0*)parser.current)->GetFieldInt("y1", 0);
-            r[2] = ((Class_004c46c0*)parser.current)->GetFieldInt("x2", 0);
-            r[3] = ((Class_004c46c0*)parser.current)->GetFieldInt("y2", 0);
+            r[0] = ((TdfRecord*)parser.current)->GetFieldInt("x1", 0);
+            r[1] = ((TdfRecord*)parser.current)->GetFieldInt("y1", 0);
+            r[2] = ((TdfRecord*)parser.current)->GetFieldInt("x2", 0);
+            r[3] = ((TdfRecord*)parser.current)->GetFieldInt("y2", 0);
         }
         ((TdfFile*)&parser)->SetCurrentRecord(saved);
 
@@ -346,10 +342,10 @@ void __stdcall LoadSideData(void)
             FatalError(msgMetalmax);
         } else {
             int* r = &s->metalMax.x1;
-            r[0] = ((Class_004c46c0*)parser.current)->GetFieldInt("x1", 0);
-            r[1] = ((Class_004c46c0*)parser.current)->GetFieldInt("y1", 0);
-            r[2] = ((Class_004c46c0*)parser.current)->GetFieldInt("x2", 0);
-            r[3] = ((Class_004c46c0*)parser.current)->GetFieldInt("y2", 0);
+            r[0] = ((TdfRecord*)parser.current)->GetFieldInt("x1", 0);
+            r[1] = ((TdfRecord*)parser.current)->GetFieldInt("y1", 0);
+            r[2] = ((TdfRecord*)parser.current)->GetFieldInt("x2", 0);
+            r[3] = ((TdfRecord*)parser.current)->GetFieldInt("y2", 0);
         }
         ((TdfFile*)&parser)->SetCurrentRecord(saved);
 

@@ -16,15 +16,11 @@ public:
     void ResetCurrentRecord();
 };
 
-class Class_004c4420 {
+class TdfRecord {
 public:
     const char* field_0;
 
     void CopyRecordName(char* dest, unsigned int count);
-};
-
-class TdfRecord {
-public:
     int GetFieldString(char* dst, char* key, unsigned int size, char* def);
 };
 
@@ -49,7 +45,7 @@ void LoadAllSound()
         int i = 0;
         int more = ((TdfFile*)&obj)->SelectRecordAt(i);
         while (more) {
-            ((Class_004c4420*)obj.field_4)->CopyRecordName(name, 0x20);
+            ((TdfRecord*)obj.field_4)->CopyRecordName(name, 0x20);
             if (((TdfRecord*)obj.field_4)->GetFieldString(value, "sound", 0x100, DAT_005119b8))
                 FUN_00429470(name, value);
             i++;

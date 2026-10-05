@@ -15,22 +15,13 @@ struct Entry_0047fca0 {                // 0x11 bytes
 
 class SpeechQueue {
 public:
-    char unknown_0[0x99];
-    int count;                         // +0x99
-    int field_9d;                      // +0x9d
-    int field_a1;                      // +0xa1
-
-    void PlaySpeech(int index, int param_2, int param_3);
-};
-
-class Class_0047fca0 {
-public:
     Entry_0047fca0 entries[9];         // +0x0
     int count;                         // +0x99
     unsigned int field_9d;             // +0x9d
     unsigned int field_a1;             // +0xa1
 
     void PlayNextSpeechEntry();
+    void PlaySpeech(int index, int param_2, int param_3);
 };
 
 struct Game {
@@ -42,7 +33,7 @@ struct Game {
 extern Game* g_game;
 
 // FUNCTION: 0x47fca0
-void Class_0047fca0::PlayNextSpeechEntry()
+void SpeechQueue::PlayNextSpeechEntry()
 {
     if (count == 0) {
         return;

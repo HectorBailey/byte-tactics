@@ -19,11 +19,6 @@ public:
     void FUN_00489650();
 };
 
-class Class_00489800 {
-public:
-    void ReleaseWeapons(int param_1);
-};
-
 // Object at +0x52, deleted through its virtual destructor.
 class Attached_0043a1f0 {
 public:
@@ -46,6 +41,7 @@ struct Unit {
     Owner_0043a1f0* owner;             // +0x0
     char unknown_4[0x9a - 0x4];
     Class_004b07c0* names;             // +0x9a
+    void ReleaseWeapons(int param_1);
 };
 
 class Class_0043a1f0;
@@ -113,7 +109,7 @@ Class_0043a1f0::~Class_0043a1f0()
         }
     }
     if (!(flags & 0x10000)) {
-        ((Class_00489800*)unit)->ReleaseWeapons(3);
+        ((Unit*)unit)->ReleaseWeapons(3);
     }
     ((UnitRef*)((char*)this + 0x12))->FUN_00489650();
 }

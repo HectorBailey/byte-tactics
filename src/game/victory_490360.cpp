@@ -64,7 +64,7 @@ struct Game {
 
 extern Game* g_game;
 
-class Class_00490360 {
+class MissionConditions {
 public:
     MissionCondition* first[16];        // +0x00
     int firstCount;                     // +0x40
@@ -79,7 +79,7 @@ public:
 // with `this` in ebx: written out in the switch it keeps the loop counter
 // zeroed in esi from the function entry and reuses that register for every
 // zero in the function, which the original does not do.
-static inline int check_second(Class_00490360* self)
+static inline int check_second(MissionConditions* self)
 {
     if (self->secondCount == 0) {
         self->second[self->secondCount] = new DefeatAllUnitsKilled;
@@ -93,7 +93,7 @@ static inline int check_second(Class_00490360* self)
 }
 
 // FUNCTION: 0x490360
-int Class_00490360::CheckDefeat()
+int MissionConditions::CheckDefeat()
 {
     if (field_88) {
         if (FUN_0041d8b0()) {

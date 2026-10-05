@@ -20,8 +20,8 @@
 //    local: that drops one live-across-call variable, so the hoisted name temp lands
 //    in EDI (the `lea edi,[esi-0x221]` in the preheader) instead of competing for EBX.
 // Note 0x4c48c0 and 0x4c46c0 are two different classes in data/symbols.csv
-// (TdfRecord::GetFieldString and Class_004c46c0::GetFieldInt), so `current`
-// is a TdfRecord* and the int-arg calls cast it to Class_004c46c0*.
+// (TdfRecord::GetFieldString and TdfRecord::GetFieldInt), so `current`
+// is a TdfRecord* and the int-arg calls cast it to TdfRecord*.
 
 #include <math.h>
 #include <vector>
@@ -43,10 +43,6 @@ public:
 class TdfRecord {
 public:
     int GetFieldString(char* dst, const char* key, int size, char* def);
-};
-
-class Class_004c46c0 {
-public:
     int GetFieldInt(const char* name, int def);
 };
 
@@ -143,8 +139,8 @@ void LoadDownloadMenus()
                     for (unsigned short u = 0; u < g_game->unitDefCount; u++) {
                         if (_strcmpi(g_game->unitDefs[u].name, buf) == 0) {
                             g_game->buildLists[i].entries[j].typeId = u;
-                            g_game->buildLists[i].entries[j].page = (unsigned char)((Class_004c46c0*)parser.current)->GetFieldInt("MENU", 0);
-                            g_game->buildLists[i].entries[j].slot = (unsigned char)((Class_004c46c0*)parser.current)->GetFieldInt("BUTTON", 0);
+                            g_game->buildLists[i].entries[j].page = (unsigned char)((TdfRecord*)parser.current)->GetFieldInt("MENU", 0);
+                            g_game->buildLists[i].entries[j].slot = (unsigned char)((TdfRecord*)parser.current)->GetFieldInt("BUTTON", 0);
                             parser.current->GetFieldString(g_game->buildLists[i].entries[j].name, "UNITNAME", 0x20, DAT_005119b8);
                             break;
                         }

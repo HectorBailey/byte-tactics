@@ -49,25 +49,17 @@ struct Game {
 extern Game* g_game;
 extern char DAT_005119b8[];
 
-class Class_004c46c0 {
-public:
-    int GetFieldInt(const char* name, int def);
-};
-
 class TdfRecord {
 public:
     int GetFieldString(char* dst, char* key, size_t size, char* def);
-};
-
-class Class_004c4760 {
-public:
+    int GetFieldInt(const char* name, int def);
     double GetFieldDouble(const char* name, double def);
 };
 
 class TdfFile {
 public:
     int field_0;
-    Class_004c46c0* current;            // +0x4
+    TdfRecord* current;            // +0x4
     int field_8;
     TdfFile();
     ~TdfFile();
@@ -194,9 +186,9 @@ public:
     void LoadMissionData(char* schema, TdfFile* parser);
 };
 
-static inline float GetFloat(Class_004c46c0* section, const char* key)
+static inline float GetFloat(TdfRecord* section, const char* key)
 {
-    double value = ((Class_004c4760*)section)->GetFieldDouble(key, 0.0);
+    double value = ((TdfRecord*)section)->GetFieldDouble(key, 0.0);
     float result = (float)value;
     return result;
 }
