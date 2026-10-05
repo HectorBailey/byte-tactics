@@ -107,7 +107,7 @@ address,size,file,symbol,status,similarity
 0x408cb0,602,src/ai/ai_player_408cb0.cpp,??0Class_00408cb0@@QAE@PAUPlayer_00408cb0@@@Z,matched,100.0
 0x408f10,32,src/ai/ai_player_408f10.cpp,?FUN_00408f10@Class_00408f10@@QAEXXZ,matched,100.0
 0x408f30,546,src/ai/ai_player_408f30.cpp,?insert@?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QAEXPAPAUUnit@@IABQAU3@@Z,matched,100.0
-0x409160,783,src/ai/ai_player_409160.cpp,??0Class_00409160@@QAE@E@Z,matched,100.0
+0x409160,783,src/ai/ai_player_409160.cpp,??0PlayerAI@@QAE@E@Z,matched,100.0
 0x409470,176,src/ai/ai_player_409470.cpp,?FUN_00409470@Class_00409470@@QAEXXZ,matched,100.0
 0x409520,166,src/ai/ai_player_409520.cpp,?FUN_00409520@@YGHPAUClass_00409520@@@Z,matched,100.0
 0x4095d0,346,src/ai/ai_player_4095d0.cpp,?FUN_004095d0@@YGHPAUClass_004095d0@@@Z,matched,100.0
