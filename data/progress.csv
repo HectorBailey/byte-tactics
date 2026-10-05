@@ -197,7 +197,7 @@ address,size,file,symbol,status,similarity
 0x40e9c0,28,src/ai/pathfind_40e9c0.cpp,?FUN_0040e9c0@Class_0040e9c0@@QAEXH@Z,matched,100.0
 0x40e9e0,326,src/ai/pathfind_40e9e0.cpp,??0Pathfinder@@QAE@XZ,matched,100.0
 0x40eb30,52,src/ai/pathfind_40eb30.cpp,??1Pathfinder@@QAE@XZ,matched,100.0
-0x40eb70,937,src/ai/pathfind_40eb70.cpp,?RunSearches@Class_0040eb70@@QAEXXZ,matched,100.0
+0x40eb70,937,src/ai/pathfind_40eb70.cpp,?RunSearches@Pathfinder@@QAEXXZ,matched,100.0
 0x40ef20,223,src/ai/pathfind_40ef20.cpp,?RemoveNode@Class_0040ef20@@QAEXH@Z,matched,100.0
 0x40f000,88,src/ai/pathfind_40f000.cpp,?SiftUp@OpenHeap@@QAEXH@Z,matched,100.0
 0x40f060,172,src/ai/pathfind_40f060.cpp,?SiftDown@OpenHeap@@QAEXH@Z,matched,100.0

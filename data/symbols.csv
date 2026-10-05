@@ -199,7 +199,7 @@ address,name
 0x40e9c0,Class_0040e9c0::FUN_0040e9c0
 0x40e9e0,Pathfinder::Pathfinder
 0x40eb30,Pathfinder::~Pathfinder
-0x40eb70,Class_0040eb70::RunSearches
+0x40eb70,Pathfinder::RunSearches
 0x40ef20,Class_0040ef20::RemoveNode
 0x40f000,OpenHeap::SiftUp
 0x40f060,OpenHeap::SiftDown

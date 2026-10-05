@@ -300,7 +300,7 @@
 struct Unit;
 struct Player_00464f80;
 
-struct Class_0040eb70 { void RunSearches(); };
+struct Pathfinder { void RunSearches(); };
 struct Class_00408c40 { void TickIfActive(); };
 struct Class_00435100 {
     char unknown_0[0xd44];
@@ -426,7 +426,7 @@ struct Game {
     unsigned char localPlayer;         // +0x2a42
     unsigned char field_2a43;          // +0x2a43
     char unknown_2a44[0x14207 - 0x2a44];
-    Class_0040eb70* field_14207;       // +0x14207
+    Pathfinder* field_14207;           // +0x14207
     char unknown_1420b[0x14223 - 0x1420b];
     int screen_x;                      // +0x14223
     int screen_y;                      // +0x14227
