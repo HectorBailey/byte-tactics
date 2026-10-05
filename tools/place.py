@@ -770,6 +770,32 @@ def place_gaps(placer: Placer, gaps: dict) -> None:
         placer.stats["gap regions built from source"] += 1
 
 
+def place_tree_globals(placer: Placer, objects_by_src: dict[str, Obj]) -> None:
+    """The globals the tree's own files define (class objects with static
+    initialisers, template statics), each from its largest definition: two
+    files can hold different views of one class (0x460e20's Class_00460f60
+    is 0xb53c bytes, 0x460f60's 0xb528)."""
+    for row in load_rows(GLOBALS):
+        if row.get("size_from") != "definition":
+            continue
+        addr = int(row["address"], 16)
+        best = None
+        for src, obj in objects_by_src.items():
+            if not src.startswith("src/unsorted/"):
+                continue
+            for name, sym in obj.externals.items():
+                sec = obj.secs[sym.section - 1]
+                if sec.is_code or address_of(name, placer.symbols) != addr:
+                    continue
+                lo, hi = sec.slice_at(sym.value)
+                if best is None or hi - lo > best[3] - best[2]:
+                    best = (obj, sec, lo, hi, name)
+        if best is not None and placer.img.free(addr):
+            obj, sec, lo, hi, name = best
+            placer.place(obj, sec, lo, hi, addr, OBJDATA, name)
+            placer.stats["globals placed from the tree's own definitions"] += 1
+
+
 def place_data_sources(placer: Placer, objects_by_src: dict[str, Obj]) -> None:
     """src/data, the game's data as source: every global at the address its
     `// GLOBAL:` annotation (or its DAT_<address> name) gives, from its
@@ -1222,6 +1248,7 @@ def layout(jobs: int | None = None) -> tuple[Image, Placer]:
     place_gaps(placer, gap_objects())
     place_library(placer, lib_paths)
     place_import_thunks(placer)
+    place_tree_globals(placer, by_src)
     place_data_sources(placer, by_src)
     data_objs, data_addr = build_data(symbols)
     place_globals(placer, data_objs, data_addr)

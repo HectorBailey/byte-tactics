@@ -43,6 +43,7 @@ import struct
 import sys
 from collections import Counter
 from dataclasses import dataclass
+from pathlib import Path
 
 import capstone
 
@@ -342,7 +343,48 @@ def build(objects, img: Image) -> list[dict]:
             "init": raw.hex() if section != ".bss" else "",
             "_t": t, "_g": g, "_gap": gap,
         })
+    # A global a tree file defines (a class object, a template's static
+    # member) is as big as its largest definition: the offsets the source
+    # uses can run past it (an end pointer) to globals of their own.
+    for row in rows:
+        sizes = [definition_size(f, row["_g"]) for f in row["_g"]["defined_in"]
+                 if not f.startswith("src/data/")]
+        sizes = [n for n in sizes if n]
+        if sizes and not row["defined"].startswith("src/data/"):
+            row["size"], row["size_from"] = max(sizes), "definition"
+    # A global that starts inside another (a field of a struct, an entry of an
+    # array the code reaches by its address) is part of it, not a definition
+    # of its own: linked separately, the two would be two variables.
+    end, outer = 0, None
+    for row in rows:
+        addr = int(row["address"], 16)
+        if outer is not None and addr < end and not row["defined"]:
+            base = int(outer["address"], 16)
+            row["defined"] = f"in {outer['name']}+{addr - base:#x}"
+            if addr + int(row["size"]) > end and outer["size_from"] != "definition":
+                # The part runs past the global that holds it: so does the global.
+                end = addr + int(row["size"])
+                outer["size"], outer["size_from"] = end - base, "parts"
+            continue
+        if addr + int(row["size"]) > end:
+            end, outer = addr + int(row["size"]), row
     return rows
+
+
+def definition_size(src: str, g: dict) -> int | None:
+    """The size of the global a tree file defines: its symbol's slice of its
+    section in the file's object."""
+    from place import parse
+    obj_path = ROOT / "build/progress" / Path(src).relative_to("src").with_suffix(".obj")
+    if not obj_path.exists():
+        return None
+    obj = parse(obj_path)
+    for name in g["spellings"]:
+        sym = obj.externals.get(name)
+        if sym is not None and sym.section > 0 and not obj.secs[sym.section - 1].is_code:
+            lo, hi = obj.secs[sym.section - 1].slice_at(sym.value)
+            return hi - lo
+    return None
 
 
 def write_csv(rows: list[dict]) -> None:
@@ -381,7 +423,7 @@ class Entry:
 def header_entry(row: dict) -> Entry | None:
     """The declaration of one global for globals.h, or None when its type is not settled."""
     g, t = row["_g"], row["_t"]
-    if row["kind"] in ("template", "library", "vtable") or row["defined"].startswith("src/data/"):
+    if row["kind"] in ("template", "library", "vtable") or row["defined"]:
         return None
     if not settled(g, row["type"], row["type_files"], row["other_files"]):
         return None
@@ -408,10 +450,14 @@ def header_entry(row: dict) -> Entry | None:
         elem = type_size(t[2])
         if elem and size % elem == 0 and portable(t[2]):
             t = ("arr", [size // elem] + list(t[1][1:]), t[2])
-    elif row["size_from"] == "gap>type" and portable(t[2]):
-        # An uninitialised buffer that runs on to the next known address.
+    elif row["size_from"] in ("gap>type", "parts") and t is not None and t[0] == "arr" and portable(t[2]) \
+            and size % row_element(t) == 0:
+        # An uninitialised buffer that runs on to the next known address, or
+        # an array with globals of its own inside it that run past its end.
         t = ("arr", [size // row_element(t)] + list(t[1][1:]), t[2])
         note += f" (declared {row['type']})"
+    elif row["size_from"] == "parts" and type_size(t) != size:
+        return Entry(row, name, byte_array, linkage, f"{note}; {row['type']} with the globals inside it")
     if portable(t):
         return Entry(row, name, t, linkage, f"{note}; {agree}")
     return Entry(row, name, byte_array, linkage, f"{note}; {row['type']} by value in {agree}")
@@ -453,7 +499,9 @@ def write_header(rows: list[dict]) -> list[Entry]:
     lines += ["", f"// Not declared: {len(skipped)} globals defined in src/data or whose type is not settled "
               "(see data/globals.csv)."]
     for row in sorted(skipped, key=lambda r: -r["files"]):
-        if row["defined"].startswith("src/data/"):
+        if row["defined"].startswith("in "):
+            why = f"part of another global: {row['defined'][3:]}"
+        elif row["defined"]:
             why = f"defined in {row['defined']}"
         elif row["kind"] in ("template", "library", "vtable"):
             why = f"{row['kind']}"
