@@ -58,7 +58,7 @@ public:
     void SetCdCallback(void (*param_1)());
 };
 
-class Class_004ce690 {
+class Sound {
 public:
     void SetTrackCategory(int param_1);
 };
@@ -243,7 +243,7 @@ void InitGame()
     ((Class_004ce7a0*)g_game->field_10)->SetPlaybackOrder(g_game->field_37f16);
     ((Class_004cd9d0*)g_game->field_10)->SetCdCallback(FUN_00490fe0);
     FUN_00490fe0();
-    ((Class_004ce690*)g_game->field_10)->SetTrackCategory(0);
+    ((Sound*)g_game->field_10)->SetTrackCategory(0);
     ApplyBrightnessAndVolume();
     LoadSideData();
     LoadLogos();

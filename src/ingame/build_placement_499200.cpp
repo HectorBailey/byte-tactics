@@ -88,14 +88,14 @@ public:
     void LoadMissionByName(void* p);
 };
 
-class Class_004ce690 {
+class Sound {
 public:
     void SetTrackCategory(int a);
 };
 
 struct Game {
     char unknown_0[0x10];
-    Class_004ce690* field_10;          // +0x10
+    Sound* field_10;                   // +0x10
     char unknown_14[0x519 - 0x14];
     char field_519[0x18];              // +0x519
     Struct_00499200_531* field_531;    // +0x531

@@ -2930,7 +2930,7 @@ address,size,file,symbol,status,similarity
 0x4ce5b0,35,src/sound/cd_audio_4ce5b0.cpp,?OnNextTrackTimer@@YGXPAX@Z,matched,100.0
 0x4ce5e0,150,src/sound/cd_audio_4ce5e0.cpp,?OnCdFadeTimer@@YGXPAX@Z,matched,100.0
 0x4ce680,7,src/sound/cd_audio_4ce680.cpp,?GetTrackCategory@Class_004ce680@@QAEHXZ,matched,100.0
-0x4ce690,258,src/sound/cd_audio_4ce690.cpp,?SetTrackCategory@Class_004ce690@@QAEXH@Z,matched,100.0
+0x4ce690,258,src/sound/cd_audio_4ce690.cpp,?SetTrackCategory@Sound@@QAEXH@Z,matched,100.0
 0x4ce7a0,18,src/sound/cd_audio_4ce7a0.cpp,?SetPlaybackOrder@Class_004ce7a0@@QAEHH@Z,matched,100.0
 0x4ce7c0,18,src/sound/cd_audio_4ce7c0.cpp,?SetCategoryOfTrack@Class_004ce7c0@@QAEXHE@Z,matched,100.0
 0x4ce7e0,14,src/sound/cd_audio_4ce7e0.cpp,?GetCategoryOfTrack@Class_004ce7e0@@QAEEH@Z,matched,100.0
@@ -2949,7 +2949,7 @@ address,size,file,symbol,status,similarity
 0x4cf0b0,148,src/sound/samples_4cf0b0.cpp,?ReapFinishedBuffers@Class_004cf0b0@@QAEXXZ,matched,100.0
 0x4cf150,48,src/sound/samples_4cf150.cpp,?StopAllBuffers@Class_004cf150@@QAEXXZ,matched,100.0
 0x4cf180,138,src/sound/samples_4cf180.cpp,?StopOldestBuffer@Class_004cf180@@QAEXXZ,matched,100.0
-0x4cf210,10,src/sound/samples_4cf210.cpp,?SetMaxBuffers@Class_004cf210@@QAEXH@Z,matched,100.0
+0x4cf210,10,src/sound/samples_4cf210.cpp,?SetMaxBuffers@Sound@@QAEXH@Z,matched,100.0
 0x4cf220,4,src/sound/samples_4cf220.cpp,?GetMaxBuffers@Class_004cf220@@QAEHXZ,matched,100.0
 0x4cf230,309,src/sound/samples_4cf230.cpp,?CreateSampleFromMemory@Class_004cf230@@QAEPAPAUIDirectSoundBuffer@@PAXKHHH@Z,matched,100.0
 0x4cf370,348,src/sound/samples_4cf370.cpp,?CreateSampleFromFile@Class_004cf370@@QAEPAPAUIDirectSoundBuffer@@PAUFileHandle@@KHHH@Z,matched,100.0

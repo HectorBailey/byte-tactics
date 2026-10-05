@@ -5,7 +5,7 @@ public:
     int FUN_00435100();
 };
 
-class Class_004ce690 {
+class Sound {
 public:
     void SetTrackCategory(int param_1);
 };
@@ -18,7 +18,7 @@ public:
 #pragma pack(push, 1)
 struct Game {
     char unknown_0[0x10];
-    Class_004ce690* field_10;             // +0x10
+    Sound* field_10;                      // +0x10
     char unknown_14[0x2a44 - 0x14];
     unsigned short flags_2a44;            // +0x2a44
     char unknown_2a46[0x14383 - 0x2a46];

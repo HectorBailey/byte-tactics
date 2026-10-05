@@ -7,7 +7,7 @@ public:
     int HasCdPlayerWindow();
 };
 
-class Class_004ce690 {
+class Sound {
 public:
     void SetTrackCategory(int value);
 };
@@ -127,7 +127,7 @@ void __stdcall OpenMainMenu()
 
     LoadPictureCached("FrontendX", 1, 1, 0);
     PlayLoopingSoundByName("BGM", 0);
-    ((Class_004ce690*)g_game->field_10)->SetTrackCategory(4);
+    ((Sound*)g_game->field_10)->SetTrackCategory(4);
     FUN_0049fa50(&g_game->sub);
 
     char* name = "FrontendX";

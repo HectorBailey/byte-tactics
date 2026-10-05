@@ -737,7 +737,7 @@ class Class_004ceee0;
 class Class_004cf0b0;
 struct Class_004cf150;
 class Class_004cf180;
-class Class_004cf210;
+class Sound;
 class Class_004cf220;
 class Class_004cf230;
 class Class_004cf370;
@@ -5624,7 +5624,7 @@ public:
     void FUN_00435d30(int);
 };
 
-class Class_004cf210 {  // 0x30 bytes, 2 views
+class Sound {           // 0x30 bytes, 2 views
 public:
     char unknown_0[44];
     int field_2c;  // +0x2c

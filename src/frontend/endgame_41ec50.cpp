@@ -5,7 +5,7 @@
 // Start/Missions (checks the campaign CD and starts the chosen mission),
 // MainMenu and Difficulty (cycles easy, medium, hard).
 
-class Class_004ce690 {
+class Sound {
 public:
     void SetTrackCategory(int param_1);
 };
@@ -53,7 +53,7 @@ struct Options_0041ec50 {
 
 struct Game {
     char unknown_0[0x10];
-    Class_004ce690* field_10;            // +0x10
+    Sound* field_10;                     // +0x10
     char unknown_14[0x519 - 0x14];
     char message[0x29a0 - 0x519];        // +0x519
     Options_0041ec50* options;           // +0x29a0

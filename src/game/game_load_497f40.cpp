@@ -185,7 +185,7 @@ void* __stdcall AllocSurface(char*, int, int);
 void __stdcall DrawSurface(void*, void*, int, int);
 void __stdcall HAPINET_guaranteepackets(int);
 class Class_004cdb40 { public: void PlayNextTrack(); };
-class Class_004ce690 { public: void SetTrackCategory(int); };
+class Sound { public: void SetTrackCategory(int); };
 class Class_004ce800 { public: int IsCdPlaying(); };
 
 int __cdecl GetScreenWidth();
@@ -320,7 +320,7 @@ void LoadingScreenFrame(void)
         SetCloseHandler(FUN_004609a0, 0);
         g_game->field_589 = 0;
         memset((void*)g_game->progress, 0, 8);
-        ((Class_004ce690*)g_game->field_10)->SetTrackCategory(0);
+        ((Sound*)g_game->field_10)->SetTrackCategory(0);
         if (!((Class_004ce800*)g_game->field_10)->IsCdPlaying()) {
             ((Class_004cdb40*)g_game->field_10)->PlayNextTrack();
         }
