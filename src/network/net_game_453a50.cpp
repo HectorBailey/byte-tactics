@@ -40,8 +40,8 @@ struct Gui_00453a50 {
 #pragma pack(pop)
 
 extern Game* g_game;
-extern int DAT_005061d8;
-extern void* DAT_00512c74;
+extern int g_timeoutPlayerDpid;
+extern void* g_loungeChatter;
 
 int __stdcall FUN_004ab060(void* obj, const char* name);
 void* __stdcall FUN_004aa8f0(void* obj, const char* name, int size);
@@ -97,14 +97,14 @@ void __stdcall OpenTimeoutDialog(int id)
                                                     "TIMEOUT.GUI", 0x800);
     void* entries = gui->entries;
     gui->callback = &HandleTimeoutDialog;
-    DAT_005061d8 = id;
+    g_timeoutPlayerDpid = id;
 
     void* p = FUN_004d83b0("LOUNGE CHATTER", 0xa00);
-    DAT_00512c74 = p;
+    g_loungeChatter = p;
     memset(p, 0, 0x780);
 
     OutEntry_00453a50* out = FUN_0049ff90(entries, "OUTPUT");
-    FUN_004a32a0((char*)g_game + 0x519, "OUTPUT", DAT_00512c74,
+    FUN_004a32a0((char*)g_game + 0x519, "OUTPUT", g_loungeChatter,
                  (int)out->field_19 / (FUN_004a50b0() + 2), 0);
 
     gui->field_1c = &UpdateTimeoutDialog;

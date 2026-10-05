@@ -8,11 +8,11 @@ public:
     unsigned int* data;                // +0x00
     int index;                         // +0x04
     int bit;                           // +0x08
-    int FUN_00415dc0(int bits);
+    int ReadBits(int bits);
 };
 
 // FUNCTION: 0x415dc0
-int Class_00415dc0::FUN_00415dc0(int bits)
+int Class_00415dc0::ReadBits(int bits)
 {
     if (bit + bits < 32) {
         int r = (data[index] >> bit) & ((1 << bits) - 1);

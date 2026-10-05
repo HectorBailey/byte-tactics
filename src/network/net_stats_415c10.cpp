@@ -17,7 +17,7 @@ public:
     unsigned int* data;                // +0xc
     unsigned int buffer[0x100];        // +0x10
 
-    void FUN_00415c10(int value, int bits);
+    void WriteBits(int value, int bits);
 };
 
 static inline void CopyWords(unsigned int* first, unsigned int* last, unsigned int* dst)
@@ -41,7 +41,7 @@ static inline void Grow_00415c10(Class_00415c10* s)
 }
 
 // FUNCTION: 0x415c10
-void Class_00415c10::FUN_00415c10(int value, int bits)
+void Class_00415c10::WriteBits(int value, int bits)
 {
     if (bits + index < 0x20) {
         data[bit] |= (value & ((1 << bits) - 1)) << index;

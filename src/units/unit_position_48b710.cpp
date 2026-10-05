@@ -20,7 +20,7 @@
 
 class Class_00415b60 {
 public:
-    void FUN_00415bb0();
+    void GrowBuffer();
     Class_00415b60();
 };
 
@@ -32,20 +32,20 @@ public:
     unsigned int* data;                // +0xc
     unsigned int buffer[0x100];        // +0x10
 
-    void FUN_00415c10(int value, int bits);
+    void WriteBits(int value, int bits);
 };
 
 // The same object seen as the byte writer of 0x415da0 and the free of 0x415b90.
 struct Class_00415da0 {
     char unknown_0[0xc];
     unsigned char* data;               // +0xc
-    void FUN_00415da0(int index, unsigned char value);
+    void SetByteAt(int index, unsigned char value);
 };
 
 struct Class_00415b90 {
     char unknown_0[0xc];
     void* data;                        // +0xc
-    void FUN_00415b90();
+    void FreeBuffer();
 };
 
 struct Link_0048b710 {
@@ -118,9 +118,9 @@ int __stdcall BroadcastPacket(int player, void* data, int size);
 void __stdcall FUN_0048b710(Player_0048b710* p)
 {
     Class_00415c10 stream;
-    stream.FUN_00415c10(0x2c, 8);
-    stream.FUN_00415c10(0, 0x10);
-    stream.FUN_00415c10(g_game->ticks, 0x20);
+    stream.WriteBits(0x2c, 8);
+    stream.WriteBits(0, 0x10);
+    stream.WriteBits(g_game->ticks, 0x20);
     p->ticks = g_game->ticks;
     for (Unit* u = p->units_begin; u <= p->units_end; u++) {
         if (!(u->flags & 0x10000000))
@@ -129,15 +129,15 @@ void __stdcall FUN_0048b710(Player_0048b710* p)
             continue;
         if (!u->owner->player->vf7())
             continue;
-        stream.FUN_00415c10(u->field_a8 - u->link->field_6f, 0x10);
-        stream.FUN_00415c10(u->field_a6, g_game->field_14393);
+        stream.WriteBits(u->field_a8 - u->link->field_6f, 0x10);
+        stream.WriteBits(u->field_a6, g_game->field_14393);
         u->owner->player->WriteTo(&stream);
         // `>> 3`, not `/ 8`: that is the original's `add ecx, 7; sar ecx, 3`
         // with no sign fix-up.
         if (((stream.index + 7) >> 3) + stream.bit * 4 >= 0x200)
             break;
     }
-    stream.FUN_00415c10(-1, 0x10);
+    stream.WriteBits(-1, 0x10);
     int i = g_game->ticks % g_game->field_37ee6;
     stream.data[stream.bit] |= 1 << stream.index;
     stream.index++;
@@ -145,17 +145,17 @@ void __stdcall FUN_0048b710(Player_0048b710* p)
         stream.index = 0;
         stream.bit++;
         if (stream.bit == stream.capacity)
-            stream.FUN_00415bb0();
+            stream.GrowBuffer();
         stream.data[stream.bit] = 0;
     }
     FUN_0048b200(&stream, &p->units_begin[i]);
     // The packet's length, little-endian at bytes 1 and 2, is only known here.
     // The `char` cast is what makes MSVC 5 narrow the first sum to a byte and
     // push the register unmasked; the second is pushed as a dword.
-    ((Class_00415da0*)&stream)->FUN_00415da0(
+    ((Class_00415da0*)&stream)->SetByteAt(
         1, (char)(((stream.index + 7) >> 3) + (unsigned char)stream.bit * 4));
-    ((Class_00415da0*)&stream)->FUN_00415da0(
+    ((Class_00415da0*)&stream)->SetByteAt(
         2, (char)((((stream.index + 7) >> 3) + stream.bit * 4) >> 8));
     BroadcastPacket(p->id, stream.data, ((stream.index + 7) >> 3) + stream.bit * 4);
-    ((Class_00415b90*)&stream)->FUN_00415b90();
+    ((Class_00415b90*)&stream)->FreeBuffer();
 }

@@ -6,7 +6,7 @@
 // exists, once to take the address), which is what produces the two copies of
 // the id loop. When the net layer has no DirectPlay interface (g_usePacketManager
 // clear) it goes through HAPINET_sendpacket on g_game + 0x14 and reports the packet
-// as forwarded with FUN_00415ef0/FUN_00415f40. If instead g_game + 0x299c is
+// as forwarded with CountMessage/CountPacket. If instead g_game + 0x299c is
 // non-zero this is a broadcast round: every in-use player in state 3 whose
 // target group has not been told yet gets the packet, and the group is marked
 // in DAT_00512b90. A single shared `return 1` at the end is what made the
@@ -57,8 +57,8 @@ extern int DAT_00512b90[11];
 int __stdcall GetSlotDpid(unsigned char index);
 int __stdcall SendPacketToPlayer(int from, int to, void* packet, int size);
 int __stdcall HAPINET_sendpacket(void* net, unsigned long from, unsigned long to, void* data, unsigned long size);
-void __stdcall FUN_00415ef0(unsigned char kind, int amount, int player);
-void __stdcall FUN_00415f40(int size, int overhead, int sent);
+void __stdcall CountMessage(unsigned char kind, int amount, int player);
+void __stdcall CountPacket(int size, int overhead, int sent);
 
 static inline unsigned char FindPlayerIndex(int id)
 {
@@ -94,8 +94,8 @@ int __stdcall BroadcastPacket(int id, unsigned char* packet, int size)
                 return g_packetManager.QueueOnChannel(id, &DAT_00513008, (int)packet, size);
             if (HAPINET_sendpacket((char*)g_game + 0x14, id, 0, packet, size) != 0)
                 return 0;
-            FUN_00415ef0(packet[0], size, 1);
-            FUN_00415f40(size, 0, 1);
+            CountMessage(packet[0], size, 1);
+            CountPacket(size, 0, 1);
             return 1;
         }
         memset(DAT_00512b90, 0, 0x2c);

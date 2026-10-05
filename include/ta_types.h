@@ -3896,14 +3896,14 @@ public:
     unsigned int* data;  // +0xc
     unsigned int buffer[256];  // +0x10
     Class_00415b60(void);
-    void FUN_00415bb0(void);
+    void GrowBuffer(void);
 };
 
 struct Class_00415b90 {  // 0x14 bytes, 2 views
     char unknown_0[12];
     void* ptr;  // +0xc
     char unknown_10[4];
-    void FUN_00415b90(void);
+    void FreeBuffer(void);
 };
 
 class Class_00415c10 {  // 0x410 bytes, 7 views
@@ -3913,13 +3913,13 @@ public:
     int capacity;  // +0x8
     unsigned int* data;  // +0xc
     unsigned int buffer[256];  // +0x10
-    void FUN_00415c10(int, int);
+    void WriteBits(int, int);
 };
 
 struct Class_00415da0 {  // 0x10 bytes, 2 views
     char unknown_0[12];
     void* field_c;  // +0xc
-    void FUN_00415da0(int, unsigned char);
+    void SetByteAt(int, unsigned char);
 };
 
 class Class_00415dc0 {  // 0xc bytes, 9 views
@@ -3927,8 +3927,8 @@ public:
     unsigned int* data;  // +0x0
     int index;  // +0x4
     int bit;  // +0x8
-    int FUN_00415dc0(int);
-    int FUN_00415e60(int);
+    int ReadBits(int);
+    int ReadSignedBits(int);
     int ReadBit(void);
 };
 
@@ -7029,7 +7029,7 @@ public:
     int field_58;  // +0x58
     char unknown_5c[8];
     int field_64;  // +0x64
-    int FUN_0046e000(void);
+    int AllPlayersSynced(void);
 };
 
 struct Record_005129b4 {  // 0x62 bytes, 7 views
@@ -10098,13 +10098,13 @@ public:
     int field_0;  // +0x0
     char unknown_4[8];
     std::vector<Elem_0046faf0> vec;  // +0xc
-    void FUN_0046cc10(Elem_0046faf0*, Elem_0046faf0*);
+    void SendSequenced(Elem_0046faf0*, Elem_0046faf0*);
 };
 
 class Class_0046cec0 {  // 0x1 bytes, 2 views
 public:
     char unknown_0[1];
-    void FUN_0046cec0(unsigned int, void*);
+    void SendUnsequenced(unsigned int, void*);
     void Inl(unsigned int, void*);
 };
 
@@ -10124,7 +10124,7 @@ public:
     unsigned int max;  // +0x8
     Class_0046eba0 sent;  // +0xc
     Class_0046eba0 queue;  // +0x1c
-    void FUN_0046cef0(Packet_0046cef0*, int, void*, unsigned int);
+    void ReceiveSequenced(Packet_0046cef0*, int, void*, unsigned int);
 };
 
 struct Packet_0046cef0 {  // 0xe bytes, 1 view
@@ -10168,7 +10168,7 @@ public:
     int a;  // +0x0
     int b;  // +0x4
     int c;  // +0x8
-    void FUN_0046cec0(void*, int);
+    void SendUnsequenced(void*, int);
 };
 
 class ListWrap_0046d1a0 {  // 0xc bytes, 1 view
@@ -10233,10 +10233,10 @@ public:
     int direct;  // +0x58
     char unknown_5c[8];
     int disabled;  // +0x64
-    void FUN_0046d4c0(unsigned int*, Packet_0046d860*, int);
-    void FUN_0046d5b0(Target_0046d5b0*, unsigned char, int, int, int);
+    void SendSyncPacket(unsigned int*, Packet_0046d860*, int);
+    void SendSyncMessageTo(Target_0046d5b0*, unsigned char, int, int, int);
     void Send(Target_0046d530*, void*);
-    void FUN_0046d530(unsigned char, int, int, int);
+    void SendSyncMessage(unsigned char, int, int, int);
 };
 
 struct Packet_0046d860 {  // 0xe bytes, 2 views
@@ -10281,7 +10281,7 @@ public:
     int direct;  // +0x58
     char unknown_5c[8];
     int disabled;  // +0x64
-    void FUN_0046d630(Target_0046d630*, unsigned char, Source_0046d630*, int);
+    void SendEntryTo(Target_0046d630*, unsigned char, Source_0046d630*, int);
 };
 
 struct Packet_0046d630 {  // 0xe bytes, 1 view
@@ -10359,7 +10359,7 @@ public:
     int field_5c;  // +0x5c
     char unknown_60[4];
     int disabled;  // +0x64
-    void FUN_0046d6c0(Packet_0046d6c0*, unsigned char);
+    void HandleSyncPacket(Packet_0046d6c0*, unsigned char);
 };
 
 class Iter_0046e330 {  // 0x4 bytes, 16 views
@@ -10459,7 +10459,7 @@ public:
     char unknown_8[92];
     int field_64;  // +0x64
     Iter_0046e330 End(void);
-    void FUN_0046e160(void);
+    void ApplyToUnitTypes(void);
     Iter_0046e330 Find(unsigned int*);
 };
 
@@ -10494,7 +10494,7 @@ public:
     LiveNode* head;  // +0x4
     Iter_0046e330 End(void);
     Iter_0046e330 Find(unsigned int*);
-    int FUN_0046e3c0(Unit_0046e3c0*);
+    int ToggleUnitAllowed(Unit_0046e3c0*);
 };
 
 struct Unit_0046e3c0 {  // 0x142 bytes, 1 view
@@ -10512,7 +10512,7 @@ struct Class_0046e450 {  // 0x8 bytes, 2 views
     char unknown_1[3];
     LiveNode* head;  // +0x4
     Iter_0046e330 End(void);
-    int FUN_0046e450(UnitDef*);
+    int DisallowUnit(UnitDef*);
     Iter_0046e330 Find(unsigned int*);
 };
 
@@ -10526,7 +10526,7 @@ struct Class_0046e4d0 {  // 0x8 bytes, 2 views
     char unknown_1[3];
     LiveNode* head;  // +0x4
     Iter_0046e330 End(void);
-    int FUN_0046e4d0(UnitDef*);
+    int AllowUnit(UnitDef*);
     Iter_0046e330 Find(unsigned int*);
 };
 
@@ -10541,7 +10541,7 @@ public:
     char unknown_1[3];
     LiveNode* head;  // +0x4
     Iter_0046e330 End(void);
-    void FUN_0046e550(UnitDef*, int);
+    void SetUnitLimit(UnitDef*, int);
     Iter_0046e330 Find(unsigned int*);
 };
 
@@ -10583,9 +10583,9 @@ public:
     int field_5c;  // +0x5c
     int field_60;  // +0x60
     int disabled;  // +0x64
-    void FUN_0046d860(unsigned int);
-    void FUN_0046dad0(void);
-    void FUN_0046d970(unsigned int, int);
+    void NotifyEntryChanged(unsigned int);
+    void ProcessSync(void);
+    void CheckUnitAvailable(unsigned int, int);
 };
 
 class Class_0046ded0 : public Class_0046eaa0 {  // 0x5c bytes, 10 views
@@ -10612,12 +10612,12 @@ public:
     Class_0046d040(int);
     ~Class_0046d040(void);
     Iter_0046e330 End(void);
-    char* FUN_0046df40(void);
-    int FUN_0046e0b0(int);
-    int FUN_0046e280(Event_0046d860*);
-    int FUN_0046e330(UnitDef*, Rect*);
-    void FUN_0046d2e0(void);
-    void FUN_0046d500(void*, int);
+    char* GetSyncStatusText(void);
+    int IsPlayerSynced(int);
+    int PopChangedEntry(Event_0046d860*);
+    int GetUnitEntry(UnitDef*, Rect*);
+    void ResetEntries(void);
+    void ReceiveSyncPacket(void*, int);
     Iter_0046e330 Find(unsigned int*);
 };
 

@@ -8,11 +8,11 @@ extern "C" void __stdcall SendPacketToPlayer(int a, unsigned int b, void* c, int
 
 class Class_0046cec0 {
 public:
-    void FUN_0046cec0(unsigned int param_1, void* param_2);
+    void SendUnsequenced(unsigned int param_1, void* param_2);
 };
 
 // FUNCTION: 0x46cec0
-void Class_0046cec0::FUN_0046cec0(unsigned int param_1, void* param_2)
+void Class_0046cec0::SendUnsequenced(unsigned int param_1, void* param_2)
 {
     *(int*)((char*)param_2 + 2) = 0;
     SendPacketToPlayer(GetLocalHumanDpid(), param_1, param_2, 0xe);

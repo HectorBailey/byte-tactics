@@ -2,7 +2,7 @@
 
 class Class_00415dc0 {                 // bit reader
 public:
-    int FUN_00415dc0(int bits);
+    int ReadBits(int bits);
 };
 
 struct Owner_00490a10;
@@ -54,11 +54,11 @@ void Class_00490880::FUN_0044efd0(Class_00415dc0* reader)
         delete current;
         current = 0;
     }
-    int kind = reader->FUN_00415dc0(2);
+    int kind = reader->ReadBits(2);
     if (kind == 1)
         current = new Class_0044e080(owner, reader);
     else if (kind == 2)
         current = new Class_0044e9c0(owner, reader);
-    int state = reader->FUN_00415dc0(2);
+    int state = reader->ReadBits(2);
     owner->obj->FUN_0043d210(owner, state);
 }

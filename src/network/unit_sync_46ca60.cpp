@@ -142,7 +142,7 @@ public:
 
 class Class_0046e160 {
 public:
-    void FUN_0046e160();
+    void ApplyToUnitTypes();
 };
 
 struct Game {
@@ -153,9 +153,9 @@ struct Game {
 extern Game* g_game;
 
 // FUNCTION: 0x46ca60
-void __fastcall FUN_0046ca60()
+void __fastcall FinishUnitSync()
 {
-    ((Class_0046e160*)g_game->field_2a30)->FUN_0046e160();
+    ((Class_0046e160*)g_game->field_2a30)->ApplyToUnitTypes();
     delete g_game->field_2a30;
     g_game->field_2a30 = 0;
 }

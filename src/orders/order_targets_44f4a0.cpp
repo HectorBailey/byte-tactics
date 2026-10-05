@@ -12,7 +12,7 @@
 // data/symbols.csv still names after the class of 0x415b60.
 class Class_00415b60 {
 public:
-    void FUN_00415bb0();
+    void GrowBuffer();
 };
 
 class Class_00415c10 : public Class_00415b60 {
@@ -23,7 +23,7 @@ public:
     unsigned int* data;                // +0xc
     unsigned int buffer[0x100];        // +0x10
 
-    void FUN_00415c10(int value, int bits);
+    void WriteBits(int value, int bits);
 };
 
 struct Target_0044f4a0 {
@@ -72,14 +72,14 @@ void Class_0044f010::FUN_0044efc0(Class_00415c10* stream)
         stream->index = 0;
         stream->bit++;
         if (stream->bit == stream->capacity) {
-            stream->FUN_00415bb0();
+            stream->GrowBuffer();
         }
         stream->data[stream->bit] = 0;
     }
-    stream->FUN_00415c10(n, 2);
+    stream->WriteBits(n, 2);
     for (int i = 0; i < n; i++) {
-        stream->FUN_00415c10(points[i].x, 0x10);
-        stream->FUN_00415c10(points[i].y, 0x10);
+        stream->WriteBits(points[i].x, 0x10);
+        stream->WriteBits(points[i].y, 0x10);
     }
     flag_2 = (owner->target->field_2e & 4) != 0;
     flag_3 = 0;

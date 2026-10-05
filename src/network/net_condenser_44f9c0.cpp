@@ -33,7 +33,7 @@ struct Net_0044f9c0 {
 #pragma pack(pop)
 
 int __stdcall HAPINET_receivepacket(void* net, void* data, int* size);
-void __stdcall FUN_00415f40(int size, int overhead, int sent);
+void __stdcall CountPacket(int size, int overhead, int sent);
 int __stdcall FUN_004d1480(char* out, char* in);
 void FUN_004d1800();
 void FUN_004d1810();
@@ -62,7 +62,7 @@ int NetCondenser::ReceivePacket(void* net, char* data, int* size)
     int result = HAPINET_receivepacket(net, data, size);
     if (((Net_0044f9c0*)net)->field_4b5 != 0) {
         if (result == 0) {
-            FUN_00415f40(*size, 0, 0);
+            CountPacket(*size, 0, 0);
             if (data[0] != 3 && data[0] != 4)
                 return 0;
             if (*size < 4)

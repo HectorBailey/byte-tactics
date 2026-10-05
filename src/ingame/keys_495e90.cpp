@@ -186,7 +186,7 @@ void __stdcall FUN_0048ca20(void* param);
 void __stdcall FUN_0048d920(int param);
 void __stdcall FUN_0041d3b0(int param);
 void __stdcall FUN_0041d3f0(int param);
-void FUN_00464000(void);
+void CycleMessageUnits(void);
 void FUN_00463c80(void);
 void __stdcall FUN_00490df0(int param_1, int param_2);
 void __stdcall FUN_004ab190(Sub_495e90* gui, int param);
@@ -356,7 +356,7 @@ void FUN_00495e90(void)
         break;
 
     case 0xe4:
-        FUN_00464000();
+        CycleMessageUnits();
         break;
 
     case 0xd7: {

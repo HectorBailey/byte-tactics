@@ -53,13 +53,13 @@ public:
     char unknown_5c[0x64 - 0x5c];
     int field_64;                      // +0x64
 
-    int FUN_0046e000();
+    int AllPlayersSynced();
 };
 
 Player_0046e000* __stdcall FindPlayerByDpid(int id);
 
 // FUNCTION: 0x46e000
-int Class_0046e000::FUN_0046e000()
+int Class_0046e000::AllPlayersSynced()
 {
     if (field_64 != 0)
         return 1;

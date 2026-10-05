@@ -40,7 +40,7 @@ struct Event_44c220 {
 };
 
 struct Class_0046e280 {
-    int FUN_0046e280(Event_44c220* event);
+    int PopChangedEntry(Event_44c220* event);
 };
 
 struct Game {
@@ -78,7 +78,7 @@ void FUN_0044c220()
         FUN_0044c0d0();
     }
 
-    while (g_game->queue->FUN_0046e280(&event) != 0) {
+    while (g_game->queue->PopChangedEntry(&event) != 0) {
         n++;
         for (int i = 0; i < entry->count; i++) {
             if (event.field_0 == g_game->items[DAT_005129b4[i].field_52].field_13e) {

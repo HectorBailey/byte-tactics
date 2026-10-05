@@ -952,7 +952,7 @@ Things that look wrong in the original but have no effect, kept for the record.
   `RejectPlayer(sender, 6)` only when `cmd <= 1 && cmd >= 45`, which can never
   hold, so `||` was surely meant; out-of-range commands are still dropped by
   the switch bound, but silently, after the raw byte has indexed the
-  DAT_00512bc0 mask table (0x454758). (The same block also repeats the status
+  g_packetModes mask table (0x454758). (The same block also repeats the status
   test of 0x4547cc at 0x45480e.) And command 20 (0x455649) looks up the player
   named at packet+3; when there is none the lookup gives 10, the code sets the
   player pointer to 0 (0x4556ef to 0x4556f5) and then reads `[eax]` at

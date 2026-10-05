@@ -81,7 +81,7 @@ extern PacketManager g_packetManager;
 int __stdcall GetSlotDpid(unsigned char index);
 unsigned char __stdcall FindSlotByDpid(int id);
 int __stdcall SendPacketToPlayer(int from, int to, void* packet, int size);
-void __stdcall FUN_0046c620(int param_1);
+void __stdcall ReportGameEvent(int param_1);
 
 static inline unsigned char FindIndex_00452960(int id)
 {
@@ -189,6 +189,6 @@ int __stdcall SetAlliance(int from, int to, unsigned char value, int extra)
         result = r;
     }
     if (g_game->net->FUN_00435100() == 3)
-        FUN_0046c620(4);
+        ReportGameEvent(4);
     return result;
 }

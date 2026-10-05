@@ -109,9 +109,9 @@ struct Class_004358f0 { int FUN_004358f0(); };
 struct Class_004373a0 { int FUN_004373a0(); };
 struct Class_00435a20 { void FUN_00435a20(PlayerInfo_0044a680* info); };
 struct Class_00435c30 { char* FUN_00435c30(); };
-struct Class_0046e000 { int FUN_0046e000(); };
+struct Class_0046e000 { int AllPlayersSynced(); };
 struct Class_00463c60 { void SetType(int param); };
-class Class_0046d860 { public: void FUN_0046dad0(); };
+class Class_0046d860 { public: void ProcessSync(); };
 
 
 extern Game* g_game;
@@ -322,7 +322,7 @@ void FUN_0044a680()
         g_game->dirty = 0;
         if (FUN_004ab060(&g_game->gui, "LOUNGE2.GUI") != 0) {
             if (pl->info->flags & 1) {
-                int synched = ((Class_0046e000*)g_game->net)->FUN_0046e000();
+                int synched = ((Class_0046e000*)g_game->net)->AllPlayersSynced();
                 int ready = FUN_00456760();
                 Gadget_0044a680* start;
 
@@ -395,7 +395,7 @@ void FUN_0044a680()
         FUN_004a5d30(&g_game->gui, 0);
     }
 
-    ((Class_0046d860*)g_game->net)->FUN_0046dad0();
+    ((Class_0046d860*)g_game->net)->ProcessSync();
     if (DAT_005129a8 < (unsigned int)FUN_004b6340()) {
         unsigned char r;
         PlayerInfo_0044a680* info;

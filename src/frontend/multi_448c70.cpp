@@ -146,7 +146,7 @@ public:
 };
 class Class_0046d040 {
 public:
-    int FUN_0046e0b0(int id);
+    int IsPlayerSynced(int id);
 };
 
 struct Layer_00448c70 {
@@ -193,7 +193,7 @@ int IsHostLocal();
 int FUN_004b6340();
 int __stdcall GetSlotDpid(unsigned char player);
 void __stdcall RejectPlayer(int id, unsigned char msg);
-void __stdcall FUN_00463e50(Player_00448c70* p, char* text, int a, int b);
+void __stdcall SendChatMessage(Player_00448c70* p, char* text, int a, int b);
 char* __stdcall FUN_004c5740(char* text);
 Gadget_00448c70* __stdcall FUN_0049ff90(char* entries, char* name);
 Gadget_00448c70* __stdcall FUN_0049ff10(char* entries, char* name);
@@ -332,7 +332,7 @@ void FUN_00448c70()
         if (!FUN_00440cd0()) {
             mapname->colour = (FUN_004b6340() / 30 & 1) ? 0xc : 0;
             if (differs) {
-                FUN_00463e50(me, FUN_004c5740("does not have this map"), 4, 0);
+                SendChatMessage(me, FUN_004c5740("does not have this map"), 4, 0);
                 me->info->b.ready = 0;
                 sprintf(name, "READY%d", g_game->localPlayer);
                 FUN_004a1110(g_game->gui, name, 0);
@@ -495,7 +495,7 @@ void FUN_00448c70()
                     str = e->text;
                     _itoa(p->ping, str, 10);
                     if (IsHostLocal())
-                        strcat(str, g_game->net->FUN_0046e0b0(GetSlotDpid(n)) ? ":s" : "");
+                        strcat(str, g_game->net->IsPlayerSynced(GetSlotDpid(n)) ? ":s" : "");
                     if (minPing >= p->ping)
                         minPing = p->ping;
                     e->visible = 1;

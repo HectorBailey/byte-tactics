@@ -78,7 +78,7 @@ public:
         Iter_0046e160 p = Iter_0046e160(((Class_0046fe60*)this)->FUN_0046fe60(key));
         return (p == End() || compare(*key, p.ptr->key)) ? End() : p;
     }
-    void FUN_0046e160();
+    void ApplyToUnitTypes();
 };
 
 extern Game* g_game;
@@ -87,7 +87,7 @@ void FUN_00428fe0();
 void FUN_00428fc0();
 
 // FUNCTION: 0x46e160
-void Class_0046e160::FUN_0046e160()
+void Class_0046e160::ApplyToUnitTypes()
 {
     if (field_64 != 0)
         return;

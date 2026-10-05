@@ -226,7 +226,7 @@ int IsHostLocal();
 int IsOnlineConfigLoaded();
 void __stdcall FUN_0045b9b0(Gadget_00449bb0* gadget, int value);
 int __stdcall FUN_0045ba20(Gadget_00449bb0* gadget);
-void __stdcall FUN_0046c8e0(int param_1);
+void __stdcall CreateUnitSync(int param_1);
 void __stdcall FUN_0049fa90(Gui_00449bb0* gui);
 void __stdcall FUN_0049fb10(Gui_00449bb0* gui, int value);
 int __stdcall FUN_0049fdf0(Gadget_00449bb0* entries, char* name, int type);
@@ -395,10 +395,10 @@ void FUN_00449bb0()
         sprintf(mem->text, "%d", g_game->players[g_game->localPlayer].info->memory);
     }
     isHost = g_game->players[g_game->localPlayer].info->f97_0;
-    FUN_0046c8e0(isHost);
-    FUN_004a0570(&g_game->gui, "START", ((Class_0046e000*)g_game->net)->FUN_0046e000());
+    CreateUnitSync(isHost);
+    FUN_004a0570(&g_game->gui, "START", ((Class_0046e000*)g_game->net)->AllPlayersSynced());
     FUN_004a1250(&g_game->gui, "START",
-                 host && FUN_00456760() && ((Class_0046e000*)g_game->net)->FUN_0046e000() ? 0 : 1);
+                 host && FUN_00456760() && ((Class_0046e000*)g_game->net)->AllPlayersSynced() ? 0 : 1);
     FUN_004a1250(&g_game->gui, "RESTRICTIONS", 0);
     FUN_004a32a0(&g_game->gui, "OUTPUT", g_game->chatter, 0, 0);
     {

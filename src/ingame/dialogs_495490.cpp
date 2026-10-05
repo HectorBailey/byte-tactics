@@ -65,7 +65,7 @@ void FUN_00466580(void);
 void FUN_00428bd0(void);
 void FUN_00428be0(void);
 void FUN_00428bf0(void);
-void FUN_00463ef0(void);
+void ExpireOldestMessage(void);
 void FUN_00482130(void);
 void __stdcall UpdateResourceSharing(Player_495490* player);
 
@@ -112,7 +112,7 @@ void __stdcall FUN_00495490(int showStats)
     FUN_00428bd0();
     FUN_00428be0();
     FUN_00428bf0();
-    FUN_00463ef0();
+    ExpireOldestMessage();
     FUN_00482130();
     g_game->prof.FUN_0046a400(8);
 }

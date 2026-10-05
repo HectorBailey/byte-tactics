@@ -3,7 +3,7 @@
 // Bit reader, see src/network/net_stats_415dc0.cpp.
 class Class_00415dc0 {
 public:
-    int FUN_00415dc0(int bits);
+    int ReadBits(int bits);
 };
 
 struct Owner_0044e9c0;
@@ -37,14 +37,14 @@ Class_0044e9c0::Class_0044e9c0(Owner_0044e9c0* owner, Class_00415dc0* reader)
     field_4 = 0;
     this->owner = owner;
     vtable = DAT_004fd3f8;
-    flags = reader->FUN_00415dc0(1);
-    field_a = reader->FUN_00415dc0(0x20);
-    field_e = reader->FUN_00415dc0(0x20);
-    field_12 = reader->FUN_00415dc0(0x20);
-    field_16 = reader->FUN_00415dc0(0x20);
-    field_1a = reader->FUN_00415dc0(0x20);
-    field_1e = reader->FUN_00415dc0(0x20);
+    flags = reader->ReadBits(1);
+    field_a = reader->ReadBits(0x20);
+    field_e = reader->ReadBits(0x20);
+    field_12 = reader->ReadBits(0x20);
+    field_16 = reader->ReadBits(0x20);
+    field_1a = reader->ReadBits(0x20);
+    field_1e = reader->ReadBits(0x20);
     if (flags & 1) {
-        field_24 = reader->FUN_00415dc0(0x10);
+        field_24 = reader->ReadBits(0x10);
     }
 }

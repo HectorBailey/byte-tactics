@@ -54,7 +54,7 @@ struct UnitType_0044c7e0 {              // 0x249 bytes
     unsigned int f245_high : 16;
 };
 
-struct Info_0044c7e0 {                  // filled by FUN_0046e330
+struct Info_0044c7e0 {                  // filled by GetUnitEntry
     char unknown_0[0xa];
     short field_a;                      // +0xa
     int field_c;                        // +0xc
@@ -99,7 +99,7 @@ struct Gui_0044c7e0 {
 
 class Class_0046e330 {
 public:
-    int FUN_0046e330(UnitType_0044c7e0* type, Info_0044c7e0* out);
+    int GetUnitEntry(UnitType_0044c7e0* type, Info_0044c7e0* out);
 };
 
 struct Game {
@@ -229,7 +229,7 @@ void FUN_0044c7e0()
                     g_game->unitTypes[i].unitName, FUN_004c5740(type->description),
                     (int)type->metalCost, (int)type->energyCost);
             DAT_005129b4[n].type = i;
-            g_game->queue->FUN_0046e330(&g_game->unitTypes[i], &info);
+            g_game->queue->GetUnitEntry(&g_game->unitTypes[i], &info);
             count = info.field_c == -1 ? 0x65 : info.field_c;
             DAT_005129b4[n].count = count;
             DAT_005129c4[n] = count;

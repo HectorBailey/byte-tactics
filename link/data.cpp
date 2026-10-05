@@ -111,8 +111,8 @@ char DAT_00505f18[8] = "GAMES";  // 0x505f18 .data
 char DAT_00505f20[16] = "SAVEGAME DESCS";  // 0x505f20 .data
 char DAT_00505f30[16] = "SAVEGAME NAMES";  // 0x505f30 .data
 char DAT_00505f40[4] = "LST";  // 0x505f40 .data
-char* DAT_005061b8[8] = {(char*)"has left the scene", (char*)"has been shown the door", (char*)"has gone to a better place", (char*)"has bowed out", (char*)"has terminated", (char*)"has been eradicated", (char*)"has been liquidated", (char*)"has been obliterated"};  // 0x5061b8 .data
-int DAT_005061d8 = -1;  // 0x5061d8 .data
+char* g_leftGameTexts[8] = {(char*)"has left the scene", (char*)"has been shown the door", (char*)"has gone to a better place", (char*)"has bowed out", (char*)"has terminated", (char*)"has been eradicated", (char*)"has been liquidated", (char*)"has been obliterated"};  // 0x5061b8 .data
+int g_timeoutPlayerDpid = -1;  // 0x5061d8 .data
 char DAT_00506290[8] = "%s %s";  // 0x506290 .data
 char s_PACKET_DATA_00506524[12] = "PACKET DATA";  // 0x506524 .data (holds 1 value(s) that look like addresses in the exe: they need symbols before this can be relinked)
 char DAT_00506578[8] = "TALK";  // 0x506578 .data
@@ -329,41 +329,41 @@ int DAT_005119e8[10];  // 0x5119e8 .bss
 int DAT_00511a10[10];  // 0x511a10 .bss
 int DAT_00511a38;  // 0x511a38 .bss
 unsigned char DAT_00511a3c[4];  // 0x511a3c .bss
-int DAT_00511a40;  // 0x511a40 .bss
-int DAT_00511a44;  // 0x511a44 .bss
-unsigned int DAT_00511a48;  // 0x511a48 .bss
-int DAT_00511a4c;  // 0x511a4c .bss
-unsigned int DAT_00511a50;  // 0x511a50 .bss
+int g_byteRatesLastReceived;  // 0x511a40 .bss
+int g_compressionPercent;  // 0x511a44 .bss
+unsigned int g_bytesSentPerSecond;  // 0x511a48 .bss
+int g_lastPacketBytesSent;  // 0x511a4c .bss
+unsigned int g_bytesReceivedPerSecond;  // 0x511a50 .bss
 unsigned char DAT_00511a54[4];  // 0x511a54 .bss
-int DAT_00511a58[45][2];  // 0x511a58 .bss (the type runs past the next known address, 0x511a58+0x4)
+int g_messageCountByType[45][2];  // 0x511a58 .bss (the type runs past the next known address, 0x511a58+0x4)
 int DAT_00511bc0;  // 0x511bc0 .bss
 int DAT_00511bc4;  // 0x511bc4 .bss
 int DAT_00511bc8;  // 0x511bc8 .bss
-int DAT_00511bcc;  // 0x511bcc .bss
+int g_lastPacketBytesReceived;  // 0x511bcc .bss
 char DAT_00511bd0[80];  // 0x511bd0 .bss
 int DAT_00511c20;  // 0x511c20 .bss
-int DAT_00511c24;  // 0x511c24 .bss
-int DAT_00511c28;  // 0x511c28 .bss
-int DAT_00511c2c;  // 0x511c2c .bss
-unsigned int DAT_00511c30;  // 0x511c30 .bss
+int g_lastPacketsSent;  // 0x511c24 .bss
+int g_lastPacketsReceived;  // 0x511c28 .bss
+int g_byteRatesLastSent;  // 0x511c2c .bss
+unsigned int g_packetBytesReceivedRate;  // 0x511c30 .bss
 int DAT_00511c34;  // 0x511c34 .bss
-unsigned int DAT_00511c38;  // 0x511c38 .bss
-unsigned int DAT_00511c3c;  // 0x511c3c .bss
-int DAT_00511c40;  // 0x511c40 .bss
-int DAT_00511c44;  // 0x511c44 .bss
+unsigned int g_messageBytesReceivedRate;  // 0x511c38 .bss
+unsigned int g_messageBytesSentRate;  // 0x511c3c .bss
+int g_lastMessageBytesReceived;  // 0x511c40 .bss
+int g_lastMessageBytesSent;  // 0x511c44 .bss
 int DAT_00511c48;  // 0x511c48 .bss
-unsigned int DAT_00511c4c;  // 0x511c4c .bss
+unsigned int g_packetBytesSentRate;  // 0x511c4c .bss
 int DAT_00511c50;  // 0x511c50 .bss
 unsigned char DAT_00511c54[4];  // 0x511c54 .bss
-int DAT_00511c58[45][2];  // 0x511c58 .bss (the type runs past the next known address, 0x511c58+0x8)
-unsigned int DAT_00511dc0;  // 0x511dc0 .bss
-unsigned int DAT_00511dc4;  // 0x511dc4 .bss
-int DAT_00511dc8;  // 0x511dc8 .bss
-int DAT_00511dcc;  // 0x511dcc .bss
+int g_messageBytesByType[45][2];  // 0x511c58 .bss (the type runs past the next known address, 0x511c58+0x8)
+unsigned int g_packetsReceivedRate;  // 0x511dc0 .bss
+unsigned int g_packetsSentRate;  // 0x511dc4 .bss
+int g_compressedBytesSent;  // 0x511dc8 .bss
+int g_lastCompressedBytesSent;  // 0x511dcc .bss
 int DAT_00511dd0;  // 0x511dd0 .bss
 int DAT_00511dd4;  // 0x511dd4 .bss
-unsigned int DAT_00511dd8;  // 0x511dd8 .bss
-unsigned int DAT_00511ddc;  // 0x511ddc .bss
+unsigned int g_netStatsTick;  // 0x511dd8 .bss
+unsigned int g_byteRatesTick;  // 0x511ddc .bss
 int DAT_00511de0;  // 0x511de0 .bss
 int DAT_00511de4;  // 0x511de4 .bss
 Game* g_game;  // 0x511de8 .bss
@@ -433,7 +433,7 @@ int DAT_005129c0;  // 0x5129c0 .bss
 int* DAT_005129c4;  // 0x5129c4 .bss
 int DAT_005129c8;  // 0x5129c8 .bss
 unsigned char DAT_005129cc[4];  // 0x5129cc .bss
-void (__stdcall* DAT_00512a20[2])(void*);  // 0x512a20 .bss
+void (__stdcall* g_packetHandlers[2])(void*);  // 0x512a20 .bss
 int (__stdcall* DAT_00512a28)(int);  // 0x512a28 .bss
 int (__stdcall* DAT_00512a2c)(int);  // 0x512a2c .bss
 unsigned char DAT_00512a30[4];  // 0x512a30 .bss
@@ -525,7 +525,7 @@ unsigned char DAT_00512b84[4];  // 0x512b84 .bss
 int DAT_00512b88;  // 0x512b88 .bss
 unsigned char DAT_00512b8c[4];  // 0x512b8c .bss
 int DAT_00512b90[12];  // 0x512b90 .bss
-int DAT_00512bc0[2];  // 0x512bc0 .bss
+int g_packetModes[2];  // 0x512bc0 .bss
 int DAT_00512bc8;  // 0x512bc8 .bss
 int DAT_00512bcc;  // 0x512bcc .bss
 unsigned char DAT_00512bd0[4];  // 0x512bd0 .bss
@@ -569,8 +569,8 @@ int DAT_00512c64;  // 0x512c64 .bss
 int DAT_00512c68;  // 0x512c68 .bss
 unsigned char DAT_00512c6c[4];  // 0x512c6c .bss
 int DAT_00512c70;  // 0x512c70 .bss
-int DAT_00512c78;  // 0x512c78 .bss
-unsigned int DAT_00512c7c;  // 0x512c7c .bss
+int g_loungeRefreshTime;  // 0x512c78 .bss
+unsigned int g_timeoutTimerStart;  // 0x512c7c .bss
 unsigned char DAT_00512c80[336];  // 0x512c80 .bss (the type runs past the next known address, 0x512c80+0x4)
 char DAT_00512dd0[260];  // 0x512dd0 .bss
 unsigned char DAT_00512ed4[20];  // 0x512ed4 .bss
@@ -597,12 +597,12 @@ int (__stdcall* DAT_0051e54c)(int*, int);  // 0x51e54c .bss
 int (__stdcall* DAT_0051e554)(char*);  // 0x51e554 .bss
 void (__cdecl* DAT_0051e558)(void);  // 0x51e558 .bss
 unsigned char DAT_0051e55c[4];  // 0x51e55c .bss
-unsigned char DAT_0051e560[20];  // 0x51e560 .bss
+unsigned char g_reportPlayerName[20];  // 0x51e560 .bss
 void (__stdcall* DAT_0051e578)(void (__stdcall*)(int), int (__stdcall*)(char*, int));  // 0x51e578 .bss
 int (__stdcall* DAT_0051e588)(int);  // 0x51e588 .bss
 int DAT_0051e590;  // 0x51e590 .bss
-int DAT_0051e594;  // 0x51e594 .bss
-char DAT_0051e5a0[104];  // 0x51e5a0 .bss
+int g_reportFlags;  // 0x51e594 .bss
+char g_unitSyncStatusText[104];  // 0x51e5a0 .bss
 char DAT_0051e608;  // 0x51e608 .bss
 unsigned char DAT_0051e609[7];  // 0x51e609 .bss
 unsigned char DAT_0051e610[36];  // 0x51e610 .bss

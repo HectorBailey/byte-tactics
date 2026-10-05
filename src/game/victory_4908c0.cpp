@@ -2,7 +2,7 @@
 
 class Class_00415c10 {
 public:
-    void FUN_00415c10(int value, int bits);
+    void WriteBits(int value, int bits);
 };
 
 class Link_004908c0 {
@@ -50,14 +50,14 @@ public:
 void Class_004907e0::FUN_0044efc0(Class_00415c10* stream)
 {
     if (link == 0) {
-        stream->FUN_00415c10(0, 2);
+        stream->WriteBits(0, 2);
     } else if (link->GetType() == 2) {
-        stream->FUN_00415c10(1, 2);
+        stream->WriteBits(1, 2);
         link->Write(stream);
     } else if (link->GetType() == 3) {
-        stream->FUN_00415c10(2, 2);
+        stream->WriteBits(2, 2);
         link->Write(stream);
     }
-    stream->FUN_00415c10(holder->ptr->mode, 2);
+    stream->WriteBits(holder->ptr->mode, 2);
     state = holder->ptr->mode << 1;     // clears the dirty bit too
 }

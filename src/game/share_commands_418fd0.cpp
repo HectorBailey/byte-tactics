@@ -36,7 +36,7 @@ struct Game {
 
 extern Game* g_game;
 
-void __stdcall FUN_00463ca0(char* text, int param_2, int param_3, int param_4);
+void __stdcall AddMessage(char* text, int param_2, int param_3, int param_4);
 void BroadcastPlayerInfo();
 
 // FUNCTION: 0x418fd0
@@ -49,7 +49,7 @@ void __stdcall FUN_00418fd0(int unused)
         sprintf(buf, "Toggled ShareRadar to: %s",
                 (g_game->players[g_game->localPlayer].info->flags & 0x40)
                     ? "ON" : "OFF");
-        FUN_00463ca0(buf, 2, 0, 10);
+        AddMessage(buf, 2, 0, 10);
         BroadcastPlayerInfo();
     }
 }

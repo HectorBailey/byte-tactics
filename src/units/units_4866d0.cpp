@@ -216,7 +216,7 @@ void __stdcall FUN_0047cbd0(void* unit);
 void __stdcall FUN_00482090(void* unit);
 void __stdcall FUN_00494ff0(int flag);
 char* __stdcall FUN_004c5740(char* text);
-void __stdcall FUN_00463ca0(char* text, int a, int b, int c);
+void __stdcall AddMessage(char* text, int a, int b, int c);
 void __stdcall FUN_004948b0(int a, int b);
 void __stdcall FUN_0049b000(void* unit, int flag);
 void __stdcall FUN_00486360(void* unit, int a, int b);
@@ -344,7 +344,7 @@ void __stdcall FUN_004866d0(Cmd_004866d0* cmd, int local)
                     char text[100];
                     sprintf(text, FUN_004c5740(DAT_00508bf0), rec->name,
                             g_game->mode == 2 ? rec->kills2 : rec->kills);
-                    FUN_00463ca0(text, 2, 0, 10);
+                    AddMessage(text, 2, 0, 10);
                 }
             }
         }

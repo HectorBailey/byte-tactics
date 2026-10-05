@@ -109,7 +109,7 @@ public:
 
 class Class_0046d500 {
 public:
-    void FUN_0046d500(void*, unsigned char);
+    void ReceiveSyncPacket(void*, unsigned char);
 };
 
 struct Settings {
@@ -215,7 +215,7 @@ public:
 
 extern Game* g_game;
 extern char DAT_005119b8[];
-extern int DAT_00512bc0[];
+extern int g_packetModes[];
 extern int g_usePacketManager;
 extern PacketManager g_packetManager;
 extern char DAT_00505dc4[];
@@ -236,7 +236,7 @@ int __stdcall RejectPlayer(int, int);
 void __stdcall BuildGameInfo(char*, int*, int*, int*, int*);
 void __stdcall HAPINET_updategameinfo(void*, char*, char*, int, int, int, int);
 void __stdcall HandlePing(void*);
-void __stdcall FUN_00463ca0(void*, int, int, unsigned char);
+void __stdcall AddMessage(void*, int, int, unsigned char);
 int __stdcall SendPacketToPlayer(int, int, void*, int);
 int __stdcall BroadcastPacket(int, void*, int);
 void __stdcall FUN_00452bd0(Player*);
@@ -426,11 +426,11 @@ static inline void DropPlayer(int id)
 static inline int CommandAllowed(unsigned char* bytes)
 {
     int mode = g_game->mode;
-    if (mode == 5 && (DAT_00512bc0[bytes[0]] & 2))
+    if (mode == 5 && (g_packetModes[bytes[0]] & 2))
         return 1;
-    if (mode == 6 && (DAT_00512bc0[bytes[0]] & 4))
+    if (mode == 6 && (g_packetModes[bytes[0]] & 4))
         return 1;
-    if (mode != 5 && mode != 6 && (DAT_00512bc0[bytes[0]] & 1))
+    if (mode != 5 && mode != 6 && (g_packetModes[bytes[0]] & 1))
         return 1;
     return 0;
 }
@@ -661,7 +661,7 @@ int HandleNetPackets()
                 break;
             char text[200];
             sprintf(text, FUN_004c5740(DAT_005065c4), PlayerBySlot(id)->name);
-            FUN_00463ca0(text, 4, 0, from);
+            AddMessage(text, 4, 0, from);
             DropPlayer(*(int*)(packet + 1));
             if (*(int*)(packet + 1) == FirstJoinedId()) {
                 g_game->bit2_3923b = 1;
@@ -685,7 +685,7 @@ int HandleNetPackets()
         }
         case 5:
             if (recipient->active && recipient->state == 1)
-                FUN_00463ca0(packet + 1, 8, 0, from);
+                AddMessage(packet + 1, 8, 0, from);
             break;
         case 39: {
             Player* p = PlayerBySlot(*(int*)(packet + 1));
@@ -695,7 +695,7 @@ int HandleNetPackets()
             char text[256];
             sprintf(text, DAT_00506290, p->name, FUN_004c5740(DAT_0050658c));
             for (int i = 0; i < 12; i++)
-                FUN_00463ca0(text, 8, 0, from);
+                AddMessage(text, 8, 0, from);
             break;
         }
         case 6: {
@@ -832,7 +832,7 @@ int HandleNetPackets()
             break;
         case 26:
             if (g_game->field_2a30 && recipient->active && recipient->state == 1)
-                g_game->field_2a30->FUN_0046d500(packet, from);
+                g_game->field_2a30->ReceiveSyncPacket(packet, from);
             break;
         case 29:
             if (g_usePacketManager)

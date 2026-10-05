@@ -63,7 +63,7 @@ struct Game {
 extern Game* g_game;
 
 // FUNCTION: 0x46c920
-void __fastcall FUN_0046c920()
+void __fastcall DeleteUnitSync()
 {
     if (g_game->field_2a30)
         delete g_game->field_2a30;

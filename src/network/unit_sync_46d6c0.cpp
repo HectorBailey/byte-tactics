@@ -142,8 +142,8 @@ struct Entry_0046d6c0 {               // 0x5c bytes
 
 class Class_0046d860 {
 public:
-    void FUN_0046d860(unsigned int key);
-    void FUN_0046d970(unsigned int key, int y);
+    void NotifyEntryChanged(unsigned int key);
+    void CheckUnitAvailable(unsigned int key, int y);
 };
 
 class Class_0046d6c0 {
@@ -156,13 +156,13 @@ public:
     char unknown_60[0x64 - 0x60];
     int disabled;                                // +0x64
 
-    void FUN_0046d6c0(Packet_0046d6c0* packet, unsigned char player);
+    void HandleSyncPacket(Packet_0046d6c0* packet, unsigned char player);
 
 
 };
 
 // FUNCTION: 0x46d6c0
-void Class_0046d6c0::FUN_0046d6c0(Packet_0046d6c0* packet, unsigned char player)
+void Class_0046d6c0::HandleSyncPacket(Packet_0046d6c0* packet, unsigned char player)
 {
     if (disabled != 0) {
         return;
@@ -208,7 +208,7 @@ void Class_0046d6c0::FUN_0046d6c0(Packet_0046d6c0* packet, unsigned char player)
                 Vec_0046d6c0& w = i->pairs;
                 w.insert(w.end(), 1, packet->field_a.all);
             }
-            ((Class_0046d860*)this)->FUN_0046d970(packet->field_6, packet->field_a.all);
+            ((Class_0046d860*)this)->CheckUnitAvailable(packet->field_6, packet->field_a.all);
             break;
 
         case 3:
@@ -229,7 +229,7 @@ void Class_0046d6c0::FUN_0046d6c0(Packet_0046d6c0* packet, unsigned char player)
             r.h = packet->field_a.part.hi;
             r.unknown_c = packet->field_a.part.top;
             map[packet->field_6] = r;
-            ((Class_0046d860*)this)->FUN_0046d860(packet->field_6);
+            ((Class_0046d860*)this)->NotifyEntryChanged(packet->field_6);
         }
     }
 }

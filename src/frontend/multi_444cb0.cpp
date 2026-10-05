@@ -81,7 +81,7 @@ Entry_00444cb0* __stdcall FUN_004a0280(void* entries, char* name);
 char* __stdcall FUN_004b6af0(char* text, int n);
 void __stdcall FUN_0047f1a0(char* str, int flag);
 void __stdcall FUN_004ab0a0(Gadget_00444cb0* gadget);
-void __stdcall FUN_0046c620(int msg);
+void __stdcall ReportGameEvent(int msg);
 void __cdecl FUN_004d85a0(void* p);
 void BroadcastPlayerInfo(void);
 void UpdateNetGameInfo(void);
@@ -118,7 +118,7 @@ void __stdcall FUN_00444cb0(Gadget_00444cb0* param_1)
             ((Class_004373a0*)g_game->field_391e9)->FUN_004373a0();
 
         BroadcastPlayerInfo();
-        FUN_0046c620(5);
+        ReportGameEvent(5);
         UpdateNetGameInfo();
 
         for (int i = 0; i < 10; i++) {

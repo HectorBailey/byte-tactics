@@ -27,7 +27,7 @@ struct Game {
 
 extern Game* g_game;
 
-void __stdcall FUN_00463ca0(char* param_1, int param_2, int param_3, int param_4);
+void __stdcall AddMessage(char* param_1, int param_2, int param_3, int param_4);
 void BroadcastPlayerInfo(void);
 
 // FUNCTION: 0x418e50
@@ -40,7 +40,7 @@ void __stdcall FUN_00418e50(int unused)
         sprintf(buf, "Toggled ShareMapping to: %s",
                 (g_game->players[g_game->local_player].data->flags & 0x20)
                     ? "ON" : "OFF");
-        FUN_00463ca0(buf, 2, 0, 10);
+        AddMessage(buf, 2, 0, 10);
         BroadcastPlayerInfo();
     }
 }

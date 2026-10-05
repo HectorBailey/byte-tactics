@@ -3,7 +3,7 @@
 // Bit reader, see src/network/net_stats_415dc0.cpp.
 class Class_00415dc0 {
 public:
-    int FUN_00415dc0(int bits);
+    int ReadBits(int bits);
 };
 
 // Unit reference link: vtable, owner, next, value (0x10 bytes).
@@ -71,27 +71,27 @@ Class_0044e080::Class_0044e080(Owner_0044e080* owner_, Class_00415dc0* reader)
     : Class_0044ce20(0), owner(owner_), ref(0, 0)
 {
     vtable = DAT_004fd3b8;
-    flags = reader->FUN_00415dc0(8);
+    flags = reader->ReadBits(8);
     if (flags & 1) {
-        field_10 = reader->FUN_00415dc0(0x10);
-        unsigned short index = reader->FUN_00415dc0(0x10);
+        field_10 = reader->ReadBits(0x10);
+        unsigned short index = reader->ReadBits(0x10);
         ref.FUN_00489690(index == 0 ? 0 : (void*)&g_game->units[index]);
     }
     if (flags & 0x10)
-        field_a = reader->FUN_00415dc0(0x10);
+        field_a = reader->ReadBits(0x10);
     else
         field_a = 0;
     if (flags & 8)
-        field_c = reader->FUN_00415dc0(0x10);
+        field_c = reader->ReadBits(0x10);
     else
         field_c = 0;
     if (flags & 0x40)
-        field_e = reader->FUN_00415dc0(0x10);
+        field_e = reader->ReadBits(0x10);
     else
         field_e = 0;
     if (flags & 0x20) {
-        pos_x = reader->FUN_00415dc0(0x20);
-        pos_y = reader->FUN_00415dc0(0x20);
-        pos_z = reader->FUN_00415dc0(0x20);
+        pos_x = reader->ReadBits(0x20);
+        pos_y = reader->ReadBits(0x20);
+        pos_z = reader->ReadBits(0x20);
     }
 }

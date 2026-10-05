@@ -23,7 +23,7 @@ int GetLocalHumanDpid();
 unsigned int GetHostDpid();
 void __stdcall SendPacketToPlayer(int a, unsigned int b, void* c, int d);
 
-// Inlined copy of Class_0046cec0::FUN_0046cec0 (a method that ignores this).
+// Inlined copy of Class_0046cec0::SendUnsequenced (a method that ignores this).
 static inline void SendPacket(unsigned int to, void* packet)
 {
     *(int*)((char*)packet + 2) = 0;
@@ -37,11 +37,11 @@ public:
     char unknown_5c[0x64 - 0x5c];
     int disabled;                      // +0x64
 
-    void FUN_0046d5b0(Target_0046d5b0* target, unsigned char arg, int a, int b, int unused);
+    void SendSyncMessageTo(Target_0046d5b0* target, unsigned char arg, int a, int b, int unused);
 };
 
 // FUNCTION: 0x46d5b0
-void Class_0046d4c0::FUN_0046d5b0(Target_0046d5b0* target, unsigned char arg, int a, int b, int unused)
+void Class_0046d4c0::SendSyncMessageTo(Target_0046d5b0* target, unsigned char arg, int a, int b, int unused)
 {
     if (disabled == 0) {
         Packet_0046d5b0 packet;

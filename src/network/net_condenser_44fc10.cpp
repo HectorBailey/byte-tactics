@@ -12,7 +12,7 @@ int __stdcall FUN_004d0f60(char* out, char* in, int size);
 void FUN_004d1800();
 void FUN_004d1810();
 int __stdcall HAPINET_sendpacket(void* net, unsigned long from, unsigned long to, void* data, unsigned long size);
-void __stdcall FUN_00415f40(int size, int overhead, int sent);
+void __stdcall CountPacket(int size, int overhead, int sent);
 
 #pragma pack(push, 1)
 class Class_0044fc10 {
@@ -70,7 +70,7 @@ int Class_0044fc10::SendPacket(void* session, int from)
     else
         result = HAPINET_sendpacket(session, from, to_21, packet, total);
     if (result == 0)
-        FUN_00415f40(size_1d + 3, total, 1);
+        CountPacket(size_1d + 3, total, 1);
     size_1d = 0;
     flag_1c = 0;
     return result;

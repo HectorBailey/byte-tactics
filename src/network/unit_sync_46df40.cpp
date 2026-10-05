@@ -21,13 +21,13 @@ public:
     char unknown_20[0x58 - 0x20];
     int active;                              // +0x58
 
-    char* FUN_0046df40();
+    char* GetSyncStatusText();
 };
 
-extern char DAT_0051e5a0[];
+extern char g_unitSyncStatusText[];
 
 // FUNCTION: 0x46df40
-char* Class_0046df40::FUN_0046df40()
+char* Class_0046df40::GetSyncStatusText()
 {
     if (active == 0) {
         return 0;
@@ -37,12 +37,12 @@ char* Class_0046df40::FUN_0046df40()
             return "No units_expected sent from player";
         }
         if (it->units.size() != it->expected) {
-            sprintf(DAT_0051e5a0, "expected %d units, got %d", it->expected, it->units.size());
-            return DAT_0051e5a0;
+            sprintf(g_unitSyncStatusText, "expected %d units, got %d", it->expected, it->units.size());
+            return g_unitSyncStatusText;
         }
         if (it->sent != it->ackd) {
-            sprintf(DAT_0051e5a0, "packets sent=%d  ackd=%d", it->sent, it->ackd);
-            return DAT_0051e5a0;
+            sprintf(g_unitSyncStatusText, "packets sent=%d  ackd=%d", it->sent, it->ackd);
+            return g_unitSyncStatusText;
         }
     }
     return "OK";

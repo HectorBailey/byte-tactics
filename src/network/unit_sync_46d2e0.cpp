@@ -200,7 +200,7 @@ public:
     char unknown_10[0x58 - 0x10];
     int field_58;                      // +0x58
 
-    void FUN_0046d2e0();
+    void ResetEntries();
 };
 
 // The flag expression in its own small inline helper. Written out in the loop
@@ -212,7 +212,7 @@ static inline bool FlagOf_0046d2e0(Def_0046d2e0* d)
 }
 
 // FUNCTION: 0x46d2e0
-void Class_0046d040::FUN_0046d2e0()
+void Class_0046d040::ResetEntries()
 {
     Rect_0046e160 v;
     for (unsigned short i = 1; i < g_game->count; i++) {

@@ -86,7 +86,7 @@ int __stdcall BroadcastPacket(int player, void* data, int size);
 void __stdcall FUN_00464290(unsigned char player, char type);
 void FUN_00450530();
 int FUN_004b6340();
-void __stdcall FUN_0046c620(int param_1);
+void __stdcall ReportGameEvent(int param_1);
 
 static inline unsigned char FindSlot_00450a10(int id)
 {
@@ -198,7 +198,7 @@ int __stdcall AddNetPlayer(int param_1)
         g_packetManager.SendAllQueued(1);
     }
     if (g_game->campaign->FUN_00435100() == 3 && g_game->count > 1) {
-        FUN_0046c620(2);
+        ReportGameEvent(2);
     }
     return 1;
 }

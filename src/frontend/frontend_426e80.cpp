@@ -155,12 +155,12 @@ int __stdcall InitNetConnection(void);
 void __stdcall LeaveNetGame(void);
 void __stdcall BroadcastPlayerInfo(void);
 void __stdcall FUN_00460160(void);
-void __stdcall FUN_0046ca60(void);
+void __stdcall FinishUnitSync(void);
 void __stdcall FUN_00449bb0(void);
 void __stdcall FUN_0044a680(void);
 int __stdcall FUN_00441bc0(void);
-void __stdcall FUN_0046c620(int param);
-void __stdcall FUN_0046c920(void);
+void __stdcall ReportGameEvent(int param);
+void __stdcall DeleteUnitSync(void);
 void __stdcall FUN_0046c190(void);
 void __stdcall FUN_00491a70(void);
 int __stdcall FUN_004436e0(void);
@@ -693,13 +693,13 @@ void FUN_00426e80(void)
         case 0:
             if (!((Bits_00426e80*)(g_game + 0x2a44))->b2) {
                 FUN_00449bb0();
-                FUN_0046c620(1);
-                FUN_0046c620(2);
+                ReportGameEvent(1);
+                ReportGameEvent(2);
                 SetSubState(1, 0x5ff, DAT_00503004);
                 BroadcastPlayerInfo();
                 return;
             }
-            FUN_0046ca60();
+            FinishUnitSync();
             SetSubState(0x11, 0x605, DAT_00503004);
             BroadcastPlayerInfo();
             return;
@@ -707,7 +707,7 @@ void FUN_00426e80(void)
             FUN_0044a680();
             FUN_00425b60();
             if (((Bits_00426e80*)(g_game + 0x2a44))->b2) {
-                FUN_0046ca60();
+                FinishUnitSync();
                 FUN_004a9660((int)(g_game + 0x519));
                 SetSubStateLogged(0x11, 0x613, DAT_00503004);
             }
@@ -719,7 +719,7 @@ void FUN_00426e80(void)
                     ((Class_00463c60*)p)->SetType(0);
                 p += 0x14b;
             }
-            FUN_0046ca60();
+            FinishUnitSync();
             ((Bits_00426e80*)(g_game + 0x2a44))->b2 = 1;
             return;
         }
@@ -727,8 +727,8 @@ void FUN_00426e80(void)
             ((Bits_00426e80*)(g_game + 0x2a44))->b0 = 1;
             HAPINET_quitgame((int)(g_game + 0x14));
             InitPacketManager(2, 100);
-            FUN_0046c920();
-            FUN_0046c620(8);
+            DeleteUnitSync();
+            ReportGameEvent(8);
             FUN_0046c190();
             if (((Bits_00426e80*)(g_game + 0x2bee))->b4) {
                 LeaveNetGame();

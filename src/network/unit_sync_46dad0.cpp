@@ -3,9 +3,9 @@
 // - The tail (field_5c > 0) is a nested if/else (field_60 < count, else the
 //   arg-4 packet last), with `for (n = 0; n < 4;) { ...; n++; field_60++; }`
 //   whose first statement re-reads g_game and returns when field_60 >= count.
-// - The loop's direct send is an inlined copy of FUN_0046cec0 (Class_0046cec0::Inl:
+// - The loop's direct send is an inlined copy of SendUnsequenced (Class_0046cec0::Inl:
 //   field_2 = 0, then SendPacketToPlayer(GetLocalHumanDpid(), id, &packet, 0xe)); all other
-//   sends are real FUN_0046cec0 calls with the id read into a local first.
+//   sends are real SendUnsequenced calls with the id read into a local first.
 // - key and y are read into locals (y first) before the `disabled` test.
 // - The vector members of Class_0046eaa0 are the classes symbols.csv names:
 //   Class_0046e5c0::FUN_0046e5c0 is the vector ctor body (inline, so list_a gets
@@ -138,7 +138,7 @@ void __stdcall SendPacketToPlayer(int a, unsigned int b, void* c, int d);
 
 class Class_0046cec0 {
   public:
-    void FUN_0046cec0(unsigned int param_1, void* param_2);
+    void SendUnsequenced(unsigned int param_1, void* param_2);
     void Inl(unsigned int param_1, void* param_2) {
         *(int*)((char*)param_2 + 2) = 0;
         SendPacketToPlayer(GetLocalHumanDpid(), param_1, param_2, 0xe);
@@ -147,7 +147,7 @@ class Class_0046cec0 {
 
 class Class_0046d4c0 {
   public:
-    void FUN_0046d4c0(void* target, Packet_0046dad0* packet, int unused);
+    void SendSyncPacket(void* target, Packet_0046dad0* packet, int unused);
 };
 
 extern char* g_game;
@@ -175,12 +175,12 @@ class Class_0046d860 {
     int field_60; // +0x60
     int disabled; // +0x64
 
-    void FUN_0046dad0();
-    void FUN_0046d970(unsigned int key, int y);
+    void ProcessSync();
+    void CheckUnitAvailable(unsigned int key, int y);
 };
 
 // FUNCTION: 0x46dad0
-void Class_0046d860::FUN_0046dad0() {
+void Class_0046d860::ProcessSync() {
     if (disabled != 0)
         return;
 
@@ -233,7 +233,7 @@ void Class_0046d860::FUN_0046dad0() {
                         packet.arg = 0;
                         packet.field_6 = 0;
                         packet.field_a = 0;
-                        ((Class_0046d4c0*)this)->FUN_0046d4c0(e, &packet, 1);
+                        ((Class_0046d4c0*)this)->SendSyncPacket(e, &packet, 1);
                         e->field_28++;
                     }
                     changed = 1;
@@ -247,7 +247,7 @@ void Class_0046d860::FUN_0046dad0() {
             Increment increment = &Tree::iterator::_Inc;
             for (std::map<unsigned int, Rect_0046e160>::iterator k = map.begin(); k != map.end();
                  (k.*increment)()) {
-                FUN_0046d970(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(k->second.x)))))))))), 0);
+                CheckUnitAvailable(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(k->second.x)))))))))), 0);
             }
         }
         return;
@@ -266,10 +266,10 @@ void Class_0046d860::FUN_0046dad0() {
                     packet.field_6 = 0;
                     packet.field_a = v;
                     if (direct != 0) {
-                        ((Class_0046cec0*)((char*)this + 0x2c))->FUN_0046cec0(DAT_00000000, &packet);
+                        ((Class_0046cec0*)((char*)this + 0x2c))->SendUnsequenced(DAT_00000000, &packet);
                     } else {
                         unsigned int id = GetHostDpid();
-                        ((Class_0046cec0*)((char*)this + 0x2c))->FUN_0046cec0(id, &packet);
+                        ((Class_0046cec0*)((char*)this + 0x2c))->SendUnsequenced(id, &packet);
                     }
                 }
                 field_60 = 1;
@@ -294,7 +294,7 @@ void Class_0046d860::FUN_0046dad0() {
                         ((Class_0046cec0*)((char*)this + 0x2c))->Inl(DAT_00000000, &packet);
                     } else {
                         unsigned int id = GetHostDpid();
-                        ((Class_0046cec0*)((char*)this + 0x2c))->FUN_0046cec0(id, &packet);
+                        ((Class_0046cec0*)((char*)this + 0x2c))->SendUnsequenced(id, &packet);
                     }
                 }
                 n++;
@@ -307,7 +307,7 @@ void Class_0046d860::FUN_0046dad0() {
             packet.field_6 = 0;
             packet.field_a = field_5c;
             unsigned int id = GetHostDpid();
-            ((Class_0046cec0*)((char*)this + 0x2c))->FUN_0046cec0(id, &packet);
+            ((Class_0046cec0*)((char*)this + 0x2c))->SendUnsequenced(id, &packet);
         }
     }
 }

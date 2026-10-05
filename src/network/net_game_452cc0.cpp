@@ -88,7 +88,7 @@ struct Game {
 extern Game* g_game;
 
 void __stdcall FUN_00486f10(unsigned char player);
-void __stdcall FUN_0046c620(int msg);
+void __stdcall ReportGameEvent(int msg);
 int __stdcall HAPINET_removeplayer(void* net, int id);
 
 // 0x44ffd0 (matched in its own file).
@@ -195,7 +195,7 @@ void __stdcall RemovePlayer(int id)
     memset(&p->allies, 0, 11);
 
     if (g_game->net->FUN_00435100() == 3)
-        FUN_0046c620(3);
+        ReportGameEvent(3);
 
     if ((g_game->flags.value & 4) && host != 0) {
         unsigned int best = 0;

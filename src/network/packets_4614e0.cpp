@@ -6,7 +6,7 @@
 // when the buffer is non null.
 #include <string.h>
 
-void __stdcall FUN_00415ef0(unsigned char type, int len, int which);
+void __stdcall CountMessage(unsigned char type, int len, int which);
 
 class PacketManager {
 public:
@@ -43,6 +43,6 @@ int PacketManager::AppendToSendBuffer(unsigned char* data, unsigned int len)
     }
     memcpy(buffer + size, data, len);
     size += len;
-    FUN_00415ef0(*data, len, 1);
+    CountMessage(*data, len, 1);
     return 1;
 }

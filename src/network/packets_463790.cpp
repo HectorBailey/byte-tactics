@@ -45,7 +45,7 @@ public:
     unsigned int* data;                // +0x00
     int index;                         // +0x04
     int bit;                           // +0x08
-    int FUN_00415dc0(int bits);
+    int ReadBits(int bits);
 };
 
 // Length of each packet command, one word per 4-byte entry.
@@ -149,8 +149,8 @@ int FrameQueue::QueueFrames(char* src, unsigned int size, int tick, int a4, int 
             reader.data = (unsigned int*)p;
             reader.index = 0;
             reader.bit = 0;
-            reader.FUN_00415dc0(8);
-            w = (unsigned short)reader.FUN_00415dc0(0x10);
+            reader.ReadBits(8);
+            w = (unsigned short)reader.ReadBits(0x10);
         } else {
             w = DAT_00512ad8[c][0];
         }
@@ -184,8 +184,8 @@ int FrameQueue::QueueFrames(char* src, unsigned int size, int tick, int a4, int 
                     reader.data = (unsigned int*)q;
                     reader.index = 0;
                     reader.bit = 0;
-                    reader.FUN_00415dc0(8);
-                    w = (unsigned short)reader.FUN_00415dc0(0x10);
+                    reader.ReadBits(8);
+                    w = (unsigned short)reader.ReadBits(0x10);
                     if (left > 0) {
                         left--;
                         remaining -= w;
@@ -222,8 +222,8 @@ int FrameQueue::QueueFrames(char* src, unsigned int size, int tick, int a4, int 
                 reader.data = (unsigned int*)q;
                 reader.index = 0;
                 reader.bit = 0;
-                reader.FUN_00415dc0(8);
-                w = (unsigned short)reader.FUN_00415dc0(0x10);
+                reader.ReadBits(8);
+                w = (unsigned short)reader.ReadBits(0x10);
                 if (left > 0) {
                     left--;
                     rem -= w;

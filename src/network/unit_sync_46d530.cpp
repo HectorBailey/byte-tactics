@@ -3,7 +3,7 @@
 // disabled. The send goes through an inline helper taking a target, called
 // here with no target: in "direct" mode it reads the id through that null
 // pointer, which is the `mov eax, [0]` in the original.
-// Sibling of FUN_0046d630 (same object, same packet type).
+// Sibling of SendEntryTo (same object, same packet type).
 
 #pragma pack(push, 1)
 struct Packet_0046d530 {               // 0xe bytes
@@ -23,7 +23,7 @@ int GetLocalHumanDpid();
 unsigned int GetHostDpid();
 void __stdcall SendPacketToPlayer(int a, unsigned int b, void* c, int d);
 
-// Inlined copy of Class_0046cec0::FUN_0046cec0 (a method that ignores this).
+// Inlined copy of Class_0046cec0::SendUnsequenced (a method that ignores this).
 static inline void SendPacket(unsigned int to, void* packet)
 {
     *(int*)((char*)packet + 2) = 0;
@@ -45,11 +45,11 @@ public:
             SendPacket(GetHostDpid(), packet);
         }
     }
-    void FUN_0046d530(unsigned char arg, int a, int b, int unused);
+    void SendSyncMessage(unsigned char arg, int a, int b, int unused);
 };
 
 // FUNCTION: 0x46d530
-void Class_0046d4c0::FUN_0046d530(unsigned char arg, int a, int b, int unused)
+void Class_0046d4c0::SendSyncMessage(unsigned char arg, int a, int b, int unused)
 {
     if (disabled == 0) {
         Packet_0046d530 packet;

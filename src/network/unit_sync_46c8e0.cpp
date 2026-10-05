@@ -11,7 +11,7 @@ public:
 };
 
 // FUNCTION: 0x46c8e0
-void __stdcall FUN_0046c8e0(int param_1)
+void __stdcall CreateUnitSync(int param_1)
 {
     *(Class_0046d040**)(g_game + 0x2a30) = new Class_0046d040(param_1);
 }

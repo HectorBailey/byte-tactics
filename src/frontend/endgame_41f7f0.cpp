@@ -41,7 +41,7 @@ void HandleNetPackets();
 Engine* FUN_004b6220();
 void* __stdcall FUN_004c69f0(const char*,int,int);
 void __stdcall FUN_004c6b70(void*,void*,int,int);
-void __stdcall FUN_0046c620(int);
+void __stdcall ReportGameEvent(int);
 const char* __stdcall GetRejectReasonText(unsigned);
 const char* __stdcall FUN_004c5740(const char*);
 void __stdcall FUN_004abd90(Menu*,const char*,int,int,int);
@@ -49,7 +49,7 @@ void __stdcall FUN_0049fa90(Menu*);
 void __stdcall FUN_0049fad0(Menu*);
 void FUN_004c63a0();
 int __stdcall FUN_004ab060(Menu*,const char*);
-void __stdcall FUN_00464060(void*);
+void __stdcall DrawMessages(void*);
 void __stdcall FUN_004a9fd0(Menu*);
 void __stdcall FUN_004ab170(Menu*,void*,void*);
 void FUN_004c2870();
@@ -113,7 +113,7 @@ void __stdcall FUN_0041f7f0()
             Engine* e=FUN_004b6220();
             g_game->lastFrame=FUN_004c69f0("Copy of last game frame",e->width,e->height);
             FUN_004c6b70(g_game->lastFrame,g_game->surface,e->width,e->height);
-            FUN_0046c620(7);
+            ReportGameEvent(7);
             g_game->state=1;
             Player* player=&g_game->players[g_game->localPlayer];
             if(player->message && player->message!=2) {
@@ -130,7 +130,7 @@ void __stdcall FUN_0041f7f0()
             if(g_game->state==1) {
                 Engine* e=FUN_004b6220();
                 FUN_004c6b70(g_game->surface,g_game->lastFrame,e->width,e->height);
-                FUN_00464060(g_game->surface);
+                DrawMessages(g_game->surface);
                 FUN_004a9fd0(&g_game->menu);
                 FUN_004ab170(&g_game->menu,0,0);
                 FUN_004c2870();

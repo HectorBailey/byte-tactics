@@ -6,7 +6,7 @@ public:
     unsigned int* data;                // +0x00
     int index;                         // +0x04
     int bit;                           // +0x08
-    int FUN_00415dc0(int bits);
+    int ReadBits(int bits);
 
     int ReadBit()
     {
@@ -51,9 +51,9 @@ public:
 void Class_0044f5c0::FUN_0044f5c0(Class_00415dc0* reader)
 {
     owner->target->flag_2 = reader->ReadBit();
-    count = reader->FUN_00415dc0(2);
+    count = reader->ReadBits(2);
     for (int i = 0; i < count; i++) {
-        points[i].x = reader->FUN_00415dc0(16);
-        points[i].y = reader->FUN_00415dc0(16);
+        points[i].x = reader->ReadBits(16);
+        points[i].y = reader->ReadBits(16);
     }
 }

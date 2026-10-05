@@ -141,7 +141,7 @@ public:
 };
 class Class_0046df40 {
 public:
-    char* FUN_0046df40();
+    char* GetSyncStatusText();
 };
 class PacketManager {
 public:
@@ -217,9 +217,9 @@ int CountHumanPlayers();
 int CountComputerPlayers();
 int CountLocalComputerPlayers();
 unsigned int FUN_004b6340();
-void __stdcall FUN_00463ca0(char* text, int a, int b, int c);
-void __stdcall FUN_00463e50(Player_00447b10* p, char* text, int a, int b);
-void __stdcall FUN_0046c620(int sound);
+void __stdcall AddMessage(char* text, int a, int b, int c);
+void __stdcall SendChatMessage(Player_00447b10* p, char* text, int a, int b);
+void __stdcall ReportGameEvent(int sound);
 void __stdcall FUN_0047f1a0(char* sound, int b);
 int __stdcall FUN_004288d0(char* name, int a, int b, int c);
 void __stdcall FUN_0049fb10(char* gui, int value);
@@ -428,7 +428,7 @@ void __stdcall FUN_00447b10(Gadget_00447b10* gadget)
                 }
             }
             g_game->dirty = 1;
-            FUN_0046c620(4);
+            ReportGameEvent(4);
             BroadcastPlayerInfo();
         }
 
@@ -456,7 +456,7 @@ void __stdcall FUN_00447b10(Gadget_00447b10* gadget)
             sprintf(text, " %s %s",
                     FUN_004c5740(me->ally[i] ? "allied with" : "broke alliance with"),
                     g_game->players[i].name);
-            FUN_00463e50(me, text, 4, 0);
+            SendChatMessage(me, text, 4, 0);
             g_game->dirty = 1;
             BroadcastPlayerInfo();
         }
@@ -519,11 +519,11 @@ void __stdcall FUN_00447b10(Gadget_00447b10* gadget)
         char* msg = box->text;
         if (strlen(msg) != 0) {
             if (_strcmpi(msg, "+syncerr") == 0) {
-                char* s = g_game->net->FUN_0046df40();
+                char* s = g_game->net->GetSyncStatusText();
                 if (s)
-                    FUN_00463ca0(s, 4, 0, 10);
+                    AddMessage(s, 4, 0, 10);
             } else {
-                FUN_00463e50(me, msg, 4, 0);
+                SendChatMessage(me, msg, 4, 0);
                 if (g_usePacketManager)
                     g_packetManager.SendAllQueued(1);
             }

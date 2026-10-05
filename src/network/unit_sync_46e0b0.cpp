@@ -48,11 +48,11 @@ public:
     char unknown_5c[0x64 - 0x5c];
     int field_64;                        // +0x64
 
-    int FUN_0046e0b0(int id);
+    int IsPlayerSynced(int id);
 };
 
 // FUNCTION: 0x46e0b0
-int Class_0046d040::FUN_0046e0b0(int id)
+int Class_0046d040::IsPlayerSynced(int id)
 {
     if (field_58 == 0)
         return 0;

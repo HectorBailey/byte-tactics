@@ -18,11 +18,11 @@ public:
     char unknown_0[0x58];
     int field_58; // +0x58
 
-    void FUN_0046d4c0(unsigned int* param_1, ParamStruct_0046d4c0* param_2, int unused);
+    void SendSyncPacket(unsigned int* param_1, ParamStruct_0046d4c0* param_2, int unused);
 };
 
 // FUNCTION: 0x46d4c0
-void Class_0046d4c0::FUN_0046d4c0(unsigned int* param_1, ParamStruct_0046d4c0* param_2, int unused)
+void Class_0046d4c0::SendSyncPacket(unsigned int* param_1, ParamStruct_0046d4c0* param_2, int unused)
 {
     unsigned int val;
     if (field_58 != 0)

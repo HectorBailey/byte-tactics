@@ -58,15 +58,15 @@ struct Menu_0044c420 {
 };
 
 struct Class_0046e450 {
-    int FUN_0046e450(Item_0044c420* unit);
+    int DisallowUnit(Item_0044c420* unit);
 };
 
 struct Class_0046e4d0 {
-    int FUN_0046e4d0(Item_0044c420* unit);
+    int AllowUnit(Item_0044c420* unit);
 };
 
 struct Class_0046e330 {
-    void FUN_0046e550(Item_0044c420* unit, int value);
+    void SetUnitLimit(Item_0044c420* unit, int value);
 };
 
 struct Game {
@@ -138,9 +138,9 @@ void __stdcall FUN_0044c420(Menu_0044c420* menu)
                     if (item->field_245.bits.flag) {
                     } else {
                         if (DAT_005129b4[i].field_5a == 0)
-                            ((Class_0046e450*)g_game->queue)->FUN_0046e450(item);
+                            ((Class_0046e450*)g_game->queue)->DisallowUnit(item);
                         else
-                            ((Class_0046e4d0*)g_game->queue)->FUN_0046e4d0(item);
+                            ((Class_0046e4d0*)g_game->queue)->AllowUnit(item);
                     }
                 }
             }
@@ -177,7 +177,7 @@ void __stdcall FUN_0044c420(Menu_0044c420* menu)
                 else
                     DAT_005129b4[i].field_5a = 0;
                 if (DAT_005129b4[i].field_5a != DAT_005129b4[i].field_56) {
-                    ((Class_0046e330*)g_game->queue)->FUN_0046e550(
+                    ((Class_0046e330*)g_game->queue)->SetUnitLimit(
                         &g_game->items[DAT_005129b4[i].field_52],
                         DAT_005129b4[i].field_5a);
                 }
@@ -200,7 +200,7 @@ void __stdcall FUN_0044c420(Menu_0044c420* menu)
             // +0x20, so its address can never be null); kept for byte fidelity.
             if (g_game->items[i].field_245.bits.flag) {
             } else if (g_game->items[i].name != 0) {
-                ((Class_0046e330*)g_game->queue)->FUN_0046e550(
+                ((Class_0046e330*)g_game->queue)->SetUnitLimit(
                     &g_game->items[i], DAT_005129c4[n]);
                 n++;
             }

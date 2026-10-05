@@ -58,7 +58,7 @@ public:
     int b;                             // +0x4
     int c;                             // +0x8
 
-    void FUN_0046cec0(void* packet, int to);
+    void SendUnsequenced(void* packet, int to);
 };
 
 class Sub2_0046d040 {                  // the object at +0x58

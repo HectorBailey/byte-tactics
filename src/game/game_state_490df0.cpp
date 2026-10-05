@@ -15,7 +15,7 @@ extern Game* g_game;
 char* __stdcall FUN_004c5740(char* text);
 int GetLocalDpid();
 int __stdcall BroadcastPacket(int player, void* data, int size);
-void __stdcall FUN_00463ca0(char* text, int param_2, int param_3, int param_4);
+void __stdcall AddMessage(char* text, int param_2, int param_3, int param_4);
 
 // FUNCTION: 0x490df0
 void __stdcall FUN_00490df0(int speed, int param_2)
@@ -33,7 +33,7 @@ void __stdcall FUN_00490df0(int speed, int param_2)
             sprintf(buf, "%s  %c%d\n", FUN_004c5740("Game Speed"),
                     (d > 0) ? '+' : ' ', d);
         }
-        FUN_00463ca0(buf, 2, 0, 10);
+        AddMessage(buf, 2, 0, 10);
     }
     g_game->field_38a4b = speed;
     g_game->field_38a4d = speed;

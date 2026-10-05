@@ -160,7 +160,7 @@ void __stdcall FUN_004288d0(int a, int b, int c, int d);
 void BroadcastPlayerInfo();
 void UpdateNetGameInfo();
 void FUN_00464f80();
-void __stdcall FUN_0046c620(int x);
+void __stdcall ReportGameEvent(int x);
 void FUN_004649d0();
 void __stdcall FUN_0041c4c0(int x, int y, int z);
 unsigned short __stdcall FUN_00488b10(const char* name);
@@ -336,7 +336,7 @@ void __cdecl FUN_00497180(void*)
                 cz = start.z.h.whole - *(int*)(g_game + 0x37e3b) / 2;
             }
             FUN_0041c4c0(cx, cz, 0);
-            FUN_0046c620(6);
+            ReportGameEvent(6);
         } else if (((Class_00435100*)*(void**)(g_game + 0x391e9))->FUN_00435100() == 2 &&
             *(void**)(g_game + 0x38d6b) == 0) {
             if (*(int*)((char*)*(void**)(g_game + 0x29a0) + 0x118) != 0) {
