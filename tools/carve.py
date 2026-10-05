@@ -18,10 +18,11 @@ no base relocations, so here the relocation sites come from elsewhere:
     region, and every 32-bit immediate or displacement that holds an address
     in the image.
   * origdata.obj holds the runs of the original's .rdata and .data that no
-    object defines (the bytes tools/place.py copies) and what those runs point
-    at that no symbol names, each run a section of its own named for its
-    address. The game's data itself comes
-    from source: link/data.cpp, src/data and the tree's own objects. Its
+    object defines (the bytes tools/place.py copies, but for runs of zeros
+    nothing refers to) and what those runs point at that no symbol names,
+    each run a section of its own named for its address. The game's data
+    itself comes from source: link/data.cpp, src/data and the tree's own
+    objects. Its
     relocations come from tools/place.py's layout: every pointer field of a
     placed piece of data; in data no object defines, every dword that holds
     the exact address of a function, a global, a placed piece or a string
@@ -613,8 +614,8 @@ def carve_data(img: Image, placer: Placer, namer: Namer, more: set[int], out: Pa
 def kept_runs(img: Image, placer: Placer, wanted: set[int],
               runs: list[tuple[int, int]] | None = None) -> list[tuple[int, int]]:
     """The runs of the original's data origdata.obj holds: the bytes the
-    layout copied (nothing defines them) and the pieces holding the
-    addresses in `wanted`, merged."""
+    layout copied (nothing defines them) but for runs of zeros, and the
+    pieces holding the addresses in `wanted`, merged."""
     keep = bytearray(img.size)
     for start, end in runs or ():
         keep[start - img.base:end - img.base] = b"\1" * (end - start)
@@ -628,6 +629,20 @@ def kept_runs(img: Image, placer: Placer, wanted: set[int],
         for i in range(lo, hi):
             if img.src[i] == COPIED and not tables[i]:
                 keep[i] = 1
+        # A run of zeros needs no definition until something refers to it
+        # (`wanted`): LINK lays the library members' data out itself, and
+        # the zeros between two pieces of the game's data hold nothing.
+        i = lo
+        while i < hi:
+            if keep[i]:
+                j = i
+                while j < hi and keep[j]:
+                    j += 1
+                if not any(img.pristine[i:j]):
+                    keep[i:j] = bytes(j - i)
+                i = j
+            else:
+                i += 1
     for v in wanted:
         o = v - img.base
         pid = img.owner[o]
