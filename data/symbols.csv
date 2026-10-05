@@ -70,7 +70,7 @@ address,name
 0x406ee0,FUN_00406ee0
 0x406f00,RegisterAICommands
 0x406f40,FUN_00406f40
-0x406f50,Class_00406f50::FUN_00406f50
+0x406f50,SquadManager::FUN_00406f50
 0x406f80,ReactToAttack
 0x4071f0,Class_004071f0::FindNearestEnemyUnit
 0x407350,SquadTimer::SquadTimer

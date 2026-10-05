@@ -127,7 +127,7 @@ class Class_00401110;
 class Class_00401180;
 class Class_004011c0;
 class Class_00405d90;
-class Class_00406f50;
+class SquadManager;
 class Class_004071f0;
 class Class_00407560;
 class Class_00407930;
@@ -2973,7 +2973,7 @@ public:
     int GetIntArg(int, int);
 };
 
-class Class_00406f50 {  // 0x1 bytes, 3 views
+class SquadManager {    // 0x1 bytes, 3 views
 public:
     char unknown_0[1];
     void FUN_00406f50(Obj_00406f50*, int, int);
