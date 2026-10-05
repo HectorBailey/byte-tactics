@@ -433,10 +433,12 @@ and `link.py` applies that to patched copies of the objects under
   0x51fbc0 was never freed at exit.
 - Every other file's definition of an annotated game function is made
   static, so the name binds to the annotated one (590 copies).
-- Only the original's 17 C++ static initialisers run, in its order (see
-  `fix_initialisers` in `link.py`): files that define global objects only so
-  that a function matches would otherwise construct them with the wrong
-  constructors at start-up.
+- Of the tree's own objects, only the original's 17 C++ static initialisers
+  run, in its order (see `fix_initialisers` in `link.py`): files that define
+  global objects only so that a function matches would otherwise construct
+  them with the wrong constructors at start-up. The gap regions' objects and
+  `src/lib/` add none either (those that include `<string>` carry an
+  initialiser for a `locale::id` guard).
 - zlib comes from the objects `tools/setup_toolchain.sh` builds, and the
   runtime library from `LIBCMT.LIB` and `LIBCPMT.LIB`, as LINK picks them.
 - GOG's no-CD music fix has two parts, and the link makes both. The exe
