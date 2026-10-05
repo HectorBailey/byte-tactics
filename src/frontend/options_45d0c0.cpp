@@ -5,7 +5,7 @@
 // UpdateTrackGadgets and marks the settings block for saving (FUN_0049fa90).
 #include <stdlib.h>
 
-struct Menu;
+struct Dialog;
 
 class Class_004ce7f0 {
 public:
@@ -24,7 +24,7 @@ extern int DAT_00512fe0;
 
 int __stdcall GetGadgetText(void* settings, const char* key, char* out);
 void __cdecl UpdateTrackGadgets();
-void __stdcall FUN_0049fa90(Menu* obj);
+void __stdcall FUN_0049fa90(Dialog* obj);
 
 // FUNCTION: 0x45d0c0
 void FUN_0045d0c0()
@@ -35,6 +35,6 @@ void FUN_0045d0c0()
     if (track != g_game->x10->GetCurrentTrack()) {
         DAT_00512fe0 = g_game->x10->GetCurrentTrack();
         UpdateTrackGadgets();
-        FUN_0049fa90((Menu*)g_game->settings);
+        FUN_0049fa90((Dialog*)g_game->settings);
     }
 }

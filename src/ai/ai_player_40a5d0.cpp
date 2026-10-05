@@ -32,14 +32,14 @@ struct UnitType {
     short field_1c0;                   // +0x1c0
 };
 
-struct Net {
+struct Mission {
     char unknown_0[0xd30];
     int field_d30;                     // +0xd30
 };
 
 struct Game {
     char unknown_0[0x391e9];
-    Net* net;                          // +0x391e9
+    Mission* net;                      // +0x391e9
 };
 
 class PlayerAI {

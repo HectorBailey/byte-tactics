@@ -116,7 +116,7 @@ struct Gadget_00448c70 {
 };
 #pragma pack(pop)
 
-class Net {
+class Mission {
 public:
     int FUN_004358f0();
 };
@@ -174,7 +174,7 @@ struct Game {
     char unknown_2a9f[0x148db - 0x2a9f];
     int field_148db;                    // +0x148db
     char unknown_148df[0x391e9 - 0x148df];
-    Net* map;                           // +0x391e9
+    Mission* map;                       // +0x391e9
 };
 #pragma pack(pop)
 

@@ -48,8 +48,8 @@ static inline Vec3 MoveTowards(const Vec3* from, const Vec3* to,
 struct Point { short x, y; };
 #pragma pack(push, 1)
 struct UnitType { char pad0[0x14a]; Point origin; char pad14e[0x1ce-0x14e]; float value; };
-struct Net { char pad0[0xd30]; int threshold; };
-struct Game { char pad0[0x14223]; int width, height; char pad1422b[0x391e9-0x1422b]; Net* net; };
+struct Mission { char pad0[0xd30]; int threshold; };
+struct Game { char pad0[0x14223]; int width, height; char pad1422b[0x391e9-0x1422b]; Mission* net; };
 class PlayerAI {
 public:
     char pad0[0x35]; Vec3 pos; char pad41[12]; char cells[16]; char pad5d[0x109-0x5d]; int range;

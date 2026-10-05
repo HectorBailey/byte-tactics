@@ -662,14 +662,14 @@ address,size,file,symbol,status,similarity
 0x435110,401,src/game/campaign_435110.cpp,?LoadCampaign@Class_00435110@@QAEXPAD@Z,matched,100.0
 0x4352b0,24,src/game/campaign_4352b0.cpp,?FUN_004352b0@Class_004352b0@@QAEPADXZ,matched,100.0
 0x4352d0,76,src/game/campaign_4352d0.cpp,?CampaignFileExists@@YGHPAD@Z,matched,100.0
-0x435320,121,src/game/campaign_435320.cpp,?LoadBriefing@Net@@QAEXXZ,matched,100.0
+0x435320,121,src/game/campaign_435320.cpp,?LoadBriefing@Mission@@QAEXXZ,matched,100.0
 0x4353a0,7,src/game/campaign_4353a0.cpp,?FUN_004353a0@Class_004353a0@@QAEHXZ,matched,100.0
-0x4353b0,118,src/game/campaign_4353b0.cpp,?FUN_004353b0@Net@@QAEXHPAD@Z,matched,100.0
+0x4353b0,118,src/game/campaign_4353b0.cpp,?FUN_004353b0@Mission@@QAEXHPAD@Z,matched,100.0
 0x435430,652,src/game/campaign_435430.cpp,?BuildCampaignFilePath@Class_00435c00@@QAEXHPAD00@Z,matched,100.0
 0x4356c0,37,src/game/campaign_4356c0.cpp,?FUN_004356c0@Class_004356c0@@QAEHH@Z,matched,100.0
-0x4356f0,97,src/game/campaign_4356f0.cpp,?CountMissions@Net@@QAEHXZ,matched,100.0
+0x4356f0,97,src/game/campaign_4356f0.cpp,?CountMissions@Mission@@QAEHXZ,matched,100.0
 0x435760,394,src/game/campaign_435760.cpp,?BuildMissionList@Class_00435760@@QAEHPAH@Z,matched,100.0
-0x4358f0,7,src/game/campaign_4358f0.cpp,?FUN_004358f0@Net@@QAEHXZ,matched,100.0
+0x4358f0,7,src/game/campaign_4358f0.cpp,?FUN_004358f0@Mission@@QAEHXZ,matched,100.0
 0x435900,7,src/game/campaign_435900.cpp,?FUN_00435900@Class_00435900@@QAEHXZ,matched,100.0
 0x435910,7,src/game/campaign_435910.cpp,?FUN_00435910@Class_00435910@@QAEHXZ,matched,100.0
 0x435920,81,src/game/campaign_435920.cpp,?FUN_00435920@Class_00435920@@QAEHXZ,matched,100.0
@@ -2143,7 +2143,7 @@ address,size,file,symbol,status,similarity
 0x49f9c0,131,src/gui/gui_49f9c0.cpp,?RunWhileScreenNamed@@YGXPAUMenu_0049f9c0@@PAD@Z,matched,100.0
 0x49fa50,17,src/gui/gui_49fa50.cpp,?FUN_0049fa50@@YGXPAUObj_49fa50@@@Z,matched,100.0
 0x49fa70,17,src/gui/gui_49fa70.cpp,?FUN_0049fa70@@YGXPAUObj_0049fa70@@@Z,matched,100.0
-0x49fa90,17,src/gui/gui_49fa90.cpp,?FUN_0049fa90@@YGXPAUMenu@@@Z,matched,100.0
+0x49fa90,17,src/gui/gui_49fa90.cpp,?FUN_0049fa90@@YGXPAUDialog@@@Z,matched,100.0
 0x49fab0,17,src/gui/gui_49fab0.cpp,?FUN_0049fab0@@YGXPAX@Z,matched,100.0
 0x49fad0,21,src/gui/gui_49fad0.cpp,?FUN_0049fad0@@YGXPAUDialog@@@Z,matched,100.0
 0x49faf0,17,src/gui/gui_49faf0.cpp,?FUN_0049faf0@@YGXPAUOuter_49faf0@@@Z,matched,100.0
@@ -2190,7 +2190,7 @@ address,size,file,symbol,status,similarity
 0x4a1110,164,src/gui/gui_4a1110.cpp,?SetGadgetStatusByName@@YGHPAUDialog@@PADH@Z,matched,100.0
 0x4a11c0,60,src/gui/gui_4a11c0.cpp,?SetGadgetStatus@@YGXPAUObj_004a11c0@@HF@Z,matched,100.0
 0x4a1200,72,src/gui/gui_4a1200.cpp,?FUN_004a1200@@YGXPAUDialog@@HH@Z,matched,100.0
-0x4a1250,142,src/gui/gui_4a1250.cpp,?FUN_004a1250@@YGXPAUMenu@@PADH@Z,matched,100.0
+0x4a1250,142,src/gui/gui_4a1250.cpp,?FUN_004a1250@@YGXPAUDialog@@PADH@Z,matched,100.0
 0x4a12e0,368,src/gui/gui_4a12e0.cpp,?FUN_004a12e0@@YGXPAUDialog@@HH@Z,matched,100.0
 0x4a1450,107,src/gui/gui_4a1450.cpp,?FUN_004a1450@@YGXPAUObject_004a1450@@PADH@Z,matched,100.0
 0x4a14c0,107,src/gui/gui_4a14c0.cpp,?FUN_004a14c0@@YGXPAUObject_004a14c0@@PADH@Z,matched,100.0

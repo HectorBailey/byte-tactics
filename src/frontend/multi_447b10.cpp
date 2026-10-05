@@ -127,7 +127,7 @@ class Class_00463c60 {
 public:
     void SetType(int state);
 };
-class Net {
+class Mission {
 public:
     int FUN_004358f0();
 };
@@ -179,7 +179,7 @@ struct Game {
     char unknown_37ef2[0x37f39 - 0x37ef2];
     int sides;                          // +0x37f39
     char unknown_37f3d[0x391e9 - 0x37f3d];
-    Net* map;                           // +0x391e9
+    Mission* map;                       // +0x391e9
     char unknown_391ed[0x39229 - 0x391ed];
     int commander;                      // +0x39229
     int mapping;                        // +0x3922d

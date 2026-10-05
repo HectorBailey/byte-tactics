@@ -5,7 +5,7 @@
 
 int __stdcall HAPI_FileLengthByName(char* path);
 
-class Net {
+class Mission {
 public:
     char unknown_0[0x104];
     char names[9][0x100];              // +0x104
@@ -15,7 +15,7 @@ public:
 };
 
 // FUNCTION: 0x4353b0
-void Net::FUN_004353b0(int index, char* text)
+void Mission::FUN_004353b0(int index, char* text)
 {
     strcpy(names[index], text);
     if (index == 1) {

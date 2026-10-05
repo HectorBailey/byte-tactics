@@ -1,6 +1,6 @@
 // Decompiled by Opus. Names are provisional.
 
-class Net {
+class Mission {
 public:
     int FUN_004358f0();
 };
@@ -28,7 +28,7 @@ struct Game {
     char unknown_0[0x1b63];
     Player_00440cd0 players[10];       // +0x1b63
     char unknown_2851[0x391e9 - 0x2851];
-    Net* field_391e9;                  // +0x391e9
+    Mission* field_391e9;              // +0x391e9
 };
 #pragma pack(pop)
 

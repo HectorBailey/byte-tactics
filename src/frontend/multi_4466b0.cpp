@@ -4,12 +4,12 @@
 // GAMEOPEN controls from that player's flags.
 
 struct Class_004a1080;
-struct Menu;
+struct Dialog;
 
 int __stdcall SetButtonStageByName(Class_004a1080* obj, char* name, int value);
-void __stdcall FUN_0049fa90(Menu* obj);
-void __stdcall FUN_0049fb10(Menu* obj, int value);
-void __stdcall RenderLayer(Menu* obj, int value);
+void __stdcall FUN_0049fa90(Dialog* obj);
+void __stdcall FUN_0049fb10(Dialog* obj, int value);
+void __stdcall RenderLayer(Dialog* obj, int value);
 void __stdcall RefreshAlliesScreen(int value);
 void __stdcall HandleControlDialogClick(void* gadget);
 
@@ -63,7 +63,7 @@ void OpenControlDialog()
     info = g_game->players[g_game->localPlayer].info;
     SetButtonStageByName((Class_004a1080*)g_game->gui, "WATCHING", info->watching);
     SetButtonStageByName((Class_004a1080*)g_game->gui, "GAMEOPEN", !info->closed);
-    FUN_0049fa90((Menu*)g_game->gui);
-    FUN_0049fb10((Menu*)g_game->gui, 1);
-    RenderLayer((Menu*)g_game->gui, 0x40);
+    FUN_0049fa90((Dialog*)g_game->gui);
+    FUN_0049fb10((Dialog*)g_game->gui, 1);
+    RenderLayer((Dialog*)g_game->gui, 0x40);
 }

@@ -1486,7 +1486,7 @@ struct Name_0046c620;
 struct Name_004866d0;
 struct Name_0048d630;
 struct Named_004c4450;
-class Net;
+class Mission;
 struct Net2_4517b0;
 struct Net_00443100;
 struct Net_004c9920;
@@ -5984,7 +5984,7 @@ struct Buffer_00434ff0 {  // 0x8 bytes, 3 views
     int size;  // +0x4
 };
 
-class Net {  // 0xec4 bytes, 139 views
+class Mission {  // 0xec4 bytes, 139 views
 public:
     int unknown_0;  // +0x0
     char campaign[256];  // +0x4
@@ -6022,8 +6022,8 @@ public:
     Buffer_00434ff0 buffer2;  // +0xdbc
     char memory[128];  // +0xdc4
     char numPlayers[128];  // +0xe44
-    Net(int);
-    ~Net(void);
+    Mission(int);
+    ~Mission(void);
     char* FUN_00435c30(int);
     char* GetName(int);
     int FUN_00435100(void);
@@ -9932,7 +9932,7 @@ struct Game {  // 0x3924d bytes, 904 views
     char field_391cf[24];  // +0x391cf
     char field_391e7;  // +0x391e7
     char field_391e8;  // +0x391e8
-    Net* net;  // +0x391e9
+    Mission* net;  // +0x391e9
     MissionConditions* list_391ed;  // +0x391ed
     int mode_391f1;  // +0x391f1
     void (__stdcall *handler)(void);  // +0x391f5
