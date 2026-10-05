@@ -1059,7 +1059,7 @@ address,size,file,symbol,status,similarity
 0x44feb0,22,src/network/net_game_44feb0.cpp,?FUN_0044feb0@@YGEPAUPlayer_0044feb0@@@Z,matched,100.0
 0x44fed0,243,src/network/net_game_44fed0.cpp,?FindPlayerByDpid@@YGPAUPlayer_0044fed0@@H@Z,matched,100.0
 0x44ffd0,61,src/network/net_game_44ffd0.cpp,?GetSlotDpid@@YGHE@Z,matched,100.0
-0x450010,27,src/network/net_game_450010.cpp,?GetPlayerDpid@@YGHPAUClass_00450010@@@Z,matched,100.0
+0x450010,27,src/network/net_game_450010.cpp,?GetPlayerDpid@@YGHPAUPlayer@@@Z,matched,100.0
 0x450030,96,src/network/net_game_450030.cpp,?GetHostDpid@@YGHXZ,matched,100.0
 0x450090,161,src/network/net_game_450090.cpp,?SetPlayerName@@YGHEPAD0@Z,matched,100.0
 0x450140,252,src/network/net_game_450140.cpp,?GetPlayerName@@YGHHPAD0@Z,matched,100.0
