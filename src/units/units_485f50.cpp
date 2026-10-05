@@ -29,7 +29,7 @@ public:
     UnitMotion(Unit* unit);
 };
 
-class Class_00490520 {
+class MissionConditions {
 public:
     void NotifyUnitCreated(Unit* unit);
 };
@@ -105,7 +105,7 @@ struct Game {
     char unknown_1435b[0x1439b - 0x1435b];
     UnitType_00485f50* unitTypes;        // +0x1439b
     char unknown_1439f[0x391ed - 0x1439f];
-    Class_00490520* list;                // +0x391ed
+    MissionConditions* list;             // +0x391ed
 };
 #pragma pack(pop)
 

@@ -8,7 +8,7 @@
 // for the new owner with 0x485f50 and filled either from the record passed in
 // or from the old unit, and the old unit's state bits are moved across.
 
-class Class_00490520 {
+class MissionConditions {
 public:
     void NotifyUnitCaptured(struct Unit* unit);
 };
@@ -85,7 +85,7 @@ struct Unit {                          // 0x118 bytes
 
 struct Game {
     char unknown_0[0x391ed];
-    Class_00490520* list;              // +0x391ed
+    MissionConditions* list;           // +0x391ed
 };
 #pragma pack(pop)
 

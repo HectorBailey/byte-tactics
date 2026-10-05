@@ -1968,8 +1968,8 @@ address,name
 0x490360,Class_00490360::CheckDefeat
 0x4904b0,Class_004904b0::FUN_004904b0
 0x4904c0,Class_004904c0::NotifyUnitDied
-0x490520,Class_00490520::NotifyUnitCaptured
-0x490580,Class_00490520::NotifyUnitCreated
+0x490520,MissionConditions::NotifyUnitCaptured
+0x490580,MissionConditions::NotifyUnitCreated
 0x4905e0,Class_00490630::Class_00490630
 0x490630,??_GClass_00490630@@UAEPAXI@Z
 0x490650,Class_00490630::FUN_0044f000

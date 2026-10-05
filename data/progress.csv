@@ -1977,8 +1977,8 @@ address,size,file,symbol,status,similarity
 0x490360,334,src/game/victory_490360.cpp,?CheckDefeat@Class_00490360@@QAEHXZ,matched,100.0
 0x4904b0,11,src/game/victory_4904b0.cpp,?FUN_004904b0@Class_004904b0@@QAEXXZ,matched,100.0
 0x4904c0,84,src/game/victory_4904c0.cpp,?NotifyUnitDied@Class_004904c0@@QAEXH@Z,matched,100.0
-0x490520,84,src/game/victory_490520.cpp,?NotifyUnitCaptured@Class_00490520@@QAEXH@Z,matched,100.0
-0x490580,84,src/game/victory_490580.cpp,?NotifyUnitCreated@Class_00490520@@QAEXH@Z,matched,100.0
+0x490520,84,src/game/victory_490520.cpp,?NotifyUnitCaptured@MissionConditions@@QAEXH@Z,matched,100.0
+0x490580,84,src/game/victory_490580.cpp,?NotifyUnitCreated@MissionConditions@@QAEXH@Z,matched,100.0
 0x4905e0,76,src/game/victory_490630.cpp,??0Class_00490630@@QAE@PAUStruct_004907e0@@@Z,matched,100.0
 0x490630,32,src/game/victory_490630.cpp,??_GClass_00490630@@UAEPAXI@Z,matched,100.0
 0x490650,63,src/game/victory_490650.cpp,?FUN_0044f000@Class_00490630@@UAEXPAUVec3_004907e0@@0PAF@Z,matched,100.0
