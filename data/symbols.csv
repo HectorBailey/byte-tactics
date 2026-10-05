@@ -105,7 +105,7 @@ address,name
 0x408920,RetargetWeapon
 0x4089a0,Class_004089a0::RetargetWeapons
 0x408bf0,Class_00408bf0::TickTimers
-0x408c40,Class_00408c40::TickIfActive
+0x408c40,SquadManager::TickIfActive
 0x408cb0,SquadManager::SquadManager
 0x408f10,Class_00408f10::DeleteTimers
 0x408f30,PAUUnit::?$vector::insert

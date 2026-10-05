@@ -103,7 +103,7 @@ address,size,file,symbol,status,similarity
 0x408920,117,src/ai/ai_player_408920.cpp,?RetargetWeapon@@YGXPAUUnit@@I@Z,matched,100.0
 0x4089a0,578,src/ai/ai_player_4089a0.cpp,?RetargetWeapons@Class_004089a0@@QAEXH@Z,matched,100.0
 0x408bf0,73,src/ai/ai_player_408bf0.cpp,?TickTimers@Class_00408bf0@@QAEXXZ,matched,100.0
-0x408c40,112,src/ai/ai_player_408c40.cpp,?TickIfActive@Class_00408c40@@QAEXXZ,matched,100.0
+0x408c40,112,src/ai/ai_player_408c40.cpp,?TickIfActive@SquadManager@@QAEXXZ,matched,100.0
 0x408cb0,602,src/ai/ai_player_408cb0.cpp,??0SquadManager@@QAE@PAUPlayer_00408cb0@@@Z,matched,100.0
 0x408f10,32,src/ai/ai_player_408f10.cpp,?DeleteTimers@Class_00408f10@@QAEXXZ,matched,100.0
 0x408f30,546,src/ai/ai_player_408f30.cpp,?insert@?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QAEXPAPAUUnit@@IABQAU3@@Z,matched,100.0

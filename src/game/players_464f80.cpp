@@ -301,7 +301,7 @@ struct Unit;
 struct Player_00464f80;
 
 struct Pathfinder { void RunSearches(); };
-struct Class_00408c40 { void TickIfActive(); };
+struct SquadManager { void TickIfActive(); };
 struct Class_00435100 {
     char unknown_0[0xd44];
     int field_d44;                     // +0xd44
@@ -382,7 +382,7 @@ struct PlayerInfo_00464f80 {           // +0x1b63, stride 0x14b
     Unit* units_end;                   // +0x6b
     char unknown_6f[0x73 - 0x6f];
     unsigned char type;                // +0x73
-    Class_00408c40* field_74;          // +0x74
+    SquadManager* field_74;            // +0x74
     char unknown_78[0xf0 - 0x78];
     int field_f0;                      // +0xf0
     char unknown_f4[0x140 - 0xf4];

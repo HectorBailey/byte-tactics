@@ -33,7 +33,7 @@ public:
 };
 
 #pragma pack(push, 1)
-class Class_00408c40 {
+class SquadManager {
 public:
     Target_00408c40* target;           // +0x0
     char unknown_4;
@@ -46,7 +46,7 @@ public:
 #pragma pack(pop)
 
 // FUNCTION: 0x408c40
-void Class_00408c40::TickIfActive()
+void SquadManager::TickIfActive()
 {
     if (target->unknown_0 != 0 && target->state == 2) {
         if (--countdown <= 0) {
