@@ -7,6 +7,11 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/HectorBailey/byte-tactics/actions/workflows/build.yml"><img src="https://github.com/HectorBailey/byte-tactics/actions/workflows/build.yml/badge.svg?branch=main" alt="Build from source"></a>
+  <a href="#building-the-exe"><img src="https://img.shields.io/badge/TotalA.exe_MD5-8e74a1dffa1f5988624c52048f5b20cd-brightgreen" alt="TotalA.exe MD5 8e74a1dffa1f5988624c52048f5b20cd"></a>
+</p>
+
+<p align="center">
   <a href="#progress">Progress</a> ·
   <a href="#quick-start">Quick start</a> ·
   <a href="#building-the-exe">Building the exe</a> ·
@@ -131,7 +136,9 @@ wherever LINK.EXE puts them and the bytes differ, but that exe plays the game
 too (`tools/playtest.py` runs scripted games on both builds).
 
 GitHub Actions builds the exe from source on every change to the code and
-fails unless its MD5 is the shipped one (`.github/workflows/build.yml`).
+fails unless its MD5 is the shipped one (`.github/workflows/build.yml`): the
+"Build from source" badge at the top shows the latest run on main, and each
+run's summary lists the MD5 and SHA-256 it built.
 [docs/linking.md](docs/linking.md) explains how both builds work.
 
 ## How a match works
