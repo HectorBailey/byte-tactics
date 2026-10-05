@@ -107,7 +107,7 @@ address,name
 0x408bf0,Class_00408bf0::TickTimers
 0x408c40,Class_00408c40::TickIfActive
 0x408cb0,SquadManager::SquadManager
-0x408f10,Class_00408f10::DeleteTimers
+0x408f10,SquadManager::DeleteTimers
 0x408f30,PAUUnit::?$vector::insert
 0x409160,PlayerAI::PlayerAI
 0x409470,Class_00409470::InitUnitTables
