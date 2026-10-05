@@ -77,13 +77,13 @@ public:
     int LoadMission(char* map);
 };
 
-class Class_00435110 : public Class_00435c00 {
+class Net : public Class_00435c00 {
 public:
     void LoadCampaign(char* file);
 };
 
 // FUNCTION: 0x435110
-void Class_00435110::LoadCampaign(char* file)
+void Net::LoadCampaign(char* file)
 {
     char msg[0x80];
 

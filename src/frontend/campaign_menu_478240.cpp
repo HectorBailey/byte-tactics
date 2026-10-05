@@ -104,7 +104,7 @@ void __stdcall FUN_004a32a0(void* menu, const char* name, int* data, int count,
 void __stdcall FUN_004a2be0(void* menu, int index);
 char* __stdcall SkipTextLines(char* text, int line);
 
-class Class_00435110 {
+class Net {
 public:
     void LoadCampaign(char* file);
 };
@@ -242,7 +242,7 @@ void __stdcall OpenNewGameMenu(int param_1)
             Entry_00478240* m = FindGadgetChecked(g_game->menu.layer->entries,
                                              "Campaign");
             char* text = SkipTextLines(m->text, m->line);
-            ((Class_00435110*)g_game->net)->LoadCampaign(text);
+            ((Net*)g_game->net)->LoadCampaign(text);
             int mc = ((Class_00435760*)g_game->net)->BuildMissionList(
                 (int*)&DAT_0051e660);
             FUN_004a32a0(menu, "Missions", DAT_0051e660, mc, 0);

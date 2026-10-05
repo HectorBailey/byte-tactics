@@ -16,7 +16,7 @@ public:
     Class_004c2ea0();
 };
 
-class Class_00435110 {
+class Net {
 public:
     void LoadCampaign(char* name);
 };
@@ -65,7 +65,7 @@ inline Class_00434f70::Class_00434f70(int owner_)
     text_a14[0] = 0;
     text_b14[0] = 0;
     owner = owner_;
-    ((Class_00435110*)this)->LoadCampaign(DAT_005119b8);
+    ((Net*)this)->LoadCampaign(DAT_005119b8);
 }
 
 #pragma pack(push, 1)

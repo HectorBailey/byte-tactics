@@ -29,7 +29,7 @@ struct Game {
 };
 #pragma pack(pop)
 
-class Class_004356c0 {
+class Net {
 public:
     int FUN_004356c0(int param_1);
 };
@@ -79,7 +79,7 @@ void ShowSelectedMapInfo()
         entry->field_c2 = 0;
     }
     void* bmp = FUN_004295b0(
-        (char*)((Class_004356c0*)g_game->field_391e9)->FUN_004356c0(1), &outX, &outY);
+        (char*)((Net*)g_game->field_391e9)->FUN_004356c0(1), &outX, &outY);
     entry->field_c2 = bmp;
     if (bmp != 0) {
         ResizeRadarPicture(bmp, entry->field_17, entry->field_19, outX << 4, outY << 4);

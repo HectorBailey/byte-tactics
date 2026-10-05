@@ -6,7 +6,7 @@
 // Outcome0 screen.
 #include <string.h>
 
-class Class_004356c0 {
+class Net {
 public:
     char* FUN_004356c0(int index);
 };
@@ -32,7 +32,7 @@ struct Game {
     void* desiredPalette;              // +0x39087
     void* fadeTable;                   // +0x3908b
     char glamour[0x391e9 - 0x3908f];   // +0x3908f
-    Class_004356c0* campaign;          // +0x391e9
+    Net* campaign;                     // +0x391e9
     char unknown_391ed[0x3923b - 0x391ed];
     unsigned char flags_3923b;         // +0x3923b
 };

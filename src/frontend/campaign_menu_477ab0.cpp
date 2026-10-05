@@ -36,7 +36,7 @@ struct Menu_00477ab0 {
 };
 #pragma pack(pop)
 
-class Class_00435110 {
+class Net {
 public:
     void LoadCampaign(char* name);
 };
@@ -102,7 +102,7 @@ void __stdcall FillMissionList(Menu_00477ab0* menu, Entry_00477ab0* unused)
     }
     Entry_00477ab0* layout =
         FindGadgetChecked((*(Holder_00477ab0**)(g_game + 0x531))->entries, "Campaign");
-    ((Class_00435110*)*(void**)(g_game + 0x391e9))->LoadCampaign(
+    ((Net*)*(void**)(g_game + 0x391e9))->LoadCampaign(
         SkipTextLines(layout->text, layout->selected));
     int count = ((Class_00435760*)*(void**)(g_game + 0x391e9))->BuildMissionList(&DAT_0051e660);
     FUN_004a32a0(menu, "Missions", DAT_0051e660, count, 0);
@@ -144,11 +144,11 @@ void __stdcall HandleNewGameClick(Menu_00477ab0* menu)
             if (DAT_00507b6c == 0) {
                 Entry_00477ab0* e = FindGadgetChecked(entries, "Campaign");
                 name = SkipTextLines(e->text, e->selected);
-                ((Class_00435110*)*(void**)(g_game + 0x391e9))->LoadCampaign(name);
+                ((Net*)*(void**)(g_game + 0x391e9))->LoadCampaign(name);
             } else if (*(unsigned char*)(*(int*)(playerInfo + 0x1b8a) + 0x95) == 0) {
-                ((Class_00435110*)*(void**)(g_game + 0x391e9))->LoadCampaign("Arm Campaign");
+                ((Net*)*(void**)(g_game + 0x391e9))->LoadCampaign("Arm Campaign");
             } else {
-                ((Class_00435110*)*(void**)(g_game + 0x391e9))->LoadCampaign("Core Campaign");
+                ((Net*)*(void**)(g_game + 0x391e9))->LoadCampaign("Core Campaign");
             }
         }
         if (DAT_0051e668 != 0) {

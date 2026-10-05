@@ -2,7 +2,7 @@
 #include <windows.h>
 #include <string.h>
 
-class Class_00435110 {
+class Net {
 public:
     void LoadCampaign(char* name);
 };
@@ -25,7 +25,7 @@ struct Game {
     char unknown_0[0x2a44];
     Flags_004268b0 flags;              // +0x2a44
     char unknown_2a46[0x391e9 - 0x2a46];
-    Class_00435110* level;             // +0x391e9
+    Net* level;                        // +0x391e9
 };
 #pragma pack(pop)
 

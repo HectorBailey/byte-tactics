@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-class Class_00435110 {
+class Net {
 public:
     void LoadCampaign(char* name);
 };
@@ -48,7 +48,7 @@ struct Game {
     char unknown_2c82[0x37eee - 0x2c82];
     int field_37eee;                 // +0x37eee
     char unknown_37ef2[0x391e9 - 0x37ef2];
-    Class_00435110* level;           // +0x391e9
+    Net* level;                      // +0x391e9
 };
 #pragma pack(pop)
 

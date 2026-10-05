@@ -10,7 +10,7 @@ public:
     char* FUN_004353a0();
 };
 
-class Class_004356c0 {
+class Net {
 public:
     char* FUN_004356c0(int param_1);
 };
@@ -80,7 +80,7 @@ void FUN_00476d80()
         DrawHelpPage();
     }
     if (g_game->field_391f1 != 6) {
-        char* name = ((Class_004356c0*)g_game->net)->FUN_004356c0(3);
+        char* name = ((Net*)g_game->net)->FUN_004356c0(3);
         if (name) {
             StreamSoundDelayed(name, 0, 0x3c);
         }

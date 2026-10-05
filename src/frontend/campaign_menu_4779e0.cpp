@@ -26,7 +26,7 @@ struct Table_004779e0 {
     Layout_004779e0* entries;          // +0x4
 };
 
-class Class_00435110 {
+class Net {
 public:
     int LoadCampaign(char* name);
 };
@@ -44,7 +44,7 @@ struct Game {
     char unknown_519[0x531 - 0x519];
     Table_004779e0* table;             // +0x531
     char unknown_535[0x391e9 - 0x535];
-    Class_00435110* net;               // +0x391e9
+    Net* net;                          // +0x391e9
 };
 #pragma pack(pop)
 

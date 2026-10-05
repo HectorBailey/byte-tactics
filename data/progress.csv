@@ -659,14 +659,14 @@ address,size,file,symbol,status,similarity
 0x434f70,118,src/map/map_list_434f70.cpp,??0Class_00434f70@@QAE@H@Z,matched,100.0
 0x434ff0,259,src/map/map_list_434ff0.cpp,??1Class_00434f70@@QAE@XZ,matched,100.0
 0x435100,3,src/game/campaign_435100.cpp,?FUN_00435100@Class_00435100@@QAEHXZ,matched,100.0
-0x435110,401,src/game/campaign_435110.cpp,?LoadCampaign@Class_00435110@@QAEXPAD@Z,matched,100.0
+0x435110,401,src/game/campaign_435110.cpp,?LoadCampaign@Net@@QAEXPAD@Z,matched,100.0
 0x4352b0,24,src/game/campaign_4352b0.cpp,?FUN_004352b0@Class_004352b0@@QAEPADXZ,matched,100.0
 0x4352d0,76,src/game/campaign_4352d0.cpp,?CampaignFileExists@@YGHPAD@Z,matched,100.0
 0x435320,121,src/game/campaign_435320.cpp,?LoadBriefing@Class_00435320@@QAEXXZ,matched,100.0
 0x4353a0,7,src/game/campaign_4353a0.cpp,?FUN_004353a0@Class_004353a0@@QAEHXZ,matched,100.0
 0x4353b0,118,src/game/campaign_4353b0.cpp,?FUN_004353b0@Class_004353b0@@QAEXHPAD@Z,matched,100.0
 0x435430,652,src/game/campaign_435430.cpp,?BuildCampaignFilePath@Class_00435c00@@QAEXHPAD00@Z,matched,100.0
-0x4356c0,37,src/game/campaign_4356c0.cpp,?FUN_004356c0@Class_004356c0@@QAEHH@Z,matched,100.0
+0x4356c0,37,src/game/campaign_4356c0.cpp,?FUN_004356c0@Net@@QAEHH@Z,matched,100.0
 0x4356f0,97,src/game/campaign_4356f0.cpp,?CountMissions@Class_004356f0@@QAEHXZ,matched,100.0
 0x435760,394,src/game/campaign_435760.cpp,?BuildMissionList@Class_00435760@@QAEHPAH@Z,matched,100.0
 0x4358f0,7,src/game/campaign_4358f0.cpp,?FUN_004358f0@Class_004358f0@@QAEHXZ,matched,100.0

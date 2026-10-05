@@ -73,7 +73,7 @@ public:
     char* FUN_004352b0();
 };
 
-class Class_00435110 {
+class Net {
 public:
     void LoadCampaign(void* p);
 };
@@ -319,7 +319,7 @@ void FUN_00499200(void)
             BlankScreen();
             int a = ((Class_00435c50*)g_game->net)->FUN_00435c50();
             char* b = ((Class_004352b0*)g_game->net)->FUN_004352b0();
-            ((Class_00435110*)g_game->net)->LoadCampaign(b);
+            ((Net*)g_game->net)->LoadCampaign(b);
             if (((Class_00435c00*)g_game->net)->FUN_00435c00(a) != 0) {
                 g_game->field_2a44.bits.b3 = 1;
                 g_game->field_2a44.value |= 4;

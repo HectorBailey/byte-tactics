@@ -102,7 +102,7 @@ struct Game {
 #pragma pack(pop)
 
 struct Class_00435100 { int FUN_00435100(); };
-struct Class_00435110 { void LoadCampaign(char* name); };
+struct Net { void LoadCampaign(char* name); };
 struct Class_00435a20 { void* LoadMissionByName(char* name); };
 struct Class_004b3630 { void CloseBank(); };
 struct HapiBank { void OpenAccount(char* name); };
@@ -234,7 +234,7 @@ void __stdcall LoadGameScreenHandler(Gadget_00492360* gadget)
         FUN_00434ab0(((Class_004b4800*)g_game->p38d6b)->GetIntegerItem("Gametype", 0));
         char* campaign = ((Class_004b48a0*)g_game->p38d6b)->GetStringItem("Campaign", 0);
         if (campaign != 0)
-            ((Class_00435110*)g_game->p391e9)->LoadCampaign(campaign);
+            ((Net*)g_game->p391e9)->LoadCampaign(campaign);
         g_game->field_37ef2 = ((Class_004b4800*)g_game->p38d6b)->GetIntegerItem("Side", 0);
         g_game->field_37eee = ((Class_004b4800*)g_game->p38d6b)->GetIntegerItem("Difficulty", 0);
         if (((Class_00435100*)g_game->p391e9)->FUN_00435100() == 1) {

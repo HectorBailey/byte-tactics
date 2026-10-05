@@ -1,6 +1,6 @@
 // Decompiled by space-bunny-free. Names are provisional.
 // Applies the unit-type restrictions listed in the embedded list entry that
-// Class_004356c0 returns for index 6: clears bit 23 (0x800000) on every unit
+// Net returns for index 6: clears bit 23 (0x800000) on every unit
 // type, then sets it on each type named by the entry.
 
 #include <string.h>
@@ -37,7 +37,7 @@ public:
     void CopyRecordName(char* dest, size_t count);
 };
 
-class Class_004356c0 {
+class Net {
 public:
     char* FUN_004356c0(int index);
 };
@@ -70,7 +70,7 @@ void FUN_00431740()
 {
     Class_004c2ea0 parser;
     char name[256];
-    char* file = ((Class_004356c0*)g_game->field_391e9)->FUN_004356c0(6);
+    char* file = ((Net*)g_game->field_391e9)->FUN_004356c0(6);
     if (file == 0)
         return;
     if (!((Class_004c2f60*)&parser)->LoadFile(file))
