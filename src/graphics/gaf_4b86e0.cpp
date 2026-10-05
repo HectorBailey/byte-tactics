@@ -65,7 +65,7 @@ struct Display_004b86e0 {
     unsigned short flags;               // +0xf0, bit 0x100 = "may draw"
 };
 
-Display_004b86e0* FUN_004b6220(void);
+Display_004b86e0* GetDisplay(void);
 int __stdcall FUN_004c5e70(Surface_004b86e0* out);
 int __stdcall FUN_004c5fa0(Surface_004b86e0* s);
 void __stdcall FUN_004b7e60(Rect_004b86e0* other, Rect_004b86e0* rect, Rect_004b86e0* bounds);
@@ -77,7 +77,7 @@ void __stdcall FUN_004b86e0(Class_004c6ae0* param_1, Bitmap_004b86e0* param_2, i
 // FUNCTION: 0x4b86e0
 void __stdcall FUN_004b86e0(Class_004c6ae0* param_1, Bitmap_004b86e0* param_2, int x, int y)
 {
-    Display_004b86e0* d = FUN_004b6220();
+    Display_004b86e0* d = GetDisplay();
     if ((d->flags & 0x100) != 0 && param_2->flag9 == 0) {
         Surface_004b86e0 screen;
         if (param_1 == 0) {

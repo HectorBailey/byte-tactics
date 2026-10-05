@@ -34,11 +34,11 @@ void __stdcall FUN_004ba690(Display_004b6110* obj);
 void __stdcall FUN_004ba6e0(Display_004b6110* obj);
 void __stdcall FUN_004ba730(Display_004b6110* obj);
 void __stdcall FUN_004be070(void* item);
-void __stdcall FUN_004b4ff0(Display_004b6110* obj);
+void __stdcall ReleaseDirectDraw(Display_004b6110* obj);
 void __cdecl FUN_004d85a0(void* p);
 
 // FUNCTION: 0x4b6110
-void __stdcall FUN_004b6110(Display_004b6110* d)
+void __stdcall ShutdownEnvironment(Display_004b6110* d)
 {
     FUN_004c1aa0();
     FUN_004c2cc0();
@@ -56,7 +56,7 @@ void __stdcall FUN_004b6110(Display_004b6110* d)
         FUN_004ba6e0(d);
     if (d->has_obj_d0)
         FUN_004ba730(d);
-    FUN_004b4ff0(d);
+    ReleaseDirectDraw(d);
     if (d->dc)
         DeleteDC(d->dc);
     if (d->bitmap)

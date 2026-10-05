@@ -123,7 +123,7 @@ void FUN_0044f6a0();
 void FUN_00420620();
 void FUN_00419560();
 void* __cdecl FUN_004d83b0(const char* name, unsigned int size);
-unsigned int FUN_004b6340();
+unsigned int GetTicks();
 
 // FUNCTION: 0x4917d0
 void FUN_004917d0()
@@ -164,7 +164,7 @@ void FUN_004917d0()
     g_game->xform = FUN_004d83b0("TEMP XFORM PTS", 0x960);
     g_game->projected = FUN_004d83b0("TEMP PROJECTED PTS", 0x640);
     g_game->assem = FUN_004d83b0("ASSEM PTS", 0xa0);
-    g_game->field_38a37 = FUN_004b6340();
+    g_game->field_38a37 = GetTicks();
     g_game->field_38a47 = 0;
     if (g_game->net->FUN_00435100() == 3) {
         g_game->field_38a4b = 10;

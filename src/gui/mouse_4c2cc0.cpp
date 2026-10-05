@@ -1,5 +1,5 @@
 // Decompiled by Opus. Names are provisional.
-// Shuts down the object FUN_004b6220 returns: when flag bit 10 is set and
+// Shuts down the object GetDisplay returns: when flag bit 10 is set and
 // the worker at +0x1ca is running, asks it to stop (+0x1d6) and waits up to
 // 20 x 100 ms for it to acknowledge; then releases the three objects at
 // +0x1be..+0x1c6 and frees the event buffer at +0x18a (see 0x4c2d60).
@@ -25,7 +25,7 @@ struct Input_004c2cc0 {
 };
 #pragma pack(pop)
 
-Input_004c2cc0* FUN_004b6220(void);
+Input_004c2cc0* GetDisplay(void);
 void __stdcall FUN_004b6b50(unsigned int param_1);
 void __stdcall FUN_004c6ac0(void* param_1);
 void __cdecl FUN_004d85a0(void* p);
@@ -33,7 +33,7 @@ void __cdecl FUN_004d85a0(void* p);
 // FUNCTION: 0x4c2cc0
 void FUN_004c2cc0(void)
 {
-    Input_004c2cc0* o = FUN_004b6220();
+    Input_004c2cc0* o = GetDisplay();
     if (o->entries) {
         if (o->active) {
             if (o->running) {

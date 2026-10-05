@@ -38,7 +38,7 @@ extern Game* g_game;
 extern int DAT_00511dec;
 void __stdcall FUN_004c69a0(void*);
 void HandleNetPackets();
-Engine* FUN_004b6220();
+Engine* GetDisplay();
 void* __stdcall FUN_004c69f0(const char*,int,int);
 void __stdcall FUN_004c6b70(void*,void*,int,int);
 void __stdcall ReportGameEvent(int);
@@ -53,8 +53,8 @@ void __stdcall DrawMessages(void*);
 void __stdcall FUN_004a9fd0(Menu*);
 void __stdcall FUN_004ab170(Menu*,void*,void*);
 void FUN_004c2870();
-unsigned FUN_004b6340();
-int FUN_004b6330();
+unsigned GetTicks();
+int GetTickRate();
 void __stdcall FUN_004c22d0(int);
 void FUN_00491a70();
 void __stdcall FUN_004bf4d0(void*,int*,int);
@@ -110,7 +110,7 @@ void __stdcall FUN_0041f7f0()
     switch(g_game->state) {
     case 0:
         if(g_game->campaign->FUN_00435100()==3) {
-            Engine* e=FUN_004b6220();
+            Engine* e=GetDisplay();
             g_game->lastFrame=FUN_004c69f0("Copy of last game frame",e->width,e->height);
             FUN_004c6b70(g_game->lastFrame,g_game->surface,e->width,e->height);
             ReportGameEvent(7);
@@ -128,7 +128,7 @@ void __stdcall FUN_0041f7f0()
     case 1:
         if(FUN_004ab060(&g_game->menu,"MSGBOX.GUI")) {
             if(g_game->state==1) {
-                Engine* e=FUN_004b6220();
+                Engine* e=GetDisplay();
                 FUN_004c6b70(g_game->surface,g_game->lastFrame,e->width,e->height);
                 DrawMessages(g_game->surface);
                 FUN_004a9fd0(&g_game->menu);
@@ -140,7 +140,7 @@ void __stdcall FUN_0041f7f0()
         break;
     case 2:
         g_game->fade=10;
-        g_game->tick=FUN_004b6340()+1;
+        g_game->tick=GetTicks()+1;
         g_game->complete=0;
         FUN_004c22d0(0);
         g_game->state=3;
@@ -149,9 +149,9 @@ void __stdcall FUN_0041f7f0()
         if(!g_game->complete) {
             event[1]=0; event[0]=0;
             event[2]=g_game->width; event[3]=g_game->height;
-            if(g_game->tick<FUN_004b6340()) {
+            if(g_game->tick<GetTicks()) {
                 FUN_004bf4d0(0,event,g_game->fade-29);
-                g_game->tick=FUN_004b6340()+1;
+                g_game->tick=GetTicks()+1;
                 --g_game->fade;
                 if(!g_game->fade) g_game->complete=1;
             }
@@ -174,7 +174,7 @@ void __stdcall FUN_0041f7f0()
         FUN_0041da60();
         int next=((Class_00435980*)g_game->campaign)->FUN_00435980(g_game->mission+1);
         if(g_game->campaign->FUN_00435100()==1 && (g_game->flags&0x10) && !next && !g_game->skip) {
-            if((unsigned char)FUN_004b6220()->network) {
+            if((unsigned char)GetDisplay()->network) {
                 if(!g_game->players[0].owner->flag) FUN_00425860(4,0x4ce,"c:\\cavedog\\wargame\\endgame.cpp");
                 else FUN_00425860(5,0x4d3,"c:\\cavedog\\wargame\\endgame.cpp");
             } else FUN_00425860(2,0x4d9,"c:\\cavedog\\wargame\\endgame.cpp");
@@ -182,7 +182,7 @@ void __stdcall FUN_0041f7f0()
         } else if(g_game->campaign->FUN_00435100()==1 && (g_game->flags&0x10) && g_game->image) {
             memset(palette,0,sizeof(palette));
             FUN_0041dfc0(g_game->palette,palette,5);
-            g_game->tick=FUN_004b6340()+1;
+            g_game->tick=GetTicks()+1;
             g_game->state=6;
             FUN_004c6b70(g_game->surface,g_game->image,0,0);
         } else {
@@ -195,13 +195,13 @@ void __stdcall FUN_0041f7f0()
     case 6:
         if(!g_game->complete) {
             FUN_0041e270();
-            unsigned now=FUN_004b6340();
-            now+=FUN_004b6330();
+            unsigned now=GetTicks();
+            now+=GetTickRate();
             g_game->deadline=now;
             DAT_00511dec=0;
         } else {
             if(!DAT_00511dec) { FUN_00476ca0(); DAT_00511dec=1; }
-            if(g_game->deadline<FUN_004b6340()) {
+            if(g_game->deadline<GetTicks()) {
                 FUN_004c2340(event);
                 if(FUN_004c1ab0() || g_game->advance) {
                     g_game->input->FUN_004cfb40();
@@ -209,8 +209,8 @@ void __stdcall FUN_0041f7f0()
                     FUN_0049fad0(&g_game->menu); FUN_0049fa90(&g_game->menu);
                     g_game->state=7;
                 }
-                unsigned deadline=FUN_004b6330()*5+g_game->deadline;
-                if(deadline<FUN_004b6340())
+                unsigned deadline=GetTickRate()*5+g_game->deadline;
+                if(deadline<GetTicks())
                     FUN_004c1830(g_game->surface,FUN_004c5740("Click to continue."),g_game->textColor,g_game->shadowColor,g_game->height-20);
             }
         }
@@ -225,7 +225,7 @@ void __stdcall FUN_0041f7f0()
         int skip=0;
         int clicked=FUN_004c1ab0();
         if(clicked && g_game->campaign->FUN_00435100()!=3) skip=1;
-        if(g_game->deadline<FUN_004b6340() || skip) {
+        if(g_game->deadline<GetTicks() || skip) {
             if(clicked) {
                 { ENABLE_BARS("Kills") }
                 { ENABLE_BARS("Losses") }
@@ -249,7 +249,7 @@ void __stdcall FUN_0041f7f0()
                 Player* player=&g_game->players[g_game->localPlayer];
                 for(int j=0;j<2;++j) SendPlayerEconomy(player,0,0);
             }
-            g_game->deadline=FUN_004b6340()+10;
+            g_game->deadline=GetTicks()+10;
             ++g_game->bar;
         }
         break;

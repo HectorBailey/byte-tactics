@@ -12,7 +12,7 @@ struct Obj_004badf0 {
 };
 #pragma pack(pop)
 
-extern Obj_004badf0* FUN_004b6220(void);
+extern Obj_004badf0* GetDisplay(void);
 
 void __stdcall FUN_004ba920(PALETTEENTRY* palette, int* sums, unsigned char* order);
 unsigned char __stdcall FUN_004ba9d0(PALETTEENTRY* palette, int* sums, unsigned char* order,
@@ -27,7 +27,7 @@ extern double DAT_004fdbe8;
 // FUNCTION: 0x4badf0
 unsigned char* __stdcall FUN_004badf0(PALETTEENTRY* palette)
 {
-    Obj_004badf0* app = FUN_004b6220();
+    Obj_004badf0* app = GetDisplay();
     if (app->flag6) {
         PALETTEENTRY color;
         unsigned char order[256];

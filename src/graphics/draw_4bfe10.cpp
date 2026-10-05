@@ -86,7 +86,7 @@ struct Game_004bfe10 {
     unsigned char flags;               // +0xf1
 };
 
-Game_004bfe10* FUN_004b6220();
+Game_004bfe10* GetDisplay();
 int __stdcall FUN_004c5e70(Surface_004bfe10* out);
 int __stdcall FUN_004c5fa0(Surface_004bfe10* s);
 int __stdcall FUN_004bf620(void* s, Rect_004bfe10* r);
@@ -97,7 +97,7 @@ int __stdcall FUN_004bfe10(Surface_004bfe10* surface, Rect_004bfe10* rect)
 {
     Surface_004bfe10 screen;
     Rect_004bfe10 r = *rect;
-    Game_004bfe10* g = FUN_004b6220();
+    Game_004bfe10* g = GetDisplay();
     if ((g->flags & 1) == 0)
         return 0;
     int result;

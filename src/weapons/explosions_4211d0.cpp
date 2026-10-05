@@ -170,7 +170,7 @@ struct Game {
 
 extern Game* g_game;
 
-int __stdcall FUN_004b6720(void* rect, int x, int y);
+int __stdcall PointInRect(void* rect, int x, int y);
 void* __stdcall FUN_004b7ee0(Pic_004211d0* pic);
 void* __stdcall FUN_004b7f30(unsigned short* table, int index);
 void __stdcall FUN_004c0310(void* surface, Point_004211d0* points, int count, int flags);
@@ -193,7 +193,7 @@ void __stdcall FUN_004211d0(void* surface, Obj_00421170* obj, Inner_00421550* in
     short* hp = (short*)&off;
     int sy = hp[5] - (hp[3] >> 1) + 0x20;
     int sx = hp[1] + 0x80;
-    if (!FUN_004b6720(&g_game->viewport[0], sx, sy)) {
+    if (!PointInRect(&g_game->viewport[0], sx, sy)) {
         return;
     }
 

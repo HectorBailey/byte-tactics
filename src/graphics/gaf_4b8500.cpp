@@ -69,7 +69,7 @@ struct Display_004b8500 {
     unsigned char flags;                  // +0xf0
 };
 
-Display_004b8500* FUN_004b6220(void);
+Display_004b8500* GetDisplay(void);
 int __stdcall FUN_004c5e70(Surface_004b8500* out);
 int __stdcall FUN_004c5fa0(Surface_004b8500* s);
 void __stdcall FUN_004b7e60(Rect_004b8500* other, Rect_004b8500* rect, Rect_004b8500* bounds);
@@ -80,7 +80,7 @@ void __cdecl FUN_004cc057(int linkid, int sprite, Rect_004b8500* drect, Sprite_0
 // FUNCTION: 0x4b8500
 void __stdcall FUN_004b8500(Class_004c6ae0* param_1, Sprite_004b8500* param_2, int x, int y)
 {
-    Display_004b8500* d = FUN_004b6220();
+    Display_004b8500* d = GetDisplay();
     if ((d->flags & 0x20) != 0) {
         Screen_004b8500 screen;
         if (param_1 == 0) {

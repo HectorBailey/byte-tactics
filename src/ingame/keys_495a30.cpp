@@ -114,7 +114,7 @@ Class_004b8da0* __stdcall FUN_004b8da0(const char* name, int width, int height);
 void __cdecl FUN_004d8e50(int param);
 void __stdcall FUN_0049e6f0();
 void __stdcall FUN_004b8a80(Surface_00495a30* dst, void* src);
-void* __stdcall FUN_004b6220();
+void* __stdcall GetDisplay();
 void __stdcall FUN_004b8ae0(Dst_004b8ae0* dst, Src_004b8ae0* src);
 void __stdcall FUN_0041c4c0(int x, int y, int z);
 void __stdcall FUN_0048bae0();
@@ -176,7 +176,7 @@ void __stdcall FUN_00495a30(char* dir, char* name, int x, int y, int w, int h)
 
             g_game->field_37f27 = 0;
             FUN_004b8a80(&surf, bm);
-            FUN_004b8ae0(&pal, ((SrcHolder_00495a30*)FUN_004b6220())->frame);
+            FUN_004b8ae0(&pal, ((SrcHolder_00495a30*)GetDisplay())->frame);
 
             pal.flag8 = 0;
             int row = 0;

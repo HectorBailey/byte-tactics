@@ -2412,9 +2412,9 @@ name (`std::_Lockit::_Lockit` is 0x4e39b0).
   statement and operand orders with `check.py <addr> <scratch> --sym` costs no
   runs, and found 0x49a890's and 0x49abb0's best forms (Sonnet 5.5, #1082).
 - **Store order around a call can depend on how `this` is reached**: with a
-  plain local `Display* d = FUN_004b6220();` MSVC puts a struct store before a
+  plain local `Display* d = GetDisplay();` MSVC puts a struct store before a
   field load; writing the body as an inline method called on the call's result
-  (`return FUN_004b6220()->LockMe(out);`) lets the store slide between the
+  (`return GetDisplay()->LockMe(out);`) lets the store slide between the
   argument pushes as in the original (0x4c5e70, 0x4c5ff0).
 - **A one-expression inline method of an embedded struct** keeps a null test
   and the reload after it separate, where a local or a multi-statement helper

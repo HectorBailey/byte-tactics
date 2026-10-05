@@ -70,14 +70,14 @@ struct Arg_004c6210 {
 
 extern int DAT_0051fe00;
 
-Display_004c6210* FUN_004b6220(void);
+Display_004c6210* GetDisplay(void);
 int __stdcall FUN_004c5e70(Surface_004c6210* out);
 void __cdecl FUN_004cbbe0(Surface_004c6210* dst, Surface_004c6210* src, int x, int y);
 
 // FUNCTION: 0x4c6210
 int __stdcall FUN_004c6210(Arg_004c6210* arg)
 {
-    Display_004c6210* d = FUN_004b6220();
+    Display_004c6210* d = GetDisplay();
     if (d->field_44 != 0)
         return 0;
 
@@ -89,7 +89,7 @@ int __stdcall FUN_004c6210(Arg_004c6210* arg)
             FUN_004c5e70(&screen);
             FUN_004cbbe0(&screen, d->field_98, r, r);
 
-            Display_004c6210* d2 = FUN_004b6220();
+            Display_004c6210* d2 = GetDisplay();
             if (d2->field_44 == 0 && d2->field_dc == 0 && d2->screen.surface != 0) {
                 d2->screen.UnlockRect((LPRECT)r);
                 if (DAT_0051fe00 > 0)

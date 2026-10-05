@@ -20,7 +20,7 @@ struct Surface_004bec70 {
     int unknown_10[8];
 };
 
-App_004bec70* FUN_004b6220();
+App_004bec70* GetDisplay();
 Surface_004bec70* __stdcall FUN_004c5e70(Surface_004bec70* out);
 int __stdcall FUN_004c5fa0(Surface_004bec70* s);
 int __stdcall FUN_004bea20(Surface_004bec70* dst, int* a, int* b, int* c, int* d);
@@ -31,7 +31,7 @@ void __cdecl FUN_004cc8df(Surface_004bec70* dst, int a, int b, int c, int d, int
 Surface_004bec70* __stdcall FUN_004bec70(Surface_004bec70* surface, int x0, int y0,
                                          int x1, int y1, int color)
 {
-    App_004bec70* app = FUN_004b6220();
+    App_004bec70* app = GetDisplay();
     if (!app->palette)
         return 0;
     Surface_004bec70* ret;

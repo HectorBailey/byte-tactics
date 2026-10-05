@@ -4,7 +4,7 @@
 
 void __stdcall FUN_004290f0(char* out, const char* dir, const char* name, const char* ext);
 void* __stdcall FUN_004cb560(char* param);
-void __stdcall FUN_004b6290(char* path);
+void __stdcall FatalError(char* path);
 void __stdcall FUN_004cb590(void* data);
 void __stdcall FUN_0042a140(void* data, const char* name);
 
@@ -15,7 +15,7 @@ void* __stdcall FUN_0042a2c0(const char* name)
     FUN_004290f0(path, "objects3d", name, "3DO");
     void* data = FUN_004cb560(path);
     if (data == 0) {
-        FUN_004b6290(path);
+        FatalError(path);
     }
     FUN_004cb590(data);
     FUN_0042a140(data, name);

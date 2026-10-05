@@ -60,17 +60,17 @@ struct App_4b5cc0 {
 };
 
 extern App_4b5cc0* DAT_0051fbd0;
-extern void (__cdecl *DAT_0051fc78)(int);
-extern int DAT_0051fc7c;
+extern void (__cdecl *g_closeHandler)(int);
+extern int g_closeHandlerArg;
 
-void __stdcall FUN_004b5510(int param);
+void __stdcall SetFullScreen(int param);
 void __stdcall FUN_004c1b20(int v);
 void __stdcall FUN_004c1d50(int v, int flag);
 void __stdcall FUN_004c2360(int* p);
 void __stdcall FUN_004c2e30(Event_4b5cc0* ev);
 
 // FUNCTION: 0x4b5cc0
-long __stdcall FUN_004b5cc0(HWND hwnd, unsigned int msg, unsigned int wparam,
+long __stdcall WindowProc(HWND hwnd, unsigned int msg, unsigned int wparam,
                             unsigned int lparam)
 {
     Event_4b5cc0 e;
@@ -79,7 +79,7 @@ long __stdcall FUN_004b5cc0(HWND hwnd, unsigned int msg, unsigned int wparam,
         return 0;
     case WM_DESTROY:
         if (DAT_0051fbd0->flags.bits.bit1)
-            FUN_004b5510(0);
+            SetFullScreen(0);
         PostQuitMessage(0);
         return 0;
     case WM_ACTIVATE:
@@ -89,8 +89,8 @@ long __stdcall FUN_004b5cc0(HWND hwnd, unsigned int msg, unsigned int wparam,
             DAT_0051fbd0->active = 1;
         return 0;
     case WM_CLOSE:
-        if (DAT_0051fc78 != 0) {
-            DAT_0051fc78(DAT_0051fc7c);
+        if (g_closeHandler != 0) {
+            g_closeHandler(g_closeHandlerArg);
             return 0;
         }
         DestroyWindow(hwnd);

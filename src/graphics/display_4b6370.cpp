@@ -8,13 +8,13 @@ struct GameCtx_4b6370 {
 
 extern GameCtx_4b6370* DAT_0051fbd0;
 extern unsigned int DAT_0051fc84;
-extern int DAT_0051fc80;
+extern int g_timerCount;
 extern int DAT_0051fbe0;
 
 typedef int (__stdcall *Callback_4b6370)(int);
 
 // FUNCTION: 0x4b6370
-void FUN_004b6370()
+void UpdateTimers()
 {
     unsigned int q1 = (GetTickCount() * DAT_0051fbd0->f_e8) / 1000;
     int diff = (int)q1 - DAT_0051fc84;
@@ -31,5 +31,5 @@ void FUN_004b6370()
             }
         }
         p += 4;
-    } while ((int)p < (int)&DAT_0051fc80);
+    } while ((int)p < (int)&g_timerCount);
 }

@@ -30,7 +30,7 @@ struct FindData_004cb170 {
 extern char DAT_00503374[];
 extern char DAT_005119b8[];
 
-Game_004cb170* FUN_004b6220();
+Game_004cb170* GetDisplay();
 int __stdcall FUN_004bc4b0(const char* path, FindData_004cb170* fd, int a, int b);
 int __stdcall FUN_004bc640(int handle, FindData_004cb170* fd);
 void __stdcall FUN_004bc8d0(int handle);
@@ -39,7 +39,7 @@ int __stdcall FUN_004cac40(char* name, unsigned char* data, int width, int heigh
 // FUNCTION: 0x4cb170
 int __stdcall FUN_004cb170(char* param_1, char* param_2)
 {
-    Game_004cb170* game = FUN_004b6220();
+    Game_004cb170* game = GetDisplay();
     int flag = 0;
     char filename[260];
     FindData_004cb170 fd;
@@ -72,7 +72,7 @@ int __stdcall FUN_004cb170(char* param_1, char* param_2)
     sprintf(filename, "%s%s%s%04i.pcx", param_1, sep, param_2, best + 1);
 
     Bitmap_004cb170* bitmap = game->bitmap;
-    Game_004cb170* g = FUN_004b6220();
+    Game_004cb170* g = GetDisplay();
     for (int i = 0; i < 256; i++) {
         pal[i * 3] = g->palette[i].peRed;
         pal[i * 3 + 1] = g->palette[i].peGreen;

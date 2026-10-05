@@ -71,7 +71,7 @@ public:
 
 int* __stdcall FUN_00429660(int* file);
 int __cdecl sprintf(char* buf, const char* fmt, ...);
-void __stdcall FUN_004b6290(char* message);
+void __stdcall FatalError(char* message);
 void* __cdecl FUN_004d83b0(const char* name, unsigned int size);
 void __cdecl FUN_004d85a0(void* block);
 void* __stdcall FUN_004b8da0(const char* name, int width, int height);
@@ -142,7 +142,7 @@ void FUN_00483610()
         break;
     default:
         sprintf(text, "Unknown TNT version:  0x%08x", info.version);
-        FUN_004b6290(text);
+        FatalError(text);
         break;
     }
     // REGION r1 end

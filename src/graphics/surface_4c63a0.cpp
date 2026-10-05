@@ -1,7 +1,7 @@
 // Decompiled by deepseek-v4.1-flash, finished by GPT-6.1-sol, finished by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by Space Bunny Free, finished by claude-sonnet-5-5, finished by GPT-6, finished by claude-opus-5-5. Names are provisional.
 // Presents a frame. With flag bit 1 clear it blits the cached bitmap through
 // GDI. Otherwise, when +0xdc is set, it copies the bitmap at +0xbc (if its
-// size matches FUN_004b6700/FUN_004b6710) into the locked primary surface;
+// size matches GetScreenWidth/GetScreenHeight) into the locked primary surface;
 // else it flips, or Blts the back surface to the window's client rect,
 // retrying after DDERR_SURFACELOST.
 // The two "MAIN" Lock()/Unlock() pairs share one Unlock body in the exe.
@@ -74,9 +74,9 @@ extern LONG DAT_0052a4ec;
 extern HANDLE DAT_0052a4f0;
 extern int DAT_0051fe00;
 
-Display_004c63a0* FUN_004b6220(void);
-int FUN_004b6700(void);
-int FUN_004b6710(void);
+Display_004c63a0* GetDisplay(void);
+int GetScreenWidth(void);
+int GetScreenHeight(void);
 int __stdcall FUN_004c5e70(Surface_004c63a0* out);
 void __stdcall FUN_004c6b70(Surface_004c63a0* dst, Surface_004c63a0* bmp, int x, int y);
 void __stdcall FUN_004c67c0(Display_004c63a0* obj, void* dst);
@@ -108,7 +108,7 @@ static inline void Unlock(LONG held)
 // 0x4c5fa0, inlined here.
 static inline int UnlockScreen()
 {
-    Display_004c63a0* d = FUN_004b6220();
+    Display_004c63a0* d = GetDisplay();
     if (d->field_44 == 0 && d->field_dc == 0) {
         if (d->screen.surface == 0)
             return 0;
@@ -125,7 +125,7 @@ static inline int UnlockScreen()
 // Lock the same registers as the first path and tail-merge the two Unlocks.
 static inline HRESULT RestoreSurfaces(Display_004c63a0* d)
 {
-    Display_004c63a0* dd = FUN_004b6220();
+    Display_004c63a0* dd = GetDisplay();
     if (dd->field_44 != 0)
         return 0;
     HRESULT hr = d->screen.primary->Restore();
@@ -152,7 +152,7 @@ struct Desc {
 // FUNCTION: 0x4c63a0
 void FUN_004c63a0(void)
 {
-    Display_004c63a0* d = FUN_004b6220();
+    Display_004c63a0* d = GetDisplay();
     unsigned short flags = d->flags;
 
     if ((flags & 2) == 0) {
@@ -173,9 +173,9 @@ void FUN_004c63a0(void)
         Desc desc;
         Surface_004c63a0 out;
         Surface_004c63a0* bmp = d->field_bc;
-        if (bmp->data[0] != FUN_004b6700())
+        if (bmp->data[0] != GetScreenWidth())
             return;
-        if (bmp->data[1] != FUN_004b6710())
+        if (bmp->data[1] != GetScreenHeight())
             return;
 
         LONG held = Lock();

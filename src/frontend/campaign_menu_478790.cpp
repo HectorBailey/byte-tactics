@@ -125,7 +125,7 @@ Entry_00478790* __stdcall FUN_004a0280(Entry_00478790* entries, const char* name
 int __stdcall FUN_004a1810(Entry_00478790* entries, int index);
 void __stdcall FUN_0049fa90(Window_00478790* window);
 void __stdcall FUN_0049fad0(Window_00478790* window);
-unsigned int __cdecl FUN_004b6340();
+unsigned int __cdecl GetTicks();
 int __stdcall FUN_004b7f30(unsigned short* param_1, int param_2);
 void __stdcall FUN_004b7f90(void* surface, Frame_00478790* frame, int x, int y);
 char* __stdcall FUN_004c5740(const char* key);
@@ -183,11 +183,11 @@ void __stdcall FUN_00478790(Window_00478790* arg1, Item_00478790* arg2)
         for (int j = 0; j < *(unsigned short*)arg2->gaf; j++)
             total += ((Frame_00478790*)FUN_004b7f30((unsigned short*)arg2->gaf, j))->width;
 
-        if (DAT_0051e678 < (int)FUN_004b6340()) {
+        if (DAT_0051e678 < (int)GetTicks()) {
             DAT_0051e674++;
             if ((int)DAT_0051e674 >= total)
                 DAT_0051e674 = 0;
-            DAT_0051e678 = FUN_004b6340() + 2;
+            DAT_0051e678 = GetTicks() + 2;
         }
 
         FUN_0049fad0(arg1);
@@ -200,7 +200,7 @@ void __stdcall FUN_00478790(Window_00478790* arg1, Item_00478790* arg2)
         void* gaf = arg2->gaf;
         surface = arg1->table->entries->surface;
 
-        int now = (int)FUN_004b6340();
+        int now = (int)GetTicks();
         int idx = now / 3 % *(unsigned short*)gaf;
         arg2->frame = (short)idx;
         Frame_00478790* f = (Frame_00478790*)FUN_004b7f30((unsigned short*)gaf, arg2->frame);

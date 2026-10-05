@@ -49,7 +49,7 @@ extern Class_0051fba4* DAT_0051fba4;
 void __stdcall FUN_004c1420(int id);
 int FUN_004c1450();
 void* __stdcall FUN_004b7f30(void* a, int b);
-unsigned int __cdecl FUN_004b6340();
+unsigned int __cdecl GetTicks();
 
 // FUNCTION: 0x4a30c0
 void __stdcall FUN_004a30c0(Class_004a30c0* obj, int index)
@@ -80,5 +80,5 @@ void __stdcall FUN_004a30c0(Class_004a30c0* obj, int index)
     }
     int h = e->height;
     e->height = h - h % (step + 2);
-    *(int*)&e->count = FUN_004b6340();
+    *(int*)&e->count = GetTicks();
 }

@@ -111,7 +111,7 @@ void __stdcall FUN_004c1420(int id);
 int FUN_004c1450();
 int __stdcall FUN_004b7f30(unsigned short* param_1, int param_2);
 char* __stdcall FUN_004b6af0(char* text, int n);
-int FUN_004b6340();
+int GetTicks();
 int __stdcall FUN_004ab570(Object_004a3780* obj, unsigned char buttons);
 int __stdcall FUN_004ab510(Object_004a3780* obj, unsigned char buttons);
 int __stdcall FUN_004ab5b0(Object_004a3780* obj, unsigned int mask);
@@ -298,8 +298,8 @@ ret1:
         }
         obj->field_cca = 1;
     } else if (point.y < r.y0) {
-        if (me->field_bc > 0 && me->field_b6 < FUN_004b6340()) {
-            me->field_b6 = FUN_004b6340() + 2;
+        if (me->field_bc > 0 && me->field_b6 < GetTicks()) {
+            me->field_b6 = GetTicks() + 2;
             if (me->field_ba > me->field_bc)
                 me->field_ba = me->field_bc;
             me->field_bc--;
@@ -317,8 +317,8 @@ ret1:
             goto finish;
         }
     } else if (point.y > r.y1) {
-        if (me->field_bc < me->field_be && me->field_b6 < FUN_004b6340()) {
-            me->field_b6 = FUN_004b6340() + 2;
+        if (me->field_bc < me->field_be && me->field_b6 < GetTicks()) {
+            me->field_b6 = GetTicks() + 2;
             me->field_bc++;
             me->field_ba = me->field_bc + step - 1;
             if (me->field_c2 != 0) {

@@ -13,7 +13,7 @@ struct App_004b6290 {
 extern App_004b6290* DAT_0051fbd0;
 
 // FUNCTION: 0x4b6290
-void __stdcall FUN_004b6290(char* message)
+void __stdcall FatalError(char* message)
 {
     if (message) {
         MessageBoxA(DAT_0051fbd0->hwnd, message, DAT_0051fbd0->title, MB_ICONHAND | MB_SYSTEMMODAL);

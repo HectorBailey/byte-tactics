@@ -172,7 +172,7 @@ void* __stdcall FUN_004b7f30(void* gaf, int frame);
 void __stdcall FUN_004b7f90(void* dest, void* src, int x, int y);
 void __stdcall FUN_004b8500(void* dest, void* src, int x, int y);
 void __stdcall FUN_0046bae0(void* dest, Vec3_0049be60* pos, void* sprite, void* rect);
-int __stdcall FUN_004b6720(void* region, int x, int y);
+int __stdcall PointInRect(void* region, int x, int y);
 void __stdcall FUN_004b9360(void* dest, void* src, int x, int y);
 void __stdcall FUN_004be950(void* dest, int x1, int y1, int x2, int y2, unsigned int color);
 int __stdcall FUN_004b7f60(void* gaf);
@@ -288,7 +288,7 @@ void __stdcall FUN_0049be60(void* surface)
                     int sy = ((int)*(short*)((char*)pos + 10)
                               - ((int)*(short*)((char*)pos + 6) >> 1))
                              - (short)g_game->scrollY + 0x20;
-                    if (FUN_004b6720(g_game->field_37e27, sx, sy) == 0)
+                    if (PointInRect(g_game->field_37e27, sx, sy) == 0)
                         return;
                     FUN_004b9360(surface, g_game->field_1ab9b, sx, sy);
                 } else if (type->field_10c == 3) {

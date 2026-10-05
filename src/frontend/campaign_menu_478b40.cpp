@@ -87,7 +87,7 @@ extern Anim_00478b40 DAT_0051e640;
 extern unsigned int DAT_0051e67c;
 extern unsigned int DAT_0051e680;
 
-unsigned int __cdecl FUN_004b6340();
+unsigned int __cdecl GetTicks();
 int __stdcall FUN_004b8b90(Anim_00478b40* anim);
 int __stdcall FUN_004b7f30(void* gaf, int frame);
 void __stdcall FUN_004b7f90(void* surface, void* frame, int x, int y);
@@ -122,7 +122,7 @@ void __stdcall FUN_00478b40(Window_00478b40* arg1, Item_00478b40* arg2)
             rect.y1 = y1;
             rect.y2 = y2;
 
-            if (FUN_004b6340() != DAT_0051e67c) {
+            if (GetTicks() != DAT_0051e67c) {
                 FUN_004b8b90(&DAT_0051e640);
                 arg2->frame = DAT_0051e640.index;
             }

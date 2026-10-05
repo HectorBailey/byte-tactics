@@ -162,7 +162,7 @@ extern Class_0051fba4* DAT_0051fba4;
 extern int DAT_0051fbb4;
 extern char DAT_005119b8[];
 
-int FUN_004b6340();
+int GetTicks();
 void __stdcall FUN_004ab5d0(Menu_004a9fd0*);
 int FUN_004c1b00();
 int FUN_004c1ab0();
@@ -235,13 +235,13 @@ static inline void FUN_004a4890(Menu_004a9fd0* menu, int i)
     Entry_004a9fd0* entries = menu->layer->entries;
     Entry_004a9fd0* e = &entries[i];
     if (e->u_b6.anim.field_ce && e->u_b6.anim.field_ba < e->u_b6.anim.field_be) {
-        if (FUN_004b6340() > e->u_b6.anim.field_c6) {
+        if (GetTicks() > e->u_b6.anim.field_c6) {
             e->u_b6.anim.field_ba += (int)e->u_b6.anim.field_ca;
             if (e->u_b6.anim.field_ba > e->u_b6.anim.field_be) {
                 e->u_b6.anim.field_ba = e->u_b6.anim.field_be;
                 e->u_b6.anim.field_ce = 0;
             }
-            e->u_b6.anim.field_c6 = FUN_004b6340() + e->u_b6.anim.field_c2;
+            e->u_b6.anim.field_c6 = GetTicks() + e->u_b6.anim.field_c2;
         }
         FUN_004a4660(menu, i);
     }
@@ -317,7 +317,7 @@ int __stdcall FUN_004a9fd0(Menu_004a9fd0* menu)
     if (menu->layer == 0)
         return 0;
 
-    int now = FUN_004b6340();
+    int now = GetTicks();
     menu->field_9a = now - menu->field_96;
     menu->field_96 = now;
     FUN_004ab5d0(menu);
@@ -380,9 +380,9 @@ int __stdcall FUN_004a9fd0(Menu_004a9fd0* menu)
     point.y -= entries->y;
 
     int elapsed;
-    if (FUN_004b6340() - DAT_0051fbb4 > 0) {
+    if (GetTicks() - DAT_0051fbb4 > 0) {
         elapsed = 1;
-        DAT_0051fbb4 = FUN_004b6340();
+        DAT_0051fbb4 = GetTicks();
     } else {
         elapsed = 0;
     }

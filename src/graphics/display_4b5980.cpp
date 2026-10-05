@@ -133,12 +133,12 @@ int __stdcall FUN_004ba5c0(App_4b5980* d);
 int __stdcall FUN_004ba660(App_4b5980* d);
 int __stdcall FUN_004ba6b0(App_4b5980* d);
 int __stdcall FUN_004ba700(App_4b5980* d);
-void __stdcall FUN_004b4ff0(App_4b5980* d);
-int __stdcall FUN_004b5510(int param);
-long __stdcall FUN_004b5cc0(HWND hwnd, unsigned int msg, unsigned int wparam, long lparam);
+void __stdcall ReleaseDirectDraw(App_4b5980* d);
+int __stdcall SetFullScreen(int param);
+long __stdcall WindowProc(HWND hwnd, unsigned int msg, unsigned int wparam, long lparam);
 
 // FUNCTION: 0x4b5980
-int __stdcall FUN_004b5980(App_4b5980* d)
+int __stdcall InitEnvironment(App_4b5980* d)
 {
     DAT_0051fbd0 = d;
     MEMORYSTATUS mem;
@@ -206,7 +206,7 @@ int __stdcall FUN_004b5980(App_4b5980* d)
         d->oldPalette = 0;
         d->unknown_80 = 0;
         d->mode = d->startMode;
-        d->wc.lpfnWndProc = FUN_004b5cc0;
+        d->wc.lpfnWndProc = WindowProc;
         d->wc.style = 8;
         d->wc.hInstance = d->hInstance;
         d->wc.lpszClassName = d->className;
@@ -225,13 +225,13 @@ int __stdcall FUN_004b5980(App_4b5980* d)
             if (d->hwnd != 0) {
                 ShowWindow(d->hwnd, d->nCmdShow);
                 UpdateWindow(d->hwnd);
-                int r = FUN_004b5510(d->videoFlags & 1);
+                int r = SetFullScreen(d->videoFlags & 1);
                 if (r != 0) {
                     return 1;
                 }
             }
         }
-        FUN_004b4ff0(d);
+        ReleaseDirectDraw(d);
         if (d->dc) {
             DeleteDC(d->dc);
         }

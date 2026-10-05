@@ -51,7 +51,7 @@ void __stdcall FUN_004abd90(char* dest, char* text, int param_3, int param_4, in
 char* __stdcall FUN_004c5740(char* text);
 void __stdcall FUN_004c6890(int param_1, int param_2);
 void __stdcall FUN_004c69a0(int param_1);
-Display_00425d80* FUN_004b6220(void);
+Display_00425d80* GetDisplay(void);
 
 // FUNCTION: 0x425d80
 void __stdcall FUN_00425d80(Gadget_00425d80* gadget)
@@ -89,7 +89,7 @@ void __stdcall FUN_00425d80(Gadget_00425d80* gadget)
     }
     if (FUN_0049fd60(gadget, "INTRO")) {
         FUN_0047f1a0("smlButton", 0);
-        Display_00425d80* display = FUN_004b6220();
+        Display_00425d80* display = GetDisplay();
         if (!display->fullscreen) {
             FUN_004abd90(g_game + 0x519,
                          "Debug:  You must be in full-screen mode to play a movie.",
@@ -135,7 +135,7 @@ void __stdcall FUN_00425d80(Gadget_00425d80* gadget)
     }
     if (FUN_0049fd60(gadget, "Credits")) {
         FUN_0047f1a0("smlButton", 0);
-        Display_00425d80* display = FUN_004b6220();
+        Display_00425d80* display = GetDisplay();
         if (!display->fullscreen) {
             FUN_004abd90(g_game + 0x519,
                          "Debug:  You must be in full-screen mode to play a movie.",

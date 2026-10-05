@@ -53,7 +53,7 @@ struct Display_004b9740 {
     unsigned char* blend;               // +0xc0
 };
 
-Display_004b9740* FUN_004b6220(void);
+Display_004b9740* GetDisplay(void);
 int __stdcall FUN_004c5e70(Surface_004b9740* out);
 int __stdcall FUN_004c5fa0(Surface_004b9740* s);
 void __stdcall FUN_004b7e60(Rect_004b9740* other, Rect_004b9740* rect, Rect_004b9740* bounds);
@@ -61,7 +61,7 @@ void __stdcall FUN_004b7e60(Rect_004b9740* other, Rect_004b9740* rect, Rect_004b
 // FUNCTION: 0x4b9740
 void __stdcall FUN_004b9740(Class_004c6ae0* dst, Bitmap_004b9740* bmp, int x, int y, double sx, double sy)
 {
-    Display_004b9740* d = FUN_004b6220();
+    Display_004b9740* d = GetDisplay();
     Surface_004b9740 screen;
     if (dst == 0) {
         int ok = FUN_004c5e70(&screen);

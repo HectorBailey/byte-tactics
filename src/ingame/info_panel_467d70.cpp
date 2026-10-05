@@ -40,7 +40,7 @@ extern Game* g_game;
 
 int __stdcall FUN_004b7f30(unsigned short* frames, int frame);
 void __stdcall FUN_004b7f90(void* surf, short* frame, int x, int y);
-int FUN_004b6710();
+int GetScreenHeight();
 void __stdcall FUN_004c69a0(void* surf);
 void __stdcall FUN_004c6890(void* surf, int mode);
 void FUN_004c63a0();
@@ -57,7 +57,7 @@ void FUN_00467d70()
     short* bar = (short*)FUN_004b7f30(g_game->field_1481f[side], 0);
     FUN_004b7f90(surf, bar, bar[2] + 0x81, bar[3]);
 
-    int dy = FUN_004b6710() - 0x20;
+    int dy = GetScreenHeight() - 0x20;
     bar = (short*)FUN_004b7f30(g_game->field_14833[side], 0);
     FUN_004b7f90(surf, bar, bar[2] + 0x81, bar[3] + dy);
 

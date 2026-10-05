@@ -40,20 +40,20 @@ struct Obj_004c2870 {
 };
 #pragma pack(pop)
 
-Obj_004c2870* FUN_004b6220(void);
+Obj_004c2870* GetDisplay(void);
 void __stdcall FUN_004c6b70(void* dst, void* bmp, int x, int y);
 void __stdcall FUN_004b7f90(void* dst, Bitmap_004c2870* bmp, int x, int y);
 
 static inline void GetRect(Rect_004c2870* out)
 {
-    Obj_004c2870* p = FUN_004b6220();
+    Obj_004c2870* p = GetDisplay();
     memcpy(out, &p->rect, sizeof(Rect_004c2870));
 }
 
 // FUNCTION: 0x4c2870
 void __fastcall FUN_004c2870(void)
 {
-    Obj_004c2870* o = FUN_004b6220();
+    Obj_004c2870* o = GetDisplay();
     if (o->mode != 1) {
         if (--o->count <= 0) {
             POINT pt;
@@ -68,7 +68,7 @@ void __fastcall FUN_004c2870(void)
                 o->field_1be[2] = o->bmp->width;
             }
             FUN_004c6b70(o->field_1be, 0, -o->x, -o->y);
-            Obj_004c2870* o2 = FUN_004b6220();
+            Obj_004c2870* o2 = GetDisplay();
             if (o2->mode != 1 && o2->count <= 0) {
                 Rect_004c2870 r;
                 GetRect(&r);

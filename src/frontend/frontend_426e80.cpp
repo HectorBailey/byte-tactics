@@ -128,14 +128,14 @@ void __stdcall AddNetPlayer(int param);
 void __stdcall FUN_004c69a0(int param);
 void __stdcall FUN_004c6890(int param1, int param2);
 void __stdcall FUN_004c63a0(void);
-void __stdcall FUN_004b6230(int param);
+void __stdcall QuitApp(int param);
 void __stdcall HAPINET_guaranteepackets(int param);
 void __stdcall FUN_004a9660(int param);
 void __stdcall FUN_004ab0a0(int param);
 void __stdcall HAPINET_quitgame(int param);
 void __stdcall InitPacketManager(int param1, int param2);
 void __stdcall FUN_004c1ab0(void);
-Obj_00426e80* __stdcall FUN_004b6220(void);
+Obj_00426e80* __stdcall GetDisplay(void);
 void __stdcall FUN_004263b0(void);
 void __stdcall FUN_00430f00(void);
 int __stdcall InitLobbiedConnection(void);
@@ -293,7 +293,7 @@ void FUN_00426e80(void)
 
     switch ((unsigned char)g_game[0x2bbe]) {
     case 0: {
-        Obj_00426e80* p = FUN_004b6220();
+        Obj_00426e80* p = GetDisplay();
         FUN_004c22d0(0);
         if (p->flag) {
             if (*(int*)(g_game + 0x3923d)) {
@@ -356,7 +356,7 @@ void FUN_00426e80(void)
             return;
         case 8:
             FUN_004257a0();
-            FUN_004b6230(0);
+            QuitApp(0);
             return;
         }
         break;

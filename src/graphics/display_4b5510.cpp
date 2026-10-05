@@ -64,7 +64,7 @@ extern HANDLE DAT_0052a4f0;
 extern Display_004b5510 *DAT_0051fbd0;
 
 int __stdcall FUN_0049f710(int guid, void *display, int zero);
-void __stdcall FUN_004b4ff0(Display_004b5510 *d);
+void __stdcall ReleaseDirectDraw(Display_004b5510 *d);
 void __stdcall FUN_004c6a60(Class_004c6a60 *s, int width, int height, int a, int b);
 int __stdcall FUN_004c5e70(Surface_004b5510 *s);
 void __cdecl FUN_004cbbe0(Surface_004b5510 *dst, void *src, int x, int y);
@@ -85,7 +85,7 @@ static inline void FreeGdi_004b5510(Display_004b5510 *d, HDC &dc)
 }
 
 // FUNCTION: 0x4b5510
-int __stdcall FUN_004b5510(int mode) {
+int __stdcall SetFullScreen(int mode) {
     int lockResult;
     Display_004b5510 *d;
     DDSURFACEDESC ddsd;
@@ -110,7 +110,7 @@ int __stdcall FUN_004b5510(int mode) {
     d = DAT_0051fbd0;
     DirectDrawState *dd = &d->draw;
     dd->field_9c = 0;
-    FUN_004b4ff0(DAT_0051fbd0);
+    ReleaseDirectDraw(DAT_0051fbd0);
 
     FreeGdi_004b5510(DAT_0051fbd0, DAT_0051fbd0->dc);
     SetWindowPos(d->hwnd, NULL, 0, 0, DAT_0051fbd0->width, DAT_0051fbd0->height,

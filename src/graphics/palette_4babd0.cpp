@@ -12,7 +12,7 @@ struct Obj_004babd0 {
 };
 #pragma pack(pop)
 
-extern Obj_004babd0* FUN_004b6220(void);
+extern Obj_004babd0* GetDisplay(void);
 
 void __stdcall FUN_004ba920(PALETTEENTRY* palette, int* sums,
                             unsigned char* order);
@@ -22,7 +22,7 @@ unsigned char __stdcall FUN_004ba9d0(PALETTEENTRY* palette, int* sums,
 // FUNCTION: 0x4babd0
 unsigned char* __stdcall FUN_004babd0(PALETTEENTRY* palette)
 {
-    Obj_004babd0* obj = FUN_004b6220();
+    Obj_004babd0* obj = GetDisplay();
     if (obj->flag7) {
         int sums[256];
         unsigned char order[256];

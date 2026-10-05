@@ -44,7 +44,7 @@ struct BmpInfo {
     RgbQuad colors[256];
 };
 
-void* FUN_004b6220();
+void* GetDisplay();
 
 class Class_004cb7f0 {
 public:
@@ -58,7 +58,7 @@ public:
 // FUNCTION: 0x4cb7f0
 bool Class_004cb7f0::FUN_004cb7f0(const char* name, int w, int h)
 {
-    void* palbase = FUN_004b6220();
+    void* palbase = GetDisplay();
 
     width = w;
     height = h;

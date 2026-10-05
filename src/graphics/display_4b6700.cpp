@@ -8,7 +8,7 @@ struct GlobalObj {
 };
 
 // FUNCTION: 0x4b6700
-int FUN_004b6700()
+int GetScreenWidth()
 {
     GlobalObj* obj = (GlobalObj*)DAT_0051fbd0;
     return obj->field_d4;

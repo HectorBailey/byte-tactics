@@ -24,7 +24,7 @@
 
 extern char* g_game;
 
-int FUN_004b6710();
+int GetScreenHeight();
 int __stdcall FUN_004b7f30(unsigned short* param_1, int param_2);
 void __stdcall FUN_004b7f90(void* dst, void* bmp, int x, int y);
 void __stdcall FUN_004c13a0(int param_1, int param_2);
@@ -105,7 +105,7 @@ void __stdcall FUN_0046a860(void* surface) {
         char* table = *(char**)(g_game + player * 331 + 0x1b8a);
         int idx = *(unsigned char*)(table + 0x95);
         do {
-            int dy = FUN_004b6710() - 0x20;
+            int dy = GetScreenHeight() - 0x20;
             unsigned short* icon = *(unsigned short**)(g_game + idx * 4 + 0x14833);
             int bmp = FUN_004b7f30(icon, 0);
             FUN_004b7f90(surface, (void*)bmp, (short)*(unsigned short*)(bmp + 4) + y,
@@ -213,7 +213,7 @@ void __stdcall FUN_0046a860(void* surface) {
     FUN_004c1420(*(int*)(panel + 0x22e));
     int y = 0x81;
     do {
-        int dy = FUN_004b6710() - 0x20;
+        int dy = GetScreenHeight() - 0x20;
         char* loopInfo = playerInfo->info;
         int loopSide = *(unsigned char*)(loopInfo + 0x95);
         unsigned short* icon = *(unsigned short**)(g_game + loopSide * 4 + 0x14833);

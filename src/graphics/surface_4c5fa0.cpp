@@ -26,12 +26,12 @@ struct Display_004c5fa0 {
 
 extern int DAT_0051fe00;
 
-Display_004c5fa0* FUN_004b6220(void);
+Display_004c5fa0* GetDisplay(void);
 
 // FUNCTION: 0x4c5fa0
 int __stdcall FUN_004c5fa0(Surface_004c5fa0* s)
 {
-    Display_004c5fa0* d = FUN_004b6220();
+    Display_004c5fa0* d = GetDisplay();
     if (d->field_44 == 0 && d->field_dc == 0) {
         if (d->screen.surface == 0)
             return 0;

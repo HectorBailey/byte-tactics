@@ -8,7 +8,7 @@ struct GlobalObj {
 };
 
 // FUNCTION: 0x4b6330
-int FUN_004b6330()
+int GetTickRate()
 {
     GlobalObj* obj = (GlobalObj*)DAT_0051fbd0;
     return obj->field_e8;

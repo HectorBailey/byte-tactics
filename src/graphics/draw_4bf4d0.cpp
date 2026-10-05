@@ -50,7 +50,7 @@ struct Engine_004bf4d0 {
     int height;                        // +0xd8
 };
 
-Engine_004bf4d0* FUN_004b6220();
+Engine_004bf4d0* GetDisplay();
 int __stdcall FUN_004c5e70(Surface_004bf4d0* out);
 int __stdcall FUN_004c5fa0(Surface_004bf4d0* s);
 int __stdcall FUN_004bf620(Surface_004bf4d0* s, Rect_004bf4d0* r);
@@ -58,7 +58,7 @@ int __stdcall FUN_004bf620(Surface_004bf4d0* s, Rect_004bf4d0* r);
 // FUNCTION: 0x4bf4d0
 int __stdcall FUN_004bf4d0(Surface_004bf4d0* surface, Rect_004bf4d0* rect, int level)
 {
-    Engine_004bf4d0* engine = FUN_004b6220();
+    Engine_004bf4d0* engine = GetDisplay();
     Surface_004bf4d0 screen;
     Rect_004bf4d0 r;
     if (surface == 0) {

@@ -181,10 +181,10 @@ struct FontRoot_004a81e0 {
 
 extern FontRoot_004a81e0* DAT_0051fba4;
 
-int FUN_004b6700(void);
-int FUN_004b6710(void);
+int GetScreenWidth(void);
+int GetScreenHeight(void);
 int FUN_004c1ab0(void);
-unsigned int FUN_004b6340(void);
+unsigned int GetTicks(void);
 int FUN_004c1450(void);
 
 void __stdcall FUN_004a05e0(void* obj, int index);
@@ -266,17 +266,17 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
         entries[0].x = -2;
     }
     if (-1 == entries[0].x) {
-        entries[0].x = (short)((FUN_004b6700() - entries[0].w) / 2);
-        entries[0].y = (short)((FUN_004b6710() - entries[0].h) / 2);
+        entries[0].x = (short)((GetScreenWidth() - entries[0].w) / 2);
+        entries[0].y = (short)((GetScreenHeight() - entries[0].h) / 2);
     }
     if (entries[0].x == -2) {
-        entries[0].x = (short)(((FUN_004b6700() - 0x80 - entries[0].w) / 2) + 0x80);
-        entries[0].y = (short)((FUN_004b6710() - entries[0].h) / 2);
+        entries[0].x = (short)(((GetScreenWidth() - 0x80 - entries[0].w) / 2) + 0x80);
+        entries[0].y = (short)((GetScreenHeight() - entries[0].h) / 2);
     }
-    if (entries[0].x + entries[0].w > FUN_004b6700())
-        entries[0].x = (short)((FUN_004b6700() - entries[0].w) / 2);
-    if (entries[0].y + entries[0].h > FUN_004b6710())
-        entries[0].y = (short)((FUN_004b6710() - entries[0].h) / 2);
+    if (entries[0].x + entries[0].w > GetScreenWidth())
+        entries[0].x = (short)((GetScreenWidth() - entries[0].w) / 2);
+    if (entries[0].y + entries[0].h > GetScreenHeight())
+        entries[0].y = (short)((GetScreenHeight() - entries[0].h) / 2);
 
     force = flags & 1;
     if (force) {
@@ -290,7 +290,7 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
                 entries[i].field_13a = 0;
         }
     }
-    if (entries[0].w > FUN_004b6700() || entries[0].h > FUN_004b6710())
+    if (entries[0].w > GetScreenWidth() || entries[0].h > GetScreenHeight())
         return 0;
 
     entries[0].u.assets.archive = 0;
@@ -322,7 +322,7 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
         case 0:
         case 11: {
             if (0 > entries[0].y)
-                entries[0].y += (short)FUN_004b6710();
+                entries[0].y += (short)GetScreenHeight();
             FUN_004a81b0(menu, buf1);
             strncpy(textbuf, entries[0].name, 0x10);
             textbuf[0x10] = 0;
@@ -570,7 +570,7 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
 
         case 13: {
             Entry_004a81e0* en = menu->layer->entries;
-            en[i].u.t13.f_c6 = FUN_004b6340() + en[i].u.t13.f_c2;
+            en[i].u.t13.f_c6 = GetTicks() + en[i].u.t13.f_c2;
             break;
         }
 
@@ -648,7 +648,7 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
                         fh = ((Glyph_004a81e0*)FUN_004b7f30(DAT_0051fba4->language->glyphs, 0x49))->h + 2;
                     int hh = base[i].h;
                     base[i].h = (short)(hh - ((int)base[i].h) % (fh + 2));
-                    base[i].u.list.field_0 = FUN_004b6340();
+                    base[i].u.list.field_0 = GetTicks();
                 }
                 if (force || (flags & 0x40))
                     FUN_004a1b40(menu, i);
@@ -686,7 +686,7 @@ int __stdcall FUN_004a81e0(Menu_004a81e0* menu, unsigned int flags)
             case 13:
                 if (force) {
                     Entry_004a81e0* base = menu->layer->entries;
-                    base[i].u.t13.f_c6 = FUN_004b6340() + base[i].u.t13.f_c2;
+                    base[i].u.t13.f_c6 = GetTicks() + base[i].u.t13.f_c2;
                 }
                 if (force || (flags & 0x40))
                     FUN_004a4660(menu, i);

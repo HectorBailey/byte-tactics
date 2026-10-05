@@ -164,9 +164,9 @@ void __stdcall FUN_004a50e0(void*, char*, int, int, int, int);
 void __stdcall FUN_004a9660(void*);
 void __stdcall FUN_004ab400(void*, void*);
 void __stdcall FUN_004ac7d0(void*, void*, void*);
-void __stdcall FUN_004b4fd0(void (__cdecl *)(int), int);
-void __stdcall FUN_004b5940(int, int);
-void __stdcall FUN_004b6290(char*);
+void __stdcall SetCloseHandler(void (__cdecl *)(int), int);
+void __stdcall SetResolution(int, int);
+void __stdcall FatalError(char*);
 int __stdcall FUN_004b6b20(void (*)(void), int, int);
 void __stdcall FUN_004b6b50(int);
 void* __stdcall FUN_004b7f30(void*, int);
@@ -188,12 +188,12 @@ class Class_004cdb40 { public: void FUN_004cdb40(); };
 class Class_004ce690 { public: void FUN_004ce690(int); };
 class Class_004ce800 { public: int FUN_004ce800(); };
 
-int __cdecl FUN_004b6700();
-int __cdecl FUN_004b6710();
+int __cdecl GetScreenWidth();
+int __cdecl GetScreenHeight();
 int __cdecl FUN_004c13f0();
 int __cdecl FUN_004c1450();
 int __cdecl FUN_004568c0();
-unsigned int __cdecl FUN_004b6340();
+unsigned int __cdecl GetTicks();
 char* __cdecl FUN_0049f580();
 
 class Class_00435100 {
@@ -248,13 +248,13 @@ void FUN_00497f40(void)
         FUN_004257a0();
         g_game->field_37e1f = 0x280;
         g_game->field_37e23 = 0x1e0;
-        if (FUN_004b6700() != 0x280 || FUN_004b6710() != 0x1e0) {
+        if (GetScreenWidth() != 0x280 || GetScreenHeight() != 0x1e0) {
             FUN_004d85a0((void*)g_game->field_37e1b);
             g_game->field_37e1b = 0;
             FUN_004c61f0(0);
             FUN_004c62c0();
             SetWindowPos(*(HWND*)(g_game->field_c + 0x40), 0, 0, 0, 0x280, 0x1e0, 4);
-            FUN_004b5940(0x280, 0x1e0);
+            SetResolution(0x280, 0x1e0);
             g_game->field_37e1b = (int)FUN_004c69f0("OFFSCREEN", g_game->field_37e1f, g_game->field_37e23);
             FUN_004c61f0(g_game->field_37e1b);
             FUN_004c69a0((void*)g_game->field_37e1b);
@@ -263,7 +263,7 @@ void FUN_00497f40(void)
         surfaceHandle = FUN_004bbe50((unsigned int*)aux, 0);
         FUN_004ac7d0(&g_game->field_519, SURFACE_143a7, surfaceHandle);
         FUN_004d85a0(surfaceHandle);
-        g_game->field_38a37 = FUN_004b6340();
+        g_game->field_38a37 = GetTicks();
         g_game->field_38a3b = 0;
         g_game->field_38a47 = 0;
         g_game->field_38a4f = 0;
@@ -288,7 +288,7 @@ void FUN_00497f40(void)
             g_game->slots.flag40[i] = (pi->active != 0 && (pi->data->flags & 0x40) != 0) ? 1 : 0;
         }
         if (!FUN_004b6b20(FUN_00497c70, 0, 0)) {
-            FUN_004b6290("Unable to start the loading thread!");
+            FatalError("Unable to start the loading thread!");
         }
         memset(DAT_0051f2c8, 0, 10);
         memset(DAT_0051e810, 0, 10);
@@ -301,14 +301,14 @@ void FUN_00497f40(void)
         FUN_0047f750();
         FUN_004257a0();
         FUN_00428730();
-        if (FUN_004b6700() != g_game->field_37f1b || FUN_004b6710() != g_game->field_37f1f) {
+        if (GetScreenWidth() != g_game->field_37f1b || GetScreenHeight() != g_game->field_37f1f) {
             FUN_004d85a0((void*)g_game->field_37e1b);
             g_game->field_37e1b = 0;
             FUN_004c61f0(0);
             FUN_004c62c0();
             SetWindowPos(*(HWND*)(g_game->field_c + 0x40), 0, 0, 0, g_game->field_37f1b,
                          g_game->field_37f1f, 4);
-            FUN_004b5940(g_game->field_37f1b, g_game->field_37f1f);
+            SetResolution(g_game->field_37f1b, g_game->field_37f1f);
             g_game->field_37e1b = (int)FUN_004c69f0("OFFSCREEN", g_game->field_37e1f, g_game->field_37e23);
             FUN_004c61f0(g_game->field_37e1b);
         }
@@ -317,7 +317,7 @@ void FUN_00497f40(void)
         FUN_004c2870();
         g_game->field_391f1 = 6;
         g_game->field_391f5 = FUN_00499200;
-        FUN_004b4fd0(FUN_004609a0, 0);
+        SetCloseHandler(FUN_004609a0, 0);
         g_game->field_589 = 0;
         memset((void*)g_game->progress, 0, 8);
         ((Class_004ce690*)g_game->field_10)->FUN_004ce690(0);
@@ -353,9 +353,9 @@ void FUN_00497f40(void)
     int ok = FUN_004c5e70(&gadget);
     if (ok != 0) {
         color = g_game->palette[15];
-        stamp = FUN_004b6340();
+        stamp = GetTicks();
         if (DAT_0051f308 < (int)stamp) {
-            DAT_0051f308 = FUN_004b6340();
+            DAT_0051f308 = GetTicks();
             for (i = 0; i < 6; i++) {
                 if (((char*)&DAT_0051e6c8)[i] != 0) {
                     ((char*)&DAT_0051e6c8)[i] -= 2;

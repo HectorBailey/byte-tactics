@@ -11,7 +11,7 @@ struct GlobalObj_004b6340 {
 extern GlobalObj_004b6340* DAT_0051fbd0;
 
 // FUNCTION: 0x4b6340
-unsigned int FUN_004b6340()
+unsigned int GetTicks()
 {
     return GetTickCount() * DAT_0051fbd0->rate / 1000;
 }

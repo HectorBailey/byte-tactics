@@ -7,7 +7,7 @@
 // MATCH (201 of 201 bytes, Claude Sonnet 5.5 #694). The SIB base/index swap at
 // 0x4c17ba (`mov al, [edx + ecx]` against `[ecx + edx]`) was not compiler state
 // and not the glyph access: it comes from how `font` reaches the inlined width
-// loop. Written as `int font = FUN_004b6220(); font = *(int*)(font + 0x204);`
+// loop. Written as `int font = GetDisplay(); font = *(int*)(font + 0x204);`
 // (the earlier form), or as a Font* local, or as one nested expression, the
 // register roles come out swapped (98.8, 51.2 and 48.8 percent). With the
 // singleton held as a `char*` local and the font read as
@@ -28,7 +28,7 @@ struct Rect_004c1760 {
     int data[12];
 };
 
-int FUN_004b6220(void);
+int GetDisplay(void);
 int __stdcall FUN_004c5e70(Rect_004c1760* out);
 int __stdcall FUN_004c14f0(Rect_004c1760* dst, unsigned char* text, int x,
                            int a, int b);
@@ -56,7 +56,7 @@ static inline int WidthText(Font_004c1760* font, unsigned char* text)
 // FUNCTION: 0x4c1760
 void __stdcall FUN_004c1760(int* dst, unsigned char* text, int flag)
 {
-    char* single = (char*)FUN_004b6220();
+    char* single = (char*)GetDisplay();
     int width = WidthText(*(Font_004c1760**)(single + 0x204), text);
     if (dst == 0) {
         Rect_004c1760 r;

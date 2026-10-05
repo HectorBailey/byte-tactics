@@ -46,7 +46,7 @@ typedef unsigned char byte;
 typedef unsigned short ushort;
 typedef unsigned int uint;
 extern char* g_game;
-unsigned long FUN_004b6560();
+unsigned long GetMilliseconds();
 int __stdcall FormatNetStats(int);
 int __stdcall FUN_00417f30(int,int);
 int __stdcall FUN_00418310(int);
@@ -78,9 +78,9 @@ int __stdcall FUN_0048cc30(int,int);
 int __stdcall FUN_004948e0(int);
 int __stdcall FUN_0049be60(int);
 int __stdcall FUN_004ab170(int,int,int);
-int FUN_004b66a0();
-int FUN_004b6710();
-int __stdcall FUN_004b6720(int,int,int);
+int GetFrameRate();
+int GetScreenHeight();
+int __stdcall PointInRect(int,int,int);
 int __stdcall FUN_004b7f30(int,int);
 int __stdcall FUN_004b7f90(int,int,int,int);
 int __stdcall FUN_004be950(int,int,int,int,int,int);
@@ -116,7 +116,7 @@ struct Class_0046a400 {
 };
 static inline void ProfileMark(Class_0046a400 *p, int i)
 {
-  unsigned long t = FUN_004b6560();
+  unsigned long t = GetMilliseconds();
   p->acc[i] += t - p->last;
   p->last = t;
 }
@@ -239,7 +239,7 @@ static inline int ShowSelectBox(int drawObjects)
   if (*(byte *)(g_game + 0x2cc6) & 8)
     return 1;
   if (*(char *)(g_game + 0x2cc3) == '\x0e')
-    return FUN_004b6720((int)(g_game + 0x37e27), *(int *)(g_game + 0x2c76), *(int *)(g_game + 0x2c7a)) != 0;
+    return PointInRect((int)(g_game + 0x37e27), *(int *)(g_game + 0x2c76), *(int *)(g_game + 0x2c7a)) != 0;
   return 0;
 }
 
@@ -535,7 +535,7 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
     FUN_004c13a0(colors[0xf], FUN_004c13f0());
     FUN_004c1420(*(int *)(g_game + 0x391f9));
     int ty = FUN_004c1450() * 3 - 10;
-    sprintf(debugText, "FRATE: %d\n", FUN_004b66a0());
+    sprintf(debugText, "FRATE: %d\n", GetFrameRate());
     FUN_004c14f0((int)&ctx, (int)debugText, 0x83, ty, -1);
     FUN_004c14f0((int)&ctx, (int)"[Release]", 0xbc, ty, -1);
     sprintf(debugText, "MODE %s INFO %s", ((Bits8 *)(g_game + 0x3923b))->b1 ? "DEBUG" : "NORMAL",
@@ -563,7 +563,7 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
     int seconds = (rest - minutes * 1800) / 30;
     sprintf(gameTime, "%s : %02d:%02d:%02d", (char *)FUN_004c5740((int)"Game Time"), hours, minutes, seconds);
     FUN_004c13a0(colors[0xf], FUN_004c13f0());
-    FUN_004c14f0((int)&ctx, (int)gameTime, 0x82, -0x22 - FUN_004c1450() + FUN_004b6710(), -1);
+    FUN_004c14f0((int)&ctx, (int)gameTime, 0x82, -0x22 - FUN_004c1450() + GetScreenHeight(), -1);
   }
   if (((Bits8 *)(g_game + 0x38a51))->b1)
     FUN_004b7f90((int)&ctx, FUN_004b7f30(*(int *)(g_game + 0x148cf), 0), *(int *)(g_game + 0x37e1f) - 0x10, *(int *)(g_game + 0x37e23) - 0x50);

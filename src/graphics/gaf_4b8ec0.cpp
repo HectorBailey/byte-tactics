@@ -67,7 +67,7 @@ struct Display_004b8ec0 {
     unsigned short has_obj_c8 : 1;      // +0xf0, bit 7
 };
 
-Display_004b8ec0* FUN_004b6220(void);
+Display_004b8ec0* GetDisplay(void);
 int __stdcall FUN_004c5e70(Surface_004b8ec0* out);
 int __stdcall FUN_004c5fa0(Surface_004b8ec0* s);
 void __stdcall FUN_004b7e60(Rect_004b8ec0* other, Rect_004b8ec0* rect, Rect_004b8ec0* bounds);
@@ -77,7 +77,7 @@ void __cdecl FUN_004cc1bf(int param_1, int param_2, Rect_004b8ec0* rect, void* p
 // FUNCTION: 0x4b8ec0
 void __stdcall FUN_004b8ec0(Class_004c6ae0* dst, Bitmap_004b8ec0* bmp, int x, int y)
 {
-    Display_004b8ec0* d = FUN_004b6220();
+    Display_004b8ec0* d = GetDisplay();
     if (d->has_obj_c8 == 1) {
         Surface_004b8ec0 screen;
         if (dst == 0) {

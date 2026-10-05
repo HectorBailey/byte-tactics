@@ -1,7 +1,7 @@
 // Decompiled by deepseek-v4.1-flash. Names are provisional.
 // Initialises the mouse-event input object: allocates the event queue, resets
 // it, creates the three save-mouse surfaces, and optionally starts the worker
-// thread at 0x4c2990. The second FUN_004b6220 call is FUN_004c2bb0 inlined.
+// thread at 0x4c2990. The second GetDisplay call is FUN_004c2bb0 inlined.
 
 #pragma pack(push, 2)
 struct Obj_004c2bd0 {
@@ -25,7 +25,7 @@ struct Obj_004c2bd0 {
 #pragma pack(pop)
 
 void __cdecl FUN_004c2990(void* param_1);
-int FUN_004b6220(void);
+int GetDisplay(void);
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
 void* __stdcall FUN_004c69f0(char* name, int width, int height);
 int __stdcall FUN_004b6b20(void* param_1, unsigned int param_2, void* param_3);
@@ -33,10 +33,10 @@ int __stdcall FUN_004b6b20(void* param_1, unsigned int param_2, void* param_3);
 // FUNCTION: 0x4c2bd0
 void __stdcall FUN_004c2bd0(int count, int start)
 {
-    Obj_004c2bd0* p = (Obj_004c2bd0*)FUN_004b6220();
+    Obj_004c2bd0* p = (Obj_004c2bd0*)GetDisplay();
     p->capacity = count;
     p->entries = (int)FUN_004d83b0("MOUSE EVENTS", count * 0x18);
-    Obj_004c2bd0* q = (Obj_004c2bd0*)FUN_004b6220();
+    Obj_004c2bd0* q = (Obj_004c2bd0*)GetDisplay();
     q->head = 0;
     q->tail = 0;
     p->unknown_1b2 = 0;

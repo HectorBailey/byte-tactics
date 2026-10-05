@@ -25,14 +25,14 @@ struct RGBA {
     unsigned char a;                   // +3
 };
 
-extern Obj_004ba750* FUN_004b6220(void);
+extern Obj_004ba750* GetDisplay(void);
 void __stdcall FUN_004ba920(unsigned char* data, int* sums, unsigned char* idx);
 unsigned char __stdcall FUN_004ba9d0(PALETTEENTRY* palette, int* band, unsigned char* order, PALETTEENTRY color);
 
 // FUNCTION: 0x4ba750
 unsigned int* __stdcall FUN_004ba750(unsigned char* data)
 {
-    Obj_004ba750* obj = FUN_004b6220();
+    Obj_004ba750* obj = GetDisplay();
     if (obj->flag5) {
         int sums[256];
         unsigned char idx[256];

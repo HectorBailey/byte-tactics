@@ -32,8 +32,8 @@ struct Class_004aff00 {
 };
 #pragma pack(pop)
 
-unsigned int FUN_004b6340();
-int FUN_004b6330();
+unsigned int GetTicks();
+int GetTickRate();
 int FUN_004c13f0();
 void __stdcall FUN_004a1810(Entry_004a1810* entries, int index);
 void __stdcall FUN_004c13a0(int param_1, int param_2);
@@ -46,7 +46,7 @@ void __stdcall FUN_004aff00(Class_004aff00* obj)
     if (obj->active == 0)
         return;
 
-    int time = FUN_004b6340();
+    int time = GetTicks();
 
     if (obj->words->value != -1)
         FUN_004a1810((Entry_004a1810*)obj->field_18->field_4,
@@ -60,11 +60,11 @@ void __stdcall FUN_004aff00(Class_004aff00* obj)
         if (obj->words[i].field_9c < ft) {
             if (obj->words[i].field_98 != 0) {
                 obj->words[i].field_9c =
-                    (float)FUN_004b6330() * obj->words[i].field_8c + ft;
+                    (float)GetTickRate() * obj->words[i].field_8c + ft;
                 obj->words[i].field_98 = 0;
             } else {
                 obj->words[i].field_9c =
-                    (float)FUN_004b6330() * obj->words[i].field_94 + ft;
+                    (float)GetTickRate() * obj->words[i].field_94 + ft;
                 obj->words[i].field_98 = 1;
             }
         }

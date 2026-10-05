@@ -28,7 +28,7 @@ struct Display_0041f760 {
 
 extern Game* g_game;
 
-Display_0041f760* FUN_004b6220(void);
+Display_0041f760* GetDisplay(void);
 void __stdcall FUN_004c6b70(void* dest, void* image, int x, int y);
 void __stdcall DrawMessages(void* surface);
 void __stdcall FUN_004a9fd0(Sub_0041f760* sub);
@@ -40,7 +40,7 @@ void FUN_004c63a0();
 int FUN_0041f760()
 {
     if (g_game->state == 1) {
-        Display_0041f760* d = FUN_004b6220();
+        Display_0041f760* d = GetDisplay();
         FUN_004c6b70(g_game->surface, g_game->image, d->x, d->y);
         DrawMessages(g_game->surface);
         FUN_004a9fd0(&g_game->sub);

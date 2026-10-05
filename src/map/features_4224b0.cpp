@@ -116,7 +116,7 @@ extern List_004224b0* DAT_00511fb4;
 extern char DAT_005119b8[];
 
 void __stdcall FUN_004290f0(char* out, const char* dir, const char* name, const char* ext);
-void __stdcall FUN_004b6290(char* path);
+void __stdcall FatalError(char* path);
 void* __cdecl FUN_004d84a0(void* p, const char* name, unsigned int size);
 void* __stdcall FUN_0042a2c0(const char* name);
 Gaf_004224b0* __stdcall FUN_004b8c60(char* path);
@@ -164,7 +164,7 @@ int __stdcall FUN_004224b0(char* name)
     Class_004c3e10* entry = FindEntry(name);
     if (entry == 0) {
         sprintf(path, "Record \"%s\" missing from feature files", name);
-        FUN_004b6290(path);
+        FatalError(path);
     }
     g_game->features = (FeatureDef_004224b0*)FUN_004d84a0(g_game->features, "FEATURES",
                                                           (g_game->featureCount + 1) * 0x100);

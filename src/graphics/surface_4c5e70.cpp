@@ -96,10 +96,10 @@ struct Display_004c5e70 {
     }
 };
 
-Display_004c5e70* FUN_004b6220(void);
+Display_004c5e70* GetDisplay(void);
 
 // FUNCTION: 0x4c5e70
 int __stdcall FUN_004c5e70(Out_004c5e70* out)
 {
-    return FUN_004b6220()->LockMe(out);
+    return GetDisplay()->LockMe(out);
 }

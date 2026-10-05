@@ -7,14 +7,14 @@ struct Obj {
 };
 
 extern Obj* DAT_0051fbd0;
-extern void __stdcall FUN_004b5510(int);
+extern void __stdcall SetFullScreen(int);
 
 // FUNCTION: 0x4b5910
-void FUN_004b5910()
+void ToggleFullScreen()
 {
     if (DAT_0051fbd0->flag) {
-        FUN_004b5510(0);
+        SetFullScreen(0);
     } else {
-        FUN_004b5510(1);
+        SetFullScreen(1);
     }
 }

@@ -19,7 +19,7 @@ struct Display_004b4f50 {
 extern Display_004b4f50* DAT_0051fbd0;
 
 // FUNCTION: 0x4b4f50
-int FUN_004b4f50()
+int ApplyPalette()
 {
     Display_004b4f50* d = DAT_0051fbd0;
     if (d->hpalette) {

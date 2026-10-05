@@ -234,7 +234,7 @@ extern Game* g_game;
 extern char DAT_005119b8[];
 
 void __stdcall FUN_004290f0(char* out, const char* dir, const char* name, const char* ext);
-void __stdcall FUN_004b6290(char* path);
+void __stdcall FatalError(char* path);
 void* __stdcall FUN_004cb560(char* path);
 void __stdcall FUN_004cb590(void* p);
 void __stdcall FUN_0042a140(void* a, char* b);
@@ -334,7 +334,7 @@ void __stdcall FUN_0042e440(Class_004c4440* parser) {
         FUN_004290f0(path, "objects3d", model, "3DO");
         void* h = FUN_004cb560(path);
         if (h == 0)
-            FUN_004b6290(path);
+            FatalError(path);
         FUN_004cb590(h);
         FUN_0042a140(h, model);
         g_game->weapons[count].text = h;

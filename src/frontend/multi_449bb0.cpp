@@ -243,7 +243,7 @@ void __stdcall FUN_004a7190(Gui_00449bb0* gui, int index);
 void __stdcall FUN_004a81e0(Gui_00449bb0* gui, int value);
 Layer_00449bb0* __stdcall FUN_004aa8f0(Gui_00449bb0* gui, const char* name, int size);
 int __stdcall FUN_004ab060(Gui_00449bb0* gui, char* name);
-void __stdcall FUN_004b6290(char* message);
+void __stdcall FatalError(char* message);
 void* __stdcall FUN_004b8d40(void* gaf, const char* name);
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
 
@@ -423,7 +423,7 @@ void FUN_00449bb0()
     if (isHost && IsOnlineConfigLoaded() && DAT_00512ce8[0])
         ((Class_00435a20*)g_game->map)->FUN_00435a20(DAT_00512ce8);
     if (!((Class_00435c40*)g_game->map)->FUN_00435c40())
-        FUN_004b6290("Could not find the multiplayer map!!");
+        FatalError("Could not find the multiplayer map!!");
     strcpy(info->map, ((Class_00435c30*)g_game->map)->FUN_00435c30());
     info->mapCrc = ((Class_004373a0*)g_game->map)->FUN_004373a0();
     BroadcastPlayerInfo();

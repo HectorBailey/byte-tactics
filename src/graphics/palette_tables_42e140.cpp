@@ -6,7 +6,7 @@
 void __stdcall FUN_004290f0(char* out, const char* dir, const char* name, const char* ext);
 int __stdcall FUN_004bbc40(char* path);
 void* __stdcall FUN_004bbe50(char* path, int flags);
-void __stdcall FUN_004b6290(char* path);
+void __stdcall FatalError(char* path);
 void __stdcall FUN_004baad0(unsigned int* param_1);
 void __cdecl FUN_004d85a0(void* p);
 unsigned int* __stdcall FUN_004ba750(void* palette);
@@ -20,7 +20,7 @@ unsigned int* __stdcall FUN_0042e140(void* palette)
     if (FUN_004bbc40(path)) {
         unsigned int* table = (unsigned int*)FUN_004bbe50(path, 0);
         if (table == 0) {
-            FUN_004b6290(path);
+            FatalError(path);
         }
         FUN_004baad0(table);
         FUN_004d85a0(table);

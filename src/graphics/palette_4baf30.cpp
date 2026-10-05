@@ -12,7 +12,7 @@ struct App_004baf30 {
 };
 #pragma pack(pop)
 
-extern App_004baf30* FUN_004b6220(void);
+extern App_004baf30* GetDisplay(void);
 void __stdcall FUN_004ba920(PALETTEENTRY* palette, int* sums, unsigned char* order);
 unsigned char __stdcall FUN_004ba9d0(PALETTEENTRY* palette, int* sums, unsigned char* order,
                                      PALETTEENTRY color);
@@ -20,7 +20,7 @@ unsigned char __stdcall FUN_004ba9d0(PALETTEENTRY* palette, int* sums, unsigned 
 // FUNCTION: 0x4baf30
 unsigned char* __stdcall FUN_004baf30(PALETTEENTRY* palette)
 {
-    App_004baf30* app = FUN_004b6220();
+    App_004baf30* app = GetDisplay();
     if (app->flag9) {
         PALETTEENTRY color;
         unsigned char order[256];

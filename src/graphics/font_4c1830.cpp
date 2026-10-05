@@ -29,7 +29,7 @@ struct Rect_004c1830 {
     int data[12];
 };
 
-int FUN_004b6220(void);
+int GetDisplay(void);
 int __stdcall FUN_004c5e70(Rect_004c1830* out);
 int __stdcall FUN_004c5fa0(Rect_004c1830* buf);
 int __stdcall FUN_004c14f0(Rect_004c1830* dst, unsigned char* text, int x,
@@ -38,13 +38,13 @@ int __stdcall FUN_004c14f0(Rect_004c1830* dst, unsigned char* text, int x,
 // FUN_004c13f0, inlined: the current value of field_0x210.
 static inline int CurrentColour(void)
 {
-    return *(int*)((unsigned char*)FUN_004b6220() + 0x210);
+    return *(int*)((unsigned char*)GetDisplay() + 0x210);
 }
 
 // FUN_004c13a0, inlined: field_0x208 then field_0x20c, each only if not -1.
 static inline void SetColour(int a, int b)
 {
-    unsigned char* obj = (unsigned char*)FUN_004b6220();
+    unsigned char* obj = (unsigned char*)GetDisplay();
     if (a != -1) {
         *(int*)(obj + 0x208) = a;
     }
@@ -76,7 +76,7 @@ static inline int WidthText(Font_004c1830* font, unsigned char* text)
 void __stdcall FUN_004c1830(Rect_004c1830* dst, unsigned char* text, int fore,
                             int back, int y)
 {
-    Game_004c1830* game = (Game_004c1830*)FUN_004b6220();
+    Game_004c1830* game = (Game_004c1830*)GetDisplay();
     int width = WidthText(game->font, text);
     if (dst == 0) {
         Rect_004c1830 r;

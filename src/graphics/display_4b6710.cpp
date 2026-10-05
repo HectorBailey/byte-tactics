@@ -8,7 +8,7 @@ struct GlobalObj {
 };
 
 // FUNCTION: 0x4b6710
-int FUN_004b6710()
+int GetScreenHeight()
 {
     GlobalObj* obj = (GlobalObj*)DAT_0051fbd0;
     return obj->field_d8;

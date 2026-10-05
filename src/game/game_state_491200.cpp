@@ -32,7 +32,7 @@
 // own with its own MEMORYSTATUS flips it to match. The mini also shows what
 // else moves that store: three or more stores to globals between the two
 // calls, and any call between them (which is why every spelling tried before
-// could not reach it: FUN_004b4fd0 sits between the two sites here).
+// could not reach it: SetCloseHandler sits between the two sites here).
 //
 // Scratch used: build/scratch/0x491200/{probe,mini,orc}.py and s1-s5.py.
 #include <string.h>
@@ -145,8 +145,8 @@ extern const char DAT_00509244[];          // "hattfont11"
 extern const char DAT_00509238[];          // "UnitLimit"
 extern int DAT_0051e828[];
 
-int FUN_004b6700();
-int FUN_004b6710();
+int GetScreenWidth();
+int GetScreenHeight();
 int __stdcall FUN_004c69f0(const char* name, int width, int height);
 void __stdcall FUN_004c61f0(int param_1);
 void __stdcall FUN_004c61b0(int param_1);
@@ -183,7 +183,7 @@ void __stdcall FUN_004aeee0(void* param_1, const char* name);
 void __stdcall FUN_004aedd0(void* param_1, const char* name, int param_3);
 void __stdcall FUN_004c13d0(int param_1);
 void __stdcall FUN_004c1420(int param_1);
-void __stdcall FUN_004b4fd0(void (__cdecl *param_1)(), int param_2);
+void __stdcall SetCloseHandler(void (__cdecl *param_1)(), int param_2);
 void FUN_004287b0();
 int __stdcall FUN_0049f5a0(const char* name, int param_2);
 void FUN_00496a60();
@@ -199,8 +199,8 @@ void FUN_00491200()
         mem.dwLength = 0x20;
         GlobalMemoryStatus(&mem);
     }
-    g_game->field_37e1f = FUN_004b6700();
-    g_game->field_37e23 = FUN_004b6710();
+    g_game->field_37e1f = GetScreenWidth();
+    g_game->field_37e23 = GetScreenHeight();
     g_game->field_37e1b = FUN_004c69f0(DAT_005091d4, g_game->field_37e1f,
                                       g_game->field_37e23);
     FUN_004c61f0(g_game->field_37e1b);
@@ -269,7 +269,7 @@ void FUN_00491200()
     g_game->field_38d7b = 0;
     g_game->field_391f1 = 0;
     g_game->field_391f5 = FUN_00496a60;
-    FUN_004b4fd0(LeaveNetGameCallback, 0);
+    SetCloseHandler(LeaveNetGameCallback, 0);
     {
         MEMORYSTATUS mem2;
         mem2.dwLength = 0x20;

@@ -3,7 +3,7 @@
 // phase into g_game->prof.acc[]; the profile object also lives at +0x38d85 with
 // total at +4, the display copy at +8 and the accumulators at +0x2c.
 
-unsigned int __cdecl FUN_004b6560(void);
+unsigned int __cdecl GetMilliseconds(void);
 
 class PacketManager {
 public:
@@ -18,7 +18,7 @@ public:
     int acc[9];                         // +0x2c
 
     void FUN_0046a400(int i) {
-        unsigned int t = FUN_004b6560();
+        unsigned int t = GetMilliseconds();
         int d = t - last;
         int v = acc[i];
         v = v + d;

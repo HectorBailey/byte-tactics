@@ -34,7 +34,7 @@ struct GameCtx_4b66a0 {
 extern GameCtx_4b66a0* DAT_0051fbd0;
 
 // FUNCTION: 0x4b66a0
-int FUN_004b66a0()
+int GetFrameRate()
 {
     DAT_0051fbd0->counter.Tick();
     return DAT_0051fbd0->counter.rate;

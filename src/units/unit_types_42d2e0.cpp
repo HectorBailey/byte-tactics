@@ -284,7 +284,7 @@ int __stdcall FUN_004bbc40(char* path);
 void* __stdcall FUN_004cb560(char* path);
 void __stdcall FUN_004cb590(void* obj);
 int __stdcall FUN_004cb5f0(void* obj);
-void __stdcall FUN_004b6290(const char* msg);
+void __stdcall FatalError(const char* msg);
 void* __stdcall FUN_004b2450(char* path);
 void __stdcall FUN_004bb0f0(char* text);
 short __stdcall FindUnitTypeId(char* text);
@@ -310,7 +310,7 @@ void LoadUnitTypes() {
         Class_004c2ea0 parser;
         FUN_004290f0(path, "gamedata", "moveinfo", "TDF");
         if (!((Class_004c2f60*)&parser)->FUN_004c2f60(path))
-            FUN_004b6290("Can't load MOVEINFO.TDF");
+            FatalError("Can't load MOVEINFO.TDF");
 
         int i = 0;
         MovementClass* cls = MovementClassTable::g_movementClasses.entries;
@@ -428,7 +428,7 @@ void LoadUnitTypes() {
         FUN_004290f0(objpath, "objects3d", namebuf, "3DO");
         void* model = FUN_004cb560(objpath);
         if (model == 0)
-            FUN_004b6290(objpath);
+            FatalError(objpath);
         FUN_004cb590(model);
         FUN_0042a140(model, namebuf);
         g_game->field_14377[u] = model;
@@ -474,7 +474,7 @@ void LoadUnitTypes() {
     Class_004c2ea0 parser2;
     FUN_004290f0(path, "gamedata", "sidedata", "TDF");
     if (!((Class_004c2f60*)&parser2)->FUN_004c2f60(path)) {
-        FUN_004b6290("Can't load GAMEDATA.TDF");
+        FatalError("Can't load GAMEDATA.TDF");
     } else {
         short* list = (short*)FUN_004d83b0("TEMP UTYPE LIST", 0x3c);
         for (unsigned short s = 1; s < g_game->field_1438f; s++) {

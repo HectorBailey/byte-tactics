@@ -73,12 +73,12 @@ static void clear_screen(Class_004c6890* o, int colour)
     memset(o->pixels, colour, o->field_54 * o->field_58);
 }
 
-extern Class_004c6890* FUN_004b6220(void);
+extern Class_004c6890* GetDisplay(void);
 
 // FUNCTION: 0x4c6890
 int __stdcall FUN_004c6890(Surface* surface, int colour)
 {
-    Class_004c6890* obj = FUN_004b6220();
+    Class_004c6890* obj = GetDisplay();
     int ret = 1;
     if (surface == 0) {
         if (obj->field_dc != 0) {

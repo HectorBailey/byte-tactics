@@ -66,7 +66,7 @@ struct App_4b6570 {
 extern App_4b6570* DAT_0051fbd0;
 
 // FUNCTION: 0x4b6570
-int __stdcall FUN_004b6570()
+int __stdcall DrawFrameRate()
 {
     FrameCounter_4b6570* c = &DAT_0051fbd0->counter;
     unsigned int now = GetTickCount();

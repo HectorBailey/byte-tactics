@@ -29,14 +29,14 @@ struct Display_004c6c50 {
 
 extern int DAT_0051fe00;
 
-Display_004c6c50* FUN_004b6220(void);
+Display_004c6c50* GetDisplay(void);
 int __stdcall FUN_004c5e70(Surface_004c6c50* out);
 void __cdecl FUN_004cbcd5(Surface_004c6c50* dst, Surface_004c6c50* src, int x, int y, int color);
 
 // 0x4c5fa0, inlined here.
 static inline void UnlockScreen(Surface_004c6c50* s)
 {
-    Display_004c6c50* d = FUN_004b6220();
+    Display_004c6c50* d = GetDisplay();
     if (d->field_44 == 0 && d->field_dc == 0) {
         if (d->screen.surface == 0)
             return;
