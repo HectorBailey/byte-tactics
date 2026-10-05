@@ -722,7 +722,7 @@ extern long DAT_0052a4fc;                                                       
 //   0x512f71 DAT_00512f71: char (3), int (2), unsigned char (1)
 //   0x512f75 DAT_00512f75: char[] (4), char (2)
 //   0x51e58c DAT_0051e58c: int (4), void* (2)
-//   0x51e6a0 DAT_0051e6a0: defined in src/unsorted/0x4814c0.cpp
+//   0x51e6a0 DAT_0051e6a0: defined in src/map/line_of_sight_4814c0.cpp
 //   0x51f2e4 DAT_0051f2e4: char* (4), int* (1), void* (1)
 //   0x526ff4 DAT_00526ff4: char* (4), void* (2)
 //   0x5120b8 DAT_005120b8: Entry_00428730[10] (1), char[] (1), Entry_004287d0[10] (1), Entry_00428850[10] (1), and 1 more
@@ -798,9 +798,9 @@ extern long DAT_0052a4fc;                                                       
 //   0x4fcf08 DPAID_ComPort: defined in src/data/guids.cpp
 //   0x4fcf68 IID_IDirectSound3DBuffer: defined in src/data/guids.cpp
 //   0x4fd488 DAT_004fd488: defined in src/data/vtables.cpp
-//   0x501d38 g_consoleCommands: defined in src/data/console_commands.cpp
-//   0x501f48 g_cheatCommands: defined in src/data/console_commands.cpp
-//   0x501fd0 g_debugCommands: defined in src/data/console_commands.cpp
+//   0x501d38 g_consoleCommands: defined in src/game/console_commands.cpp
+//   0x501f48 g_cheatCommands: defined in src/game/console_commands.cpp
+//   0x501fd0 g_debugCommands: defined in src/game/console_commands.cpp
 //   0x505205 DAT_00505205: defined in src/weapons/ballistics.cpp
 //   0x505510 DAT_00505510: unsigned char (1), int (1)
 //   0x507b70 DAT_00507b70: unsigned char[] (1), ColourEntry_00478790[] (1)
@@ -813,7 +813,7 @@ extern long DAT_0052a4fc;                                                       
 //   0x50da00 g_pentiumProEvents: defined in src/data/perf_counters.cpp
 //   0x5122d4 DAT_005122d4: void* (1), char* (1)
 //   0x512328 DAT_00512328: Player_00437cd0* (1), void* (1)
-//   0x512340 DAT_00512340$S5516: defined in src/unsorted/0x438450.cpp
+//   0x512340 DAT_00512340$S5516: defined in src/map/meteors_438450.cpp
 //   0x512370 DAT_00512370: part of another global: Class_00440290::DAT_00512358+0x18
 //   0x512764 DAT_00512764: short (1), int (1)
 //   0x5129f1 DAT_005129f1: part of another global: DAT_005129d0+0x21
@@ -881,7 +881,7 @@ extern long DAT_0052a4fc;                                                       
 //   0x4fd458 DAT_004fd458: vtable
 //   0x4fda70 DAT_004fda70: defined in src/data/unused.cpp
 //   0x4fdbe0 DAT_004fdbe0: defined in src/data/unused.cpp
-//   0x501fcc DAT_00501fcc: defined in src/data/console_commands.cpp
+//   0x501fcc DAT_00501fcc: defined in src/game/console_commands.cpp
 //   0x502f98 DAT_00502f98: defined in src/data/unused.cpp
 //   0x505200 g_rangeByPitch: defined in src/weapons/ballistics.cpp
 //   0x5066f8 DAT_005066f8: defined in src/data/unused.cpp

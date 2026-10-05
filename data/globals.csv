@@ -89,10 +89,10 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x4fdbf0,DAT_004fdbf0,.rdata,40,gap,string,char[],1,0,1,one type,1,,,,,436f7079726967687420303030302043617665646f6720456e7465727461696e6d656e7400000000
 0x501774,DAT_00501774,.data,4,type,data,int,4,0,1,one type,4,,INT_00501774,,,01000000
 0x501d18,DAT_00501d18,.data,32,gap,data,unsigned char[],1,0,1,one type,1,,s__00501d18,,,000000000000000000006f6e6d6c6b6a585756555453525150ffffffffffffff
-0x501d38,g_consoleCommands,.data,528,gap,data,Option_00419560,1,1,2,conflicting: shape,2,,PTR_s_NoShake_00501d38,86,src/data/console_commands.cpp,44245000606e4100010000003c245000b06d41000100000030245000f06c41000100000028245000206d41000100000020245000d06b41000100000018245000
-0x501f48,g_cheatCommands,.data,132,gap,data,Option_00419560,1,1,2,conflicting: shape,2,,PTR_s_Radar_00501f48,20,src/data/console_commands.cpp,a022500090704100020000009c225000c07041000200000094225000506b41000200000090225000506d41000200000088225000806d4100020000007c225000
-0x501fcc,DAT_00501fcc,.data,4,type,data,int,1,0,1,one type,1,,,,src/data/console_commands.cpp,00000000
-0x501fd0,g_debugCommands,.data,432,gap,data,Option_00419560,1,1,2,conflicting: shape,2,,PTR_DAT_00501fd0,60,src/data/console_commands.cpp,e018500080624100040000004c225000b06a41000400000044225000b0644100040000003c225000d06941000400000034225000306a4100040000002c225000
+0x501d38,g_consoleCommands,.data,528,gap,data,Option_00419560,1,1,2,conflicting: shape,2,,PTR_s_NoShake_00501d38,86,src/game/console_commands.cpp,44245000606e4100010000003c245000b06d41000100000030245000f06c41000100000028245000206d41000100000020245000d06b41000100000018245000
+0x501f48,g_cheatCommands,.data,132,gap,data,Option_00419560,1,1,2,conflicting: shape,2,,PTR_s_Radar_00501f48,20,src/game/console_commands.cpp,a022500090704100020000009c225000c07041000200000094225000506b41000200000090225000506d41000200000088225000806d4100020000007c225000
+0x501fcc,DAT_00501fcc,.data,4,type,data,int,1,0,1,one type,1,,,,src/game/console_commands.cpp,00000000
+0x501fd0,g_debugCommands,.data,432,gap,data,Option_00419560,1,1,2,conflicting: shape,2,,PTR_DAT_00501fd0,60,src/game/console_commands.cpp,e018500080624100040000004c225000b06a41000400000044225000b0644100040000003c225000d06941000400000034225000306a4100040000002c225000
 0x502288,DAT_00502288,.data,8,gap,string,char[],1,0,1,one type,1,,s_Mapping_00502288,,,4d617070696e6700
 0x5024fc,DAT_005024fc,.data,16,gap,string,char[],1,0,1,one type,1,,s__s_screenshots_005024fc,,,25735c73637265656e73686f74730000
 0x502820,DAT_00502820,.data,8,gap,string,const char[],1,0,1,one type,1,,s_guis_00502820,,,6775697300000000
@@ -406,7 +406,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x512336,DAT_00512336,.bss,2,type,data,short,1,0,1,one type,1,,SHORT_00512336,,in DAT_00512334+0x2,
 0x512338,DAT_00512338,.bss,4,type,data,int,3,0,1,one type,3,,INT_00512338,,,
 0x51233c,DAT_0051233c,.bss,4,gap,unreferenced,unsigned char[4],0,0,0,,0,,,,,
-0x512340,DAT_00512340$S5516,.bss,16,definition,data,"Vector_00438480<int, std::allocator<int> >",2,0,1,one type,2,0xc,DAT_00512340,,src/unsorted/0x438450.cpp,
+0x512340,DAT_00512340$S5516,.bss,16,definition,data,"Vector_00438480<int, std::allocator<int> >",2,0,1,one type,2,0xc,DAT_00512340,,src/map/meteors_438450.cpp,
 0x512344,DAT_00512344,.bss,4,type,data,int,3,13,14,conflicting: shape,16,,DAT_00512344,,in DAT_00512340$S5516+0x4,
 0x512348,DAT_00512348,.bss,4,type,data,int,1,2,3,conflicting: shape,3,,DAT_00512348,,in DAT_00512340$S5516+0x8,
 0x512350,DAT_00512350,.bss,8,gap,unreferenced,unsigned char[8],0,0,0,,0,,,,,
@@ -702,7 +702,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x51e694,DAT_0051e694,.bss,4,type,data,int,9,1,2,conflicting: shape,10,,DAT_0051e694,,,
 0x51e698,DAT_0051e698,.bss,4,type,data,int,2,0,1,one type,2,,INT_0051e698,,,
 0x51e69c,DAT_0051e69c,.bss,4,type,data,int,2,0,1,one type,2,,INT_0051e69c,,,
-0x51e6a0,DAT_0051e6a0,.bss,16,definition,data,char[],3,3,3,conflicting: shape,6,0xc,DAT_0051e6a0,,src/unsorted/0x4814c0.cpp,
+0x51e6a0,DAT_0051e6a0,.bss,16,definition,data,char[],3,3,3,conflicting: shape,6,0xc,DAT_0051e6a0,,src/map/line_of_sight_4814c0.cpp,
 0x51e6b0,DAT_0051e6b0$S4554,.bss,12,gap,data,"std::vector<Class_00489260, std::allocator<Class_00489260> >",1,0,1,one type,1,0x8,DAT_0051e6b0,,,
 0x51e6bc,DAT_0051e6bc,.bss,4,gap,unreferenced,unsigned char[4],0,0,0,,0,,_DAT_0051e6bc,,,
 0x51e6c0,DAT_0051e6c0,.bss,4,type,data,int,2,0,1,one type,2,,INT_0051e6c0,,,
