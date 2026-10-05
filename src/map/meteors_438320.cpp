@@ -41,7 +41,7 @@ public:
     ~Class_004c2ea0();
 };
 
-class Class_00438320 {
+class MeteorParams {
 public:
     char name[0x20];                    // +0x0
     int radius;                         // +0x20
@@ -52,7 +52,7 @@ public:
 };
 
 // FUNCTION: 0x438320
-void Class_00438320::LoadMeteorDefaults()
+void MeteorParams::LoadMeteorDefaults()
 {
     Class_004c2ea0 parser;
     char path[256];

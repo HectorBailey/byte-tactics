@@ -211,7 +211,7 @@ class Class_004379b0;
 class Class_00437a20;
 class CMemoryCache;
 class Class_00437c80;
-class Class_00438320;
+class MeteorParams;
 class Class_00438760;
 class Class_00438760_2;
 struct Class_00438870;
@@ -6133,7 +6133,7 @@ public:
     void LoadMissionData(char*, Class_004c2ea0*);
 };
 
-class Class_00438320 {  // 0x30 bytes, 3 views
+class MeteorParams {    // 0x30 bytes, 3 views
 public:
     char name[32];  // +0x0
     int radius;  // +0x20

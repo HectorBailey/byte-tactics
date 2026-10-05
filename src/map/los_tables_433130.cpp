@@ -83,7 +83,7 @@ public:
     void Unload();
 };
 
-class Class_00433380 {
+class LosTables {
 public:
     void LoadLosTable(Class_004c2ea0* tdf, short index);
 };
@@ -115,7 +115,7 @@ void Class_00433130::LoadLosTables()
                     tables.erase(tables.begin() + n, tables.end());
             }
             for (short i = 0; i < numtables; i++)
-                ((Class_00433380*)this)->LoadLosTable(&tdf, i);
+                ((LosTables*)this)->LoadLosTable(&tdf, i);
         }
         ((Class_004c3240*)&tdf)->Unload();
     }

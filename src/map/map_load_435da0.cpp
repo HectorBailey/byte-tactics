@@ -105,7 +105,7 @@ public:
     void RegisterConditions(Class_004c2ea0* parser);
 };
 
-class Class_00438320 {
+class MeteorParams {
 public:
     char name[0x20];                    // +0x0
     int radius;                         // +0x20
@@ -132,7 +132,7 @@ void* __cdecl FUN_004d83b0(const char* tag, int size);
 void __cdecl FUN_004d85a0(void* p);
 void EnableMeteors();
 void DisableMeteors();
-void __stdcall SetMeteorParams(Class_00438320* p);
+void __stdcall SetMeteorParams(MeteorParams* p);
 
 struct Buffer_00435da0 {
     int* data;                         // +0x0
@@ -224,7 +224,7 @@ int Class_00435c00::LoadMission(char* map)
     char schema[0x20];
     char value[0x100];
     char path[0x100];
-    Class_00438320 meteor;
+    MeteorParams meteor;
     char desc[0x80];
     char lower[0x80];
 
