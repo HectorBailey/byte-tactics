@@ -103,7 +103,7 @@ public:
     int OpenNamedBox(const char* name);
 };
 
-class Class_00435100 {
+class Net {
 public:
     int FUN_00435100();
 };
@@ -182,9 +182,9 @@ int __stdcall SaveGameFile(char* param_1, char* param_2, int param_3)
     ((Class_004b4630*)&file)->SetIntegerItem(DAT_00502a78, g_game->difficulty);
     ((Class_004b4630*)&file)->SetIntegerItem(DAT_00504988, g_game->players[g_game->localPlayer].unit->side);
     ((Class_004b4630*)&file)->SetIntegerItem(DAT_00504980, g_game->numPlayers);
-    ((Class_004b4630*)&file)->SetIntegerItem(DAT_00504974, ((Class_00435100*)g_game->campaign)->FUN_00435100());
+    ((Class_004b4630*)&file)->SetIntegerItem(DAT_00504974, ((Net*)g_game->campaign)->FUN_00435100());
     ((Class_004b4750*)&file)->SetStringItem(DAT_0050496c, g_game->thumbs);
-    if (((Class_00435100*)g_game->campaign)->FUN_00435100() == 2) {
+    if (((Net*)g_game->campaign)->FUN_00435100() == 2) {
         ((Class_004b4630*)&file)->SetIntegerItem(DAT_0050495c, g_game->options->commanderDeath);
         ((Class_004b4630*)&file)->SetIntegerItem(DAT_00504950, g_game->options->location);
         ((Class_004b4630*)&file)->SetIntegerItem(DAT_00502288, g_game->options->mapping);

@@ -17,7 +17,7 @@ public:
     int SelectRecord(char* name);
 };
 
-class Class_004356f0 {
+class Net {
 public:
     int unknown_0;
     char name[0xa08 - 4];              // +0x4
@@ -27,7 +27,7 @@ public:
 };
 
 // FUNCTION: 0x4356f0
-int Class_004356f0::CountMissions()
+int Net::CountMissions()
 {
     char buf[128];
     if (strlen(name) == 0)

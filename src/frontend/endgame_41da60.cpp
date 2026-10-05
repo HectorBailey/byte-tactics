@@ -11,7 +11,7 @@ public:
     char* FUN_004356c0(int index);
 };
 
-class Class_00435100 {
+class Net {
 public:
     int FUN_00435100();
 };
@@ -61,7 +61,7 @@ void SetUpEndMissionScreen()
     char* name = g_game->campaign->FUN_004356c0(5);
     if (name == 0)
         g_game->image_3907b = 0;
-    if (((Class_00435100*)g_game->campaign)->FUN_00435100() == 1
+    if (((Net*)g_game->campaign)->FUN_00435100() == 1
         && (g_game->flags_3923b & 0x10) && name != 0) {
         BuildDataPath(path, "bitmaps\\glamour", name + 1, "PCX");
         if (HAPI_FileLengthByName(path) == 0)
@@ -72,7 +72,7 @@ void SetUpEndMissionScreen()
         g_game->palette_3907f = palette;
         return;
     }
-    if (((Class_00435100*)g_game->campaign)->FUN_00435100() == 1)
+    if (((Net*)g_game->campaign)->FUN_00435100() == 1)
         LoadPictureCached("Outcome1", 0, 0, 1);
     else
         LoadPictureCached("Outcome0", 0, 0, 1);

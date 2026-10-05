@@ -1,6 +1,6 @@
 // Decompiled by deepseek-v4.1-flash. Names are provisional.
 
-class Class_00435100 {
+class Net {
 public:
     int FUN_00435100();
 };
@@ -26,7 +26,7 @@ struct Game {
     void* field_14387;                    // +0x14387
     void* field_1438b;                    // +0x1438b
     char unknown_1438f[0x391e9 - 0x1438f];
-    Class_00435100* field_391e9;          // +0x391e9
+    Net* field_391e9;                     // +0x391e9
 };
 #pragma pack(pop)
 

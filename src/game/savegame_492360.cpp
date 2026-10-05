@@ -101,7 +101,7 @@ struct Game {
 };
 #pragma pack(pop)
 
-struct Class_00435100 { int FUN_00435100(); };
+struct Net { int FUN_00435100(); };
 struct Class_00435110 { void LoadCampaign(char* name); };
 struct Class_00435a20 { void* LoadMissionByName(char* name); };
 struct Class_004b3630 { void CloseBank(); };
@@ -237,7 +237,7 @@ void __stdcall LoadGameScreenHandler(Gadget_00492360* gadget)
             ((Class_00435110*)g_game->p391e9)->LoadCampaign(campaign);
         g_game->field_37ef2 = ((Class_004b4800*)g_game->p38d6b)->GetIntegerItem("Side", 0);
         g_game->field_37eee = ((Class_004b4800*)g_game->p38d6b)->GetIntegerItem("Difficulty", 0);
-        if (((Class_00435100*)g_game->p391e9)->FUN_00435100() == 1) {
+        if (((Net*)g_game->p391e9)->FUN_00435100() == 1) {
             if (g_game->field_37ef2 == 0) {
                 *(unsigned char*)((char*)g_game->p1b8a + 0x95) = 0;
                 *(unsigned char*)((char*)g_game->p1cd5 + 0x95) = 1;
@@ -258,7 +258,7 @@ void __stdcall LoadGameScreenHandler(Gadget_00492360* gadget)
         strncpy(g_game->buf391cf, thumbs, 0x19);
         if (strlen(g_game->buf391cf) != 0x19)
             FUN_0041da30();
-        if (((Class_00435100*)g_game->p391e9)->FUN_00435100() == 2) {
+        if (((Net*)g_game->p391e9)->FUN_00435100() == 2) {
             ((HapiBank*)g_game->p38d6b)->OpenAccount("summary");
             g_game->field_2a3c =
                 (short)((Class_004b4800*)g_game->p38d6b)->GetIntegerItem("Players", 0);
@@ -290,7 +290,7 @@ void __stdcall LoadGameScreenHandler(Gadget_00492360* gadget)
             FUN_004d85a0(DAT_0051f2ec);
         DAT_0051f2ec = 0;
         FUN_00491d70(1);
-        if (((Class_00435100*)g_game->p391e9)->FUN_00435100() == 1 &&
+        if (((Net*)g_game->p391e9)->FUN_00435100() == 1 &&
             ((Class_004b48f0*)g_game->p38d6b)->HasItem("BetweenMissions")) {
             g_game->flags_2a44.b3 = 1;
             if (g_game->p38d6b) {

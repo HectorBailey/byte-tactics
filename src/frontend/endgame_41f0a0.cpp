@@ -12,7 +12,7 @@
 // other way round.
 #include <string.h>
 
-class Class_00435100 {
+class Net {
 public:
     int FUN_00435100();
 };
@@ -98,7 +98,7 @@ struct Game {
     char unknown_391b3[0x391cf - 0x391b3];
     char missionFlags[0x19];             // +0x391cf
     char unknown_391e8[0x391e9 - 0x391e8];
-    Class_00435100* campaign;            // +0x391e9
+    Net* campaign;                       // +0x391e9
 };
 #pragma pack(pop)
 

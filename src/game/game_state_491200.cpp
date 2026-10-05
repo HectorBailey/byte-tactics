@@ -38,7 +38,7 @@
 #include <string.h>
 #include <windows.h>
 
-class Class_00435100 {
+class Net {
 public:
     int FUN_00435100();
 };
@@ -119,7 +119,7 @@ struct Game {
     char unknown_38d6f[0x38d7b - 0x38d6f];
     int field_38d7b;                         // +0x38d7b
     char unknown_38d7f[0x391e9 - 0x38d7f];
-    Class_00435100* field_391e9;             // +0x391e9
+    Net* field_391e9;                        // +0x391e9
     char unknown_391ed[0x391f1 - 0x391ed];
     int field_391f1;                         // +0x391f1
     void (*field_391f5)();                   // +0x391f5

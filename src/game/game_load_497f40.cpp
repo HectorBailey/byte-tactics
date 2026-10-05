@@ -196,7 +196,7 @@ int __cdecl FUN_004568c0();
 unsigned int __cdecl GetTicks();
 char* __cdecl FUN_0049f580();
 
-class Class_00435100 {
+class Net {
 public:
     int FUN_00435100();
 };
@@ -239,7 +239,7 @@ void LoadingScreenFrame(void)
         }
         SetFont(g_game->field_391f9);
         SetPaletteColors(SURFACE_143a7, 0, 0x100);
-        if (((Class_00435100*)g_game->field_391e9)->FUN_00435100() != 2) {
+        if (((Net*)g_game->field_391e9)->FUN_00435100() != 2) {
             SaveSettings();
         }
         while (g_game->field_531 != 0) {
@@ -364,7 +364,7 @@ void LoadingScreenFrame(void)
         }
         SetFont(g_game->field_391f9);
         DrawSurface(&gadget, (void*)g_game->field_11eb, 0, 0);
-        if (((Class_00435100*)g_game->field_391e9)->FUN_00435100() != 1) {
+        if (((Net*)g_game->field_391e9)->FUN_00435100() != 1) {
             SetTextColors(color, 0xfe);
             char* name = ((Class_00435c30*)g_game->field_391e9)->FUN_00435c30();
             strncpy(namebuf, name, 100);
@@ -472,7 +472,7 @@ void LoadingScreenFrame(void)
             FillRectangle(&gadget, rect, color);
             DrawFrame(&gadget, lightbar, rect[0], rect[1]);
         }
-        if (((Class_00435100*)g_game->field_391e9)->FUN_00435100() == 3) {
+        if (((Net*)g_game->field_391e9)->FUN_00435100() == 3) {
             DrawSyncStatus(&gadget);
             SendLoadProgress();
         }

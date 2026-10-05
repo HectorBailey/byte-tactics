@@ -15,7 +15,7 @@
 #include <string.h>
 #include <windows.h>
 
-class Class_00435100;
+class Net;
 
 #pragma pack(push, 1)
 struct PlayerData_00450a10 {
@@ -51,7 +51,7 @@ struct Game {
     char unknown_2a3e[0x2a44 - 0x2a3e];
     unsigned short flags_2a44;         // +0x2a44
     char unknown_2a46[0x391e9 - 0x2a46];
-    Class_00435100* campaign;          // +0x391e9
+    Net* campaign;                     // +0x391e9
 };
 
 struct Packet_00450a10 {
@@ -72,7 +72,7 @@ public:
     int SendAllQueued(int param_1);
 };
 
-class Class_00435100 {
+class Net {
 public:
     int FUN_00435100();
 };

@@ -38,7 +38,7 @@ public:
     virtual int VisitUnit(Unit* unit);
 };
 
-class Class_00435100 {
+class Net {
 public:
     int FUN_00435100();
 };
@@ -58,7 +58,7 @@ struct Game {
     char unknown_2a43[0x38a47 - 0x2a43];
     unsigned int ticks;                 // +0x38a47
     char unknown_38a4b[0x391e9 - 0x38a4b];
-    Class_00435100* field_391e9;        // +0x391e9
+    Net* field_391e9;                   // +0x391e9
 };
 #pragma pack(pop)
 

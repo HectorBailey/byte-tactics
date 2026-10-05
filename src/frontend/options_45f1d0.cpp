@@ -71,7 +71,7 @@ struct RuleSet_0045f1d0 {                // +0x118 startType, read from element 
     int startType;                       // +0x118
 };
 
-struct Class_00435100 { int FUN_00435100(); };
+struct Net { int FUN_00435100(); };
 struct Class_00435c30 { char* FUN_00435c30(); };
 
 struct Game {
@@ -99,7 +99,7 @@ struct Game {
     char unknown_37ef2[0x37ef6 - 0x37ef2];
     int commanderDeath;                  // +0x37ef6
     char unknown_37efa[0x391e9 - 0x37efa];
-    Class_00435100* net;                   // +0x391e9
+    Net* net;                              // +0x391e9
 };
 #pragma pack(pop)
 

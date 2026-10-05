@@ -4,7 +4,7 @@
 // whose entry field +0x15 is set to 0x1a0. Then focuses Missions or
 // MainMenu and refreshes the menu.
 
-class Class_00435100 {
+class Net {
 public:
     int FUN_00435100();
 };
@@ -38,7 +38,7 @@ struct Game {
     int mission;                         // +0x391ab
     int field_391af;                     // +0x391af
     char unknown_391b3[0x391e9 - 0x391b3];
-    Class_00435100* campaign;            // +0x391e9
+    Net* campaign;                       // +0x391e9
 };
 #pragma pack(pop)
 

@@ -101,7 +101,7 @@ struct Gadget_497180 {
     char* owner;                                 // +0xc
 };
 
-class Class_00435100 {
+class Net {
 public:
     int FUN_00435100();
 };
@@ -195,7 +195,7 @@ void __cdecl LoadMatch(void*)
     srand((unsigned)time(NULL));
     *(int*)(g_game + 0x38a47) = 0;
 
-    switch (((Class_00435100*)*(void**)(g_game + 0x391e9))->FUN_00435100()) {
+    switch (((Net*)*(void**)(g_game + 0x391e9))->FUN_00435100()) {
     case 1:
         DAT_005091cc = 0;
         FUN_00496e10((Settings_00496e10*)(g_game + 0x39219));
@@ -257,7 +257,7 @@ void __cdecl LoadMatch(void*)
         if (((Class_004b48f0*)*(void**)(g_game + 0x38d6b))->HasItem("BetweenMissions") ==
             0) {
             LoadPlayerControllers(*(void**)(g_game + 0x38d6b));
-            if (((Class_00435100*)*(void**)(g_game + 0x391e9))->FUN_00435100() == 2) {
+            if (((Net*)*(void**)(g_game + 0x391e9))->FUN_00435100() == 2) {
                 int count = 0;
                 int* def = (int*)*(void**)(g_game + 0x29a0);
                 int i = 0;
@@ -278,8 +278,8 @@ void __cdecl LoadMatch(void*)
 
     FUN_004917d0();
 
-    if (((Class_00435100*)*(void**)(g_game + 0x391e9))->FUN_00435100() != 1) {
-        if (((Class_00435100*)*(void**)(g_game + 0x391e9))->FUN_00435100() == 3) {
+    if (((Net*)*(void**)(g_game + 0x391e9))->FUN_00435100() != 1) {
+        if (((Net*)*(void**)(g_game + 0x391e9))->FUN_00435100() == 3) {
             *(volatile unsigned short*)(g_game + 0x38d75) |= 4;
             while ((*(unsigned short*)(g_game + 0x38d75) & 8) == 0)
                 SleepMilliseconds(0x32);
@@ -337,7 +337,7 @@ void __cdecl LoadMatch(void*)
             }
             SetCameraPosition(cx, cz, 0);
             ReportGameEvent(6);
-        } else if (((Class_00435100*)*(void**)(g_game + 0x391e9))->FUN_00435100() == 2 &&
+        } else if (((Net*)*(void**)(g_game + 0x391e9))->FUN_00435100() == 2 &&
             *(void**)(g_game + 0x38d6b) == 0) {
             if (*(int*)((char*)*(void**)(g_game + 0x29a0) + 0x118) != 0) {
                 for (int i1 = 0; i1 < 10; i1++) {
@@ -395,7 +395,7 @@ void __cdecl LoadMatch(void*)
             LoadSavedGameState(*(void**)(g_game + 0x38d6b));
             goto tail;
         }
-    } else if (((Class_00435100*)*(void**)(g_game + 0x391e9))->FUN_00435100() != 1) {
+    } else if (((Net*)*(void**)(g_game + 0x391e9))->FUN_00435100() != 1) {
         goto tail;
     }
     CreateMissionUnits();

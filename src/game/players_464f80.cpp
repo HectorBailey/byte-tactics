@@ -302,7 +302,7 @@ struct Player_00464f80;
 
 struct Class_0040eb70 { void RunSearches(); };
 struct Class_00408c40 { void TickIfActive(); };
-struct Class_00435100 {
+struct Net {
     char unknown_0[0xd44];
     int field_d44;                     // +0xd44
     int FUN_00435100();
@@ -447,7 +447,7 @@ struct Game {
     char startPos[0x38a47 - 0x37f5f];  // +0x37f5f, 0x232-byte records
     unsigned int tick;                 // +0x38a47
     char unknown_38a4b[0x391e9 - 0x38a4b];
-    Class_00435100* mode;              // +0x391e9
+    Net* mode;                         // +0x391e9
     MissionConditions* list;           // +0x391ed
     char unknown_391f1[0x39239 - 0x391f1];
     short field_39239;                 // +0x39239

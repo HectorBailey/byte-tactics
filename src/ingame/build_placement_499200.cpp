@@ -58,7 +58,7 @@ union Flags16_00499200 {
     BitFlags16_00499200 bits;
 };
 
-class Class_00435100 {
+class Net {
 public:
     int FUN_00435100();
 };
@@ -139,7 +139,7 @@ struct Game {
     char unknown_37e9e[0x37efa - 0x37e9e];
     int field_37efa;                   // +0x37efa
     char unknown_37efe[0x391e9 - 0x37efe];
-    Class_00435100* net;               // +0x391e9
+    Net* net;                          // +0x391e9
     char unknown_391ed[0x391f1 - 0x391ed];
     int field_391f1;                   // +0x391f1
     void (*field_391f5)(void);         // +0x391f5
@@ -292,7 +292,7 @@ void FUN_00499200(void)
 
     if (g_game->field_3923b.bits.b2 || g_game->field_3923b.bits.b4) {
         if (g_game->net->FUN_00435100() != 3 ||
-            (((Class_00435100*)g_game->net)->FUN_00435100() == 3 &&
+            (((Net*)g_game->net)->FUN_00435100() == 3 &&
              FUN_004572a0() != 0)) {
             SetCursor(0x13);
             FUN_00491d70(1);

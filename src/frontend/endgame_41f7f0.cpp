@@ -1,7 +1,7 @@
 // Decompiled by GPT-6. Names are provisional.
 #include <windows.h>
 #include <string.h>
-class Class_00435100 { public: int FUN_00435100(); };
+class Net { public: int FUN_00435100(); };
 class Class_00435980 { public: int MissionExists(int); };
 class Class_004cfb40 { public: void StopStream(); };
 #pragma pack(push,1)
@@ -30,7 +30,7 @@ struct Game {
     char pad3901d[0x39057-0x3901d]; int state; unsigned deadline,tick; int complete,fade,bar;
     int unknown3906f,skip; void* lastFrame; void* image; void* palette;
     char pad39083[0x391ab-0x39083]; int mission;
-    char pad391af[0x391e9-0x391af]; Class_00435100* campaign;
+    char pad391af[0x391e9-0x391af]; Net* campaign;
     char pad391ed[0x3923b-0x391ed]; unsigned char flags;
 };
 #pragma pack(pop)

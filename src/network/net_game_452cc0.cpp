@@ -34,7 +34,7 @@ public:
     void SetType(int param_1);
 };
 
-class Class_00435100 {
+class Net {
 public:
     int FUN_00435100();
 };
@@ -81,7 +81,7 @@ struct Game {
         };
     } flags;
     char unknown_2a46[0x391e9 - 0x2a46];
-    Class_00435100* net;               // +0x391e9
+    Net* net;                          // +0x391e9
 };
 #pragma pack(pop)
 

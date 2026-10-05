@@ -8,7 +8,7 @@
 // unsigned-to-float conversion needs an 8-byte stack temporary.
 
 // The campaign object at g_game+0x391e9 (Class_00435c00 in 0x435da0.cpp).
-class Class_00435100 {
+class Net {
 public:
     int FUN_00435100();
     char unknown_0[0xd54];
@@ -83,7 +83,7 @@ struct Game_0041dc20 {
     int won;                           // +0x391af
     char unknown_391b3[0x391cf - 0x391b3];
     char results[0x391e9 - 0x391cf];   // +0x391cf
-    Class_00435100* campaign;          // +0x391e9
+    Net* campaign;                     // +0x391e9
     char unknown_391ed[0x3923b - 0x391ed];
     unsigned short bits0_3923b : 2;    // +0x3923b
     unsigned short bit2_3923b : 1;
@@ -126,7 +126,7 @@ void FUN_0041dc20()
                 stats[i].field_2a = (int)p->field_b4;
                 stats[i].field_2e = (int)p->field_cc;
                 stats[i].field_32 = (int)p->field_d4;
-                Class_00435100* c = g_game->campaign;
+                Net* c = g_game->campaign;
                 int t = (int)(g_game->ticks / 60 * c->timeMul);
                 stats[i].score = t + (int)(stats[i].kills * c->killMul);
                 if (stats[i].score < 0)
