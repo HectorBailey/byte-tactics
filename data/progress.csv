@@ -656,8 +656,8 @@ address,size,file,symbol,status,similarity
 0x434ab0,212,src/map/map_list_434ab0.cpp,?FUN_00434ab0@@YGXH@Z,matched,100.0
 0x434b90,92,src/map/map_list_434b90.cpp,?FUN_00434b90@@YGXXZ,matched,100.0
 0x434bf0,886,src/map/map_list_434bf0.cpp,?LoadMapList@@YGHPAPAXHH@Z,matched,100.0
-0x434f70,118,src/map/map_list_434f70.cpp,??0Class_00434f70@@QAE@H@Z,matched,100.0
-0x434ff0,259,src/map/map_list_434ff0.cpp,??1Class_00434f70@@QAE@XZ,matched,100.0
+0x434f70,118,src/map/map_list_434f70.cpp,??0Campaign@@QAE@H@Z,matched,100.0
+0x434ff0,259,src/map/map_list_434ff0.cpp,??1Campaign@@QAE@XZ,matched,100.0
 0x435100,3,src/game/campaign_435100.cpp,?FUN_00435100@Class_00435100@@QAEHXZ,matched,100.0
 0x435110,401,src/game/campaign_435110.cpp,?LoadCampaign@Class_00435110@@QAEXPAD@Z,matched,100.0
 0x4352b0,24,src/game/campaign_4352b0.cpp,?FUN_004352b0@Class_004352b0@@QAEPADXZ,matched,100.0
@@ -684,8 +684,8 @@ address,size,file,symbol,status,similarity
 0x435d30,100,src/map/map_load_435d30.cpp,?FUN_00435d30@Class_00435d30@@QAEXH@Z,matched,100.0
 0x435da0,2740,src/map/map_load_435da0.cpp,?LoadMission@Class_00435c00@@QAEHPAD@Z,matched,100.0
 0x436860,972,src/map/map_load_436860.cpp,?FUN_00436860@Class_00435c00@@QAEHHPAVClass_004c2ea0@@PAD@Z,matched,100.0
-0x436c30,1613,src/map/map_load_436c30.cpp,?LoadMissionData@Class_00436c30@@QAEXPADPAUParser_00436c30@@@Z,matched,100.0
-0x437280,127,src/map/map_load_437280.cpp,?FreeMissionData@Class_00437280@@QAEXXZ,matched,100.0
+0x436c30,1613,src/map/map_load_436c30.cpp,?LoadMissionData@Campaign@@QAEXPADPAUParser_00436c30@@@Z,matched,100.0
+0x437280,127,src/map/map_load_437280.cpp,?FreeMissionData@Campaign@@QAEXXZ,matched,100.0
 0x437300,31,src/map/map_load_437300.cpp,?CountStartPositions@Class_00437300@@QAEHXZ,matched,100.0
 0x437320,116,src/map/map_load_437320.cpp,?GetStartPosition@Class_00437320@@QAEHPAUVec3_00437320@@H@Z,matched,100.0
 0x4373a0,477,src/map/map_load_4373a0.cpp,?ComputeMapChecksum@Class_004373a0@@QAEHXZ,matched,100.0

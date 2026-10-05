@@ -1,5 +1,5 @@
 // Decompiled by Space Bunny Free. Names are provisional.
-// Destructor of Class_00434f70 (constructor 0x434f70, sibling 0x437280).
+// Destructor of Campaign (constructor 0x434f70, sibling 0x437280).
 // Deletes the object at g_game+0x391ed, frees the two-dword buffers at
 // +0xdac/+0xdb4/+0xdbc and the pointers at +0xc14 and +0xd24, then destroys
 // the sub-object at +0xa08. The second round of buffer frees is dead (the
@@ -32,7 +32,7 @@ struct Buffer_00434ff0 {
     int size;                          // +0x4
 };
 
-class Class_00434f70 {
+class Campaign {
 public:
     char unknown_0[0xa08];
     char subobject_a08[0xc14 - 0xa08]; // Class_004c2ea0, destroyed explicitly
@@ -44,11 +44,11 @@ public:
     Buffer_00434ff0 buffer1;           // +0xdb4
     Buffer_00434ff0 buffer2;           // +0xdbc
 
-    ~Class_00434f70();
+    ~Campaign();
 };
 
 // FUNCTION: 0x434ff0
-Class_00434f70::~Class_00434f70()
+Campaign::~Campaign()
 {
     Class_0048dfb0* obj = (Class_0048dfb0*)g_game->field_391ed;
     if (obj) {

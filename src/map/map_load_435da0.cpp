@@ -115,7 +115,7 @@ public:
     void LoadMeteorDefaults();
 };
 
-class Class_00436c30 {
+class Campaign {
 public:
     void LoadMissionData(char* schema, Class_004c2ea0* parser);
 };
@@ -389,7 +389,7 @@ int Class_00435c00::LoadMission(char* map)
         meteor.LoadMeteorDefaults();
     }
     SetMeteorParams(&meteor);
-    ((Class_00436c30*)this)->LoadMissionData(schema, &parser);
+    ((Campaign*)this)->LoadMissionData(schema, &parser);
     return 1;
 }
 

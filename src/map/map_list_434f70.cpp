@@ -18,7 +18,7 @@ public:
 
 extern char DAT_005119b8[];
 
-class Class_00434f70 {
+class Campaign {
 public:
     int owner;                          // +0x0
     char unknown_4[0xa04 - 0x4];
@@ -39,11 +39,11 @@ public:
     int field_dbc;                      // +0xdbc
     int field_dc0;                      // +0xdc0
 
-    Class_00434f70(int owner_);
+    Campaign(int owner_);
 };
 
 // FUNCTION: 0x434f70
-Class_00434f70::Class_00434f70(int owner_)
+Campaign::Campaign(int owner_)
 {
     field_db8 = 0;
     field_db0 = 0;

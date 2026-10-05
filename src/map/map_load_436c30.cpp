@@ -93,7 +93,7 @@ extern char DAT_005119b8[];
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
 void __cdecl FUN_004d85a0(void* p);
 
-class Class_00436c30 {
+class Campaign {
 public:
     char unknown_0[0xdac];
     MissionUnit_00436c30* units;       // +0xdac
@@ -107,7 +107,7 @@ public:
 };
 
 // FUNCTION: 0x436c30
-void Class_00436c30::LoadMissionData(char* name, Parser_00436c30* parser)
+void Campaign::LoadMissionData(char* name, Parser_00436c30* parser)
 {
     char text[0x100];
     char buf[0x400];

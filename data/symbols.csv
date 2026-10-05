@@ -659,8 +659,8 @@ address,name
 0x434ab0,FUN_00434ab0
 0x434b90,FUN_00434b90
 0x434bf0,LoadMapList
-0x434f70,Class_00434f70::Class_00434f70
-0x434ff0,Class_00434f70::~Class_00434f70
+0x434f70,Campaign::Campaign
+0x434ff0,Campaign::~Campaign
 0x435100,Class_00435100::FUN_00435100
 0x435110,Class_00435110::LoadCampaign
 0x4352b0,Class_004352b0::FUN_004352b0
@@ -687,8 +687,8 @@ address,name
 0x435d30,Class_00435d30::FUN_00435d30
 0x435da0,Class_00435c00::LoadMission
 0x436860,Class_00435c00::FUN_00436860
-0x436c30,Class_00436c30::LoadMissionData
-0x437280,Class_00437280::FreeMissionData
+0x436c30,Campaign::LoadMissionData
+0x437280,Campaign::FreeMissionData
 0x437300,Class_00437300::CountStartPositions
 0x437320,Class_00437320::GetStartPosition
 0x4373a0,Class_004373a0::ComputeMapChecksum
