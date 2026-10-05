@@ -2,14 +2,14 @@
 #include <stdio.h>
 #include <string.h>
 
-class Class_004c48c0 {
+class TdfRecord {
 public:
     int GetFieldString(char* dst, char* key, size_t size, char* def);
 };
 
 struct Source_0042f450 {
     char unknown_0[4];
-    Class_004c48c0* tdf;               // +0x4
+    TdfRecord* tdf;                    // +0x4
 };
 
 extern char DAT_005119b8[];

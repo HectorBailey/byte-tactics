@@ -17,7 +17,7 @@ public:
     int SelectRecord(char* name);
 };
 
-class Class_004c48c0 {
+class TdfRecord {
 public:
     int GetFieldString(char* dst, char* key, int size, char* def);
 };
@@ -99,7 +99,7 @@ void FUN_00422ea0()
     if (*count > 0) {
         features = &g_game->features;
         do {
-            Class_004c48c0* parser = (Class_004c48c0*)FindEntry((*features)[i].name)->parser;
+            TdfRecord* parser = (TdfRecord*)FindEntry((*features)[i].name)->parser;
             if (parser->GetFieldString(buf, "featuredead", 0x100, DAT_005119b8))
                 (*features)[i].dead = FeatureIndex(buf);
             else

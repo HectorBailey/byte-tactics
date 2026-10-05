@@ -85,7 +85,7 @@ public:
     int GetFieldInt(const char* name, int def);
 };
 
-class Class_004c48c0 {
+class TdfRecord {
 public:
     int GetFieldString(char* buf, const char* name, int size, void* def);
 };
@@ -385,43 +385,43 @@ void Class_0048ff40::FUN_0048e010(Param_0048e010* p)
         victory[victoryCount] = new Class_0048ec20;
         victoryCount++;
     }
-    int r4 = ((Class_004c48c0*)p->reader)->GetFieldString(buf, "BuildUnitType", 0x100, &DAT_005119b8);
+    int r4 = ((TdfRecord*)p->reader)->GetFieldString(buf, "BuildUnitType", 0x100, &DAT_005119b8);
     if (r4 != 0) {
         victory[victoryCount] = new Class_0048edb0(buf);
         victoryCount++;
     }
-    int r5 = ((Class_004c48c0*)p->reader)->GetFieldString(buf, "CaptureUnitType", 0x100, &DAT_005119b8);
+    int r5 = ((TdfRecord*)p->reader)->GetFieldString(buf, "CaptureUnitType", 0x100, &DAT_005119b8);
     if (r5 != 0) {
         victory[victoryCount] = new Class_0048eeb0(buf);
         victoryCount++;
     }
-    int r6 = ((Class_004c48c0*)p->reader)->GetFieldString(buf, "KillAllOfType", 0x100, &DAT_005119b8);
+    int r6 = ((TdfRecord*)p->reader)->GetFieldString(buf, "KillAllOfType", 0x100, &DAT_005119b8);
     if (r6 != 0) {
         victory[victoryCount] = new Class_0048efb0(buf);
         victoryCount++;
     }
-    int r7 = ((Class_004c48c0*)p->reader)->GetFieldString(buf, "KillUnitType", 0x100, &DAT_005119b8);
+    int r7 = ((TdfRecord*)p->reader)->GetFieldString(buf, "KillUnitType", 0x100, &DAT_005119b8);
     if (r7 != 0) {
         int n;
         sscanf(buf, "%[a-zA-Z],%i", stype, &n);
         victory[victoryCount] = new Class_0048f0f0(stype, n);
         victoryCount++;
     }
-    int r8 = ((Class_004c48c0*)p->reader)->GetFieldString(buf, "MoveUnitToRadius", 0x100, &DAT_005119b8);
+    int r8 = ((TdfRecord*)p->reader)->GetFieldString(buf, "MoveUnitToRadius", 0x100, &DAT_005119b8);
     if (r8 != 0) {
         int a, b, c;
         sscanf(buf, "%[a-zA-Z],%i,%i,%i", stype, &a, &b, &c);
         victory[victoryCount] = new Class_0048f250(stype, a, b, c);
         victoryCount++;
     }
-    int r9 = ((Class_004c48c0*)p->reader)->GetFieldString(buf, "UnitTypePassesX", 0x100, &DAT_005119b8);
+    int r9 = ((TdfRecord*)p->reader)->GetFieldString(buf, "UnitTypePassesX", 0x100, &DAT_005119b8);
     if (r9 != 0) {
         int n;
         sscanf(buf, "%[a-zA-Z],%i", stype, &n);
         victory[victoryCount] = new Class_0048f3e0(stype, n);
         victoryCount++;
     }
-    int r10 = ((Class_004c48c0*)p->reader)->GetFieldString(buf, "UnitTypePassesZ", 0x100, &DAT_005119b8);
+    int r10 = ((TdfRecord*)p->reader)->GetFieldString(buf, "UnitTypePassesZ", 0x100, &DAT_005119b8);
     if (r10 != 0) {
         int n;
         sscanf(buf, "%[a-zA-Z],%i", stype, &n);
@@ -445,12 +445,12 @@ void Class_0048ff40::FUN_0048e010(Param_0048e010* p)
         defeat[defeatCount] = new Class_0048f840;
         defeatCount++;
     }
-    int r13 = ((Class_004c48c0*)p->reader)->GetFieldString(buf, "AllUnitsKilledOfType", 0x100, &DAT_005119b8);
+    int r13 = ((TdfRecord*)p->reader)->GetFieldString(buf, "AllUnitsKilledOfType", 0x100, &DAT_005119b8);
     if (r13 != 0) {
         defeat[defeatCount] = new Class_0048f9d0(buf);
         defeatCount++;
     }
-    int r14 = ((Class_004c48c0*)p->reader)->GetFieldString(buf, "UnitTypeKilled", 0x100, &DAT_005119b8);
+    int r14 = ((TdfRecord*)p->reader)->GetFieldString(buf, "UnitTypeKilled", 0x100, &DAT_005119b8);
     if (r14 != 0) {
         int n;
         sscanf(buf, "%[a-zA-Z],%i", stype, &n);

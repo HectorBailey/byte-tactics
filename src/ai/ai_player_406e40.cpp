@@ -24,7 +24,7 @@ public:
     char* GetArg(int index, char* fallback);
 };
 
-class Class_004b73e0 {
+class CommandArgs {
 public:
     int GetIntArg(int index, int fallback);
 };
@@ -39,7 +39,7 @@ public:
 void __stdcall FUN_00409e90(int player, UnitTypeSet* set, int value, int param_4);
 
 // FUNCTION: 0x406e40
-void __stdcall FUN_00406e40(Class_004b73e0* args)
+void __stdcall FUN_00406e40(CommandArgs* args)
 {
     if (DAT_00501774 != 0) {
         int count;

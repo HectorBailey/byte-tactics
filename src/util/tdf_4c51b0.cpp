@@ -9,7 +9,7 @@
 // That destructor is defined again below, unannotated, to emit this COMDAT;
 // with this layout it compiles byte-identical to 0x4c2eb0. The entry vector
 // sits two (implicit-destructor) wrapper levels deep in the section: with one
-// level, MSVC calls ~Elem_004c5bc0 out of line instead of this ??_G. The
+// level, MSVC calls ~TdfField out of line instead of this ??_G. The
 // real wrapper classes are unknown (0x4c48c0 binary-searches the entries).
 // 0x4c9390 is really the handle's destructor, but it is established as
 // Class_004c9390::ReleaseRef, so the handle's inline destructor calls it.
@@ -29,7 +29,7 @@ public:
     ~Class_004c91a0() { ((Class_004c9390*)this)->ReleaseRef(); }
 };
 
-struct Elem_004c5bc0 {
+struct TdfField {
     Class_004c91a0 a;                  // +0x0 key
     Class_004c91a0 b;                  // +0x4 value
 };
@@ -38,7 +38,7 @@ void __cdecl FUN_004d85a0(int* param_1);
 
 #pragma pack(push, 1)
 struct Inner_004c51b0 {
-    std::vector<Elem_004c5bc0> v;
+    std::vector<TdfField> v;
 };
 
 struct Entries_004c51b0 {
@@ -72,7 +72,7 @@ public:
 };
 
 // FUNCTION: 0x4c2eb0
-// FUNCTION: 0x4c51b0 ??_GElem_004c5bc0@@QAEPAXI@Z
+// FUNCTION: 0x4c51b0 ??_GTdfField@@QAEPAXI@Z
 Class_004c2ea0::~Class_004c2ea0()
 {
     delete root;

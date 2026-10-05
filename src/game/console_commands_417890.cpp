@@ -8,7 +8,7 @@ struct Game { char pad0[0x2caa]; Vec3 pos; char pad2cb6[0x1422b-0x2cb6]; int wid
 extern Game* g_game;
 extern char DAT_005119b8[];
 class Class_004b73c0 { public: char* GetArg(int,char*); };
-class Class_004b73e0 { public: int GetIntArg(int,int); };
+class CommandArgs { public: int GetIntArg(int,int); };
 int __stdcall MatchWildcard(const char*,const char*);
 void __stdcall FUN_0047ddc0(UnitDef*,Vec3*);
 void* __stdcall CreateUnit(unsigned char,short,Vec3,int,int,int);
@@ -27,7 +27,7 @@ void __stdcall FUN_00417890(Class_004b73c0* args)
         if (MatchWildcard(def->name,args->GetArg(0,DAT_005119b8))) {
             if (count) pos.x-=def->min.x;
             FUN_0047ddc0(def,&pos);
-            CreateUnit(((Class_004b73e0*)args)->GetIntArg(1,0),i,pos,1,1,0);
+            CreateUnit(((CommandArgs*)args)->GetIntArg(1,0),i,pos,1,1,0);
             pos.x+=def->max.x+0x200000;
             if (pos.x >= (g_game->width<<16)) { pos.x=0xa00000; pos.z+=0xa00000; }
             ++count;

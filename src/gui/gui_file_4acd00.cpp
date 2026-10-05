@@ -5,11 +5,11 @@
 #include <stdio.h>
 #include <string.h>
 
-struct Class_004bbbe0;
+struct FileHandle;
 
-extern unsigned int __stdcall HAPI_WriteFile(Class_004bbbe0* file, void* data, unsigned int size);
+extern unsigned int __stdcall HAPI_WriteFile(FileHandle* file, void* data, unsigned int size);
 
-static inline void WriteTabs(Class_004bbbe0* file, int depth)
+static inline void WriteTabs(FileHandle* file, int depth)
 {
     char tab = '\t';
     for (int i = 0; i < depth; i++)
@@ -17,7 +17,7 @@ static inline void WriteTabs(Class_004bbbe0* file, int depth)
 }
 
 // FUNCTION: 0x4acd00
-void __stdcall FUN_004acd00(Class_004bbbe0* file, char* name, int depth)
+void __stdcall FUN_004acd00(FileHandle* file, char* name, int depth)
 {
     char line[100];
     sprintf(line, "[%s]", name);

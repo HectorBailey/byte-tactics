@@ -15,7 +15,7 @@
 //     the out-of-line release function FUN_004c5170 on each one. That is what
 //     makes the destroy loop of the inlined ~Class_004c42a0 call
 //     FUN_004c5170 (0x4c5170) with the element pointer as a stack argument,
-//     as it does here, instead of Elem_004c5bc0::~Elem_004c5bc0 (0x4c5190,
+//     as it does here, instead of TdfField::~TdfField (0x4c5190,
 //     0x4c3240) or its scalar deleting destructor ??_G (0x4c51b0,
 //     0x4c3120);
 //   * `got` and `flag` below. The call results have to land in locals, not in

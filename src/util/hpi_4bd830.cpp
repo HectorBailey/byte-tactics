@@ -43,7 +43,7 @@ struct Node_004bd830 {
     unsigned char obfuscate;             // +0xc
 };
 
-struct Shared_004bd830 {
+struct OPENHAPIFILE {
     FILE* fp;                            // +0x0
     int pos;                             // +0x4
     Node_004bd830* node;                 // +0x8
@@ -58,9 +58,9 @@ struct Info_004bd830 {
     unsigned char compressed;            // +0x8
 };
 
-struct File_004bd830 {
+struct FileHandle {
     FILE* fp;                            // +0x0
-    Shared_004bd830* shared;             // +0x4
+    OPENHAPIFILE* shared;                // +0x4
     Info_004bd830* info;                 // +0x8
     unsigned int pos;                    // +0xc
     int* buffer;                         // +0x10
@@ -75,8 +75,8 @@ struct Entry_004bd830 {
 };
 #pragma pack(pop)
 
-File_004bd830* __stdcall HAPI_OpenFile(char* filename, const char* mode);
-int __stdcall HAPI_readfromfile(File_004bd830* file, unsigned char* buf, int size);
+FileHandle* __stdcall HAPI_OpenFile(char* filename, const char* mode);
+int __stdcall HAPI_readfromfile(FileHandle* file, unsigned char* buf, int size);
 int __stdcall SquashPack(void* chunk, int* chunkSize, char* data,
                            int size, int method, int encrypt);
 unsigned int __stdcall SquashMaxPackedSize(unsigned int value, int mode);
@@ -88,7 +88,7 @@ void __stdcall HAPI_WriteArchiveData(char* path, char* base, int off, FILE* f,
 
 // The handle's file size, from the same translation unit (its own file is
 // src/util/hpi_4bbd00.cpp), so it is inlined below.
-long __stdcall HAPI_FileLength(File_004bd830* file)
+long __stdcall HAPI_FileLength(FileHandle* file)
 {
     if (file->shared != 0)
         return file->info->size;
@@ -118,7 +118,7 @@ void __stdcall HAPI_WriteArchiveData(char* path, char* base, int off, FILE* f,
     int n, * table;
     int clen;
     unsigned remaining, i;
-    File_004bd830* file;
+    FileHandle* file;
     unsigned char* pack;
     int j;
     unsigned char* data;

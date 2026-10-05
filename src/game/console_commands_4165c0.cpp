@@ -10,7 +10,7 @@ struct Flags_004165c0
 extern void* g_game;
 
 // Command arguments.
-class Class_004b73e0 {
+class CommandArgs {
 public:
     char* args[0x34];                  // +0x00
     int count;                         // +0xd0
@@ -20,7 +20,7 @@ public:
 void FUN_00430f00(void);
 
 // FUNCTION: 0x4165c0
-void __stdcall FUN_004165c0(Class_004b73e0* args)
+void __stdcall FUN_004165c0(CommandArgs* args)
 {
     if (args->count < 2) {
         Flags_004165c0* f = (Flags_004165c0*)((char*)g_game + 0x37f06);

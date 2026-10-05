@@ -18,18 +18,18 @@
 
 // The real preceding function, 0x4ae630, matched in its own file (see the
 // note above). It has no annotation here to avoid a duplicate.
-struct Class_004bbbe0;
+struct FileHandle;
 char* __stdcall ChangeExtension(char*, char*, const char*);
 int __stdcall HAPI_FileLengthByName(char*);
 void __stdcall RemoveFile(char*);
 void __stdcall RenameFile(char*, char*);
-Class_004bbbe0* __stdcall HAPI_CreateFile(char*);
-void __stdcall HAPI_CloseFile(Class_004bbbe0*);
-unsigned int __stdcall HAPI_WriteFile(Class_004bbbe0*, void*, unsigned int);
-void __stdcall FUN_004accd0(Class_004bbbe0*, int);
-void __stdcall FUN_004acde0(Class_004bbbe0*, char*, char*, int);
-void __stdcall FUN_004ace50(void*, Class_004bbbe0*, int);
-void __stdcall FUN_004ad4f0(void*, Class_004bbbe0*, int);
+FileHandle* __stdcall HAPI_CreateFile(char*);
+void __stdcall HAPI_CloseFile(FileHandle*);
+unsigned int __stdcall HAPI_WriteFile(FileHandle*, void*, unsigned int);
+void __stdcall FUN_004accd0(FileHandle*, int);
+void __stdcall FUN_004acde0(FileHandle*, char*, char*, int);
+void __stdcall FUN_004ace50(void*, FileHandle*, int);
+void __stdcall FUN_004ad4f0(void*, FileHandle*, int);
 
 void __stdcall FUN_004ae630(char* obj, char* name)
 {
@@ -51,7 +51,7 @@ void __stdcall FUN_004ae630(char* obj, char* name)
         RemoveFile(backup);
         RenameFile(path, backup);
     }
-    Class_004bbbe0* out = HAPI_CreateFile(path);
+    FileHandle* out = HAPI_CreateFile(path);
     char* p = obj;
     for (index = 0; index < *(short*)(obj + 0xb6) + 1; index++, p += 0x15b) {
         sprintf(gadget, "GADGET%d", index);
@@ -131,7 +131,7 @@ public:
     int GetFieldInt(const char* name, int def);
 };
 
-class Class_004c48c0 {
+class TdfRecord {
 public:
     int GetFieldString(char* dst, char* key, size_t size, char* def);
 };
@@ -273,7 +273,7 @@ int __stdcall FUN_004aeac0(Elem_004aeac0* obj, char* name)
                 e->tail.s34.maxchars = (short)parser.current->GetFieldInt("maxchars", 0);
                 if (e->tail.s34.maxchars > 0x80)
                     e->tail.s34.maxchars = 0x80;
-                ((Class_004c48c0*)parser.current)->GetFieldString(e->body.text, "text", 0x80, DAT_005119b8);
+                ((TdfRecord*)parser.current)->GetFieldString(e->body.text, "text", 0x80, DAT_005119b8);
                 strcpy(e->body.text, Translate(e->body.text));
                 break;
             case 4:
@@ -282,16 +282,16 @@ int __stdcall FUN_004aeac0(Elem_004aeac0* obj, char* name)
                 e->tail.s34.knobpos = (short)parser.current->GetFieldInt("knobpos", 0);
                 e->tail.s34.knobsize = (short)parser.current->GetFieldInt("knobsize", 0);
                 e->tail.s34.field_144 = 0;
-                ((Class_004c48c0*)parser.current)->GetFieldString(e->body.text, "text", 0x80, DAT_005119b8);
+                ((TdfRecord*)parser.current)->GetFieldString(e->body.text, "text", 0x80, DAT_005119b8);
                 strcpy(e->body.text, Translate(e->body.text));
                 break;
             case 5:
                 e->tail.s5.link[0] = 0;
                 e->tail.s5.field_147 = 0;
                 memset(e->body.text, 0, sizeof(e->body.text));
-                ((Class_004c48c0*)parser.current)->GetFieldString(e->body.text, "text", 0x80, DAT_005119b8);
+                ((TdfRecord*)parser.current)->GetFieldString(e->body.text, "text", 0x80, DAT_005119b8);
                 strncpy(e->body.text, Translate(e->body.text), 0x7f);
-                ((Class_004c48c0*)parser.current)->GetFieldString(e->tail.s5.link, "link", 0x10, DAT_005119b8);
+                ((TdfRecord*)parser.current)->GetFieldString(e->tail.s5.link, "link", 0x10, DAT_005119b8);
                 break;
             case 6:
                 {
@@ -300,10 +300,10 @@ int __stdcall FUN_004aeac0(Elem_004aeac0* obj, char* name)
                 }
                 break;
             case 7:
-                ((Class_004c48c0*)parser.current)->GetFieldString(e->body.text, "filename", 0x20, DAT_005119b8);
+                ((TdfRecord*)parser.current)->GetFieldString(e->body.text, "filename", 0x20, DAT_005119b8);
                 break;
             case 8:
-                ((Class_004c48c0*)parser.current)->GetFieldString(e->body.text, "filename", 0x20, DAT_005119b8);
+                ((TdfRecord*)parser.current)->GetFieldString(e->body.text, "filename", 0x20, DAT_005119b8);
                 break;
             case 10:
                 e->body.nuttin = parser.current->GetFieldInt("nuttin", 0);

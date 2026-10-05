@@ -18,7 +18,7 @@ struct Node_004bb7c0 {
     unsigned char obfuscate;             // +0xc
 };
 
-struct Item_004bb7c0 {
+struct OPENHAPIFILE {
     FILE* fp;                            // +0x0
     int pos;                             // +0x4
     Node_004bb7c0* node;                 // +0x8
@@ -33,9 +33,9 @@ struct Info_004bb7c0 {
     unsigned char compressed;            // +0x8
 };
 
-struct File_004bb7c0 {
+struct FileHandle {
     FILE* fp;                            // +0x0
-    Item_004bb7c0* shared;               // +0x4
+    OPENHAPIFILE* shared;                // +0x4
     Info_004bb7c0* info;                 // +0x8
     unsigned int pos;                    // +0xc
     int* buffer;                         // +0x10, block sizes
@@ -46,7 +46,7 @@ struct File_004bb7c0 {
 
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
 void __cdecl FUN_004d85a0(void* p);
-long __stdcall HAPI_SeekFile(File_004bb7c0* file, long pos);
+long __stdcall HAPI_SeekFile(FileHandle* file, long pos);
 int __stdcall SquashUnpack(unsigned char* dst, unsigned char* src);
 char* __stdcall SquashErrorString(int code);
 void __stdcall FatalError(char* text);
@@ -56,7 +56,7 @@ static inline int nblocks(int w)
     return w / 65536 + (w % 65536 != 0);
 }
 
-static inline int BlockOffset(File_004bb7c0* file, int& counter, int b, int tableSize)
+static inline int BlockOffset(FileHandle* file, int& counter, int b, int tableSize)
 {
     int off = tableSize;
     for (counter = 0; counter < b; ++counter)
@@ -66,7 +66,7 @@ static inline int BlockOffset(File_004bb7c0* file, int& counter, int b, int tabl
 
 
 // FUNCTION: 0x4bb7c0
-int __stdcall HAPI_readfromfile(File_004bb7c0* file, unsigned char* buf, int size)
+int __stdcall HAPI_readfromfile(FileHandle* file, unsigned char* buf, int size)
 {
     int n;
     unsigned char* dst;
@@ -76,7 +76,7 @@ int __stdcall HAPI_readfromfile(File_004bb7c0* file, unsigned char* buf, int siz
     int blocks;
     int tableSize;
     int b;
-    Item_004bb7c0* item = file->shared;
+    OPENHAPIFILE* item = file->shared;
     if (item != 0) {
         Info_004bb7c0* info = file->info;
         n = size;

@@ -293,14 +293,14 @@ public:
     void CloseBank();
 };
 
-struct File_004bb5d0;
+struct FileHandle;
 
 void* __stdcall HAPI_OpenFileRead(void* param1);
-int __stdcall HAPI_CloseFile(File_004bb5d0* file);
-long __stdcall HAPI_SeekFile(File_004bb5d0* file, long pos);
-long __stdcall HAPI_TellFile(File_004bb5d0* file);
-void __stdcall HAPI_readfromfile(File_004bb5d0* file, void* buf, int size);
-long __stdcall HAPI_FileLength(File_004bb5d0* file);
+int __stdcall HAPI_CloseFile(FileHandle* file);
+long __stdcall HAPI_SeekFile(FileHandle* file, long pos);
+long __stdcall HAPI_TellFile(FileHandle* file);
+void __stdcall HAPI_readfromfile(FileHandle* file, void* buf, int size);
+long __stdcall HAPI_FileLength(FileHandle* file);
 void* __cdecl FUN_004d8450(unsigned int size);
 void* __cdecl FUN_004d8460(unsigned int count, unsigned int size);
 void* __cdecl FUN_004d8580(void* ptr, unsigned int size);
@@ -335,7 +335,7 @@ public:
     char unknown_4[4];
     int field_8;
 
-    void LoadAccount(File_004bb5d0* file, void** buf, void* arg3);
+    void LoadAccount(FileHandle* file, void** buf, void* arg3);
     int OpenBank(char* filename, char* name, void* arg3);
 };
 
@@ -346,11 +346,11 @@ int Class_004b3770::OpenBank(char* filename, char* name, void* arg3)
     BankFileHeader h;
     Image_004b3770 img;
     char errmsg[0x80];
-    File_004bb5d0* file;
+    FileHandle* file;
     long remaining;
     long pos;
 
-    file = (File_004bb5d0*)HAPI_OpenFileRead(filename);
+    file = (FileHandle*)HAPI_OpenFileRead(filename);
     if (file == 0) {
         return 0;
     }

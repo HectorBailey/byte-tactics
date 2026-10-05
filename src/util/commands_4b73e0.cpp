@@ -2,7 +2,7 @@
 
 int __cdecl atoi(const char* str);
 
-struct Class_004b73e0
+struct CommandArgs
 {
 public:
     char unknown_0[0xd0];
@@ -12,7 +12,7 @@ public:
 };
 
 // FUNCTION: 0x4b73e0
-int Class_004b73e0::GetIntArg(int param_1, int param_2)
+int CommandArgs::GetIntArg(int param_1, int param_2)
 {
     if (param_1 < 0 || param_1 >= field_d0) {
         return param_2;

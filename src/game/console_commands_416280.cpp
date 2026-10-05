@@ -21,7 +21,7 @@ struct Game {
 extern Game* g_game;
 
 // Command arguments.
-class Class_004b73e0 {
+class CommandArgs {
 public:
     int GetIntArg(int index, int fallback);
 };
@@ -32,7 +32,7 @@ public:
 };
 
 // FUNCTION: 0x416280
-void __stdcall FUN_00416280(Class_004b73e0* args)
+void __stdcall FUN_00416280(CommandArgs* args)
 {
     unsigned char i = args->GetIntArg(1, g_game->field_2a42);
     if (i < 10) {

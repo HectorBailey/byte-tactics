@@ -13,16 +13,16 @@ struct Info_004bc120 {
     long size;       // +0x4
 };
 
-struct Shared_004bc120 {
+struct OPENHAPIFILE {
     FILE* fp;        // +0x0
     char unknown_4[8];
     int refCount;    // +0xc
     int field_10;    // +0x10
 };
 
-struct File_004bc120 {
+struct FileHandle {
     FILE* fp;                 // +0x0
-    Shared_004bc120* shared;  // +0x4
+    OPENHAPIFILE* shared;     // +0x4
     Info_004bc120* info;      // +0x8
     unsigned int pos;         // +0xc
     int* buffer;              // +0x10
@@ -30,14 +30,14 @@ struct File_004bc120 {
 };
 
 void __cdecl FUN_004d85a0(void* param_1);
-File_004bc120* __stdcall HAPI_OpenFile(char* param_1, const char* param_2);
-long __stdcall HAPI_SeekFile(File_004bc120* param_1, long param_2);
-long __stdcall HAPI_readfromfile(File_004bc120* param_1, void* param_2, long param_3);
+FileHandle* __stdcall HAPI_OpenFile(char* param_1, const char* param_2);
+long __stdcall HAPI_SeekFile(FileHandle* param_1, long param_2);
+long __stdcall HAPI_readfromfile(FileHandle* param_1, void* param_2, long param_3);
 
 // FUNCTION: 0x4bc120
 int* __stdcall HAPI_LoadFileInto(char* param_1, int* param_2)
 {
-    File_004bc120* file = HAPI_OpenFile(param_1, "rb");
+    FileHandle* file = HAPI_OpenFile(param_1, "rb");
     long size;
     if (file == 0)
         goto fail;

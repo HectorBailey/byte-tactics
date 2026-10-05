@@ -110,7 +110,7 @@ public:
     int GetFieldInt(const char* name, int def);
 };
 
-class Class_004c48c0 {
+class TdfRecord {
 public:
     int GetFieldString(char* dst, const char* key, size_t size, const char* def);
 };
@@ -217,13 +217,13 @@ void __stdcall FUN_00431a60(void)
         ((Class_004c3e10*)&parser)->ResetCurrentRecord();
         if (!((Class_004c3410*)&parser)->SelectRecord(name))
             break;
-        if (((Class_004c48c0*)parser.current)->GetFieldString(name, "name", 0x1e, DAT_005119b8))
+        if (((TdfRecord*)parser.current)->GetFieldString(name, "name", 0x1e, DAT_005119b8))
             strcpy(s->name, name);
-        if (((Class_004c48c0*)parser.current)->GetFieldString(name, "nameprefix", 4, DAT_005119b8))
+        if (((TdfRecord*)parser.current)->GetFieldString(name, "nameprefix", 4, DAT_005119b8))
             strcpy(s->nameprefix, name);
-        if (((Class_004c48c0*)parser.current)->GetFieldString(name, "commander", 0x20, DAT_005119b8))
+        if (((TdfRecord*)parser.current)->GetFieldString(name, "commander", 0x20, DAT_005119b8))
             strcpy(s->commander, name);
-        if (((Class_004c48c0*)parser.current)->GetFieldString(name, "font", 0x100, DAT_005119b8)) {
+        if (((TdfRecord*)parser.current)->GetFieldString(name, "font", 0x100, DAT_005119b8)) {
             void* font;
             FUN_004290f0(fontPath, "fonts", name, "FNT");
             font = HAPI_LoadFile(fontPath, 0);

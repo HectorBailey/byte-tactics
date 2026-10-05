@@ -20,7 +20,7 @@ public:
     int SelectRecord(char* name);
 };
 
-class Class_004c48c0 {
+class TdfRecord {
 public:
     int GetFieldString(char* dst, char* key, int size, char* def);
 };
@@ -170,17 +170,17 @@ int __stdcall FUN_004224b0(char* name)
                                                           (g_game->featureCount + 1) * 0x100);
     FeatureDef_004224b0* def = &g_game->features[g_game->featureCount];
     strncpy(def->name, name, 0x80);
-    ((Class_004c48c0*)entry->parser)->GetFieldString(def->description, "Description", 0x14, DAT_005119b8);
+    ((TdfRecord*)entry->parser)->GetFieldString(def->description, "Description", 0x14, DAT_005119b8);
     def->footprintx = ((Class_004c46c0*)entry->parser)->GetFieldInt("footprintx", 0);
     def->footprintz = ((Class_004c46c0*)entry->parser)->GetFieldInt("footprintz", 0);
     def->height = ((Class_004c46c0*)entry->parser)->GetFieldInt("height", 0);
-    ok = ((Class_004c48c0*)entry->parser)->GetFieldString(file, "object", 0x100, DAT_005119b8);
+    ok = ((TdfRecord*)entry->parser)->GetFieldString(file, "object", 0x100, DAT_005119b8);
     if (ok) {
         def->noobject = 0;
         def->object = FUN_0042a2c0(file);
     } else {
         def->noobject = 1;
-        ((Class_004c48c0*)entry->parser)->GetFieldString(file, "filename", 0x100, DAT_005119b8);
+        ((TdfRecord*)entry->parser)->GetFieldString(file, "filename", 0x100, DAT_005119b8);
         for (j = 0; j < g_game->featureCount; j++) {
             if (strncmp(g_game->features[j].filename, file, 0x10) == 0) {
                 def->anims = 0;
@@ -195,17 +195,17 @@ int __stdcall FUN_004224b0(char* name)
             strncpy(def->filename, file, 0x10);
             anims = def->anims;
         }
-        ok = ((Class_004c48c0*)entry->parser)->GetFieldString(seqname, "seqname", 0x100, DAT_005119b8);
+        ok = ((TdfRecord*)entry->parser)->GetFieldString(seqname, "seqname", 0x100, DAT_005119b8);
         if (ok)
             def->seq = SeqByName(anims, 0, seqname);
         else
             def->seq = 0;
-        ok = ((Class_004c48c0*)entry->parser)->GetFieldString(seqname, "seqnameshad", 0x100, DAT_005119b8);
+        ok = ((TdfRecord*)entry->parser)->GetFieldString(seqname, "seqnameshad", 0x100, DAT_005119b8);
         if (ok)
             def->seqshad = SeqByName(anims, 0, seqname);
         else
             def->seqshad = 0;
-        ok = ((Class_004c48c0*)entry->parser)->GetFieldString(seqname, "seqnameburn", 0x100, DAT_005119b8);
+        ok = ((TdfRecord*)entry->parser)->GetFieldString(seqname, "seqnameburn", 0x100, DAT_005119b8);
         if (ok) {
             def->seqburn = SeqByName(anims, 0, seqname);
             if (def->seqburn)
@@ -213,7 +213,7 @@ int __stdcall FUN_004224b0(char* name)
         } else {
             def->seqburn = 0;
         }
-        ok = ((Class_004c48c0*)entry->parser)->GetFieldString(seqname, "seqnameburnshad", 0x100, DAT_005119b8);
+        ok = ((TdfRecord*)entry->parser)->GetFieldString(seqname, "seqnameburnshad", 0x100, DAT_005119b8);
         if (ok) {
             def->seqburnshad = SeqByName(anims, 0, seqname);
             if (def->seqburnshad)
@@ -221,7 +221,7 @@ int __stdcall FUN_004224b0(char* name)
         } else {
             def->seqburnshad = 0;
         }
-        ok = ((Class_004c48c0*)entry->parser)->GetFieldString(seqname, "seqnamedie", 0x100, DAT_005119b8);
+        ok = ((TdfRecord*)entry->parser)->GetFieldString(seqname, "seqnamedie", 0x100, DAT_005119b8);
         if (ok) {
             def->seqdie = SeqByName(anims, 0, seqname);
             if (def->seqdie)
@@ -229,7 +229,7 @@ int __stdcall FUN_004224b0(char* name)
         } else {
             def->seqdie = 0;
         }
-        ok = ((Class_004c48c0*)entry->parser)->GetFieldString(seqname, "seqnamedieshad", 0x100, DAT_005119b8);
+        ok = ((TdfRecord*)entry->parser)->GetFieldString(seqname, "seqnamedieshad", 0x100, DAT_005119b8);
         if (ok) {
             def->seqdieshad = SeqByName(anims, 0, seqname);
             if (def->seqdieshad)
@@ -237,7 +237,7 @@ int __stdcall FUN_004224b0(char* name)
         } else {
             def->seqdieshad = 0;
         }
-        ok = ((Class_004c48c0*)entry->parser)->GetFieldString(seqname, "seqnamereclamate", 0x100, DAT_005119b8);
+        ok = ((TdfRecord*)entry->parser)->GetFieldString(seqname, "seqnamereclamate", 0x100, DAT_005119b8);
         if (ok) {
             def->seqreclamate = SeqByName(anims, 0, seqname);
             if (def->seqreclamate)
@@ -245,7 +245,7 @@ int __stdcall FUN_004224b0(char* name)
         } else {
             def->seqreclamate = 0;
         }
-        ok = ((Class_004c48c0*)entry->parser)->GetFieldString(seqname, "seqnamereclamateshad", 0x100, DAT_005119b8);
+        ok = ((TdfRecord*)entry->parser)->GetFieldString(seqname, "seqnamereclamateshad", 0x100, DAT_005119b8);
         if (ok) {
             def->seqreclamateshad = SeqByName(anims, 0, seqname);
             if (def->seqreclamateshad)
@@ -280,7 +280,7 @@ int __stdcall FUN_004224b0(char* name)
     if (_strcmpi(name, "Fortification_Core") == 0)
         def->nodrawundergray = 1;
     def->sparktime = (short)(((Class_004c4760*)entry->parser)->GetFieldDouble("sparktime", 0.0) * 30.0);
-    ((Class_004c48c0*)entry->parser)->GetFieldString(seqname, "burnweapon", 0x100, DAT_005119b8);
+    ((TdfRecord*)entry->parser)->GetFieldString(seqname, "burnweapon", 0x100, DAT_005119b8);
     def->burnweapon = FUN_0049e5b0(seqname);
     def->ref.index = 0;
     def->ref.value = 0;

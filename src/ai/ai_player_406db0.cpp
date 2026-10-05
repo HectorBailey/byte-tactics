@@ -27,7 +27,7 @@ public:
     char* GetArg(int index, char* fallback);
 };
 
-class Class_004b7410 {
+class CommandArgs {
 public:
     float GetFloatArg(int index, float default_val);
 };
@@ -42,7 +42,7 @@ public:
 void __stdcall FUN_00409dc0(int player, UnitTypeSet* set, float value, int count);
 
 // FUNCTION: 0x406db0
-void __stdcall FUN_00406db0(Class_004b7410* args)
+void __stdcall FUN_00406db0(CommandArgs* args)
 {
     if (DAT_00501774 != 0) {
         int count;

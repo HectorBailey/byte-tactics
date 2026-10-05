@@ -19,15 +19,15 @@ public:
     void ReleaseRef();
 };
 
-struct Elem_004b75d0 {
+struct CommandEntry {
     Class_004c9390 name;               // +0x0
     int value1;                        // +0x4
     int value2;                        // +0x8
 
-    ~Elem_004b75d0() { name.ReleaseRef(); }
+    ~CommandEntry() { name.ReleaseRef(); }
 };
 
-static std::vector<Elem_004b75d0> s_commandTable;
+static std::vector<CommandEntry> s_commandTable;
 
 extern char DAT_005119b8[];
 extern int g_defaultCommandHandler;
@@ -71,10 +71,10 @@ struct NameLess_004b7900 {
 static inline HandlerSlot_004b7900* Find_004b7900(const char* key)
 {
     NameLess_004b7900 less;
-    Elem_004b75d0* first = s_commandTable.begin();
-    Elem_004b75d0* last = s_commandTable.end();
+    CommandEntry* first = s_commandTable.begin();
+    CommandEntry* last = s_commandTable.end();
     while (first != last) {
-        Elem_004b75d0* mid = first + (last - first) / 2;
+        CommandEntry* mid = first + (last - first) / 2;
         if (less(mid->name.data, key))
             first = mid + 1;
         else

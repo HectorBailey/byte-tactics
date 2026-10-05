@@ -22,7 +22,7 @@ public:
     ~Class_004c91a0() { ((Class_004c9390*)this)->ReleaseRef(); }
 };
 
-struct Elem_004c5bc0 {
+struct TdfField {
     Class_004c91a0 a;                  // +0x0 key
     Class_004c91a0 b;                  // +0x4 value
 };
@@ -34,7 +34,7 @@ void* __cdecl FUN_004d83b0(char* name, int size);
 
 #pragma pack(push, 1)
 struct Inner_004c51b0 {
-    std::vector<Elem_004c5bc0> v;
+    std::vector<TdfField> v;
 };
 
 struct Entries_004c51b0 {

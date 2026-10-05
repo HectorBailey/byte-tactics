@@ -31,14 +31,14 @@ extern char DAT_005119b8[];
 
 void __stdcall FatalError(char* text);
 
-class Class_004c48c0 {
+class TdfRecord {
 public:
     int GetFieldString(char* dst, char* key, size_t size, char* def);
 };
 
 class Class_004c44c0 {
 public:
-    Class_004c48c0* GetSubRecord(int index);
+    TdfRecord* GetSubRecord(int index);
 };
 
 class Class_004c3410 {
@@ -54,7 +54,7 @@ public:
 class Class_004c2ea0 {
 public:
     int field_0;
-    Class_004c48c0* current;            // +0x4
+    TdfRecord* current;                 // +0x4
     int field_8;
 };
 
@@ -132,7 +132,7 @@ int Class_00435c00::FUN_00436860(int type, Class_004c2ea0* parser, char* schema)
 
     int bestCount = 0;
     int found = 0;
-    Class_004c48c0* best = 0;
+    TdfRecord* best = 0;
     for (int k = 0; k < 4; k++) {
         int d = order[k];
         if (d == -1)
@@ -153,11 +153,11 @@ int Class_00435c00::FUN_00436860(int type, Class_004c2ea0* parser, char* schema)
                     strcpy(schema, name);
                 return 1;
             }
-            Class_004c48c0* section = parser->current;
+            TdfRecord* section = parser->current;
             int count = 0;
             if (((Class_004c3410*)parser)->SelectRecord("specials")) {
                 Class_004c44c0* specials = (Class_004c44c0*)parser->current;
-                Class_004c48c0* s;
+                TdfRecord* s;
                 for (int i = 0; (s = specials->GetSubRecord(i)) != 0; i++) {
                     if (s->GetFieldString(what, "specialwhat", 0x10, DAT_005119b8)) {
                         static int len = strlen("StartPos");

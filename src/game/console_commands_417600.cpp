@@ -34,7 +34,7 @@ public:
     char* GetArg(int index, char* fallback);
 };
 
-class Class_004b73e0 {
+class CommandArgs {
 public:
     char* args[0x34];                  // +0x00
     int count;                         // +0xd0
@@ -51,9 +51,9 @@ void __stdcall FUN_00417600(Class_004b73c0* args)
     int w = 0xc80;
     int h = 0x960;
     if (args->count > 1)
-        w = ((Class_004b73e0*)args)->GetIntArg(1, 0);
+        w = ((CommandArgs*)args)->GetIntArg(1, 0);
     if (args->count > 2)
-        h = ((Class_004b73e0*)args)->GetIntArg(2, 0);
+        h = ((CommandArgs*)args)->GetIntArg(2, 0);
     if (_strcmpi(args->GetArg(1, DAT_005119b8), "all") == 0) {
         w = g_game->mapWidth;
         h = g_game->mapHeight;

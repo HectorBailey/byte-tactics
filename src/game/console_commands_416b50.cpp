@@ -21,13 +21,13 @@ struct Game {
 extern Game* g_game;
 
 // Command arguments.
-class Class_004b73e0 {
+class CommandArgs {
 public:
     int GetIntArg(int index, int fallback);
 };
 
 // FUNCTION: 0x416b50
-void __stdcall FUN_00416b50(Class_004b73e0* args)
+void __stdcall FUN_00416b50(CommandArgs* args)
 {
     unsigned char i = args->GetIntArg(1, 0);
     if (i < 10) {

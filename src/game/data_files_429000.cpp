@@ -20,7 +20,7 @@ public:
     int SelectRecord(char* name);
 };
 
-class Class_004c48c0 {
+class TdfRecord {
 public:
     int GetFieldString(char* dst, char* key, int size, char* def);
 };
@@ -43,7 +43,7 @@ void FUN_00429000()
     FUN_004290f0(path, "gamedata", "version", "tdf");
     if (((Class_004c2f60*)&parser)->LoadFile(path)) {
         if (((Class_004c3410*)&parser)->SelectRecord("Version")) {
-            if (((Class_004c48c0*)parser.current)->GetFieldString(buf, "GPFVersion", 0x40, DAT_005119b8)) {
+            if (((TdfRecord*)parser.current)->GetFieldString(buf, "GPFVersion", 0x40, DAT_005119b8)) {
                 found = 1;
                 if (_strcmpi("v3.0", buf) != 0) {
                     FUN_004abd90(g_game + 0x519,

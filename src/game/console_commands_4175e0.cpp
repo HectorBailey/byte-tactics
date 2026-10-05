@@ -1,6 +1,6 @@
 // Decompiled by Haiku. Names are provisional.
 
-class Class_004b73e0 {
+class CommandArgs {
 public:
     int GetIntArg(int, int);
 };
@@ -15,7 +15,7 @@ extern void* g_game;
 // FUNCTION: 0x4175e0
 void __stdcall FUN_004175e0(void* param_1)
 {
-    Class_004b73e0* obj = (Class_004b73e0*)param_1;
+    CommandArgs* obj = (CommandArgs*)param_1;
     int result = obj->GetIntArg(1, 0);
     void* p = *(void**)((char*)g_game + 0x10);
     ((Class_004ce690*)p)->FUN_004ce690(result);

@@ -92,7 +92,7 @@ class Class_004c3240 {
     void Unload();
 };
 
-class Class_004c48c0 {
+class TdfRecord {
   public:
     int GetFieldString(char* dst, char* key, int size, char* def);
 };
@@ -261,27 +261,27 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
             goto FINISH;
         }
         {
-            ((Class_004c48c0*)parser.current)
+            ((TdfRecord*)parser.current)
                 ->GetFieldString(unitdef->unitname, "unitname", 0x20, DAT_005119b8);
             GetLocalizedString(&parser, unitdef->name, "name", 0x20, 0);
             GetLocalizedString(&parser, unitdef->description, "description", 0x40, 0);
-            ((Class_004c48c0*)parser.current)
+            ((TdfRecord*)parser.current)
                 ->GetFieldString(buf, "defaultmissiontype", 100, DAT_005119b8);
             MissionHolder m(buf);
             unitdef->defaultmissiontype = m.mission.value;
-            ((Class_004c48c0*)parser.current)
+            ((TdfRecord*)parser.current)
                 ->GetFieldString(buf, "wpri_badTargetCategory", 100, DAT_00503ea0);
             unitdef->wpri_badtargetcategory = GetCategoryMask(buf);
-            ((Class_004c48c0*)parser.current)
+            ((TdfRecord*)parser.current)
                 ->GetFieldString(buf, "wsec_badTargetCategory", 100, DAT_00503ea0);
             unitdef->wsec_badtargetcategory = GetCategoryMask(buf);
-            ((Class_004c48c0*)parser.current)
+            ((TdfRecord*)parser.current)
                 ->GetFieldString(buf, "wspe_badTargetCategory", 100, DAT_00503ea0);
             unitdef->wspe_badtargetcategory = GetCategoryMask(buf);
-            ((Class_004c48c0*)parser.current)
+            ((TdfRecord*)parser.current)
                 ->GetFieldString(buf, "noChaseCategory", 100, DAT_00503ea0);
             unitdef->nochasecategory = GetCategoryMask(buf);
-            if (((Class_004c48c0*)parser.current)
+            if (((TdfRecord*)parser.current)
                     ->GetFieldString(unitdef->objectname, "objectname", 0x20, DAT_005119b8) == 0) {
                 strcpy(unitdef->objectname, unitdef->unitname);
             }
@@ -500,9 +500,9 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
                 unitdef->selfdestructcountdown = atoi(countdown);
             else
                 unitdef->selfdestructcountdown = 5;
-            ((Class_004c48c0*)parser.current)->GetFieldString(buf, "category", 100, DAT_005119b8);
+            ((TdfRecord*)parser.current)->GetFieldString(buf, "category", 100, DAT_005119b8);
             ((Class_00488e70*)unitdef)->AddToCategories(buf);
-            int found = ((Class_004c48c0*)parser.current)
+            int found = ((TdfRecord*)parser.current)
                     ->GetFieldString(buf, "soundcategory", 100, DAT_005119b8);
             if (found) {
                 int sound;
@@ -518,10 +518,10 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
             }
         SOUND_DONE:
             unitdef->corpse = -1;
-            if (((Class_004c48c0*)parser.current)->GetFieldString(buf, "corpse", 100, DAT_005119b8))
+            if (((TdfRecord*)parser.current)->GetFieldString(buf, "corpse", 100, DAT_005119b8))
                 unitdef->corpse = FUN_00422e40(buf);
             unitdef->movementclass = 0;
-            if (((Class_004c48c0*)parser.current)
+            if (((TdfRecord*)parser.current)
                     ->GetFieldString(buf, "movementclass", 100, DAT_005119b8))
                 unitdef->movementclass = FindMovementClass(buf);
             Class_004402e0 movement;
@@ -539,19 +539,19 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
             unitdef->maxslopevelocity = (int)(((__int64)unitdef->maxvelocity << 16) /
                                              ((unitdef->maxslope + 1) * 0x10000));
             char* defaultWeapon = g_game + 0x2cf3;
-            ((Class_004c48c0*)parser.current)->GetFieldString(weapon, "weapon1", 128, DAT_005119b8);
+            ((TdfRecord*)parser.current)->GetFieldString(weapon, "weapon1", 128, DAT_005119b8);
             char* weapon1 = FUN_0049e5b0(weapon);
             unitdef->weapon1 = weapon1 ? weapon1 : defaultWeapon;
-            ((Class_004c48c0*)parser.current)->GetFieldString(weapon, "weapon2", 128, DAT_005119b8);
+            ((TdfRecord*)parser.current)->GetFieldString(weapon, "weapon2", 128, DAT_005119b8);
             char* weapon2 = FUN_0049e5b0(weapon);
             unitdef->weapon2 = weapon2 ? weapon2 : defaultWeapon;
-            ((Class_004c48c0*)parser.current)->GetFieldString(weapon, "weapon3", 128, DAT_005119b8);
+            ((TdfRecord*)parser.current)->GetFieldString(weapon, "weapon3", 128, DAT_005119b8);
             char* weapon3 = FUN_0049e5b0(weapon);
             unitdef->weapon3 = weapon3 ? weapon3 : defaultWeapon;
-            ((Class_004c48c0*)parser.current)->GetFieldString(weapon, "explodeas", 128, DAT_005119b8);
+            ((TdfRecord*)parser.current)->GetFieldString(weapon, "explodeas", 128, DAT_005119b8);
             char* explodeas = FUN_0049e5b0(weapon);
             unitdef->explodeas = explodeas ? explodeas : defaultWeapon;
-            ((Class_004c48c0*)parser.current)
+            ((TdfRecord*)parser.current)
                 ->GetFieldString(weapon, "selfdestructas", 128, DAT_005119b8);
             char* selfdestructas = FUN_0049e5b0(weapon);
             unitdef->selfdestructas = selfdestructas ? selfdestructas : defaultWeapon;
@@ -563,7 +563,7 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
                 unitdef->flags1 |= 0x10000;
             unitdef->yardmap = 0;
             if (unitdef->bmcode == 0) {
-                ((Class_004c48c0*)parser.current)
+                ((TdfRecord*)parser.current)
                     ->GetFieldString(yard, "YardMap", 1024, DAT_005119b8);
                 unitdef->yardmap = (char*)FUN_004d83b0(
                     "BUILDING YARD", unitdef->footprintx * unitdef->footprintz);

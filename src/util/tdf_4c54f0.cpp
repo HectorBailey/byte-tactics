@@ -19,7 +19,7 @@
 //    The pair is passed as `const Elem&`, so the call is the real member
 //    Class_004c5ba0::FUN_004c59d0 (same class as 0x4c59d0).
 //  * Freeing the old map is written out in the caller as
-//        if (g_translations) { Class_004c5840* old = g_translations;
+//        if (g_translations) { TranslationTable* old = g_translations;
 //                            DestroyVec(&g_translations->v); ::operator delete(old); }
 //    DestroyVec is a static inline taking the vector pointer. Reading the
 //    global once for the vector and once into `old` keeps the vector pointer
@@ -84,14 +84,14 @@ static inline bool Ne(const Class_004c91a0& a, const Class_004c91a0& b)
 }
 
 // One entry of the global map: a key and a value, both string handles.
-struct Elem_004c5bc0 {
+struct TdfField {
     Class_004c91a0 key;                  // +0x0
     Class_004c91a0 value;                // +0x4
 
-    ~Elem_004c5bc0();
+    ~TdfField();
 };
 
-class Class_004c54d0 : public Elem_004c5bc0 {
+class Class_004c54d0 : public TdfField {
 public:
     Class_004c54d0(const Class_004c91a0& a, const Class_004c91a0& b);
 };
@@ -108,19 +108,19 @@ class Class_004c5ba0 {
 public:
     char count;                          // +0x0
     char pad[3];
-    Elem_004c5bc0* first;                // +0x4
-    Elem_004c5bc0* last;                 // +0x8
-    Elem_004c5bc0* end;                  // +0xc
+    TdfField* first;                     // +0x4
+    TdfField* last;                      // +0x8
+    TdfField* end;                       // +0xc
 
-    Elem_004c5bc0* FUN_004c59d0(Elem_004c5bc0* pos, const Elem_004c5bc0& val);
+    TdfField* FUN_004c59d0(TdfField* pos, const TdfField& val);
 };
 
 static inline void DestroyVec(Class_004c5ba0* w)
 {
-    Elem_004c5bc0* e = w->last;
-    Elem_004c5bc0* p = w->first;
+    TdfField* e = w->last;
+    TdfField* p = w->first;
     while (p != e) {
-        p->~Elem_004c5bc0();
+        p->~TdfField();
         p++;
     }
     ::operator delete(w->first);
@@ -134,24 +134,24 @@ static inline void DestroyVec(Class_004c5ba0* w)
 class Class_004c5c60 {
 public:
     char unknown_0[5];
-    Elem_004c5bc0* first;               // +0x5
-    Elem_004c5bc0* last;                // +0x9
+    TdfField* first;                    // +0x5
+    TdfField* last;                     // +0x9
 
-    Elem_004c5bc0* FindLowerBound(const char* key);
+    TdfField* FindLowerBound(const char* key);
 };
 
-class Class_004c5840 {
+class TranslationTable {
 public:
     char unknown_0;                      // +0x0
     Class_004c5ba0 v;                      // +0x1 (_First at +0x5)
 
-    Class_004c5840(char count);
+    TranslationTable(char count);
 };
 #pragma pack(pop)
 
-extern Class_004c5840* g_translations;
+extern TranslationTable* g_translations;
 
-Class_004c5840::Class_004c5840(char count)
+TranslationTable::TranslationTable(char count)
 {
     v.first = 0;
     v.count = count;
@@ -162,7 +162,7 @@ Class_004c5840::Class_004c5840(char count)
 // Inserts a new entry for the key at e, with an empty value, and returns its
 // value handle. The temporaries (the empty handle and the entry) live until
 // the end of the return statement.
-static inline Class_004c93f0* InsertNew(Class_004c5840* s, Elem_004c5bc0* e, const Class_004c91a0& key)
+static inline Class_004c93f0* InsertNew(TranslationTable* s, TdfField* e, const Class_004c91a0& key)
 {
     return (Class_004c93f0*)&((Class_004c5ba0*)(1 + (char*)s))->FUN_004c59d0(e, MakeElem(key, Class_004c9180()))->value;
 }
@@ -175,7 +175,7 @@ public:
     void CopyRecordName(char* dest, size_t count);
 };
 
-class Class_004c48c0 {
+class TdfRecord {
 public:
     char unknown_0[0x19];
 
@@ -227,7 +227,7 @@ public:
 
 static inline void LoadMap(char flag, char* section)
 {
-    g_translations = new Class_004c5840(flag);
+    g_translations = new TranslationTable(flag);
     FUN_004d83a0((int)g_translations);
     strcpy(g_language, section);
 }
@@ -236,12 +236,12 @@ static inline void LoadMap(char flag, char* section)
 void __stdcall LoadTranslations(char* filename, char* section)
 {
     char flag;
-    Class_004c5840* s;
+    TranslationTable* s;
 
     if (_strcmpi(section, g_language) == 0)
         return;
     if (g_translations) {
-        Class_004c5840* old = g_translations;
+        TranslationTable* old = g_translations;
         DestroyVec(&g_translations->v);
         ::operator delete(old);
     }
@@ -255,10 +255,10 @@ void __stdcall LoadTranslations(char* filename, char* section)
             index = 0;
             while (((Class_004c3490*)&f)->SelectRecordAt(index)) {
                 f.current->CopyRecordName(name, 0xff);
-                ((Class_004c48c0*)f.current)->GetFieldString(value, g_language, 0xff, DAT_005119b8);
+                ((TdfRecord*)f.current)->GetFieldString(value, g_language, 0xff, DAT_005119b8);
                 if (strlen(value) != 0) {
                     Class_004c91b0 key(name);
-                    Elem_004c5bc0* e;
+                    TdfField* e;
                     s = g_translations;
                     e = ((Class_004c5c60*)g_translations)->FindLowerBound(key.ptr);
                     Class_004c93f0* r;

@@ -5,30 +5,30 @@
 // fclose and buffer-free blocks are the inlined body of 0x4bb5d0.
 #include <stdio.h>
 
-struct Shared_004bbd30 {
+struct OPENHAPIFILE {
     FILE* fp;                          // +0x0
     char unknown_4[8];
     int refCount;                      // +0xc
     int field_10;                      // +0x10
 };
 
-struct File_004bbd30 {
+struct FileHandle {
     FILE* fp;                          // +0x0
-    Shared_004bbd30* shared;           // +0x4
+    OPENHAPIFILE* shared;              // +0x4
     char unknown_8[8];
     int* buffer;                       // +0x10
     int* buffer2;                      // +0x14
 };
 
-File_004bbd30* __stdcall HAPI_OpenFile(const char* name, const char* mode);
-long __stdcall HAPI_SeekFile(File_004bbd30* file, long pos);
-int __stdcall HAPI_readfromfile(File_004bbd30* file, void* buffer, unsigned int size);
+FileHandle* __stdcall HAPI_OpenFile(const char* name, const char* mode);
+long __stdcall HAPI_SeekFile(FileHandle* file, long pos);
+int __stdcall HAPI_readfromfile(FileHandle* file, void* buffer, unsigned int size);
 void __cdecl FUN_004d85a0(int* param_1);
 
 // FUNCTION: 0x4bbd30
 void* __stdcall HAPI_ReadFileAt(char* name, void* buffer, long pos, unsigned int size)
 {
-    File_004bbd30* file = HAPI_OpenFile(name, "rb");
+    FileHandle* file = HAPI_OpenFile(name, "rb");
     if (file == 0) {
         return 0;
     }

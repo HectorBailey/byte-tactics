@@ -106,7 +106,7 @@ public:
     double GetFieldDouble(char* key, double def);
 };
 
-class Class_004c48c0 {
+class TdfRecord {
 public:
     int GetFieldString(char* dst, char* key, int size, char* def);
 };
@@ -122,7 +122,7 @@ public:
 
     int GetString(char* dst, char* key, int size, char* def)
     {
-        return ((Class_004c48c0*)current)->GetFieldString(dst, key, size, def);
+        return ((TdfRecord*)current)->GetFieldString(dst, key, size, def);
     }
     int GetInt(char* key, int def) { return ((Class_004c46c0*)current)->GetFieldInt(key, def); }
     double GetDouble(char* key, double def) { return ((Class_004c4760*)current)->GetFieldDouble(key, def); }

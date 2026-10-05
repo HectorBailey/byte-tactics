@@ -20,8 +20,8 @@
 //    local: that drops one live-across-call variable, so the hoisted name temp lands
 //    in EDI (the `lea edi,[esi-0x221]` in the preheader) instead of competing for EBX.
 // Note 0x4c48c0 and 0x4c46c0 are two different classes in data/symbols.csv
-// (Class_004c48c0::GetFieldString and Class_004c46c0::GetFieldInt), so `current`
-// is a Class_004c48c0* and the int-arg calls cast it to Class_004c46c0*.
+// (TdfRecord::GetFieldString and Class_004c46c0::GetFieldInt), so `current`
+// is a TdfRecord* and the int-arg calls cast it to Class_004c46c0*.
 
 #include <math.h>
 #include <vector>
@@ -40,7 +40,7 @@ public:
     ~Class_004c91a0() { ((Class_004c9390*)this)->ReleaseRef(); }
 };
 
-class Class_004c48c0 {
+class TdfRecord {
 public:
     int GetFieldString(char* dst, const char* key, int size, char* def);
 };
@@ -53,7 +53,7 @@ public:
 class Class_004c2ea0 {
 public:
     int field_0;                       // +0x0
-    Class_004c48c0* current;           // +0x4
+    TdfRecord* current;                // +0x4
     int field_8;                       // +0x8
 
     Class_004c2ea0();

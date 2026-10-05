@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-struct Class_004bbbe0 {
+struct FileHandle {
     FILE* file;                        // +0x0
     int error;                         // +0x4
 };
@@ -16,9 +16,9 @@ struct Obj_004ae230 {
     char link[0x80];                   // +0x136
 };
 
-unsigned int __stdcall HAPI_WriteFile(Class_004bbbe0* param_1, void* param_2, unsigned int param_3);
+unsigned int __stdcall HAPI_WriteFile(FileHandle* param_1, void* param_2, unsigned int param_3);
 
-static inline void WriteTabs(Class_004bbbe0* out, int indent)
+static inline void WriteTabs(FileHandle* out, int indent)
 {
     char tab = '\t';
     for (int i = 0; i < indent; i++)
@@ -26,7 +26,7 @@ static inline void WriteTabs(Class_004bbbe0* out, int indent)
 }
 
 // FUNCTION: 0x4ae230
-void __stdcall FUN_004ae230(Obj_004ae230* obj, Class_004bbbe0* out, int indent)
+void __stdcall FUN_004ae230(Obj_004ae230* obj, FileHandle* out, int indent)
 {
     char line[100];
     WriteTabs(out, indent);

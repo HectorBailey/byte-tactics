@@ -42,7 +42,7 @@ public:
     void CopyRecordName(char* dest, unsigned int count);
 };
 
-class Class_004c48c0 {
+class TdfRecord {
 public:
     int GetFieldString(char* dst, char* key, unsigned int size, char* def);
 };
@@ -69,7 +69,7 @@ void FUN_0042f7e0()
         int more = ((Class_004c3490*)&obj)->SelectRecordAt(i);
         while (more) {
             ((Class_004c4420*)obj.field_4)->CopyRecordName(name, 0x20);
-            if (((Class_004c48c0*)obj.field_4)->GetFieldString(value, "sound", 0x100, DAT_005119b8))
+            if (((TdfRecord*)obj.field_4)->GetFieldString(value, "sound", 0x100, DAT_005119b8))
                 FUN_00429470(name, value);
             i++;
             ((Class_004c3e10*)&obj)->ResetCurrentRecord();

@@ -34,12 +34,12 @@ struct Game {
 extern Game* g_game;
 
 // Command arguments.
-class Class_004b73e0;
+class CommandArgs;
 
 void __stdcall KillPlayerUnits(unsigned char player);
 
 // FUNCTION: 0x4169d0
-void __stdcall FUN_004169d0(Class_004b73e0* args)
+void __stdcall FUN_004169d0(CommandArgs* args)
 {
     if (g_game->players[g_game->localPlayer].data->field_95 == 1)
         KillPlayerUnits(0);

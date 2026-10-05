@@ -17,7 +17,7 @@ extern Game* g_game;
 extern char DAT_005119b8[];
 
 // Command arguments.
-class Class_004b73e0 {
+class CommandArgs {
 public:
     int GetIntArg(int index, int fallback);
 };
@@ -28,7 +28,7 @@ public:
 };
 
 // FUNCTION: 0x416860
-void __stdcall FUN_00416860(Class_004b73e0* args)
+void __stdcall FUN_00416860(CommandArgs* args)
 {
     if (_strcmpi(((Class_004b73c0*)args)->GetArg(0, DAT_005119b8), "move") == 0) {
         int dx = args->GetIntArg(1, 0);

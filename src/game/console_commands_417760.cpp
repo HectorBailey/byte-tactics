@@ -3,7 +3,7 @@
 // depending on it; without one, calls FUN_00438070.
 
 // Command arguments.
-class Class_004b73e0 {
+class CommandArgs {
 public:
     char* args[0x34];                  // +0x00
     int count;                         // +0xd0
@@ -15,7 +15,7 @@ void FUN_00437d50();
 void FUN_00438070();
 
 // FUNCTION: 0x417760
-void __stdcall FUN_00417760(Class_004b73e0* args)
+void __stdcall FUN_00417760(CommandArgs* args)
 {
     if (args->count > 1) {
         if (args->GetIntArg(1, 0))

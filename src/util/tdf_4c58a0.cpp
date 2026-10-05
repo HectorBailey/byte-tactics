@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-class Class_004c48c0 {
+class TdfRecord {
 public:
     char unknown_0[0x19];
     int GetFieldString(char* dst, char* key, size_t size, char* def);
@@ -17,7 +17,7 @@ public:
 class Class_004c2ea0 {
 public:
     int root;                            // +0x0
-    Class_004c48c0* current;             // +0x4
+    TdfRecord* current;                  // +0x4
     int file;                            // +0x8
 };
 

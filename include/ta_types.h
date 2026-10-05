@@ -691,11 +691,11 @@ class Class_004c45e0;
 class Class_004c4630;
 class Class_004c4760;
 class Class_004c4800;
-class Class_004c48c0;
+class TdfRecord;
 class Class_004c5470;
 class Class_004c54a0;
 class Class_004c54d0;
-class Class_004c5840;
+class TranslationTable;
 class Class_004c5ba0;
 struct Class_004c5c60;
 struct Class_004c61f0;
@@ -1032,7 +1032,7 @@ struct Elem_004b75d0_3;
 struct Elem_004b75d0_4;
 struct Elem_004be010;
 struct Elem_004c5740;
-struct Elem_004c5bc0;
+struct TdfField;
 struct Elem_004cb4c0;
 struct Elem_004cb5f0;
 struct Elem_004dd8c0;
@@ -1839,7 +1839,7 @@ struct Rec_00421620;
 struct Rec_0043e180;
 struct Rec_0044de80;
 struct Rec_0044dfb0;
-struct Rec_004b7760;
+struct ConsoleCommand;
 struct Rec_004c7580;
 struct Record_0043de30;
 struct Record_0044c0d0;
@@ -2364,7 +2364,7 @@ struct Point16 {  // 0x4 bytes, 113 views
 
 struct Unit {  // 0x118 bytes, 462 views
     int field_0;  // +0x0
-    Class_004c48c0* current;  // +0x4
+    TdfRecord* current;       // +0x4
     int field_8;  // +0x8
     UnitMotion* type;      // +0xc
     Mover* f10;  // +0x10
@@ -4474,16 +4474,16 @@ public:
     void LoadBuffer(char*, int, int, char*);
 };
 
-class Class_004c48c0 {  // 0x21 bytes, 66 views
+class TdfRecord {       // 0x21 bytes, 66 views
 public:
     char* name;  // +0x0
     int unknown_4;  // +0x4
-    Class_004c48c0** first;  // +0x8
-    Class_004c48c0** last;  // +0xc
+    TdfRecord** first;       // +0x8
+    TdfRecord** last;       // +0xc
     char unknown_10[9];
     Entry* first_19;  // +0x19
     Entry* last_1d;  // +0x1d
-    Class_004c48c0* FindChild(char*);
+    TdfRecord* FindChild(char*);
     int GetFieldInt(char*, int);
     int GetFieldString(char*, char*, unsigned int, char*);
     void CopyRecordName(char*, unsigned int);
@@ -5563,8 +5563,8 @@ public:
 class Class_004c4470 {  // 0x14 bytes, 3 views
 public:
     int unknown_0;  // +0x0
-    std::vector<Class_004c48c0*> entries;  // +0x4
-    Class_004c48c0* FindSubRecord(char*);
+    std::vector<TdfRecord*> entries;       // +0x4
+    TdfRecord* FindSubRecord(char*);
 };
 
 class Class_004c45e0 {  // 0x25 bytes, 2 views
@@ -5589,7 +5589,7 @@ public:
 
 struct Source_0042f450 {  // 0x8 bytes, 1 view
     char unknown_0[4];
-    Class_004c48c0* tdf;  // +0x4
+    TdfRecord* tdf;       // +0x4
 };
 
 class Class_004c4450 {  // 0x14 bytes, 3 views
@@ -5702,7 +5702,7 @@ public:
 
 struct Obj_00431950 {  // 0x8 bytes, 1 view
     char unknown_0[4];
-    Class_004c48c0* table;  // +0x4
+    TdfRecord* table;       // +0x4
 };
 
 struct Entry_00431a20 {  // 0x232 bytes, 1 view
@@ -6146,8 +6146,8 @@ public:
 class Class_004c44c0 {  // 0x14 bytes, 3 views
 public:
     int unknown_0;  // +0x0
-    std::vector<Class_004c48c0*> entries;  // +0x4
-    Class_004c48c0* GetSubRecord(int);
+    std::vector<TdfRecord*> entries;       // +0x4
+    TdfRecord* GetSubRecord(int);
 };
 
 struct MissionFeature_00436c30 {  // 0x88 bytes, 1 view
@@ -6781,7 +6781,7 @@ struct Thing_0043f0e0 {  // 0xff bytes, 1 view
 
 struct Source_00440340 {  // 0x8 bytes, 1 view
     char unknown_0[4];
-    Class_004c48c0* tdf;  // +0x4
+    TdfRecord* tdf;       // +0x4
 };
 
 class Class_00440470 {  // 0x1c bytes, 1 view
@@ -15105,7 +15105,7 @@ struct StructA_004ada10 {  // 0xb8 bytes, 1 view
 
 struct StructB_004ada10 {  // 0x8 bytes, 1 view
     char unknown_0[4];
-    Class_004c48c0* field_4;  // +0x4
+    TdfRecord* field_4;       // +0x4
 };
 
 struct Obj_004ada40 {  // 0x13e bytes, 1 view
@@ -15127,7 +15127,7 @@ struct Struct_004add60 {  // 0xdc bytes, 1 view
 
 struct Param2_004addf0 {  // 0x8 bytes, 1 view
     char unknown_0[4];
-    Class_004c48c0* obj;  // +0x4
+    TdfRecord* obj;       // +0x4
 };
 
 struct Struct_004addf0 {  // 0xdc bytes, 1 view
@@ -15152,7 +15152,7 @@ struct Obj_004adf10 {  // 0x13a bytes, 1 view
 
 struct Source_004adf10 {  // 0x8 bytes, 1 view
     char unknown_0[4];
-    Class_004c48c0* tdf;  // +0x4
+    TdfRecord* tdf;       // +0x4
 };
 
 struct Obj_004ae170 {  // 0x148 bytes, 1 view
@@ -15179,7 +15179,7 @@ struct Obj_004ae170_2 {  // 0x148 bytes, 1 view
 
 struct Source_004ae170 {  // 0x8 bytes, 1 view
     char unknown_0[4];
-    Class_004c48c0* tdf;  // +0x4
+    TdfRecord* tdf;       // +0x4
 };
 
 struct Obj_004ae230 {  // 0x1b6 bytes, 1 view
@@ -15197,7 +15197,7 @@ struct Obj_004ae300 {  // 0x148 bytes, 1 view
 
 struct Source_004ae300 {  // 0x8 bytes, 1 view
     char unknown_0[4];
-    Class_004c48c0* tdf;  // +0x4
+    TdfRecord* tdf;       // +0x4
 };
 
 struct Obj_004ae380 {  // 0xcc bytes, 1 view
@@ -15214,7 +15214,7 @@ struct Obj_004ae410 {  // 0xcc bytes, 1 view
 
 struct Source_004ae410 {  // 0x8 bytes, 1 view
     char unknown_0[4];
-    Class_004c48c0* tdf;  // +0x4
+    TdfRecord* tdf;       // +0x4
 };
 
 struct Obj_004ae440 {  // 0x136 bytes, 1 view
@@ -15229,7 +15229,7 @@ struct Obj_004ae4b0 {  // 0x136 bytes, 1 view
 
 struct Source_004ae4b0 {  // 0x8 bytes, 1 view
     char unknown_0[4];
-    Class_004c48c0* tdf;  // +0x4
+    TdfRecord* tdf;       // +0x4
 };
 
 struct Obj_004ae4e0 {  // 0x136 bytes, 1 view
@@ -15244,7 +15244,7 @@ struct Obj_004ae550 {  // 0x136 bytes, 1 view
 
 struct Source_004ae550 {  // 0x8 bytes, 1 view
     char unknown_0[4];
-    Class_004c48c0* tdf;  // +0x4
+    TdfRecord* tdf;       // +0x4
 };
 
 struct Obj_004ae580 {  // 0xba bytes, 1 view
@@ -15259,7 +15259,7 @@ struct StructA_004ae610 {  // 0xba bytes, 1 view
 
 struct StructB_004ae610 {  // 0x8 bytes, 1 view
     char unknown_0[4];
-    Class_004c48c0* field_4;  // +0x4
+    TdfRecord* field_4;       // +0x4
 };
 
 struct Sub2_004aeac0 {  // 0x80 bytes, 1 view
@@ -16123,7 +16123,7 @@ struct NameNe_004b7760 {  // 0x1 bytes, 1 view
     unsigned char operator()(Class_004c9390&, Class_004c9390&);
 };
 
-struct Rec_004b7760 {  // 0xc bytes, 1 view
+struct ConsoleCommand {  // 0xc bytes, 1 view
     char* name;  // +0x0
     void (__stdcall *fn)(void*);  // +0x4
     int mask;  // +0x8
@@ -16939,10 +16939,10 @@ public:
     void StripComments(char*);
 };
 
-struct Elem_004c5bc0 {  // 0x8 bytes, 17 views
+struct TdfField {       // 0x8 bytes, 17 views
     Class_004c9390 a;  // +0x0
     Class_004c9390 b;  // +0x4
-    ~Elem_004c5bc0(void);
+    ~TdfField(void);
 };
 
 class Class_004c42a0 {  // 0x25 bytes, 7 views
@@ -16950,14 +16950,14 @@ public:
     int* name;  // +0x0
     std::vector<Class_004c42a0*> children;  // +0x4
     char unknown_14;  // +0x14
-    std::vector<Elem_004c5bc0> entries;  // +0x15
+    std::vector<TdfField> entries;       // +0x15
     ~Class_004c42a0(void);
     Class_004c42a0* FUN_004c3e40(char*, char*, int, char*);
     Class_004c42a0* GetChild(int);
 };
 
 struct Inner_004c51b0 {  // 0x10 bytes, 2 views
-    std::vector<Elem_004c5bc0> v;  // +0x0
+    std::vector<TdfField> v;       // +0x0
 };
 
 struct Entries_004c51b0 {  // 0x10 bytes, 2 views
@@ -17063,11 +17063,11 @@ public:
     void* FUN_004c5470(int*);
 };
 
-class Class_004c5840 {  // 0x11 bytes, 3 views
+class TranslationTable {  // 0x11 bytes, 3 views
 public:
     char unknown_0;  // +0x0
     std::vector<Pair_00419560> pairs;  // +0x1
-    Class_004c5840(char);
+    TranslationTable(char);
 };
 
 class Class_004c5ba0 {  // 0x10 bytes, 3 views
@@ -17076,16 +17076,16 @@ public:
     char unknown_1[3];
     int field_4;  // +0x4
     int field_8;  // +0x8
-    Elem_004c5bc0* end;  // +0xc
-    Elem_004c5bc0* FUN_004c59d0(Elem_004c5bc0*, Elem_004c5bc0&);
+    TdfField* end;       // +0xc
+    TdfField* FUN_004c59d0(TdfField*, TdfField&);
     int FUN_004c5ba0(void);
 };
 
 struct Class_004c5c60 {  // 0xd bytes, 2 views
     char unknown_0[5];
-    Elem_004c5bc0* first;  // +0x5
-    Elem_004c5bc0* last;  // +0x9
-    Elem_004c5bc0* FindLowerBound(char*);
+    TdfField* first;       // +0x5
+    TdfField* last;       // +0x9
+    TdfField* FindLowerBound(char*);
 };
 
 class Class_004c93f0 {  // 0x4 bytes, 2 views

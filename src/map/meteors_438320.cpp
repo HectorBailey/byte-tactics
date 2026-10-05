@@ -12,7 +12,7 @@ public:
     int GetFieldInt(const char* name, int def);
 };
 
-class Class_004c48c0 {
+class TdfRecord {
 public:
     int GetFieldString(char* dst, char* key, size_t size, char* def);
 };
@@ -59,7 +59,7 @@ void Class_00438320::FUN_00438320()
     FUN_004290f0(path, "gamedata", "meteor", DAT_0050310c);
     if (((Class_004c2f60*)&parser)->LoadFile(path)
         && ((Class_004c3410*)&parser)->SelectRecord("Default")) {
-        if (((Class_004c48c0*)parser.current)->GetFieldString((char*)this, "MeteorWeapon", 0x20, DAT_005119b8)) {
+        if (((TdfRecord*)parser.current)->GetFieldString((char*)this, "MeteorWeapon", 0x20, DAT_005119b8)) {
             radius = parser.current->GetFieldInt("MeteorRadius", 0);
             density = (float)((Class_004c4760*)parser.current)->GetFieldDouble("MeteorDensity", 0.0);
             duration = (float)((Class_004c4760*)parser.current)->GetFieldDouble("MeteorDuration", 0.0);

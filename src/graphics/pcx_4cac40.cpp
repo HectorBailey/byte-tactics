@@ -24,14 +24,14 @@
 #include <stdio.h>
 #include <string.h>
 
-struct Class_004bbbe0 {
+struct FileHandle {
     FILE* file;
     int error;
 };
 
 extern void* __stdcall HAPI_OpenFileAppend(void* thing);
-extern void __stdcall HAPI_CloseFile(Class_004bbbe0* file);
-extern unsigned int __stdcall HAPI_WriteFile(Class_004bbbe0* file, void* buf, unsigned int size);
+extern void __stdcall HAPI_CloseFile(FileHandle* file);
+extern unsigned int __stdcall HAPI_WriteFile(FileHandle* file, void* buf, unsigned int size);
 
 // PCX file header (128 bytes).
 struct Header_004cac40 {
@@ -57,7 +57,7 @@ struct Header_004cac40 {
 int __stdcall WritePcx(void* filename, unsigned char* data, int width, int height, unsigned char* block)
 {
     Header_004cac40 hdr;
-    Class_004bbbe0* file = (Class_004bbbe0*)HAPI_OpenFileAppend(filename);
+    FileHandle* file = (FileHandle*)HAPI_OpenFileAppend(filename);
     int total;
     int rows;
     int n;

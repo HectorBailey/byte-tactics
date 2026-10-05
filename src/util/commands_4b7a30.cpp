@@ -11,11 +11,11 @@ public:
     void SubstituteArgs(Class_004b74f0* other);
 };
 
-class Class_004b73b0 {
+class CommandArgs {
 public:
     char unknown_0[0xd0];
     int field_d0;
-    Class_004b73b0* InitArgs();
+    CommandArgs* InitArgs();
 };
 
 class Class_004b7440 {
@@ -43,7 +43,7 @@ int __stdcall ExecuteCommandText(char* text, int len, Class_004b74f0* vars, int 
 {
     int result = 0;
     Class_004b74f0 cmd;
-    ((Class_004b73b0*)&cmd)->InitArgs();
+    ((CommandArgs*)&cmd)->InitArgs();
     while (len > 0) {
         int n = FindLineEnd(text, len);
         if (n > len)

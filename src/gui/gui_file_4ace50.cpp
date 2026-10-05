@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Class_004bbbe0 {
+struct FileHandle {
     FILE* file;                        // +0x0
     int error;                         // +0x4
 };
@@ -35,12 +35,12 @@ struct Common_004ad350 {
 
 extern int DAT_0051fba8;
 
-unsigned int __stdcall HAPI_WriteFile(Class_004bbbe0* out, void* buf, unsigned int len);
-void __stdcall FUN_004accd0(Class_004bbbe0* out, int indent);
-void __stdcall FUN_004acde0(Class_004bbbe0* out, char* name, char* value, int indent);
+unsigned int __stdcall HAPI_WriteFile(FileHandle* out, void* buf, unsigned int len);
+void __stdcall FUN_004accd0(FileHandle* out, int indent);
+void __stdcall FUN_004acde0(FileHandle* out, char* name, char* value, int indent);
 
 // FUNCTION: 0x4ace50
-void __stdcall FUN_004ace50(Common_004ad350* obj, Class_004bbbe0* out, int indent)
+void __stdcall FUN_004ace50(Common_004ad350* obj, FileHandle* out, int indent)
 {
     char tab;
     char* value;

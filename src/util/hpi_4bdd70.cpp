@@ -33,7 +33,7 @@ struct Header_004bdd70 {
     Table_004bdd70* table;             // +0x10
 };
 
-struct File_004bdd70 {                 // 0x118 bytes
+struct OPENHAPIFILE {                  // 0x118 bytes
     FILE* fp;                          // +0x0
     int field_4;                       // +0x4
     Header_004bdd70* header;           // +0x8
@@ -65,12 +65,12 @@ static inline int Bad_004bdd70(FILE* f, Header_004bdd70* hdr, char* copyright)
 }
 
 // FUNCTION: 0x4bdd70
-File_004bdd70* __stdcall HAPI_OpenArchive(const char* name, int mode)
+OPENHAPIFILE* __stdcall HAPI_OpenArchive(const char* name, int mode)
 {
     FILE* f = fopen(name, "rb");
     if (f == 0)
         return 0;
-    File_004bdd70* h = (File_004bdd70*)FUN_004d83b0("OPENHAPIFILE structure", 0x118);
+    OPENHAPIFILE* h = (OPENHAPIFILE*)FUN_004d83b0("OPENHAPIFILE structure", 0x118);
     char* filePart;
     h->fp = f;
     h->field_4 = -1;

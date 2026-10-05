@@ -43,7 +43,7 @@ struct Tex_004bb2e0 {
     unsigned char is_texture;            // +0x8
 };
 
-struct Item_004bb2e0 {
+struct OPENHAPIFILE {
     FILE* fp;                            // +0x0
     int pos;                             // +0x4, read position
     Node_004bb2e0* node;                 // +0x8
@@ -54,14 +54,14 @@ struct Item_004bb2e0 {
 
 struct State_004bb2e0 {
     char unknown_0[0x618];
-    Item_004bb2e0** items;               // +0x618
+    OPENHAPIFILE** items;                // +0x618
     int itemCount;                       // +0x61c
 };
 
 // The same class as 0x4bb6a0, whose file has these field names.
-struct File_004bb2e0 {
+struct FileHandle {
     FILE* fp;                            // +0x0
-    Item_004bb2e0* shared;               // +0x4
+    OPENHAPIFILE* shared;                // +0x4
     Tex_004bb2e0* info;                  // +0x8
     int pos;                             // +0xc
     void* buffer;                        // +0x10, the block just read
@@ -81,14 +81,14 @@ static inline int nblocks(int w)
 }
 
 // FUNCTION: 0x4bb2e0
-File_004bb2e0* __stdcall HAPI_OpenFile(char* filename, const char* mode)
+FileHandle* __stdcall HAPI_OpenFile(char* filename, const char* mode)
 {
     int size;
     int off;
     int k;
     unsigned char* p;
     State_004bb2e0* state = GetDisplay();
-    File_004bb2e0* h = (File_004bb2e0*)FUN_004d83b0("File Handle", 0x118);
+    FileHandle* h = (FileHandle*)FUN_004d83b0("File Handle", 0x118);
     memset(h, 0, 0x118);
     strncpy(h->name, filename, 0x100);
     h->name[0xff] = 0;

@@ -13,13 +13,13 @@ struct Game {
 extern Game* g_game;
 
 // Command arguments.
-class Class_004b73e0 {
+class CommandArgs {
 public:
     int GetIntArg(int index, int fallback);
 };
 
 // FUNCTION: 0x416730
-void __stdcall FUN_00416730(Class_004b73e0* args)
+void __stdcall FUN_00416730(CommandArgs* args)
 {
     g_game->offsetX = g_game->baseX - args->GetIntArg(1, 0x20);
     g_game->offsetY = g_game->baseY - args->GetIntArg(2, 0x80);

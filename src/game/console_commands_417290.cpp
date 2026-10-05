@@ -11,7 +11,7 @@ struct Game {
 extern Game* g_game;
 
 // Command arguments.
-class Class_004b73e0 {
+class CommandArgs {
 public:
     int GetIntArg(int index, int fallback);
 };
@@ -20,7 +20,7 @@ void __stdcall SetBrightness(float value);
 void FUN_00430f00();
 
 // FUNCTION: 0x417290
-void __stdcall FUN_00417290(Class_004b73e0* args)
+void __stdcall FUN_00417290(CommandArgs* args)
 {
     SetBrightness(args->GetIntArg(1, 0) * 0.1f);
     g_game->brightness = args->GetIntArg(1, 0);

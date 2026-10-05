@@ -680,7 +680,7 @@ int g_defaultCommandMask;  // 0x51fc94 .bss
 unsigned char DAT_0051fcb0[256];  // 0x51fcb0 .bss
 int DAT_0051fdb0;  // 0x51fdb0 .bss
 unsigned char DAT_0051fdb4[4];  // 0x51fdb4 .bss
-Class_004c5840* g_translations;  // 0x51fdb8 .bss
+TranslationTable* g_translations;  // 0x51fdb8 .bss
 unsigned char DAT_0051fdbc[4];  // 0x51fdbc .bss
 char g_language[304];  // 0x51fdc0 .bss
 int DAT_0051fef0;  // 0x51fef0 .bss

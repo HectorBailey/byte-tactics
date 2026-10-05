@@ -11,19 +11,19 @@
 #include <dsound.h>
 #include <string.h>
 
-struct File_004bb5d0;
+struct FileHandle;
 
 int __stdcall RemoveTimer(int i);
-int __stdcall HAPI_CloseFile(File_004bb5d0* file);
-long __stdcall HAPI_TellFile(File_004bb5d0* file);
-long __stdcall HAPI_FileLength(File_004bb5d0* file);
-int __stdcall HAPI_readfromfile(File_004bb5d0* file, void* buf, int size);
+int __stdcall HAPI_CloseFile(FileHandle* file);
+long __stdcall HAPI_TellFile(FileHandle* file);
+long __stdcall HAPI_FileLength(FileHandle* file);
+int __stdcall HAPI_readfromfile(FileHandle* file, void* buf, int size);
 
 class Class_004cfb40 {
 public:
     char unknown_0[0x1e4];
     IDirectSoundBuffer* stream;             // +0x1e4
-    File_004bb5d0* file;                    // +0x1e8
+    FileHandle* file;                       // +0x1e8
     int bits;                               // +0x1ec  wBitsPerSample
     int size;                               // +0x1f0  bytes per buffer
     int pos;                                // +0x1f4  file offset of the next byte

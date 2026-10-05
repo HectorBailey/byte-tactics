@@ -20,8 +20,8 @@
 //
 // What fixed the bytes (this retry): the element temporary is constructed
 // with a by-value constructor argument holding the (0, 0) pair:
-//     Class_004b7e30 e(key, Pair_004b7760(0, 0));
-// with `Class_004b7e30(const Class_004c91a0& h, Pair_004b7760 pp)` whose body
+//     CommandEntry e(key, Pair_004b7760(0, 0));
+// with `CommandEntry(const Class_004c91a0& h, Pair_004b7760 pp)` whose body
 // copies the pair as a unit into the two int fields (a nested Pair member
 // `p(pp)` is the same codegen; two field initialisers `value1(pp.fn)` are
 // not). MSVC 5 materialises the Pair temporary's two int parameters as two
@@ -35,7 +35,7 @@
 //
 // Load-bearing details kept from earlier passes: the outer
 // `for (; rec->name; rec++)` (not while) puts the record increment after the
-// key destructor; std::vector<Class_004b7e30> lifts the index division above
+// key destructor; std::vector<CommandEntry> lifts the index division above
 // the insert; the NameLess functor spelling puts the lower_bound result in
 // edx; the `int* slot` pointers give `lea esi, [eax+edx*4+4]` with stores
 // [esi]/[esi+4]; the element/Pair/Class_004c9390/Class_004c91b0 definitions
@@ -53,17 +53,17 @@ struct Pair_004b7760;
 
 typedef int Fwd_004b7760;
 
-class Class_004b7e30 {
+class CommandEntry {
 public:
     Class_004c91a0 handle;             // +0x0
     int value1;                        // +0x4
     int value2;                        // +0x8
 
-    Class_004b7e30(const Class_004c91a0& h, Pair_004b7760 pp);
-    ~Class_004b7e30();
+    CommandEntry(const Class_004c91a0& h, Pair_004b7760 pp);
+    ~CommandEntry();
 };
 
-static std::vector<Class_004b7e30> s_commandTable;
+static std::vector<CommandEntry> s_commandTable;
 
 extern "C" int __cdecl _strcmpi(const char* str1, const char* str2);
 
@@ -83,11 +83,11 @@ struct Pair_004b7760 {
     Pair_004b7760(int f, int m) : fn(f), mask(m) {}
 };
 
-Class_004b7e30::Class_004b7e30(const Class_004c91a0& h, Pair_004b7760 pp) : handle(h)
+CommandEntry::CommandEntry(const Class_004c91a0& h, Pair_004b7760 pp) : handle(h)
 {
     *(Pair_004b7760*)&value1 = pp;
 }
-Class_004b7e30::~Class_004b7e30() { ((Class_004c9390*)&handle)->ReleaseRef(); }
+CommandEntry::~CommandEntry() { ((Class_004c9390*)&handle)->ReleaseRef(); }
 
 class Class_004c91b0 : public Class_004c91a0 {
 public:
@@ -111,25 +111,25 @@ struct NameNe_004b7760 {
 
 typedef void (__stdcall *Handler_004b7760)(void*);
 
-struct Rec_004b7760 {
+struct ConsoleCommand {
     const char* name;                  // +0x0
     Handler_004b7760 fn;               // +0x4
     int mask;                          // +0x8
 };
 
 // FUNCTION: 0x4b7760
-void __stdcall RegisterCommands(Rec_004b7760* rec)
+void __stdcall RegisterCommands(ConsoleCommand* rec)
 {
     for (; rec->name; rec++) {
         int mask = rec->mask;
         Handler_004b7760 fn = rec->fn;
         Class_004c91b0 key(rec->name);
-        Class_004b7e30* first = s_commandTable.begin();
-        Class_004b7e30* last = s_commandTable.end();
+        CommandEntry* first = s_commandTable.begin();
+        CommandEntry* last = s_commandTable.end();
         NameLess_004b7760 less;
         const char* k = key.data;
         while (first != last) {
-            Class_004b7e30* mid = first + (last - first) / 2;
+            CommandEntry* mid = first + (last - first) / 2;
             if (less(mid->handle.data, k))
                 first = mid + 1;
             else
@@ -137,7 +137,7 @@ void __stdcall RegisterCommands(Rec_004b7760* rec)
         }
         int* slot;
         if (first == s_commandTable.end() || NameNe_004b7760()(first->handle, key)) {
-            Class_004b7e30 e(key, Pair_004b7760(0, 0));
+            CommandEntry e(key, Pair_004b7760(0, 0));
             int index = first - s_commandTable.begin();
             s_commandTable.insert(first, e);
             slot = &(s_commandTable.begin() + index)->value1;

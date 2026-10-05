@@ -30,7 +30,7 @@ struct Info_004bbe50 {
     int size;
 };
 
-struct Shared_004bbe50 {
+struct OPENHAPIFILE {
     FILE* fp;                 // +0x0
     int pos;                  // +0x4
     void* node;               // +0x8
@@ -38,17 +38,17 @@ struct Shared_004bbe50 {
     int field_10;             // +0x10
 };
 
-struct File_004bbe50 {
+struct FileHandle {
     FILE* fp;                 // +0x0
-    Shared_004bbe50* shared;  // +0x4
+    OPENHAPIFILE* shared;     // +0x4
     Info_004bbe50* info;      // +0x8
     int pos;                  // +0xc
     void* buffer;             // +0x10
     void* buffer2;            // +0x14
 };
 
-File_004bbe50* __stdcall HAPI_OpenFile(char* filename, const char* mode);
-long __stdcall HAPI_SeekFile(File_004bbe50* file, long pos);
+FileHandle* __stdcall HAPI_OpenFile(char* filename, const char* mode);
+long __stdcall HAPI_SeekFile(FileHandle* file, long pos);
 int __stdcall HAPI_readfromfile(void* file, void* buf, int size);
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
 void __cdecl FUN_004d85a0(void* p);
@@ -58,7 +58,7 @@ char* __stdcall HAPI_LoadFile(char* name, int* size)
 {
     char buf[0x100];
     char* data = 0;
-    File_004bbe50* f;
+    FileHandle* f;
     int len;
 
     if (size) {

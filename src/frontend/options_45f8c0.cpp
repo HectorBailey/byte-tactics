@@ -58,7 +58,7 @@ struct Page_0045f8c0 {
     int last;                         // +0x8
 };
 
-class Class_004c48c0 {
+class TdfRecord {
 public:
     char unknown_0[0x19];
     int GetFieldString(char* dst, char* key, size_t size, char* def);
@@ -67,7 +67,7 @@ public:
 class Class_004c2ea0 {
 public:
     int field_0;
-    Class_004c48c0* current;          // +0x4
+    TdfRecord* current;               // +0x4
     int field_8;
     Class_004c2ea0();
     ~Class_004c2ea0();

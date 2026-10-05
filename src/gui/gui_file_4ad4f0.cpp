@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Class_004bbbe0 {
+struct FileHandle {
     FILE* file;                        // +0x0
     int error;                         // +0x4
 };
@@ -42,12 +42,12 @@ struct Obj_004ad4f0 {
     char panel[16];                    // +0xfc
 };
 
-unsigned int __stdcall HAPI_WriteFile(Class_004bbbe0* out, void* buf, unsigned int len);
-void __stdcall FUN_004accd0(Class_004bbbe0* out, int indent);
-void __stdcall FUN_004acde0(Class_004bbbe0* out, char* name, char* value, int indent);
+unsigned int __stdcall HAPI_WriteFile(FileHandle* out, void* buf, unsigned int len);
+void __stdcall FUN_004accd0(FileHandle* out, int indent);
+void __stdcall FUN_004acde0(FileHandle* out, char* name, char* value, int indent);
 
 // FUNCTION: 0x4ad4f0
-void __stdcall FUN_004ad4f0(Obj_004ad4f0* obj, Class_004bbbe0* out, int indent)
+void __stdcall FUN_004ad4f0(Obj_004ad4f0* obj, FileHandle* out, int indent)
 {
     char tab;
     char line[100];

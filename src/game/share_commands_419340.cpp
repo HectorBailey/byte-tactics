@@ -33,7 +33,7 @@ struct Game {
 extern Game* g_game;
 
 // Command arguments.
-class Class_004b73e0 {
+class CommandArgs {
 public:
     int GetIntArg(int index, int fallback);
 };
@@ -41,7 +41,7 @@ public:
 void __stdcall AddMessage(char* param_1, int param_2, int param_3, int param_4);
 
 // FUNCTION: 0x419340
-void __stdcall FUN_00419340(Class_004b73e0* args)
+void __stdcall FUN_00419340(CommandArgs* args)
 {
     char buf[256];
     if (g_game->flags & 1) {

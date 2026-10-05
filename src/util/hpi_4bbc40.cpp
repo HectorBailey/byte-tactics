@@ -16,7 +16,7 @@ struct Class_004bbc40_Other
     long value; // +0x4
 };
 
-struct Class_004bbc40_Entry
+struct OPENHAPIFILE
 {
     FILE* fp;       // +0x0
     int unknown_4;  // +0x4
@@ -25,10 +25,10 @@ struct Class_004bbc40_Entry
     int unknown_10; // +0x10
 };
 
-struct Class_004bbc40
+struct FileHandle
 {
     Class_004bbc40_File* file;   // +0x0
-    Class_004bbc40_Entry* entry; // +0x4
+    OPENHAPIFILE* entry; // +0x4
     Class_004bbc40_Other* other; // +0x8
     int unknown_c;               // +0xc
     int unknown_10;              // +0x10
@@ -41,7 +41,7 @@ extern void __cdecl FUN_004d85a0(void* param_1);
 // FUNCTION: 0x4bbc40
 long __stdcall HAPI_FileLengthByName(char* param_1)
 {
-    Class_004bbc40* h = (Class_004bbc40*)HAPI_OpenFile(param_1, "rb");
+    FileHandle* h = (FileHandle*)HAPI_OpenFile(param_1, "rb");
     if (h == 0)
         return 0;
 

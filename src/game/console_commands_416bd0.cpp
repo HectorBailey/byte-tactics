@@ -22,7 +22,7 @@ struct Game {
 extern Game* g_game;
 extern char DAT_005119b8[];
 
-class Class_004b73e0 {
+class CommandArgs {
 public:
     int GetIntArg(int index, int fallback);
 };
@@ -36,7 +36,7 @@ void __stdcall FUN_00464c60(unsigned char a, int b, float c, int d);
 void __stdcall FUN_00464b30(unsigned char a, int b, float c, int d);
 
 // FUNCTION: 0x416bd0
-void __stdcall FUN_00416bd0(Class_004b73e0* args)
+void __stdcall FUN_00416bd0(CommandArgs* args)
 {
     unsigned char i = args->GetIntArg(1, 0);
     if (i < 10) {

@@ -16,32 +16,32 @@
 // the class-qualified name for 0x4d01b0 to data/symbols.csv.
 #include <string.h>
 
-struct File_004bb5d0;
+struct FileHandle;
 
 class Class_004cf370 {
   public:
-    void* FUN_004cf370(File_004bb5d0* file, int bytes, int sampleRate, int bits, int channels);
+    void* FUN_004cf370(FileHandle* file, int bytes, int sampleRate, int bits, int channels);
 };
 class Class_004cf8a0 {
   public:
-    int FUN_004cf8a0(File_004bb5d0* file, int bytes, int sampleRate, int bits, int channels, int f,
+    int FUN_004cf8a0(FileHandle* file, int bytes, int sampleRate, int bits, int channels, int f,
                      int g);
 };
 class Class_004cfb40 {
   public:
-    void FUN_004cf940(File_004bb5d0* file, int sampleRate, int bits, int channels, int volume);
+    void FUN_004cf940(FileHandle* file, int sampleRate, int bits, int channels, int volume);
 };
 class Class_004d02a0 {
   public:
     int FUN_004d02a0(char* path, int mode, int p3, int p4);
 };
 
-struct Class_004d01b0 { int FUN_004d01b0(File_004bb5d0* file); };
-File_004bb5d0* __stdcall HAPI_OpenFileRead(char* path);
-int __stdcall HAPI_CloseFile(File_004bb5d0* file);
-int __stdcall HAPI_SeekFile(File_004bb5d0* file, int pos);
-int __stdcall HAPI_readfromfile(File_004bb5d0* file, void* buf, int size);
-int __stdcall HAPI_FileLength(File_004bb5d0* file);
+struct Class_004d01b0 { int FUN_004d01b0(FileHandle* file); };
+FileHandle* __stdcall HAPI_OpenFileRead(char* path);
+int __stdcall HAPI_CloseFile(FileHandle* file);
+int __stdcall HAPI_SeekFile(FileHandle* file, int pos);
+int __stdcall HAPI_readfromfile(FileHandle* file, void* buf, int size);
+int __stdcall HAPI_FileLength(FileHandle* file);
 
 struct WaveFormat {
     unsigned short wFormatTag;
@@ -52,7 +52,7 @@ struct WaveFormat {
     unsigned short wBitsPerSample;
 };
 
-static inline unsigned int FindChunk(File_004bb5d0* file, const char* tag) {
+static inline unsigned int FindChunk(FileHandle* file, const char* tag) {
     unsigned int limit, id, offset, size;
     HAPI_SeekFile(file, 4);
     HAPI_readfromfile(file, &limit, 4);
@@ -76,7 +76,7 @@ static inline unsigned int FindChunk(File_004bb5d0* file, const char* tag) {
 // FUNCTION: 0x4d02a0
 int Class_004d02a0::FUN_004d02a0(char* path, int mode, int p3, int p4) {
     int result = 0;
-    File_004bb5d0* file = HAPI_OpenFileRead(path);
+    FileHandle* file = HAPI_OpenFileRead(path);
     if (file == 0)
         return result;
     int kind = ((Class_004d01b0*)this)->FUN_004d01b0(file);

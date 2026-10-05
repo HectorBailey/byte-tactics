@@ -8,22 +8,22 @@
 #include <dsound.h>
 #include <float.h>
 
-struct File_004bb5d0;
+struct FileHandle;
 
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
-int __stdcall HAPI_readfromfile(File_004bb5d0* file, void* buf, int size);
+int __stdcall HAPI_readfromfile(FileHandle* file, void* buf, int size);
 
 class Class_004cf370 {
 public:
     char unknown_0[0x24];
     IDirectSound* field_24;                 // +0x24
 
-    IDirectSoundBuffer** FUN_004cf370(File_004bb5d0* file, DWORD bytes,
+    IDirectSoundBuffer** FUN_004cf370(FileHandle* file, DWORD bytes,
                                       int sampleRate, int bits, int channels);
 };
 
 // FUNCTION: 0x4cf370
-IDirectSoundBuffer** Class_004cf370::FUN_004cf370(File_004bb5d0* file, DWORD bytes,
+IDirectSoundBuffer** Class_004cf370::FUN_004cf370(FileHandle* file, DWORD bytes,
                                                   int sampleRate, int bits, int channels)
 {
     WAVEFORMATEX wfx;

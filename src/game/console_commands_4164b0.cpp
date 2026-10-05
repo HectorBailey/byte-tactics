@@ -5,7 +5,7 @@
 // Compare 0x4169d0 / 0x416a30.
 
 #pragma pack(push, 1)
-struct Class_004b73e0 {
+struct CommandArgs {
     char unknown_0[0xd0];
     int field_d0;                      // +0xd0
 
@@ -29,7 +29,7 @@ void KillAllUnits(void);
 void __stdcall KillPlayerUnits(unsigned char player);
 
 // FUNCTION: 0x4164b0
-void __stdcall FUN_004164b0(Class_004b73e0* args)
+void __stdcall FUN_004164b0(CommandArgs* args)
 {
     if (args->field_d0 == 1) {
         KillAllUnits();

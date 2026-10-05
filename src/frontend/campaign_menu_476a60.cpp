@@ -30,7 +30,7 @@ public:
     int SelectRecord(char* name);
 };
 
-class Class_004c48c0 {
+class TdfRecord {
 public:
     int GetFieldString(char* dst, char* key, int size, char* def);
 };
@@ -77,7 +77,7 @@ int __stdcall FUN_00476a60(char** out, int side)
         FUN_004290f0(path, "camps", q, "tdf");
         if (((Class_004c2f60*)&parser)->LoadFile(path)) {
             if (((Class_004c3410*)&parser)->SelectRecord("HEADER")) {
-                ((Class_004c48c0*)parser.current)->GetFieldString(name, "campaignside", 0x40, DAT_005119b8);
+                ((TdfRecord*)parser.current)->GetFieldString(name, "campaignside", 0x40, DAT_005119b8);
                 if (strcmp(g_game->names[side], name) == 0 || strcmp("ALL", name) == 0) {
                     found++;
                     p = AppendName_00476a60(p, q);

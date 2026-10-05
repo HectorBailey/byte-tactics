@@ -2,7 +2,7 @@
 // Destructor-shaped method: frees the TDF section tree hanging off root and
 // zeroes the 12-byte object. Same body as Class_004c2ea0's destructor
 // (0x4c2eb0, in 0x4c51b0.cpp), but the entry vector here is a direct
-// std::vector<Elem_004c5bc0> member, so its destroy loop calls ~Elem
+// std::vector<TdfField> member, so its destroy loop calls ~Elem
 // out of line (0x4c5190) instead of the scalar deleting destructor 0x4c51b0.
 //
 // The one byte-level difference from `delete root;` on its own is the register
@@ -26,11 +26,11 @@ public:
     ~Class_004c91a0() { ((Class_004c9390*)this)->ReleaseRef(); }
 };
 
-struct Elem_004c5bc0 {
+struct TdfField {
     Class_004c91a0 a;                  // +0x0 key
     Class_004c91a0 b;                  // +0x4 value
 
-    ~Elem_004c5bc0();
+    ~TdfField();
 };
 
 void __cdecl FUN_004d85a0(int* param_1);
@@ -41,7 +41,7 @@ public:
     int* name;                                 // +0x0
     std::vector<Class_004c42a0*> children;   // +0x4 (_First at +0x8)
     char unknown_14;                           // +0x14
-    std::vector<Elem_004c5bc0> entries;        // +0x15 (_First at +0x19)
+    std::vector<TdfField> entries;             // +0x15 (_First at +0x19)
 
     ~Class_004c42a0()
     {

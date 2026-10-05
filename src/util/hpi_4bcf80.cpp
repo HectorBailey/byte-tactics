@@ -26,7 +26,7 @@ struct Info_004bcf80 {
 };
 
 // One of the game's loaded items: the file all handles onto it share.
-struct Item_004bcf80 {
+struct OPENHAPIFILE {
     FILE* fp;                          // +0x0
     int pos;                           // +0x4
     void* node;                        // +0x8
@@ -36,9 +36,9 @@ struct Item_004bcf80 {
 };
 
 // A file handle, the same class as 0x4bb2e0's.
-struct File_004bcf80 {
+struct FileHandle {
     FILE* fp;                          // +0x0
-    Item_004bcf80* shared;             // +0x4
+    OPENHAPIFILE* shared;              // +0x4
     Info_004bcf80* info;               // +0x8
     int pos;                           // +0xc
     void* buffer;                      // +0x10
@@ -46,14 +46,14 @@ struct File_004bcf80 {
     char name[0x100];                  // +0x18
 };
 
-File_004bcf80* __stdcall HAPI_OpenFile(char* filename, const char* mode);
-long __stdcall HAPI_SeekFile(File_004bcf80* file, long pos);
-int __stdcall HAPI_readfromfile(File_004bcf80* file, void* buf, int size);
+FileHandle* __stdcall HAPI_OpenFile(char* filename, const char* mode);
+long __stdcall HAPI_SeekFile(FileHandle* file, long pos);
+int __stdcall HAPI_readfromfile(FileHandle* file, void* buf, int size);
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
 void __cdecl FUN_004d85a0(void* p);
 
 // Drops one reference on a handle, closing and freeing whatever it still holds.
-static void Close_004bcf80(File_004bcf80* f)
+static void Close_004bcf80(FileHandle* f)
 {
     if (f->shared) {
         f->shared->count--;
@@ -72,14 +72,14 @@ static void Close_004bcf80(File_004bcf80* f)
 }
 
 // FUNCTION: 0x4bcf80
-int __stdcall HAPI_CopyIntoFile(File_004bcf80* dst, char* name)
+int __stdcall HAPI_CopyIntoFile(FileHandle* dst, char* name)
 {
     int len;
     int left;
     int got;
     int written;
     void* buf = 0;
-    File_004bcf80* f = HAPI_OpenFile(name, "rb");
+    FileHandle* f = HAPI_OpenFile(name, "rb");
     if (f == 0)
         return 0;
     if (f->shared)

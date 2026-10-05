@@ -6,14 +6,14 @@ public:
     int GetFieldInt(const char* name, int def);
 };
 
-class Class_004c48c0 {
+class TdfRecord {
 public:
     int GetFieldString(char* dst, char* key, size_t size, char* def);
 };
 
 struct Source_004adf10 {
     char unknown_0[4];
-    Class_004c48c0* tdf;               // +0x4
+    TdfRecord* tdf;                    // +0x4
 };
 
 #pragma pack(push, 1)

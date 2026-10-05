@@ -223,14 +223,14 @@ struct Header_004be400 {
     Table_004be400* table;             // +0x10
 };
 
-struct File_004be400 {
+struct OPENHAPIFILE {
     char unknown_0[8];
     Header_004be400* header;           // +0x8
 };
 
 struct Display_004be400 {
     char unknown_0[0x618];
-    File_004be400** files;             // +0x618
+    OPENHAPIFILE** files;              // +0x618
     int count;                         // +0x61c
 };
 #pragma pack(pop)

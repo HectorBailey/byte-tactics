@@ -54,7 +54,7 @@ public:
     int GetFieldInt(const char* name, int def);
 };
 
-class Class_004c48c0 {
+class TdfRecord {
 public:
     int GetFieldString(char* dst, char* key, size_t size, char* def);
 };
@@ -268,7 +268,7 @@ int Class_00435c00::FUN_00435da0(char* map)
             return 0;
         }
         GetLocalizedString(&list, missionName, "missionname", 0x100, 0);
-        int found = ((Class_004c48c0*)list.current)->GetFieldString(path, "missionfile", 0x100, DAT_005119b8);
+        int found = ((TdfRecord*)list.current)->GetFieldString(path, "missionfile", 0x100, DAT_005119b8);
         if (found) {
             char file[0x100];
             FUN_004290f0(file, "Maps", path, "OTA");
@@ -331,21 +331,21 @@ int Class_00435c00::FUN_00435da0(char* map)
     FUN_00435430(3, "camps\\briefs", value, "WAV");
     GetLocalizedString(&parser, value, "missionhint", 0x100, DAT_005119b8);
     FUN_00435430(4, "camps\\hints", value, "TXT");
-    ((Class_004c48c0*)parser.current)->GetFieldString(value, "glamour", 0x100, DAT_005119b8);
+    ((TdfRecord*)parser.current)->GetFieldString(value, "glamour", 0x100, DAT_005119b8);
     FUN_00435430(5, DAT_005119b8, value, "PCX");
-    ((Class_004c48c0*)parser.current)->GetFieldString(value, "glamoursound", 0x100, DAT_005119b8);
+    ((TdfRecord*)parser.current)->GetFieldString(value, "glamoursound", 0x100, DAT_005119b8);
     FUN_00435430(8, "camps\\briefs", value, "WAV");
-    ((Class_004c48c0*)parser.current)->GetFieldString(value, "UseOnlyUnits", 0x100, DAT_005119b8);
+    ((TdfRecord*)parser.current)->GetFieldString(value, "UseOnlyUnits", 0x100, DAT_005119b8);
     FUN_00435430(6, "camps\\useonly", value, "TDF");
     g_game->mapping = parser.current->GetFieldInt("mapping", 0);
     g_game->lineOfSight = parser.current->GetFieldInt("lineofsight", 0);
     g_game->field_39225 = 1;
     g_game->field_39219 = 0;
-    ((Class_004c48c0*)parser.current)->GetFieldString(memory, "memory", 0x80, DAT_005119b8);
-    ((Class_004c48c0*)parser.current)->GetFieldString(numPlayers, "numplayers", 0x80, DAT_005119b8);
-    ((Class_004c48c0*)parser.current)->GetFieldString(planet, "Planet", 0x80, DAT_005119b8);
+    ((TdfRecord*)parser.current)->GetFieldString(memory, "memory", 0x80, DAT_005119b8);
+    ((TdfRecord*)parser.current)->GetFieldString(numPlayers, "numplayers", 0x80, DAT_005119b8);
+    ((TdfRecord*)parser.current)->GetFieldString(planet, "Planet", 0x80, DAT_005119b8);
     g_game->noMovie = parser.current->GetFieldInt("nomovie", 0);
-    ((Class_004c48c0*)parser.current)->GetFieldString(desc, "missiondescription", 0x80, "No description available");
+    ((TdfRecord*)parser.current)->GetFieldString(desc, "missiondescription", 0x80, "No description available");
     strcpy(lower, desc);
     _strlwr(lower);
     strcpy(description, Translate(lower));
@@ -371,11 +371,11 @@ int Class_00435c00::FUN_00435da0(char* map)
     computerMetal = (float)parser.current->GetFieldInt("ComputerMetal", 0);
     computerEnergy = (float)parser.current->GetFieldInt("ComputerEnergy", 0);
     surfaceMetal = parser.current->GetFieldInt("SurfaceMetal", 0);
-    ((Class_004c48c0*)parser.current)->GetFieldString(value, "aiprofile", 0x100, DAT_005119b8);
+    ((TdfRecord*)parser.current)->GetFieldString(value, "aiprofile", 0x100, DAT_005119b8);
     FUN_00435430(7, "ai", value, "txt");
     if (!GetName(7))
         FUN_00435430(7, "ai", "default", "txt");
-    ((Class_004c48c0*)parser.current)->GetFieldString(meteor.name, "MeteorWeapon", 0x20, DAT_005119b8);
+    ((TdfRecord*)parser.current)->GetFieldString(meteor.name, "MeteorWeapon", 0x20, DAT_005119b8);
     if (strlen(meteor.name) != 0) {
         meteor.radius = parser.current->GetFieldInt("MeteorRadius", 0);
         meteor.density = GetFloat(parser.current, "MeteorDensity");

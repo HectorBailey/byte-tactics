@@ -26,7 +26,7 @@ struct Game {
 extern Game* g_game;
 
 // Command arguments.
-class Class_004b73e0 {
+class CommandArgs {
 public:
     char* args[0x34];                  // +0x00
     int count;                         // +0xd0
@@ -34,7 +34,7 @@ public:
 };
 
 // FUNCTION: 0x4171f0
-void __stdcall FUN_004171f0(Class_004b73e0* args)
+void __stdcall FUN_004171f0(CommandArgs* args)
 {
     unsigned char i;
     if (args->count == 1)

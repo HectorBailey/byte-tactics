@@ -7,12 +7,12 @@
 
 extern char DAT_00511bd0[];
 
-class Class_004b73b0 {
+class CommandArgs {
 public:
     char unknown_0[0xd0];
     int field_d0;                      // +0xd0
 
-    Class_004b73b0* InitArgs();
+    CommandArgs* InitArgs();
 };
 
 class Class_004b7440 {
@@ -35,7 +35,7 @@ void __stdcall FUN_00417b50(char* param_1, int param_2)
     else
         strncpy(DAT_00511bd0, param_1, 0x4f);
 
-    ((Class_004b73b0*)buf)->InitArgs();
+    ((CommandArgs*)buf)->InitArgs();
     ((Class_004b7440*)buf)->Tokenize(param_1, 0);
     ExecuteCommand(buf, param_2);
 }

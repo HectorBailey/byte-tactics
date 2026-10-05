@@ -23,7 +23,7 @@ struct Elem_00434020 {
 
 typedef std::vector<Elem_00434020> Vec_004336f0;
 
-class Class_004c48c0 {
+class TdfRecord {
 public:
     int GetFieldString(char* dst, char* key, int size, char* def);
 };
@@ -31,7 +31,7 @@ public:
 class Class_004c3e10 {
 public:
     char unknown_0[4];
-    Class_004c48c0* parser;
+    TdfRecord* parser;
 };
 
 extern char DAT_005119b8[];

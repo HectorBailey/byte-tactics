@@ -8,14 +8,14 @@ struct Pair_004c5840 {
 };
 
 #pragma pack(push, 1)
-class Class_004c5840 {
+class TranslationTable {
 public:
     char unknown_0[0x1];
     std::vector<Pair_004c5840> pairs;   // +0x1 (_First at +0x5)
 };
 #pragma pack(pop)
 
-extern Class_004c5840* g_translations;
+extern TranslationTable* g_translations;
 
 // FUNCTION: 0x4c5840
 int __stdcall FindTranslation(char* name)

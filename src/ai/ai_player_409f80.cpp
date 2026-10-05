@@ -25,11 +25,11 @@ public:
 };
 #pragma pack(pop)
 
-class Class_004b73b0 {
+class CommandArgs {
 public:
     char unknown_0[0xd0];
     int field_d0;
-    Class_004b73b0* InitArgs();
+    CommandArgs* InitArgs();
 };
 
 class Class_004b74f0 {
@@ -56,7 +56,7 @@ void __stdcall FUN_00409f80(int player)
                 int len = strlen(def->name);
                 if (len != 0) {
                     Class_004b74f0 vars;
-                    ((Class_004b73b0*)&vars)->InitArgs();
+                    ((CommandArgs*)&vars)->InitArgs();
                     ExecuteCommandText(def->name, len, &vars, -1);
                 }
             }

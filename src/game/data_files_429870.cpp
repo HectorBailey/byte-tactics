@@ -126,7 +126,7 @@ public:
     int GetFieldInt(const char* name, int def);
 };
 
-class Class_004c48c0 {
+class TdfRecord {
 public:
     int GetFieldString(char* dst, char* key, int size, char* def);
 };
@@ -246,7 +246,7 @@ void FUN_00429870()
         ((Class_004c3e10*)&parser)->ResetCurrentRecord();
         if (!((Class_004c3410*)&parser)->SelectRecord(buf))
             break;
-        int intgaf = ((Class_004c48c0*)parser.current)->GetFieldString(buf, "intgaf", 0x1e, DAT_005119b8);
+        int intgaf = ((TdfRecord*)parser.current)->GetFieldString(buf, "intgaf", 0x1e, DAT_005119b8);
         if (intgaf != 0) {
             char* side = (char*)FUN_00429700(buf);
             if (side) {

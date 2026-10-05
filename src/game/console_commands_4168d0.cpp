@@ -36,7 +36,7 @@ struct Game {
 extern Game* g_game;
 
 // Command arguments.
-class Class_004b73e0 {
+class CommandArgs {
 public:
     int GetIntArg(int index, int fallback);
 };
@@ -44,7 +44,7 @@ public:
 void __stdcall AddMessage(char* text, int param_2, int param_3, int param_4);
 
 // FUNCTION: 0x4168d0
-void __stdcall FUN_004168d0(Class_004b73e0* args)
+void __stdcall FUN_004168d0(CommandArgs* args)
 {
     int n = args->GetIntArg(1, 0);
     if (n >= 0) {

@@ -36,7 +36,7 @@ public:
     Section_00436c30* GetSubRecord(int index);
 };
 
-class Class_004c48c0 {
+class TdfRecord {
 public:
     int GetFieldString(char* dst, char* key, size_t size, char* def);
 };
@@ -129,11 +129,11 @@ void Class_00436c30::FUN_00436c30(char* name, Parser_00436c30* parser)
         count = 0;
     for (i = 0; i < count; i++) {
         Section_00436c30* s = ((Class_004c44c0*)list)->GetSubRecord(i);
-        if (((Class_004c48c0*)s)->GetFieldString(buf, "Unitname", 0x400, DAT_005119b8))
+        if (((TdfRecord*)s)->GetFieldString(buf, "Unitname", 0x400, DAT_005119b8))
             total += strlen(buf) + 1;
-        if (((Class_004c48c0*)s)->GetFieldString(buf, "Ident", 0x400, DAT_005119b8))
+        if (((TdfRecord*)s)->GetFieldString(buf, "Ident", 0x400, DAT_005119b8))
             total += strlen(buf) + 1;
-        if (((Class_004c48c0*)s)->GetFieldString(buf, "InitialMission", 0x400, DAT_005119b8))
+        if (((TdfRecord*)s)->GetFieldString(buf, "InitialMission", 0x400, DAT_005119b8))
             total += strlen(buf) + 1;
     }
     int unitBytes = count * sizeof(MissionUnit_00436c30);
@@ -144,19 +144,19 @@ void Class_00436c30::FUN_00436c30(char* name, Parser_00436c30* parser)
     for (i = 0; i < count; i++) {
         MissionUnit_00436c30* u = &units[i];
         Section_00436c30* s = ((Class_004c44c0*)list)->GetSubRecord(i);
-        if (((Class_004c48c0*)s)->GetFieldString(strings, "Unitname", 0x400, DAT_005119b8)) {
+        if (((TdfRecord*)s)->GetFieldString(strings, "Unitname", 0x400, DAT_005119b8)) {
             u->name = strings;
             strings += strlen(strings) + 1;
         } else {
             u->name = 0;
         }
-        if (((Class_004c48c0*)s)->GetFieldString(strings, "Ident", 0x400, DAT_005119b8)) {
+        if (((TdfRecord*)s)->GetFieldString(strings, "Ident", 0x400, DAT_005119b8)) {
             u->ident = strings;
             strings += strlen(strings) + 1;
         } else {
             u->ident = 0;
         }
-        if (((Class_004c48c0*)s)->GetFieldString(strings, "InitialMission", 0x400, DAT_005119b8)) {
+        if (((TdfRecord*)s)->GetFieldString(strings, "InitialMission", 0x400, DAT_005119b8)) {
             u->initialMission = strings;
             strings += strlen(strings) + 1;
         } else {
@@ -191,7 +191,7 @@ void Class_00436c30::FUN_00436c30(char* name, Parser_00436c30* parser)
         MissionRule_00436c30* r = &rules[i];
         r->type = 0;
         Section_00436c30* s = ((Class_004c44c0*)list)->GetSubRecord(i);
-        if (((Class_004c48c0*)s)->GetFieldString(text, "specialwhat", 0x100, DAT_005119b8)) {
+        if (((TdfRecord*)s)->GetFieldString(text, "specialwhat", 0x100, DAT_005119b8)) {
             static int len = strlen("StartPos");
             if (_strnicmp(text, "StartPos", len) == 0) {
                 r->type = 1;
@@ -221,7 +221,7 @@ void Class_00436c30::FUN_00436c30(char* name, Parser_00436c30* parser)
     for (i = 0; i < count; i++) {
         MissionFeature_00436c30* f = &features[i];
         Section_00436c30* s = ((Class_004c44c0*)list)->GetSubRecord(i);
-        if (!((Class_004c48c0*)s)->GetFieldString(f->name, "Featurename", 0x80, DAT_005119b8))
+        if (!((TdfRecord*)s)->GetFieldString(f->name, "Featurename", 0x80, DAT_005119b8))
             f->name[0] = 0;
         f->x = ((Class_004c46c0*)s)->GetFieldInt("XPos", -1);
         f->z = ((Class_004c46c0*)s)->GetFieldInt("ZPos", -1);

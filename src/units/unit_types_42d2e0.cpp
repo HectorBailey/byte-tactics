@@ -145,7 +145,7 @@ class Class_004c3240 {
     void Unload();
 };
 
-class Class_004c48c0 {
+class TdfRecord {
   public:
     int GetFieldString(char* dst, char* key, int size, char* def);
 };
@@ -319,7 +319,7 @@ void LoadUnitTypes() {
             sprintf(classbuf, "CLASS%d", i);
             ((Class_004c3e10*)&parser)->ResetCurrentRecord();
             if (((Class_004c3410*)&parser)->SelectRecord(classbuf)) {
-                ((Class_004c48c0*)parser.current)
+                ((TdfRecord*)parser.current)
                     ->GetFieldString(classbuf, "name", 100, DAT_005119b8);
                 cls->field_0 = (int*)FUN_004d8610(classbuf);
                 cls->ReadMoveInfo(&parser);
@@ -488,7 +488,7 @@ void LoadUnitTypes() {
                     int count = 0;
                     int k = 1;
                     sprintf(objpath, "canbuild%d", k);
-                    while (((Class_004c48c0*)parser2.current)
+                    while (((TdfRecord*)parser2.current)
                                ->GetFieldString(valbuf, objpath, 0x20, DAT_005119b8)) {
                         short val = FindUnitTypeId(valbuf);
                         if (val != 0) {

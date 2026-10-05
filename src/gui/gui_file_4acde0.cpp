@@ -3,12 +3,12 @@
 #include <stdio.h>
 #include <string.h>
 
-struct Class_004bbbe0;
+struct FileHandle;
 
-extern unsigned int __stdcall HAPI_WriteFile(Class_004bbbe0* file, void* data, unsigned int size);
+extern unsigned int __stdcall HAPI_WriteFile(FileHandle* file, void* data, unsigned int size);
 
 // FUNCTION: 0x4acde0
-void __stdcall FUN_004acde0(Class_004bbbe0* file, char* key, char* value, int depth)
+void __stdcall FUN_004acde0(FileHandle* file, char* key, char* value, int depth)
 {
     char tab = '\t';
     char line[100];

@@ -21,7 +21,7 @@ extern Game* g_game;
 extern char DAT_005119b8[];
 
 // Command arguments.
-class Class_004b73e0 {
+class CommandArgs {
 public:
     char* args[0x34];                  // +0x00
     int count;                         // +0xd0
@@ -34,7 +34,7 @@ public:
 };
 
 // FUNCTION: 0x416780
-void __stdcall FUN_00416780(Class_004b73e0* args)
+void __stdcall FUN_00416780(CommandArgs* args)
 {
     if (args->GetIntArg(1, 0)) {
         g_game->obj->value = args->GetIntArg(1, 0);

@@ -12,18 +12,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Class_004bbbe0;
+struct FileHandle;
 char* __stdcall ChangeExtension(char*, char*, const char*);
 int __stdcall HAPI_FileLengthByName(char*);
 void __stdcall RemoveFile(char*);
 void __stdcall RenameFile(char*, char*);
-Class_004bbbe0* __stdcall HAPI_CreateFile(char*);
-void __stdcall HAPI_CloseFile(Class_004bbbe0*);
-unsigned int __stdcall HAPI_WriteFile(Class_004bbbe0*, void*, unsigned int);
-void __stdcall FUN_004accd0(Class_004bbbe0*, int);
-void __stdcall FUN_004acde0(Class_004bbbe0*, char*, char*, int);
-void __stdcall FUN_004ace50(void*, Class_004bbbe0*, int);
-void __stdcall FUN_004ad4f0(void*, Class_004bbbe0*, int);
+FileHandle* __stdcall HAPI_CreateFile(char*);
+void __stdcall HAPI_CloseFile(FileHandle*);
+unsigned int __stdcall HAPI_WriteFile(FileHandle*, void*, unsigned int);
+void __stdcall FUN_004accd0(FileHandle*, int);
+void __stdcall FUN_004acde0(FileHandle*, char*, char*, int);
+void __stdcall FUN_004ace50(void*, FileHandle*, int);
+void __stdcall FUN_004ad4f0(void*, FileHandle*, int);
 
 // FUNCTION: 0x4ae630
 void __stdcall FUN_004ae630(char* obj, char* name)
@@ -46,7 +46,7 @@ void __stdcall FUN_004ae630(char* obj, char* name)
         RemoveFile(backup);
         RenameFile(path, backup);
     }
-    Class_004bbbe0* out = HAPI_CreateFile(path);
+    FileHandle* out = HAPI_CreateFile(path);
     char* p = obj;
     for (index = 0; index < *(short*)(obj + 0xb6) + 1; index++, p += 0x15b) {
         sprintf(gadget, "GADGET%d", index);
