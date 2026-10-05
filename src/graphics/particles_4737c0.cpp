@@ -1,5 +1,5 @@
 // Decompiled by space-bunny-free, finished by deepseek-v4.1-flash. Names are provisional.
-// Slot 4 of Class_00471430 (vtable 0x4fd588; see 0x472d50.cpp and 0x471430.cpp
+// Slot 4 of TeleportParticles (vtable 0x4fd588; see 0x472d50.cpp and 0x471430.cpp
 // for the class and 0x471cc0.cpp for the family). The container at +0xc is a
 // real std::vector<Class_00473590> (0x34-byte elements, the type 0x472e30.cpp
 // and 0x471430.cpp already use). It first makes room for however many ten-tick
@@ -64,7 +64,7 @@ public:
     void FUN_004758c0(char* where, int count, const Class_00473590& val);
 };
 
-class Class_00471430 {
+class TeleportParticles {
 public:
     virtual void FUN_00471430();        // slot 0
     virtual void Update();              // slot 1
@@ -84,7 +84,7 @@ public:
 };
 
 // FUNCTION: 0x4737c0
-void Class_00471430::Emit()
+void TeleportParticles::Emit()
 {
     int grow = (field_4 - g_game->field_38a47 + 10) / 10;
 

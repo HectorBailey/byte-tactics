@@ -1,9 +1,9 @@
 // Decompiled by space-bunny-free. Names are provisional.
-// Creates a Class_004716a0 (vtable 0x4fd5d8) from the object pool after jittering
+// Creates a ThrustParticles (vtable 0x4fd5d8) from the object pool after jittering
 // the high short of each of the three pairs of the 12-byte point it is given, then
 // initialises it through virtual slot 6 (0x4742c0) with that same point twice, a
 // 1 and a fourth random number, and finally appends it to the
-// std::vector<Class_00471cc0*> selected by the short index. When that list
+// std::vector<ParticleSystem*> selected by the short index. When that list
 // already holds more than 400 entries its oldest element is deleted and erased
 // first. The append lives in an inlined member helper, which is what leaves
 // std::vector::insert (0x4732e0) out of line. Twin of 0x472330, which takes the
@@ -44,12 +44,12 @@ extern Class_00470ed0 DAT_0051e610;
 extern char DAT_0051e608;
 
 // Vtable 0x4fd5a8, constructor 0x471cc0, destructor 0x471d00, ??_G 0x471cd0.
-class Class_00471cc0 {
+class ParticleSystem {
 public:
     int field_4;                                        // +0x4
 
-    Class_00471cc0() { field_4 = 0; }
-    virtual ~Class_00471cc0();                          // slot 0
+    ParticleSystem() { field_4 = 0; }
+    virtual ~ParticleSystem();                          // slot 0
     virtual void Update() = 0;                          // slot 1
     virtual void FUN_00472e30(int) = 0;                 // slot 2
     virtual int FUN_00472e70() = 0;                     // slot 3
@@ -87,13 +87,13 @@ struct Shape_00472ab0 {
 };
 
 // Vtable 0x4fd5d8, ??_G 0x4716a0; 0x44 bytes.
-class Class_004716a0 : public Class_00471cc0 {
+class ThrustParticles : public ParticleSystem {
 public:
     int field_8;                                        // +0x8
     std::vector<Class_00474170> items;                  // +0xc (_First +0x10)
     char unknown_1c[0x44 - 0x1c];
 
-    Class_004716a0() {}
+    ThrustParticles() {}
     virtual void Update();                              // slot 1, 0x473010
     virtual void FUN_00472e30(int);                     // slot 2, 0x4730f0
     virtual int FUN_00472e70();                         // slot 3, 0x473130
@@ -105,9 +105,9 @@ public:
 // The owner of the per-index lists.
 class Lists_00472ab0 {
 public:
-    std::vector<Class_00471cc0*> lists[10];             // 0x10 bytes each
+    std::vector<ParticleSystem*> lists[10];             // 0x10 bytes each
 
-    void Add(short index, Class_00471cc0* p)
+    void Add(short index, ParticleSystem* p)
     {
         if (lists[index].size() > 400) {
             delete lists[index][0];
@@ -135,7 +135,7 @@ void __stdcall FUN_00472ab0(Shape_00472ab0* param_1, short index)
     s.v[2].hi += (int)((__int64)rand() * 3 / 0x8000) - 1;
     int r = (int)((__int64)rand() * 3 / 0x8000) + 1;
     Lists_00472ab0* lists = g_game->lists;
-    Class_004716a0* p = new Class_004716a0;
+    ThrustParticles* p = new ThrustParticles;
     if (p) {
         p->FUN_004742c0(&s, &s, 1, r);
         lists->Add(index, p);

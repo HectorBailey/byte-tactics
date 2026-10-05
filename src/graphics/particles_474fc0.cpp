@@ -5,7 +5,7 @@
 // vertical rate (y), and when the timer runs out counts one more step and
 // restarts the timer at a random value between period/2 and period. Slot 1
 // of Class_004750b0 (0x475600) inlines this; this out-of-line copy is never
-// called. 0x474b00 is the same update for Class_00474cd0's records (y * 4).
+// called. 0x474b00 is the same update for SmokeParticles's records (y * 4).
 #include <stdlib.h>
 
 #pragma pack(push, 1)

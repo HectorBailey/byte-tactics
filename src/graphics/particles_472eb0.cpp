@@ -1,5 +1,5 @@
 // Decompiled by space-bunny-free. Names are provisional.
-// Slot 1 of Class_00471560 (vtable 0x4fd5b8, family listed in 0x471cc0.cpp).
+// Slot 1 of NanoParticles (vtable 0x4fd5b8, family listed in 0x471cc0.cpp).
 // Steps every item in the std::vector at +0xc, drops the ones whose field_2c is
 // below the current game tick (the vector erase is inlined, so the shift down is
 // the rep movsd loop), then asks the two virtuals at +0x14 and +0x10 whether the
@@ -25,12 +25,12 @@ public:
 extern char* g_game;                   // 0x511de8, ticks at +0x38a47
 
 // Vtable 0x4fd5a8, constructor 0x471cc0, destructor 0x471d00, ??_G 0x471cd0.
-class Class_00471cc0 {
+class ParticleSystem {
 public:
     int field_4;                                        // +0x4
 
-    Class_00471cc0();
-    virtual ~Class_00471cc0();                          // slot 0
+    ParticleSystem();
+    virtual ~ParticleSystem();                          // slot 0
     virtual void Update() = 0;                          // slot 1
     virtual void FUN_00472e30(int) = 0;                 // slot 2
     virtual int FUN_00472e70() = 0;                     // slot 3
@@ -39,13 +39,13 @@ public:
 };
 
 // Vtable 0x4fd5b8, ??_G 0x471560; 0x4c bytes.
-class Class_00471560 : public Class_00471cc0 {
+class NanoParticles : public ParticleSystem {
 public:
     int field_8;                                        // +0x8
     std::vector<Class_004739b0> items;                  // +0xc (_First +0x10)
     char unknown_1c[0x4c - 0x1c];
 
-    Class_00471560() {}
+    NanoParticles() {}
     virtual void Update();                              // slot 1, 0x472eb0
     virtual void FUN_00472e30(int);                     // slot 2, 0x472f90
     virtual int FUN_00472e70();                         // slot 3, 0x472fd0
@@ -55,7 +55,7 @@ public:
 };
 
 // FUNCTION: 0x472eb0
-void Class_00471560::Update()
+void NanoParticles::Update()
 {
     std::vector<Class_004739b0>::iterator it = items.begin();
     while (it != items.end()) {

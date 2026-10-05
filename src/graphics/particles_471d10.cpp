@@ -1,5 +1,5 @@
 // Decompiled by Opus. Names are provisional.
-// The class-specific operator new of Class_00471cc0 (the family is listed
+// The class-specific operator new of ParticleSystem (the family is listed
 // in 0x471cc0.cpp): takes a zeroed object from the pool DAT_0051e610, or
 // returns null while DAT_0051e608 is set. Its operator delete is 0x471d50.
 #include <stddef.h>
@@ -20,12 +20,12 @@ extern Class_00470ed0 DAT_0051e610;
 extern char DAT_0051e608;
 
 // Vtable 0x4fd5a8, constructor 0x471cc0, destructor 0x471d00, ??_G 0x471cd0.
-class Class_00471cc0 {
+class ParticleSystem {
 public:
     int field_4;                                        // +0x4
 
-    Class_00471cc0();
-    virtual ~Class_00471cc0();                          // slot 0
+    ParticleSystem();
+    virtual ~ParticleSystem();                          // slot 0
     virtual void Update() = 0;                          // slot 1
     virtual void FUN_00472e30(int) = 0;                 // slot 2
     virtual int FUN_00472e70() = 0;                     // slot 3
@@ -34,7 +34,7 @@ public:
 };
 
 // FUNCTION: 0x471d10
-void* __stdcall Class_00471cc0::operator new(size_t size)
+void* __stdcall ParticleSystem::operator new(size_t size)
 {
     if (DAT_0051e608)
         return 0;

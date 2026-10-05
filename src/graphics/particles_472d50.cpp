@@ -32,7 +32,7 @@ public:
 
 // Vtable 0x4fd588, ??_G 0x471430; 0x44 bytes. The class is the one the
 // constructor at 0x471cc0 news up (see 0x471430.cpp).
-class Class_00471430 {
+class TeleportParticles {
 public:
     char unknown_0[8];                   // +0x0 vptr, +0x4 field_4
     std::vector<Class_00473560> items;   // +0x8 (_First +0x10, _Last +0x14)
@@ -48,7 +48,7 @@ public:
 };
 
 // FUNCTION: 0x472d50
-void Class_00471430::Update()
+void TeleportParticles::Update()
 {
     std::vector<Class_00473560>::iterator it = items.begin();
 

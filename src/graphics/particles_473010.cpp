@@ -1,5 +1,5 @@
 // Decompiled by space-bunny-free. Names are provisional.
-// Class_004716a0's slot 1 override, Update (vtable 0x4fd5d8, see
+// ThrustParticles's slot 1 override, Update (vtable 0x4fd5d8, see
 // 0x4716a0.cpp and 0x471cc0.cpp for the family). It walks the std::vector of 0x3c-byte
 // elements at +0xc, advances each one with Step, and erases every
 // element IsExpired reports as expired, then, when virtual slot 5
@@ -36,19 +36,19 @@ public:
 };
 
 // Vtable 0x4fd5a8, the base of the pool-allocated family (see 0x471cc0.cpp).
-class Class_00471cc0 {
+class ParticleSystem {
 public:
     int field_4;                                        // +0x4
 
-    Class_00471cc0();
-    virtual ~Class_00471cc0();                          // slot 0
+    ParticleSystem();
+    virtual ~ParticleSystem();                          // slot 0
     virtual void Update() = 0;                          // slot 1
     virtual void FUN_00472e30(int) = 0;                 // slot 2
     virtual int FUN_00472e70() = 0;                     // slot 3
 };
 
 // Vtable 0x4fd5d8, this function is its slot 1 override.
-class Class_004716a0 : public Class_00471cc0 {
+class ThrustParticles : public ParticleSystem {
 public:
     int field_8;                                        // +0x8
     std::vector<Class_00474130> items;                  // +0xc (_First +0x10)
@@ -61,7 +61,7 @@ public:
 };
 
 // FUNCTION: 0x473010
-void Class_004716a0::Update()
+void ThrustParticles::Update()
 {
     for (std::vector<Class_00474130>::iterator it = items.begin(); it != items.end(); ) {
         it->Step();

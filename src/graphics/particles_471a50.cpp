@@ -53,12 +53,12 @@ extern Class_00470ed0 DAT_0051e610;
 extern char DAT_0051e608;
 
 // Vtable 0x4fd5a8, constructor 0x471cc0, destructor 0x471d00, ??_G 0x471cd0.
-class Class_00471cc0 {
+class ParticleSystem {
 public:
     int field_4;                                        // +0x4
 
-    Class_00471cc0();
-    virtual ~Class_00471cc0();                          // slot 0
+    ParticleSystem();
+    virtual ~ParticleSystem();                          // slot 0
     virtual void Update() = 0;                          // slot 1
     virtual void FUN_00472e30(int) = 0;                 // slot 2
     virtual int FUN_00472e70() = 0;                     // slot 3
@@ -96,7 +96,7 @@ struct Record_004750b0 {
 };
 
 // Vtable 0x4fd638, constructor 0x4750b0, ??_G 0x475110; 0x34 bytes.
-class Class_004750b0 : public Class_00471cc0 {
+class Class_004750b0 : public ParticleSystem {
 public:
     int time;                                           // +0x8
     std::vector<Record_004750b0> records;               // +0xc (_First +0x10)

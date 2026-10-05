@@ -400,7 +400,7 @@ class Class_0046fad0;
 class Class_0046fe60;
 class Class_00470250;
 struct Class_00470560;
-class Class_00470ae0;
+class ObjectPool;
 class Class_00470c10;
 class Class_00470e50;
 class Class_00470eb0;
@@ -408,17 +408,17 @@ class Class_00470ed0;
 class ParticleLists;
 class Class_00471120;
 class Class_00471340;
-class Class_00471430;
+class TeleportParticles;
 class Class_00471470;
-class Class_00471560;
+class NanoParticles;
 class Class_004715a0;
-class Class_004716a0;
+class ThrustParticles;
 class Class_004716e0;
-class Class_004717e0;
+class WakeParticles;
 class Class_00471820;
 class Class_00471a50;
-class Class_00471cc0;
-struct Class_00471cc0;
+class ParticleSystem;
+struct ParticleSystem;
 class Class_00471d70;
 struct Class_00472200;
 class Class_00472e00;
@@ -450,7 +450,7 @@ class Class_00474720;
 class Class_00474760;
 struct Class_00474b00;
 class Class_00474cb0;
-class Class_00474cd0;
+class SmokeParticles;
 class Class_00474d50;
 struct Class_00474f80;
 class Class_00474fc0;
@@ -10685,16 +10685,16 @@ struct Elem_00470a40 {  // 0xe bytes, 1 view
     short d;  // +0xc
 };
 
-class Class_00470ae0 {  // 0x24 bytes, 3 views
+class ObjectPool {      // 0x24 bytes, 3 views
 public:
     std::vector<Item_00470ae0*> items;  // +0x4
     void* field_14;  // +0x14
     int field_18;  // +0x18
     int field_1c;  // +0x1c
     int field_20;  // +0x20
-    virtual ~Class_00470ae0(void);
-    Class_00470ae0(Class_00470ae0&);
-    Class_00470ae0(int, int);
+    virtual ~ObjectPool(void);
+    ObjectPool(ObjectPool&);
+    ObjectPool(int, int);
 };
 
 struct Item_00470ae0 {  // 0x4 bytes, 3 views
@@ -10766,7 +10766,7 @@ struct Slot_00471120 {  // 0x10 bytes, 1 view
     char unknown_c[4];
 };
 
-class Class_00474cd0 {  // 0x38 bytes, 12 views
+class SmokeParticles {  // 0x38 bytes, 12 views
 public:
     char unknown_4[4];
     int time;  // +0x8
@@ -10776,9 +10776,9 @@ public:
     int unknown_24;  // +0x24
     void* unknown_28;  // +0x28
     Vec3 pos;  // +0x2c
-    virtual ~Class_00474cd0(void);
-    Class_00474cd0(Class_00474cd0&);
-    Class_00474cd0(void);
+    virtual ~SmokeParticles(void);
+    SmokeParticles(SmokeParticles&);
+    SmokeParticles(void);
     virtual void Notify(void*);
     virtual void FUN_00472d50(void);
     virtual void FUN_00472e30(int);
@@ -10807,8 +10807,8 @@ public:
 
 class Class_00471340 {  // 0x10 bytes, 1 view
 public:
-    std::vector<Class_00471cc0*> lists[1];  // +0x0
-    void Add(short, Class_00471cc0*);
+    std::vector<ParticleSystem*> lists[1];  // +0x0
+    void Add(short, ParticleSystem*);
     void AddTeleportParticles(int, int, int, short);
 };
 
@@ -10825,7 +10825,7 @@ public:
     void FUN_00473590(void*, short, short);
 };
 
-class Class_00471430 {  // 0x44 bytes, 5 views
+class TeleportParticles {  // 0x44 bytes, 5 views
 public:
     int field_4;  // +0x4
     int field_8;  // +0x8
@@ -10834,8 +10834,8 @@ public:
     Vec3 pos1;  // +0x20
     Vec3 pos2;  // +0x2c
     Vec3 dir;  // +0x38
-    Class_00471430(Class_00471430&);
-    Class_00471430(void);
+    TeleportParticles(TeleportParticles&);
+    TeleportParticles(void);
     virtual void FUN_00471430(void);
     virtual void FUN_00472d50(void);
     virtual void FUN_00472e30(int);
@@ -10847,8 +10847,8 @@ public:
 
 class Class_00471470 {  // 0x10 bytes, 1 view
 public:
-    std::vector<Class_00471cc0*> lists[1];  // +0x0
-    void Add(short, Class_00471cc0*);
+    std::vector<ParticleSystem*> lists[1];  // +0x0
+    void Add(short, ParticleSystem*);
     void AddNanoParticles(int, int, int, short);
 };
 
@@ -10859,7 +10859,7 @@ public:
     void FUN_00473a00(int, short, short);
 };
 
-class Class_00471560 {  // 0x4c bytes, 6 views
+class NanoParticles {   // 0x4c bytes, 6 views
 public:
     char unknown_0[4];
     int field_4;  // +0x4
@@ -10869,8 +10869,8 @@ public:
     Vec3 radius;  // +0x28
     Vec3 target;  // +0x34
     Vec3 spread;  // +0x40
-    Class_00471560(Class_00471560&);
-    Class_00471560(void);
+    NanoParticles(NanoParticles&);
+    NanoParticles(void);
     void FUN_00472d50(void);
     void FUN_00472e30(int);
     int FUN_00472e70(void);
@@ -10881,15 +10881,15 @@ public:
 
 class Class_004715a0 {  // 0x10 bytes, 1 view
 public:
-    std::vector<Class_00471cc0*> lists[1];  // +0x0
-    void Add(short, Class_00471cc0*);
+    std::vector<ParticleSystem*> lists[1];  // +0x0
+    void Add(short, ParticleSystem*);
     void AddThrustParticles(int, int, int, int, short);
 };
 
 class Class_004716e0 {  // 0x10 bytes, 1 view
 public:
-    std::vector<Class_00471cc0*> lists[1];  // +0x0
-    void Add(short, Class_00471cc0*);
+    std::vector<ParticleSystem*> lists[1];  // +0x0
+    void Add(short, ParticleSystem*);
     void AddWakeParticles(int, int, int, int, short, int);
 };
 
@@ -10909,7 +10909,7 @@ public:
     void FUN_004745e0(void*, short, short);
 };
 
-class Class_004717e0 {  // 0x48 bytes, 5 views
+class WakeParticles {   // 0x48 bytes, 5 views
 public:
     char unknown_0[8];
     int field_8;  // +0x8
@@ -10919,8 +10919,8 @@ public:
     Vec3 pos_b;  // +0x2c
     Vec3 dir;  // +0x38
     int field_44;  // +0x44
-    Class_004717e0(Class_004717e0&);
-    Class_004717e0(void);
+    WakeParticles(WakeParticles&);
+    WakeParticles(void);
     void FUN_00472d50(void);
     void FUN_00472e30(int);
     int FUN_00472e70(void);
@@ -10932,7 +10932,7 @@ public:
 class Class_00471820 {  // 0x10 bytes, 1 view
 public:
     std::vector<Elem_00473500> lists[1];  // +0x0
-    void Add(short, Class_00474cd0*);
+    void Add(short, SmokeParticles*);
     void AddSmoke(Vec3*, int, int, int, int, short, int);
 };
 
@@ -10970,9 +10970,9 @@ public:
 };
 
 struct Class_00472200 {  // 0xa0 bytes, 18 views
-    std::vector<Class_00471cc0*> lists[10];  // +0x0
+    std::vector<ParticleSystem*> lists[10];  // +0x0
     ~Class_00472200(void);
-    void Add(short, Class_00471cc0*);
+    void Add(short, ParticleSystem*);
 };
 
 struct Ctx_004720d0 {  // 0x18 bytes, 1 view
@@ -11225,14 +11225,14 @@ public:
     void FUN_00474170(void*, short, short);
 };
 
-class Class_004716a0 {  // 0x44 bytes, 5 views
+class ThrustParticles {  // 0x44 bytes, 5 views
 public:
     char unknown_0[8];
     int field_8;  // +0x8
     std::vector<Class_00474170> items;  // +0xc
     char unknown_1c[40];
-    Class_004716a0(Class_004716a0&);
-    Class_004716a0(void);
+    ThrustParticles(ThrustParticles&);
+    ThrustParticles(void);
     void FUN_00472d50(void);
     void FUN_00472e30(int);
     int FUN_00472e70(void);

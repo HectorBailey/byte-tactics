@@ -98,7 +98,7 @@ the tool.
   separate placeholder classes. 0x485e30.cpp keeps a static `new` to emit its
   `??_G` until 0x485d40 is decompiled. The run 0x4b0720-0x4b1c00 is probably
   more non-virtual methods of `CobScript` (0x485d40 calls 0x4b0940).
-- `Class_00470ae0` (vtable 0x4fd580, `??_G` at 0x470ae0): its constructor is
+- `ObjectPool` (vtable 0x4fd580, `??_G` at 0x470ae0): its constructor is
   0x470a90 (`Class_00470a90::Construct`) and its destructor 0x470b80
   (`Class_00470b80::Destroy`).
 - `Class_0044e250` and `Class_0044e330`: two constructors storing vtable
@@ -200,14 +200,14 @@ revisit them once the surrounding code is known.
 
 
 - The 0x4fd5a8 family is consolidated (table in 0x471cc0.cpp): base
-  `Class_00471cc0` (destructor 0x471d00, class `operator new` 0x471d10 and
+  `ParticleSystem` (destructor 0x471d00, class `operator new` 0x471d10 and
   `operator delete` 0x471d50) and six derived classes. Left over: the slot
   methods keep their placeholder classes (0x472f90 is still
   `Class_00472fd0::FUN_00472f90`); 0x471d70 is a non-virtual base method;
   0x475330 is recorded as a free function but is slot 3 of `Class_004750b0`;
   four derived `??_G` files use a static `new` until the real `new` sites
   (0x471340 and others) are decompiled; the pool at DAT_0051e610 is
-  `Class_00470ed0`/`Class_00470eb0` in some files and `Class_00470ae0` in
+  `Class_00470ed0`/`Class_00470eb0` in some files and `ObjectPool` in
   0x470ae0.cpp.
 
 - The victory condition with vtables 0x4fd890 (primary) and 0x4fd888 (visitor

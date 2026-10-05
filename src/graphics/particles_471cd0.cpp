@@ -1,5 +1,5 @@
 // Decompiled by Sonnet, class family consolidated by Opus. Names are provisional.
-// The compiler-generated scalar deleting destructor of Class_00471cc0
+// The compiler-generated scalar deleting destructor of ParticleSystem
 // (vtable 0x4fd5a8), the base of the family listed in 0x471cc0.cpp. It
 // inlines the base destructor (0x471d00, the vtable store) and the class's
 // operator delete (0x471d50, which returns the object to the pool).
@@ -19,12 +19,12 @@ public:
 extern Class_00470ed0 DAT_0051e610;
 
 // Vtable 0x4fd5a8, constructor 0x471cc0, destructor 0x471d00, ??_G 0x471cd0.
-class Class_00471cc0 {
+class ParticleSystem {
 public:
     int field_4;                                        // +0x4
 
-    Class_00471cc0();
-    virtual ~Class_00471cc0();                          // slot 0
+    ParticleSystem();
+    virtual ~ParticleSystem();                          // slot 0
     virtual void Update() = 0;                          // slot 1
     virtual void FUN_00472e30(int) = 0;                 // slot 2
     virtual int FUN_00472e70() = 0;                     // slot 3
@@ -32,17 +32,17 @@ public:
     static void __stdcall operator delete(void* p);     // 0x471d50
 };
 
-// FUNCTION: 0x471cd0 ??_GClass_00471cc0@@UAEPAXI@Z
-Class_00471cc0::Class_00471cc0()
+// FUNCTION: 0x471cd0 ??_GParticleSystem@@UAEPAXI@Z
+ParticleSystem::ParticleSystem()
 {
     field_4 = 0;
 }
 
-Class_00471cc0::~Class_00471cc0()
+ParticleSystem::~ParticleSystem()
 {
 }
 
-void __stdcall Class_00471cc0::operator delete(void* p)
+void __stdcall ParticleSystem::operator delete(void* p)
 {
     DAT_0051e610.FreeSlot(p);
 }

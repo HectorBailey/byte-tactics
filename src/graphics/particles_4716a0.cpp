@@ -1,6 +1,6 @@
 // Decompiled by Opus, class family consolidated by Opus. Names are provisional.
-// The compiler-generated scalar deleting destructor of Class_004716a0
-// (vtable 0x4fd5d8), derived from Class_00471cc0 (the family is listed in
+// The compiler-generated scalar deleting destructor of ThrustParticles
+// (vtable 0x4fd5d8), derived from ParticleSystem (the family is listed in
 // 0x471cc0.cpp). Its implicit destructor destroys the std::vector at +0xc
 // (the inlined ~vector leaves the dead store of _First in the `push ecx`
 // slot), then the inlined base destructor stores the base vtable, and the
@@ -24,12 +24,12 @@ public:
 extern Class_00470ed0 DAT_0051e610;
 
 // Vtable 0x4fd5a8, constructor 0x471cc0, destructor 0x471d00, ??_G 0x471cd0.
-class Class_00471cc0 {
+class ParticleSystem {
 public:
     int field_4;                                        // +0x4
 
-    Class_00471cc0();
-    virtual ~Class_00471cc0();                          // slot 0
+    ParticleSystem();
+    virtual ~ParticleSystem();                          // slot 0
     virtual void Update() = 0;                          // slot 1
     virtual void FUN_00472e30(int) = 0;                 // slot 2
     virtual int FUN_00472e70() = 0;                     // slot 3
@@ -44,13 +44,13 @@ public:
 };
 
 // Vtable 0x4fd5d8, ??_G 0x4716a0; 0x44 bytes.
-class Class_004716a0 : public Class_00471cc0 {
+class ThrustParticles : public ParticleSystem {
 public:
     int field_8;                                        // +0x8
     std::vector<Class_00474170> items;                  // +0xc (_First +0x10)
     char unknown_1c[0x44 - 0x1c];
 
-    Class_004716a0() {}
+    ThrustParticles() {}
     virtual void Update();                              // slot 1, 0x473010
     virtual void FUN_00472e30(int);                     // slot 2, 0x4730f0
     virtual int FUN_00472e70();                         // slot 3, 0x473130
@@ -59,14 +59,14 @@ public:
     virtual void FUN_004742c0(int, int, int, int);      // slot 6, 0x4742c0
 };
 
-Class_00471cc0::~Class_00471cc0()
+ParticleSystem::~ParticleSystem()
 {
 }
 
-void __stdcall Class_00471cc0::operator delete(void* p)
+void __stdcall ParticleSystem::operator delete(void* p)
 {
     DAT_0051e610.FreeSlot(p);
 }
 
-// FUNCTION: 0x4716a0 ??_GClass_004716a0@@UAEPAXI@Z
-static Class_004716a0* s_object = new Class_004716a0;
+// FUNCTION: 0x4716a0 ??_GThrustParticles@@UAEPAXI@Z
+static ThrustParticles* s_object = new ThrustParticles;
