@@ -1407,7 +1407,7 @@ address,name
 0x46dad0,Class_0046d860::ProcessSync
 0x46ded0,UnitSyncPlayer::~UnitSyncPlayer
 0x46df40,UnitSync::GetSyncStatusText
-0x46e000,Class_0046e000::AllPlayersSynced
+0x46e000,UnitSync::AllPlayersSynced
 0x46e0b0,UnitSync::IsPlayerSynced
 0x46e160,Class_0046e160::ApplyToUnitTypes
 0x46e280,UnitSync::PopChangedEntry

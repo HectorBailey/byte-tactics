@@ -382,7 +382,7 @@ class Class_0046d630;
 class Class_0046d6c0;
 class Class_0046d860;
 class UnitSyncPlayer;
-class Class_0046e000;
+class UnitSync;
 class Class_0046e160;
 class Class_0046e330;
 class Class_0046e3c0;
@@ -7020,7 +7020,7 @@ struct Message_00447150 {  // 0x164a bytes, 1 view
     char unknown_0[5706];
 };
 
-class Class_0046e000 {  // 0x68 bytes, 3 views
+class UnitSync {        // 0x68 bytes, 3 views
 public:
     char unknown_0[20];
     Entry_0046e000* begin;  // +0x14

@@ -1411,7 +1411,7 @@ address,size,file,symbol,status,similarity
 0x46dad0,1024,src/network/unit_sync_46dad0.cpp,?ProcessSync@Class_0046d860@@QAEXXZ,matched,100.0
 0x46ded0,111,src/network/unit_sync_46ded0.cpp,??1UnitSyncPlayer@@QAE@XZ,matched,100.0
 0x46df40,185,src/network/unit_sync_46df40.cpp,?GetSyncStatusText@UnitSync@@QAEPADXZ,matched,100.0
-0x46e000,166,src/network/unit_sync_46e000.cpp,?AllPlayersSynced@Class_0046e000@@QAEHXZ,matched,100.0
+0x46e000,166,src/network/unit_sync_46e000.cpp,?AllPlayersSynced@UnitSync@@QAEHXZ,matched,100.0
 0x46e0b0,163,src/network/unit_sync_46e0b0.cpp,?IsPlayerSynced@UnitSync@@QAEHH@Z,matched,100.0
 0x46e160,276,src/network/unit_sync_46e160.cpp,?ApplyToUnitTypes@Class_0046e160@@QAEXXZ,matched,100.0
 0x46e280,173,src/network/unit_sync_46e280.cpp,?PopChangedEntry@UnitSync@@QAEHPAUEvent_0046e280@@@Z,matched,100.0
