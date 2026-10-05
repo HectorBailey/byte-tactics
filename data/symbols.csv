@@ -196,7 +196,7 @@ address,name
 0x40e160,Class_0040e160::ProbeStraightPath
 0x40e630,Class_0040e630::StartSearch
 0x40e9a0,Class_0040e9a0::FUN_0040e9a0
-0x40e9c0,Class_0040e9c0::FUN_0040e9c0
+0x40e9c0,Pathfinder::FUN_0040e9c0
 0x40e9e0,Pathfinder::Pathfinder
 0x40eb30,Pathfinder::~Pathfinder
 0x40eb70,Class_0040eb70::RunSearches
