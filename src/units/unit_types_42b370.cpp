@@ -1,5 +1,5 @@
 // Decompiled by deepseek-v4.1-flash. Names are provisional.
-// Class_0042b370::operator= for the 0x249-byte UnitType element. Hand-written:
+// UnitType::operator= for the 0x249-byte UnitType element. Hand-written:
 // char arrays are copied with byte loops, plain ints/shorts/structs member by
 // member, and the two flag words at +0x241/+0x245 bit by bit.
 #pragma pack(push, 1)
@@ -67,7 +67,7 @@ struct Vec3i_0042b370 {
     int x, y, z;
 };
 
-class Class_0042b370 {
+class UnitType {
 public:
     char f000[0x20];                    // +0x000
     char f020[0x20];                    // +0x020
@@ -103,12 +103,12 @@ public:
     Flags241_0042b370 f241;             // +0x241
     Flags245_0042b370 f245;             // +0x245
 
-    Class_0042b370& operator=(const Class_0042b370& src);
+    UnitType& operator=(const UnitType& src);
 };
 #pragma pack(pop)
 
-// FUNCTION: 0x42b370 ??4Class_0042b370@@QAEAAV0@ABV0@@Z
-Class_0042b370& Class_0042b370::operator=(const Class_0042b370& src)
+// FUNCTION: 0x42b370 ??4UnitType@@QAEAAV0@ABV0@@Z
+UnitType& UnitType::operator=(const UnitType& src)
 {
     unsigned int i;
 

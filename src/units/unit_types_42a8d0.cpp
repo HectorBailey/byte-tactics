@@ -166,7 +166,7 @@ public:
 
 #pragma pack(push, 1)
 // One unit type, 0x249 bytes.
-class Class_0042b370 {
+class UnitType {
 public:
     char name[0x20];                   // +0x000
     char unitname[0x20];               // +0x020
@@ -197,7 +197,7 @@ public:
         };
     };
 
-    Class_0042b370& operator=(const Class_0042b370& src);
+    UnitType& operator=(const UnitType& src);
 };
 
 struct Game {
@@ -207,7 +207,7 @@ struct Game {
     char unknown_3[0x1438c];
     int unit_count;                    // +0x1438f
     char unknown_14393[8];
-    Class_0042b370* unitinfo;          // +0x1439b
+    UnitType* unitinfo;                // +0x1439b
 };
 #pragma pack(pop)
 
@@ -291,15 +291,15 @@ int LoadUnitInfo()
     ListDirectory(path, 0, &files);
     int count = files.size() + 1;
     g_game->unit_count = count;
-    int size = count * sizeof(Class_0042b370);
-    g_game->unitinfo = (Class_0042b370*)FUN_004d83b0("UNITINFO", size);
+    int size = count * sizeof(UnitType);
+    g_game->unitinfo = (UnitType*)FUN_004d83b0("UNITINFO", size);
     memset(g_game->unitinfo, 0, size);
     strcpy(g_game->unitinfo->unitname, "None");
     g_game->unitinfo->flags1 |= 0x800000;
     int offset = strstr(COPYRIGHT, "0000") - COPYRIGHT;
 
     for (unsigned short i = 1; i < count; i++) {
-        Class_0042b370* u = &g_game->unitinfo[i];
+        UnitType* u = &g_game->unitinfo[i];
         u->id = i;
         BuildDataPath(path, "units", files[i - 1], "FBI");
         void* f = HAPI_OpenFileRead(path);
@@ -378,14 +378,14 @@ int LoadUnitInfo()
     // hole; `size` is the byte offset of the end of the kept units.
     int oldcount = count;
     for (unsigned short j = count - 1; j > 0; j--) {
-        Class_0042b370* u = &g_game->unitinfo[j];
+        UnitType* u = &g_game->unitinfo[j];
         if (!(u->flags1 & 0x800000)) {
             if (j != count - 1) {
-                *u = *(Class_0042b370*)((char*)g_game->unitinfo + size - sizeof(Class_0042b370));
+                *u = *(UnitType*)((char*)g_game->unitinfo + size - sizeof(UnitType));
                 u->id = j;
             }
             count--;
-            size -= sizeof(Class_0042b370);
+            size -= sizeof(UnitType);
         }
     }
     g_game->unit_count = count;

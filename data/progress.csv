@@ -555,7 +555,7 @@ address,size,file,symbol,status,similarity
 0x42a570,159,src/game/data_files_42a570.cpp,?FUN_0042a570@@YGXXZ,matched,100.0
 0x42a610,596,src/game/data_files_42a610.cpp,?FUN_0042a610@@YGXPAUDef_0042a610@@@Z,matched,100.0
 0x42a870,95,src/game/data_files_42a870.cpp,??_EClass_004c2ea0@@QAEPAXI@Z,matched,100.0
-0x42b370,2375,src/units/unit_types_42b370.cpp,??4Class_0042b370@@QAEAAV0@ABV0@@Z,matched,100.0
+0x42b370,2375,src/units/unit_types_42b370.cpp,??4UnitType@@QAEAAV0@ABV0@@Z,matched,100.0
 0x42bcc0,77,src/units/unit_types_42bcc0.cpp,?FreeUnitInfo@@YGXXZ,matched,100.0
 0x42bd10,46,src/units/unit_types_42bd10.cpp,?RefreshUnitInfo@@YGXXZ,matched,100.0
 0x42bd40,225,src/units/unit_types_42bd40.cpp,?CheckDownloadableFlags@@YGXXZ,matched,100.0
@@ -610,8 +610,8 @@ address,size,file,symbol,status,similarity
 0x432cb0,51,src/map/los_tables_432cb0.cpp,?FUN_00432cb0@@YGPAUElem_432cb0@@PAU1@00@Z,matched,100.0
 0x432cf0,33,src/map/los_tables_432cf0.cpp,?construct@?$allocator@UEntry_00432cf0@@@std@@QAEXPAUEntry_00432cf0@@ABU3@@Z,matched,100.0
 0x432d20,27,src/map/los_tables_432d20.cpp,?FUN_00432d20@Class_004c93b0@@QAEPAXPAH@Z,matched,100.0
-0x432d40,612,src/map/los_tables_432d40.cpp,?FUN_00432d40@@YGXPAVClass_0042b370@@0P6GHABV1@1@ZH@Z,matched,100.0
-0x432fb0,244,src/map/los_tables_432fb0.cpp,?FUN_00432fb0@@YGXPAVClass_0042b370@@0P6GHABV1@1@ZPAX@Z,matched,100.0
+0x432d40,612,src/map/los_tables_432d40.cpp,?FUN_00432d40@@YGXPAVUnitType@@0P6GHABV1@1@ZH@Z,matched,100.0
+0x432fb0,244,src/map/los_tables_432fb0.cpp,?FUN_00432fb0@@YGXPAVUnitType@@0P6GHABV1@1@ZPAX@Z,matched,100.0
 0x4330b0,119,src/map/los_tables_4330b0.cpp,?FUN_004330b0@Class_004330b0@@QAEXXZ,matched,100.0
 0x433130,312,src/map/los_tables_433130.cpp,?LoadLosTables@Class_00433130@@QAEXXZ,matched,100.0
 0x433270,270,src/map/los_tables_433270.cpp,?FUN_00433270@Class_00433270@@QAEXF@Z,matched,100.0

@@ -201,7 +201,7 @@ union UType_0042b370_flags {
     } bits;
 };
 
-class Class_0042b370 {
+class UnitType {
   public:
     char unknown_0[0x20];
     char name[0x60];
@@ -225,7 +225,7 @@ class Class_0042b370 {
     UType_0042b370_flags flags;
     char unknown_245[0x249 - 0x245];
 
-    Class_0042b370& operator=(const Class_0042b370& other);
+    UnitType& operator=(const UnitType& other);
 };
 
 struct MovementClass {
@@ -265,7 +265,7 @@ struct Game {
     };
     int field_14393;
     int field_14397;
-    Class_0042b370* field_1439b;
+    UnitType* field_1439b;
     char unknown_1439f[0x37e1f - 0x1439f];
     int field_37e1f;
     int field_37e23;
@@ -278,7 +278,7 @@ extern Game* g_game;
 extern char DAT_005119b8[];
 
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
-void __stdcall LoadUnitFbi(char* path, Class_0042b370* type);
+void __stdcall LoadUnitFbi(char* path, UnitType* type);
 void __stdcall FUN_0042a140(void* obj, char* name);
 int __stdcall HAPI_FileLengthByName(char* path);
 void* __stdcall Load3do(char* path);
@@ -351,11 +351,11 @@ void LoadUnitTypes() {
 
     ProtectBlockReadWrite(g_game->field_1439b);
 
-    Class_0042b370* end = g_game->field_1439b + g_game->field_1438f;
-    Class_0042b370* start = g_game->field_1439b + 1;
+    UnitType* end = g_game->field_1439b + g_game->field_1438f;
+    UnitType* start = g_game->field_1439b + 1;
 
-    Class_0042b370* p = start;
-    Class_0042b370* d;
+    UnitType* p = start;
+    UnitType* d;
     if (p != end) {
         while (p != end && !(~(p->flags.value) & 0x800000))
             p++;
@@ -363,8 +363,8 @@ void LoadUnitTypes() {
     if (p == end) {
         d = p;
     } else {
-        Class_0042b370* w = p;
-        for (Class_0042b370* s = p + 1; s != end; s++) {
+        UnitType* w = p;
+        for (UnitType* s = p + 1; s != end; s++) {
             if (!(~(s->flags.value) & 0x800000)) {
                 *w++ = *s;
             }
@@ -374,17 +374,17 @@ void LoadUnitTypes() {
     g_game->field_1438f = (int)(d - g_game->field_1439b);
 
     start = g_game->field_1439b + 1;
-    Class_0042b370* last = d;
+    UnitType* last = d;
     if (last - start <= 0x10) {
         FUN_00432fb0(start, last, (void*)CompareUnitTypeNames, 0);
     } else {
         FUN_00432d40(start, last, (void*)CompareUnitTypeNames, 0);
-        Class_0042b370* q = start + 0x10;
+        UnitType* q = start + 0x10;
         FUN_00432fb0(start, q, (void*)CompareUnitTypeNames, 0);
         for (; q != last; q++) {
-            Class_0042b370 tmp = *q;
-            Class_0042b370* r = q - 1;
-            Class_0042b370* w = q;
+            UnitType tmp = *q;
+            UnitType* r = q - 1;
+            UnitType* w = q;
             while (_strcmpi(tmp.name, r->name) < 0) {
                 *w = *r;
                 w = r;
@@ -415,7 +415,7 @@ void LoadUnitTypes() {
     g_game->field_14377 = (void**)FUN_004d83b0("MODEL PTRS", g_game->field_1438f * 4);
 
     for (unsigned short u = 1; u < g_game->field_1438f; u++) {
-        Class_0042b370* type = &g_game->field_1439b[u];
+        UnitType* type = &g_game->field_1439b[u];
         Game* gp = g_game;
         g_game->field_38d71 = (unsigned char)((u * 100) / gp->field_1438f);
         type->field_21e = u;
@@ -478,7 +478,7 @@ void LoadUnitTypes() {
     } else {
         short* list = (short*)FUN_004d83b0("TEMP UTYPE LIST", 0x3c);
         for (unsigned short s = 1; s < g_game->field_1438f; s++) {
-            Class_0042b370* type = &g_game->field_1439b[s];
+            UnitType* type = &g_game->field_1439b[s];
             type->field_152 = 0;
             type->field_156 = 0;
             if (type->flags.bits.canbuild) {

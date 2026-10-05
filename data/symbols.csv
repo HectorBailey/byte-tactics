@@ -560,7 +560,7 @@ address,name
 0x42a610,FUN_0042a610
 0x42a870,??_EClass_004c2ea0@@QAEPAXI@Z
 0x42a8d0,LoadUnitInfo
-0x42b370,??4Class_0042b370@@QAEAAV0@ABV0@@Z
+0x42b370,??4UnitType@@QAEAAV0@ABV0@@Z
 0x42bcc0,FreeUnitInfo
 0x42bd10,RefreshUnitInfo
 0x42bd40,CheckDownloadableFlags
