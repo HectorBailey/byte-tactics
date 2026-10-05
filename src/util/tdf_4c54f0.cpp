@@ -208,7 +208,7 @@ public:
     Class_004c4420* SelectRecordAt(int index);
 };
 
-class Class_004c3e10 {
+class TdfFile {
 public:
     char unknown_0[4];
     int field_4;
@@ -269,7 +269,7 @@ void __stdcall LoadTranslations(char* filename, char* section)
                     }
                     r->AssignText(value);
                 }
-                ((Class_004c3e10*)&f)->ResetCurrentRecord();
+                ((TdfFile*)&f)->ResetCurrentRecord();
                 index++;
             }
             ((Class_004c3240*)&f)->Unload();

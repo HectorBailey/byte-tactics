@@ -674,7 +674,7 @@ class Class_004c2f60;
 class Class_004c3240;
 class Class_004c33a0;
 class Class_004c3490;
-class Class_004c3e10;
+class TdfFile;
 class Class_004c3e10_2;
 class Class_004c3e20;
 class Class_004c3e30;
@@ -5002,7 +5002,7 @@ struct Elem_004222e0 {  // 0x4 bytes, 1 view
     ~Elem_004222e0(void);
 };
 
-class Class_004c3e10 {  // 0x8 bytes, 22 views
+class TdfFile {         // 0x8 bytes, 22 views
 public:
     char unknown_0[4];
     int field_0x4;  // +0x4
@@ -5013,7 +5013,7 @@ class Class_00435980 {  // 0xa10 bytes, 5 views
 public:
     int unknown_0;  // +0x0
     char name[2564];  // +0x4
-    Class_004c3e10 list;  // +0xa08
+    TdfFile list;         // +0xa08
     int MissionExists(int);
 };
 
@@ -5021,14 +5021,14 @@ class Class_00435760 {  // 0xa10 bytes, 6 views
 public:
     int unknown_0;  // +0x0
     char name[2564];  // +0x4
-    Class_004c3e10 list;  // +0xa08
+    TdfFile list;         // +0xa08
     int BuildMissionList(int*);
 };
 
 struct List_004be3b0 {  // 0x10 bytes, 11 views
     int count;  // +0x0
     Entry* entries;  // +0x4
-    Class_004c3e10** last;  // +0x8
+    TdfFile** last;         // +0x8
     char* end;  // +0xc
     void FUN_004758c0(char*, int, Class_00473590&);
     void FUN_00475ef0(char*, int, Class_004745e0&);
@@ -6071,7 +6071,7 @@ class Class_004356f0 {  // 0xa10 bytes, 1 view
 public:
     int unknown_0;  // +0x0
     char name[2564];  // +0x4
-    Class_004c3e10 list;  // +0xa08
+    TdfFile list;         // +0xa08
     int CountMissions(void);
 };
 

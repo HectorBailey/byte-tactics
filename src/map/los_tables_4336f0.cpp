@@ -28,7 +28,7 @@ public:
     int GetFieldString(char* dst, char* key, int size, char* def);
 };
 
-class Class_004c3e10 {
+class TdfFile {
 public:
     char unknown_0[4];
     TdfRecord* parser;
@@ -38,11 +38,11 @@ extern char DAT_005119b8[];
 
 class LosLine : public Vec_004336f0 {
 public:
-    void LoadLosLine(Class_004c3e10* obj, short line, short mode);
+    void LoadLosLine(TdfFile* obj, short line, short mode);
 };
 
 // FUNCTION: 0x4336f0
-void LosLine::LoadLosLine(Class_004c3e10* obj, short line, short mode)
+void LosLine::LoadLosLine(TdfFile* obj, short line, short mode)
 {
     char name[32];
     char buf[0x200];

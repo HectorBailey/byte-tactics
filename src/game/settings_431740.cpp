@@ -19,7 +19,7 @@ public:
     int LoadFile(char* file);
 };
 
-class Class_004c3e10 {
+class TdfFile {
 public:
     char unknown_0[4];
     void* field_0x4;
@@ -79,8 +79,8 @@ void FUN_00431740()
         ProtectBlockReadWrite(g_game->defs);
         for (int i = 1; i < g_game->count; i++)
             g_game->defs[i].flags &= 0xff7fffff;
-        ((Class_004c3e10*)&parser)->ResetCurrentRecord();
-        for (int j = 0; ((Class_004c3490*)&parser)->SelectRecordAt(j); j++, ((Class_004c3e10*)&parser)->ResetCurrentRecord()) {
+        ((TdfFile*)&parser)->ResetCurrentRecord();
+        for (int j = 0; ((Class_004c3490*)&parser)->SelectRecordAt(j); j++, ((TdfFile*)&parser)->ResetCurrentRecord()) {
             ((Class_004c4420*)parser.current)->CopyRecordName(name, 0x100);
             for (int k = 0; k < g_game->count; k++) {
                 if (_strcmpi(g_game->defs[k].name, name) == 0) {

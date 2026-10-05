@@ -27,7 +27,7 @@ public:
     void Unload();
 };
 
-class Class_004c3e10 {
+class TdfFile {
 public:
     char unknown_0[4];
     int field_0x4;
@@ -72,7 +72,7 @@ void LoadAllSound()
             if (((TdfRecord*)obj.field_4)->GetFieldString(value, "sound", 0x100, DAT_005119b8))
                 FUN_00429470(name, value);
             i++;
-            ((Class_004c3e10*)&obj)->ResetCurrentRecord();
+            ((TdfFile*)&obj)->ResetCurrentRecord();
             more = ((Class_004c3490*)&obj)->SelectRecordAt(i);
         }
         ((Class_004c3240*)&obj)->Unload();

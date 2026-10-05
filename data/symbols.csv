@@ -2747,7 +2747,7 @@ address,name
 0x4c3af0,std::out_of_range::_Doraise
 0x4c3c60,??_Gout_of_range@std@@UAEPAXI@Z
 0x4c3cc0,std::out_of_range::out_of_range
-0x4c3e10,Class_004c3e10::ResetCurrentRecord
+0x4c3e10,TdfFile::ResetCurrentRecord
 0x4c3e20,Class_004c3e20::GetCurrentRecord
 0x4c3e30,Class_004c3e30::SetCurrentRecord
 0x4c3e40,TdfRecord::TdfRecord

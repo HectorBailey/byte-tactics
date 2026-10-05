@@ -130,7 +130,7 @@ class Class_004c2f60 {
     int LoadFile(char* file);
 };
 
-class Class_004c3e10 {
+class TdfFile {
   public:
     void ResetCurrentRecord();
 };
@@ -317,7 +317,7 @@ void LoadUnitTypes() {
         MovementClass* cls_end = &MovementClassTable::g_movementClasses.entries[32];
         do {
             sprintf(classbuf, "CLASS%d", i);
-            ((Class_004c3e10*)&parser)->ResetCurrentRecord();
+            ((TdfFile*)&parser)->ResetCurrentRecord();
             if (((Class_004c3410*)&parser)->SelectRecord(classbuf)) {
                 ((TdfRecord*)parser.current)
                     ->GetFieldString(classbuf, "name", 100, DAT_005119b8);
@@ -482,7 +482,7 @@ void LoadUnitTypes() {
             type->field_152 = 0;
             type->field_156 = 0;
             if (type->flags.bits.canbuild) {
-                ((Class_004c3e10*)&parser2)->ResetCurrentRecord();
+                ((TdfFile*)&parser2)->ResetCurrentRecord();
                 if (((Class_004c3410*)&parser2)->SelectRecord("CANBUILD") &&
                     ((Class_004c3410*)&parser2)->SelectRecord(type->name)) {
                     int count = 0;

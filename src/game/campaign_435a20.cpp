@@ -35,7 +35,7 @@ public:
     int field_8;
 };
 
-class Class_004c3e10 {
+class TdfFile {
 public:
     void ResetCurrentRecord();
 };
@@ -44,7 +44,7 @@ class Class_00435760 {
 public:
     int unknown_0;
     char name[0xa08 - 4];               // +0x4
-    Class_004c3e10 list;                // +0xa08
+    TdfFile list;                       // +0xa08
 
     int BuildMissionList(char** param_1);
 };

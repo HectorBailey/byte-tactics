@@ -86,7 +86,7 @@ public:
     int SelectRecord(char* name);
 };
 
-class Class_004c3e10 {
+class TdfFile {
 public:
     void ResetCurrentRecord();
 };
@@ -263,7 +263,7 @@ static inline int FindWeapon(char* name)
     if (name != 0 && *name != 0) {
         for (int k = 0; k < DAT_005122a4; k++) {
             Class_004c2ea0* tdf = &DAT_005122a0[k];
-            ((Class_004c3e10*)tdf)->ResetCurrentRecord();
+            ((TdfFile*)tdf)->ResetCurrentRecord();
             if (((Class_004c3410*)tdf)->SelectRecord(name))
                 return *(int*)((char*)tdf->current + 0x25);
         }

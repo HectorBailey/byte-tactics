@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
-class Class_004c3e10 {
+class TdfFile {
 public:
     char unknown_0[4];
     int field_0x4;
@@ -21,14 +21,14 @@ public:
 };
 
 char* __stdcall SkipTextLines(int list, int index);
-int __stdcall GetLocalizedString(Class_004c3e10* obj, char* buf, const char* key, int size, int def);
+int __stdcall GetLocalizedString(TdfFile* obj, char* buf, const char* key, int size, int def);
 void* __cdecl FUN_004d83b0(const char* name, int size);
 
 class Class_00435760 {
 public:
     int unknown_0;
     char name[0xa08 - 4];              // +0x4
-    Class_004c3e10 list;               // +0xa08
+    TdfFile list;                      // +0xa08
 
     int BuildMissionList(int* param_1);
 };

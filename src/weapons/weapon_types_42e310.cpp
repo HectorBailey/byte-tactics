@@ -33,7 +33,7 @@ public:
     int LoadFile(char* file);
 };
 
-class Class_004c3e10 {
+class TdfFile {
 public:
     void ResetCurrentRecord();
 };
@@ -85,7 +85,7 @@ void LoadWeaponTypes()
             && (parser.field_8 || FUN_0041d8a0() == 0)) {
             int i = 0;
             while (1) {
-                ((Class_004c3e10*)&parser)->ResetCurrentRecord();
+                ((TdfFile*)&parser)->ResetCurrentRecord();
                 if (!((Class_004c3490*)&parser)->SelectRecordAt(i))
                     break;
                 LoadWeaponType(parser.current);

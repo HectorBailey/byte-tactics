@@ -90,7 +90,7 @@ public:
     int SelectRecord(char* name);
 };
 
-class Class_004c3e10 {
+class TdfFile {
 public:
     void ResetCurrentRecord();
 };
@@ -214,7 +214,7 @@ void __stdcall LoadSideData(void)
         int saved;
         s->sideNumber = side;
         sprintf(name, "SIDE%d", side);
-        ((Class_004c3e10*)&parser)->ResetCurrentRecord();
+        ((TdfFile*)&parser)->ResetCurrentRecord();
         if (!((Class_004c3410*)&parser)->SelectRecord(name))
             break;
         if (((TdfRecord*)parser.current)->GetFieldString(name, "name", 0x1e, DAT_005119b8))

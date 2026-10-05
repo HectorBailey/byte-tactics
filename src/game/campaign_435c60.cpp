@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <string.h>
 
-class Class_004c3e10 {
+class TdfFile {
 public:
     char unknown_0[4];
     int field_0x4;
@@ -34,7 +34,7 @@ class Class_00435c00 {
 public:
     int unknown_0;                      // +0x0
     char name[0xa08 - 4];               // +0x4
-    Class_004c3e10 list;                // +0xa08
+    TdfFile list;                       // +0xa08
     char unknown_a10[0xc18 - 0xa10];
     int field_c18;                      // +0xc18
     int field_c1c;                      // +0xc1c

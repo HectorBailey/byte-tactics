@@ -38,7 +38,7 @@ public:
     int SelectRecordAt(int index);
 };
 
-class Class_004c3e10 {
+class TdfFile {
 public:
     void ResetCurrentRecord();
 };
@@ -83,7 +83,7 @@ void LoadSoundCategories()
         memset((void*)*(int*)(g_game + 0x37e13), 0, size);
         for (int i = 0; i < *(int*)(g_game + 0x37e17); i++) {
             char* rec = (char*)*(int*)(g_game + 0x37e13) + i * 0x160;
-            ((Class_004c3e10*)&obj)->ResetCurrentRecord();
+            ((TdfFile*)&obj)->ResetCurrentRecord();
             if (((Class_004c3490*)&obj)->SelectRecordAt(i)) {
                 ((Class_004c4420*)obj.field_4)->CopyRecordName(rec, 0x3f);
                 p = DAT_005086fc;

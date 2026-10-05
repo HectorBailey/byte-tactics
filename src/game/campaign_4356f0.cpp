@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-class Class_004c3e10 {
+class TdfFile {
 public:
     char unknown_0[4];
     int field_0x4;
@@ -21,7 +21,7 @@ class Class_004356f0 {
 public:
     int unknown_0;
     char name[0xa08 - 4];              // +0x4
-    Class_004c3e10 list;               // +0xa08
+    TdfFile list;                      // +0xa08
 
     int CountMissions();
 };

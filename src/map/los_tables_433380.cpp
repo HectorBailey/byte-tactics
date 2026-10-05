@@ -69,7 +69,7 @@ public:
     int SelectRecord(char* name);
 };
 
-class Class_004c3e10 {
+class TdfFile {
 public:
     void ResetCurrentRecord();
 };
@@ -92,7 +92,7 @@ void LosTables::LoadLosTable(Class_004c3410* file, short table)
 {
     char name[32];
     sprintf(name, "TABLE%d", table + 1);
-    ((Class_004c3e10*)file)->ResetCurrentRecord();
+    ((TdfFile*)file)->ResetCurrentRecord();
     if (file->SelectRecord(name)) {
         LosTable* t = GetTable(table + 1);
         short numlines = (short)file->current->GetFieldInt("numlines", 0);

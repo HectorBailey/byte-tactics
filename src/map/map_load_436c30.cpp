@@ -11,7 +11,7 @@
 
 class Section_00436c30;
 
-class Class_004c3e10 {
+class TdfFile {
 public:
     void ResetCurrentRecord();
 };
@@ -115,7 +115,7 @@ void Campaign::LoadMissionData(char* name, Parser_00436c30* parser)
     int count;
     int total = 0;
 
-    ((Class_004c3e10*)parser)->ResetCurrentRecord();
+    ((TdfFile*)parser)->ResetCurrentRecord();
     if (!((Class_004c3410*)parser)->SelectRecord("globalheader"))
         return;
     if (!((Class_004c3410*)parser)->SelectRecord(name))

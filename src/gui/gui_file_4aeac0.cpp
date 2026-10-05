@@ -141,7 +141,7 @@ public:
     int LoadFile(char* file);
 };
 
-class Class_004c3e10 {
+class TdfFile {
 public:
     void ResetCurrentRecord();
 };
@@ -250,7 +250,7 @@ int __stdcall ReadGuiFile(Elem_004aeac0* obj, char* name)
         ret = 1;
         i = 0;
         while (1) {
-            ((Class_004c3e10*)&parser)->ResetCurrentRecord();
+            ((TdfFile*)&parser)->ResetCurrentRecord();
             if (!((Class_004c3490*)&parser)->SelectRecordAt(i))
                 break;
             void* cur = ((Class_004c3e20*)&parser)->GetCurrentRecord();

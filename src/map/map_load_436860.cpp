@@ -46,7 +46,7 @@ public:
     int SelectRecord(char* name);
 };
 
-class Class_004c3e10 {
+class TdfFile {
 public:
     void ResetCurrentRecord();
 };
@@ -138,7 +138,7 @@ int Class_00435c00::FUN_00436860(int type, Class_004c2ea0* parser, char* schema)
         if (d == -1)
             break;
         for (int n = 0; ; n++) {
-            ((Class_004c3e10*)parser)->ResetCurrentRecord();
+            ((TdfFile*)parser)->ResetCurrentRecord();
             if (!((Class_004c3410*)parser)->SelectRecord("GlobalHeader"))
                 FatalError("Very bad news!  No MSG!");
             sprintf(name, "Schema %i", n);

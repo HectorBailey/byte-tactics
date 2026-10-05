@@ -111,7 +111,7 @@ public:
     int LoadFile(char* file);
 };
 
-class Class_004c3e10 {
+class TdfFile {
 public:
     void ResetCurrentRecord();
 };
@@ -233,7 +233,7 @@ void LoadGameResources()
     BuildDataPath(buf, "gamedata", "sidedata", "TDF");
     ((Class_004c2f60*)&parser)->LoadFile(buf);
     sprintf(buf, "GENERAL");
-    ((Class_004c3e10*)&parser)->ResetCurrentRecord();
+    ((TdfFile*)&parser)->ResetCurrentRecord();
     if (((Class_004c3410*)&parser)->SelectRecord(buf) == 1) {
         g_game->baseHeight = ((Class_004c46c0*)parser.current)->GetFieldInt("baseheight", 0x1e0);
     } else {
@@ -243,7 +243,7 @@ void LoadGameResources()
     int i = 0;
     while (1) {
         sprintf(buf, "SIDE%d", i);
-        ((Class_004c3e10*)&parser)->ResetCurrentRecord();
+        ((TdfFile*)&parser)->ResetCurrentRecord();
         if (!((Class_004c3410*)&parser)->SelectRecord(buf))
             break;
         int intgaf = ((TdfRecord*)parser.current)->GetFieldString(buf, "intgaf", 0x1e, DAT_005119b8);

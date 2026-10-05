@@ -74,7 +74,7 @@ public:
     int SelectRecord(char* name);
 };
 
-class Class_004c3e10 {
+class TdfFile {
 public:
     void ResetCurrentRecord();
 };
@@ -260,7 +260,7 @@ int Class_00435c00::LoadMission(char* map)
     case 1: {
         char key[0x100];
         sprintf(key, "MISSION%d", missionIndex);
-        ((Class_004c3e10*)&list)->ResetCurrentRecord();
+        ((TdfFile*)&list)->ResetCurrentRecord();
         if (!((Class_004c3410*)&list)->SelectRecord(key)) {
             char msg[0x100];
             wsprintfA(msg, "The requested mission file, %s, does not exist.", key);
@@ -278,10 +278,10 @@ int Class_00435c00::LoadMission(char* map)
                 OpenMessageBox(g_game->messages, msg, 0x1e0, 1, 1);
                 return 0;
             }
-            ((Class_004c3e10*)&parser)->ResetCurrentRecord();
+            ((TdfFile*)&parser)->ResetCurrentRecord();
             if (((Class_004c3410*)&parser)->SelectRecord("GlobalHeader")) {
                 g_game->maxUnits = parser.current->GetFieldInt("maxunits", 200);
-                ((Class_004c3e10*)&parser)->ResetCurrentRecord();
+                ((TdfFile*)&parser)->ResetCurrentRecord();
                 BuildCampaignFilePath(1, "Maps", path, "TNT");
             } else {
                 char msg[0x100];
