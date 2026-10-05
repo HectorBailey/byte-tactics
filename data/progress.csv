@@ -3162,12 +3162,12 @@ address,size,file,symbol,status,similarity
 0x4df160,101,src/debug/debug_lib_4df160.cpp,?FUN_004df160@@YGXXZ,matched,100.0
 0x4df1d0,1,src/debug/debug_lib_4df1d0.cpp,?FUN_004df1d0@@YGXXZ,matched,100.0
 0x4df1e0,102,src/debug/debug_lib_4df1e0.cpp,??0Class_004df1e0@@QAE@XZ,matched,100.0
-0x4df250,46,src/debug/debug_lib_4df250.cpp,?CreatePerformanceDialog@Class_004df250@@QAEXXZ,matched,100.0
+0x4df250,46,src/debug/debug_lib_4df250.cpp,?CreatePerformanceDialog@PerformanceDialog@@QAEXXZ,matched,100.0
 0x4df280,163,src/debug/debug_lib_4df280.cpp,?SetPerformanceWindowVisible@Class_004df280@@QAEXD@Z,matched,100.0
 0x4df330,76,src/debug/debug_lib_4df330.cpp,?PerformanceDlgProc@@YGHPAXIIJ@Z,matched,100.0
 0x4df380,340,src/debug/debug_lib_4df380.cpp,?FUN_004df380@Class_004df380@@QAEXXZ,matched,100.0
 0x4df4e0,175,src/debug/debug_lib_4df4e0.cpp,?FUN_004df4e0@Class_004df4e0@@QAEXXZ,matched,100.0
-0x4df590,1904,src/debug/debug_lib_4df590.cpp,?HandlePerformanceMessage@Class_004df590@@QAEHIIJ@Z,matched,100.0
+0x4df590,1904,src/debug/debug_lib_4df590.cpp,?HandlePerformanceMessage@PerformanceDialog@@QAEHIIJ@Z,matched,100.0
 0x4dfd00,15,src/debug/debug_lib_4dfd00.cpp,?ShowPerformanceStatus@@YGXXZ,matched,100.0
 0x4dfd10,51,src/debug/debug_lib_4dfd10.cpp,?GetPerformanceWindow@@YGPAVClass_004df1e0@@XZ,matched,100.0
 0x4dfd50,290,src/debug/debug_lib_4dfd50.cpp,_$E2,matched,100.0
@@ -3178,7 +3178,7 @@ address,size,file,symbol,status,similarity
 0x4e04e0,49,src/debug/debug_lib_4e04e0.cpp,?FUN_004e04e0@@YAPAUNode_004e04e0@@PAU1@@Z,matched,100.0
 0x4e0520,67,src/debug/debug_lib_4e0520.cpp,?FUN_004e0520@Class_004e0520@@QAEXH@Z,matched,100.0
 0x4e0570,73,src/debug/debug_lib_4e0570.cpp,??0Class_004e0570@@QAE@XZ,matched,100.0
-0x4e05c0,46,src/debug/debug_lib_4e05c0.cpp,?CreateMemoryStatusDialog@Class_004e05c0@@QAEXXZ,matched,100.0
+0x4e05c0,46,src/debug/debug_lib_4e05c0.cpp,?CreateMemoryStatusDialog@MemoryStatusDialog@@QAEXXZ,matched,100.0
 0x4e05f0,168,src/debug/debug_lib_4e05f0.cpp,?SetMemoryStatusWindowVisible@Class_004e05f0@@QAEXD@Z,matched,100.0
 0x4e06a0,76,src/debug/debug_lib_4e06a0.cpp,?MemoryStatusDlgProc@@YGHPAXIIJ@Z,matched,100.0
 0x4e06f0,50,src/debug/debug_lib_4e06f0.cpp,?FUN_004e06f0@@YGPAU_RTL_CRITICAL_SECTION@@XZ,matched,100.0
@@ -3186,7 +3186,7 @@ address,size,file,symbol,status,similarity
 0x4e0740,67,src/debug/debug_lib_4e0740.cpp,?FUN_004e0740@@YGXXZ,matched,100.0
 0x4e0790,67,src/debug/debug_lib_4e0790.cpp,?FUN_004e0790@@YGXXZ,matched,100.0
 0x4e07e0,934,src/debug/debug_lib_4e07e0.cpp,?FormatWorkingSet@@YADPAD@Z,matched,100.0
-0x4e0b90,2150,src/debug/debug_lib_4e0b90.cpp,?HandleMemoryStatusMessage@Class_004e0b90@@QAEHIHH@Z,matched,100.0
+0x4e0b90,2150,src/debug/debug_lib_4e0b90.cpp,?HandleMemoryStatusMessage@MemoryStatusDialog@@QAEHIHH@Z,matched,100.0
 0x4e1400,15,src/debug/debug_lib_4e1400.cpp,?ShowMemoryStatus@@YGXXZ,matched,100.0
 0x4e1410,51,src/debug/debug_lib_4e1410.cpp,?FUN_004e1410@@YGPAVClass_004e0570@@XZ,matched,100.0
 0x4e1450,1,src/debug/debug_lib_4e1450.cpp,?FUN_004e1450@@YGXXZ,matched,100.0

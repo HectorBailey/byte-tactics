@@ -3192,12 +3192,12 @@ address,name
 0x4df160,FUN_004df160
 0x4df1d0,FUN_004df1d0
 0x4df1e0,Class_004df1e0::Class_004df1e0
-0x4df250,Class_004df250::CreatePerformanceDialog
+0x4df250,PerformanceDialog::CreatePerformanceDialog
 0x4df280,Class_004df280::SetPerformanceWindowVisible
 0x4df330,PerformanceDlgProc
 0x4df380,Class_004df380::FUN_004df380
 0x4df4e0,Class_004df4e0::FUN_004df4e0
-0x4df590,Class_004df590::HandlePerformanceMessage
+0x4df590,PerformanceDialog::HandlePerformanceMessage
 0x4dfd00,ShowPerformanceStatus
 0x4dfd10,GetPerformanceWindow
 0x4dfe80,StartPerformanceStatus
@@ -3207,7 +3207,7 @@ address,name
 0x4e04e0,FUN_004e04e0
 0x4e0520,Class_004e0520::FUN_004e0520
 0x4e0570,Class_004e0570::Class_004e0570
-0x4e05c0,Class_004e05c0::CreateMemoryStatusDialog
+0x4e05c0,MemoryStatusDialog::CreateMemoryStatusDialog
 0x4e05f0,Class_004e05f0::SetMemoryStatusWindowVisible
 0x4e06a0,MemoryStatusDlgProc
 0x4e06f0,FUN_004e06f0
@@ -3215,7 +3215,7 @@ address,name
 0x4e0740,FUN_004e0740
 0x4e0790,FUN_004e0790
 0x4e07e0,FormatWorkingSet
-0x4e0b90,Class_004e0b90::HandleMemoryStatusMessage
+0x4e0b90,MemoryStatusDialog::HandleMemoryStatusMessage
 0x4e1400,ShowMemoryStatus
 0x4e1410,FUN_004e1410
 0x4e1450,FUN_004e1450

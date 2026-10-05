@@ -13,7 +13,7 @@ public:
     NameTable();                       // 0x4e17c0
 };
 
-class Class_004df250 {
+class PerformanceDialog {
 public:
     void CreatePerformanceDialog();
 };
@@ -59,5 +59,5 @@ Class_004df1e0::Class_004df1e0()
     count = DAT_00529dcc;
     table = DAT_00529df8;
     time = GetTimeSeconds();
-    ((Class_004df250*)this)->CreatePerformanceDialog();
+    ((PerformanceDialog*)this)->CreatePerformanceDialog();
 }
