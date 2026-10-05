@@ -16,7 +16,7 @@ public:
     ~Class_004c2ea0();
 };
 
-class Class_004c2f60 {
+class TdfFile {
 public:
     int LoadFile(char* file);
 };
@@ -74,7 +74,7 @@ void __stdcall HandleMainMenuClick(Gadget_00425d80* gadget)
         RegisterDataArchives();
         BuildDataPath(buf, "maps", "multiplay", "tdf");
         Class_004c2ea0 obj;
-        if (((Class_004c2f60*)&obj)->LoadFile(buf) != 0) {
+        if (((TdfFile*)&obj)->LoadFile(buf) != 0) {
             g_game[0x2bc0] = 6;
             SetOffscreenSurface(*(int*)(g_game + 0x37e1b));
             FillSurface(0, 0);

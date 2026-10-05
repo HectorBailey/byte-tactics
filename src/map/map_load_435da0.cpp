@@ -64,7 +64,7 @@ public:
     double GetFieldDouble(const char* name, double def);
 };
 
-class Class_004c2f60 {
+class TdfFile {
 public:
     int LoadFile(char* file);
 };
@@ -272,7 +272,7 @@ int Class_00435c00::LoadMission(char* map)
         if (found) {
             char file[0x100];
             BuildDataPath(file, "Maps", path, "OTA");
-            if (!((Class_004c2f60*)&parser)->LoadFile(file)) {
+            if (!((TdfFile*)&parser)->LoadFile(file)) {
                 char msg[0x100];
                 sprintf(msg, "Hey, joker!  There is no mission defintion for this mission: %s", path);
                 OpenMessageBox(g_game->messages, msg, 0x1e0, 1, 1);
@@ -300,7 +300,7 @@ int Class_00435c00::LoadMission(char* map)
         exists = 0;
         strcpy(missionName, map);
         BuildDataPath(path, "Maps", map, "OTA");
-        if (((Class_004c2f60*)&parser)->LoadFile(path)) {
+        if (((TdfFile*)&parser)->LoadFile(path)) {
             BuildCampaignFilePath(1, "Maps", map, "TNT");
             break;
         }
@@ -309,7 +309,7 @@ int Class_00435c00::LoadMission(char* map)
             return 0;
         strcpy(missionName, map);
         BuildDataPath(path, "Maps", map, "OTA");
-        if (!((Class_004c2f60*)&parser)->LoadFile(path))
+        if (!((TdfFile*)&parser)->LoadFile(path))
             return 0;
         BuildCampaignFilePath(1, "Maps", map, "TNT");
         break;

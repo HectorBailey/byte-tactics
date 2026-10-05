@@ -12,7 +12,7 @@ public:
     ~Class_004c2ea0();
 };
 
-class Class_004c2f60 {
+class TdfFile {
 public:
     int LoadFile(char* file);
 };
@@ -62,7 +62,7 @@ char __stdcall FindGameCdDrive(int side)
         if (path[0] != drive)
             DAT_00511de4 = 1;
         Class_004c2ea0 parser;
-        if (((Class_004c2f60*)&parser)->LoadFile(path)
+        if (((TdfFile*)&parser)->LoadFile(path)
             && ((Class_004c3410*)&parser)->SelectRecord("Contents")
             && parser.current->GetFieldInt(name, 0))
             return drive;

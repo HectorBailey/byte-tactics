@@ -14,7 +14,7 @@ public:
     ~Class_004c2ea0();
 };
 
-class Class_004c2f60 {
+class TdfFile {
 public:
     int LoadFile(char* file);
 };
@@ -73,7 +73,7 @@ void FUN_00431740()
     char* file = ((Class_004356c0*)g_game->field_391e9)->FUN_004356c0(6);
     if (file == 0)
         return;
-    if (!((Class_004c2f60*)&parser)->LoadFile(file))
+    if (!((TdfFile*)&parser)->LoadFile(file))
         return;
     {
         ProtectBlockReadWrite(g_game->defs);

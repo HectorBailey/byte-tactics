@@ -23,7 +23,7 @@ public:
     ~Class_004c2ea0();
 };
 
-class Class_004c2f60 {
+class TdfFile {
 public:
     int LoadFile(char* name);
 };
@@ -52,7 +52,7 @@ void __stdcall LoadFeatureFileList()
     FindFilesRecursive("features", "*.tdf", &list, -1, 1);
     for (std::vector<Elem_004222e0>::iterator it = list.begin(); it < list.end(); it++) {
         Class_004c2ea0* obj = new Class_004c2ea0;
-        if (((Class_004c2f60*)obj)->LoadFile(it->name.data)) {
+        if (((TdfFile*)obj)->LoadFile(it->name.data)) {
             DAT_00511fb4->push_back(obj);
         } else {
             delete obj;

@@ -31,7 +31,7 @@ public:
     int field_8;
 };
 
-class Class_004c2f60 {
+class TdfFile {
 public:
     int LoadFile(char* file);
 };
@@ -94,7 +94,7 @@ void Class_00435110::LoadCampaign(char* file)
     if (strlen(file) != 0) {
         BuildCampaignFilePath(0, "camps", campaign, "TDF");
         if (strlen(file) != 0) {
-            if (!((Class_004c2f60*)&list)->LoadFile(GetName(0))) {
+            if (!((TdfFile*)&list)->LoadFile(GetName(0))) {
                 wsprintfA(msg, "The requested campaign file, %s, does not exist.", GetName(0));
                 OpenMessageBox(g_game + 0x519, msg, 0x1e0, 1, 1);
                 LoadCampaign(DAT_005119b8);

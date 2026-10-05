@@ -77,7 +77,7 @@ class Class_004c2ea0 {
     ~Class_004c2ea0();
 };
 
-class Class_004c2f60 {
+class TdfFile {
   public:
     int LoadFile(char* file);
 };
@@ -255,7 +255,7 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
     char weapon[128];
     char yard[1024];
 
-    if (((Class_004c2f60*)&parser)->LoadFile(fbi_file)) {
+    if (((TdfFile*)&parser)->LoadFile(fbi_file)) {
         if (!((Class_004c3410*)&parser)->SelectRecord("UNITINFO")) {
             ((Class_004c3240*)&parser)->Unload();
             goto FINISH;

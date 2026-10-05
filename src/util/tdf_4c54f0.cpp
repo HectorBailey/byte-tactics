@@ -192,7 +192,7 @@ public:
     ~Class_004c2ea0();
 };
 
-class Class_004c2f60 {
+class TdfFile {
 public:
     char unknown_0[4];
     int field_4;
@@ -250,7 +250,7 @@ void __stdcall LoadTranslations(char* filename, char* section)
         Class_004c2ea0 f;
         char value[256];
         char name[256];
-        if (((Class_004c2f60*)&f)->LoadFile(filename)) {
+        if (((TdfFile*)&f)->LoadFile(filename)) {
             int index;
             index = 0;
             while (((Class_004c3490*)&f)->SelectRecordAt(index)) {

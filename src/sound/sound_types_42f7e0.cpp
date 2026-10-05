@@ -12,7 +12,7 @@ public:
     ~Class_004c2ea0();
 };
 
-class Class_004c2f60 {
+class TdfFile {
 public:
     int LoadFile(char* path);
 };
@@ -64,7 +64,7 @@ void LoadAllSound()
 
     *(int*)(g_game + 0x33a0f) = 0;
     BuildDataPath(path, "gamedata", "allsound", "TDF");
-    if (((Class_004c2f60*)&obj)->LoadFile(path)) {
+    if (((TdfFile*)&obj)->LoadFile(path)) {
         int i = 0;
         int more = ((Class_004c3490*)&obj)->SelectRecordAt(i);
         while (more) {

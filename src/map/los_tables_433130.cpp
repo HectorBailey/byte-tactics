@@ -63,7 +63,7 @@ public:
     ~Class_004c2ea0();
 };
 
-class Class_004c2f60 {
+class TdfFile {
 public:
     int LoadFile(char* path);
 };
@@ -103,7 +103,7 @@ void Class_00433130::LoadLosTables()
     Class_004c2ea0 tdf;
     char path[256];
     BuildDataPath(path, "gamedata", "los", "TDF");
-    if (((Class_004c2f60*)&tdf)->LoadFile(path) != 0) {
+    if (((TdfFile*)&tdf)->LoadFile(path) != 0) {
         if (((Class_004c3410*)&tdf)->SelectRecord("TABLEINFO") != 0) {
             short numtables = (short)((Class_004c46c0*)tdf.field_4)->GetFieldInt("numtables", 0);
             {

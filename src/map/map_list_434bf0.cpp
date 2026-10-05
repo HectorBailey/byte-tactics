@@ -42,7 +42,7 @@ public:
     ~Class_004c2ea0();
 };
 
-class Class_004c2f60 {
+class TdfFile {
 public:
     int LoadFile(char* file);
 };
@@ -115,7 +115,7 @@ int __stdcall LoadMapList(void** param_1, int param_2, int param_3)
         struct A { char name[256]; char lower[256]; char path[256]; } a;
         BuildDataPath(a.path, "Maps", files[s.i].ptr, "OTA");
         Class_004c2ea0 parser;
-        if (((Class_004c2f60*)&parser)->LoadFile(a.path) != 0
+        if (((TdfFile*)&parser)->LoadFile(a.path) != 0
             && ((Class_00435c00*)(*(int*)(g_game + 0x391e9)))
                    ->FUN_00436860(3, &parser, 0) != 0) {
             strcpy(a.name, files[s.i].ptr);

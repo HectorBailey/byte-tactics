@@ -60,7 +60,7 @@ public:
     ~Class_004c2ea0();
 };
 
-class Class_004c2f60 {
+class TdfFile {
 public:
     int LoadFile(char* file);
 };
@@ -143,7 +143,7 @@ void LoadDownloadMenus()
     for (i = 0; i < n; i++) {
         Class_004c2ea0 parser;
         BuildDataPath(path, "download", files[i].p, "TDF");
-        if (((Class_004c2f60*)&parser)->LoadFile(path)) {
+        if (((TdfFile*)&parser)->LoadFile(path)) {
             int j = 0;
             while (1) {
                 ((Class_004c3e10*)&parser)->ResetCurrentRecord();

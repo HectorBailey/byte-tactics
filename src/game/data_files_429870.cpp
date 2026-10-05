@@ -106,7 +106,7 @@ public:
     ~Class_004c2ea0();
 };
 
-class Class_004c2f60 {
+class TdfFile {
 public:
     int LoadFile(char* file);
 };
@@ -231,7 +231,7 @@ void LoadGameResources()
     char buf[256];
 
     BuildDataPath(buf, "gamedata", "sidedata", "TDF");
-    ((Class_004c2f60*)&parser)->LoadFile(buf);
+    ((TdfFile*)&parser)->LoadFile(buf);
     sprintf(buf, "GENERAL");
     ((Class_004c3e10*)&parser)->ResetCurrentRecord();
     if (((Class_004c3410*)&parser)->SelectRecord(buf) == 1) {

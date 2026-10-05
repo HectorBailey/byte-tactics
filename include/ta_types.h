@@ -670,7 +670,7 @@ struct Class_004bbd00_Other;
 struct Class_004bce10;
 struct Class_004be010;
 class Class_004c2ea0;
-class Class_004c2f60;
+class TdfFile;
 class Class_004c3240;
 class Class_004c33a0;
 class Class_004c3490;
@@ -4465,7 +4465,7 @@ struct FindData_0041d4c0 {  // 0x118 bytes, 1 view
     char name[260];  // +0x14
 };
 
-class Class_004c2f60 {  // 0xc bytes, 24 views
+class TdfFile {         // 0xc bytes, 24 views
 public:
     Class_004c42a0* root;  // +0x0
     int field_4;  // +0x4

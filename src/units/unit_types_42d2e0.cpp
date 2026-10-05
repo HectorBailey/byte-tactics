@@ -125,7 +125,7 @@ class Class_004c2ea0 {
     ~Class_004c2ea0();
 };
 
-class Class_004c2f60 {
+class TdfFile {
   public:
     int LoadFile(char* file);
 };
@@ -309,7 +309,7 @@ void LoadUnitTypes() {
     {
         Class_004c2ea0 parser;
         BuildDataPath(path, "gamedata", "moveinfo", "TDF");
-        if (!((Class_004c2f60*)&parser)->LoadFile(path))
+        if (!((TdfFile*)&parser)->LoadFile(path))
             FatalError("Can't load MOVEINFO.TDF");
 
         int i = 0;
@@ -473,7 +473,7 @@ void LoadUnitTypes() {
 
     Class_004c2ea0 parser2;
     BuildDataPath(path, "gamedata", "sidedata", "TDF");
-    if (!((Class_004c2f60*)&parser2)->LoadFile(path)) {
+    if (!((TdfFile*)&parser2)->LoadFile(path)) {
         FatalError("Can't load GAMEDATA.TDF");
     } else {
         short* list = (short*)FUN_004d83b0("TEMP UTYPE LIST", 0x3c);

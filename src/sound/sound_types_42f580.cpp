@@ -23,7 +23,7 @@ public:
     ~Class_004c2ea0();
 };
 
-class Class_004c2f60 {
+class TdfFile {
 public:
     int LoadFile(char* path);
 };
@@ -76,7 +76,7 @@ void LoadSoundCategories()
     SoundInfo_005086fc* p;
 
     BuildDataPath(path, "gamedata", "sound", "TDF");
-    if (((Class_004c2f60*)&obj)->LoadFile(path)) {
+    if (((TdfFile*)&obj)->LoadFile(path)) {
         *(int*)(g_game + 0x37e17) = ((Class_004c4450*)obj.field_0)->GetSubRecordCount();
         int size = *(int*)(g_game + 0x37e17) * 0x160;
         *(int*)(g_game + 0x37e13) = (int)FUN_004d83b0("Sound Categories", size);

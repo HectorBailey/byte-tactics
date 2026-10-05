@@ -75,7 +75,7 @@ typedef std::vector<Elem_00432be0> FileList;
 
 void __stdcall ListDirectory(const char* pattern, int dirs, FileList* out);
 
-class Class_004c2f60 {
+class TdfFile {
 public:
     int LoadFile(char* path);
     void LoadBuffer(char* data, int size, int flag, char* name);
@@ -250,7 +250,7 @@ static inline void LoadWeaponTDFs()
         char path[256];
         Class_004c2ea0* tdf = &DAT_005122a0[DAT_005122a4];
         BuildDataPath(path, "Weapons", it->data, "TDF");
-        if (((Class_004c2f60*)tdf)->LoadFile(path)) {
+        if (((TdfFile*)tdf)->LoadFile(path)) {
             if (tdf->field_8 != 0 || FUN_0041d8a0() == 0)
                 DAT_005122a4++;
         }
@@ -319,7 +319,7 @@ int LoadUnitInfo()
                 }
             }
             Class_004c2ea0 parser;
-            ((Class_004c2f60*)&parser)->LoadBuffer(buf, len, 0, "<NO FILE>");
+            ((TdfFile*)&parser)->LoadBuffer(buf, len, 0, "<NO FILE>");
             if (!((Class_004c3410*)&parser)->SelectRecord("UNITINFO")) {
                 // Original bug: this exit leaves the FBI file open (no
                 // HAPI_CloseFile), the weapon TDF table allocated and the unit

@@ -20,7 +20,7 @@ public:
     ~Class_004c2ea0();
 };
 
-class Class_004c2f60 {
+class TdfFile {
 public:
     int LoadFile(char* file);
 };
@@ -75,7 +75,7 @@ int __stdcall BuildCampaignNameList(char** out, int side)
     char* p = *out;
     for (int i = 0; i < n; i++) {
         BuildDataPath(path, "camps", q, "tdf");
-        if (((Class_004c2f60*)&parser)->LoadFile(path)) {
+        if (((TdfFile*)&parser)->LoadFile(path)) {
             if (((Class_004c3410*)&parser)->SelectRecord("HEADER")) {
                 ((TdfRecord*)parser.current)->GetFieldString(name, "campaignside", 0x40, DAT_005119b8);
                 if (strcmp(g_game->names[side], name) == 0 || strcmp("ALL", name) == 0) {

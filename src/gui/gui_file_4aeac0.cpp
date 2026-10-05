@@ -136,7 +136,7 @@ public:
     int GetFieldString(char* dst, char* key, size_t size, char* def);
 };
 
-class Class_004c2f60 {
+class TdfFile {
 public:
     int LoadFile(char* file);
 };
@@ -246,7 +246,7 @@ int __stdcall ReadGuiFile(Elem_004aeac0* obj, char* name)
     int ret = 0;
     char path[256];
     ChangeExtension(name, path, "GUI");
-    if (((Class_004c2f60*)&parser)->LoadFile(path) == 1) {
+    if (((TdfFile*)&parser)->LoadFile(path) == 1) {
         ret = 1;
         i = 0;
         while (1) {

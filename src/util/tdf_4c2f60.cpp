@@ -6,7 +6,7 @@
 // it into a new root section named "root" (FUN_004c3e40). The tree parsed by
 // the previous load is deleted first. Returns 1 on success, 0 when the file
 // cannot be opened or the read fails. The tail of the function is the same
-// code as Class_004c2f60::LoadBuffer (0x4c3120), written out again here.
+// code as TdfFile::LoadBuffer (0x4c3120), written out again here.
 //
 // Two things decide the register allocation and the stack layout, and both
 // are needed for a byte match:
@@ -85,7 +85,7 @@ public:
     void StripComments(char* p);
 };
 
-class Class_004c2f60 {
+class TdfFile {
 public:
     TdfRecord* root;                     // +0x0
     int field_4;                         // +0x4
@@ -102,7 +102,7 @@ int __stdcall HAPI_readfromfile(char* file, void* buf, int size);
 int __stdcall HAPI_FileLength(char* file);
 
 // FUNCTION: 0x4c2f60
-int Class_004c2f60::LoadFile(char* path)
+int TdfFile::LoadFile(char* path)
 {
     char* file = HAPI_OpenFileRead(path);
     if (!file)

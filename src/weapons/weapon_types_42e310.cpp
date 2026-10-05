@@ -28,7 +28,7 @@ public:
     ~Class_004c2ea0();
 };
 
-class Class_004c2f60 {
+class TdfFile {
 public:
     int LoadFile(char* file);
 };
@@ -81,7 +81,7 @@ void LoadWeaponTypes()
     for (Class_004c91a0* p = files.begin(); p < files.end(); p++) {
         Class_004c2ea0 parser;
         BuildDataPath(path, "Weapons", p->p, "TDF");
-        if (((Class_004c2f60*)&parser)->LoadFile(path)
+        if (((TdfFile*)&parser)->LoadFile(path)
             && (parser.field_8 || FUN_0041d8a0() == 0)) {
             int i = 0;
             while (1) {

@@ -2733,8 +2733,8 @@ address,name
 0x4c2e30,PushMouseEvent
 0x4c2ea0,Class_004c2ea0::Class_004c2ea0
 0x4c2eb0,Class_004c2ea0::~Class_004c2ea0
-0x4c2f60,Class_004c2f60::LoadFile
-0x4c3120,Class_004c2f60::LoadBuffer
+0x4c2f60,TdfFile::LoadFile
+0x4c3120,TdfFile::LoadBuffer
 0x4c3240,Class_004c3240::Unload
 0x4c32f0,??_GTdfRecord@@QAEPAXI@Z
 0x4c33a0,Class_004c33a0::StripComments

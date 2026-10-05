@@ -2736,8 +2736,8 @@ address,size,file,symbol,status,similarity
 0x4c2e30,98,src/gui/mouse_4c2e30.cpp,?PushMouseEvent@@YGXPAUEvent_4c2e30@@@Z,matched,100.0
 0x4c2ea0,13,src/util/tdf_4c2ea0.cpp,??0Class_004c2ea0@@QAE@XZ,matched,100.0
 0x4c2eb0,171,src/util/tdf_4c51b0.cpp,??1Class_004c2ea0@@QAE@XZ,matched,100.0
-0x4c2f60,434,src/util/tdf_4c2f60.cpp,?LoadFile@Class_004c2f60@@QAEHPAD@Z,matched,100.0
-0x4c3120,288,src/util/tdf_4c3120.cpp,?LoadBuffer@Class_004c2f60@@QAEXPADHH0@Z,matched,100.0
+0x4c2f60,434,src/util/tdf_4c2f60.cpp,?LoadFile@TdfFile@@QAEHPAD@Z,matched,100.0
+0x4c3120,288,src/util/tdf_4c3120.cpp,?LoadBuffer@TdfFile@@QAEXPADHH0@Z,matched,100.0
 0x4c3240,170,src/util/tdf_4c3240.cpp,?Unload@Class_004c3240@@QAEXXZ,matched,100.0
 0x4c32f0,169,src/util/tdf_4c32f0.cpp,??_GTdfRecord@@QAEPAXI@Z,matched,100.0
 0x4c33a0,105,src/util/tdf_4c33a0.cpp,?StripComments@Class_004c33a0@@QAEXPAD@Z,matched,100.0

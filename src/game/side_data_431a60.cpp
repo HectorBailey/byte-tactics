@@ -75,7 +75,7 @@
 #include <stdio.h>
 #include <string.h>
 
-class Class_004c2f60 {
+class TdfFile {
 public:
     int LoadFile(char* file);
 };
@@ -207,7 +207,7 @@ void __stdcall LoadSideData(void)
     Side_00431a60* s;
 
     BuildDataPath(name, "gamedata", "sidedata", "TDF");
-    ((Class_004c2f60*)&parser)->LoadFile(name);
+    ((TdfFile*)&parser)->LoadFile(name);
     s = g_game->sides;
     side = 0;
     while (1) {

@@ -65,7 +65,7 @@ public:
     void StripComments(char* p);
 };
 
-class Class_004c2f60 {
+class TdfFile {
 public:
     TdfRecord* root;                     // +0x0
     int field_4;                           // +0x4
@@ -74,7 +74,7 @@ public:
 };
 
 // FUNCTION: 0x4c3120
-void Class_004c2f60::LoadBuffer(char* data, int size, int flag, char* path)
+void TdfFile::LoadBuffer(char* data, int size, int flag, char* path)
 {
     delete root;
     root = 0;
