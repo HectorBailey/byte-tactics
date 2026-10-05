@@ -170,7 +170,7 @@ void __stdcall GetWeaponPiecePosition(Unit* unit, Vec3_0049b720* out, unsigned c
 int __stdcall FUN_0047f300(int sound, Vec3_0049b720* pos, int flag);
 void __stdcall EmitWhiteSmoke(Vec3_0049b720* pos, short kind);
 Cell_0049b720* __stdcall FUN_004815a0(Vec3_0049b720* pos);
-void __stdcall FUN_00420a30(Vec3_0049b720* pos, void* src, int index, int flag);
+void __stdcall AddExplosionEffect(Vec3_0049b720* pos, void* src, int index, int flag);
 int __stdcall FUN_004b6c30(int range);
 int __cdecl FUN_004b70ef(short angle, int scale);
 int __cdecl FUN_004b7123(short angle, int scale);
@@ -350,7 +350,7 @@ void FUN_0049b720()
             if (oldY > g_game->seaLevel && p->pos.yw.hi <= g_game->seaLevel) {
                 Cell_0049b720* cell = FUN_004815a0(&p->pos);
                 if (cell && cell->height < g_game->seaLevel && g_game->net->field_d48 == 0)
-                    FUN_00420a30(&p->pos, type->splash, 0, 1);
+                    AddExplosionEffect(&p->pos, type->splash, 0, 1);
             }
         }
     }

@@ -243,7 +243,7 @@ void* __stdcall FindGafEntry(void* a, char* b);
 int __stdcall FUN_00429470(void* a, char* b);
 
 // FUNCTION: 0x42e440
-void __stdcall FUN_0042e440(Class_004c4440* parser) {
+void __stdcall LoadWeaponType(Class_004c4440* parser) {
     char* id = parser->FUN_004c4440();
     Weapon_0042e440* w = &g_game->weapons[((Class_004c46c0*)parser)->FUN_004c46c0("ID", -1)];
     strcpy(w->name, id);
