@@ -672,7 +672,7 @@ struct Class_004be010;
 class Class_004c2ea0;
 class Class_004c2f60;
 class Class_004c3240;
-class Class_004c33a0;
+class TdfFile;
 class Class_004c3490;
 class Class_004c3e10;
 class Class_004c3e10_2;
@@ -16933,7 +16933,7 @@ struct Queue_4c2e30 {  // 0x1ae bytes, 1 view
     Event_4b5cc0 empty;  // +0x196
 };
 
-class Class_004c33a0 {  // 0x1 bytes, 3 views
+class TdfFile {         // 0x1 bytes, 3 views
 public:
     char unknown_0[1];
     void StripComments(char*);

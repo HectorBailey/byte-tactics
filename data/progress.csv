@@ -2740,7 +2740,7 @@ address,size,file,symbol,status,similarity
 0x4c3120,288,src/util/tdf_4c3120.cpp,?LoadBuffer@Class_004c2f60@@QAEXPADHH0@Z,matched,100.0
 0x4c3240,170,src/util/tdf_4c3240.cpp,?Unload@Class_004c3240@@QAEXXZ,matched,100.0
 0x4c32f0,169,src/util/tdf_4c32f0.cpp,??_GTdfRecord@@QAEPAXI@Z,matched,100.0
-0x4c33a0,105,src/util/tdf_4c33a0.cpp,?StripComments@Class_004c33a0@@QAEXPAD@Z,matched,100.0
+0x4c33a0,105,src/util/tdf_4c33a0.cpp,?StripComments@TdfFile@@QAEXPAD@Z,matched,100.0
 0x4c3410,115,src/util/tdf_4c3410.cpp,?SelectRecord@Class_004c3410@@QAEHPAD@Z,matched,100.0
 0x4c3490,292,src/util/tdf_4c3490.cpp,?SelectRecordAt@Class_004c3490@@QAEHH@Z,matched,100.0
 0x4c35c0,354,src/util/tdf_4c35c0.cpp,??0logic_error@std@@QAE@ABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@1@@Z,matched,100.0

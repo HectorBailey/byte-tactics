@@ -1,7 +1,7 @@
 // Decompiled by space-bunny-free, finished by space-bunny-free. Names are provisional.
 // Loads a .TDF file: opens it, takes the file length, reads the whole file
 // into a fresh block, copies it into a "TDF file" block that is NUL
-// terminated, blanks out comments in that copy (Class_004c33a0::StripComments,
+// terminated, blanks out comments in that copy (TdfFile::StripComments,
 // reached through a base class of the object that holds the tree) and parses
 // it into a new root section named "root" (FUN_004c3e40). The tree parsed by
 // the previous load is deleted first. Returns 1 on success, 0 when the file
@@ -80,7 +80,7 @@ public:
 };
 #pragma pack(pop)
 
-class Class_004c33a0 {
+class TdfFile {
 public:
     void StripComments(char* p);
 };
@@ -124,7 +124,7 @@ int Class_004c2f60::LoadFile(char* path)
             char* text = (char*)FUN_004d83b0("TDF file", size + 1);
             memcpy(text, buf, size);
             text[size] = 0;
-            ((Class_004c33a0*)this)->StripComments(text);
+            ((TdfFile*)this)->StripComments(text);
             TdfRecord* node = (TdfRecord*)operator new(0x29);
             root = node ? node->FUN_004c3e40("root", text, 0, path) : 0;
             FUN_004d85a0((int*)text);
