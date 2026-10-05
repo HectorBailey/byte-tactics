@@ -575,6 +575,11 @@ Things that look wrong in the original but have no effect, kept for the record.
 - **0x4d89b0**: `out[0] = 0;` (0x4d89cd) just before `strcpy(out, "\n")`.
   Found by ozgb's Cline / deepseek-v4.1 in #2242.
 
+- **0x440940** (`BuildAllPassMaps`): the load progress starts at 100 and
+  adds 100 before each store of `progress / count`, so after movement class k
+  of n it shows (k + 1) * 100 / n: one class ahead, and past 100 on the last
+  class until the final store of 100.
+
 ## Possible leaks and unchecked inputs
 
 - **0x42a8d0** (the unit type loader, a gap region; likely): when an FBI file
@@ -1003,3 +1008,15 @@ Things that look wrong in the original but have no effect, kept for the record.
   `[end+0x2c]` (0x46d7b3). Harmless if messages only come from tracked players.
   Found while checking the other 0x46d6c0 claim in #2132 (Space Bunny Free,
   CubeB), which did not hold.
+- **0x481140** (`UnitScript::ExplodePiece`, possible): builds the debris
+  record for FUN_00421620 on the stack and updates its flags dword at +0x28
+  with read-modify-writes (`h.bits & ~0x30` and the four merges after it)
+  that are never preceded by a plain store, so bits 6 to 31 keep whatever the
+  stack held and are copied into the debris object, as in 0x420e50 above. The
+  dword at +0x2c is never written either. Harmless if nothing reads those
+  bits.
+- **0x4b2040** (`CobScript::LoadScriptState`, possible): allocates the
+  "Piece States" buffer and returns 0 without freeing it when the read that
+  fills it comes back short (`cmp eax, edi; je` at 0x4b2161). The total size
+  is checked against the record's length first, so only a failed read can
+  get there.
