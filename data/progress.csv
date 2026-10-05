@@ -1966,7 +1966,7 @@ address,size,file,symbol,status,similarity
 0x48fd70,57,src/game/victory_48fd70.cpp,?SaveState@DefeatDeathTimerRunsOut@@UAEXPAVHapiBank@@@Z,matched,100.0
 0x48fdb0,59,src/game/victory_48fdb0.cpp,?LoadState@DefeatDeathTimerRunsOut@@UAEXPAVHapiBank@@@Z,matched,100.0
 0x48fdf0,105,src/game/victory_48fdf0.cpp,?SaveConditions@MissionConditions@@QAEXPAVHapiBank@@@Z,matched,100.0
-0x48fe60,105,src/game/victory_48fe60.cpp,?LoadConditions@Class_0048fe60@@QAEXPAVHapiBank@@@Z,matched,100.0
+0x48fe60,105,src/game/victory_48fe60.cpp,?LoadConditions@MissionConditions@@QAEXPAVHapiBank@@@Z,matched,100.0
 0x48fed0,108,src/game/victory_48fed0.cpp,?AllVictoryConditionsMet@MissionConditions@@QAEHXZ,matched,100.0
 0x48ff40,136,src/game/victory_48ff40.cpp,?AnyDefeatConditionMet@MissionConditions@@QAEHXZ,matched,100.0
 0x48ffd0,126,src/game/victory_48ffd0.cpp,?FUN_0048ffd0@@YGHXZ,matched,100.0
@@ -1975,7 +1975,7 @@ address,size,file,symbol,status,similarity
 0x490200,42,src/game/victory_490200.cpp,?FUN_00490200@@YGHXZ,matched,100.0
 0x490230,301,src/game/victory_490230.cpp,?CheckVictory@MissionConditions@@QAEHXZ,matched,100.0
 0x490360,334,src/game/victory_490360.cpp,?CheckDefeat@Class_00490360@@QAEHXZ,matched,100.0
-0x4904b0,11,src/game/victory_4904b0.cpp,?FUN_004904b0@Class_004904b0@@QAEXXZ,matched,100.0
+0x4904b0,11,src/game/victory_4904b0.cpp,?FUN_004904b0@MissionConditions@@QAEXXZ,matched,100.0
 0x4904c0,84,src/game/victory_4904c0.cpp,?NotifyUnitDied@Class_004904c0@@QAEXH@Z,matched,100.0
 0x490520,84,src/game/victory_490520.cpp,?NotifyUnitCaptured@Class_00490520@@QAEXH@Z,matched,100.0
 0x490580,84,src/game/victory_490580.cpp,?NotifyUnitCreated@Class_00490520@@QAEXH@Z,matched,100.0

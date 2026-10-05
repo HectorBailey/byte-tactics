@@ -93,7 +93,7 @@ public:
     int count;                        // +0xdb0
 };
 
-class Class_004904b0 {
+class MissionConditions {
 public:
     char unknown_0[0x88];
     int field_88;
@@ -122,7 +122,7 @@ struct Game {
     Player_00488310 players[10];      // +0x1b63
     char unknown_2851[0x391e9 - 0x2851];
     Net* net;                         // +0x391e9
-    Class_004904b0* mission;          // +0x391ed
+    MissionConditions* mission;       // +0x391ed
 };
 
 // RunInitialMission's third argument is the container itself: +0 is the empty
