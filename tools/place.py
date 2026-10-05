@@ -362,7 +362,6 @@ class Placer:
         self.library: dict[str, list[int]] = defaultdict(list)   # runtime library symbol -> addresses
         self.stats = Counter()
         self.mismatches: list[str] = []
-        self.kept: list[str] = []
         self.unresolved: Counter = Counter()
         self.clashes: list[str] = []
         self.renamed: list[str] = []
@@ -680,15 +679,11 @@ class Placer:
                 if target != orig_target:
                     note = (f"{site:#x} in {piece.label}: {sym.name} resolves to {target:#x}, "
                             f"the original uses {orig_target:#x}")
-                    if not sec.is_code and piece.source != DATASRC:
-                        # A vtable or table of the source's own (partial) view of
-                        # a class: keep the original's entry. (src/data is the
-                        # data itself, so a wrong pointer there is an error.)
-                        self.kept.append(note)
-                        o = site - self.img.base
-                        if self.pieces_own(piece, site):
-                            self.img.out[o:o + 4] = self.img.pristine[o:o + 4]
-                        continue
+                    if piece.label.startswith("??_7") or "(??_7" in piece.label:
+                        # A vtable slot naming the base class's method where the
+                        # original has an override: tools/vtablecheck.py says
+                        # which name the slot's own file defines.
+                        note += " (a vtable slot: see tools/vtablecheck.py)"
                     self.mismatches.append(note)
                 if rtype == REL_DIR32:
                     value = (target + ours) & 0xFFFFFFFF
@@ -1277,9 +1272,7 @@ def report(img: Image, placer: Placer, verbose: bool) -> int:
         parts = [f"{SOURCES[s]} {counts[(name, s)]:,}" for s in range(len(SOURCES)) if counts[(name, s)]]
         print(f"  {name:6} {max(vsize, rsize):>9,}: " + ", ".join(parts))
     limit = None if verbose else 15
-    for title, items in (("relocations in code and src/data that disagree with the original", placer.mismatches),
-                         ("table entries in compiled data that disagree with the original (the original's kept)",
-                          placer.kept),
+    for title, items in (("relocations that disagree with the original, and missing definitions", placer.mismatches),
                          ("pieces that differ from a piece already placed there", placer.clashes),
                          ("library functions data/functions.csv names differently", placer.renamed)):
         if items:
