@@ -26,7 +26,7 @@ public:
 };
 
 // FUNCTION: 0x489740
-void __stdcall FUN_00489740(Owner_00489740* obj)
+void __stdcall ClearUnitRefs(Owner_00489740* obj)
 {
     for (Class_00489740* n = obj->head; n != 0; n = obj->head) {
         Owner_00489740* saved = n->owner;

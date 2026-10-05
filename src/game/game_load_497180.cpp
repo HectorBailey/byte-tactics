@@ -165,7 +165,7 @@ void FUN_004649d0();
 void __stdcall FUN_0041c4c0(int x, int y, int z);
 unsigned short __stdcall FUN_00488b10(const char* name);
 void __stdcall FUN_00496ee0(int team, int startpos);
-void __stdcall FUN_00485f50(unsigned char team, unsigned short id, FixedPos_497180 pos, int a,
+void __stdcall CreateUnit(unsigned char team, unsigned short id, FixedPos_497180 pos, int a,
     int b, int c);
 Gadget_497180* __stdcall FUN_004aa8f0(Sub_497180* sub, const char* name, int flags);
 void __stdcall FUN_00494890(Gadget_497180* gadget);
@@ -314,7 +314,7 @@ void __cdecl FUN_00497180(void*)
                     start = pos;
                 unsigned short id =
                     FUN_00488b10(g_game + 0x37f5f + 0x232 * side);
-                FUN_00485f50(*(unsigned char*)(rec + 0x146), id, pos, 1, 1, 0);
+                CreateUnit(*(unsigned char*)(rec + 0x146), id, pos, 1, 1, 0);
                 int s1 = *(unsigned short*)(pl + 0xa1) * 100;
                 int s2 = *(unsigned short*)(pl + 0xa3) * 100;
                 ((RecFlag_497180*)(rec + 0x149))->started = 1;

@@ -16,7 +16,7 @@ struct Class_0048a160 {
 };
 
 // FUNCTION: 0x48a160
-void __stdcall FUN_0048a160(Class_0048a160* obj, int index)
+void __stdcall ResetWeaponTarget(Class_0048a160* obj, int index)
 {
     Point_0048a160* p = &obj->entries[index].point;
     p->a = 0;

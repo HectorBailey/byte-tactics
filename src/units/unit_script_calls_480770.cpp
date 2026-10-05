@@ -70,7 +70,7 @@ struct Vec3_00480770 {
 extern Game* g_game;
 
 Vec3_00480770 __stdcall FUN_0043e060(Unit* obj, int param);
-int __stdcall FUN_00485070(Vec3_00480770* pos);
+int __stdcall GetGroundHeight(Vec3_00480770* pos);
 int __cdecl FUN_004b715a(int a, int b);
 
 static inline Unit* GetUnit(unsigned short id)
@@ -157,7 +157,7 @@ int UnitScript::GetUnitValue(int which, int a, int b, int c, int d)
         v.z = a << 16;
         if (v.z < 0)
             v.x += 0x10000;
-        return FUN_00485070(&v) << 16;
+        return GetGroundHeight(&v) << 16;
     }
     case 17: {
         int result;

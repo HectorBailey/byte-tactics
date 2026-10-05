@@ -284,7 +284,7 @@ can disagree on types (a real link would fail). Known cases:
   0x412d40.cpp declares it as a union. Settle on the struct.
 
 - 0x4118e0 passes the landing pad index as a full dword to
-  `Class_0044e250::Class_0044e250` and `FUN_0048aac0`, whose own files declare
+  `Class_0044e250::Class_0044e250` and `AttachUnitToPiece`, whose own files declare
   that parameter `short` and `char`; 0x4118e0.cpp declares them `int`. The
   real parameters are probably `int`. 0x44e190 (unnamed) is a constructor
   (stores vtables, returns `this`, called on `operator new(0x36)`); 0x4118e0
@@ -307,7 +307,7 @@ can disagree on types (a real link would fail). Known cases:
   that class. 0x462860 and 0x4628a0 are methods of the channel class (a
   timeout and the send pacing), matched under separate placeholder classes.
 
-- FUN_00485e90's unit type parameter is `int` in 0x485e90.cpp but must be
+- InitUnit's unit type parameter is `int` in 0x485e90.cpp but must be
   `unsigned short` where 0x4861d0 inlines it (#333); 0x485e90 also matches
   with `unsigned short`, so settle on that.
 

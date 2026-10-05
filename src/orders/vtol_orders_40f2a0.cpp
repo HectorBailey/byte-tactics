@@ -25,8 +25,8 @@ public:
     unsigned char field_2e;            // +0x2e
     void FUN_0043d210(Unit* unit, int state);
 };
-class Class_004898b0 { public: void FUN_004898b0(int); };
-class Class_0048b090 { public: void FUN_0048b090(int, int); };
+class Class_004898b0 { public: void ClaimWeapons(int); };
+class Class_0048b090 { public: void SetStateBits(int, int); };
 class Class_004388d0 { public: void FUN_004388d0(int); };
 class Class_0044e6c0 { public: void FUN_0044e6c0(int); };
 class Class_0044e730 { public: void FUN_0044e730(short); };
@@ -68,11 +68,11 @@ extern Game* g_game;
 int __stdcall FUN_004b6c30(int);
 int __cdecl FUN_004b70ef(short, int);
 int __cdecl FUN_004b7123(short, int);
-int __stdcall FUN_0048a980(Vec3*, Vec3*);
-int __stdcall FUN_00485070(Vec3*);
+int __stdcall GetHeadingBetween(Vec3*, Vec3*);
+int __stdcall GetGroundHeight(Vec3*);
 int __stdcall FUN_0047e2d0(Unit*, Vec3*);
 Vec3 __stdcall FUN_0040f790(const Vec3& a, const Vec3& b);
-void __stdcall FUN_0048aac0(Unit* unit, Unit* target, char p3, char p4);
+void __stdcall AttachUnitToPiece(Unit* unit, Unit* target, char p3, char p4);
 
 static inline Vec3 Offset(short angle, int distance)
 {
@@ -98,10 +98,10 @@ static inline void CellToWorld(Point origin, Point c, Vec3* v)
 // 0x40f200, matched in 0x40f200.cpp; inlined into the state 0 case below.
 void __stdcall FUN_0040f200(Unit* unit, Order* order, unsigned int flags)
 {
-    ((Class_004898b0*)unit)->FUN_004898b0(3);
+    ((Class_004898b0*)unit)->ClaimWeapons(3);
     if (unit->field_86)
-        FUN_0048aac0(unit, 0, -1, 2);
-    ((Class_0048b090*)unit)->FUN_0048b090(1, 1);
+        AttachUnitToPiece(unit, 0, -1, 2);
+    ((Class_0048b090*)unit)->SetStateBits(1, 1);
     if ((unit->type->field_2e & 3) == 1) {
         unit->type->FUN_0043d210(unit, 2);
         Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);
@@ -122,7 +122,7 @@ int __stdcall FUN_0040f2a0(Unit* unit, Order* order, int flags)
         Vec3 centre;
         centre.x = g_game->width / 2 << 16;
         centre.z = g_game->height / 2 << 16;
-        short angle = FUN_0048a980(&unit->pos, &centre);
+        short angle = GetHeadingBetween(&unit->pos, &centre);
         Vec3 dest = FUN_0040f790(unit->pos, Offset(angle, 0x3200000));
         Class_0044e2d0* obj = new Class_0044e2d0(order, dest);
         ((Class_0044e730*)obj)->FUN_0044e730(0x80);
@@ -148,11 +148,11 @@ int __stdcall FUN_0040f2a0(Unit* unit, Order* order, int flags)
         if (FUN_0047e2d0(unit, &unit->pos)) {
             unit->script->StartScript("EndTransport", 0, 1);
             Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);
-            int h = max(FUN_00485070(&unit->pos), g_game->seaLevel);
-            ((Class_0044e6c0*)obj)->FUN_0044e6c0(h <= g_game->seaLevel ? FUN_00485070(&unit->pos) - g_game->seaLevel : 0);
+            int h = max(GetGroundHeight(&unit->pos), g_game->seaLevel);
+            ((Class_0044e6c0*)obj)->FUN_0044e6c0(h <= g_game->seaLevel ? GetGroundHeight(&unit->pos) - g_game->seaLevel : 0);
             ((Class_004388d0*)order)->FUN_004388d0((int)obj);
             order->flags = 0xe0;
-            ((Class_0048b090*)unit)->FUN_0048b090(1, 0);
+            ((Class_0048b090*)unit)->SetStateBits(1, 0);
             return 1;
         }
         for (int r = 0x40; r < 0x100; r += 0x10) {

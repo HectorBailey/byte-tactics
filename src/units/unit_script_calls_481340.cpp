@@ -25,7 +25,7 @@ struct Player_00481340 {
     int id;                            // +0x0c
 };
 
-void __stdcall FUN_0048aac0(Unit* unit, int player, int a, int b);
+void __stdcall AttachUnitToPiece(Unit* unit, int player, int a, int b);
 
 static inline Unit* GetUnit(unsigned short id)
 {
@@ -107,6 +107,6 @@ void UnitScript::AttachUnit(unsigned short id, int a, int b)
     Unit* u = GetUnit(id);
     if (u != 0 && (u->flags & 0x10000000)
         && (u->owner == 0 || u->owner == player->id)) {
-        FUN_0048aac0(u, player->id, a, b);
+        AttachUnitToPiece(u, player->id, a, b);
     }
 }

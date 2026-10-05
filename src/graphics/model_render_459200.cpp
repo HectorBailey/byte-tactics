@@ -170,7 +170,7 @@ public:
     void FUN_004589c0(int bmp, Model_459200* model);
 };
 
-int __stdcall FUN_00485070(Pos_459200* p);
+int __stdcall GetGroundHeight(Pos_459200* p);
 void __stdcall FUN_004b7f90(int param_1, int param_2, int x, int y);
 void __stdcall FUN_004b8500(int param_1, int param_2, int x, int y);
 void __stdcall FUN_004b90a0(int bmp, int param_2, int x, int y, int z);
@@ -206,7 +206,7 @@ void Class_00459200::FUN_00459200(int param_2, Model_459200* model, Vec3_459200 
     v.v[0] = model->owner->pos_x - v.v[0];
     v.v[1] = model->owner->pos_y;
     v.v[2] = model->owner->pos_z - cv.v[2];
-    int altitude = FUN_00485070((Pos_459200*)&model->owner->pos_x);
+    int altitude = GetGroundHeight((Pos_459200*)&model->owner->pos_x);
     int z = v.p.z.whole - (v.p.y.whole >> 1) + 0x20;
     int y = v.p.z.whole - (altitude >> 1) + 0x20;
     short dx = v.p.y.whole;

@@ -122,8 +122,8 @@ struct Unit {
 // string bytes as a pointer.
 extern char* DAT_00509688[3];
 
-int __stdcall FUN_0048a1e0(Unit* unit, Vec3_0049e1a0* pos, int index);
-Unit* __stdcall FUN_0048a190(Unit* obj, int index);
+int __stdcall GetWeaponTargetPos(Unit* unit, Vec3_0049e1a0* pos, int index);
+Unit* __stdcall GetWeaponTargetUnit(Unit* obj, int index);
 void __stdcall FUN_0043e2e0(Unit* unit, Vec3_0049e1a0* out, unsigned char weapon);
 void __stdcall FUN_0049e570(Vec3_0049e1a0* a, Vec3_0049e1a0* b, int* dx, int* dy, int* dz);
 short __cdecl FUN_004b715a(int x, int z);
@@ -155,7 +155,7 @@ void __stdcall FUN_0049e1a0(Unit* unit) {
             continue;
         if (e->f_14 > 0)
             e->f_14--;
-        if (!FUN_0048a1e0(unit, &pos, i)) {
+        if (!GetWeaponTargetPos(unit, &pos, i)) {
             e->flags &= 0xfe;
             continue;
         }
@@ -212,7 +212,7 @@ void __stdcall FUN_0049e1a0(Unit* unit) {
             }
             if (can == 0)
                 continue;
-            Unit* fired = FUN_0048a190(unit, i);
+            Unit* fired = GetWeaponTargetUnit(unit, i);
             if (attached->f60(unit, &e->point, fired, &pos) == 0)
                 continue;
             if (attached->f_111.b28) {

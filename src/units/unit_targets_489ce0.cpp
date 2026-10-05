@@ -96,7 +96,7 @@ int __cdecl FUN_004b70ef(short idx, int scale);
 // ev->amount` makes the original put hp in eax and the amount in edx.
 //
 // FUNCTION: 0x489ce0
-void __stdcall FUN_00489ce0(Event_00489ce0* ev)
+void __stdcall ApplyUnitDamage(Event_00489ce0* ev)
 {
     Unit* unit = ev->attacker == 0 ? 0 : &g_game->units[ev->attacker];
     Unit* target = ev->target == 0 ? 0 : &g_game->units[ev->target];

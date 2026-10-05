@@ -81,7 +81,7 @@ extern Game* g_game;
 
 int __stdcall FUN_004246b0(Cell_00423c50* cell, int flag);
 void __stdcall FUN_004232f0(int index, int* head);
-int __stdcall FUN_00485070(Vec3_00423c50* pos);
+int __stdcall GetGroundHeight(Vec3_00423c50* pos);
 void* __stdcall FUN_0045a8d0(void* obj);
 void __stdcall FUN_00472c50(Vec3_00423c50* p, short index);
 void __stdcall FUN_00440a40(Point16_00423c50 a, Point16_00423c50 b);
@@ -108,7 +108,7 @@ static inline Vec3_00423c50 FootprintCentre_00421eb0(Point16_00423c50* cell, Fea
     Vec3_00423c50 p;
     p.x = (f.x + c.x * 2) << 19;
     p.z = (f.z + c.z * 2) << 19;
-    p.y = FUN_00485070(&p) << 16;
+    p.y = GetGroundHeight(&p) << 16;
     return p;
 }
 

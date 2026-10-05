@@ -8,7 +8,7 @@
 // when the pad repairs and the unit is damaged.
 // Match notes: a header set is needed (<windows.h> and <math.h> here, several
 // others work): without one the health compare in state 6 swaps ecx and edx.
-// The pad index is passed to Class_0044e250's constructor and FUN_0048aac0 as
+// The pad index is passed to Class_0044e250's constructor and AttachUnitToPiece as
 // a full dword load, so those parameters are declared int here.
 #include <windows.h>
 #include <math.h>
@@ -38,7 +38,7 @@ public:
     Class_004895c0* next;              // +0x8
     int value;                         // +0xc
     virtual ~Class_004895c0();
-    void FUN_00489690(Unit* o);
+    void SetUnit(Unit* o);
 };
 class Class_00438760 { public: unsigned char index; Class_00438760(const char*); };
 class Class_00438880 { public: void FUN_00438880(const char*); };
@@ -46,8 +46,8 @@ class Class_004388d0 { public: void FUN_004388d0(int); };
 class Class_00439e80 { public: void FUN_00439e80(int); };
 class Class_0044e6c0 { public: void FUN_0044e6c0(int); };
 class Class_0044e730 { public: void FUN_0044e730(short); };
-class Class_004898b0 { public: void FUN_004898b0(int); };
-class Class_0048b090 { public: void FUN_0048b090(int, int); };
+class Class_004898b0 { public: void ClaimWeapons(int); };
+class Class_0048b090 { public: void SetStateBits(int, int); };
 class Class_004b0940 { public: void StartScript(const char*, int, int); };
 class Class_004b0bc0 {
 public:
@@ -107,7 +107,7 @@ int __cdecl FUN_004b70ef(short, int);
 int __cdecl FUN_004b7123(short, int);
 int __stdcall FUN_0047e570(Unit* unit, int id);
 void __stdcall FUN_0047f780(Unit*, int, const char*);
-void __stdcall FUN_0048aac0(Unit* unit, Unit* target, int p3, int p4);
+void __stdcall AttachUnitToPiece(Unit* unit, Unit* target, int p3, int p4);
 void __stdcall FUN_0043acb0(Unit*, Class_0043a1f0*);
 
 static inline Vec3 Offset(short angle, int distance)
@@ -122,10 +122,10 @@ static inline Vec3 Offset(short angle, int distance)
 // 0x40f200, matched in 0x40f200.cpp; inlined into the state 0 case below.
 void __stdcall FUN_0040f200(Unit* unit, Order* order, unsigned int flags)
 {
-    ((Class_004898b0*)unit)->FUN_004898b0(3);
+    ((Class_004898b0*)unit)->ClaimWeapons(3);
     if (unit->field_86)
-        FUN_0048aac0(unit, 0, -1, 2);
-    ((Class_0048b090*)unit)->FUN_0048b090(1, 1);
+        AttachUnitToPiece(unit, 0, -1, 2);
+    ((Class_0048b090*)unit)->SetStateBits(1, 1);
     if ((unit->type->field_2e & 3) == 1) {
         unit->type->FUN_0043d210(unit, 2);
         Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);
@@ -242,10 +242,10 @@ int __stdcall FUN_004118e0(Unit* unit, Order* order, int flags)
         }
         if (unit->cargo) {
             unit->script->StartScript("EndTransport", 0, 0);
-            FUN_0048aac0(unit->cargo, order->target.owner, order->angle, 0);
+            AttachUnitToPiece(unit->cargo, order->target.owner, order->angle, 0);
             dropped = 1;
         } else {
-            FUN_0048aac0(unit, order->target.owner, order->angle, 0);
+            AttachUnitToPiece(unit, order->target.owner, order->angle, 0);
         }
         if (!dropped && unit->health < unit->def->maxHealth
             && (order->target.owner->def->flags & 0x200)

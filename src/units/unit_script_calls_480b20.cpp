@@ -33,7 +33,7 @@ struct Data_00480b20 {
 
 class Class_0048b090 {
 public:
-    void FUN_0048b090(int which, int on);
+    void SetStateBits(int which, int on);
 };
 
 class UnitScript {
@@ -52,7 +52,7 @@ void UnitScript::SetUnitValue(int which, int value)
     Unit* unit = data->unit;
     switch (which) {
     case 1:
-        ((Class_0048b090*)unit)->FUN_0048b090(1, value);
+        ((Class_0048b090*)unit)->SetStateBits(1, value);
         break;
     case 5:
         unit->bit0 = value;
@@ -67,7 +67,7 @@ void UnitScript::SetUnitValue(int which, int value)
         unit->bit3 = value;
         break;
     case 20:
-        ((Class_0048b090*)unit)->FUN_0048b090(2, value);
+        ((Class_0048b090*)unit)->SetStateBits(2, value);
         break;
     }
     unit->dirty = true;
