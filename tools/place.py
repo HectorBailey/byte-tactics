@@ -1168,6 +1168,21 @@ def place_crt_tables(placer: Placer) -> None:
         img.copy(lo, max(ends) + 4 - lo, FIXED)
 
 
+def place_commons(placer: Placer) -> None:
+    """Communal variables (uninitialised data a C object defines without a
+    section, such as string.obj's guards), where the original has them: LINK
+    allocates each in .bss at the size its definers give it."""
+    img = placer.img
+    library = {name for obj in placer.objects if obj.library for name in obj.commons}
+    for name, addr in sorted(placer.common_at.items(), key=lambda kv: kv[1]):
+        size = placer.commons.get(name, 0)
+        if not size or not img.inside(addr):
+            continue
+        source = LIBDATA if name in library else OBJDATA
+        if img.write(addr, bytes(size), source) == 0:
+            placer.stats["communal variables placed where the original has them"] += 1
+
+
 def pad_data(placer: Placer) -> None:
     """The linker's alignment padding between pieces of data: zeros after
     one placed piece, up to the next placed piece at its section's alignment
@@ -1315,6 +1330,7 @@ def layout(jobs: int | None = None) -> tuple[Image, Placer]:
     place_unreferenced_library(placer)
     placer.relocate()
     place_crt_tables(placer)
+    place_commons(placer)
     pad_data(placer)
     copy_unbuilt(img)
     return img, placer
