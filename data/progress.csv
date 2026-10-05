@@ -1976,7 +1976,7 @@ address,size,file,symbol,status,similarity
 0x490230,301,src/game/victory_490230.cpp,?CheckVictory@MissionConditions@@QAEHXZ,matched,100.0
 0x490360,334,src/game/victory_490360.cpp,?CheckDefeat@Class_00490360@@QAEHXZ,matched,100.0
 0x4904b0,11,src/game/victory_4904b0.cpp,?FUN_004904b0@Class_004904b0@@QAEXXZ,matched,100.0
-0x4904c0,84,src/game/victory_4904c0.cpp,?NotifyUnitDied@Class_004904c0@@QAEXH@Z,matched,100.0
+0x4904c0,84,src/game/victory_4904c0.cpp,?NotifyUnitDied@MissionConditions@@QAEXH@Z,matched,100.0
 0x490520,84,src/game/victory_490520.cpp,?NotifyUnitCaptured@Class_00490520@@QAEXH@Z,matched,100.0
 0x490580,84,src/game/victory_490580.cpp,?NotifyUnitCreated@Class_00490520@@QAEXH@Z,matched,100.0
 0x4905e0,76,src/game/victory_490630.cpp,??0Class_00490630@@QAE@PAUStruct_004907e0@@@Z,matched,100.0

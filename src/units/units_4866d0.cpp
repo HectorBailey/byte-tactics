@@ -42,7 +42,7 @@
 extern char DAT_00508be8[];
 extern char DAT_00508bf0[];
 
-class Class_004904c0 {
+class MissionConditions {
 public:
     void NotifyUnitDied(void* unit);
 };
@@ -198,7 +198,7 @@ struct Game {
     Name_004866d0 names[8];             // +0x37f5f
     char unknown_390ef[0x391e9 - 0x390ef];
     Class_00435100* x391e9;             // +0x391e9
-    Class_004904c0* x391ed;             // +0x391ed
+    MissionConditions* x391ed;          // +0x391ed
 };
 #pragma pack(pop)
 
