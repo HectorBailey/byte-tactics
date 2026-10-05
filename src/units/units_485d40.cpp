@@ -23,7 +23,7 @@ struct ObjectState_00485d40 {
     int field_10;                      // +0x10
 };
 
-struct Class_0045ae80;                 // object definition, only passed on
+struct Object3do;                      // object definition, only passed on
 
 #pragma pack(push, 1)
 struct Data_00485d40 {                // the definition data at type+0x18e
@@ -37,7 +37,7 @@ struct Unit_00485d40 {
 
 struct Game {
     char unknown_0[0x14377];
-    Class_0045ae80** definitions;      // +0x14377
+    Object3do** definitions;           // +0x14377
 };
 #pragma pack(pop)
 
@@ -140,13 +140,13 @@ struct Object_00485d40 {
 extern Game* g_game;
 
 void* __cdecl operator new(size_t size);
-ObjectState_00485d40* __stdcall CreatePlayerObjectState(Class_0045ae80* obj, Data_00485d40* data, int player);
-ObjectState_00485d40* __stdcall CreateObjectState(Class_0045ae80* obj);
+ObjectState_00485d40* __stdcall CreatePlayerObjectState(Object3do* obj, Data_00485d40* data, int player);
+ObjectState_00485d40* __stdcall CreateObjectState(Object3do* obj);
 
 // FUNCTION: 0x485d40
 void __stdcall InitUnitScript(Object_00485d40* self)
 {
-    Class_0045ae80* obj = g_game->definitions[self->id];
+    Object3do* obj = g_game->definitions[self->id];
     if (self->unit->data) {
         self->vars = new UnitScript;
         self->vars->SetCob(self->unit->data);

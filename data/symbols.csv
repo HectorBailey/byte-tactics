@@ -1147,7 +1147,7 @@ address,name
 0x458d30,Class_00458d30::RecolorByShade
 0x458dd0,Class_00458d30::ShadeByIntensity
 0x458fa0,Class_00458fa0::DrawPieceEdges
-0x459170,Class_00459170::CopyPicture
+0x459170,CMemoryCache::CopyPicture
 0x459200,Class_00459200::DrawObjectPicture
 0x4597f0,SetLightVector
 0x459830,Class_004581e0::DrawPieces
