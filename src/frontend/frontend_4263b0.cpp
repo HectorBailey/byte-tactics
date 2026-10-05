@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 
-class Class_004ce1d0 {
+class SJE_CdPlayerClass {
 public:
     int HasCdPlayerWindow();
 };
@@ -163,7 +163,7 @@ void __stdcall OpenMainMenu()
     memset(DAT_00512298, 0, 0x145 * 4);
 
     if (DAT_0051229c == 0) {
-        if (((Class_004ce1d0*)g_game->field_10)->HasCdPlayerWindow()) {
+        if (((SJE_CdPlayerClass*)g_game->field_10)->HasCdPlayerWindow()) {
             OpenCloseCdPlayerDialog();
             DAT_0051229c = 1;
         }

@@ -2939,8 +2939,8 @@ address,name
 0x4cdb40,Class_004cdb40::PlayNextTrack
 0x4ce020,Class_004ce020::GetPlayState
 0x4ce030,HandleCdMessage
-0x4ce190,Class_004ce190::CloseCdPlayerWindow
-0x4ce1d0,Class_004ce1d0::HasCdPlayerWindow
+0x4ce190,SJE_CdPlayerClass::CloseCdPlayerWindow
+0x4ce1d0,SJE_CdPlayerClass::HasCdPlayerWindow
 0x4ce1e0,FindCdPlayerWindow
 0x4ce260,Class_004ce260::OpenCdAudio
 0x4ce3e0,Class_004ce3e0::FUN_004ce3e0
@@ -2957,8 +2957,8 @@ address,name
 0x4ce7a0,Class_004ce7a0::SetPlaybackOrder
 0x4ce7c0,Class_004ce7c0::SetCategoryOfTrack
 0x4ce7e0,Class_004ce7e0::GetCategoryOfTrack
-0x4ce7f0,Class_004ce7f0::GetCurrentTrack
-0x4ce800,Class_004ce800::IsCdPlaying
+0x4ce7f0,SJE_CdPlayerClass::GetCurrentTrack
+0x4ce800,SJE_CdPlayerClass::IsCdPlaying
 0x4ce880,GetCdPosition
 0x4ce8c0,Class_004ce8c0::SelectTrack
 0x4ce910,Class_004ce910::PauseCdAudio

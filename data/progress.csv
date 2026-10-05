@@ -2916,8 +2916,8 @@ address,size,file,symbol,status,similarity
 0x4cdb40,1248,src/sound/cd_audio_4cdb40.cpp,?PlayNextTrack@Class_004cdb40@@QAEXXZ,matched,100.0
 0x4ce020,7,src/sound/cd_audio_4ce020.cpp,?GetPlayState@Class_004ce020@@QAEHXZ,matched,100.0
 0x4ce030,340,src/sound/cd_audio_4ce030.cpp,?HandleCdMessage@@YAXHHH@Z,matched,100.0
-0x4ce190,61,src/sound/cd_audio_4ce190.cpp,?CloseCdPlayerWindow@Class_004ce190@@QAEXXZ,matched,100.0
-0x4ce1d0,14,src/sound/cd_audio_4ce1d0.cpp,?HasCdPlayerWindow@Class_004ce1d0@@QAE_NXZ,matched,100.0
+0x4ce190,61,src/sound/cd_audio_4ce190.cpp,?CloseCdPlayerWindow@SJE_CdPlayerClass@@QAEXXZ,matched,100.0
+0x4ce1d0,14,src/sound/cd_audio_4ce1d0.cpp,?HasCdPlayerWindow@SJE_CdPlayerClass@@QAE_NXZ,matched,100.0
 0x4ce1e0,114,src/sound/cd_audio_4ce1e0.cpp,?FindCdPlayerWindow@@YGHPAXJ@Z,matched,100.0
 0x4ce260,378,src/sound/cd_audio_4ce260.cpp,?OpenCdAudio@Class_004ce260@@QAEHXZ,matched,100.0
 0x4ce3e0,39,src/sound/cd_audio_4ce3e0.cpp,?FUN_004ce3e0@Class_004ce3e0@@QAEXPBX@Z,matched,100.0
@@ -2934,8 +2934,8 @@ address,size,file,symbol,status,similarity
 0x4ce7a0,18,src/sound/cd_audio_4ce7a0.cpp,?SetPlaybackOrder@Class_004ce7a0@@QAEHH@Z,matched,100.0
 0x4ce7c0,18,src/sound/cd_audio_4ce7c0.cpp,?SetCategoryOfTrack@Class_004ce7c0@@QAEXHE@Z,matched,100.0
 0x4ce7e0,14,src/sound/cd_audio_4ce7e0.cpp,?GetCategoryOfTrack@Class_004ce7e0@@QAEEH@Z,matched,100.0
-0x4ce7f0,7,src/sound/cd_audio_4ce7f0.cpp,?GetCurrentTrack@Class_004ce7f0@@QAEHXZ,matched,100.0
-0x4ce800,117,src/sound/cd_audio_4ce800.cpp,?IsCdPlaying@Class_004ce800@@QAEHXZ,matched,100.0
+0x4ce7f0,7,src/sound/cd_audio_4ce7f0.cpp,?GetCurrentTrack@SJE_CdPlayerClass@@QAEHXZ,matched,100.0
+0x4ce800,117,src/sound/cd_audio_4ce800.cpp,?IsCdPlaying@SJE_CdPlayerClass@@QAEHXZ,matched,100.0
 0x4ce880,50,src/sound/cd_audio_4ce880.cpp,?GetCdPosition@@YGHXZ,matched,100.0
 0x4ce8c0,71,src/sound/cd_audio_4ce8c0.cpp,?SelectTrack@Class_004ce8c0@@QAEHH@Z,matched,100.0
 0x4ce910,591,src/sound/cd_audio_4ce910.cpp,?PauseCdAudio@Class_004ce910@@QAEHH@Z,matched,100.0
