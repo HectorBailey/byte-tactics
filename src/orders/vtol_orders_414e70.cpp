@@ -42,7 +42,7 @@ class Class_00439e80 { public: void FUN_00439e80(int); };
 class Class_004899b0 { public: int CanRepair(Unit*); };
 
 #pragma pack(push, 1)
-struct UnitType {
+struct UnitDef {
     char unknown_0[0x15e];
     Box bounds;                        // +0x15e
     char unknown_176[0x1fa - 0x176];
@@ -64,7 +64,7 @@ struct Unit {
     char unknown_76[0x86 - 0x76];
     int field_86;                      // +0x86
     char unknown_8a[0x92 - 0x8a];
-    UnitType* type;                    // +0x92
+    UnitDef* type;                     // +0x92
     char unknown_96[0x108 - 0x96];
     short health;                      // +0x108
     char unknown_10a[0x110 - 0x10a];

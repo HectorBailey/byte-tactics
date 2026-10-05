@@ -14,7 +14,7 @@
 //     this file with `--sym FUN_0043cc20`). With it in the file the two
 //     final calls cross-jump as in the original (one shared `mov
 //     ecx,[esp+0x10]; push eax; push edi; call`, the then arm ending in a
-//     `jmp`): 94.8 -> 96.7. Its Unit and UnitType declarations are merged with
+//     `jmp`): 94.8 -> 96.7. Its Unit and UnitDef declarations are merged with
 //     this file's; +0x70 (the whole part of pos.y that 0x43cc20 reads) is a
 //     union view over pos.
 //  2. The `imul ecx`: VC5 only narrows a 64-bit multiply to a one-operand
@@ -252,7 +252,7 @@
 //
 
 // deepseek-v4.1-flash retry, 2026-10-01. State: 74.8% (original 943 bytes,
-// ours 964); kept, no improvement. Also tried hoisting `UnitType* type =
+// ours 964); kept, no improvement. Also tried hoisting `UnitDef* type =
 // unit->type;` and using it in the hasPath==0 arm: 70.4% / 959 bytes, so the
 // extra dword of frame is not a cached type pointer. The original tail really
 // is ONE

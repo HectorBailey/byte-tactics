@@ -48,10 +48,6 @@ class Class_004c4630 {
   public:
     char* FindFieldValue(char* key);
 };
-class UnitType {
-  public:
-    void AddToCategories(char* category);
-};
 class Class_004402e0 {
   public:
     char data[32];
@@ -244,6 +240,8 @@ struct UnitDef {
             unsigned int high : 9;
         };
     };
+
+    void AddToCategories(char* category);
 };
 #pragma pack(pop)
 
@@ -501,7 +499,7 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
             else
                 unitdef->selfdestructcountdown = 5;
             ((TdfRecord*)parser.current)->GetFieldString(buf, "category", 100, DAT_005119b8);
-            ((UnitType*)unitdef)->AddToCategories(buf);
+            unitdef->AddToCategories(buf);
             int found = ((TdfRecord*)parser.current)
                     ->GetFieldString(buf, "soundcategory", 100, DAT_005119b8);
             if (found) {

@@ -54,7 +54,7 @@ public:
 };
 
 #pragma pack(push, 1)
-struct UnitType {
+struct UnitDef {
     char unknown_0[0x15e];
     Box bounds;                        // +0x15e
     char unknown_176[0x1fa - 0x176];
@@ -79,7 +79,7 @@ struct Unit {
     char unknown_7a[0x7e - 0x7a];
     Point16 footprint;                 // +0x7e
     char unknown_82[0x92 - 0x82];
-    UnitType* type;                    // +0x92
+    UnitDef* type;                     // +0x92
     char unknown_96[0xb0 - 0x96];
     int repairTime;                    // +0xb0
     char unknown_b4[0x104 - 0xb4];

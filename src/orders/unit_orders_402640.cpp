@@ -63,7 +63,7 @@ public:
 };
 
 #pragma pack(push, 1)
-struct UnitType {
+struct UnitDef {
     char unknown_0[0x14a];
     Point16 footprint;                 // +0x14a
     char unknown_14e[0x15e - 0x14e];
@@ -88,7 +88,7 @@ struct Unit {
     char unknown_0[0x6a];
     Vec3 pos;                          // +0x6a
     char unknown_76[0x92 - 0x76];
-    UnitType* type;                    // +0x92
+    UnitDef* type;                     // +0x92
     char unknown_96[0x9a - 0x96];
     Class_004b0bc0* script;            // +0x9a
     char unknown_9e[0xb0 - 0x9e];
@@ -131,7 +131,7 @@ struct Order {
 
 struct Game {
     char unknown_0[0x1439b];
-    UnitType* unitTypes;               // +0x1439b
+    UnitDef* unitTypes;                // +0x1439b
     char unknown_1439f[0x37eee - 0x1439f];
     int difficulty;                    // +0x37eee
     char unknown_37ef2[0x38a47 - 0x37ef2];
@@ -147,7 +147,7 @@ void __stdcall FinishConstruction(Unit* unit, Unit* target);
 void __stdcall DamageUnit(Unit* unit, Unit* target, int n, int kind, int flag);
 int __stdcall FUN_00438700(Unit* unit, Order* order, int flags);
 Vec3 __stdcall GetPiecePosition(Unit* unit, int piece);
-int __stdcall FUN_0047db70(UnitType* type, short a, Point16 cell, int b);
+int __stdcall FUN_0047db70(UnitDef* type, short a, Point16 cell, int b);
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short type, Vec3 pos, int a, int b, int c);
 void __stdcall AttachUnitToPiece(Unit* unit, Unit* builder, char piece, char p4);
 void __stdcall AddOrder(Class_00438760 kind, int remove, Unit* owner, Unit* id, int flags, int param_6, int param_7);
@@ -272,7 +272,7 @@ int __stdcall BuildingBuildOrder(Unit* unit, Order* order, int flags)
         int piece = -1;
         unit->script->QueryScript("QueryBuildInfo", &piece, 0, 0, 0);
         order->pos = GetPiecePosition(unit, piece);
-        UnitType* ut = &g_game->unitTypes[order->unitType];
+        UnitDef* ut = &g_game->unitTypes[order->unitType];
         Point16 cell = GridCell(order->pos, ut->footprint);
         if (!FUN_0047db70(ut, 0, cell, unit->flags & 3)) {
             ((Class_00439e80*)order)->FUN_00439e80(15);

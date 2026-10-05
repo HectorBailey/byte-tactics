@@ -8,7 +8,7 @@
 // ebx for `this` instead of edi.
 #include <stdio.h>
 
-struct UnitType {
+struct UnitDef {
     char unknown_0[0x21e];
     unsigned short team;              // +0x21e
 
@@ -18,7 +18,7 @@ struct UnitType {
 void* __stdcall GetCategoryMask(char* name);
 
 // FUNCTION: 0x488e70
-void UnitType::AddToCategories(char* names)
+void UnitDef::AddToCategories(char* names)
 {
     int n;
     char buf[256];
