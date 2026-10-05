@@ -2143,7 +2143,7 @@ address,size,file,symbol,status,similarity
 0x49f9c0,131,src/gui/gui_49f9c0.cpp,?RunWhileScreenNamed@@YGXPAUMenu_0049f9c0@@PAD@Z,matched,100.0
 0x49fa50,17,src/gui/gui_49fa50.cpp,?FUN_0049fa50@@YGXPAUObj_49fa50@@@Z,matched,100.0
 0x49fa70,17,src/gui/gui_49fa70.cpp,?FUN_0049fa70@@YGXPAUObj_0049fa70@@@Z,matched,100.0
-0x49fa90,17,src/gui/gui_49fa90.cpp,?FUN_0049fa90@@YGXPAUClass_0049fa90@@@Z,matched,100.0
+0x49fa90,17,src/gui/gui_49fa90.cpp,?FUN_0049fa90@@YGXPAUMenu@@@Z,matched,100.0
 0x49fab0,17,src/gui/gui_49fab0.cpp,?FUN_0049fab0@@YGXPAX@Z,matched,100.0
 0x49fad0,21,src/gui/gui_49fad0.cpp,?FUN_0049fad0@@YGXPAUClass_0049fad0@@@Z,matched,100.0
 0x49faf0,17,src/gui/gui_49faf0.cpp,?FUN_0049faf0@@YGXPAUOuter_49faf0@@@Z,matched,100.0
@@ -2190,7 +2190,7 @@ address,size,file,symbol,status,similarity
 0x4a1110,164,src/gui/gui_4a1110.cpp,?SetGadgetStatusByName@@YGHPAUClass_004a1110@@PADH@Z,matched,100.0
 0x4a11c0,60,src/gui/gui_4a11c0.cpp,?SetGadgetStatus@@YGXPAUObj_004a11c0@@HF@Z,matched,100.0
 0x4a1200,72,src/gui/gui_4a1200.cpp,?FUN_004a1200@@YGXPAUClass_004a1200@@HH@Z,matched,100.0
-0x4a1250,142,src/gui/gui_4a1250.cpp,?FUN_004a1250@@YGXPAUClass_004a1250@@PADH@Z,matched,100.0
+0x4a1250,142,src/gui/gui_4a1250.cpp,?FUN_004a1250@@YGXPAUMenu@@PADH@Z,matched,100.0
 0x4a12e0,368,src/gui/gui_4a12e0.cpp,?FUN_004a12e0@@YGXPAUClass_004a12e0@@HH@Z,matched,100.0
 0x4a1450,107,src/gui/gui_4a1450.cpp,?FUN_004a1450@@YGXPAUObject_004a1450@@PADH@Z,matched,100.0
 0x4a14c0,107,src/gui/gui_4a14c0.cpp,?FUN_004a14c0@@YGXPAUObject_004a14c0@@PADH@Z,matched,100.0
