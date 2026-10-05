@@ -1,7 +1,7 @@
 // Decompiled by Sonnet. Names are provisional.
 // Class_004907e0's override of slot 2 (vtable 0x4fd9b0, see 0x44ef60.cpp for
 // the family): sets the dirty bit when the mode differs from the owner's,
-// then runs the middle class's slot 2 (0x490690).
+// then runs the middle class's own slot 2 (0x490690).
 
 class Base_00490a10 {                  // the object at +0x4 (see 0x490a10.cpp)
 public:
@@ -70,16 +70,10 @@ public:
     virtual void FUN_0044efc0(Class_00415c10*);     // slot 8, 0x4908c0
 };
 
-// The middle class's slot 2 under its established name (data/symbols.csv).
-class Class_00490880 {
-public:
-    void FUN_00490690();
-};
-
 // FUNCTION: 0x490880
 void Class_004907e0::FUN_0044efb0()
 {
     if ((owner->target->field_2e & 3) != mode)
         dirty = 1;
-    ((Class_00490880*)this)->FUN_00490690();
+    Class_00490630::FUN_0044efb0();
 }
