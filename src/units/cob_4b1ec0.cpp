@@ -3,7 +3,7 @@
 // the loader 0x4b2040. Writes the eight 0xa4-byte records at +0x1c, the block
 // at ptr10, then one 0x6c-byte record per element of the array at ptr14.
 
-// Chunked file writer / seeker (see src/util/hapibank_4b4cf0.cpp).
+// Chunked file writer / seeker (see src/util/hapi_bank.cpp).
 class HapiBank {
 public:
     void SeekBox(int pos);
