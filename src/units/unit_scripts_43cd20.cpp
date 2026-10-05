@@ -8,7 +8,7 @@
 // because it reads the two 0x500000 immediates (`gap1 > 0x500000`, `gap1 -
 // 0x500000`: 80.0 in 16.16 fixed point) as hard-coded addresses; they are
 // plain constants, and no spelling can give them a relocation. Three changes:
-//  1. The real preceding function, Class_0043cc20::FUN_0043cc20 (0x43cc20,
+//  1. The real preceding function, UnitMotion::FUN_0043cc20 (0x43cc20,
 //     matched in its own file), is defined above this one without its
 //     annotation (the guide's preceding-function rule; it still MATCHes from
 //     this file with `--sym FUN_0043cc20`). With it in the file the two
@@ -541,7 +541,7 @@ static inline void ClampToZero(int& value)
         value = 0;
 }
 
-class Class_0043cc20 {
+class UnitMotion {
 public:
     char unknown_0[8];
     Vec3_0043cc20 pos;                 // +0x8
@@ -563,7 +563,7 @@ public:
 
 // The preceding function in the original object file (0x43cc20, matched in
 // its own file), defined here without its annotation: see the note above.
-void Class_0043cc20::FUN_0043cc20(Unit* unit, int amount)
+void UnitMotion::FUN_0043cc20(Unit* unit, int amount)
 {
     field_20 = field_20 + amount;
     ClampToZero(field_20);
@@ -596,7 +596,7 @@ void Class_0043cd20::SteerGroundUnit(Unit* unit)
     if (obj->v5() == 0) {
         turn = 0;
         const int& amount = -unit->type->field_19a;
-        ((Class_0043cc20*)this)->FUN_0043cc20(unit, amount);
+        ((UnitMotion*)this)->FUN_0043cc20(unit, amount);
         return;
     }
 
@@ -660,8 +660,8 @@ void Class_0043cd20::SteerGroundUnit(Unit* unit)
     int lim = (int)(((__int64)turned * turned) >> 32) * 4;
 
     if (d1 > lim && d2 > r)
-        ((Class_0043cc20*)this)->FUN_0043cc20(unit, unit->type->field_19e);
+        ((UnitMotion*)this)->FUN_0043cc20(unit, unit->type->field_19e);
     else
-        ((Class_0043cc20*)this)->FUN_0043cc20(unit, -rate);
+        ((UnitMotion*)this)->FUN_0043cc20(unit, -rate);
 }
 
