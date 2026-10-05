@@ -6,10 +6,10 @@ address,name
 0x401070,PlayerRef::Reset
 0x4010b0,Class_004010b0::SaveUnitAccounts
 0x401110,Class_00401110::LoadUnitAccounts
-0x401180,Class_00401180::FUN_00401180
+0x401180,PlayerRef::FUN_00401180
 0x4011c0,Class_004011c0::FUN_004011c0
-0x401220,Class_00401220::SpendMetal
-0x401260,Class_00401260::SpendEnergy
+0x401220,PlayerRef::SpendMetal
+0x401260,PlayerRef::SpendEnergy
 0x4012a0,Class_004012a0::SpendMetalAndEnergy
 0x401320,FUN_00401320
 0x401360,UpdatePlayerEconomy

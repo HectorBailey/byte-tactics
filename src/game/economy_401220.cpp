@@ -8,7 +8,7 @@ struct Store_00401220 {
     float metal;                       // +0x8c
 };
 
-class Class_00401220 {
+class PlayerRef {
 public:
     char unknown_0[0x4];
     float x0;                          // +0x04
@@ -19,7 +19,7 @@ public:
 };
 
 // FUNCTION: 0x401220
-int Class_00401220::SpendMetal(float amount)
+int PlayerRef::SpendMetal(float amount)
 {
     if (store->metal >= amount) {
         store->metal -= amount;

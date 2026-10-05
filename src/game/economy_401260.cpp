@@ -7,7 +7,7 @@ struct Store_00401260 {
     float energy;                      // +0x98
 };
 
-class Class_00401260 {
+class PlayerRef {
 public:
     char unknown_0[0x1c];
     float y0;                          // +0x1c
@@ -18,7 +18,7 @@ public:
 };
 
 // FUNCTION: 0x401260
-int Class_00401260::SpendEnergy(float amount)
+int PlayerRef::SpendEnergy(float amount)
 {
     if (store->energy >= amount) {
         store->energy -= amount;

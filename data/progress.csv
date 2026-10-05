@@ -4,10 +4,10 @@ address,size,file,symbol,status,similarity
 0x401070,57,src/game/economy_401070.cpp,?Reset@PlayerRef@@QAEXE@Z,matched,100.0
 0x4010b0,95,src/game/economy_4010b0.cpp,?SaveUnitAccounts@Class_004010b0@@QAEXPAUUnitInfo_4010b0@@PAVClass_004b4ba0@@@Z,matched,100.0
 0x401110,99,src/game/economy_401110.cpp,?LoadUnitAccounts@Class_00401110@@QAEXPAUUnitInfo_401110@@PAVClass_004b4ba0@@@Z,matched,100.0
-0x401180,53,src/game/economy_401180.cpp,?FUN_00401180@Class_00401180@@QAEHPAV1@M@Z,matched,100.0
+0x401180,53,src/game/economy_401180.cpp,?FUN_00401180@PlayerRef@@QAEHPAV1@M@Z,matched,100.0
 0x4011c0,93,src/game/economy_4011c0.cpp,?FUN_004011c0@Class_004011c0@@QAEHMM@Z,matched,100.0
-0x401220,61,src/game/economy_401220.cpp,?SpendMetal@Class_00401220@@QAEHM@Z,matched,100.0
-0x401260,61,src/game/economy_401260.cpp,?SpendEnergy@Class_00401260@@QAEHM@Z,matched,100.0
+0x401220,61,src/game/economy_401220.cpp,?SpendMetal@PlayerRef@@QAEHM@Z,matched,100.0
+0x401260,61,src/game/economy_401260.cpp,?SpendEnergy@PlayerRef@@QAEHM@Z,matched,100.0
 0x4012a0,126,src/game/economy_4012a0.cpp,?SpendMetalAndEnergy@Class_004012a0@@QAEHMM@Z,matched,100.0
 0x401320,53,src/game/economy_401320.cpp,?FUN_00401320@@YGXPAUObj_00401320@@MM@Z,matched,100.0
 0x401360,2239,src/game/economy_401360.cpp,?UpdatePlayerEconomy@@YGXPAUPlayer_00401360@@@Z,matched,100.0
