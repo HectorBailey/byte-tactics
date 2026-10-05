@@ -17,9 +17,11 @@ no base relocations, so here the relocation sites come from elsewhere:
     relocations come from disassembly: every rel32 branch that leaves its
     region, and every 32-bit immediate or displacement that holds an address
     in the image.
-  * origdata.obj holds the original's .rdata and .data byte for byte, apart
-    from the tables the linker builds itself (the import tables, the TLS and
-    debug directories, the .CRT$X* initialiser tables), which are zeroed. Its
+  * origdata.obj holds the runs of the original's .rdata and .data that no
+    object defines (the bytes tools/place.py copies), the vtables it takes
+    over (below) and what those runs point at that no symbol names, each run
+    a section of its own named for its address. The game's data itself comes
+    from source: link/data.cpp, src/data and the tree's own objects. Its
     relocations come from tools/place.py's layout: every pointer field of a
     placed piece of data; in data no object defines, every dword that holds
     the exact address of a function, a global, a placed piece or a string
@@ -29,8 +31,10 @@ no base relocations, so here the relocation sites come from elsewhere:
 
 Every address a relocation points at is named from the same layout: a game
 function by the symbol its object defines, a runtime library function or
-global by its library name, an import by its __imp_ symbol, and the gap
-regions and the original's data by the symbols these two objects define.
+global by its library name, an import by its __imp_ symbol, a global by the
+symbol of what the layout placed there (a static by a public name its object
+gets), and the gap regions and the original's data by the symbols these two
+objects define.
 
 The layout also says what every reference in the tree's own objects means,
 which tools/link.py --carve applies to copies of them (patch_objects):
@@ -38,9 +42,14 @@ which tools/link.py --carve applies to copies of them (patch_objects):
   * a name no object defines is aliased to the symbol at the address the
     original's code holds wherever the name is used (in a placed function, or
     in a byte-identical copy of one another file keeps so that it inlines);
-  * origdata.obj defines, at each global's address and each placed vtable's,
-    every name a compiled object defines there, and is linked first, so LINK
-    keeps one copy: the original's, at its full size and with every slot;
+  * a name that points inside a global (a field, an entry) has its
+    references pointed at that global with the offset added;
+  * every other definition of a placed global (another file's view of the
+    same class, another spelling of a template's static) becomes a static
+    nothing uses, its file's references going to the placed one;
+  * origdata.obj defines, at each placed vtable's address, every name a
+    compiled object defines there, and is linked first, so LINK keeps one
+    copy: the original's, with every slot;
   * a placed function's references to file statics and to functions of its
     own file (copies kept so that they inline) point at the original's data
     and at the real function, where the original's code points;

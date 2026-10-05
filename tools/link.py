@@ -3,7 +3,7 @@
     uv run tools/link.py                 # build build/link/TotalA.exe
     uv run tools/link.py --strict        # no /FORCE:UNRESOLVED; generate stubs so it succeeds
     uv run tools/link.py --stub          # the same, naming the generated stubs explicitly
-    uv run tools/link.py --carve         # link the gap regions and the original's data carved
+    uv run tools/link.py --carve         # link the data from source, and what has none carved
                                          # out of the exe (tools/carve.py): an image that runs
     uv run tools/link.py --verbose       # also list the symbols left unresolved
 
@@ -747,8 +747,8 @@ def main() -> None:
     ap.add_argument("--stub", action="store_true",
                     help="the same as --strict, naming the generated stubs explicitly")
     ap.add_argument("--carve", action="store_true",
-                    help="link the gap regions and the original's data carved from the exe "
-                         "(tools/carve.py) instead of stubs and link/data.cpp; implies --stub")
+                    help="link with what has no source carved from the exe (tools/carve.py), the "
+                         "game's data laid out in the original's order; implies --stub")
     ap.add_argument("--output", type=Path, default=BUILD / "TotalA.exe")
     ap.add_argument("--map", action="store_true", help="also write build/link/TotalA.map")
     ap.add_argument("--no-exe-patches", action="store_true",
