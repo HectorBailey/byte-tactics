@@ -4,7 +4,7 @@
 
 #pragma pack(push, 2)
 
-class Class_00415c10 {
+class BitWriter {
 public:
     void WriteBits(int value, int bits);
 };
@@ -29,13 +29,13 @@ public:
     int field_2a;                   // +0x2a
     int field_2e;                   // +0x2e
 
-    void FUN_0044ddc0(Class_00415c10* stream);
+    void FUN_0044ddc0(BitWriter* stream);
 };
 
 #pragma pack(pop)
 
 // FUNCTION: 0x44ddc0
-void Class_0044ddc0::FUN_0044ddc0(Class_00415c10* stream)
+void Class_0044ddc0::FUN_0044ddc0(BitWriter* stream)
 {
     stream->WriteBits(flags, 8);
     if ((flags & 1) != 0) {

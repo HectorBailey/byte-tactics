@@ -139,7 +139,7 @@ class Class_004373a0 {
 public:
     unsigned int FUN_004373a0();
 };
-class Class_0046df40 {
+class UnitSync {
 public:
     char* GetSyncStatusText();
 };
@@ -160,7 +160,7 @@ struct Game {
     char unknown_2851[0x29a0 - 0x2851];
     Options_00447b10* options;          // +0x29a0
     char unknown_29a4[0x2a30 - 0x29a4];
-    Class_0046df40* net;                // +0x2a30
+    UnitSync* net;                      // +0x2a30
     char unknown_2a34[0x2a3c - 0x2a34];
     unsigned short field_2a3c;          // +0x2a3c
     char unknown_2a3e[0x2a42 - 0x2a3e];

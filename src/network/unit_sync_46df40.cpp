@@ -14,7 +14,7 @@ struct PlayerSync_0046df40 {                 // 0x5c bytes
     char unknown_30[0x5c - 0x30];
 };
 
-class Class_0046df40 {
+class UnitSync {
 public:
     char unknown_0[0x10];
     std::vector<PlayerSync_0046df40> players; // +0x10
@@ -27,7 +27,7 @@ public:
 extern char g_unitSyncStatusText[];
 
 // FUNCTION: 0x46df40
-char* Class_0046df40::GetSyncStatusText()
+char* UnitSync::GetSyncStatusText()
 {
     if (active == 0) {
         return 0;

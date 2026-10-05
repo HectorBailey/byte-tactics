@@ -28,12 +28,12 @@ public:
     void FUN_0046eba0(Packet_0046cef0* where, int count, Packet_0046cef0* val);
 };
 
-class Class_0046d6c0 {
+class UnitSync {
 public:
     void HandleSyncPacket(void* param_1, int param_2);
 };
 
-class Class_0046cef0 {
+class PacketSequencer {
 public:
     char unknown_0[4];
     unsigned int cur;            // +0x4
@@ -44,7 +44,7 @@ public:
 };
 
 // FUNCTION: 0x46cef0
-void Class_0046cef0::ReceiveSequenced(Packet_0046cef0* packet, int param_2, void* param_3, unsigned int target)
+void PacketSequencer::ReceiveSequenced(Packet_0046cef0* packet, int param_2, void* param_3, unsigned int target)
 {
     if (packet->arg == 0x65) {
         for (Packet_0046cef0* p = sent.first; p != sent.last; p++) {
@@ -60,7 +60,7 @@ void Class_0046cef0::ReceiveSequenced(Packet_0046cef0* packet, int param_2, void
     }
     if (packet->id == cur + 1) {
         cur = packet->id;
-        ((Class_0046d6c0*)param_3)->HandleSyncPacket(packet, param_2);
+        ((UnitSync*)param_3)->HandleSyncPacket(packet, param_2);
         for (unsigned int i = cur + 1; i <= max; i++) {
             Packet_0046cef0* p;
             for (p = queue.first; p != queue.last; p++) {
@@ -68,7 +68,7 @@ void Class_0046cef0::ReceiveSequenced(Packet_0046cef0* packet, int param_2, void
             }
             if (p == queue.last) break;
             cur = i;
-            ((Class_0046d6c0*)param_3)->HandleSyncPacket(p, param_2);
+            ((UnitSync*)param_3)->HandleSyncPacket(p, param_2);
         }
         return;
     }

@@ -74,7 +74,7 @@ struct Elem_0046faf0 {
 extern "C" int __cdecl GetLocalHumanDpid();
 extern "C" void __stdcall SendPacketToPlayer(int a, unsigned int b, void* c, int d);
 
-class Class_0046cc10 {
+class PacketSequencer {
 public:
 	int field_0;
 	char unknown_4[8];
@@ -87,7 +87,7 @@ public:
 // directly makes the front end keep the end() load rooted at ecx+0x14, which
 // blocks the load CSE with the insert's own [esi + 8] read of _Last and costs
 // the original's single `mov edi, ecx` in the capacity block.
-void Class_0046cc10::SendSequenced(Elem_0046faf0* param_1, Elem_0046faf0* param_2)
+void PacketSequencer::SendSequenced(Elem_0046faf0* param_1, Elem_0046faf0* param_2)
 {
 	param_2->id = ++field_0;
 	std::vector<Elem_0046faf0>& _v = vec;

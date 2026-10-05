@@ -1,7 +1,7 @@
 // Decompiled by Opus. Names are provisional.
 // Reads a signed bit field: ReadBits's value, sign-extended from `bits`.
 
-class Class_00415dc0 {
+class BitReader {
 public:
     unsigned int* data;                // +0x00
     int index;                         // +0x04
@@ -11,7 +11,7 @@ public:
 };
 
 // FUNCTION: 0x415e60
-int Class_00415dc0::ReadSignedBits(int bits)
+int BitReader::ReadSignedBits(int bits)
 {
     int r = ReadBits(bits);
     if (r & (1 << (bits - 1))) {

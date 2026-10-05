@@ -3,7 +3,7 @@
 #include <string.h>
 
 // Reads bit fields from an array of dwords, lowest bits first.
-class Class_00415dc0 {
+class BitReader {
 public:
     unsigned int* data;                // +0x00
     int index;                         // +0x04
@@ -12,7 +12,7 @@ public:
 };
 
 // FUNCTION: 0x415dc0
-int Class_00415dc0::ReadBits(int bits)
+int BitReader::ReadBits(int bits)
 {
     if (bit + bits < 32) {
         int r = (data[index] >> bit) & ((1 << bits) - 1);

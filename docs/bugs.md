@@ -35,7 +35,7 @@ enough for the game's own data, which would explain why it went unnoticed.
 
 ## Send reads a target's id through a null pointer (possible)
 
-**0x46d530**. The send helper `Class_0046d4c0::Send(target, packet)` (inlined)
+**0x46d530**. The send helper `UnitSync::Send(target, packet)` (inlined)
 reads `target->id` when the object is in "direct" mode. 0x46d530 calls it with
 no target, so in direct mode it reads address 0 (`mov eax, [0]` in the
 original) and would crash. Either direct mode is never on when this runs, or

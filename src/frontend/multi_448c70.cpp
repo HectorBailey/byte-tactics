@@ -144,7 +144,7 @@ class Class_004373a0 {
 public:
     unsigned int FUN_004373a0();
 };
-class Class_0046d040 {
+class UnitSync {
 public:
     int IsPlayerSynced(int id);
 };
@@ -164,7 +164,7 @@ struct Game {
     char unknown_1b5f[0x1b63 - 0x1b5f];
     Player_00448c70 players[10];        // +0x1b63
     char unknown_2851[0x2a30 - 0x2851];
-    Class_0046d040* net;                // +0x2a30
+    UnitSync* net;                      // +0x2a30
     char unknown_2a34[0x2a3e - 0x2a34];
     unsigned short scrollEnd;           // +0x2a3e
     unsigned short scrollStart;         // +0x2a40

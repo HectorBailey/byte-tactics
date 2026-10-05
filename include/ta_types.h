@@ -162,9 +162,9 @@ class Class_0040f1e0;
 class Class_00410830;
 class Class_00415b60;
 struct Class_00415b90;
-class Class_00415c10;
+class BitWriter;
 struct Class_00415da0;
-class Class_00415dc0;
+class BitReader;
 class Class_00417e00;
 class Class_00428c90;
 class Class_00428d10;
@@ -3758,9 +3758,9 @@ public:
     virtual void vf6(void);
     virtual int vf7(void);
     virtual void v7(void);
-    virtual void WriteTo(Class_00415c10*);
+    virtual void WriteTo(BitWriter*);
     virtual void v8(void);
-    virtual void ReadFrom(Class_00415dc0*);
+    virtual void ReadFrom(BitReader*);
 };
 
 struct Node_0040eb70 {  // 0x14 bytes, 1 view
@@ -3906,7 +3906,7 @@ struct Class_00415b90 {  // 0x14 bytes, 2 views
     void FreeBuffer(void);
 };
 
-class Class_00415c10 {  // 0x410 bytes, 7 views
+class BitWriter {       // 0x410 bytes, 7 views
 public:
     int bit;  // +0x0
     int index;  // +0x4
@@ -3922,7 +3922,7 @@ struct Class_00415da0 {  // 0x10 bytes, 2 views
     void SetByteAt(int, unsigned char);
 };
 
-class Class_00415dc0 {  // 0xc bytes, 9 views
+class BitReader {       // 0xc bytes, 9 views
 public:
     unsigned int* data;  // +0x0
     int index;  // +0x4
@@ -7136,7 +7136,7 @@ public:
     Class_0044e740(int, Class_004b4560*, char*);
     int FUN_0044e880(int, Class_004b4560*, char*);
     int FUN_0044eb60(Object_0044e880*);
-    void FUN_0044e930(Class_00415c10*);
+    void FUN_0044e930(BitWriter*);
     void FUN_0044ec10(int);
 };
 
@@ -7467,7 +7467,7 @@ public:
     int field_26;  // +0x26
     int field_2a;  // +0x2a
     int field_2e;  // +0x2e
-    void FUN_0044ddc0(Class_00415c10*);
+    void FUN_0044ddc0(BitWriter*);
 };
 
 struct Target_0044ddc0 {  // 0xaa bytes, 1 view
@@ -7557,7 +7557,7 @@ public:
     int pos_z;  // +0x2e
     char unknown_32[4];
     Class_0044e080(Class_0044e080&);
-    Class_0044e080(Owner_0044e080*, Class_00415dc0*);
+    Class_0044e080(Owner_0044e080*, BitReader*);
 };
 
 class Class_0044e3a0 {  // 0x1e bytes, 1 view
@@ -7687,7 +7687,7 @@ public:
     short pad_26;  // +0x26
     Owner_0044e9c0* owner;  // +0x28
     Class_0044e9c0(Class_0044e9c0&);
-    Class_0044e9c0(Owner_0044e9c0*, Class_00415dc0*);
+    Class_0044e9c0(Owner_0044e9c0*, BitReader*);
 };
 
 class Class_0044ea60 {  // 0x2c bytes, 1 view
@@ -7887,7 +7887,7 @@ public:
     unsigned char flag_3 : 1;
     unsigned char : 4;
     char unknown_65[3];
-    void FUN_0044f4a0(Class_00415c10*);
+    void FUN_0044f4a0(BitWriter*);
 };
 
 struct Link_0044f4a0 {  // 0x4 bytes, 1 view
@@ -7913,7 +7913,7 @@ public:
     Owner_0044f5c0* owner;  // +0x8
     Point16 points[3];  // +0xc
     int count;  // +0x18
-    void FUN_0044f5c0(Class_00415dc0*);
+    void FUN_0044f5c0(BitReader*);
 };
 
 struct Owner_0044f5c0 {  // 0x4 bytes, 1 view
@@ -13883,7 +13883,7 @@ public:
     char unknown_c[27];
     unsigned char state : 3;  // +0x27
     unsigned char : 5;
-    void FUN_004908c0(Class_00415c10*);
+    void FUN_004908c0(BitWriter*);
 };
 
 struct Holder_004908c0 {  // 0x4 bytes, 1 view
@@ -13902,7 +13902,7 @@ public:
     virtual void vf7(void);
     virtual void vf8(void);
     virtual void vf9(void);
-    virtual void Write(Class_00415c10*);
+    virtual void Write(BitWriter*);
 };
 
 struct Target_004908c0 {  // 0x2f bytes, 1 view
@@ -13921,7 +13921,7 @@ public:
     int unknown_0;  // +0x0
     Base_00490a10_3* current;  // +0x4
     Unit* owner;  // +0x8
-    void FUN_00490a10(Class_00415dc0*);
+    void FUN_00490a10(BitReader*);
 };
 
 struct CdLists_490f80 {  // 0xaa0 bytes, 2 views

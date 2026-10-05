@@ -97,7 +97,7 @@ struct Gui_0044c7e0 {
     Layer_0044c7e0* table;              // +0x18
 };
 
-class Class_0046e330 {
+class UnitSync {
 public:
     int GetUnitEntry(UnitType_0044c7e0* type, Info_0044c7e0* out);
 };
@@ -108,7 +108,7 @@ struct Game {
     char unknown_535[0x1b63 - 0x535];
     Player_0044c7e0 players[10];        // +0x1b63
     char unknown_2851[0x2a30 - 0x2851];
-    Class_0046e330* queue;              // +0x2a30
+    UnitSync* queue;                    // +0x2a30
     char unknown_2a34[0x2a42 - 0x2a34];
     unsigned char localPlayer;          // +0x2a42
     char unknown_2a43[0x1438f - 0x2a43];

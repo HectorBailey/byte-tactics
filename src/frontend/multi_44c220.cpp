@@ -39,7 +39,7 @@ struct Event_44c220 {
     int field_c;                       // +0x0c
 };
 
-struct Class_0046e280 {
+struct UnitSync {
     int PopChangedEntry(Event_44c220* event);
 };
 
@@ -47,7 +47,7 @@ struct Game {
     char unknown_0[0x531];
     Holder_44c220* holder;             // +0x531
     char unknown_535[0x2a30 - 0x535];
-    Class_0046e280* queue;             // +0x2a30
+    UnitSync* queue;                   // +0x2a30
     char unknown_2a34[0x1439b - 0x2a34];
     Item_44c220* items;                // +0x1439b
 };

@@ -10,7 +10,7 @@ struct Vec3_0044e930 {
     int z;
 };
 
-class Class_00415c10 {
+class BitWriter {
 public:
     void WriteBits(int value, int bits);
 };
@@ -24,12 +24,12 @@ public:
     short field_22;                     // +0x22
     unsigned short field_24;            // +0x24
 
-    void FUN_0044e930(Class_00415c10* stream);
+    void FUN_0044e930(BitWriter* stream);
 };
 #pragma pack(pop)
 
 // FUNCTION: 0x44e930
-void Class_0044e740::FUN_0044e930(Class_00415c10* stream)
+void Class_0044e740::FUN_0044e930(BitWriter* stream)
 {
     stream->WriteBits(field_8, 1);
     stream->WriteBits(target.x, 0x20);

@@ -68,7 +68,7 @@ public:
     Iter_0046d860 FUN_0046e9b0(const unsigned int& key);
 };
 
-class Class_0046d4c0 {
+class UnitSync {
 public:
     void SendSyncPacket(Player_0046d860* target, Packet_0046d860* packet, int unused);
 };
@@ -104,7 +104,7 @@ void Class_0046d860::NotifyEntryChanged(unsigned int param_1)
                 packet.field_a = v->field_8;
                 packet.field_b = v->field_a;
                 packet.field_c = v->field_c;
-                ((Class_0046d4c0*)this)->SendSyncPacket(&*i, &packet, 1);
+                ((UnitSync*)this)->SendSyncPacket(&*i, &packet, 1);
                 i->sent++;
             }
         }

@@ -24,7 +24,7 @@ public:
     Class_00415b60();
 };
 
-class Class_00415c10 : public Class_00415b60 {
+class BitWriter : public Class_00415b60 {
 public:
     int bit;                           // +0x0 current word index
     int index;                         // +0x4 bits used in the current word
@@ -64,7 +64,7 @@ public:
     virtual void vf5();
     virtual void vf6();
     virtual int vf7();                              // vtable +0x1c
-    virtual void WriteTo(Class_00415c10* stream);  // vtable +0x20
+    virtual void WriteTo(BitWriter* stream);       // vtable +0x20
     char unknown_4[0x1c];
     int field_20;                                   // +0x20
 };
@@ -111,13 +111,13 @@ struct Game {
 
 extern Game* g_game;
 
-void __stdcall FUN_0048b200(Class_00415c10* stream, Unit* u);
+void __stdcall FUN_0048b200(BitWriter* stream, Unit* u);
 int __stdcall BroadcastPacket(int player, void* data, int size);
 
 // FUNCTION: 0x48b710
 void __stdcall FUN_0048b710(Player_0048b710* p)
 {
-    Class_00415c10 stream;
+    BitWriter stream;
     stream.WriteBits(0x2c, 8);
     stream.WriteBits(0, 0x10);
     stream.WriteBits(g_game->ticks, 0x20);

@@ -12,7 +12,7 @@ struct ParamStruct_0046d4c0
 };
 #pragma pack(pop)
 
-class Class_0046d4c0
+class UnitSync
 {
 public:
     char unknown_0[0x58];
@@ -22,7 +22,7 @@ public:
 };
 
 // FUNCTION: 0x46d4c0
-void Class_0046d4c0::SendSyncPacket(unsigned int* param_1, ParamStruct_0046d4c0* param_2, int unused)
+void UnitSync::SendSyncPacket(unsigned int* param_1, ParamStruct_0046d4c0* param_2, int unused)
 {
     unsigned int val;
     if (field_58 != 0)

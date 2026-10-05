@@ -1,5 +1,5 @@
 // Decompiled by space-bunny-free. Names are provisional.
-// A method of Class_0046d040 (the object at g_game+0x2a30, built by
+// A method of UnitSync (the object at g_game+0x2a30, built by
 // 0x46c8e0): it reports whether one player's copy of the shared unit list has
 // caught up. The player whose id matches is looked up with FindPlayerByDpid, the
 // four early "already done" cases are one || chain, and the entry's
@@ -39,7 +39,7 @@ struct PlayerSync_0046e0b0 {            // 0x5c bytes
 
 Player_0046e0b0* __stdcall FindPlayerByDpid(int id);
 
-class Class_0046d040 {
+class UnitSync {
 public:
     char unknown_0[0x10];
     std::vector<PlayerSync_0046e0b0> players;    // +0x10
@@ -52,7 +52,7 @@ public:
 };
 
 // FUNCTION: 0x46e0b0
-int Class_0046d040::IsPlayerSynced(int id)
+int UnitSync::IsPlayerSynced(int id)
 {
     if (field_58 == 0)
         return 0;

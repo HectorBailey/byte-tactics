@@ -15,7 +15,7 @@ public:
     void GrowBuffer();
 };
 
-class Class_00415c10 : public Class_00415b60 {
+class BitWriter : public Class_00415b60 {
 public:
     int bit;                           // +0x0 current word index
     int index;                         // +0x4 bits used in the current word
@@ -52,11 +52,11 @@ public:
     unsigned char flag_2 : 1;          // bit 2
     unsigned char flag_3 : 1;          // bit 3
 
-    virtual void FUN_0044efc0(Class_00415c10* stream);  // slot 8
+    virtual void FUN_0044efc0(BitWriter* stream);       // slot 8
 };
 
 // FUNCTION: 0x44f4a0
-void Class_0044f010::FUN_0044efc0(Class_00415c10* stream)
+void Class_0044f010::FUN_0044efc0(BitWriter* stream)
 {
     int n;
     if (active) {

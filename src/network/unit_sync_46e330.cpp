@@ -44,7 +44,7 @@ public:
     Node_0046e330* FUN_0046fe60(const unsigned int* key);
 };
 
-class Class_0046e330 {
+class UnitSync {
 public:
     Less_0046e330 compare;
     Node_0046e330* head;               // +0x4
@@ -59,7 +59,7 @@ public:
 };
 
 // FUNCTION: 0x46e330
-int Class_0046e330::GetUnitEntry(Unit_0046e330* unit, Rect_0046e330* out)
+int UnitSync::GetUnitEntry(Unit_0046e330* unit, Rect_0046e330* out)
 {
     *out = Find(&unit->key).ptr->value;
     return out->w != 0 && out->h != 0;

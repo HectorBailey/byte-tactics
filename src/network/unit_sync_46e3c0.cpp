@@ -52,7 +52,7 @@ public:
     void NotifyEntryChanged(unsigned int key);
 };
 
-class Class_0046e3c0 {
+class UnitSync {
 public:
     Less_0046e3c0 compare;
     Node_0046e3c0* head;               // +0x4
@@ -67,7 +67,7 @@ public:
 };
 
 // FUNCTION: 0x46e3c0
-int Class_0046e3c0::ToggleUnitAllowed(Unit_0046e3c0* unit)
+int UnitSync::ToggleUnitAllowed(Unit_0046e3c0* unit)
 {
     Node_0046e3c0* n = Find(&unit->key).ptr;
     n->value.w = (n->value.w == 0);

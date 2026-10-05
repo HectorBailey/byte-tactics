@@ -1,7 +1,7 @@
 // Decompiled by deepseek-v4.1-flash. Names are provisional.
 
 // Bit reader, see src/network/net_stats_415dc0.cpp.
-class Class_00415dc0 {
+class BitReader {
 public:
     int ReadBits(int bits);
 };
@@ -62,12 +62,12 @@ public:
     int pos_y;                         // +0x2a
     int pos_z;                         // +0x2e
 
-    Class_0044e080(Owner_0044e080* owner_, Class_00415dc0* reader);
+    Class_0044e080(Owner_0044e080* owner_, BitReader* reader);
 };
 #pragma pack(pop)
 
 // FUNCTION: 0x44e080
-Class_0044e080::Class_0044e080(Owner_0044e080* owner_, Class_00415dc0* reader)
+Class_0044e080::Class_0044e080(Owner_0044e080* owner_, BitReader* reader)
     : Class_0044ce20(0), owner(owner_), ref(0, 0)
 {
     vtable = DAT_004fd3b8;

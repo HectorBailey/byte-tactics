@@ -63,7 +63,7 @@ struct Game {
 // Inline-budget filler, see the header.
 inline int Pass(int v) { return v; }
 
-struct Rect_0046e160 {
+struct UnitSyncEntry {
     int x, y;
     short w, h;
     int unknown_c;
@@ -110,14 +110,14 @@ class Class_0046e610 {
     ~Class_0046e610();
 };
 
-struct Class_0046cbe0 { // 0x2c bytes, the entry's +0x30 member
+struct PacketSequencer { // 0x2c bytes, the entry's +0x30 member
     int field_0;
     int field_4;
     int field_8;
     Class_0046e610 list_c; // +0xc
     Class_0046e610 list_d; // +0x1c
 
-    Class_0046cbe0();
+    PacketSequencer();
 };
 
 struct Class_0046eaa0 {    // 0x5c bytes, one vector element
@@ -127,7 +127,7 @@ struct Class_0046eaa0 {    // 0x5c bytes, one vector element
     int field_24;          // +0x24
     int field_28;          // +0x28
     int field_2c;          // +0x2c
-    Class_0046cbe0 sub;    // +0x30
+    PacketSequencer sub;   // +0x30
 
     Class_0046eaa0& operator=(const Class_0046eaa0& src);
 };
@@ -145,7 +145,7 @@ class Class_0046cec0 {
     }
 };
 
-class Class_0046d4c0 {
+class UnitSync {
   public:
     void SendSyncPacket(void* target, Packet_0046dad0* packet, int unused);
 };
@@ -166,7 +166,7 @@ class Vec_0046d860 : public std::vector<Class_0046eaa0> {
 
 class Class_0046d860 {
   public:
-    std::map<unsigned int, Rect_0046e160> map; // +0x00
+    std::map<unsigned int, UnitSyncEntry> map; // +0x00
     std::vector<Class_0046eaa0> players;       // +0x10
     std::list<unsigned int> queue;             // +0x20
     char unknown_2c[0x58 - 0x2c];
@@ -233,7 +233,7 @@ void Class_0046d860::ProcessSync() {
                         packet.arg = 0;
                         packet.field_6 = 0;
                         packet.field_a = 0;
-                        ((Class_0046d4c0*)this)->SendSyncPacket(e, &packet, 1);
+                        ((UnitSync*)this)->SendSyncPacket(e, &packet, 1);
                         e->field_28++;
                     }
                     changed = 1;
@@ -242,10 +242,10 @@ void Class_0046d860::ProcessSync() {
         }
 
         if (changed != 0) {
-            typedef std::map<unsigned int, Rect_0046e160>::_Imp Tree;
+            typedef std::map<unsigned int, UnitSyncEntry>::_Imp Tree;
             typedef void (Tree::iterator::*Increment)();
             Increment increment = &Tree::iterator::_Inc;
-            for (std::map<unsigned int, Rect_0046e160>::iterator k = map.begin(); k != map.end();
+            for (std::map<unsigned int, UnitSyncEntry>::iterator k = map.begin(); k != map.end();
                  (k.*increment)()) {
                 CheckUnitAvailable(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(k->second.x)))))))))), 0);
             }

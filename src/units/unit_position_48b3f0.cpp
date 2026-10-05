@@ -97,7 +97,7 @@
 
 #pragma pack(push, 1)
 
-class Class_00415dc0 {
+class BitReader {
 public:
     unsigned int* data;                // +0x00
     int index;                         // +0x04
@@ -207,7 +207,7 @@ void __stdcall FUN_0047cc30(Class_0048b090* u);
 void __stdcall FUN_004827b0(Class_0048b090* u);
 
 // FUNCTION: 0x48b3f0
-void __stdcall FUN_0048b3f0(Class_00415dc0* reader, Class_0048b090* u)
+void __stdcall FUN_0048b3f0(BitReader* reader, Class_0048b090* u)
 {
     unsigned short type = (unsigned short)reader->ReadBits(g_game->field_14393);
     int zero = 0;

@@ -50,7 +50,7 @@ public:
     void NotifyEntryChanged(unsigned int key);
 };
 
-class Class_0046e330 {
+class UnitSync {
 public:
     Less_0046e330 compare;
     Node_0046e330* head;               // +0x4
@@ -66,7 +66,7 @@ public:
 
 
 // FUNCTION: 0x46e550
-void Class_0046e330::SetUnitLimit(Unit_0046e330* unit, int value)
+void UnitSync::SetUnitLimit(Unit_0046e330* unit, int value)
 {
     Iter_0046e330 it = Find(&unit->key);
     if (!(it == End())) {

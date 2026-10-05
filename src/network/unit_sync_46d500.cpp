@@ -4,7 +4,7 @@
 // the call, so ecx (this) flows through unchanged from ReceiveSyncPacket's own
 // thiscall "this" into HandleSyncPacket's.
 
-class Class_0046d6c0 {
+class UnitSync {
 public:
     void HandleSyncPacket(void* param_1, int param_2);
 };
@@ -20,6 +20,6 @@ void Class_0046d500::ReceiveSyncPacket(void* param_1, int param_2)
     unsigned char b = *((unsigned char*)param_1 + 1);
     *(int*)((char*)param_1 + 2) = 0;
     if (b < 0x64) {
-        ((Class_0046d6c0*)this)->HandleSyncPacket(param_1, param_2);
+        ((UnitSync*)this)->HandleSyncPacket(param_1, param_2);
     }
 }

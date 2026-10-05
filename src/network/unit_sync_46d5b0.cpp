@@ -30,7 +30,7 @@ static inline void SendPacket(unsigned int to, void* packet)
     SendPacketToPlayer(GetLocalHumanDpid(), to, packet, 0xe);
 }
 
-class Class_0046d4c0 {
+class UnitSync {
 public:
     char unknown_0[0x58];
     int direct;                        // +0x58
@@ -41,7 +41,7 @@ public:
 };
 
 // FUNCTION: 0x46d5b0
-void Class_0046d4c0::SendSyncMessageTo(Target_0046d5b0* target, unsigned char arg, int a, int b, int unused)
+void UnitSync::SendSyncMessageTo(Target_0046d5b0* target, unsigned char arg, int a, int b, int unused)
 {
     if (disabled == 0) {
         Packet_0046d5b0 packet;

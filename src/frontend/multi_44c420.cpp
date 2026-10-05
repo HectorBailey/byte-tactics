@@ -65,7 +65,7 @@ struct Class_0046e4d0 {
     int AllowUnit(Item_0044c420* unit);
 };
 
-struct Class_0046e330 {
+struct UnitSync {
     void SetUnitLimit(Item_0044c420* unit, int value);
 };
 
@@ -177,7 +177,7 @@ void __stdcall FUN_0044c420(Menu_0044c420* menu)
                 else
                     DAT_005129b4[i].field_5a = 0;
                 if (DAT_005129b4[i].field_5a != DAT_005129b4[i].field_56) {
-                    ((Class_0046e330*)g_game->queue)->SetUnitLimit(
+                    ((UnitSync*)g_game->queue)->SetUnitLimit(
                         &g_game->items[DAT_005129b4[i].field_52],
                         DAT_005129b4[i].field_5a);
                 }
@@ -200,7 +200,7 @@ void __stdcall FUN_0044c420(Menu_0044c420* menu)
             // +0x20, so its address can never be null); kept for byte fidelity.
             if (g_game->items[i].field_245.bits.flag) {
             } else if (g_game->items[i].name != 0) {
-                ((Class_0046e330*)g_game->queue)->SetUnitLimit(
+                ((UnitSync*)g_game->queue)->SetUnitLimit(
                     &g_game->items[i], DAT_005129c4[n]);
                 n++;
             }

@@ -16,7 +16,7 @@ public:
     void GrowBuffer();
 };
 
-class Class_00415c10 : public Class_00415b60 {
+class BitWriter : public Class_00415b60 {
 public:
     int bit;                           // +0x0 current word index
     int index;                         // +0x4 bits used in the current word
@@ -70,7 +70,7 @@ struct Game {
 extern Game* g_game;
 
 // FUNCTION: 0x48b200
-void __stdcall FUN_0048b200(Class_00415c10* stream, Unit* u)
+void __stdcall FUN_0048b200(BitWriter* stream, Unit* u)
 {
     stream->WriteBits(u->field_a6, g_game->field_14393);
     if (u->field_a6 == 0)

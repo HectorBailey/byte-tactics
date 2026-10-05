@@ -40,7 +40,7 @@ void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* p);
 
 // Bit reader, see src/network/net_stats_415dc0.cpp.
-class Class_00415dc0 {
+class BitReader {
 public:
     unsigned int* data;                // +0x00
     int index;                         // +0x04
@@ -145,7 +145,7 @@ int FrameQueue::QueueFrames(char* src, unsigned int size, int tick, int a4, int 
             break;
         unsigned short w;
         if (c == 0x2c) {
-            Class_00415dc0 reader;
+            BitReader reader;
             reader.data = (unsigned int*)p;
             reader.index = 0;
             reader.bit = 0;
@@ -180,7 +180,7 @@ int FrameQueue::QueueFrames(char* src, unsigned int size, int tick, int a4, int 
                 unsigned char c = *q;
                 unsigned short w;
                 if (c == 0x2c) {
-                    Class_00415dc0 reader;
+                    BitReader reader;
                     reader.data = (unsigned int*)q;
                     reader.index = 0;
                     reader.bit = 0;
@@ -218,7 +218,7 @@ int FrameQueue::QueueFrames(char* src, unsigned int size, int tick, int a4, int 
                 break;
             unsigned short w;
             if (c == 0x2c) {
-                Class_00415dc0 reader;
+                BitReader reader;
                 reader.data = (unsigned int*)q;
                 reader.index = 0;
                 reader.bit = 0;
