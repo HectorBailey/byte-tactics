@@ -146,14 +146,14 @@ void __stdcall FUN_0041c150(Unit* unit);
 void __stdcall FUN_0041b8d0(Unit* unit, Unit* target);
 void __stdcall DamageUnit(Unit* unit, Unit* target, int n, int kind, int flag);
 int __stdcall FUN_00438700(Unit* unit, Order* order, int flags);
-Vec3 __stdcall FUN_0043e060(Unit* unit, int piece);
+Vec3 __stdcall GetPiecePosition(Unit* unit, int piece);
 int __stdcall FUN_0047db70(UnitType* type, short a, Point16 cell, int b);
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short type, Vec3 pos, int a, int b, int c);
 void __stdcall AttachUnitToPiece(Unit* unit, Unit* builder, char piece, char p4);
 void __stdcall FUN_0043adc0(Class_00438760 kind, int remove, Unit* owner, Unit* id, int flags, int param_6, int param_7);
 int __stdcall FUN_0041bd10(Unit* builder, Unit* unit, float amount);
 int __stdcall FUN_0041ba60(Unit* unit, Unit* target, float amount);
-void __stdcall FUN_0043e400(Unit* unit, Vec3* out);
+void __stdcall GetNanoPiecePosition(Unit* unit, Vec3* out);
 void __stdcall FUN_004720d0(Vec3* from, Box* to, int count);
 
 // Order handler "Repairing": the order's target unit (the builder) repairs
@@ -181,7 +181,7 @@ int __stdcall FUN_00402430(Unit* unit, Order* order, int unused)
         unit->repairTime = g_game->ticks + 0x96;
         if (FUN_0041bd10(order->target.owner, unit, (float)(order->target.owner->type->workerTime / 30))) {
             Vec3 nano;
-            FUN_0043e400(order->target.owner, &nano);
+            GetNanoPiecePosition(order->target.owner, &nano);
             Box box;
             box.hi = unit->pos;
             box.lo = unit->pos;
@@ -271,7 +271,7 @@ int __stdcall FUN_00402640(Unit* unit, Order* order, int flags)
     case 2: {
         int piece = -1;
         unit->script->QueryScript("QueryBuildInfo", &piece, 0, 0, 0);
-        order->pos = FUN_0043e060(unit, piece);
+        order->pos = GetPiecePosition(unit, piece);
         UnitType* ut = &g_game->unitTypes[order->unitType];
         Point16 cell = GridCell(order->pos, ut->footprint);
         if (!FUN_0047db70(ut, 0, cell, unit->flags & 3)) {
@@ -299,7 +299,7 @@ int __stdcall FUN_00402640(Unit* unit, Order* order, int flags)
         if (order->target.owner != 0) {
             if (FUN_0041ba60(unit, order->target.owner, (float)(unit->type->workerTime / 30))) {
                 Vec3 nano;
-                FUN_0043e400(unit, &nano);
+                GetNanoPiecePosition(unit, &nano);
                 Box box;
                 box.hi = order->target.owner->pos;
                 box.lo = order->target.owner->pos;

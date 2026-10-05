@@ -11,7 +11,7 @@
 //    FUN_00421620 consumes) from the data->unit pointer at +0x0c, the first
 //    argument and six FUN_004b6c30 random draws, then hands it to
 //    FUN_00421620.
-//  - (b & 0x3f00): computes the unit's position with FUN_0043e060 and appends
+//  - (b & 0x3f00): computes the unit's position with GetPiecePosition and appends
 //    it to up to six tables in g_game (+0x147f7, a six-pointer array) with
 //    FUN_00420a30(&v, table, 2, 0).
 //
@@ -80,7 +80,7 @@ extern Game* g_game;
 
 int __stdcall FUN_004b6c30(int range);
 void __stdcall FUN_00421620(Header_00481140* h);
-Vec3_00481140 __stdcall FUN_0043e060(Unit* obj, int param);
+Vec3_00481140 __stdcall GetPiecePosition(Unit* obj, int param);
 void __stdcall FUN_00420a30(void* pos, void* src, int index, int flag);
 
 struct Elem_4b0610 {
@@ -138,7 +138,7 @@ void UnitScript::ExplodePiece(int a, unsigned int b)
     }
     if (b & 0x3f00) {
         Vec3_00481140 v;
-        v = FUN_0043e060(data->unit, a);
+        v = GetPiecePosition(data->unit, a);
         if (b & 0x100)
             FUN_00420a30(&v, g_game->sources[0], 2, 0);
         if (b & 0x200)

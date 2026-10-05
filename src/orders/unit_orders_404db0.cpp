@@ -162,7 +162,7 @@ unsigned short __stdcall GetHeadingBetween(Vec3* from, Vec3* to);
 void __stdcall FUN_00438590(Unit* unit, Order* order, short turn);
 int __stdcall FUN_00438700(Unit* unit, Order* order, int flags);
 unsigned short __stdcall FUN_00488b10(char* name);
-void __stdcall FUN_0043e400(Unit* unit, Vec3* out);
+void __stdcall GetNanoPiecePosition(Unit* unit, Vec3* out);
 void __stdcall FUN_004720d0(Vec3* from, Box* to, int count);
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short type, Vec3 pos, int a, int b, int c);
 Cell* __stdcall FUN_004815f0(Vec3* pos);
@@ -237,7 +237,7 @@ int __stdcall FUN_00404db0(Unit* unit, Order* order, int flags)
     case 4:
         if (order->time--) {
             Vec3 nano;
-            FUN_0043e400(unit, &nano);
+            GetNanoPiecePosition(unit, &nano);
             Box box;
             box.lo.x = cell.x << 20;
             box.lo.z = cell.z << 20;

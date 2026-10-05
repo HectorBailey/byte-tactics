@@ -187,7 +187,7 @@ public:
 
 class Class_0043dd70 {
 public:
-    void FUN_0043dd70(Unit* unit, void* file);
+    void SaveMotion(Unit* unit, void* file);
 };
 
 class Class_004b4560 {
@@ -256,7 +256,7 @@ void __stdcall FUN_004876c0(Class_004b4560* file)
             }
 
             if (unit->vtable != 0)
-                ((Class_0043dd70*)unit->vtable)->FUN_0043dd70(unit, file);
+                ((Class_0043dd70*)unit->vtable)->SaveMotion(unit, file);
             ((Class_004010b0*)((char*)unit + 0xbc))->FUN_004010b0(unit, file);
 
             strcpy(rec.name, (char*)(*(char**)((char*)unit + 0x92) + 0x20));

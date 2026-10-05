@@ -124,7 +124,7 @@ void __stdcall FUN_00438590(Unit* unit, Order* order, short turn);
 int __stdcall FUN_00438700(Unit* unit, Order* order, int flags);
 void __stdcall FUN_004385f0(Unit* unit, Order* order);
 int __stdcall FUN_0041bd10(Unit* builder, Unit* unit, float amount);
-void __stdcall FUN_0043e400(Unit* unit, Vec3* out);
+void __stdcall GetNanoPiecePosition(Unit* unit, Vec3* out);
 void __stdcall FUN_004720d0(Vec3* from, Box* to, int count);
 
 // Order handler "Repair" of a builder: walks up to the target unit, then
@@ -181,7 +181,7 @@ int __stdcall FUN_00405300(Unit* unit, Order* order, int flags)
         unit->repairTime = g_game->ticks + 150;
         if (FUN_0041bd10(unit, order->target, (float)(unit->type->workerTime / 30))) {
             Vec3 nano;
-            FUN_0043e400(order->source, &nano);
+            GetNanoPiecePosition(order->source, &nano);
             Box box;
             box.hi = order->target->pos;
             box.lo = order->target->pos;

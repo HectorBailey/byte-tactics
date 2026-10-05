@@ -229,7 +229,7 @@ public:
 class Class_004388b0 { public: void FUN_004388b0(); };
 void __stdcall FUN_0047db20(Unit* unit);
 class Class_00401110 { public: void FUN_00401110(Unit*, Class_004b4560*); };
-class Class_0043d210 { public: void FUN_0043de30(Unit*, Class_004b4560*); };
+class Class_0043d210 { public: void LoadMotion(Unit*, Class_004b4560*); };
 class CobScript { public: void LoadScriptState(Class_004b4560*); };
 
 
@@ -320,7 +320,7 @@ Unit* __stdcall FUN_00487080(unsigned short id, Class_004b4560* file)
 
     ((Class_00401110*)&unit->info)->FUN_00401110(unit, file);
     if (rec.f27 != 0)
-        ((Class_0043d210*)unit->vtable)->FUN_0043de30(unit, file);
+        ((Class_0043d210*)unit->vtable)->LoadMotion(unit, file);
 
     Class_0043a420** normal = (Class_0043a420**)&unit->listHead;
     Class_0043a420** special = (Class_0043a420**)&unit->listTail;

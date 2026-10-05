@@ -17,11 +17,11 @@ public:
     int* block;                        // +0x4
     Chunk_004379b0* free;              // +0x8
 
-    int FUN_004379b0(unsigned int size);
+    int InitCache(unsigned int size);
 };
 
 // FUNCTION: 0x4379b0
-int Class_004379b0::FUN_004379b0(unsigned int newSize)
+int Class_004379b0::InitCache(unsigned int newSize)
 {
     if (block != 0) {
         FUN_004d85a0(block);

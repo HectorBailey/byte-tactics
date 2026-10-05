@@ -558,7 +558,7 @@ public:
     int field_20;                     // +0x20
     short turn;                       // +0x24
 
-    void FUN_0043cd20(Unit* unit);
+    void SteerGroundUnit(Unit* unit);
 };
 
 // The preceding function in the original object file (0x43cc20, matched in
@@ -591,7 +591,7 @@ void Class_0043cc20::FUN_0043cc20(Unit* unit, int amount)
 }
 
 // FUNCTION: 0x43cd20
-void Class_0043cd20::FUN_0043cd20(Unit* unit)
+void Class_0043cd20::SteerGroundUnit(Unit* unit)
 {
     if (obj->v5() == 0) {
         turn = 0;

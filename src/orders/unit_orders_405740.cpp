@@ -29,7 +29,7 @@ struct Game { char pad0[0x38a47]; int tick; };
 extern Game* g_game;
 void __stdcall FUN_0047f780(Unit*, int, const char*);
 int __stdcall FUN_0041bd10(Unit*, Unit*, float);
-void __stdcall FUN_0043e400(Unit*, Vec3*);
+void __stdcall GetNanoPiecePosition(Unit*, Vec3*);
 void __stdcall FUN_004720d0(Vec3*, Vec3*, int);
 // FUNCTION: 0x405740
 int __stdcall FUN_00405740(Unit* unit, Order* order, int unused)
@@ -57,7 +57,7 @@ int __stdcall FUN_00405740(Unit* unit, Order* order, int unused)
         rate = unit->def->buildRate;
         if (FUN_0041bd10(unit, order->target.Get(), (float)(rate / 30))) {
             Vec3 start;
-            FUN_0043e400(order->source, &start);
+            GetNanoPiecePosition(order->source, &start);
             Vec3 bounds[2];
             bounds[1] = order->target.Get()->pos;
             bounds[0] = order->target.Get()->pos;

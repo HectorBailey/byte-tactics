@@ -55,7 +55,7 @@ union Fixed_437840 {
 Cell_437840* __stdcall FUN_00481550(int x, int y);
 
 // FUNCTION: 0x437840
-void __stdcall FUN_00437840(Unit* unit)
+void __stdcall UpdateMetalExtraction(Unit* unit)
 {
     if (unit->type->extractsMetal > 0.0f) {
         Fixed_437840 total;

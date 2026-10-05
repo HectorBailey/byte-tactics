@@ -24,7 +24,7 @@ class Class_0043d210 {
 public:
     char unknown_0[0x2e];
     unsigned char field_2e;            // +0x2e
-    void FUN_0043d210(Unit* unit, int state);
+    void SetFlightMode(Unit* unit, int state);
 };
 class Class_004898b0 { public: void ClaimWeapons(int); };
 class Class_0048b090 { public: void SetStateBits(int, int); };
@@ -83,7 +83,7 @@ void __stdcall FUN_0047f780(Unit*, int, const char*);
 // as a dword, which a char parameter would load as a byte.
 void __stdcall AttachUnitToPiece(Unit* unit, Unit* target, int p3, char p4);
 int __stdcall FUN_00456200(Unit* unit, char* name, char p3, int p4, int p5, int p6, int p7);
-Vec3 __stdcall FUN_0043def0(Unit* unit, int piece);
+Vec3 __stdcall GetPieceOffset(Unit* unit, int piece);
 
 // 0x40f200, matched in 0x40f200.cpp; inlined into the state 0 case below.
 void __stdcall FUN_0040f200(Unit* unit, Order* order, unsigned int flags)
@@ -93,7 +93,7 @@ void __stdcall FUN_0040f200(Unit* unit, Order* order, unsigned int flags)
         AttachUnitToPiece(unit, 0, -1, 2);
     ((Class_0048b090*)unit)->SetStateBits(1, 1);
     if ((unit->type->field_2e & 3) == 1) {
-        unit->type->FUN_0043d210(unit, 2);
+        unit->type->SetFlightMode(unit, 2);
         Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);
         ((Class_0044e6c0*)obj)->FUN_0044e6c0(unit->def->field_21c / 2);
         ((Class_004388d0*)order)->FUN_004388d0((int)obj);
@@ -151,7 +151,7 @@ int __stdcall FUN_004111b0(Unit* unit, Order* order, int flags)
             int height = target->def->field_16e;
             unit->script->StartScriptWithArgs("BeginTransport", 0, 1, 1, height, 0, 0, 0);
             FUN_00456200(unit, "BeginTransport", 1, height, 0, 0, 0);
-            Vec3 offset = FUN_0043def0(unit, order->piece);
+            Vec3 offset = GetPieceOffset(unit, order->piece);
             Class_0044e250* obj = new Class_0044e250(order, order->target, -1);
             ((Class_0044e6c0*)obj)->FUN_0044e6c0(-offset.yw);
             ((Class_004388d0*)order)->FUN_004388d0((int)obj);

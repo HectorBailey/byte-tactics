@@ -26,10 +26,10 @@ struct Class_00481490 {                  // 0x1c bytes, vtable 0x4fd6f0
     char unknown_4[0x1c - 0x4];
 };
 
-class Class_0043dc00 {
+class UnitMotion {
 public:
     char unknown_0[0x2f];
-    Class_0043dc00(Unit* unit);
+    UnitMotion(Unit* unit);
 };
 
 class Class_00490520 {
@@ -58,7 +58,7 @@ struct Spawn_004861d0 {                  // 0x11 bytes
 };
 
 struct Unit {                            // 0x118 bytes
-    Class_0043dc00* obj;                 // +0x0
+    UnitMotion* obj;                     // +0x0
     char unknown_4[0x8 - 0x4];
     Class_00481490 sub_8;                // +0x8
     Class_00481490 sub_24;               // +0x24
@@ -100,7 +100,7 @@ void __stdcall KillUnit(Unit* unit, int param_2);
 void __stdcall InitUnitFromType(Unit* unit, Pos_004861d0 pos, int param_5);
 void __stdcall InitUnitScript(Unit* unit);
 void __stdcall FUN_0049e070(Unit* unit);
-void __stdcall FUN_00437840(Unit* unit);
+void __stdcall UpdateMetalExtraction(Unit* unit);
 void __stdcall UpdateUnitHeight(Unit* unit);
 void __stdcall FUN_0047cc30(Unit* unit);
 void __stdcall FUN_00482ac0(Unit* unit);
@@ -123,9 +123,9 @@ static inline void __stdcall InitUnit_00485e90(unsigned short unitType, Pos_0048
     InitUnitFromType(unit, pos, param_5);
     InitUnitScript(unit);
     FUN_0049e070(unit);
-    FUN_00437840(unit);
+    UpdateMetalExtraction(unit);
     if (type->field_22f == 1) {
-        unit->obj = new Class_0043dc00(unit);
+        unit->obj = new UnitMotion(unit);
         unit->field_66 = unit->type->field_210;
     }
 }

@@ -209,7 +209,7 @@ class Class_004379a0;
 class Class_004379a0_2;
 class Class_004379b0;
 class Class_00437a20;
-class Class_00437a30;
+class CMemoryCache;
 class Class_00437c80;
 class Class_00438320;
 class Class_00438760;
@@ -234,7 +234,7 @@ class Class_0043d290;
 class Class_0043d6d0;
 class Class_0043da70;
 class Class_0043db50;
-struct Class_0043dc00;
+struct UnitMotion;
 class Class_0043dd70;
 struct Class_00440290;
 struct Class_004402e0;
@@ -2366,7 +2366,7 @@ struct Unit {  // 0x118 bytes, 462 views
     int field_0;  // +0x0
     Class_004c48c0* current;  // +0x4
     int field_8;  // +0x8
-    Class_0043dc00* type;  // +0xc
+    UnitMotion* type;      // +0xc
     Mover* f10;  // +0x10
     char unknown_14[2];
     short field_16;  // +0x16
@@ -2694,7 +2694,7 @@ struct Order_00403100 {  // 0x3a bytes, 1 view
 };
 
 struct Slot_004390a0 {  // 0x1c bytes, 8 views
-    Class_0043dc00* weapon;  // +0x0
+    UnitMotion* weapon;      // +0x0
     int field_4;  // +0x4
     short field_8;  // +0x8
     char unknown_a[4];
@@ -2980,7 +2980,7 @@ public:
 };
 
 struct Obj_00406f50 {  // 0x6b bytes, 26 views
-    Class_0043dc00* type;  // +0x0
+    UnitMotion* type;      // +0x0
     Vec3 pos;  // +0x4
     Vec3 start;  // +0x10
     int field_1c;  // +0x1c
@@ -3138,7 +3138,7 @@ struct Player {  // 0x14b bytes, 312 views
     float GetMetal(void);
 };
 
-struct Class_0043dc00 {  // 0x115 bytes, 58 views
+struct UnitMotion {      // 0x115 bytes, 58 views
     Handler_004388d0* handler;  // +0x0
     void* owner;  // +0x4
     Vec3 p1;  // +0x8
@@ -3192,9 +3192,9 @@ struct Class_0043dc00 {  // 0x115 bytes, 58 views
     unsigned char field_10e;  // +0x10e
     char unknown_10f[2];
     unsigned int flags;  // +0x111
-    Class_0043dc00(Unit*);
+    UnitMotion(Unit*);
     void FUN_0043dd10(void);
-    void FUN_0043dd20(Unit*);
+    void UpdateMotion(Unit*);
 };
 
 struct Slot_4b62d0 {  // 0x10 bytes, 5 views
@@ -3799,9 +3799,9 @@ public:
     unsigned char state : 2;  // +0x2e
     unsigned char flag : 1;
     unsigned char rest : 5;
-    void FUN_0043d0d0(Unit*, Vec3*);
-    void FUN_0043d210(Unit*, int);
-    void FUN_0043de30(Unit*, Class_004b4560*);
+    void ApplyBankAndPitch(Unit*, Vec3*);
+    void SetFlightMode(Unit*, int);
+    void LoadMotion(Unit*, Class_004b4560*);
 };
 
 class Class_0044e6c0 {  // 0x32 bytes, 21 views
@@ -3958,8 +3958,8 @@ public:
     void* handle;  // +0xc
     void* ptr;  // +0x10
     Class_00437c80* FUN_00458160(void);
-    void FUN_00437c80(void);
-    void FUN_00437c90(int);
+    void FlushCache(void);
+    void ReleaseHandle(int);
     void FUN_004581c0(void);
     void FUN_00458810(SpotState*, Vec3*);
 };
@@ -4648,9 +4648,9 @@ struct Engine {  // 0xf2 bytes, 2 views
 class Class_004379a0 {  // 0x1 bytes, 4 views
 public:
     char unknown_0[1];
-    int FUN_00437a30(int*, int);
+    int AllocHandle(int*, int);
     void FUN_004379a0(void);
-    void FUN_004379b0(int);
+    void InitCache(int);
     void FUN_00437a20(void);
 };
 
@@ -6259,7 +6259,7 @@ public:
     unsigned int size;  // +0x0
     int* block;  // +0x4
     Chunk* free;  // +0x8
-    int FUN_004379b0(unsigned int);
+    int InitCache(unsigned int);
 };
 
 class Class_00437a20 {  // 0x8 bytes, 2 views
@@ -6269,14 +6269,14 @@ public:
     void FUN_00437a20(void);
 };
 
-class Class_00437a30 {  // 0x14 bytes, 7 views
+class CMemoryCache {    // 0x14 bytes, 7 views
 public:
     int unknown_0[4];  // +0x0
     Bitmap_00437b50* scratch;  // +0x10
-    int FUN_00437a30(void**, int);
-    int FUN_00437b50(Bitmap_00437b50**, int, int);
+    int AllocHandle(void**, int);
+    int AllocBitmap(Bitmap_00437b50**, int, int);
     void FUN_0045a790(SpotState*, Bitmap_00437b50*);
-    int FUN_00437be0(Bitmap_00437b50**, int, int);
+    int AllocTwoPlaneBitmap(Bitmap_00437b50**, int, int);
 };
 
 struct Record_00474cd0 {  // 0x3c bytes, 24 views
@@ -6596,7 +6596,7 @@ public:
     int field_20;  // +0x20
     short turn;  // +0x24
     char unknown_26[2];
-    void FUN_0043cd20(Unit*);
+    void SteerGroundUnit(Unit*);
 };
 
 class Iface_0043dd20 {  // 0x4 bytes, 1 view
@@ -6611,7 +6611,7 @@ public:
 
 class Class_0043d290 : public Class_0043d210 {  // 0x2f bytes, 2 views
 public:
-    void FUN_0043d290(Unit*);
+    void SteerAircraft(Unit*);
 };
 
 class Class_0043d6d0 {  // 0x2f bytes, 2 views
@@ -6625,7 +6625,7 @@ public:
     unsigned char mode : 2;  // +0x2e
     unsigned char flag : 1;
     unsigned char unknown_2f : 5;
-    void FUN_0043d6d0(Unit*);
+    void UpdatePosition(Unit*);
 };
 
 struct FP_0043d6d0 {  // 0x4 bytes, 1 view
@@ -6640,13 +6640,13 @@ public:
     short field_24;  // +0x24
     char unknown_26[8];
     unsigned char field_2e;  // +0x2e
-    void FUN_0043da70(Unit*);
+    void UpdateMoveRate(Unit*);
 };
 
 class Class_0043db50 {  // 0x1 bytes, 2 views
 public:
     char unknown_0[1];
-    void FUN_0043db50(Unit*);
+    void UpdateSfxOccupy(Unit*);
 };
 
 struct Vec3i_00474130 {  // 0xc bytes, 3 views
@@ -6669,7 +6669,7 @@ public:
     unsigned char f2 : 1;
     unsigned char : 5;
     char unknown_2f[1];
-    void FUN_0043dd70(Unit*, Class_004b4560*);
+    void SaveMotion(Unit*, Class_004b4560*);
 };
 
 struct MobHdr_43dd70 {  // 0x24 bytes, 1 view
@@ -14229,7 +14229,7 @@ struct ProjFlags_0049b720 {  // 0x2 bytes, 1 view
 
 struct Weapon_0049b720 {  // 0x1c bytes, 1 view
     char unknown_0[16];
-    Class_0043dc00* type;  // +0x10
+    UnitMotion* type;      // +0x10
     char unknown_14[8];
 };
 
@@ -14282,7 +14282,7 @@ struct Head_0049cc20 {  // 0x80 bytes, 1 view
 struct Shot_0049cc20 {  // 0x1c bytes, 2 views
     char unknown_0[8];
     int piece;  // +0x8
-    Class_0043dc00* def;  // +0xc
+    UnitMotion* def;      // +0xc
     char unknown_10[6];
     short heading;  // +0x16
     short pitch;  // +0x18
@@ -14302,7 +14302,7 @@ struct Shot_0049d000 {  // 0x10 bytes, 1 view
 
 struct Entry_0049d120 {  // 0x1c bytes, 1 view
     char unknown_0[12];
-    Class_0043dc00* def;  // +0xc
+    UnitMotion* def;      // +0xc
     char unknown_10[10];
     unsigned char active;  // +0x1a
     char unknown_1b;  // +0x1b
@@ -14336,7 +14336,7 @@ struct DefFlags_0049d270 {  // 0x4 bytes, 1 view
 
 struct Entry_0049d270 {  // 0x1c bytes, 1 view
     char unknown_0[12];
-    Class_0043dc00* type;  // +0xc
+    UnitMotion* type;      // +0xc
     char unknown_10[6];
     short f_16;  // +0x16
     short f_18;  // +0x18
@@ -14385,7 +14385,7 @@ struct Packet_0049db70 {  // 0x24 bytes, 1 view
 
 struct Aim_0049dd60 {  // 0x1c bytes, 1 view
     char unknown_0[12];
-    Class_0043dc00* type;  // +0xc
+    UnitMotion* type;      // +0xc
     char unknown_10[6];
     short field_16;  // +0x16
     short field_18;  // +0x18
