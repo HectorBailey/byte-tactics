@@ -46,12 +46,7 @@ class Class_004388d0 { public: void FUN_004388d0(int); };
 class Class_00439e80 { public: void FUN_00439e80(int); };
 class Class_0044e6c0 { public: void FUN_0044e6c0(int); };
 class Class_0044e730 { public: void FUN_0044e730(short); };
-class Class_004b0940 { public: void StartScript(const char*, int, int); };
-class Class_004b0bc0 {
-public:
-    int QueryScript(char* name, int* param_2, int* param_3, int* param_4, int* param_5);
-};
-
+class CobScript { public: void StartScript(const char*, int, int); int QueryScript(char* name, int* param_2, int* param_3, int* param_4, int* param_5); };
 #pragma pack(push, 1)
 struct UnitDef {
     char pad0[0x170]; short field_170;
@@ -70,7 +65,7 @@ struct Unit {
     int field_82; int field_86;
     Unit* cargo;
     char pad8e[4]; UnitDef* def;
-    char pad96[4]; Class_004b0940* script;
+    char pad96[4]; CobScript* script;
     char pad9e[0x104 - 0x9e]; float buildLeft;
     short health;
     void ClaimWeapons(int);
@@ -153,7 +148,7 @@ int __stdcall FindLandingPad(Unit* unit, int pad)
     pads[1] = -1;
     pads[2] = -1;
     pads[3] = -1;
-    ((Class_004b0bc0*)unit->script)->QueryScript("QueryLandingPad", &pads[0], &pads[1], &pads[2], &pads[3]);
+    ((CobScript*)unit->script)->QueryScript("QueryLandingPad", &pads[0], &pads[1], &pads[2], &pads[3]);
     for (int i = 0; i < 4; i++) {
         if (pads[i] != -1 && FUN_0047e570(unit, pads[i])) {
             return pads[i];

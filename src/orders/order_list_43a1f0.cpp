@@ -4,13 +4,9 @@
 // same code as StopBuildingScript), releases the attached object at +0x52 and
 // unlinks the list node at +0x12 (0x489650 is the link's destructor).
 
-class Class_004b07c0 {
+class CobScript {
 public:
     int FindScript(char* name);
-};
-
-class Class_004b0b00 {
-public:
     int StartScriptWithArgsByIndex(int index, void* param_2, int param_3, int param_4, int param_5, int param_6, int param_7, int param_8);
 };
 
@@ -40,7 +36,7 @@ struct Owner_0043a1f0 {
 struct Unit {
     Owner_0043a1f0* owner;             // +0x0
     char unknown_4[0x9a - 0x4];
-    Class_004b07c0* names;             // +0x9a
+    CobScript* names;                  // +0x9a
     void ReleaseWeapons(int param_1);
 };
 
@@ -91,7 +87,7 @@ Class_0043a1f0::~Class_0043a1f0()
     if (flags & 0x400000) {
         Unit* obj = unit;
         int index = obj->names->FindScript("StopBuilding");
-        ((Class_004b0b00*)obj->names)->StartScriptWithArgsByIndex(index, 0, 0, 0, 0, 0, 0, 0);
+        ((CobScript*)obj->names)->StartScriptWithArgsByIndex(index, 0, 0, 0, 0, 0, 0, 0);
         SendScriptCallNoArgs(obj, index);
         flags &= ~0x400000;
     }

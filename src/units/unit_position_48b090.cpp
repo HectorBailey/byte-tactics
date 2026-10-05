@@ -391,7 +391,7 @@ public:
     Class_0043a1e0* value;              // +0xc
 };
 
-class Class_004b0940 {
+class CobScript {
 public:
     void StartScript(const char* name, int a, int b);
 };
@@ -401,7 +401,7 @@ class Unit {
 public:
     char unknown_0[0x96];
     Player_0048b090* player;            // +0x96
-    Class_004b0940* vars;               // +0x9a, the script
+    CobScript* vars;                    // +0x9a, the script
     void* block;                        // +0x9e
     Class_004895c0* head;               // +0xa2, the link list
     char unknown_a6[0xa8 - 0xa6];

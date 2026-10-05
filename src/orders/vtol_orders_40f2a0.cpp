@@ -28,7 +28,7 @@ public:
 class Class_004388d0 { public: void FUN_004388d0(int); };
 class Class_0044e6c0 { public: void FUN_0044e6c0(int); };
 class Class_0044e730 { public: void FUN_0044e730(short); };
-class Class_004b0940 { public: void StartScript(const char*, int, int); };
+class CobScript { public: void StartScript(const char*, int, int); };
 
 #pragma pack(push, 1)
 struct UnitDef {
@@ -41,7 +41,7 @@ struct Unit {
     char pad76[8]; Point footprint;
     int field_82; int field_86;
     char pad8a[8]; UnitDef* def;
-    char pad96[4]; Class_004b0940* script;
+    char pad96[4]; CobScript* script;
     void ClaimWeapons(int);
     void SetStateBits(int, int);
 };

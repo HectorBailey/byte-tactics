@@ -100,7 +100,7 @@ struct Feature {
     char data[0x115];
 };
 
-class Class_004b0b00 {
+class CobScript {
 public:
     int StartScriptWithArgsByIndex(int, int, int, int, int, int, int, int);
 };
@@ -108,7 +108,7 @@ public:
 class Unit {
 public:
     char unknown_0[0x9a];
-    Class_004b0b00* field_9a;          // +0x9a
+    CobScript* field_9a;               // +0x9a
     char unknown_9e[0x110 - 0x9e];
     unsigned int flags_110;            // +0x110
     char unknown_114[4];

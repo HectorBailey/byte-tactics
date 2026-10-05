@@ -41,7 +41,7 @@ public:
     void FUN_00439e80(int ticks);
 };
 
-class Class_004b0bc0 {
+class CobScript {
 public:
     int QueryScript(char* name, int* param_2, int* param_3, int* param_4, int* param_5);
 };
@@ -80,7 +80,7 @@ struct Unit {
     char unknown_76[0x92 - 0x76];
     UnitDef* type;                     // +0x92
     char unknown_96[0x9a - 0x96];
-    Class_004b0bc0* script;            // +0x9a
+    CobScript* script;                 // +0x9a
     char unknown_9e[0xb0 - 0x9e];
     int repairTime;                    // +0xb0
     char unknown_b4[0xd4 - 0xb4];

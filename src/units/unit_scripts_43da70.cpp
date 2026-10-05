@@ -1,6 +1,6 @@
 // Decompiled by DeepSeek V4.1 Flash. Names are provisional.
 
-class Class_004b0940 { public: void StartScript(const char*, int, int); };
+class CobScript { public: void StartScript(const char*, int, int); };
 
 #pragma pack(push, 1)
 struct Type_0043da70 {
@@ -15,7 +15,7 @@ struct Unit {
     char unknown_8a[0x92 - 0x8a];
     Type_0043da70* field_92;       // +0x92
     char unknown_96[0x9a - 0x96];
-    Class_004b0940* script;        // +0x9a
+    CobScript* script;             // +0x9a
     char unknown_9e[0x110 - 0x9e];
     unsigned int flags;            // +0x110
 };

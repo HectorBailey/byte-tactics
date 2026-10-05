@@ -82,6 +82,7 @@ public:
     virtual ~CobScript();                             // slot 20
 
     void SetCob(Data_00485d40* data);
+    void StartScript(const char* name, int a, int b);
 };
 
 class UnitScript : public CobScript {
@@ -108,19 +109,6 @@ public:
     virtual int GetUnitValue(int, int, int, int, int); // slot 17, 0x480770
     virtual int IsCarryingUnit(int);                  // slot 18, 0x481430
     virtual int GetTransporterId();                   // slot 19, 0x481470
-};
-
-// The two names below are the ones data/symbols.csv gives 0x480d40 and
-// 0x4b0940, but both are called on the variable block here, through casts.
-class Class_004b0940 {
-public:
-    void StartScript(const char* name, int a, int b);
-};
-
-class Class_00480d40 {
-public:
-    char unknown_0[0x540];
-    void* field_540;               // +0x540, the state block
 
     void SetObjectState(ObjectState_00485d40* state);
 };
@@ -151,8 +139,8 @@ void __stdcall InitUnitScript(Object_00485d40* self)
         self->vars = new UnitScript;
         self->vars->SetCob(self->unit->data);
         self->state = CreatePlayerObjectState(obj, self->unit->data, (int)self);  // the owner, as an int
-        ((Class_00480d40*)self->vars)->SetObjectState(self->state);
-        ((Class_004b0940*)self->vars)->StartScript("Create", 0, 1);
+        self->vars->SetObjectState(self->state);
+        ((CobScript*)self->vars)->StartScript("Create", 0, 1);
     } else {
         self->vars = 0;
         self->state = CreateObjectState(obj);
