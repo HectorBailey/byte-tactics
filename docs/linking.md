@@ -154,7 +154,7 @@ What stands out:
   `operator delete`s repeated in each file of a class family
   (`Class_00407350`'s constructor in 8 files, `Class_00471cc0`'s destructor and
   `operator delete` in 6). The 3 globals defined twice are `DAT_00512340`,
-  `DAT_00512358` and `g_packetManager`.
+  `g_movementClasses` and `g_packetManager`.
 - **53 folds are silent hazards.** Inline functions and vtables that differ
   between objects link without complaint and the linker keeps any one. Most
   come from files standing in for a helper differently: `vector<Unit*>::_Ucopy`
