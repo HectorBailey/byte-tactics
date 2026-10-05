@@ -59,7 +59,7 @@ GHIDRA = ROOT / "build/ghidra/decomp"
 INIT_CAP = 64
 DATA_LO, DATA_HI = 0x4FC000, 0x52D000
 COLUMNS = ["address", "name", "section", "size", "size_from", "kind", "type", "type_files", "other_files",
-           "types", "verdict", "files", "max_offset", "ghidra", "pointers", "init"]
+           "types", "verdict", "files", "max_offset", "ghidra", "pointers", "defined", "init"]
 
 
 # --- the exe --------------------------------------------------------------------
@@ -125,9 +125,17 @@ def referenced_addresses(img: Image) -> set[int]:
         raw = img.orig.read(lo, raw_end - lo)
         for i in range(0, len(raw) - 3, 4):
             (v,) = struct.unpack_from("<I", raw, i)
-            if DATA_LO <= v < DATA_HI:
+            if DATA_LO <= v < DATA_HI and not text_fragment(raw[i:i + 3]):
                 out.add(v)
     return out
+
+
+def text_fragment(low: bytes) -> bool:
+    """Whether the low three bytes of a dword that looks like an address are
+    text: four bytes of a string ("BAR" and its terminator are 0x524142), not
+    a pointer. An address's low bytes are printable only by chance, and a
+    false boundary cuts a .bss buffer short."""
+    return all(0x20 <= c < 0x7F for c in low)
 
 
 def ghidra_labels() -> dict[int, str]:
@@ -237,6 +245,19 @@ def portable(t: tuple | None) -> bool:
 
 # --- the manifest ---------------------------------------------------------------------
 
+def row_element(t: tuple | None) -> int | None:
+    """The size of one element of an array's outermost dimension
+    (int[45][2] -> 8), or None for anything else."""
+    if t is None or t[0] != "arr" or not t[1] or not all(t[1]):
+        return None
+    size = type_size(t[2])
+    if not size:
+        return None
+    for d in t[1][1:]:
+        size *= d
+    return size
+
+
 def build(objects, img: Image) -> list[dict]:
     symbols = load_symbols()
     table = global_table(objects, symbols)
@@ -274,11 +295,17 @@ def build(objects, img: Image) -> list[dict]:
         tsize = type_size(t)
         if re.match(r"(IID|CLSID|GUID)_", g["name"]):
             tsize = 16  # a COM interface or class id, declared through a macro
+        section = img.section(addr)
         if tsize:
             size, size_from = tsize, ("type>gap" if tsize > gap and tsize > hi + 1 else "type")
+            elem = row_element(t)
+            if section == ".bss" and elem and gap > tsize and gap % elem == 0:
+                # An uninitialised buffer owns the space up to the next thing the
+                # image refers to: the source may declare it too small
+                # (DAT_00528ae8 is declared char[0x1e8] in a 0x3e8-byte slot).
+                size, size_from = gap, "gap>type"
         else:
             size, size_from = gap, "gap"
-        section = img.section(addr)
         raw = img.read(addr, min(size, INIT_CAP))
         kind = "data"
         name = g["name"]
@@ -298,8 +325,12 @@ def build(objects, img: Image) -> list[dict]:
         whole = img.read(addr, size)
         pointers = sum(1 for i in range(0, len(whole) - 3, 4)
                        if 0x401000 <= struct.unpack_from("<I", whole, i)[0] < DATA_HI)
+        # Where it is defined: src/data, or the tree files that define it.
+        defined = (sorted({f for f in g["defined_in"] if f.startswith("src/data/")})
+                   or sorted(set(g["defined_in"])))
         rows.append({
             "address": f"{addr:#x}", "name": name, "section": section, "size": size,
+            "defined": defined[0] if defined else "",
             "size_from": size_from, "kind": kind, "type": key, "type_files": agree, "other_files": other,
             "types": len(g["types"]), "verdict": g["verdict"], "files": len(g["files"]),
             "max_offset": f"{hi:#x}" if g["addends"] and hi > 0 else "",
@@ -346,7 +377,7 @@ class Entry:
 def header_entry(row: dict) -> Entry | None:
     """The declaration of one global for globals.h, or None when its type is not settled."""
     g, t = row["_g"], row["_t"]
-    if row["kind"] in ("template", "library", "vtable"):
+    if row["kind"] in ("template", "library", "vtable") or row["defined"].startswith("src/data/"):
         return None
     if not settled(g, row["type"], row["type_files"], row["other_files"]):
         return None
@@ -373,6 +404,10 @@ def header_entry(row: dict) -> Entry | None:
         elem = type_size(t[2])
         if elem and size % elem == 0 and portable(t[2]):
             t = ("arr", [size // elem] + list(t[1][1:]), t[2])
+    elif row["size_from"] == "gap>type" and portable(t[2]):
+        # An uninitialised buffer that runs on to the next known address.
+        t = ("arr", [size // row_element(t)] + list(t[1][1:]), t[2])
+        note += f" (declared {row['type']})"
     if portable(t):
         return Entry(row, name, t, linkage, f"{note}; {agree}")
     return Entry(row, name, byte_array, linkage, f"{note}; {row['type']} by value in {agree}")
@@ -411,9 +446,12 @@ def write_header(rows: list[dict]) -> list[Entry]:
     width = max(len(e.declaration) for e in entries)
     for e in entries:
         lines.append(f"{e.declaration:{width}s}  // {e.note}")
-    lines += ["", f"// Not declared: {len(skipped)} globals whose type is not settled (see data/globals.csv)."]
+    lines += ["", f"// Not declared: {len(skipped)} globals defined in src/data or whose type is not settled "
+              "(see data/globals.csv)."]
     for row in sorted(skipped, key=lambda r: -r["files"]):
-        if row["kind"] in ("template", "library", "vtable"):
+        if row["defined"].startswith("src/data/"):
+            why = f"defined in {row['defined']}"
+        elif row["kind"] in ("template", "library", "vtable"):
             why = f"{row['kind']}"
         else:
             views = ", ".join(f"{k} ({n})" for k, n in row["_g"]["types"].most_common(4))

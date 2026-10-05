@@ -76,9 +76,9 @@ SKIP_SECTIONS = (".drectve", ".debug")
 # Where each byte of the image came from.
 SOURCES = ["unset", "game code", "game data", "global data", "library (copied)", "gap (copied)",
            "data (copied)", "padding", "headers, imports, resources (copied)", "library code",
-           "library data", "gap code"]
+           "library data", "gap code", "data source"]
 (UNSET, CODE, OBJDATA, GLOBALDATA, LIBRARY, GAP, COPIED, PADDING, FIXED, LIBCODE,
- LIBDATA, GAPCODE) = range(len(SOURCES))
+ LIBDATA, GAPCODE, DATASRC) = range(len(SOURCES))
 
 # The libraries the original links statically: the VC5 SP3 C and C++ runtimes,
 # and zlib 1.0.4 as tools/setup_toolchain.sh builds it with Cavedog's options.
@@ -127,6 +127,7 @@ class Obj:
     raw: bytes
     library: bool = False      # a member of a runtime or third-party library
     gap: bool = False          # a gap region's source (tools/gapcheck.py)
+    data: bool = False         # the data as source (src/data)
     externals: dict[str, Sym] = field(default_factory=dict)
     absolutes: dict[str, int] = field(default_factory=dict)    # IMAGE_SYM_ABSOLUTE externals
     commons: dict[str, int] = field(default_factory=dict)      # communal (.bss) externals -> size
@@ -424,7 +425,7 @@ class Placer:
         if obj.library:
             source = LIBCODE if sec.is_code else LIBDATA
         else:
-            source = (GAPCODE if obj.gap else CODE) if sec.is_code else OBJDATA
+            source = (GAPCODE if obj.gap else CODE) if sec.is_code else (DATASRC if obj.data else OBJDATA)
         piece = self.place(obj, sec, lo, hi, start, source, f"{sec.name} of {obj.path.stem} ({sym.name})")
         piece.why = why
         self.stats["code pieces placed where the original refers to them" if sec.is_code
@@ -768,6 +769,28 @@ def place_gaps(placer: Placer, gaps: dict) -> None:
         placer.stats["gap regions built from source"] += 1
 
 
+def place_data_sources(placer: Placer, objects_by_src: dict[str, Obj]) -> None:
+    """src/data, the game's data as source: every global at the address its
+    `// GLOBAL:` annotation (or its DAT_<address> name) gives, from its
+    symbol to the next one. String literals and other data its initial
+    values point at follow where the original's pointers point."""
+    for src, obj in sorted(objects_by_src.items()):
+        if not src.startswith("src/data/"):
+            continue
+        obj.data = True
+        for name, sym in sorted(obj.externals.items(), key=lambda kv: (kv[1].section, kv[1].value)):
+            sec = obj.secs[sym.section - 1]
+            if sec.is_code or sec.name.startswith(SKIP_SECTIONS):
+                continue
+            addr = address_of(name, placer.symbols)
+            if addr is None:
+                placer.mismatches.append(f"{src}: {name} has no address (annotate it // GLOBAL: 0x...)")
+                continue
+            lo, hi = sec.slice_at(sym.value)
+            placer.place(obj, sec, lo, hi, addr, DATASRC, name)
+            placer.stats["globals placed from src/data"] += 1
+
+
 def place_globals(placer: Placer, data_objs: list[Path], data_addr: dict[int, str]) -> None:
     """link/data.cpp and the generated extra globals, one global at a time."""
     sizes = {int(r["address"], 16): int(r["size"]) for r in load_rows(GLOBALS)}
@@ -1060,6 +1083,28 @@ def copy_unbuilt(img: Image) -> None:
         img.copy(start, max(vsize, rsize), COPIED)
 
 
+def pad_data(placer: Placer) -> None:
+    """The linker's alignment padding between pieces of data: zeros after
+    one placed piece, up to the next placed piece at its section's alignment
+    (a string literal of six bytes, then two zeros before the next one)."""
+    img = placer.img
+    for p in sorted(placer.pieces, key=lambda p: p.va):
+        if p.sec.is_code:
+            continue
+        n = (p.sec.chars >> 20) & 0xF
+        # One global of a section that holds several: a dword's alignment.
+        align = (1 << (n - 1) if n else 16) if not p.lo else 4
+        o = p.va - img.base
+        if align < 2 or p.va % align:
+            continue
+        run = o
+        while run > o - align + 1 and img.src[run - 1] == UNSET and not img.pristine[run - 1]:
+            run -= 1
+        if run < o and img.src[run - 1] != UNSET:
+            for i in range(run, o):
+                img.out[i], img.src[i] = 0, PADDING
+
+
 def write_exe(img: Image, out: Path) -> None:
     raw = bytearray(img.pe.__data__[:img.pe.OPTIONAL_HEADER.SizeOfHeaders])
     for name, start, vsize, rsize, s in img.sections:
@@ -1176,11 +1221,13 @@ def layout(jobs: int | None = None) -> tuple[Image, Placer]:
     place_gaps(placer, gap_objects())
     place_library(placer, lib_paths)
     place_import_thunks(placer)
+    place_data_sources(placer, by_src)
     data_objs, data_addr = build_data(symbols)
     place_globals(placer, data_objs, data_addr)
     placer.relocate()
     place_unreferenced_library(placer)
     placer.relocate()
+    pad_data(placer)
     copy_unbuilt(img)
     return img, placer
 

@@ -62,7 +62,7 @@ from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from check import DEFAULT_FLAGS, GAP_DIR, ROOT, winpath
+from check import DATA_DIR, DEFAULT_FLAGS, GAP_DIR, ROOT, winpath
 from linkcheck import (CRT_LIBS, IMPORT_LIBS, Demangle, MEMBER_STATIC, address_of,
                        archive_symbols, base_name, data_symbol, include_hash, library_symbols,
                        load_known, read_object, type_size)
@@ -149,8 +149,9 @@ def global_rows() -> dict[int, tuple[str, int, str, str]]:
 
 
 def build_data(symbols: dict[str, int]) -> tuple[list[Path], dict[int, str]]:
-    """Compile link/data.cpp, emit the globals it omits, and return the two
-    objects with address -> the symbol each defines."""
+    """Compile link/data.cpp, emit the globals it and src/data omit, and
+    return the two objects with address -> the symbol each defines (and each
+    src/data definition)."""
     BUILD.mkdir(parents=True, exist_ok=True)
     compile_data = ROOT / "tools/wcl"
     objects = []
@@ -173,10 +174,16 @@ def build_data(symbols: dict[str, int]) -> tuple[list[Path], dict[int, str]]:
     else:
         out = None
 
-    # Extra globals: those globals.csv lists but data.cpp leaves out.
+    # The data src/data defines (compiled with the rest of src/ by compile_all).
+    sources: dict[int, str] = {}
+    for obj in sorted((ROOT / "build/progress/data").glob("*.obj")):
+        if (DATA_DIR / obj.with_suffix(".cpp").name).exists():
+            sources.update(defined_addresses(obj, symbols))
+
+    # Extra globals: those globals.csv lists but neither data.cpp nor src/data defines.
     rows = global_rows()
     rows = {a: r for a, r in rows.items() if GLOBAL_LO <= a < GLOBAL_HI}
-    have = defined_addresses(out, symbols) if out else set()
+    have = (set(defined_addresses(out, symbols)) if out else set()) | set(sources)
     extra = {a: r for a, r in rows.items() if a not in have}
     if extra:
         lines = ['extern "C" {']
@@ -199,6 +206,7 @@ def build_data(symbols: dict[str, int]) -> tuple[list[Path], dict[int, str]]:
     for out in objects:
         for addr, sym in defined_addresses(out, symbols).items():
             by_addr[addr] = sym
+    by_addr.update(sources)
     return objects, by_addr
 
 
