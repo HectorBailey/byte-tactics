@@ -287,7 +287,11 @@ def build(objects, img: Image) -> list[dict]:
         # pointer (`&a[10]`), and a known address exactly there starts the
         # next object.
         reach = addr + max(hi, 0)
-        elem = type_size(t[2]) if t is not None and t[0] == "arr" else None
+        # Every file's view counts: an array of 4-byte entries in one file and
+        # of bytes in another is reached at +1 for a field, not for an end.
+        views = [v for v in g["typed"].values() if v is not None]
+        elems = [type_size(v[2]) for v in views if v[0] == "arr"]
+        elem = max((e or 0 for e in elems), default=0) if elems and all(elems) else None
         if elem and hi > 0 and hi % elem == 0:
             i = bisect.bisect_left(ordered, reach)
         else:
@@ -296,6 +300,10 @@ def build(objects, img: Image) -> list[dict]:
         end = min(nxt, img.section_end(addr))
         gap = max(end - addr, 1)
         tsize = type_size(t)
+        # The largest view: a char in one file and an int in another is an int.
+        sizes = [type_size(v) for v in views]
+        if tsize and all(sizes) and max(sizes) > tsize:
+            tsize = max(sizes)
         if re.match(r"(IID|CLSID|GUID)_", g["name"]):
             tsize = 16  # a COM interface or class id, declared through a macro
         section = img.section(addr)
@@ -306,6 +314,10 @@ def build(objects, img: Image) -> list[dict]:
                 # An uninitialised buffer owns the space up to the next thing the
                 # image refers to: the source may declare it too small
                 # (DAT_00528ae8 is declared char[0x1e8] in a 0x3e8-byte slot).
+                size, size_from = gap, "gap>type"
+            elif hi >= tsize and gap > tsize:
+                # The source reaches past the type it declares (DAT_00529e00 is
+                # an unsigned int in one file and a 16-byte entry in others).
                 size, size_from = gap, "gap>type"
         else:
             size, size_from = gap, "gap"
@@ -458,6 +470,9 @@ def header_entry(row: dict) -> Entry | None:
         note += f" (declared {row['type']})"
     elif row["size_from"] == "parts" and type_size(t) != size:
         return Entry(row, name, byte_array, linkage, f"{note}; {row['type']} with the globals inside it")
+    if type_size(t) is not None and type_size(t) < size:
+        # Smaller than what the source reaches inside it.
+        return Entry(row, name, byte_array, linkage, f"{note}; {row['type']} in {agree}, but used past its end")
     if portable(t):
         return Entry(row, name, t, linkage, f"{note}; {agree}")
     return Entry(row, name, byte_array, linkage, f"{note}; {row['type']} by value in {agree}")

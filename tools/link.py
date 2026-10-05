@@ -197,11 +197,14 @@ def build_data(symbols: dict[str, int]) -> tuple[list[Path], dict[int, str]]:
     have |= {a for a in rows if inside(extents, a)}
     extra = {a: r for a, r in rows.items() if a not in have}
     if extra:
+        from check import Original
+        exe = Original()
         lines = ['extern "C" {']
         for addr in sorted(extra):
             _, size, section, init = extra[addr]
             name = f"DAT_{addr:08x}"
-            bytes_ = bytes.fromhex(init) if init else b""
+            # The whole initial value (globals.csv shows only its start).
+            bytes_ = exe.read(addr, size).rstrip(b"\0") if section != ".bss" else b""
             if section == ".bss" or not bytes_:
                 lines.append(f"unsigned char {name}[{max(size, 1)}];")
             else:
@@ -768,9 +771,14 @@ def main() -> None:
     if args.carve:
         from carve import THIRD_PARTY_OBJS, carve, library_aliases
         result = carve(objects)
-        carved, data_addr = result.objects, result.data_names
+        carved = result.objects
         gaps = result.gap_sources
-        data_objs = list(THIRD_PARTY_OBJS)       # zlib, which the original links too
+        # The game's data from source (link/data.cpp and the globals it leaves
+        # out; src/data is among the objects), what origdata.obj still holds,
+        # and zlib, which the original links too.
+        data_objs, data_addr = build_data(symbols)
+        data_addr.update(result.data_names)
+        data_objs += list(THIRD_PARTY_OBJS)
         extra = library_aliases(objects + gaps, symbols, result)
     else:
         from gapcheck import gap_objects
@@ -798,8 +806,9 @@ def main() -> None:
     # LINK keeps the first definition, the original's, at its full size.
     game = fix_initialisers(objects + gaps) if stub_mode else list(objects) + gaps
     if args.carve:
-        from carve import patch_objects
-        game = patch_objects(game, result)
+        from carve import order_data, patch_objects
+        game = order_data(patch_objects(game, result), result)
+        data_objs = order_data(data_objs, result)
     link_objects = carved[:1] + game + carved[1:] + list(data_objs)
     if stub_mode:
         missing = unresolved_names(link_objects, set(aliases), libs)
