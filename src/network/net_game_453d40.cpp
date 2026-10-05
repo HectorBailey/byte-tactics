@@ -94,7 +94,7 @@ struct Feature {
 
 class Class_004b0b00 {
 public:
-    int FUN_004b0b00(int, int, int, int, int, int, int, int);
+    int StartScriptWithArgsByIndex(int, int, int, int, int, int, int, int);
 };
 
 class Class_0048b090 {
@@ -752,7 +752,7 @@ int HandleNetPackets()
         case 16: {
             Class_0048b090* unit = UnitAt(*(unsigned short*)(packet + 1));
             if (unit->flags_110 & 0x10000000)
-                unit->field_9a->FUN_004b0b00(*(short*)(packet + 3), 0, 0, packet[5],
+                unit->field_9a->StartScriptWithArgsByIndex(*(short*)(packet + 3), 0, 0, packet[5],
                                              *(int*)(packet + 6), *(int*)(packet + 10),
                                              *(int*)(packet + 14), *(int*)(packet + 18));
             break;

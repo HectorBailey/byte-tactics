@@ -30,7 +30,7 @@ class Class_0048b090 { public: void FUN_0048b090(int, int); };
 class Class_004388d0 { public: void FUN_004388d0(int); };
 class Class_0044e6c0 { public: void FUN_0044e6c0(int); };
 class Class_0044e730 { public: void FUN_0044e730(short); };
-class Class_004b0940 { public: void FUN_004b0940(const char*, int, int); };
+class Class_004b0940 { public: void StartScript(const char*, int, int); };
 
 #pragma pack(push, 1)
 struct UnitDef {
@@ -146,7 +146,7 @@ int __stdcall FUN_0040f2a0(Unit* unit, Order* order, int flags)
         break;
     case 1: {
         if (FUN_0047e2d0(unit, &unit->pos)) {
-            unit->script->FUN_004b0940("EndTransport", 0, 1);
+            unit->script->StartScript("EndTransport", 0, 1);
             Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);
             int h = max(FUN_00485070(&unit->pos), g_game->seaLevel);
             ((Class_0044e6c0*)obj)->FUN_0044e6c0(h <= g_game->seaLevel ? FUN_00485070(&unit->pos) - g_game->seaLevel : 0);

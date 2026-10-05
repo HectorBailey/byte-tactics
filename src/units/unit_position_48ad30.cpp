@@ -43,7 +43,7 @@ struct Player_0048ad30;
 class Class_004b0d60 {
 public:
     char unknown_0[8];
-    void FUN_004b0d60(int n);
+    void RunScripts(int n);
 };
 
 struct Type_0048ad30 {
@@ -200,7 +200,7 @@ void __stdcall FUN_0048ad30(void)
                             }
                         }
                         if (u->f9a != 0) {
-                            u->f9a->FUN_004b0d60(1);
+                            u->f9a->RunScripts(1);
                         }
                         if (u->ffa != 0) {
                             u->ffa--;

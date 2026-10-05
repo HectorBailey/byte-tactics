@@ -41,7 +41,7 @@ struct Vec3_0049e070 {
 
 class Class_004b0a70 {
 public:
-    int FUN_004b0a70(char* name, void* param_2, int param_3, int param_4,
+    int StartScriptWithArgs(char* name, void* param_2, int param_3, int param_4,
                      int param_5, int param_6, int param_7, int param_8);
 };
 
@@ -106,5 +106,5 @@ void __stdcall FUN_0049e070(Unit* unit)
         if (s->attached->field_e4 > frame.maxTime)
             frame.maxTime = s->attached->field_e4;
     }
-    unit->script->FUN_004b0a70("SetMaxReloadTime", 0, 0, 1, frame.maxTime * 1000 / 30, 0, 0, 0);
+    unit->script->StartScriptWithArgs("SetMaxReloadTime", 0, 0, 1, frame.maxTime * 1000 / 30, 0, 0, 0);
 }

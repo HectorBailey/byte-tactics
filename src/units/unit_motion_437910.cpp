@@ -5,7 +5,7 @@
 
 class Class_004b0a70 {
 public:
-    int FUN_004b0a70(char* name, void* param_2, int param_3, int param_4, int param_5, int param_6, int param_7, int param_8);
+    int StartScriptWithArgs(char* name, void* param_2, int param_3, int param_4, int param_5, int param_6, int param_7, int param_8);
 };
 
 #pragma pack(push, 1)
@@ -36,7 +36,7 @@ extern Game* g_game;
 void __stdcall FUN_00437910(Unit* unit)
 {
     if (unit->type->field_1d2 > 0.0f && g_game->windEnabled) {
-        unit->script->FUN_004b0a70("SetDirection", 0, 0, 1, g_game->windDirection, 0, 0, 0);
-        unit->script->FUN_004b0a70("SetSpeed", 0, 0, 1, g_game->windSpeed << 4, 0, 0, 0);
+        unit->script->StartScriptWithArgs("SetDirection", 0, 0, 1, g_game->windDirection, 0, 0, 0);
+        unit->script->StartScriptWithArgs("SetSpeed", 0, 0, 1, g_game->windSpeed << 4, 0, 0, 0);
     }
 }

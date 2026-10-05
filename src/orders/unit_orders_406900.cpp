@@ -5,7 +5,7 @@ class Class_00438880 { public: void FUN_00438880(const char*); };
 class Class_00438930 { public: void FUN_00438930(Vec3*, int); };
 class Class_00439e80 { public: void FUN_00439e80(int); };
 class Class_004895c0 { public: void FUN_00489690(Unit*); };
-class Class_004b0a70 { public: int FUN_004b0a70(char*, void*, int, int, int, int, int, int); };
+class Class_004b0a70 { public: int StartScriptWithArgs(char*, void*, int, int, int, int, int, int); };
 #pragma pack(push, 1)
 struct Def { char pad0[0x180]; short height; char pad182[0x241-0x182]; unsigned int flags, flags2; };
 struct Unit {
@@ -30,7 +30,7 @@ int __stdcall FUN_00406900(Unit* unit, Order* order, int flags)
         ((Class_004895c0*)&order->ref)->FUN_00489690(unit->cargo);
         if (!order->target) return 5;
         ((Class_00438880*)order)->FUN_00438880("Unloading");
-        unit->script->FUN_004b0a70("TransportDrop",0,1,1,order->target->id,
+        unit->script->StartScriptWithArgs("TransportDrop",0,1,1,order->target->id,
             (order->pos.x&0xffff0000)+(order->pos.z>>16),0,0);
         ++order->attempts;
         ((Class_00439e80*)order)->FUN_00439e80(15);

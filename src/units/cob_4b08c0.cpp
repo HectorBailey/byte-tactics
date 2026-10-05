@@ -28,11 +28,11 @@ public:
     Channel_004b08c0 channels[8];      // +0x1c
     int activeCount;                   // +0x53c
 
-    int FUN_004b08c0(int id);
+    int StartThread(int id);
 };
 
 // FUNCTION: 0x4b08c0
-int Class_004b08c0::FUN_004b08c0(int id)
+int Class_004b08c0::StartThread(int id)
 {
     if (id < 0 || id >= table->count)
         return -1;

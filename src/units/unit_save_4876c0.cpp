@@ -215,9 +215,9 @@ public:
     int FUN_004b4630(char* name, int value);
 };
 
-class Class_004b0610 {
+class CobScript {
 public:
-    int FUN_004b1ec0(void* file);
+    int SaveScriptState(void* file);
 };
 
 // FUNCTION: 0x4876c0
@@ -237,7 +237,7 @@ void __stdcall FUN_004876c0(Class_004b4560* file)
 
             sprintf(script, "Script%i", count);
             ((Class_004b4ba0*)file)->FUN_004b4ba0(script);
-            ((Class_004b0610*)unit->f9a)->FUN_004b1ec0(file);
+            ((CobScript*)unit->f9a)->SaveScriptState(file);
 
             int n = 0;
             Class_0043a1f0* c = (Class_0043a1f0*)unit->listHead;

@@ -20,7 +20,7 @@ struct Point16_437840 {
 
 class Class_004b0a70 {
 public:
-    int FUN_004b0a70(char* name, void* param_2, int param_3, int param_4,
+    int StartScriptWithArgs(char* name, void* param_2, int param_3, int param_4,
                      int param_5, int param_6, int param_7, int param_8);
 };
 
@@ -71,6 +71,6 @@ void __stdcall FUN_00437840(Unit* unit)
         }
         unit->extraction = unit->type->extractsMetal * 1.52587890625e-05 * (float)total.value;
         if (unit->script)
-            unit->script->FUN_004b0a70("SetSpeed", 0, 0, 1, total.parts.whole, 0, 0, 0);
+            unit->script->StartScriptWithArgs("SetSpeed", 0, 0, 1, total.parts.whole, 0, 0, 0);
     }
 }

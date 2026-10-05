@@ -21,7 +21,7 @@ struct Vec3_0049e1a0 {
 
 class Class_004b0a70 {
   public:
-    int FUN_004b0a70(char* name, void* param_2, int param_3, int param_4, int param_5, int param_6,
+    int StartScriptWithArgs(char* name, void* param_2, int param_3, int param_4, int param_5, int param_6,
                      int param_7, int param_8);
 };
 
@@ -182,7 +182,7 @@ void __stdcall FUN_0049e1a0(Unit* unit) {
                     e->f_18 = angle;
                     e->f_16 = heading;
                     e->f_8 = 0;
-                    unit->script->FUN_004b0a70(DAT_00509688[(e->flags >> 2) & 3], &e->name, 0, 2,
+                    unit->script->StartScriptWithArgs(DAT_00509688[(e->flags >> 2) & 3], &e->name, 0, 2,
                                                heading, angle, 0, 0);
                     SendScriptCallByName(unit, DAT_00509688[(e->flags >> 2) & 3], 2, heading, angle, 0, 0);
                     e->flags |= 1;
@@ -192,7 +192,7 @@ void __stdcall FUN_0049e1a0(Unit* unit) {
             bool armed = attached->f_111.b4;
             if (armed && (!attached->f_111.b28 || e->f_1a) && !(e->flags & 1)) {
                 e->f_8 = 0;
-                unit->script->FUN_004b0a70(DAT_00509688[(e->flags >> 2) & 3], &e->name, 0, 2, 0, 0,
+                unit->script->StartScriptWithArgs(DAT_00509688[(e->flags >> 2) & 3], &e->name, 0, 2, 0, 0,
                                            0, 0);
                 SendScriptCallByName(unit, DAT_00509688[(e->flags >> 2) & 3], 2, 0, 0, 0, 0);
                 e->flags |= 1;

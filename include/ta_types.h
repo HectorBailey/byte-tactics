@@ -500,7 +500,7 @@ class Class_00481430;
 class Class_00481470;
 struct Class_00481490;
 struct Class_00482110;
-class Class_00485e30;
+class UnitScript;
 class Class_00488c50;
 class Class_00488d30;
 struct Class_00488e70;
@@ -614,7 +614,7 @@ struct Class_004acc70;
 struct Class_004af5b0;
 struct Class_004afc60;
 struct Class_004aff00;
-class Class_004b0610;
+class CobScript;
 class Class_004b07a0;
 class Class_004b0830;
 class Class_004b08c0;
@@ -12106,7 +12106,7 @@ class Class_00480c30 {  // 0x544 bytes, 1 view
 public:
     char unknown_0[1344];
     Data_00480c30* data;  // +0x540
-    int FUN_00480c30(int, int);
+    int GetPieceTranslation(int, int);
 };
 
 struct Entry_00480c30 {  // 0x36 bytes, 1 view
@@ -12124,7 +12124,7 @@ class Class_00480c50 {  // 0x544 bytes, 1 view
 public:
     char unknown_0[1344];
     BuildList_0045a950* data;  // +0x540
-    void FUN_00480c50(int, int, int);
+    void SetPieceTranslation(int, int, int);
 };
 
 struct Entry_00480c50 {  // 0x36 bytes, 2 views
@@ -12141,7 +12141,7 @@ class Class_00480cb0 {  // 0x544 bytes, 1 view
 public:
     char unknown_0[1344];
     void* table;  // +0x540
-    int FUN_00480cb0(int, int);
+    int GetPieceRotation(int, int);
 };
 
 struct Elem_4b0610 {  // 0xa4 bytes, 8 views
@@ -12151,7 +12151,7 @@ struct Elem_4b0610 {  // 0xa4 bytes, 8 views
     char unknown_24[128];
 };
 
-class Class_004b0610 {  // 0x540 bytes, 10 views
+class CobScript {       // 0x540 bytes, 10 views
 public:
     int field_4;  // +0x4
     int field_8;  // +0x8
@@ -12161,57 +12161,57 @@ public:
     int field_18;  // +0x18
     Elem_4b0610 arr[8];  // +0x1c
     int field_53c;  // +0x53c
-    virtual ~Class_004b0610(void);
-    Class_004b0610(Class_004b0610&);
-    Class_004b0610(void);
-    virtual void FUN_00480c50(int, int, int) = 0;
-    virtual void FUN_00480ce0(int, int, int) = 0;
-    virtual void FUN_00480d50(int, int) = 0;
-    virtual void FUN_00480db0(int, int) = 0;
-    virtual void FUN_00480df0(int, int) = 0;
-    virtual int FUN_00480c30(int, int) = 0;
-    virtual int FUN_00480cb0(int, int) = 0;
-    virtual int FUN_004b1e50(int);
-    virtual int FUN_004b1e60(int);
-    virtual int FUN_004b1e70(int);
+    virtual ~CobScript(void);
+    CobScript(CobScript&);
+    CobScript(void);
+    virtual void SetPieceTranslation(int, int, int) = 0;
+    virtual void SetPieceRotation(int, int, int) = 0;
+    virtual void SetPieceVisible(int, int) = 0;
+    virtual void SetPieceCached(int, int) = 0;
+    virtual void SetPieceShaded(int, int) = 0;
+    virtual int GetPieceTranslation(int, int) = 0;
+    virtual int GetPieceRotation(int, int) = 0;
+    virtual int IsPieceVisible(int);
+    virtual int IsPieceCached(int);
+    virtual int IsPieceShaded(int);
     virtual void FUN_004b1e80(int, int, int);
     virtual void FUN_004b1e90(int);
-    virtual void FUN_004b1ea0(int, int);
-    virtual void FUN_004b1eb0(int, int);
-    virtual void FUN_004b0650(int, int, int);
-    virtual void FUN_004b0660(int);
-    virtual void FUN_004b0670(int, int);
-    virtual int FUN_004b0680(int, int, int, int, int);
-    virtual int FUN_004b0690(int);
-    virtual int FUN_004b06a0(void);
-    int FUN_004b2040(Class_004b4560*);
-    void FUN_004b0720(BuildList_0045a950*);
-    void FUN_004b1ec0(Class_004b4cf0*);
+    virtual void EmitSfx(int, int);
+    virtual void ExplodePiece(int, int);
+    virtual void AttachUnit(int, int, int);
+    virtual void DropUnit(int);
+    virtual void SetUnitValue(int, int);
+    virtual int GetUnitValue(int, int, int, int, int);
+    virtual int IsCarryingUnit(int);
+    virtual int GetTransporterId(void);
+    int LoadScriptState(Class_004b4560*);
+    void SetCob(BuildList_0045a950*);
+    void SaveScriptState(Class_004b4cf0*);
 };
 
-class Class_00485e30 : public Class_004b0610 {  // 0x544 bytes, 9 views
+class UnitScript : public CobScript {           // 0x544 bytes, 9 views
 public:
     BuildList_0045a950* data;  // +0x540
-    virtual void FUN_00480c50(int, int, int);
-    virtual void FUN_00480ce0(int, int, int);
-    virtual void FUN_00480d50(int, int);
-    virtual void FUN_00480db0(int, int);
-    virtual void FUN_00480df0(int, int);
-    virtual int FUN_00480c30(int, int);
-    virtual int FUN_00480cb0(int, int);
-    virtual int FUN_004b1e50(int);
-    virtual int FUN_004b1e60(int);
-    virtual int FUN_004b1e70(int);
+    virtual void SetPieceTranslation(int, int, int);
+    virtual void SetPieceRotation(int, int, int);
+    virtual void SetPieceVisible(int, int);
+    virtual void SetPieceCached(int, int);
+    virtual void SetPieceShaded(int, int);
+    virtual int GetPieceTranslation(int, int);
+    virtual int GetPieceRotation(int, int);
+    virtual int IsPieceVisible(int);
+    virtual int IsPieceCached(int);
+    virtual int IsPieceShaded(int);
     virtual void FUN_004b1e80(int, int, int);
     virtual void FUN_004b1e90(int);
-    virtual void FUN_004b1ea0(int, int);
-    virtual void FUN_004b1eb0(int, int);
-    virtual void FUN_004b0650(int, int, int);
-    virtual void FUN_004b0660(int);
-    virtual void FUN_004b0670(int, int);
-    virtual int FUN_004b0680(int, int, int, int, int);
-    virtual int FUN_004b0690(int);
-    virtual int FUN_004b06a0(void);
+    virtual void EmitSfx(int, int);
+    virtual void ExplodePiece(int, int);
+    virtual void AttachUnit(int, int, int);
+    virtual void DropUnit(int);
+    virtual void SetUnitValue(int, int);
+    virtual int GetUnitValue(int, int, int, int, int);
+    virtual int IsCarryingUnit(int);
+    virtual int GetTransporterId(void);
     void FUN_00481140(int, unsigned int);
 };
 
@@ -12219,14 +12219,14 @@ class Class_00480d40 {  // 0x544 bytes, 2 views
 public:
     char unknown_0[1344];
     void* field_540;  // +0x540
-    void FUN_00480d40(int);
+    void SetObjectState(int);
 };
 
 class Class_00480d50 {  // 0x544 bytes, 1 view
 public:
     char unknown_0[1344];
     BuildList_0045a950* data;  // +0x540
-    void FUN_00480d50(int, int);
+    void SetPieceVisible(int, int);
 };
 
 struct Entry_00480d50 {  // 0x36 bytes, 3 views
@@ -15412,14 +15412,14 @@ struct Cell_004b0230 {  // 0x8 bytes, 1 view
 class Class_004b07a0 {  // 0x1 bytes, 1 view
 public:
     char unknown_0[1];
-    int FUN_004b07a0(void);
+    int GetCob(void);
 };
 
 class Class_004b0830 {  // 0xc bytes, 1 view
 public:
     char unknown_0[8];
     NameTable_004b0830* table;  // +0x8
-    int FUN_004b0830(char*);
+    int StartThreadByName(char*);
 };
 
 struct NameTable_004b0830 {  // 0x20 bytes, 4 views
@@ -15446,7 +15446,7 @@ public:
     char unknown_c[16];
     Channel_004b08c0 channels[8];  // +0x1c
     int activeCount;  // +0x53c
-    int FUN_004b08c0(int);
+    int StartThread(int);
 };
 
 struct Table_004b08c0 {  // 0x1c bytes, 1 view
@@ -15492,11 +15492,11 @@ public:
     virtual void v44(void);
     virtual void v48(void);
     virtual void v4c(void);
-    int FUN_004b07c0(char*);
-    int FUN_004b0940(char*, int, int);
-    int FUN_004b0a70(char*, void*, int, int, int, int, int, int);
-    int FUN_004b0bc0(char*, int*, int*, int*, int*);
-    void FUN_004b0d60(int);
+    int FindScript(char*);
+    int StartScript(char*, int, int);
+    int StartScriptWithArgs(char*, void*, int, int, int, int, int, int);
+    int QueryScript(char*, int*, int*, int*, int*);
+    void RunScripts(int);
 };
 
 class Class_004b1c00 {  // 0x1c bytes, 5 views
@@ -15506,14 +15506,14 @@ public:
     char unknown_c[8];
     Data_004b1c00* ptr14;  // +0x14
     int field_18;  // +0x18
-    virtual void FUN_00480c50(int, int, int) = 0;
-    virtual void FUN_00480ce0(int, int, int) = 0;
-    virtual int FUN_00480d50(int, int) = 0;
-    virtual int FUN_00480db0(int, int) = 0;
-    virtual int FUN_00480df0(int, int) = 0;
-    virtual int FUN_00480c30(int, int) = 0;
-    virtual int FUN_00480cb0(int, int) = 0;
-    void FUN_004b1c00(int);
+    virtual void SetPieceTranslation(int, int, int) = 0;
+    virtual void SetPieceRotation(int, int, int) = 0;
+    virtual int SetPieceVisible(int, int) = 0;
+    virtual int SetPieceCached(int, int) = 0;
+    virtual int SetPieceShaded(int, int) = 0;
+    virtual int GetPieceTranslation(int, int) = 0;
+    virtual int GetPieceRotation(int, int) = 0;
+    void AnimatePieces(int);
 };
 
 struct Channel_004b0a10 {  // 0xa4 bytes, 1 view
@@ -15531,7 +15531,7 @@ public:
     char unknown_0[28];
     Channel_004b0a10 channels[8];  // +0x1c
     int activeCount;  // +0x53c
-    int FUN_004b0a10(int, int, int);
+    int StartScriptByIndex(int, int, int);
 };
 
 struct Channel_004b0b00 {  // 0xa4 bytes, 1 view
@@ -15544,7 +15544,7 @@ struct Channel_004b0b00 {  // 0xa4 bytes, 1 view
 
 class Class_004b0b00_param2 {  // 0x4 bytes, 1 view
 public:
-    virtual void FUN_004b0b00(int);
+    virtual void StartScriptWithArgsByIndex(int);
 };
 
 struct Channel_004b0c40 {  // 0xa4 bytes, 1 view
@@ -15560,7 +15560,7 @@ class Class_004b0c40 {  // 0x524 bytes, 2 views
 public:
     Channel_004b0c40 channels[8];  // +0x0
     int activeCount;  // +0x520
-    int FUN_004b0c40(int, int*, int*, int*, int*);
+    int QueryScriptByIndex(int, int*, int*, int*, int*);
 };
 
 struct Entry_004b0d20 {  // 0xa4 bytes, 1 view
@@ -15575,7 +15575,7 @@ public:
     char unknown_0[28];
     Entry_004b0d20 entries[8];  // +0x1c
     int guard_53c;  // +0x53c
-    void FUN_004b0d20(int);
+    void RemoveCallback(int);
 };
 
 struct Callback {  // 0x4 bytes, 1 view
@@ -15608,27 +15608,27 @@ public:
     int changed;  // +0x18
     Channel channels[8];  // +0x1c
     int activeCount;  // +0x53c
-    virtual void FUN_00480c50(int, int, int) = 0;
-    virtual void FUN_00480ce0(int, int, int) = 0;
-    virtual void FUN_00480d50(int, int) = 0;
-    virtual void FUN_00480db0(int, int) = 0;
-    virtual void FUN_00480df0(int, int) = 0;
-    virtual int FUN_00480c30(int, int) = 0;
-    virtual int FUN_00480cb0(int, int) = 0;
-    virtual int FUN_004b1e50(int);
-    virtual int FUN_004b1e60(int);
-    virtual int FUN_004b1e70(int);
+    virtual void SetPieceTranslation(int, int, int) = 0;
+    virtual void SetPieceRotation(int, int, int) = 0;
+    virtual void SetPieceVisible(int, int) = 0;
+    virtual void SetPieceCached(int, int) = 0;
+    virtual void SetPieceShaded(int, int) = 0;
+    virtual int GetPieceTranslation(int, int) = 0;
+    virtual int GetPieceRotation(int, int) = 0;
+    virtual int IsPieceVisible(int);
+    virtual int IsPieceCached(int);
+    virtual int IsPieceShaded(int);
     virtual void FUN_004b1e80(int, int, int);
     virtual void FUN_004b1e90(int);
-    virtual void FUN_004b1ea0(int, int);
-    virtual void FUN_004b1eb0(int, int);
-    virtual void FUN_004b0650(int, int, int);
-    virtual void FUN_004b0660(int);
-    virtual void FUN_004b0670(int, int);
-    virtual int FUN_004b0680(int, int, int, int, int);
-    virtual int FUN_004b0690(int);
-    virtual int FUN_004b06a0(void);
-    void FUN_004b0da0(unsigned int, int);
+    virtual void EmitSfx(int, int);
+    virtual void ExplodePiece(int, int);
+    virtual void AttachUnit(int, int, int);
+    virtual void DropUnit(int);
+    virtual void SetUnitValue(int, int);
+    virtual int GetUnitValue(int, int, int, int, int);
+    virtual int IsCarryingUnit(int);
+    virtual int GetTransporterId(void);
+    void RunThread(unsigned int, int);
     void Wake(unsigned int);
 };
 
