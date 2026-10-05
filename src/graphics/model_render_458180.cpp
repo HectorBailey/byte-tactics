@@ -14,11 +14,11 @@ public:
     char unknown_0[0x10];
     void* buffer;                      // +0x10
 
-    int FUN_00458180(unsigned int size);
+    int Initialize(unsigned int size);
 };
 
 // FUNCTION: 0x458180
-int Class_00458180::FUN_00458180(unsigned int size)
+int Class_00458180::Initialize(unsigned int size)
 {
     if (!((CMemoryCache*)this)->InitCache(size))
         return 0;

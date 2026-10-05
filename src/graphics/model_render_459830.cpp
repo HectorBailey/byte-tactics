@@ -124,7 +124,7 @@ struct List_459c70 {
 struct Class_004581e0 {
     char unknown_0[0x10];
     Bitmap_459c70* shadow;           // +0x10
-    void FUN_00459830(Bitmap_459c70* bitmap, List_459c70* list, int kind, int useColor);
+    void DrawPieces(Bitmap_459c70* bitmap, List_459c70* list, int kind, int useColor);
 };
 
 static __inline int shade_bias(Owner_459c70* owner)
@@ -134,7 +134,7 @@ static __inline int shade_bias(Owner_459c70* owner)
 }
 
 // FUNCTION: 0x459830
-void Class_004581e0::FUN_00459830(Bitmap_459c70* bitmap, List_459c70* list,
+void Class_004581e0::DrawPieces(Bitmap_459c70* bitmap, List_459c70* list,
     int kind, int useColor)
 {
     Vec3 vertex[2000];

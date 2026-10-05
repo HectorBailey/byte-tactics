@@ -20,11 +20,11 @@ class Class_0045a470 {
 public:
     char unknown_0[0x10];
     Image_0045a470* image;              // +0x10
-    Image_0045a470* FUN_0045a470(Image_0045a470* src);
+    Image_0045a470* MakeSilhouette(Image_0045a470* src);
 };
 
 // FUNCTION: 0x45a470
-Image_0045a470* Class_0045a470::FUN_0045a470(Image_0045a470* src)
+Image_0045a470* Class_0045a470::MakeSilhouette(Image_0045a470* src)
 {
     image->width = src->width;
     image->height = src->height;

@@ -95,11 +95,11 @@ void __stdcall FillFlatPolygon(View_0045a610* view, Vertex_0045a610* verts, int 
 // the call. It compiles the same as a __stdcall free function.
 class Class_0045a610 {
 public:
-    void FUN_0045a610(View_0045a610* view, Model_0045a610* model);
+    void DrawShadowShape(View_0045a610* view, Model_0045a610* model);
 };
 
 // FUNCTION: 0x45a610
-void Class_0045a610::FUN_0045a610(View_0045a610* view, Model_0045a610* model)
+void Class_0045a610::DrawShadowShape(View_0045a610* view, Model_0045a610* model)
 {
     Vertex_0045a610 verts[2000];
     Vertex_0045a610 tmp[25];

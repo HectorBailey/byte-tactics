@@ -52,7 +52,7 @@ int __stdcall FUN_00417f30(int,int);
 int __stdcall FUN_00418310(int);
 int __stdcall FUN_00420b00(int);
 struct Class_00435100 { int FUN_00435100(); };
-int __stdcall FUN_0045ac20(int,int);
+int __stdcall DrawUnit(int,int);
 int __stdcall FUN_0045ffb0(int);
 int __stdcall DrawMessages(int);
 float __stdcall FUN_00464ab0(int);
@@ -405,7 +405,7 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
           if (((UnitFlags *)(u + 0x110))->b4)
             FUN_0046a530((int)&ctx, u);
           if (*(int *)(u + 0x9a) != 0)
-            FUN_0045ac20((int)&ctx, u);
+            DrawUnit((int)&ctx, u);
         }
       }
       int tile = (y * mv->width + x0) * 0xd + mv->tiles;
@@ -439,7 +439,7 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
           if (((UnitFlags *)(u + 0x110))->b4)
             FUN_0046a530((int)&ctx, u);
           if (*(int *)(u + 0x9a) != 0)
-            FUN_0045ac20((int)&ctx, u);
+            DrawUnit((int)&ctx, u);
         }
         k++;
         pUnit++;

@@ -28,7 +28,7 @@
 //    0x159d4 (69.6% -> 97.6%, then 98.7% for the k * 3 form).
 //  * The division loop divides by `weight[k]` directly (no float local),
 //    and accum[k][2] is summed through a temporary.
-//  * DAT_005065fc is declared before DAT_005065f8. The order of those
+//  * g_lightY is declared before g_lightX. The order of those
 //    extern declarations decides which product of the lighting sum MSVC
 //    loads first (the later-declared constant's goes first); declared in
 //    address order, accum[k][1] was loaded before accum[k][0]. (Indexing
@@ -44,9 +44,9 @@
 #include <string.h>
 
 extern char* g_game;
-extern float DAT_005065fc;
-extern float DAT_005065f8;
-extern float DAT_00506600;
+extern float g_lightY;
+extern float g_lightX;
+extern float g_lightZ;
 extern const float DAT_004fd4cc;
 struct Bitmap_459c70;
 
@@ -157,7 +157,7 @@ struct Poly_459c70 { int x; int y; int z; int shade; };
 struct Class_004581e0 {
     char unknown_0[0x10];
     Bitmap_459c70* shadow;           // +0x10
-    void FUN_00459c70(Bitmap_459c70* bitmap, List_459c70* list, int kind, int useColor);
+    void DrawLitPieces(Bitmap_459c70* bitmap, List_459c70* list, int kind, int useColor);
 };
 
 // The 50 or 125 bias the original materialises separately in each arm of the
@@ -169,7 +169,7 @@ static __inline int shade_bias(List_459c70* list)
 }
 
 // FUNCTION: 0x459c70
-void Class_004581e0::FUN_00459c70(Bitmap_459c70* bitmap, List_459c70* list,
+void Class_004581e0::DrawLitPieces(Bitmap_459c70* bitmap, List_459c70* list,
     int kind, int useColor)
 {
     PieceInfo_459c70* info;
@@ -301,8 +301,8 @@ void Class_004581e0::FUN_00459c70(Bitmap_459c70* bitmap, List_459c70* list,
                     for (int j = 0; j < face->count; j++, idx++) {
                         poly[j] = vertex[*idx];
                         if (list->pieces[p].flags.lit) {
-                            float light = accum[*idx][0] * DAT_005065f8 + accum[*idx][1] * DAT_005065fc;
-                            light += accum[*idx][2] * DAT_00506600;
+                            float light = accum[*idx][0] * g_lightX + accum[*idx][1] * g_lightY;
+                            light += accum[*idx][2] * g_lightZ;
                             poly[j].shade = 0x1f & ((int)(DAT_004fd4cc * light));
                         } else {
                             poly[j].shade = 0xf;

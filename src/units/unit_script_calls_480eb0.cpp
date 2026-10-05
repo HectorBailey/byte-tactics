@@ -4,7 +4,7 @@
 //
 // First the unit's visibility against the local player's map is tested; if the
 // unit is not visible nothing happens. Otherwise the unit's state is snapped
-// (FUN_0045ab10) and a two-position record is built: with bit 0x100 of `b`
+// (UpdateObjectState) and a two-position record is built: with bit 0x100 of `b`
 // set, only one position is needed, otherwise two (the second from the six
 // dwords the entry's +0xc pointer aims at). The message id `b` then selects
 // which list-append helper receives the pair.
@@ -51,7 +51,7 @@ struct Data_00480eb0 {
 extern Game* g_game;
 
 int __stdcall FUN_00465ac0(Player_00480eb0* player, Unit* unit);
-void __stdcall FUN_0045ab10(Unit* unit);
+void __stdcall UpdateObjectState(Unit* unit);
 void __stdcall FUN_00472330(int, int, int, int, short);
 void __stdcall FUN_00472430(int, int, int, short);
 void __stdcall FUN_00472530(int, int, int, short);
@@ -71,7 +71,7 @@ void UnitScript::EmitSfx(int a, int b)
 {
     if (!FUN_00465ac0(&g_game->players[g_game->playerIndex], data->unit))
         return;
-    FUN_0045ab10(data->unit);
+    UpdateObjectState(data->unit);
 
     Vec3_00480eb0 v1;
     Vec3_00480eb0 v2;

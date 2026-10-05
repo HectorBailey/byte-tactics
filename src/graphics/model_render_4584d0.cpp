@@ -258,7 +258,7 @@ void __stdcall DrawFrameQuad(void* surface, void* pic, Point_4584d0* points, voi
 
 class Class_004584d0 {
 public:
-    void FUN_004584d0(Model_4584d0* model, void* surface, Vec3_4584d0* camera,
+    void DrawPiece(Model_4584d0* model, void* surface, Vec3_4584d0* camera,
         PieceInfo_4584d0* info, Vertex_4584d0* vertices, unsigned int palette,
         int useColor);
 };
@@ -482,7 +482,7 @@ public:
 static inline int FaceCount(Face_4584d0* face) { return face->count; }
 
 // FUNCTION: 0x4584d0
-void Class_004584d0::FUN_004584d0(Model_4584d0* model, void* surface,
+void Class_004584d0::DrawPiece(Model_4584d0* model, void* surface,
     Vec3_4584d0* camera, PieceInfo_4584d0* info, Vertex_4584d0* vertices,
     unsigned int palette, int useColor)
 {

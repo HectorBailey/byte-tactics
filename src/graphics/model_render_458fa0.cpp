@@ -101,11 +101,11 @@ void __stdcall DrawPolygonEdges(View_0045a610* view, Vertex_0045a610* points, in
 // `this` through in ecx, and spells the parameters (image, model, palette).
 class Class_00458fa0 {
 public:
-    void FUN_00458fa0(View_0045a610* view, Model_00458fa0* model, int color);
+    void DrawPieceEdges(View_0045a610* view, Model_00458fa0* model, int color);
 };
 
 // FUNCTION: 0x458fa0
-void Class_00458fa0::FUN_00458fa0(View_0045a610* view, Model_00458fa0* model, int color)
+void Class_00458fa0::DrawPieceEdges(View_0045a610* view, Model_00458fa0* model, int color)
 {
     Vertex_0045a610 verts[2000];
     Vertex_0045a610 tmp[25];

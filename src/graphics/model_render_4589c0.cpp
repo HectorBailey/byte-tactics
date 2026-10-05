@@ -2,7 +2,7 @@
 // MATCH (claude-opus-5-5, #5067, from 93.6%). Grows this->bitmap to cover the model
 // and its child pieces, then copies or re-blits `bmp` (pixels, then the shade plane
 // through a pixels/shade swap) into it. The last three levers:
-//   * One named `origin(0, 0, 0)` is passed to both FUN_00458310 calls. Built in
+//   * One named `origin(0, 0, 0)` is passed to both AddModelBounds calls. Built in
 //     place for the first call it gives the three separate zero registers; in the
 //     loop its fields are rematerialised from one `xor eax, eax`. A fresh
 //     `Pos_4589c0()` (memset) in the loop stores the middle field through a
@@ -101,13 +101,13 @@ struct Surface_4589c0 {
 
 class Class_00458310 {
 public:
-    void FUN_00458310(int* minX, int* maxX, int* minY, int* maxY, Model_4589c0* model,
+    void AddModelBounds(int* minX, int* maxX, int* minY, int* maxY, Model_4589c0* model,
                       Pos_4589c0 pos);
 };
 
 class Class_00458d30 {
 public:
-    int FUN_00458dd0(Image_4589c0* image, Model_4589c0* model);
+    int ShadeByIntensity(Image_4589c0* image, Model_4589c0* model);
 };
 
 class Class_004c6ae0;
@@ -132,7 +132,7 @@ class Class_00459200 {
 public:
     char unknown_0[0x10];
     Image_4589c0* bitmap;           // +0x10
-    void FUN_004589c0(Image_4589c0* src, Model_4589c0* model);
+    void MergeIntoComposite(Image_4589c0* src, Model_4589c0* model);
 };
 
 template <class T> inline void Swap(T& a, T& b)
@@ -143,7 +143,7 @@ template <class T> inline void Swap(T& a, T& b)
 }
 
 // FUNCTION: 0x4589c0
-void Class_00459200::FUN_004589c0(Image_4589c0* bmp, Model_4589c0* model)
+void Class_00459200::MergeIntoComposite(Image_4589c0* bmp, Model_4589c0* model)
 {
     Pos_4589c0 origin(0, 0, 0);
     int minX = 0;
@@ -151,7 +151,7 @@ void Class_00459200::FUN_004589c0(Image_4589c0* bmp, Model_4589c0* model)
     int minY = 0;
     int maxY = 0;
 
-    ((Class_00458310*)this)->FUN_00458310(&minX, &maxX, &minY, &maxY, model, origin);
+    ((Class_00458310*)this)->AddModelBounds(&minX, &maxX, &minY, &maxY, model, origin);
     Child_4589c0* child = model->owner->firstChild;
     while (child != 0) {
         if ((child->flags & 0x20000) == 0) {
@@ -159,7 +159,7 @@ void Class_00459200::FUN_004589c0(Image_4589c0* bmp, Model_4589c0* model)
             int cminY = 0;
             int cmaxX = 0;
             int cmaxY = 0;
-            ((Class_00458310*)this)->FUN_00458310(&cminX, &cmaxX, &cminY, &cmaxY,
+            ((Class_00458310*)this)->AddModelBounds(&cminX, &cmaxX, &cminY, &cmaxY,
                                                   child->model, origin);
             struct Vec { Fixed x, y, z; };
             int* op = &model->owner->x;
@@ -226,5 +226,5 @@ void Class_00459200::FUN_004589c0(Image_4589c0* bmp, Model_4589c0* model)
         Swap(bmp->dx, sdx);
         Swap(bmp->dy, sdy);
     }
-    ((Class_00458d30*)this)->FUN_00458dd0(this->bitmap, model);
+    ((Class_00458d30*)this)->ShadeByIntensity(this->bitmap, model);
 }

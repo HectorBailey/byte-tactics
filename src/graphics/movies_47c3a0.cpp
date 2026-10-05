@@ -57,11 +57,11 @@ public:
     char unknown_410[0x544 - 0x410];
     Display_0047c3a0* display;          // +0x544
 
-    void FUN_0047c3a0(HWND hwnd);
+    void PlayFrame(HWND hwnd);
 };
 
 // FUNCTION: 0x47c3a0
-void Class_0047c3a0::FUN_0047c3a0(HWND hwnd)
+void Class_0047c3a0::PlayFrame(HWND hwnd)
 {
     if (GetFocus() != hwnd)
         return;

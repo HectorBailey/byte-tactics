@@ -123,7 +123,7 @@ int __stdcall GetGafSequenceFrame(Handle* h);
 int __stdcall GetGafFrame(unsigned short* table, int index);
 void __stdcall DrawFrame(void* dest, short* frame, int x, int y);
 void __stdcall DrawFrameBlended(void* dest, short* frame, int x, int y);
-void __stdcall FUN_0045ac20(void* dest, Unit* unit);
+void __stdcall DrawUnit(void* dest, Unit* unit);
 
 // Bit 4 of the draw flags word: shadows may be drawn.
 static int DrawFlags()
@@ -171,7 +171,7 @@ void __stdcall FUN_0046a610(void* dest, Cell* cell, int ix, int iy)
             st->owner = unit;
             unit->rot = spot->rot;
             unit->pos = spot->pos;
-            FUN_0045ac20(dest, unit);
+            DrawUnit(dest, unit);
         }
     } else {
         if (f->over) {

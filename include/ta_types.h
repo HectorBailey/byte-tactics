@@ -464,7 +464,7 @@ struct Class_00475840;
 class Class_00475bd0;
 class Class_00476210;
 class Class_00476490;
-class Class_0047bdf0;
+class MoviePlayer;
 class Class_0047bf20;
 class Class_0047bf70;
 class Class_0047c150;
@@ -3957,11 +3957,11 @@ public:
     char unknown_8[4];
     void* handle;  // +0xc
     void* ptr;  // +0x10
-    Class_00437c80* FUN_00458160(void);
+    Class_00437c80* Construct(void);
     void FlushCache(void);
     void ReleaseHandle(int);
-    void FUN_004581c0(void);
-    void FUN_00458810(SpotState*, Vec3*);
+    void Destroy(void);
+    void DrawObjectState(SpotState*, Vec3*);
 };
 
 class Class_0048ff40 {  // 0x8c bytes, 23 views
@@ -5308,7 +5308,7 @@ public:
     int stopped;  // +0x8
     void* hwnd;  // +0xc
     void FUN_0047c530(void);
-    void FUN_0047c6c0(void);
+    void Play(void);
 };
 
 struct Flags_004268b0 {  // 0x2 bytes, 1 view
@@ -5536,7 +5536,7 @@ class Class_00458180 {  // 0x14 bytes, 2 views
 public:
     char unknown_0[16];
     void* buffer;  // +0x10
-    int FUN_00458180(unsigned int);
+    int Initialize(unsigned int);
 };
 
 union UType_0042b370_flags {  // 0x4 bytes, 3 views
@@ -6275,7 +6275,7 @@ public:
     Bitmap_00437b50* scratch;  // +0x10
     int AllocHandle(void**, int);
     int AllocBitmap(Bitmap_00437b50**, int, int);
-    void FUN_0045a790(SpotState*, Bitmap_00437b50*);
+    void BuildShadow(SpotState*, Bitmap_00437b50*);
     int AllocTwoPlaneBitmap(Bitmap_00437b50**, int, int);
 };
 
@@ -8323,44 +8323,44 @@ struct Packet_00457d30 {  // 0x11 bytes, 1 view
 struct Class_004581e0 {  // 0x14 bytes, 6 views
     char unknown_0[16];
     Bitmap_00437b50* shadow;  // +0x10
-    int FUN_004586a0(SpotState*, int, int);
-    void FUN_004581e0(int*, int*, int*, int*, SpotState*, Vec3*);
-    void FUN_00459830(Bitmap_00437b50*, SpotState*, int, int);
-    void FUN_00459c70(Bitmap_00437b50*, SpotState*, int, int);
+    int BuildObjectPicture(SpotState*, int, int);
+    void MeasureModel(int*, int*, int*, int*, SpotState*, Vec3*);
+    void DrawPieces(Bitmap_00437b50*, SpotState*, int, int);
+    void DrawLitPieces(Bitmap_00437b50*, SpotState*, int, int);
 };
 
 class Class_00458310 {  // 0x1 bytes, 2 views
 public:
     char unknown_0[1];
-    void FUN_00458310(int*, int*, int*, int*, SpotState*, Pos_4589c0);
-    void FUN_00458310(int*, int*, int*, int*, SpotState*, int, int, int);
+    void AddModelBounds(int*, int*, int*, int*, SpotState*, Pos_4589c0);
+    void AddModelBounds(int*, int*, int*, int*, SpotState*, int, int, int);
 };
 
 class Class_00458430 {  // 0x1 bytes, 2 views
 public:
     char unknown_0[1];
-    void FUN_00458430(int, SpotState*, Vec3, int);
+    void DrawObjectPieces(int, SpotState*, Vec3, int);
 };
 
 class Class_004584d0 {  // 0x1 bytes, 4 views
 public:
     char unknown_0[1];
-    void FUN_004584d0(SpotState*, void*, Vec3*, Object3do*, Vec3*, unsigned int, int);
+    void DrawPiece(SpotState*, void*, Vec3*, Object3do*, Vec3*, unsigned int, int);
 };
 
 class Class_00459200 {  // 0x14 bytes, 4 views
 public:
     char unknown_0[16];
     int bitmap;  // +0x10
-    void FUN_004589c0(Surface_004c0a90*, SpotState*);
-    void FUN_00459200(int, SpotState*, Vec3_459200, int);
+    void MergeIntoComposite(Surface_004c0a90*, SpotState*);
+    void DrawObjectPicture(int, SpotState*, Vec3_459200, int);
 };
 
 class Class_00458d30 {  // 0x1 bytes, 4 views
 public:
     char unknown_0[1];
-    int FUN_00458dd0(Surface_004c0a90*, SpotState*);
-    void FUN_00458d30(Surface_004c0a90*, unsigned char, int, int, int);
+    int ShadeByIntensity(Surface_004c0a90*, SpotState*);
+    void RecolorByShade(Surface_004c0a90*, unsigned char, int, int, int);
 };
 
 struct Pos_4589c0 {  // 0xc bytes, 1 view
@@ -8408,7 +8408,7 @@ struct Count_00458d20 {  // 0x4 bytes, 1 view
 class Class_00458fa0 {  // 0x1 bytes, 2 views
 public:
     char unknown_0[1];
-    void FUN_00458fa0(Surface_004c0a90*, SpotState*, int);
+    void DrawPieceEdges(Surface_004c0a90*, SpotState*, int);
 };
 
 struct Map_00458fa0 {  // 0x245 bytes, 2 views
@@ -8422,13 +8422,13 @@ class Class_00459170 {  // 0x14 bytes, 1 view
 public:
     char unknown_0[16];
     Surface_004c0a90* image;  // +0x10
-    void FUN_00459170(Surface_004c0a90*);
+    void CopyPicture(Surface_004c0a90*);
 };
 
 struct Class_0045a470 {  // 0x14 bytes, 2 views
     char unknown_0[16];
     Surface_004c0a90* image;  // +0x10
-    Surface_004c0a90* FUN_0045a470(Surface_004c0a90*);
+    Surface_004c0a90* MakeSilhouette(Surface_004c0a90*);
 };
 
 struct Fixed_00485140 {  // 0x4 bytes, 2 views
@@ -8463,13 +8463,13 @@ struct Poly_459c70 {  // 0x10 bytes, 1 view
 class Class_0045a510 {  // 0x1 bytes, 2 views
 public:
     char unknown_0[1];
-    void FUN_0045a510(int*, int*, int*, int*, SpotState*);
+    void MeasureShadow(int*, int*, int*, int*, SpotState*);
 };
 
 class Class_0045a610 {  // 0x1 bytes, 2 views
 public:
     char unknown_0[1];
-    void FUN_0045a610(Bitmap_00437b50*, SpotState*);
+    void DrawShadowShape(Bitmap_00437b50*, SpotState*);
 };
 
 struct Class_0045ae80 {  // 0x34 bytes, 7 views
@@ -11626,7 +11626,7 @@ struct Surfaces_0047bdf0 {  // 0x14 bytes, 2 views
     IUnknown* surface_10;  // +0x10
 };
 
-class Class_0047bdf0 {  // 0x5b8 bytes, 2 views
+class MoviePlayer {     // 0x5b8 bytes, 2 views
 public:
     void* smack;  // +0x0
     int frame;  // +0x4
@@ -11639,14 +11639,14 @@ public:
     char unknown_53c[8];
     Surfaces_0047bdf0* wrapper;  // +0x544
     char unknown_548[112];
-    Class_0047bdf0(char*, int, int, int, int, int);
+    MoviePlayer(char*, int, int, int, int, int);
 };
 
 class Class_0047c150 {  // 0x548 bytes, 2 views
 public:
     char unknown_0[1348];
     SmackerSurfaces* surfaces;  // +0x544
-    int FUN_0047c150(SmackerSurface*);
+    int GetBlitMode(SmackerSurface*);
 };
 
 class DDraw_0047bf70 {  // 0x14 bytes, 1 view
@@ -11707,7 +11707,7 @@ public:
     char unknown_414[304];
     DDraw_0047bf70* ddraw;  // +0x544
     SurfaceDesc_0047bf70 surfaceDesc;  // +0x548
-    int FUN_0047bf70(void);
+    int SetupDirectDraw(void);
 };
 
 struct SmackerSurface {  // 0x4 bytes, 1 view
@@ -11724,7 +11724,7 @@ public:
     char unknown_0[12];
     void* hwnd;  // +0xc
     tagPALETTEENTRY entries[256];  // +0x10
-    void FUN_0047c230(int);
+    void ReadSystemPalette(int);
 };
 
 class Class_0047c2a0 {  // 0x548 bytes, 1 view
@@ -11734,7 +11734,7 @@ public:
     tagPALETTEENTRY entries[256];  // +0x10
     char unknown_410[308];
     DisplaySurface* display;  // +0x544
-    void FUN_0047c2a0(void);
+    void UpdatePalette(void);
 };
 
 struct DisplaySurface {  // 0x14 bytes, 1 view
@@ -11751,7 +11751,7 @@ class Class_0047c2f0 {  // 0x548 bytes, 1 view
 public:
     char unknown_0[1348];
     SurfaceWrapper* wrapper;  // +0x544
-    void FUN_0047c2f0(void);
+    void ClearScreen(void);
 };
 
 struct SurfaceWrapper {  // 0x8 bytes, 1 view
@@ -11763,7 +11763,7 @@ class Class_0047c330 {  // 0x8 bytes, 1 view
 public:
     Smack_0047c330* smack;  // +0x0
     unsigned int frame;  // +0x4
-    void FUN_0047c330(void*);
+    void OnPaint(void*);
 };
 
 struct Smack_0047c330 {  // 0xc bytes, 1 view
@@ -11781,7 +11781,7 @@ public:
     tagPALETTEENTRY entries[256];  // +0x10
     char unknown_410[308];
     Display_0047c3a0* display;  // +0x544
-    void FUN_0047c3a0(void*);
+    void PlayFrame(void*);
 };
 
 struct Display_0047c3a0 {  // 0x14 bytes, 1 view

@@ -8,8 +8,8 @@
 // the 2 bytes the count-into-memory adds. The last hunk (the canbuild `je` skipping the list
 // reload on the zero-iteration edge) needs the index store form `list[count] = val; count++;`
 // instead of the walking `*out = val; out++;`. Finally `new Class_00458160` had to become
-// `operator new(0x14)` + `obj = obj ? obj->FUN_00458160() : 0;` because data/symbols.csv names
-// that address Class_00458160::FUN_00458160, not the constructor.
+// `operator new(0x14)` + `obj = obj ? obj->Construct() : 0;` because data/symbols.csv names
+// that address Class_00458160::Construct, not the constructor.
 // Pass 15 (deepseek-v4.1-flash): shape unchanged, re-confirmed 2173/2173 at 96.8. The whole
 // residual diff is three adjacent spots from one allocator decision: (1) the units-loop entry
 // guard, ours materialises the count (`mov ecx,[edi+0x1438f]; cmp ecx,esi`) where the original
@@ -155,12 +155,12 @@ class Class_00458160 {
     char unknown_0[0x10];
     int field_10;
 
-    Class_00458160* FUN_00458160(void);
+    Class_00458160* Construct(void);
 };
 
 class Class_00458180 {
   public:
-    void FUN_00458180(int size);
+    void Initialize(int size);
 };
 
 union UType_0042b370_flags {
@@ -331,7 +331,7 @@ void LoadUnitTypes() {
     }
 
     Class_00458160* obj = (Class_00458160*)operator new(0x14);
-    obj = obj ? obj->FUN_00458160() : 0;
+    obj = obj ? obj->Construct() : 0;
     g_game->field_1437b = obj;
 
     int t = g_game->field_37e23 * g_game->field_37e1f * 2;
@@ -347,7 +347,7 @@ void LoadUnitTypes() {
             scale = (float)d;
     }
     int size = (int)(v * scale);
-    ((Class_00458180*)g_game->field_1437b)->FUN_00458180((size + 0xfff) & 0xfffff000);
+    ((Class_00458180*)g_game->field_1437b)->Initialize((size + 0xfff) & 0xfffff000);
 
     FUN_004d8780(g_game->field_1439b);
 
