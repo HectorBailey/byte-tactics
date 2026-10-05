@@ -1,5 +1,5 @@
 // Decompiled by Space Bunny Free. Names are provisional.
-// Slot 4 (FUN_00474df0) of Class_00474cd0 (vtable 0x4fd618, see 0x474cd0.cpp):
+// Slot 4 (Emit) of Class_00474cd0 (vtable 0x4fd618, see 0x474cd0.cpp):
 // every frame it works out how many periods of unknown_1c have passed since
 // field_4, reserves room for that many more 32-byte records, and appends one
 // record built from the position at +0x2c, unknown_20 and a random size. It
@@ -43,7 +43,7 @@ public:
 
     Class_00471cc0();
     virtual ~Class_00471cc0();                          // slot 0
-    virtual void FUN_00472d50() = 0;                    // slot 1
+    virtual void Update() = 0;                          // slot 1
     virtual void FUN_00472e30(int) = 0;                 // slot 2
     virtual int FUN_00472e70() = 0;                     // slot 3
 };
@@ -71,16 +71,16 @@ public:
     Vec3_00474cd0 pos;                                  // +0x2c
 
     Class_00474cd0();
-    virtual void FUN_00472d50();                        // slot 1, 0x475340
+    virtual void Update();                              // slot 1, 0x475340
     virtual void FUN_00472e30(int);                     // slot 2, 0x475470
     virtual int FUN_00472e70();                         // slot 3, 0x474f80
-    virtual void FUN_00474df0();                        // slot 4, 0x474df0
+    virtual void Emit();                                // slot 4, 0x474df0
 };
 
 // The two pointer locals are only there to get the address of the position and
 // the address of the vector into ebp and esi, in that order, before the loop.
 // FUNCTION: 0x474df0
-void Class_00474cd0::FUN_00474df0()
+void Class_00474cd0::Emit()
 {
     int periods = (field_4 - g_game->frame + unknown_1c) / unknown_1c;
     if (periods > 0) {

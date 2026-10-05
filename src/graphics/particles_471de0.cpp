@@ -53,7 +53,7 @@ inline Class_00472200::~Class_00472200()
 extern Game* g_game;
 
 // FUNCTION: 0x471de0
-void FUN_00471de0()
+void DestroyParticleLists()
 {
     if (g_game->lists_38d77) {
         delete g_game->lists_38d77;

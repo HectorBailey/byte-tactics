@@ -99,8 +99,8 @@ the tool.
   `??_G` until 0x485d40 is decompiled. The run 0x4b0720-0x4b1c00 is probably
   more non-virtual methods of `CobScript` (0x485d40 calls 0x4b0940).
 - `Class_00470ae0` (vtable 0x4fd580, `??_G` at 0x470ae0): its constructor is
-  0x470a90 (`Class_00470a90::FUN_00470a90`) and its destructor 0x470b80
-  (`Class_00470b80::FUN_00470b80`).
+  0x470a90 (`Class_00470a90::Construct`) and its destructor 0x470b80
+  (`Class_00470b80::Destroy`).
 - `Class_0044e250` and `Class_0044e330`: two constructors storing vtable
   `DAT_004fd3b8`.
 - The pathfinder ("AISearch touched mapentries" is its grid): one class with

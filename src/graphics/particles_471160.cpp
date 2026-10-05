@@ -45,12 +45,12 @@ class Class_00471120 {
 public:
     std::vector<Elem_00473500> lists[1];
 
-    void FUN_00471120(void* param, short index);
-    void FUN_00471160(Elem_00473500 x, short index);
+    void DrawList(void* param, short index);
+    void AddToList(Elem_00473500 x, short index);
 };
 
 // FUNCTION: 0x471160
-void Class_00471120::FUN_00471160(Elem_00473500 x, short index)
+void Class_00471120::AddToList(Elem_00473500 x, short index)
 {
     if (lists[index].size() > 400) {
         delete lists[index][0].p;

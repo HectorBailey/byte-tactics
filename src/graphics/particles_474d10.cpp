@@ -23,7 +23,7 @@ public:
 
     Class_00471cc0();
     virtual ~Class_00471cc0();                          // slot 0
-    virtual void FUN_00472d50() = 0;                    // slot 1
+    virtual void Update() = 0;                          // slot 1
     virtual void FUN_00472e30(int) = 0;                 // slot 2
     virtual int FUN_00472e70() = 0;                     // slot 3
     static void* __stdcall operator new(size_t size);   // 0x471d10
@@ -44,10 +44,10 @@ public:
     char unknown_1c[0x38 - 0x1c];
 
     Class_00474cd0();
-    virtual void FUN_00472d50();                        // slot 1, 0x475340
+    virtual void Update();                              // slot 1, 0x475340
     virtual void FUN_00472e30(int);                     // slot 2, 0x475470
     virtual int FUN_00472e70();                         // slot 3, 0x474f80
-    virtual void FUN_00474df0();                        // slot 4, 0x474df0
+    virtual void Emit();                                // slot 4, 0x474df0
     virtual int FUN_00475440();                         // slot 5, 0x475440
     virtual void FUN_00474d50(Vec3_00474d50* pos, int limit, int a, int b, int c,
                               int alt);                 // slot 6, 0x474d50

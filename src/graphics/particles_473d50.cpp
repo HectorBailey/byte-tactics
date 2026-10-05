@@ -199,11 +199,11 @@ public:
     Vec3_00473d50 target;                       // +0x34
     Vec3_00473d50 spread;                       // +0x40
 
-    void FUN_00473d50();
+    void Emit();
 };
 
 // FUNCTION: 0x473d50
-void Class_00471560::FUN_00473d50()
+void Class_00471560::Emit()
 {
     int grow = field_4 - *(int*)(g_game + 0x38a47) + 1;
     if (grow > 0)

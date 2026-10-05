@@ -20,7 +20,7 @@ int __stdcall GetGafFrameCount(void* ptr);
 
 class Class_00471d70 {
 public:
-    void FUN_00471d70(int param_1);
+    void SetLifetime(int param_1);
 };
 
 class Class_00475150 {
@@ -41,7 +41,7 @@ public:
 // FUNCTION: 0x475150
 void Class_00475150::FUN_00475150(Vec3_00475150* p, int a, int b, int c)
 {
-    ((Class_00471d70*)this)->FUN_00471d70(c);
+    ((Class_00471d70*)this)->SetLifetime(c);
     pos = *p;
     unknown_1c = a;
     unknown_24 = GetGafFrameCount(g_game->unknown_147cf) - 1;

@@ -19,7 +19,7 @@
 
 class Class_00470eb0 {                 // the pool's allocation method
 public:
-    void* FUN_00470eb0(unsigned int size);
+    void* AllocSlot(unsigned int size);
 };
 
 // The object pool (see 0x470ae0.cpp); its method returns the object to the
@@ -27,7 +27,7 @@ public:
 class Class_00470ed0 {
 public:
     char unknown_0[4];
-    void FUN_00470ed0(void* p);
+    void FreeSlot(void* p);
 };
 
 extern Class_00470ed0 DAT_0051e610;
@@ -40,7 +40,7 @@ public:
 
     Class_00471cc0() { field_4 = 0; }
     virtual ~Class_00471cc0();                          // slot 0
-    virtual void FUN_00472d50() = 0;                    // slot 1
+    virtual void Update() = 0;                          // slot 1
     virtual void FUN_00472e30(int) = 0;                 // slot 2
     virtual int FUN_00472e70() = 0;                     // slot 3
 
@@ -48,7 +48,7 @@ public:
     {
         if (DAT_0051e608)
             return 0;
-        void* p = ((Class_00470eb0*)&DAT_0051e610)->FUN_00470eb0(size);
+        void* p = ((Class_00470eb0*)&DAT_0051e610)->AllocSlot(size);
         if (p)
             memset(p, 0, size);
         return p;
@@ -56,7 +56,7 @@ public:
 
     static void __stdcall operator delete(void* p)
     {
-        DAT_0051e610.FUN_00470ed0(p);
+        DAT_0051e610.FreeSlot(p);
     }
 };
 
@@ -73,7 +73,7 @@ public:
     char unknown_1c[0x44 - 0x1c];
 
     Class_004716a0() {}
-    virtual void FUN_00472d50();                        // slot 1, 0x473010
+    virtual void Update();                              // slot 1, 0x473010
     virtual void FUN_00472e30(int);                     // slot 2, 0x4730f0
     virtual int FUN_00472e70();                         // slot 3, 0x473130
     virtual void FUN_004743a0();                        // slot 4, 0x4743a0
@@ -95,11 +95,11 @@ public:
         lists[index].push_back(p);
     }
 
-    void FUN_004715a0(int param_1, int param_2, int param_3, int param_4, short index);
+    void AddThrustParticles(int param_1, int param_2, int param_3, int param_4, short index);
 };
 
 // FUNCTION: 0x4715a0
-void Class_004715a0::FUN_004715a0(int param_1, int param_2, int param_3, int param_4, short index)
+void Class_004715a0::AddThrustParticles(int param_1, int param_2, int param_3, int param_4, short index)
 {
     Class_004716a0* p = new Class_004716a0;
     if (p) {

@@ -1,6 +1,6 @@
 // Decompiled by Opus. Names are provisional.
 // Slot 2 (FUN_00472e30) of Class_004716a0 (vtable 0x4fd5d8, see 0x472ab0.cpp
-// and 0x471cc0.cpp for the family): calls FUN_00474170 on every 60-byte
+// and 0x471cc0.cpp for the family): calls DrawParticle on every 60-byte
 // element of the vector at +0xc with the argument and the two shorts at
 // g_game+0x1431f and +0x14323.
 #include <stddef.h>
@@ -21,7 +21,7 @@ class Class_00474170 {
 public:
     char unknown_0[0x3c];
 
-    void FUN_00474170(int param_1, short param_2, short param_3);
+    void DrawParticle(int param_1, short param_2, short param_3);
 };
 
 // Vtable 0x4fd5a8, constructor 0x471cc0, destructor 0x471d00, ??_G 0x471cd0.
@@ -31,7 +31,7 @@ public:
 
     Class_00471cc0();
     virtual ~Class_00471cc0();                          // slot 0
-    virtual void FUN_00472d50() = 0;                    // slot 1
+    virtual void Update() = 0;                          // slot 1
     virtual void FUN_00472e30(int) = 0;                 // slot 2
     virtual int FUN_00472e70() = 0;                     // slot 3
     static void* __stdcall operator new(size_t size);   // 0x471d10
@@ -45,7 +45,7 @@ public:
     std::vector<Class_00474170> items;                  // +0xc (_First +0x10)
     char unknown_1c[0x44 - 0x1c];
 
-    virtual void FUN_00472d50();                        // slot 1, 0x473010
+    virtual void Update();                              // slot 1, 0x473010
     virtual void FUN_00472e30(int);                     // slot 2, 0x4730f0
     virtual int FUN_00472e70();                         // slot 3, 0x473130
     virtual void FUN_004743a0();                        // slot 4, 0x4743a0
@@ -56,6 +56,6 @@ public:
 void Class_004716a0::FUN_00472e30(int param_1)
 {
     for (std::vector<Class_00474170>::iterator it = items.begin(); it != items.end(); ++it) {
-        it->FUN_00474170(param_1, g_game->f_1431f, g_game->f_14323);
+        it->DrawParticle(param_1, g_game->f_1431f, g_game->f_14323);
     }
 }

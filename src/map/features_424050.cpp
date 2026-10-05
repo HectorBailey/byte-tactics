@@ -158,7 +158,7 @@ void __stdcall FUN_004232f0(int index, int* head);
 int __stdcall GetCellMeanHeight(Vec3_00424050* pos);
 int __stdcall GetGroundHeight(Vec3_00424050* pos);
 Frame_00424050* __stdcall GetGafSequenceFrame(Anim_00424050* anim);
-void __stdcall FUN_00472810(SmokePos_00424050* pos, short index);
+void __stdcall EmitWhiteSmoke(SmokePos_00424050* pos, short index);
 int __stdcall FUN_004246b0(Cell_00424050* cell, int flag);
 void __stdcall FUN_00423710(int x, int z, int flag);
 void __stdcall FUN_004239c0(Feature_00424050* f, Point16_00424050* cell);
@@ -267,7 +267,7 @@ void __stdcall FUN_00424050()
         } else if (spot->flags & 1) {
             if (smoke) {
                 SmokePos_00424050 q = SmokeAt_00424050(spot, f);
-                FUN_00472810(&q, 5);
+                EmitWhiteSmoke(&q, 5);
             }
             StepGafSequence(&spot->anim);
             if (spot->flags & 4)

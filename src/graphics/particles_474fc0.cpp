@@ -32,11 +32,11 @@ public:
     int period;                        // +0x18
     int timer;                         // +0x1c
 
-    void FUN_00474fc0();
+    void Step();
 };
 
 // FUNCTION: 0x474fc0
-void Class_00474fc0::FUN_00474fc0()
+void Class_00474fc0::Step()
 {
     x += g_game->windX * 8;
     y += g_game->rise * 16;

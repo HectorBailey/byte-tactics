@@ -1,7 +1,7 @@
 // Decompiled by Opus. Names are provisional.
 // The out-of-line destructor of Class_00470ae0 (vtable 0x4fd580, see
 // 0x470ae0.cpp, whose ??_G inlines the same body). A matched caller
-// (0x471ca0.cpp) already calls it as Class_00470b80::FUN_00470b80, so it is
+// (0x471ca0.cpp) already calls it as Class_00470b80::Destroy, so it is
 // written as that method, which runs the real destructor non-virtually.
 #include <vector>
 
@@ -34,11 +34,11 @@ public:
 
 class Class_00470b80 {
 public:
-    void FUN_00470b80();
+    void Destroy();
 };
 
 // FUNCTION: 0x470b80
-void Class_00470b80::FUN_00470b80()
+void Class_00470b80::Destroy()
 {
     ((Class_00470ae0*)this)->Class_00470ae0::~Class_00470ae0();
 }

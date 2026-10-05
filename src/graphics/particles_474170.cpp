@@ -226,7 +226,7 @@ public:
     char unknown_4[0x6 - 0x4];
     Pos_00473590 pos;              // +0x06
     int field_2c;                  // +0x2c
-    void FUN_00474170(void* dest, short px, short py);
+    void DrawParticle(void* dest, short px, short py);
 };
 #pragma pack(pop)
 
@@ -243,7 +243,7 @@ static inline int IsSeen_00474170(Player_00473590* p, Player_00473590* q, int co
 }
 
 // FUNCTION: 0x474170
-void Class_00474170::FUN_00474170(void* dest, short px, short py)
+void Class_00474170::DrawParticle(void* dest, short px, short py)
 {
     Pos_00473590* q = &pos;
     short sx = q->x - px + 0x80;

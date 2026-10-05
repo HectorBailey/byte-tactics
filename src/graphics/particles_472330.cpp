@@ -20,7 +20,7 @@
 
 class Class_00470eb0 {                 // the pool's allocation method
 public:
-    void* FUN_00470eb0(unsigned int size);
+    void* AllocSlot(unsigned int size);
 };
 
 // The object pool (see 0x470ae0.cpp); its method returns the object to the
@@ -28,7 +28,7 @@ public:
 class Class_00470ed0 {
 public:
     char unknown_0[4];
-    void FUN_00470ed0(void* p);
+    void FreeSlot(void* p);
 };
 
 extern Class_00470ed0 DAT_0051e610;
@@ -41,7 +41,7 @@ public:
 
     Class_00471cc0() { field_4 = 0; }
     virtual ~Class_00471cc0();                          // slot 0
-    virtual void FUN_00472d50() = 0;                    // slot 1
+    virtual void Update() = 0;                          // slot 1
     virtual void FUN_00472e30(int) = 0;                 // slot 2
     virtual int FUN_00472e70() = 0;                     // slot 3
 
@@ -49,7 +49,7 @@ public:
     {
         if (DAT_0051e608)
             return 0;
-        void* p = ((Class_00470eb0*)&DAT_0051e610)->FUN_00470eb0(size);
+        void* p = ((Class_00470eb0*)&DAT_0051e610)->AllocSlot(size);
         if (p)
             memset(p, 0, size);
         return p;
@@ -57,14 +57,14 @@ public:
 
     static void __stdcall operator delete(void* p)
     {
-        DAT_0051e610.FUN_00470ed0(p);
+        DAT_0051e610.FreeSlot(p);
     }
 };
 
 class Class_00474170 {                 // vector element (see 0x4730f0.cpp)
 public:
     char unknown_0[0x3c];
-    void FUN_00474170(int param_1, short param_2, short param_3);
+    void DrawParticle(int param_1, short param_2, short param_3);
 };
 
 // Vtable 0x4fd5d8, ??_G 0x4716a0; 0x44 bytes.
@@ -75,7 +75,7 @@ public:
     char unknown_1c[0x44 - 0x1c];
 
     Class_004716a0() {}
-    virtual void FUN_00472d50();                        // slot 1, 0x473010
+    virtual void Update();                              // slot 1, 0x473010
     virtual void FUN_00472e30(int);                     // slot 2, 0x4730f0
     virtual int FUN_00472e70();                         // slot 3, 0x473130
     virtual void FUN_004743a0();                        // slot 4, 0x4743a0
@@ -108,7 +108,7 @@ struct Game {
 extern Game* g_game;
 
 // FUNCTION: 0x472330
-void __stdcall FUN_00472330(int param_1, int param_2, int param_3, int param_4,
+void __stdcall EmitThrustParticles(int param_1, int param_2, int param_3, int param_4,
                             short index)
 {
     Lists_00472330* lists = g_game->lists;

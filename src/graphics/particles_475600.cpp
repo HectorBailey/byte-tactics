@@ -30,7 +30,7 @@ public:
 
     Class_00471cc0();
     virtual ~Class_00471cc0();                          // slot 0
-    virtual void FUN_00472d50() = 0;                    // slot 1
+    virtual void Update() = 0;                          // slot 1
     virtual void FUN_00472e30(int) = 0;                 // slot 2
     virtual int FUN_00472e70() = 0;                     // slot 3
     static void* __stdcall operator new(size_t size);   // 0x471d10
@@ -58,16 +58,16 @@ public:
     char unknown_1c[0x34 - 0x1c];
 
     Class_004750b0();
-    virtual void FUN_00472d50();                        // slot 1, 0x475600
+    virtual void Update();                              // slot 1, 0x475600
     virtual void FUN_00472e30(int);                     // slot 2, 0x475700
     virtual int FUN_00472e70();                         // slot 3, 0x475330
-    virtual void FUN_004751c0();                        // slot 4, 0x4751c0
+    virtual void Emit();                                // slot 4, 0x4751c0
     virtual int FUN_004750f0();                         // slot 5, 0x4750f0
     virtual void FUN_00475150(Vec3_00475150* pos, int a, int b, int c); // slot 6, 0x475150
 };
 
 // FUNCTION: 0x475600
-void Class_004750b0::FUN_00472d50()
+void Class_004750b0::Update()
 {
     std::vector<Record_004750b0>::iterator it = records.begin();
     while (it != records.end()) {
@@ -86,5 +86,5 @@ void Class_004750b0::FUN_00472d50()
         }
     }
     if (FUN_004750f0())
-        FUN_004751c0();
+        Emit();
 }

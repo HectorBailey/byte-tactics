@@ -104,7 +104,7 @@ void FUN_0042a440();
 void FUN_004222e0();
 void InitUnitCategories();
 void FUN_00440930();
-void FUN_00471d90();
+void CreateParticleLists();
 void FUN_00499a30();
 void FUN_0042e310();
 void FUN_00483610();
@@ -147,7 +147,7 @@ void FUN_004917d0()
     FUN_004222e0();
     InitUnitCategories();
     FUN_00440930();
-    FUN_00471d90();
+    CreateParticleLists();
     FUN_00499a30();
     FUN_0042e310();
     FUN_00483610();

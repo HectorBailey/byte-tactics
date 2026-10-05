@@ -360,7 +360,7 @@ struct Record_00474b80 {
     Pos_00474b80 pos;              // +0x06
     char unknown_10[0x14 - 0x10];
     int field_14;                  // +0x14
-    void FUN_00474b80(void* dest, short px, short py);
+    void DrawParticle(void* dest, short px, short py);
 };
 #pragma pack(pop)
 
@@ -381,7 +381,7 @@ static inline int IsSeen_00474b80(Player_00474b80* p, Player_00474b80* q, int co
 }
 
 // FUNCTION: 0x474b80
-void Record_00474b80::FUN_00474b80(void* dest, short px, short py)
+void Record_00474b80::DrawParticle(void* dest, short px, short py)
 {
     Pos_00474b80* q = &pos;
     short sx = q->x - px + 0x80;

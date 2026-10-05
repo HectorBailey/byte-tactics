@@ -70,7 +70,7 @@ int __stdcall FUN_0046a530(int,int);
 int __stdcall FUN_0046a610(int,int,int,int);
 int __stdcall FUN_0046a860(int);
 int __stdcall FUN_0046b900(int,int,int);
-int __stdcall FUN_00471f90(int,int);
+int __stdcall DrawParticleList(int,int);
 int __stdcall FUN_00483fa0(int);
 int __stdcall FUN_004848e0(int);
 int __stdcall FUN_0048c190(int,int);
@@ -361,9 +361,9 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
       k++;
       pIdx++;
     }
-    FUN_00471f90((int)&ctx, 0);
-    FUN_00471f90((int)&ctx, 1);
-    FUN_00471f90((int)&ctx, 2);
+    DrawParticleList((int)&ctx, 0);
+    DrawParticleList((int)&ctx, 1);
+    DrawParticleList((int)&ctx, 2);
     y = y0;
     i = 0;
     while (i < h) {
@@ -392,8 +392,8 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
       i++;
       y++;
     }
-    FUN_00471f90((int)&ctx, 3);
-    FUN_00471f90((int)&ctx, 4);
+    DrawParticleList((int)&ctx, 3);
+    DrawParticleList((int)&ctx, 4);
     for (i = 0; i < h; i++) {
       int row = i + skip;
       y = y0 + i;
@@ -424,12 +424,12 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
       }
     }
   }
-  FUN_00471f90((int)&ctx, 5);
+  DrawParticleList((int)&ctx, 5);
   if (param_1 != 0) {
-    FUN_00471f90((int)&ctx, 6);
+    DrawParticleList((int)&ctx, 6);
     FUN_0049be60((int)&ctx);
     FUN_00420b00((int)&ctx);
-    FUN_00471f90((int)&ctx, 7);
+    DrawParticleList((int)&ctx, 7);
     for (i = 0; i < mv->rows; i++) {
       int *pUnit = mv->buf + mv->stride * i;
       k = 0;
@@ -446,7 +446,7 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
       }
     }
   }
-  FUN_00471f90((int)&ctx, 8);
+  DrawParticleList((int)&ctx, 8);
   if (FUN_004c1b80(0xf9))
     FUN_0048cc30((int)&ctx, (int)(g_game + 0x142f3));
 
@@ -473,7 +473,7 @@ void __stdcall FUN_00468cf0(int param_1, int param_2)
         }
       }
     }
-    FUN_00471f90((int)&ctx, 9);
+    DrawParticleList((int)&ctx, 9);
   }
   ProfileMark((Class_0046a400 *)(g_game + 0x38d85), 4);
   if ((*(ushort *)(g_game + 0x3923b) & 1) && (*(ushort *)(g_game + 0x3923b) & 2) && param_1 != 0)

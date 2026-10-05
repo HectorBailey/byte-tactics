@@ -17,7 +17,7 @@ public:
 
     Class_00471cc0();
     virtual ~Class_00471cc0();                          // slot 0
-    virtual void FUN_00472d50() = 0;                    // slot 1
+    virtual void Update() = 0;                          // slot 1
     virtual void FUN_00472e30(int) = 0;                 // slot 2
     virtual int FUN_00472e70() = 0;                     // slot 3
     static void* __stdcall operator new(size_t size);   // 0x471d10
@@ -31,10 +31,10 @@ public:
     std::vector<Elem_00473290> items;                   // +0xc (_First +0x10)
     char unknown_1c[0x48 - 0x1c];
 
-    virtual void FUN_00472d50();                        // slot 1, 0x473170
+    virtual void Update();                              // slot 1, 0x473170
     virtual void FUN_00472e30(int);                     // slot 2, 0x473250
     virtual int FUN_00472e70();                         // slot 3, 0x473290
-    virtual void FUN_00474880();                        // slot 4, 0x474880
+    virtual void Emit();                                // slot 4, 0x474880
     virtual int FUN_00473220();                         // slot 5, 0x473220
     virtual void FUN_00474760(int, int, int, int, int); // slot 6, 0x474760
 };

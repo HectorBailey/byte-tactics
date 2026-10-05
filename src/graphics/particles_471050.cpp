@@ -16,11 +16,11 @@ class Class_00470fb0 {
 public:
     std::vector<Listener_00470fb0*> lists[10];
 
-    void FUN_00471050();
+    void UpdateAll();
 };
 
 // FUNCTION: 0x471050
-void Class_00470fb0::FUN_00471050()
+void Class_00470fb0::UpdateAll()
 {
     for (int i = 0; i < 10; i++) {
         std::vector<Listener_00470fb0*>::iterator it = lists[i].begin();

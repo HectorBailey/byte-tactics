@@ -67,10 +67,10 @@ public:
 class Class_00471430 {
 public:
     virtual void FUN_00471430();        // slot 0
-    virtual void FUN_00472d50();        // slot 1
+    virtual void Update();              // slot 1
     virtual void FUN_00472e30(int);     // slot 2
     virtual int FUN_00472e70();         // slot 3
-    virtual void FUN_004737c0();        // slot 4
+    virtual void Emit();                // slot 4
     virtual int FUN_00472e00();         // slot 5
     virtual void FUN_004736e0(int, int, int); // slot 6
 
@@ -84,7 +84,7 @@ public:
 };
 
 // FUNCTION: 0x4737c0
-void Class_00471430::FUN_004737c0()
+void Class_00471430::Emit()
 {
     int grow = (field_4 - g_game->field_38a47 + 10) / 10;
 

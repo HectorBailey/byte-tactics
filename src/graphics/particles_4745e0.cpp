@@ -160,14 +160,14 @@ public:
     int color;                      // +0x30
     char unknown_34[0x44 - 0x34];
 
-    void FUN_004745e0(void* surface, short px, short py);
+    void DrawParticle(void* surface, short px, short py);
 };
 
 // Draws the record's one-pixel marker at (surface, px, py) offset by its own
 // position, when that position is visible to the local player. The marker is a
 // 1x1 rectangle centred on the sprite's origin, 0x80/0x20 to the right of it.
 // FUNCTION: 0x4745e0
-void Class_004745e0::FUN_004745e0(void* surface, short px, short py)
+void Class_004745e0::DrawParticle(void* surface, short px, short py)
 {
     Rect_004b0510 r;
     short sx = pos.x - px;

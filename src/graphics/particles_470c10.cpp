@@ -115,11 +115,11 @@ public:
     int field_1c;                              // +0x1c, the slot count
     int field_20;                              // +0x20, slots handed out
 
-    int FUN_00470c10(int param_1, int param_2);
+    int Grow(int param_1, int param_2);
 };
 
 // FUNCTION: 0x470c10
-int Class_00470c10::FUN_00470c10(int param_1, int param_2)
+int Class_00470c10::Grow(int param_1, int param_2)
 {
     int result = 0;
     if (param_1 > field_1c) {

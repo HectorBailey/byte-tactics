@@ -34,11 +34,11 @@ struct Class_00474b00 {
     int period;                        // +0x18
     int countdown;                     // +0x1c
 
-    void FUN_00474b00();
+    void Step();
 };
 
 // FUNCTION: 0x474b00
-void Class_00474b00::FUN_00474b00()
+void Class_00474b00::Step()
 {
     cursor1 += g_game->count1;
     cursor2 += g_game->count2;

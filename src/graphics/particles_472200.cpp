@@ -14,7 +14,7 @@
 
 class Class_00470eb0 {                 // the pool's allocation method
 public:
-    void* FUN_00470eb0(unsigned int size);
+    void* AllocSlot(unsigned int size);
 };
 
 // The object pool (see 0x470ae0.cpp); its method returns the object to the
@@ -22,7 +22,7 @@ public:
 class Class_00470ed0 {
 public:
     char unknown_0[4];
-    void FUN_00470ed0(void* p);
+    void FreeSlot(void* p);
 };
 
 extern Class_00470ed0 DAT_0051e610;
@@ -35,7 +35,7 @@ public:
 
     Class_00471cc0() { field_4 = 0; }
     virtual ~Class_00471cc0();                          // slot 0
-    virtual void FUN_00472d50() = 0;                    // slot 1
+    virtual void Update() = 0;                          // slot 1
     virtual void FUN_00472e30(int) = 0;                 // slot 2
     virtual int FUN_00472e70() = 0;                     // slot 3
 
@@ -43,7 +43,7 @@ public:
     {
         if (DAT_0051e608)
             return 0;
-        void* p = ((Class_00470eb0*)&DAT_0051e610)->FUN_00470eb0(size);
+        void* p = ((Class_00470eb0*)&DAT_0051e610)->AllocSlot(size);
         if (p)
             memset(p, 0, size);
         return p;
@@ -51,7 +51,7 @@ public:
 
     static void __stdcall operator delete(void* p)
     {
-        DAT_0051e610.FUN_00470ed0(p);
+        DAT_0051e610.FreeSlot(p);
     }
 };
 
@@ -68,10 +68,10 @@ public:
     char unknown_1c[0x4c - 0x1c];
 
     Class_00471560() {}
-    virtual void FUN_00472d50();                        // slot 1, 0x472eb0
+    virtual void Update();                              // slot 1, 0x472eb0
     virtual void FUN_00472e30(int);                     // slot 2, 0x472f90
     virtual int FUN_00472e70();                         // slot 3, 0x472fd0
-    virtual void FUN_00473d50();                        // slot 4, 0x473d50
+    virtual void Emit();                                // slot 4, 0x473d50
     virtual int FUN_00472f60();                         // slot 5, 0x472f60
     virtual void FUN_00473b50(void*, void*, int);       // slot 6, 0x473b50
 };
@@ -112,7 +112,7 @@ struct Game {
 extern Game* g_game;
 
 // FUNCTION: 0x472200
-void __stdcall FUN_00472200(Pos_00472200* param_1, Vec3* param_2, short param_3)
+void __stdcall EmitReverseNanoParticles(Pos_00472200* param_1, Vec3* param_2, short param_3)
 {
     Pos_00472200 pos;
     pos.a = *param_2;

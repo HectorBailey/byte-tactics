@@ -1,6 +1,6 @@
 // Decompiled by Opus. Names are provisional.
 // The constructor of Class_00470ae0 (vtable 0x4fd580, see 0x470ae0.cpp). Its
-// only caller (0x471c80.cpp) already calls it as Class_00470a90::FUN_00470a90,
+// only caller (0x471c80.cpp) already calls it as Class_00470a90::Construct,
 // so it is written as that method, which runs the real (inline) constructor
 // on this through an explicit constructor call.
 #include <vector>
@@ -13,7 +13,7 @@ void __cdecl FUN_004d85a0(void* p);
 
 class Class_00470c10 {
 public:
-    void FUN_00470c10(int param_1, int param_2);
+    void Grow(int param_1, int param_2);
 };
 
 class Class_00470ae0 {
@@ -31,7 +31,7 @@ public:
         field_1c = 0;
         field_20 = 0;
         if (param_1 != 0 && param_2 != 0)
-            ((Class_00470c10*)this)->FUN_00470c10(param_1, param_2);
+            ((Class_00470c10*)this)->Grow(param_1, param_2);
     }
     virtual ~Class_00470ae0()
     {
@@ -47,11 +47,11 @@ public:
 
 class Class_00470a90 {
 public:
-    Class_00470ae0* FUN_00470a90(int param_1, int param_2);
+    Class_00470ae0* Construct(int param_1, int param_2);
 };
 
 // FUNCTION: 0x470a90
-Class_00470ae0* Class_00470a90::FUN_00470a90(int param_1, int param_2)
+Class_00470ae0* Class_00470a90::Construct(int param_1, int param_2)
 {
     ((Class_00470ae0*)this)->Class_00470ae0::Class_00470ae0(param_1, param_2);
     return (Class_00470ae0*)this;

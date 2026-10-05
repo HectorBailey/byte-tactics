@@ -46,7 +46,7 @@ struct Game {
 extern Game* g_game;
 
 void __stdcall InitGafSequence(Ref_00420a30* ref, Src_00420a30* src, int index);
-void __stdcall FUN_00472630(int* pos, int a, int b, int c);
+void __stdcall EmitSmoke(int* pos, int a, int b, int c);
 
 // FUNCTION: 0x420a30
 void __stdcall FUN_00420a30(Pos_00420a30* pos, Src_00420a30* src, int index, int flag)
@@ -64,7 +64,7 @@ void __stdcall FUN_00420a30(Pos_00420a30* pos, Src_00420a30* src, int index, int
         else
             e->ref2.src = 0;
         if (flag == 0 && pos->field_6 > (short)g_game->field_1427f)
-            FUN_00472630((int*)pos, 7, 0xf, 9);
+            EmitSmoke((int*)pos, 7, 0xf, 9);
         e->field_0 = 0;
     }
 }
