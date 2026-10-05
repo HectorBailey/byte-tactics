@@ -45,22 +45,22 @@ public:
 
 class Class_004cedc0 {
 public:
-    void FUN_004cedc0(int param_1);
+    void EnableCdAudio(int param_1);
 };
 
 class Class_004ce7a0 {
 public:
-    void FUN_004ce7a0(int param_1);
+    void SetPlaybackOrder(int param_1);
 };
 
 class Class_004cd9d0 {
 public:
-    void FUN_004cd9d0(void (*param_1)());
+    void SetCdCallback(void (*param_1)());
 };
 
 class Class_004ce690 {
 public:
-    void FUN_004ce690(int param_1);
+    void SetTrackCategory(int param_1);
 };
 
 #pragma pack(push, 1)
@@ -239,11 +239,11 @@ void FUN_00491200()
     int ok = FUN_0042f980(DAT_00509200, DAT_0051e828, &size);
     if (ok == 0)
         memset(DAT_0051e828, 0, 0xaa0);
-    ((Class_004cedc0*)g_game->field_10)->FUN_004cedc0(g_game->field_37f14 & 1);
-    ((Class_004ce7a0*)g_game->field_10)->FUN_004ce7a0(g_game->field_37f16);
-    ((Class_004cd9d0*)g_game->field_10)->FUN_004cd9d0(FUN_00490fe0);
+    ((Class_004cedc0*)g_game->field_10)->EnableCdAudio(g_game->field_37f14 & 1);
+    ((Class_004ce7a0*)g_game->field_10)->SetPlaybackOrder(g_game->field_37f16);
+    ((Class_004cd9d0*)g_game->field_10)->SetCdCallback(FUN_00490fe0);
     FUN_00490fe0();
-    ((Class_004ce690*)g_game->field_10)->FUN_004ce690(0);
+    ((Class_004ce690*)g_game->field_10)->SetTrackCategory(0);
     FUN_0045bcc0();
     FUN_00431a60();
     FUN_004318c0();

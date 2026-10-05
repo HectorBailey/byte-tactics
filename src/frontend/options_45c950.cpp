@@ -8,7 +8,7 @@
 
 class Class_004cdb40 {
 public:
-    void FUN_004cdb40();
+    void PlayNextTrack();
 };
 
 class Class_004ce3e0 {
@@ -23,7 +23,7 @@ public:
 
 class Class_004ce7a0 {
 public:
-    int FUN_004ce7a0(int value);
+    int SetPlaybackOrder(int value);
 };
 
 class Class_004d0070 {
@@ -64,9 +64,9 @@ void FUN_0045c950()
     g_game->volume2 = DAT_00512f42;
     ((Class_004ce3e0*)g_game->field_10)->FUN_004ce3e0(&DAT_00512f75);
     g_game->field_37f16 = DAT_00512f48;
-    ((Class_004ce7a0*)g_game->field_10)->FUN_004ce7a0(g_game->field_37f16);
+    ((Class_004ce7a0*)g_game->field_10)->SetPlaybackOrder(g_game->field_37f16);
     if (((unsigned char)g_game->flags ^ (unsigned char)DAT_00512f46) & 1) {
-        ((Class_004cdb40*)g_game->field_10)->FUN_004cdb40();
+        ((Class_004cdb40*)g_game->field_10)->PlayNextTrack();
     }
     unsigned short f = g_game->flags;
     f = f ^ ((f ^ DAT_00512f46) & 1);

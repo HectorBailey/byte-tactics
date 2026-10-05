@@ -11,7 +11,7 @@ public:
 
 class Class_004ce260 {
 public:
-    void FUN_004ce260();
+    void OpenCdAudio();
 };
 
 class Class_004cff20 {
@@ -88,6 +88,6 @@ void FUN_0047ed40(void)
                 FatalError(DAT_00508a78);
         }
     }
-    ((Class_004ce260*)g_game->field_10)->FUN_004ce260();
+    ((Class_004ce260*)g_game->field_10)->OpenCdAudio();
     DAT_0051e68c = new Sound_0047ed40();
 }

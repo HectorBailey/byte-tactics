@@ -10,12 +10,12 @@ extern void __stdcall RemoveTimer(int);
 
 class Class_004cda00 {
 public:
-    void FUN_004cda00();
+    void QueryDisc();
 };
 
 class Class_004cdb40 {
 public:
-    void FUN_004cdb40();
+    void PlayNextTrack();
 };
 
 struct CdAudio_004ce030 {
@@ -33,7 +33,7 @@ struct CdAudio_004ce030 {
 extern CdAudio_004ce030* DAT_0051ff14;
 
 // FUNCTION: 0x4ce030
-void __cdecl FUN_004ce030(int param_1, int param_2, int param_3)
+void __cdecl HandleCdMessage(int param_1, int param_2, int param_3)
 {
     char buf[64];
 
@@ -51,7 +51,7 @@ void __cdecl FUN_004ce030(int param_1, int param_2, int param_3)
         RemoveTimer(DAT_0050b544);
         DAT_0050b540 = DAT_0050b544 = -1;
         if (param_2 == 0x8000) {
-            ((Class_004cda00*)DAT_0051ff14)->FUN_004cda00();
+            ((Class_004cda00*)DAT_0051ff14)->QueryDisc();
             if (DAT_0051ff14->callback)
                 DAT_0051ff14->callback();
         }
@@ -65,7 +65,7 @@ void __cdecl FUN_004ce030(int param_1, int param_2, int param_3)
             else
                 playing = 0;
             if (!playing)
-                ((Class_004cdb40*)DAT_0051ff14)->FUN_004cdb40();
+                ((Class_004cdb40*)DAT_0051ff14)->PlayNextTrack();
         }
         break;
     }

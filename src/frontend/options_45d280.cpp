@@ -84,7 +84,7 @@ struct Game {
 
 class Class_004cdb40 {
 public:
-    void FUN_004cdb40();
+    void PlayNextTrack();
 };
 
 class Class_004ce3e0 {
@@ -94,7 +94,7 @@ public:
 
 class Class_004ce450 {
 public:
-    int FUN_004ce450();
+    int GetTrackCount();
 };
 
 class Class_004ce580 {
@@ -109,37 +109,37 @@ public:
 
 class Class_004ce7a0 {
 public:
-    int FUN_004ce7a0(int value);
+    int SetPlaybackOrder(int value);
 };
 
 class Class_004ce7c0 {
 public:
-    void FUN_004ce7c0(int value, char type);
+    void SetCategoryOfTrack(int value, char type);
 };
 
 class Class_004ce7e0 {
 public:
-    int FUN_004ce7e0(int value);
+    int GetCategoryOfTrack(int value);
 };
 
 class Class_004ce8c0 {
 public:
-    int FUN_004ce8c0(int value);
+    int SelectTrack(int value);
 };
 
 class Class_004ceb60 {
 public:
-    void FUN_004ceb60(int value, int flag);
+    void PlayCdTrack(int value, int flag);
 };
 
 class Class_004ced40 {
 public:
-    void FUN_004ced40();
+    void StopCdAudio();
 };
 
 class Class_004cedc0 {
 public:
-    int FUN_004cedc0(int value);
+    int EnableCdAudio(int value);
 };
 
 class Class_004d0070 {
@@ -197,7 +197,7 @@ void FUN_0045c510()
     Entry_0045d280* gadgets = ((Holder_0045d280*)g_game->table_531)->entries;
     if (g_game->field_37f16 == 4) {
         int index = FindGadgetIndex(gadgets, DAT_0050692c, 1);
-        ((Class_004ce7c0*)g_game->sound)->FUN_004ce7c0(DAT_00512fe0, gadgets[index].value);
+        ((Class_004ce7c0*)g_game->sound)->SetCategoryOfTrack(DAT_00512fe0, gadgets[index].value);
     }
 }
 
@@ -208,7 +208,7 @@ void FUN_0045c630()
     g_game->field_37f16 = 4;
     if (!(g_game->flags.word & 1)) {
         g_game->flags.word |= 1;
-        ((Class_004cdb40*)g_game->sound)->FUN_004cdb40();
+        ((Class_004cdb40*)g_game->sound)->PlayNextTrack();
     }
     FUN_0045bcc0();
 }
@@ -219,9 +219,9 @@ void FUN_0045c950()
     g_game->volume2 = DAT_00512f42;
     ((Class_004ce3e0*)g_game->sound)->FUN_004ce3e0(DAT_00512f75);
     g_game->field_37f16 = DAT_00512f48;
-    ((Class_004ce7a0*)g_game->sound)->FUN_004ce7a0(g_game->field_37f16);
+    ((Class_004ce7a0*)g_game->sound)->SetPlaybackOrder(g_game->field_37f16);
     if (((unsigned char)g_game->flags.word ^ (unsigned char)DAT_00512f46) & 1) {
-        ((Class_004cdb40*)g_game->sound)->FUN_004cdb40();
+        ((Class_004cdb40*)g_game->sound)->PlayNextTrack();
     }
     unsigned short f = g_game->flags.word;
     f = f ^ ((f ^ DAT_00512f46) & 1);
@@ -236,11 +236,11 @@ void __stdcall FUN_0045d280(Object_0045d280* obj)
     Entry_0045d280* entries = obj->holder->entries;
     if (obj->field_60 == -1) {
         if (!g_game->prefs) {
-            ((Class_004ced40*)g_game->sound)->FUN_004ced40();
+            ((Class_004ced40*)g_game->sound)->StopCdAudio();
             g_game->loaded = 0;
             return;
         }
-        ((Class_004cdb40*)g_game->sound)->FUN_004cdb40();
+        ((Class_004cdb40*)g_game->sound)->PlayNextTrack();
         g_game->loaded = 0;
         return;
     }
@@ -251,13 +251,13 @@ void __stdcall FUN_0045d280(Object_0045d280* obj)
         int v = GetButtonStageByName(obj, DAT_005067bc);
         unsigned short f = g_game->flags.word;
         g_game->flags.word = f ^ ((f ^ v) & 1);
-        ((Class_004cedc0*)g_game->sound)->FUN_004cedc0(g_game->flags.word & 1);
+        ((Class_004cedc0*)g_game->sound)->EnableCdAudio(g_game->flags.word & 1);
         FUN_004ab0a0(obj);
         FUN_0045d130();
     } else if (IsCurrentGadgetNamed(obj, DAT_00506984)) {  // "TRACKMODE"
         FUN_0047f1a0(DAT_00502b38, 0);
         g_game->field_37f16 = GetButtonStageByName(obj, DAT_00506984) + 1;
-        ((Class_004ce7a0*)g_game->sound)->FUN_004ce7a0(g_game->field_37f16);
+        ((Class_004ce7a0*)g_game->sound)->SetPlaybackOrder(g_game->field_37f16);
         if (g_game->field_37f16 == 3) {
             DAT_00512fe0 = ((Class_004ce5a0*)g_game->sound)->FUN_004ce5a0();
             FUN_004ab0a0(obj);
@@ -265,7 +265,7 @@ void __stdcall FUN_0045d280(Object_0045d280* obj)
             return;
         }
         if (g_game->field_37f16 == 4) {
-            SetButtonStageByName(obj, DAT_0050692c, (unsigned char)((Class_004ce7e0*)g_game->sound)->FUN_004ce7e0(DAT_00512fe0));
+            SetButtonStageByName(obj, DAT_0050692c, (unsigned char)((Class_004ce7e0*)g_game->sound)->GetCategoryOfTrack(DAT_00512fe0));
             FUN_0045c510();
         }
         FUN_004ab0a0(obj);
@@ -274,23 +274,23 @@ void __stdcall FUN_0045d280(Object_0045d280* obj)
     } else if (IsCurrentGadgetNamed(obj, DAT_0050692c)) {  // "TRACKTYPE"
         FUN_0047f1a0(DAT_00502b38, 0);
         int i = obj->field_60;
-        ((Class_004ce7c0*)g_game->sound)->FUN_004ce7c0(DAT_00512fe0, entries[i].value);
+        ((Class_004ce7c0*)g_game->sound)->SetCategoryOfTrack(DAT_00512fe0, entries[i].value);
         FUN_0045c3f0();
         FUN_004ab0a0(obj);
         return;
     }
     if (IsCurrentGadgetNamed(obj, DAT_0050696c)) {      // "CDPLAY"
         FUN_0047f1a0(DAT_00502b38, 0);
-        ((Class_004ceb60*)g_game->sound)->FUN_004ceb60(DAT_00512fe0, 1);
+        ((Class_004ceb60*)g_game->sound)->PlayCdTrack(DAT_00512fe0, 1);
         FUN_004ab0a0(obj);
         return;
     } else if (IsCurrentGadgetNamed(obj, DAT_00506964)) {  // "CDNEXT"
         FUN_0047f1a0(DAT_00502b38, 0);
         DAT_00512fe0 = DAT_00512fe0 + 1;
-        int n = ((Class_004ce450*)g_game->sound)->FUN_004ce450();
+        int n = ((Class_004ce450*)g_game->sound)->GetTrackCount();
         if (DAT_00512fe0 > n)
             DAT_00512fe0 = 1;
-        DAT_00512fe0 = ((Class_004ce8c0*)g_game->sound)->FUN_004ce8c0(DAT_00512fe0);
+        DAT_00512fe0 = ((Class_004ce8c0*)g_game->sound)->SelectTrack(DAT_00512fe0);
         FUN_0045c3f0();
         FUN_004ab0a0(obj);
         return;
@@ -298,15 +298,15 @@ void __stdcall FUN_0045d280(Object_0045d280* obj)
         FUN_0047f1a0(DAT_00502b38, 0);
         DAT_00512fe0 = DAT_00512fe0 - 1;
         if (DAT_00512fe0 < 1)
-            DAT_00512fe0 = ((Class_004ce450*)g_game->sound)->FUN_004ce450();
-        DAT_00512fe0 = ((Class_004ce8c0*)g_game->sound)->FUN_004ce8c0(DAT_00512fe0);
+            DAT_00512fe0 = ((Class_004ce450*)g_game->sound)->GetTrackCount();
+        DAT_00512fe0 = ((Class_004ce8c0*)g_game->sound)->SelectTrack(DAT_00512fe0);
         FUN_0045c3f0();
         FUN_004ab0a0(obj);
         return;
     } else if (IsCurrentGadgetNamed(obj, DAT_00506974)) {  // "CDSTOP"
         FUN_0047f1a0(DAT_00502b38, 0);
-        ((Class_004ced40*)g_game->sound)->FUN_004ced40();
-        DAT_00512fe0 = ((Class_004ce8c0*)g_game->sound)->FUN_004ce8c0(1);
+        ((Class_004ced40*)g_game->sound)->StopCdAudio();
+        DAT_00512fe0 = ((Class_004ce8c0*)g_game->sound)->SelectTrack(1);
         FUN_0045c3f0();
         FUN_004ab0a0(obj);
         return;

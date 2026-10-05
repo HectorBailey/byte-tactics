@@ -16,7 +16,7 @@ public:
 
 class Class_004ce7e0 {
 public:
-    unsigned char FUN_004ce7e0(int index);
+    unsigned char GetCategoryOfTrack(int index);
 };
 
 // The surface laid out by AllocSurface: the pixels follow a 0x30-byte header.
@@ -144,7 +144,7 @@ void FUN_00460160()
     DAT_00512f71 = g_game->field_1434d;
     DAT_00512fd9 = ((Class_004ce5a0*)g_game->field_10)->FUN_004ce5a0();
     for (int i = 0; i < 100; i++) {
-        DAT_00512f75[i] = ((Class_004ce7e0*)g_game->field_10)->FUN_004ce7e0(i);
+        DAT_00512f75[i] = ((Class_004ce7e0*)g_game->field_10)->GetCategoryOfTrack(i);
     }
     FUN_0049fb10(&g_game->menu, 1);
     RenderLayer(&g_game->menu, 0xc0);

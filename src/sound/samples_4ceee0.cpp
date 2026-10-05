@@ -12,7 +12,7 @@ class Class_004ce410 {
 public:
     int open;                          // +0x0
 
-    void FUN_004ce410();
+    void CloseCdAudio();
 };
 
 class Class_004cf4d0 {
@@ -58,7 +58,7 @@ void Class_004ceee0::FUN_004ceee0()
         stream = 0;
         FUN_004bb5d0(file);
     }
-    ((Class_004ce410*)this)->FUN_004ce410();
+    ((Class_004ce410*)this)->CloseCdAudio();
     if (field_28 != 0)
         field_28->Release();
     if (field_24 != 0)

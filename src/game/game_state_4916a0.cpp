@@ -7,12 +7,12 @@ extern char* g_game;
 
 class Class_004ce450 {
 public:
-    int FUN_004ce450();
+    int GetTrackCount();
 };
 
 class Class_004ce7e0 {
 public:
-    unsigned char FUN_004ce7e0(int param_1);
+    unsigned char GetCategoryOfTrack(int param_1);
 };
 
 // The CD-list settings block: 0x24 bytes of header, then 0xaa0-0x24 bytes
@@ -49,8 +49,8 @@ void FUN_00434b90();
 // FUNCTION: 0x4916a0
 void FUN_004916a0(void)
 {
-    for (int i = 0; i < ((Class_004ce450*)*(void**)(g_game + 0x10))->FUN_004ce450(); i++) {
-        DAT_0051e828.tracks[i] = ((Class_004ce7e0*)*(void**)(g_game + 0x10))->FUN_004ce7e0(i + 1);
+    for (int i = 0; i < ((Class_004ce450*)*(void**)(g_game + 0x10))->GetTrackCount(); i++) {
+        DAT_0051e828.tracks[i] = ((Class_004ce7e0*)*(void**)(g_game + 0x10))->GetCategoryOfTrack(i + 1);
     }
     FUN_0042f960("CDLISTS", &DAT_0051e828, 0xaa0);
     FUN_00428730();

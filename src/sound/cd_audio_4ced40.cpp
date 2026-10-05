@@ -17,12 +17,12 @@ public:
     char unknown_210[0x284 - 0x210];
     int unknown_284;                   // +0x284
 
-    int FUN_004ced40();
+    int StopCdAudio();
 };
 
 // Stops CD audio playback; returns 1 when the MCI command succeeded.
 // FUNCTION: 0x4ced40
-int Class_004ced40::FUN_004ced40()
+int Class_004ced40::StopCdAudio()
 {
     MCIERROR err = mciSendStringA("stop cdaudio", 0, 0, 0);
     if (unknown_200)

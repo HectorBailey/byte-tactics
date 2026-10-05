@@ -19,11 +19,11 @@ public:
     char unknown_280[0x284 - 0x280];
     int unknown_284;                   // +0x284
 
-    void FUN_004cedc0(int on);
+    void EnableCdAudio(int on);
 };
 
 // FUNCTION: 0x4cedc0
-void Class_004cedc0::FUN_004cedc0(int on)
+void Class_004cedc0::EnableCdAudio(int on)
 {
     enabled = on;
     if (on == 0) {

@@ -4021,7 +4021,7 @@ public:
     int field_284;  // +0x284
     char unknown_288[4];
     int field_28c;  // +0x28c
-    int FUN_004ceb60(int, int);
+    int PlayCdTrack(int, int);
 };
 
 class Class_004ced40 {  // 0x288 bytes, 5 views
@@ -4033,7 +4033,7 @@ public:
     int unknown_20c;  // +0x20c
     char unknown_210[116];
     int unknown_284;  // +0x284
-    int FUN_004ced40(void);
+    int StopCdAudio(void);
 };
 
 class Class_004cfe80 {  // 0x8 bytes, 5 views
@@ -4146,18 +4146,18 @@ public:
     int handle;  // +0x288
     int field_28c;  // +0x28c
     int field_290;  // +0x290
-    int FUN_004ce450(void);
-    int FUN_004ce680(void);
-    int FUN_004ce7f0(void);
+    int GetTrackCount(void);
+    int GetTrackCategory(void);
+    int GetCurrentTrack(void);
     int FUN_004cef90(int, int, int, void*);
     int FUN_004cf570(IDirectSoundBuffer**, long, Pos_004cf570*);
     int FUN_004cfba0(void);
-    unsigned char FUN_004ce7e0(int);
-    void FUN_004cdb40(void);
-    void FUN_004ce190(void);
+    unsigned char GetCategoryOfTrack(int);
+    void PlayNextTrack(void);
+    void CloseCdPlayerWindow(void);
     void FUN_004ce580(int);
-    void FUN_004ce690(int);
-    void FUN_004ce7c0(int, unsigned char);
+    void SetTrackCategory(int);
+    void SetCategoryOfTrack(int, unsigned char);
     void FUN_004cf4d0(IDirectSoundBuffer**);
     void FUN_004cfb40(void);
     void FUN_004d0130(void);
@@ -5277,7 +5277,7 @@ struct Gadget_00426190 {  // 0x64 bytes, 8 views
 class Class_004ce1d0 {  // 0x1 bytes, 2 views
 public:
     char unknown_0[1];
-    bool FUN_004ce1d0(void);
+    bool HasCdPlayerWindow(void);
 };
 
 class Class_004cff20 {  // 0x1 bytes, 3 views
@@ -8559,7 +8559,7 @@ class Class_004ce7a0 {  // 0x200 bytes, 8 views
 public:
     char unknown_0[508];
     int field_1fc;  // +0x1fc
-    int FUN_004ce7a0(int);
+    int SetPlaybackOrder(int);
 };
 
 class Class_004ce5a0 {  // 0x1 bytes, 5 views
@@ -8588,7 +8588,7 @@ public:
     char unknown_204[4];
     int current;  // +0x208
     int mode;  // +0x20c
-    int FUN_004ce8c0(int);
+    int SelectTrack(int);
 };
 
 class Class_004cedc0 {  // 0x288 bytes, 5 views
@@ -8602,7 +8602,7 @@ public:
     int enabled;  // +0x27c
     char unknown_280[4];
     int unknown_284;  // +0x284
-    void FUN_004cedc0(int);
+    void EnableCdAudio(int);
 };
 
 union Flags_0045d280 {  // 0x2 bytes, 1 view
@@ -11894,7 +11894,7 @@ public:
     int field_284;  // +0x284
     char unknown_288[4];
     int field_28c;  // +0x28c
-    int FUN_004ce260(void);
+    int OpenCdAudio(void);
 };
 
 struct Entry_0047f8c0 {  // 0x11 bytes, 6 views
@@ -13938,14 +13938,14 @@ public:
 class Class_004ce460 {  // 0x1 bytes, 2 views
 public:
     char unknown_0[1];
-    int FUN_004ce460(void);
+    int IsFirstTrackData(void);
 };
 
 class Class_004cd9d0 {  // 0x290 bytes, 3 views
 public:
     char unknown_0[652];
     void (__stdcall *callback)(void);  // +0x28c
-    int FUN_004cd9d0(void (__stdcall *)(void));
+    int SetCdCallback(void (__stdcall *)(void));
 };
 
 struct Zero11_004917d0 {  // 0xb bytes, 1 view
@@ -14076,7 +14076,7 @@ struct ViewFlags_497180 {  // 0x2 bytes, 1 view
 class Class_004ce800 {  // 0x1 bytes, 2 views
 public:
     char unknown_0[1];
-    int FUN_004ce800(void);
+    int IsCdPlaying(void);
 };
 
 union LoadFlags_00497f40 {  // 0x2 bytes, 1 view
@@ -14454,7 +14454,7 @@ struct Flags_0049e1a0 {  // 0x4 bytes, 1 view
 class Class_004ce410 {  // 0x4 bytes, 3 views
 public:
     int open;  // +0x0
-    void FUN_004ce410(void);
+    void CloseCdAudio(void);
 };
 
 class Class_004cee50 {  // 0x294 bytes, 2 views
@@ -18545,13 +18545,13 @@ public:
     int field_210;  // +0x210
     char unknown_214[108];
     int field_280;  // +0x280
-    int FUN_004cda00(void);
+    int QueryDisc(void);
 };
 
 class Class_004ce020 {  // 0x1 bytes, 1 view
 public:
     char unknown_0[1];
-    int FUN_004ce020(void);
+    int GetPlayState(void);
 };
 
 class Class_004d02a0 {  // 0x290 bytes, 7 views

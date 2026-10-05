@@ -7,7 +7,7 @@
 
 class Class_004ce690 {
 public:
-    void FUN_004ce690(int param_1);
+    void SetTrackCategory(int param_1);
 };
 
 class Class_00435c00 {
@@ -144,7 +144,7 @@ void __stdcall FUN_0041ec50(Gadget_0041ec50* gadget)
         FUN_004d85a0(data);
         if (g_game->flag4)
             LeaveNetGame();
-        g_game->field_10->FUN_004ce690(4);
+        g_game->field_10->SetTrackCategory(4);
         Display_0041ec50* display = GetDisplay();
         display->field_614 = g_game->field_3906f;
         return;

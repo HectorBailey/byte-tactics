@@ -6,11 +6,11 @@ extern int DAT_0051ff18;
 
 class Class_004ce1d0 {
 public:
-    bool FUN_004ce1d0();
+    bool HasCdPlayerWindow();
 };
 
 // FUNCTION: 0x4ce1d0
-bool Class_004ce1d0::FUN_004ce1d0()
+bool Class_004ce1d0::HasCdPlayerWindow()
 {
     return DAT_0051ff18 != 0;
 }

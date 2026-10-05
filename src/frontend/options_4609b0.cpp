@@ -13,7 +13,7 @@ public:
 
 class Class_004ce910 {
 public:
-    void FUN_004ce910(int value);
+    void PauseCdAudio(int value);
 };
 
 class Class_004c6a60 {
@@ -109,7 +109,7 @@ void __stdcall FUN_004609b0(Gadget_004609b0* gadget)
                 g_game->flags_38a51 &= 0xfffe;
         }
         g_game->orders &= 0xfffe;
-        g_game->field_10->FUN_004ce910(0);
+        g_game->field_10->PauseCdAudio(0);
         return;
     }
     if (IsCurrentGadgetNamed(gadget, "LOADGAME")) {

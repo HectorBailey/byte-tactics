@@ -5,7 +5,7 @@
 
 class Class_004cdb40 {
 public:
-    void FUN_004cdb40();
+    void PlayNextTrack();
 };
 
 class Class_004d0070 {
@@ -42,7 +42,7 @@ void FUN_0045c630()
     g_game->field_37f16 = 4;
     if (!(g_game->flags & 1)) {
         g_game->flags |= 1;
-        g_game->sound->FUN_004cdb40();
+        g_game->sound->PlayNextTrack();
     }
     SetBrightness(0.5 - g_game->brightness * -0.041666668f);
     ((Class_004d0070*)g_game->sound)->FUN_004d0070(g_game->volume1 << 10);

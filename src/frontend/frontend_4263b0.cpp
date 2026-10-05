@@ -4,12 +4,12 @@
 
 class Class_004ce1d0 {
 public:
-    int FUN_004ce1d0();
+    int HasCdPlayerWindow();
 };
 
 class Class_004ce690 {
 public:
-    void FUN_004ce690(int value);
+    void SetTrackCategory(int value);
 };
 
 class Class_004cff20 {
@@ -127,7 +127,7 @@ void __stdcall FUN_004263b0()
 
     FUN_004288d0("FrontendX", 1, 1, 0);
     FUN_0047f210("BGM", 0);
-    ((Class_004ce690*)g_game->field_10)->FUN_004ce690(4);
+    ((Class_004ce690*)g_game->field_10)->SetTrackCategory(4);
     FUN_0049fa50(&g_game->sub);
 
     char* name = "FrontendX";
@@ -163,7 +163,7 @@ void __stdcall FUN_004263b0()
     memset(DAT_00512298, 0, 0x145 * 4);
 
     if (DAT_0051229c == 0) {
-        if (((Class_004ce1d0*)g_game->field_10)->FUN_004ce1d0()) {
+        if (((Class_004ce1d0*)g_game->field_10)->HasCdPlayerWindow()) {
             FUN_00426200();
             DAT_0051229c = 1;
         }

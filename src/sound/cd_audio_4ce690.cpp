@@ -7,11 +7,11 @@ extern int DAT_0050b540;
 
 extern int __stdcall RemoveTimer(int handle);
 extern int __stdcall AddTimer(int delay, int id, void (__stdcall* callback)(void*));
-extern void __stdcall FUN_004ce5e0(void* unused);
+extern void __stdcall OnCdFadeTimer(void* unused);
 
 class Class_004cdb40 {
 public:
-    void FUN_004cdb40();
+    void PlayNextTrack();
 };
 
 class Class_004d00d0 {
@@ -32,11 +32,11 @@ public:
     char unknown_27c[0x284 - 0x27c];
     int field_284;                     // +0x284
 
-    void FUN_004ce690(int mode);
+    void SetTrackCategory(int mode);
 };
 
 // FUNCTION: 0x4ce690
-void Class_004ce690::FUN_004ce690(int mode)
+void Class_004ce690::SetTrackCategory(int mode)
 {
     int old = field_278;
     if (old == mode)
@@ -56,17 +56,17 @@ void Class_004ce690::FUN_004ce690(int mode)
                 DAT_0050b540 = -1;
             }
             ((Class_004d00d0*)this)->FUN_004d00d0(field_20, 0);
-            ((Class_004cdb40*)this)->FUN_004cdb40();
+            ((Class_004cdb40*)this)->PlayNextTrack();
         } else {
             if (DAT_0050b544 >= 0) {
                 RemoveTimer(DAT_0050b544);
                 DAT_0050b544 = -1;
                 RemoveTimer(DAT_0050b540);
                 DAT_0050b540 = -1;
-                ((Class_004cdb40*)this)->FUN_004cdb40();
+                ((Class_004cdb40*)this)->PlayNextTrack();
             } else {
                 field_284 = field_20 / -18;
-                DAT_0050b544 = AddTimer(2, 0, FUN_004ce5e0);
+                DAT_0050b544 = AddTimer(2, 0, OnCdFadeTimer);
             }
         }
     }
