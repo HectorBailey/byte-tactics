@@ -12,7 +12,7 @@ public:
     void Disable3D();
 };
 
-class Class_004cfe80 {
+class SJE_CdPlayerClass {
 public:
     void Enable3D();
 };
@@ -26,7 +26,7 @@ void __stdcall CmdSound3D(int unused)
         (*(Class_004cfe90**)((char*)g_game + 0x10))->Disable3D();
         SaveSettings();
     } else {
-        (*(Class_004cfe80**)((char*)g_game + 0x10))->Enable3D();
+        (*(SJE_CdPlayerClass**)((char*)g_game + 0x10))->Enable3D();
         SaveSettings();
     }
 }

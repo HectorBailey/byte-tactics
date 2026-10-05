@@ -9,7 +9,7 @@
 // the compiler then keeps it in bl and emits the xor/and/xor bitfield-merge
 // idiom the original used. The low-three-bit test reads it as a byte again.
 
-class Class_004cfe80 {
+class SJE_CdPlayerClass {
 public:
     char unknown_0[4];
     int field_4;
@@ -65,7 +65,7 @@ void FUN_0045c820()
     g_game->field_37f19 = (g_game->field_37f19 & ~0x20) | (DAT_00512f4b & 0x20);
     g_game->field_37f19 = (g_game->field_37f19 & ~0x40) | ((DAT_00512f4b & 0x20) << 1);
     if ((((unsigned char)DAT_00512f4b) & 7) == 2)
-        ((Class_004cfe80*)g_game->sound)->Enable3D();
+        ((SJE_CdPlayerClass*)g_game->sound)->Enable3D();
     else
         ((Class_004cfe90*)g_game->sound)->Disable3D();
     g_game->field_37f19 = (g_game->field_37f19 & ~7) | (DAT_00512f4b & 7);

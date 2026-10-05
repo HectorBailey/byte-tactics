@@ -72,14 +72,14 @@ struct Rect_00478b40 {
     int y2;
 };
 
-class Class_004cfba0 {
+class SJE_CdPlayerClass {
 public:
     int IsStreamActive();
 };
 
 struct Game {
     char unknown_0[0x10];
-    Class_004cfba0* f_0x10;            // +0x10
+    SJE_CdPlayerClass* f_0x10;         // +0x10
 };
 
 extern Game* g_game;

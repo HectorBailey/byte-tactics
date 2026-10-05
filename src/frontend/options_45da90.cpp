@@ -74,7 +74,7 @@ struct Game {
 };
 #pragma pack(pop)
 
-class Class_004cfe80 {
+class SJE_CdPlayerClass {
 public:
     void Enable3D();
 };
@@ -144,7 +144,7 @@ void __stdcall HandleSoundOptionsClick(Object_0045da90* obj)
         if ((g_game->soundFlags.word & 7) == 0)
             StopAllSounds();
         if ((g_game->soundFlags.word & 7) == 2)
-            ((Class_004cfe80*)g_game->sound)->Enable3D();
+            ((SJE_CdPlayerClass*)g_game->sound)->Enable3D();
         else
             ((Class_004cfe90*)g_game->sound)->Disable3D();
         if ((g_game->soundFlags.word & 7) == 1 && !g_game->prefs)

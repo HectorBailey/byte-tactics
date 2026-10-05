@@ -2950,7 +2950,7 @@ address,size,file,symbol,status,similarity
 0x4cf150,48,src/sound/samples_4cf150.cpp,?StopAllBuffers@Class_004cf150@@QAEXXZ,matched,100.0
 0x4cf180,138,src/sound/samples_4cf180.cpp,?StopOldestBuffer@Class_004cf180@@QAEXXZ,matched,100.0
 0x4cf210,10,src/sound/samples_4cf210.cpp,?SetMaxBuffers@Class_004cf210@@QAEXH@Z,matched,100.0
-0x4cf220,4,src/sound/samples_4cf220.cpp,?GetMaxBuffers@Class_004cf220@@QAEHXZ,matched,100.0
+0x4cf220,4,src/sound/samples_4cf220.cpp,?GetMaxBuffers@SJE_CdPlayerClass@@QAEHXZ,matched,100.0
 0x4cf230,309,src/sound/samples_4cf230.cpp,?CreateSampleFromMemory@Class_004cf230@@QAEPAPAUIDirectSoundBuffer@@PAXKHHH@Z,matched,100.0
 0x4cf370,348,src/sound/samples_4cf370.cpp,?CreateSampleFromFile@Class_004cf370@@QAEPAPAUIDirectSoundBuffer@@PAUFileHandle@@KHHH@Z,matched,100.0
 0x4cf4d0,103,src/sound/samples_4cf4d0.cpp,?ReleaseSampleSet@Class_004cf4d0@@QAEXPAPAUIDirectSoundBuffer@@@Z,matched,100.0
@@ -2960,11 +2960,11 @@ address,size,file,symbol,status,similarity
 0x4cf8a0,153,src/sound/samples_4cf8a0.cpp,?PlayFileSample@Class_004cf8a0@@QAEHHHHHHHH@Z,matched,100.0
 0x4cf940,499,src/sound/samples_4cf940.cpp,?StartStream@Class_004cfb40@@QAEXPAUFileHandle@@HHHJ@Z,matched,100.0
 0x4cfb40,82,src/sound/samples_4cfb40.cpp,?StopStream@Class_004cfb40@@QAEXXZ,matched,100.0
-0x4cfba0,28,src/sound/samples_4cfba0.cpp,?IsStreamActive@Class_004cfba0@@QAEHXZ,matched,100.0
+0x4cfba0,28,src/sound/samples_4cfba0.cpp,?IsStreamActive@SJE_CdPlayerClass@@QAEHXZ,matched,100.0
 0x4cfbc0,218,src/sound/samples_4cfbc0.cpp,?UpdateStream@Class_004cfb40@@QAEXXZ,matched,100.0
 0x4cfca0,403,src/sound/samples_4cfca0.cpp,?FillStreamHalf@Class_004cfb40@@QAEXXZ,matched,100.0
 0x4cfe40,56,src/sound/samples_4cfe40.cpp,?FillSilence@Class_004cfe40@@QAEXPAXI@Z,matched,100.0
-0x4cfe80,8,src/sound/samples_4cfe80.cpp,?Enable3D@Class_004cfe80@@QAEXXZ,matched,100.0
+0x4cfe80,8,src/sound/samples_4cfe80.cpp,?Enable3D@SJE_CdPlayerClass@@QAEXXZ,matched,100.0
 0x4cfe90,8,src/sound/samples_4cfe90.cpp,?Disable3D@Class_004cfe90@@QAEXXZ,matched,100.0
 0x4cfea0,4,src/sound/samples_4cfea0.cpp,?Is3DEnabled@Class_004cfea0@@QAEHXZ,matched,100.0
 0x4cfeb0,17,src/sound/samples_4cfeb0.cpp,?Set3DDistances@Class_004cfeb0@@QAEXHH@Z,matched,100.0
