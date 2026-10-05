@@ -48,7 +48,7 @@ public:
 };
 
 // A named timer that also reads the two performance counters.
-class Class_004e1e30 {
+class Timer {
 public:
     double time;                        // +0x0, elapsed when stopped, else the start time
     __int64 start0;                     // +0x8, counter 0 at the start
@@ -66,7 +66,7 @@ public:
 // Reports the elapsed time and the counters since the start, to the
 // debugger and to the log.
 // FUNCTION: 0x4e1e50
-void Class_004e1e30::ReportElapsedTime(const char* label)
+void Timer::ReportElapsedTime(const char* label)
 {
     __int64 count1;
     __int64 count0;
@@ -116,7 +116,7 @@ void Class_004e1e30::ReportElapsedTime(const char* label)
 
 // Starts the timer (again) and the counters; the time it had run.
 // FUNCTION: 0x4e20a0
-double Class_004e1e30::RestartTimer()
+double Timer::RestartTimer()
 {
     double elapsed;
     __int64 count0;
