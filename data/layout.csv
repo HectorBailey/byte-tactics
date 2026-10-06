@@ -5197,11 +5197,11 @@ piece,0x5049ec,9,src/map/los_tables_433380.cpp,3,0,game data
 piece,0x5049e8,4,src/map/los_tables_433130.cpp,6,0,game data
 piece,0x5049dc,10,src/map/los_tables_433130.cpp,4,0,game data
 piece,0x5049d0,10,src/map/los_tables_433130.cpp,3,0,game data
-piece,0x5044d4,19,src/game/settings_campaign_432b80.cpp,4,0,game data
-piece,0x5032e8,19,src/game/settings_campaign_432b80.cpp,3,0,game data
-piece,0x504370,12,src/game/settings_campaign_432b60.cpp,4,0,game data
-piece,0x5049c4,9,src/game/settings_campaign_432b00.cpp,5,0,game data
-piece,0x5049bc,8,src/game/settings_campaign_432b00.cpp,4,0,game data
+piece,0x5044d4,19,src/game/settings_campaign.cpp,24,0,game data
+piece,0x5032e8,19,src/game/settings_campaign.cpp,14,0,game data
+piece,0x504370,12,src/game/settings_campaign.cpp,21,0,game data
+piece,0x5049c4,9,src/game/settings_campaign.cpp,16,0,game data
+piece,0x5049bc,8,src/game/settings_campaign.cpp,15,0,game data
 piece,0x503410,9,src/game/side_data_431a60.cpp,46,0,game data
 piece,0x5048ec,11,src/game/side_data_431a60.cpp,42,0,game data
 piece,0x5039f0,10,src/game/side_data_431a60.cpp,41,0,game data
@@ -12021,10 +12021,7 @@ same,0x5032e8,19,src/game/settings_430f00.cpp,66,0,
 same,0x502a78,11,src/game/settings_430f00.cpp,43,0,
 same,0x50341c,4,src/game/side_data_431a60.cpp,47,0,
 same,0x50338c,6,src/game/side_data_431a60.cpp,38,0,
-same,0x5048f8,9,src/game/settings_campaign_432610.cpp,3,0,
-same,0x5032e8,19,src/game/settings_campaign_432a80.cpp,3,0,
-same,0x5032e8,19,src/game/settings_campaign_432b00.cpp,3,0,
-same,0x5032e8,19,src/game/settings_campaign_432b60.cpp,3,0,
+same,0x5048f8,9,src/game/settings_campaign.cpp,9,0,
 same,0x50341c,4,src/map/los_tables_433130.cpp,7,0,
 same,0x5122c0,16,src/map/map_list.cpp,6,0,
 same,0x50341c,4,src/map/mission.cpp,11,0,

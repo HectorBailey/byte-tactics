@@ -127,8 +127,8 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x50328c,DAT_0050328c,.data,8,gap,string,char[],1,0,1,one type,1,,s_5_zrb_0050328c,,,352e7a7262000000
 0x503294,DAT_00503294,.data,8,gap,string,char[],1,0,1,one type,1,,s_2_zrb_00503294,,,322e7a7262000000
 0x50329c,DAT_0050329c,.data,8,gap,string,char[],1,0,1,one type,1,,s_1_zrb_0050329c,,,312e7a7262000000
-0x50331c,DAT_0050331c,.data,4,type,string,char*,3,0,1,one type,3,,PTR_s_Total_Annihilation_3_0_0050331c,1,,2c335000
-0x503320,DAT_00503320,.data,4,type,string,char*,3,0,1,one type,3,,PTR_s_Summary_00503320,1,,24335000
+0x50331c,DAT_0050331c,.data,4,type,string,char*,1,0,1,one type,1,,PTR_s_Total_Annihilation_3_0_0050331c,1,,2c335000
+0x503320,DAT_00503320,.data,4,type,string,char*,1,0,1,one type,1,,PTR_s_Summary_00503320,1,,24335000
 0x503374,DAT_00503374,.data,4,gap,data,char[],3,0,1,one type,3,,DAT_00503374,,,5c000000
 0x50338c,DAT_0050338c,.data,8,gap,string,const char[],1,0,1,one type,1,,s_fonts_0050338c,,,666f6e7473000000
 0x50341c,DAT_0050341c,.data,4,gap,string,char[],1,0,1,one type,1,,DAT_0050341c,1,,54444600
@@ -355,7 +355,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x511ddc,g_byteRatesTick,.bss,4,type,data,unsigned int,1,0,1,one type,1,,DAT_00511ddc,,,
 0x511de0,DAT_00511de0,.bss,4,type,data,int,2,0,1,one type,2,,DAT_00511de0,,,
 0x511de4,DAT_00511de4,.bss,4,type,data,int,1,0,1,one type,1,,DAT_00511de4,,,
-0x511de8,g_game,.bss,4,type,data,Game*,843,111,15,conflicting: shape,954,,DAT_00511de8,,,
+0x511de8,g_game,.bss,4,type,data,Game*,840,111,15,conflicting: shape,951,,DAT_00511de8,,,
 0x511dec,DAT_00511dec,.bss,4,type,data,int,1,0,1,one type,1,,DAT_00511dec,,,
 0x511df0,DAT_00511df0,.bss,400,type,data,int[100],2,5,6,conflicting: shape,7,0x190,DAT_00511df0,,,
 0x511f80,DAT_00511f80,.bss,16,gap,data,CMemoryCache,5,0,1,one type,5,,DAT_00511f80,,,
