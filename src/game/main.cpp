@@ -1,6 +1,75 @@
-// Decompiled by deepseek-v4.1-flash, finished by space-bunny-free and
-// deepseek-v4.1-flash, edited by deepseek-v4.1, retried by Sonnet 5.5 and
-// space-bunny-free. Names are provisional.
+// Decompiled by Opus, Haiku, space-bunny-free, deepseek-v4.1-flash, deepseek-v4.1 and Sonnet 5.5. Names are provisional.
+// WinMain of Total Annihilation.
+#include <windows.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <time.h>
+#include <new>
+
+// Appends a string (with its terminating zero) to DEBUG.FIL, creating the
+// file if it cannot be opened for appending.
+struct FileHandle;
+
+FileHandle* __stdcall HAPI_OpenFileAppend(char* path);
+FileHandle* __stdcall HAPI_CreateFile(char* path);
+unsigned int __stdcall HAPI_WriteFile(FileHandle* file, void* data, unsigned int size);
+int __stdcall HAPI_CloseFile(FileHandle* file);
+
+// FUNCTION: 0x49e640
+void __stdcall AppendToDebugFile(char* text)
+{
+    FileHandle* file = HAPI_OpenFileAppend("DEBUG.FIL");
+    if (!file)
+        file = HAPI_CreateFile("DEBUG.FIL");
+    HAPI_WriteFile(file, text, strlen(text) + 1);
+    HAPI_CloseFile(file);
+}
+
+void OutOfMemoryHandler();
+void __cdecl SetOutOfMemoryHandler(void (*param_1)());
+
+// FUNCTION: 0x49e6f0
+void FUN_0049e6f0()
+{
+    SetOutOfMemoryHandler(OutOfMemoryHandler);
+}
+
+// Out of memory handler: appends a note to ErrorLog.txt beside the
+// executable, then reports and aborts.
+void __stdcall ReportViaException(char* text);
+void FUN_004d8390(void);
+
+// FUNCTION: 0x49e700
+void OutOfMemoryHandler()
+{
+    char path[1000];
+    DWORD written;
+    HANDLE file;
+    char* slash;
+
+    GetModuleFileNameA(NULL, path, 1000);
+    slash = strrchr(path, '\\');
+    if (slash)
+        slash[1] = 0;
+    else
+        strcpy(path, "C:\\");
+    strcat(path, "ErrorLog.txt");
+    file = CreateFileA(path, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (file) {
+        SetFilePointer(file, 0, NULL, FILE_END);
+        WriteFile(file, "Out of memory!\r\nYour hard disk may be full\r\n",
+                  strlen("Out of memory!\r\nYour hard disk may be full\r\n"), &written, NULL);
+        CloseHandle(file);
+    }
+    ReportViaException("Out of memory handler");
+    MessageBoxA(NULL, "Out of memory!\r\nYour hard disk may be full\r\n", "Total Annihilation", 0x41010);
+    FUN_004d8390();
+    raise(SIGABRT);
+    _exit(3);
+}
+
 // space-bunny-free retry: MATCH (1365 of 1365 bytes), from 89.2%. Three
 // changes, all in the DAT_0051f320 initialisation block, none of them a new
 // construct: the or chain, the b0 read-modify-write register and the whole
@@ -28,14 +97,6 @@
 //     register rotations one step out. tools/headers.py reaches 99.3% on the
 //     93.1% body with <windows.h> <stdio.h> and with <windows.h>
 //     <string.h> <stdio.h>; every other header set scores below that.
-// WinMain of Total Annihilation.
-#include <windows.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <new>
-
 class Sound {
 public:
     char pad[0x294];
@@ -167,10 +228,8 @@ extern const char DAT_005097b0[];
 extern const char DAT_005097a8[];
 extern const char DAT_00504ab8[];
 
-void OutOfMemoryHandler();
-void __cdecl FUN_0049ed90();
+void FUN_0049ed90();
 void __cdecl InitDebugSupport(int param_1);
-void __cdecl SetOutOfMemoryHandler(void (*param_1)());
 void CreateGameObject();
 void RegisterDataArchives();
 void FUN_00428bb0();
@@ -210,7 +269,8 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     SetOutOfMemoryHandler(OutOfMemoryHandler);
     if ((DAT_0051f31c & 1) == 0) {
         DAT_0051f31c |= 1;
-        atexit(FUN_0049ed90);
+        // atexit wants a __cdecl handler; /Gz makes FUN_0049ed90 __stdcall.
+        atexit((void (__cdecl *)(void))FUN_0049ed90);
     }
     CreateGameObject();
     HANDLE hSem = OpenSemaphoreA(0x1f0003, lzero, DAT_0050971c);
@@ -326,4 +386,40 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     }
     ShutdownEnvironment(&DAT_0051f320);
     return msg.wParam;
+}
+
+// FUNCTION: 0x49ed90
+void FUN_0049ed90(void)
+{
+}
+
+// Changes the current directory to the one holding the executable.
+char* __stdcall StripFileName(char* path);
+
+// FUNCTION: 0x49f540
+void ChdirToExeDirectory()
+{
+    char path[256];
+
+    GetModuleFileNameA(NULL, path, 256);
+    StripFileName(path);
+    SetCurrentDirectoryA(path);
+}
+
+// FUNCTION: 0x49f580
+int FUN_0049f580(void)
+{
+    return 0 < strlen(DAT_0051fb50) ? (int)(const void*)DAT_0051fb50 : 0;
+}
+
+// FUNCTION: 0x49f5a0
+UINT __stdcall GetPreferenceInt(char* key, int defaultValue)
+{
+    char exePath[256];
+    char iniPath[256];
+
+    GetModuleFileNameA(NULL, exePath, 256);
+    StripFileName(exePath);
+    sprintf(iniPath, "%s\\totala.ini", exePath);
+    return GetPrivateProfileIntA("Preferences", key, defaultValue, iniPath);
 }

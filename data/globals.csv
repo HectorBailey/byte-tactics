@@ -744,7 +744,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x51f320,DAT_0051f320,.bss,2088,gap,data,App_0049e830,1,0,1,one type,1,0x202,DAT_0051f320,,,
 0x51fb48,DAT_0051fb48,.bss,4,type,data,int,2,0,1,one type,2,,DAT_0051fb48,,,
 0x51fb4c,DAT_0051fb4c,.bss,4,gap,unreferenced,unsigned char[4],0,0,0,,0,,,,,
-0x51fb50,DAT_0051fb50,.bss,64,gap,data,char[],2,1,2,conflicting: shape,3,,DAT_0051fb50,,,
+0x51fb50,DAT_0051fb50,.bss,64,gap,data,char[],2,0,1,one type,2,,DAT_0051fb50,,,
 0x51fb90,DAT_0051fb90,.bss,4,type,data,int,1,0,1,one type,1,,DAT_0051fb90,,,
 0x51fb94,DAT_0051fb94,.bss,4,type,data,unsigned long,1,0,1,one type,1,,DAT_0051fb94,,,
 0x51fb98,DAT_0051fb98,.bss,4,gap,unreferenced,unsigned char[4],0,0,0,,0,,,,,
