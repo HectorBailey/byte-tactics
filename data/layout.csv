@@ -5915,7 +5915,7 @@ piece,0x501330,15,src/orders/unit_orders_402640.cpp,11,0,game data
 piece,0x4fc478,8,src/game/economy_401360.cpp,3,0,game data
 piece,0x4fc480,8,src/game/economy_401360.cpp,3,8,game data
 piece,0x4fc488,8,src/game/economy_401360.cpp,3,16,game data
-piece,0x501090,9,src/game/economy_401110.cpp,3,0,game data
+piece,0x501090,9,src/game/economy.cpp,17,0,game data
 piece,0x4f2c90,6,LIBCMT.LIB#135,4,0,library code
 piece,0x4fdf28,2,LIBCMT.LIB#553,3,8,library data
 piece,0x4fdf2a,10,LIBCMT.LIB#553,3,10,library data
@@ -11924,7 +11924,7 @@ common,0x52b64c,4,___unguarded_readlc_active,,,
 common,0x52b650,4,__acmdln,,,
 common,0x52b654,4,___onexitend,,,
 common,0x52b658,4,___onexitbegin,,,
-same,0x4fc478,4,src/game/unit_resources.cpp,5,0,
+same,0x4fc478,4,src/game/economy.cpp,22,0,
 same,0x4fc6d0,4,src/orders/unit_orders_402640.cpp,3,0,
 same,0x4fc910,8,src/orders/unit_orders_403a20.cpp,4,0,
 same,0x4fc918,8,src/orders/unit_orders_403a20.cpp,4,8,
