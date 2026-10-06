@@ -1714,11 +1714,11 @@ address,size,file,symbol,status,similarity
 0x4801f0,83,src/units/squads.cpp,?FreeSquads@@YGXPAUOwner@@@Z,matched,100.0
 0x480250,520,src/units/squads.cpp,?SetUnitSquad@@YGXPAUUnit@@H@Z,matched,100.0
 0x480460,120,src/units/squads.cpp,?OrderSquad@@YGXPAUOwner@@HEHPAUUnit@@HHH@Z,matched,100.0
-0x4804e0,40,src/units/unit_script_calls_4804e0.cpp,?StepTowards@@YGHHHH@Z,matched,100.0
-0x480510,83,src/units/unit_script_calls_480510.cpp,?StepPointTowards@@YG?AUPoint_00480510@@U1@0F@Z,matched,100.0
-0x480570,49,src/units/unit_script_calls_480570.cpp,?ChebyshevDistance@@YGHUPoint_00480570@@0@Z,matched,100.0
-0x4805b0,366,src/units/unit_script_calls_4805b0.cpp,?FUN_004805b0@@YGXPAUPoint_004805b0@@U1@1@Z,matched,100.0
-0x480720,78,src/units/unit_script_calls_480720.cpp,?OctantBetween@@YGDUPoint_00480720@@0@Z,matched,100.0
+0x4804e0,40,src/units/unit_script_calls.cpp,?StepTowards@@YGHHHH@Z,matched,100.0
+0x480510,83,src/units/unit_script_calls.cpp,?StepPointTowards@@YG?AUPoint_00480510@@U1@0F@Z,matched,100.0
+0x480570,49,src/units/unit_script_calls.cpp,?ChebyshevDistance@@YGHUPoint_00480570@@0@Z,matched,100.0
+0x4805b0,366,src/units/unit_script_calls.cpp,?FUN_004805b0@@YGXPAUPoint_004805b0@@U1@1@Z,matched,100.0
+0x480720,78,src/units/unit_script_calls.cpp,?OctantBetween@@YGDUPoint_00480720@@0@Z,matched,100.0
 0x480770,932,src/units/unit_script.cpp,?GetUnitValue@UnitScript@@UAEHHHHHH@Z,matched,100.0
 0x480b20,268,src/units/unit_script.cpp,?SetUnitValue@UnitScript@@UAEXHH@Z,matched,100.0
 0x480c30,31,src/units/unit_script.cpp,?GetPieceTranslation@UnitScript@@UAEHHH@Z,matched,100.0
@@ -1740,8 +1740,8 @@ address,size,file,symbol,status,similarity
 0x4813b0,123,src/units/unit_script.cpp,?DropUnit@UnitScript@@UAEXG@Z,matched,100.0
 0x481430,62,src/units/unit_script.cpp,?IsCarryingUnit@UnitScript@@UAEHH@Z,matched,100.0
 0x481470,32,src/units/unit_script.cpp,?GetTransporterId@UnitScript@@UAEHXZ,matched,100.0
-0x481490,18,src/units/unit_script_calls_481490.cpp,?FUN_00481490@Class_00481490@@QAEXH@Z,matched,100.0
-0x4814b0,5,src/units/unit_script_calls_4814b0.cpp,?FUN_004814b0@@YGHHHHH@Z,matched,100.0
+0x481490,18,src/units/unit_script_calls.cpp,?FUN_00481490@Class_00481490@@QAEXH@Z,matched,100.0
+0x4814b0,5,src/units/unit_script_calls.cpp,?FUN_004814b0@@YGHHHHH@Z,matched,100.0
 0x4814c0,42,src/map/line_of_sight_4814c0.cpp,_$E4,matched,100.0
 0x4814f0,10,src/map/line_of_sight_4814f0.cpp,?FUN_004814f0@@YGXXZ,matched,100.0
 0x481500,46,src/map/line_of_sight_481500.cpp,?InitEyeballs@@YGXXZ,matched,100.0
