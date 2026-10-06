@@ -609,7 +609,7 @@ address,size,file,symbol,status,similarity
 0x432c80,46,src/map/los_tables_432c80.cpp,?FUN_00432c80@@YGXPAUElem_432cb0@@00@Z,matched,100.0
 0x432cb0,51,src/map/los_tables_432cb0.cpp,?FUN_00432cb0@@YGPAUElem_432cb0@@PAU1@00@Z,matched,100.0
 0x432cf0,33,src/map/los_tables_432cf0.cpp,?construct@?$allocator@UEntry_00432cf0@@@std@@QAEXPAUEntry_00432cf0@@ABU3@@Z,matched,100.0
-0x432d20,27,src/map/los_tables_432d20.cpp,?FUN_00432d20@Class_004c93b0@@QAEPAXPAH@Z,matched,100.0
+0x432d20,27,src/map/los_tables_432d20.cpp,?FUN_00432d20@Class_004c93b0@@QAEPAXPAU1@@Z,matched,100.0
 0x432d40,612,src/map/los_tables_432d40.cpp,?FUN_00432d40@@YGXPAVUnitDef@@0P6GHABV1@1@ZH@Z,matched,100.0
 0x432fb0,244,src/map/los_tables_432fb0.cpp,?FUN_00432fb0@@YGXPAVUnitDef@@0P6GHABV1@1@ZPAX@Z,matched,100.0
 0x4330b0,119,src/map/los_tables_4330b0.cpp,?FUN_004330b0@LosTables@@QAEXXZ,matched,100.0
@@ -1147,13 +1147,13 @@ address,size,file,symbol,status,similarity
 0x4586a0,267,src/graphics/model_render_4586a0.cpp,?BuildObjectPicture@Class_004581e0@@QAEHPAUList_004586a0@@HH@Z,matched,100.0
 0x4587b0,85,src/graphics/model_render_4587b0.cpp,?HalveFrame@@YGXPAUBitmap_004587b0@@0@Z,matched,100.0
 0x458810,427,src/graphics/model_render_458810.cpp,?DrawObjectState@CMemoryCache@@QAEXPAUList_458810@@PAUVec3_458810@@@Z,matched,100.0
-0x4589c0,861,src/graphics/model_render_4589c0.cpp,?MergeIntoComposite@Class_00459200@@QAEXPAUImage_4589c0@@PAUModel_4589c0@@@Z,matched,100.0
+0x4589c0,861,src/graphics/model_render_4589c0.cpp,?MergeIntoComposite@Class_00459200@@QAEXPAUImage_4589c0@@PAUModel_459200@@@Z,matched,100.0
 0x458d20,14,src/graphics/model_render_458d20.cpp,?FUN_00458d20@@YGXHPAUCount_00458d20@@H@Z,matched,100.0
 0x458d30,149,src/graphics/model_render_458d30.cpp,?RecolorByShade@Class_00458d30@@QAEXPAUImage_458d30@@EHHH@Z,matched,100.0
 0x458dd0,449,src/graphics/model_render_458d30.cpp,?ShadeByIntensity@Class_00458d30@@QAEHPAUImage_458d30@@PAUModel_458dd0@@@Z,matched,100.0
 0x458fa0,455,src/graphics/model_render_458fa0.cpp,?DrawPieceEdges@Class_00458fa0@@QAEXPAUView_0045a610@@PAUModel_00458fa0@@H@Z,matched,100.0
 0x459170,144,src/graphics/model_render_459170.cpp,?CopyPicture@CMemoryCache@@QAEXPAUImage_00459170@@@Z,matched,100.0
-0x459200,1506,src/graphics/model_render_459200.cpp,?DrawObjectPicture@Class_00459200@@QAEXHPAUModel_459200@@TVec3_459200@@H@Z,matched,100.0
+0x459200,1506,src/graphics/model_render_4589c0.cpp,?DrawObjectPicture@Class_00459200@@QAEXHPAUModel_459200@@TVec3_459200@@H@Z,matched,100.0
 0x4597f0,61,src/graphics/model_render_4597f0.cpp,?SetLightVector@@YGXHHH@Z,matched,100.0
 0x459830,1082,src/graphics/model_render_459830.cpp,?DrawPieces@Class_004581e0@@QAEXPAUBitmap_459c70@@PAUList_459c70@@HH@Z,matched,100.0
 0x459c70,2047,src/graphics/model_render_459c70.cpp,?DrawLitPieces@Class_004581e0@@QAEXPAUBitmap_459c70@@PAUList_459c70@@HH@Z,matched,100.0
@@ -2785,7 +2785,7 @@ address,size,file,symbol,status,similarity
 0x4c58a0,292,src/util/tdf_4c58a0.cpp,?GetLocalizedString@@YGHPAVTdfFile@@PAD1I1@Z,matched,100.0
 0x4c59d0,415,src/util/tdf_4c59d0.cpp,?FUN_004c59d0@Class_004c5ba0@@QAEPAUTdfField@@PAU2@ABU2@@Z,matched,100.0
 0x4c5b70,48,src/util/tdf_4c5b70.cpp,?_Destroy@?$vector@UTdfField@@V?$allocator@UTdfField@@@std@@@std@@IAEXPAUTdfField@@0@Z,matched,100.0
-0x4c5ba0,19,src/util/tdf_4c5ba0.cpp,?FUN_004c5ba0@Class_004c5ba0@@QAEHXZ,matched,100.0
+0x4c5ba0,19,src/util/tdf_4c59d0.cpp,?FUN_004c5ba0@Class_004c5ba0@@QAEHXZ,matched,100.0
 0x4c5bc0,87,src/util/tdf_4c5bc0.cpp,?_Ucopy@?$vector@UTdfField@@V?$allocator@UTdfField@@@std@@@std@@IAEPAUTdfField@@PBU3@0PAU3@@Z,matched,100.0
 0x4c5c20,63,src/util/tdf_4c5c20.cpp,?_Ufill@?$vector@UTdfField@@V?$allocator@UTdfField@@@std@@@std@@IAEXPAUTdfField@@IABU3@@Z,matched,100.0
 0x4c5c60,108,src/util/tdf_4c5c60.cpp,?FindLowerBound@Class_004c5c60@@QAEPAUElem_004c5c60@@PBD@Z,matched,100.0
@@ -2840,7 +2840,7 @@ address,size,file,symbol,status,similarity
 0x4c9290,128,src/graphics/surface_4c9290.cpp,?MakeLower@Class_004c9290@@QAEPAV1@XZ,matched,100.0
 0x4c9310,128,src/graphics/surface_4c9310.cpp,?MakeUpper@Class_004c9310@@QAEPAV1@XZ,matched,100.0
 0x4c9390,31,src/graphics/surface_4c9390.cpp,?ReleaseRef@Class_004c9390@@QAEXXZ,matched,100.0
-0x4c93b0,56,src/graphics/surface_4c93b0.cpp,?Assign@Class_004c93b0@@QAEPAU1@PAU1@@Z,matched,100.0
+0x4c93b0,56,src/map/los_tables_432d20.cpp,?Assign@Class_004c93b0@@QAEPAU1@PAU1@@Z,matched,100.0
 0x4c93f0,145,src/graphics/surface_4c93f0.cpp,?AssignText@Class_004c93f0@@QAEPAV1@PBD@Z,matched,100.0
 0x4c9490,152,src/graphics/surface_4c9490.cpp,?SubString@Class_004c9490@@QBE?AV1@HH@Z,matched,100.0
 0x4c9530,523,src/network/hapinet_4c9530.cpp,?HAPINET_GetDPErrorString@@YGPADH@Z,matched,100.0
@@ -3096,8 +3096,8 @@ address,size,file,symbol,status,similarity
 0x4dab10,160,src/debug/debug_lib_4dab10.cpp,?DescribeAddress@@YAXIPADH@Z,matched,100.0
 0x4dabb0,311,src/debug/debug_lib_4dabb0.cpp,?FUN_004dabb0@@YADIPADI@Z,matched,100.0
 0x4dacf0,780,src/debug/debug_lib_4dacf0.cpp,?AllocDebugBlock@@YAIII@Z,matched,100.0
-0x4db000,439,src/debug/debug_lib_4db000.cpp,?AddFreeBlock@FreeBlockMap@@QAEXUPair_004db000@@@Z,matched,100.0
-0x4db1c0,646,src/debug/debug_lib_4db1c0.cpp,?TakeFreeBlock@FreeBlockMap@@QAEII@Z,matched,100.0
+0x4db000,439,src/debug/free_block_map.cpp,?AddFreeBlock@FreeBlockMap@@QAEXUPair_004db000@@@Z,matched,100.0
+0x4db1c0,646,src/debug/free_block_map.cpp,?TakeFreeBlock@FreeBlockMap@@QAEII@Z,matched,100.0
 0x4db450,444,src/debug/debug_lib_4db450.cpp,?GrowReservation@Class_004db450@@QAE_NI@Z,matched,100.0
 0x4db610,332,src/debug/debug_lib_4db610.cpp,?GetFreeBlockSet@@YGPAVFreeBlockMap@@XZ,matched,100.0
 0x4db760,70,src/debug/debug_lib_4db760.cpp,?IsBackAlign@@YGDXZ,matched,100.0
@@ -3119,7 +3119,7 @@ address,size,file,symbol,status,similarity
 0x4dc680,643,src/debug/debug_lib_4dc680.cpp,?FUN_004dc680@Class_004dc680@@QAE?AVClass_004ddbe0@@PAUPair_004dc680@@@Z,matched,100.0
 0x4dc910,1262,src/debug/debug_lib_4dc910.cpp,?erase@Class_004dc910@@QAE?AVIter_004dc910@@V2@@Z,matched,100.0
 0x4dce00,88,src/debug/debug_lib_4dce00.cpp,?FUN_004dce00@Class_004dce00@@QAE?AVIter_004dce00@@ABI@Z,matched,100.0
-0x4dce60,746,src/debug/debug_lib_4dce60.cpp,?FUN_004dce60@Class_004dce60@@QAE?AVClass_004dd2a0@@PAUNode_004dce60@@0PAUPair_004dce60@@@Z,matched,100.0
+0x4dce60,746,src/debug/debug_lib_4dbbc0.cpp,?FUN_004dce60@Class_004dce60@@QAE?AVClass_004dd2a0@@PAUNode_004dbbc0@@0PBUPair_004dbbc0@@@Z,matched,100.0
 0x4dd150,90,src/debug/debug_lib_4dd150.cpp,?FUN_004dd150@Class_004dd150@@QAEXPAUNode_004dd150@@@Z,matched,100.0
 0x4dd1b0,49,src/debug/debug_lib_4dd1b0.cpp,?FUN_004dd1b0@@YAPAUNode_004dd1b0@@PAU1@@Z,matched,100.0
 0x4dd1f0,92,src/debug/debug_lib_4dd1f0.cpp,?FUN_004dd1f0@Class_004dd1f0@@QAEXPAUNode_004dd1f0@@@Z,matched,100.0
