@@ -3899,8 +3899,8 @@ piece,0x50a6f0,35,src/util/tdf_record.cpp,6,0,game data
 piece,0x50a6cc,35,src/util/tdf_record.cpp,5,0,game data
 piece,0x50a6a8,33,src/util/tdf_record.cpp,4,0,game data
 piece,0x50a68c,28,src/util/tdf_record.cpp,3,0,game data
-piece,0x4fefd8,16,src/util/tdf_4c3740.cpp,18,0,game data
-piece,0x4fefc8,12,src/util/tdf_4c3740.cpp,17,0,game data
+piece,0x4fefd8,16,src/util/logic_error.cpp,18,0,game data
+piece,0x4fefc8,12,src/util/logic_error.cpp,17,0,game data
 piece,0x50a60c,9,src/util/tdf_4c3120.cpp,4,0,game data
 piece,0x50a604,5,src/util/tdf_4c3120.cpp,3,0,game data
 piece,0x50a5f4,13,src/gui/mouse_4c2bd0.cpp,6,0,game data
@@ -5047,11 +5047,11 @@ piece,0x50520c,10,src/units/unit_scripts_43da70.cpp,3,0,game data
 piece,0x4fd2d0,8,src/units/unit_scripts_43d290.cpp,3,0,game data
 piece,0x4fd2d8,8,src/units/unit_scripts_43d290.cpp,3,8,game data
 piece,0x4fd2e0,4,src/units/unit_scripts_43d290.cpp,3,16,game data
-piece,0x5051f4,6,src/orders/order_list_43a970.cpp,9,0,game data
-piece,0x5051e0,13,src/orders/order_list_43a970.cpp,4,0,game data
-piece,0x5051f0,2,src/orders/order_list_43a970.cpp,3,0,game data
-piece,0x4fd2cc,4,src/orders/order_list_43a420.cpp,13,0,game data
-piece,0x4fd2c8,4,src/orders/order_list_43a420.cpp,12,0,game data
+piece,0x5051f4,6,src/orders/order_queue_438870.cpp,17,0,game data
+piece,0x5051e0,13,src/orders/order_queue_438870.cpp,9,0,game data
+piece,0x5051f0,2,src/orders/order_queue_438870.cpp,12,0,game data
+piece,0x4fd2cc,4,src/orders/order_queue_438870.cpp,18,0,game data
+piece,0x4fd2c8,4,src/orders/order_queue_438870.cpp,6,0,game data
 piece,0x4fd2c0,8,src/ingame/markers_4399f0.cpp,3,0,game data
 piece,0x5051c4,27,src/ingame/markers_439740.cpp,5,0,game data
 piece,0x5051ac,21,src/ingame/markers_439740.cpp,4,0,game data
@@ -12089,11 +12089,9 @@ same,0x4fd3e8,4,src/orders/order_targets_44e5b0.cpp,3,0,
 same,0x506290,6,src/network/net_game_450380.cpp,3,0,
 same,0x506578,5,src/network/net_game_4538f0.cpp,4,0,
 same,0x506578,5,src/network/net_game_453a50.cpp,4,0,
-same,0x4fd4c0,4,src/graphics/model_render_4586a0.cpp,3,0,
+same,0x4fd4c0,4,src/graphics/model_render_4581e0.cpp,3,0,
 same,0x4fd4c0,4,src/graphics/model_render_458810.cpp,5,0,
 same,0x4fd4c0,4,src/graphics/model_render_458d30.cpp,5,0,
-same,0x4fd4c0,4,src/graphics/model_render_459830.cpp,3,0,
-same,0x4fd4c0,4,src/graphics/model_render_459c70.cpp,3,0,
 same,0x4fd4e0,8,src/frontend/options_45b9b0.cpp,3,0,
 same,0x4fd4e8,8,src/frontend/options_45b9b0.cpp,3,8,
 same,0x4fd4e0,8,src/frontend/options_45bb00.cpp,5,0,
@@ -12464,7 +12462,7 @@ same,0x4c3740,32,LIBCPMT.LIB#3@2,57,0,
 same,0x50a630,32,LIBCPMT.LIB#3@2,14,0,
 same,0x4febd0,24,LIBCPMT.LIB#3@2,7,0,
 same,0x5119b8,1,zlib/zutil.obj,9,0,
-same,0x4c38a0,80,src/util/tdf_4c3740.cpp,20,0,
+same,0x4c38a0,80,src/util/logic_error.cpp,20,0,
 reloc,0x46ca12,,0x4e39b0,,,
 reloc,0x46ca3c,,0x4e3a70,,,
 reloc,0x46cb92,,0x4e39b0,,,

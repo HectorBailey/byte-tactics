@@ -3420,7 +3420,6 @@ address,name
 0x4e80e0,_mkdir
 0x4e8110,rewind
 0x4e8190,exception::exception
-0x4e8230,Class_004e8230::Class_004e8230
 0x4e82a0,??4exception@@QAEAAV0@ABV0@@Z
 0x4e82c0,exception::~exception
 0x4e82e0,exception::what
