@@ -5243,69 +5243,69 @@ piece,0x50477c,9,src/game/side_data.cpp,20,0,game data
 piece,0x504734,6,src/game/side_data.cpp,5,0,game data
 piece,0x503720,9,src/game/side_data.cpp,4,0,game data
 piece,0x504728,9,src/game/side_data.cpp,3,0,game data
-piece,0x504708,15,src/game/settings_430f00.cpp,67,0,game data
-piece,0x5046f4,17,src/game/settings_430f00.cpp,65,0,game data
-piece,0x5046e0,18,src/game/settings_430f00.cpp,64,0,game data
-piece,0x504718,15,src/game/settings_430f00.cpp,62,0,game data
-piece,0x5046d4,12,src/game/settings_430f00.cpp,61,0,game data
-piece,0x5046bc,21,src/game/settings_430f00.cpp,60,0,game data
-piece,0x5046ac,14,src/game/settings_430f00.cpp,59,0,game data
-piece,0x504698,18,src/game/settings_430f00.cpp,58,0,game data
-piece,0x504688,14,src/game/settings_430f00.cpp,57,0,game data
-piece,0x50467c,11,src/game/settings_430f00.cpp,56,0,game data
-piece,0x504670,11,src/game/settings_430f00.cpp,55,0,game data
-piece,0x504664,11,src/game/settings_430f00.cpp,54,0,game data
-piece,0x504644,14,src/game/settings_430f00.cpp,53,0,game data
-piece,0x504654,14,src/game/settings_430f00.cpp,52,0,game data
-piece,0x504634,14,src/game/settings_430f00.cpp,51,0,game data
-piece,0x504624,14,src/game/settings_430f00.cpp,50,0,game data
-piece,0x504618,11,src/game/settings_430f00.cpp,49,0,game data
-piece,0x504610,8,src/game/settings_430f00.cpp,48,0,game data
-piece,0x504600,15,src/game/settings_430f00.cpp,47,0,game data
-piece,0x5045f0,15,src/game/settings_430f00.cpp,46,0,game data
-piece,0x5045e4,12,src/game/settings_430f00.cpp,44,0,game data
-piece,0x5045d8,9,src/game/settings_430f00.cpp,40,0,game data
-piece,0x5045cc,9,src/game/settings_430f00.cpp,39,0,game data
-piece,0x5045c0,10,src/game/settings_430f00.cpp,38,0,game data
-piece,0x5045a8,23,src/game/settings_430f00.cpp,37,0,game data
-piece,0x504580,18,src/game/settings_430f00.cpp,36,0,game data
-piece,0x504544,9,src/game/settings_430f00.cpp,35,0,game data
-piece,0x504534,13,src/game/settings_430f00.cpp,34,0,game data
-piece,0x504574,10,src/game/settings_430f00.cpp,33,0,game data
-piece,0x504568,11,src/game/settings_430f00.cpp,32,0,game data
-piece,0x50455c,11,src/game/settings_430f00.cpp,31,0,game data
-piece,0x504550,10,src/game/settings_430f00.cpp,30,0,game data
-piece,0x5044e8,6,src/game/settings_430f00.cpp,29,0,game data
-piece,0x504528,10,src/game/settings_430f00.cpp,28,0,game data
-piece,0x504520,7,src/game/settings_430f00.cpp,27,0,game data
-piece,0x504518,6,src/game/settings_430f00.cpp,26,0,game data
-piece,0x504510,8,src/game/settings_430f00.cpp,25,0,game data
-piece,0x504504,9,src/game/settings_430f00.cpp,24,0,game data
-piece,0x5044fc,6,src/game/settings_430f00.cpp,23,0,game data
-piece,0x5044f0,9,src/game/settings_430f00.cpp,22,0,game data
-piece,0x5044c0,20,src/game/settings_430f00.cpp,21,0,game data
-piece,0x5044b0,13,src/game/settings_430f00.cpp,20,0,game data
-piece,0x50449c,17,src/game/settings_430f00.cpp,19,0,game data
-piece,0x50448c,13,src/game/settings_430f00.cpp,18,0,game data
-piece,0x504474,23,src/game/settings_430f00.cpp,17,0,game data
-piece,0x504464,16,src/game/settings_430f00.cpp,16,0,game data
-piece,0x504450,20,src/game/settings_430f00.cpp,15,0,game data
-piece,0x504440,16,src/game/settings_430f00.cpp,14,0,game data
-piece,0x504418,17,src/game/settings_430f00.cpp,13,0,game data
-piece,0x50442c,19,src/game/settings_430f00.cpp,12,0,game data
-piece,0x50440c,12,src/game/settings_430f00.cpp,11,0,game data
-piece,0x5043f8,19,src/game/settings_430f00.cpp,10,0,game data
-piece,0x503300,28,src/game/settings_430f00.cpp,9,0,game data
-piece,0x5043e8,13,src/game/settings_430f00.cpp,8,0,game data
-piece,0x5043d8,14,src/game/settings_430f00.cpp,7,0,game data
-piece,0x5043c4,18,src/game/settings_430f00.cpp,6,0,game data
-piece,0x5043b4,14,src/game/settings_430f00.cpp,5,0,game data
-piece,0x5043a4,15,src/game/settings_430f00.cpp,4,0,game data
-piece,0x504398,10,src/game/settings_430f00.cpp,3,0,game data
-piece,0x50459c,12,src/game/settings_42f9a0.cpp,42,0,game data
-piece,0x504384,17,src/game/settings_42f9a0.cpp,5,0,game data
-piece,0x50437c,6,src/game/settings_42f9a0.cpp,4,0,game data
-piece,0x504368,8,src/game/settings_42f910.cpp,4,0,game data
+piece,0x504708,15,src/game/settings.cpp,79,0,game data
+piece,0x5046f4,17,src/game/settings.cpp,78,0,game data
+piece,0x5046e0,18,src/game/settings.cpp,77,0,game data
+piece,0x504718,15,src/game/settings.cpp,82,0,game data
+piece,0x5046d4,12,src/game/settings.cpp,74,0,game data
+piece,0x5046bc,21,src/game/settings.cpp,73,0,game data
+piece,0x5046ac,14,src/game/settings.cpp,72,0,game data
+piece,0x504698,18,src/game/settings.cpp,71,0,game data
+piece,0x504688,14,src/game/settings.cpp,70,0,game data
+piece,0x50467c,11,src/game/settings.cpp,69,0,game data
+piece,0x504670,11,src/game/settings.cpp,68,0,game data
+piece,0x504664,11,src/game/settings.cpp,67,0,game data
+piece,0x504644,14,src/game/settings.cpp,65,0,game data
+piece,0x504654,14,src/game/settings.cpp,66,0,game data
+piece,0x504634,14,src/game/settings.cpp,64,0,game data
+piece,0x504624,14,src/game/settings.cpp,63,0,game data
+piece,0x504618,11,src/game/settings.cpp,62,0,game data
+piece,0x504610,8,src/game/settings.cpp,61,0,game data
+piece,0x504600,15,src/game/settings.cpp,60,0,game data
+piece,0x5045f0,15,src/game/settings.cpp,59,0,game data
+piece,0x5045e4,12,src/game/settings.cpp,57,0,game data
+piece,0x5045d8,9,src/game/settings.cpp,54,0,game data
+piece,0x5045cc,9,src/game/settings.cpp,53,0,game data
+piece,0x5045c0,10,src/game/settings.cpp,52,0,game data
+piece,0x5045a8,23,src/game/settings.cpp,51,0,game data
+piece,0x504580,18,src/game/settings.cpp,48,0,game data
+piece,0x504544,9,src/game/settings.cpp,43,0,game data
+piece,0x504534,13,src/game/settings.cpp,42,0,game data
+piece,0x504574,10,src/game/settings.cpp,47,0,game data
+piece,0x504568,11,src/game/settings.cpp,46,0,game data
+piece,0x50455c,11,src/game/settings.cpp,45,0,game data
+piece,0x504550,10,src/game/settings.cpp,44,0,game data
+piece,0x5044e8,6,src/game/settings.cpp,34,0,game data
+piece,0x504528,10,src/game/settings.cpp,41,0,game data
+piece,0x504520,7,src/game/settings.cpp,40,0,game data
+piece,0x504518,6,src/game/settings.cpp,39,0,game data
+piece,0x504510,8,src/game/settings.cpp,38,0,game data
+piece,0x504504,9,src/game/settings.cpp,37,0,game data
+piece,0x5044fc,6,src/game/settings.cpp,36,0,game data
+piece,0x5044f0,9,src/game/settings.cpp,35,0,game data
+piece,0x5044c0,20,src/game/settings.cpp,32,0,game data
+piece,0x5044b0,13,src/game/settings.cpp,31,0,game data
+piece,0x50449c,17,src/game/settings.cpp,30,0,game data
+piece,0x50448c,13,src/game/settings.cpp,29,0,game data
+piece,0x504474,23,src/game/settings.cpp,28,0,game data
+piece,0x504464,16,src/game/settings.cpp,27,0,game data
+piece,0x504450,20,src/game/settings.cpp,26,0,game data
+piece,0x504440,16,src/game/settings.cpp,25,0,game data
+piece,0x504418,17,src/game/settings.cpp,23,0,game data
+piece,0x50442c,19,src/game/settings.cpp,24,0,game data
+piece,0x50440c,12,src/game/settings.cpp,22,0,game data
+piece,0x5043f8,19,src/game/settings.cpp,21,0,game data
+piece,0x503300,28,src/game/settings.cpp,20,0,game data
+piece,0x5043e8,13,src/game/settings.cpp,19,0,game data
+piece,0x5043d8,14,src/game/settings.cpp,18,0,game data
+piece,0x5043c4,18,src/game/settings.cpp,17,0,game data
+piece,0x5043b4,14,src/game/settings.cpp,16,0,game data
+piece,0x5043a4,15,src/game/settings.cpp,15,0,game data
+piece,0x504398,10,src/game/settings.cpp,14,0,game data
+piece,0x50459c,12,src/game/settings.cpp,50,0,game data
+piece,0x504384,17,src/game/settings.cpp,13,0,game data
+piece,0x50437c,6,src/game/settings.cpp,12,0,game data
+piece,0x504368,8,src/game/settings.cpp,4,0,game data
 piece,0x50435c,9,src/sound/sound_types.cpp,16,0,game data
 piece,0x504354,6,src/sound/sound_types.cpp,10,0,game data
 piece,0x504340,17,src/sound/sound_types.cpp,8,0,game data
@@ -12012,13 +12012,8 @@ same,0x50341c,4,src/units/unit_types_42dcf0.cpp,11,0,
 same,0x50372c,2,src/units/unit_types_42dcf0.cpp,10,0,
 same,0x50341c,4,src/weapons/weapon_types.cpp,4,0,
 same,0x50341c,4,src/sound/sound_types.cpp,11,0,
-same,0x5032e8,19,src/game/settings_42f910.cpp,3,0,
-same,0x5032e8,19,src/game/settings_42f960.cpp,3,0,
-same,0x5032e8,19,src/game/settings_42f980.cpp,3,0,
-same,0x5032e8,19,src/game/settings_42f9a0.cpp,71,0,
-same,0x502a78,11,src/game/settings_42f9a0.cpp,67,0,
-same,0x5032e8,19,src/game/settings_430f00.cpp,66,0,
-same,0x502a78,11,src/game/settings_430f00.cpp,43,0,
+same,0x5032e8,19,src/game/settings.cpp,3,0,
+same,0x502a78,11,src/game/settings.cpp,75,0,
 same,0x50341c,4,src/game/side_data.cpp,59,0,
 same,0x50338c,6,src/game/side_data.cpp,50,0,
 same,0x5048f8,9,src/game/settings_campaign.cpp,9,0,
