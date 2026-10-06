@@ -201,7 +201,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x5069c8,DAT_005069c8,.data,8,gap,string,char[],2,0,1,one type,2,,s_VOLTEXT_005069c8,,,564f4c5445585400
 0x5069d0,DAT_005069d0,.data,8,gap,string,char[],2,0,1,one type,2,,DAT_005069d0,,,4d4f444500000000
 0x5069d8,DAT_005069d8,.data,20,gap,string,char[],1,0,1,one type,1,,s_sounds_explode_wav_005069d8,,,736f756e64735c6578706c6f64652e7761760000
-0x506dbc,g_usePacketManager,.data,4,type,data,int,24,1,2,"one type, plus extern ""C"" references",25,,DAT_00506dbc,,,01000000
+0x506dbc,g_usePacketManager,.data,4,type,data,int,24,0,1,one type,24,,DAT_00506dbc,,,01000000
 0x507318,DAT_00507318,.data,32,gap,string,char[],1,0,1,one type,1,,s_You_re_out__Continue_Watching__00507318,,,596f75277265206f7574212020436f6e74696e7565205761746368696e673f00
 0x5074e8,DAT_005074e8,.data,16,gap,string,char[],1,0,1,one type,1,,s_RADARPIC_TEMP_005074e8,,,52414441525049432054454d50000000
 0x5074f8,DAT_005074f8,.data,16,gap,string,char[],1,0,1,one type,1,,s_RADAR_PICTURE_005074f8,,,52414441522050494354555245000000
@@ -355,7 +355,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x511ddc,g_byteRatesTick,.bss,4,type,data,unsigned int,1,0,1,one type,1,,DAT_00511ddc,,,
 0x511de0,DAT_00511de0,.bss,4,type,data,int,2,0,1,one type,2,,DAT_00511de0,,,
 0x511de4,DAT_00511de4,.bss,4,type,data,int,1,0,1,one type,1,,DAT_00511de4,,,
-0x511de8,g_game,.bss,4,type,data,Game*,778,105,15,conflicting: shape,883,,DAT_00511de8,,,
+0x511de8,g_game,.bss,4,type,data,Game*,775,104,15,conflicting: shape,879,,DAT_00511de8,,,
 0x511dec,DAT_00511dec,.bss,4,type,data,int,1,0,1,one type,1,,DAT_00511dec,,,
 0x511df0,DAT_00511df0,.bss,400,type,data,int[100],2,5,6,conflicting: shape,7,0x190,DAT_00511df0,,,
 0x511f80,DAT_00511f80,.bss,16,gap,data,CMemoryCache,5,0,1,one type,5,,DAT_00511f80,,,
@@ -637,7 +637,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x512ff4,DAT_00512ff4,.bss,4,type,data,Class_004c6a60*,2,1,2,conflicting: shape,3,,DAT_00512ff4,,,
 0x512ff8,DAT_00512ff8,.bss,4,type,data,int,4,0,1,one type,4,,DAT_00512ff8,,,
 0x512ffc,DAT_00512ffc,.bss,4,gap,unreferenced,unsigned char[4],0,0,0,,0,,,,,
-0x513000,g_packetManager,.bss,46396,definition,data,PacketManager,27,1,2,"one type, plus extern ""C"" references",28,0xb54c,DAT_00513000,,src/network/packets_460e20.cpp,
+0x513000,g_packetManager,.bss,46396,definition,data,PacketManager,27,0,1,one type,27,0xb54c,DAT_00513000,,src/network/packets_460e20.cpp,
 0x513008,DAT_00513008,.bss,4,gap,data,PacketChannel,1,0,1,one type,1,,DAT_00513008,,in g_packetManager+0x8,
 0x51e2f4,DAT_0051e2f4,.bss,4,type,data,int*,1,0,1,one type,1,,DAT_0051e2f4,,in g_packetManager+0xb2f4,
 0x51e2f8,DAT_0051e2f8,.bss,4,type,data,unsigned int,1,0,1,one type,1,,DAT_0051e2f8,,in g_packetManager+0xb2f8,

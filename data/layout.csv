@@ -4101,27 +4101,27 @@ piece,0x5096e8,13,src/weapons/weapons_499a30.cpp,3,0,game data
 piece,0x502714,5,src/ingame/build_placement.cpp,4,0,game data
 piece,0x509660,10,src/ingame/build_placement.cpp,5,0,game data
 piece,0x509650,13,src/ingame/build_placement.cpp,3,0,game data
-piece,0x5031d0,4,src/game/game_load_497f40.cpp,18,0,game data
-piece,0x5031c8,7,src/game/game_load_497f40.cpp,17,0,game data
-piece,0x5031bc,9,src/game/game_load_497f40.cpp,16,0,game data
-piece,0x509644,12,src/game/game_load_497f40.cpp,15,0,game data
-piece,0x509620,36,src/game/game_load_497f40.cpp,14,0,game data
-piece,0x508ad8,7,src/game/game_load_497f40.cpp,11,0,game data
-piece,0x4fda40,8,src/game/game_load_497f40.cpp,10,0,game data
-piece,0x506c78,9,src/game/game_load_497f40.cpp,9,0,game data
-piece,0x509614,9,src/game/game_load_497f40.cpp,8,0,game data
-piece,0x50960c,8,src/game/game_load_497f40.cpp,7,0,game data
-piece,0x5077ec,6,src/game/game_load_497f40.cpp,6,0,game data
-piece,0x509600,10,src/game/game_load_497f40.cpp,5,0,game data
-piece,0x5095f8,8,src/game/game_load_497f40.cpp,4,0,game data
-piece,0x5095ec,11,src/game/game_load_497f40.cpp,3,0,game data
-piece,0x5095d0,25,src/game/game_load_497ce0.cpp,7,0,game data
-piece,0x5095c0,13,src/game/game_load_497ce0.cpp,6,0,game data
-piece,0x5095b0,14,src/game/game_load_497ce0.cpp,5,0,game data
-piece,0x509594,26,src/game/game_load_497ce0.cpp,4,0,game data
-piece,0x509588,11,src/game/game_load_497ce0.cpp,3,0,game data
-piece,0x509348,8,src/game/game_load_497180.cpp,5,0,game data
-piece,0x509570,12,src/game/game_load_497180.cpp,3,0,game data
+piece,0x5031d0,4,src/game/game_load.cpp,30,0,game data
+piece,0x5031c8,7,src/game/game_load.cpp,29,0,game data
+piece,0x5031bc,9,src/game/game_load.cpp,28,0,game data
+piece,0x509644,12,src/game/game_load.cpp,27,0,game data
+piece,0x509620,36,src/game/game_load.cpp,26,0,game data
+piece,0x508ad8,7,src/game/game_load.cpp,23,0,game data
+piece,0x4fda40,8,src/game/game_load.cpp,22,0,game data
+piece,0x506c78,9,src/game/game_load.cpp,21,0,game data
+piece,0x509614,9,src/game/game_load.cpp,20,0,game data
+piece,0x50960c,8,src/game/game_load.cpp,19,0,game data
+piece,0x5077ec,6,src/game/game_load.cpp,18,0,game data
+piece,0x509600,10,src/game/game_load.cpp,17,0,game data
+piece,0x5095f8,8,src/game/game_load.cpp,16,0,game data
+piece,0x5095ec,11,src/game/game_load.cpp,15,0,game data
+piece,0x5095d0,25,src/game/game_load.cpp,12,0,game data
+piece,0x5095c0,13,src/game/game_load.cpp,11,0,game data
+piece,0x5095b0,14,src/game/game_load.cpp,10,0,game data
+piece,0x509594,26,src/game/game_load.cpp,9,0,game data
+piece,0x509588,11,src/game/game_load.cpp,8,0,game data
+piece,0x509348,8,src/game/game_load.cpp,5,0,game data
+piece,0x509570,12,src/game/game_load.cpp,3,0,game data
 piece,0x509534,59,src/game/main_loop.cpp,20,0,game data
 piece,0x5094f8,5,src/game/main_loop.cpp,3,0,game data
 piece,0x509528,12,src/ingame/keys.cpp,24,0,game data
@@ -12333,10 +12333,10 @@ same,0x509400,9,src/ingame/dialogs_494050.cpp,3,0,
 same,0x502b38,8,src/ingame/dialogs_4948e0.cpp,6,0,
 same,0x503130,12,src/ingame/dialogs_495010.cpp,7,0,
 same,0x503130,12,src/ingame/keys.cpp,16,0,
-same,0x504924,16,src/game/game_load_497180.cpp,4,0,
-same,0x5091d4,10,src/game/game_load_497f40.cpp,19,0,
-same,0x504ab8,8,src/game/game_load_497f40.cpp,13,0,
-same,0x504990,4,src/game/game_load_497f40.cpp,12,0,
+same,0x504924,16,src/game/game_load.cpp,4,0,
+same,0x5091d4,10,src/game/game_load.cpp,31,0,
+same,0x504ab8,8,src/game/game_load.cpp,25,0,
+same,0x504990,4,src/game/game_load.cpp,24,0,
 same,0x503374,2,src/gui/gui_49fb50.cpp,3,0,
 same,0x503374,2,src/gui/gui_49fba0.cpp,3,0,
 same,0x503374,2,src/gui/gui_49fbf0.cpp,3,0,
