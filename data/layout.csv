@@ -5306,10 +5306,10 @@ piece,0x50459c,12,src/game/settings_42f9a0.cpp,42,0,game data
 piece,0x504384,17,src/game/settings_42f9a0.cpp,5,0,game data
 piece,0x50437c,6,src/game/settings_42f9a0.cpp,4,0,game data
 piece,0x504368,8,src/game/settings_42f910.cpp,4,0,game data
-piece,0x50435c,9,src/sound/sound_types_42f7e0.cpp,5,0,game data
-piece,0x504354,6,src/sound/sound_types_42f7e0.cpp,3,0,game data
-piece,0x504340,17,src/sound/sound_types_42f580.cpp,4,0,game data
-piece,0x504338,5,src/sound/sound_types_42f580.cpp,3,0,game data
+piece,0x50435c,9,src/sound/sound_types.cpp,16,0,game data
+piece,0x504354,6,src/sound/sound_types.cpp,10,0,game data
+piece,0x504340,17,src/sound/sound_types.cpp,8,0,game data
+piece,0x504338,5,src/sound/sound_types.cpp,7,0,game data
 piece,0x504310,3,src/weapons/weapon_types.cpp,85,0,game data
 piece,0x504300,15,src/weapons/weapon_types.cpp,83,0,game data
 piece,0x4fd240,8,src/weapons/weapon_types.cpp,61,0,game data
@@ -12011,8 +12011,7 @@ same,0x502820,5,src/units/unit_types_42d2e0.cpp,12,0,
 same,0x50341c,4,src/units/unit_types_42dcf0.cpp,11,0,
 same,0x50372c,2,src/units/unit_types_42dcf0.cpp,10,0,
 same,0x50341c,4,src/weapons/weapon_types.cpp,4,0,
-same,0x50341c,4,src/sound/sound_types_42f580.cpp,7,0,
-same,0x50341c,4,src/sound/sound_types_42f7e0.cpp,6,0,
+same,0x50341c,4,src/sound/sound_types.cpp,11,0,
 same,0x5032e8,19,src/game/settings_42f910.cpp,3,0,
 same,0x5032e8,19,src/game/settings_42f960.cpp,3,0,
 same,0x5032e8,19,src/game/settings_42f980.cpp,3,0,
