@@ -650,8 +650,6 @@ unsigned char DAT_0051f2c8[10];  // 0x51f2c8 .bss (the type runs past the next k
 unsigned char DAT_0051f2d2[6];  // 0x51f2d2 .bss
 unsigned int DAT_0051f2d8;  // 0x51f2d8 .bss
 int DAT_0051f2dc;  // 0x51f2dc .bss
-char* DAT_0051f2e0;  // 0x51f2e0 .bss
-char* DAT_0051f2ec;  // 0x51f2ec .bss
 int DAT_0051f2f0;  // 0x51f2f0 .bss
 int DAT_0051f2f4;  // 0x51f2f4 .bss
 unsigned int DAT_0051f2f8;  // 0x51f2f8 .bss

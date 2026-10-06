@@ -1961,44 +1961,43 @@ piece,0x502e30,8,link/data.obj,6,16,global data
 piece,0x502820,8,link/data.obj,6,8,global data
 piece,0x4fd4cc,4,link/data.obj,6,4,global data
 piece,0x4fd4c0,4,link/data.obj,6,0,global data
-piece,0x50a77c,4,link/data.obj,31,40764,global data
-piece,0x50a400,36,link/data.obj,31,40728,global data
-piece,0x4fdaf0,16,link/data.obj,31,40712,global data
-piece,0x511dd8,4,link/data.obj,31,40704,global data
-piece,0x511a40,4,link/data.obj,31,40700,global data
-piece,0x51ff18,4,link/data.obj,31,40696,global data
-piece,0x529e74,1,link/data.obj,31,40692,global data
-piece,0x529e80,4,link/data.obj,31,40688,global data
-piece,0x529e58,4,link/data.obj,31,40684,global data
-piece,0x529e64,1,link/data.obj,31,40680,global data
-piece,0x529e70,1,link/data.obj,31,40676,global data
-piece,0x511dc0,4,link/data.obj,31,40672,global data
-piece,0x529e20,56,link/data.obj,31,40616,global data
-piece,0x51e690,4,link/data.obj,31,40608,global data
-piece,0x52a4f8,4,link/data.obj,31,40604,global data
-piece,0x52a4f4,4,link/data.obj,31,40600,global data
-piece,0x52a4e8,4,link/data.obj,31,40596,global data
-piece,0x52a4f0,4,link/data.obj,31,40592,global data
-piece,0x52a4e4,1,link/data.obj,31,40588,global data
-piece,0x529e98,4,link/data.obj,31,40584,global data
-piece,0x529e88,13,link/data.obj,31,40568,global data
-piece,0x526ff0,4,link/data.obj,31,40564,global data
-piece,0x529e78,1,link/data.obj,31,40560,global data
-piece,0x529e84,4,link/data.obj,31,40556,global data
-piece,0x51e560,20,link/data.obj,31,40536,global data
-piece,0x52a4ec,4,link/data.obj,31,40528,global data
-piece,0x51e6f8,24,link/data.obj,31,40504,global data
-piece,0x51f2f8,4,link/data.obj,31,40500,global data
-piece,0x51f2f4,4,link/data.obj,31,40496,global data
-piece,0x528ae8,1000,link/data.obj,31,39496,global data
-piece,0x51f2d8,4,link/data.obj,31,39488,global data
-piece,0x51f2f0,4,link/data.obj,31,39484,global data
-piece,0x528ad8,1,link/data.obj,31,39480,global data
-piece,0x528ae4,1,link/data.obj,31,39476,global data
-piece,0x511c3c,4,link/data.obj,31,39472,global data
-piece,0x51e6c8,8,link/data.obj,31,39464,global data
-piece,0x51f2c8,10,link/data.obj,31,39448,global data
-piece,0x51f2e0,4,link/data.obj,31,39440,global data
+piece,0x50a77c,4,link/data.obj,31,40756,global data
+piece,0x50a400,36,link/data.obj,31,40720,global data
+piece,0x4fdaf0,16,link/data.obj,31,40704,global data
+piece,0x511dd8,4,link/data.obj,31,40696,global data
+piece,0x511a40,4,link/data.obj,31,40692,global data
+piece,0x51ff18,4,link/data.obj,31,40688,global data
+piece,0x529e74,1,link/data.obj,31,40684,global data
+piece,0x529e80,4,link/data.obj,31,40680,global data
+piece,0x529e58,4,link/data.obj,31,40676,global data
+piece,0x529e64,1,link/data.obj,31,40672,global data
+piece,0x529e70,1,link/data.obj,31,40668,global data
+piece,0x511dc0,4,link/data.obj,31,40664,global data
+piece,0x529e20,56,link/data.obj,31,40608,global data
+piece,0x51e690,4,link/data.obj,31,40600,global data
+piece,0x52a4f8,4,link/data.obj,31,40596,global data
+piece,0x52a4f4,4,link/data.obj,31,40592,global data
+piece,0x52a4e8,4,link/data.obj,31,40588,global data
+piece,0x52a4f0,4,link/data.obj,31,40584,global data
+piece,0x52a4e4,1,link/data.obj,31,40580,global data
+piece,0x529e98,4,link/data.obj,31,40576,global data
+piece,0x529e88,13,link/data.obj,31,40560,global data
+piece,0x526ff0,4,link/data.obj,31,40556,global data
+piece,0x529e78,1,link/data.obj,31,40552,global data
+piece,0x529e84,4,link/data.obj,31,40548,global data
+piece,0x51e560,20,link/data.obj,31,40528,global data
+piece,0x52a4ec,4,link/data.obj,31,40520,global data
+piece,0x51e6f8,24,link/data.obj,31,40496,global data
+piece,0x51f2f8,4,link/data.obj,31,40492,global data
+piece,0x51f2f4,4,link/data.obj,31,40488,global data
+piece,0x528ae8,1000,link/data.obj,31,39488,global data
+piece,0x51f2d8,4,link/data.obj,31,39480,global data
+piece,0x51f2f0,4,link/data.obj,31,39476,global data
+piece,0x528ad8,1,link/data.obj,31,39472,global data
+piece,0x528ae4,1,link/data.obj,31,39468,global data
+piece,0x511c3c,4,link/data.obj,31,39464,global data
+piece,0x51e6c8,8,link/data.obj,31,39456,global data
+piece,0x51f2c8,10,link/data.obj,31,39440,global data
 piece,0x528ae0,4,link/data.obj,31,39436,global data
 piece,0x529e7c,4,link/data.obj,31,39432,global data
 piece,0x51f2d2,6,link/data.obj,31,39424,global data
@@ -2009,9 +2008,8 @@ piece,0x51e6c0,4,link/data.obj,31,39364,global data
 piece,0x528aa8,1,link/data.obj,31,39360,global data
 piece,0x529e5c,8,link/data.obj,31,39352,global data
 piece,0x51e6b0,12,link/data.obj,31,39336,global data
-piece,0x528aa4,4,link/data.obj,31,39332,global data
-piece,0x528ab0,4,link/data.obj,31,39328,global data
-piece,0x51f2ec,4,link/data.obj,31,39324,global data
+piece,0x528aa4,4,link/data.obj,31,39328,global data
+piece,0x528ab0,4,link/data.obj,31,39324,global data
 piece,0x51f2dc,4,link/data.obj,31,39320,global data
 piece,0x528adc,1,link/data.obj,31,39316,global data
 piece,0x51e6bc,4,link/data.obj,31,39312,global data
@@ -2439,18 +2437,20 @@ piece,0x5289f4,4,link/data.obj,31,0,global data
 piece,0x507b70,24,link/extra_data.obj,2,8,global data
 piece,0x505510,4,link/extra_data.obj,2,4,global data
 piece,0x502ae8,4,link/extra_data.obj,2,0,global data
-piece,0x529e00,32,link/extra_data.obj,3,3968,global data
-piece,0x526ff4,4,link/extra_data.obj,3,3960,global data
-piece,0x51f2e8,4,link/extra_data.obj,3,3956,global data
-piece,0x529e9c,1,link/extra_data.obj,3,3952,global data
-piece,0x51f2e4,4,link/extra_data.obj,3,3948,global data
-piece,0x528ac8,4,link/extra_data.obj,3,3944,global data
-piece,0x528ad4,4,link/extra_data.obj,3,3940,global data
-piece,0x528ab8,4,link/extra_data.obj,3,3936,global data
-piece,0x528ac4,4,link/extra_data.obj,3,3932,global data
-piece,0x528ad0,4,link/extra_data.obj,3,3928,global data
-piece,0x528ab4,4,link/extra_data.obj,3,3924,global data
-piece,0x528ac0,4,link/extra_data.obj,3,3920,global data
+piece,0x529e00,32,link/extra_data.obj,3,3976,global data
+piece,0x526ff4,4,link/extra_data.obj,3,3968,global data
+piece,0x51f2e8,4,link/extra_data.obj,3,3964,global data
+piece,0x529e9c,1,link/extra_data.obj,3,3960,global data
+piece,0x51f2e4,4,link/extra_data.obj,3,3956,global data
+piece,0x51f2e0,4,link/extra_data.obj,3,3952,global data
+piece,0x528ac8,4,link/extra_data.obj,3,3948,global data
+piece,0x528ad4,4,link/extra_data.obj,3,3944,global data
+piece,0x528ab8,4,link/extra_data.obj,3,3940,global data
+piece,0x528ac4,4,link/extra_data.obj,3,3936,global data
+piece,0x528ad0,4,link/extra_data.obj,3,3932,global data
+piece,0x528ab4,4,link/extra_data.obj,3,3928,global data
+piece,0x528ac0,4,link/extra_data.obj,3,3924,global data
+piece,0x51f2ec,4,link/extra_data.obj,3,3920,global data
 piece,0x528acc,4,link/extra_data.obj,3,3916,global data
 piece,0x528abc,4,link/extra_data.obj,3,3912,global data
 piece,0x529df8,4,link/extra_data.obj,3,3908,global data
@@ -4170,33 +4170,33 @@ piece,0x5093b8,8,src/ingame/dialogs_4936f0.cpp,3,0,game data
 piece,0x5093cc,8,src/ingame/dialogs_4934b0.cpp,10,0,game data
 piece,0x5093c0,9,src/ingame/dialogs_4934b0.cpp,9,0,game data
 piece,0x502860,10,src/ingame/dialogs_4933e0.cpp,3,0,game data
-piece,0x50936c,13,src/game/savegame_4931d0.cpp,9,0,game data
-piece,0x5093a4,11,src/game/savegame_4931d0.cpp,8,0,game data
-piece,0x50937c,40,src/game/savegame_4931d0.cpp,7,0,game data
-piece,0x505f44,7,src/game/savegame_4931d0.cpp,5,0,game data
-piece,0x505670,9,src/game/savegame_4931d0.cpp,4,0,game data
-piece,0x502ac4,9,src/game/savegame_4931d0.cpp,3,0,game data
-piece,0x509360,11,src/game/savegame_493060.cpp,9,0,game data
-piece,0x505f4c,10,src/game/savegame_493060.cpp,8,0,game data
-piece,0x502adc,9,src/game/savegame_493060.cpp,3,0,game data
-piece,0x50935c,4,src/game/savegame_492df0.cpp,3,0,game data
-piece,0x509350,10,src/game/savegame_492b10.cpp,5,0,game data
-piece,0x5030c0,56,src/game/savegame_492360.cpp,20,0,game data
-piece,0x502a34,53,src/game/savegame_492360.cpp,19,0,game data
-piece,0x5057c4,10,src/game/savegame_492360.cpp,18,0,game data
-piece,0x509328,31,src/game/savegame_492360.cpp,4,0,game data
-piece,0x509308,6,src/game/savegame_491ec0.cpp,26,0,game data
-piece,0x509300,7,src/game/savegame_491ec0.cpp,23,0,game data
-piece,0x5092e8,22,src/game/savegame_491ec0.cpp,22,0,game data
-piece,0x5092e4,4,src/game/savegame_491ec0.cpp,21,0,game data
-piece,0x5092d8,9,src/game/savegame_491ec0.cpp,20,0,game data
-piece,0x5092cc,9,src/game/savegame_491ec0.cpp,18,0,game data
-piece,0x5092c0,9,src/game/savegame_491ec0.cpp,17,0,game data
-piece,0x506d74,8,src/game/savegame_491ec0.cpp,14,0,game data
-piece,0x50191c,15,src/game/savegame_491ec0.cpp,12,0,game data
-piece,0x5092b8,5,src/game/savegame_491ec0.cpp,11,0,game data
-piece,0x5092b0,5,src/game/savegame_491ec0.cpp,9,0,game data
-piece,0x5092a8,5,src/game/savegame_491ec0.cpp,3,0,game data
+piece,0x50936c,13,src/game/savegame.cpp,72,0,game data
+piece,0x5093a4,11,src/game/savegame.cpp,77,0,game data
+piece,0x50937c,40,src/game/savegame.cpp,76,0,game data
+piece,0x505f44,7,src/game/savegame.cpp,65,0,game data
+piece,0x505670,9,src/game/savegame.cpp,29,0,game data
+piece,0x502ac4,9,src/game/savegame.cpp,75,0,game data
+piece,0x509360,11,src/game/savegame.cpp,71,0,game data
+piece,0x505f4c,10,src/game/savegame.cpp,70,0,game data
+piece,0x502adc,9,src/game/savegame.cpp,68,0,game data
+piece,0x50935c,4,src/game/savegame.cpp,58,0,game data
+piece,0x509350,10,src/game/savegame.cpp,54,0,game data
+piece,0x5030c0,56,src/game/savegame.cpp,47,0,game data
+piece,0x502a34,53,src/game/savegame.cpp,46,0,game data
+piece,0x5057c4,10,src/game/savegame.cpp,45,0,game data
+piece,0x509328,31,src/game/savegame.cpp,36,0,game data
+piece,0x509308,6,src/game/savegame.cpp,26,0,game data
+piece,0x509300,7,src/game/savegame.cpp,23,0,game data
+piece,0x5092e8,22,src/game/savegame.cpp,22,0,game data
+piece,0x5092e4,4,src/game/savegame.cpp,21,0,game data
+piece,0x5092d8,9,src/game/savegame.cpp,20,0,game data
+piece,0x5092cc,9,src/game/savegame.cpp,18,0,game data
+piece,0x5092c0,9,src/game/savegame.cpp,17,0,game data
+piece,0x506d74,8,src/game/savegame.cpp,14,0,game data
+piece,0x50191c,15,src/game/savegame.cpp,12,0,game data
+piece,0x5092b8,5,src/game/savegame.cpp,11,0,game data
+piece,0x5092b0,5,src/game/savegame.cpp,9,0,game data
+piece,0x5092a8,5,src/game/savegame.cpp,3,0,game data
 piece,0x509298,15,src/game/game_state_4917d0.cpp,5,0,game data
 piece,0x509284,19,src/game/game_state_4917d0.cpp,4,0,game data
 piece,0x509278,10,src/game/game_state_4917d0.cpp,3,0,game data
@@ -12309,44 +12309,33 @@ same,0x508f24,11,src/game/defeat_death_timer_runs_out.cpp,5,0,
 same,0x509200,8,src/game/game_state_490f40.cpp,3,0,
 same,0x509200,8,src/game/game_state_490f80.cpp,3,0,
 same,0x509200,8,src/game/game_state_4916a0.cpp,3,0,
-same,0x505f18,6,src/game/savegame_491ec0.cpp,30,0,
-same,0x504904,12,src/game/savegame_491ec0.cpp,27,0,
-same,0x504980,8,src/game/savegame_491ec0.cpp,25,0,
-same,0x504974,9,src/game/savegame_491ec0.cpp,24,0,
-same,0x5028f8,9,src/game/savegame_491ec0.cpp,19,0,
-same,0x504994,8,src/game/savegame_491ec0.cpp,16,0,
-same,0x504990,4,src/game/savegame_491ec0.cpp,15,0,
-same,0x504910,10,src/game/savegame_491ec0.cpp,13,0,
-same,0x504988,5,src/game/savegame_491ec0.cpp,10,0,
-same,0x502a78,11,src/game/savegame_491ec0.cpp,8,0,
-same,0x504ea8,5,src/game/savegame_491ec0.cpp,7,0,
-same,0x504ea0,7,src/game/savegame_491ec0.cpp,6,0,
-same,0x504e98,5,src/game/savegame_491ec0.cpp,5,0,
-same,0x505f18,6,src/game/savegame_492360.cpp,23,0,
-same,0x504974,9,src/game/savegame_492360.cpp,21,0,
-same,0x5028f8,9,src/game/savegame_492360.cpp,16,0,
-same,0x504988,5,src/game/savegame_492360.cpp,15,0,
-same,0x502a78,11,src/game/savegame_492360.cpp,14,0,
-same,0x504994,8,src/game/savegame_492360.cpp,13,0,
-same,0x50496c,7,src/game/savegame_492360.cpp,12,0,
-same,0x504980,8,src/game/savegame_492360.cpp,11,0,
-same,0x50495c,15,src/game/savegame_492360.cpp,10,0,
-same,0x504950,9,src/game/savegame_492360.cpp,9,0,
-same,0x502288,8,src/game/savegame_492360.cpp,8,0,
-same,0x504944,12,src/game/savegame_492360.cpp,7,0,
-same,0x504934,16,src/game/savegame_492360.cpp,6,0,
-same,0x504924,16,src/game/savegame_492360.cpp,5,0,
-same,0x509310,22,src/game/savegame_492360.cpp,3,0,
-same,0x50372c,2,src/game/savegame_492b10.cpp,9,0,
-same,0x505f18,6,src/game/savegame_492b10.cpp,8,0,
-same,0x505f30,15,src/game/savegame_492b10.cpp,7,0,
-same,0x505f20,15,src/game/savegame_492b10.cpp,6,0,
-same,0x502e78,12,src/game/savegame_492b10.cpp,3,0,
-same,0x503130,12,src/game/savegame_492df0.cpp,9,0,
-same,0x505f18,6,src/game/savegame_492df0.cpp,8,0,
-same,0x50313c,6,src/game/savegame_493060.cpp,7,0,
-same,0x505f18,6,src/game/savegame_493060.cpp,5,0,
-same,0x505f18,6,src/game/savegame_4931d0.cpp,6,0,
+same,0x505f18,6,src/game/savegame.cpp,30,0,
+same,0x504904,12,src/game/savegame.cpp,27,0,
+same,0x504980,8,src/game/savegame.cpp,25,0,
+same,0x504974,9,src/game/savegame.cpp,24,0,
+same,0x5028f8,9,src/game/savegame.cpp,19,0,
+same,0x504994,8,src/game/savegame.cpp,16,0,
+same,0x504990,4,src/game/savegame.cpp,15,0,
+same,0x504910,10,src/game/savegame.cpp,13,0,
+same,0x504988,5,src/game/savegame.cpp,10,0,
+same,0x502a78,11,src/game/savegame.cpp,8,0,
+same,0x504ea8,5,src/game/savegame.cpp,7,0,
+same,0x504ea0,7,src/game/savegame.cpp,6,0,
+same,0x504e98,5,src/game/savegame.cpp,5,0,
+same,0x50496c,7,src/game/savegame.cpp,43,0,
+same,0x50495c,15,src/game/savegame.cpp,42,0,
+same,0x504950,9,src/game/savegame.cpp,41,0,
+same,0x502288,8,src/game/savegame.cpp,40,0,
+same,0x504944,12,src/game/savegame.cpp,39,0,
+same,0x504934,16,src/game/savegame.cpp,38,0,
+same,0x504924,16,src/game/savegame.cpp,37,0,
+same,0x509310,22,src/game/savegame.cpp,35,0,
+same,0x50372c,2,src/game/savegame.cpp,57,0,
+same,0x505f30,15,src/game/savegame.cpp,56,0,
+same,0x505f20,15,src/game/savegame.cpp,55,0,
+same,0x502e78,12,src/game/savegame.cpp,53,0,
+same,0x503130,12,src/game/savegame.cpp,64,0,
+same,0x50313c,6,src/game/savegame.cpp,69,0,
 same,0x502b38,8,src/ingame/dialogs_4934b0.cpp,8,0,
 same,0x502ae8,3,src/ingame/dialogs_4934b0.cpp,7,0,
 same,0x506578,5,src/ingame/dialogs_494050.cpp,5,0,
