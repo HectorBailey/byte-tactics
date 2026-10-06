@@ -404,9 +404,12 @@ int DAT_00512310;  // 0x512310 .bss
 int DAT_00512314;  // 0x512314 .bss
 int g_meteorActive;  // 0x512318 .bss
 int g_meteorStrikeEndTime;  // 0x51231c .bss
+unsigned char g_meteorOrigin[4];  // 0x512320 .bss
 int DAT_00512324;  // 0x512324 .bss
+Player_00437cd0* DAT_00512328;  // 0x512328 .bss
 int g_meteorsEnabled;  // 0x51232c .bss
 int g_meteorNextHitTime;  // 0x512330 .bss
+unsigned char g_meteorTarget[4];  // 0x512334 .bss
 int DAT_00512338;  // 0x512338 .bss
 unsigned char DAT_0051233c[4];  // 0x51233c .bss
 unsigned char DAT_00512350[8];  // 0x512350 .bss

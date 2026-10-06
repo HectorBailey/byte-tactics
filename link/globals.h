@@ -17,6 +17,7 @@ struct Dialog;
 struct Entry_00443100;
 struct Game;
 struct Node_004dde70;
+struct Player_00437cd0;
 struct Record_005129b4;
 struct Struct_00526ff0;
 
@@ -271,7 +272,7 @@ extern unsigned int g_netStatsTick;                                             
 extern unsigned int g_byteRatesTick;                                                          // 0x511ddc, 4 bytes; 1 of 1 files
 extern int DAT_00511de0;                                                                      // 0x511de0, 4 bytes; 2 of 2 files
 extern int DAT_00511de4;                                                                      // 0x511de4, 4 bytes; 1 of 1 files
-extern Game* g_game;                                                                          // 0x511de8, 4 bytes; 821 of 931 files (conflicting: shape)
+extern Game* g_game;                                                                          // 0x511de8, 4 bytes; 820 of 929 files (conflicting: shape)
 extern int DAT_00511dec;                                                                      // 0x511dec, 4 bytes; 1 of 1 files
 extern unsigned char DAT_00511f80[16];                                                        // 0x511f80, 16 bytes; CMemoryCache by value in 5 of 5 files
 extern int DAT_00511f90;                                                                      // 0x511f90, 4 bytes; 1 of 1 files
@@ -300,17 +301,20 @@ extern int DAT_005122d8;                                                        
 extern int DAT_005122dc;                                                                      // 0x5122dc, 4 bytes; 1 of 1 files
 extern int DAT_005122e0;                                                                      // 0x5122e0, 4 bytes; 1 of 1 files
 extern unsigned char DAT_005122e4[4];                                                         // 0x5122e4, 4 bytes; nothing refers to it
-extern int g_meteorNextStrikeTime;                                                            // 0x5122e8, 4 bytes; 4 of 5 files (conflicting: signedness or const)
+extern int g_meteorNextStrikeTime;                                                            // 0x5122e8, 4 bytes; 1 of 1 files
 extern unsigned char DAT_005122ec[4];                                                         // 0x5122ec, 4 bytes; nothing refers to it
-extern char DAT_005122f0[32];                                                                 // 0x5122f0, 32 bytes; 2 of 2 files
-extern int DAT_00512310;                                                                      // 0x512310, 4 bytes; 2 of 2 files
-extern int DAT_00512314;                                                                      // 0x512314, 4 bytes; 3 of 3 files
-extern int g_meteorActive;                                                                    // 0x512318, 4 bytes; 5 of 5 files
-extern int g_meteorStrikeEndTime;                                                             // 0x51231c, 4 bytes; 3 of 4 files (conflicting: signedness or const)
-extern int DAT_00512324;                                                                      // 0x512324, 4 bytes; 3 of 3 files
-extern int g_meteorsEnabled;                                                                  // 0x51232c, 4 bytes; 5 of 5 files
-extern int g_meteorNextHitTime;                                                               // 0x512330, 4 bytes; 3 of 4 files (conflicting: signedness or const)
-extern int DAT_00512338;                                                                      // 0x512338, 4 bytes; 3 of 3 files
+extern char DAT_005122f0[32];                                                                 // 0x5122f0, 32 bytes; 1 of 1 files
+extern int DAT_00512310;                                                                      // 0x512310, 4 bytes; 1 of 1 files
+extern int DAT_00512314;                                                                      // 0x512314, 4 bytes; 1 of 1 files
+extern int g_meteorActive;                                                                    // 0x512318, 4 bytes; 1 of 1 files
+extern int g_meteorStrikeEndTime;                                                             // 0x51231c, 4 bytes; 1 of 1 files
+extern unsigned char g_meteorOrigin[4];                                                       // 0x512320, 4 bytes; Point16 by value in 1 of 1 files
+extern int DAT_00512324;                                                                      // 0x512324, 4 bytes; 1 of 1 files
+extern Player_00437cd0* DAT_00512328;                                                         // 0x512328, 4 bytes; 1 of 1 files
+extern int g_meteorsEnabled;                                                                  // 0x51232c, 4 bytes; 1 of 1 files
+extern int g_meteorNextHitTime;                                                               // 0x512330, 4 bytes; 1 of 1 files
+extern unsigned char g_meteorTarget[4];                                                       // 0x512334, 4 bytes; Point16 by value in 1 of 1 files
+extern int DAT_00512338;                                                                      // 0x512338, 4 bytes; 1 of 1 files
 extern unsigned char DAT_0051233c[4];                                                         // 0x51233c, 4 bytes; nothing refers to it
 extern unsigned char DAT_00512350[8];                                                         // 0x512350, 8 bytes; nothing refers to it
 extern unsigned char DAT_00512758[8];                                                         // 0x512758, 8 bytes; nothing refers to it
@@ -700,7 +704,7 @@ extern int DAT_0052a4f4;                                                        
 extern void* DAT_0052a4f8;                                                                    // 0x52a4f8, 4 bytes; 3 of 3 files
 extern long DAT_0052a4fc;                                                                     // 0x52a4fc, 4 bytes; 2 of 3 files (conflicting: signedness or const)
 
-// Not declared: 238 globals defined in a data file or whose type is not settled (see data/globals.csv).
+// Not declared: 233 globals defined in a data file or whose type is not settled (see data/globals.csv).
 //   0x513000 g_packetManager: defined in src/network/packets_460e20.cpp
 //   0x5119c0 g_playerAI: PlayerAI*[] (11), void*[] (5), Owner*[] (3), Player_40b0d0*[] (1), and 2 more
 //   0x51fbd0 g_display: void* (4), int (2), Display_004b4f50* (1), Display_004b5370* (1), and 14 more
@@ -738,8 +742,6 @@ extern long DAT_0052a4fc;                                                       
 //   0x4fd6f0 DAT_004fd6f0: defined in src/data/vtables.cpp
 //   0x511a60 DAT_00511a60: part of another global: g_messageCountByType+0x8
 //   0x511c60 DAT_00511c60: part of another global: g_messageBytesByType+0x8
-//   0x512320 g_meteorOrigin: Point16_00437de0 (1), Point16_00438070 (1), Point16_00438180 (1), short (1)
-//   0x512334 g_meteorTarget: Point16_00437de0 (1), Point16_00438070 (1), Point16_00438180 (1), short (1)
 //   0x512770 DAT_00512770: char[] (2), Serial_00441c30 (1), int (1)
 //   0x5129d0 g_sendCondenser: defined in src/network/net_condenser.cpp
 //   0x512f2c DAT_00512f2c: part of another global: DAT_00512f18+0x14
@@ -807,8 +809,6 @@ extern long DAT_0052a4fc;                                                       
 //   0x50ced8 g_profilerDialog: defined in src/debug/debug_dialogs.cpp
 //   0x50d980 g_pentiumEvents: defined in src/debug/perf_counters.cpp
 //   0x50da00 g_pentiumProEvents: defined in src/debug/perf_counters.cpp
-//   0x512328 DAT_00512328: Player_00437cd0* (1), void* (1)
-//   0x512340 DAT_00512340$S5516: defined in src/map/meteors_438450.cpp
 //   0x512370 DAT_00512370: part of another global: MovementClassTable::g_movementClasses+0x18
 //   0x512764 DAT_00512764: short (1), int (1)
 //   0x5129f1 DAT_005129f1: part of another global: g_sendCondenser+0x21
@@ -894,8 +894,7 @@ extern long DAT_0052a4fc;                                                       
 //   0x5086fc DAT_005086fc: defined in src/units/unit_messages.cpp
 //   0x50b6e0 DAT_0050b6e0: defined in src/data/unused.cpp
 //   0x5120bc DAT_005120bc: part of another global: DAT_005120b8+0x4
-//   0x512322 DAT_00512322: part of another global: g_meteorOrigin+0x2
-//   0x512336 DAT_00512336: part of another global: g_meteorTarget+0x2
+//   0x512340 DAT_00512340$S5516: defined in src/map/meteors.cpp
 //   0x512774 DAT_00512774: part of another global: DAT_00512770+0x4
 //   0x512c8c DAT_00512c8c: part of another global: DAT_00512c80+0xc
 //   0x512c94 DAT_00512c94: part of another global: DAT_00512c80+0x14
