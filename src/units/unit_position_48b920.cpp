@@ -54,7 +54,7 @@ struct Unit;
 
 class UnitMotion {
 public:
-    Iface_0048b920* iface;             // +0x0, see src/units/unit_scripts_43dd20.cpp
+    Iface_0048b920* iface;             // +0x0, see src/orders/order_list_43cc20.cpp
     void UpdateMotion(Unit* u);
 };
 

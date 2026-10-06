@@ -269,7 +269,7 @@ extern unsigned int g_netStatsTick;                                             
 extern unsigned int g_byteRatesTick;                                                          // 0x511ddc, 4 bytes; 1 of 1 files
 extern int DAT_00511de0;                                                                      // 0x511de0, 4 bytes; 2 of 2 files
 extern int DAT_00511de4;                                                                      // 0x511de4, 4 bytes; 2 of 2 files
-extern Game* g_game;                                                                          // 0x511de8, 4 bytes; 893 of 1024 files (conflicting: shape)
+extern Game* g_game;                                                                          // 0x511de8, 4 bytes; 889 of 1020 files (conflicting: shape)
 extern int DAT_00511dec;                                                                      // 0x511dec, 4 bytes; 1 of 1 files
 extern unsigned char DAT_00511f80[16];                                                        // 0x511f80, 16 bytes; CMemoryCache by value in 5 of 5 files
 extern int DAT_00511f90;                                                                      // 0x511f90, 4 bytes; 1 of 1 files
@@ -801,7 +801,6 @@ extern long DAT_0052a4fc;                                                       
 //   0x501d38 g_consoleCommands: defined in src/game/console_commands.cpp
 //   0x501f48 g_cheatCommands: defined in src/game/console_commands.cpp
 //   0x501fd0 g_debugCommands: defined in src/game/console_commands.cpp
-//   0x505205 DAT_00505205: defined in src/weapons/ballistics.cpp
 //   0x505510 DAT_00505510: unsigned char (1), int (1)
 //   0x507b70 DAT_00507b70: unsigned char[] (1), ColourEntry_00478790[] (1)
 //   0x5086e0 DAT_005086e0: defined in src/units/unit_messages.cpp
@@ -884,6 +883,7 @@ extern long DAT_0052a4fc;                                                       
 //   0x501fcc DAT_00501fcc: defined in src/game/console_commands.cpp
 //   0x502f98 DAT_00502f98: defined in src/data/unused.cpp
 //   0x505200 g_rangeByPitch: defined in src/weapons/ballistics.cpp
+//   0x505205 DAT_00505205: defined in src/weapons/ballistics.cpp
 //   0x5066f8 DAT_005066f8: defined in src/data/unused.cpp
 //   0x506718 DAT_00506718: defined in src/data/unused.cpp
 //   0x506738 DAT_00506738: defined in src/data/unused.cpp

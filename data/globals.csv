@@ -159,7 +159,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x504ea0,DAT_00504ea0,.data,8,gap,string,char[],1,0,1,one type,1,,s_Medium_00504ea0,,,4d656469756d0000
 0x504ea8,DAT_00504ea8,.data,8,gap,string,char[],1,0,1,one type,1,,DAT_00504ea8,,,4561737900000000
 0x505200,g_rangeByPitch,.data,4,type,data,signed char*,1,0,1,one type,1,,,,src/weapons/ballistics.cpp,19374655
-0x505205,DAT_00505205,.data,7,gap,data,signed char[],2,0,1,one type,2,,,,src/weapons/ballistics.cpp,644b3219140f00
+0x505205,DAT_00505205,.data,7,gap,data,signed char[],1,0,1,one type,1,,,,src/weapons/ballistics.cpp,644b3219140f00
 0x505490,DAT_00505490,.data,24,gap,data,int[],1,0,1,one type,1,,DAT_00505490,,,00c2010000e1000000960000004b00004038000080250000
 0x5054a8,DAT_005054a8,.data,4,type,data,unsigned int,1,0,1,one type,1,,DAT_005054a8,,,10000000
 0x5054b0,DAT_005054b0,.data,92,gap,data,char*[],2,0,1,one type,2,,PTR_s_PLAYERx_005054b0,20,,04565000fc555000f4555000ec555000e4555000dc555000d4555000cc555000c8555000bc5550000000000000000000b0555000a45550009855500090555000
@@ -356,7 +356,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x511ddc,g_byteRatesTick,.bss,4,type,data,unsigned int,1,0,1,one type,1,,DAT_00511ddc,,,
 0x511de0,DAT_00511de0,.bss,4,type,data,int,2,0,1,one type,2,,DAT_00511de0,,,
 0x511de4,DAT_00511de4,.bss,4,type,data,int,2,0,1,one type,2,,DAT_00511de4,,,
-0x511de8,g_game,.bss,4,type,data,Game*,893,131,15,conflicting: shape,1024,,DAT_00511de8,,,
+0x511de8,g_game,.bss,4,type,data,Game*,889,131,15,conflicting: shape,1020,,DAT_00511de8,,,
 0x511dec,DAT_00511dec,.bss,4,type,data,int,1,0,1,one type,1,,DAT_00511dec,,,
 0x511df0,DAT_00511df0,.bss,400,type,data,int[100],2,5,6,conflicting: shape,7,0x190,DAT_00511df0,,,
 0x511f80,DAT_00511f80,.bss,16,gap,data,CMemoryCache,5,0,1,one type,5,,DAT_00511f80,,,
