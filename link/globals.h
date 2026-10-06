@@ -42,7 +42,7 @@ extern char DAT_00502878[12];                                                   
 extern char DAT_00502884[12];                                                                 // 0x502884, 12 bytes; 2 of 2 files
 extern char DAT_00502890[8];                                                                  // 0x502890, 8 bytes; 2 of 2 files
 extern int DAT_00502898;                                                                      // 0x502898, 4 bytes; 1 of 1 files
-extern int DAT_0050289c;                                                                      // 0x50289c, 4 bytes; 4 of 4 files
+extern int DAT_0050289c;                                                                      // 0x50289c, 4 bytes; 1 of 1 files
 extern char DAT_005028f8[12];                                                                 // 0x5028f8, 12 bytes; 1 of 1 files
 extern char DAT_00502910[4];                                                                  // 0x502910, 4 bytes; 1 of 1 files
 extern char DAT_00502a20[4];                                                                  // 0x502a20, 4 bytes; 3 of 3 files
@@ -270,7 +270,7 @@ extern int DAT_00511dd4;                                                        
 extern unsigned int g_netStatsTick;                                                           // 0x511dd8, 4 bytes; 1 of 1 files
 extern unsigned int g_byteRatesTick;                                                          // 0x511ddc, 4 bytes; 1 of 1 files
 extern int DAT_00511de0;                                                                      // 0x511de0, 4 bytes; 2 of 2 files
-extern int DAT_00511de4;                                                                      // 0x511de4, 4 bytes; 2 of 2 files
+extern int DAT_00511de4;                                                                      // 0x511de4, 4 bytes; 1 of 1 files
 extern Game* g_game;                                                                          // 0x511de8, 4 bytes; 856 of 970 files (conflicting: shape)
 extern int DAT_00511dec;                                                                      // 0x511dec, 4 bytes; 1 of 1 files
 extern unsigned char DAT_00511f80[16];                                                        // 0x511f80, 16 bytes; CMemoryCache by value in 5 of 5 files

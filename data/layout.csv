@@ -5711,17 +5711,17 @@ piece,0x502944,9,src/frontend/endgame_41da60.cpp,4,0,game data
 piece,0x502938,9,src/frontend/endgame_41da60.cpp,3,0,game data
 piece,0x50292c,12,src/frontend/endgame_41d920.cpp,6,0,game data
 piece,0x502920,9,src/frontend/endgame_41d920.cpp,5,0,game data
-piece,0x502914,10,src/game/cd_check_41d7b0.cpp,4,0,game data
-piece,0x502904,12,src/game/cd_check_41d6a0.cpp,6,0,game data
-piece,0x5028e8,14,src/game/cd_check_41d6a0.cpp,4,0,game data
-piece,0x5028dc,9,src/game/cd_check_41d6a0.cpp,3,0,game data
-piece,0x5028d8,3,src/game/cd_check_41d4c0.cpp,9,0,game data
-piece,0x5028cc,10,src/game/cd_check_41d4c0.cpp,8,0,game data
-piece,0x5028c4,6,src/game/cd_check_41d4c0.cpp,7,0,game data
-piece,0x5028bc,6,src/game/cd_check_41d4c0.cpp,6,0,game data
-piece,0x5028b4,6,src/game/cd_check_41d4c0.cpp,5,0,game data
-piece,0x5028a8,10,src/game/cd_check_41d4c0.cpp,4,0,game data
-piece,0x5028a0,7,src/game/cd_check_41d4c0.cpp,3,0,game data
+piece,0x502914,10,src/game/cd_check.cpp,19,0,game data
+piece,0x502904,12,src/game/cd_check.cpp,15,0,game data
+piece,0x5028e8,14,src/game/cd_check.cpp,13,0,game data
+piece,0x5028dc,9,src/game/cd_check.cpp,12,0,game data
+piece,0x5028d8,3,src/game/cd_check.cpp,9,0,game data
+piece,0x5028cc,10,src/game/cd_check.cpp,8,0,game data
+piece,0x5028c4,6,src/game/cd_check.cpp,7,0,game data
+piece,0x5028bc,6,src/game/cd_check.cpp,6,0,game data
+piece,0x5028b4,6,src/game/cd_check.cpp,5,0,game data
+piece,0x5028a8,10,src/game/cd_check.cpp,4,0,game data
+piece,0x5028a0,7,src/game/cd_check.cpp,3,0,game data
 piece,0x502850,14,src/ingame/control_panel_41c060.cpp,3,0,game data
 piece,0x4fcc8c,4,src/ingame/control_panel_41bd10.cpp,3,0,game data
 piece,0x4fcca0,4,src/ingame/control_panel_41bd10.cpp,3,4,game data
@@ -11954,8 +11954,8 @@ same,0x5024fc,15,src/game/console_commands_417600.cpp,4,0,
 same,0x4fcc88,4,src/ingame/control_panel_41ace0.cpp,9,0,
 same,0x502820,5,src/ingame/control_panel_41ace0.cpp,7,0,
 same,0x4fcc8c,4,src/ingame/control_panel_41ba60.cpp,3,4,
-same,0x5028f8,9,src/game/cd_check_41d6a0.cpp,5,0,
-same,0x502910,2,src/game/cd_check_41d7b0.cpp,3,0,
+same,0x5028f8,9,src/game/cd_check.cpp,14,0,
+same,0x502910,2,src/game/cd_check.cpp,18,0,
 same,0x502a20,3,src/frontend/endgame_41eb60.cpp,3,0,
 same,0x502a78,11,src/frontend/endgame_41ec50.cpp,5,0,
 same,0x502ae8,3,src/frontend/endgame_41f0a0.cpp,3,0,
