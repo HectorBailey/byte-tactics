@@ -272,7 +272,7 @@ extern unsigned int g_netStatsTick;                                             
 extern unsigned int g_byteRatesTick;                                                          // 0x511ddc, 4 bytes; 1 of 1 files
 extern int DAT_00511de0;                                                                      // 0x511de0, 4 bytes; 2 of 2 files
 extern int DAT_00511de4;                                                                      // 0x511de4, 4 bytes; 1 of 1 files
-extern Game* g_game;                                                                          // 0x511de8, 4 bytes; 795 of 902 files (conflicting: shape)
+extern Game* g_game;                                                                          // 0x511de8, 4 bytes; 795 of 901 files (conflicting: shape)
 extern int DAT_00511dec;                                                                      // 0x511dec, 4 bytes; 1 of 1 files
 extern unsigned char DAT_00511f80[16];                                                        // 0x511f80, 16 bytes; CMemoryCache by value in 5 of 5 files
 extern int DAT_00511f90;                                                                      // 0x511f90, 4 bytes; 1 of 1 files
@@ -505,12 +505,13 @@ extern int DAT_0051e540;                                                        
 extern int DAT_0051e544;                                                                      // 0x51e544, 4 bytes; 1 of 1 files
 extern int (__stdcall* DAT_0051e54c)(int*, int);                                              // 0x51e54c, 4 bytes; 1 of 1 files
 extern int (__stdcall* DAT_0051e554)(char*);                                                  // 0x51e554, 4 bytes; 1 of 1 files
-extern void (__cdecl* DAT_0051e558)(void);                                                    // 0x51e558, 4 bytes; 2 of 2 files
+extern void (__cdecl* DAT_0051e558)(void);                                                    // 0x51e558, 4 bytes; 1 of 1 files
 extern unsigned char DAT_0051e55c[4];                                                         // 0x51e55c, 4 bytes; nothing refers to it
 extern unsigned char g_reportPlayerName[20];                                                  // 0x51e560, 20 bytes; Name_0046c620 by value in 1 of 1 files
 extern void (__stdcall* DAT_0051e578)(void (__stdcall*)(int), int (__stdcall*)(char*, int));  // 0x51e578, 4 bytes; 1 of 1 files
-extern int (__stdcall* DAT_0051e588)(int);                                                    // 0x51e588, 4 bytes; 2 of 2 files
-extern int DAT_0051e590;                                                                      // 0x51e590, 4 bytes; 4 of 4 files
+extern int (__stdcall* DAT_0051e588)(int);                                                    // 0x51e588, 4 bytes; 1 of 1 files
+extern int DAT_0051e58c;                                                                      // 0x51e58c, 4 bytes; 3 of 4 files (conflicting: shape)
+extern int DAT_0051e590;                                                                      // 0x51e590, 4 bytes; 3 of 3 files
 extern int g_reportFlags;                                                                     // 0x51e594, 4 bytes; 2 of 2 files
 extern char g_unitSyncStatusText[104];                                                        // 0x51e5a0, 104 bytes; 1 of 1 files
 extern char DAT_0051e608;                                                                     // 0x51e608, 1 bytes; 18 of 18 files
@@ -704,7 +705,7 @@ extern int DAT_0052a4f4;                                                        
 extern void* DAT_0052a4f8;                                                                    // 0x52a4f8, 4 bytes; 3 of 3 files
 extern long DAT_0052a4fc;                                                                     // 0x52a4fc, 4 bytes; 2 of 3 files (conflicting: signedness or const)
 
-// Not declared: 233 globals defined in a data file or whose type is not settled (see data/globals.csv).
+// Not declared: 232 globals defined in a data file or whose type is not settled (see data/globals.csv).
 //   0x513000 g_packetManager: defined in src/network/packets_460e20.cpp
 //   0x5119c0 g_playerAI: PlayerAI*[] (11), void*[] (5), Owner*[] (3), Player_40b0d0*[] (1), and 2 more
 //   0x51fbd0 g_display: void* (4), int (2), Display_004b4f50* (1), Display_004b5370* (1), and 14 more
@@ -726,14 +727,12 @@ extern long DAT_0052a4fc;                                                       
 //   0x5129ac DAT_005129ac: char* (4), int* (1), void* (1)
 //   0x512f71 DAT_00512f71: char (3), int (2), unsigned char (1)
 //   0x512f75 DAT_00512f75: char[] (4), char (2)
-//   0x51e58c DAT_0051e58c: int (4), void* (2)
 //   0x51e6a0 g_losTables: defined in src/map/line_of_sight_4814c0.cpp
 //   0x526ff4 DAT_00526ff4: char* (4), void* (2)
 //   0x5120b8 DAT_005120b8: Entry_00428730[10] (1), char[] (1), Entry_004287d0[10] (1), Entry_00428850[10] (1), and 1 more
 //   0x512c84 DAT_00512c84: part of another global: DAT_00512c80+0x4
 //   0x512d90 DAT_00512d90: part of another global: DAT_00512c80+0x110
 //   0x512f49 DAT_00512f49: part of another global: DAT_00512f18+0x31
-//   0x51e574 DAT_0051e574: PlayerInfo_0046c2a0** (1), PlayerInfo_0046bce0** (1), ElemA_0046c190** (1), void* (1), and 1 more
 //   0x51e828 DAT_0051e828: unsigned int[680] (1), CdLists_490f80 (1), int[680] (1), int[] (1), and 1 more
 //   0x51fbe0 DAT_0051fbe0: part of another global: DAT_0051fbd8+0x8
 //   0x51fc80 g_timerCount: part of another global: DAT_0051fbd8+0xa8
@@ -750,7 +749,7 @@ extern long DAT_0052a4fc;                                                       
 //   0x512f55 DAT_00512f55: part of another global: DAT_00512f18+0x3d
 //   0x512f59 DAT_00512f59: part of another global: DAT_00512f18+0x41
 //   0x512fe8 DAT_00512fe8: Class_004c6a60* (2), void* (1), int (1)
-//   0x51e57c DAT_0051e57c: ScoreBoard_0046c2a0** (1), ScoreBoard_0046bce0** (1), ElemB_0046c190** (1), void* (1)
+//   0x51e574 DAT_0051e574: PlayerInfo_0046c2a0** (1), PlayerInfo_0046bce0** (1), void* (1), int* (1)
 //   0x51fbc0 DAT_0051fbc0$S425: defined in src/util/int_map_4b2290.cpp
 //   0x528ab4 DAT_00528ab4: void* (2), void (__stdcall*)(void) (1), int (__stdcall*)(void*, unsigned long, unsigned long*, Line_004de550*) (1)
 //   0x528acc DAT_00528acc: void* (2), void (__stdcall*)(void) (1), int (__stdcall*)(void*, unsigned long, int*, void*) (1)
@@ -774,7 +773,7 @@ extern long DAT_0052a4fc;                                                       
 //   0x512ca8 DAT_00512ca8: part of another global: DAT_00512c80+0x28
 //   0x512d48 DAT_00512d48: part of another global: DAT_00512c80+0xc8
 //   0x512ff4 DAT_00512ff4: Class_004c6a60* (2), void* (1)
-//   0x51e550 DAT_0051e550: char** (1), void** (1), int (1)
+//   0x51e57c DAT_0051e57c: ScoreBoard_0046c2a0** (1), ScoreBoard_0046bce0** (1), void* (1)
 //   0x51e660 DAT_0051e660: int* (2), char* (1)
 //   0x51f2e8 DAT_0051f2e8: int (1), int* (1), char* (1)
 //   0x51fb50 DAT_0051fb50: char[] (2), const char[] (1)
@@ -816,6 +815,7 @@ extern long DAT_0052a4fc;                                                       
 //   0x512c98 DAT_00512c98: part of another global: DAT_00512c80+0x18
 //   0x512d28 DAT_00512d28: part of another global: DAT_00512c80+0xa8
 //   0x51e548 DAT_0051e548: int (__stdcall*)(int, char*) (1), int (__stdcall*)(int, int) (1)
+//   0x51e550 DAT_0051e550: char** (1), int (1)
 //   0x51e580 DAT_0051e580: int (__stdcall*)(void) (1), void (__stdcall*)(void) (1)
 //   0x51e584 DAT_0051e584: int (__stdcall*)(int, int, int, int, int, int, int, int, int, int) (1), int (__stdcall*)(int, Rect_0046c620*, void*, int, Name_0046c620*, int, int, int, void*, void*) (1)
 //   0x51e640 DAT_0051e640: Anim_00478b40 (1), int (1)

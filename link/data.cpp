@@ -606,6 +606,7 @@ unsigned char DAT_0051e55c[4];  // 0x51e55c .bss
 unsigned char g_reportPlayerName[20];  // 0x51e560 .bss
 void (__stdcall* DAT_0051e578)(void (__stdcall*)(int), int (__stdcall*)(char*, int));  // 0x51e578 .bss
 int (__stdcall* DAT_0051e588)(int);  // 0x51e588 .bss
+int DAT_0051e58c;  // 0x51e58c .bss
 int DAT_0051e590;  // 0x51e590 .bss
 int g_reportFlags;  // 0x51e594 .bss
 char g_unitSyncStatusText[104];  // 0x51e5a0 .bss
