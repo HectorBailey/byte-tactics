@@ -253,15 +253,15 @@ void StartMeteorShower()
 void __stdcall SaveMeteors(HapiBank* file)
 {
     file->OpenAccount("Meteor");
-    ((HapiBank*)file)->SetIntegerItem("Enabled", g_meteorsEnabled);
-    ((HapiBank*)file)->SetIntegerItem("Active", g_meteorActive);
-    ((HapiBank*)file)->SetIntegerItem("Next Strike Time", g_meteorNextStrikeTime);
-    ((HapiBank*)file)->SetIntegerItem("Time Strike Ends", g_meteorStrikeEndTime);
-    ((HapiBank*)file)->SetIntegerItem("Next Hit Time", g_meteorNextHitTime);
-    ((HapiBank*)file)->SetIntegerItem("Origin X", g_meteorOrigin.x);
-    ((HapiBank*)file)->SetIntegerItem("Origin Z", g_meteorOrigin.y);
-    ((HapiBank*)file)->SetIntegerItem("Target X", g_meteorTarget.x);
-    ((HapiBank*)file)->SetIntegerItem("Target Z", g_meteorTarget.y);
+    file->SetIntegerItem("Enabled", g_meteorsEnabled);
+    file->SetIntegerItem("Active", g_meteorActive);
+    file->SetIntegerItem("Next Strike Time", g_meteorNextStrikeTime);
+    file->SetIntegerItem("Time Strike Ends", g_meteorStrikeEndTime);
+    file->SetIntegerItem("Next Hit Time", g_meteorNextHitTime);
+    file->SetIntegerItem("Origin X", g_meteorOrigin.x);
+    file->SetIntegerItem("Origin Z", g_meteorOrigin.y);
+    file->SetIntegerItem("Target X", g_meteorTarget.x);
+    file->SetIntegerItem("Target Z", g_meteorTarget.y);
 }
 
 // Reads the "Meteor" section into the meteor weapon globals.
@@ -269,15 +269,15 @@ void __stdcall SaveMeteors(HapiBank* file)
 void __stdcall LoadMeteors(HapiBank* file)
 {
     file->OpenAccount("Meteor");
-    g_meteorsEnabled = ((HapiBank*)file)->GetIntegerItem("Enabled", 0);
-    g_meteorActive = ((HapiBank*)file)->GetIntegerItem("Active", 0);
-    g_meteorNextStrikeTime = ((HapiBank*)file)->GetIntegerItem("Next Strike Time", 0);
-    g_meteorStrikeEndTime = ((HapiBank*)file)->GetIntegerItem("Time Strike Ends", 0);
-    g_meteorNextHitTime = ((HapiBank*)file)->GetIntegerItem("Next Hit Time", 0);
-    g_meteorOrigin.x = ((HapiBank*)file)->GetIntegerItem("Origin X", 0);
-    g_meteorOrigin.y = ((HapiBank*)file)->GetIntegerItem("Origin Z", 0);
-    g_meteorTarget.x = ((HapiBank*)file)->GetIntegerItem("Target X", 0);
-    g_meteorTarget.y = ((HapiBank*)file)->GetIntegerItem("Target Z", 0);
+    g_meteorsEnabled = file->GetIntegerItem("Enabled", 0);
+    g_meteorActive = file->GetIntegerItem("Active", 0);
+    g_meteorNextStrikeTime = file->GetIntegerItem("Next Strike Time", 0);
+    g_meteorStrikeEndTime = file->GetIntegerItem("Time Strike Ends", 0);
+    g_meteorNextHitTime = file->GetIntegerItem("Next Hit Time", 0);
+    g_meteorOrigin.x = file->GetIntegerItem("Origin X", 0);
+    g_meteorOrigin.y = file->GetIntegerItem("Origin Z", 0);
+    g_meteorTarget.x = file->GetIntegerItem("Target X", 0);
+    g_meteorTarget.y = file->GetIntegerItem("Target Z", 0);
 }
 
 // FUNCTION: 0x438320
