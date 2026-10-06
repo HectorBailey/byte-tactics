@@ -1172,9 +1172,9 @@ address,size,file,symbol,status,similarity
 0x45b030,105,src/graphics/model_render_45b030.cpp,?RestorePieceVertices@@YIHPAUPiece_0045b030@@H@Z,matched,100.0
 0x45b0a0,174,src/graphics/model_render_45b0a0.cpp,?PoseModel@@YIXPAUModel_0045b0a0@@PAUPiece_0045b030@@H@Z,matched,100.0
 0x45b150,242,src/graphics/model_render_45b150.cpp,?TransformPieces@@YIXPAUSpotState@@PAUPiece_0045b150@@PAFPAUVec3@@H@Z,matched,100.0
-0x45b480,13,src/network/online_45b480.cpp,?OnlineTranslate@@YGXPAE@Z,matched,100.0
-0x45b640,27,src/network/online_45b640.cpp,?OnlineUnload@@YGXXZ,matched,100.0
-0x45b660,6,src/network/online_45b660.cpp,?IsOnlineConfigLoaded@@YGHXZ,matched,100.0
+0x45b480,13,src/network/online.cpp,?OnlineTranslate@@YGXPAE@Z,matched,100.0
+0x45b640,27,src/network/online.cpp,?OnlineUnload@@YGXXZ,matched,100.0
+0x45b660,6,src/network/online.cpp,?IsOnlineConfigLoaded@@YGHXZ,matched,100.0
 0x45b800,30,src/frontend/options_45b800.cpp,?SetDirectConnectAddress@@YGXPAD@Z,matched,100.0
 0x45b820,50,src/frontend/options_45b820.cpp,?FUN_0045b820@@YGXHPAD@Z,matched,100.0
 0x45b860,32,src/frontend/options_45b860.cpp,?FUN_0045b860@@YGXH@Z,matched,100.0
