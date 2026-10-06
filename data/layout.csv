@@ -3967,10 +3967,10 @@ piece,0x509ce8,57,src/util/hapi_bank.cpp,19,0,game data
 piece,0x509ce0,5,src/util/hapi_bank.cpp,14,0,game data
 piece,0x509cd4,9,src/util/hapi_bank.cpp,10,0,game data
 piece,0x509ca4,45,src/util/hapi_bank.cpp,9,0,game data
-piece,0x509c94,13,src/units/cob_script.cpp,68,0,game data
-piece,0x509c84,14,src/units/cob_script.cpp,23,0,game data
-piece,0x509c74,16,src/units/cob_script.cpp,22,0,game data
-piece,0x4fdb00,84,src/units/cob_script.cpp,3,0,game data
+piece,0x509c94,13,src/units/cob.cpp,72,0,game data
+piece,0x509c84,14,src/units/cob.cpp,23,0,game data
+piece,0x509c74,16,src/units/cob.cpp,22,0,game data
+piece,0x4fdb00,84,src/units/cob.cpp,3,0,game data
 piece,0x509c6c,8,src/gui/listbox.cpp,7,0,game data
 piece,0x509c60,11,src/gui/file_list.cpp,40,0,game data
 piece,0x509c54,12,src/gui/file_list.cpp,37,0,game data

@@ -1,9 +1,12 @@
-// Decompiled by Sonnet, Haiku, Opus, deepseek-v4.1-flash, GPT-6, space-bunny-free, deepseek-v4.1 and GPT-5.6-Terra. Names are provisional.
+// Decompiled by Sonnet, Haiku, Opus, deepseek-v4.1-flash, GPT-6, space-bunny-free, deepseek-v4.1, GPT-5.6-Terra, LongCat 2.5 Preview Free, GPT-6.1-sol, mimo-v2.6-pro, claude-sonnet-5-5 and Space Bunny Free. Names are provisional.
 // CobScript: the interpreter of a unit's COB script, an abstract base class
 // of 0x540 bytes (vtable 0x4fdb00, 21 slots). Slots 0-6 are pure; each is
 // named after the one override that fills it, in the vtable of the only
 // derived class, UnitScript (src/units/unit_script.cpp). Slot 20 is the
 // virtual destructor (the vtable holds its scalar deleting destructor).
+//
+// The units/cob module, merged from src/units/cob_script.cpp,
+// src/units/cob_4b0c40.cpp and src/units/cob_4b1c00.cpp.
 
 #include <string.h>
 #include <stdlib.h>
@@ -56,16 +59,36 @@ struct Channel
     }
 };
 
+// 0x4b0c40's view of a channel. Its channel array starts at offset 0, so its
+// fields sit 0x1c after the real Channel's: `count` is the real `sp`, `values`
+// the real `stack` and `unknown_3c` the real `callback`. The function does not
+// use activeCount, so the view's offset does not matter.
+struct Channel_004b0c40 {
+    char unknown_0[0x24];
+    int count;                         // +0x24
+    char unknown_28[0x3c - 0x28];
+    int unknown_3c;                    // +0x3c
+    int values[5];                     // +0x40
+    char unknown_54[0xa4 - 0x54];
+};
+
 // The script's state of one piece: where it is moving and turning to.
+// `e` is 0x4b1c00's view of the same record, e[0..5] being move, moveSpeed,
+// turn, turnSpeed, spin and acceleration.
 struct Piece
 {
     int active;
-    int move[3];
-    int moveSpeed[3];
-    int turn[3];
-    int turnSpeed[3];
-    int spin[3];
-    int acceleration[3];
+    union {
+        struct {
+            int move[3];
+            int moveSpeed[3];
+            int turn[3];
+            int turnSpeed[3];
+            int spin[3];
+            int acceleration[3];
+        };
+        int e[6][3];
+    };
 };
 
 // The saved state of a script (0x528 bytes) and of one piece (0x6c bytes).
@@ -151,8 +174,8 @@ class CobScript
     int StartScriptWithArgs(char* name, Callback* callback, int update, int count, int a, int b, int c, int d);
     int StartScriptWithArgsByIndex(int index, Callback* callback, int update, int count, int a, int b, int c, int d);
     int QueryScript(char* name, int* param_2, int* param_3, int* param_4, int* param_5);
-    // 0x4b0c40, in cob_4b0c40.cpp: it matches only addressing the channels
-    // from `this + i * 0xa4`, as its own view of the class does.
+    // 0x4b0c40: it matches only through the Channel_004b0c40 view, addressing
+    // the channels from `this + i * 0xa4`.
     int QueryScriptByIndex(int index, int* p2, int* p3, int* p4, int* p5);
     void RemoveCallback(Callback* callback);
     void RunScripts(int param_1);
@@ -163,8 +186,8 @@ class CobScript
             if ((channels[i].state & 0xfff00000) == 0x2800000 && channels[i].waiting == index)
                 channels[i].state = 0x1000000;
     }
-    // 0x4b1c00, in cob_4b1c00.cpp: it matches only with <windows.h> before
-    // its own view of the class, and RunThread only without it.
+    // 0x4b1c00: it matches only indexing the piece record through Piece's
+    // e[6][3] view (see the note at its definition).
     void AnimatePieces(int param_1);
     void SaveScriptState(HapiBank* file);
     int LoadScriptState(HapiBank* file);
@@ -397,6 +420,42 @@ int CobScript::StartScriptWithArgsByIndex(int index, Callback* callback, int upd
 int CobScript::QueryScript(char* name, int* param_2, int* param_3, int* param_4, int* param_5)
 {
     return QueryScriptByIndex(FindScript(name), param_2, param_3, param_4, param_5);
+}
+
+// Index-taking core of 0x4b0bc0: claims a channel for `index` (0x4b08c0),
+// pushes the four pointed-to values (0 when the pointer is null) onto the
+// channel's value list, processes the channel with 0x4b0da0, then writes the
+// four processed values back through the pointers. Compare 0x4b0bc0, its
+// name-taking wrapper.
+//
+// The channel is viewed from `this + index * 0xa4` with the fields at +0x24
+// (the real `sp`, starts at -1), +0x3c (the real `callback`) and +0x40 (the
+// real `stack`), the offsets 0x1c past the real Channel; addressing it through
+// the real `channels[i]` makes MSVC fold the 0x1c base into every field offset
+// instead of the original's single scaled base.
+//
+// Binding a reference to the count (`int& cnt = c->count;`) is what keeps the
+// count store in the fourth push, which a plain `++c->count` drops.
+// FUNCTION: 0x4b0c40
+int CobScript::QueryScriptByIndex(int index, int* p2, int* p3, int* p4, int* p5)
+{
+    int i = ((CobScript*)this)->StartThread(index);
+    if (i < 0)
+        return 0;
+    Channel_004b0c40* c = (Channel_004b0c40*)((char*)this + i * 0xa4);
+    c->unknown_3c = 0;
+    int& cnt = c->count;
+    c->values[++cnt] = p2 ? *p2 : 0;
+    c->values[++cnt] = p3 ? *p3 : 0;
+    c->values[++cnt] = p4 ? *p4 : 0;
+    c->values[++cnt] = p5 ? *p5 : 0;
+    c->count = 3;
+    ((CobScript*)this)->RunThread(i, 0);
+    if (p2) *p2 = c->values[0];
+    if (p3) *p3 = c->values[1];
+    if (p4) *p4 = c->values[2];
+    if (p5) *p5 = c->values[3];
+    return 1;
 }
 
 // FUNCTION: 0x4b0d20
@@ -1009,6 +1068,96 @@ void CobScript::RunThread(unsigned int channel, int elapsed)
                 break;
             }
         } while (running);
+    }
+}
+
+// MATCH. The last 2 bytes (584 of 586) were the multiply: the original loads the
+// parameter into the destination register first (`mov ebp, [esp+0x2c]; imul ebp, edx`,
+// and in the turn block `mov ecx, [esp+0x2c]; ... imul ecx, eax`), so which operand of
+// the commutative `*` MSVC loads first matters here.
+// In the function's own file the multiply only landed with `#include <windows.h>`; in
+// the merged file it lands without it. What the merge does need is the record indexed
+// through Piece's e[6][3] view: with the named arrays (`pieces[i].move[i]` and friends)
+// MSVC swaps the base and index of every piece access (`[ecx + esi]` for the original's
+// `[esi + ecx]`, 96.9%); the two-dimensional view gives the original stream.
+//
+// Advance every moving piece by param_1 (a percentage) of its per-axis speed:
+// e[1] is the translation speed toward the e[0] limit, e[5] the turn speed with the
+// e[4] limit, e[3] the current angle, e[2] the wanted angle (-1 means none). Each
+// element that still moves leaves its record's active flag set, and any such flag
+// keeps `changed` (the "something is still animating" flag) at 1.
+// FUNCTION: 0x4b1c00
+void CobScript::AnimatePieces(int param_1)
+{
+    if (param_1 == 0)
+        return;
+    if (changed == 0)
+        return;
+    changed = 0;
+    for (int i = 0; i < table->pieceCount; i++) {
+        if (pieces[i].active != 0) {
+            pieces[i].active = 0;
+            for (int j = 0; j <= 2; j++) {
+                if (pieces[i].e[1][j] != 0) {
+                    int v = GetPieceTranslation(i, j);
+                    v += param_1 * pieces[i].e[1][j];
+                    if (pieces[i].e[1][j] > 0) {
+                        if (v >= pieces[i].e[0][j]) {
+                            v = pieces[i].e[0][j];
+                            pieces[i].e[1][j] = 0;
+                        } else
+                            pieces[i].active = 1;
+                    } else {
+                        if (v <= pieces[i].e[0][j]) {
+                            v = pieces[i].e[0][j];
+                            pieces[i].e[1][j] = 0;
+                        } else
+                            pieces[i].active = 1;
+                    }
+                    SetPieceTranslation(i, j, v);
+                }
+                if (pieces[i].e[5][j] != 0) {
+                    pieces[i].e[3][j] += pieces[i].e[5][j];
+                    if (pieces[i].e[5][j] > 0) {
+                        if (pieces[i].e[3][j] >= pieces[i].e[4][j]) {
+                            pieces[i].e[3][j] = pieces[i].e[4][j];
+                            pieces[i].e[5][j] = 0;
+                        }
+                    } else {
+                        if (pieces[i].e[3][j] <= pieces[i].e[4][j]) {
+                            pieces[i].e[3][j] = pieces[i].e[4][j];
+                            pieces[i].e[5][j] = 0;
+                        }
+                    }
+                }
+                if (pieces[i].e[3][j] != 0) {
+                    int r = GetPieceRotation(i, j);
+                    int cur = r;
+                    int step = param_1 * pieces[i].e[3][j];
+                    r += step;
+                    int want = pieces[i].e[2][j];
+                    if (want != -1) {
+                        if (pieces[i].e[3][j] > 0) {
+                            if ((want - cur + 0x10000) % 0x10000 <= step) {
+                                r = want;
+                                pieces[i].e[3][j] = 0;
+                            } else
+                                pieces[i].active = 1;
+                        } else {
+                            if ((cur - want + 0x10000) % 0x10000 <= -step) {
+                                r = want;
+                                pieces[i].e[3][j] = 0;
+                            } else
+                                pieces[i].active = 1;
+                        }
+                    } else
+                        pieces[i].active = 1;
+                    SetPieceRotation(i, j, r & 0xffff);
+                }
+            }
+            if (pieces[i].active != 0)
+                changed = 1;
+        }
     }
 }
 
