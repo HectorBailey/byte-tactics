@@ -2047,11 +2047,11 @@ address,size,file,symbol,status,similarity
 0x495230,601,src/ingame/dialogs_495230.cpp,?UpdateFramePacing@@YGXXZ,matched,100.0
 0x495490,547,src/ingame/dialogs_495490.cpp,?RunGameSteps@@YGXH@Z,matched,100.0
 0x4956c0,416,src/ingame/dialogs_4956c0.cpp,?FUN_004956c0@@YGXH@Z,matched,100.0
-0x495860,83,src/ingame/keys_495860.cpp,?SelectStopOrder@@YGXXZ,matched,100.0
-0x4958c0,103,src/ingame/keys_4958c0.cpp,?FUN_004958c0@@YGXH@Z,matched,100.0
-0x495930,256,src/ingame/keys_495930.cpp,?BuildScreenshotPath@@YGXPADPBD11@Z,matched,100.0
-0x495a30,1105,src/ingame/keys_495a30.cpp,?WriteScreenshot@@YGXPAD0HHHH@Z,matched,100.0
-0x495e90,2292,src/ingame/keys_495e90.cpp,?HandleGameKey@@YGXXZ,matched,100.0
+0x495860,83,src/ingame/keys.cpp,?SelectStopOrder@@YGXXZ,matched,100.0
+0x4958c0,103,src/ingame/keys.cpp,?FUN_004958c0@@YGXH@Z,matched,100.0
+0x495930,256,src/ingame/keys.cpp,?BuildScreenshotPath@@YGXPADPBD11@Z,matched,100.0
+0x495a30,1105,src/ingame/keys.cpp,?WriteScreenshot@@YGXPAD0HHHH@Z,matched,100.0
+0x495e90,2292,src/ingame/keys.cpp,?HandleGameKey@@YGXXZ,matched,100.0
 0x496790,711,src/game/main_loop.cpp,?FUN_00496790@@YGXXZ,matched,100.0
 0x496a60,175,src/game/main_loop.cpp,?FUN_00496a60@@YGXXZ,matched,100.0
 0x496b10,148,src/game/main_loop.cpp,?FUN_00496b10@@YGXXZ,matched,100.0

@@ -4125,17 +4125,17 @@ piece,0x509348,8,src/game/game_load_497180.cpp,5,0,game data
 piece,0x509570,12,src/game/game_load_497180.cpp,3,0,game data
 piece,0x509534,59,src/game/main_loop.cpp,20,0,game data
 piece,0x5094f8,5,src/game/main_loop.cpp,3,0,game data
-piece,0x509528,12,src/ingame/keys_495e90.cpp,11,0,game data
-piece,0x50951c,12,src/ingame/keys_495e90.cpp,10,0,game data
-piece,0x509510,10,src/ingame/keys_495e90.cpp,9,0,game data
-piece,0x509500,13,src/ingame/keys_495e90.cpp,8,0,game data
-piece,0x5094f0,8,src/ingame/keys_495e90.cpp,6,0,game data
-piece,0x5094e8,7,src/ingame/keys_495e90.cpp,5,0,game data
-piece,0x501520,13,src/ingame/keys_495e90.cpp,4,0,game data
-piece,0x5094e4,4,src/ingame/keys_495a30.cpp,4,0,game data
-piece,0x5094d8,11,src/ingame/keys_495a30.cpp,3,0,game data
-piece,0x5094cc,11,src/ingame/keys_495930.cpp,4,0,game data
-piece,0x5094bc,14,src/ingame/keys_495930.cpp,3,0,game data
+piece,0x509528,12,src/ingame/keys.cpp,24,0,game data
+piece,0x50951c,12,src/ingame/keys.cpp,23,0,game data
+piece,0x509510,10,src/ingame/keys.cpp,22,0,game data
+piece,0x509500,13,src/ingame/keys.cpp,21,0,game data
+piece,0x5094f0,8,src/ingame/keys.cpp,19,0,game data
+piece,0x5094e8,7,src/ingame/keys.cpp,18,0,game data
+piece,0x501520,13,src/ingame/keys.cpp,17,0,game data
+piece,0x5094e4,4,src/ingame/keys.cpp,13,0,game data
+piece,0x5094d8,11,src/ingame/keys.cpp,12,0,game data
+piece,0x5094cc,11,src/ingame/keys.cpp,9,0,game data
+piece,0x5094bc,14,src/ingame/keys.cpp,8,0,game data
 piece,0x4fda28,8,src/ingame/dialogs_495230.cpp,3,0,game data
 piece,0x4fda30,8,src/ingame/dialogs_495230.cpp,3,8,game data
 piece,0x4fda38,8,src/ingame/dialogs_495230.cpp,3,16,game data
@@ -12334,7 +12334,7 @@ same,0x5093f8,7,src/ingame/dialogs_494050.cpp,4,0,
 same,0x509400,9,src/ingame/dialogs_494050.cpp,3,0,
 same,0x502b38,8,src/ingame/dialogs_4948e0.cpp,6,0,
 same,0x503130,12,src/ingame/dialogs_495010.cpp,7,0,
-same,0x503130,12,src/ingame/keys_495e90.cpp,3,0,
+same,0x503130,12,src/ingame/keys.cpp,16,0,
 same,0x504924,16,src/game/game_load_497180.cpp,4,0,
 same,0x5091d4,10,src/game/game_load_497f40.cpp,19,0,
 same,0x504ab8,8,src/game/game_load_497f40.cpp,13,0,
