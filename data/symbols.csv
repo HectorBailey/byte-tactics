@@ -193,7 +193,7 @@ address,name
 0x40da70,Pathfinder::ExpandNeighbour
 0x40df00,Pathfinder::ExpandBestNode
 0x40e050,Pathfinder::TracePath
-0x40e160,Class_0040e160::ProbeStraightPath
+0x40e160,Pathfinder::ProbeStraightPath
 0x40e630,Pathfinder::StartSearch
 0x40e9a0,Pathfinder::FUN_0040e9a0
 0x40e9c0,Pathfinder::FUN_0040e9c0

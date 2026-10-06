@@ -5827,7 +5827,7 @@ piece,0x501ba4,15,src/orders/vtol_orders_4111b0.cpp,6,0,game data
 piece,0x4fcc60,4,src/orders/vtol_orders_410850.cpp,3,0,game data
 piece,0x501b1c,15,src/orders/vtol_orders_40fbe0.cpp,3,0,game data
 piece,0x5012bc,15,src/orders/vtol_orders_40f7d0.cpp,3,0,game data
-piece,0x50192c,28,src/ai/pathfind_40e9e0.cpp,3,0,game data
+piece,0x50192c,28,src/ai/pathfinder.cpp,25,0,game data
 piece,0x501908,17,src/ai/ai_player_40c250.cpp,19,0,game data
 piece,0x5018ec,25,src/ai/ai_player_40c250.cpp,18,0,game data
 piece,0x5018e4,8,src/ai/ai_player_40c250.cpp,17,0,game data
