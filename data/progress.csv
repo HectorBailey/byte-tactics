@@ -567,11 +567,11 @@ address,size,file,symbol,status,similarity
 0x42db90,351,src/units/unit_types_42db90.cpp,?FreeUnitTypes@@YGXXZ,matched,100.0
 0x42dcf0,1061,src/units/unit_types_42dcf0.cpp,?LoadDownloadMenus@@YGXXZ,matched,100.0
 0x42e120,21,src/units/unit_types_42e120.cpp,?FreeDownloadMenus@@YGXXZ,matched,100.0
-0x42e140,144,src/graphics/palette_tables_42e140.cpp,?LoadAlphaTable@@YGPAIPAX@Z,matched,100.0
-0x42e1d0,144,src/graphics/palette_tables_42e1d0.cpp,?LoadShadeTable@@YGPAIPAX@Z,matched,100.0
-0x42e260,144,src/graphics/palette_tables_42e260.cpp,?LoadLightTable@@YGPAIPAX@Z,matched,100.0
-0x42e2f0,13,src/graphics/palette_tables_42e2f0.cpp,?MakeGrayTable@@YGXI@Z,matched,100.0
-0x42e300,13,src/graphics/palette_tables_42e300.cpp,?MakeBlueTable@@YGXI@Z,matched,100.0
+0x42e140,144,src/graphics/palette_tables.cpp,?LoadAlphaTable@@YGPAIPAX@Z,matched,100.0
+0x42e1d0,144,src/graphics/palette_tables.cpp,?LoadShadeTable@@YGPAIPAX@Z,matched,100.0
+0x42e260,144,src/graphics/palette_tables.cpp,?LoadLightTable@@YGPAIPAX@Z,matched,100.0
+0x42e2f0,13,src/graphics/palette_tables.cpp,?MakeGrayTable@@YGXI@Z,matched,100.0
+0x42e300,13,src/graphics/palette_tables.cpp,?MakeBlueTable@@YGXI@Z,matched,100.0
 0x42e310,289,src/weapons/weapon_types.cpp,?LoadWeaponTypes@@YGXXZ,matched,100.0
 0x42e440,3923,src/weapons/weapon_types.cpp,?LoadWeaponType@@YGXPAVClass_004c4440@@@Z,matched,100.0
 0x42f3a0,167,src/weapons/weapon_types.cpp,?FreeWeaponTypes@@YGXXZ,matched,100.0

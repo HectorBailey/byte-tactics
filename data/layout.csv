@@ -5387,10 +5387,10 @@ piece,0x503fac,11,src/weapons/weapon_types.cpp,12,0,game data
 piece,0x503fa0,9,src/weapons/weapon_types.cpp,11,0,game data
 piece,0x503f94,11,src/weapons/weapon_types.cpp,10,0,game data
 piece,0x503f8c,7,src/weapons/weapon_types.cpp,9,0,game data
-piece,0x50339c,4,src/graphics/palette_tables_42e260.cpp,5,0,game data
-piece,0x5033a4,8,src/graphics/palette_tables_42e260.cpp,4,0,game data
-piece,0x503398,4,src/graphics/palette_tables_42e1d0.cpp,5,0,game data
-piece,0x5033a0,4,src/graphics/palette_tables_42e140.cpp,5,0,game data
+piece,0x50339c,4,src/graphics/palette_tables.cpp,11,0,game data
+piece,0x5033a4,8,src/graphics/palette_tables.cpp,4,0,game data
+piece,0x503398,4,src/graphics/palette_tables.cpp,8,0,game data
+piece,0x5033a0,4,src/graphics/palette_tables.cpp,5,0,game data
 piece,0x503730,9,src/units/unit_types_42dcf0.cpp,9,0,game data
 piece,0x503f7c,13,src/units/unit_types_42dcf0.cpp,8,0,game data
 piece,0x503f70,9,src/units/unit_types_42dcf0.cpp,7,0,game data
