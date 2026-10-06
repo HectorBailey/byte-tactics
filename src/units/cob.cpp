@@ -4,9 +4,6 @@
 // named after the one override that fills it, in the vtable of the only
 // derived class, UnitScript (src/units/unit_script.cpp). Slot 20 is the
 // virtual destructor (the vtable holds its scalar deleting destructor).
-//
-// The units/cob module, merged from src/units/cob_script.cpp,
-// src/units/cob_4b0c40.cpp and src/units/cob_4b1c00.cpp.
 
 #include <string.h>
 #include <stdlib.h>

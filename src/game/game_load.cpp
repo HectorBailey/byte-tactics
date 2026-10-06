@@ -217,9 +217,8 @@ struct Cell_00498da0 {
     char unknown_c;
 };
 
-// One view of the game state, merged from the four partial views the module's
-// files declared. The ranges two views name differently sit in anonymous
-// unions, so each function keeps the names it matched with.
+// One view of the game state. The ranges two views name differently sit in
+// anonymous unions, so each function keeps the names it matched with.
 struct Game {
     char unknown_0[0xc];
     int field_c;                        // +0xc

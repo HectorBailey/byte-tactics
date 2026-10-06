@@ -295,7 +295,7 @@ public:
     void WriteBits(int value, int bits);
 };
 
-// Bit reader, the counterpart of the writer (see src/network/bit_reader.cpp).
+// Bit reader, the counterpart of the writer (see src/network/net_stats.cpp).
 class BitReader {
 public:
     unsigned int* data;                // +0x00

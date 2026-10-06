@@ -1,9 +1,9 @@
 // Decompiled by Opus, space-bunny-free, Sonnet, Space Bunny Free, Haiku and deepseek-v4.1-flash. Names are provisional.
 // The units/movement_class module: the 32-entry movement class table at
 // 0x512358, the passability maps it owns and the helpers that keep them
-// current. Gathered from the module's per-function files, so one Game, one
-// MovementClass, one MovementClassTable and one Class_00440500 cover the views
-// those files held (Class_00440500 keeps its own 32-byte view of MovementClass).
+// current. One Game, one MovementClass, one MovementClassTable and one
+// Class_00440500 cover the module's views (Class_00440500 keeps its own
+// 32-byte view of MovementClass).
 //
 // Nothing here uses <windows.h>: its symbols put RefreshPassMap and
 // SetPassMapCell in the symbol-id windows they match in (docs/c2-regalloc.md).

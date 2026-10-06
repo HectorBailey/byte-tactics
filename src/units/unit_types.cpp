@@ -1,8 +1,8 @@
 // Decompiled by deepseek-v4.1-flash, Opus, space-bunny-free, GPT-6, Sonnet and Claude Opus 5.5, finished by deepseek-v4.1-flash. Names are provisional.
 // The unit type registry: one UnitDef per unit, its FBI / COB data, the
-// movement classes, and the downloadable build menu tables. UnitDef,
-// TdfFile, TdfRecord, MovementClass and Game are merged from the module's
-// per-function views below.
+// movement classes, and the downloadable build menu tables. UnitDef, TdfFile,
+// TdfRecord, MovementClass and Game each have one definition; the views the
+// functions used sit in unions where they disagree.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

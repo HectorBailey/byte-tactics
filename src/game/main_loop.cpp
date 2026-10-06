@@ -212,8 +212,8 @@ struct Player_00496ce0 {               // 0x14b bytes, array at g_game+0x1b63
     };
 };
 
-// One view of the game state, merged from the nine partial views the module's
-// files declared. The ten team records and the sub-object at +0x1cd5 overlap
+// One view of the game state. The ten team records and the sub-object at
+// +0x1cd5 overlap
 // the same bytes, as do the name table at +0x37f5f and the timing block the
 // main loop reads there, so each pair sits in an anonymous union. Two views
 // name the pointer at +0x29a0 differently (team definitions, start-position
