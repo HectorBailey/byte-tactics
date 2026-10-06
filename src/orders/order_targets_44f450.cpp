@@ -1,7 +1,7 @@
 // Decompiled by Sonnet and Opus. Names are provisional.
-// The out-of-line destructor of Class_0044f010 (vtable 0x4fd458), derived
-// from Class_0044ef20 (see 0x44ef60.cpp for the family). It stores its own
-// vtable, unregisters the object, then the empty inline base destructor
+// The out-of-line destructor of Class_0044f010 (vtable 0x4fd458), derived from
+// Class_0044ef20 (see order_targets_44ef20.cpp for the family). It stores its
+// own vtable, unregisters the object, then the empty inline base destructor
 // stores 0x4fd428. Its scalar deleting destructor 0x44f040 inlines it.
 
 class Pathfinder {
@@ -18,7 +18,8 @@ struct Game {
 
 extern Game* g_game;
 
-class Base_00490a10 {                  // the object at +0x4 (see 0x490a10.cpp)
+// The object at +0x4 (see victory_490940.cpp).
+class Base_00490a10 {
 public:
     virtual ~Base_00490a10();
 };

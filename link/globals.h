@@ -133,7 +133,7 @@ extern char DAT_005069c0[8];                                                    
 extern char DAT_005069c8[8];                                                                  // 0x5069c8, 8 bytes; 2 of 2 files
 extern char DAT_005069d0[8];                                                                  // 0x5069d0, 8 bytes; 2 of 2 files
 extern char DAT_005069d8[20];                                                                 // 0x5069d8, 20 bytes; 1 of 1 files
-extern int g_usePacketManager;                                                                // 0x506dbc, 4 bytes; 26 of 27 files (one type, plus extern "C" references)
+extern int g_usePacketManager;                                                                // 0x506dbc, 4 bytes; 24 of 25 files (one type, plus extern "C" references)
 extern char DAT_00507318[32];                                                                 // 0x507318, 32 bytes; 1 of 1 files
 extern char DAT_005074e8[16];                                                                 // 0x5074e8, 16 bytes; 1 of 1 files
 extern char DAT_005074f8[16];                                                                 // 0x5074f8, 16 bytes; 1 of 1 files
@@ -269,7 +269,7 @@ extern unsigned int g_netStatsTick;                                             
 extern unsigned int g_byteRatesTick;                                                          // 0x511ddc, 4 bytes; 1 of 1 files
 extern int DAT_00511de0;                                                                      // 0x511de0, 4 bytes; 2 of 2 files
 extern int DAT_00511de4;                                                                      // 0x511de4, 4 bytes; 2 of 2 files
-extern Game* g_game;                                                                          // 0x511de8, 4 bytes; 889 of 1020 files (conflicting: shape)
+extern Game* g_game;                                                                          // 0x511de8, 4 bytes; 888 of 1019 files (conflicting: shape)
 extern int DAT_00511dec;                                                                      // 0x511dec, 4 bytes; 1 of 1 files
 extern unsigned char DAT_00511f80[16];                                                        // 0x511f80, 16 bytes; CMemoryCache by value in 5 of 5 files
 extern int DAT_00511f90;                                                                      // 0x511f90, 4 bytes; 1 of 1 files
@@ -797,7 +797,6 @@ extern long DAT_0052a4fc;                                                       
 //   0x4fcee8 DPAID_INet: defined in src/data/guids.cpp
 //   0x4fcf08 DPAID_ComPort: defined in src/data/guids.cpp
 //   0x4fcf68 IID_IDirectSound3DBuffer: defined in src/data/guids.cpp
-//   0x4fd488 DAT_004fd488: defined in src/data/vtables.cpp
 //   0x501d38 g_consoleCommands: defined in src/game/console_commands.cpp
 //   0x501f48 g_cheatCommands: defined in src/game/console_commands.cpp
 //   0x501fd0 g_debugCommands: defined in src/game/console_commands.cpp
@@ -878,6 +877,7 @@ extern long DAT_0052a4fc;                                                       
 //   0x4fcff8 DAT_004fcff8: defined in src/data/guids.cpp
 //   0x4fd2e4 DAT_004fd2e4: defined in src/data/unused.cpp
 //   0x4fd458 DAT_004fd458: vtable
+//   0x4fd488 DAT_004fd488: defined in src/data/vtables.cpp
 //   0x4fda70 DAT_004fda70: defined in src/data/unused.cpp
 //   0x4fdbe0 DAT_004fdbe0: defined in src/data/unused.cpp
 //   0x501fcc DAT_00501fcc: defined in src/game/console_commands.cpp

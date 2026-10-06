@@ -4206,8 +4206,8 @@ piece,0x5091ec,18,src/game/game_state_490df0.cpp,5,0,game data
 piece,0x507764,11,src/game/game_state_490df0.cpp,4,0,game data
 piece,0x5091e0,10,src/game/game_state_490df0.cpp,3,0,game data
 piece,0x4fda10,8,src/game/game_state_490c40.cpp,3,0,game data
-piece,0x4fd9e0,44,src/game/victory_4909e0.cpp,4,0,game data
-piece,0x4fd428,44,src/game/victory_4909e0.cpp,3,0,game data
+piece,0x4fd9e0,44,src/game/victory_490940.cpp,3,0,game data
+piece,0x4fd428,44,src/game/victory_490940.cpp,7,0,game data
 piece,0x4fd980,44,src/game/victory_490940.cpp,4,0,game data
 piece,0x4fd9b0,44,src/game/victory_4907e0.cpp,3,0,game data
 piece,0x4fd940,4,src/game/mission_conditions.cpp,48,0,game data
@@ -4683,7 +4683,7 @@ piece,0x506ed8,39,src/network/packets_461fd0.cpp,7,0,game data
 piece,0x506f48,32,src/network/packet_channel.cpp,14,0,game data
 piece,0x506f00,70,src/network/packet_channel.cpp,13,0,game data
 piece,0x506e10,50,src/network/packet_channel.cpp,7,0,game data
-piece,0x506dc0,41,src/network/packets_4619e0.cpp,3,0,game data
+piece,0x506dc0,41,src/network/packet_manager.cpp,26,0,game data
 piece,0x4fd514,4,src/network/packets_461420.cpp,10,0,game data
 piece,0x506db0,11,src/frontend/options_460cc0.cpp,7,0,game data
 piece,0x506d98,9,src/frontend/options_460cc0.cpp,5,0,game data

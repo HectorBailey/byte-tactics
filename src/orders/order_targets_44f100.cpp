@@ -1,12 +1,13 @@
 // Decompiled by Opus. Names are provisional.
-// A method of Class_0044f010 (see 0x44ef60.cpp for the class family): drops
-// the first n path points, clears the active flag when fewer than two are
-// left and sets flag 3. The class declarations are copied from 0x44f080.cpp.
+// A method of Class_0044f010 (see order_targets_44ef20.cpp for the class
+// family): drops the first n path points, clears the active flag when fewer
+// than two are left and sets flag 3. The class declarations are copied from
+// 0x44f080.cpp.
 #include <algorithm>
 
 struct Struct_004907e0;                // the owner (see 0x4907e0.cpp)
 
-// The object at +0x4 (see 0x490a10.cpp); base vtable 0x4fd2f8.
+// The object at +0x4 (see victory_490940.cpp); base vtable 0x4fd2f8.
 class Base_00490a10 {
 public:
     virtual ~Base_00490a10();                               // slot 0

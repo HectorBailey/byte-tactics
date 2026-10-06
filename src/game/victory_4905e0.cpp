@@ -1,28 +1,13 @@
-// Decompiled by Space Bunny Free. Names are provisional.
-// Class_00490630's override of slot 2 (vtable 0x4fd980, inherited by
-// Class_00490880 and called directly by Class_004907e0's own override,
-// 0x490880; the class family is listed in 0x44ef60.cpp): one update step of
-// a moving object. The object at +0x4 moves this object's position (its slot
-// 8) and the difference goes into vel. When the object has drifted further than
-// 0xa00000 from its owner, its height is snapped to the ground under it, the
-// sea level for a unit whose def has the flag at +0x241 bit 22 set, the
-// owner's field_82 byte 1 otherwise, plus the def's field_21c, and past
-// 0x1400000 (or 0x100000 with slot 9 refusing) it turns to face the owner.
-// Then the object at +0x4 gets the last word: slot 4 saying it is done, plus
-// slot 11, means slot 1 with 0.
-//
-// Match notes: `vel = pos - old` needs an inline `operator-` returning the
-// struct by value, so that all three differences are computed before the
-// first store. The flag at def+0x241 is a 1-bit bitfield at bit 22
-// (`shr ecx, 0x16; test cl, 1`). In the else branch field_21c has to be
-// reached through `owner->def->` and be the *first* operand of the add:
-// MSVC orders the operands of a commutative add by the size of the two
-// expression trees, and only the longer path makes the add asymmetric
-// enough for the two branches not to be tail-merged into one.
+// Decompiled by Haiku, Opus and Space Bunny Free. Names are provisional.
+// Class_00490630 (vtable 0x4fd980), derived from Class_0044ef20 (see
+// order_targets_44ef20.cpp for the family) and the base of Class_004907e0 and
+// Class_00490880: a moving object that follows its owner.
 #include <math.h>
 
 struct Vec3_004907e0 {
     int x, y, z;
+    Vec3_004907e0() {}
+    Vec3_004907e0(int ax, int ay, int az) : x(ax), y(ay), z(az) {}
 };
 
 static inline Vec3_004907e0 operator-(const Vec3_004907e0& p, const Vec3_004907e0& q)
@@ -65,8 +50,9 @@ struct Game {
 
 extern Game* g_game;
 
-// The object at +0x4. Only the offsets of the four virtuals it is asked for
-// (slots 4, 8, 9 and 11) matter, so twelve of them are declared here.
+// The object at +0x4 (see victory_490940.cpp). Only the offsets of the four
+// virtuals it is asked for (slots 4, 8, 9 and 11) matter, so twelve of them are
+// declared here.
 class Class_0044ced0 {
 public:
     virtual ~Class_0044ced0();
@@ -120,10 +106,58 @@ public:
 
     Class_00490630(Struct_004907e0* p);
     virtual void FUN_0044efb0();                    // slot 2, 0x490690
+    virtual void FUN_0044f000(Vec3_004907e0*, Vec3_004907e0*, short*);  // slot 4, 0x490650
 };
 
 unsigned short __stdcall GetHeadingBetween(Vec3_004907e0* from, Vec3_004907e0* to);
 
+// The constructor (0x4905e0) and, emitted with the vtable it stores, the
+// compiler-generated scalar deleting destructor: the destructor is trivial,
+// so only the inlined base destructor's store of 0x4fd428 is left. 0x4907e0
+// inlines the same constructor.
+// FUNCTION: 0x4905e0
+// FUNCTION: 0x490630 ??_GClass_00490630@@UAEPAXI@Z
+Class_00490630::Class_00490630(Struct_004907e0* p)
+    : Class_0044ef20(p)
+{
+    pos = p->pos;
+    vel = Vec3_004907e0(0, 0, 0);
+    field_24 = p->field_66;
+}
+
+// Class_00490630's override of slot 4 (vtable 0x4fd980, inherited by
+// Class_004907e0 and Class_00490880; the class family is listed in
+// order_targets_44ef20.cpp): copies out the position, the velocity and field_24
+// (the heading 0x490690 turns towards the owner).
+// FUNCTION: 0x490650
+void Class_00490630::FUN_0044f000(Vec3_004907e0* outPos, Vec3_004907e0* outVel,
+                                  short* outHeading)
+{
+    *outPos = pos;
+    *outVel = vel;
+    *outHeading = field_24;
+}
+
+// Class_00490630's override of slot 2 (vtable 0x4fd980, inherited by
+// Class_00490880 and called directly by Class_004907e0's own override,
+// 0x490880; the class family is listed in order_targets_44ef20.cpp): one update
+// step of a moving object. The object at +0x4 moves this object's position (its
+// slot 8) and the difference goes into vel. When the object has drifted further
+// than 0xa00000 from its owner, its height is snapped to the ground under it,
+// the sea level for a unit whose def has the flag at +0x241 bit 22 set, the
+// owner's field_82 byte 1 otherwise, plus the def's field_21c, and past
+// 0x1400000 (or 0x100000 with slot 9 refusing) it turns to face the owner. Then
+// the object at +0x4 gets the last word: slot 4 saying it is done, plus slot
+// 11, means slot 1 with 0.
+//
+// Match notes: `vel = pos - old` needs an inline `operator-` returning the
+// struct by value, so that all three differences are computed before the
+// first store. The flag at def+0x241 is a 1-bit bitfield at bit 22
+// (`shr ecx, 0x16; test cl, 1`). In the else branch field_21c has to be
+// reached through `owner->def->` and be the *first* operand of the add:
+// MSVC orders the operands of a commutative add by the size of the two
+// expression trees, and only the longer path makes the add asymmetric
+// enough for the two branches not to be tail-merged into one.
 // FUNCTION: 0x490690
 void Class_00490630::FUN_0044efb0()
 {

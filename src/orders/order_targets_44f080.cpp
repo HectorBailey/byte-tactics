@@ -1,14 +1,14 @@
 // Decompiled by Opus. Names are provisional.
-// A method of Class_0044f010 (see 0x44ef60.cpp for the class family): sets
-// the path points (at most 20) and marks it active, or with no points asks
-// the object at +0x4 about the owner and flags it (0x40) when that fails.
-// The class declarations are copied from 0x44f450.cpp, with the fields this
-// function (and 0x44f010/0x44f150) uses added to Class_0044f010.
+// A method of Class_0044f010 (see order_targets_44ef20.cpp for the class
+// family): sets the path points (at most 20) and marks it active, or with no
+// points asks the object at +0x4 about the owner and flags it (0x40) when that
+// fails. The class declarations are copied from 0x44f450.cpp, with the fields
+// this function (and 0x44f010/0x44f150) uses added to Class_0044f010.
 #include <algorithm>
 
 struct Struct_004907e0;                // the owner (see 0x4907e0.cpp)
 
-// The object at +0x4 (see 0x490a10.cpp); base vtable 0x4fd2f8.
+// The object at +0x4 (see victory_490940.cpp); base vtable 0x4fd2f8.
 class Base_00490a10 {
 public:
     virtual ~Base_00490a10();                               // slot 0

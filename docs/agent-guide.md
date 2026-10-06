@@ -1170,7 +1170,7 @@ name (`std::_Lockit::_Lockit` is 0x4e39b0).
 - **A derived class's `??_G` when its destructor is trivial**: the static
   object trick does not emit it (the derived vtable store is dead, so the
   vtable is never emitted). Define the real constructor again, unannotated, in
-  the `??_G` file (0x44f590, 0x490840, 0x490630); see 0x44ef60.cpp for the
+  the `??_G` file (0x44f590, 0x490840, 0x490630); see order_targets_44ef20.cpp for the
   whole family.
 - **Variants in one scratch file influence each other**: earlier functions in a
   file change how later ones compile. Recompile the winning variant alone (or

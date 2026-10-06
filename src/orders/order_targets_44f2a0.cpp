@@ -63,7 +63,7 @@ struct Point_0044f2a0 {
     short y;
 };
 
-// The object at +0x4 (see 0x490a10.cpp); vtable 0x4fd2f8. Slot 8 is the
+// The object at +0x4 (see victory_490940.cpp); vtable 0x4fd2f8. Slot 8 is the
 // "give me your position as a Vec3" call (an implementation is 0x44dc60).
 class Base_00490a10 {
 public:
