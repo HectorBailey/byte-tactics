@@ -4280,8 +4280,8 @@ piece,0x508da0,7,src/ingame/selection_48dc30.cpp,4,0,game data
 piece,0x4fd760,8,src/ingame/selection_48cf30.cpp,5,0,game data
 piece,0x4fd748,4,src/units/unit_position_48b200.cpp,3,0,game data
 piece,0x4fd74c,4,src/units/unit_position_48b200.cpp,3,4,game data
-piece,0x5050f4,14,src/units/unit_position_48b090.cpp,4,0,game data
-piece,0x505104,13,src/units/unit_position_48b090.cpp,3,0,game data
+piece,0x5050f4,14,src/units/unit.cpp,4,0,game data
+piece,0x505104,13,src/units/unit.cpp,18,0,game data
 piece,0x508d58,14,src/units/unit_targets_48a1e0.cpp,3,0,game data
 piece,0x4fd754,4,src/units/unit_ref.cpp,7,0,game data
 piece,0x508d4c,9,src/units/unit_targets_489280.cpp,14,0,game data
@@ -5090,7 +5090,7 @@ piece,0x505048,9,src/map/meteors_438250.cpp,5,0,game data
 piece,0x50503c,9,src/map/meteors_438250.cpp,4,0,game data
 piece,0x505030,9,src/map/meteors_438250.cpp,3,0,game data
 piece,0x4fd280,4,src/map/meteors_437d60.cpp,3,0,game data
-piece,0x50501c,17,src/units/unit_motion_4379b0.cpp,3,0,game data
+piece,0x50501c,17,src/units/c_memory_cache.cpp,7,0,game data
 piece,0x4fd270,4,src/units/unit_motion_437910.cpp,5,0,game data
 piece,0x50500c,13,src/units/unit_motion_437910.cpp,4,0,game data
 piece,0x505000,9,src/units/unit_motion_437910.cpp,3,0,game data
@@ -12090,7 +12090,7 @@ same,0x506290,6,src/network/net_game_450380.cpp,3,0,
 same,0x506578,5,src/network/net_game_4538f0.cpp,4,0,
 same,0x506578,5,src/network/net_game_453a50.cpp,4,0,
 same,0x4fd4c0,4,src/graphics/model_render_4581e0.cpp,3,0,
-same,0x4fd4c0,4,src/graphics/model_render_458810.cpp,5,0,
+same,0x4fd4c0,4,src/units/c_memory_cache.cpp,24,0,
 same,0x4fd4c0,4,src/graphics/model_render_458d30.cpp,5,0,
 same,0x4fd4e0,8,src/frontend/options_45b9b0.cpp,3,0,
 same,0x4fd4e8,8,src/frontend/options_45b9b0.cpp,3,8,
@@ -12254,7 +12254,7 @@ same,0x488a00,80,src/units/unit_commands_4889d0.cpp,6,0,
 same,0x51e6b0,16,src/units/unit_commands_4889d0.cpp,4,0,
 same,0x51e6b0,16,src/units/unit_commands_488a00.cpp,4,0,
 same,0x51e6b0,16,src/units/unit_commands_488bf0.cpp,4,0,
-same,0x4fd748,4,src/units/unit_targets_489a90.cpp,3,0,
+same,0x4fd748,4,src/units/unit.cpp,15,0,
 same,0x508d80,9,src/units/unit_targets_489fa0.cpp,3,0,
 same,0x4fd748,4,src/units/unit_position_48ad30.cpp,3,0,
 same,0x4fd758,4,src/ingame/selection_48bd50.cpp,3,0,
