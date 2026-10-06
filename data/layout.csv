@@ -1648,7 +1648,7 @@ piece,0x52c004,9,src/debug/debug_lib_4d8d70.cpp,2,0,thread-local data
 piece,0x52c010,4,LIBCMT.LIB#344,4,0,library data
 piece,0x4fdd58,24,LIBCMT.LIB#344,1,0,library data
 piece,0x512340,16,src/map/meteors.cpp,3,0,game data
-piece,0x512358,1024,src/units/movement_class_440230.cpp,3,0,game data
+piece,0x512358,1024,src/units/movement_class.cpp,3,0,game data
 piece,0x5129d0,40,src/network/net_condenser.cpp,3,0,game data
 piece,0x5129f8,37,src/network/net_condenser.cpp,3,40,game data
 piece,0x513000,46396,src/network/packets_460e20.cpp,3,0,game data
@@ -4985,14 +4985,14 @@ piece,0x505698,13,src/frontend/multi_441220.cpp,4,0,game data
 piece,0x505688,13,src/frontend/multi_441080.cpp,7,0,game data
 piece,0x50567c,10,src/frontend/multi_441080.cpp,6,0,game data
 piece,0x50563c,27,src/frontend/multi_440d70.cpp,6,0,game data
-piece,0x505484,11,src/units/movement_class.cpp,14,0,game data
-piece,0x505478,11,src/units/movement_class.cpp,13,0,game data
-piece,0x505468,14,src/units/movement_class.cpp,12,0,game data
-piece,0x505458,14,src/units/movement_class.cpp,11,0,game data
-piece,0x50544c,9,src/units/movement_class.cpp,10,0,game data
-piece,0x505440,9,src/units/movement_class.cpp,9,0,game data
-piece,0x505430,14,src/units/movement_class.cpp,8,0,game data
-piece,0x505420,14,src/units/movement_class.cpp,7,0,game data
+piece,0x505484,11,src/units/movement_class.cpp,24,0,game data
+piece,0x505478,11,src/units/movement_class.cpp,23,0,game data
+piece,0x505468,14,src/units/movement_class.cpp,22,0,game data
+piece,0x505458,14,src/units/movement_class.cpp,21,0,game data
+piece,0x50544c,9,src/units/movement_class.cpp,20,0,game data
+piece,0x505440,9,src/units/movement_class.cpp,19,0,game data
+piece,0x505430,14,src/units/movement_class.cpp,18,0,game data
+piece,0x505420,14,src/units/movement_class.cpp,17,0,game data
 piece,0x505414,9,src/orders/order_dispatch_43f0e0.cpp,43,0,game data
 piece,0x505408,10,src/orders/order_dispatch_43f0e0.cpp,42,0,game data
 piece,0x5053fc,9,src/orders/order_dispatch_43f0e0.cpp,41,0,game data
@@ -5937,7 +5937,7 @@ piece,0x50e3f0,4,LIBCMT.LIB#67,2,0,library data
 piece,0x50e934,4,LIBCMT.LIB#126,1,0,library data
 piece,0x501008,4,src/map/map_list.cpp,2,0,game data
 piece,0x50100c,4,src/map/meteors.cpp,2,0,game data
-piece,0x501010,4,src/units/movement_class_440230.cpp,2,0,game data
+piece,0x501010,4,src/units/movement_class.cpp,2,0,game data
 piece,0x50101c,4,src/network/packets_460e20.cpp,2,0,game data
 piece,0x501028,4,src/map/line_of_sight_4814c0.cpp,2,0,game data
 piece,0x50102c,4,src/units/unit_commands_4889d0.cpp,2,0,game data
@@ -12033,8 +12033,7 @@ same,0x512340,16,src/orders/order_list_43bc90.cpp,4,0,
 same,0x512340,16,src/orders/order_list_43c050.cpp,4,0,
 same,0x4fd2e8,4,src/units/unit_scripts.cpp,34,0,
 same,0x4fd2e8,4,src/orders/order_dispatch_43f0e0.cpp,3,0,
-same,0x440290,80,src/units/movement_class_440230.cpp,6,0,
-same,0x512758,1,src/units/movement_class_440290.cpp,3,1024,
+same,0x512758,1,src/units/movement_class.cpp,3,1024,
 same,0x502ae8,3,src/frontend/multi_440d70.cpp,8,0,
 same,0x504ab8,8,src/frontend/multi_441460.cpp,24,0,
 same,0x503164,4,src/frontend/multi_441460.cpp,17,0,
