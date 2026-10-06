@@ -5202,47 +5202,47 @@ piece,0x5032e8,19,src/game/settings_campaign.cpp,14,0,game data
 piece,0x504370,12,src/game/settings_campaign.cpp,21,0,game data
 piece,0x5049c4,9,src/game/settings_campaign.cpp,16,0,game data
 piece,0x5049bc,8,src/game/settings_campaign.cpp,15,0,game data
-piece,0x503410,9,src/game/side_data_431a60.cpp,46,0,game data
-piece,0x5048ec,11,src/game/side_data_431a60.cpp,42,0,game data
-piece,0x5039f0,10,src/game/side_data_431a60.cpp,41,0,game data
-piece,0x5048e4,5,src/game/side_data_431a60.cpp,40,0,game data
-piece,0x503394,4,src/game/side_data_431a60.cpp,39,0,game data
-piece,0x5048d8,12,src/game/side_data_431a60.cpp,37,0,game data
-piece,0x5048cc,11,src/game/side_data_431a60.cpp,36,0,game data
-piece,0x5048c4,5,src/game/side_data_431a60.cpp,35,0,game data
-piece,0x50474c,45,src/game/side_data_431a60.cpp,34,0,game data
-piece,0x504748,3,src/game/side_data_431a60.cpp,33,0,game data
-piece,0x504744,3,src/game/side_data_431a60.cpp,32,0,game data
-piece,0x504740,3,src/game/side_data_431a60.cpp,31,0,game data
-piece,0x50473c,3,src/game/side_data_431a60.cpp,30,0,game data
-piece,0x5048b8,10,src/game/side_data_431a60.cpp,29,0,game data
-piece,0x5048ac,10,src/game/side_data_431a60.cpp,28,0,game data
-piece,0x5048a0,9,src/game/side_data_431a60.cpp,27,0,game data
-piece,0x504894,9,src/game/side_data_431a60.cpp,26,0,game data
-piece,0x504888,11,src/game/side_data_431a60.cpp,25,0,game data
-piece,0x50487c,10,src/game/side_data_431a60.cpp,24,0,game data
-piece,0x504874,8,src/game/side_data_431a60.cpp,23,0,game data
-piece,0x50486c,7,src/game/side_data_431a60.cpp,22,0,game data
-piece,0x504860,10,src/game/side_data_431a60.cpp,21,0,game data
-piece,0x504854,9,src/game/side_data_431a60.cpp,20,0,game data
-piece,0x504844,15,src/game/side_data_431a60.cpp,19,0,game data
-piece,0x504834,15,src/game/side_data_431a60.cpp,18,0,game data
-piece,0x504824,14,src/game/side_data_431a60.cpp,17,0,game data
-piece,0x504814,14,src/game/side_data_431a60.cpp,16,0,game data
-piece,0x50480c,6,src/game/side_data_431a60.cpp,15,0,game data
-piece,0x503f54,9,src/game/side_data_431a60.cpp,14,0,game data
-piece,0x504800,10,src/game/side_data_431a60.cpp,13,0,game data
-piece,0x5047f0,14,src/game/side_data_431a60.cpp,12,0,game data
-piece,0x5047e0,13,src/game/side_data_431a60.cpp,11,0,game data
-piece,0x5047d0,15,src/game/side_data_431a60.cpp,10,0,game data
-piece,0x5047c0,14,src/game/side_data_431a60.cpp,9,0,game data
-piece,0x5047b4,12,src/game/side_data_431a60.cpp,8,0,game data
-piece,0x5047a8,10,src/game/side_data_431a60.cpp,7,0,game data
-piece,0x50479c,11,src/game/side_data_431a60.cpp,6,0,game data
-piece,0x50477c,9,src/game/side_data_431a60.cpp,3,0,game data
-piece,0x504734,6,src/game/side_data_4318c0.cpp,5,0,game data
-piece,0x503720,9,src/game/side_data_4318c0.cpp,4,0,game data
-piece,0x504728,9,src/game/side_data_4318c0.cpp,3,0,game data
+piece,0x503410,9,src/game/side_data.cpp,58,0,game data
+piece,0x5048ec,11,src/game/side_data.cpp,54,0,game data
+piece,0x5039f0,10,src/game/side_data.cpp,53,0,game data
+piece,0x5048e4,5,src/game/side_data.cpp,52,0,game data
+piece,0x503394,4,src/game/side_data.cpp,51,0,game data
+piece,0x5048d8,12,src/game/side_data.cpp,49,0,game data
+piece,0x5048cc,11,src/game/side_data.cpp,48,0,game data
+piece,0x5048c4,5,src/game/side_data.cpp,47,0,game data
+piece,0x50474c,45,src/game/side_data.cpp,15,0,game data
+piece,0x504748,3,src/game/side_data.cpp,14,0,game data
+piece,0x504744,3,src/game/side_data.cpp,13,0,game data
+piece,0x504740,3,src/game/side_data.cpp,12,0,game data
+piece,0x50473c,3,src/game/side_data.cpp,11,0,game data
+piece,0x5048b8,10,src/game/side_data.cpp,46,0,game data
+piece,0x5048ac,10,src/game/side_data.cpp,45,0,game data
+piece,0x5048a0,9,src/game/side_data.cpp,44,0,game data
+piece,0x504894,9,src/game/side_data.cpp,43,0,game data
+piece,0x504888,11,src/game/side_data.cpp,42,0,game data
+piece,0x50487c,10,src/game/side_data.cpp,41,0,game data
+piece,0x504874,8,src/game/side_data.cpp,40,0,game data
+piece,0x50486c,7,src/game/side_data.cpp,39,0,game data
+piece,0x504860,10,src/game/side_data.cpp,38,0,game data
+piece,0x504854,9,src/game/side_data.cpp,37,0,game data
+piece,0x504844,15,src/game/side_data.cpp,36,0,game data
+piece,0x504834,15,src/game/side_data.cpp,35,0,game data
+piece,0x504824,14,src/game/side_data.cpp,34,0,game data
+piece,0x504814,14,src/game/side_data.cpp,33,0,game data
+piece,0x50480c,6,src/game/side_data.cpp,32,0,game data
+piece,0x503f54,9,src/game/side_data.cpp,31,0,game data
+piece,0x504800,10,src/game/side_data.cpp,30,0,game data
+piece,0x5047f0,14,src/game/side_data.cpp,29,0,game data
+piece,0x5047e0,13,src/game/side_data.cpp,28,0,game data
+piece,0x5047d0,15,src/game/side_data.cpp,27,0,game data
+piece,0x5047c0,14,src/game/side_data.cpp,26,0,game data
+piece,0x5047b4,12,src/game/side_data.cpp,25,0,game data
+piece,0x5047a8,10,src/game/side_data.cpp,24,0,game data
+piece,0x50479c,11,src/game/side_data.cpp,23,0,game data
+piece,0x50477c,9,src/game/side_data.cpp,20,0,game data
+piece,0x504734,6,src/game/side_data.cpp,5,0,game data
+piece,0x503720,9,src/game/side_data.cpp,4,0,game data
+piece,0x504728,9,src/game/side_data.cpp,3,0,game data
 piece,0x504708,15,src/game/settings_430f00.cpp,67,0,game data
 piece,0x5046f4,17,src/game/settings_430f00.cpp,65,0,game data
 piece,0x5046e0,18,src/game/settings_430f00.cpp,64,0,game data
@@ -12019,8 +12019,8 @@ same,0x5032e8,19,src/game/settings_42f9a0.cpp,71,0,
 same,0x502a78,11,src/game/settings_42f9a0.cpp,67,0,
 same,0x5032e8,19,src/game/settings_430f00.cpp,66,0,
 same,0x502a78,11,src/game/settings_430f00.cpp,43,0,
-same,0x50341c,4,src/game/side_data_431a60.cpp,47,0,
-same,0x50338c,6,src/game/side_data_431a60.cpp,38,0,
+same,0x50341c,4,src/game/side_data.cpp,59,0,
+same,0x50338c,6,src/game/side_data.cpp,50,0,
 same,0x5048f8,9,src/game/settings_campaign.cpp,9,0,
 same,0x50341c,4,src/map/los_tables_433130.cpp,7,0,
 same,0x5122c0,16,src/map/map_list.cpp,6,0,
