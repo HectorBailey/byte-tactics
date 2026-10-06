@@ -3971,7 +3971,7 @@ piece,0x509c94,13,src/units/cob_script.cpp,68,0,game data
 piece,0x509c84,14,src/units/cob_script.cpp,23,0,game data
 piece,0x509c74,16,src/units/cob_script.cpp,22,0,game data
 piece,0x4fdb00,84,src/units/cob_script.cpp,3,0,game data
-piece,0x509c6c,8,src/gui/listbox_4b0230.cpp,3,0,game data
+piece,0x509c6c,8,src/gui/listbox.cpp,7,0,game data
 piece,0x509c60,11,src/gui/file_list_4afc60.cpp,3,0,game data
 piece,0x509c54,12,src/gui/file_list_4afa30.cpp,12,0,game data
 piece,0x509c40,20,src/gui/file_list_4afa30.cpp,11,0,game data
