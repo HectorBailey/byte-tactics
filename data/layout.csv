@@ -5090,11 +5090,11 @@ piece,0x505048,9,src/map/meteors_438250.cpp,5,0,game data
 piece,0x50503c,9,src/map/meteors_438250.cpp,4,0,game data
 piece,0x505030,9,src/map/meteors_438250.cpp,3,0,game data
 piece,0x4fd280,4,src/map/meteors_437d60.cpp,3,0,game data
-piece,0x50501c,17,src/units/c_memory_cache.cpp,7,0,game data
-piece,0x4fd270,8,src/units/unit_motion.cpp,4,0,game data
-piece,0x50500c,13,src/units/unit_motion.cpp,7,0,game data
-piece,0x505000,9,src/units/unit_motion.cpp,3,0,game data
-piece,0x4fd278,8,src/units/unit_motion.cpp,4,8,game data
+piece,0x50501c,17,src/units/unit_motion.cpp,14,0,game data
+piece,0x4fd270,8,src/units/unit_motion.cpp,6,0,game data
+piece,0x50500c,13,src/units/unit_motion.cpp,9,0,game data
+piece,0x505000,9,src/units/unit_motion.cpp,5,0,game data
+piece,0x4fd278,8,src/units/unit_motion.cpp,6,8,game data
 piece,0x504ff0,14,src/map/mission.cpp,173,0,game data
 piece,0x504fdc,17,src/map/mission.cpp,172,0,game data
 piece,0x504fcc,13,src/map/mission.cpp,163,0,game data
@@ -12091,7 +12091,6 @@ same,0x506290,6,src/network/net_game_450380.cpp,3,0,
 same,0x506578,5,src/network/net_game_4538f0.cpp,4,0,
 same,0x506578,5,src/network/net_game_453a50.cpp,4,0,
 same,0x4fd4c0,4,src/graphics/model_render_4581e0.cpp,3,0,
-same,0x4fd4c0,4,src/units/c_memory_cache.cpp,24,0,
 same,0x4fd4c0,4,src/graphics/model_render_458d30.cpp,5,0,
 same,0x4fd4e0,8,src/frontend/options_45b9b0.cpp,3,0,
 same,0x4fd4e8,8,src/frontend/options_45b9b0.cpp,3,8,
@@ -12464,6 +12463,7 @@ same,0x50a630,32,LIBCPMT.LIB#3@2,14,0,
 same,0x4febd0,24,LIBCPMT.LIB#3@2,7,0,
 same,0x5119b8,1,zlib/zutil.obj,9,0,
 same,0x4c38a0,80,src/util/logic_error.cpp,20,0,
+reloc,0x4588a6,,0x4fd4c0,,,
 reloc,0x46ca12,,0x4e39b0,,,
 reloc,0x46ca3c,,0x4e3a70,,,
 reloc,0x46cb92,,0x4e39b0,,,
