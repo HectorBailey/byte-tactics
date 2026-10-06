@@ -11,7 +11,7 @@ public:
 struct Struct_004907e0;                // the owner (see 0x4907e0.cpp)
 
 struct Vec3_004907e0;                  // a position (see 0x4907e0.cpp)
-class Class_0044f010;                  // slot 6's result (see 0x44f450.cpp)
+class Class_0044f010;                  // slot 6's result
 class BitWriter;                       // the bit writer slot 8 takes
 class BitReader;                       // the bit reader slot 9 takes
 

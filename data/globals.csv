@@ -73,8 +73,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x4fd358,DAT_004fd358,.rdata,48,gap,vtable,void*[],2,1,2,conflicting: shape,3,,PTR_FUN_004fd358,12,src/data/vtables.cpp,50d4440000d5440040d4440030cf440000d84400c0d7440060d5440040d8440020d7440040cf440050cf4400f0ce4400
 0x4fd388,DAT_004fd388,.rdata,48,gap,vtable,void*[],2,1,2,conflicting: shape,3,,PTR_FUN_004fd388,12,src/data/vtables.cpp,10d94400a0d9440000d9440030cf440000cf4400b0dc440000da440000dd440060dc440040cf440050cf4400f0ce4400
 0x4fd3b8,DAT_004fd3b8,.rdata,48,gap,vtable,void*[],6,1,2,conflicting: shape,7,,PTR_FUN_004fd3b8,12,src/data/vtables.cpp,80df4400b0df440070df4400b0e64400b0e5440020cf440090ce4400c0ce4400c0e3440030e54400c0dd4400a0e34400
-0x4fd3f8,DAT_004fd3f8,.rdata,48,gap,vtable,void*[],3,1,2,conflicting: shape,4,,PTR_FUN_004fd3f8,12,src/data/vtables.cpp,b0e7440080e84400a0e7440000ec440060eb440020cf440090ce4400c0ce440060ea440040eb440030e9440050ea4400
-0x4fd458,DAT_004fd458,.rdata,48,gap,vtable,void*[],1,0,1,one type,1,,PTR_FUN_004fd458,11,,40f04400a0f24400a0f1440050f1440000f0440090f2440060f2440080f44400a0f44400d0ef4400007e410000000000
+0x4fd3f8,DAT_004fd3f8,.rdata,48,gap,vtable,void*[],2,1,2,conflicting: shape,3,,PTR_FUN_004fd3f8,12,src/data/vtables.cpp,b0e7440080e84400a0e7440000ec440060eb440020cf440090ce4400c0ce440060ea440040eb440030e9440050ea4400
 0x4fd488,DAT_004fd488,.rdata,4,type,data,void (__stdcall* const const*)(void),1,0,1,one type,1,,PTR_FUN_004fd488,1,src/data/vtables.cpp,90f54400
 0x4fd4c0,DAT_004fd4c0,.rdata,4,type,float,const float,1,0,1,one type,1,,,,,00000000
 0x4fd4cc,DAT_004fd4cc,.rdata,4,type,float,const float,1,0,1,one type,1,,,,,0000a040
@@ -356,7 +355,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x511ddc,g_byteRatesTick,.bss,4,type,data,unsigned int,1,0,1,one type,1,,DAT_00511ddc,,,
 0x511de0,DAT_00511de0,.bss,4,type,data,int,2,0,1,one type,2,,DAT_00511de0,,,
 0x511de4,DAT_00511de4,.bss,4,type,data,int,2,0,1,one type,2,,DAT_00511de4,,,
-0x511de8,g_game,.bss,4,type,data,Game*,888,131,15,conflicting: shape,1019,,DAT_00511de8,,,
+0x511de8,g_game,.bss,4,type,data,Game*,887,130,15,conflicting: shape,1017,,DAT_00511de8,,,
 0x511dec,DAT_00511dec,.bss,4,type,data,int,1,0,1,one type,1,,DAT_00511dec,,,
 0x511df0,DAT_00511df0,.bss,400,type,data,int[100],2,5,6,conflicting: shape,7,0x190,DAT_00511df0,,,
 0x511f80,DAT_00511f80,.bss,16,gap,data,CMemoryCache,5,0,1,one type,5,,DAT_00511f80,,,

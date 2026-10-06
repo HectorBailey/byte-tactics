@@ -70,7 +70,7 @@ public:
     void FUN_0044ced0(int param);
 };
 
-class Class_0044f010;                  // slot 6's result (see 0x44f450.cpp)
+class Class_0044f010;                  // slot 6's result
 class BitWriter;                       // the bit writer slot 8 takes
 class BitReader;                       // the bit reader slot 9 takes
 

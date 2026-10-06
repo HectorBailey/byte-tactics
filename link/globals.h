@@ -269,7 +269,7 @@ extern unsigned int g_netStatsTick;                                             
 extern unsigned int g_byteRatesTick;                                                          // 0x511ddc, 4 bytes; 1 of 1 files
 extern int DAT_00511de0;                                                                      // 0x511de0, 4 bytes; 2 of 2 files
 extern int DAT_00511de4;                                                                      // 0x511de4, 4 bytes; 2 of 2 files
-extern Game* g_game;                                                                          // 0x511de8, 4 bytes; 888 of 1019 files (conflicting: shape)
+extern Game* g_game;                                                                          // 0x511de8, 4 bytes; 887 of 1017 files (conflicting: shape)
 extern int DAT_00511dec;                                                                      // 0x511dec, 4 bytes; 1 of 1 files
 extern unsigned char DAT_00511f80[16];                                                        // 0x511f80, 16 bytes; CMemoryCache by value in 5 of 5 files
 extern int DAT_00511f90;                                                                      // 0x511f90, 4 bytes; 1 of 1 files
@@ -698,7 +698,7 @@ extern int DAT_0052a4f4;                                                        
 extern void* DAT_0052a4f8;                                                                    // 0x52a4f8, 4 bytes; 3 of 3 files
 extern long DAT_0052a4fc;                                                                     // 0x52a4fc, 4 bytes; 2 of 3 files (conflicting: signedness or const)
 
-// Not declared: 241 globals defined in a data file or whose type is not settled (see data/globals.csv).
+// Not declared: 240 globals defined in a data file or whose type is not settled (see data/globals.csv).
 //   0x513000 g_packetManager: defined in src/network/packets_460e20.cpp
 //   0x5119c0 g_playerAI: PlayerAI*[] (11), void*[] (5), Owner*[] (3), Player_40b0d0*[] (1), and 2 more
 //   0x51fbd0 g_display: void* (4), int (2), Display_004b4f50* (1), Display_004b5370* (1), and 14 more
@@ -735,7 +735,6 @@ extern long DAT_0052a4fc;                                                       
 //   0x51fc80 g_timerCount: part of another global: DAT_0051fbd8+0xa8
 //   0x51ff14 g_cdPlayer: void* (2), CdAudio_004ce030* (1), Sound_004ce5e0* (1), Class_004d02a0* (1)
 //   0x529e9c DAT_00529e9c: char (3), bool (2)
-//   0x4fd3f8 DAT_004fd3f8: defined in src/data/vtables.cpp
 //   0x4fd670 DAT_004fd670: signed char[] (2), const char[] (2)
 //   0x4fd678 DAT_004fd678: signed char[] (2), const char[] (2)
 //   0x4fd6f0 DAT_004fd6f0: defined in src/data/vtables.cpp
@@ -765,6 +764,7 @@ extern long DAT_0052a4fc;                                                       
 //   0x4fd328 DAT_004fd328: defined in src/data/vtables.cpp
 //   0x4fd358 DAT_004fd358: defined in src/data/vtables.cpp
 //   0x4fd388 DAT_004fd388: defined in src/data/vtables.cpp
+//   0x4fd3f8 DAT_004fd3f8: defined in src/data/vtables.cpp
 //   0x502ae8 DAT_00502ae8: char[] (2), char (1)
 //   0x5086e8 DAT_005086e8: defined in src/units/unit_messages.cpp
 //   0x512298 DAT_00512298: Smoke_00425b80* (1), void* (1), char* (1)
@@ -876,7 +876,6 @@ extern long DAT_0052a4fc;                                                       
 //   0x4fcfe8 DAT_004fcfe8: defined in src/data/guids.cpp
 //   0x4fcff8 DAT_004fcff8: defined in src/data/guids.cpp
 //   0x4fd2e4 DAT_004fd2e4: defined in src/data/unused.cpp
-//   0x4fd458 DAT_004fd458: vtable
 //   0x4fd488 DAT_004fd488: defined in src/data/vtables.cpp
 //   0x4fda70 DAT_004fda70: defined in src/data/unused.cpp
 //   0x4fdbe0 DAT_004fdbe0: defined in src/data/unused.cpp

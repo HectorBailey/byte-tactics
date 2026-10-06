@@ -52,7 +52,7 @@ public:
 };
 #pragma pack(pop)
 
-class Class_0044f010;                  // slot 6's result (see 0x44f450.cpp)
+class Class_0044f010;                  // slot 6's result
 
 class Class_0044ef20 {
 public:

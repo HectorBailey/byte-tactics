@@ -51,7 +51,7 @@ public:
     virtual void Write(BitWriter* stream);          // +0x28
 };
 
-class Class_0044f010;                  // slot 6's result (see 0x44f450.cpp)
+class Class_0044f010;                  // slot 6's result
 
 // Vtable 0x4fd428, constructor 0x44ef20, ??_G 0x44ef60.
 class Class_0044ef20 {
