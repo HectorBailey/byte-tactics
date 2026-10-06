@@ -1,4 +1,4 @@
-// Decompiled by Claude Opus 5.5, Opus, DeepSeek V4.1 Flash, space-bunny-free, deepseek-v4.1-flash, Haiku and Sonnet. Names are provisional.
+// Decompiled by DeepSeek V4.1 Flash, Claude Opus 5.5, Opus, space-bunny-free, deepseek-v4.1-flash, Haiku, Sonnet and GPT-6. Names are provisional.
 // The AI's path search (AISearch): an A* over the map's cells with an open
 // heap of nodes (the OpenHeap base, whose sift-up and sift-down are defined
 // here too, at their place in the original file), a per-tick scheduler that
@@ -8,14 +8,96 @@
 #include <windows.h>
 #include <ddraw.h>
 #include <vector>
-// Only for its symbol ids: ProbeStraightPath matches only in a window of the
-// symbol count.
-#include <assert.h>
 
 void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* p);
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
 void __cdecl FUN_004d85a0(void* param_1);
+
+// A min-heap record for MakeHeap and friends (the STL heap the search uses).
+struct Entry_40d670 {
+    Entry_40d670() {}
+    Entry_40d670(const Entry_40d670& o) : value(o.value), key(o.key) {}
+    int value;                       // +0x0
+    float key;                       // +0x4
+};
+
+static inline bool operator<(const Entry_40d670& a, const Entry_40d670& b)
+{
+    return a.key < b.key;
+}
+
+void __stdcall AdjustHeap(Entry_40d670* first, int hole, int len, Entry_40d670 val);
+void __stdcall PushHeapSiftUp(Entry_40d670* first, int hole, int top, Entry_40d670 val);
+
+// Placement copy of a pair of ints (an STL construct helper), like 0x40d600.
+// FUNCTION: 0x40d5e0
+void __stdcall FUN_0040d5e0(int* param_1, int* param_2) {
+    if (param_1 != 0) {
+        param_1[0] = param_2[0];
+        param_1[1] = param_2[1];
+    }
+}
+
+// Placement copy of one char (an STL construct helper), like 0x40d600.
+// FUNCTION: 0x40d600
+void __stdcall FUN_0040d600(char* param_1, char* param_2)
+{
+    if (param_1 != 0) {
+        *param_1 = *param_2;
+    }
+}
+
+// make_heap over [first, last): the STL _Make_heap shape.
+// FUNCTION: 0x40d620
+void __stdcall MakeHeap(Entry_40d670* first, Entry_40d670* last, int*, Entry_40d670*)
+{
+    int n = last - first;
+    for (int h = n / 2; 0 < h; ) {
+        --h;
+        AdjustHeap(first, h, n, Entry_40d670(first[h]));
+    }
+}
+
+// FUNCTION: 0x40d670
+void __stdcall AdjustHeap(Entry_40d670* first, int hole, int len, Entry_40d670 val)
+{
+    int top = hole;
+    int k = 2 * hole + 2;
+
+    while (k < len) {
+        if (first[k] < first[k - 1])
+            k--;
+        first[hole] = first[k];
+        hole = k;
+        k = 2 * k + 2;
+    }
+    if (k == len) {
+        first[hole] = first[k - 1];
+        hole = k - 1;
+    }
+    PushHeapSiftUp(first, hole, top, val);
+}
+
+// FUNCTION: 0x40d700
+void __stdcall PopHeapFirst(Entry_40d670* first, Entry_40d670* last, Entry_40d670* dest,
+                             Entry_40d670 val, void* unused)
+{
+    *dest = *first;
+    AdjustHeap(first, 0, last - first, val);
+}
+
+// push_heap's sift-up (the STL _Push_heap shape) for the heap of
+// AdjustHeap: moves parents down while they are less than val.
+// FUNCTION: 0x40d740
+void __stdcall PushHeapSiftUp(Entry_40d670* first, int hole, int top, Entry_40d670 val)
+{
+    for (int idx = (hole - 1) / 2; top < hole && first[idx] < val; idx = (hole - 1) / 2) {
+        first[hole] = first[idx];
+        hole = idx;
+    }
+    first[hole] = val;
+}
 
 struct Point16 {
     short x;
@@ -271,8 +353,69 @@ public:
     int count;                         // +0x14
     int topPopped;                     // +0x18
 
-    void SiftUp(int i);
+    // FUNCTION: 0x40f000 ?SiftUp@OpenHeap@@QAEXH@Z
+    void SiftUp(int i)
+    {
+        if (i != 0) {
+            int parent = (i - 1) >> 1;
+            Node* node = items[i];
+            Node* p = items[parent];
+            if (node->data.f < p->data.f) {
+                items[i] = p;
+                p->index = i;
+                i = parent;
+                while (i != 0) {
+                    parent = (i - 1) >> 1;
+                    p = items[parent];
+                    if (node->data.f >= p->data.f) break;
+                    items[i] = p;
+                    p->index = i;
+                    i = parent;
+                }
+                items[i] = node;
+                node->index = i;
+            }
+        }
+    }
     void SiftDown(int i);
+    // RemoveNode inlines this copy; the out-of-line 0x40f060 below is what the
+    // other methods call.
+    void SiftDownInline(int i)
+    {
+        Node* node = items[i];
+        while (true) {
+            int left = i * 2 + 1;
+            int right = i * 2 + 2;
+            if (right < count) {
+                Node* l = items[left];
+                Node* r = items[right];
+                if (r->data.f < l->data.f) {
+                    if (r->data.f >= node->data.f)
+                        break;
+                    items[i] = r;
+                    r->index = i;
+                    i = right;
+                } else {
+                    if (l->data.f >= node->data.f)
+                        break;
+                    items[i] = l;
+                    l->index = i;
+                    i = left;
+                }
+            } else {
+                if (left >= count)
+                    break;
+                Node* l = items[left];
+                if (l->data.f >= node->data.f)
+                    break;
+                items[i] = l;
+                items[left]->index = i;
+                i = left;
+            }
+        }
+        items[i] = node;
+        node->index = i;
+    }
     void Clear()
     {
         count = 0;
@@ -359,6 +502,15 @@ public:
     Unit* cursor[10];                  // +0x79
     int budget[10];                    // +0xa1
 
+    // The heuristic estimate: caches the scale before the virtual call, then
+    // truncates the 64-bit product. The original inlines it here; the
+    // out-of-line 0x40da40 below is the same arithmetic returned 64 bits wide.
+    int EstimateCost(int x, int y)
+    {
+        int factor = costScale;
+        int v = target->Cost(x, y);
+        return (int)(((__int64)v * factor) >> 16);
+    }
     int Cost(int x, int y)
     {
         int s = costScale;
@@ -443,8 +595,8 @@ public:
     void MarkGoalCell(unsigned int x, unsigned int y);
     void ClearDirtyCells();
     __int64 Estimate(int param1, int param2);
-    // In pathfind_40da70.cpp: it inlines the node pool's growth (0x40f110),
-    // which StartSearch calls.
+    // Inlines the node pool's growth (0x40f110) that StartSearch calls out of
+    // line.
     void ExpandNeighbour(NodeData* from, Cell* fromCell, int turn);
     int ExpandBestNode();
     void TracePath();
@@ -455,9 +607,27 @@ public:
     Pathfinder();
     ~Pathfinder();
     void RunSearches();
-    // In pathfind_40ef20.cpp: it inlines the sift-down the rest call.
+    // Inlines the sift-down (0x40f060) the other methods call out of line.
     void RemoveNode(int k);
-    void GrowNodes(int n);
+    // FUNCTION: 0x40f110 ?GrowNodes@Pathfinder@@QAEXH@Z
+    void GrowNodes(int n)
+    {
+        int cap = capacity;
+        if (n < cap)
+            n = cap + (cap >> 1) + 0x10;
+        Node* newe = (Node*)operator new(n * 0x14);
+        int i;
+        for (i = 0; i < used; i++)
+            *(newe + i) = pool[i];
+        operator delete(pool);
+        Node** newp = (Node**)operator new(n * 4);
+        for (i = 0; i < count; i++)
+            newp[i] = newe + (items[i] - pool);
+        operator delete(items);
+        pool = newe;
+        items = newp;
+        capacity = n;
+    }
     void FreeNode(int index);
 };
 #pragma pack(pop)
@@ -555,11 +725,97 @@ void Pathfinder::ClearDirtyCells()
     grid.ClearLast(i);
 }
 
+// Maps a (dx, dy) step to one of eight directions, or -1.
+// FUNCTION: 0x40d9c0
+int __stdcall DirectionFromStep(int dx, int dy)
+{
+    if (dx > 0) {
+        if (dy == dx)
+            return 5;
+        if (dy == -dx)
+            return 7;
+        if (dy == 0)
+            return 6;
+    } else if (dx < 0) {
+        if (dy == dx)
+            return 1;
+        if (dy == -dx)
+            return 3;
+        if (dy == 0)
+            return 2;
+    } else {
+        if (dy > 0)
+            return 4;
+        if (dy < 0)
+            return 0;
+    }
+    return -1;
+}
+
 // FUNCTION: 0x40da40
 __int64 Pathfinder::Estimate(int param1, int param2)
 {
     int a = costScale;
     return ((__int64)target->Cost(param1, param2) * (__int64)a) >> 0x10;
+}
+
+// Expands one open-list node onto the navigation grid: for each of the
+// directions in [fromCell->dir - range, fromCell->dir + range], update the
+// neighbour cell's cost and push it or sift it up in the open heap.
+// FUNCTION: 0x40da70
+void Pathfinder::ExpandNeighbour(NodeData* from, Cell* fromCell, int turn)
+{
+    int dir = (fromCell->dir + turn) & 7;
+    unsigned int x = from->pos.x + DAT_004fd670[dir];
+    unsigned int y = from->pos.y + DAT_004fd678[dir];
+    if (!grid.InBounds(x, y))
+        return;
+    unsigned int i = grid.width * y + x;
+    Cell* cell = &grid.cells[i];
+    switch (cell->flags & 3) {
+    case 0: {
+        grid.dirty[i >> 8] |= 1 << ((i >> 3) & 0x1f);
+        unsigned int r = GetCellState(x, y);
+        if (r < 1 && !(cell->flags & 8)) {
+            cell->flags |= 3;
+            return;
+        }
+        int h = EstimateCost(x, y);
+        if (h <= probe)
+            cell->flags |= 5;
+        else
+            cell->flags |= 1;
+        cell->dir = dir;
+        NodeData d;
+        d.pos.x = x;
+        d.pos.y = y;
+        if (turn)
+            d.steps = 1;
+        else
+            d.steps = from->steps + 1;
+        d.penalty = r > 1 ? 0 : 30;
+        d.g = turnCost[turn] + stepCost[dir] + from->g + d.penalty;
+        if (turn && from->steps < 5)
+            d.g += 75;
+        d.f = d.g + h;
+        cell->node = Push(d);
+        break;
+    }
+    case 1: {
+        NodeData* n = &pool[cell->node].data;
+        int g = turnCost[turn] + stepCost[dir] + from->g + n->penalty;
+        if (turn && from->steps < 5)
+            g += 75;
+        if (g < n->g) {
+            cell->dir = dir;
+            n->f += g - n->g;
+            n->g = g;
+            n->steps = Steps(from, turn);
+            Update(cell->node);
+        }
+        break;
+    }
+    }
 }
 
 // Pops the best node from an open list and expands it on the navigation grid.
@@ -1006,29 +1262,19 @@ void Pathfinder::RunSearches()
     }
 }
 
-// Sift-up of a binary min-heap of node pointers; each node stores its heap index.
-// FUNCTION: 0x40f000
-void OpenHeap::SiftUp(int i)
+// Removes node `k` from the open heap: puts it back on the free list, shrinks
+// the heap by one, moves the last heap element into the freed slot and sifts it
+// down. Inlines the free and the sift-down (0x40f060).
+// FUNCTION: 0x40ef20
+void Pathfinder::RemoveNode(int k)
 {
-    if (i != 0) {
-        int parent = (i - 1) >> 1;
-        Node* node = items[i];
-        Node* p = items[parent];
-        if (node->data.f < p->data.f) {
-            items[i] = p;
-            p->index = i;
-            i = parent;
-            while (i != 0) {
-                parent = (i - 1) >> 1;
-                p = items[parent];
-                if (node->data.f >= p->data.f) break;
-                items[i] = p;
-                p->index = i;
-                i = parent;
-            }
-            items[i] = node;
-            node->index = i;
-        }
+    int idx = pool[k].index;
+    Free(k);
+    count--;
+    if (idx < count) {
+        items[idx] = items[count];
+        items[idx]->index = idx;
+        SiftDownInline(idx);
     }
 }
 
@@ -1069,28 +1315,6 @@ void OpenHeap::SiftDown(int i)
     }
     items[i] = node;
     node->index = i;
-}
-
-// Reallocates the element array (20-byte elements) and the parallel array of
-// element pointers of the node pool, fixing up each pointer to the new block.
-// FUNCTION: 0x40f110
-void Pathfinder::GrowNodes(int param_1)
-{
-    int cap = capacity;
-    if (param_1 < cap)
-        param_1 = cap + (cap >> 1) + 0x10;
-    Node* newe = (Node*)operator new(param_1 * 0x14);
-    int i;
-    for (i = 0; i < used; i++)
-        *(newe + i) = pool[i];
-    operator delete(pool);
-    Node** newp = (Node**)operator new(param_1 * 4);
-    for (i = 0; i < count; i++)
-        newp[i] = newe + (items[i] - pool);
-    operator delete(items);
-    items = newp;
-    pool = newe;
-    capacity = param_1;
 }
 
 // Pushes entry `index` onto the free list threaded through the entries.

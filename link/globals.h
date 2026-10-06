@@ -28,8 +28,8 @@ extern double DAT_004fd2b0;                                                     
 extern double DAT_004fd2b8;                                                                   // 0x4fd2b8, 8 bytes; 1 of 1 files
 extern const float DAT_004fd4c0;                                                              // 0x4fd4c0, 4 bytes; 1 of 1 files
 extern const float DAT_004fd4cc;                                                              // 0x4fd4cc, 4 bytes; 1 of 1 files
-extern signed char DAT_004fd670[8];                                                           // 0x4fd670, 8 bytes; 3 of 3 files
-extern signed char DAT_004fd678[8];                                                           // 0x4fd678, 8 bytes; 3 of 3 files
+extern signed char DAT_004fd670[8];                                                           // 0x4fd670, 8 bytes; 2 of 2 files
+extern signed char DAT_004fd678[8];                                                           // 0x4fd678, 8 bytes; 2 of 2 files
 extern float DAT_004fd750;                                                                    // 0x4fd750, 4 bytes; 1 of 1 files
 extern unsigned char DAT_004fdaf0[16];                                                        // 0x4fdaf0, 16 bytes; V4i by value in 1 of 2 files (conflicting: struct names only)
 extern double DAT_004fdbe8;                                                                   // 0x4fdbe8, 8 bytes; 1 of 1 files
