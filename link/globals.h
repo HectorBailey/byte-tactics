@@ -230,7 +230,7 @@ extern char* DAT_0050d4d0;                                                      
 extern char* DAT_0050d660;                                                                    // 0x50d660, 4 bytes; 2 of 2 files
 extern char DAT_0050d6b4[36];                                                                 // 0x50d6b4, 36 bytes; 1 of 1 files
 extern char* DAT_0050d72c;                                                                    // 0x50d72c, 4 bytes; 3 of 3 files
-extern char DAT_005119b8[8];                                                                  // 0x5119b8, 8 bytes; 70 of 75 files (conflicting: shape)
+extern char DAT_005119b8[8];                                                                  // 0x5119b8, 8 bytes; 69 of 74 files (conflicting: shape)
 extern int DAT_005119e8[10];                                                                  // 0x5119e8, 40 bytes; 1 of 1 files
 extern int DAT_00511a10[10];                                                                  // 0x511a10, 40 bytes; 1 of 1 files
 extern int DAT_00511a38;                                                                      // 0x511a38, 4 bytes; 1 of 1 files
@@ -272,7 +272,7 @@ extern unsigned int g_netStatsTick;                                             
 extern unsigned int g_byteRatesTick;                                                          // 0x511ddc, 4 bytes; 1 of 1 files
 extern int DAT_00511de0;                                                                      // 0x511de0, 4 bytes; 2 of 2 files
 extern int DAT_00511de4;                                                                      // 0x511de4, 4 bytes; 1 of 1 files
-extern Game* g_game;                                                                          // 0x511de8, 4 bytes; 787 of 893 files (conflicting: shape)
+extern Game* g_game;                                                                          // 0x511de8, 4 bytes; 786 of 892 files (conflicting: shape)
 extern int DAT_00511dec;                                                                      // 0x511dec, 4 bytes; 1 of 1 files
 extern unsigned char DAT_00511f80[16];                                                        // 0x511f80, 16 bytes; CMemoryCache by value in 5 of 5 files
 extern int DAT_00511f90;                                                                      // 0x511f90, 4 bytes; 1 of 1 files
@@ -292,7 +292,6 @@ extern int DAT_00512290;                                                        
 extern int DAT_00512294;                                                                      // 0x512294, 4 bytes; 1 of 1 files
 extern int DAT_0051229c;                                                                      // 0x51229c, 4 bytes; 1 of 1 files
 extern unsigned char DAT_005122a0[4];                                                         // 0x5122a0, 4 bytes; nothing refers to it
-extern unsigned char DAT_005122c0[4];                                                         // 0x5122c0, 4 bytes; MapCache by value in 1 of 1 files
 extern MapCacheEntry* DAT_005122c4;                                                           // 0x5122c4, 4 bytes; 1 of 1 files
 extern MapCacheEntry* DAT_005122c8;                                                           // 0x5122c8, 4 bytes; 1 of 1 files
 extern unsigned char DAT_005122cc[4];                                                         // 0x5122cc, 4 bytes; nothing refers to it
