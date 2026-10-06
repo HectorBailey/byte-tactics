@@ -1,6 +1,6 @@
 // Decompiled by Haiku. Names are provisional.
 
-class Class_00475090 {
+class Class_00474fc0 {
 public:
     char unknown_0[0x10];
     int field_10;
@@ -10,7 +10,7 @@ public:
 };
 
 // FUNCTION: 0x475090
-int Class_00475090::IsExpired(int unused)
+int Class_00474fc0::IsExpired(int unused)
 {
     return field_14 >= field_10 ? 1 : 0;
 }

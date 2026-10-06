@@ -1,6 +1,6 @@
 // Decompiled by Sonnet. Names are provisional.
 
-class Class_00474cb0 {
+class Class_00474b00 {
 public:
     char unknown_0[0x10];
     int a;  // +0x10
@@ -9,7 +9,7 @@ public:
 };
 
 // FUNCTION: 0x474cb0
-int Class_00474cb0::IsExpired(int unused)
+int Class_00474b00::IsExpired(int unused)
 {
     return b >= a;
 }

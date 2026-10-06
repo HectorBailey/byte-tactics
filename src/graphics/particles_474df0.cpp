@@ -14,7 +14,7 @@ struct Vec3_00474cd0 {
     int z;
 };
 
-struct Record_00474cd0 {
+struct Class_00474b00 {
     void* image;                                  // +0x00, the bitmap 0x475470 draws
     Vec3_00474cd0 pos;                            // +0x04, read back as three
                                                  //   16-bit values by 0x475470
@@ -48,15 +48,15 @@ public:
     virtual int FUN_00472e70() = 0;                     // slot 3
 };
 
-typedef std::vector<Record_00474cd0> Vec_00474cd0;
+typedef std::vector<Class_00474b00> Vec_00474cd0;
 
-// 0x476210 is std::vector<Record_00474cd0>::insert(iterator, size_type,
+// 0x476210 is std::vector<Class_00474b00>::insert(iterator, size_type,
 // const _Ty&), which the original leaves out of line; declaring it here keeps
 // the call out of line too.
 class Class_00476210 {
 public:
     void FUN_00476210(Vec_00474cd0::iterator p, unsigned int m,
-                     const Record_00474cd0& x);
+                     const Class_00474b00& x);
 };
 
 // Vtable 0x4fd618, constructor 0x474cd0, ??_G 0x474d10; 0x38 bytes.
@@ -89,7 +89,7 @@ void SmokeParticles::Emit()
     Vec3_00474cd0* p = &pos;
     Vec_00474cd0* v = &records;
     for (int i = 1; i != 0; i--) {
-        Record_00474cd0 rec;
+        Class_00474b00 rec;
         rec.pos = *p;
         rec.field_18 = unknown_20;
         rec.field_1c = unknown_20;

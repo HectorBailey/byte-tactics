@@ -21,12 +21,6 @@ public:
     char unknown_0[0x44];
 
     void Step();
-};
-
-class Class_00474720 {
-public:
-    char unknown_0[0x44];
-
     int IsExpired(int param_1);
 };
 
@@ -66,7 +60,7 @@ void WakeParticles::Update()
 
     while (it != items.end()) {
         it->Step();
-        if (((Class_00474720*)it)->IsExpired(g_game->field_38a47)) {
+        if (it->IsExpired(g_game->field_38a47)) {
             items.erase(it);
         } else {
             ++it;

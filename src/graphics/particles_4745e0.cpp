@@ -152,7 +152,7 @@ struct Pos_004745e0 {
 };
 #pragma pack(pop)
 
-class Class_004745e0 {              // vector element (see 0x473250.cpp)
+class Class_00474580 {              // vector element (see 0x473250.cpp)
 public:
     char unknown_0[6];
     Pos_004745e0 pos;               // +0x6
@@ -167,7 +167,7 @@ public:
 // position, when that position is visible to the local player. The marker is a
 // 1x1 rectangle centred on the sprite's origin, 0x80/0x20 to the right of it.
 // FUNCTION: 0x4745e0
-void Class_004745e0::DrawParticle(void* surface, short px, short py)
+void Class_00474580::DrawParticle(void* surface, short px, short py)
 {
     Rect_004b0510 r;
     short sx = pos.x - px;

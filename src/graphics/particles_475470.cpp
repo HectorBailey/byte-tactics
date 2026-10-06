@@ -126,7 +126,7 @@ static inline int IsVisible(Player_00475470* map, Position_00475470* pos)
 }
 
 // The 32-byte record; its unculled draw method is 0x475040.
-struct Record_00475470 {
+struct Class_00474b00 {
     void* data;                        // +0x00
     Position_00475470 pos;             // +0x04
     char unknown_10[0x14 - 0x10];
@@ -148,7 +148,7 @@ struct Vec3_00474d50;
 class SmokeParticles : public ParticleSystem {
 public:
     int time;                                           // +0x8
-    std::vector<Record_00475470> records;               // +0xc (_First +0x10)
+    std::vector<Class_00474b00> records;               // +0xc (_First +0x10)
     char unknown_1c[0x38 - 0x1c];
 
     SmokeParticles();
@@ -164,7 +164,7 @@ public:
 // FUNCTION: 0x475470
 void SmokeParticles::FUN_00472e30(int dest)
 {
-    for (std::vector<Record_00475470>::iterator it = records.begin(); it != records.end();
+    for (std::vector<Class_00474b00>::iterator it = records.begin(); it != records.end();
          ++it) {
         it->DrawIfVisible((void*)dest, g_game->scrollX, g_game->scrollY);
     }

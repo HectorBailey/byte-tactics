@@ -362,7 +362,7 @@ struct Game {
     unsigned char fogFlags;        // +0x14281
 };
 
-class Class_00473590 {
+class Class_00473560 {
 public:
     void* data;                    // +0x00
     char unknown_4[0x6 - 0x4];
@@ -393,7 +393,7 @@ static inline int IsSeen_00473590(Player_00473590* p, Player_00473590* q, int co
 }
 
 // FUNCTION: 0x473590
-void Class_00473590::DrawParticle(void* dest, short px, short py)
+void Class_00473560::DrawParticle(void* dest, short px, short py)
 {
     Pos_00473590* q = &pos;
     short sx = q->x - px + 0x80;

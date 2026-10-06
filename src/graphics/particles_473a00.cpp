@@ -102,7 +102,7 @@ static inline int IsSeen_00473a00(Player_00473a00* p, Player_00473a00* q, int co
             (1 << g_game->playerIndex)) != 0;
 }
 
-class Class_00473a00 {
+class Class_004739b0 {
 public:
     char unknown_0[0x2];
     short x;                         // +0x2
@@ -121,7 +121,7 @@ public:
 void __stdcall FillRectangle(void* surface, Rect_004b0510* rect, int color);
 
 // FUNCTION: 0x473a00
-void Class_00473a00::DrawParticle(int param_1, short x, short y)
+void Class_004739b0::DrawParticle(int param_1, short x, short y)
 {
     Rect_004b0510 r;
     r.x1 = (short)(this->x - x) + 0x80;

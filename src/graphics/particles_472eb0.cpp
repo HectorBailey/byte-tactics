@@ -11,14 +11,9 @@
 // The vector element is 0x30 bytes (see 0x4739b0.cpp and 0x473b30.cpp).
 class Class_004739b0 {
 public:
-    char unknown_0[0x30];
-    void Step();
-};
-
-class Class_00473b30 {
-public:
     char unknown_0[0x2c];
     int field_2c;                      // +0x2c
+    void Step();
     int IsExpired(int value);
 };
 
@@ -60,7 +55,7 @@ void NanoParticles::Update()
     std::vector<Class_004739b0>::iterator it = items.begin();
     while (it != items.end()) {
         it->Step();
-        if (((Class_00473b30*)it)->IsExpired(*(int*)(g_game + 0x38a47)))
+        if (it->IsExpired(*(int*)(g_game + 0x38a47)))
             it = items.erase(it);
         else
             ++it;

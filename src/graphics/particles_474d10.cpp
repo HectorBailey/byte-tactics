@@ -30,7 +30,7 @@ public:
     static void __stdcall operator delete(void* p);     // 0x471d50
 };
 
-struct Record_00474cd0 {
+struct Class_00474b00 {
     int unknown[8];
 };
 
@@ -40,7 +40,7 @@ struct Vec3_00474d50;
 class SmokeParticles : public ParticleSystem {
 public:
     int time;                                           // +0x8
-    std::vector<Record_00474cd0> records;               // +0xc (_First +0x10)
+    std::vector<Class_00474b00> records;               // +0xc (_First +0x10)
     char unknown_1c[0x38 - 0x1c];
 
     SmokeParticles();

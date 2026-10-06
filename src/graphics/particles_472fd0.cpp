@@ -6,7 +6,7 @@
 #include <stddef.h>
 #include <vector>
 
-struct Elem_00472fd0 {
+struct Class_004739b0 {
     char unknown_0[0x30];
 };
 
@@ -28,7 +28,7 @@ public:
 class NanoParticles : public ParticleSystem {
 public:
     int field_8;                                        // +0x8
-    std::vector<Elem_00472fd0> items;                   // +0xc (_First +0x10)
+    std::vector<Class_004739b0> items;                   // +0xc (_First +0x10)
     char unknown_1c[0x4c - 0x1c];
 
     virtual void Update();                              // slot 1, 0x472eb0

@@ -17,7 +17,7 @@ struct Game {
 
 extern Game* g_game;
 
-class Class_004745e0 {
+class Class_00474580 {
 public:
     char unknown_0[0x44];
 
@@ -42,7 +42,7 @@ public:
 class WakeParticles : public ParticleSystem {
 public:
     int field_8;                                        // +0x8
-    std::vector<Class_004745e0> items;                  // +0xc (_First +0x10)
+    std::vector<Class_00474580> items;                  // +0xc (_First +0x10)
     char unknown_1c[0x48 - 0x1c];
 
     virtual void Update();                              // slot 1, 0x473170
@@ -56,7 +56,7 @@ public:
 // FUNCTION: 0x473250
 void WakeParticles::FUN_00472e30(int param_1)
 {
-    for (std::vector<Class_004745e0>::iterator it = items.begin(); it != items.end(); ++it) {
+    for (std::vector<Class_00474580>::iterator it = items.begin(); it != items.end(); ++it) {
         it->DrawParticle(param_1, g_game->x, g_game->y);
     }
 }

@@ -37,7 +37,7 @@ public:
     static void __stdcall operator delete(void* p);     // 0x471d50
 };
 
-struct Record_004750b0 {
+struct Class_00474fc0 {
     void* data;                        // +0x00
     int x;                             // +0x04
     int y;                             // +0x08
@@ -54,7 +54,7 @@ struct Vec3_00475150;
 class Class_004750b0 : public ParticleSystem {
 public:
     int time;                                           // +0x8
-    std::vector<Record_004750b0> records;               // +0xc (_First +0x10)
+    std::vector<Class_00474fc0> records;               // +0xc (_First +0x10)
     char unknown_1c[0x34 - 0x1c];
 
     Class_004750b0();
@@ -69,7 +69,7 @@ public:
 // FUNCTION: 0x475600
 void Class_004750b0::Update()
 {
-    std::vector<Record_004750b0>::iterator it = records.begin();
+    std::vector<Class_00474fc0>::iterator it = records.begin();
     while (it != records.end()) {
         it->x += g_game->windX * 8;
         it->y += g_game->rise * 16;

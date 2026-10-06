@@ -10,7 +10,7 @@ struct Game
 
 extern Game* g_game;
 
-class Class_00474720
+class Class_00474580
 {
 public:
     char unknown_0[4];
@@ -21,7 +21,7 @@ public:
 };
 
 // FUNCTION: 0x474720
-int Class_00474720::IsExpired(int param_1)
+int Class_00474580::IsExpired(int param_1)
 {
     if (param_1 <= field_40) {
         int r = GetGroundHeight(sub_4);

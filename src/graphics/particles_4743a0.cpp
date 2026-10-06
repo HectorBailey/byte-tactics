@@ -19,7 +19,7 @@ struct Vec3_004743a0 {
     int z;
 };
 
-struct Record_004743a0 {
+struct Class_00474130 {
     unsigned short* bitmask;                      // +0x00
     Vec3_004743a0 pos0;                           // +0x04
     Vec3_004743a0 pos1;                           // +0x10
@@ -44,13 +44,13 @@ extern Game* g_game;
 
 int __stdcall GetGafFrameCount(unsigned short* p);
 
-typedef std::vector<Record_004743a0> Vec_004743a0;
+typedef std::vector<Class_00474130> Vec_004743a0;
 
 // 0x475bd0 is this vector's insert left out of line by the original; declaring
 // it as a method of its own keeps the call out of line here too.
 class Class_00475bd0 {
 public:
-    void* FUN_00475bd0(Record_004743a0* at, unsigned int n, const Record_004743a0& x);
+    void* FUN_00475bd0(Class_00474130* at, unsigned int n, const Class_00474130& x);
 };
 
 class ThrustParticles {
@@ -78,7 +78,7 @@ void ThrustParticles::FUN_004743a0()
     Vec3_004743a0* p = &pos0;
     Vec_004743a0* v = &records;
     for (int i = 1; i != 0; i--) {
-        Record_004743a0 rec;
+        Class_00474130 rec;
         rec.field_34 = unknown_1c;
         rec.field_38 = field_4;
         rec.field_30 = 0;

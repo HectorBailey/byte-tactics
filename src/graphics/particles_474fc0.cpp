@@ -1,7 +1,7 @@
 // Decompiled by Opus. Names are provisional.
 // Per-tick update of one 32-byte record in the std::vector at +0xc of
 // Class_004750b0 (the family listed in 0x471cc0.cpp; that file calls the
-// record Record_004750b0): drifts the 16.16 position by the wind (x, z) and a
+// record Class_00474fc0): drifts the 16.16 position by the wind (x, z) and a
 // vertical rate (y), and when the timer runs out counts one more step and
 // restarts the timer at a random value between period/2 and period. Slot 1
 // of Class_004750b0 (0x475600) inlines this; this out-of-line copy is never

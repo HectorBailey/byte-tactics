@@ -48,7 +48,7 @@ public:
     virtual int FUN_00472e70() = 0;                     // slot 3
 };
 
-class Class_004745e0 {                 // one element, 0x44 bytes
+class Class_00474580 {                 // one element, 0x44 bytes
 public:
     void* data;                        // +0x00
     Vec3_00474880 pos;                 // +0x04
@@ -71,14 +71,14 @@ public:
     char* last;                        // +0x08
     char* end;                         // +0x0c
 
-    void FUN_00475ef0(char* where, int count, const Class_004745e0& val);
+    void FUN_00475ef0(char* where, int count, const Class_00474580& val);
 };
 
 // Vtable 0x4fd5f8, ??_G 0x4717e0; 0x48 bytes.
 class WakeParticles : public ParticleSystem {
 public:
     int field_8;                                        // +0x8
-    std::vector<Class_004745e0> items;                  // +0xc (_First +0x10)
+    std::vector<Class_00474580> items;                  // +0xc (_First +0x10)
     int field_1c;                                       // +0x1c
     Vec3_00474880 pos_a;                                // +0x20
     Vec3_00474880 pos_b;                                // +0x2c
@@ -104,7 +104,7 @@ void WakeParticles::Emit()
 
     int i = 1;
     do {
-        Class_004745e0 e;
+        Class_00474580 e;
 
         e.field_38 = 0;
         e.field_3c = field_1c;

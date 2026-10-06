@@ -16,7 +16,7 @@ struct Game {
 
 extern Game* g_game;
 
-class Class_00473a00 {
+class Class_004739b0 {
 public:
     char unknown_0[0x30];
     void DrawParticle(int param_1, short x, short y);
@@ -40,7 +40,7 @@ public:
 class NanoParticles : public ParticleSystem {
 public:
     int field_8;                                        // +0x8
-    std::vector<Class_00473a00> items;                  // +0xc (_First +0x10)
+    std::vector<Class_004739b0> items;                  // +0xc (_First +0x10)
     char unknown_1c[0x4c - 0x1c];
 
     virtual void Update();                              // slot 1, 0x472eb0
@@ -54,6 +54,6 @@ public:
 // FUNCTION: 0x472f90
 void NanoParticles::FUN_00472e30(int param_1)
 {
-    for (std::vector<Class_00473a00>::iterator it = items.begin(); it != items.end(); ++it)
+    for (std::vector<Class_004739b0>::iterator it = items.begin(); it != items.end(); ++it)
         it->DrawParticle(param_1, g_game->scroll_x, g_game->scroll_y);
 }

@@ -26,12 +26,6 @@ public:
     char unknown_0[0x3c];
 
     void Step();
-};
-
-class Class_004742a0 {                   // the same element, second method
-public:
-    char unknown_0[0x3c];
-
     int IsExpired(int param_1);
 };
 
@@ -65,7 +59,7 @@ void ThrustParticles::Update()
 {
     for (std::vector<Class_00474130>::iterator it = items.begin(); it != items.end(); ) {
         it->Step();
-        if (((Class_004742a0*)it)->IsExpired(g_game->f_38a47))
+        if (it->IsExpired(g_game->f_38a47))
             items.erase(it);
         else
             ++it;

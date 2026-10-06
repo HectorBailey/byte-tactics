@@ -4,7 +4,7 @@
 // the effect named by g_game->unknown_147cf at this->pos, a random lifetime
 // of 2 to unknown_24 - 1 periods, and a countdown of unknown_20 periods.
 // The records are stepped and aged by slot 1 (0x475600) and drawn by slot 2
-// (0x475700), which read the fields at the offsets named in Record_004750b0.
+// (0x475700), which read the fields at the offsets named in Class_00474fc0.
 // The body runs once per call inside a countdown loop: MSVC 5 folds a one trip
 // loop away when the body is small, and keeps it as a counter when it is not.
 #include <stddef.h>
@@ -42,7 +42,7 @@ struct Vec3_00475150 {
     int z;
 };
 
-struct Record_004750b0 {
+struct Class_00474fc0 {
     void* data;                        // +0x00
     Vec3_00475150 pos;                 // +0x04
     int limit;                         // +0x10
@@ -51,17 +51,17 @@ struct Record_004750b0 {
     int timer;                         // +0x1c
 };
 
-// 0x476490: std::vector<Record_004750b0>::insert, out of line.
+// 0x476490: std::vector<Class_00474fc0>::insert, out of line.
 class Class_00476490 {
 public:
-    void FUN_00476490(Record_004750b0* pos, int count, const Record_004750b0* src);
+    void FUN_00476490(Class_00474fc0* pos, int count, const Class_00474fc0* src);
 };
 
 // Vtable 0x4fd638, constructor 0x4750b0, ??_G 0x475110; 0x34 bytes.
 class Class_004750b0 : public ParticleSystem {
 public:
     int time;                                           // +0x8
-    std::vector<Record_004750b0> records;               // +0xc (_First +0x10)
+    std::vector<Class_00474fc0> records;               // +0xc (_First +0x10)
     int unknown_1c;                                     // +0x1c
     int unknown_20;                                     // +0x20
     int unknown_24;                                     // +0x24
@@ -86,10 +86,10 @@ void Class_004750b0::Emit()
     // into callee saved registers before the loop, and reads the record's
     // position and the vector's _Last through them.
     Vec3_00475150* p = &pos;
-    std::vector<Record_004750b0>* v = &records;
+    std::vector<Class_00474fc0>* v = &records;
     int i = 1;
     do {
-        Record_004750b0 rec;
+        Class_00474fc0 rec;
         rec.pos = *p;
         rec.period = unknown_20;
         rec.timer = unknown_20;

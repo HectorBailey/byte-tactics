@@ -3,7 +3,7 @@
 void* __stdcall GetGafFrame(void* a, int b);
 void __stdcall DrawFrameBlended(void* dest, void* src, int x, int y);
 
-class Class_00475040 {
+class Class_00474fc0 {
 public:
     void* data;                        // +0x00
     char unknown_4[0x6 - 0x4];
@@ -18,7 +18,7 @@ public:
 };
 
 // FUNCTION: 0x475040
-void Class_00475040::DrawParticle(void* dest, short px, short py)
+void Class_00474fc0::DrawParticle(void* dest, short px, short py)
 {
     short sy = y - (height >> 1) - py + 0x20;
     short sx = x - px + 0x80;

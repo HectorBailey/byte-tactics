@@ -38,7 +38,7 @@ public:
 };
 
 // The 32-byte record; its draw method is 0x475040.
-struct Record_004750b0 {
+struct Class_00474fc0 {
     void* data;                        // +0x00
     char unknown_4[0x6 - 0x4];
     short x;                           // +0x06
@@ -64,7 +64,7 @@ struct Vec3_00475150;
 class Class_004750b0 : public ParticleSystem {
 public:
     int time;                                           // +0x8
-    std::vector<Record_004750b0> records;               // +0xc (_First +0x10)
+    std::vector<Class_00474fc0> records;               // +0xc (_First +0x10)
     char unknown_1c[0x34 - 0x1c];
 
     Class_004750b0();
@@ -79,7 +79,7 @@ public:
 // FUNCTION: 0x475700
 void Class_004750b0::FUN_00472e30(int dest)
 {
-    for (std::vector<Record_004750b0>::iterator it = records.begin(); it != records.end(); ++it) {
+    for (std::vector<Class_00474fc0>::iterator it = records.begin(); it != records.end(); ++it) {
         it->Draw((void*)dest, g_game->field_1431f, g_game->field_14323);
     }
 }

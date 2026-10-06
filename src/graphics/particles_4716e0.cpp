@@ -55,7 +55,7 @@ public:
     }
 };
 
-class Class_004745e0 {                 // vector element (see 0x473250.cpp)
+class Class_00474580 {                 // vector element (see 0x473250.cpp)
 public:
     char unknown_0[0x44];
     void DrawParticle(int param_1, short param_2, short param_3);
@@ -65,7 +65,7 @@ public:
 class WakeParticles : public ParticleSystem {
 public:
     int field_8;                                        // +0x8
-    std::vector<Class_004745e0> items;                  // +0xc (_First +0x10)
+    std::vector<Class_00474580> items;                  // +0xc (_First +0x10)
     char unknown_1c[0x48 - 0x1c];
 
     WakeParticles() {}

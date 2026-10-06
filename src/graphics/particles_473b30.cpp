@@ -1,6 +1,6 @@
 // Decompiled by Opus. Names are provisional.
 
-class Class_00473b30 {
+class Class_004739b0 {
 public:
     char unknown_0[0x2c];
     int field_2c;                      // +0x2c
@@ -9,7 +9,7 @@ public:
 };
 
 // FUNCTION: 0x473b30
-int Class_00473b30::IsExpired(int value)
+int Class_004739b0::IsExpired(int value)
 {
     return value > field_2c;
 }

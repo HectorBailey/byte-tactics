@@ -6,7 +6,7 @@
 #include <stddef.h>
 #include <vector>
 
-struct Elem_00473130 {
+struct Class_00474130 {
     char unknown_0[0x3c];
 };
 
@@ -28,7 +28,7 @@ public:
 class ThrustParticles : public ParticleSystem {
 public:
     int field_8;                                        // +0x8
-    std::vector<Elem_00473130> items;                   // +0xc (_First +0x10)
+    std::vector<Class_00474130> items;                   // +0xc (_First +0x10)
     char unknown_1c[0x44 - 0x1c];
 
     virtual void Update();                              // slot 1, 0x473010

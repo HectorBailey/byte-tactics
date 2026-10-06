@@ -70,7 +70,7 @@ public:
     }
 };
 
-class Class_00474170 {                 // vector element (see 0x4730f0.cpp)
+class Class_00474130 {                 // vector element (see 0x4730f0.cpp)
 public:
     char unknown_0[0x3c];
     void DrawParticle(int param_1, short param_2, short param_3);
@@ -90,7 +90,7 @@ struct Shape_00472ab0 {
 class ThrustParticles : public ParticleSystem {
 public:
     int field_8;                                        // +0x8
-    std::vector<Class_00474170> items;                  // +0xc (_First +0x10)
+    std::vector<Class_00474130> items;                  // +0xc (_First +0x10)
     char unknown_1c[0x44 - 0x1c];
 
     ThrustParticles() {}
