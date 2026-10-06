@@ -4640,7 +4640,7 @@ piece,0x507550,22,src/ingame/info_panel_467e50.cpp,3,0,game data
 piece,0x4fd55c,4,src/ingame/info_panel_467440.cpp,5,0,game data
 piece,0x4fd558,4,src/ingame/info_panel_467440.cpp,4,0,game data
 piece,0x4fd554,4,src/ingame/info_panel_467440.cpp,3,0,game data
-piece,0x5074d8,15,src/map/radar_4665d0.cpp,3,0,game data
+piece,0x5074d8,15,src/map/radar.cpp,3,0,game data
 piece,0x4fd550,4,src/game/players_464f80.cpp,2,16,game data
 piece,0x4fd540,8,src/game/players_464f80.cpp,2,0,game data
 piece,0x4fd548,8,src/game/players_464f80.cpp,2,8,game data
