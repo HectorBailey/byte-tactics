@@ -6,7 +6,7 @@
 // element is deleted and erased first. The append lives in an inlined member
 // helper, and here std::vector::insert is inlined too, so both its fast path
 // and its growth path (0x4b4f10 / 0x4b4f20) appear in the body; the class
-// declaration is the one in 0x4750b0.cpp, so the constructor stays an
+// declaration is the one in particles_4750b0.cpp, so the constructor stays an
 // out-of-line call. Closest match is 0x472c50.cpp, which builds the same
 // class; the differences are the owner (a member here, g_game there) and that
 // the insert is out of line there. Operator new (0x471d10) is inlined here as

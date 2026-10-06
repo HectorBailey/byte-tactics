@@ -6,8 +6,8 @@
 // what compile to the signed division by 0x30, and `allocator::allocate` is
 // MSVC 5's `_Allocate` with its `if (_N < 0) _N = 0;` clamp, so nothing here
 // is hand-written. The store of _First into the dead parameter slot is
-// `allocator<Elem>::deallocate`'s inlined first parameter; see 0x475110.cpp
-// for the same store from the inlined ~vector.
+// `allocator<Elem>::deallocate`'s inlined first parameter; see
+// particles_4750b0.cpp for the same store from the inlined ~vector.
 // Its caller 0x473d50 inlines vector::insert and calls this reserve (and
 // vector::size, out of line at 0x475840) with ecx set to the vector.
 #include <vector>

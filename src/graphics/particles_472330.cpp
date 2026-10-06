@@ -61,7 +61,7 @@ public:
     }
 };
 
-class Class_00474130 {                 // vector element (see 0x4730f0.cpp)
+class Class_00474130 {                 // see thrust_particles.cpp
 public:
     char unknown_0[0x3c];
     void DrawParticle(int param_1, short param_2, short param_3);

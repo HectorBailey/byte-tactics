@@ -57,7 +57,7 @@ public:
     }
 };
 
-class Class_00473560 {                 // vector element (see teleport_particles.cpp)
+class Class_00473560 {                 // see teleport_particles.cpp
 public:
     char unknown_0[0x34];
     void DrawParticle(void* p, short a, short b);

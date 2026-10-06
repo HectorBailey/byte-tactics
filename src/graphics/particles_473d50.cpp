@@ -1,6 +1,7 @@
 // Decompiled by deepseek-v4.1-flash, finished by space-bunny-free. Names are provisional.
 //
-// Slot 4 of NanoParticles (vtable 0x4fd5b8, family in 0x471cc0.cpp): makes
+// Slot 4 of NanoParticles (vtable 0x4fd5b8, family in 0x471cc0.cpp; the rest
+// of the class is in nano_particles.cpp, which uses the real <vector>): makes
 // room in the std::vector<Class_004739b0> at +0xc for five particles a beat,
 // then per particle picks a random point in the box at +0x28 around the
 // centre at +0x1c and one in the box at +0x40 around the point at +0x34,

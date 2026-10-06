@@ -4,7 +4,8 @@
 // short index. When that list already holds more than 400 entries its oldest
 // element is deleted and erased first. The append lives in an inlined member
 // helper, which is what leaves std::vector::insert (0x4732e0) out of line.
-// Class family listed in 0x4716a0.cpp; operator new (0x471d10) is inlined here.
+// Class family listed in thrust_particles.cpp; operator new (0x471d10) is
+// inlined here.
 //
 // Signature: four ints forwarded to virtual slot 6, then the short index.
 // ret 0x14 is five dwords, and the virtual callee (a __thiscall, so it pops its
@@ -60,7 +61,7 @@ public:
     }
 };
 
-class Class_00474130 {                 // vector element (see 0x4730f0.cpp)
+class Class_00474130 {                 // see thrust_particles.cpp
 public:
     char unknown_0[0x3c];
 };

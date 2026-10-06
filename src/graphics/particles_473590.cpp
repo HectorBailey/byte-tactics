@@ -180,7 +180,7 @@
 // bytes, and the 128 header sets are exhausted (headers.py: no set beats
 // 85.4). Tried the ByteMap `Get()` route that fixed 0x4745e0, with the
 // Player record reshaped to `unsigned char* data + MapSize size` at +0x7c as
-// in 0x4745e0.cpp and 0x475470.cpp, so that both index reads become
+// in 0x4745e0.cpp and smoke_particles.cpp, so that both index reads become
 // rematerialisable: no `seen`/`w` locals at all, fog arm through
 // `map->explored.Get(col,row)` = `data[size.width*row+col]`, mask arm through
 // a fresh `map->explored.size.width * row + col`.

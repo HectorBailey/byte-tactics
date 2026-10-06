@@ -152,7 +152,7 @@ struct Pos_004745e0 {
 };
 #pragma pack(pop)
 
-class Class_00474580 {              // vector element (see 0x473250.cpp)
+class Class_00474580 {              // see wake_particles.cpp
 public:
     char unknown_0[6];
     Pos_004745e0 pos;               // +0x6

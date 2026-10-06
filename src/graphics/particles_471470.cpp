@@ -54,7 +54,7 @@ public:
     }
 };
 
-class Class_004739b0 {                 // vector element (see 0x472f90.cpp)
+class Class_004739b0 {                 // see nano_particles.cpp
 public:
     char unknown_0[0x30];
 };

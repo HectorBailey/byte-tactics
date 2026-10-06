@@ -56,7 +56,7 @@ public:
     }
 };
 
-class Class_00474580 {                 // vector element (see 0x473250.cpp)
+class Class_00474580 {                 // see wake_particles.cpp
 public:
     char unknown_0[0x44];
     void DrawParticle(int param_1, short param_2, short param_3);
