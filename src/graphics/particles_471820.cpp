@@ -1,4 +1,8 @@
 // Decompiled by space-bunny-free. Names are provisional.
+// A method of ParticleLists, whose other methods are in particles_470f80.cpp;
+// this one sees a list as a std::vector<Elem_00473500> and inlines its insert,
+// which comes out differently there.
+//
 // Creates a SmokeParticles (vtable 0x4fd618), whose constructor (0x474cd0) is
 // called out of line, initialises it through virtual slot 6 (0x474d50) with
 // the first five arguments and the last, then appends it to the

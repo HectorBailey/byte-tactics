@@ -8,7 +8,7 @@
 // std::vector::insert (0x4732e0) out of line.
 // Class family listed in 0x471cc0.cpp; operator new (0x471d10) is inlined here.
 // The byte stored at +0xc is MSVC copying the vector's empty allocator
-// temporary, not a constructor parameter (see 0x471340.cpp).
+// temporary, not a constructor parameter (see particles_470f80.cpp).
 #include <stddef.h>
 #include <string.h>
 #include <vector>

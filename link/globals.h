@@ -508,9 +508,9 @@ extern int (__stdcall* DAT_0051e588)(int);                                      
 extern int DAT_0051e590;                                                                      // 0x51e590, 4 bytes; 4 of 4 files
 extern int g_reportFlags;                                                                     // 0x51e594, 4 bytes; 2 of 2 files
 extern char g_unitSyncStatusText[104];                                                        // 0x51e5a0, 104 bytes; 1 of 1 files
-extern char DAT_0051e608;                                                                     // 0x51e608, 1 bytes; 21 of 21 files
+extern char DAT_0051e608;                                                                     // 0x51e608, 1 bytes; 18 of 18 files
 extern unsigned char DAT_0051e609[7];                                                         // 0x51e609, 7 bytes; nothing refers to it
-extern unsigned char DAT_0051e610[36];                                                        // 0x51e610, 36 bytes; Class_00470ed0 by value in 24 of 26 files (conflicting: struct names only)
+extern unsigned char DAT_0051e610[36];                                                        // 0x51e610, 36 bytes; Class_00470ed0 by value in 21 of 23 files (conflicting: struct names only)
 extern unsigned char DAT_0051e634;                                                            // 0x51e634, 1 bytes; 1 of 1 files
 extern unsigned char DAT_0051e635[7];                                                         // 0x51e635, 7 bytes; nothing refers to it
 extern char* DAT_0051e63c;                                                                    // 0x51e63c, 4 bytes; 3 of 3 files

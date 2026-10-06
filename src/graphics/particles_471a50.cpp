@@ -1,4 +1,8 @@
 // Decompiled by space-bunny-free. Names are provisional.
+// A method of ParticleLists, whose other methods are in particles_470f80.cpp;
+// this one sees a list as a std::vector<Elem_00473500> and inlines its insert,
+// which comes out differently there.
+//
 // Creates a Class_004750b0 (vtable 0x4fd638) from the object pool, initialises
 // it through virtual slot 6 (0x475150) with the first four arguments, then
 // appends it to the std::vector of pointers selected by the short index in the

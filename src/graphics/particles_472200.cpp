@@ -7,7 +7,7 @@
 // leaves std::vector::insert (0x4732e0) out of line. Same shape as the matched
 // 0x471470, but a free function that reads the list owner out of g_game.
 // The byte stored at +0xc is MSVC copying the vector's empty allocator
-// temporary, not a constructor parameter (see 0x471340.cpp).
+// temporary, not a constructor parameter (see particles_470f80.cpp).
 #include <stddef.h>
 #include <string.h>
 #include <vector>
