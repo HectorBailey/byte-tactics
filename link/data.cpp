@@ -666,6 +666,7 @@ unsigned char DAT_0051fb4c[4];  // 0x51fb4c .bss
 int DAT_0051fb90;  // 0x51fb90 .bss
 unsigned long DAT_0051fb94;  // 0x51fb94 .bss
 unsigned char DAT_0051fb98[4];  // 0x51fb98 .bss
+char* g_loopingWav;  // 0x51fb9c .bss
 int* g_diskWav;  // 0x51fba0 .bss
 Dialog* g_guiContext;  // 0x51fba4 .bss
 int DAT_0051fba8;  // 0x51fba8 .bss

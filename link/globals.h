@@ -569,7 +569,8 @@ extern unsigned char DAT_0051fb4c[4];                                           
 extern int DAT_0051fb90;                                                                      // 0x51fb90, 4 bytes; 1 of 1 files
 extern unsigned long DAT_0051fb94;                                                            // 0x51fb94, 4 bytes; 1 of 1 files
 extern unsigned char DAT_0051fb98[4];                                                         // 0x51fb98, 4 bytes; nothing refers to it
-extern int* g_diskWav;                                                                        // 0x51fba0, 4 bytes; 2 of 2 files
+extern char* g_loopingWav;                                                                    // 0x51fb9c, 4 bytes; 1 of 1 files
+extern int* g_diskWav;                                                                        // 0x51fba0, 4 bytes; 1 of 1 files
 extern Dialog* g_guiContext;                                                                  // 0x51fba4, 4 bytes; 15 of 31 files (conflicting: shape)
 extern int DAT_0051fba8;                                                                      // 0x51fba8, 4 bytes; 1 of 1 files
 extern int DAT_0051fbac;                                                                      // 0x51fbac, 4 bytes; 1 of 1 files
@@ -701,7 +702,7 @@ extern int DAT_0052a4f4;                                                        
 extern void* DAT_0052a4f8;                                                                    // 0x52a4f8, 4 bytes; 3 of 3 files
 extern long DAT_0052a4fc;                                                                     // 0x52a4fc, 4 bytes; 2 of 3 files (conflicting: signedness or const)
 
-// Not declared: 237 globals defined in a data file or whose type is not settled (see data/globals.csv).
+// Not declared: 236 globals defined in a data file or whose type is not settled (see data/globals.csv).
 //   0x513000 g_packetManager: defined in src/network/packets_460e20.cpp
 //   0x5119c0 g_playerAI: PlayerAI*[] (11), void*[] (5), Owner*[] (3), Player_40b0d0*[] (1), and 2 more
 //   0x51fbd0 g_display: void* (4), int (2), Display_004b4f50* (1), Display_004b5370* (1), and 14 more
@@ -778,7 +779,6 @@ extern long DAT_0052a4fc;                                                       
 //   0x51e550 DAT_0051e550: char** (1), void** (1), int (1)
 //   0x51e660 DAT_0051e660: int* (2), char* (1)
 //   0x51fb50 DAT_0051fb50: char[] (2), const char[] (1)
-//   0x51fb9c g_loopingWav: const char* (1), int (1), char* (1)
 //   0x51fe08 g_screenLocks: part of another global: g_language+0x48
 //   0x528a10 DAT_00528a10: void* (2), Node_004ddc00* (1)
 //   0x528ac0 DAT_00528ac0: void* (1), void (__stdcall*)(void) (1), int (__stdcall*)(unsigned long, void*, void*, void*, void*, void*, void*, void*, void*) (1)
