@@ -5029,16 +5029,16 @@ piece,0x5052fc,14,src/orders/order_dispatch_43f0e0.cpp,9,0,game data
 piece,0x5052f0,10,src/orders/order_dispatch_43f0e0.cpp,8,0,game data
 piece,0x5016c4,8,src/orders/order_dispatch_43f0e0.cpp,7,0,game data
 piece,0x5052e4,12,src/orders/order_dispatch_43f0e0.cpp,6,0,game data
-piece,0x5052d4,15,src/units/unit_scripts_43e400.cpp,3,0,game data
-piece,0x5052c8,10,src/units/unit_scripts_43e3c0.cpp,3,0,game data
-piece,0x5052b8,15,src/units/unit_scripts_43e2e0.cpp,8,0,game data
-piece,0x5052a4,17,src/units/unit_scripts_43e2e0.cpp,7,0,game data
-piece,0x505294,16,src/units/unit_scripts_43e2e0.cpp,6,0,game data
-piece,0x505284,13,src/units/unit_scripts_43e2e0.cpp,5,0,game data
-piece,0x505274,15,src/units/unit_scripts_43e2e0.cpp,4,0,game data
-piece,0x505264,14,src/units/unit_scripts_43e2e0.cpp,3,0,game data
+piece,0x5052d4,15,src/units/unit_scripts.cpp,29,0,game data
+piece,0x5052c8,10,src/units/unit_scripts.cpp,26,0,game data
+piece,0x5052b8,15,src/units/unit_scripts.cpp,23,0,game data
+piece,0x5052a4,17,src/units/unit_scripts.cpp,22,0,game data
+piece,0x505294,16,src/units/unit_scripts.cpp,21,0,game data
+piece,0x505284,13,src/units/unit_scripts.cpp,16,0,game data
+piece,0x505274,15,src/units/unit_scripts.cpp,15,0,game data
+piece,0x505264,14,src/units/unit_scripts.cpp,14,0,game data
 piece,0x505258,9,src/orders/order_list_43cc20.cpp,31,0,game data
-piece,0x505248,13,src/units/unit_scripts_43db50.cpp,3,0,game data
+piece,0x505248,13,src/units/unit_scripts.cpp,3,0,game data
 piece,0x50523c,11,src/orders/order_list_43cc20.cpp,22,0,game data
 piece,0x505230,12,src/orders/order_list_43cc20.cpp,21,0,game data
 piece,0x505224,10,src/orders/order_list_43cc20.cpp,20,0,game data
@@ -12036,7 +12036,7 @@ same,0x504ea0,7,src/map/mission.cpp,137,0,
 same,0x504e98,5,src/map/mission.cpp,136,0,
 same,0x512340,16,src/orders/order_list_43bc90.cpp,4,0,
 same,0x512340,16,src/orders/order_list_43c050.cpp,4,0,
-same,0x4fd2e8,4,src/units/unit_scripts_43e490.cpp,3,0,
+same,0x4fd2e8,4,src/units/unit_scripts.cpp,34,0,
 same,0x4fd2e8,4,src/orders/order_dispatch_43f0e0.cpp,3,0,
 same,0x440290,80,src/units/movement_class_440230.cpp,6,0,
 same,0x512758,1,src/units/movement_class_440290.cpp,3,1024,
