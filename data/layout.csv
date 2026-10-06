@@ -4278,8 +4278,8 @@ piece,0x4fd768,4,src/game/mission_conditions.cpp,3,0,game data
 piece,0x4fd758,4,src/ingame/selection_48dd10.cpp,3,0,game data
 piece,0x508da0,7,src/ingame/selection_48dc30.cpp,4,0,game data
 piece,0x4fd760,8,src/ingame/selection_48cf30.cpp,5,0,game data
-piece,0x4fd748,4,src/units/unit_position_48b200.cpp,3,0,game data
-piece,0x4fd74c,4,src/units/unit_position_48b200.cpp,3,4,game data
+piece,0x4fd748,4,src/units/unit_position.cpp,17,0,game data
+piece,0x4fd74c,4,src/units/unit_position.cpp,17,4,game data
 piece,0x5050f4,14,src/units/unit.cpp,4,0,game data
 piece,0x505104,13,src/units/unit.cpp,18,0,game data
 piece,0x508d58,14,src/units/unit_targets_48a1e0.cpp,3,0,game data
@@ -12252,7 +12252,6 @@ same,0x51e6b0,16,src/units/unit_commands_488a00.cpp,4,0,
 same,0x51e6b0,16,src/units/unit_commands_488bf0.cpp,4,0,
 same,0x4fd748,4,src/units/unit.cpp,15,0,
 same,0x508d80,9,src/units/unit_targets_489fa0.cpp,3,0,
-same,0x4fd748,4,src/units/unit_position_48ad30.cpp,3,0,
 same,0x4fd758,4,src/ingame/selection_48bd50.cpp,3,0,
 same,0x4fd758,4,src/ingame/selection_48be00.cpp,3,0,
 same,0x4fd758,4,src/ingame/selection_48bf30.cpp,3,0,
