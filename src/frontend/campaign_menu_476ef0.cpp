@@ -1,7 +1,7 @@
 // Decompiled by deepseek-v4.1-flash, finished by GPT-6, edited by deepseek-v4.1, finished by deepseek-v4.1-flash, finished by space-bunny-free, finished by deepseek-v4.1-flash, finished by opus. Names are provisional.
 // Draws one page of the help text (DAT_0051e63c) into the dialog's
 // "TextRegion" gadgets, one gadget per line, with "&R", "&Y", "&G" colour
-// sections drawn over the line through FUN_004afd80.
+// sections drawn over the line through AddBlinkWord.
 #include <string.h>
 
 #pragma pack(push, 1)
@@ -52,8 +52,8 @@ extern unsigned char DAT_00507b70[];
 extern char DAT_005119b8;
 
 int __stdcall FindGadgetIndex(Entry_476ef0* gadgets, const char* name, int type);
-void __stdcall FUN_004afec0(Menu_476ef0* menu);
-void __stdcall FUN_004afd20(Menu_476ef0* menu, int value);
+void __stdcall ClearBlinkWords(Menu_476ef0* menu);
+void __stdcall SetBlinkGadget(Menu_476ef0* menu, int value);
 void __stdcall SelectFontForEntry(Entry_476ef0* gadgets, int index);
 void* __cdecl GetFont();
 int __stdcall FontHeight(void* font);
@@ -64,7 +64,7 @@ void __stdcall AddTextGadget(Holder_476ef0* dialog, const char* name, char* text
 void __stdcall FUN_004a0bf0(Menu_476ef0* menu, const char* name, char* text,
                             int value);
 void __stdcall FUN_004a0c70(Menu_476ef0* menu, const char* name, int value);
-void __stdcall FUN_004afd80(Menu_476ef0* menu, char* text, int x, int y,
+void __stdcall AddBlinkWord(Menu_476ef0* menu, char* text, int x, int y,
                             int count, int colour, float a, float b);
 
 // Left unannotated so it inlines twice; two pointers walk in step, found and
@@ -108,8 +108,8 @@ void DrawHelpPage()
         gadgets[0].u.count = (short)DAT_0051e66c;
     }
 
-    FUN_004afec0(&g_game->menu);
-    FUN_004afd20(&g_game->menu,
+    ClearBlinkWords(&g_game->menu);
+    SetBlinkGadget(&g_game->menu,
                  FindGadgetIndex(gadgets, "TextRegion", 5));
     int idx = FindGadgetIndex(gadgets, "TextRegion", 0xe);
     Entry_476ef0* gp = &gadgets[idx];
@@ -187,7 +187,7 @@ void DrawHelpPage()
                         q++;
                     }
                     buf[k] = 0;
-                    FUN_004afd80(&g_game->menu, buf, x, ey, colour, 0x5e,
+                    AddBlinkWord(&g_game->menu, buf, x, ey, colour, 0x5e,
                                  1.0f, 0.25f);
                 } else if (*lineStart == '&') {
                     colourState = 1;

@@ -75,7 +75,7 @@ void __stdcall GetBasePosition(int index, Vec3* out);
 unsigned short __stdcall ChooseBuildOption(unsigned int player, Unit_00408100* unit);
 int __stdcall FindBuildPosition(unsigned int player, Vec3* from, Item_00408100* item, Vec3* out);
 int __stdcall GetBuilderCount(unsigned int player);
-Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit_00408100* unit, Unit_00408100* target, Vec3* pos);
+Class_00438760 __stdcall GetOrderType(unsigned char mode, Unit_00408100* unit, Unit_00408100* target, Vec3* pos);
 void __stdcall AddOrder(Class_00438760 kind, int remove, Unit_00408100* unit, Unit_00408100* target, Vec3* pos, int param_6, int param_7);
 int __stdcall RandomInt(int range);
 
@@ -147,7 +147,7 @@ void Class_004085d0::OnTimer()
                         ok = 0;
                 }
                 if (ok) {
-                    Class_00438760 kind = FUN_0043f0e0(0xe, u, 0, &pos);
+                    Class_00438760 kind = GetOrderType(0xe, u, 0, &pos);
                     AddOrder(kind, 0, u, 0, &pos, idx, 1);
                 }
             }
@@ -168,9 +168,9 @@ void Class_004085d0::OnTimer()
                 // operator+ builds all three sums before storing; named sums differ.
                 target = origin + d;
                 Class_00438760 kind;
-                kind = FUN_0043f0e0(2, u, 0, &target);
+                kind = GetOrderType(2, u, 0, &target);
                 AddOrder(kind, 0, u, 0, &target, 0, 0);
-                kind = FUN_0043f0e0(9, u, 0, &origin);
+                kind = GetOrderType(9, u, 0, &origin);
                 AddOrder(kind, 1, u, 0, &origin, 0, 0);
             } else {
                 Vec3 d = origin - u->pos;
@@ -187,7 +187,7 @@ void Class_004085d0::OnTimer()
                     }
                     target = u->pos + d;
                 }
-                Class_00438760 kind = FUN_0043f0e0(9, u, 0, &target);
+                Class_00438760 kind = GetOrderType(9, u, 0, &target);
                 AddOrder(kind, 0, u, 0, &target, 0, 0);
             }
         }

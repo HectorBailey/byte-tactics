@@ -399,7 +399,7 @@ void __stdcall SeedRandom(int x);
 void __stdcall SleepMilliseconds(int x);
 int __stdcall RandomInt(int x);
 unsigned char __stdcall FindHostSlot();
-void FUN_00431740();
+void ApplyUseOnlyUnits();
 void HandleNetPackets();
 void __stdcall LoadPlayerControllers(void* mission);
 void FUN_0047a760();
@@ -432,7 +432,7 @@ void __stdcall FUN_004a50e0(void* surface, const char* text, int x, int y, int l
 char* __stdcall Translate(char* s);
 
 void LoadThreadMain();
-void FUN_00499200();
+void BattleFrame();
 void __cdecl FUN_004609a0(int);
 void __cdecl BlankScreen();
 void __cdecl FreePictureCache();
@@ -550,7 +550,7 @@ void __cdecl LoadMatch(void*)
     case 1:
         DAT_005091cc = 0;
         FUN_00496e10((Settings_00496e10*)((char*)g_game + 0x39219));
-        FUN_00431740();
+        ApplyUseOnlyUnits();
         break;
     case 2:
         *(unsigned short*)((char*)g_game + 0x37ee6) = *(unsigned short*)((char*)g_game + 0x37eec);
@@ -868,7 +868,7 @@ void __stdcall DrawSyncStatus(void* surface)
 }
 // The loading-screen frame: on the first call it starts the loader thread
 // (LoadThreadMain), once the loader sets the "loaded" bit it restores the game
-// screen and installs the game frame handler (FUN_00499200), and otherwise it
+// screen and installs the game frame handler (BattleFrame), and otherwise it
 // draws the six progress bars.
 // FUNCTION: 0x497f40
 void LoadingScreenFrame(void)
@@ -976,7 +976,7 @@ void LoadingScreenFrame(void)
         FUN_00496790();
         FUN_004c2870();
         g_game->field_391f1 = 6;
-        g_game->field_391f5 = FUN_00499200;
+        g_game->field_391f5 = BattleFrame;
         SetCloseHandler(FUN_004609a0, 0);
         g_game->field_589 = 0;
         memset((void*)g_game->progress, 0, 8);

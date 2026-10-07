@@ -209,7 +209,7 @@ class Mission {
 public:
     char* FUN_004356c0(int index);
     char* FUN_00435c30();
-    void FUN_00435d30(int arg);
+    void RefreshMapList(int arg);
 };
 
 
@@ -612,7 +612,7 @@ void LoadSettings()
     if (ReadRegistryData("Total Annihilation", "SkirmishMap",
                      g_game->options->skirmishMap, &value) == 0) {
         FUN_00434ab0(2);
-        ((Mission*)g_game->campaign)->FUN_00435d30(0);
+        ((Mission*)g_game->campaign)->RefreshMapList(0);
         strncpy(g_game->options->skirmishMap,
                 ((Mission*)g_game->campaign)->FUN_00435c30(), 0x100);
         FUN_00434ab0(0);
@@ -789,7 +789,7 @@ void SaveSettings()
 // Mission returns for index 6: clears bit 23 (0x800000) on every unit
 // type, then sets it on each type named by the entry.
 // FUNCTION: 0x431740
-void FUN_00431740()
+void ApplyUseOnlyUnits()
 {
     TdfFile parser;
     char name[256];

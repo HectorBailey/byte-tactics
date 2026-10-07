@@ -579,7 +579,7 @@ static inline int Selectable(Unit_0043e490* t) {
 }
 
 // Returns the cursor/action code for an order of type
-// `mode` given by `unit` on `target` / `pos`; FUN_0043f0e0 is the sibling that
+// `mode` given by `unit` on `target` / `pos`; GetOrderType is the sibling that
 // returns the action's name.
 // FUNCTION: 0x43e490
 int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e490* target,

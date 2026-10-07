@@ -4649,7 +4649,7 @@ class Class_004379a0 {  // 0x1 bytes, 4 views
 public:
     char unknown_0[1];
     int AllocHandle(int*, int);
-    void FUN_004379a0(void);
+    void ClearPointers(void);
     void InitCache(int);
     void FUN_00437a20(void);
 };
@@ -5621,7 +5621,7 @@ public:
     char* list;  // +0xd24
     int count;  // +0xd28
     int multi;  // +0xd2c
-    void FUN_00435d30(int);
+    void RefreshMapList(int);
 };
 
 class Class_004cf210 {  // 0x30 bytes, 2 views
@@ -6033,7 +6033,7 @@ public:
     int LoadMissionByName(char*);
     int FUN_00435c30(void);
     int AdvanceMission(void);
-    int FUN_00436860(int, Unit*, char*);
+    int SelectSchema(int, Unit*, char*);
     int GetStartPosition(Vec3*, int);
     void LoadCampaign(char*);
     void FUN_00435c00(int);
@@ -6246,7 +6246,7 @@ public:
     int field_4;  // +0x4
     char unknown_8[4];
     int field_c;  // +0xc
-    Class_004379a0_2* FUN_004379a0(void);
+    Class_004379a0_2* ClearPointers(void);
 };
 
 struct Chunk {  // 0x8 bytes, 4 views

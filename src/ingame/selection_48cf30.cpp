@@ -74,7 +74,7 @@ struct Game {
 extern Game* g_game;
 
 int __stdcall FUN_0043e470(unsigned char type);
-Class_00438760 __stdcall FUN_0043f0e0(unsigned char mode, Unit* unit,
+Class_00438760 __stdcall GetOrderType(unsigned char mode, Unit* unit,
                                        Unit* target, void* param_5);
 void __stdcall FUN_0043afc0(OrderType kind, int flag, Unit* unit,
                             Unit* target, int* pos, int param_5, int param_6);
@@ -121,7 +121,7 @@ void __stdcall IssueOrderToSelection(UnitType_0048cf30* entry, unsigned char mod
         if (!(u->flags & 0x10) || u == except)
             continue;
         if (mode)
-            kind.index = FUN_0043f0e0(mode, u, except, &g_game->field_2caa).index;
+            kind.index = GetOrderType(mode, u, except, &g_game->field_2caa).index;
         if (!kind.index)
             continue;
         // fire and move are named locals from the Order() wrapper, not constructed
