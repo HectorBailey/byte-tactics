@@ -11,11 +11,11 @@
 // 0x4cbe70  BlitRectKeyed(dst, src, rect, pos, key)         copy a rectangle, skipping the key colour
 // 0x4cbef1  BlitTile32x32(dst, x, y, tile)                  copy a 32 x 32 tile to (x, y)
 // 0x4cbf2c  BlitRectBlended(dst, src, rect, pos, key, table)  dst = table[src][dst], skipping the key
-// 0x4cbfc4  FUN_004cbfc4(dst, src, rect, pos, key, table)  dst = table[dst] under each non-key pixel
+// 0x4cbfc4  BlitRectRemapDest(dst, src, rect, pos, key, table)  dst = table[dst] under each non-key pixel
 // 0x4cc057, 0x4cc1bf, 0x4cc3d0, 0x4cc51d                    run-length sprite blitters
 //           (pixels, pitch, drect, runs, srect[, table]): each row of runs follows
 //           its byte length (a word); a run's count byte says skip, copy or repeat
-// 0x4cc332  FUN_004cc332(dst, src, rect, pos, key, table)  dst = table[src - 0x4f][dst],
+// 0x4cc332  BlitRectShadow(dst, src, rect, pos, key, table)  dst = table[src - 0x4f][dst],
 //                                                           skipping the key
 // 0x4cc650  IsLineVisible(surface, x0, y0, x1, y1)          0 when the segment misses the surface
 // 0x4cc7ab  FUN_004cc7ab(surface, x0, y0, x1, y1, color)   draw a line
@@ -528,7 +528,7 @@ extern "C" __declspec(naked) void __cdecl BlitSurface(void* dst, void* src, int 
         leave
         ret
 
-        // ENTRY: 0x4cbfc4
+        // ENTRY: 0x4cbfc4 _BlitRectRemapDest
     L004cbfc4:
         push ebp
         mov ebp, esp
@@ -602,7 +602,7 @@ extern "C" __declspec(naked) void __cdecl BlitSurface(void* dst, void* src, int 
         leave
         ret
 
-        // ENTRY: 0x4cc057
+        // ENTRY: 0x4cc057 _BlitCompressedBlended
     L004cc057:
         push ebp
         mov ebp, esp
@@ -813,7 +813,7 @@ extern "C" __declspec(naked) void __cdecl BlitSurface(void* dst, void* src, int 
         jne L004cc1a0
         jmp L004cc114
 
-        // ENTRY: 0x4cc1bf
+        // ENTRY: 0x4cc1bf _BlitCompressedShadow
     L004cc1bf:
         push ebp
         mov ebp, esp
@@ -1024,7 +1024,7 @@ extern "C" __declspec(naked) void __cdecl BlitSurface(void* dst, void* src, int 
         jne L004cc310
         jmp L004cc27c
 
-        // ENTRY: 0x4cc332
+        // ENTRY: 0x4cc332 _BlitRectShadow
     L004cc332:
         push ebp
         mov ebp, esp
@@ -1302,7 +1302,7 @@ extern "C" __declspec(naked) void __cdecl BlitCompressedLit(unsigned char* pixel
         jne L004cc504
         jmp L004cc48c
 
-        // ENTRY: 0x4cc51d
+        // ENTRY: 0x4cc51d _BlitCompressed
     L004cc51d:
         push ebp
         mov ebp, esp

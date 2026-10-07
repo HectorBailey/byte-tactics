@@ -2916,12 +2916,12 @@ address,name
 0x4cbe70,BlitRectKeyed
 0x4cbef1,BlitTile32x32
 0x4cbf2c,BlitRectBlended
-0x4cbfc4,FUN_004cbfc4
-0x4cc057,FUN_004cc057
-0x4cc1bf,FUN_004cc1bf
-0x4cc332,FUN_004cc332
+0x4cbfc4,BlitRectRemapDest
+0x4cc057,BlitCompressedBlended
+0x4cc1bf,BlitCompressedShadow
+0x4cc332,BlitRectShadow
 0x4cc3d0,BlitCompressedLit
-0x4cc51d,FUN_004cc51d
+0x4cc51d,BlitCompressed
 0x4cc7ab,FUN_004cc7ab
 0x4cc8df,FUN_004cc8df
 0x4ccdea,FUN_004ccdea
