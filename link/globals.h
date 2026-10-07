@@ -271,7 +271,7 @@ extern int DAT_00511dd4;                                                        
 extern unsigned int g_netStatsTick;                                                           // 0x511dd8, 4 bytes; 1 of 1 files
 extern unsigned int g_byteRatesTick;                                                          // 0x511ddc, 4 bytes; 1 of 1 files
 extern int DAT_00511de0;                                                                      // 0x511de0, 4 bytes; 2 of 2 files
-extern int DAT_00511de4;                                                                      // 0x511de4, 4 bytes; 1 of 1 files
+extern int g_cdPathMismatch;                                                                  // 0x511de4, 4 bytes; 1 of 1 files
 extern Game* g_game;                                                                          // 0x511de8, 4 bytes; 775 of 879 files (conflicting: shape)
 extern int DAT_00511dec;                                                                      // 0x511dec, 4 bytes; 1 of 1 files
 extern unsigned char DAT_00511f80[16];                                                        // 0x511f80, 16 bytes; CMemoryCache by value in 5 of 5 files
@@ -561,8 +561,8 @@ extern int DAT_0051f2f0;                                                        
 extern int DAT_0051f2f4;                                                                      // 0x51f2f4, 4 bytes; 1 of 1 files
 extern unsigned int DAT_0051f2f8;                                                             // 0x51f2f8, 4 bytes; 1 of 1 files
 extern int DAT_0051f2fc;                                                                      // 0x51f2fc, 4 bytes; 1 of 1 files
-extern int DAT_0051f300;                                                                      // 0x51f300, 4 bytes; 1 of 1 files
-extern int DAT_0051f304;                                                                      // 0x51f304, 4 bytes; 1 of 1 files
+extern int g_netProbeNextTick;                                                                // 0x51f300, 4 bytes; 1 of 1 files
+extern int g_netHeartbeatNextTick;                                                            // 0x51f304, 4 bytes; 1 of 1 files
 extern "C" unsigned char DAT_0051f308[8];                                                     // 0x51f308, 4 bytes; extern "C" (no type) in declared extern "C" in 1 of 1 files, but used past its end
 extern unsigned char DAT_0051f31c;                                                            // 0x51f31c, 1 bytes; 1 of 1 files
 extern unsigned char DAT_0051f320[2088];                                                      // 0x51f320, 2088 bytes; App_0049e830 by value in 1 of 1 files

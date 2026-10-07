@@ -367,7 +367,7 @@ int DAT_00511dd4;  // 0x511dd4 .bss
 unsigned int g_netStatsTick;  // 0x511dd8 .bss
 unsigned int g_byteRatesTick;  // 0x511ddc .bss
 int DAT_00511de0;  // 0x511de0 .bss
-int DAT_00511de4;  // 0x511de4 .bss
+int g_cdPathMismatch;  // 0x511de4 .bss
 Game* g_game;  // 0x511de8 .bss
 int DAT_00511dec;  // 0x511dec .bss
 unsigned char DAT_00511f80[16];  // 0x511f80 .bss
@@ -657,8 +657,8 @@ int DAT_0051f2f0;  // 0x51f2f0 .bss
 int DAT_0051f2f4;  // 0x51f2f4 .bss
 unsigned int DAT_0051f2f8;  // 0x51f2f8 .bss
 int DAT_0051f2fc;  // 0x51f2fc .bss
-int DAT_0051f300;  // 0x51f300 .bss
-int DAT_0051f304;  // 0x51f304 .bss
+int g_netProbeNextTick;  // 0x51f300 .bss
+int g_netHeartbeatNextTick;  // 0x51f304 .bss
 unsigned char DAT_0051f308[8];  // 0x51f308 .bss
 unsigned char DAT_0051f31c;  // 0x51f31c .bss
 unsigned char DAT_0051f320[2088];  // 0x51f320 .bss
