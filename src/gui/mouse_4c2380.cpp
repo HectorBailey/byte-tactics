@@ -1,5 +1,5 @@
 // Decompiled by Opus. Names are provisional.
-// GetRect is the body of FUN_004c2340 (copies the 24-byte rectangle at +0x196
+// GetRect is the body of GetCurrentMouseEvent (copies the 24-byte rectangle at +0x196
 // with memcpy); a struct assignment computes the source with mov/add, not lea.
 #include <string.h>
 struct Rect_004c2380 {

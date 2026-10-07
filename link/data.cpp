@@ -367,7 +367,7 @@ int DAT_00511dd4;  // 0x511dd4 .bss
 unsigned int g_netStatsTick;  // 0x511dd8 .bss
 unsigned int g_byteRatesTick;  // 0x511ddc .bss
 int DAT_00511de0;  // 0x511de0 .bss
-int DAT_00511de4;  // 0x511de4 .bss
+int g_cdPathMismatch;  // 0x511de4 .bss
 Game* g_game;  // 0x511de8 .bss
 int DAT_00511dec;  // 0x511dec .bss
 unsigned char DAT_00511f80[16];  // 0x511f80 .bss
