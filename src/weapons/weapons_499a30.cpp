@@ -108,6 +108,7 @@ extern Game* g_game;
 
 void* __cdecl FUN_004d83b0(char* name, unsigned int size);
 
+// Allocates and clears the 0x7d64-byte weapon array, then resets its count.
 // FUNCTION: 0x499a30
 void AllocWeaponArray(void)
 {
@@ -229,6 +230,13 @@ struct Packet_00499ab0 {
 
 int __stdcall BroadcastPacket(int player, void* data, int size);
 
+// Builds the 0x24 byte "unit status" network message (type 0xd) and hands it
+// to BroadcastPacket. Only sent while g_game's bit 0 flag is set. Sibling of
+// 0x499ba0, which sends the same type and size.
+//
+// The byte at packet +0x1a is a 1 bit bitfield that is only ever read and
+// write back by the assignment at the end, so its upper seven bits are never
+// initialised here; see the note in the bug list.
 // FUNCTION: 0x499ab0
 void __stdcall SendWeaponFirePacket(Unit* unit, Obj_00499ab0* source,
                             Obj_00499ab0* target, Vec3_00499ab0* a,
@@ -431,6 +439,13 @@ static inline int* Find_00499cd0(Table_00499cd0* table, char* name)
     return &first->value;
 }
 
+// Damage a weapon does to a target. The weapon's def holds a base damage
+// (+0xd4) and a name-keyed damage table (+0x64); the target's unit type name
+// is looked up in it (the same sorted (name, value) array and lower_bound as
+// 0x4c4630). The result is scaled, boosted by the attacker's armour
+// (6% per point, capped at 5 points), doubled or halved by two global flags,
+// and handed to DamageUnit together with the angle from the weapon to the
+// target minus the target's heading.
 // FUNCTION: 0x499cd0
 int __stdcall ApplyWeaponDamage(Weapon_00499cd0* weapon, Unit* target,
                            float scale)
@@ -1122,6 +1137,11 @@ struct Projectile_0049ae20 {
 };
 #pragma pack(pop)
 
+// Compacts the projectile array: entries whose flags bit 1 is set are dropped
+// and the remaining ones are moved down. Each projectile's own old index is
+// written to field_67 first, so the pointers held at field_56 (relinked to the
+// moved targets in the second pass) can be resolved by searching for that
+// index.
 // FUNCTION: 0x49ae20
 void CompactProjectiles()
 {
@@ -1207,6 +1227,9 @@ static inline int SamePos(const Vec3_0049af90& a, const Vec3_0049af90& b)
     return a.x == b.x && a.z == b.z && a.y == b.y;
 }
 
+// Finds the projectile a network packet refers to (by position and type) and
+// removes it. The position compare is an inlined helper taking references;
+// written inline, MSVC keeps one induction pointer instead of two.
 // FUNCTION: 0x49af90
 void __stdcall ApplyProjectileHitPacket(int unused, Packet_0049af90* p)
 {
@@ -1243,6 +1266,8 @@ struct Projectile_0049b000 {
 
 void __stdcall DetonateProjectile(Projectile_0049b000* proj, int flag);
 
+// Fires one of a unit's two weapons (by type) from the unit's position,
+// building the projectile on the stack; see 0x49af90 for the projectile.
 // FUNCTION: 0x49b000
 void __stdcall DetonateUnitWeapon(Unit* unit, int second)
 {
@@ -1372,6 +1397,12 @@ union Fixed_0049b520 {
     struct { unsigned short fraction; short whole; };
 };
 
+// Aim a unit's two turret angles at a target point. The heading (+0x36) is
+// atan2(dx, dz); the pitch (+0x38) comes from the vertical difference against
+// the horizontal distance. Each angle is then moved towards the wanted one by
+// at most the unit type's turn rate (+0xE8), and if the wanted angle is more
+// than 27000 (about 148 degrees) away while the type's flag bit 22 of +0x111 is
+// set, the function gives up and returns 0. Otherwise it returns 1.
 // FUNCTION: 0x49b520
 int __stdcall TurnUnitTowardsPoint(Unit_0049b520* unit, Vec3_0049b520* target)
 {
@@ -1440,6 +1471,8 @@ struct Projectile_0049b6e0 {
 };
 #pragma pack(pop)
 
+// Takes the next free entry of the 300-entry projectile array (see
+// 0x499a30), resets two of its fields and returns it, or 0 when full.
 // FUNCTION: 0x49b6e0
 Projectile_0049b6e0* AllocProjectile()
 {
