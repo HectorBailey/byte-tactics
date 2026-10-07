@@ -138,10 +138,10 @@ extern char DAT_005069d0[8];                                                    
 extern char DAT_005069d8[20];                                                                 // 0x5069d8, 20 bytes; 1 of 1 files
 extern int g_usePacketManager;                                                                // 0x506dbc, 4 bytes; 24 of 24 files
 extern char DAT_00507318[32];                                                                 // 0x507318, 32 bytes; 1 of 1 files
-extern char DAT_005074e8[16];                                                                 // 0x5074e8, 16 bytes; 1 of 1 files
-extern char DAT_005074f8[16];                                                                 // 0x5074f8, 16 bytes; 1 of 1 files
-extern char DAT_00507508[16];                                                                 // 0x507508, 16 bytes; 1 of 1 files
-extern char DAT_00507518[12];                                                                 // 0x507518, 12 bytes; 1 of 1 files
+extern char g_radarPicTempName[16];                                                           // 0x5074e8, 16 bytes; 1 of 1 files
+extern char g_radarPictureName[16];                                                           // 0x5074f8, 16 bytes; 1 of 1 files
+extern char g_radarMappedName[16];                                                            // 0x507508, 16 bytes; 1 of 1 files
+extern char g_radarFinalName[12];                                                             // 0x507518, 12 bytes; 1 of 1 files
 extern char* DAT_00507948[2];                                                                 // 0x507948, 8 bytes; 1 of 1 files
 extern char* DAT_00507950[9];                                                                 // 0x507950, 36 bytes; 1 of 1 files
 extern int DAT_00507b6c;                                                                      // 0x507b6c, 4 bytes; 2 of 2 files
@@ -271,7 +271,7 @@ extern int DAT_00511dd4;                                                        
 extern unsigned int g_netStatsTick;                                                           // 0x511dd8, 4 bytes; 1 of 1 files
 extern unsigned int g_byteRatesTick;                                                          // 0x511ddc, 4 bytes; 1 of 1 files
 extern int DAT_00511de0;                                                                      // 0x511de0, 4 bytes; 2 of 2 files
-extern int DAT_00511de4;                                                                      // 0x511de4, 4 bytes; 1 of 1 files
+extern int g_cdPathMismatch;                                                                  // 0x511de4, 4 bytes; 1 of 1 files
 extern Game* g_game;                                                                          // 0x511de8, 4 bytes; 775 of 879 files (conflicting: shape)
 extern int DAT_00511dec;                                                                      // 0x511dec, 4 bytes; 1 of 1 files
 extern unsigned char DAT_00511f80[16];                                                        // 0x511f80, 16 bytes; CMemoryCache by value in 5 of 5 files
