@@ -2928,10 +2928,10 @@ address,name
 0x4cce87,XorRect
 0x4cced5,RemapRect
 0x4ccf60,BlitText
-0x4cd896,FUN_004cd896
-0x4cd8da,FUN_004cd8da
-0x4cd91e,FUN_004cd91e
-0x4cd962,FUN_004cd962
+0x4cd896,BlitSpan128
+0x4cd8da,BlitSpan64
+0x4cd91e,BlitSpan32
+0x4cd962,BlitSpan16
 0x4cd9b0,FUN_004cd9b0
 0x4cd9c0,Sound::FUN_004cd9c0
 0x4cd9d0,Class_004cd9d0::SetCdCallback

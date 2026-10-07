@@ -3724,7 +3724,7 @@ extern "C" __declspec(naked) void __cdecl FUN_004cd010(void* dst, void* src, int
         leave
         ret
 
-        // ENTRY: 0x4cd896
+        // ENTRY: 0x4cd896 _BlitSpan128
     L004cd896:
         push ebp
         mov ebp, esp
@@ -3764,7 +3764,7 @@ extern "C" __declspec(naked) void __cdecl FUN_004cd010(void* dst, void* src, int
         leave
         ret
 
-        // ENTRY: 0x4cd8da
+        // ENTRY: 0x4cd8da _BlitSpan64
     L004cd8da:
         push ebp
         mov ebp, esp
@@ -3804,7 +3804,7 @@ extern "C" __declspec(naked) void __cdecl FUN_004cd010(void* dst, void* src, int
         leave
         ret
 
-        // ENTRY: 0x4cd91e
+        // ENTRY: 0x4cd91e _BlitSpan32
     L004cd91e:
         push ebp
         mov ebp, esp
@@ -3844,7 +3844,7 @@ extern "C" __declspec(naked) void __cdecl FUN_004cd010(void* dst, void* src, int
         leave
         ret
 
-        // ENTRY: 0x4cd962
+        // ENTRY: 0x4cd962 _BlitSpan16
     L004cd962:
         push ebp
         mov ebp, esp
