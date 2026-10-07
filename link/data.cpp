@@ -367,7 +367,7 @@ int DAT_00511dd4;  // 0x511dd4 .bss
 unsigned int g_netStatsTick;  // 0x511dd8 .bss
 unsigned int g_byteRatesTick;  // 0x511ddc .bss
 int DAT_00511de0;  // 0x511de0 .bss
-int DAT_00511de4;  // 0x511de4 .bss
+int g_cdPathMismatch;  // 0x511de4 .bss
 Game* g_game;  // 0x511de8 .bss
 int DAT_00511dec;  // 0x511dec .bss
 unsigned char DAT_00511f80[16];  // 0x511f80 .bss
@@ -577,8 +577,7 @@ int DAT_00512c70;  // 0x512c70 .bss
 int g_loungeRefreshTime;  // 0x512c78 .bss
 unsigned int g_timeoutTimerStart;  // 0x512c7c .bss
 unsigned char DAT_00512c80[336];  // 0x512c80 .bss (the type runs past the next known address, 0x512c80+0x4)
-char DAT_00512dd0[260];  // 0x512dd0 .bss
-unsigned char DAT_00512ed4[20];  // 0x512ed4 .bss
+unsigned char DAT_00512dd0[260];  // 0x512dd0 .bss
 int g_onlineConfigLoaded;  // 0x512ee8 .bss
 void* g_onlineDll;  // 0x512eec .bss
 int DAT_00512ef0;  // 0x512ef0 .bss
