@@ -2922,11 +2922,11 @@ address,name
 0x4cc332,BlitRectShadow
 0x4cc3d0,BlitCompressedLit
 0x4cc51d,BlitCompressed
-0x4cc7ab,FUN_004cc7ab
-0x4cc8df,FUN_004cc8df
-0x4ccdea,FUN_004ccdea
-0x4cce87,FUN_004cce87
-0x4cced5,FUN_004cced5
+0x4cc7ab,BlitLine
+0x4cc8df,BlitLineRemapped
+0x4ccdea,FillSolidRect
+0x4cce87,XorRect
+0x4cced5,RemapRect
 0x4ccf60,BlitText
 0x4cd896,FUN_004cd896
 0x4cd8da,FUN_004cd8da

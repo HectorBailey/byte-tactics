@@ -18,16 +18,16 @@
 // 0x4cc332  BlitRectShadow(dst, src, rect, pos, key, table)  dst = table[src - 0x4f][dst],
 //                                                           skipping the key
 // 0x4cc650  IsLineVisible(surface, x0, y0, x1, y1)          0 when the segment misses the surface
-// 0x4cc7ab  FUN_004cc7ab(surface, x0, y0, x1, y1, color)   draw a line
-// 0x4cc8df  FUN_004cc8df(surface, x0, y0, x1, y1, ..., table)   draw a line through a table
+// 0x4cc7ab  BlitLine(surface, x0, y0, x1, y1, color)   draw a line
+// 0x4cc8df  BlitLineRemapped(surface, x0, y0, x1, y1, ..., table)   draw a line through a table
 // 0x4cca33  (x0, y0, x1, y1, color)                         16-bit line; no callers, and it
 //                                                           hands IsLineVisible no surface
 // 0x4ccb65  (surface in esi)                                 no callers
-// 0x4ccd1c  FUN_004ccd1c(surface, rect, color)             rectangle outline, four FUN_004cc7ab
+// 0x4ccd1c  FUN_004ccd1c(surface, rect, color)             rectangle outline, four BlitLine
 // 0x4ccd85  (rect, color)                                   the same through 0x4cca33; no callers
-// 0x4ccdea  FUN_004ccdea(surface, rect, color)             fill a rectangle
-// 0x4cce87  FUN_004cce87(surface, rect, value)             xor a rectangle with a byte
-// 0x4cced5  FUN_004cced5(pixels, pitch, w, h, table)       translate pixels through a table
+// 0x4ccdea  FillSolidRect(surface, rect, color)             fill a rectangle
+// 0x4cce87  XorRect(surface, rect, value)             xor a rectangle with a byte
+// 0x4cced5  RemapRect(pixels, pitch, w, h, table)       translate pixels through a table
 // 0x4ccf60  BlitText(pixels, pitch, font, text, x, y, c1, c2, c3)   glyph blitter
 // 0x4cd010  FUN_004cd010(dst, src, x0, y0, x1, y1, step)   no callers
 // 0x4cd896..0x4cd962  (dest, src, width, y, x, rowstep, colstep)  sample a span of src into dest
@@ -1645,7 +1645,7 @@ extern "C" __declspec(naked) int __cdecl IsLineVisible(void* surface, int x0, in
         xor eax, eax
         jmp L004cc7a0
 
-        // ENTRY: 0x4cc7ab
+        // ENTRY: 0x4cc7ab _BlitLine
     L004cc7ab:
         push ebp
         mov ebp, esp
@@ -1796,7 +1796,7 @@ extern "C" __declspec(naked) int __cdecl IsLineVisible(void* surface, int x0, in
         leave
         ret
 
-        // ENTRY: 0x4cc8df
+        // ENTRY: 0x4cc8df _BlitLineRemapped
     L004cc8df:
         push ebp
         mov ebp, esp
@@ -2409,7 +2409,7 @@ extern "C" __declspec(naked) int __cdecl IsLineVisible(void* surface, int x0, in
         leave
         ret
 
-        // ENTRY: 0x4ccdea
+        // ENTRY: 0x4ccdea _FillSolidRect
     L004ccdea:
         push ebp
         mov ebp, esp
@@ -2497,7 +2497,7 @@ extern "C" __declspec(naked) int __cdecl IsLineVisible(void* surface, int x0, in
         leave
         ret
 
-        // ENTRY: 0x4cce87
+        // ENTRY: 0x4cce87 _XorRect
     L004cce87:
         push ebp
         mov ebp, esp
@@ -2546,7 +2546,7 @@ extern "C" __declspec(naked) int __cdecl IsLineVisible(void* surface, int x0, in
         leave
         ret
 
-        // ENTRY: 0x4cced5
+        // ENTRY: 0x4cced5 _RemapRect
     L004cced5:
         push ebp
         mov ebp, esp
