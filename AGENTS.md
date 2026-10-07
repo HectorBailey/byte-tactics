@@ -155,8 +155,10 @@ git push -u origin issue-<N>
 gh pr create --title "<Type>: <what the issue did>" --body-file <file>
 ```
 
-If a rename's rebase conflicts, reset to main and run `tools/rename.py` again
-with the same pairs rather than merging by hand.
+If a rename's rebase conflicts, start a fresh branch from main
+(`git fetch origin main && git switch -c issue-<N>-2 origin/main`) and run
+`tools/rename.py` again with the same pairs, rather than merging by hand. Never
+use `git reset --hard`: it throws work away, and agent sandboxes refuse it.
 
 If you can't push to the repository (an outside contributor), push to your
 fork instead: `gh repo fork --remote --remote-name fork` once, then
