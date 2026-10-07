@@ -29,7 +29,7 @@ unsigned char DAT_00501d18[32] = {
     88, 87, 86, 85, 84, 83, 82, 81, 80, 255, 255, 255, 255, 255, 255, 255
 };
 char DAT_00502288[8] = "Mapping";  // 0x502288 .data
-char DAT_005024fc[16] = "%s\\screenshots";  // 0x5024fc .data
+char g_screenshotDirFormat[16] = "%s\\screenshots";  // 0x5024fc .data
 const char DAT_00502820[8] = "guis";  // 0x502820 .data
 char DAT_00502878[12] = "X Position";  // 0x502878 .data
 char DAT_00502884[12] = "Z Position";  // 0x502884 .data
@@ -200,7 +200,7 @@ char DAT_005093f4[4] = ",:;";  // 0x5093f4 .data
 char DAT_005093f8[8] = "SENDTO";  // 0x5093f8 .data
 char DAT_00509400[12] = "SENDTYPE";  // 0x509400 .data
 char DAT_0050940c[12] = "LIVEPLYR";  // 0x50940c .data
-char DAT_0050966c[12] = "SHOT";  // 0x50966c .data
+char g_screenshotPrefix[12] = "SHOT";  // 0x50966c .data
 char* DAT_00509678[4] = {(char*)"FirePrimary", (char*)"FireSecondary", (char*)"FireTertiary"};  // 0x509678 .data
 char* DAT_00509688[3] = {(char*)"AimPrimary", (char*)"AimSecondary", (char*)"AimTertiary"};  // 0x509688 .data
 char* DAT_00509718 = (char*)"Total Annihilation Class";  // 0x509718 .data
@@ -367,7 +367,7 @@ int DAT_00511dd4;  // 0x511dd4 .bss
 unsigned int g_netStatsTick;  // 0x511dd8 .bss
 unsigned int g_byteRatesTick;  // 0x511ddc .bss
 int DAT_00511de0;  // 0x511de0 .bss
-int DAT_00511de4;  // 0x511de4 .bss
+int g_cdPathMismatch;  // 0x511de4 .bss
 Game* g_game;  // 0x511de8 .bss
 int DAT_00511dec;  // 0x511dec .bss
 unsigned char DAT_00511f80[16];  // 0x511f80 .bss
