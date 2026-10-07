@@ -9,7 +9,7 @@
 
 #include "globals.h"
 
-unsigned char DAT_004fca10[8] = {0, 40, 60, 80, 100, 80, 60, 40};  // 0x4fca10 .rdata
+unsigned char g_turnCosts[8] = {0, 40, 60, 80, 100, 80, 60, 40};  // 0x4fca10 .rdata
 unsigned char DAT_004fcc68[8] = {4, 14, 10};  // 0x4fcc68 .rdata
 char DAT_004fd050[200] = "Warning! The currently installed version of Microsoft%sDirectX may not function properly with Total Annihilation.%sPlease install the version of DirectX included on the%sTotal Annihilation setup CD.";  // 0x4fd050 .rdata
 double DAT_004fd2b0 = 6.28318530717958;  // 0x4fd2b0 .rdata
@@ -327,9 +327,9 @@ char* DAT_0050d660 = (char*)"Performance status";  // 0x50d660 .data
 char DAT_0050d6b4[36] = "Performance dialog failed to open";  // 0x50d6b4 .data
 char* DAT_0050d72c = (char*)"Memory Status";  // 0x50d72c .data
 char DAT_005119b8[8];  // 0x5119b8 .bss
-int DAT_005119e8[10];  // 0x5119e8 .bss
-int DAT_00511a10[10];  // 0x511a10 .bss
-int DAT_00511a38;  // 0x511a38 .bss
+int g_playerBudgetCap[10];  // 0x5119e8 .bss
+int g_playerTickLoad[10];  // 0x511a10 .bss
+int g_budgetRefreshCounter;  // 0x511a38 .bss
 unsigned char DAT_00511a3c[4];  // 0x511a3c .bss
 int g_byteRatesLastReceived;  // 0x511a40 .bss
 int g_compressionPercent;  // 0x511a44 .bss
@@ -367,7 +367,7 @@ int DAT_00511dd4;  // 0x511dd4 .bss
 unsigned int g_netStatsTick;  // 0x511dd8 .bss
 unsigned int g_byteRatesTick;  // 0x511ddc .bss
 int DAT_00511de0;  // 0x511de0 .bss
-int DAT_00511de4;  // 0x511de4 .bss
+int g_cdPathMismatch;  // 0x511de4 .bss
 Game* g_game;  // 0x511de8 .bss
 int DAT_00511dec;  // 0x511dec .bss
 unsigned char DAT_00511f80[16];  // 0x511f80 .bss
