@@ -182,7 +182,7 @@ public:
 
 #pragma pack(push, 1)
 // The fields between the vtable pointer and the link, as a second base whose
-// inline constructor clears the kind (see the notes at 0x43a420).
+// inline constructor clears the kind.
 struct Head_0043a1f0 {
     unsigned char kind;                // +0x4
     unsigned char flag5;               // +0x5

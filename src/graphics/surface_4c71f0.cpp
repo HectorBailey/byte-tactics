@@ -54,7 +54,7 @@ void __stdcall FUN_004c71f0(int value, Range* out, int at_low, int at_high)
         {
             // The distance is passed through a pointer to a local. It reads
             // like a leftover from the original, but it is what puts case 1's
-            // global reload in the 5-byte accumulator form (see the notes).
+            // global reload in the 5-byte accumulator form.
             int span = size - offset;
             int* spanp = &span;
             out->high = FUN_004b7381(at_high, *spanp, DAT_0051fe40);

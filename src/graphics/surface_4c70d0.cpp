@@ -49,7 +49,7 @@ void __stdcall FUN_004c70d0(int value, Range* out, int at_low, int at_high)
     case 0: {
         // The distance is passed through a pointer to a local. It reads like a
         // leftover from the original, but it is what makes cl 5 schedule case 0
-        // the way the original does (see the notes).
+        // the way the original does.
         int span = size - offset;
         int* spanp = &span;
         out->low = 0;
