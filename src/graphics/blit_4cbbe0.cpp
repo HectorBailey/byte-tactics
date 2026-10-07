@@ -6,11 +6,11 @@
 // that save every register they use.
 //
 // 0x4cbbe0  BlitSurface(dst, src, x, y)                   blit a bitmap at (x, y), clipped
-// 0x4cbcd5  FUN_004cbcd5(dst, src, x, y, key)              the same, skipping the key colour
-// 0x4cbdd1  FUN_004cbdd1(dst, src, rect, pos)              copy a rectangle
-// 0x4cbe70  FUN_004cbe70(dst, src, rect, pos, key)         copy a rectangle, skipping the key colour
-// 0x4cbef1  FUN_004cbef1(dst, x, y, tile)                  copy a 32 x 32 tile to (x, y)
-// 0x4cbf2c  FUN_004cbf2c(dst, src, rect, pos, key, table)  dst = table[src][dst], skipping the key
+// 0x4cbcd5  BlitSurfaceKeyed(dst, src, x, y, key)              the same, skipping the key colour
+// 0x4cbdd1  BlitRect(dst, src, rect, pos)              copy a rectangle
+// 0x4cbe70  BlitRectKeyed(dst, src, rect, pos, key)         copy a rectangle, skipping the key colour
+// 0x4cbef1  BlitTile32x32(dst, x, y, tile)                  copy a 32 x 32 tile to (x, y)
+// 0x4cbf2c  BlitRectBlended(dst, src, rect, pos, key, table)  dst = table[src][dst], skipping the key
 // 0x4cbfc4  FUN_004cbfc4(dst, src, rect, pos, key, table)  dst = table[dst] under each non-key pixel
 // 0x4cc057, 0x4cc1bf, 0x4cc3d0, 0x4cc51d                    run-length sprite blitters
 //           (pixels, pitch, drect, runs, srect[, table]): each row of runs follows
@@ -149,7 +149,7 @@ extern "C" __declspec(naked) void __cdecl BlitSurface(void* dst, void* src, int 
         leave
         ret
 
-        // ENTRY: 0x4cbcd5
+        // ENTRY: 0x4cbcd5 _BlitSurfaceKeyed
     L004cbcd5:
         push ebp
         mov ebp, esp
@@ -268,7 +268,7 @@ extern "C" __declspec(naked) void __cdecl BlitSurface(void* dst, void* src, int 
         leave
         ret
 
-        // ENTRY: 0x4cbdd1
+        // ENTRY: 0x4cbdd1 _BlitRect
     L004cbdd1:
         push ebp
         mov ebp, esp
@@ -349,7 +349,7 @@ extern "C" __declspec(naked) void __cdecl BlitSurface(void* dst, void* src, int 
         leave
         ret
 
-        // ENTRY: 0x4cbe70
+        // ENTRY: 0x4cbe70 _BlitRectKeyed
     L004cbe70:
         push ebp
         mov ebp, esp
@@ -417,7 +417,7 @@ extern "C" __declspec(naked) void __cdecl BlitSurface(void* dst, void* src, int 
         leave
         ret
 
-        // ENTRY: 0x4cbef1
+        // ENTRY: 0x4cbef1 _BlitTile32x32
     L004cbef1:
         push ebp
         mov ebp, esp
@@ -453,7 +453,7 @@ extern "C" __declspec(naked) void __cdecl BlitSurface(void* dst, void* src, int 
         leave
         ret
 
-        // ENTRY: 0x4cbf2c
+        // ENTRY: 0x4cbf2c _BlitRectBlended
     L004cbf2c:
         push ebp
         mov ebp, esp

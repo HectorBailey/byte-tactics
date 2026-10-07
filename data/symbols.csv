@@ -2911,11 +2911,11 @@ address,name
 0x4cbab0,ExceptionFilter
 0x4cbb70,PassThroughDebugHelper
 0x4cbbe0,BlitSurface
-0x4cbcd5,FUN_004cbcd5
-0x4cbdd1,FUN_004cbdd1
-0x4cbe70,FUN_004cbe70
-0x4cbef1,FUN_004cbef1
-0x4cbf2c,FUN_004cbf2c
+0x4cbcd5,BlitSurfaceKeyed
+0x4cbdd1,BlitRect
+0x4cbe70,BlitRectKeyed
+0x4cbef1,BlitTile32x32
+0x4cbf2c,BlitRectBlended
 0x4cbfc4,FUN_004cbfc4
 0x4cc057,FUN_004cc057
 0x4cc1bf,FUN_004cc1bf
