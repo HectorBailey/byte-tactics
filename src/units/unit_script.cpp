@@ -314,7 +314,7 @@ void UnitScript::SetUnitValue(int which, int value)
     Unit* unit = state->unit;
     switch (which) {
     case 1:
-        ((Unit*)unit)->SetStateBits(1, value);
+        unit->SetStateBits(1, value);
         break;
     case 5:
         unit->bit0 = value;
@@ -329,7 +329,7 @@ void UnitScript::SetUnitValue(int which, int value)
         unit->bit3 = value;
         break;
     case 20:
-        ((Unit*)unit)->SetStateBits(2, value);
+        unit->SetStateBits(2, value);
         break;
     }
     // After the switch, not inside the cases.
@@ -342,6 +342,11 @@ int UnitScript::GetPieceTranslation(int index, int slot)
 {
     return state->pieces[index].translation[slot];
 }
+
+// Unused here: the symbol ids the removed (Unit*) casts took, kept for
+// SetPieceTranslation (docs/c2-regalloc.md).
+extern int Pad_480c50_0;
+extern int Pad_480c50_1;
 
 // FUNCTION: 0x480c50
 void UnitScript::SetPieceTranslation(int index, int slot, int v)
