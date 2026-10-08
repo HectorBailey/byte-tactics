@@ -1392,16 +1392,16 @@ struct AllyFlagsPacket {
 
 struct UnitCreatePacket {
     unsigned char type;                // +0x0
-    short field_1;                     // +0x1
-    short field_3;                     // +0x3
-    Vec3_00456050 field_5;             // +0x5
-    Short3_00456050 field_11;          // +0x11
+    short defIndex;                    // +0x1
+    short unitId;                      // +0x3
+    Vec3_00456050 pos;                 // +0x5
+    Short3_00456050 rot;               // +0x11
 };
 
 struct BuilderLinkPacket {
     unsigned char type;                // +0x0
-    short field_1;                     // +0x1
-    short field_3;                     // +0x3
+    short constructedUnitId;           // +0x1
+    short builderUnitId;               // +0x3
 };
 
 // The incoming packet's header, cast onto g_game->buffer.
@@ -2753,10 +2753,10 @@ void __stdcall SendNewUnit(Unit* obj)
 {
     UnitCreatePacket packet;
     packet.type = 9;
-    packet.field_1 = obj->unitDefIndex;
-    packet.field_3 = obj->id;
-    packet.field_5 = obj->pos;
-    packet.field_11 = obj->rot;
+    packet.defIndex = obj->unitDefIndex;
+    packet.unitId = obj->id;
+    packet.pos = obj->pos;
+    packet.rot = obj->rot;
     BroadcastPacket(obj->player->field_4, &packet, 0x17);
 }
 
@@ -2765,8 +2765,8 @@ void __stdcall BroadcastBuilderLink(Unit* obj, Unit* target)
 {
     BuilderLinkPacket packet;
     packet.type = 0x12;
-    packet.field_1 = target->id;
-    packet.field_3 = obj->id;
+    packet.constructedUnitId = target->id;
+    packet.builderUnitId = obj->id;
     BroadcastPacket(obj->player->field_4, &packet, 5);
 }
 
@@ -2787,11 +2787,11 @@ struct UnitScriptCallPacket {
     unsigned char type;                // +0x0
     short id;                          // +0x1
     short index;                       // +0x3
-    char field_5;                      // +0x5
-    int field_6;                       // +0x6
-    int field_a;                       // +0xa
-    int field_e;                       // +0xe
-    int field_12;                      // +0x12
+    char argCount;                     // +0x5
+    int arg0;                          // +0x6
+    int arg1;                          // +0xa
+    int arg2;                          // +0xe
+    int arg3;                          // +0x12
 };
 
 struct LatencyPacket {
@@ -2833,20 +2833,20 @@ void Unused_004571c0(int a, int b, int c, int d, int e, int f);
 struct PlayerViewStatePacket {        // 0x3a bytes
     unsigned char type;                // +0x0
     unsigned char shareFlag;           // +0x1
-    int field_2;                       // +0x2
-    int field_6;                       // +0x6
-    int field_a;                       // +0xa
-    int field_e;                       // +0xe
-    int field_12;                      // +0x12
-    int field_16;                      // +0x16
-    int field_1a;                      // +0x1a
-    int field_1e;                      // +0x1e
-    float field_22;                    // +0x22
-    float field_26;                    // +0x26
-    float field_2a;                    // +0x2a
-    float field_2e;                    // +0x2e
-    float field_32;                    // +0x32
-    float field_36;                    // +0x36
+    int unitsKilled;                   // +0x2
+    int unitsLost;                     // +0x6
+    int commandersKilled;              // +0xa
+    int commandersLost;                // +0xe
+    int metalAmount;                   // +0x12
+    int energyAmount;                  // +0x16
+    int metalStorage;                  // +0x1a
+    int energyStorage;                 // +0x1e
+    float energyProduced;              // +0x22
+    float energyConsumed;              // +0x26
+    float energyWasted;                // +0x2a
+    float metalProduced;               // +0x2e
+    float metalConsumed;               // +0x32
+    float metalWasted;                 // +0x36
 };
 
 // Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
@@ -2886,11 +2886,11 @@ int __stdcall SendScriptCallNoArgsByName(Unit* obj, char* name)
     packet.type = 0x10;
     packet.id = obj->id;
     packet.index = index;
-    packet.field_5 = 0;
-    packet.field_6 = 0;
-    packet.field_a = 0;
-    packet.field_e = 0;
-    packet.field_12 = 0;
+    packet.argCount = 0;
+    packet.arg0 = 0;
+    packet.arg1 = 0;
+    packet.arg2 = 0;
+    packet.arg3 = 0;
     return BroadcastPacket(obj->player->id, &packet, 0x16);
 }
 
@@ -2904,11 +2904,11 @@ int __stdcall SendScriptCallNoArgs(Unit* obj, short index)
     packet.type = 0x10;
     packet.id = obj->id;
     packet.index = index;
-    packet.field_5 = 0;
-    packet.field_6 = 0;
-    packet.field_a = 0;
-    packet.field_e = 0;
-    packet.field_12 = 0;
+    packet.argCount = 0;
+    packet.arg0 = 0;
+    packet.arg1 = 0;
+    packet.arg2 = 0;
+    packet.arg3 = 0;
     return BroadcastPacket(obj->player->id, &packet, 0x16);
 }
 
@@ -2926,11 +2926,11 @@ int __stdcall SendScriptCallByName(Unit* obj, char* name, char argCount,
     packet.type = 0x10;
     packet.id = obj->id;
     packet.index = index;
-    packet.field_5 = argCount;
-    packet.field_6 = arg0;
-    packet.field_a = arg1;
-    packet.field_e = arg2;
-    packet.field_12 = arg3;
+    packet.argCount = argCount;
+    packet.arg0 = arg0;
+    packet.arg1 = arg1;
+    packet.arg2 = arg2;
+    packet.arg3 = arg3;
     return BroadcastPacket(obj->player->id, &packet, 0x16);
 }
 
@@ -2947,11 +2947,11 @@ int __stdcall SendScriptCall(Unit* obj, short index, char argCount,
     packet.type = 0x10;
     packet.id = obj->id;
     packet.index = index;
-    packet.field_5 = argCount;
-    packet.field_6 = arg0;
-    packet.field_a = arg1;
-    packet.field_e = arg2;
-    packet.field_12 = arg3;
+    packet.argCount = argCount;
+    packet.arg0 = arg0;
+    packet.arg1 = arg1;
+    packet.arg2 = arg2;
+    packet.arg3 = arg3;
     return BroadcastPacket(obj->player->id, &packet, 0x16);
 }
 
@@ -3478,20 +3478,20 @@ void __stdcall SendPlayerEconomy(Player* player, Player* target,
     PlayerViewStatePacket packet;
     packet.type = 0x28;
     packet.shareFlag = flag;
-    packet.field_2 = player->kills;
-    packet.field_6 = player->losses;
-    packet.field_a = player->commanderKills;
-    packet.field_e = player->commanderLosses;
-    packet.field_12 = player->field_98;
-    packet.field_16 = player->field_8c;
-    packet.field_1a = player->metalCapacity;
-    packet.field_1e = player->energyCapacity;
-    packet.field_22 = (float)player->totalEnergyProduced;
-    packet.field_26 = (float)player->totalEnergyConsumed;
-    packet.field_2a = (float)player->energyWasted;
-    packet.field_2e = (float)player->totalMetalProduced;
-    packet.field_32 = (float)player->totalMetalConsumed;
-    packet.field_36 = (float)player->metalWasted;
+    packet.unitsKilled = player->kills;
+    packet.unitsLost = player->losses;
+    packet.commandersKilled = player->commanderKills;
+    packet.commandersLost = player->commanderLosses;
+    packet.metalAmount = player->field_98;
+    packet.energyAmount = player->field_8c;
+    packet.metalStorage = player->metalCapacity;
+    packet.energyStorage = player->energyCapacity;
+    packet.energyProduced = (float)player->totalEnergyProduced;
+    packet.energyConsumed = (float)player->totalEnergyConsumed;
+    packet.energyWasted = (float)player->energyWasted;
+    packet.metalProduced = (float)player->totalMetalProduced;
+    packet.metalConsumed = (float)player->totalMetalConsumed;
+    packet.metalWasted = (float)player->metalWasted;
 
     if (target != 0) {
         if (target->field_22 == 0)
@@ -3539,20 +3539,20 @@ void __stdcall HandlePlayerEconomy(PlayerViewStatePacket* packet, Player* player
     }
 
     if (found == 0) {
-        player->kills = *(short*)&packet->field_2;
-        player->losses = *(short*)&packet->field_6;
-        player->commanderKills = *(short*)&packet->field_a;
-        player->commanderLosses = *(short*)&packet->field_e;
-        player->field_98 = packet->field_12;
-        player->field_8c = packet->field_16;
-        player->metalCapacity = packet->field_1a;
-        player->energyCapacity = packet->field_1e;
-        player->totalEnergyProduced = packet->field_22;
-        player->totalEnergyConsumed = packet->field_26;
-        player->energyWasted = packet->field_2a;
-        player->totalMetalProduced = packet->field_2e;
-        player->totalMetalConsumed = packet->field_32;
-        player->metalWasted = packet->field_36;
+        player->kills = *(short*)&packet->unitsKilled;
+        player->losses = *(short*)&packet->unitsLost;
+        player->commanderKills = *(short*)&packet->commandersKilled;
+        player->commanderLosses = *(short*)&packet->commandersLost;
+        player->field_98 = packet->metalAmount;
+        player->field_8c = packet->energyAmount;
+        player->metalCapacity = packet->metalStorage;
+        player->energyCapacity = packet->energyStorage;
+        player->totalEnergyProduced = packet->energyProduced;
+        player->totalEnergyConsumed = packet->energyConsumed;
+        player->energyWasted = packet->energyWasted;
+        player->totalMetalProduced = packet->metalProduced;
+        player->totalMetalConsumed = packet->metalConsumed;
+        player->metalWasted = packet->metalWasted;
     }
 
     if (packet->shareFlag == 0)
