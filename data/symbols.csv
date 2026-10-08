@@ -2909,10 +2909,10 @@ address,name
 0x4cb5f0,GetObjectHeight
 0x4cb650,GetObjectBounds
 0x4cb6a0,AddObjectBounds
-0x4cb7c0,Class_004cb7c0::Init
-0x4cb7d0,Class_004cb7d0::Close
-0x4cb7f0,Class_004cb7f0::Open
-0x4cb940,Class_004cb940::WriteRows
+0x4cb7c0,BmpWriter::Init
+0x4cb7d0,BmpWriter::Close
+0x4cb7f0,BmpWriter::Open
+0x4cb940,BmpWriter::WriteRows
 0x4cb9e0,SaveBmp
 0x4cbab0,ExceptionFilter
 0x4cbb70,PassThroughDebugHelper
@@ -4400,7 +4400,7 @@ address,name
 0x511fa8,g_explosion2Duration
 0x511fac,g_explosion2StartSize
 0x511fb0,g_explosion2EndSize
-0x511fb4,s_featureTdfParsers$S32680
+0x511fb4,s_featureTdfParsers$S23899
 0x511fb8,g_frontendErrorText
 0x5120b8,g_pictureCache
 0x512288,DAT_00512288
