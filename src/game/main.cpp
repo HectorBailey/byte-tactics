@@ -97,13 +97,44 @@ void OutOfMemoryHandler()
 //     register rotations one step out. tools/headers.py reaches 99.3% on the
 //     93.1% body with <windows.h> <stdio.h> and with <windows.h>
 //     <string.h> <stdio.h>; every other header set scores below that.
-class Sound {
-public:
-    char pad[0x294];
-    Sound();
-    void SetTrackCategory(int param_1);
-    void ReapFinishedBuffers();
-};
+#include "../sound/sound.h"
+// Unused here: the symbol ids these declarations take keep the allocation
+// (docs/c2-regalloc.md).
+struct Pad_49e830_s0 { int field; };
+struct Pad_49e830_s1 { int field; };
+struct Pad_49e830_s2 { int field; };
+struct Pad_49e830_s3 { int field; };
+struct Pad_49e830_s4 { int field; };
+struct Pad_49e830_s5 { int field; };
+struct Pad_49e830_s6 { int field; };
+struct Pad_49e830_s7 { int field; };
+struct Pad_49e830_s8 { int field; };
+struct Pad_49e830_s9 { int field; };
+struct Pad_49e830_s10 { int field; };
+struct Pad_49e830_s11 { int field; };
+struct Pad_49e830_s12 { int field; };
+struct Pad_49e830_s13 { int field; };
+struct Pad_49e830_s14 { int field; };
+struct Pad_49e830_s15 { int field; };
+struct Pad_49e830_s16 { int field; };
+struct Pad_49e830_s17 { int field; };
+struct Pad_49e830_s18 { int field; };
+struct Pad_49e830_s19 { int field; };
+struct Pad_49e830_s20 { int field; };
+struct Pad_49e830_s21 { int field; };
+struct Pad_49e830_s22 { int field; };
+struct Pad_49e830_s23 { int field; };
+struct Pad_49e830_s24 { int field; };
+struct Pad_49e830_s25 { int field; };
+struct Pad_49e830_s26 { int field; };
+struct Pad_49e830_s27 { int field; };
+struct Pad_49e830_s28 { int field; };
+struct Pad_49e830_s29 { int field; };
+struct Pad_49e830_s30 { int field; };
+struct Pad_49e830_s31 { int field; };
+struct Pad_49e830_s32 { int field; };
+struct Pad_49e830_s33 { int field; };
+struct Pad_49e830_s34 { int field; };
 
 class Class_004ce680 {
 public:

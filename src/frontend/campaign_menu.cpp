@@ -12,11 +12,7 @@
 
 #include "../util/tdf.h"
 
-class Sound {
-public:
-    int IsStreamActive();
-    void StopStream();
-};
+#include "../sound/sound.h"
 
 class Mission {
 public:
@@ -586,6 +582,32 @@ static inline char* FindPageStart(char* start, int lines, int page)
     return found ? q : 0;
 }
 
+// Unused here: the symbol ids these declarations take keep the allocation
+// (docs/c2-regalloc.md).
+struct Pad_476ef0_s0 { int field; };
+struct Pad_476ef0_s1 { int field; };
+struct Pad_476ef0_s2 { int field; };
+struct Pad_476ef0_s3 { int field; };
+struct Pad_476ef0_s4 { int field; };
+struct Pad_476ef0_s5 { int field; };
+struct Pad_476ef0_s6 { int field; };
+struct Pad_476ef0_s7 { int field; };
+struct Pad_476ef0_s8 { int field; };
+struct Pad_476ef0_s9 { int field; };
+struct Pad_476ef0_s10 { int field; };
+struct Pad_476ef0_s11 { int field; };
+struct Pad_476ef0_s12 { int field; };
+struct Pad_476ef0_s13 { int field; };
+struct Pad_476ef0_s14 { int field; };
+struct Pad_476ef0_s15 { int field; };
+struct Pad_476ef0_s16 { int field; };
+struct Pad_476ef0_s17 { int field; };
+struct Pad_476ef0_s18 { int field; };
+struct Pad_476ef0_s19 { int field; };
+struct Pad_476ef0_s20 { int field; };
+struct Pad_476ef0_s21 { int field; };
+struct Pad_476ef0_s22 { int field; };
+struct Pad_476ef0_s23 { int field; };
 // FUNCTION: 0x476ef0
 void DrawHelpPage()
 {

@@ -287,14 +287,7 @@ public:
     CommandArgs* InitArgs();
 };
 
-class Sound {
-public:
-    void PlayCdTrack(int index, int flag);
-    int Is3DEnabled();
-    void Disable3D();
-    void Enable3D();
-    void SetTrackCategory(int);
-};
+#include "../sound/sound.h"
 
 class Class_004ced40 {
 public:
@@ -960,6 +953,49 @@ void __stdcall CmdNow(CommandArgs* args)
     else g_game->flags_37f2f&=~2;
 }
 
+// Unused here: the symbol ids these declarations take keep the allocation
+// (docs/c2-regalloc.md).
+struct Pad_417030_s0 { int field; };
+struct Pad_417030_s1 { int field; };
+struct Pad_417030_s2 { int field; };
+struct Pad_417030_s3 { int field; };
+struct Pad_417030_s4 { int field; };
+struct Pad_417030_s5 { int field; };
+struct Pad_417030_s6 { int field; };
+struct Pad_417030_s7 { int field; };
+struct Pad_417030_s8 { int field; };
+struct Pad_417030_s9 { int field; };
+struct Pad_417030_s10 { int field; };
+struct Pad_417030_s11 { int field; };
+struct Pad_417030_s12 { int field; };
+struct Pad_417030_s13 { int field; };
+struct Pad_417030_s14 { int field; };
+struct Pad_417030_s15 { int field; };
+struct Pad_417030_s16 { int field; };
+struct Pad_417030_s17 { int field; };
+struct Pad_417030_s18 { int field; };
+struct Pad_417030_s19 { int field; };
+struct Pad_417030_s20 { int field; };
+struct Pad_417030_s21 { int field; };
+struct Pad_417030_s22 { int field; };
+struct Pad_417030_s23 { int field; };
+struct Pad_417030_s24 { int field; };
+struct Pad_417030_s25 { int field; };
+struct Pad_417030_s26 { int field; };
+struct Pad_417030_s27 { int field; };
+struct Pad_417030_s28 { int field; };
+struct Pad_417030_s29 { int field; };
+struct Pad_417030_s30 { int field; };
+struct Pad_417030_s31 { int field; };
+struct Pad_417030_s32 { int field; };
+struct Pad_417030_s33 { int field; };
+struct Pad_417030_s34 { int field; };
+extern int Pad_417030_e0;
+extern int Pad_417030_e1;
+extern int Pad_417030_e2;
+extern int Pad_417030_e3;
+extern int Pad_417030_e4;
+extern int Pad_417030_e5;
 // FUNCTION: 0x417030
 void __stdcall CmdDoubleShot(int unused)
 {
@@ -1380,6 +1416,15 @@ void __stdcall WorldToScreenTileOffset(int x, int z, int* screen_x, int* screen_
 
 // Draws a line from a world position to the same position shifted by
 // (dx, dz) whole map units, converting both ends to screen coordinates.
+// Unused here: the symbol ids these declarations take keep the allocation
+// (docs/c2-regalloc.md).
+struct Pad_417c70_s0 { int field; };
+struct Pad_417c70_s1 { int field; };
+struct Pad_417c70_s2 { int field; };
+struct Pad_417c70_s3 { int field; };
+struct Pad_417c70_s4 { int field; };
+struct Pad_417c70_s5 { int field; };
+struct Pad_417c70_s6 { int field; };
 // FUNCTION: 0x417c70
 void __stdcall DrawWorldDeltaLine(void* surface, Pos_00417bb0* p, short dx, short dz, int color)
 {
@@ -1521,6 +1566,15 @@ void __stdcall DrawTriangleContours(void* surface, Point_00417f60 p1, int z1,
 // Draws one map cell: four triangles fanning from the cell's centre, whose
 // position and height are the rounded averages of the four corners. The
 // corner heights are bytes, scaled to 8 fraction bits.
+// Unused here: the symbol ids these declarations take keep the allocation
+// (docs/c2-regalloc.md).
+struct Pad_4181d0_s0 { int field; };
+extern int Pad_4181d0_e0;
+extern int Pad_4181d0_e1;
+extern int Pad_4181d0_e2;
+extern int Pad_4181d0_e3;
+extern int Pad_4181d0_e4;
+extern int Pad_4181d0_e5;
 // FUNCTION: 0x4181d0
 void __stdcall DrawCellContours(void* surface, Point_00417f60* corners, unsigned char* heights)
 {
@@ -1546,6 +1600,25 @@ void __stdcall DrawCellContours(void* surface, Point_00417f60* corners, unsigned
 // matches in (docs/c2-regalloc.md), and must not sit at the top, where it
 // moves 0x4181d0 out of its own window.
 #include <direct.h>
+// Unused here: the symbol ids these declarations take keep the allocation
+// (docs/c2-regalloc.md).
+struct Pad_418310_s0 { int field; };
+struct Pad_418310_s1 { int field; };
+struct Pad_418310_s2 { int field; };
+struct Pad_418310_s3 { int field; };
+struct Pad_418310_s4 { int field; };
+struct Pad_418310_s5 { int field; };
+struct Pad_418310_s6 { int field; };
+struct Pad_418310_s7 { int field; };
+struct Pad_418310_s8 { int field; };
+struct Pad_418310_s9 { int field; };
+struct Pad_418310_s10 { int field; };
+extern int Pad_418310_e0;
+extern int Pad_418310_e1;
+extern int Pad_418310_e2;
+extern int Pad_418310_e3;
+extern int Pad_418310_e4;
+extern int Pad_418310_e5;
 // FUNCTION: 0x418310
 void __stdcall DrawMapDebugOverlay(void* surface)
 {
