@@ -4405,114 +4405,114 @@ piece,0x508180,38,src/frontend/skirmish_menu_479660.cpp,29,0,game data
 piece,0x508174,9,src/frontend/skirmish_menu_479660.cpp,28,0,game data
 piece,0x508134,61,src/frontend/skirmish_menu_479660.cpp,27,0,game data
 piece,0x5080f4,63,src/frontend/skirmish_menu_479660.cpp,26,0,game data
-piece,0x5080ac,9,src/frontend/campaign_menu_478e80.cpp,73,0,game data
-piece,0x50809c,13,src/frontend/campaign_menu_478e80.cpp,72,0,game data
-piece,0x506c14,8,src/frontend/campaign_menu_478e80.cpp,69,0,game data
-piece,0x506c1c,11,src/frontend/campaign_menu_478e80.cpp,68,0,game data
-piece,0x507c5c,12,src/frontend/campaign_menu_478e80.cpp,67,0,game data
-piece,0x507ddc,7,src/frontend/campaign_menu_478e80.cpp,66,0,game data
-piece,0x508094,6,src/frontend/campaign_menu_478e80.cpp,65,0,game data
-piece,0x508090,2,src/frontend/campaign_menu_478e80.cpp,64,0,game data
-piece,0x508084,11,src/frontend/campaign_menu_478e80.cpp,63,0,game data
-piece,0x508074,13,src/frontend/campaign_menu_478e80.cpp,62,0,game data
-piece,0x508068,12,src/frontend/campaign_menu_478e80.cpp,61,0,game data
-piece,0x50805c,11,src/frontend/campaign_menu_478e80.cpp,60,0,game data
-piece,0x508054,7,src/frontend/campaign_menu_478e80.cpp,59,0,game data
-piece,0x50804c,5,src/frontend/campaign_menu_478e80.cpp,58,0,game data
-piece,0x508040,11,src/frontend/campaign_menu_478e80.cpp,57,0,game data
-piece,0x508038,7,src/frontend/campaign_menu_478e80.cpp,55,0,game data
-piece,0x508034,4,src/frontend/campaign_menu_478e80.cpp,54,0,game data
-piece,0x50802c,5,src/frontend/campaign_menu_478e80.cpp,53,0,game data
-piece,0x508024,6,src/frontend/campaign_menu_478e80.cpp,52,0,game data
-piece,0x508018,12,src/frontend/campaign_menu_478e80.cpp,51,0,game data
-piece,0x508010,5,src/frontend/campaign_menu_478e80.cpp,50,0,game data
-piece,0x508008,8,src/frontend/campaign_menu_478e80.cpp,49,0,game data
-piece,0x507ffc,11,src/frontend/campaign_menu_478e80.cpp,48,0,game data
-piece,0x507fec,13,src/frontend/campaign_menu_478e80.cpp,47,0,game data
-piece,0x507fe0,12,src/frontend/campaign_menu_478e80.cpp,46,0,game data
-piece,0x507fd4,10,src/frontend/campaign_menu_478e80.cpp,45,0,game data
-piece,0x507fc8,10,src/frontend/campaign_menu_478e80.cpp,44,0,game data
-piece,0x507fbc,11,src/frontend/campaign_menu_478e80.cpp,43,0,game data
-piece,0x507fb0,11,src/frontend/campaign_menu_478e80.cpp,42,0,game data
-piece,0x507fa4,12,src/frontend/campaign_menu_478e80.cpp,41,0,game data
-piece,0x507f98,9,src/frontend/campaign_menu_478e80.cpp,40,0,game data
-piece,0x507f8c,10,src/frontend/campaign_menu_478e80.cpp,39,0,game data
-piece,0x507f80,11,src/frontend/campaign_menu_478e80.cpp,38,0,game data
-piece,0x507f74,11,src/frontend/campaign_menu_478e80.cpp,37,0,game data
-piece,0x507f68,10,src/frontend/campaign_menu_478e80.cpp,36,0,game data
-piece,0x507f58,13,src/frontend/campaign_menu_478e80.cpp,35,0,game data
-piece,0x507f4c,9,src/frontend/campaign_menu_478e80.cpp,34,0,game data
-piece,0x507f40,9,src/frontend/campaign_menu_478e80.cpp,33,0,game data
-piece,0x507f38,8,src/frontend/campaign_menu_478e80.cpp,32,0,game data
-piece,0x507f30,8,src/frontend/campaign_menu_478e80.cpp,31,0,game data
-piece,0x507f28,8,src/frontend/campaign_menu_478e80.cpp,30,0,game data
-piece,0x507f20,8,src/frontend/campaign_menu_478e80.cpp,29,0,game data
-piece,0x507f14,9,src/frontend/campaign_menu_478e80.cpp,28,0,game data
-piece,0x507f08,9,src/frontend/campaign_menu_478e80.cpp,27,0,game data
-piece,0x507efc,10,src/frontend/campaign_menu_478e80.cpp,26,0,game data
-piece,0x507ef4,7,src/frontend/campaign_menu_478e80.cpp,25,0,game data
-piece,0x507eec,8,src/frontend/campaign_menu_478e80.cpp,24,0,game data
-piece,0x507ee0,9,src/frontend/campaign_menu_478e80.cpp,23,0,game data
-piece,0x507ed4,9,src/frontend/campaign_menu_478e80.cpp,22,0,game data
-piece,0x507ecc,8,src/frontend/campaign_menu_478e80.cpp,21,0,game data
-piece,0x507ec0,9,src/frontend/campaign_menu_478e80.cpp,20,0,game data
-piece,0x507eb4,12,src/frontend/campaign_menu_478e80.cpp,19,0,game data
-piece,0x507ea8,12,src/frontend/campaign_menu_478e80.cpp,18,0,game data
-piece,0x507e98,14,src/frontend/campaign_menu_478e80.cpp,17,0,game data
-piece,0x507e8c,11,src/frontend/campaign_menu_478e80.cpp,16,0,game data
-piece,0x507e80,11,src/frontend/campaign_menu_478e80.cpp,15,0,game data
-piece,0x507e74,11,src/frontend/campaign_menu_478e80.cpp,14,0,game data
-piece,0x507e68,12,src/frontend/campaign_menu_478e80.cpp,13,0,game data
-piece,0x507e5c,12,src/frontend/campaign_menu_478e80.cpp,12,0,game data
-piece,0x507e4c,13,src/frontend/campaign_menu_478e80.cpp,11,0,game data
-piece,0x507e40,10,src/frontend/campaign_menu_478e80.cpp,10,0,game data
-piece,0x507e34,11,src/frontend/campaign_menu_478e80.cpp,9,0,game data
-piece,0x507e28,12,src/frontend/campaign_menu_478e80.cpp,8,0,game data
-piece,0x507e1c,12,src/frontend/campaign_menu_478e80.cpp,7,0,game data
-piece,0x507e10,11,src/frontend/campaign_menu_478e80.cpp,6,0,game data
-piece,0x507e00,14,src/frontend/campaign_menu_478e80.cpp,5,0,game data
-piece,0x507df4,9,src/frontend/campaign_menu_478e80.cpp,4,0,game data
-piece,0x507dec,7,src/frontend/campaign_menu_478e80.cpp,3,0,game data
-piece,0x507de4,5,src/frontend/campaign_menu_478cb0.cpp,3,0,game data
-piece,0x507dd0,11,src/frontend/campaign_menu_478790.cpp,8,0,game data
-piece,0x507dc8,8,src/frontend/campaign_menu_478790.cpp,7,0,game data
-piece,0x4fd658,8,src/frontend/campaign_menu_478790.cpp,6,0,game data
-piece,0x507dc0,8,src/frontend/campaign_menu_478790.cpp,5,0,game data
-piece,0x507db4,10,src/frontend/campaign_menu_478790.cpp,4,0,game data
-piece,0x507dac,8,src/frontend/campaign_menu_478790.cpp,3,0,game data
-piece,0x507da0,12,src/frontend/campaign_menu_478240.cpp,20,0,game data
-piece,0x507d90,13,src/frontend/campaign_menu_478240.cpp,19,0,game data
-piece,0x507d80,14,src/frontend/campaign_menu_478240.cpp,15,0,game data
-piece,0x507d70,13,src/frontend/campaign_menu_478240.cpp,14,0,game data
-piece,0x507d60,13,src/frontend/campaign_menu_478240.cpp,12,0,game data
-piece,0x502ab0,9,src/frontend/campaign_menu_478240.cpp,11,0,game data
-piece,0x507c88,6,src/frontend/campaign_menu_478240.cpp,10,0,game data
-piece,0x507c80,6,src/frontend/campaign_menu_478240.cpp,9,0,game data
-piece,0x507d50,13,src/frontend/campaign_menu_478240.cpp,3,0,game data
-piece,0x507ca0,10,src/frontend/campaign_menu_477ab0.cpp,23,0,game data
-piece,0x507d40,13,src/frontend/campaign_menu_477ab0.cpp,21,0,game data
-piece,0x507d30,14,src/frontend/campaign_menu_477ab0.cpp,20,0,game data
-piece,0x507d24,10,src/frontend/campaign_menu_477ab0.cpp,16,0,game data
-piece,0x507d18,12,src/frontend/campaign_menu_477ab0.cpp,11,0,game data
-piece,0x507d0c,11,src/frontend/campaign_menu_477ab0.cpp,10,0,game data
-piece,0x507cf4,11,src/frontend/campaign_menu_4777a0.cpp,7,0,game data
-piece,0x507ce8,9,src/frontend/campaign_menu_4777a0.cpp,6,0,game data
-piece,0x507c90,7,src/frontend/campaign_menu_4777a0.cpp,5,0,game data
-piece,0x507ce0,8,src/frontend/campaign_menu_4777a0.cpp,4,0,game data
-piece,0x507cd8,8,src/frontend/campaign_menu_4775a0.cpp,15,0,game data
-piece,0x507cc0,9,src/frontend/campaign_menu_4775a0.cpp,11,0,game data
-piece,0x507cb8,8,src/frontend/campaign_menu_4775a0.cpp,7,0,game data
-piece,0x507c98,8,src/frontend/campaign_menu_477510.cpp,4,0,game data
-piece,0x507c70,14,src/frontend/campaign_menu_476ef0.cpp,6,0,game data
-piece,0x507c68,8,src/frontend/campaign_menu_476ef0.cpp,5,0,game data
-piece,0x507c50,12,src/frontend/campaign_menu_476cd0.cpp,3,0,game data
-piece,0x507c40,16,src/frontend/campaign_menu_476a60.cpp,8,0,game data
-piece,0x507c30,16,src/frontend/campaign_menu_476a60.cpp,7,0,game data
-piece,0x507c28,7,src/frontend/campaign_menu_476a60.cpp,5,0,game data
-piece,0x507c18,13,src/frontend/campaign_menu_476a60.cpp,4,0,game data
-piece,0x507c04,15,src/frontend/campaign_menu_4769f0.cpp,3,0,game data
-piece,0x507bf8,9,src/frontend/campaign_menu_476830.cpp,3,0,game data
-piece,0x503384,8,src/frontend/campaign_menu_476740.cpp,3,0,game data
+piece,0x5080ac,9,src/frontend/campaign_menu.cpp,187,0,game data
+piece,0x50809c,13,src/frontend/campaign_menu.cpp,186,0,game data
+piece,0x506c14,8,src/frontend/campaign_menu.cpp,45,0,game data
+piece,0x506c1c,11,src/frontend/campaign_menu.cpp,37,0,game data
+piece,0x507c5c,12,src/frontend/campaign_menu.cpp,38,0,game data
+piece,0x507ddc,7,src/frontend/campaign_menu.cpp,116,0,game data
+piece,0x508094,6,src/frontend/campaign_menu.cpp,185,0,game data
+piece,0x508090,2,src/frontend/campaign_menu.cpp,184,0,game data
+piece,0x508084,11,src/frontend/campaign_menu.cpp,183,0,game data
+piece,0x508074,13,src/frontend/campaign_menu.cpp,182,0,game data
+piece,0x508068,12,src/frontend/campaign_menu.cpp,181,0,game data
+piece,0x50805c,11,src/frontend/campaign_menu.cpp,180,0,game data
+piece,0x508054,7,src/frontend/campaign_menu.cpp,179,0,game data
+piece,0x50804c,5,src/frontend/campaign_menu.cpp,178,0,game data
+piece,0x508040,11,src/frontend/campaign_menu.cpp,177,0,game data
+piece,0x508038,7,src/frontend/campaign_menu.cpp,175,0,game data
+piece,0x508034,4,src/frontend/campaign_menu.cpp,174,0,game data
+piece,0x50802c,5,src/frontend/campaign_menu.cpp,173,0,game data
+piece,0x508024,6,src/frontend/campaign_menu.cpp,172,0,game data
+piece,0x508018,12,src/frontend/campaign_menu.cpp,171,0,game data
+piece,0x508010,5,src/frontend/campaign_menu.cpp,170,0,game data
+piece,0x508008,8,src/frontend/campaign_menu.cpp,169,0,game data
+piece,0x507ffc,11,src/frontend/campaign_menu.cpp,168,0,game data
+piece,0x507fec,13,src/frontend/campaign_menu.cpp,167,0,game data
+piece,0x507fe0,12,src/frontend/campaign_menu.cpp,166,0,game data
+piece,0x507fd4,10,src/frontend/campaign_menu.cpp,165,0,game data
+piece,0x507fc8,10,src/frontend/campaign_menu.cpp,164,0,game data
+piece,0x507fbc,11,src/frontend/campaign_menu.cpp,163,0,game data
+piece,0x507fb0,11,src/frontend/campaign_menu.cpp,162,0,game data
+piece,0x507fa4,12,src/frontend/campaign_menu.cpp,161,0,game data
+piece,0x507f98,9,src/frontend/campaign_menu.cpp,160,0,game data
+piece,0x507f8c,10,src/frontend/campaign_menu.cpp,159,0,game data
+piece,0x507f80,11,src/frontend/campaign_menu.cpp,158,0,game data
+piece,0x507f74,11,src/frontend/campaign_menu.cpp,157,0,game data
+piece,0x507f68,10,src/frontend/campaign_menu.cpp,156,0,game data
+piece,0x507f58,13,src/frontend/campaign_menu.cpp,155,0,game data
+piece,0x507f4c,9,src/frontend/campaign_menu.cpp,154,0,game data
+piece,0x507f40,9,src/frontend/campaign_menu.cpp,153,0,game data
+piece,0x507f38,8,src/frontend/campaign_menu.cpp,152,0,game data
+piece,0x507f30,8,src/frontend/campaign_menu.cpp,151,0,game data
+piece,0x507f28,8,src/frontend/campaign_menu.cpp,150,0,game data
+piece,0x507f20,8,src/frontend/campaign_menu.cpp,149,0,game data
+piece,0x507f14,9,src/frontend/campaign_menu.cpp,148,0,game data
+piece,0x507f08,9,src/frontend/campaign_menu.cpp,147,0,game data
+piece,0x507efc,10,src/frontend/campaign_menu.cpp,146,0,game data
+piece,0x507ef4,7,src/frontend/campaign_menu.cpp,145,0,game data
+piece,0x507eec,8,src/frontend/campaign_menu.cpp,144,0,game data
+piece,0x507ee0,9,src/frontend/campaign_menu.cpp,143,0,game data
+piece,0x507ed4,9,src/frontend/campaign_menu.cpp,142,0,game data
+piece,0x507ecc,8,src/frontend/campaign_menu.cpp,141,0,game data
+piece,0x507ec0,9,src/frontend/campaign_menu.cpp,140,0,game data
+piece,0x507eb4,12,src/frontend/campaign_menu.cpp,139,0,game data
+piece,0x507ea8,12,src/frontend/campaign_menu.cpp,138,0,game data
+piece,0x507e98,14,src/frontend/campaign_menu.cpp,137,0,game data
+piece,0x507e8c,11,src/frontend/campaign_menu.cpp,136,0,game data
+piece,0x507e80,11,src/frontend/campaign_menu.cpp,135,0,game data
+piece,0x507e74,11,src/frontend/campaign_menu.cpp,134,0,game data
+piece,0x507e68,12,src/frontend/campaign_menu.cpp,133,0,game data
+piece,0x507e5c,12,src/frontend/campaign_menu.cpp,132,0,game data
+piece,0x507e4c,13,src/frontend/campaign_menu.cpp,131,0,game data
+piece,0x507e40,10,src/frontend/campaign_menu.cpp,130,0,game data
+piece,0x507e34,11,src/frontend/campaign_menu.cpp,129,0,game data
+piece,0x507e28,12,src/frontend/campaign_menu.cpp,128,0,game data
+piece,0x507e1c,12,src/frontend/campaign_menu.cpp,127,0,game data
+piece,0x507e10,11,src/frontend/campaign_menu.cpp,126,0,game data
+piece,0x507e00,14,src/frontend/campaign_menu.cpp,125,0,game data
+piece,0x507df4,9,src/frontend/campaign_menu.cpp,124,0,game data
+piece,0x507dec,7,src/frontend/campaign_menu.cpp,123,0,game data
+piece,0x507de4,5,src/frontend/campaign_menu.cpp,119,0,game data
+piece,0x507dd0,11,src/frontend/campaign_menu.cpp,113,0,game data
+piece,0x507dc8,8,src/frontend/campaign_menu.cpp,112,0,game data
+piece,0x4fd658,8,src/frontend/campaign_menu.cpp,111,0,game data
+piece,0x507dc0,8,src/frontend/campaign_menu.cpp,110,0,game data
+piece,0x507db4,10,src/frontend/campaign_menu.cpp,109,0,game data
+piece,0x507dac,8,src/frontend/campaign_menu.cpp,108,0,game data
+piece,0x507da0,12,src/frontend/campaign_menu.cpp,105,0,game data
+piece,0x507d90,13,src/frontend/campaign_menu.cpp,104,0,game data
+piece,0x507d80,14,src/frontend/campaign_menu.cpp,103,0,game data
+piece,0x507d70,13,src/frontend/campaign_menu.cpp,102,0,game data
+piece,0x507d60,13,src/frontend/campaign_menu.cpp,101,0,game data
+piece,0x502ab0,9,src/frontend/campaign_menu.cpp,89,0,game data
+piece,0x507c88,6,src/frontend/campaign_menu.cpp,50,0,game data
+piece,0x507c80,6,src/frontend/campaign_menu.cpp,48,0,game data
+piece,0x507d50,13,src/frontend/campaign_menu.cpp,100,0,game data
+piece,0x507ca0,10,src/frontend/campaign_menu.cpp,66,0,game data
+piece,0x507d40,13,src/frontend/campaign_menu.cpp,96,0,game data
+piece,0x507d30,14,src/frontend/campaign_menu.cpp,95,0,game data
+piece,0x507d24,10,src/frontend/campaign_menu.cpp,94,0,game data
+piece,0x507d18,12,src/frontend/campaign_menu.cpp,93,0,game data
+piece,0x507d0c,11,src/frontend/campaign_menu.cpp,92,0,game data
+piece,0x507cf4,11,src/frontend/campaign_menu.cpp,82,0,game data
+piece,0x507ce8,9,src/frontend/campaign_menu.cpp,81,0,game data
+piece,0x507c90,7,src/frontend/campaign_menu.cpp,62,0,game data
+piece,0x507ce0,8,src/frontend/campaign_menu.cpp,80,0,game data
+piece,0x507cd8,8,src/frontend/campaign_menu.cpp,77,0,game data
+piece,0x507cc0,9,src/frontend/campaign_menu.cpp,73,0,game data
+piece,0x507cb8,8,src/frontend/campaign_menu.cpp,69,0,game data
+piece,0x507c98,8,src/frontend/campaign_menu.cpp,63,0,game data
+piece,0x507c70,14,src/frontend/campaign_menu.cpp,44,0,game data
+piece,0x507c68,8,src/frontend/campaign_menu.cpp,43,0,game data
+piece,0x507c50,12,src/frontend/campaign_menu.cpp,34,0,game data
+piece,0x507c40,16,src/frontend/campaign_menu.cpp,27,0,game data
+piece,0x507c30,16,src/frontend/campaign_menu.cpp,26,0,game data
+piece,0x507c28,7,src/frontend/campaign_menu.cpp,24,0,game data
+piece,0x507c18,13,src/frontend/campaign_menu.cpp,23,0,game data
+piece,0x507c04,15,src/frontend/campaign_menu.cpp,17,0,game data
+piece,0x507bf8,9,src/frontend/campaign_menu.cpp,14,0,game data
+piece,0x503384,8,src/frontend/campaign_menu.cpp,3,0,game data
 piece,0x4fd638,28,src/graphics/particles_472630.cpp,21,0,game data
 piece,0x4fd618,28,src/graphics/particles_472630.cpp,16,0,game data
 piece,0x4fd5d8,28,src/graphics/particles_472ab0.cpp,3,0,game data
@@ -12226,38 +12226,17 @@ same,0x4fd568,4,src/ingame/info_panel_468cf0.cpp,22,0,
 same,0x504910,10,src/ingame/info_panel_468cf0.cpp,13,0,
 same,0x502ae8,3,src/network/unit_sync.cpp,49,0,
 same,0x470a40,80,src/network/unit_sync.cpp,245,0,
-same,0x50341c,4,src/frontend/campaign_menu_4767f0.cpp,5,0,
-same,0x50372c,2,src/frontend/campaign_menu_4767f0.cpp,4,0,
-same,0x504a64,6,src/frontend/campaign_menu_4767f0.cpp,3,0,
-same,0x50341c,4,src/frontend/campaign_menu_476920.cpp,6,0,
-same,0x50372c,2,src/frontend/campaign_menu_476920.cpp,5,0,
-same,0x504a64,6,src/frontend/campaign_menu_476920.cpp,4,0,
-same,0x50341c,4,src/frontend/campaign_menu_4769f0.cpp,6,0,
-same,0x50372c,2,src/frontend/campaign_menu_4769f0.cpp,5,0,
-same,0x504a64,6,src/frontend/campaign_menu_4769f0.cpp,4,0,
-same,0x50341c,4,src/frontend/campaign_menu_476a60.cpp,11,0,
-same,0x50372c,2,src/frontend/campaign_menu_476a60.cpp,10,0,
-same,0x504a64,6,src/frontend/campaign_menu_476a60.cpp,9,0,
-same,0x50310c,4,src/frontend/campaign_menu_476a60.cpp,6,0,
-same,0x502a78,11,src/frontend/campaign_menu_477410.cpp,6,0,
-same,0x504ea8,5,src/frontend/campaign_menu_477410.cpp,5,0,
-same,0x504ea0,7,src/frontend/campaign_menu_477410.cpp,4,0,
-same,0x504e98,5,src/frontend/campaign_menu_477410.cpp,3,0,
-same,0x502b38,8,src/frontend/campaign_menu_4775a0.cpp,8,0,
-same,0x5028f8,9,src/frontend/campaign_menu_477940.cpp,3,0,
-same,0x5028f8,9,src/frontend/campaign_menu_4779e0.cpp,4,0,
-same,0x5028f8,9,src/frontend/campaign_menu_477ab0.cpp,3,0,
-same,0x502a78,11,src/frontend/campaign_menu_477ab0.cpp,17,0,
-same,0x50341c,4,src/frontend/campaign_menu_478240.cpp,18,0,
-same,0x50372c,2,src/frontend/campaign_menu_478240.cpp,17,0,
-same,0x504a64,6,src/frontend/campaign_menu_478240.cpp,16,0,
-same,0x5028f8,9,src/frontend/campaign_menu_478240.cpp,13,0,
-same,0x502a78,11,src/frontend/campaign_menu_478240.cpp,8,0,
-same,0x504ea8,5,src/frontend/campaign_menu_478240.cpp,7,0,
-same,0x504ea0,7,src/frontend/campaign_menu_478240.cpp,6,0,
-same,0x504e98,5,src/frontend/campaign_menu_478240.cpp,5,0,
-same,0x502b38,8,src/frontend/campaign_menu_478cb0.cpp,9,0,
-same,0x503130,12,src/frontend/campaign_menu_478cb0.cpp,8,0,
+same,0x50341c,4,src/frontend/campaign_menu.cpp,11,0,
+same,0x50372c,2,src/frontend/campaign_menu.cpp,10,0,
+same,0x504a64,6,src/frontend/campaign_menu.cpp,9,0,
+same,0x50310c,4,src/frontend/campaign_menu.cpp,25,0,
+same,0x502a78,11,src/frontend/campaign_menu.cpp,57,0,
+same,0x504ea8,5,src/frontend/campaign_menu.cpp,56,0,
+same,0x504ea0,7,src/frontend/campaign_menu.cpp,55,0,
+same,0x504e98,5,src/frontend/campaign_menu.cpp,54,0,
+same,0x502b38,8,src/frontend/campaign_menu.cpp,70,0,
+same,0x5028f8,9,src/frontend/campaign_menu.cpp,85,0,
+same,0x503130,12,src/frontend/campaign_menu.cpp,120,0,
 same,0x50495c,15,src/frontend/skirmish_menu_479660.cpp,44,0,
 same,0x502288,8,src/frontend/skirmish_menu_479660.cpp,41,0,
 same,0x504944,12,src/frontend/skirmish_menu_479660.cpp,38,0,
