@@ -41,10 +41,7 @@ struct Conn_00444580 {
     int size;
 };
 
-class Mission {
-public:
-    void RefreshMapList(int param_1);
-};
+#include "../map/mission.h"
 
 struct Game_00444580 {
     char unknown_0[0x14];
@@ -110,6 +107,10 @@ static int __stdcall CloneServiceSlot(Entry_00444580* entries, int from, short y
 
 // Opens the SELPROV.GUI menu (choose a connection provider) and adds a button
 // for each online service online.dll reports, copied from the SERVICEX one.
+// Unused here: the symbol ids these declarations take keep the allocation
+// (docs/c2-regalloc.md).
+extern int Pad_444580_e0;
+extern int Pad_444580_e1;
 // FUNCTION: 0x444580
 void FillProviderList()
 {

@@ -54,12 +54,7 @@ struct Spawn;
 struct UnitType;
 struct Player;
 
-class Mission {
-public:
-    char unknown_0[0xd4c];
-    int waterDoesDamage;               // +0xd4c
-    int waterDamage;                   // +0xd50
-};
+#include "../map/mission.h"
 
 // The player behind a unit (the unit's +0x96 and g_game's player array): the
 // unit list at +0x67, the player kind byte at +0x73.
@@ -826,6 +821,35 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u)
 // accepts it, until the stream is half full; then a 16-bit -1 end marker, one
 // more bit, the player's own unit (the one at ticks % the unit count) written
 // in full, the length patched into the header as two bytes, and the packet.
+// Unused here: the symbol ids these declarations take keep the allocation
+// (docs/c2-regalloc.md).
+struct Pad_48b710_s0 { int field; };
+struct Pad_48b710_s1 { int field; };
+struct Pad_48b710_s2 { int field; };
+struct Pad_48b710_s3 { int field; };
+struct Pad_48b710_s4 { int field; };
+struct Pad_48b710_s5 { int field; };
+struct Pad_48b710_s6 { int field; };
+struct Pad_48b710_s7 { int field; };
+struct Pad_48b710_s8 { int field; };
+struct Pad_48b710_s9 { int field; };
+struct Pad_48b710_s10 { int field; };
+struct Pad_48b710_s11 { int field; };
+struct Pad_48b710_s12 { int field; };
+struct Pad_48b710_s13 { int field; };
+struct Pad_48b710_s14 { int field; };
+struct Pad_48b710_s15 { int field; };
+struct Pad_48b710_s16 { int field; };
+struct Pad_48b710_s17 { int field; };
+struct Pad_48b710_s18 { int field; };
+struct Pad_48b710_s19 { int field; };
+struct Pad_48b710_s20 { int field; };
+struct Pad_48b710_s21 { int field; };
+struct Pad_48b710_s22 { int field; };
+struct Pad_48b710_s23 { int field; };
+struct Pad_48b710_s24 { int field; };
+extern int Pad_48b710_e0;
+extern int Pad_48b710_e1;
 // FUNCTION: 0x48b710
 void __stdcall SendUnitStates(Player* p)
 {

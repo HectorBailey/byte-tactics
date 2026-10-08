@@ -9,10 +9,11 @@
 #include <string.h>
 #include <stddef.h>
 
-class Mission {
-public:
-    int GetGameType();
-};
+#include "../map/mission.h"
+// Unused here: the symbol ids these declarations take keep the allocation
+// (docs/c2-regalloc.md).
+extern int Pad_485420_e0;
+extern int Pad_485420_e1;
 
 class MissionConditions;
 class CobScript;
@@ -410,6 +411,10 @@ static inline Cell_00485010* GetCellCachedWidth(int x, int y)
     return 0;
 }
 
+// Unused here: the symbol ids these declarations take keep the allocation
+// (docs/c2-regalloc.md).
+extern int Pad_485140_e0;
+extern int Pad_485140_e1;
 // FUNCTION: 0x485140
 int __stdcall GetCellMeanHeight(Pos_00485070* p)
 {
@@ -564,6 +569,9 @@ template<class _RI, class _Ty, class _Pr> void __stdcall QuickSort(_RI _F, _RI _
 void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
 int __stdcall ComparePlayers(Player* a, Player* b);
 
+// Unused here: the symbol ids these declarations take keep the allocation
+// (docs/c2-regalloc.md).
+extern int Pad_4854a0_e0;
 // FUNCTION: 0x4854a0
 void __stdcall AllocateUnitMemory(void)
 {

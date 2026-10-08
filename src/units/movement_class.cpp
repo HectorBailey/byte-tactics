@@ -20,10 +20,7 @@ void __cdecl operator delete(void* p);
 struct MovementClass;
 unsigned int __stdcall GetPassMapFootprintValueWithEdgeStrips(MovementClass* obj, int x, int y);
 
-class TdfRecord {
-public:
-    int GetFieldInt(const char* name, int def);
-};
+#include "../util/tdf.h"
 
 struct Source_00440340 {
     char unknown_0[4];
@@ -185,11 +182,7 @@ struct Player_00440cd0 {
 };
 #pragma pack(pop)
 
-class Mission {
-public:
-    int GetTerrainLength();
-    unsigned int ComputeMapChecksum();
-};
+#include "../map/mission.h"
 
 #pragma pack(push, 1)
 struct Game {
@@ -323,6 +316,14 @@ void MovementClass::ResizePassMap(unsigned int w, unsigned int h)
     }
 }
 
+// Unused here: the symbol ids these declarations take keep the allocation
+// (docs/c2-regalloc.md).
+struct Pad_4404c0_s0 { int field; };
+extern int Pad_4404c0_e0;
+extern int Pad_4404c0_e1;
+extern int Pad_4404c0_e2;
+extern int Pad_4404c0_e3;
+extern int Pad_4404c0_e4;
 // FUNCTION: 0x4404c0
 void MovementClass::SetPassMapCell(int param_1, int param_2, int param_3)
 {
@@ -425,6 +426,21 @@ void Class_00440500::BuildPassMap()
 
 // Writes a rectangle of 2-bit cells into the transposed bitmap whose dword at
 // column x of row band (y>>4) holds 16 cells stacked down the column.
+// Unused here: the symbol ids these declarations take keep the allocation
+// (docs/c2-regalloc.md).
+struct Pad_440830_s0 { int field; };
+struct Pad_440830_s1 { int field; };
+struct Pad_440830_s2 { int field; };
+struct Pad_440830_s3 { int field; };
+struct Pad_440830_s4 { int field; };
+struct Pad_440830_s5 { int field; };
+struct Pad_440830_s6 { int field; };
+struct Pad_440830_s7 { int field; };
+struct Pad_440830_s8 { int field; };
+struct Pad_440830_s9 { int field; };
+struct Pad_440830_s10 { int field; };
+extern int Pad_440830_e0;
+extern int Pad_440830_e1;
 // FUNCTION: 0x440830
 void MovementClass::RefreshPassMap(Point a, Point b)
 {
