@@ -186,7 +186,7 @@ extern const float DAT_004fd4c0;
 
 struct CMemoryCache { void BuildShadow(Model_459200*, Image_4589c0*); };
 struct Class_0045a470 { void MakeSilhouette(Image_4589c0*); };
-struct Class_004581e0 { void BuildObjectPicture(Model_459200*,int,int); void DrawPieces(Image_4589c0*,Model_459200*,int,int); };
+struct UnitTable { void BuildObjectPicture(Model_459200*,int,int); void DrawPieces(Image_4589c0*,Model_459200*,int,int); };
 struct Class_004584d0 { void DrawPiece(Model_459200*,int,Vec3_459200*,int,int,unsigned char,int); };
 
 int __stdcall GetGroundHeight(Pos_459200* p);
@@ -274,7 +274,7 @@ void Class_00459200::DrawObjectPicture(int param_2, Model_459200* model, Vec3_45
             }
         }
         if (model->bitmap == 0) {
-            ((Class_004581e0*)this)->BuildObjectPicture(model, 0, 1);
+            ((UnitTable*)this)->BuildObjectPicture(model, 0, 1);
             bmp = model->bitmap;
         }
         if (!(model->owner->field_10e & 4) && g_game->field_14280 == 0)
@@ -338,16 +338,16 @@ void Class_00459200::DrawObjectPicture(int param_2, Model_459200* model, Vec3_45
             }
         }
         if (model->bitmap == 0) {
-            ((Class_004581e0*)this)->BuildObjectPicture(model, 0, 1);
+            ((UnitTable*)this)->BuildObjectPicture(model, 0, 1);
             bmp = model->bitmap;
         }
         MergeIntoComposite(bmp, model);
         if ((model->owner->flags & 0x20000000) == 0 || model->owner->intensity == DAT_004fd4c0)
-            ((Class_004581e0*)this)->DrawPieces(this->bitmap,model,model->owner->kind,0);
+            ((UnitTable*)this)->DrawPieces(this->bitmap,model,model->owner->kind,0);
         Unit_459200* unit = model->owner->list_head;
         while (unit) {
             if (!(unit->flags & 0x20000)) {
-                ((Class_004581e0*)this)->BuildObjectPicture(unit->sprites,1,-1);
+                ((UnitTable*)this)->BuildObjectPicture(unit->sprites,1,-1);
                 if (unit->sprites->bitmap) {
                     ((Class_00458d30*)this)->ShadeByIntensity(unit->sprites->bitmap,unit->sprites);
                     // Owner position read through int* op.
