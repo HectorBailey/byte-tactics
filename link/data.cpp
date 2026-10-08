@@ -377,7 +377,7 @@ int g_explosion1EndSize;  // 0x511fa4 .bss
 int g_explosion2Duration;  // 0x511fa8 .bss
 int g_explosion2StartSize;  // 0x511fac .bss
 int g_explosion2EndSize;  // 0x511fb0 .bss
-List_00422ea0* DAT_00511fb4;  // 0x511fb4 .bss
+unsigned char DAT_00511fb4[4];  // 0x511fb4 .bss
 char g_frontendErrorText[256];  // 0x511fb8 .bss
 unsigned char g_pictureCache[464];  // 0x5120b8 .bss
 int DAT_00512288;  // 0x512288 .bss
