@@ -1240,18 +1240,6 @@ public:
     void TruncateWaypointsFrom(int n);
 };
 
-// Vtable 0x4fd488, constructor 0x44f570, ??_G 0x44f590.
-class Class_0044f570 : public Class_0044ef20 {
-public:
-    char unknown_c[0x18 - 0xc];
-    int field_18;                      // +0x18
-
-    Class_0044f570(Struct_004907e0* p);
-    virtual void FUN_0044ef40(Vec3_004907e0*, int, int);  // slot 3, 0x44f650
-    virtual int FUN_0044ef80();                     // slot 5, 0x44f5b0
-    virtual void FUN_0044efd0(BitReader*);          // slot 9, 0x44f5c0
-};
-
 class Class_0044f5b0 {
 public:
     char unknown_0[0x18];
@@ -1277,16 +1265,31 @@ struct Point_0044f5c0 {
     short y;                           // +0x2
 };
 
-class PatrolGoal {
+// Unused here: a forward declaration of the type below; its symbol id, with
+// the two declarations in the class, keeps the allocation the merged class
+// moved (docs/c2-regalloc.md).
+struct Vec3_0044f650;
+
+// Vtable 0x4fd488, constructor 0x44f570, ??_G 0x44f590.
+class PatrolGoal : public Class_0044ef20 {
 public:
-    void* vtable;                      // +0x0
-    int field_4;                       // +0x4
-    Owner_0044f5c0* owner;             // +0x8
     Point_0044f5c0 points[3];          // +0xc
     int count;                         // +0x18
 
+    PatrolGoal(Struct_004907e0* p);
+    virtual void FUN_0044ef40(Vec3_004907e0*, int, int);  // slot 3, 0x44f650
+    virtual int FUN_0044ef80();                     // slot 5, 0x44f5b0
+    virtual void FUN_0044efd0(BitReader*);          // slot 9, 0x44f5c0
     void FUN_0044f5c0(BitReader* reader);
+    // Unused here: the slot methods the other views declare keep the symbol
+    // ids of the functions after the merged class (docs/c2-regalloc.md).
+    int FUN_0044f5b0();
+    void FUN_0044f650(Vec3_0044f650*, int, int);
 };
+
+// Unused here: a forward declaration of a later function of this file; its
+// symbol id keeps the allocation (docs/c2-regalloc.md).
+void CreatePathfinder();
 
 struct Point_0044f650 {
     short x;                           // +0x0
@@ -2820,11 +2823,11 @@ void Class_0044f010::SerializeNetUnitState(BitWriter* stream)
 // destructor is trivial, so the dead store of this class's vtable disappears
 // and only the inlined base destructor's store of 0x4fd428 is left.
 // FUNCTION: 0x44f570
-// FUNCTION: 0x44f590 ??_GClass_0044f570@@UAEPAXI@Z
-Class_0044f570::Class_0044f570(Struct_004907e0* p)
+// FUNCTION: 0x44f590 ??_GPatrolGoal@@UAEPAXI@Z
+PatrolGoal::PatrolGoal(Struct_004907e0* p)
     : Class_0044ef20(p)
 {
-    field_18 = 0;
+    count = 0;
 }
 
 // FUNCTION: 0x44f5b0
@@ -2836,7 +2839,7 @@ int Class_0044f5b0::FUN_0044f5b0()
 // FUNCTION: 0x44f5c0
 void PatrolGoal::FUN_0044f5c0(BitReader* reader)
 {
-    owner->target->flag_2 = reader->ReadBit();
+    ((Owner_0044f5c0*)owner)->target->flag_2 = reader->ReadBit();
     count = reader->ReadBits(2);
     for (int i = 0; i < count; i++) {
         points[i].x = reader->ReadBits(16);
