@@ -233,7 +233,7 @@ extern char* DAT_0050d4d0;                                                      
 extern char* DAT_0050d660;                                                                                    // 0x50d660, 4 bytes; 1 of 1 files
 extern char DAT_0050d6b4[36];                                                                                 // 0x50d6b4, 36 bytes; 1 of 1 files
 extern char* DAT_0050d72c;                                                                                    // 0x50d72c, 4 bytes; 1 of 1 files
-extern char DAT_005119b8[8];                                                                                  // 0x5119b8, 8 bytes; 35 of 37 files (conflicting: shape)
+extern char DAT_005119b8[8];                                                                                  // 0x5119b8, 8 bytes; 34 of 36 files (conflicting: shape)
 extern PlayerAI* g_playerAI[10];                                                                              // 0x5119c0, 40 bytes; 2 of 3 files (conflicting: struct names only)
 extern int g_playerBudgetCap[10];                                                                             // 0x5119e8, 40 bytes; 1 of 1 files
 extern int g_playerTickLoad[10];                                                                              // 0x511a10, 40 bytes; 1 of 1 files
@@ -276,7 +276,7 @@ extern unsigned int g_netStatsTick;                                             
 extern unsigned int g_byteRatesTick;                                                                          // 0x511ddc, 4 bytes; 1 of 1 files
 extern int DAT_00511de0;                                                                                      // 0x511de0, 4 bytes; 2 of 2 files
 extern int g_cdPathMismatch;                                                                                  // 0x511de4, 4 bytes; 1 of 1 files
-extern Game* g_game;                                                                                          // 0x511de8, 4 bytes; 149 of 168 files (conflicting: shape)
+extern Game* g_game;                                                                                          // 0x511de8, 4 bytes; 147 of 166 files (conflicting: shape)
 extern int g_endGameGlamourSoundStarted;                                                                      // 0x511dec, 4 bytes; 1 of 1 files
 extern ExplodedPiece* g_explodedPieces[100];                                                                  // 0x511df0, 400 bytes; 1 of 1 files
 extern unsigned char DAT_00511f80[16];                                                                        // 0x511f80, 16 bytes; CMemoryCache by value in 2 of 2 files
@@ -335,7 +335,7 @@ extern int DAT_00512984;                                                        
 extern Entry_004426e0* DAT_00512988;                                                                          // 0x512988, 4 bytes; 1 of 1 files
 extern char* DAT_0051298c;                                                                                    // 0x51298c, 4 bytes; 1 of 1 files
 extern char* DAT_00512990;                                                                                    // 0x512990, 4 bytes; 1 of 1 files
-extern int DAT_00512994;                                                                                      // 0x512994, 4 bytes; 4 of 4 files
+extern int DAT_00512994;                                                                                      // 0x512994, 4 bytes; 3 of 3 files
 extern unsigned char DAT_00512998[12];                                                                        // 0x512998, 12 bytes; nothing refers to it
 extern int DAT_005129a4;                                                                                      // 0x5129a4, 4 bytes; 1 of 1 files
 extern unsigned int DAT_005129a8;                                                                             // 0x5129a8, 4 bytes; 1 of 1 files
