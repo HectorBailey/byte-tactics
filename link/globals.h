@@ -36,7 +36,7 @@ extern signed char DAT_004fd670[8];                                             
 extern signed char DAT_004fd678[8];                                                               // 0x4fd678, 8 bytes; 2 of 2 files
 extern float g_buildPercentScale;                                                                 // 0x4fd750, 4 bytes; 1 of 1 files
 extern unsigned char DAT_004fdaf0[16];                                                            // 0x4fdaf0, 16 bytes; V4i by value in 1 of 2 files (conflicting: struct names only)
-extern double DAT_004fdbe8;                                                                       // 0x4fdbe8, 8 bytes; 1 of 1 files
+extern double g_shadeStep;                                                                        // 0x4fdbe8, 8 bytes; 1 of 1 files
 extern char g_hapiCopyright[40];                                                                  // 0x4fdbf0, 40 bytes; 1 of 1 files
 extern int g_aiCommandsEnabled;                                                                   // 0x501774, 4 bytes; 1 of 1 files
 extern unsigned char DAT_00501d18[32];                                                            // 0x501d18, 32 bytes; 1 of 1 files
@@ -215,8 +215,8 @@ extern "C" double DAT_00509ef8;                                                 
 extern "C" short DAT_00509f00[128];                                                               // 0x509f00, 256 bytes; declared extern "C" in 1 of 1 files
 extern "C" short DAT_0050a000[512];                                                               // 0x50a000, 1024 bytes; declared extern "C" in 1 of 1 files
 extern "C" int DAT_0050a400[9];                                                                   // 0x50a400, 36 bytes; declared extern "C" in 1 of 1 files
-extern char DAT_0050a430[12];                                                                     // 0x50a430, 12 bytes; 1 of 1 files
-extern const char DAT_0050a43c[12];                                                               // 0x50a43c, 12 bytes; 1 of 1 files
+extern char g_alphaTableName[12];                                                                 // 0x50a430, 12 bytes; 1 of 1 files
+extern const char g_shadeTableName[12];                                                           // 0x50a43c, 12 bytes; 1 of 1 files
 extern char g_dotDot[4];                                                                          // 0x50a548, 4 bytes; 1 of 1 files
 extern char g_packageDataName[16];                                                                // 0x50a56c, 16 bytes; 1 of 1 files
 extern char g_dirWildcard[4];                                                                     // 0x50a57c, 4 bytes; 1 of 1 files
@@ -290,7 +290,7 @@ extern int g_explosion1EndSize;                                                 
 extern int g_explosion2Duration;                                                                  // 0x511fa8, 4 bytes; 1 of 1 files
 extern int g_explosion2StartSize;                                                                 // 0x511fac, 4 bytes; 1 of 1 files
 extern int g_explosion2EndSize;                                                                   // 0x511fb0, 4 bytes; 1 of 1 files
-extern List_00422ea0* DAT_00511fb4;                                                               // 0x511fb4, 4 bytes, DAT_00511fb4$S22242; 1 of 2 files (conflicting: struct names only)
+extern List_00422ea0* DAT_00511fb4;                                                               // 0x511fb4, 4 bytes, DAT_00511fb4$S23898; 1 of 2 files (conflicting: struct names only)
 extern char DAT_00511fb8[256];                                                                    // 0x511fb8, 256 bytes; 1 of 1 files
 extern unsigned char DAT_005120b8[464];                                                           // 0x5120b8, 464 bytes; Entry_00428730[10] by value in 1 of 1 files
 extern int DAT_00512288;                                                                          // 0x512288, 4 bytes; 1 of 1 files
