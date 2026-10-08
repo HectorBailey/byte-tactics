@@ -57,7 +57,7 @@ int __stdcall FindGadgetIndex(void* gadgets, const char* name, int flag);
 void __stdcall SetGadgetText(Menu_0044bc10* menu, int index, char* text);
 void __stdcall FUN_0049fa90(Menu_0044bc10* menu);
 void __stdcall FUN_0049fb10(Menu_0044bc10* menu, int value);
-void FUN_00428b60();
+void OrLabelAttribs();
 void __stdcall FUN_0049fa50(Menu_0044bc10* menu);
 void __stdcall RenderLayer(Menu_0044bc10* menu, int value);
 void __stdcall HandleLoadListClick(Menu_0044bc10* menu);
@@ -107,7 +107,7 @@ void OpenLoadListDialog()
         SetGadgetText(menu, index, DAT_005119b8);
     FUN_0049fa90(&g_game->menu);
     FUN_0049fb10(&g_game->menu, 1);
-    FUN_00428b60();
+    OrLabelAttribs();
     FUN_004a0570(&g_game->menu, "SaveGame", 0);
     FUN_0049fa50(&g_game->menu);
     RenderLayer(&g_game->menu, 0x40);

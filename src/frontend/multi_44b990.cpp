@@ -58,7 +58,7 @@ void __stdcall SetGadgetText(Menu_0044b990* menu, int index, char* text);
 void __stdcall FUN_0049fa90(Menu_0044b990* menu);
 void __stdcall FUN_004a7190(Menu_0044b990* menu, int index);
 void __stdcall FUN_0049fb10(Menu_0044b990* menu, int value);
-void __stdcall FUN_00428b60();
+void __stdcall OrLabelAttribs();
 void __stdcall FUN_0049fa50(Menu_0044b990* menu);
 void __stdcall RenderLayer(Menu_0044b990* menu, int value);
 
@@ -110,7 +110,7 @@ void __stdcall OpenSaveGameDialog()
 
     FUN_004a7190(&g_game->menu, index);
     FUN_0049fb10(&g_game->menu, 1);
-    FUN_00428b60();
+    OrLabelAttribs();
     FUN_004a0570(&g_game->menu, "LoadGame", 0);
     FUN_0049fa50(&g_game->menu);
     RenderLayer(&g_game->menu, 0x40);
