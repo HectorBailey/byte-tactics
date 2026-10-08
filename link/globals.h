@@ -10,6 +10,7 @@
 class Class_004d02a0;
 class FreeBlockMap;
 class NameTable;
+class PlayerAI;
 class SpeechQueue;
 class TranslationTable;
 struct Chunk;
@@ -163,9 +164,9 @@ extern const char g_cheatFivePlayers[4];                                        
 extern const char g_cheatFourPlayers[4];                                                          // 0x508498, 4 bytes; 1 of 1 files
 extern char g_skirmishSetupPictureName[16];                                                       // 0x50849c, 16 bytes; 1 of 1 files
 extern char g_skirmishGuiName[16];                                                                // 0x5084ac, 16 bytes; 1 of 1 files
-extern char DAT_00508a78[44];                                                                     // 0x508a78, 44 bytes; 1 of 1 files
-extern char DAT_00508aa4[16];                                                                     // 0x508aa4, 16 bytes; 1 of 1 files
-extern char DAT_00508ab4[16];                                                                     // 0x508ab4, 16 bytes; 1 of 1 files
+extern char g_soundInitError[44];                                                                 // 0x508a78, 44 bytes; 1 of 1 files
+extern char g_useWindowsSoundKey[16];                                                             // 0x508aa4, 16 bytes; 1 of 1 files
+extern char g_noDirectSoundKey[16];                                                               // 0x508ab4, 16 bytes; 1 of 1 files
 extern char DAT_00508be8[8];                                                                      // 0x508be8, 8 bytes; 1 of 1 files
 extern char DAT_00508bf0[36];                                                                     // 0x508bf0, 36 bytes; 1 of 1 files
 extern char s_TakeDamage_00508d68[12];                                                            // 0x508d68, 12 bytes; 1 of 1 files
@@ -236,6 +237,7 @@ extern char* DAT_0050d660;                                                      
 extern char DAT_0050d6b4[36];                                                                     // 0x50d6b4, 36 bytes; 1 of 1 files
 extern char* DAT_0050d72c;                                                                        // 0x50d72c, 4 bytes; 3 of 3 files
 extern char DAT_005119b8[8];                                                                      // 0x5119b8, 8 bytes; 42 of 46 files (conflicting: shape)
+extern PlayerAI* g_playerAI[10];                                                                  // 0x5119c0, 40 bytes; 2 of 3 files (conflicting: struct names only)
 extern int g_playerBudgetCap[10];                                                                 // 0x5119e8, 40 bytes; 1 of 1 files
 extern int g_playerTickLoad[10];                                                                  // 0x511a10, 40 bytes; 1 of 1 files
 extern int g_budgetRefreshCounter;                                                                // 0x511a38, 4 bytes; 1 of 1 files
@@ -277,7 +279,7 @@ extern unsigned int g_netStatsTick;                                             
 extern unsigned int g_byteRatesTick;                                                              // 0x511ddc, 4 bytes; 1 of 1 files
 extern int DAT_00511de0;                                                                          // 0x511de0, 4 bytes; 2 of 2 files
 extern int g_cdPathMismatch;                                                                      // 0x511de4, 4 bytes; 1 of 1 files
-extern Game* g_game;                                                                              // 0x511de8, 4 bytes; 201 of 224 files (conflicting: shape)
+extern Game* g_game;                                                                              // 0x511de8, 4 bytes; 189 of 212 files (conflicting: shape)
 extern int g_endGameGlamourSoundStarted;                                                          // 0x511dec, 4 bytes; 1 of 1 files
 extern ExplodedPiece* g_explodedPieces[100];                                                      // 0x511df0, 400 bytes; 1 of 1 files
 extern unsigned char DAT_00511f80[16];                                                            // 0x511f80, 16 bytes; CMemoryCache by value in 2 of 2 files
@@ -290,7 +292,7 @@ extern int g_explosion1EndSize;                                                 
 extern int g_explosion2Duration;                                                                  // 0x511fa8, 4 bytes; 1 of 1 files
 extern int g_explosion2StartSize;                                                                 // 0x511fac, 4 bytes; 1 of 1 files
 extern int g_explosion2EndSize;                                                                   // 0x511fb0, 4 bytes; 1 of 1 files
-extern List_00422ea0* DAT_00511fb4;                                                               // 0x511fb4, 4 bytes, DAT_00511fb4$S22242; 1 of 2 files (conflicting: struct names only)
+extern List_00422ea0* DAT_00511fb4;                                                               // 0x511fb4, 4 bytes, DAT_00511fb4$S23898; 1 of 2 files (conflicting: struct names only)
 extern char DAT_00511fb8[256];                                                                    // 0x511fb8, 256 bytes; 1 of 1 files
 extern unsigned char DAT_005120b8[464];                                                           // 0x5120b8, 464 bytes; Entry_00428730[10] by value in 1 of 1 files
 extern int DAT_00512288;                                                                          // 0x512288, 4 bytes; 1 of 1 files
@@ -543,7 +545,7 @@ extern unsigned int DAT_0051e67c;                                               
 extern unsigned int DAT_0051e680;                                                                 // 0x51e680, 4 bytes; 1 of 1 files
 extern int DAT_0051e684;                                                                          // 0x51e684, 4 bytes; 2 of 2 files
 extern int DAT_0051e688;                                                                          // 0x51e688, 4 bytes; 2 of 2 files
-extern SpeechQueue* DAT_0051e68c;                                                                 // 0x51e68c, 4 bytes; 1 of 1 files
+extern SpeechQueue* g_speechQueue;                                                                // 0x51e68c, 4 bytes; 1 of 1 files
 extern int g_noDirectSound;                                                                       // 0x51e690, 4 bytes; 1 of 1 files
 extern int g_useWindowsSound;                                                                     // 0x51e694, 4 bytes; 1 of 1 files
 extern int DAT_0051e698;                                                                          // 0x51e698, 4 bytes; 2 of 2 files
@@ -713,8 +715,7 @@ extern int g_lzssLockOwner;                                                     
 extern void* DAT_0052a4f8;                                                                        // 0x52a4f8, 4 bytes; 2 of 2 files
 extern long DAT_0052a4fc;                                                                         // 0x52a4fc, 4 bytes; 1 of 2 files (conflicting: signedness or const)
 
-// Not declared: 210 globals defined in a data file or whose type is not settled (see data/globals.csv).
-//   0x5119c0 g_playerAI: PlayerAI*[] (11), void*[] (5), Owner*[] (3), Player_40b0d0*[] (1), and 2 more
+// Not declared: 209 globals defined in a data file or whose type is not settled (see data/globals.csv).
 //   0x513000 g_packetManager: defined in src/network/packets_460e20.cpp
 //   0x5292c4 QBDUValue_004e17c0::PBDU?$pair::?$_Tree::_Nil: defined in src/debug/debug_lib_4e17c0.cpp
 //   0x528a54 std::IH::IU?$pair::?$_Tree::_Nil: defined in src/debug/debug_lib_4db610.cpp
@@ -863,7 +864,7 @@ extern long DAT_0052a4fc;                                                       
 //   0x507b64 DAT_00507b64: defined in src/data/unused.cpp
 //   0x507b68 DAT_00507b68: defined in src/data/unused.cpp
 //   0x5086d8 g_unitMessages: defined in src/units/unit_messages.cpp
-//   0x5086dc DAT_005086dc: defined in src/units/unit_messages.cpp
+//   0x5086dc g_speechTypes: defined in src/units/unit_messages.cpp
 //   0x5086fc g_speechCategories: defined in src/units/unit_messages.cpp
 //   0x50b6e0 DAT_0050b6e0: defined in src/data/unused.cpp
 //   0x5122c4 g_mapCacheBegin: part of another global: src/map/map_list.cpp:0x5122c0+0x4

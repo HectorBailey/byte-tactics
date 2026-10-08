@@ -160,9 +160,9 @@ const char g_cheatFivePlayers[4] = "*V";  // 0x508494 .data
 const char g_cheatFourPlayers[4] = "*IV";  // 0x508498 .data
 char g_skirmishSetupPictureName[16] = "Skirmsetup4x";  // 0x50849c .data
 char g_skirmishGuiName[16] = "SKIRMISH.GUI";  // 0x5084ac .data
-char DAT_00508a78[44] = "Error:  Sound system initialization failed.";  // 0x508a78 .data
-char DAT_00508aa4[16] = "UseWindowsSound";  // 0x508aa4 .data
-char DAT_00508ab4[16] = "NoDirectSound";  // 0x508ab4 .data
+char g_soundInitError[44] = "Error:  Sound system initialization failed.";  // 0x508a78 .data
+char g_useWindowsSoundKey[16] = "UseWindowsSound";  // 0x508aa4 .data
+char g_noDirectSoundKey[16] = "NoDirectSound";  // 0x508ab4 .data
 char DAT_00508be8[8] = "Killed";  // 0x508be8 .data
 char DAT_00508bf0[36] = "%s has taken the lead with %d kills";  // 0x508bf0 .data
 char s_TakeDamage_00508d68[12] = "TakeDamage";  // 0x508d68 .data
@@ -322,6 +322,7 @@ char* DAT_0050d660 = (char*)"Performance status";  // 0x50d660 .data
 char DAT_0050d6b4[36] = "Performance dialog failed to open";  // 0x50d6b4 .data
 char* DAT_0050d72c = (char*)"Memory Status";  // 0x50d72c .data
 char DAT_005119b8[8];  // 0x5119b8 .bss
+PlayerAI* g_playerAI[10];  // 0x5119c0 .bss
 int g_playerBudgetCap[10];  // 0x5119e8 .bss
 int g_playerTickLoad[10];  // 0x511a10 .bss
 int g_budgetRefreshCounter;  // 0x511a38 .bss
@@ -629,7 +630,7 @@ unsigned int DAT_0051e67c;  // 0x51e67c .bss
 unsigned int DAT_0051e680;  // 0x51e680 .bss
 int DAT_0051e684;  // 0x51e684 .bss
 int DAT_0051e688;  // 0x51e688 .bss
-SpeechQueue* DAT_0051e68c;  // 0x51e68c .bss
+SpeechQueue* g_speechQueue;  // 0x51e68c .bss
 int g_noDirectSound;  // 0x51e690 .bss
 int g_useWindowsSound;  // 0x51e694 .bss
 int DAT_0051e698;  // 0x51e698 .bss
