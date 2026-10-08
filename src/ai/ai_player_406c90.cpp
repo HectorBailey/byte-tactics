@@ -139,21 +139,21 @@ struct UnitDef {                       // the game's unit type table entry
     };
     Point16 origin;                    // +0x14a
     char unknown_14e[0x152 - 0x14e];
-    int field_152;                     // +0x152
-    int field_156;                     // +0x156
+    int count;                         // +0x152
+    int ids;                           // +0x156
     char unknown_15a[0x186 - 0x15a];
-    float field_186;                   // +0x186
-    float field_18a;                   // +0x18a
+    float energyCost;                  // +0x186
+    float metalCost;                   // +0x18a
     char unknown_18e[0x1c0 - 0x18e];
-    short field_1c0;                   // +0x1c0
+    short minwaterdepth;               // +0x1c0
     char unknown_1c2[0x1ce - 0x1c2];
-    float field_1ce;                   // +0x1ce
+    float extractsMetal;               // +0x1ce
     char unknown_1d2[0x1ee - 0x1d2];
     Sub_00409520* arr[3];              // +0x1ee
     char unknown_1fa[0x22d - 0x1fa];
-    char field_22d;                    // +0x22d
+    char makesMetal;                   // +0x22d
     char unknown_22e[0x22f - 0x22e];
-    char field_22f;                    // +0x22f
+    char mobile;                       // +0x22f
     char unknown_230;
     unsigned int* weaponCategories[3]; // +0x231
     unsigned int* categories;          // +0x23d
@@ -1164,13 +1164,13 @@ void Class_00408810::OnTimer()
     for (std::vector<Unit*>::iterator it = group->units.begin(); it != group->units.end(); ++it) {
         Unit* u = *it;
         if ((u->flags & 0x20000000) && (u->flags & 0x10000000) && !(u->flags & 0x4000)) {
-            if (u->def->field_22d) {
+            if (u->def->makesMetal) {
                 if (u->economy->cost + u->economy->cost < u->economy->energy) {
                     if (GetNetEnergy(u->economy) > 0.0f && RandomInt(5))
                         u->SetStateBits(1, 1);
                 } else
                     u->SetStateBits(1, 0);
-            } else if (u->def->field_152 && !u->orders) {
+            } else if (u->def->count && !u->orders) {
                 unsigned short id = ChooseBuildOption(player, u);
                 if (id)
                     QueueBuildOrder((char*)&g_game->defs[id] + 0x20, u, 1);
@@ -1202,7 +1202,7 @@ void SquadManager::AssignSquads()
                     else SetUnitSquad(u,1);
                 } else if(u->def->builder) SetUnitSquad(u,4);
                 else if(u->def->flying) SetUnitSquad(u,8);
-                else if(u->def->field_1c0>0) SetUnitSquad(u,7);
+                else if(u->def->minwaterdepth>0) SetUnitSquad(u,7);
                 else if(u->flags&0x80000000) SetUnitSquad(u,3);
             }
         }
@@ -1378,9 +1378,9 @@ void PlayerAI::InitUnitTables()
     for (int i = 0; i < n; ++i) {
         UnitDef* def = &g_game->defs[i];
         weights[i] = 0;
-        if (!def->field_22f)
+        if (!def->mobile)
             weights[i] += 40;
-        if (def->field_156)
+        if (def->ids)
             weights[i] += 20;
         counts[i] = 0;
         vec_ad[i].value = 100;
@@ -1444,7 +1444,7 @@ bool PlayerAI::FindCellNearFeatures(UnitDef* type, Vec3* pos, std::vector<Elem_0
 // Picks a random build cell near a world position: up to 30 tries of a
 // random direction and distance (within `range` cells) from `pos`, snapped
 // to the class's placement grid (spacing, offset and a random jitter reduced
-// by a margin; the second grid is used for types whose field_1c0 is
+// by a margin; the second grid is used for types whose minwaterdepth is
 // non-negative). A cell is accepted when CanPlaceUnitFootprint allows the type there
 // and the score GetBuildSiteMetal is at most the type's footprint area times
 // twice net->field_d30.
@@ -1454,9 +1454,9 @@ bool PlayerAI::FindRandomPlacementCell(UnitDef* type, Vec3* pos, int range, Poin
     int areaY = type->origin.y;
     int areaX = type->origin.x;
     int threshold = g_game->net->field_d30 * areaY * areaX * 2;
-    Point16 spacing = type->field_1c0 < 0 ? spacing0 : spacing1;
-    Point16 offset = type->field_1c0 < 0 ? offset0 : offset1;
-    int margin = type->field_1c0 < 0 ? margin0 : margin1;
+    Point16 spacing = type->minwaterdepth < 0 ? spacing0 : spacing1;
+    Point16 offset = type->minwaterdepth < 0 ? offset0 : offset1;
+    int margin = type->minwaterdepth < 0 ? margin0 : margin1;
     for (int i = 0; i < 30; i++) {
         int dist = RandomInt(range) << 16;
         int angle = RandomInt(0x10000);
