@@ -2929,7 +2929,7 @@ address,size,file,symbol,status,similarity
 0x4ce5a0,7,src/sound/cd_audio.cpp,?GetLockedTrack@Class_004ce5a0@@QAEHXZ,matched,100.0
 0x4ce5b0,35,src/sound/cd_audio.cpp,?OnNextTrackTimer@@YGXPAX@Z,matched,100.0
 0x4ce5e0,150,src/sound/cd_audio.cpp,?OnCdFadeTimer@@YGXPAX@Z,matched,100.0
-0x4ce680,7,src/sound/cd_audio.cpp,?GetTrackCategory@Class_004ce680@@QAEHXZ,matched,100.0
+0x4ce680,7,src/sound/cd_audio.cpp,?GetTrackCategory@Sound@@QAEHXZ,matched,100.0
 0x4ce690,258,src/sound/cd_audio.cpp,?SetTrackCategory@Sound@@QAEXH@Z,matched,100.0
 0x4ce7a0,18,src/sound/cd_audio.cpp,?SetPlaybackOrder@Class_004ce7a0@@QAEHH@Z,matched,100.0
 0x4ce7c0,18,src/sound/cd_audio.cpp,?SetCategoryOfTrack@Class_004ce7c0@@QAEXHE@Z,matched,100.0

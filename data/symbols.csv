@@ -2960,7 +2960,7 @@ address,name
 0x4ce5a0,Class_004ce5a0::GetLockedTrack
 0x4ce5b0,OnNextTrackTimer
 0x4ce5e0,OnCdFadeTimer
-0x4ce680,Class_004ce680::GetTrackCategory
+0x4ce680,Sound::GetTrackCategory
 0x4ce690,Sound::SetTrackCategory
 0x4ce7a0,Class_004ce7a0::SetPlaybackOrder
 0x4ce7c0,Class_004ce7c0::SetCategoryOfTrack
