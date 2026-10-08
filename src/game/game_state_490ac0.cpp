@@ -441,11 +441,6 @@ public:
     void CopyTrackTypeTable(const void* src);
 };
 
-class Class_004ce460 {
-public:
-    int IsFirstTrackData();
-};
-
 class Class_004ce680 {
 public:
     int GetTrackCategory();
@@ -455,6 +450,8 @@ class Sound {
 public:
     void SetTrackCategory(int param_1);
     int GetDiscSerial();
+    int IsFirstTrackData();
+    int SetCdCallback(void (*param_1)());
 };
 
 class Class_004ce7a0 {
@@ -523,7 +520,7 @@ void ReopenCdAudio()
 newdisc:
     if (index == 0x14) {
         if (((Class_004ce450*)g_game->cd)->GetTrackCount() == 0x10) {
-            if (((Class_004ce460*)g_game->cd)->IsFirstTrackData() != 0) {
+            if (g_game->cd->IsFirstTrackData() != 0) {
                 ((Class_004ce3e0*)g_game->cd)->CopyTrackTypeTable(tracks);
             }
         }
@@ -542,11 +539,6 @@ newdisc:
     else
         ((Class_004ced40*)g_game->cd)->StopCdAudio();
 }
-
-class Class_004cd9d0 {
-public:
-    int SetCdCallback(void (*param_1)());
-};
 
 extern const char g_skirmishInfoTag[];     // "SkirmishInfo"
 extern const char g_cdListsKey[];          // "CDLISTS"
@@ -649,7 +641,7 @@ void InitGame()
         memset(&g_cdListsDiscEntries, 0, 0xaa0);
     ((Class_004cedc0*)g_game->cd)->EnableCdAudio(g_game->musicMode & 1);
     ((Class_004ce7a0*)g_game->cd)->SetPlaybackOrder(g_game->cdMode);
-    ((Class_004cd9d0*)g_game->cd)->SetCdCallback(ReopenCdAudio);
+    g_game->cd->SetCdCallback(ReopenCdAudio);
     ReopenCdAudio();
     g_game->cd->SetTrackCategory(0);
     ApplyBrightnessAndVolume();
