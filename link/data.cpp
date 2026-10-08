@@ -694,7 +694,7 @@ int g_cdFadeVolume;  // 0x51ff10 .bss
 Class_004d02a0* g_cdPlayer;  // 0x51ff14 .bss
 void* g_cdPlayerWindow;  // 0x51ff18 .bss
 unsigned char DAT_0051ff1c[4];  // 0x51ff1c .bss
-int DAT_0051ff20[10];  // 0x51ff20 .bss
+int g_cdCategorySavedTrack[10];  // 0x51ff20 .bss
 int g_playBufferLooping;  // 0x51ff48 .bss
 unsigned char DAT_0051ff4c[12];  // 0x51ff4c .bss
 int DAT_0051ff58;  // 0x51ff58 .bss
@@ -703,6 +703,7 @@ char DAT_0051ff60[112];  // 0x51ff60 .bss
 char g_lzssPresetWindow[176];  // 0x51ffd0 .bss
 unsigned char DAT_00520080[3944];  // 0x520080 .bss
 char g_lzssPresetTree[24584];  // 0x520fe8 .bss
+Struct_00526ff0* DAT_00526ff0;  // 0x526ff0 .bss
 int g_lzssPresetReady;  // 0x526ff8 .bss
 int g_lzssUsePreset;  // 0x526ffc .bss (the type runs past the next known address, 0x526ffc+0x3)
 char DAT_005289b4;  // 0x5289b4 .bss
