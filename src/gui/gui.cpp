@@ -2102,7 +2102,7 @@ void __stdcall DrawSliderBar(Object_004a2580* obj, int index)
     }
 }
 #pragma pack(push, 1)
-struct Entry_004a2be0 {                // 0x15b bytes
+struct Gadget_004a2be0 {               // 0x15b bytes
     unsigned char type;                // +0x00
     char unknown_01[0x19 - 0x01];      // +0x01
     short field_19;                    // +0x19
@@ -2129,7 +2129,7 @@ struct Entry_004a2be0 {                // 0x15b bytes
 
 struct Holder_004a2be0 {
     int current;                       // +0x00
-    Entry_004a2be0* entries;           // +0x04
+    Gadget_004a2be0* entries;          // +0x04
     char unknown_08[0x14 - 0x08];
     void* list;                        // +0x14
 };
@@ -2147,7 +2147,7 @@ char* __stdcall SkipTextLines(char* text, int line);
 // FUNCTION: 0x4a2be0
 void __stdcall SyncAssocGadgets(Dialog_4a2be0* param_1, int param_2)
 {
-    Entry_004a2be0* entries = param_1->holder->entries;
+    Gadget_004a2be0* entries = param_1->holder->entries;
     int i = 1;
     char* me = (char*)entries + param_2 * 0x15b;
     int type = *(unsigned char*)me;
@@ -2750,7 +2750,7 @@ void __stdcall SetGadgetItems(Table_004a36a0* table, char* name, int* items, int
     }
 }
 #pragma pack(push, 1)
-struct Entry_004a3780 {                // 0x15b bytes
+struct Gadget_004a3780 {               // 0x15b bytes
     unsigned char type;                // +0x00
     unsigned char kind;                // +0x01
     char unknown_02[0x13 - 0x02];
@@ -2787,7 +2787,7 @@ struct List_004a3780 {
 
 struct Holder_004a3780 {
     int current;                       // +0x00
-    Entry_004a3780* entries;           // +0x04
+    Gadget_004a3780* entries;          // +0x04
     char unknown_08[0x14 - 0x08];
     List_004a3780* list;               // +0x14
     char unknown_18[0x20 - 0x18];
@@ -2858,8 +2858,8 @@ int __stdcall HandleListBoxInput(Object_004a3780* obj, int index, int param_3)
 {
     if (obj->field_60 != -1)
         return 0;
-    Entry_004a3780* entries = obj->holder->entries;
-    Entry_004a3780* me = &entries[index];
+    Gadget_004a3780* entries = obj->holder->entries;
+    Gadget_004a3780* me = &entries[index];
     int orig_sel = me->field_ba;
     if (me->field_c0 == 0)
         return 0;
