@@ -337,12 +337,17 @@ extern Game* g_game;
 
 extern unsigned char g_scorePanelKillFlash[10];
 extern unsigned char g_scorePanelLossFlash[10];
-extern "C" int g_loadingBarFlashAlpha;
+extern "C" unsigned char g_loadingBarFlashAlpha[8];
+// The last two bars' flash alphas: its +4. Folding the pointer spelling into
+// the array moves LoadingScreenFrame's expression temporaries.
 extern "C" int DAT_0051e6cc;
 extern "C" int g_loadingBarFlashDecayTick;
 extern int g_usePacketManager;
-extern "C" unsigned char g_loadingBarPrevPercent, DAT_0051e821, DAT_0051e822;
-extern "C" unsigned char DAT_0051e823, DAT_0051e824, DAT_0051e825;
+extern "C" unsigned char g_loadingBarPrevPercent[6];
+// Unused here: these declarations take the symbol ids of the folded views
+// (docs/c2-regalloc.md).
+extern "C" unsigned char Pad_0051e821, Pad_0051e822;
+extern "C" unsigned char Pad_0051e823, Pad_0051e824, Pad_0051e825;
 extern int g_nonCampaignGame;
 
 static inline ViewFlags_497180* g_game_view() { return (ViewFlags_497180*)((char*)g_game + 0x14281); }
@@ -1056,14 +1061,14 @@ void LoadingScreenFrame(void)
             void* lightbar = GetGafFrame(light, 0);
             *((short*)lightbar + 3) = 0;
             *((short*)lightbar + 2) = 0;
-            DrawLoadingBar(&gadget, lightbar, 0, &g_loadingBarPrevPercent, (unsigned char*)&g_loadingBarFlashAlpha, 0, "Textures", 0x87, rect);
-            DrawLoadingBar(&gadget, lightbar, 1, &DAT_0051e821, (unsigned char*)&g_loadingBarFlashAlpha, 1, "Terrain", 0xb1, rect);
-            DrawLoadingBar(&gadget, lightbar, 2, &DAT_0051e822, (unsigned char*)&g_loadingBarFlashAlpha, 2, "Units", 0xda, rect);
-            DrawLoadingBar(&gadget, lightbar, 3, &DAT_0051e823, (unsigned char*)&g_loadingBarFlashAlpha, 3, "Animation", 0x106, rect);
-            DrawLoadingBar(&gadget, lightbar, 4, &DAT_0051e824, (unsigned char*)&DAT_0051e6cc, 0, "3D Data", 0x130, rect);
+            DrawLoadingBar(&gadget, lightbar, 0, g_loadingBarPrevPercent, (unsigned char*)&g_loadingBarFlashAlpha, 0, "Textures", 0x87, rect);
+            DrawLoadingBar(&gadget, lightbar, 1, &g_loadingBarPrevPercent[1], (unsigned char*)&g_loadingBarFlashAlpha, 1, "Terrain", 0xb1, rect);
+            DrawLoadingBar(&gadget, lightbar, 2, &g_loadingBarPrevPercent[2], (unsigned char*)&g_loadingBarFlashAlpha, 2, "Units", 0xda, rect);
+            DrawLoadingBar(&gadget, lightbar, 3, &g_loadingBarPrevPercent[3], (unsigned char*)&g_loadingBarFlashAlpha, 3, "Animation", 0x106, rect);
+            DrawLoadingBar(&gadget, lightbar, 4, &g_loadingBarPrevPercent[4], (unsigned char*)&DAT_0051e6cc, 0, "3D Data", 0x130, rect);
             DrawFrame(&gadget, lightbar, rect[0] + *((short*)lightbar + 2),
                          rect[1] + *((short*)lightbar + 3));
-            DrawLoadingBar(&gadget, lightbar, 5, &DAT_0051e825, (unsigned char*)&DAT_0051e6cc, 1, "Explosions", 0x15b, rect);
+            DrawLoadingBar(&gadget, lightbar, 5, &g_loadingBarPrevPercent[5], (unsigned char*)&DAT_0051e6cc, 1, "Explosions", 0x15b, rect);
         }
         if (((Mission*)g_game->mapInfo)->GetGameType() == 3) {
             DrawSyncStatus(&gadget);

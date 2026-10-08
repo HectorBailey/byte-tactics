@@ -389,8 +389,10 @@ void DecreaseGameSpeed()
 }
 
 struct CdLists_490f80 {
-    char unknown_0[0x24];
-    unsigned char tracks[0xaa0 - 0x24]; // +0x24
+    char unknown_0[0x20];
+    int discSerial;                    // +0x20
+    unsigned char tracks[16];          // +0x24, the first disc's track categories
+    char unknown_34[0xaa0 - 0x34];
 };
 
 extern CdLists_490f80 g_cdListsDiscEntries;
@@ -443,11 +445,14 @@ void SaveCdLists()
 // tracks. The final cleanup call depends on the game mode.
 
 
-extern int DAT_0051e848;
-extern int g_cachedCdTrackTypes;
-extern int DAT_0051e850;
-extern int DAT_0051e854;
-extern int DAT_0051e858;
+// Unused here: the symbol ids these declarations take keep the allocation of
+// the later functions (docs/c2-regalloc.md); the views they stand for are
+// fields of g_cdListsDiscEntries now.
+extern int Pad_0051e848;
+extern int Pad_0051e84c;
+extern int Pad_0051e850;
+extern int Pad_0051e854;
+extern int Pad_0051e858;
 extern int* g_savegameSideList;
 
 // FUNCTION: 0x490fe0
@@ -466,7 +471,7 @@ void ReopenCdAudio()
 
     int id = g_game->cd->GetDiscSerial();
     int index = 0;
-    int* slot = &DAT_0051e848;
+    int* slot = &g_cdListsDiscEntries.discSerial;
     // Test *slot != id first, with the break as its own block: else the loop is rotated.
     while (1) {
         if (*slot != id) {
@@ -484,7 +489,7 @@ void ReopenCdAudio()
             memcpy((char*)&g_cdListsDiscEntries + j * 0x88,
                    (char*)&g_cdListsDiscEntries + (j - 1) * 0x88, 0x88);
         memcpy(&g_cdListsDiscEntries, buf, 0x88);
-        g_game->cd->CopyTrackTypeTable(&g_cachedCdTrackTypes);
+        g_game->cd->CopyTrackTypeTable(g_cdListsDiscEntries.tracks);
     }
 newdisc:
     if (index == 0x14) {
@@ -497,11 +502,11 @@ newdisc:
         int p = (int)&g_cdListsDiscEntries + 0xa18;
         for (; p > (int)&g_cdListsDiscEntries; p -= 0x88)
             memcpy((void*)p, (void*)(p - 0x88), 0x88);
-        g_cachedCdTrackTypes = *(int*)&tracks[0];
-        DAT_0051e850 = *(int*)&tracks[4];
-        DAT_0051e854 = *(int*)&tracks[8];
-        DAT_0051e858 = *(int*)&tracks[12];
-        DAT_0051e848 = id;
+        *(int*)&g_cdListsDiscEntries.tracks[0] = *(int*)&tracks[0];
+        *(int*)&g_cdListsDiscEntries.tracks[4] = *(int*)&tracks[4];
+        *(int*)&g_cdListsDiscEntries.tracks[8] = *(int*)&tracks[8];
+        *(int*)&g_cdListsDiscEntries.tracks[12] = *(int*)&tracks[12];
+        g_cdListsDiscEntries.discSerial = id;
     }
     if ((g_game->flags_2a44 & 4) != 0 && g_game->mode == 6)
         g_game->cd->PlayNextTrack();

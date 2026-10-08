@@ -142,7 +142,7 @@ extern char g_volTextGadgetName[8];                                             
 extern char g_modeGadgetName[8];                                                                  // 0x5069d0, 8 bytes; 1 of 1 files
 extern char g_explodeSoundFile[20];                                                               // 0x5069d8, 20 bytes; 1 of 1 files
 extern int g_usePacketManager;                                                                    // 0x506dbc, 4 bytes; 9 of 9 files
-extern char DAT_00507318[32];                                                                     // 0x507318, 32 bytes; 1 of 1 files
+extern char g_continueWatchingTitle[32];                                                          // 0x507318, 32 bytes; 1 of 1 files
 extern char g_radarPicTempName[16];                                                               // 0x5074e8, 16 bytes; 1 of 1 files
 extern char g_radarPictureName[16];                                                               // 0x5074f8, 16 bytes; 1 of 1 files
 extern char g_radarMappedName[16];                                                                // 0x507508, 16 bytes; 1 of 1 files
@@ -212,8 +212,8 @@ extern const char g_errorCaption[20];                                           
 extern "C" double g_radToAngle16;                                                                 // 0x509ef0, 8 bytes; declared extern "C" in 1 of 1 files
 extern "C" double g_angle16ToRad;                                                                 // 0x509ef8, 8 bytes; declared extern "C" in 1 of 1 files
 extern "C" short g_sinTable[128];                                                                 // 0x509f00, 256 bytes; declared extern "C" in 1 of 1 files
-extern "C" short DAT_0050a000[512];                                                               // 0x50a000, 1024 bytes; declared extern "C" in 1 of 1 files
-extern "C" int DAT_0050a400[9];                                                                   // 0x50a400, 36 bytes; declared extern "C" in 1 of 1 files
+extern "C" short g_cosTable[512];                                                                 // 0x50a000, 1024 bytes; declared extern "C" in 1 of 1 files
+extern "C" int g_rotationMatrix[9];                                                               // 0x50a400, 36 bytes; declared extern "C" in 1 of 1 files
 extern char g_alphaTableName[12];                                                                 // 0x50a430, 12 bytes; 1 of 1 files
 extern const char g_shadeTableName[12];                                                           // 0x50a43c, 12 bytes; 1 of 1 files
 extern char g_dotDot[4];                                                                          // 0x50a548, 4 bytes; 1 of 1 files
@@ -277,7 +277,7 @@ extern unsigned int g_netStatsTick;                                             
 extern unsigned int g_byteRatesTick;                                                              // 0x511ddc, 4 bytes; 1 of 1 files
 extern int g_cdBypassDriveScan;                                                                   // 0x511de0, 4 bytes; 2 of 2 files
 extern int g_cdPathMismatch;                                                                      // 0x511de4, 4 bytes; 1 of 1 files
-extern Game* g_game;                                                                              // 0x511de8, 4 bytes; 143 of 162 files (conflicting: shape)
+extern Game* g_game;                                                                              // 0x511de8, 4 bytes; 145 of 162 files (conflicting: shape)
 extern int g_endGameGlamourSoundStarted;                                                          // 0x511dec, 4 bytes; 1 of 1 files
 extern ExplodedPiece* g_explodedPieces[100];                                                      // 0x511df0, 400 bytes; 1 of 1 files
 extern unsigned char g_debrisMemCache[16];                                                        // 0x511f80, 16 bytes; CMemoryCache by value in 2 of 2 files
@@ -526,7 +526,7 @@ extern int g_reportFlags;                                                       
 extern char g_unitSyncStatusText[104];                                                            // 0x51e5a0, 104 bytes; 1 of 1 files
 extern char g_fxEventPoolBlocked;                                                                 // 0x51e608, 1 bytes; 5 of 5 files
 extern unsigned char DAT_0051e609[7];                                                             // 0x51e609, 7 bytes; nothing refers to it
-extern unsigned char g_particlePool[36];                                                          // 0x51e610, 36 bytes; Class_00470ed0 by value in 4 of 4 files
+extern unsigned char g_particlePool[36];                                                          // 0x51e610, 36 bytes; ObjectPool by value in 4 of 4 files
 extern unsigned char g_particlePoolDestroyed;                                                     // 0x51e634, 1 bytes; 1 of 1 files
 extern unsigned char DAT_0051e635[7];                                                             // 0x51e635, 7 bytes; nothing refers to it
 extern char* g_briefingWrappedText;                                                               // 0x51e63c, 4 bytes; 1 of 1 files
@@ -555,15 +555,14 @@ extern int g_playLooping;                                                       
 extern unsigned char DAT_0051e6b0[4];                                                             // 0x51e6b0, 4 bytes; nothing refers to it
 extern int g_mapLoadFlag;                                                                         // 0x51e6c0, 4 bytes; 1 of 1 files
 extern unsigned int g_cdMismatchDefeatTick;                                                       // 0x51e6c4, 4 bytes; 1 of 1 files
-extern "C" unsigned char g_loadingBarFlashAlpha[8];                                               // 0x51e6c8, 4 bytes; extern "C" (no type) with the globals inside it
+extern "C" unsigned char g_loadingBarFlashAlpha[8];                                               // 0x51e6c8, 8 bytes (declared extern "C" (no type)); declared extern "C" in 1 of 1 files
 extern int g_shareDialogPlayerNetIds[10];                                                         // 0x51e6d0, 40 bytes; 1 of 1 files
 extern char g_savegameRadarFrame[24];                                                             // 0x51e6f8, 24 bytes; 1 of 1 files
 extern int g_cdActivitySampleRing[30];                                                            // 0x51e710, 120 bytes; 2 of 2 files
 extern char g_chatDraftText[136];                                                                 // 0x51e788, 136 bytes; 1 of 1 files
 extern unsigned char g_scorePanelLossFlash[10];                                                   // 0x51e810, 10 bytes; 2 of 2 files
 extern unsigned char DAT_0051e81a[6];                                                             // 0x51e81a, 6 bytes; nothing refers to it
-extern "C" unsigned char g_loadingBarPrevPercent[5];                                              // 0x51e820, 1 bytes; extern "C" (no type) in declared extern "C" in 1 of 1 files, but used past its end
-extern "C" unsigned char DAT_0051e825[3];                                                         // 0x51e825, 1 bytes; extern "C" (no type) in declared extern "C" in 1 of 1 files, but used past its end
+extern "C" unsigned char g_loadingBarPrevPercent[8];                                              // 0x51e820, 6 bytes; extern "C" (no type) in declared extern "C" in 1 of 1 files, but used past its end
 extern unsigned char g_cdListsDiscEntries[2720];                                                  // 0x51e828, 2720 bytes; CdLists_490f80 by value in 1 of 1 files
 extern unsigned char g_scorePanelKillFlash[10];                                                   // 0x51f2c8, 10 bytes; 2 of 2 files
 extern unsigned char DAT_0051f2d2[6];                                                             // 0x51f2d2, 6 bytes; nothing refers to it
@@ -618,9 +617,9 @@ extern unsigned char DAT_0051ff1c[4];                                           
 extern int g_cdCategorySavedTrack[10];                                                            // 0x51ff20, 40 bytes; 1 of 1 files
 extern int g_playBufferLooping;                                                                   // 0x51ff48, 4 bytes; 1 of 1 files
 extern unsigned char DAT_0051ff4c[12];                                                            // 0x51ff4c, 12 bytes; nothing refers to it
-extern int DAT_0051ff58;                                                                          // 0x51ff58, 4 bytes; 1 of 1 files
+extern int g_delayedSampleVolume;                                                                 // 0x51ff58, 4 bytes; 1 of 1 files
 extern unsigned char DAT_0051ff5c[4];                                                             // 0x51ff5c, 4 bytes; nothing refers to it
-extern char DAT_0051ff60[112];                                                                    // 0x51ff60, 112 bytes; 1 of 1 files
+extern char g_delayedSampleName[112];                                                             // 0x51ff60, 112 bytes; 1 of 1 files
 extern char g_lzssPresetWindow[176];                                                              // 0x51ffd0, 176 bytes; 1 of 1 files
 extern unsigned char DAT_00520080[3944];                                                          // 0x520080, 3944 bytes; nothing refers to it
 extern char g_lzssPresetTree[24584];                                                              // 0x520fe8, 24584 bytes; 1 of 1 files
@@ -719,7 +718,7 @@ extern int g_lzssLockOwner;                                                     
 extern void* g_squashThreadLockEvent;                                                             // 0x52a4f8, 4 bytes; 2 of 2 files
 extern long g_squashThreadLockTicket;                                                             // 0x52a4fc, 4 bytes; 1 of 2 files (conflicting: signedness or const)
 
-// Not declared: 198 globals defined in a data file or whose type is not settled (see data/globals.csv).
+// Not declared: 189 globals defined in a data file or whose type is not settled (see data/globals.csv).
 //   0x513000 g_packetManager: defined in src/network/packets_460e20.cpp
 //   0x4fcdb8 DPSPGUID_SERIAL: defined in src/data/guids.cpp
 //   0x4fcdc8 DPSPGUID_MODEM: defined in src/data/guids.cpp
@@ -895,15 +894,6 @@ extern long g_squashThreadLockTicket;                                           
 //   0x513008 DAT_00513008: part of another global: g_packetManager+0x8
 //   0x51e300 g_packetManagerReceiver: part of another global: g_packetManager+0xb300
 //   0x51e6cc DAT_0051e6cc: part of another global: g_loadingBarFlashAlpha+0x4
-//   0x51e821 DAT_0051e821: part of another global: g_loadingBarPrevPercent+0x1
-//   0x51e822 DAT_0051e822: part of another global: g_loadingBarPrevPercent+0x2
-//   0x51e823 DAT_0051e823: part of another global: g_loadingBarPrevPercent+0x3
-//   0x51e824 DAT_0051e824: part of another global: g_loadingBarPrevPercent+0x4
-//   0x51e848 DAT_0051e848: part of another global: g_cdListsDiscEntries+0x20
-//   0x51e84c g_cachedCdTrackTypes: part of another global: g_cdListsDiscEntries+0x24
-//   0x51e850 DAT_0051e850: part of another global: g_cdListsDiscEntries+0x28
-//   0x51e854 DAT_0051e854: part of another global: g_cdListsDiscEntries+0x2c
-//   0x51e858 DAT_0051e858: part of another global: g_cdListsDiscEntries+0x30
 //   0x51f310 g_tdfGlobalParser: defined in src/weapons/weapons.cpp
 //   0x51fbb8 std::HH::HU?$pair::?$_Tree::_Nilrefs: defined in src/util/int_map_4b2290.cpp
 //   0x51fbbc std::HH::HU?$pair::?$_Tree::_Nil: defined in src/util/int_map_4b2290.cpp
