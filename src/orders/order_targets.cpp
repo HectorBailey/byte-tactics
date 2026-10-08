@@ -1665,6 +1665,7 @@ static inline Vec3_0044d720 Direction(short angle, int scale)
 
 static inline int MeanRadius(Class_0044d720* c)
 {
+    // The locals keep the loads radius1 first; a single sum commutes them.
     int r1 = c->radius1;
     int r2 = c->radius2;
     return (r1 + r2) / 2;
