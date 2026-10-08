@@ -225,11 +225,11 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x50849c,g_skirmishSetupPictureName,.data,16,gap,string,char[],1,0,1,one type,1,,s_Skirmsetup4x_0050849c,,,536b69726d7365747570347800000000
 0x5084ac,g_skirmishGuiName,.data,16,gap,string,char[],1,0,1,one type,1,,s_SKIRMISH_GUI_005084ac,,,534b49524d4953482e47554900000000
 0x5086d8,g_unitMessages,.data,4,type,data,UnitMessage*,1,0,1,one type,1,,,,src/units/unit_messages.cpp,00000000
-0x5086dc,DAT_005086dc,.data,600,gap,data,Message_0047fad0[24],1,0,1,one type,1,0x250,DAT_005086dc,36,src/units/unit_messages.cpp,0000000000000000000000000000000000000000010000000a00000000000000708a50000000000000000000020000000900000014000000648a5000548a5000
+0x5086dc,g_speechTypes,.data,600,gap,data,Message_0047fad0[24],1,0,1,one type,1,0x250,DAT_005086dc,36,src/units/unit_messages.cpp,0000000000000000000000000000000000000000010000000a00000000000000708a50000000000000000000020000000900000014000000648a5000548a5000
 0x5086fc,g_speechCategories,.data,560,gap,data,SoundInfo_005086fc[],1,0,1,one type,1,0x228,PTR_s_select_005086fc,36,src/units/unit_messages.cpp,708a50000000000000000000020000000900000014000000648a5000548a500000000000030000000400000002000000488a5000000000000000000004000000
-0x508a78,DAT_00508a78,.data,44,gap,string,char[],1,0,1,one type,1,,s_Error__Sound_system_initializati_00508a78,,,4572726f723a2020536f756e642073797374656d20696e697469616c697a6174696f6e206661696c65642e00
-0x508aa4,DAT_00508aa4,.data,16,gap,string,char[],1,0,1,one type,1,,s_UseWindowsSound_00508aa4,,,55736557696e646f7773536f756e6400
-0x508ab4,DAT_00508ab4,.data,16,gap,string,char[],1,0,1,one type,1,,s_NoDirectSound_00508ab4,,,4e6f446972656374536f756e64000000
+0x508a78,g_soundInitError,.data,44,gap,string,char[],1,0,1,one type,1,,s_Error__Sound_system_initializati_00508a78,,,4572726f723a2020536f756e642073797374656d20696e697469616c697a6174696f6e206661696c65642e00
+0x508aa4,g_useWindowsSoundKey,.data,16,gap,string,char[],1,0,1,one type,1,,s_UseWindowsSound_00508aa4,,,55736557696e646f7773536f756e6400
+0x508ab4,g_noDirectSoundKey,.data,16,gap,string,char[],1,0,1,one type,1,,s_NoDirectSound_00508ab4,,,4e6f446972656374536f756e64000000
 0x508be8,DAT_00508be8,.data,8,gap,string,char[],1,0,1,one type,1,,s_Killed_00508be8,,,4b696c6c65640000
 0x508bf0,DAT_00508bf0,.data,36,gap,string,char[],1,0,1,one type,1,,s__s_has_taken_the_lead_with__d_ki_00508bf0,,,2573206861732074616b656e20746865206c6561642077697468202564206b696c6c7300
 0x508d68,s_TakeDamage_00508d68,.data,12,gap,string,char[],1,0,1,one type,1,,s_TakeDamage_00508d68,,,54616b6544616d6167650000
@@ -364,7 +364,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x511fa8,g_explosion2Duration,.bss,4,type,data,int,1,0,1,one type,1,,DAT_00511fa8,,,
 0x511fac,g_explosion2StartSize,.bss,4,type,data,int,1,0,1,one type,1,,DAT_00511fac,,,
 0x511fb0,g_explosion2EndSize,.bss,4,type,data,int,1,0,1,one type,1,,DAT_00511fb0,,,
-0x511fb4,DAT_00511fb4$S22242,.bss,4,type,data,List_00422ea0*,1,1,2,conflicting: struct names only,2,,DAT_00511fb4,,,
+0x511fb4,DAT_00511fb4$S23898,.bss,4,type,data,List_00422ea0*,1,1,2,conflicting: struct names only,2,,DAT_00511fb4,,,
 0x511fb8,DAT_00511fb8,.bss,256,gap,data,char[],1,0,1,one type,1,,DAT_00511fb8,,,
 0x5120b8,DAT_005120b8,.bss,464,gap,data,Entry_00428730[10],1,0,1,one type,1,0x198,DAT_005120b8,,,
 0x512288,DAT_00512288,.bss,4,type,data,int,1,0,1,one type,1,,DAT_00512288,,,
@@ -678,7 +678,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x51e680,g_briefingPlanetNextTick,.bss,4,type,data,unsigned int,1,0,1,one type,1,,DAT_0051e680,,,
 0x51e684,DAT_0051e684,.bss,4,type,data,int,2,0,1,one type,2,,DAT_0051e684,,,
 0x51e688,DAT_0051e688,.bss,4,type,data,int,2,0,1,one type,2,,DAT_0051e688,,,
-0x51e68c,DAT_0051e68c,.bss,4,type,data,SpeechQueue*,1,0,1,one type,1,,DAT_0051e68c,,,
+0x51e68c,g_speechQueue,.bss,4,type,data,SpeechQueue*,1,0,1,one type,1,,DAT_0051e68c,,,
 0x51e690,g_noDirectSound,.bss,4,type,data,int,1,0,1,one type,1,,DAT_0051e690,,,
 0x51e694,g_useWindowsSound,.bss,4,type,data,int,1,0,1,one type,1,,DAT_0051e694,,,
 0x51e698,DAT_0051e698,.bss,4,type,data,int,2,0,1,one type,2,,DAT_0051e698,,,

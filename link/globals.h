@@ -163,9 +163,9 @@ extern const char g_cheatFivePlayers[4];                                        
 extern const char g_cheatFourPlayers[4];                                                          // 0x508498, 4 bytes; 1 of 1 files
 extern char g_skirmishSetupPictureName[16];                                                       // 0x50849c, 16 bytes; 1 of 1 files
 extern char g_skirmishGuiName[16];                                                                // 0x5084ac, 16 bytes; 1 of 1 files
-extern char DAT_00508a78[44];                                                                     // 0x508a78, 44 bytes; 1 of 1 files
-extern char DAT_00508aa4[16];                                                                     // 0x508aa4, 16 bytes; 1 of 1 files
-extern char DAT_00508ab4[16];                                                                     // 0x508ab4, 16 bytes; 1 of 1 files
+extern char g_soundInitError[44];                                                                 // 0x508a78, 44 bytes; 1 of 1 files
+extern char g_useWindowsSoundKey[16];                                                             // 0x508aa4, 16 bytes; 1 of 1 files
+extern char g_noDirectSoundKey[16];                                                               // 0x508ab4, 16 bytes; 1 of 1 files
 extern char DAT_00508be8[8];                                                                      // 0x508be8, 8 bytes; 1 of 1 files
 extern char DAT_00508bf0[36];                                                                     // 0x508bf0, 36 bytes; 1 of 1 files
 extern char s_TakeDamage_00508d68[12];                                                            // 0x508d68, 12 bytes; 1 of 1 files
@@ -291,7 +291,7 @@ extern int g_explosion1EndSize;                                                 
 extern int g_explosion2Duration;                                                                  // 0x511fa8, 4 bytes; 1 of 1 files
 extern int g_explosion2StartSize;                                                                 // 0x511fac, 4 bytes; 1 of 1 files
 extern int g_explosion2EndSize;                                                                   // 0x511fb0, 4 bytes; 1 of 1 files
-extern List_00422ea0* DAT_00511fb4;                                                               // 0x511fb4, 4 bytes, DAT_00511fb4$S22242; 1 of 2 files (conflicting: struct names only)
+extern List_00422ea0* DAT_00511fb4;                                                               // 0x511fb4, 4 bytes, DAT_00511fb4$S23898; 1 of 2 files (conflicting: struct names only)
 extern char DAT_00511fb8[256];                                                                    // 0x511fb8, 256 bytes; 1 of 1 files
 extern unsigned char DAT_005120b8[464];                                                           // 0x5120b8, 464 bytes; Entry_00428730[10] by value in 1 of 1 files
 extern int DAT_00512288;                                                                          // 0x512288, 4 bytes; 1 of 1 files
@@ -547,7 +547,7 @@ extern unsigned int g_briefingPlanetLastTick;                                   
 extern unsigned int g_briefingPlanetNextTick;                                                     // 0x51e680, 4 bytes; 1 of 1 files
 extern int DAT_0051e684;                                                                          // 0x51e684, 4 bytes; 2 of 2 files
 extern int DAT_0051e688;                                                                          // 0x51e688, 4 bytes; 2 of 2 files
-extern SpeechQueue* DAT_0051e68c;                                                                 // 0x51e68c, 4 bytes; 1 of 1 files
+extern SpeechQueue* g_speechQueue;                                                                // 0x51e68c, 4 bytes; 1 of 1 files
 extern int g_noDirectSound;                                                                       // 0x51e690, 4 bytes; 1 of 1 files
 extern int g_useWindowsSound;                                                                     // 0x51e694, 4 bytes; 1 of 1 files
 extern int DAT_0051e698;                                                                          // 0x51e698, 4 bytes; 2 of 2 files
@@ -863,7 +863,7 @@ extern long DAT_0052a4fc;                                                       
 //   0x507b64 DAT_00507b64: defined in src/data/unused.cpp
 //   0x507b68 DAT_00507b68: defined in src/data/unused.cpp
 //   0x5086d8 g_unitMessages: defined in src/units/unit_messages.cpp
-//   0x5086dc DAT_005086dc: defined in src/units/unit_messages.cpp
+//   0x5086dc g_speechTypes: defined in src/units/unit_messages.cpp
 //   0x5086fc g_speechCategories: defined in src/units/unit_messages.cpp
 //   0x50b6e0 DAT_0050b6e0: defined in src/data/unused.cpp
 //   0x5122c4 g_mapCacheBegin: part of another global: src/map/map_list.cpp:0x5122c0+0x4
