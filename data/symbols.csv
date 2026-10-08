@@ -625,7 +625,7 @@ address,name
 0x433520,LosTables::GetLosTableCount
 0x433540,Class_00433540::FreeLines
 0x4335c0,LosTable::GetLosLineCount
-0x4335e0,Class_4335e0::GetLosLine
+0x4335e0,LosTable::GetLosLine
 0x4335f0,LosTable::ResizeLines
 0x4336c0,UElem_004336c0::?$vector::~?$vector
 0x4336f0,LosLine::LoadLosLine
