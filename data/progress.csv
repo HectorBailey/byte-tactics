@@ -620,7 +620,7 @@ address,size,file,symbol,status,similarity
 0x433520,19,src/map/los_tables.cpp,?GetLosTableCount@LosTables@@QAEHXZ,matched,100.0
 0x433540,119,src/map/los_tables.cpp,?FreeLines@Class_00433540@@QAEXXZ,matched,100.0
 0x4335c0,19,src/map/los_tables.cpp,?GetLosLineCount@LosTable@@QAEHXZ,matched,100.0
-0x4335e0,16,src/map/los_tables.cpp,?GetLosLine@Class_4335e0@@QAEHF@Z,matched,100.0
+0x4335e0,16,src/map/los_tables.cpp,?GetLosLine@LosTable@@QAEPAVLosLine@@F@Z,matched,100.0
 0x4335f0,194,src/map/los_tables.cpp,?ResizeLines@LosTable@@QAEXF@Z,matched,100.0
 0x4336c0,34,src/map/los_tables.cpp,??1?$vector@UElem_004336c0@@V?$allocator@UElem_004336c0@@@std@@@std@@QAE@XZ,matched,100.0
 0x4336f0,708,src/map/los_tables.cpp,?LoadLosLine@LosLine@@QAEXPAVTdfFile@@FF@Z,matched,100.0

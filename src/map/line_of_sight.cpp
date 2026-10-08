@@ -378,10 +378,6 @@ public:
 class LosTable {
 public:
     short GetLosLineCount();
-};
-
-class Class_4335e0 {
-public:
     void* GetLosLine(short i);
 };
 
@@ -395,6 +391,7 @@ public:
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 int DrawWrappedText(char*, char*, int, int, int, int, int);
 void ParseDownloadableAiWeightScripts(int);
+int ScanDirectory(char*, char*, char*, int, int, int);
 
 class Mission {
 public:
