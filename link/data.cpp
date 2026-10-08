@@ -591,8 +591,8 @@ Class_004c6a60* g_optionsBackupSurface;  // 0x512ff4 .bss
 int g_battleQuitIntent;  // 0x512ff8 .bss
 unsigned char DAT_00512ffc[4];  // 0x512ffc .bss
 int DAT_0051e53c;  // 0x51e53c .bss
-int DAT_0051e540;  // 0x51e540 .bss
-int DAT_0051e544;  // 0x51e544 .bss
+int g_probePanelBottom;  // 0x51e540 .bss
+int g_statusPanelNextTick;  // 0x51e544 .bss
 int (__stdcall* g_riInitializeEx)(int*, int);  // 0x51e54c .bss
 int (__stdcall* g_riGetVersion)(char*);  // 0x51e554 .bss
 void (__cdecl* g_riTerminate)(void);  // 0x51e558 .bss
@@ -703,6 +703,7 @@ char DAT_0051ff60[112];  // 0x51ff60 .bss
 char g_lzssPresetWindow[176];  // 0x51ffd0 .bss
 unsigned char DAT_00520080[3944];  // 0x520080 .bss
 char g_lzssPresetTree[24584];  // 0x520fe8 .bss
+Struct_00526ff0* DAT_00526ff0;  // 0x526ff0 .bss
 int g_lzssPresetReady;  // 0x526ff8 .bss
 int g_lzssUsePreset;  // 0x526ffc .bss (the type runs past the next known address, 0x526ffc+0x3)
 char DAT_005289b4;  // 0x5289b4 .bss
