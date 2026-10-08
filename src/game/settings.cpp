@@ -167,6 +167,8 @@ public:
     void Disable3D();
     int Is3DEnabled();
     int GetMaxBuffers();
+    int QueryWaveVolume();
+    int QueryAuxVolume();
 };
 
 class Class_004d0070 {
@@ -177,16 +179,6 @@ public:
 class Class_004d00d0 {
 public:
     int SetAuxVolume(int value, int flag);
-};
-
-class Class_004cfff0 {
-public:
-    int QueryWaveVolume();
-};
-
-class Class_004d0040 {
-public:
-    int QueryAuxVolume();
 };
 
 class TdfFile {
@@ -616,9 +608,9 @@ void SaveSettings()
                  g_game->sound->GetMaxBuffers());
     if (g_game->soundFlags.restoreVolume) {
         WriteRegistryDword("Total Annihilation", "WaveOutVolume",
-                     ((Class_004cfff0*)g_game->sound)->QueryWaveVolume());
+                     g_game->sound->QueryWaveVolume());
         WriteRegistryDword("Total Annihilation", "CDAudioVolume",
-                     ((Class_004d0040*)g_game->sound)->QueryAuxVolume());
+                     g_game->sound->QueryAuxVolume());
     }
     WriteRegistryDword("Total Annihilation", "Anti-Alias", g_game->flags_37f06.antiAlias);
     WriteRegistryDword("Total Annihilation", "Shadows", g_game->flags_37f06.shadows);

@@ -68,24 +68,7 @@ struct App_004b6220 {
 
 extern App_004b6220* GetDisplay();
 
-class Class_004cff30 {
-public:
-    void InitMixerVolumes();
-};
-
-class Class_004d0040 {
-public:
-    int QueryAuxVolume();
-};
-
 struct FileHandle;
-
-class Class_004ce410 {
-public:
-    int open;                          // +0x0
-
-    void CloseCdAudio();
-};
 
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 
@@ -124,11 +107,6 @@ long __stdcall HAPI_TellFile(FileHandle* file);
 long __stdcall HAPI_FileLength(FileHandle* file);
 int __stdcall HAPI_readfromfile(FileHandle* file, void* buf, int size);
 
-class Class_004d02a0 {
-public:
-    void OpenSample(const char* name, int mode, int a, int b);
-};
-
 void __stdcall OnStreamTimer(int unused1);
 int __stdcall AddTimer(int delay, int param, void (__stdcall* callback)(int));
 
@@ -142,38 +120,8 @@ int __stdcall HAPI_readfromfile(void* file, void* buf, int size);
 // the streamed sample, at g_game+0x10.
 #include "sound.h"
 
-class Class_004cd9d0 {
-public:
-    char unknown_0[0x28c];
-    void (*callback)();                // +0x28c
-
-    int SetCdCallback(void (*cb)());
-};
-
-class Class_004ce260 {
-public:
-    int open;                          // +0x0
-    char unknown_4[0x1fc - 4];
-    int field_1fc;                     // +0x1fc
-    int field_200;                     // +0x200
-    int field_204;                     // +0x204
-    int field_208;                     // +0x208
-    int field_20c;                     // +0x20c
-    int field_210;                     // +0x210
-    unsigned char arr_214[100];        // +0x214
-    int field_278;                     // +0x278
-    int field_27c;                     // +0x27c
-    int field_280;                     // +0x280
-    union { int field_284; int step; }; // +0x284
-    char unknown_288[4];
-    union { int field_28c; void (*callback)(); }; // +0x28c
-
-    int OpenCdAudio();
-};
-
-// The CD player object g_cdPlayer points at: the same object as Class_004ce260
-// views (the CD audio methods and the CD fields all use it).
-extern Class_004ce260* g_cdPlayer;
+// The sound object g_cdPlayer points at: the same object as g_game+0x10.
+extern Sound* g_cdPlayer;
 
 // OpenCdAudio registers these; 0x4ce1e0 defines FindCdPlayerWindow.
 extern void __stdcall SetMediaNotifyCallback(void (__stdcall*)(int, int, int));
@@ -194,11 +142,6 @@ public:
 class Class_004ce450 {
 public:
     int GetTrackCount();
-};
-
-class Class_004ce460 {
-public:
-    int IsFirstTrackData();
 };
 
 class Class_004ce580 {
@@ -304,10 +247,10 @@ int Sound::GetDiscSerial()
 }
 
 // FUNCTION: 0x4cd9d0
-int Class_004cd9d0::SetCdCallback(void (*cb)())
+int Sound::SetCdCallback(void (*cb)())
 {
     callback = cb;
-    ((Sound*)this)->QueryDisc();
+    QueryDisc();
     if (callback != 0)
         callback();
     return 1;
@@ -506,14 +449,14 @@ void __cdecl HandleCdMessage(int param_1, int param_2, int param_3)
 
     switch (param_1) {
     case 0x219: {
-        Class_004ce260* obj = g_cdPlayer;
+        Sound* obj = g_cdPlayer;
         mciSendStringA("stop cdaudio", 0, 0, 0);
-        if (obj->field_200)
-            obj->field_208 = 1;
+        if (obj->trackCount)
+            obj->currentTrack = 1;
         else
-            obj->field_208 = 0;
-        obj->field_20c = 0;
-        obj->field_284 = 0;
+            obj->currentTrack = 0;
+        obj->playState = 0;
+        obj->step = 0;
         RemoveTimer(g_cdNextTrackTimer);
         RemoveTimer(g_cdFadeTimer);
         g_cdNextTrackTimer = g_cdFadeTimer = -1;
@@ -525,7 +468,7 @@ void __cdecl HandleCdMessage(int param_1, int param_2, int param_3)
         break;
     }
     case 0x3b9:
-        if (param_2 == 1 && g_cdPlayer->field_20c == 1) {
+        if (param_2 == 1 && g_cdPlayer->playState == 1) {
             int playing;
             if (mciSendStringA("status cdaudio mode", buf, 0x40, 0) == 0)
                 playing = strcmp(buf, "playing") == 0;
@@ -572,7 +515,7 @@ BOOL __stdcall FindCdPlayerWindow(HWND hwnd, LPARAM param)
 // The store to arr_214[0] before the loop is overwritten by the loop's first
 // iteration (0 % 4 + 1 == 1), so it is redundant in the original.
 // FUNCTION: 0x4ce260
-int Class_004ce260::OpenCdAudio()
+int Sound::OpenCdAudio()
 {
     // Results go through hr: comparing the calls directly changes the test emitted.
     MCIERROR hr;
@@ -583,15 +526,15 @@ int Class_004ce260::OpenCdAudio()
     arr_214[0] = 1;
     for (int i = 0; i < 100; i++)
         arr_214[i] = (i % 4) + 1;
-    field_204 = 1;
-    field_208 = 0;
-    field_210 = 0;
-    field_28c = 0;
-    field_1fc = 1;
-    field_278 = 0;
+    lockedTrack = 1;
+    currentTrack = 0;
+    discSerial = 0;
+    callback = 0;
+    playbackOrder = 1;
+    trackCategory = 0;
     open = 0;
-    field_200 = 0;
-    field_280 = 0;
+    trackCount = 0;
+    dataTrack = 0;
     hr = mciSendStringA("open cdaudio", 0, 0, 0);
     if (hr != 0) {
         EnumWindows((WNDENUMPROC)FindCdPlayerWindow, 0);
@@ -600,9 +543,9 @@ int Class_004ce260::OpenCdAudio()
             return 0;
     }
     mciSendStringA("stop cdaudio", 0, 0, 0);
-    field_20c = 0;
-    field_208 = (field_200 != 0);
-    field_284 = 0;
+    playState = 0;
+    currentTrack = (trackCount != 0);
+    step = 0;
     RemoveTimer(g_cdNextTrackTimer);
     RemoveTimer(g_cdFadeTimer);
     g_cdFadeTimer = -1;
@@ -616,16 +559,16 @@ int Class_004ce260::OpenCdAudio()
         }
         return 0;
     }
-    field_210 = 0;
-    field_200 = ((Sound*)this)->QueryDisc();
+    discSerial = 0;
+    trackCount = QueryDisc();
     SetMediaNotifyCallback((void (__stdcall*)(int, int, int))HandleCdMessage);
     open = 1;
-    field_204 = 1;
-    field_208 = 0;
-    field_28c = 0;
-    field_1fc = 1;
-    field_278 = 0;
-    field_27c = 1;
+    lockedTrack = 1;
+    currentTrack = 0;
+    callback = 0;
+    playbackOrder = 1;
+    trackCategory = 0;
+    cdEnabled = 1;
     return 1;
 }
 
@@ -639,7 +582,7 @@ void Class_004ce3e0::CopyTrackTypeTable(const void* src)
 // would inline it into its caller.
 #pragma auto_inline(off)
 // FUNCTION: 0x4ce410
-void Class_004ce410::CloseCdAudio()
+void Sound::CloseCdAudio()
 {
     if (open != 0) {
         mciSendStringA("stop cdaudio", 0, 0, 0);
@@ -656,7 +599,7 @@ int Class_004ce450::GetTrackCount()
 }
 
 // FUNCTION: 0x4ce460
-int Class_004ce460::IsFirstTrackData()
+int Sound::IsFirstTrackData()
 {
     int type;
     char buf[32];
@@ -721,7 +664,7 @@ void __stdcall OnCdFadeTimer(void*)
         g_cdFadeVolume = 0;
         g_cdPlayer->step = 0;
         ((Class_004d00d0*)g_cdPlayer)->SetAuxVolume(g_cdFadeVolume, 1);
-        if (g_cdPlayer->field_278 == 0)
+        if (g_cdPlayer->trackCategory == 0)
             g_cdNextTrackTimer = AddTimer(0x78, 0, OnNextTrackTimer);
         else
             ((Class_004cdb40*)g_cdPlayer)->PlayNextTrack();

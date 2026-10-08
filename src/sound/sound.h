@@ -21,7 +21,7 @@ public:
     float minDistance;                 // +0x08
     float maxDistance;                 // +0x0c
     int waveDevices;                   // +0x10
-    unsigned int auxDevice;            // +0x14
+    int auxDevice;                     // +0x14
     int waveVolume;                    // +0x18
     int auxVolume;                     // +0x1c
     int cdVolume;                      // +0x20
@@ -55,9 +55,18 @@ public:
     int dataTrack;                     // +0x280, track 1 is not audio
     int step;                          // +0x284
     int streamTimer;                   // +0x288, the stream's timer
-    int callback;                      // +0x28c
+    void (*callback)();                // +0x28c
     int noDriver;                      // +0x290
 
+    int SetCdCallback(void (*cb)());
+    int OpenCdAudio();
+    void CloseCdAudio();
+    int IsFirstTrackData();
+    void InitMixerVolumes();
+    int QueryWaveVolume();
+    int QueryAuxVolume();
+    int OpenSample(char* path, int mode, int a, int b);
+    void RestoreMixerVolumes();
     int GetDiscSerial();
     int QueryDisc();
     int GetPlayState();
