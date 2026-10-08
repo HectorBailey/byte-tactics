@@ -138,9 +138,10 @@ def is_local(text: str, depths: list[int], start: int) -> bool:
 
 
 def replacement(operand: str) -> str:
-    """`x->` for a plain variable, `(x)->` otherwise: `&file->` and
-    `g_game->sound->` would change what the arrow applies to."""
-    return operand + "->" if re.fullmatch(IDENT, operand) else "(" + operand + ")->"
+    """`x->` for a variable or member chain, `(&x)->` for an address: the
+    arrow applies to the last member of a chain anyway, but `&x->` would
+    parse as `&(x->..)`."""
+    return "(" + operand + ")->" if operand.startswith("&") else operand + "->"
 
 
 def group_key(match: re.Match) -> tuple[str, str]:
