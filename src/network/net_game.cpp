@@ -2789,12 +2789,8 @@ void __stdcall BroadcastBuilderLink(Unit* obj, Unit* target)
 #include <time.h>
 #pragma pack(push, 1)
 
-struct Message_004565a0 {
-    char unknown_0[1];
-    int start_tick;                    // +0x01
-    int sent_tick;                     // +0x05
-    int id;                            // +0x09
-};
+// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
+void Unused_004565a0(int a, int b, int c, int d, int e, int f);
 
 struct Packet_00456110 {
     unsigned char type;                // +0x0
@@ -2832,26 +2828,16 @@ struct Packet_00456de0 {
 struct Packet_00456ee0 {
     unsigned char type;                // +0x0
     int subtype;                       // +0x1
-    int from;                          // +0x5
-    int to;                            // +0x9
-    int extra;                         // +0xd
+    int fromNetId;                     // +0x5
+    int toNetId;                       // +0x9
+    int amount;                        // +0xd
 };
 
-struct Packet_00457050 {
-    unsigned char type;                // +0x0
-    int subtype;                       // +0x1
-    int from;                          // +0x5
-    int to;                            // +0x9
-    int value;                         // +0xd
-};
+// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
+void Unused_00457050(int a, int b, int c, int d, int e, int f);
 
-struct Packet_004571c0 {
-    unsigned char type;                // +0x0
-    int subtype;                       // +0x1
-    int from;                          // +0x5
-    int to;                            // +0x9
-    int zero;                          // +0xd
-};
+// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
+void Unused_004571c0(int a, int b, int c, int d, int e, int f);
 
 struct Packet_004573d0 {              // 0x3a bytes
     unsigned char type;                // +0x0
@@ -2872,28 +2858,8 @@ struct Packet_004573d0 {              // 0x3a bytes
     float field_36;                    // +0x36
 };
 
-struct Packet_00457540 {              // 0x3a bytes
-    unsigned char type;                // +0x0
-    unsigned char flag;                // +0x1
-    short field_2;                     // +0x2
-    char unknown_4[0x6 - 0x4];
-    short field_6;                     // +0x6
-    char unknown_8[0xa - 0x8];
-    short field_a;                     // +0xa
-    char unknown_c[0xe - 0xc];
-    short field_e;                     // +0xe
-    char unknown_10[0x12 - 0x10];
-    int field_12;                      // +0x12
-    int field_16;                      // +0x16
-    int field_1a;                      // +0x1a
-    int field_1e;                      // +0x1e
-    float field_22;                    // +0x22
-    float field_26;                    // +0x26
-    float field_2a;                    // +0x2a
-    float field_2e;                    // +0x2e
-    float field_32;                    // +0x32
-    float field_36;                    // +0x36
-};
+// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
+void Unused_00457540(int a, int b, int c, int d, int e, int f);
 
 struct TeamPacket_00457540 {           // 3 bytes
     unsigned char type;                // +0x0
@@ -2901,13 +2867,8 @@ struct TeamPacket_00457540 {           // 3 bytes
     unsigned char flag2;               // +0x2
 };
 
-struct Packet_00457d30 {
-    unsigned char type;                // +0x0
-    int subtype;                       // +0x1
-    int from;                          // +0x5
-    int to;                            // +0x9
-    int zero;                          // +0xd
-};
+// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
+void Unused_00457d30(int a, int b, int c, int d, int e, int f);
 
 #pragma pack(pop)
 
@@ -3116,7 +3077,7 @@ static inline unsigned char FindPlayerIndex(int id)
 }
 
 // FUNCTION: 0x4565a0
-void __stdcall HandlePing(Message_004565a0* p)
+void __stdcall HandlePing(Msg13_00456310* p)
 {
     if (p->sent_tick == 0) {                       // not sent yet
         if (g_usePacketManager != 0) {
@@ -3399,9 +3360,9 @@ void __stdcall SendShareMetal(unsigned char from, unsigned char to, int param_3)
         Packet_00456ee0 packet;
         packet.type = 0x16;
         packet.subtype = 1;
-        packet.from = PlayerDpid(from);
-        packet.to = PlayerDpid(to);
-        packet.extra = param_3;
+        packet.fromNetId = PlayerDpid(from);
+        packet.toNetId = PlayerDpid(to);
+        packet.amount = param_3;
         SendPacketToPlayer(PlayerDpid(from), PlayerDpid(to), &packet, sizeof(packet));
     }
 }
@@ -3423,12 +3384,12 @@ void __stdcall SendShareEnergy(unsigned char from, unsigned char to, int value)
         && (second->type == 1 || second->type == 2 || second->type == 3)
         && second->field_146 != 10
         && (second->unitCount != 0 || second->unitsCreated == 0)) {
-        Packet_00457050 packet;
+        Packet_00456ee0 packet;
         packet.type = 0x16;
         packet.subtype = 2;
-        packet.from = PlayerDpid(from);
-        packet.to = PlayerDpid(to);
-        packet.value = value;
+        packet.fromNetId = PlayerDpid(from);
+        packet.toNetId = PlayerDpid(to);
+        packet.amount = value;
         SendPacketToPlayer(PlayerDpid(from), PlayerDpid(to), &packet, sizeof(packet));
     }
 }
@@ -3447,12 +3408,12 @@ static inline int PlayerDpid_00457d30(unsigned char i)
 void __stdcall SendShareMapInfo(unsigned char from, unsigned char to)
 {
     if (from != 10 && to != 10) {
-        Packet_004571c0 packet;
+        Packet_00456ee0 packet;
         packet.type = 0x16;
         packet.subtype = 3;
-        packet.from = PlayerDpid_00457d30(from);
-        packet.to = PlayerDpid_00457d30(to);
-        packet.zero = 0;
+        packet.fromNetId = PlayerDpid_00457d30(from);
+        packet.toNetId = PlayerDpid_00457d30(to);
+        packet.amount = 0;
         SendPacketToPlayer(PlayerDpid_00457d30(from), PlayerDpid_00457d30(to), &packet, sizeof(packet));
     }
 }
@@ -3571,7 +3532,7 @@ void __stdcall SendPlayerEconomy(Player* player, Player* target,
 // team number, the two tables at +0x11e and +0x129 are eleven bytes each, one
 // entry per team.
 // FUNCTION: 0x457540
-void __stdcall HandlePlayerEconomy(Packet_00457540* packet, Player* player)
+void __stdcall HandlePlayerEconomy(Packet_004573d0* packet, Player* player)
 {
     if (player == 0)
         return;
@@ -3587,10 +3548,10 @@ void __stdcall HandlePlayerEconomy(Packet_00457540* packet, Player* player)
     }
 
     if (found == 0) {
-        player->kills = packet->field_2;
-        player->losses = packet->field_6;
-        player->commanderKills = packet->field_a;
-        player->commanderLosses = packet->field_e;
+        player->kills = *(short*)&packet->field_2;
+        player->losses = *(short*)&packet->field_6;
+        player->commanderKills = *(short*)&packet->field_a;
+        player->commanderLosses = *(short*)&packet->field_e;
         player->field_98 = packet->field_12;
         player->field_8c = packet->field_16;
         player->metalCapacity = packet->field_1a;
@@ -3950,12 +3911,12 @@ void __stdcall UpdateResourceSharing(Player* player)
                 unsigned char a = player->field_146;
                 unsigned char b = p->field_146;
                 if (a != 10 && b != 10) {
-                    Packet_00457d30 packet;
+                    Packet_00456ee0 packet;
                     packet.type = 0x16;
                     packet.subtype = 3;
-                    packet.from = PlayerDpid_00457d30(a);
-                    packet.to = PlayerDpid_00457d30(b);
-                    packet.zero = 0;
+                    packet.fromNetId = PlayerDpid_00457d30(a);
+                    packet.toNetId = PlayerDpid_00457d30(b);
+                    packet.amount = 0;
                     SendPacketToPlayer(PlayerDpid_00457d30(a), PlayerDpid_00457d30(b),
                                  &packet, sizeof(packet));
                 }
