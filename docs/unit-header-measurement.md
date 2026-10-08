@@ -254,8 +254,8 @@ its by-value types have headers.
 - The candidate is a measurement artifact, not a reviewed header, and no
   source, data or docs file changed for it.
 - The scratch files (`build/scratch/6334/unit.h`, `unit_probe.h`, `swap.py`,
-  `swap-results.json`) live outside the tree's tracked files, as the issue
-  asks; this page is the record.
+  the probe logs) live outside the tree's tracked files, as the issue asks;
+  this page is the record.
 
 ```
 uv run tools/stateprobe.py build/scratch/6334/unit_probe.h   # the 5.1%
