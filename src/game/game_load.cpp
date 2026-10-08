@@ -380,22 +380,19 @@ public:
     int SaveBank(char*, char*, int, int);
 };
 
-class Class_004cdb40 {
-public:
-    void PlayNextTrack();
-};
-
 extern PacketManager g_packetManager;
 
 class Sound {
 public:
     void SetTrackCategory(int);
     int IsCdPlaying();
+    void PlayNextTrack();
     // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
     int QueryDisc();
     void PlayLooping(int sample, int volume);
     void Set3DDistances(int minimum, int maximum);
 };
+int ScanDirectory(char*, char*, char*, int, int, int);
 
 void __stdcall SeedRandom(int x);
 void __stdcall SleepMilliseconds(int x);
@@ -1006,7 +1003,7 @@ void LoadingScreenFrame(void)
         memset((void*)g_game->progress, 0, 8);
         g_game->sound->SetTrackCategory(0);
         if (!g_game->sound->IsCdPlaying()) {
-            ((Class_004cdb40*)g_game->sound)->PlayNextTrack();
+            g_game->sound->PlayNextTrack();
         }
         // Index players[i], not explicit offsets: keeps the SIB base and index order.
         for (i = 0; i < 10; i++) {

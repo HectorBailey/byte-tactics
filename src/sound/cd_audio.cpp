@@ -34,33 +34,6 @@ extern int __stdcall RemoveTimer(int handle);
 extern int __stdcall AddTimer(int delay, int id, void (__stdcall* callback)(void*));
 extern void __stdcall OnCdFadeTimer(void* unused);
 
-class Class_004cdb40 {
-public:
-    char unknown_0[0x20];
-    int field_20;                      // +0x20
-    char unknown_24[0x1fc - 0x24];
-    int field_1fc;                     // +0x1fc
-    int field_200;                     // +0x200 tracks on the disc
-    int field_204;                     // +0x204
-    int field_208;                     // +0x208 current track
-    int field_20c;                     // +0x20c
-    int field_210;                     // +0x210
-    unsigned char arr_214[100];        // +0x214
-    int field_278;                     // +0x278 mode
-    int field_27c;                     // +0x27c
-    int field_280;                     // +0x280
-    int field_284;                     // +0x284
-    char unknown_288[4];
-    int field_28c;                     // +0x28c
-
-    void PlayNextTrack();
-};
-
-class Class_004d00d0 {
-public:
-    int SetAuxVolume(int volume, int temporary);
-};
-
 struct App_004b6220 {
     char unknown_0[0x40];
     HWND hwnd;                         // +0x40
@@ -126,109 +99,6 @@ extern Sound* g_cdPlayer;
 // OpenCdAudio registers these; 0x4ce1e0 defines FindCdPlayerWindow.
 extern void __stdcall SetMediaNotifyCallback(void (__stdcall*)(int, int, int));
 extern BOOL __stdcall FindCdPlayerWindow(HWND, LPARAM);
-
-#pragma pack(push, 1)
-class Class_004ce3e0 {
-public:
-    char unknown_0[0x200];
-    unsigned int size;                 // +0x200
-    char unknown_204[0x215 - 0x204];
-    char buf[1];                       // +0x215
-
-    void CopyTrackTypeTable(const void* src);
-};
-#pragma pack(pop)
-
-class Class_004ce450 {
-public:
-    int GetTrackCount();
-};
-
-class Class_004ce580 {
-public:
-    char unknown_0[0x200];
-    int limit;                         // +0x200
-    int value;                         // +0x204
-
-    void SetLockedTrack(int v);
-};
-
-class Class_004ce5a0 {
-public:
-    int GetLockedTrack();
-};
-
-struct Class_004ce7a0
-{
-public:
-    char unknown_0[0x1fc];
-    int field_1fc;
-
-    int SetPlaybackOrder(int value);
-};
-
-class Class_004ce7c0 {
-public:
-    void SetCategoryOfTrack(int index, unsigned char value);
-};
-
-class Class_004ce7e0 {
-public:
-    char unknown_0[0x214];
-    unsigned char field_214;
-
-    unsigned char GetCategoryOfTrack(int param_1);
-};
-
-class Class_004ce8c0 {
-public:
-    char unknown_0[0x200];
-    int count;          // +0x200
-    char unknown_204[4];
-    int current;        // +0x208
-    int mode;           // +0x20c
-    int SelectTrack(int index);
-};
-
-class Class_004ce910 {
-public:
-    int unknown_0[0x200 / 4];
-    int field_200;                     // +0x200
-    int unknown_204[2];
-    int field_20c;                     // +0x20c
-    int unknown_210[(0x27c - 0x210) / 4];
-    int field_27c;                     // +0x27c
-
-    int PauseCdAudio(int pause);
-};
-
-class Class_004ced40 {
-public:
-    char unknown_0[0x200];
-    int unknown_200;                   // +0x200
-    char unknown_204[0x208 - 0x204];
-    int unknown_208;                   // +0x208
-    int unknown_20c;                   // +0x20c
-    char unknown_210[0x284 - 0x210];
-    int unknown_284;                   // +0x284
-
-    int StopCdAudio();
-};
-
-class Class_004cedc0 {
-public:
-    char unknown_0[0x200];
-    int unknown_200;                   // +0x200
-    char unknown_204[0x208 - 0x204];
-    int unknown_208;                   // +0x208
-    int unknown_20c;                   // +0x20c
-    char unknown_210[0x27c - 0x210];
-    int enabled;                       // +0x27c
-    char unknown_280[0x284 - 0x280];
-    int unknown_284;                   // +0x284
-
-    void EnableCdAudio(int on);
-};
 
 // FUNCTION: 0x4cd9b0
 void __stdcall NopRet4(int)
@@ -298,7 +168,7 @@ done:
 }
 
 // FUNCTION: 0x4cdb40
-void Class_004cdb40::PlayNextTrack()
+void Sound::PlayNextTrack()
 {
     char buf[64];
     int playing;
@@ -309,45 +179,45 @@ void Class_004cdb40::PlayNextTrack()
     int zero = 0;
     int res;
 
-    if (field_200 == zero)
+    if (trackCount == zero)
         return;
-    if (field_278 == 4) {
+    if (trackCategory == 4) {
         mciSendStringA("stop cdaudio", (LPSTR)zero, 0, (HWND)zero);
-        if (field_200 != zero)
-            field_208 = 1;
+        if (trackCount != zero)
+            currentTrack = 1;
         else
-            field_208 = zero;
-        field_20c = zero;
-        field_284 = zero;
+            currentTrack = zero;
+        playState = zero;
+        step = zero;
         RemoveTimer(g_cdNextTrackTimer);
         RemoveTimer(g_cdFadeTimer);
         // Chained store, as in the original: g_cdNextTrackTimer is written first.
         g_cdNextTrackTimer = g_cdFadeTimer = -1;
         return;
     }
-    if (field_20c == 2)
+    if (playState == 2)
         return;
-    if (field_278 != 2 && field_278 != 3) {
+    if (trackCategory != 2 && trackCategory != 3) {
         int one = 1;
-        switch (field_1fc) {
+        switch (playbackOrder) {
         case 0:
             {
                 int none = 0;
-                if (field_20c == zero)
+                if (playState == zero)
                     return;
-                field_20c = zero;
+                playState = zero;
                 // Result kept in a local so the call is not folded into test eax,eax.
                 res = mciSendStringA("status cdaudio mode", buf, 0x40, (HWND)zero);
                 playing = res == none ? strcmp(buf, "playing") == none : none;
                 if (playing == none)
                     return;
                 mciSendStringA("stop cdaudio", (LPSTR)none, 0, (HWND)none);
-                if (field_200 != none)
-                    field_208 = 1;
+                if (trackCount != none)
+                    currentTrack = 1;
                 else
-                    field_208 = none;
-                field_20c = none;
-                field_284 = none;
+                    currentTrack = none;
+                playState = none;
+                step = none;
                 RemoveTimer(g_cdNextTrackTimer);
                 RemoveTimer(g_cdFadeTimer);
                 g_cdNextTrackTimer = g_cdFadeTimer = -1;
@@ -359,13 +229,13 @@ void Class_004cdb40::PlayNextTrack()
             playing = res == zero ? strcmp(buf, "playing") == zero : zero;
             if (playing != zero)
                 goto done;
-            if (field_208 < one)
-                field_208 = one;
+            if (currentTrack < one)
+                currentTrack = one;
             else
-                field_208++;
-            ((Sound*)this)->PlayCdTrack(field_208, field_200 - field_208 + 1);
-            if (field_208 > field_200)
-                field_208 = one;
+                currentTrack++;
+            ((Sound*)this)->PlayCdTrack(currentTrack, trackCount - currentTrack + 1);
+            if (currentTrack > trackCount)
+                currentTrack = one;
             goto done;
             }
         case 2:
@@ -374,16 +244,16 @@ void Class_004cdb40::PlayNextTrack()
             playing = res == zero ? strcmp(buf, "playing") == zero : zero;
             if (playing != zero)
                 goto done;
-            ((Sound*)this)->PlayCdTrack(rand() % field_200 + 1, one);
+            ((Sound*)this)->PlayCdTrack(rand() % trackCount + 1, one);
             goto done;
             }
         case 3:
             {
             res = mciSendStringA("status cdaudio mode", buf, 0x40, (HWND)zero);
-            playing = res == zero ? strcmp(buf, "playing") == zero : zero;            if (playing == zero || field_208 != field_204) {
-                if (field_204 == zero)
-                    field_204 = one;
-                ((Sound*)this)->PlayCdTrack(field_204, one);
+            playing = res == zero ? strcmp(buf, "playing") == zero : zero;            if (playing == zero || currentTrack != lockedTrack) {
+                if (lockedTrack == zero)
+                    lockedTrack = one;
+                ((Sound*)this)->PlayCdTrack(lockedTrack, one);
             }
             goto done;
             }
@@ -396,18 +266,18 @@ void Class_004cdb40::PlayNextTrack()
     r = rand() & 0xf;
     res = mciSendStringA("status cdaudio mode", buf, 0x40, (HWND)zero);
     playing = res == zero ? strcmp(buf, "playing") == 0 : 0;
-    if (playing != 0 && arr_214[field_208] == field_278)
+    if (playing != 0 && arr_214[currentTrack] == trackCategory)
         goto done;
-    count = (r + 1) * field_200;
-    i = field_208;
+    count = (r + 1) * trackCount;
+    i = currentTrack;
     while (count > 0) {
             i++;
-            if (i > field_200)
+            if (i > trackCount)
                 i = 1;
-            if (arr_214[i] == field_278) {
+            if (arr_214[i] == trackCategory) {
                 if (--r <= 0) {
                     j = i;
-                    while (j <= field_200 && arr_214[j] == field_278)
+                    while (j <= trackCount && arr_214[j] == trackCategory)
                         j++;
                     ((Sound*)this)->PlayCdTrack(i, j - i);
                     break;
@@ -419,15 +289,15 @@ void Class_004cdb40::PlayNextTrack()
         goto done;
 stop:
     mciSendStringA("stop cdaudio", (LPSTR)zero, 0, (HWND)zero);
-    field_20c = 0;
-    field_208 = (field_200 != 0);
-    field_284 = 0;
+    playState = 0;
+    currentTrack = (trackCount != 0);
+    step = 0;
     RemoveTimer(g_cdNextTrackTimer);
     RemoveTimer(g_cdFadeTimer);
     g_cdNextTrackTimer = g_cdFadeTimer = -1;
 done:
-    ((Class_004d00d0*)this)->SetAuxVolume(field_20, 1);
-    field_20c = 1;
+    SetAuxVolume(cdVolume, 1);
+    playState = 1;
     return;
 }
 
@@ -470,7 +340,7 @@ void __cdecl HandleCdMessage(int param_1, int param_2, int param_3)
             else
                 playing = 0;
             if (!playing)
-                ((Class_004cdb40*)g_cdPlayer)->PlayNextTrack();
+                g_cdPlayer->PlayNextTrack();
         }
         break;
     }
@@ -568,9 +438,9 @@ int Sound::OpenCdAudio()
 }
 
 // FUNCTION: 0x4ce3e0
-void Class_004ce3e0::CopyTrackTypeTable(const void* src)
+void Sound::CopyTrackTypeTable(const void* src)
 {
-    memcpy(buf, src, size);
+    memcpy(arr_214 + 1, src, trackCount);
 }
 
 // ReleaseDirectSound (0x4ceee0) calls this out of line; in one file /Ob2
@@ -588,7 +458,7 @@ void Sound::CloseCdAudio()
 #pragma auto_inline(on)
 
 // FUNCTION: 0x4ce450
-int Class_004ce450::GetTrackCount()
+int Sound::GetTrackCount()
 {
     return *(int*)((char*)this + 0x200);
 }
@@ -625,15 +495,15 @@ int __stdcall GetTrackLength(int track)
 }
 
 // FUNCTION: 0x4ce580
-void Class_004ce580::SetLockedTrack(int v)
+void Sound::SetLockedTrack(int v)
 {
-    if (v <= limit) {
-        value = v;
+    if (v <= trackCount) {
+        lockedTrack = v;
     }
 }
 
 // FUNCTION: 0x4ce5a0
-int Class_004ce5a0::GetLockedTrack()
+int Sound::GetLockedTrack()
 {
     return *(int*)((char*)this + 0x204);
 }
@@ -644,7 +514,7 @@ void __stdcall OnNextTrackTimer(void*)
     int temp = g_cdNextTrackTimer;
     RemoveTimer(temp);
     g_cdNextTrackTimer = 0xffffffff;
-    ((Class_004cdb40*)g_cdPlayer)->PlayNextTrack();
+    g_cdPlayer->PlayNextTrack();
 }
 
 // Timer callback: steps the level by the object's step; once it reaches zero
@@ -658,13 +528,13 @@ void __stdcall OnCdFadeTimer(void*)
         g_cdFadeTimer = -1;
         g_cdFadeVolume = 0;
         g_cdPlayer->step = 0;
-        ((Class_004d00d0*)g_cdPlayer)->SetAuxVolume(g_cdFadeVolume, 1);
+        g_cdPlayer->SetAuxVolume(g_cdFadeVolume, 1);
         if (g_cdPlayer->trackCategory == 0)
             g_cdNextTrackTimer = AddTimer(0x78, 0, OnNextTrackTimer);
         else
-            ((Class_004cdb40*)g_cdPlayer)->PlayNextTrack();
+            g_cdPlayer->PlayNextTrack();
     } else {
-        ((Class_004d00d0*)g_cdPlayer)->SetAuxVolume(g_cdFadeVolume, 1);
+        g_cdPlayer->SetAuxVolume(g_cdFadeVolume, 1);
     }
 }
 
@@ -694,15 +564,15 @@ void Sound::SetTrackCategory(int mode)
                 RemoveTimer(g_cdNextTrackTimer);
                 g_cdNextTrackTimer = -1;
             }
-            ((Class_004d00d0*)this)->SetAuxVolume(cdVolume, 0);
-            ((Class_004cdb40*)this)->PlayNextTrack();
+            SetAuxVolume(cdVolume, 0);
+            PlayNextTrack();
         } else {
             if (g_cdFadeTimer >= 0) {
                 RemoveTimer(g_cdFadeTimer);
                 g_cdFadeTimer = -1;
                 RemoveTimer(g_cdNextTrackTimer);
                 g_cdNextTrackTimer = -1;
-                ((Class_004cdb40*)this)->PlayNextTrack();
+                PlayNextTrack();
             } else {
                 step = cdVolume / -18;
                 g_cdFadeTimer = AddTimer(2, 0, OnCdFadeTimer);
@@ -712,20 +582,20 @@ void Sound::SetTrackCategory(int mode)
 }
 
 // FUNCTION: 0x4ce7a0
-int Class_004ce7a0::SetPlaybackOrder(int value)
+int Sound::SetPlaybackOrder(int value)
 {
-    field_1fc = value;
+    playbackOrder = value;
     return 1;
 }
 
 // FUNCTION: 0x4ce7c0
-void Class_004ce7c0::SetCategoryOfTrack(int index, unsigned char value)
+void Sound::SetCategoryOfTrack(int index, unsigned char value)
 {
     *(unsigned char*)((char*)this + 0x214 + index) = value;
 }
 
 // FUNCTION: 0x4ce7e0
-unsigned char Class_004ce7e0::GetCategoryOfTrack(int param_1)
+unsigned char Sound::GetCategoryOfTrack(int param_1)
 {
     return *(unsigned char*)((char*)this + param_1 + 0x214);
 }
@@ -758,31 +628,31 @@ int GetCdPosition()
 }
 
 // FUNCTION: 0x4ce8c0
-int Class_004ce8c0::SelectTrack(int index)
+int Sound::SelectTrack(int index)
 {
-    if (count == 0)
+    if (trackCount == 0)
         return 0;
-    if (index > count)
-        index = index % count;
-    if (mode == 1) {
-        ((Sound*)this)->PlayCdTrack(index, 1);
-        return current;
+    if (index > trackCount)
+        index = index % trackCount;
+    if (playState == 1) {
+        PlayCdTrack(index, 1);
+        return currentTrack;
     }
-    current = index;
+    currentTrack = index;
     return index;
 }
 
 // FUNCTION: 0x4ce910
-int Class_004ce910::PauseCdAudio(int pause)
+int Sound::PauseCdAudio(int pause)
 {
     char cmd[100];
     char buf[200];
     char ret[200];
     int track;
 
-    if (field_27c == 0)
+    if (cdEnabled == 0)
         return 1;
-    if (field_20c == 0)
+    if (playState == 0)
         return 1;
 
     HWND hwnd = GetDisplay()->hwnd;
@@ -792,7 +662,7 @@ int Class_004ce910::PauseCdAudio(int pause)
         mciSendStringA(cmd, ret, 200, hwnd);
         track = atoi(ret);
         sprintf(buf, "play cdaudio");
-        if (track < field_200) {
+        if (track < trackCount) {
             strcat(buf, " from ");
             sprintf(cmd, "status cdaudio position");
             mciSendStringA(cmd, ret, 200, hwnd);
@@ -803,10 +673,10 @@ int Class_004ce910::PauseCdAudio(int pause)
             strcat(buf, ret);
         }
         strcat(buf, " notify");
-        field_20c = 1;
+        playState = 1;
     } else {
         sprintf(buf, "pause cdaudio");
-        field_20c = 2;
+        playState = 2;
     }
 
     // The result goes through the err local: comparing the call itself changes the epilogue.
@@ -838,7 +708,7 @@ int Sound::PlayCdTrack(int index, int flag)
         return 1;
     playState = 1;
     if (index == 0) {
-        ((Class_004cdb40*)this)->PlayNextTrack();
+        PlayNextTrack();
         return 1;
     }
     // A conditional expression, not &&: keeps the strcmp's two separate exits.
@@ -850,7 +720,7 @@ int Sound::PlayCdTrack(int index, int flag)
     currentTrack = index;
     index += dataTrack;
     hwnd = GetDisplay()->hwnd;
-    ((Class_004d00d0*)this)->SetAuxVolume(cdVolume, 1);
+    SetAuxVolume(cdVolume, 1);
     if (mciSendStringA("set cdaudio time format tmsf", 0, 0, 0) != 0)
         return 0;
     sprintf(cmd, "play cdaudio from %i", index);
@@ -868,15 +738,15 @@ int Sound::PlayCdTrack(int index, int flag)
 
 // Stops CD audio playback; returns 1 when the MCI command succeeded.
 // FUNCTION: 0x4ced40
-int Class_004ced40::StopCdAudio()
+int Sound::StopCdAudio()
 {
     MCIERROR err = mciSendStringA("stop cdaudio", 0, 0, 0);
-    if (unknown_200)
-        unknown_208 = 1;
+    if (trackCount)
+        currentTrack = 1;
     else
-        unknown_208 = 0;
-    unknown_20c = 0;
-    unknown_284 = 0;
+        currentTrack = 0;
+    playState = 0;
+    step = 0;
     RemoveTimer(g_cdNextTrackTimer);
     RemoveTimer(g_cdFadeTimer);
     g_cdNextTrackTimer = g_cdFadeTimer = -1;
@@ -884,17 +754,17 @@ int Class_004ced40::StopCdAudio()
 }
 
 // FUNCTION: 0x4cedc0
-void Class_004cedc0::EnableCdAudio(int on)
+void Sound::EnableCdAudio(int on)
 {
-    enabled = on;
+    cdEnabled = on;
     if (on == 0) {
         mciSendStringA("stop cdaudio", 0, 0, 0);
-        if (unknown_200)
-            unknown_208 = 1;
+        if (trackCount)
+            currentTrack = 1;
         else
-            unknown_208 = 0;
-        unknown_20c = 0;
-        unknown_284 = 0;
+            currentTrack = 0;
+        playState = 0;
+        step = 0;
         RemoveTimer(g_cdNextTrackTimer);
         RemoveTimer(g_cdFadeTimer);
         g_cdNextTrackTimer = g_cdFadeTimer = -1;

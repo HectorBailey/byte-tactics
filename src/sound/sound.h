@@ -49,7 +49,7 @@ public:
     int currentTrack;                  // +0x208
     int playState;                     // +0x20c
     int discSerial;                    // +0x210
-    char arr_214[100];                 // +0x214
+    unsigned char arr_214[100];        // +0x214
     int trackCategory;                 // +0x278
     int cdEnabled;                     // +0x27c
     int dataTrack;                     // +0x280, track 1 is not audio
@@ -63,11 +63,25 @@ public:
     void CloseCdAudio();
     int IsFirstTrackData();
     int GetTrackCategory();
+    void PlayNextTrack();
+    void CopyTrackTypeTable(const void* src);
+    int GetTrackCount();
+    void SetLockedTrack(int v);
+    int GetLockedTrack();
+    int SetPlaybackOrder(int value);
+    void SetCategoryOfTrack(int index, unsigned char value);
+    unsigned char GetCategoryOfTrack(int param_1);
+    int SelectTrack(int index);
+    int PauseCdAudio(int pause);
+    int StopCdAudio();
+    void EnableCdAudio(int on);
     void InitMixerVolumes();
     int QueryWaveVolume();
     int QueryAuxVolume();
-    int OpenSample(char* path, int mode, int a, int b);
+    int SetWaveVolume(int volume);
+    int SetAuxVolume(int volume, int temporary);
     void RestoreMixerVolumes();
+    int OpenSample(char* path, int mode, int a, int b);
     int GetDiscSerial();
     int QueryDisc();
     int GetPlayState();
