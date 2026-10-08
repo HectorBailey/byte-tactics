@@ -107,6 +107,8 @@ public:
     void OpenCdAudio();
     void SetCdCallback(void (*param_1)());
     int GetTrackCategory();
+    void EnableCdAudio(int param_1);
+    void SetPlaybackOrder(int param_1);
 };
 
 // Unused here: the symbol ids these declarations take keep the allocation,
@@ -114,16 +116,6 @@ public:
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 void ScaleUnitWeights(int, unsigned int*, float, int);
 void __stdcall DrawFrame(void* surface, void* header, int x, int y);
-
-class Class_004cedc0 {
-public:
-    void EnableCdAudio(int param_1);
-};
-
-class Class_004ce7a0 {
-public:
-    void SetPlaybackOrder(int param_1);
-};
 
 #pragma pack(push, 1)
 struct Game {
@@ -337,8 +329,8 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                        && g_cdNeedsReopenAfterFocus != 0) {
                 g_game->sound->OpenCdAudio();
                 g_game->sound->SetCdCallback(ReopenCdAudio);
-                ((Class_004cedc0*)g_game->sound)->EnableCdAudio(g_game->musicMode & 1);
-                ((Class_004ce7a0*)g_game->sound)->SetPlaybackOrder(g_game->cdMode);
+                g_game->sound->EnableCdAudio(g_game->musicMode & 1);
+                g_game->sound->SetPlaybackOrder(g_game->cdMode);
                 g_game->sound->SetTrackCategory(g_cdTrackCategory);
                 ReopenCdAudio();
                 g_cdNeedsReopenAfterFocus = 0;

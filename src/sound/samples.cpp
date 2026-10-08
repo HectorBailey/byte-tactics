@@ -34,23 +34,6 @@ extern int __stdcall RemoveTimer(int handle);
 extern int __stdcall AddTimer(int delay, int id, void (__stdcall* callback)(void*));
 extern void __stdcall OnCdFadeTimer(void* unused);
 
-class Class_004cdb40 {
-public:
-    void PlayNextTrack();
-};
-
-class Class_004d00d0 {
-public:
-    char unknown_0[0x14];
-    unsigned int aux_device;           // +0x14
-    char unknown_18[0x20 - 0x18];
-    int aux_volume_set;                // +0x20
-    char unknown_24[0x284 - 0x24];
-    int field_284;                     // +0x284
-
-    int SetAuxVolume(int volume, int temporary);
-};
-
 struct App_004b6220 {
     char unknown_0[0x40];
     HWND hwnd;                         // +0x40
@@ -109,14 +92,6 @@ int __stdcall HAPI_readfromfile(void* file, void* buf, int size);
 // The sound system: the CD audio player, the DirectSound sample channels and
 // the streamed sample, at g_game+0x10.
 #include "sound.h"
-
-class Class_004d0070 {
-public:
-    char unknown_0[0x10];
-    int wave_devices;                  // +0x10
-
-    int SetWaveVolume(int volume);
-};
 
 static inline int ClampVolume(int v)
 {
@@ -1018,11 +993,11 @@ int Sound::QueryAuxVolume()
 // Sets the volume of every wave-out device, clamped to 0..0xffff. Returns
 // nonzero if any device failed.
 // FUNCTION: 0x4d0070
-int Class_004d0070::SetWaveVolume(int volume)
+int Sound::SetWaveVolume(int volume)
 {
     int v = ClampVolume(volume);
     int failed = 0;
-    for (int i = 0; i < wave_devices; i++) {
+    for (int i = 0; i < waveDevices; i++) {
         if (waveOutSetVolume((HWAVEOUT)i, (v << 16) | v) != 0) {
             failed = 1;
         }
@@ -1033,16 +1008,16 @@ int Class_004d0070::SetWaveVolume(int volume)
 // Sets the aux (CD) volume, clamped to 0..0xffff; unless `temporary`, it is
 // also remembered. Returns nonzero on success.
 // FUNCTION: 0x4d00d0
-int Class_004d00d0::SetAuxVolume(int volume, int temporary)
+int Sound::SetAuxVolume(int volume, int temporary)
 {
-    if (field_284 != 0 && temporary == 0) {
+    if (step != 0 && temporary == 0) {
         return 1;
     }
     int v = ClampVolume(volume);
     if (temporary == 0) {
-        aux_volume_set = v;
+        cdVolume = v;
     }
-    return auxSetVolume(aux_device, (v << 16) | v) == 0;
+    return auxSetVolume(auxDevice, (v << 16) | v) == 0;
 }
 
 // FUNCTION: 0x4d0130

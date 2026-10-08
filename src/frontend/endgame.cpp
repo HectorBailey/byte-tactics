@@ -21,9 +21,11 @@ public:
     int MissionExists(int index);
     int SelectMission(int param_1);
     int BuildMissionList(int* param_1);
-    // Unused here: the symbol ids these declarations take keep the allocation after the
-    // Sound join added GetTrackCategory to sound.h (docs/c2-regalloc.md).
+    // Unused here: the symbol ids these declarations take keep the allocation
+    // after the Sound join grew sound.h (docs/c2-regalloc.md).
     void LoadBriefing();
+    int GetDescription();
+    char* GetMissionName();
     int GetTerrainLength();
     bool HasMissionName();
     char unknown_0[0xd54];
