@@ -239,7 +239,7 @@ int __stdcall SetGadgetStatusByName(Menu* menu, const char* name, int value);
 int __stdcall FindGadgetIndex(Entry* entries, const char* name, int type);
 Entry* __stdcall FindGadgetChecked(Entry* entries, const char* name);
 Entry* __stdcall FindGadgetOrNull(Entry* entries, const char* name);
-Entry* __stdcall FUN_004a0280(Entry* entries, const char* name);
+Entry* __stdcall FindGadgetChecked_E(Entry* entries, const char* name);
 void __stdcall SelectFontForEntry(Entry* entries, int index);
 char* __stdcall WordWrapText(Menu* menu, char* text, int value, int index);
 void DrawHelpPage();
@@ -284,7 +284,7 @@ void __stdcall SetQuickKeyByName(Menu* menu, const char* name, char value);
 void __stdcall SyncAssocGadgets(Menu* menu, int index);
 void __stdcall ConfigureListBoxByName(Menu* menu, const char* name, void* data, int count, int flag);
 void __stdcall MarkChanged(Menu* menu);
-void __stdcall FUN_0049fad0(Menu* menu);
+void __stdcall MarkLayerChanged(Menu* menu);
 void __stdcall SetKeyboardInput(Menu* menu, int value);
 void __stdcall RenderLayer(Menu* menu, int value);
 Layer* __stdcall LoadGuiLayer(Menu* menu, const char* name, int flags);
@@ -1214,7 +1214,7 @@ void __stdcall UpdateSolarSystem(Menu* arg1, Entry* arg2)
     }
 
     int i = FindGadgetIndex(arg1->layer->entries, "SOLARSYSTEM", 0xe);
-    Entry* g = FUN_004a0280(arg1->layer->entries, "SOLARSYSTEM");
+    Entry* g = FindGadgetChecked_E(arg1->layer->entries, "SOLARSYSTEM");
 
     Rect rect;
     rect.x1 = g->x;
@@ -1250,7 +1250,7 @@ void __stdcall UpdateSolarSystem(Menu* arg1, Entry* arg2)
             g_briefingPanoramaNextTick = GetTicks() + 2;
         }
 
-        FUN_0049fad0(arg1);
+        MarkLayerChanged(arg1);
 
         Rect rect2;
         rect2.x1 = arg2->x;
@@ -1312,7 +1312,7 @@ void __stdcall UpdatePlanet(Menu* arg1, Entry* arg2)
             }
         }
         if (arg2->field_be != 0) {
-            FUN_0049fad0(arg1);
+            MarkLayerChanged(arg1);
 
             int x1 = arg2->x;
             int x2 = x1 + arg2->w - 1;
