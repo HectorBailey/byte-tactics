@@ -62,6 +62,7 @@ public:
     int OpenCdAudio();
     void CloseCdAudio();
     int IsFirstTrackData();
+    int GetTrackCategory();
     void InitMixerVolumes();
     int QueryWaveVolume();
     int QueryAuxVolume();

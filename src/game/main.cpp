@@ -106,10 +106,6 @@ public:
     void CloseCdAudio();
     void OpenCdAudio();
     void SetCdCallback(void (*param_1)());
-};
-
-class Class_004ce680 {
-public:
     int GetTrackCategory();
 };
 
@@ -334,7 +330,7 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         for (;;) {
             if (g_displayContext.field_e0 == lzero && *(int*)g_game->sound != 0) {
                 SaveCdLists();
-                g_cdTrackCategory = ((Class_004ce680*)g_game->sound)->GetTrackCategory();
+                g_cdTrackCategory = g_game->sound->GetTrackCategory();
                 g_game->sound->CloseCdAudio();
                 g_cdNeedsReopenAfterFocus = 1;
             } else if (g_displayContext.field_e0 != lzero && *(int*)g_game->sound == 0

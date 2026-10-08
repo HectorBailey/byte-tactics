@@ -441,16 +441,12 @@ public:
     void CopyTrackTypeTable(const void* src);
 };
 
-class Class_004ce680 {
-public:
-    int GetTrackCategory();
-};
-
 class Sound {
 public:
     void SetTrackCategory(int param_1);
     int GetDiscSerial();
     int IsFirstTrackData();
+    int GetTrackCategory();
     int SetCdCallback(void (*param_1)());
 };
 
@@ -487,7 +483,7 @@ void ReopenCdAudio()
     char tracks[16] = {1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     char buf[0x88];
 
-    int saved = ((Class_004ce680*)g_game->cd)->GetTrackCategory();
+    int saved = g_game->cd->GetTrackCategory();
     mciSendStringA("stop cdaudio", 0, 0, 0);
     mciSendStringA("close cdaudio", 0, 0, 0);
     mciSendStringA("open cdaudio", 0, 0, 0);

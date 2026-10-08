@@ -158,11 +158,6 @@ public:
     int GetLockedTrack();
 };
 
-class Class_004ce680 {
-public:
-    int GetTrackCategory();
-};
-
 struct Class_004ce7a0
 {
 public:
@@ -674,7 +669,7 @@ void __stdcall OnCdFadeTimer(void*)
 }
 
 // FUNCTION: 0x4ce680
-int Class_004ce680::GetTrackCategory()
+int Sound::GetTrackCategory()
 {
     return *(int*)((char*)this + 0x278);
 }
