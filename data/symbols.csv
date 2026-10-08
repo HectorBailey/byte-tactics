@@ -623,7 +623,7 @@ address,name
 0x433380,LosTables::LoadLosTable
 0x433500,LosTables::GetLosTable
 0x433520,LosTables::GetLosTableCount
-0x433540,Class_00433540::FreeLines
+0x433540,LosTable::FreeLines
 0x4335c0,LosTable::GetLosLineCount
 0x4335e0,LosTable::GetLosLine
 0x4335f0,LosTable::ResizeLines
@@ -4396,7 +4396,7 @@ address,name
 0x511fa8,g_explosion2Duration
 0x511fac,g_explosion2StartSize
 0x511fb0,g_explosion2EndSize
-0x511fb4,s_featureTdfParsers$S32680
+0x511fb4,s_featureTdfParsers$S23970
 0x511fb8,g_frontendErrorText
 0x5120b8,g_pictureCache
 0x512288,DAT_00512288
