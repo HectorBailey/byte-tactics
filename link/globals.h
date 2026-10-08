@@ -291,7 +291,7 @@ extern int g_explosion1EndSize;                                                 
 extern int g_explosion2Duration;                                                                  // 0x511fa8, 4 bytes; 1 of 1 files
 extern int g_explosion2StartSize;                                                                 // 0x511fac, 4 bytes; 1 of 1 files
 extern int g_explosion2EndSize;                                                                   // 0x511fb0, 4 bytes; 1 of 1 files
-extern List_00422ea0* DAT_00511fb4;                                                               // 0x511fb4, 4 bytes, DAT_00511fb4$S22242; 1 of 2 files (conflicting: struct names only)
+extern List_00422ea0* DAT_00511fb4;                                                               // 0x511fb4, 4 bytes, DAT_00511fb4$S23898; 1 of 2 files (conflicting: struct names only)
 extern char DAT_00511fb8[256];                                                                    // 0x511fb8, 256 bytes; 1 of 1 files
 extern unsigned char DAT_005120b8[464];                                                           // 0x5120b8, 464 bytes; Entry_00428730[10] by value in 1 of 1 files
 extern int DAT_00512288;                                                                          // 0x512288, 4 bytes; 1 of 1 files
@@ -597,8 +597,8 @@ extern unsigned int g_randomSeed;                                               
 extern unsigned char DAT_0051fc8c[4];                                                             // 0x51fc8c, 4 bytes; nothing refers to it
 extern int g_defaultCommandHandler;                                                               // 0x51fc90, 4 bytes; 1 of 1 files
 extern int g_defaultCommandMask;                                                                  // 0x51fc94, 4 bytes; 1 of 1 files
-extern unsigned char DAT_0051fcb0[256];                                                           // 0x51fcb0, 256 bytes; 1 of 1 files
-extern int DAT_0051fdb0;                                                                          // 0x51fdb0, 4 bytes; 1 of 1 files
+extern unsigned char g_gafEncodeLiteralBuffer[256];                                               // 0x51fcb0, 256 bytes; 1 of 1 files
+extern int g_gafEncodeOutputSize;                                                                 // 0x51fdb0, 4 bytes; 1 of 1 files
 extern unsigned char DAT_0051fdb4[4];                                                             // 0x51fdb4, 4 bytes; nothing refers to it
 extern TranslationTable* g_translations;                                                          // 0x51fdb8, 4 bytes; 1 of 1 files
 extern unsigned char DAT_0051fdbc[4];                                                             // 0x51fdbc, 4 bytes; nothing refers to it
