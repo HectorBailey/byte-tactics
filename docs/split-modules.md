@@ -55,3 +55,10 @@ reason is what stopped it. A module whose row list is empty is one file.
 | ai/ai_player | src/ai/ai_player_40b1c0.cpp | In the joined file the compiler encodes its table access as `[pointer + id]` instead of the original's `[id + pointer]`. |
 | ai/ai_player | src/ai/ai_player_40b530.cpp | Its `std::_Construct` hook, declared before `<vector>`, changes every `vector<Unit*>` copy in the file. |
 | ai/ai_player | src/ai/ai_player_40c530.cpp | The out-of-line vector members' register allocation follows the emissions in that file; in the joined file four fall out of their windows and splitting just those four out does not help. |
+| map/features | src/map/features_421f20.cpp | The module is built with `/Gi`, and in the joined file the loop address's base and index swap (`lea [edx+ebx+4]` against the original's `[ebx+edx+4]`). |
+| map/features | src/map/features_4224b0.cpp | Merged, the symbol ids schedule the `name` load after the strncpy setup, and adding its prototypes moves 0x425210 off its window. |
+| map/features | src/map/features_422ea0.cpp | `/Gi` changes the base and index of the feature-table address and of the dead, burnt and reclamate stores; merged it falls to 81.4%. |
+| map/features | src/map/features_424c00.cpp | It matches only with `include/ta_types.h` at its exact size and with the 3D loop's `c` numbered past 65536; `/Gi` alone leaves it at 89.6%. |
+| network/online | src/network/online_45b250.cpp | Gap code: `tools/gapcheck.py` sizes a gap region by the file it is in, so it cannot share online.cpp. |
+| network/online | src/network/online_45b490.cpp | Gap code, same as online_45b250.cpp. |
+| network/online | src/network/online_45b670.cpp | Gap code, same as online_45b250.cpp. |
