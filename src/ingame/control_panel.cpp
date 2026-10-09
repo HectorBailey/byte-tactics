@@ -9,6 +9,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+// Unused here: the symbol ids <io.h> adds keep 0x41ace0 and 0x41ba60
+// matching when the Layer and PlayerInfo headers come in (docs/c2-regalloc.md).
+#include <io.h>
 
 #pragma pack(push, 1)
 
@@ -141,12 +144,7 @@ struct MenuEntry {
     char unknown_13e[0x15b - 0x13e];
 };
 
-struct Layer {
-    int unknown_0;                     // +0x0
-    MenuEntry* entries;                // +0x4
-    void (__stdcall* handler)(Menu*);  // +0x8
-    int data;                          // +0xc
-};
+#include "../gui/layer.h"
 
 struct Menu {
     char unknown_0[0x18];
@@ -157,11 +155,7 @@ struct Menu {
     int changed;                       // +0xcca
 };
 
-struct PlayerInfo {
-    Unit* unit;                        // +0x0
-    char unknown_4[0x95 - 4];
-    unsigned char playerIndex;         // +0x95
-};
+#include "../network/player_info.h"
 
 #include "../network/player.h"
 
@@ -622,7 +616,7 @@ int UpdatePlacementGhostValidity(void)
 // FUNCTION: 0x419940
 void __stdcall SetBuildCountText(Menu* obj, unsigned short index, int n)
 {
-    MenuEntry* e = FindGadgetOrNull(obj->layer->entries, g_game->buildTypes[index].name);
+    MenuEntry* e = FindGadgetOrNull((MenuEntry*)obj->layer->entries, g_game->buildTypes[index].name);
     if (e) {
         if (n)
             sprintf(e->u.text, "+%d", n);
@@ -640,7 +634,7 @@ void __stdcall SetBuildCountText(Menu* obj, unsigned short index, int n)
 // FUNCTION: 0x4199b0
 void __stdcall RefreshBuildCountTexts(Menu* menu, Unit* unit)
 {
-    MenuEntry* e = menu->layer->entries;
+    MenuEntry* e = (MenuEntry*)menu->layer->entries;
     // Read as an int so it is sign-extended once.
     int count = e->u.count;
     e++;
@@ -1066,9 +1060,9 @@ void __stdcall SetPrevNextGadgetNames(Unit* unit)
 {
     char buf[256];
     if (unit->type->buildMenuPageCount < 2) {
-        sprintf(buf, "%sPREV", g_game->sideNames[unit->player->info->playerIndex].name);
+        sprintf(buf, "%sPREV", g_game->sideNames[unit->player->info->side].name);
         SetGadgetActiveByName(&g_game->menu, buf, 0);
-        sprintf(buf, "%sNEXT", g_game->sideNames[unit->player->info->playerIndex].name);
+        sprintf(buf, "%sNEXT", g_game->sideNames[unit->player->info->side].name);
         SetGadgetActiveByName(&g_game->menu, buf, 0);
     }
 }
@@ -1082,7 +1076,7 @@ void __stdcall SetPrevNextGadgetNames(Unit* unit)
 void __stdcall HandleBuildPanelClick(Menu* menu)
 {
     if (menu->index != -1) {
-        MenuEntry* entries = menu->layer->entries;
+        MenuEntry* entries = (MenuEntry*)menu->layer->entries;
         // char[17]: a [20] buffer is placed above the name buffer.
         char idName[17];
         GetGadgetName(entries, idName, menu->index);
@@ -1140,7 +1134,7 @@ static inline MenuEntry* Entries(MenuEntry* t)
 // FUNCTION: 0x41ac90
 void __stdcall DisableUnavailableBuildMenuEntries(Menu* obj)
 {
-    MenuEntry* t = obj->layer->entries;
+    MenuEntry* t = (MenuEntry*)obj->layer->entries;
     int n = t->u.count;
     for (int i = 0; i < n; i++) {
         if (Entries(t)[i].flags & 4) {
@@ -1154,9 +1148,9 @@ static inline void SetPrevNext(Unit* unit)
 {
     char buf[256];
     if (unit->type->buildMenuPageCount < 2) {
-        sprintf(buf, "%sPREV", g_game->sideNames[unit->player->info->playerIndex].name);
+        sprintf(buf, "%sPREV", g_game->sideNames[unit->player->info->side].name);
         SetGadgetActiveByName(&g_game->menu, buf, 0);
-        sprintf(buf, "%sNEXT", g_game->sideNames[unit->player->info->playerIndex].name);
+        sprintf(buf, "%sNEXT", g_game->sideNames[unit->player->info->side].name);
         SetGadgetActiveByName(&g_game->menu, buf, 0);
     }
 }
@@ -1164,7 +1158,7 @@ static inline void SetPrevNext(Unit* unit)
 // Inlined copy of DisableUnavailableBuildMenuEntries.
 static inline void UpdateCounts(Menu* menu)
 {
-    MenuEntry* entry = menu->layer->entries;
+    MenuEntry* entry = (MenuEntry*)menu->layer->entries;
     int n = entry->u.count;
     int i = 0;
     if (n <= 0)
@@ -1188,12 +1182,12 @@ void __stdcall OpenBuildMenuGui(Unit* unit, char* guiName, int page)
         char name[256];
         BuildDataPath(path, "guis", guiName, "GUI");
         if (HAPI_FileLengthByName(path) == 0)
-            sprintf(name, "%sDL", g_game->sideNames[player->info->playerIndex].name);
+            sprintf(name, "%sDL", g_game->sideNames[player->info->side].name);
         else
             strcpy(name, guiName);
         Layer* layer = LoadGuiLayer(&g_game->menu, name, 0);
         if (layer != 0) {
-            layer->handler = HandleBuildPanelClick;
+            layer->handler = (void (__stdcall*)(void*))HandleBuildPanelClick;
             layer->data = 0;
             for (int i = 0; i < g_game->buildListCount; i++) {
                 for (int j = 0; j < g_game->buildLists[i].count; j++) {
@@ -1203,7 +1197,7 @@ void __stdcall OpenBuildMenuGui(Unit* unit, char* guiName, int page)
                     if (unit->type->id == entry->typeId
                         && entry->page - 1 == page) {
                         char* src = entry->name;
-                        MenuEntry* e = &layer->entries[entry->slot + 4];
+                        MenuEntry* e = &((MenuEntry*)layer->entries)[entry->slot + 4];
                         e->enabled = 0;
                         e->commonAttribs = 4;
                         strcpy(e->name, src);
@@ -1220,7 +1214,7 @@ void __stdcall OpenBuildMenuGui(Unit* unit, char* guiName, int page)
             RefreshOrderButtons(unit);
             RefreshBuildCountTexts(&g_game->menu, unit);
             if (unit->flags.raw & 0x20000000) {
-                int index = FindGadgetIndexBySubstring(g_game->menu.layer->entries, "ONOFF");
+                int index = FindGadgetIndexBySubstring((MenuEntry*)g_game->menu.layer->entries, "ONOFF");
                 if (index != -1)
                     SetGadgetStatus(&g_game->menu, index, unit->onOff);
             }
@@ -1240,10 +1234,10 @@ void __stdcall OpenGeneratorDialog(Unit* unit)
 {
     char name[256];
     sprintf(name, "%sGEN.GUI",
-            g_game->sideNames[g_game->players[g_game->localPlayer].info->playerIndex].name);
+            g_game->sideNames[g_game->players[g_game->localPlayer].info->side].name);
     Layer* gadget = LoadGuiLayer(&g_game->menu, name, 0);
     if (gadget != 0) {
-        gadget->handler = HandleBuildPanelClick;
+        gadget->handler = (void (__stdcall*)(void*))HandleBuildPanelClick;
         gadget->data = 0;
         RefreshOrderButtons(unit);
         RenderLayer(&g_game->menu, 0x40);
