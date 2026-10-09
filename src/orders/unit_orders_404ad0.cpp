@@ -52,6 +52,11 @@ void __stdcall ReclaimFeature(Unit* unit, Vec3* pos);
 void __stdcall AddOrder(int kind, int remove, Unit* owner, void* id, Vec3* pos, int param_6, int param_7);
 void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount);
 
+// Unused here: this header takes the symbol ids that keep ReclaimOrder's
+// allocation (docs/c2-regalloc.md); order.h gained the MissionType header, which
+// shifted this file's symbol count and moved the x87 operand order.
+#include "../map/mission.h"
+
 // Order handler "Reclaiming" for a feature (wreck, tree, rock) at the order
 // position.
 // FUNCTION: 0x404ad0
