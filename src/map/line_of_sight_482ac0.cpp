@@ -41,7 +41,7 @@ struct FrameTable {
 struct Game {
     char unknown_0[0x1427f];
     unsigned char seaLevel;             // +0x1427f
-    char debugMode;
+    char cursorCrosshairMode;
     unsigned short mapFlags;            // +0x14281
     char unknown_14283[0x1485b - 0x14283];
     FrameTable* losTable;               // +0x1485b

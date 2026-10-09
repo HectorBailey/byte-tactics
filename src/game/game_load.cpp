@@ -236,19 +236,19 @@ struct Game {
     Sound* sound;                       // +0x10
     char unknown_10[0x519 - 0x14];
     union {                             // +0x519
-        Menu_00497ce0 menu;
+        Menu_00497ce0 guiRoot;
         struct {
             int field_519;
             int gaf;
             char unknown_521[0x531 - 0x521];
-            int field_531;
+            int layer;
         };
     };
     char unknown_535[0x589 - 0x535];
     int field_589;                      // +0x589
     char unknown_58d[0xdcb - 0x58d];
     union {                             // +0xdcb
-        unsigned char palette[16];
+        unsigned char colors[16];
         struct {
             char unknown_dcb[4];
             unsigned char color1;       // +0xdcf
@@ -281,22 +281,22 @@ struct Game {
     char unknown_2cbf[0x2cc6 - 0x2cbf];
     Flags_00498da0 flags;               // +0x2cc6
     char unknown_2cc7[0x14223 - 0x2cc7];
-    int baseX;                          // +0x14223
-    int baseY;                          // +0x14227
-    union { int world_w; int worldW; };          // +0x1422b
-    union { int world_h; int worldH; };          // +0x1422f
+    int mapWidthWorld;                  // +0x14223
+    int mapHeightWorld;                 // +0x14227
+    union { int mapPixelWidth; int worldW; };    // +0x1422b
+    union { int mapPixelHeight; int worldH; };   // +0x1422f
     char unknown_14233[0x14281 - 0x14233];
     union {                             // +0x14281
         ViewFlags_497180 mapFlags;
         unsigned short mapFlagsWord;
     };
     char unknown_14283[0x142bb - 0x14283];
-    Rect_00498da0 viewLimit;            // +0x142bb
+    Rect_00498da0 minimapHitRect;       // +0x142bb
     char unknown_142cb[0x142e7 - 0x142cb];
-    union { short origin_x; short originX; };    // +0x142e7
-    union { short origin_y; short originY; };    // +0x142e9
-    union { short screen_w; short screenW; };    // +0x142eb
-    union { short screen_h; short screenH; };    // +0x142ed
+    union { short minimapGadgetX; short originX; };  // +0x142e7
+    union { short minimapGadgetY; short originY; };  // +0x142e9
+    union { short minimapGadgetW; short screenW; };  // +0x142eb
+    union { short minimapGadgetH; short screenH; };  // +0x142ed
     char unknown_142ef[0x1431f - 0x142ef];
     int scrollX;                        // +0x1431f
     int scrollY;                        // +0x14323
@@ -687,9 +687,9 @@ void __cdecl LoadMatch(void*)
                 unsigned char st = rec->team;
                 if (st != 1 && st != 2)
                     continue;
-                pos.x.i = (RandomInt(g_game->baseX - 0xa0) + 0x50) << 16;
+                pos.x.i = (RandomInt(g_game->mapWidthWorld - 0xa0) + 0x50) << 16;
                 pos.y.i = 0;
-                pos.z.i = (RandomInt(g_game->baseY - 0xa0) + 0x50) << 16;
+                pos.z.i = (RandomInt(g_game->mapHeightWorld - 0xa0) + 0x50) << 16;
                 if (rec->active != 0 && (rec->data->flags_9b & 0x40))
                     continue;
                 PlayerInfo* pl2 = rec->data;
@@ -795,7 +795,7 @@ tail:
         sprintf(g_game->guiName, "%sMAIN2.GUI", g_game->sideNames[side].name);
     }
     Gadget_497180* gadget =
-        LoadGuiLayer((Sub_497180*)&g_game->menu, g_game->guiName, 0x20);
+        LoadGuiLayer((Sub_497180*)&g_game->guiRoot, g_game->guiName, 0x20);
     gadget->handler = HandleMain2LayoutEvent;
     gadget->owner = (char*)g_game;
 
@@ -842,9 +842,9 @@ void __stdcall DrawSyncStatus(void* surface)
     int off;
     extern Game* g_game;
 
-    RenderLayer(&g_game->menu, 0x40);
-    MarkLayerChanged(&g_game->menu);
-    BlitMenuLayers(&g_game->menu, 0, 0);
+    RenderLayer(&g_game->guiRoot, 0x40);
+    MarkLayerChanged(&g_game->guiRoot);
+    BlitMenuLayers(&g_game->guiRoot, 0, 0);
 
     const char* text;
     if (g_game->netBits.synced) {
@@ -906,7 +906,7 @@ static inline void DrawLoadingBar(void* gadget, void* lightbar, int index, unsig
 {
     unsigned int color;
     int flash;
-    color = g_game->palette[g_game->progress[index] < 100 ? 12 : 10];
+    color = g_game->colors[g_game->progress[index] < 100 ? 12 : 10];
     SetTextColors(color, GetTextKeyColor());
     if (g_game->progress[index] == 100 && *prev != 100) {
         alphas[slot] = 0x1e;
@@ -946,7 +946,7 @@ void LoadingScreenFrame(void)
     char namebuf[100];
 
     if (!g_game->flags38d75.bits.started) {
-        while (g_game->field_531 != 0) {
+        while (g_game->layer != 0) {
             CloseTopScreen(&g_game->field_519);
         }
         DisableKeyCommands(&g_game->field_519);
@@ -959,7 +959,7 @@ void LoadingScreenFrame(void)
         if (((Mission*)g_game->mapInfo)->GetGameType() != 2) {
             SaveSettings();
         }
-        while (g_game->field_531 != 0) {
+        while (g_game->layer != 0) {
             CloseTopScreen(&g_game->field_519);
         }
         BlankScreen();
@@ -1074,7 +1074,7 @@ void LoadingScreenFrame(void)
     // The result stays in a local: it gives the compare against a register.
     int ok = LockScreen(&gadget);
     if (ok != 0) {
-        color = g_game->palette[15];
+        color = g_game->colors[15];
         stamp = GetTicks();
         if (g_loadingBarFlashDecayTick < (int)stamp) {
             g_loadingBarFlashDecayTick = GetTicks();
@@ -1140,11 +1140,11 @@ void __stdcall OffsetWorldPosFromView(Point_00498cd0* p, View_00498cd0* view, in
 void __stdcall MinimapCursorToWorldPos(Pos_00498d00* out)
 {
     Rect_00498d00 r = g_game->view;
-    int dx = r.x - g_game->origin_x;
-    int dy = r.y - g_game->origin_y;
+    int dx = r.x - g_game->minimapGadgetX;
+    int dy = r.y - g_game->minimapGadgetY;
     memset(out, 0, sizeof(Pos_00498d00));
-    out->x.whole = g_game->world_w * dx / g_game->screen_w;
-    out->z.whole = g_game->world_h * dy / g_game->screen_h;
+    out->x.whole = g_game->mapPixelWidth * dx / g_game->minimapGadgetW;
+    out->z.whole = g_game->mapPixelHeight * dy / g_game->minimapGadgetH;
     out->y.whole = GetGroundHeight(out);
 }
 // Turns a screen point into a world position. The caller copies the 24-byte
@@ -1189,7 +1189,7 @@ void __stdcall UpdateCursorWorldPos(View_00498da0* r)
 {
     int mx, my;
 
-    if (PointInRect(&g_game->viewLimit, r->x, r->y) && !(g_game->flags.value & 8)) {
+    if (PointInRect(&g_game->minimapHitRect, r->x, r->y) && !(g_game->flags.value & 8)) {
         mx = (r->x - g_game->originX) * g_game->worldW / g_game->screenW;
         my = (r->y - g_game->originY) * g_game->worldH / g_game->screenH;
         g_game->flags.value |= 1;

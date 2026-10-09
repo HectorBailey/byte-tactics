@@ -51,7 +51,7 @@ struct Game {
     char unknown_4e1[0x4fd - 0x4e1];
     int field_4fd;
     char unknown_501[0x519 - 0x501];
-    Sub_00441460 sub;
+    Sub_00441460 guiRoot;
     char unknown_529[0x2a47 - 0x529];
     void* data[16];
     char unknown_2a87[0x2aa7 - 0x2a87];
@@ -129,14 +129,14 @@ upd:
 conn:
     msg = "Connecting  (ESC to abort)";
 shown:
-    OpenMessageBox(&g_game->sub, Translate(msg), 0x96, 0, 1);
-    BlitMenuLayers(&g_game->sub, g_game->screen, 0);
+    OpenMessageBox(&g_game->guiRoot, Translate(msg), 0x96, 0, 1);
+    BlitMenuLayers(&g_game->guiRoot, g_game->screen, 0);
     SetOffscreenSurface(g_game->screen);
     FlipScreen();
     FlipScreen();
 
     count = HAPINET_getgames((char*)&g_game->unknown_14, g_game->desc, 0);
-    CloseTopScreen(&g_game->sub);
+    CloseTopScreen(&g_game->guiRoot);
     if (count < 0)
         return 0;
 
@@ -225,19 +225,19 @@ shown:
         } while (--left);
     }
 
-    ConfigureListBoxByName(&g_game->sub, "GAMENAME", (char*)g_game->data[1], g_game->field_4fd, 0);
-    ConfigureListBoxByName(&g_game->sub, "PLAYERS", (char*)g_game->data[2], g_game->field_4fd, 0);
-    ConfigureListBoxByName(&g_game->sub, "MAPNAME", (char*)g_game->data[3], g_game->field_4fd, 0);
-    ConfigureListBoxByName(&g_game->sub, "STATUS", (char*)g_game->data[4], g_game->field_4fd, 0);
-    ConfigureListBoxByName(&g_game->sub, "METAL", (char*)g_game->data[6], g_game->field_4fd, 0);
-    ConfigureListBoxByName(&g_game->sub, "ENERGY", (char*)g_game->data[7], g_game->field_4fd, 0);
-    ConfigureListBoxByName(&g_game->sub, "COMMANDER", (char*)g_game->data[9], g_game->field_4fd, 0);
-    ConfigureListBoxByName(&g_game->sub, "LOS", (char*)g_game->data[11], g_game->field_4fd, 0);
-    ConfigureListBoxByName(&g_game->sub, "PING", (char*)g_game->data[8], g_game->field_4fd, 0);
-    ConfigureListBoxByName(&g_game->sub, "FULLMAP", (char*)g_game->data[10], g_game->field_4fd, 0);
+    ConfigureListBoxByName(&g_game->guiRoot, "GAMENAME", (char*)g_game->data[1], g_game->field_4fd, 0);
+    ConfigureListBoxByName(&g_game->guiRoot, "PLAYERS", (char*)g_game->data[2], g_game->field_4fd, 0);
+    ConfigureListBoxByName(&g_game->guiRoot, "MAPNAME", (char*)g_game->data[3], g_game->field_4fd, 0);
+    ConfigureListBoxByName(&g_game->guiRoot, "STATUS", (char*)g_game->data[4], g_game->field_4fd, 0);
+    ConfigureListBoxByName(&g_game->guiRoot, "METAL", (char*)g_game->data[6], g_game->field_4fd, 0);
+    ConfigureListBoxByName(&g_game->guiRoot, "ENERGY", (char*)g_game->data[7], g_game->field_4fd, 0);
+    ConfigureListBoxByName(&g_game->guiRoot, "COMMANDER", (char*)g_game->data[9], g_game->field_4fd, 0);
+    ConfigureListBoxByName(&g_game->guiRoot, "LOS", (char*)g_game->data[11], g_game->field_4fd, 0);
+    ConfigureListBoxByName(&g_game->guiRoot, "PING", (char*)g_game->data[8], g_game->field_4fd, 0);
+    ConfigureListBoxByName(&g_game->guiRoot, "FULLMAP", (char*)g_game->data[10], g_game->field_4fd, 0);
 
     i = FindGadgetIndex(gadget->entries, "GAMENAME", 2);
     if (i != -1)
-        UpdateGameSelection(&g_game->sub, gadget->entries + i * 0x15b);
+        UpdateGameSelection(&g_game->guiRoot, gadget->entries + i * 0x15b);
     return 1;
 }

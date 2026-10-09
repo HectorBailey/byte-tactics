@@ -115,9 +115,9 @@ struct PlayerInfo_0049be60 {
 
 struct Game {
     char unknown_0[0xdcb];
-    unsigned char palette[0x2a];       // +0xdcb
+    unsigned char colors[0x2a];        // +0xdcb
     char unknown_df5[0x2a43 - 0xdf5];
-    unsigned char localPlayer;         // +0x2a43
+    unsigned char playerIndex;         // +0x2a43
     char unknown_2a44[0x141f3 - 0x2a44];
     int projectileCount;               // +0x141f3
     Proj_0049be60* projectiles;        // +0x141f7
@@ -193,7 +193,7 @@ void __stdcall DrawProjectiles(void* surface)
     while (1) {
         Proj_0049be60* p = (Proj_0049be60*)((char*)g_game->projectiles + offset);
         if (p->counter == 0) {
-            unsigned char player = g_game->localPlayer;
+            unsigned char player = g_game->playerIndex;
             char* pb = (char*)g_game + 0x1b63 + 0x14b * player;
             Vec3_0049be60* pos = &p->pos;
             if ((g_game->mapFlags & 2) == 2) {
@@ -211,8 +211,8 @@ void __stdcall DrawProjectiles(void* surface)
             if (visible) {
                 type = p->type;
                 if (type->field_10c == 0) {
-                    unsigned int color1 = g_game->palette[type->field_10d];
-                    unsigned int color2 = g_game->palette[type->field_10e];
+                    unsigned int color1 = g_game->colors[type->field_10d];
+                    unsigned int color2 = g_game->colors[type->field_10e];
                     int x1;
                     int y1;
                     int x2;
@@ -326,7 +326,7 @@ void __stdcall DrawProjectiles(void* surface)
                     DrawFrameBlended(surface, frame0, sx, sy);
                     DrawModel3doProjected(surface, &sp, type->field_74, &p->angles);
                 } else if (type->field_10c == 7) {
-                    unsigned int color = g_game->palette[type->field_10d];
+                    unsigned int color = g_game->colors[type->field_10d];
                     Vec3_0049be60* start = &p->start;
                     d.x = pos->x - start->x;
                     d.y = pos->y - start->y;

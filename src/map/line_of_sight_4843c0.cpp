@@ -48,7 +48,7 @@ struct Game {
     char pad1[0x2a43 - (0x1bdf + 10 * 0x14b)];
     unsigned char playerIndex;         // +0x2a43
     char pad2[0x141fb - 0x2a44];
-    MapInfo info;                      // +0x141fb
+    MapInfo sortUnitList;              // +0x141fb
     char pad3[0x14281 - (0x141fb + 0x7c)];
     FlagWord mapFlags;                 // +0x14281
     char pad4[0x1431f - 0x14283];
@@ -63,7 +63,7 @@ extern Game* g_game;
 // FUNCTION: 0x4843c0
 void BuildFogTiles(void)
 {
-    MapInfo* info = &g_game->info;
+    MapInfo* info = &g_game->sortUnitList;
     Grid* grid = info->grid;
     PlayerGrid* pg = &g_game->players[g_game->playerIndex];
     unsigned int bit = 1 << g_game->playerIndex;

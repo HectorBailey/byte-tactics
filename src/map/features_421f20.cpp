@@ -51,7 +51,7 @@ struct AnimManager_00421f20 {
 #pragma pack(push, 1)
 struct Game {
     char unknown_0[0x141fb];
-    AnimManager_00421f20 anim;         // +0x141fb
+    AnimManager_00421f20 sortUnitList;  // +0x141fb
     char unknown_14273[0x1439b - 0x14273];
     int unitDefs;                      // +0x1439b
 };
@@ -65,7 +65,7 @@ unsigned short __stdcall LoadFeatureType(char* name);
 // FUNCTION: 0x421f20
 void __stdcall InitFeatureAnimPool(List_00421f20* list)
 {
-    AnimManager_00421f20* m = &g_game->anim;
+    AnimManager_00421f20* m = &g_game->sortUnitList;
 
     m->anim = (AnimEntry_00421f20*)GameAllocIgnoreTag("FEATURE ANIM DATA", 0x18000);
     memset(m->anim, 0, 0x18000);

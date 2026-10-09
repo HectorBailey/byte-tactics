@@ -305,13 +305,13 @@ struct Game {
     Sound* sound;                      // +0x10
     char unknown_14[0x519 - 0x14];
     union {
-        Menu_0045b800 menu;            // +0x519, the menu helpers' view
+        Menu_0045b800 guiRoot;         // +0x519, the menu helpers' view
         Gui gui;                       // +0x519, the options screens' view
     };
     char unknown_11e7[0x1b63 - 0x11e7];
     Player players[10];         // +0x1b63, the info pointer at +0x27
     char unknown_2851[0x29a0 - 0x2851];
-    RuleSet_0045f1d0* rules;           // +0x29a0
+    RuleSet_0045f1d0* options;         // +0x29a0
     char unknown_29a4[0x2a42 - 0x29a4];
     union {
         unsigned char localPlayer;     // +0x2a42
@@ -983,21 +983,21 @@ void __stdcall SetDirectPlayProvider(int param_1)
 // FUNCTION: 0x45b880
 void __stdcall SetGadgetsDisabledByPrefix(char* name, int value)
 {
-    for (int i = 0; i <= g_game->menu.holder->entries->count; i++) {
-        if (strncmp(g_game->menu.holder->entries[i].name, name, strlen(name)) == 0 &&
-            g_game->menu.holder->entries[i].type == 1) {
-            SetGrayedOut(&g_game->menu, i, value);
+    for (int i = 0; i <= g_game->guiRoot.holder->entries->count; i++) {
+        if (strncmp(g_game->guiRoot.holder->entries[i].name, name, strlen(name)) == 0 &&
+            g_game->guiRoot.holder->entries[i].type == 1) {
+            SetGrayedOut(&g_game->guiRoot, i, value);
         }
     }
-    MarkChanged(&g_game->menu);
+    MarkChanged(&g_game->guiRoot);
 }
 
 // FUNCTION: 0x45b920
 void __stdcall DeactivateGadgetsByPrefix(char* prefix)
 {
-    for (int i = 0; i <= g_game->menu.holder->entries[0].count; i++) {
-        if (strncmp(g_game->menu.holder->entries[i].name, prefix, strlen(prefix)) == 0) {
-            SetGadgetActiveByName(&g_game->menu, g_game->menu.holder->entries[i].name, 0);
+    for (int i = 0; i <= g_game->guiRoot.holder->entries[0].count; i++) {
+        if (strncmp(g_game->guiRoot.holder->entries[i].name, prefix, strlen(prefix)) == 0) {
+            SetGadgetActiveByName(&g_game->guiRoot, g_game->guiRoot.holder->entries[i].name, 0);
         }
     }
 }
@@ -1028,8 +1028,8 @@ int __stdcall ReadSliderValue(Gadget* param_1)
 void __stdcall SetGadgetStatusAndText(int index, int state, char* offText, char* onText)
 {
     char name[128];
-    Gadget* entries = g_game->menu.holder->entries;
-    SetGadgetStatus(&g_game->menu, index, state);
+    Gadget* entries = g_game->guiRoot.holder->entries;
+    SetGadgetStatus(&g_game->guiRoot, index, state);
     GetGadgetName(entries, name, index);
     Gadget* e = FindGadgetOrNull(entries, name);
     // An if/else of two strcpy calls; a ternary argument places the
@@ -1104,7 +1104,7 @@ void __stdcall HandleVideoModeSlider(Menu_0045b800* obj, int unused)
         g_game->width = r->width;
         g_game->height = r->height;
     }
-    MarkChanged(&g_game->menu);
+    MarkChanged(&g_game->guiRoot);
 }
 
 // Applies the brightness value and the two volume levels (scaled by 1024) to
@@ -1173,7 +1173,7 @@ void __stdcall SetGameSpeedLabel(char* name, char* label, int speed, int normal)
         text = "Faster";
     }
     sprintf(buf, "%s (%s)", label, text);
-    SetTranslatedTextByName(&g_game->menu, name, label, 0);
+    SetTranslatedTextByName(&g_game->guiRoot, name, label, 0);
 }
 
 // FUNCTION: 0x45c010
@@ -1185,7 +1185,7 @@ void __stdcall SetGadgetTextFromValueTable(Entry_0045c010* table, char* name, in
     while (table->format != 0) {
         if (value <= table->min) {
             sprintf(buf, table->format, value);
-            SetTranslatedTextByName(&g_game->menu, name, buf, 0);
+            SetTranslatedTextByName(&g_game->guiRoot, name, buf, 0);
             return;
         }
         table++;
@@ -1271,7 +1271,7 @@ void __stdcall SetLockedCdTrack(int value)
 void UpdateTrackGadgets()
 {
     char buf[12];
-    Menu_0045b800* menu = &g_game->menu;
+    Menu_0045b800* menu = &g_game->guiRoot;
 
     if (FindGadgetIndex(menu->holder->entries, "TRACKTYPE", 1) != -1) {
         int disc = g_musicUiSelectedTrack;
@@ -1297,7 +1297,7 @@ void UpdateTrackGadgets()
 // FUNCTION: 0x45c510
 void ApplyTrackType()
 {
-    Gadget* gadgets = g_game->menu.holder->entries;
+    Gadget* gadgets = g_game->guiRoot.holder->entries;
     if (g_game->cdMode == 4) {
         int index = FindGadgetIndex(gadgets, "TRACKTYPE", 1);
         g_game->sound->SetCategoryOfTrack(g_musicUiSelectedTrack, gadgets[index].stageIndex);
@@ -1495,7 +1495,7 @@ void SaveGameSettings()
 // FUNCTION: 0x45ce80
 void EnsureOptionsPanelGadget()
 {
-    Gadget* entries = g_game->menu.holder->entries;
+    Gadget* entries = g_game->guiRoot.holder->entries;
     int index = FindGadgetIndex(entries, "PANEL", 0xe);
     if (g_game->ordersPanelFlags & 1) {
         entries->width += 0x96;
@@ -2292,7 +2292,7 @@ void ShowGameSettingsDialog()
     index &= 0xff;
     char num[0x40];
     Opts_0045f1d0* opts = g_game->players[index].info;
-    Rule_0045f1d0* rule = &((Rule_0045f1d0*)g_game->rules)[g_game->playerType];
+    Rule_0045f1d0* rule = &((Rule_0045f1d0*)g_game->options)[g_game->playerType];
     char* deathStrs[3] = { "Game Continues", "Game Ends", "Deathmatch" };
     char* locStrs[2] = { "Random", "Fixed" };
     char* mapStrs[2] = { "Mapped", "Unmapped" };
@@ -2305,7 +2305,7 @@ void ShowGameSettingsDialog()
                  0x5a, 0x78, 2);
     AddTextGadget(layer, "TEXT", Translate("Starting Locations:"), 0x12, 0x6c, 0x6e, 2);
     if (g_game->mode->GetGameType() == 2) {
-        AddTextGadget(layer, "TEXT", Translate(locStrs[g_game->rules->startType]), 0x8c,
+        AddTextGadget(layer, "TEXT", Translate(locStrs[g_game->options->startType]), 0x8c,
                      0x6c, 0x78, 2);
     } else {
         AddTextGadget(layer, "TEXT", Translate(locStrs[opts->u.b.b14]), 0x8c, 0x6c,

@@ -45,9 +45,9 @@ struct Obj_0047db20 {
 
 struct Game {
     char unknown_0[0x14233];
-    int width;
+    int mapWidthTiles;
     char unknown_14237[0x14287 - 0x14237];
-    Cell* cells;
+    Cell* heightMap;
     char unknown_1428b[0x142b7 - 0x1428b];
     int overflowBucket;
 };
@@ -69,7 +69,7 @@ void __stdcall RefreshPassMapsForUnit(Obj_0047db20* obj);
 // obj->pos.y reads become one common subexpression.
 static inline Cell* CellAt(const Point16& p)
 {
-    return &g_game->cells[p.y * g_game->width + p.x];
+    return &g_game->heightMap[p.y * g_game->mapWidthTiles + p.x];
 }
 
 // Stays in a file of its own: in the merged file the symbol count clears bit 14
@@ -90,7 +90,7 @@ void __stdcall RemoveUnitFromMap(Obj_0047db20* obj)
                     if (m & 1) cell->flags &= 0xfd;
                     cell++;
                 }
-                cell += g_game->width - size.x;
+                cell += g_game->mapWidthTiles - size.x;
             }
             Point16 grown;
             grown.x = size.x + 2;
@@ -105,7 +105,7 @@ void __stdcall RemoveUnitFromMap(Obj_0047db20* obj)
                     if (cell->unit == obj->id) cell->unit = 0;
                     cell++;
                 }
-                cell += g_game->width - size.x;
+                cell += g_game->mapWidthTiles - size.x;
             }
         } else if ((obj->flags.all & 3) == 2) {
             for (int j = size.y; j > 0; j--) {
@@ -113,7 +113,7 @@ void __stdcall RemoveUnitFromMap(Obj_0047db20* obj)
                     if (cell->unit2 == obj->id) cell->unit2 = 0;
                     cell++;
                 }
-                cell += g_game->width - size.x;
+                cell += g_game->mapWidthTiles - size.x;
             }
         }
     }

@@ -49,11 +49,11 @@ struct UnitSync;
 
 struct Game {
     char unknown_0[0x519];
-    Gui_0044a680 gui;                   // +0x519
+    Gui_0044a680 guiRoot;               // +0x519
     char unknown_535[0x1b63 - 0x535];
     Player players[10];                 // +0x1b63
     char unknown_2851[0x2a30 - 0x2851];
-    UnitSync* net;                      // +0x2a30
+    UnitSync* sync;                     // +0x2a30
     char unknown_2a34[0x2a3c - 0x2a34];
     unsigned short numPlayers;          // +0x2a3c
     char unknown_2a3e[0x2a42 - 0x2a3e];
@@ -242,12 +242,12 @@ void UpdateBattleRoom()
     pl = &g_game->players[g_game->localPlayer];
     if (pl->rejectReason != 0) {
         g_game->frontendSubstateRequest = 3;
-        CloseTopScreen(&g_game->gui);
+        CloseTopScreen(&g_game->guiRoot);
         return;
     }
 
-    entries = g_game->gui.table->entries;
-    if (IsScreenNamed(&g_game->gui, "LOUNGE2.GUI") != 0) {
+    entries = g_game->guiRoot.table->entries;
+    if (IsScreenNamed(&g_game->guiRoot, "LOUNGE2.GUI") != 0) {
         int idx = FindGadgetIndex(entries, "PLAYER0", 0xe);
         entries[idx].colour = 0x18;
     }
@@ -267,38 +267,38 @@ void UpdateBattleRoom()
         if ((pl->info->flags_97 & 1) == 0) {
             unsigned char host = FindHostSlot();
             if (host != 10) {
-                if (IsScreenNamed(&g_game->gui, "LOUNGE2.GUI") != 0) {
+                if (IsScreenNamed(&g_game->guiRoot, "LOUNGE2.GUI") != 0) {
                     PlayerInfo* info = g_game->players[host].info;
                     g_game->map->LoadMissionByName(info);
-                    SetNamedSliderValue(&g_game->gui, "MAXUNITS", g_game->players[host].info->maxUnits - 0x14);
-                    SetNamedSliderValue(&g_game->gui, "METAL", g_game->players[host].info->metal * 100);
-                    SetNamedSliderValue(&g_game->gui, "ENERGY", g_game->players[host].info->energy * 100);
-                    UpdateMaxUnitsText(&g_game->gui, 0);
-                    UpdateEnergyText(&g_game->gui, 0);
-                    UpdateMetalText(&g_game->gui, 0);
-                } else if (IsScreenNamed(&g_game->gui, "viewmap.gui") != 0) {
+                    SetNamedSliderValue(&g_game->guiRoot, "MAXUNITS", g_game->players[host].info->maxUnits - 0x14);
+                    SetNamedSliderValue(&g_game->guiRoot, "METAL", g_game->players[host].info->metal * 100);
+                    SetNamedSliderValue(&g_game->guiRoot, "ENERGY", g_game->players[host].info->energy * 100);
+                    UpdateMaxUnitsText(&g_game->guiRoot, 0);
+                    UpdateEnergyText(&g_game->guiRoot, 0);
+                    UpdateMetalText(&g_game->guiRoot, 0);
+                } else if (IsScreenNamed(&g_game->guiRoot, "viewmap.gui") != 0) {
                     PlayerInfo* info = g_game->players[host].info;
                     if (strcmp(g_game->map->GetMissionName(), info->map) != 0) {
                         g_game->map->LoadMissionByName(g_game->players[host].info);
                         ShowSelectedMapInfo();
-                        MarkLayerChanged(&g_game->gui);
+                        MarkLayerChanged(&g_game->guiRoot);
                     }
                 }
             }
         }
         g_game->dirty = 0;
-        if (IsScreenNamed(&g_game->gui, "LOUNGE2.GUI") != 0) {
+        if (IsScreenNamed(&g_game->guiRoot, "LOUNGE2.GUI") != 0) {
             if (pl->info->flags_97 & 1) {
-                int synched = g_game->net->AllPlayersSynced();
+                int synched = g_game->sync->AllPlayersSynced();
                 int ready = AreAllPlayersReady();
                 Gadget_0044a680* start;
 
-                SetGrayedOutByName(&g_game->gui, "SYNCHING", 1);
-                start = FindGadgetChecked_E(g_game->gui.table->entries, "battlestart");
+                SetGrayedOutByName(&g_game->guiRoot, "SYNCHING", 1);
+                start = FindGadgetChecked_E(g_game->guiRoot.table->entries, "battlestart");
                 if (start->frame > 0 && g_startCountdownNextTick < GetTicks()) {
                     if (start->frame < 8) {
                         start->frame++;
-                        MarkChanged(&g_game->gui);
+                        MarkChanged(&g_game->guiRoot);
                         g_game->dirty = 1;
                     }
                     g_startCountdownNextTick += 4;
@@ -320,21 +320,21 @@ void UpdateBattleRoom()
                         unsigned int colour = GetTicks() & 0x1f;
                         if (colour != entries[idx].colour) {
                             entries[idx].colour = colour;
-                            MarkChanged(&g_game->gui);
+                            MarkChanged(&g_game->guiRoot);
                         }
                     }
                 }
-                SetGrayedOutByName(&g_game->gui, "START", ready == 0);
-                SetGadgetActiveByName(&g_game->gui, "START", synched);
-                SetGadgetActiveByName(&g_game->gui, "SYNCHING", synched == 0);
+                SetGrayedOutByName(&g_game->guiRoot, "START", ready == 0);
+                SetGadgetActiveByName(&g_game->guiRoot, "START", synched);
+                SetGadgetActiveByName(&g_game->guiRoot, "SYNCHING", synched == 0);
             }
             RefreshBattleRoomRows();
-            MarkChanged(&g_game->gui);
+            MarkChanged(&g_game->guiRoot);
         }
     }
 
-    if (IsScreenNamed(&g_game->gui, "LOUNGE2.GUI") != 0) {
-        SetCurrentFont(&g_game->gui, 1);
+    if (IsScreenNamed(&g_game->guiRoot, "LOUNGE2.GUI") != 0) {
+        SetCurrentFont(&g_game->guiRoot, 1);
         {
             // unsigned char counter (a short works too), not int.
             for (unsigned char i = 0; i < 10; i++) {
@@ -360,10 +360,10 @@ void UpdateBattleRoom()
                 }
             }
         }
-        SetCurrentFont(&g_game->gui, 0);
+        SetCurrentFont(&g_game->guiRoot, 0);
     }
 
-    g_game->net->ProcessSync();
+    g_game->sync->ProcessSync();
     if (g_heartbeatNextTick < (unsigned int)GetTicks()) {
         unsigned char r;
         PlayerInfo* info;

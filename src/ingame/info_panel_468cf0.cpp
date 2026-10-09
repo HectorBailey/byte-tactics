@@ -223,7 +223,7 @@ struct SideDef_00468cf0 {
 
 struct Game {
   char unknown_0[0x519];
-  int menu;                             // +0x519, the GUI system object
+  int guiRoot;                          // +0x519, the GUI system object
   char unknown_51d[0xdcb - 0x51d];
   unsigned char colors[16];             // +0xdcb
   char unknown_ddb[0x1b63 - 0xddb];
@@ -236,12 +236,12 @@ struct Game {
   int cursorScreenX;                    // +0x2c76
   int cursorScreenY;                    // +0x2c7a
   char unknown_2c7e[0x2c92 - 0x2c7e];
-  int boxStartX;                        // +0x2c92
-  int boxStartHeight;                   // +0x2c96
-  int boxStartZ;                        // +0x2c9a
-  int boxEndX;                          // +0x2c9e
-  int boxEndHeight;                     // +0x2ca2
-  int boxEndZ;                          // +0x2ca6
+  int boxSelectStartX;                  // +0x2c92
+  int boxSelectStartH;                  // +0x2c96
+  int boxSelectStartY;                  // +0x2c9a
+  int boxSelectEndX;                    // +0x2c9e
+  int boxSelectEndH;                    // +0x2ca2
+  int boxSelectEndY;                    // +0x2ca6
   char unknown_2caa[2];
   short field_2cac;                     // +0x2cac
   char unknown_2cae[2];
@@ -254,17 +254,17 @@ struct Game {
   unsigned char inputFlags;             // +0x2cc6
   char unknown_2cc7[0x141fb - 0x2cc7];
   union {                               // +0x141fb
-    MapGrid sortUnits;                  // the map/sort grid view of this block
+    MapGrid sortUnitList;               // the map/sort grid view of this block
     struct {
       char unknown_141fb[0x1426f - 0x141fb];
       Feature_00468cf0* features;       // +0x1426f
       char unknown_14273[0x14280 - 0x14273];
-      char debugMode;                   // +0x14280
+      char cursorCrosshairMode;         // +0x14280
       char unknown_14281[0x1428b - 0x14281];
     };
   };
   char unknown_1428b[0x142f3 - 0x1428b];
-  void* followUnit;                     // +0x142f3
+  void* cameraFollowUnit;               // +0x142f3
   char unknown_142f7[0x1431f - 0x142f7];
   int scrollX;                          // +0x1431f
   int scrollY;                         // +0x14323
@@ -481,7 +481,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
   char *&game = *(char**)&g_game;
   int *viewY = &((Game *)game)->scrollY;
   y = g_game->field_2cb4 - (g_game->field_2cb0 >> 1) - *viewY + 0x20;
-  if (g_game->debugMode == '\x02') {
+  if (g_game->cursorCrosshairMode == '\x02') {
     DrawLine((int)&ctx, x - 2, y, x + 2, y, colors[0xf]);
     DrawLine((int)&ctx, x, y - 2, x, y + 2, colors[0xf]);
   }
@@ -520,7 +520,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
 
   // features and units on the visible part of the map
   idx = g_game->playerIndex;
-  mv = &g_game->sortUnits;
+  mv = &g_game->sortUnitList;
   player = &g_game->players[idx];
   SetFont((int)g_game->sideDefs[player->info->bSideId].pFontData);
   SetTextColors(g_game->colors[15], GetTextKeyColor());
@@ -657,7 +657,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
   }
   DrawParticleList((int)&ctx, 8);
   if (IsKeyDown(0xf9))
-    DrawSelectedUnitOrderOverlays((int)&ctx, (int)&g_game->followUnit);
+    DrawSelectedUnitOrderOverlays((int)&ctx, (int)&g_game->cameraFollowUnit);
 
   // unit group numbers. Suspected original bug: the outer test lets a unit
   // with a group number (group) through when the 0x37f06 bit is clear, but the
@@ -695,10 +695,10 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
   // selection box
   if (ShowSelectBox(param_1)) {
     Rect box;
-    int x1 = g_game->boxStartX - g_game->scrollX + 0x80;
-    int y1 = g_game->boxStartZ - (g_game->boxStartHeight >> 1) - g_game->scrollY + 0x20;
-    int x2 = g_game->boxEndX - g_game->scrollX + 0x80;
-    int y2 = g_game->boxEndZ - (g_game->boxEndHeight >> 1) - g_game->scrollY + 0x20;
+    int x1 = g_game->boxSelectStartX - g_game->scrollX + 0x80;
+    int y1 = g_game->boxSelectStartY - (g_game->boxSelectStartH >> 1) - g_game->scrollY + 0x20;
+    int x2 = g_game->boxSelectEndX - g_game->scrollX + 0x80;
+    int y2 = g_game->boxSelectEndY - (g_game->boxSelectEndH >> 1) - g_game->scrollY + 0x20;
     int ci;
     if (g_game->orderMode == '\x0e')
       ci = ((g_game->inputFlags & 0x40) ? 6 : 0) + 4;
@@ -778,7 +778,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
   if (g_game->pauseBits.b1)
     DrawFrame((int)&ctx, GetGafFrame(g_game->cursorHourglass, 0), g_game->width - 0x10, g_game->height - 0x50);
   ResetClipRect((int)&ctx);
-  BlitMenuLayers((int)&g_game->menu, (int)&ctx, (int)&g_game->lim);
+  BlitMenuLayers((int)&g_game->guiRoot, (int)&ctx, (int)&g_game->lim);
   if (g_game->profileBarsEnabled != 0 && param_1 != 0) {
     DrawProfileBarLine((int)&ctx, (int)"Network", 0);
     DrawProfileBarLine((int)&ctx, (int)"Units", 1);

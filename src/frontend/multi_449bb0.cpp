@@ -110,13 +110,13 @@ struct Options_00449bb0 {
 
 struct Game_00449bb0 {
     char unknown_0[0x519];
-    Gui_00449bb0 gui;                   // +0x519
+    Gui_00449bb0 guiRoot;               // +0x519
     char unknown_535[0x1b63 - 0x535];
     Player players[10];                 // +0x1b63
     char unknown_2851[0x29a0 - 0x2851];
     Options_00449bb0* options;          // +0x29a0
     char unknown_29a4[0x2a30 - 0x29a4];
-    UnitSync* net;                      // +0x2a30
+    UnitSync* sync;                     // +0x2a30
     char unknown_2a34[0x2a42 - 0x2a34];
     unsigned char localPlayer;          // +0x2a42
     char unknown_2a43[0x2a9b - 0x2a43];
@@ -232,7 +232,7 @@ void __stdcall UpdateEnergyText(Gui_00449bb0* gui, int unused)
 // The slider set-up at 0x445e50, which has no callers: /Ob2 inlined it.
 void __stdcall BindNamedSliderWithCallback(char* name, int max, int value, Callback_00449bb0 callback)
 {
-    Gui_00449bb0* gui = &g_game->gui;
+    Gui_00449bb0* gui = &g_game->guiRoot;
     Gadget_00449bb0* gadgets = gui->table->entries;
     int index = FindGadgetIndex(gadgets, name, 0xe);
     if (index != -1) {
@@ -275,11 +275,11 @@ void OpenBattleRoom()
     info->height = g_game->height;
     info->f9d_2 = FindGameCdDrive(1) != 0;
 
-    layer = LoadGuiLayer(&g_game->gui, "LOUNGE2.GUI", 0);
+    layer = LoadGuiLayer(&g_game->guiRoot, "LOUNGE2.GUI", 0);
     layer->handler = HandleBattleRoomClick;
     layer->game = g_game;
     LoadPictureCached("battleroom", 0, 1, 0);
-    entries = g_game->gui.table->entries;
+    entries = g_game->guiRoot.table->entries;
     g_battleRoomBaseGadgetCount = layer->entries->head.count;
 
     i = FindGadgetIndex(entries, "MESSAGE", 3);
@@ -289,7 +289,7 @@ void OpenBattleRoom()
         i = FindGadgetIndex(entries, "MAP", 1);
         if (i != -1) {
             entries[i].attribs = 2;
-            SetTranslatedTextByName(&g_game->gui, "MAP", "View Map", 0);
+            SetTranslatedTextByName(&g_game->guiRoot, "MAP", "View Map", 0);
         }
     }
 
@@ -346,30 +346,30 @@ void OpenBattleRoom()
 
     if (!host || g_game->locked) {
         for (char** p = g_hostOnlyGadgets; *p; p++)
-            SetGrayedOutByName(&g_game->gui, *p, 1);
+            SetGrayedOutByName(&g_game->guiRoot, *p, 1);
     }
 
     UpdateBattleRoomFlags();
     g_game->chatter = (char*)GameAllocIgnoreTag("LOUNGE CHATTER", 0xa00);
     *g_game->chatter = 0;
     {
-        Gadget_00449bb0* mem = FindGadgetChecked_C(g_game->gui.table->entries, "MEMx");
+        Gadget_00449bb0* mem = FindGadgetChecked_C(g_game->guiRoot.table->entries, "MEMx");
         mem->colour = ((PlayerInfo_00449bb0*)player->info)->memory < ((Class_00435920*)g_game->map)->GetTerrainSizeTier() ? 0xc : 0;
         sprintf(mem->text, "%d", ((PlayerInfo_00449bb0*)g_game->players[g_game->localPlayer].info)->memory);
     }
     isHost = ((PlayerInfo_00449bb0*)g_game->players[g_game->localPlayer].info)->f97_0;
     CreateUnitSync(isHost);
-    SetGadgetActiveByName(&g_game->gui, "START", g_game->net->AllPlayersSynced());
-    SetGrayedOutByName(&g_game->gui, "START",
-                 host && AreAllPlayersReady() && g_game->net->AllPlayersSynced() ? 0 : 1);
-    SetGrayedOutByName(&g_game->gui, "RESTRICTIONS", 0);
-    ConfigureListBoxByName(&g_game->gui, "OUTPUT", g_game->chatter, 0, 0);
+    SetGadgetActiveByName(&g_game->guiRoot, "START", g_game->sync->AllPlayersSynced());
+    SetGrayedOutByName(&g_game->guiRoot, "START",
+                 host && AreAllPlayersReady() && g_game->sync->AllPlayersSynced() ? 0 : 1);
+    SetGrayedOutByName(&g_game->guiRoot, "RESTRICTIONS", 0);
+    ConfigureListBoxByName(&g_game->guiRoot, "OUTPUT", g_game->chatter, 0, 0);
     {
         Gadget_00449bb0* output = FindGadgetChecked(entries, "OUTPUT");
         output->attribs |= 0x100;
     }
-    SetTranslatedTextByName(&g_game->gui, "METALTEXT", "0", 0);
-    SetTranslatedTextByName(&g_game->gui, "ENERGYTEXT", "0", 0);
+    SetTranslatedTextByName(&g_game->guiRoot, "METALTEXT", "0", 0);
+    SetTranslatedTextByName(&g_game->guiRoot, "ENERGYTEXT", "0", 0);
 
     BindNamedSliderWithCallback("METAL", 0x2711, metal, UpdateMetalText);
     {
@@ -377,9 +377,9 @@ void OpenBattleRoom()
         BindNamedSliderWithCallback("MAXUNITS", g_game->maxUnits - 20, g_game->maxUnits - 20, UpdateMaxUnitsText);
     }
     if (!isHost || g_game->locked) {
-        SetGadgetGrayedOutByName(&g_game->gui, "MAXUNITS", 1);
-        SetGadgetGrayedOutByName(&g_game->gui, "ENERGY", 1);
-        SetGadgetGrayedOutByName(&g_game->gui, "METAL", 1);
+        SetGadgetGrayedOutByName(&g_game->guiRoot, "MAXUNITS", 1);
+        SetGadgetGrayedOutByName(&g_game->guiRoot, "ENERGY", 1);
+        SetGadgetGrayedOutByName(&g_game->guiRoot, "METAL", 1);
     }
     BindNamedSliderWithCallback("ENERGY", 0x2711, energy, UpdateEnergyText);
 
@@ -391,7 +391,7 @@ void OpenBattleRoom()
     strcpy(info->map, ((Class_00435c30*)g_game->map)->GetMissionName());
     info->mapCrc = ((Class_004373a0*)g_game->map)->ComputeMapChecksum();
     BroadcastPlayerInfo();
-    BeginTextEdit(&g_game->gui, FindGadgetIndex(g_game->gui.table->entries, "MESSAGE", 0xe));
+    BeginTextEdit(&g_game->guiRoot, FindGadgetIndex(g_game->guiRoot.table->entries, "MESSAGE", 0xe));
 
     for (char** p = g_battleRoomGadgetNames; *p; p++) {
         int k = FindGadgetIndex(layer->entries, *p, 0xe);
@@ -404,14 +404,14 @@ void OpenBattleRoom()
     RefreshBattleRoomRows();
     OrLabelAttribs();
 
-    if (IsScreenNamed(&g_game->gui, "LOUNGE2.GUI")) {
+    if (IsScreenNamed(&g_game->guiRoot, "LOUNGE2.GUI")) {
         Gadget_00449bb0* start = FindGadgetChecked_E(layer->entries, "battlestart");
         start->anim.frames = FindGafEntry(layer->entries->head.gaf, "battlestart");
         start->frame = 0;
         start->c8_0 = 1;
-        SetGadgetActiveByName(&g_game->gui, "battlestart", 1);
+        SetGadgetActiveByName(&g_game->guiRoot, "battlestart", 1);
     }
 
-    SetKeyboardInput(&g_game->gui, 1);
-    RenderLayer(&g_game->gui, 0x40);
+    SetKeyboardInput(&g_game->guiRoot, 1);
+    RenderLayer(&g_game->guiRoot, 0x40);
 }

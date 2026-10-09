@@ -46,7 +46,7 @@ struct Game {
     int count;                         // +0x14277
     Eye_482910* eyes;                  // +0x1427b
     unsigned char seaLevel;            // +0x1427f
-    char debugMode;
+    char cursorCrosshairMode;
     unsigned short mapFlags;           // +0x14281
     char unknown_14283[0x1485b - 0x14283];
     Table_482910* losTable;            // +0x1485b

@@ -50,7 +50,7 @@ struct Game {
     Display_00491a70* displayContext;  // +0xc
     Sound* cd;  // +0x10
     char unknown_14[0x519 - 0x14];
-    Gui_00491d70 gui;   // +0x519
+    Gui_00491d70 guiRoot;  // +0x519
     char unknown_535[0x589 - 0x535];
     int field_589;   // +0x589
     char unknown_58d[0x12ef - 0x58d];
@@ -81,7 +81,7 @@ struct Game {
     char unknown_2cbc[0x2cbe - 0x2cbc];
     signed char cursorMode;  // +0x2cbe
     char unknown_2cbf[0x2cc3 - 0x2cbf];
-    unsigned char mode_2cc3;   // +0x2cc3
+    unsigned char orderMode;   // +0x2cc3
     unsigned short buildTypeIndex;  // +0x2cc4
     union {
         unsigned char flags_2cc6;
@@ -96,7 +96,7 @@ struct Game {
     int windSpeedMin;  // +0x1425b
     int windSpeedMax;  // +0x1425f
     char unknown_14263[0x14280 - 0x14263];
-    unsigned char debugMode;     // +0x14280
+    unsigned char cursorCrosshairMode;  // +0x14280
     char unknown_14281[0x14383 - 0x14281];
     void* xform;   // +0x14383
     void* projected;   // +0x14387
@@ -617,19 +617,19 @@ void InitGame()
     LoadSideData();
     LoadLogos();
     SetBrightness(0.5 - g_game->brightness * -0.041666668f);
-    SetCurrentGuiContext(&g_game->gui);
-    SetGuiPath(&g_game->gui, g_guisDirName);
-    SetAnimsPath(&g_game->gui, g_animsDirName);
-    SetFontsPath(&g_game->gui, g_fontsDirName);
-    SetDefaultFont(&g_game->gui, g_game->fontComix);
-    InitCursorFrames(&g_game->gui, GetGafFrame(g_game->cursorNormal, 0));
-    LoadGafFile(&g_game->gui, g_commonGuiName);
-    LoadGafIntoSlot(&g_game->gui, g_hattFont12Name, 0);
-    LoadGafIntoSlot(&g_game->gui, g_hattFont11Name, 1);
-    g_game->gui.activeFontGaf = g_game->gui.fontSlot0;
+    SetCurrentGuiContext(&g_game->guiRoot);
+    SetGuiPath(&g_game->guiRoot, g_guisDirName);
+    SetAnimsPath(&g_game->guiRoot, g_animsDirName);
+    SetFontsPath(&g_game->guiRoot, g_fontsDirName);
+    SetDefaultFont(&g_game->guiRoot, g_game->fontComix);
+    InitCursorFrames(&g_game->guiRoot, GetGafFrame(g_game->cursorNormal, 0));
+    LoadGafFile(&g_game->guiRoot, g_commonGuiName);
+    LoadGafIntoSlot(&g_game->guiRoot, g_hattFont12Name, 0);
+    LoadGafIntoSlot(&g_game->guiRoot, g_hattFont11Name, 1);
+    g_game->guiRoot.activeFontGaf = g_game->guiRoot.fontSlot0;
     SetTextKeyColor(0xfe);
     SetFont(g_game->fontComix);
-    g_game->debugMode = 0;
+    g_game->cursorCrosshairMode = 0;
     g_game->movieCaptureIndex = 0;
     g_game->imageOutputDirDirty = 0;
     g_game->movieOutputRateDirty = 0;
@@ -683,9 +683,9 @@ void ShutdownGame(void)
     }
     WriteGameRegistryValue("CDLISTS", &g_cdListsDiscEntries, 0xaa0);
     FreePictureCache();
-    FreeGafSlot((Obj_004aeda0*)&g_game->gui, 1);
-    FreeGafSlot((Obj_004aeda0*)&g_game->gui, 0);
-    FreeCommonGuiGaf((Obj_004aef80*)&g_game->gui);
+    FreeGafSlot((Obj_004aeda0*)&g_game->guiRoot, 1);
+    FreeGafSlot((Obj_004aeda0*)&g_game->guiRoot, 0);
+    FreeCommonGuiGaf((Obj_004aef80*)&g_game->guiRoot);
     FreeLogos();
     FreeSideFonts();
     FreeSounds();
@@ -743,7 +743,7 @@ void LoadBattleAssets()
 {
     ResetChatHudIndices();
     memset(&g_game->zero_2bf1, 0, 11);
-    g_game->mode_2cc3 = 1;
+    g_game->orderMode = 1;
     g_game->buildTypeIndex = 0;
     g_game->bit5_2cc6 = 0;
     g_game->bit6_2cc6 = 0;
@@ -904,7 +904,7 @@ void __stdcall SetCursorMode(int n)
 {
     if (g_game->cursorMode != n) {
         g_game->cursorMode = n;
-        SetCursorAnimation((Obj_004ab400*)&g_game->gui, g_game->table[n]);
+        SetCursorAnimation((Obj_004ab400*)&g_game->guiRoot, g_game->table[n]);
     }
 }
 
@@ -919,22 +919,22 @@ void __stdcall UpdateBattleHoverMode(int unused)
 {
     unsigned char flags = g_game->flags_2cc6;
 
-    if ((flags & 2) != 0 && g_game->mode_2cc3 == 0xe) {
+    if ((flags & 2) != 0 && g_game->orderMode == 0xe) {
         UpdatePlacementGhostValidity();
         return;
     }
     if ((flags & 2) == 0 && (flags & 1) == 0) {
         if (g_game->cursorMode != 0x13) {
             g_game->cursorMode = 0x13;
-            SetCursorAnimation((Obj_004ab400*)&g_game->gui, g_game->table[0x13]);
+            SetCursorAnimation((Obj_004ab400*)&g_game->guiRoot, g_game->table[0x13]);
         }
         return;
     }
     g_game->hoverUnitId = PickUnitUnderCursor();
-    int n = ResolveCursorModeForSelection(g_game->mode_2cc3);
+    int n = ResolveCursorModeForSelection(g_game->orderMode);
     if (g_game->cursorMode != n) {
         g_game->cursorMode = n;
-        SetCursorAnimation((Obj_004ab400*)&g_game->gui, g_game->table[n]);
+        SetCursorAnimation((Obj_004ab400*)&g_game->guiRoot, g_game->table[n]);
     }
 }
 
@@ -950,10 +950,10 @@ int __stdcall PopUntilNamedLayout(int force)
         return 0;
     }
     g_game->unitIndex = 0;
-    while (g_game->gui.current) {
-        if (IsScreenNamed(&g_game->gui, g_game->name))
+    while (g_game->guiRoot.current) {
+        if (IsScreenNamed(&g_game->guiRoot, g_game->name))
             return 1;
-        CloseTopScreen(&g_game->gui);
+        CloseTopScreen(&g_game->guiRoot);
     }
     return 0;
 }
@@ -962,9 +962,9 @@ int __stdcall PopUntilNamedLayout(int force)
 // FUNCTION: 0x491e10
 void CloseTopScreenIfNotNamed()
 {
-    if (!IsScreenNamed(&g_game->gui, g_game->name)) {
+    if (!IsScreenNamed(&g_game->guiRoot, g_game->name)) {
         g_game->unitIndex = 0;
-        CloseTopScreen(&g_game->gui);
+        CloseTopScreen(&g_game->guiRoot);
     }
 }
 

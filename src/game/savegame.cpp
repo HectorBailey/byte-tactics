@@ -114,14 +114,14 @@ struct Game {
     union {
         char message[0x1b8a - 0x519];    // +0x519
         char menu[1];
-        Menu_00491ec0 menu_00491ec0;
+        Menu_00491ec0 guiRoot;
         Menu_00493060 menu_00493060;
     };
     SideData* p1b8a;                     // +0x1b8a
     char unknown_1b8e[0x1cd5 - 0x1b8e];
-    SideData* p1cd5;                     // +0x1cd5
+    SideData* sideData;                  // +0x1cd5
     char unknown_1cd9[0x29a0 - 0x1cd9];
-    SkirmishInfo* p29a0;                 // +0x29a0
+    SkirmishInfo* options;               // +0x29a0
     char unknown_29a4[0x2a3c - 0x29a4];
     short numPlayers;                    // +0x2a3c
     char unknown_2a3e[0x2a44 - 0x2a3e];
@@ -268,8 +268,8 @@ __inline void DeleteSave_00492360(HapiBank* obj)
 // FUNCTION: 0x491ec0
 void __stdcall ShowSavedGameInfo()
 {
-    Menu_00491ec0* menu = &g_game->menu_00491ec0;
-    Layer_00491ec0* layer = g_game->menu_00491ec0.layer;
+    Menu_00491ec0* menu = &g_game->guiRoot;
+    Layer_00491ec0* layer = g_game->guiRoot.layer;
     Gadget* entries = layer->entries;
     Gadget* games = FindGadgetChecked(entries, "GAMES");
     if (games == 0)
@@ -370,7 +370,7 @@ void __stdcall ShowSavedGameInfo()
         SetTranslatedTextByName(menu, "TIME", DAT_005119b8, 0);
     }
 done:
-    MarkChanged(&g_game->menu_00491ec0);
+    MarkChanged(&g_game->guiRoot);
 #undef gametype
 #undef name
 #undef diffs
@@ -473,10 +473,10 @@ void __stdcall LoadGameScreenHandler(Gadget_00492360* gadget)
         if (g_game->mapInfo->GetGameType() == 1) {
             if (g_game->side == 0) {
                 g_game->p1b8a->bSideId = 0;
-                g_game->p1cd5->bSideId = 1;
+                g_game->sideData->bSideId = 1;
             } else {
                 g_game->p1b8a->bSideId = 1;
-                g_game->p1cd5->bSideId = 0;
+                g_game->sideData->bSideId = 0;
             }
         }
         char* mission = (g_game->p38d6b)->GetStringItem("Mission", 0);
@@ -486,7 +486,7 @@ void __stdcall LoadGameScreenHandler(Gadget_00492360* gadget)
             goto invalid;
         if (g_game->mapInfo->LoadMissionByName(mission) == 0)
             goto invalid;
-        strcpy((char*)&g_game->p29a0->aMapName[0], mission);
+        strcpy((char*)&g_game->options->aMapName[0], mission);
         char* thumbs = (g_game->p38d6b)->GetStringItem("Thumbs", 0);
         strncpy(g_game->buf391cf, thumbs, 0x19);
         if (strlen(g_game->buf391cf) != 0x19)
@@ -495,15 +495,15 @@ void __stdcall LoadGameScreenHandler(Gadget_00492360* gadget)
             (g_game->p38d6b)->OpenAccount("summary");
             g_game->numPlayers =
                 (short)(g_game->p38d6b)->GetIntegerItem("Players", 0);
-            g_game->p29a0->commanderDeath =
+            g_game->options->commanderDeath =
                 (g_game->p38d6b)->GetIntegerItem("CommanderDeath", 1);
-            g_game->p29a0->fixedLocations =
+            g_game->options->fixedLocations =
                 (g_game->p38d6b)->GetIntegerItem("Location", 1);
-            g_game->p29a0->mapping =
+            g_game->options->mapping =
                 (g_game->p38d6b)->GetIntegerItem("Mapping", 1);
-            g_game->p29a0->lineOfSight =
+            g_game->options->lineOfSight =
                 (g_game->p38d6b)->GetIntegerItem("LineOfSight", 1);
-            g_game->p29a0->losType =
+            g_game->options->losType =
                 (g_game->p38d6b)->GetIntegerItem("LineOfSightType", 1);
         }
         g_game->flags_2a44.b2 = 1;

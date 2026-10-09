@@ -52,8 +52,8 @@ struct Item_00408100 {                 // 0x249 bytes
 
 struct Game_00408100 {
     char unknown_0[0x1422b];
-    int mapWidth;                      // +0x1422b
-    int mapHeight;                     // +0x1422f
+    int mapPixelWidth;                 // +0x1422b
+    int mapPixelHeight;                // +0x1422f
     char unknown_14233[0x1439b - 0x14233];
     Item_00408100* items;              // +0x1439b
     char unknown_1439f[0x38a47 - 0x1439f];
@@ -118,7 +118,7 @@ static inline int FixDiv(int a, int b)
 
 static inline int MapRange()
 {
-    return (g_game->mapWidth + g_game->mapHeight) / 3 << 16;
+    return (g_game->mapPixelWidth + g_game->mapPixelHeight) / 3 << 16;
 }
 
 // FUNCTION: 0x408100

@@ -94,7 +94,7 @@ struct Menu_0041b2e0 {
 
 struct Game_0041b2e0 {
     char unknown_0[0x519];
-    Menu_0041b2e0 menu;                // +0x519
+    Menu_0041b2e0 guiRoot;             // +0x519
     char unknown_529[0x1b63 - 0x529];
     Player players[10];                 // +0x1b63
     char unknown_2851[0x2a42 - 0x2851];
@@ -244,7 +244,7 @@ void RefreshSelectionOrders()
             strncpy(name, g_game->buildTypes[first->typeIndex].name, 0x20);
             name[0x1f] = 0;
             sprintf(gui, "%s%d.GUI", name, page);
-            if ((IsScreenNamed(&g_game->menu, gui) == 0 || g_game->unitIndex != first->id)
+            if ((IsScreenNamed(&g_game->guiRoot, gui) == 0 || g_game->unitIndex != first->id)
                 && PopUntilNamedLayout(0))
                 OpenBuildMenuGui(first, gui, page);
             g_game->orders.refresh = 0;
