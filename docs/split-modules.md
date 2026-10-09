@@ -75,3 +75,7 @@ reason is what stopped it. A module whose row list is empty is one file.
 | debug/debug_lib | src/debug/debug_lib_4e2620.cpp | Its `NameMapTree` carries the tree fields and its own rotations, where 0x4e2250's inherits them from the XTREE chain. |
 | debug/debug_lib | src/debug/debug_lib_4e35b0.cpp | Gap region. |
 | debug/debug_lib | src/debug/debug_lib_4e3750.cpp | Joined, its register allocation lands differently, and its inlined GDPERF calls come out differently. |
+| graphics/draw | src/graphics/draw_4c0330.cpp | Merged, its dy local keeps a register where the original spills it, which takes 4 bytes off the frame and moves the block codegen; a filler sweep over the symbol count (0 to 4096) does not reach the window. |
+| graphics/model_render | src/graphics/model_render_4581e0.cpp | Its summing loop needs to be the first function after the module's own types; even there the merged context puts the store's lea before the fadd. |
+| graphics/model_render | src/graphics/model_render_4589c0.cpp | It calls BuildObjectPicture and DrawPieces on CMemoryCache, so it needs the class to derive from UnitTable, where the module makes CMemoryCache the base. |
+| graphics/model_render | src/graphics/model_render_458fa0.cpp | Merged, one of its copy loop's two pointer loads is scheduled before the other; no filler count moves it (99.3%). |
