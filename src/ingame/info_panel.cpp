@@ -74,11 +74,11 @@ struct PlayerInfo {
 };
 
 struct Owner_00467440 {
-    void* field_0;                     // +0x0
+    void* active;                      // +0x0
     char unknown_4[0x27 - 0x4];
     PlayerInfo* data;                  // +0x27
     char unknown_2b[0x73 - 0x2b];
-    char field_73;                     // +0x73
+    char type;                         // +0x73
     char unknown_74[0x108 - 0x74];
     unsigned char field_108[1];        // +0x108
 };
@@ -201,10 +201,10 @@ struct Team_004689c0 {                 // 347 bytes
     char unknown_8[347 - 8];
 };
 
-// The player array seen from +0x1b8e: field_119 is its +0x144 unitCount.
+// The player array seen from +0x1b8e: unitCount is its +0x144.
 struct Player_004689c0 {               // 331 bytes
     char unknown_0[0x119];
-    unsigned short field_119;          // +0x119
+    unsigned short unitCount;          // +0x119
     char unknown_11b[331 - 0x11b];
 };
 
@@ -230,11 +230,7 @@ struct Sub_004679a0_b {
     unsigned short* lightbar;          // +0x34
 };
 
-struct Handle {
-    unsigned short index;
-    char unknown_2[6];
-    void* table;
-};
+#include "../graphics/handle.h"
 
 struct Feature {
     char name[0x94];
@@ -404,8 +400,8 @@ struct Game {
 class DetectionVisitor {
 public:
     virtual void MarkUnitsInRadarOrSonarRadius(Unit* unit);
-    int field_4;                       // +0x4
-    int field_8;                       // +0x8
+    int radarRangeSq;                  // +0x4
+    int sonarRangeSq;                  // +0x8
     Vec3 pos;                          // +0xc
 };
 
@@ -496,13 +492,7 @@ public:
 
 // The frame-time profile at g_game+0x38d85: last tick at +0, one accumulator
 // per phase at +0x2c.
-struct FrameTimers {
-    unsigned long last;
-    int total;
-    int values[9];
-    int acc[9];
-    void AccumulateProfileTime(int i);
-};
+#include "frame_timers.h"
 
 // Bit 2 of the flags word at g_game+0x37f2f (like 0x416e00).
 struct Flags_0046a530 {
@@ -640,11 +630,11 @@ void DetectionVisitor::MarkUnitsInRadarOrSonarRadius(Unit* unit)
     int dx = unit->x - this->pos.x;
     int dist = (int)(((__int64)dx * dx) >> 32) + (int)(((__int64)dz * dz) >> 32);
 
-    if (unit->y <= ((int)g_game->seaLevel << 16) && dist < this->field_8) {
+    if (unit->y <= ((int)g_game->seaLevel << 16) && dist < this->sonarRangeSq) {
         unit->flags |= 0x200;
     }
 
-    if (def->modelMaxY + unit->y >= ((int)g_game->seaLevel << 16) && dist < this->field_4) {
+    if (def->modelMaxY + unit->y >= ((int)g_game->seaLevel << 16) && dist < this->radarRangeSq) {
         unit->flags |= 0x100;
     }
 }
@@ -1167,7 +1157,7 @@ void __stdcall DrawStatusPanel(Surface* win)
     DrawTextClipped(win, buf, left + 0x19, bottom + 0xa, -1, 0);
     int team = g_game->team_number;
     sprintf(buf, "%s : %d  (Max %d)", Translate("Total Units"),
-            g_game->players_004689c0[team].field_119, g_game->max_units);
+            g_game->players_004689c0[team].unitCount, g_game->max_units);
     DrawTextClipped(win, buf, left + 0xbe, bottom + 0xa, -1, 0);
     if (g_game->speed2 == 10)
         sprintf(num, Translate("Normal"));

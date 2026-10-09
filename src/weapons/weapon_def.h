@@ -73,7 +73,7 @@ struct WeaponDef {
         int field_c8;                 // the launch-angle solvers read the float's bits
     };
     char unknown_cc[0xd4 - 0xcc];
-    unsigned short field_d4;          // +0xd4, the default damage
+    unsigned short damage;            // +0xd4, the default damage
     unsigned short areaOfEffect;      // +0xd6, the splash radius
     float edgeDamage;                 // +0xd8, the falloff at the edge
     int range;                        // +0xdc

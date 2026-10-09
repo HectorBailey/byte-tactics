@@ -30,12 +30,7 @@ struct Flags_38d75 {
     };
 };
 
-struct FrameTimers {
-    int last;                          // +0x0
-    int total;                         // +0x4
-    int prev[9];                       // +0x8
-    int cur[9];                        // +0x2c
-};
+#include "../ingame/frame_timers.h"
 
 struct Sub_00496b10 {
     char unknown_0[0xa6];
@@ -68,8 +63,8 @@ struct Flags_00496ce0 {
 
 struct Slot_00497080 {                 // 0x18 bytes
     char unknown_0[0xc];
-    int field_c;                       // +0xc
-    int field_10;                      // +0x10
+    int metal;                         // +0xc
+    int energy;                        // +0x10
     char unknown_14[4];
 };
 
@@ -337,7 +332,7 @@ static inline void Charge(int bucket)
 {
     FrameTimers* t = &g_game->timers;
     int now = GetMilliseconds();
-    t->cur[bucket] += now - t->last;
+    t->acc[bucket] += now - t->last;
     t->last = now;
 }
 #define CHARGE(bucket) Charge(bucket)
@@ -348,9 +343,9 @@ void MainLoopTick()
     FrameTimers* t = &g_game->timers;
     t->total = 0;
     for (int i = 0; i < 9; i++) {
-        t->total += t->cur[i];
-        t->prev[i] = t->cur[i];
-        t->cur[i] = 0;
+        t->total += t->acc[i];
+        t->values[i] = t->acc[i];
+        t->acc[i] = 0;
     }
     if (t->total <= 0)
         t->total = 1;
@@ -663,10 +658,10 @@ void InitStartingResourcesFromSkirmish()
     for (int i = 0; i < 10; i++) {
         if (IsPlaying(i)) {
             Slot_00497080* s = &g_game->slots[i];
-            if (s->field_c > h)
-                h = s->field_c;
-            if (s->field_10 > w)
-                w = s->field_10;
+            if (s->metal > h)
+                h = s->metal;
+            if (s->energy > w)
+                w = s->energy;
             SetSize_00496e90(&g_game->players[i], h, w);
         }
     }

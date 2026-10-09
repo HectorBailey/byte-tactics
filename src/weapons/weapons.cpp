@@ -344,7 +344,7 @@ struct Projectile_00499eb0;
 // and 49c740's tracked.
 struct Net {
     char unknown_0[0xd48];
-    int field_d48;
+    int noSeaLevelTrigger;
 };
 
 struct Game {
@@ -668,7 +668,7 @@ int __stdcall ApplyWeaponDamage(Weapon_00499cd0* weapon, Unit* target,
                            float scale)
 {
     WeaponDef* def = weapon->def;
-    int damage = def->field_d4;
+    int damage = def->damage;
     Table_00499cd0* table = def->table;
     if (table) {
         int* p = Find_00499cd0(table, target->utype->unitname);
@@ -773,7 +773,7 @@ void __stdcall DetonateProjectile(Projectile_00499eb0* projectile, Unit* unit)
         }
         projectile->flags = projectile->flags | 2;
     }
-    if (g_game->net->field_d48 && hostile && !unit) {
+    if (g_game->net->noSeaLevelTrigger && hostile && !unit) {
         if (projectile == g_game->selected) {
             g_game->trackedPos = g_game->selectedProjectile->position;
             g_game->trackedValue = projectile->type->value;
