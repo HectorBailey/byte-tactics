@@ -388,7 +388,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x51231c,g_meteorStrikeEndTime,.bss,4,type,data,int,1,0,1,one type,1,,DAT_0051231c,,,
 0x512320,g_meteorOrigin,.bss,4,gap,data,Point16,1,0,1,one type,1,0x2,DAT_00512320,,,
 0x512324,g_meteorShowerDuration,.bss,4,type,data,int,1,0,1,one type,1,,DAT_00512324,,,
-0x512328,g_meteorWeapon,.bss,4,type,data,Player_00437cd0*,1,0,1,one type,1,,DAT_00512328,,,
+0x512328,g_meteorWeapon,.bss,4,type,data,WeaponDef*,1,0,1,one type,1,,DAT_00512328,,,
 0x51232c,g_meteorsEnabled,.bss,4,type,data,int,1,0,1,one type,1,,DAT_0051232c,,,
 0x512330,g_meteorNextHitTime,.bss,4,type,data,int,1,0,1,one type,1,,DAT_00512330,,,
 0x512334,g_meteorTarget,.bss,4,gap,data,Point16,1,0,1,one type,1,0x2,_DAT_00512334,,,

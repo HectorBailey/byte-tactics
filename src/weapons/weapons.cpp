@@ -642,11 +642,6 @@ public:
     void MarkOwnerNetDirtyFromDamageSplit(Weapon_0049a120* weapon, int enemyDamage, int friendlyDamage);
 };
 
-struct Player_499c70 {
-    char unknown_0[0x74];
-    SquadManager* field_74;            // +0x74
-};
-
 #pragma pack(push, 1)
 struct Weapon_499c70 {
     char unknown_0[0x52];
@@ -670,7 +665,7 @@ void __stdcall ApplyWeaponHit(Weapon_499c70* weapon, Unit* target)
             a = damage;
         else
             b = damage;
-        ((Player_499c70*)attacker->player)->field_74->MarkOwnerNetDirtyFromDamageSplit(weapon, a, b);
+        ((SquadManager*)attacker->player->ai)->MarkOwnerNetDirtyFromDamageSplit(weapon, a, b);
     }
 }
 
@@ -854,13 +849,6 @@ struct Net_00499eb0 {
     int field_d48;
 };
 
-struct Player_00499eb0 {
-    int active;
-    char unknown_4[0x73 - 4];
-    unsigned char state;
-    char unknown_74[0x14b - 0x74];
-};
-
 struct Holder_00499eb0 {
     char unknown_0[0x74];
     SquadManager* object;
@@ -914,8 +902,8 @@ void __stdcall DetonateProjectile(Projectile_00499eb0* projectile, Unit* unit)
             AddExplosionEffect(position, type->field_78, 0, hostile);
     }
     unsigned int player = projectile->owner;
-    Player_00499eb0* record = (Player_00499eb0*)((char*)g_game + player * 0x14b + 0x1b63);
-    if (!record->active || record->state != 3) {
+    Player* record = (Player*)((char*)g_game + player * 0x14b + 0x1b63);
+    if (!record->active || record->type != 3) {
         if (type->field_d6 <= 0x10 && unit) {
             int damage = ApplyWeaponDamage(projectile, unit, 1.0f);
             Unit* source = projectile->unit;

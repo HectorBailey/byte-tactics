@@ -401,7 +401,7 @@ int g_meteorActive;  // 0x512318 .bss
 int g_meteorStrikeEndTime;  // 0x51231c .bss
 unsigned char g_meteorOrigin[4];  // 0x512320 .bss
 int g_meteorShowerDuration;  // 0x512324 .bss
-Player_00437cd0* g_meteorWeapon;  // 0x512328 .bss
+WeaponDef* g_meteorWeapon;  // 0x512328 .bss
 int g_meteorsEnabled;  // 0x51232c .bss
 int g_meteorNextHitTime;  // 0x512330 .bss
 unsigned char g_meteorTarget[4];  // 0x512334 .bss

@@ -40,15 +40,10 @@ struct Grid_00481930 {
     int field_c;                       // +0x0c
 };
 
-struct Player_00481930 {
-    char unknown_0[0x7c];
-    Grid_00481930 grid;                // +0x7c
-    char unknown_8c[0x146 - 0x8c];
-    unsigned char index;               // +0x146
-};
+#include "../network/player.h"
 
 struct Params_00481930 {
-    Player_00481930* field_0;          // +0x00
+    Player* field_0;                   // +0x00
     short* field_4;                    // +0x04
     short field_8;                     // +0x08
     unsigned char field_a;             // +0x0a

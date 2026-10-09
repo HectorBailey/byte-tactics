@@ -18,11 +18,11 @@ struct Entry_004426e0;
 struct EventEntry;
 struct ExplodedPiece;
 struct Game;
-struct Player_00437cd0;
 struct Record_005129b4;
 struct Smoke_00425b80;
 struct Struct_00526ff0;
 struct Surface;
+struct WeaponDef;
 
 extern unsigned char g_turnCosts[8];                                                              // 0x4fca10, 8 bytes; const Table_0040d880 by value in 1 of 1 files
 extern unsigned char g_movementClassColors[8];                                                    // 0x4fcc68, 8 bytes; 1 of 1 files
@@ -314,7 +314,7 @@ extern int g_meteorActive;                                                      
 extern int g_meteorStrikeEndTime;                                                                 // 0x51231c, 4 bytes; 1 of 1 files
 extern unsigned char g_meteorOrigin[4];                                                           // 0x512320, 4 bytes; Point16 by value in 1 of 1 files
 extern int g_meteorShowerDuration;                                                                // 0x512324, 4 bytes; 1 of 1 files
-extern Player_00437cd0* g_meteorWeapon;                                                           // 0x512328, 4 bytes; 1 of 1 files
+extern WeaponDef* g_meteorWeapon;                                                                 // 0x512328, 4 bytes; 1 of 1 files
 extern int g_meteorsEnabled;                                                                      // 0x51232c, 4 bytes; 1 of 1 files
 extern int g_meteorNextHitTime;                                                                   // 0x512330, 4 bytes; 1 of 1 files
 extern unsigned char g_meteorTarget[4];                                                           // 0x512334, 4 bytes; Point16 by value in 1 of 1 files

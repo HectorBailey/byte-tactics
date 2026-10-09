@@ -40,9 +40,7 @@ struct Snapshot_0046a860 {
 };
 #pragma pack(pop)
 
-#pragma pack(push, 1)
-struct Player_0046a860 { char pad[0x27]; char* info; char pad2[331 - 0x2b]; };
-#pragma pack(pop)
+#include "../network/player.h"
 
 struct Rect_0046a860 {
     int left, top, right, bottom;
@@ -87,7 +85,7 @@ struct Game {
     unsigned char colors[16];             // +0xdcb
     char unknown_ddb[0x1b63 - 0xddb];
     union {                               // +0x1b63
-        Player_0046a860 players[10];
+        Player players[10];
         struct {
             char unknown_1b63[0x1cbe - 0x1b63];
             int field_1cbe;               // +0x1cbe, players[1] + 0x10
@@ -268,15 +266,15 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
     SetTextColors(0x53, GetTextKeyColor());
 
     int player = g_game->playerIndex;
-    Player_0046a860* playerInfo = &g_game->players[0] + player;
-    char* info = playerInfo->info;
+    Player* playerInfo = &g_game->players[0] + player;
+    char* info = (char*)playerInfo->info;
     int side = *(unsigned char*)(info + 0x95);
     char* panel = (char*)g_game + side * 562 + 0x37f3d;
     SetFont(*(int*)(panel + 0x22e));
     int y = 0x81;
     do {
         int dy = GetScreenHeight() - 0x20;
-        char* loopInfo = playerInfo->info;
+        char* loopInfo = (char*)playerInfo->info;
         int loopSide = *(unsigned char*)(loopInfo + 0x95);
         unsigned short* icon = *(unsigned short**)((char*)g_game + loopSide * 4 + 0x14833);
         int bmp = GetGafFrame(icon, 0);

@@ -49,11 +49,12 @@ struct Grid_482270 {
     int field_c;                       // +0xc
 };
 
-struct Player_482270 {
+// The header's Player names it explored; this view knows it as the byte map.
+struct Player {
     char unknown_0[0x7c];
-    ByteMap_482270 grid;              // +0x7c
+    ByteMap_482270 explored;           // +0x7c
     char unknown_88[0x146 - 0x88];
-    unsigned char playerIndex;         // +0x146
+    unsigned char index;               // +0x146
 };
 
 struct Params_482270 {
@@ -108,7 +109,7 @@ GafFrame* __stdcall GetGafFrame(unsigned short* table, int index);
 // FUNCTION: 0x482270
 void __stdcall AddLineOfSight(Params_482270* params)
 {
-    if (((Player_482270*)params->field_0)->playerIndex == g_game->playerIndex) {
+    if (((Player*)params->field_0)->index == g_game->playerIndex) {
         g_game->flag3 = 0;
         g_game->flagA = 1;
     }
@@ -133,7 +134,7 @@ void __stdcall AddLineOfSight(Params_482270* params)
                                         ->GetLosTableCount() - 1);
         short count = ((LosTable*)table)->GetLosLineCount();
         short i = 0;
-        ((Player_482270*)params->field_0)->grid.at(x, y)++;
+        ((Player*)params->field_0)->explored.at(x, y)++;
         int ref = *params->field_c;
         for (i = 0; i < count; i++) {
             void* line = ((LosTable*)table)->GetLosLine(i);
@@ -160,8 +161,8 @@ void __stdcall AddLineOfSight(Params_482270* params)
                     int d1 = cell[1] - ref;
                     int d0 = cell[0] - ref;
                     if (d0 * bestIdx > bestDiff * j1) {
-                        ((Player_482270*)params->field_0)
-                            ->grid.at((short)dx, (short)dy)++;
+                        ((Player*)params->field_0)
+                            ->explored.at((short)dx, (short)dy)++;
                         if (d1 * bestIdx > bestDiff * j1) {
                             bestIdx = j1;
                             bestDiff = d1;
@@ -193,7 +194,7 @@ void __stdcall AddLineOfSight(Params_482270* params)
             return;
         for (int i = ny; i < limitY; i++) {
             // Named ex local: shapes the destination address.
-            ByteMap_482270* ex = &((Player_482270*)params->field_0)->grid;
+            ByteMap_482270* ex = &((Player*)params->field_0)->explored;
             unsigned char* dst = ex->data + (y + i) * ex->size.width + nx + x;
             unsigned char* src = frame->data + i * frame->width + nx;
             // Counted j loop: lets the compiler turn it into dec/jne.
