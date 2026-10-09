@@ -334,23 +334,13 @@ struct Cell {                          // 13 bytes per cell
     };
 };
 
-struct PlayerData {
-    char unknown_0[0x97];
-    unsigned char flags;               // +0x97
-};
-
-struct Player {
-    int active;                        // +0x0
-    char unknown_4[0x23];
-    PlayerData* data;                  // +0x27
-    char unknown_2b[0x48];
-    unsigned char type;                // +0x73
-    char unknown_74[0xd7];
-};
+#include "../network/player.h"
 
 struct PlayerInfo {
     char unknown_0[4];
     int id;                            // +0x4
+    char unknown_8[0x97 - 8];
+    unsigned char flags;               // +0x97
 };
 
 struct Unit {
@@ -1275,7 +1265,7 @@ void __stdcall DamageFeature(Cell* cell, int x, int z, Weapon* weapon)
     FeatureDamagePacket packet;
     int send;
     if (g_game->net->GetGameType() == 3) {
-        if (!(g_game->players[g_game->playerIndex].data->flags & 1)) {
+        if (!(g_game->players[g_game->playerIndex].info->flags & 1)) {
             packet.type = 0xf;
             packet.sub = weapon->kind;
             packet.x = x;
