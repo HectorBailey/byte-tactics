@@ -112,10 +112,7 @@ public:
     int StartScriptWithArgsByIndex(int index, void* param_2, int param_3, int param_4, int param_5, int param_6, int param_7, int param_8);
 };
 
-class UnitRef {
-public:
-    void Unlink();
-};
+#include "../units/unit_ref.h"
 
 // The parsed text file the writer is handed (the same object as HapiBank).
 class File_0043a970 {
