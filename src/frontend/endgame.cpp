@@ -42,13 +42,7 @@ struct Amount {
     int required;                      // +0x4
 };
 
-struct Grid {
-    void* cells;                       // +0x0
-    int width;                         // +0x4
-    int height;                        // +0x8
-    int count;                         // +0xc
-    Grid() { width = 0; height = 0; count = 0; cells = 0; }
-};
+#include "../map/grid.h"
 
 #pragma pack(push, 1)
 
@@ -137,8 +131,8 @@ struct Display {
 
 #include "../network/player_info.h"
 
-// Unused here: a real type and functions declared to keep the file's symbol count (docs/c2-regalloc.md).
-struct Unit;
+// Unused here: real functions declared to keep the file's symbol count
+// (docs/c2-regalloc.md).
 int AimCobStub(int, int, int, int);
 int StepTowards(int, int, int);
 

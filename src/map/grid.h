@@ -12,7 +12,7 @@ struct Grid {
     unsigned int width;                // +0x4
     unsigned int height;               // +0x8
     int count;                         // +0xc
-    Grid(void);
+    Grid() { width = 0; height = 0; count = 0; cells = 0; }
 };
 
 #endif
