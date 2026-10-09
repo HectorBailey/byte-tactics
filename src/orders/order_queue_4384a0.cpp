@@ -347,7 +347,7 @@ void __stdcall AddBeCarriedOrder(Unit* p)
 void __stdcall StartBuildingScript(Unit* obj, Order* target, unsigned short param_3)
 {
     int index = obj->names->FindScript("StartBuilding");
-    ((CobScript*)obj->names)->StartScriptWithArgsByIndex(index, 0, 0, 1, param_3, 0, 0, 0);
+    obj->names->StartScriptWithArgsByIndex(index, 0, 0, 1, param_3, 0, 0, 0);
     SendScriptCall(obj, index, 1, param_3, 0, 0, 0);
     target->flags |= 0x400000;
 }
@@ -357,7 +357,7 @@ void __stdcall StopBuildingScript(Unit* obj, Order* target)
 {
     if (target->flags & 0x400000) {
         int index = obj->names->FindScript("StopBuilding");
-        ((CobScript*)obj->names)->StartScriptWithArgsByIndex(index, 0, 0, 0, 0, 0, 0, 0);
+        obj->names->StartScriptWithArgsByIndex(index, 0, 0, 0, 0, 0, 0, 0);
         SendScriptCallNoArgs(obj, index);
         target->flags &= ~0x400000;
     }
