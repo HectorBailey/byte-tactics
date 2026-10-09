@@ -59,7 +59,7 @@ struct Gadget {                         // 0x15b bytes, one GUI list entry
             void* field_c6;             // +0xc6, the cell or item array
             GafEntry* gaf;              // +0xca
             void (__stdcall* callback)(Gui*, Gadget*);  // +0xce
-            char unknown_d2[4];
+            void* records;              // +0xd2, the record the entry is bound to
             union {
                 int language;           // +0xd6
                 void* filebuf;          // +0xd6, buffer type 7/8 loads
