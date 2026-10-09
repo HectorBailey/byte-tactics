@@ -7,6 +7,8 @@
 // Required include.
 #include <windows.h>
 
+#include "los_tables.h"
+
 #pragma pack(push, 1)
 
 class LosLine {
@@ -21,15 +23,18 @@ public:
     LosLine* GetLosLine(short i);
 };
 
-class LosTables {
-public:
-    LosTable* GetLosTable(int n);
-    short GetLosTableCount();
-};
-
 // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 void CopyDwordIfNonNull(int*, int*);
+void RegisterUnitOrders(void);
+void RegisterGroundOrders(void);
+void EnableAICommands(void);
+void RegisterAICommands(void);
+void FUN_00406f40(void);
+void ResetAIPlayers(void);
+void RegisterVtolOrders(void);
+void StepAllGafSequences(void);
+void ResetNetStats(void);
 
 extern char g_losTables[];
 
@@ -125,12 +130,12 @@ void __stdcall RevealAroundUnit(SightQuery* params)
         Grid* grid = &g_game->grid1;
         if ((unsigned)x < grid->width && (unsigned)y < grid->height) {
             LosTable* table =
-                ((LosTables*)g_losTables)
+                (LosTable*)((LosTables*)g_losTables)
                     ->GetLosTable(
                         (params->sightDistance / 32 < 0 ? 0 : params->sightDistance / 32) <
-                                ((LosTables*)g_losTables)->GetLosTableCount() - 1
+                                (short)((LosTables*)g_losTables)->GetLosTableCount() - 1
                             ? (params->sightDistance / 32 < 0 ? 0 : params->sightDistance / 32)
-                            : ((LosTables*)g_losTables)->GetLosTableCount() - 1);
+                            : (short)((LosTables*)g_losTables)->GetLosTableCount() - 1);
             short count = table->GetLosLineCount();
             unsigned short* cell = &g_game->visibilityMask[halfW * y + x];
             if ((unsigned short)(bit & *cell) == 0) {
