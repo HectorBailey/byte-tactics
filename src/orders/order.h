@@ -16,7 +16,7 @@ class HapiBank;
 // Unused here: the symbol ids these declarations take keep the allocation of
 // the files that share this header (docs/c2-regalloc.md). They are the types
 // behind the pointers the order views carry.
-struct File_0043a970;
+struct Feature;
 struct Point;
 struct Link_004895c0;
 struct SaveDesc_0043a1f0;
