@@ -1516,7 +1516,7 @@ void Tree_004da8d0::Init()
 {
     std::_Lockit lock;
     if (g_blockMapNil == 0) {
-        // The allocator is the tree's +0 member (field_0), typed char here.
+        // The allocator is the tree's +0 member, which this view types as char.
         Node_004da8d0* nil =
             (Node_004da8d0*)((BlockMapAllocator*)this)->Allocate(0x40);
         nil->parent = 0;
