@@ -3939,23 +3939,34 @@ static inline int Measure_004a4d70(char* text)
     return width;
 }
 
+// The body of SelectFontForEntry at 0x4a1810, which the compiler inlined into DrawTextInput:
+// makes the font of the entry's group current and returns its number, or -1. A copy of
+// SelectFontForEntry_inlined of its own: calling the shared one here moves ListBoxSelectDown.
+static inline int SelectFont_4a4d70(Gadget* entries, int index)
+{
+    int n = 0;
+    int i = 1;
+    for (; i < entries->u.count + 1; i++) {
+        if (entries[i].type == 7) {
+            if (n == entries[index].tab) {
+                SetFont(entries[i].u.list.language);
+                break;
+            }
+            n++;
+        }
+    }
+    if (i == entries->u.count + 1) {
+        SetFont(g_guiContext->fontId);
+        i = -1;
+    }
+    return i;
+}
+
 // FUNCTION: 0x4a4d70
 void __stdcall DrawTextInput(Dialog_4a4d70* obj, int index)
 {
     Gadget* entries = obj->holder->entries;
-    int i = 1;
-    int t = 0;
-    for (; i < entries->u.count + 1; i++) {
-        if (entries[i].type == 7) {
-            if (t == entries[index].tab) {
-                SetFont(entries[i].u.list.language);
-                break;
-            }
-            t++;
-        }
-    }
-    if (i == entries->u.count + 1)
-        SetFont(g_guiContext->current);
+    SelectFont_4a4d70(entries, index);
 
     Gadget* me = &entries[index];
 
@@ -4635,8 +4646,6 @@ void __stdcall DrawGadgetGlyph(Gui* obj, int index)
 // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 
 // Unused here: real declarations that keep the file's symbol count.
-void RemoveLocalPlayers();
-int ReceiveNetPacket();
 void UpdateTimeoutDialog();
 void CheckPlayerTimeouts();
 int HandleNetPackets();
@@ -6074,10 +6083,6 @@ void __stdcall CloseTopScreen(Gui* gui)
 // Decrements the scroll offset (knobPos) of GUI entry `index`, clamped to
 // [0, field_136 - 1]. When the value actually changes it marks the object
 // changed, refreshes the gadget and runs the entry's callback (if any).
-
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
-int DrawEndGameFrame();
-void RunEndGameState();
 
 // FUNCTION: 0x4a96d0
 void __stdcall DecrementKnobPos(Gui* obj, int index)
