@@ -109,3 +109,5 @@ reason is what stopped it. A module whose row list is empty is one file.
 | orders/unit_orders | src/orders/unit_orders_406c10.cpp | The module's inline `_Construct` hook changes its bytes (44 against 46). |
 | orders/unit_orders | src/orders/unit_orders_406c40.cpp | The module's inline `_Construct` hook turns its copy loop into calls (38 bytes against 35). |
 | orders/unit_orders | src/orders/unit_orders_406c70.cpp | The module inlines it into the repair patrol's vector insert. |
+| weapons/weapons | src/weapons/weapons_49a120.cpp | Gap region (`data/functions.csv`): `tools/gapcheck.py` sizes a region by the file it is in, so it cannot share weapons.cpp; weapons.cpp keeps its type views for the symbol ids the functions after it match at. |
+| weapons/weapons | src/weapons/weapons_49b720.cpp | Merged, the b0 arm of the update loop loads g_game before the projectile's start tick (93.5%). It matches only after 0x49be60 and not after 0x49b090, while 0x49be60 matches only after 0x49b090 (or after a whole standard header such as `<io.h>`, which moves this one off again). |
