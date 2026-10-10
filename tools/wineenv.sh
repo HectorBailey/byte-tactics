@@ -25,7 +25,7 @@ winpath() {
     esac
 }
 
-TEMPLATE="$ROOT/toolchain/wineprefix"
+TEMPLATE="${BT_WINEPREFIX_TEMPLATE:-$ROOT/toolchain/wineprefix}"
 WINEPREFIX="$ROOT/build/wineprefix"
 export WINEDEBUG=-all
 # Keep an existing prefix's architecture: setups made before this change have a
@@ -52,9 +52,15 @@ make_prefix() {
         WINEPREFIX="$tmp" wineboot -i >/dev/null 2>&1 || true
         WINEPREFIX="$tmp" wineserver -w 2>/dev/null || true
     fi
+    # The compiler's temporary files are named after its process id, and each
+    # prefix has its own Wine server numbering processes from the same start,
+    # so prefixes sharing a temp folder overwrite one another's files (C1083,
+    # C1900, C1001). Each prefix gets a temp folder of its own, in the checkout.
+    sed -i -E 's/^"(TEMP|TMP)"=.*/"\1"="Y:\\\\build\\\\wintemp"/' "$tmp/user.reg"
     mv -T "$tmp" "$WINEPREFIX" 2>/dev/null || rm -rf "$tmp"
 }
 [ -f "$WINEPREFIX/system.reg" ] || make_prefix
+mkdir -p "$ROOT/build/wintemp"
 mkdir -p "$WINEPREFIX/dosdevices"
 [ "$(readlink "$WINEPREFIX/dosdevices/y:" 2>/dev/null)" = "$ROOT" ] || ln -sfn "$ROOT" "$WINEPREFIX/dosdevices/y:"
 [ -e "$WINEPREFIX/dosdevices/z:" ] || ln -sfn / "$WINEPREFIX/dosdevices/z:"
