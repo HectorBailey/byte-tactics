@@ -125,3 +125,4 @@ reason is what stopped it. A module whose row list is empty is one file.
 | game/players | src/game/players_466050.cpp | Gap region (`data/functions.csv`): `tools/gapcheck.py` sizes a region by the file it is in, so it cannot share players_464290.cpp. |
 | map/line_of_sight | src/map/line_of_sight_481d50.cpp | Merged, the player grid's address in the inlined cell lookups takes the other operand order, whatever the symbol id count. |
 | map/line_of_sight | src/map/line_of_sight_482270.cpp | Same player grid lookup as line_of_sight_481d50.cpp. |
+| map/line_of_sight | src/map/line_of_sight_4843c0.cpp | Merged, it matches only with about 100 or more symbol ids declared before it (none at 0 to 96, a match from 102), more than the module provides. |

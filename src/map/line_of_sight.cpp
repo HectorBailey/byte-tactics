@@ -6,10 +6,11 @@
 // the map cell lookups by grid and world position, line-of-sight add, remove
 // and update, the eye expiry pass, the map grids and fog tiles, the map loader
 // and its shutdown, and the cell height range and terrain lookups. The module's
-// parts joined in address order. 0x4816a0, 0x481930, 0x482910, 0x482ac0 and
-// 0x4843c0 follow 0x484b50, out of address order: at their addresses their
+// parts joined in address order. 0x4816a0, 0x481930, 0x482910 and 0x482ac0
+// follow 0x484b50, out of address order: at their addresses their
 // bodies' symbol ids would move the register windows the other functions match
-// in. 0x481d50 and 0x482270 keep their own files (docs/split-modules.md).
+// in. 0x481d50, 0x482270 and 0x4843c0 keep their own files
+// (docs/split-modules.md).
 #include <memory>
 #include <string.h>
 #include <math.h>
@@ -1763,152 +1764,6 @@ void __stdcall RevealNewUnit(Unit* unit)
             *p.frameIdx = i;
             AddLineOfSight(&p);
             RevealAroundUnit(&p);
-        }
-    }
-}
-
-// The map block at g_game + 0x141fb: the fog grid at +0x24, the map size and the
-// visibility mask.
-struct MapInfo {
-    char pad0[0x24];
-    Grid* grid;                        // +0x24
-    char pad1[0x38 - 0x28];
-    int width;                         // +0x38
-    int height;                        // +0x3c
-    char pad2[0x78 - 0x40];
-    unsigned short* visibilityMask;    // +0x78
-};
-
-
-// Unused here: real functions declared to keep the symbol ids that
-// BuildFogTiles matches with (docs/c2-regalloc.md).
-void WriteScreenshot(char*, char*, int, int, int, int);
-void DrawTextClipped(void*, char*, int, int, int, int);
-void EnumPlayersCallback(int, int, int, int, int);
-void EmitThrustParticles(int, int, int, int, short);
-short SolveLaunchAngle(int, int, int, int, float);
-int HAPINET_justone(int, int, int, int, void*);
-int CheckDirectXVersion(int, int, int, int, int);
-void WriteRegistryBinary(void*, void*, void*, int);
-void TruncateListItems(int, int, char*, int);
-void TransferMetal(unsigned char, unsigned char, float, int);
-void TransferEnergy(unsigned char, unsigned char, float, int);
-void SetGameSpeedLabel(char*, char*, int, int);
-void SetGadgetStatusAndText(int, int, char*, char*);
-void EmitWakeParticles(int, int, int, short);
-void EmitTeleportParticles(int, int, int, short);
-void EmitBubbles(int, int, int, short);
-void AddMessage(char*, unsigned char, unsigned short, char);
-int SetAlliance(int, int, unsigned char, int);
-int SendToDPID(int, int, void*, int);
-int SendAlliance(int, int, char, int);
-
-// FUNCTION: 0x4843c0
-void BuildFogTiles(void)
-{
-    MapInfo* info = (MapInfo*)&g_game->sortUnitList;
-    Grid* grid = info->grid;
-    PlayerGrid* pg = (PlayerGrid*)&g_game->players[g_game->playerIndex].explored;
-    unsigned int bit = 1 << g_game->playerIndex;
-
-    memset(grid->cells, 0, grid->count * 2);
-
-    // Interleaved: each scroll load is followed by its modulo (y0, ry, x0, rx).
-    int y0 = g_game->scrollY;
-    int ry = y0 % 32;
-    int x0 = g_game->scrollX;
-    int rx = x0 % 32;
-    if (rx < 16) x0 = x0 / 32 - 1; else x0 = x0 / 32;
-    if (ry < 16) y0 = y0 / 32 - 1; else y0 = y0 / 32;
-
-    int xEnd = x0 + grid->width;
-    int yEnd = y0 + grid->height;
-
-    for (int y = y0; y < yEnd; y++) {
-        for (int x = x0; x < xEnd; x++) {
-            if (x < pg->width && y < pg->height) {
-                if (pg->cells[y * pg->width + x] == 0 && (g_game->mapFlags.raw & 2)) {
-                    if (x - x0 < grid->width && y - y0 < grid->height)
-                        grid->cells[(y - y0) * grid->width + x - x0].hi |= 1;
-                    if (x - x0 - 1 < grid->width && y - y0 < grid->height)
-                        grid->cells[(y - y0) * grid->width + x - x0 - 1].hi |= 2;
-                    if (x - x0 < grid->width && y - y0 - 1 < grid->height)
-                        grid->cells[(y - y0 - 1) * grid->width + x - x0].hi |= 4;
-                    if (x - x0 - 1 < grid->width && y - y0 - 1 < grid->height)
-                        grid->cells[(y - y0 - 1) * grid->width + x - x0 - 1].hi |= 8;
-                }
-                if ((unsigned short)(bit & info->visibilityMask[info->width * y / 2 + x]) == 0) {
-                    if (x - x0 < grid->width && y - y0 < grid->height)
-                        grid->cells[(y - y0) * grid->width + x - x0].lo |= 1;
-                    if (x - x0 - 1 < grid->width && y - y0 < grid->height)
-                        grid->cells[(y - y0) * grid->width + x - x0 - 1].lo |= 2;
-                    if (x - x0 < grid->width && y - y0 - 1 < grid->height)
-                        grid->cells[(y - y0 - 1) * grid->width + x - x0].lo |= 4;
-                    if (x - x0 - 1 < grid->width && y - y0 - 1 < grid->height)
-                        grid->cells[(y - y0 - 1) * grid->width + x - x0 - 1].lo |= 8;
-                }
-            }
-        }
-    }
-
-    if (y0 < 0) {
-        for (unsigned int i = 0; i < grid->width; i++) {
-            if (g_game->mapFlags.bit1) {
-                if (grid->cells[i].hi & 4) grid->cells[i].hi |= 1;
-                if (grid->cells[i].hi & 8) grid->cells[i].hi |= 2;
-            }
-            if (grid->cells[i].lo & 4) grid->cells[i].lo |= 1;
-            if (grid->cells[i].lo & 8) grid->cells[i].lo |= 2;
-        }
-    }
-
-    if (yEnd > info->height / 2) {
-        for (unsigned int i = 0; i < grid->width; i++) {
-            if (g_game->mapFlags.bit1) {
-                if (grid->cells[(grid->height - 2) * grid->width + i].hi & 1)
-                    grid->cells[(grid->height - 2) * grid->width + i].hi |= 4;
-                if (grid->cells[(grid->height - 2) * grid->width + i].hi & 2)
-                    grid->cells[(grid->height - 2) * grid->width + i].hi |= 8;
-            }
-            if (grid->cells[(grid->height - 2) * grid->width + i].lo & 1)
-                grid->cells[(grid->height - 2) * grid->width + i].lo |= 4;
-            if (grid->cells[(grid->height - 2) * grid->width + i].lo & 2)
-                grid->cells[(grid->height - 2) * grid->width + i].lo |= 8;
-        }
-    }
-
-    if (x0 < 0) {
-        for (unsigned int i = 0; i < grid->height; i++) {
-            if (g_game->mapFlags.bit1) {
-                if (grid->cells[i * grid->width].hi & 8)
-                    grid->cells[i * grid->width].hi |= 4;
-                if (grid->cells[i * grid->width].hi & 2)
-                    grid->cells[i * grid->width].hi |= 1;
-            }
-            if (grid->cells[i * grid->width].lo & 8)
-                grid->cells[i * grid->width].lo |= 4;
-            if (grid->cells[i * grid->width].lo & 2)
-                grid->cells[i * grid->width].lo |= 1;
-        }
-    }
-
-    if (xEnd > info->width / 2) {
-        // Guarded do-while, not a for: the counter init follows the guard.
-        if (grid->height > 0) {
-            unsigned int i = 1;
-            do {
-                if (g_game->mapFlags.bit1) {
-                    if (grid->cells[i * grid->width - 2].hi & 4)
-                        grid->cells[i * grid->width - 2].hi |= 8;
-                    if (grid->cells[i * grid->width - 2].hi & 1)
-                        grid->cells[i * grid->width - 2].hi |= 2;
-                }
-                if (grid->cells[i * grid->width - 2].lo & 4)
-                    grid->cells[i * grid->width - 2].lo |= 8;
-                if (grid->cells[i * grid->width - 2].lo & 1)
-                    grid->cells[i * grid->width - 2].lo |= 2;
-                i++;
-            } while (i - 1 < grid->height);
         }
     }
 }
