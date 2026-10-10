@@ -117,7 +117,7 @@ struct Game {
     char unknown_0[0xdcb];
     unsigned char palette[0x2a];       // +0xdcb
     char unknown_df5[0x2a43 - 0xdf5];
-    unsigned char localPlayer;         // +0x2a43
+    unsigned char playerIndex;         // +0x2a43
     char unknown_2a44[0x141f3 - 0x2a44];
     int projectileCount;               // +0x141f3
     Proj_0049be60* projectiles;        // +0x141f7
@@ -193,7 +193,7 @@ void __stdcall DrawProjectiles(void* surface)
     while (1) {
         Proj_0049be60* p = (Proj_0049be60*)((char*)g_game->projectiles + offset);
         if (p->counter == 0) {
-            unsigned char player = g_game->localPlayer;
+            unsigned char player = g_game->playerIndex;
             char* pb = (char*)g_game + 0x1b63 + 0x14b * player;
             Vec3_0049be60* pos = &p->pos;
             if ((g_game->mapFlags & 2) == 2) {
