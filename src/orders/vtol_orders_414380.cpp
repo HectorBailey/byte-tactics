@@ -21,25 +21,9 @@ struct Vec3 {
 struct Unit;
 class UnitMotion { public: char pad0[0x2e]; unsigned char flags; void SetFlightMode(Unit*,int); };
 
-// Unused here: forward declarations of real functions; their symbol ids keep the
-// allocation of the functions after the merged views (docs/c2-regalloc.md).
-void UpdateMouseScroll();
-void UpdateEdgeScroll();
-void CenterCameraOnRadarClick();
-void CenterCameraOnStartPosition();
-void RegisterDataArchives();
-int GetCdPathMismatch();
-void CreateGameObject();
-void InitMissionStatus();
-void SetUpEndMissionScreen();
-void StartScreenFade();
-void StepScreenFade();
-void ScheduleFadeTick();
-int IsFadeDone();
-void StepPaletteFade();
-void FillEndGameStatistics();
-int AreStatBarsComplete();
+class Class_0044e730 { public: void SetApproachRadius(int); };
 class Class_0044e720 { public: void SetHeading(int); };
+class Class_0044e6c0 { public: void SetAltitude(int); };
 class MissionType { public: unsigned char index; MissionType(const char*); };
 
 class PathOrderAttach { public: void SetUnit(Unit*); };
@@ -106,13 +90,7 @@ struct Game {
     char pad0[0x1439b]; UnitDef* unitDefs;
     char pad1439f[0x38a47-0x1439f]; unsigned int tick;
 };
-class Class_0044e2d0 {
-public:
-    char data[0x36];
-    Class_0044e2d0(Order*,const Vec3&);
-    void SetAltitude(int);
-    void SetApproachRadius(int);
-};
+class Class_0044e2d0 { public: char data[0x36]; Class_0044e2d0(Order*,const Vec3&); };
 #pragma pack(pop)
 extern Game* g_game;
 static inline UnitDef* Definitions() { return g_game->unitDefs; }
@@ -171,7 +149,7 @@ int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
                 if ((unit->motion->flags&3)==1) {
                     unit->motion->SetFlightMode(unit,2);
                     Class_0044e2d0* move=new Class_0044e2d0(order,unit->pos);
-                    move->SetAltitude(unit->def->altitude/2);
+                    ((Class_0044e6c0*)move)->SetAltitude(unit->def->altitude/2);
                     order->SetAttachedFx((int)move);
                     order->flags|=0xe0;
                 }
@@ -182,7 +160,7 @@ int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
     case 1: {
         order->retries=0;
         Class_0044e2d0* move=new Class_0044e2d0(order,order->target.Get()->pos);
-        move->SetApproachRadius(unit->def->buildRange);
+        ((Class_0044e730*)move)->SetApproachRadius(unit->def->buildRange);
         order->SetAttachedFx((int)move);
         order->flags=0xe0;
         return 1;
