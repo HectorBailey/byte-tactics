@@ -3714,13 +3714,22 @@ extern int __stdcall HasMouseKeyFlags(Dialog_4a4b50* obj, unsigned int mask);
 extern void __stdcall SetClickMode(Dialog_4a4b50* obj, int value);
 extern int __stdcall TrySetFocus(Dialog_4a4b50* obj, int index);
 
+struct Rect_004a4b50 { int left, top, right, bottom; };
+
+// True when the point lies inside the rect, edges included (the body of IsPointInRect
+// at 0x4a1920, which the compiler inlined here).
+static inline int PointInHotspotRect(const Rect_004a4b50& r, const Point_004a4b50& p)
+{
+    return p.x >= r.left && p.x <= r.right && p.y >= r.top && p.y <= r.bottom;
+}
+
 // FUNCTION: 0x4a4b50
 int __stdcall HandleHotspotInput(Dialog_4a4b50* obj, int index)
 {
     Gadget* entries = obj->table->entries;
     // Entries are indexed as entries[index], not through a stored pointer.
     // 16-byte stack struct: gives the frame its size.
-    struct Rect { int left, top, right, bottom; } r;
+    Rect_004a4b50 r;
     if (entries[index].type == 0) {
         r.left = 0;
         r.top = 0;
@@ -3736,13 +3745,13 @@ int __stdcall HandleHotspotInput(Dialog_4a4b50* obj, int index)
         if (IsMouseButtonMessage(obj, 1)) {
             // Position copied into a local Point before each hit test.
             Point_004a4b50 p = obj->pos;
-            if (p.x >= r.left && p.x <= r.right && p.y >= r.top && p.y <= r.bottom) {
+            if (PointInHotspotRect(r, p)) {
                 TrySetFocus(obj, index);
                 SetClickMode(obj, 1);
             }
         } else if (IsMouseButtonMessage(obj, 2)) {
             Point_004a4b50 p = obj->pos;
-            if (p.x >= r.left && p.x <= r.right && p.y >= r.top && p.y <= r.bottom) {
+            if (PointInHotspotRect(r, p)) {
                 TrySetFocus(obj, index);
                 SetClickMode(obj, 2);
             }
@@ -3751,9 +3760,10 @@ int __stdcall HandleHotspotInput(Dialog_4a4b50* obj, int index)
             obj->focus = -1;
             // Read through a pointer so the two loads stay after the focus store.
             Point_004a4b50* pp = &obj->pos;
-            int py2 = pp->y;
-            int px2 = pp->x;
-            if (px2 >= r.left && px2 <= r.right && py2 >= r.top && py2 <= r.bottom)
+            Point_004a4b50 q;
+            q.y = pp->y;
+            q.x = pp->x;
+            if (PointInHotspotRect(r, q))
                 return 1;
         }
     }
@@ -6114,8 +6124,6 @@ void __stdcall CloseTopScreen(Gui* gui)
 // changed, refreshes the gadget and runs the entry's callback (if any).
 // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int DrawEndGameFrame();
-void RunEndGameState();
-void StepBuildMenuPage(int);
 
 
 // FUNCTION: 0x4a96d0
