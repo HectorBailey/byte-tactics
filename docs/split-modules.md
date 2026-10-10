@@ -100,3 +100,5 @@ reason is what stopped it. A module whose row list is empty is one file.
 | frontend/multi | src/frontend/multi_449bb0.cpp | Merged, `/Ob2` inlines UpdateMetalText (0x445c70) into it through BindNamedSliderWithCallback, where the original calls it (2960 bytes against 2756). |
 | frontend/multi | src/frontend/multi_44a680.cpp | Merged (with its inlined helpers as local copies), `/Ob2` inlines UpdateMaxUnitsText (0x445b70) and UpdateMetalText (0x445c70) into it, where the original calls them (2549 bytes against 2340). |
 | frontend/multi | src/frontend/multi_44c420.cpp | Two address computations swap their operand order; it matches only with its symbol ids about 34,000 above anywhere the module can put it. |
+| map/line_of_sight | src/map/line_of_sight_481d50.cpp | Merged, the player grid's address in the inlined cell lookups takes the other operand order, whatever the symbol id count. |
+| map/line_of_sight | src/map/line_of_sight_482270.cpp | Same player grid lookup as line_of_sight_481d50.cpp. |
