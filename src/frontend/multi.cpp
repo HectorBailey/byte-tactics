@@ -1079,7 +1079,7 @@ int __stdcall OnlineProcessButtonCommand(int button, char* message, unsigned int
 void OnlineUnload();
 void OpenOptionsPanel();
 // Defined in multi_443ff0.cpp: gathered here, its pointer into the session list
-// lands in ebp and no symbol count from 0 to 66,000 moves it back.
+// lands in ebp, and no symbol count in this file moves it back.
 int __stdcall SelectConnection(int index);
 void __stdcall SetPaletteColors(unsigned char* palette, int first, int count);
 void __stdcall RemapPaletteToClosestIndices(void* menu, void* palette, void* param_3);
@@ -4410,12 +4410,11 @@ void RefreshBattleRoomRows()
 
 // 0x449bb0 OpenBattleRoom stays in src/frontend/multi_449bb0.cpp: gathered
 // here, /Ob2 inlines UpdateMetalText (0x445c70) into it through
-// BindNamedSliderWithCallback, where the original calls it (2960 bytes
-// against 2756).
+// BindNamedSliderWithCallback, where the original calls it.
 
 // 0x44a680 UpdateBattleRoom stays in src/frontend/multi_44a680.cpp: gathered
 // here, /Ob2 inlines UpdateMaxUnitsText (0x445b70) and UpdateMetalText
-// (0x445c70) into it, where the original calls them (2549 bytes against 2340).
+// (0x445c70) into it, where the original calls them.
 
 // FUNCTION: 0x44afb0
 void __stdcall HandleEndMultiClick(Gui* obj)
@@ -4907,9 +4906,8 @@ void __stdcall ShowSelectedUnitCosts(void* panel, Gadget* unit)
 }
 
 // 0x44c420 HandleRestrictionsClick stays in src/frontend/multi_44c420.cpp:
-// gathered here, two address computations swap their operand order, and the
-// operand order matches only with the function's symbol ids about 34,000 above
-// anywhere this file can put it.
+// gathered here, two address computations swap their operand order, which
+// follows symbol ids that this file cannot give the function.
 
 // FUNCTION: 0x44c7a0
 int __cdecl CompareUnitRestrictEntries(const char* a, const char* b)
