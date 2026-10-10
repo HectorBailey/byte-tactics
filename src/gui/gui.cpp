@@ -3942,7 +3942,7 @@ static inline int Measure_004a4d70(char* text)
 // The body of SelectFontForEntry at 0x4a1810, which the compiler inlined into DrawTextInput:
 // makes the font of the entry's group current and returns its number, or -1. A copy of
 // SelectFontForEntry_inlined of its own: calling the shared one here moves ListBoxSelectDown.
-static inline int SelectFont_4a4d70(Gadget* entries, int index)
+static inline int SelectTextInputFont(Gadget* entries, int index)
 {
     int n = 0;
     int i = 1;
@@ -3966,7 +3966,7 @@ static inline int SelectFont_4a4d70(Gadget* entries, int index)
 void __stdcall DrawTextInput(Dialog_4a4d70* obj, int index)
 {
     Gadget* entries = obj->holder->entries;
-    SelectFont_4a4d70(entries, index);
+    SelectTextInputFont(entries, index);
 
     Gadget* me = &entries[index];
 
@@ -4418,7 +4418,7 @@ static inline int FindEntry(Gadget* entries, char* name)
 }
 
 // The body of SelectFontForEntry at 0x4a1810, which the compiler inlined into LayoutLabelText.
-static inline int SelectFont_4a53c0(Gadget* entries, int index)
+static inline int SelectLabelFont(Gadget* entries, int index)
 {
     int n = 0;
     int i = 1;
@@ -4449,7 +4449,7 @@ void __stdcall LayoutLabelText(Gui* obj, int index)
 {
     Gadget* entries = obj->layer->entries;
     Gadget* entry = &entries[index];
-    SelectFont_4a53c0(entries, index);
+    SelectLabelFont(entries, index);
     int x = !entry->type ? 0 : entry->x;
     // Real variable declared here, assigned in each arm, one shared tail stores it.
     int nx = x;
