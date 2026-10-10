@@ -30,7 +30,7 @@
 //   +0x14281 bit 2; ints scrollX +0x1431f, scrollY +0x14323; gaf pointers
 //   +0x147bb/+0x147bf/+0x147c3/+0x147c7/+0x147cb (kind 4), +0x147f3 (kind 5),
 //   +0x1480f (the shared sprite, frame 0); ptr +0x1ab9b (kind 2);
-//   localPlayer byte +0x2a43; player array base +0x1b63 stride 0x14b;
+//   playerIndex byte +0x2a43; player array base +0x1b63 stride 0x14b;
 //   region +0x37e27 (kind 2); time int +0x38a47.
 #include <stdio.h>
 #include <stdlib.h>

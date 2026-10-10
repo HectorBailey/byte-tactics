@@ -259,7 +259,7 @@ struct Game {
       char unknown_141fb[0x1426f - 0x141fb];
       Feature_00468cf0* features;       // +0x1426f
       char unknown_14273[0x14280 - 0x14273];
-      char cursorCrosshairMode;         // +0x14280
+      char debugMode;         // +0x14280
       char unknown_14281[0x1428b - 0x14281];
     };
   };
@@ -481,7 +481,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
   char *&game = *(char**)&g_game;
   int *viewY = &((Game *)game)->scrollY;
   y = g_game->field_2cb4 - (g_game->field_2cb0 >> 1) - *viewY + 0x20;
-  if (g_game->cursorCrosshairMode == '\x02') {
+  if (g_game->debugMode == '\x02') {
     DrawLine((int)&ctx, x - 2, y, x + 2, y, colors[0xf]);
     DrawLine((int)&ctx, x, y - 2, x, y + 2, colors[0xf]);
   }

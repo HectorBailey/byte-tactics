@@ -166,7 +166,7 @@ void __stdcall AddOrder(MissionType kind, int remove, Unit* unit,
 SpatialTimer::SpatialTimer(SquadManager* p, void* q)
     : SquadTimer(p, q)
 {
-    // Half of g_game's baseX and baseY, in 16.16 fixed point.
+    // Half of g_game's mapWidthWorld and mapHeightWorld, in 16.16 fixed point.
     int x = (int)(g_game->mapWidthWorld / 2 * 65536.0);
     best = Vec3_00407d40(x, 0, (int)(g_game->mapHeightWorld / 2 * 65536.0));
     x = (int)(g_game->mapWidthWorld / 2 * 65536.0);

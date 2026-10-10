@@ -5,7 +5,7 @@
 //
 // The Game views: 0x495860/0x4958c0 read 0x531 as a struct pointer with
 // `value` at +0x4, while 0x495e90 reads the same pointer as an int and then
-// `*(int*)(field_531 + 4)`. One pointer type covers both. The two byte flags
+// `*(int*)(layer + 4)`. One pointer type covers both. The two byte flags
 // 0x495a30 names as `uiOptionFlags`/`pauseFlags` are anonymous unions with the
 // bitfield views 0x495e90 uses.
 //
@@ -156,7 +156,7 @@ struct Game {
     int viewWidthTiles;                 // +0x1423b
     int viewHeightTiles;                // +0x1423f
     char unknown_14243[0x14280 - 0x14243];
-    unsigned char cursorCrosshairMode;  // +0x14280
+    unsigned char debugMode;  // +0x14280
     unsigned short mapFlags;            // +0x14281
     char unknown_14283[0x1431f - 0x14283];
     int scrollX;                        // +0x1431f
@@ -671,7 +671,7 @@ void HandleGameKey(void)
                 SetDescListCleanupFlag(&g_game->gui, 0);
             } else {
                 g_game->flags_3923b.b0 = 0;
-                g_game->cursorCrosshairMode = 0;
+                g_game->debugMode = 0;
                 SetDescListCleanupFlag(&g_game->gui, 1);
             }
         }

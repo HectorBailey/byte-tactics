@@ -179,7 +179,7 @@ struct Game {
     int viewHeightTiles;               // +0x1423f
     char unknown_14243[0x1427f - 0x14243];
     unsigned char seaLevel;            // +0x1427f
-    unsigned char cursorCrosshairMode; // +0x14280
+    unsigned char debugMode; // +0x14280
     ViewFlags mapFlags;                // +0x14281
     char unknown_14283[0x14287 - 0x14283];
     Tile* heightMap;                   // +0x14287
@@ -1548,10 +1548,10 @@ struct StringPool;
 // FUNCTION: 0x418310
 void __stdcall DrawMapDebugOverlay(void* surface)
 {
-    if (!g_game->cursorCrosshairMode && !g_contourSpacing) return;
+    if (!g_game->debugMode && !g_contourSpacing) return;
     Movement* movement = 0;
     Player* player = &g_game->players[g_game->playerIndex];
-    if (g_game->cursorCrosshairMode == 1) {
+    if (g_game->debugMode == 1) {
         Unit* unit = FindNextSelectedUnit(0, 0);
         if (unit) movement = (Movement*)unit->def->movementclass;
     }
@@ -1586,7 +1586,7 @@ void __stdcall DrawMapDebugOverlay(void* surface)
             p[3].y = (y + 2) * 16 - (heights[3] >> 1) - g_game->scrollY;
             tile -= g_game->mapWidthTiles; --y;
             if (p[0].y < g_game->bottom) offscreen = 0;
-            if (g_game->cursorCrosshairMode == 1) {
+            if (g_game->debugMode == 1) {
                 if (movement) {
                     unsigned int state = (movement->states[movement->width * (y >> 4) + x] >> ((y & 15) * 2)) & 3;
                     if (state < 3) {
@@ -1620,7 +1620,7 @@ void __stdcall DrawMapDebugOverlay(void* surface)
                     DrawLine(surface, cx - g_dirDeltaX[direction] * 4,
                                  cy - g_dirDeltaZ[direction] * 4, cx, cy, arrowColor);
                 }
-            } else if (g_game->cursorCrosshairMode == 2) {
+            } else if (g_game->debugMode == 2) {
                 if (tile->height > g_game->seaLevel) {
                     DrawLine(surface, p[0].x, p[0].y, p[1].x, p[1].y, colors[15]);
                     DrawLine(surface, p[0].x, p[0].y, p[3].x, p[3].y, colors[15]);
@@ -1645,7 +1645,7 @@ void __stdcall DrawMapDebugOverlay(void* surface)
                     DrawLine(surface, (p[3].x + p[0].x) / 2 + 2, (p[3].y + p[0].y) / 2,
                                  (p[0].x + p[1].x) / 2, (p[0].y + p[1].y) / 2 + 2, colors[15]);
                 }
-            } else if (g_game->cursorCrosshairMode == 3) {
+            } else if (g_game->debugMode == 3) {
                 if (tile->height > g_game->seaLevel) {
                     DrawLine(surface, p[0].x, p[0].y, p[1].x, p[1].y, colors[15]);
                     DrawLine(surface, p[0].x, p[0].y, p[3].x, p[3].y, colors[15]);
@@ -1657,7 +1657,7 @@ void __stdcall DrawMapDebugOverlay(void* surface)
                 SetTextColors(colors[15], GetTextKeyColor());
                 char buffer[20];
                 DrawString(surface, _itoa(tile->metal, buffer, 10), p[0].x + 2, p[0].y + 2, -1);
-            } else if (g_game->cursorCrosshairMode == 4) {
+            } else if (g_game->debugMode == 4) {
                 DrawLine(surface, p[0].x, p[0].y, p[1].x, p[1].y, colors[0]);
                 DrawLine(surface, p[0].x, p[0].y, p[3].x, p[3].y, colors[0]);
                 if (player->fog[(y / 2) * player->fogWidth + x / 2]) {

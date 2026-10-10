@@ -1184,8 +1184,8 @@ static inline SmokePos SmokeAt(Spot* spot, Feature* f)
 // debris moves under gravity until it lands (or sinks below sea level), burning
 // features puff smoke every third tick, burn down and spread fire
 // (SpreadFire), and finished animations are replaced by their remains.
-// Suspected original bug: the seed position's row is scanIndex / height
-// (+0x14237), not scanIndex / width, so on non-square maps the seed lands in
+// Suspected original bug: the seed position's row is scanIndex / mapHeightTiles
+// (+0x14237), not scanIndex / mapWidthTiles, so on non-square maps the seed lands in
 // the wrong row.
 // FUNCTION: 0x424050
 void __stdcall UpdateFeatures()

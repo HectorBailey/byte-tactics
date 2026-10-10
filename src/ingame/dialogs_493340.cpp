@@ -118,7 +118,7 @@ struct Game {
     char unknown_2c75[0x2cba - 0x2c75];
     unsigned short hoverUnitId;        // +0x2cba
     char unknown_2cbc[0x14280 - 0x2cbc];
-    unsigned char cursorCrosshairMode; // +0x14280
+    unsigned char debugMode; // +0x14280
     char unknown_14281[0x14357 - 0x14281];
     Unit* units;                       // +0x14357
     char unknown_1435b[0x1439b - 0x1435b];
@@ -559,7 +559,7 @@ void __stdcall HandleTalkDialogEvent(Gui* gadget)
         n = atoi(&entries[gadget->hotGadgetIndex].name[8]);
         // Kept as the original has it: n is never range checked before it
         // indexes the 11-byte selection mask, so a "LIVEPLYR42" style name
-        // writes outside chatRecipients. The neighbouring mode_2bf0 is clamped
+        // writes outside chatRecipients. The neighbouring chatMode is clamped
         // (`if (g_game->chatMode >= 4) g_game->chatMode = 0;`), so the
         // omission looks like an oversight rather than a deliberate choice.
         unsigned char v = (unsigned char)GetButtonStage(gadget, gadget->hotGadgetIndex);
@@ -1313,9 +1313,9 @@ void __stdcall HandleDebugHotkey(int eventType)
         g_game->bit0_3923b = !g_game->bit0_3923b;
         break;
     case 0x6d:
-        g_game->cursorCrosshairMode++;
-        if (g_game->cursorCrosshairMode == 5)
-            g_game->cursorCrosshairMode = 0;
+        g_game->debugMode++;
+        if (g_game->debugMode == 5)
+            g_game->debugMode = 0;
         break;
     case 0x50:
         SetPageFlipping(1);

@@ -824,7 +824,7 @@ void __stdcall AlignUnitToGround(Unit* u)
                 return;
             unsigned char* tb = g_game->heightMap + (gz * gw + gx) * 13;
             int b0 = tb[4];
-            // gridW read again, not gw: keeps the allocation.
+            // mapWidthTiles read again, not gw: keeps the allocation.
             unsigned char* tb1 = tb + g_game->mapWidthTiles * 13;
             int b1 = tb1[4];
             c0 = tb[0x11];

@@ -195,7 +195,7 @@ struct Blip_00466dc0 {
     int y;                               // +0x6
 };
 
-// The four shorts at +0x142e7 are named posX/posY/width/height, originX/
+// The four shorts at +0x142e7 are named minimapGadgetX/Y/W/H, originX/
 // originY/sizeX/sizeY and the four-element `dim` the rectangle test indexes,
 // depending on the function; the union in Game keeps every spelling addressable.
 

@@ -96,7 +96,7 @@ struct Game {
     int windSpeedMin;  // +0x1425b
     int windSpeedMax;  // +0x1425f
     char unknown_14263[0x14280 - 0x14263];
-    unsigned char cursorCrosshairMode;  // +0x14280
+    unsigned char debugMode;  // +0x14280
     char unknown_14281[0x14383 - 0x14281];
     void* xform;   // +0x14383
     void* projected;   // +0x14387
@@ -629,7 +629,7 @@ void InitGame()
     g_game->gui.activeFontGaf = g_game->gui.fontSlot0;
     SetTextKeyColor(0xfe);
     SetFont(g_game->fontComix);
-    g_game->cursorCrosshairMode = 0;
+    g_game->debugMode = 0;
     g_game->movieCaptureIndex = 0;
     g_game->imageOutputDirDirty = 0;
     g_game->movieOutputRateDirty = 0;

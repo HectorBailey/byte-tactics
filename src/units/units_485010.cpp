@@ -411,7 +411,7 @@ void __stdcall GetCellPosition(int x, int y, Pos_00485070* out)
 }
 
 // Clamps a 16.16 fixed-point position's x and z to the map
-// ([0, baseX) and [0, baseY) in whole units).
+// ([0, mapWidthWorld) and [0, mapHeightWorld) in whole units).
 
 // Built as a bitfield struct in a local: plain integer arithmetic folds (size - 1) << 16.
 static inline Fixed_004853b0 MakeFixed(int i)
