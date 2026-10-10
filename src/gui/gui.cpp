@@ -4454,6 +4454,7 @@ void __stdcall LayoutLabelText(Gui* obj, int index)
     // Real variable declared here, assigned in each arm, one shared tail stores it.
     int nx = x;
     int lh;
+    // Written out: LineHeightDirect here moves DecrementKnobPos and IncrementKnobPos.
     if (g_guiContext->language == 0)
         lh = GetFontHeight();
     else
