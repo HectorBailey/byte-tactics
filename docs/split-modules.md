@@ -109,3 +109,6 @@ reason is what stopped it. A module whose row list is empty is one file.
 | orders/unit_orders | src/orders/unit_orders_406c10.cpp | The module's inline `_Construct` hook changes its bytes (44 against 46). |
 | orders/unit_orders | src/orders/unit_orders_406c40.cpp | The module's inline `_Construct` hook turns its copy loop into calls (38 bytes against 35). |
 | orders/unit_orders | src/orders/unit_orders_406c70.cpp | The module inlines it into the repair patrol's vector insert. |
+| game/players | src/game/players_4658e0.cpp | Its register plan follows the small symbol count of a file that includes only `<memory.h>`; in the module (51.3%) it differs at every count from the module's own to 1,024 more, and also in front of the module's first function. |
+| game/players | src/game/players_465ac0.cpp | Same as players_4658e0.cpp: in the module (79.6%) its register plan differs at every count from the module's own to 128 more, and also with the file's own view of the unit (75.7%). |
+| game/players | src/game/players_466050.cpp | Gap region (`data/functions.csv`): `tools/gapcheck.py` sizes a region by the file it is in, so it cannot share players_464290.cpp. |
