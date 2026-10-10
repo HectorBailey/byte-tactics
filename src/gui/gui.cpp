@@ -4449,6 +4449,21 @@ void __stdcall LayoutLabelText(Gui* obj, int index)
     entry->height = (short)lh;
 }
 
+// Fills the bounding rectangle of a gadget entry (the body of GetGadgetRect at
+// 0x4a1630, which the compiler inlined here).
+static inline void GetGadgetRect_inlined(Gadget* entry, Rect* rect)
+{
+    if (entry->type == 0) {
+        rect->left = 0;
+        rect->top = 0;
+    } else {
+        rect->left = entry->x;
+        rect->top = entry->y;
+    }
+    rect->right = entry->width + rect->left - 1;
+    rect->bottom = entry->height + rect->top - 1;
+}
+
 // FUNCTION: 0x4a56b0
 void __stdcall DrawLabel(Gui* obj, int index)
 {
@@ -4476,15 +4491,7 @@ void __stdcall DrawLabel(Gui* obj, int index)
         entries[index].x = (short)((entries[0].width - GetTextPixelWidth(entries[index].u.text)) / 2);
 
     Rect rect;
-    if (entries[index].type == 0) {
-        rect.left = 0;
-        rect.top = 0;
-    } else {
-        rect.left = entries[index].x;
-        rect.top = entries[index].y;
-    }
-    rect.right = entries[index].width + rect.left - 1;
-    rect.bottom = entries[index].height + rect.top - 1;
+    GetGadgetRect_inlined(&entries[index], &rect);
 
     if (entries[index].image != 0)
         FillRectangle(entries->u.assets.surface, &rect, obj->colours[entries[index].image]);
@@ -4650,8 +4657,6 @@ int BroadcastPendingViewState();
 
 // Unused here: real declarations that keep the file's symbol count.
 struct Class_004a1b40;
-struct Class_004a32a0;
-struct Class_004a4620;
 
 // FUNCTION: 0x4a5f40
 void __stdcall DrawButton(Gui* menu, int index)
@@ -4927,15 +4932,7 @@ int __stdcall HandleButtonInput(Gui* obj, int index, int param_3)
         goto fail;
 
     Rect r;
-    if (entry->type == 0) {
-        r.left = 0;
-        r.top = 0;
-    } else {
-        r.left = entry->x;
-        r.top = entry->y;
-    }
-    r.right = entry->width + r.left - 1;
-    r.bottom = entry->height + r.top - 1;
+    GetGadgetRect_inlined(entry, &r);
 
     Point point = *(Point*)&obj->pointX;
     point.x -= entries->x;
@@ -6168,8 +6165,6 @@ static inline Gadget* entry_at(Gui* obj, int index)
 // Unused here: real declarations that keep the file's symbol count.
 struct Object_004a07d0;
 struct Object_004a0c70;
-struct Object_004a14c0;
-struct Object_004a9780;
 
 // FUNCTION: 0x4a9780
 void __stdcall IncrementKnobPos(Gui* obj, int index)
