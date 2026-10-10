@@ -698,7 +698,7 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
 
     GetGadgetName(entries, name, button->index);
     if (strstr(name, "MOVE")) {
-        if (e->field_138 == 0) {
+        if (e->status == 0) {
             SetOrderMode(1);
         } else {
             SetOrderMode(2);
@@ -715,7 +715,7 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
     }
     GetGadgetName(entries, name, button->index);
     if (strstr(name, "ATTACK")) {
-        if (e->field_138 == 0) {
+        if (e->status == 0) {
             SetOrderMode(1);
         } else {
             SetOrderMode(3);
@@ -725,7 +725,7 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
     }
     GetGadgetName(entries, name, button->index);
     if (strstr(name, "BLAST")) {
-        if (e->field_138 == 0) {
+        if (e->status == 0) {
             SetOrderMode(1);
         } else {
             SetOrderMode(4);
@@ -735,7 +735,7 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
     }
     GetGadgetName(entries, name, button->index);
     if (strstr(name, "DEFEND")) {
-        if (e->field_138 == 0) {
+        if (e->status == 0) {
             SetOrderMode(1);
         } else {
             SetOrderMode(7);
@@ -745,7 +745,7 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
     }
     GetGadgetName(entries, name, button->index);
     if (strstr(name, "REPAIR")) {
-        if (e->field_138 == 0) {
+        if (e->status == 0) {
             SetOrderMode(1);
         } else {
             SetOrderMode(8);
@@ -755,7 +755,7 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
     }
     GetGadgetName(entries, name, button->index);
     if (strstr(name, "PATROL")) {
-        if (e->field_138 == 0) {
+        if (e->status == 0) {
             SetOrderMode(1);
         } else {
             SetOrderMode(9);
@@ -765,7 +765,7 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
     }
     GetGadgetName(entries, name, button->index);
     if (strstr(name, "RECLAIM")) {
-        if (e->field_138 == 0) {
+        if (e->status == 0) {
             SetOrderMode(1);
         } else {
             SetOrderMode(0xc);
@@ -775,7 +775,7 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
     }
     GetGadgetName(entries, name, button->index);
     if (strstr(name, "CAPTURE")) {
-        if (e->field_138 == 0) {
+        if (e->status == 0) {
             SetOrderMode(1);
         } else {
             SetOrderMode(0xd);
@@ -785,7 +785,7 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
     }
     GetGadgetName(entries, name, button->index);
     if (strstr(name, "UNLOAD")) {
-        if (e->field_138 == 0) {
+        if (e->status == 0) {
             SetOrderMode(1);
         } else {
             SetOrderMode(5);
@@ -795,7 +795,7 @@ int __stdcall HandleOrderButtonClick(Gadget* button, Gadget* entries)
     }
     GetGadgetName(entries, name, button->index);
     if (strstr(name, "LOAD")) {
-        if (e->field_138 == 0) {
+        if (e->status == 0) {
             SetOrderMode(1);
         } else {
             SetOrderMode(6);
@@ -1109,6 +1109,8 @@ void __stdcall DisableUnavailableBuildMenuEntries(Gui* obj)
     Gadget* t = obj->layer->entries;
     int n = t->u.count;
     for (int i = 0; i < n; i++) {
+        // +0x28 (Gadget::tab) holds the entry flags here: bit 2 marks an entry that
+        // names a unit, which is greyed out when its type id is 0.
         if (Entries(t)[i].tab & 4) {
             SetGrayedOut(obj, i, FindUnitTypeId((char*)&Entries(t)[i]) == 0);
         }
@@ -1137,6 +1139,8 @@ static inline void UpdateCounts(Gui* menu)
         return;
     entry = (Gadget*)((char*)entry + 2);
     do {
+        // +0x28 (Gadget::tab) holds the entry flags here: bit 2 marks an entry that
+        // names a unit, which is greyed out when its type id is 0.
         if (entry[i].tab & 4)
             SetGrayedOut(menu, i, FindUnitTypeId((char*)&entry[i]) == 0);
     } while (++i < n);
