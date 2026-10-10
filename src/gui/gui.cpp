@@ -4449,6 +4449,28 @@ void __stdcall LayoutLabelText(Gui* obj, int index)
     entry->height = (short)lh;
 }
 
+// The body of SelectFontForEntry at 0x4a1810, which the compiler inlined into several
+// functions: makes the font of the entry's group current and returns its number, or -1.
+static inline int SelectFontForEntry_inlined(Gadget* entries, int index)
+{
+    int n = 0;
+    int i = 1;
+    for (; i < entries->u.count + 1; i++) {
+        if (entries[i].type == 7) {
+            if (n == entries[index].tab) {
+                SetFont(entries[i].u.list.language);
+                break;
+            }
+            n++;
+        }
+    }
+    if (i == entries->u.count + 1) {
+        SetFont(g_guiContext->fontId);
+        i = -1;
+    }
+    return i;
+}
+
 // Fills the bounding rectangle of a gadget entry (the body of GetGadgetRect at
 // 0x4a1630, which the compiler inlined here).
 static inline void GetGadgetRect_inlined(Gadget* entry, Rect* rect)
@@ -4470,21 +4492,7 @@ void __stdcall DrawLabel(Gui* obj, int index)
     obj->language = obj->values[1];
     Gadget* entries = obj->layer->entries;
 
-    int i = 1;
-    int t = 0;
-    for (; i < entries[0].u.count + 1; i++) {
-        if (entries[i].type == 7) {
-            if (t == entries[index].tab) {
-                SetFont(entries[i].u.list.language);
-                break;
-            }
-            t++;
-        }
-    }
-    if (i == entries[0].u.count + 1) {
-        SetFont(g_guiContext->fontId);
-        i = -1;
-    }
+    int i = SelectFontForEntry_inlined(entries, index);
 
 
     if (entries[index].x == -1)
@@ -4651,12 +4659,7 @@ void CheckPlayerTimeouts();
 int HandleNetPackets();
 void SendNetHeartbeat();
 int AreAllPlayersReady();
-int AssignStartPositions();
-void SendLoadProgress();
-int BroadcastPendingViewState();
 
-// Unused here: real declarations that keep the file's symbol count.
-struct Class_004a1b40;
 
 // FUNCTION: 0x4a5f40
 void __stdcall DrawButton(Gui* menu, int index)
@@ -5149,27 +5152,6 @@ void __stdcall BeginTextEdit(Gui* obj, int index)
     obj->layer->current = index;
     CommitTextEdit(obj, index, target->u.text, target->field_138, 0);
     ClearKeyQueue();
-}
-
-// A copy of the function at 0x4a1810 (another unit), inlined in HandleTextInput.
-static inline int SelectFontForEntry_inlined(Gadget* entries, int index)
-{
-    int n = 0;
-    int i = 1;
-    for (; i < entries->u.count + 1; i++) {
-        if (entries[i].type == 7) {
-            if (n == entries[index].tab) {
-                SetFont(entries[i].u.list.language);
-                break;
-            }
-            n++;
-        }
-    }
-    if (i == entries->u.count + 1) {
-        SetFont(g_guiContext->fontId);
-        i = -1;
-    }
-    return i;
 }
 
 // One mouse button's action on the entry: the rect GetGadgetRectByIndex fills here is
@@ -6162,9 +6144,6 @@ static inline Gadget* entry_at(Gui* obj, int index)
 // changed, refreshes the gadget and runs the entry's callback (if any).
 // Note: the upper clamp still uses field_136 - 1, as the copy-paste source of
 // this function did, even though this side scrolls the other way.
-// Unused here: real declarations that keep the file's symbol count.
-struct Object_004a07d0;
-struct Object_004a0c70;
 
 // FUNCTION: 0x4a9780
 void __stdcall IncrementKnobPos(Gui* obj, int index)
