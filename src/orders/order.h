@@ -109,7 +109,7 @@ struct Order {
     void Wait();
     Vec3* Position();
     int Advance(int distance);
-    int SerializeToSave(Unit* unit, File_0043a970* file, char* name);
+    int SerializeToSave(Unit* unit, HapiBank* file, char* name);
 };
 #pragma pack(pop)
 
