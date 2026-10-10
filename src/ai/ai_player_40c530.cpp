@@ -27,6 +27,12 @@
 #undef Elem_0040cc40
 #undef Elem_0040d4f0
 
+// Unused here: the symbol ids these declarations take keep the allocation
+// (docs/c2-regalloc.md), standing in for the placeholder class ta_types.h
+// no longer declares.
+void RegisterEmptyAtexitB(void);
+bool __cdecl ReadGdperf(unsigned long, void*);
+
 // A map cell and its sort key, the element of the vector at +0x4d.
 struct Elem_0040cc40 {
     Point16 pos;                       // +0x0
