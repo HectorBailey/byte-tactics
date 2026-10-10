@@ -1474,7 +1474,7 @@ public:
     void* Allocate(unsigned int n);
 };
 
-class Tree_004da8d0 {
+class Tree_004da8d0 : public BlockMapAllocator {
 public:
     char field_0;                      // +0x0
     char field_1;                      // +0x1
@@ -1517,7 +1517,7 @@ void Tree_004da8d0::Init()
     std::_Lockit lock;
     if (g_blockMapNil == 0) {
         Node_004da8d0* nil =
-            (Node_004da8d0*)((BlockMapAllocator*)this)->Allocate(0x40);
+            (Node_004da8d0*)Allocate(0x40);
         nil->parent = 0;
         nil->color = 1;
         g_blockMapNil = nil;
@@ -4819,6 +4819,7 @@ struct Node_004e18c0 {
     Node_004e18c0* right;              // +0x8
 };
 
+// The ++ operators view ptr as a NameMapIter (_Inc is out of line there); a Node_004e18c0 cannot be a NameMapIter without moving ids.
 class Iter_004e18c0 {
 public:
     Node_004e18c0* ptr;
@@ -4848,10 +4849,8 @@ public:
     Iter_004e18c0 Begin();
 };
 
-class Class_004e18c0 {
+class Class_004e18c0 : public Class_004e2240 {
 public:
-    char unknown_0[4];                 // +0x0
-    Node_004e18c0* head;               // +0x4
     bool multi;                        // +0x8
     int size;                          // +0xc
     bool changed;                      // +0x10
@@ -4874,7 +4873,7 @@ public:
         size = 0;
         head->left = head;
         head->right = head;
-        return ((Class_004e2240*)this)->Begin();
+        return Begin();
     }
 
     void Clear();
@@ -4998,6 +4997,7 @@ BOOL __stdcall PerformanceDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPa
 {
     if (msg == WM_INITDIALOG) {
         SetWindowLongA(hwnd, GWL_USERDATA, lParam);
+        // lParam is a parameter, so it cannot be retyped.
         ((PerformanceDialog*)lParam)->hwnd = hwnd;
     }
     PerformanceDialog* obj = (PerformanceDialog*)GetWindowLongA(hwnd, GWL_USERDATA);
@@ -5231,6 +5231,7 @@ BOOL PerformanceDialog::HandlePerformanceMessage(UINT msg, WPARAM wParam, LPARAM
             Map_004df590* names = (Map_004df590*)&info->names;
             Node_004df590* node = names->head->left;
             SendDlgItemMessageA(hwnd, 0x3f4, 0x184, 0, 0);
+            // Clear lives on this view of the map; the local keeps its own type.
             ((Class_004e18c0*)&map)->Clear();
             // Guarded do-while: a while or for loop moves the loop registers.
             if (Iterator_004df590(node) != Iterator_004df590(names->head)) {
@@ -5686,6 +5687,7 @@ BOOL __stdcall MemoryStatusDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 {
     if (msg == WM_INITDIALOG) {
         SetWindowLongA(hwnd, GWL_USERDATA, lParam);
+        // lParam is a parameter, so it cannot be retyped.
         ((MemoryStatusDialog*)lParam)->hwnd = hwnd;
     }
     MemoryStatusDialog* obj = (MemoryStatusDialog*)GetWindowLongA(hwnd, GWL_USERDATA);
