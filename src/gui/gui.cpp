@@ -4699,19 +4699,7 @@ void __stdcall DrawButton(Gui* menu, int index)
     if (me->attribs & 0x8000)
         menu->language = menu->values[1];
 
-    // Own counter, not t: it shares the slot of t.
-    int tab = 0;
-    for (i = 1; i < entries->u.count + 1; i++) {
-        if (entries[i].type == 7) {
-            if (tab == me->tab) {
-                SetFont(entries[i].u.list.language);
-                break;
-            }
-            tab++;
-        }
-    }
-    if (i == entries->u.count + 1)
-        SetFont(g_guiContext->fontId);
+    i = SelectFontForEntry_inlined(entries, index);
 
     textw = TruncateGadgetText(menu, index);
     surface = entries->u.assets.surface;
@@ -6131,7 +6119,6 @@ void __stdcall DecrementKnobPos(Gui* obj, int index)
 // Forward declarations of the list steps below: their symbol ids keep IncrementKnobPos matching.
 void __stdcall ListBoxSelectUp(Gui* param_1, int index);
 void __stdcall ListBoxSelectDown(Gui* param_1, int index);
-void OpenBuildMenuPage(int);
 
 // Must stay a static inline helper: written inline it changes the load order.
 static inline Gadget* entry_at(Gui* obj, int index)
