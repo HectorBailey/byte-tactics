@@ -2837,6 +2837,28 @@ static inline int LineHeight_004a3780()
     return ((GafFrame*)GetGafFrame(g_guiContext->list->field_0c, 0x49))->height + 2;
 }
 
+// The body of SelectFontForEntry at 0x4a1810, which the compiler inlined into several
+// functions: makes the font of the entry's group current and returns its number, or -1.
+static inline int SelectFontForEntry_inlined(Gadget* entries, int index)
+{
+    int n = 0;
+    int i = 1;
+    for (; i < entries->u.count + 1; i++) {
+        if (entries[i].type == 7) {
+            if (n == entries[index].tab) {
+                SetFont(entries[i].u.list.language);
+                break;
+            }
+            n++;
+        }
+    }
+    if (i == entries->u.count + 1) {
+        SetFont(g_guiContext->fontId);
+        i = -1;
+    }
+    return i;
+}
+
 // FUNCTION: 0x4a3780
 int __stdcall HandleListBoxInput(Object_004a3780* obj, int index, int param_3)
 {
@@ -2857,18 +2879,7 @@ int __stdcall HandleListBoxInput(Object_004a3780* obj, int index, int param_3)
     Point_004a3780 point = obj->point;
     point.x -= entries[0].x;
     point.y -= entries[0].y;
-    int i;
-    for (i = 1; i < entries[0].u.count + 1; i++) {
-        if (entries[i].type == 7) {
-            if (n == me->tab) {
-                SetFont(entries[i].u.list.language);
-                break;
-            }
-            n++;
-        }
-    }
-    if (i == entries[0].u.count + 1)
-        SetFont(g_guiContext->current);
+    int i = SelectFontForEntry_inlined(entries, index);
 
     int size = LineHeight_004a3780();
     short da = me->u.list.scroll;
@@ -3030,16 +3041,10 @@ end:
 
 
 // Unused here: real declarations that keep the file's symbol count.
-void EmptyPostSimStepHook_B();
 void EmptyPostSimStepHook_C();
-int MainLoopContinueStub();
 int MainLoopContinueStub_B();
 int MainLoopContinueStub_C();
-void EmptyMainLoopHook();
-void EmptyMainLoopHook_B();
 
-struct Source_004adf10;
-struct Source_004ae410;
 
 struct Table_004a3eb0 {
     char unknown_0[4];
@@ -4447,28 +4452,6 @@ void __stdcall LayoutLabelText(Gui* obj, int index)
     // Stored via entries[index], not entry: pins the store order of x, w and h.
     entries[index].x = (short)nx;
     entry->height = (short)lh;
-}
-
-// The body of SelectFontForEntry at 0x4a1810, which the compiler inlined into several
-// functions: makes the font of the entry's group current and returns its number, or -1.
-static inline int SelectFontForEntry_inlined(Gadget* entries, int index)
-{
-    int n = 0;
-    int i = 1;
-    for (; i < entries->u.count + 1; i++) {
-        if (entries[i].type == 7) {
-            if (n == entries[index].tab) {
-                SetFont(entries[i].u.list.language);
-                break;
-            }
-            n++;
-        }
-    }
-    if (i == entries->u.count + 1) {
-        SetFont(g_guiContext->fontId);
-        i = -1;
-    }
-    return i;
 }
 
 // Fills the bounding rectangle of a gadget entry (the body of GetGadgetRect at
@@ -6092,6 +6075,10 @@ void __stdcall CloseTopScreen(Gui* gui)
 // [0, field_136 - 1]. When the value actually changes it marks the object
 // changed, refreshes the gadget and runs the entry's callback (if any).
 
+// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
+int DrawEndGameFrame();
+void RunEndGameState();
+
 // FUNCTION: 0x4a96d0
 void __stdcall DecrementKnobPos(Gui* obj, int index)
 {
@@ -6119,6 +6106,7 @@ void __stdcall DecrementKnobPos(Gui* obj, int index)
 // Forward declarations of the list steps below: their symbol ids keep IncrementKnobPos matching.
 void __stdcall ListBoxSelectUp(Gui* param_1, int index);
 void __stdcall ListBoxSelectDown(Gui* param_1, int index);
+void OpenBuildMenuPage(int);
 
 // Must stay a static inline helper: written inline it changes the load order.
 static inline Gadget* entry_at(Gui* obj, int index)
