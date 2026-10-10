@@ -485,7 +485,7 @@ void __stdcall AddTextGadget(Layer* obj, char* name, char* text,
     e->field_27 = 0;
     e->tab = 0;
     e->field_29 = 1;
-    e->unknown_2a = 0;
+    e->commonAttribs = 0;
     strcpy(e->name, name);
     strncpy(e->u.text, text, 0x7f);
     e->u.text[0x7f] = 0;
