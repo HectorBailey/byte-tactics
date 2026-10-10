@@ -10,8 +10,8 @@
 // and flag setters), the list gadget's drawing, scrolling and input, the GUI
 // layout engine that draws and handles the gadgets of a screen's 0x15b-byte
 // entry table, and the helpers that render and close screens and switch the
-// current GUI context. 0x4a0880 (SetGadgetText) and 0x4a3ef0 (DrawSlider)
-// keep their own files: each only matches at its own file's symbol count.
+// current GUI context. 0x4a0880 (SetGadgetText) comes last, out of address
+// order. 0x4a3ef0 (DrawSlider) keeps its own file (docs/split-modules.md).
 //
 // <windows.h> and <math.h> are only for their symbol ids: DrawButton,
 // RenderLayer and the list steps match only at this symbol count.
@@ -862,8 +862,8 @@ void __stdcall SetGadgetTextByName(Dialog_004a04f0* obj, char* name, char* text)
     }
 }
 
-// 0x4a0880 keeps its own file: the joined file's include set and prelude
-// put the entries pointer in eax instead of ecx.
+// SetGadgetText is defined at the end of the file; this declaration and the
+// type it names keep the symbol ids of the functions after it.
 struct Object_004a0880;
 void __stdcall SetGadgetText(Object_004a0880* obj, int index, char* text);
 
@@ -6767,4 +6767,17 @@ int GetGuiContext(void)
 void __stdcall SetDefaultFont(int* param_1, int param_2)
 {
     *param_1 = param_2;
+}
+
+// The GUI context under the name SetGadgetText's declaration above gives it.
+struct Object_004a0880 : Dialog_004a04f0 {
+};
+
+// FUNCTION: 0x4a0880
+void __stdcall SetGadgetText(Object_004a0880* obj, int index, char* text)
+{
+    strcpy(obj->holder->entries[index].u.text, text);
+    if (obj->current == index) {
+        obj->length = strlen(text);
+    }
 }
