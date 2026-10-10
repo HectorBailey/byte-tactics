@@ -4901,6 +4901,13 @@ void __stdcall ClearGroupStatus(Gui* param_1, int index)
     }
 }
 
+// True when the point lies inside the rect, edges included (the body of IsPointInRect
+// at 0x4a1920, which the compiler inlined here).
+static inline int PointInButtonRect(const Rect* r, int px, int py)
+{
+    return px >= r->left && px <= r->right && py >= r->top && py <= r->bottom;
+}
+
 static inline int FindKind(Gadget* entries, unsigned char kind)
 {
     for (int i = 1; i < entries->u.count + 1; i++) {
@@ -4934,8 +4941,7 @@ int __stdcall HandleButtonInput(Gui* obj, int index, int param_3)
     point.x -= entries->x;
     point.y -= entries->y;
 
-    if (point.x >= r.left && point.x <= r.right
-        && point.y >= r.top && point.y <= r.bottom) {
+    if (PointInButtonRect(&r, point.x, point.y)) {
         obj->hoverGadgetIndex = index;
         if (IsMouseButtonMessage(obj, 1)) {
             obj->focus = -1;
@@ -4955,6 +4961,7 @@ int __stdcall HandleButtonInput(Gui* obj, int index, int param_3)
             if (!HasMouseKeyFlags(obj, 3))
                 goto fail;
             obj->focus = -1;
+            // These three rect tests stay written out: through the helper the compares reorder.
             if (point.x < r.left || point.x > r.right
                 || point.y < r.top || point.y > r.bottom) {
                 entry->field_138 = obj->clickStatusCache;
@@ -4997,8 +5004,7 @@ int __stdcall HandleButtonInput(Gui* obj, int index, int param_3)
         if (entry->attribs & 8) {
             if (HasMouseKeyFlags(obj, 3))
                 goto fail;
-            if (point.x < r.left || point.x > r.right
-                || point.y < r.top || point.y > r.bottom)
+            if (!PointInButtonRect(&r, point.x, point.y))
                 goto fail;
             if (entry->field_138 == 1)
                 entry->field_138 = 0;
@@ -5012,8 +5018,7 @@ int __stdcall HandleButtonInput(Gui* obj, int index, int param_3)
         if (entry->attribs & 0x100) {
             if (!IsMouseButtonMessage(obj, 1))
                 goto fail;
-            if (point.x < r.left || point.x > r.right
-                || point.y < r.top || point.y > r.bottom)
+            if (!PointInButtonRect(&r, point.x, point.y))
                 goto fail;
             GafEntry* p = entry->gaf;
             if (p != 0) {
@@ -5031,8 +5036,7 @@ int __stdcall HandleButtonInput(Gui* obj, int index, int param_3)
             obj->focus = -1;
             entry->field_138 = 0;
             ClearPeerStatus(obj, index);
-            if (point.x >= r.left && point.x <= r.right
-                && point.y >= r.top && point.y <= r.bottom
+            if (PointInButtonRect(&r, point.x, point.y)
                 && !(entry->attribs & 0x1800)) {
                 if (entry->stages != 0) {
                     entry->stageIndex += 1;
@@ -5055,15 +5059,13 @@ int __stdcall HandleButtonInput(Gui* obj, int index, int param_3)
                 return 0;
             }
         } else if (entry->field_138 == 0
-                   && point.x >= r.left && point.x <= r.right
-                   && point.y >= r.top && point.y <= r.bottom) {
+                   && PointInButtonRect(&r, point.x, point.y)) {
             entry->field_138 = 1;
             DAT_0051fbac = 0xf;
         } else {
             if (entry->field_138 == 0)
                 goto fail;
-            if (point.x >= r.left && point.x <= r.right
-                && point.y >= r.top && point.y <= r.bottom)
+            if (PointInButtonRect(&r, point.x, point.y))
                 goto fail;
             entry->field_138 = 0;
             DrawButton(obj, index);
@@ -6122,9 +6124,6 @@ void __stdcall CloseTopScreen(Gui* gui)
 // Decrements the scroll offset (knobPos) of GUI entry `index`, clamped to
 // [0, field_136 - 1]. When the value actually changes it marks the object
 // changed, refreshes the gadget and runs the entry's callback (if any).
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
-int DrawEndGameFrame();
-
 
 // FUNCTION: 0x4a96d0
 void __stdcall DecrementKnobPos(Gui* obj, int index)
@@ -6171,8 +6170,6 @@ struct Object_004a07d0;
 struct Object_004a0c70;
 struct Object_004a14c0;
 struct Object_004a9780;
-struct Object_004ab060;
-struct Object_004ab5b0;
 
 // FUNCTION: 0x4a9780
 void __stdcall IncrementKnobPos(Gui* obj, int index)
