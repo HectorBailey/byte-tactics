@@ -207,7 +207,7 @@ struct Game {
     char unknown_1439f[0x148db - 0x1439f];
     void* logos32;                     // +0x148db
     char unknown_148df[0x37e23 - 0x148df];
-    int viewCullMinX;                  // +0x37e23
+    int screenHeight;                  // +0x37e23
     char unknown_37e27[0x37efa - 0x37e27];
     int interfaceType;                 // +0x37efa
     char unknown_37efe[0x37f02 - 0x37efe];
@@ -1587,7 +1587,7 @@ void __stdcall DrawMapDebugOverlay(void* surface)
             p[3].x = (x + 8) * 16 - g_game->scrollX;
             p[3].y = (y + 2) * 16 - (heights[3] >> 1) - g_game->scrollY;
             tile -= g_game->mapWidthTiles; --y;
-            if (p[0].y < g_game->viewCullMinX) offscreen = 0;
+            if (p[0].y < g_game->screenHeight) offscreen = 0;
             if (g_game->debugMode == 1) {
                 if (movement) {
                     unsigned int state = (movement->states[movement->width * (y >> 4) + x] >> ((y & 15) * 2)) & 3;

@@ -265,8 +265,8 @@ struct Game {
     char unknown_147ab[0x14833 - 0x147ab];
     unsigned short* sidePanelBotSeq[5];   // +0x14833
     char unknown_14847[0x37e1f - 0x14847];
-    int offscreenHeight;                  // +0x37e1f
-    int viewCullMinX;                     // +0x37e23
+    int screenWidth;                      // +0x37e1f
+    int screenHeight;                     // +0x37e23
     char unknown_37e27[0x37e60 - 0x37e27];
     Snapshot_0046a860 selectionInfoCache; // +0x37e60
     char unknown_37e9c[0x37f3d - 0x37e9c];
@@ -290,7 +290,7 @@ struct Game {
 
 // FUNCTION: 0x46a860
 void __stdcall DrawUnitInfoPanel(void* surface) {
-    int yOffset = g_game->viewCullMinX - g_game->baseHeight;
+    int yOffset = g_game->screenHeight - g_game->baseHeight;
     Snapshot_0046a860 snapshot;
     memset(&snapshot, 0, sizeof(snapshot));
     char text[256];
@@ -308,12 +308,12 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
             DrawFrame(surface, (void*)bmp, (short)bmp->xOffset + y,
                          (short)bmp->yOffset + dy);
             y += bmp->width;
-        } while (y < g_game->offscreenHeight);
+        } while (y < g_game->screenWidth);
 
         SetFont(g_game->fontComix);
         SetTextColors(0x53, GetTextKeyColor());
         // No pfable or field_c locals: the PFSTATE sprintf re-reads g_game->displayContext per argument.
-        int pfstate = g_game->viewCullMinX - GetFontHeight() - 1;
+        int pfstate = g_game->screenHeight - GetFontHeight() - 1;
         sprintf(text, "PFSTATE %d, PFABLE %d\n", g_game->displayContext->flags & 1,
                 g_game->displayContext->field_9c);
         DrawString(surface, (unsigned char*)text, 0x82, pfstate, -1);
@@ -421,7 +421,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
         DrawFrame(surface, (void*)bmp, (short)bmp->xOffset + y,
                      (short)bmp->yOffset + dy);
         y += bmp->width;
-    } while (y < g_game->offscreenHeight);
+    } while (y < g_game->screenWidth);
 
     if (snapshot.button != -1) {
         strncpy(text, (char*)(snapshot.button * 0x15b + g_game->layer->value + 2), 0x10);

@@ -108,9 +108,9 @@ struct Game {
     char unknown_14883[0x148cb - 0x14883];
     unsigned short* cursorNormal;  // +0x148cb
     char unknown_148cf[0x37e1b - 0x148cf];
-    int offscreenWidth;        // +0x37e1b
-    int offscreenHeight;         // +0x37e1f
-    int viewCullMinX;  // +0x37e23
+    int offscreen;             // +0x37e1b
+    int screenWidth;             // +0x37e1f
+    int screenHeight;  // +0x37e23
     char unknown_37e27[0x37e9c - 0x37e27];
     short unitIndex;     // +0x37e9c
     char unknown_37e9e[0x37ea0 - 0x37e9e];
@@ -212,8 +212,8 @@ void __stdcall SetRestoreSurface(int param_1);
 // FUNCTION: 0x490ac0
 void CreateOffscreenSurface()
 {
-    g_game->offscreenWidth = AllocSurface(g_offscreenSurfaceName, g_game->offscreenHeight, g_game->viewCullMinX);
-    SetRestoreSurface(g_game->offscreenWidth);
+    g_game->offscreen = AllocSurface(g_offscreenSurfaceName, g_game->screenWidth, g_game->screenHeight);
+    SetRestoreSurface(g_game->offscreen);
 }
 
 // Releases the offscreen object created by 0x490ac0.
@@ -223,8 +223,8 @@ void RestoreScreen();
 // FUNCTION: 0x490b00
 void FreeOffscreenSurface()
 {
-    GameFreeThunk((int*)g_game->offscreenWidth);
-    g_game->offscreenWidth = 0;
+    GameFreeThunk((int*)g_game->offscreen);
+    g_game->offscreen = 0;
     SetRestoreSurface(0);
     RestoreScreen();
 }
@@ -568,11 +568,11 @@ void InitGame()
         mem.dwLength = 0x20;
         GlobalMemoryStatus(&mem);
     }
-    g_game->offscreenHeight = GetScreenWidth();
-    g_game->viewCullMinX = GetScreenHeight();
-    g_game->offscreenWidth = AllocSurface(g_offscreenSurfaceName, g_game->offscreenHeight,
-                                      g_game->viewCullMinX);
-    SetRestoreSurface(g_game->offscreenWidth);
+    g_game->screenWidth = GetScreenWidth();
+    g_game->screenHeight = GetScreenHeight();
+    g_game->offscreen = AllocSurface(g_offscreenSurfaceName, g_game->screenWidth,
+                                      g_game->screenHeight);
+    SetRestoreSurface(g_game->offscreen);
     g_game->endGameFlags &= 0xfffe;
     g_game->endGameFlags &= 0xfffd;
     g_game->restartMissionRequest = 0;
@@ -692,8 +692,8 @@ void ShutdownGame(void)
     FreeGameFonts();
     ShutdownSound();
     FreeAnimFiles();
-    GameFreeThunk((int*)g_game->offscreenWidth);
-    g_game->offscreenWidth = 0;
+    GameFreeThunk((int*)g_game->offscreen);
+    g_game->offscreen = 0;
     SetRestoreSurface(0);
     RestoreScreen();
     ClearOrderTypeTable();
@@ -814,18 +814,18 @@ void __stdcall SetOffscreenSurface(int param_1);
 // FUNCTION: 0x491a70
 void Force640x480Surfaces()
 {
-    g_game->offscreenHeight = 0x280;
-    g_game->viewCullMinX = 0x1e0;
+    g_game->screenWidth = 0x280;
+    g_game->screenHeight = 0x1e0;
     if (GetScreenWidth() != 0x280 || GetScreenHeight() != 0x1e0) {
-        GameFreeThunk((int*)g_game->offscreenWidth);
-        g_game->offscreenWidth = 0;
+        GameFreeThunk((int*)g_game->offscreen);
+        g_game->offscreen = 0;
         SetRestoreSurface(0);
         RestoreScreen();
         SetWindowPos(g_game->displayContext->hwnd, 0, 0, 0, 0x280, 0x1e0, 4);
         SetResolution(0x280, 0x1e0);
-        g_game->offscreenWidth = AllocSurface(g_offscreenSurfaceName, g_game->offscreenHeight, g_game->viewCullMinX);
-        SetRestoreSurface(g_game->offscreenWidth);
-        SetOffscreenSurface(g_game->offscreenWidth);
+        g_game->offscreen = AllocSurface(g_offscreenSurfaceName, g_game->screenWidth, g_game->screenHeight);
+        SetRestoreSurface(g_game->offscreen);
+        SetOffscreenSurface(g_game->offscreen);
     }
 }
 

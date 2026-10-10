@@ -305,9 +305,9 @@ struct Game {
     char unknown_147a7[0x148cf - 0x147a7];
     int cursorHourglass;                // +0x148cf
     char unknown_148d3[0x37e1b - 0x148d3];
-    int offscreenWidth;                 // +0x37e1b
-    int offscreenHeight;                // +0x37e1f
-    int height;                         // +0x37e23
+    int offscreen;                      // +0x37e1b
+    int screenWidth;                    // +0x37e1f
+    int screenHeight;                   // +0x37e23
     union {                             // +0x37e27
         Rect_00498da0 lim;
         struct {
@@ -966,18 +966,18 @@ void LoadingScreenFrame(void)
             CloseTopScreen(&g_game->field_519);
         }
         BlankScreen();
-        g_game->offscreenHeight = 0x280;
-        g_game->height = 0x1e0;
+        g_game->screenWidth = 0x280;
+        g_game->screenHeight = 0x1e0;
         if (GetScreenWidth() != 0x280 || GetScreenHeight() != 0x1e0) {
-            GameFreeThunk((void*)g_game->offscreenWidth);
-            g_game->offscreenWidth = 0;
+            GameFreeThunk((void*)g_game->offscreen);
+            g_game->offscreen = 0;
             SetRestoreSurface(0);
             RestoreScreen();
             SetWindowPos(g_game->displayContext->hwnd, 0, 0, 0, 0x280, 0x1e0, 4);
             SetResolution(0x280, 0x1e0);
-            g_game->offscreenWidth = (int)AllocSurface("OFFSCREEN", g_game->offscreenHeight, g_game->height);
-            SetRestoreSurface(g_game->offscreenWidth);
-            SetOffscreenSurface((void*)g_game->offscreenWidth);
+            g_game->offscreen = (int)AllocSurface("OFFSCREEN", g_game->screenWidth, g_game->screenHeight);
+            SetRestoreSurface(g_game->offscreen);
+            SetOffscreenSurface((void*)g_game->offscreen);
         }
         BuildDataPath(aux, "palettes", "guipal", "PAL");
         surfaceHandle = HAPI_LoadFile((unsigned int*)aux, 0);
@@ -988,12 +988,12 @@ void LoadingScreenFrame(void)
         g_game->gameTick = 0;
         g_game->speedHysteresis = 0;
         g_game->endGameCountdown = (short)0xffff;
-        g_game->offscreenHeight = g_game->displayWidth;
-        g_game->height = g_game->displayHeight;
+        g_game->screenWidth = g_game->displayWidth;
+        g_game->screenHeight = g_game->displayHeight;
         g_game->viewCullMinX = 0x80;
         g_game->viewCullMinY = 0x20;
-        g_game->viewCullMaxX = g_game->offscreenHeight - 1;
-        g_game->viewCullMaxY = g_game->height - 0x21;
+        g_game->viewCullMaxX = g_game->screenWidth - 1;
+        g_game->viewCullMaxY = g_game->screenHeight - 0x21;
         g_game->viewPixelWidth = g_game->viewCullMaxX - g_game->viewCullMinX + 1;
         g_game->viewPixelHeight = g_game->viewCullMaxY - g_game->viewCullMinY + 1;
         LoadPictureCached("loadgame2bg", 0, 0, 0);
@@ -1023,15 +1023,15 @@ void LoadingScreenFrame(void)
         BlankScreen();
         FreePictureCache();
         if (GetScreenWidth() != g_game->displayWidth || GetScreenHeight() != g_game->displayHeight) {
-            GameFreeThunk((void*)g_game->offscreenWidth);
-            g_game->offscreenWidth = 0;
+            GameFreeThunk((void*)g_game->offscreen);
+            g_game->offscreen = 0;
             SetRestoreSurface(0);
             RestoreScreen();
             SetWindowPos(g_game->displayContext->hwnd, 0, 0, 0, g_game->displayWidth,
                          g_game->displayHeight, 4);
             SetResolution(g_game->displayWidth, g_game->displayHeight);
-            g_game->offscreenWidth = (int)AllocSurface("OFFSCREEN", g_game->offscreenHeight, g_game->height);
-            SetRestoreSurface(g_game->offscreenWidth);
+            g_game->offscreen = (int)AllocSurface("OFFSCREEN", g_game->screenWidth, g_game->screenHeight);
+            SetRestoreSurface(g_game->offscreen);
         }
         DrawLightBars();
         MainLoopTick();
@@ -1073,7 +1073,7 @@ void LoadingScreenFrame(void)
     if (g_usePacketManager != 0) {
         (&g_packetManager)->SendAllQueued(1);
     }
-    SetOffscreenSurface((void*)g_game->offscreenWidth);
+    SetOffscreenSurface((void*)g_game->offscreen);
     // The result stays in a local: it gives the compare against a register.
     int ok = LockScreen(&gadget);
     if (ok != 0) {

@@ -284,9 +284,9 @@ struct Game {
   char unknown_14847[0x148cf - 0x14847];
   int cursorHourglass;                  // +0x148cf
   char unknown_148d3[0x37e1b - 0x148d3];
-  int offscreenWidth;                   // +0x37e1b
-  int offscreenHeight;                  // +0x37e1f
-  int height;                           // +0x37e23
+  int offscreen;                        // +0x37e1b
+  int screenWidth;                      // +0x37e1f
+  int screenHeight;                     // +0x37e23
   union {                               // +0x37e27
     Rect lim;
     struct {
@@ -375,7 +375,7 @@ static void DrawResourcePanel(Surface *ctx, PlayerState_00468cf0 *pl, Resources 
     ushort *gaf = (ushort *)GetGafFrame((int)g_game->sidePanelRows[side + (bx > 0x81) * 5], 0);
     BlitGafFrameAtOffset((int)ctx, (int)gaf, bx, 0);
     bx += *gaf;
-  } while (bx < g_game->offscreenHeight);
+  } while (bx < g_game->screenWidth);
   BlitSideLogoToRect((int)ctx, (int)pl, (int)&sideDef->rcLogo, 0);
   Rect *r = &sideDef->rcEnergyBar;
   bar = *r;
@@ -465,10 +465,10 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
   PlayerState_00468cf0 *player;
   int i, k;
 
-  cx = (g_game->offscreenHeight + 0x80) / 2;
-  cy = g_game->height / 2;
-  SetOffscreenSurface(g_game->offscreenWidth);
-  ctx = **(Surface **)&g_game->offscreenWidth;
+  cx = (g_game->screenWidth + 0x80) / 2;
+  cy = g_game->screenHeight / 2;
+  SetOffscreenSurface(g_game->offscreen);
+  ctx = **(Surface **)&g_game->offscreen;
   colors = &g_game->colors[0];
   HideSoftwareCursor();
   ctx.SetClipRect(g_game->lim);
@@ -776,7 +776,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
     DrawString((int)&ctx, (int)gameTime, 0x82, -0x22 - GetFontHeight() + GetScreenHeight(), -1);
   }
   if (g_game->pauseBits.b1)
-    DrawFrame((int)&ctx, GetGafFrame(g_game->cursorHourglass, 0), g_game->offscreenHeight - 0x10, g_game->height - 0x50);
+    DrawFrame((int)&ctx, GetGafFrame(g_game->cursorHourglass, 0), g_game->screenWidth - 0x10, g_game->screenHeight - 0x50);
   ResetClipRect((int)&ctx);
   BlitMenuLayers((int)&g_game->menu, (int)&ctx, (int)&g_game->lim);
   if (g_game->profileBarsEnabled != 0 && param_1 != 0) {

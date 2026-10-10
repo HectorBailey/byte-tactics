@@ -152,7 +152,7 @@ struct Game {
     char unknown_2a43[0x2bc0 - 0x2a43];
     unsigned char frontendSubstateRequest;  // +0x2bc0
     char unknown_2bc1[0x37e1b - 0x2bc1];
-    int offscreenWidth;                // +0x37e1b
+    int offscreen;                     // +0x37e1b
     char unknown_37e1f[0x37eee - 0x37e1f];
     int difficulty;                    // +0x37eee
     union {                            // +0x37ef2
@@ -297,7 +297,7 @@ void __stdcall DrawBitmapBackground(char* name, int lock)
     BuildDataPath(path, "bitmaps", name, "PCX");
     image = LoadBitmapByName(name, palette);
     SetPaletteColors(palette, 0, 0x100);
-    SetOffscreenSurface(g_game->offscreenWidth);
+    SetOffscreenSurface(g_game->offscreen);
     DrawSurface(0, image, 0, 0);
     FreeSurface(image);
     if (lock) {

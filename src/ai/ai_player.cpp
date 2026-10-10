@@ -1704,7 +1704,7 @@ bool PlayerAI::FindCellNearFeatures(UnitDef* type, Vec3* pos, std::vector<Elem_0
 // by a margin; the second grid is used for types whose field_1c0 is
 // non-negative). A cell is accepted when CanPlaceUnitFootprint allows the type there
 // and the score GetBuildSiteMetal is at most the type's footprint area times
-// twice net->surfaceMetal.
+// twice mapInfo->surfaceMetal.
 // FUNCTION: 0x40a5b0
 Elem_0040cc40::Elem_0040cc40(const Elem_0040cc40& o) : pos(o.pos), key(o.key)
 {

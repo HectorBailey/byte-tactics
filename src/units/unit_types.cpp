@@ -215,8 +215,8 @@ struct Game {
     char* soundCategories;             // +0x37e13
     int soundCategoryCount;            // +0x37e17
     char unknown_37e1b[0x37e1f - 0x37e1b];
-    int offscreenHeight;               // +0x37e1f
-    int viewCullMinX;                  // +0x37e23
+    int screenWidth;                   // +0x37e1f
+    int screenHeight;                  // +0x37e23
     char unknown_37e27[0x38d71 - 0x37e27];
     unsigned char loadPctUnits;        // +0x38d71
     char unknown_38d72[0x391c7 - 0x38d72];
@@ -990,7 +990,7 @@ void LoadUnitTypes() {
     obj = obj ? obj->Construct() : 0;
     g_game->unitTable = obj;
 
-    int t = g_game->viewCullMinX * g_game->offscreenHeight * 2;
+    int t = g_game->screenHeight * g_game->screenWidth * 2;
     int v = (int)(t * 1.3);
 
     int n = *(int*)((char*)g_game->displayContext + 0x620) / 0x100000 + 1;

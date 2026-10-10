@@ -349,8 +349,8 @@ struct Game {
     char unknown_1435b[0x1439b - 0x1435b];
     UnitType* unitDefs;                // +0x1439b
     char unknown_1439f[0x37e1f - 0x1439f];
-    int offscreenHeight;               // +0x37e1f
-    int viewCullMinX;                  // +0x37e23
+    int screenWidth;                   // +0x37e1f
+    int screenHeight;                  // +0x37e23
     char unknown_37e27[0x37e37 - 0x37e27];
     int viewPixelWidth;                // +0x37e37
     int viewPixelHeight;               // +0x37e3b
@@ -1944,8 +1944,8 @@ void UpdateEdgeScroll()
     Display_0041ce90* d = GetDisplay();
     if (!(d->flags_f0 & 2)) {
         GetCursorPos(&pt);
-        int w = g_game->offscreenHeight;
-        int h = g_game->viewCullMinX;
+        int w = g_game->screenWidth;
+        int h = g_game->screenHeight;
         if ((pt.x >= w || pt.y >= h) && pt.x < w + 100 && pt.y < h + 100
             && GetFocus() == d->hwnd) {
             mouse.x = pt.x;
@@ -1956,8 +1956,8 @@ void UpdateEdgeScroll()
                 mouse.y = h - 1;
         }
     } else {
-        int w = g_game->offscreenHeight;
-        int h = g_game->viewCullMinX;
+        int w = g_game->screenWidth;
+        int h = g_game->screenHeight;
         if (mouse.x >= w)
             mouse.x = w - 1;
         if (mouse.y >= h)
@@ -1966,13 +1966,13 @@ void UpdateEdgeScroll()
     int talk = IsScreenNamed(&g_game->gui, "TALK.GUI");
     int x = g_game->scrollX;
     int y = g_game->scrollY;
-    if ((IsKeyDown(0xf4) && !talk) || (mouse.x == 0 && mouse.y < g_game->viewCullMinX))
+    if ((IsKeyDown(0xf4) && !talk) || (mouse.x == 0 && mouse.y < g_game->screenHeight))
         x -= speed;
-    else if ((IsKeyDown(0xf6) && !talk) || mouse.x == g_game->offscreenHeight - 1)
+    else if ((IsKeyDown(0xf6) && !talk) || mouse.x == g_game->screenWidth - 1)
         x += speed;
-    if ((IsKeyDown(0xf5) && !talk) || (mouse.y == 0 && mouse.x < g_game->offscreenHeight))
+    if ((IsKeyDown(0xf5) && !talk) || (mouse.y == 0 && mouse.x < g_game->screenWidth))
         y -= speed;
-    else if ((IsKeyDown(0xf7) && !talk) || mouse.y == g_game->viewCullMinX - 1)
+    else if ((IsKeyDown(0xf7) && !talk) || mouse.y == g_game->screenHeight - 1)
         y += speed;
     if (g_game->scrollX != x || g_game->scrollY != y) {
         g_game->scrollX = x;

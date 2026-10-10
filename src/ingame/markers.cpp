@@ -172,7 +172,8 @@ struct Game {
     char unknown_ddb[0x1439b - 0xddb];
     UnitType* unitDefs;               // +0x1439b
     char unknown_1439f[0x1487f - 0x1439f];
-    Anim* cursorModeSeq[22];          // +0x1487f, this function uses [21]
+    Anim* cursorModeSeq[21];          // +0x1487f
+    Anim* cursorPathIconSeq;          // +0x148d3
     char unknown_148d7[0x38a47 - 0x148d7];
     unsigned int gameTick;            // +0x38a47
     char unknown_38a4b[0x391bf - 0x38a4b];
@@ -500,7 +501,7 @@ struct Trail_004394e0 {
 // Snapshots the position the caller passed in `out`,
 // calls DrawWeaponCoverage (which draws the order's icon and writes the new position
 // to `out`), and when `flag` is set walks the line from the snapshot to the
-// new position in 0x300000 steps, drawing frame `idx` of g_game->cursorModeSeq[21] at
+// new position in 0x300000 steps, drawing frame `idx` of g_game->cursorPathIconSeq at
 // each step. idx starts at (frames since order->timestamp, clamped at 0) /
 // max(1, anim->duration) % anim->count.
 // FUNCTION: 0x4394e0
@@ -524,7 +525,7 @@ void __stdcall DrawPathAnim(void* surface, View* view,
     if (dist < 0x10000)
         return;
 
-    Anim* anim = g_game->cursorModeSeq[21];
+    Anim* anim = g_game->cursorPathIconSeq;
     int pos = (t % 30) * 0x300000 / 30;
     unsigned short len = anim->duration;
     int frames = len < 1 ? 1 : (int)len;

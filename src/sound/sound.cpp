@@ -455,7 +455,7 @@ static inline int MapContains(unsigned int w, unsigned int h, int tx, int ty)
     return tx < w && ty < h;
 }
 
-// Plays the sound at soundIds[index] when the position is visible to the local
+// Plays the sound at sounds[index] when the position is visible to the local
 // player: explored (fog) map when g_game->mapFlags has bit 1 set, the shared
 // per-player visibility mask otherwise. Sends the 0x13 packet first when
 // param_3 is set, and picks the near (-585) or far (-1585) variant depending on

@@ -330,7 +330,7 @@ struct Projectile_0049c880 {
 struct Projectile_00499eb0;
 
 // The game state, as the weapon code sees it. The time word keeps one name per
-// view (now, frame, ticks, teamColor); 49d270's defs and 49e5b0's entries
+// view (now, frame, gameTick, teamColor); 49d270's defs and 49e5b0's entries
 // are one union, as are the two tracked-projectile pointers, 499a30's selected
 // and 49c740's tracked.
 struct Net {

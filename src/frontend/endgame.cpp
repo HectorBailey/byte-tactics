@@ -249,8 +249,8 @@ struct Game {
     void* logos32;                     // +0x148db
     char unknown_148df[0x37e1b - 0x148df];
     void* surface;                     // +0x37e1b
-    int offscreenHeight;               // +0x37e1f
-    int viewCullMinX;                  // +0x37e23
+    int screenWidth;                   // +0x37e1f
+    int screenHeight;                  // +0x37e23
     char unknown_37e27[0x37eee - 0x37e27];
     int difficulty;                    // +0x37eee
     char unknown_37ef2[0x38a47 - 0x37ef2];
@@ -473,8 +473,8 @@ void StepScreenFade(void)
 {
     Rect rect;
     rect.left = rect.top = 0;
-    rect.right = g_game->offscreenHeight;
-    rect.bottom = g_game->viewCullMinX;
+    rect.right = g_game->screenWidth;
+    rect.bottom = g_game->screenHeight;
     if (g_game->nextTime < GetTicks()) {
         FadeRectangle(0, &rect, g_game->steps - 0x1d);
         g_game->nextTime = GetTicks() + 1;
@@ -891,7 +891,7 @@ void __stdcall OpenEndMissionScreen()
         ApplyDifficultyButtons();
     }
     Player* player = &g_game->players[g_game->localPlayer];
-    int x = g_game->offscreenHeight / 2;
+    int x = g_game->screenWidth / 2;
     if (g_game->won != 0 && (player->active == 0 || !player->info->bit6)) {
         DrawFrame(layer->surface, GetGafFrame(g_game->endgameBadgeSeqA, 0), x, 0x1c);
     } else {
@@ -1079,7 +1079,7 @@ void __stdcall RunEndGameState()
     case 3:
         if(!g_game->done) {
             event[1]=0; event[0]=0;
-            event[2]=g_game->offscreenHeight; event[3]=g_game->viewCullMinX;
+            event[2]=g_game->screenWidth; event[3]=g_game->screenHeight;
             if(g_game->nextTime<GetTicks()) {
                 FadeRectangle(0,event,g_game->steps-29);
                 g_game->nextTime=GetTicks()+1;
@@ -1142,7 +1142,7 @@ void __stdcall RunEndGameState()
                 }
                 unsigned deadline=GetTickRate()*5+g_game->deadline;
                 if(deadline<GetTicks())
-                    DrawOutlinedString(g_game->surface,Translate("Click to continue."),g_game->gui.colours[0],g_game->gui.colours[0xf],g_game->viewCullMinX-20);
+                    DrawOutlinedString(g_game->surface,Translate("Click to continue."),g_game->gui.colours[0],g_game->gui.colours[0xf],g_game->screenHeight-20);
             }
         }
         break;

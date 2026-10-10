@@ -351,7 +351,7 @@ int LoadUnitInfo()
 
     // Drop the units marked incompatible, moving the last kept one into each
     // hole; `size` is the byte offset of the end of the kept units.
-    // Keep `size` and decrement it; indexing unitinfo[count - 1] loses ebp.
+    // Keep `size` and decrement it; indexing unitDefs[count - 1] loses ebp.
     int oldcount = count;
     for (unsigned short j = count - 1; j > 0; j--) {
         UnitDef* u = &g_game->unitDefs[j];

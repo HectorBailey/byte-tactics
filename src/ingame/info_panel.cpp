@@ -291,7 +291,7 @@ struct Game {
     char unknown_1435f[0x14377 - 0x1435f];
     Object_004cb650** unitModels;      // +0x14377
     char unknown_1437b[0x14383 - 0x1437b];
-    Vec3* scratch;                     // +0x14383
+    Vec3* tempXformPts;               // +0x14383
     Point* tempProjectedPts;           // +0x14387
     Point* assemPts;                   // +0x1438b
     char unknown_1438f[0x1439b - 0x1438f];
@@ -304,8 +304,8 @@ struct Game {
     void* logos32;                     // +0x148db
     char unknown_148df[0x37e1b - 0x148df];
     void* surface;                     // +0x37e1b
-    int offscreenHeight;               // +0x37e1f
-    int viewCullMinX;                  // +0x37e23
+    int screenWidth;                   // +0x37e1f
+    int screenHeight;                  // +0x37e23
     char unknown_37e27[0x37e3f - 0x37e27];
     union {
         struct {
@@ -623,7 +623,7 @@ void __stdcall BlitGafFrameAtOffset(void* param_1, short* param_2, int param_3, 
 void __stdcall DrawRotatedQuadOutline(void* surface, Vec3* offset,
                             Vec3* corners, short* angles)
 {
-    Vec3* scratch = g_game->scratch;
+    Vec3* scratch = g_game->tempXformPts;
     Point* points = g_game->tempProjectedPts;
     unsigned char color = g_game->color2;
     // corners is copied to c, which is the loop's induction variable: this
@@ -920,7 +920,7 @@ void __stdcall DrawNetworkStats(void* surface)
     Rect_004b0510 r;
     r.x1 = 0x81;
     r.x2 = 0xc1;
-    r.y1 = g_game->viewCullMinX - 0x5f;
+    r.y1 = g_game->screenHeight - 0x5f;
     r.y2 = r.y1 + 8;
     int h = GetFontHeight();
     GetByteRates(&sent, &received);
@@ -1191,7 +1191,7 @@ void __stdcall DrawSelectionBox(Vec3* view, Unit* unit)
 void __stdcall DrawProfileBarLine(int surface, const char* text, int index)
 {
     Rect_0046b900 rect;
-    int x = g_game->offscreenHeight - 0x5a;
+    int x = g_game->screenWidth - 0x5a;
     int c = GetFontHeight();
 
     rect.a = x - 0xc8;
@@ -1272,7 +1272,7 @@ void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,
                             Object_0046bae0* obj, short* angles)
 {
     Vec3* v = obj->verts;
-    Vec3* scratch = g_game->scratch;
+    Vec3* scratch = g_game->tempXformPts;
     Point* points = g_game->tempProjectedPts;
     int i = 0;
     // Every increment of both loops stays in the for header.

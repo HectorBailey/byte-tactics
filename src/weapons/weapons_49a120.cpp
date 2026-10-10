@@ -350,7 +350,7 @@ void __stdcall ApplyAreaDamage(Weapon_0049a120* weapon, Vec3_0049a120* pos)
     }
 
     if (weapon->def->flags.b.f30) {
-        // Every field is read through `other` (no weapons[j]): the derived
+        // Every field is read through `other` (no projectiles[j]): the derived
         // pointer is stepped after it.
         Weapon_0049a120* other = g_game->projectiles;
         for (int j = 0; j < g_game->projectileCount; j++, other++) {
