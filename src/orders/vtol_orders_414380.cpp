@@ -5,6 +5,7 @@
 #include <memory.h>
 #include <windows.h>
 struct Point { short x, y; };
+// Kept local, not util/vec3.h: with the header 0x414380 reaches only 92.7 to 93.6% whatever is declared.
 struct Vec3 {
     int x, y, z;
     void operator-=(const Vec3& v) { x-=v.x; y-=v.y; z-=v.z; }

@@ -8,6 +8,7 @@
 #include <windows.h>
 #include <vector>
 
+// Kept local, not util/vec3.h: with the header 0x410e70 drops to 97.3% and no balancing declarations recover it.
 struct Vec3 {
     int x, y, z;
 };
