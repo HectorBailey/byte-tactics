@@ -4417,6 +4417,27 @@ static inline int FindEntry(Gadget* entries, char* name)
     return -1;
 }
 
+// The body of SelectFontForEntry at 0x4a1810, which the compiler inlined into LayoutLabelText.
+static inline int SelectFont_4a53c0(Gadget* entries, int index)
+{
+    int n = 0;
+    int i = 1;
+    for (; i < entries->u.count + 1; i++) {
+        if (entries[i].type == 7) {
+            if (n == entries[index].tab) {
+                SetFont(entries[i].u.list.language);
+                break;
+            }
+            n++;
+        }
+    }
+    if (i == entries->u.count + 1) {
+        SetFont(g_guiContext->fontId);
+        i = -1;
+    }
+    return i;
+}
+
 // Walks the entry list of a layout object looking for the n-th tab stop
 // (entries whose +0x00 byte is 7), sets the language from that entry, computes
 // the line height, then lays the entry's text out right aligned (+0x1b bit 2),
@@ -4428,19 +4449,7 @@ void __stdcall LayoutLabelText(Gui* obj, int index)
 {
     Gadget* entries = obj->layer->entries;
     Gadget* entry = &entries[index];
-    int i;
-    int t = 0;
-    for (i = 1; i < entries[0].u.count + 1; i++) {
-        if (entries[i].type == 7) {
-            if (t == entry->tab) {
-                SetFont(entries[i].u.list.language);
-                break;
-            }
-            t++;
-        }
-    }
-    if (i == entries[0].u.count + 1)
-        SetFont(g_guiContext->fontId);
+    SelectFont_4a53c0(entries, index);
     int x = !entry->type ? 0 : entry->x;
     // Real variable declared here, assigned in each arm, one shared tail stores it.
     int nx = x;
@@ -4643,13 +4652,7 @@ void __stdcall DrawGadgetGlyph(Gui* obj, int index)
 // Draws one list-gadget entry: its glyph or frame, then the text (left,
 // right, centred, or centred with an underlined hotkey letter, flags 1/4/2/0x20).
 // Needed with the named glyph local in LineHeight: sets the flags 0x20 registers.
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
-
 // Unused here: real declarations that keep the file's symbol count.
-void UpdateTimeoutDialog();
-void CheckPlayerTimeouts();
-int HandleNetPackets();
-void SendNetHeartbeat();
 int AreAllPlayersReady();
 
 
