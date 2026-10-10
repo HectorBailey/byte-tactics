@@ -87,7 +87,11 @@ jobs:
           sudo apt-get install -y -q --no-install-recommends wine wine32:i386 wine64 p7zip-full cabextract
           wine --version
 
+      # A pull_request_target run would save uv's cache into main's, as with the
+      # toolchain below, so a fork's run only restores it.
       - uses: astral-sh/setup-uv@v6
+        with:
+          save-cache: ${{ github.event_name != 'pull_request_target' }}
 
       - name: Restore the toolchain
         id: toolchain
