@@ -54,12 +54,32 @@ void RegisterDataArchives();
 void CreateGameObject();
 void InitMissionStatus();
 
-class Class_0044e2d0 { public: char data[0x36]; Class_0044e2d0(Order*, const Vec3&); };
+class Class_0044e2d0 {
+public:
+    char data[0x36];
+    Class_0044e2d0(Order*, const Vec3&);
+    void SetAltitude(int);
+    void SetApproachRadius(int);
+};
 struct Game { char pad0[0x1422b]; int width, height; char pad14233[0x142b7-0x14233]; int overflowBucket; };
 #pragma pack(pop)
 extern Game* g_game;
-class Class_0044e730 { public: void SetApproachRadius(int); };
-class Class_0044e6c0 { public: void SetAltitude(int); };
+// Unused here: forward declarations of real functions; their symbol ids keep the
+// allocation of the functions after the merged views (docs/c2-regalloc.md).
+int GetCdPathMismatch();
+void SetUpEndMissionScreen();
+void StartScreenFade();
+void StepScreenFade();
+void ScheduleFadeTick();
+int IsFadeDone();
+void StepPaletteFade();
+void FillEndGameStatistics();
+int AreStatBarsComplete();
+int GetFontHeight();
+int GetTextKeyColor();
+void RegisterUnitOrders();
+void StepAllGafSequences();
+void ShowSoftwareCursor();
 void __stdcall AttachUnitToPiece(Unit*, Unit*, char, char);
 short __stdcall GetHeadingBetween(Vec3*, Vec3*);
 union Fixed { int value; struct { unsigned short frac; short whole; } parts; };
@@ -99,7 +119,7 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
         short angle=GetHeadingBetween(&unit->pos,&center);
         Vec3 pos=AddVec3(unit->pos,Offset(angle,0x3200000));
         Class_0044e2d0* move=new Class_0044e2d0(order,pos);
-        ((Class_0044e730*)move)->SetApproachRadius(128);
+        move->SetApproachRadius(128);
         order->flags|=0xe0;
         order->SetAttachedFx((OrderFx*)move);
         return 2;
@@ -120,7 +140,7 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
                 if ((unit->motion->flags&3)==1) {
                     unit->motion->SetFlightMode(unit,2);
                     Class_0044e2d0* move=new Class_0044e2d0(order,unit->pos);
-                    ((Class_0044e6c0*)move)->SetAltitude(unit->def->altitude/2);
+                    move->SetAltitude(unit->def->altitude/2);
                     order->SetAttachedFx((OrderFx*)move);
                     order->flags|=0xe0;
                 }
@@ -146,7 +166,7 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
         if (flags&0xe0) order->angle+=-RandomInt(0x2000)-0x5555;
         Vec3 pos=AddVec3(order->pos,Offset((short)order->angle,(unit->weapons[0].def->range+160)<<16));
         Class_0044e2d0* move=new Class_0044e2d0(order,pos);
-        ((Class_0044e730*)move)->SetApproachRadius(128);
+        move->SetApproachRadius(128);
         order->SetAttachedFx((OrderFx*)move);
         order->SetDeadlineTicks(RandomInt(30)+30);
         order->flags|=0xe0;
