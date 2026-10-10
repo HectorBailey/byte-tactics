@@ -114,3 +114,6 @@ reason is what stopped it. A module whose row list is empty is one file.
 | ingame/info_panel | src/ingame/info_panel_468cf0.cpp | The module includes `<windows.h>` and `<ddraw.h>` for 0x4685a0; with just those includes in front of the file, an imul operand order flips (94.8%). |
 | ingame/info_panel | src/ingame/info_panel_46a610.cpp | Merged (with the module's Unit, Feature, Game and FeatureSpot, and a Cell view), the prologue loads the feature table and the scroll offsets in another order (93.7%); 0 to 100 added declarations reach 94.7% at best. |
 | ingame/info_panel | src/ingame/info_panel_46a860.cpp | `// FLAGS: /Gi`, which the merged file cannot carry. |
+| game/players | src/game/players_4658e0.cpp | Its register plan follows the small symbol count of a file that includes only `<memory.h>`; in the module (51.3%) it differs at every count from the module's own to 1,024 more, and also in front of the module's first function. |
+| game/players | src/game/players_465ac0.cpp | Same as players_4658e0.cpp: in the module (79.6%) its register plan differs at every count from the module's own to 128 more, and also with the file's own view of the unit (75.7%). |
+| game/players | src/game/players_466050.cpp | Gap region (`data/functions.csv`): `tools/gapcheck.py` sizes a region by the file it is in, so it cannot share players_464290.cpp. |
