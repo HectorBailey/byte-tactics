@@ -28,11 +28,12 @@ struct ChatHudEntry {                  // 0x48 bytes
 };
 
 #include "player.h"
-#include "../util/vec3.h"
 
 struct Unit {
-    char unknown_0[0x6a];
-    Vec3 pos;                          // +0x6a
+    char unknown_0[0x6c];
+    short xWhole;                      // +0x6c, the whole part of pos.x
+    char unknown_6e[0x74 - 0x6e];
+    short zWhole;                      // +0x74, the whole part of pos.z
     char unknown_76[0x110 - 0x76];
     unsigned int flags;                // +0x110
     char unknown_114[0x118 - 0x114];
@@ -181,8 +182,7 @@ int ScrollToNextMessageUnit(void)
             Unit* u = &g->units[id];
             if (u->flags & 0x10000000) {
                 e->flags |= 0x30;
-                // The high halves of pos.x and pos.z (the map cell) are read as shorts.
-                CenterCameraOnPoint(((short*)&u->pos.x)[1], ((short*)&u->pos.z)[1], 1);
+                CenterCameraOnPoint(u->xWhole, u->zWhole, 1);
                 return 1;
             }
         }
