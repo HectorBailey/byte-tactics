@@ -1474,7 +1474,7 @@ int __stdcall AirToGroundHoverOrder(Unit* unit, Order* order, int flags)
         order->flags = 0x100e8;
         if ((unsigned int)unit->health < (unit->def->maxHealth >> 2) * 3) {
             std::vector<Unit*> v;
-            GetFactoriesInRadius(unit->owner->index, &unit->pos, 0xf00, &v);
+            GetFactoriesInRadius(unit->player->index, &unit->pos, 0xf00, &v);
             if (!v.empty()) {
                 order->SetAttachedFx(0);
                 Unit* target = v[RandomInt(v.size())];
