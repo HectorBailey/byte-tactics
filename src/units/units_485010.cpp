@@ -46,9 +46,8 @@ struct Entry_486360 {
 
 #include "../network/player_info.h"
 
-// Unused here: real functions declared to keep the file's symbol count (docs/c2-regalloc.md).
+// Unused here: a real function declared to keep the file's symbol count (docs/c2-regalloc.md).
 int StepTowards(int, int, int);
-void NopRetC(int, int, int);
 
 struct Unit;
 
@@ -160,10 +159,9 @@ struct Vec3_004853b0 {
     Fixed_004853b0 z;
 };
 
-struct WeaponAimCobCb {                // 0x1c bytes, vtable 0x4fd6f0
-    void* vtable;                      // +0x0
-    char unknown_4[0x1c - 0x4];
-};
+// This header's symbol ids replace those of the local aim callback view
+// (docs/c2-regalloc.md).
+#include "../weapons/unit_weapon_slot.h"
 
 class SpatialBucket {
 public:
@@ -226,11 +224,8 @@ union Flags114_485a40 {
 
 struct Unit {                          // 0x118 bytes
     UnitMotion* motion;                // +0x0
-    char unknown_4[0x8 - 0x4];
-    WeaponAimCobCb sub_8;              // +0x8
-    WeaponAimCobCb sub_24;             // +0x24
-    WeaponAimCobCb sub_40;             // +0x40
-    char unknown_5c[0x64 - 0x5c];
+    UnitWeaponSlot weapons[3];         // +0x4, stride 0x1c
+    char unknown_58[0x64 - 0x58];
     Angles16 angles;                   // +0x64
     Pos_00485a40 pos;                  // +0x6a
     ShortPair_485a40 screen;           // +0x76
@@ -825,12 +820,12 @@ extern void* g_weaponAimCobVtable[];
 void __stdcall InitUnitWeaponSlots(Unit* unit);
 void __stdcall UpdateMetalExtraction(Unit* unit);
 
-// Initialises a unit: finds its unit type, gives the three 0x1c-byte members
-// at +8, +0x24 and +0x40 their vtable, stores the type id at +0xa6, then hands
-// the unit to the position/flags setter, the object builder and two more
-// methods. When the unit type's +0x22f is 1 the unit also gets a new
-// UnitMotion and the type's +0x210 copied to +0x66, the tail of the
-// matched CreateUnitMotion inlined.
+// Initialises a unit: finds its unit type, gives the aim callback of each of
+// the three weapon slots (at +8, +0x24 and +0x40) its vtable, stores the type
+// id at +0xa6, then hands the unit to the position/flags setter, the object
+// builder and two more methods. When the unit type's +0x22f is 1 the unit
+// also gets a new UnitMotion and the type's +0x210 copied to +0x66, the tail
+// of the matched CreateUnitMotion inlined.
 // The three vtable stores are guarded by `if (unit)` but the +0xa6 store right
 // after them, and the new expression at the end, are not: a null unit pointer
 // writes to 0xa6, then to 0, and reads 0x92. Kept as the original has it.
@@ -839,11 +834,8 @@ void __stdcall InitUnit(int unitType, Pos_00485a40 pos, int param_5, Unit* unit)
 {
     UnitType* type = &g_game->unitDefs[(unsigned short)unitType];
     if (unit) {
-        WeaponAimCobCb* sub = (WeaponAimCobCb*)((char*)unit + 8);
-        for (int i = 0; i < 3; i++) {
-            sub->vtable = g_weaponAimCobVtable;
-            sub = (WeaponAimCobCb*)((char*)sub + 0x1c);
-        }
+        for (int i = 0; i < 3; i++)
+            unit->weapons[i].aimCob.ppVtbl = g_weaponAimCobVtable;
     }
     unit->unitDefIndex = (short)unitType;
     InitUnitFromType(unit, pos, param_5);
@@ -878,11 +870,8 @@ static inline void __stdcall InitUnit_00485e90(unsigned short unitType, Pos_0048
 {
     UnitType* type = &g_game->unitDefs[unitType];
     if (unit) {
-        WeaponAimCobCb* sub = (WeaponAimCobCb*)((char*)unit + 8);
-        for (int i = 0; i < 3; i++) {
-            sub->vtable = g_weaponAimCobVtable;
-            sub = (WeaponAimCobCb*)((char*)sub + 0x1c);
-        }
+        for (int i = 0; i < 3; i++)
+            unit->weapons[i].aimCob.ppVtbl = g_weaponAimCobVtable;
     }
     unit->unitDefIndex = unitType;
     InitUnitFromType(unit, pos, param_5);
@@ -1052,27 +1041,28 @@ int __stdcall IsUnitCommander(Unit* unit)
 
 // A live unit that changed its type (the linked unit name at g_game+0x37f5f
 // matches the unit type's name) recomputes a "Killed" kill count and sends the
-// 0xb byte command record at +0xa it builds here to its own player. param_2 is
-// the command kind: 7 means a spy / non-kill path, 4/5/9 or a positive
+// 0xb byte killed packet (type 0xc) it builds here to its own player; the
+// handler ApplyUnitDeath takes the same packet. param_2 is the kill type
+// (the packet's high nibble at +0xa): 7 means a spy / non-kill path, 4/5/9 or a positive
 // health skip the recount, otherwise the kills are a percentage of the
 // type's maxHealth.
 
 #pragma pack(push, 1)
-struct Cmd_004864b0 {
+struct UnitKilledPacket {
     unsigned char type;                // +0x0
     unsigned short unitId;             // +0x1
-    int killerId;                      // +0x3
-    unsigned short parentId;           // +0x7
-    signed char amount;                // +0x9
+    int attackerPlayerNetId;           // +0x3, the player net id of the last attacker slot
+    unsigned short attackerUnitId;     // +0x7, 0 for none
+    signed char cobKilledSeverity;     // +0x9, the Killed script's first result
     // 4-bit bitfields, not a plain char: they give the XOR read-modify-writes.
-    unsigned char count : 4;           // +0xa
-    unsigned char kind : 4;            // +0xa
+    unsigned char wreckageLevel : 4;   // +0xa
+    unsigned char killType : 4;        // +0xa
 };
 #pragma pack(pop)
 
 int __stdcall GetSlotDpid(unsigned char index);
 int __stdcall BroadcastPacket(int id, unsigned char* packet, int size);
-void __stdcall ApplyUnitDeath(Cmd_004864b0* cmd, int param);
+void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int param);
 void __stdcall PopUntilNamedLayout(int param);
 void __stdcall KillPlayerUnits(unsigned char player);
 
@@ -1104,18 +1094,18 @@ void __stdcall KillUnit(Unit* unit, int param_2)
         if (unit->buildLeft != 0.0f) {
             flag = 0;
         }
-        Cmd_004864b0 cmd;
-        // unitId before amount: sets the register roles.
+        UnitKilledPacket cmd;
+        // unitId before the severity: sets the register roles.
         cmd.unitId = unit->id;
-        cmd.amount = amount;
+        cmd.cobKilledSeverity = amount;
         cmd.type = 0xc;
-        cmd.count = flag;
-        cmd.kind = param_2;
-        cmd.killerId = GetSlotDpid(unit->lastAttackerSlot);
+        cmd.wreckageLevel = flag;
+        cmd.killType = param_2;
+        cmd.attackerPlayerNetId = GetSlotDpid(unit->lastAttackerSlot);
         if (unit->attacker == 0)
-            cmd.parentId = 0;
+            cmd.attackerUnitId = 0;
         else
-            cmd.parentId = unit->attacker->id;
+            cmd.attackerUnitId = unit->attacker->id;
         if (unit->player->active != 0 &&
             (unit->player->type == 1 || unit->player->type == 2)) {
             BroadcastPacket(unit->player->id, (unsigned char*)&cmd, 0xb);
@@ -1156,7 +1146,7 @@ void __stdcall AnnouncePlayerLeft(int id);
 void __stdcall AnnounceForcesDestroyed(void* player);
 
 // FUNCTION: 0x4866d0
-void __stdcall ApplyUnitDeath(Cmd_004864b0* cmd, int local)
+void __stdcall ApplyUnitDeath(UnitKilledPacket* cmd, int local)
 {
     Unit* unit;
     if (cmd->unitId == 0)
@@ -1169,12 +1159,12 @@ void __stdcall ApplyUnitDeath(Cmd_004864b0* cmd, int local)
     if (unit->player->index == g_game->playerIndex)
         AddEyeball(&unit->pos, unit->def->x202, unit->def->x170, 60);
     Unit* parent;
-    if (cmd->parentId == 0)
+    if (cmd->attackerUnitId == 0)
         parent = 0;
     else
-        parent = &g_game->units[cmd->parentId];
+        parent = &g_game->units[cmd->attackerUnitId];
     unit->attacker = parent;
-    unit->lastAttackerSlot = FindSlotByDpid(cmd->killerId);
+    unit->lastAttackerSlot = FindSlotByDpid(cmd->attackerPlayerNetId);
     g_game->conditions->NotifyUnitDied(unit);
     DeleteOrders(unit, 1);
     RemoveSpeechOfUnit(unit);
@@ -1183,18 +1173,18 @@ void __stdcall ApplyUnitDeath(Cmd_004864b0* cmd, int local)
     if (unit->carrier != 0)
         AttachUnitToPiece(unit, 0, -1, 1);
     while (unit->cargo != 0) {
-        unsigned char depth = cmd->kind != 3 ? 6 : 3;
+        unsigned char depth = cmd->killType != 3 ? 6 : 3;
         DamageUnit(unit->attacker, unit->cargo, 30000, depth, 0);
         AttachUnitToPiece(unit->cargo, 0, -1, 1);
     }
     ClearFootprintAndUnlink(unit);
     if ((g_game->mapFlags & 2) == 2)
         RemoveUnitLineOfSight(unit);
-    if (local == 0 && cmd->amount > 0)
-        unit->script->StartScriptWithArgs(g_killedScriptName, 0, 1, 1, cmd->amount, 0, 0, 0);
+    if (local == 0 && cmd->cobKilledSeverity > 0)
+        unit->script->StartScriptWithArgs(g_killedScriptName, 0, 1, 1, cmd->cobKilledSeverity, 0, 0, 0);
 
     int credited = 0;
-    switch (cmd->kind) {
+    switch (cmd->killType) {
     case 5:
         if (unit->lastAttackerSlot == 10 || unit->lastAttackerSlot == unit->playerIndex)
             break;
@@ -1283,7 +1273,7 @@ void __stdcall ApplyUnitDeath(Cmd_004864b0* cmd, int local)
             FlashScorePanelKillLoss(unit->lastAttackerSlot, unit->player->index);
     }
 
-    if (cmd->kind == 5 && unit->attacker != 0) {
+    if (cmd->killType == 5 && unit->attacker != 0) {
         // Field pointer, not a Unit* copy; and the copy into f is needed too.
         Unit** par = &unit->attacker;
         float health = 1.0f - unit->buildLeft;
@@ -1304,12 +1294,12 @@ void __stdcall ApplyUnitDeath(Cmd_004864b0* cmd, int local)
             (*par)->resourceSlot.metalMake += f;
         }
     }
-    if (cmd->amount > 0 && unit->buildLeft == 0.0f)
-        DetonateUnitWeapon(unit, cmd->kind == 3);
-    if (cmd->count > 0) {
+    if (cmd->cobKilledSeverity > 0 && unit->buildLeft == 0.0f)
+        DetonateUnitWeapon(unit, cmd->killType == 3);
+    if (cmd->wreckageLevel > 0) {
         // Local flag: without it the script's virtual delete uses another register.
-        int flag = cmd->kind != 7;
-        CreateUnitCorpse(unit, cmd->count, flag);
+        int flag = cmd->killType != 7;
+        CreateUnitCorpse(unit, cmd->wreckageLevel, flag);
     }
 
     ClearUnitRefs(unit);
@@ -1404,7 +1394,9 @@ void __stdcall KillPlayerUnits(unsigned char player)
     }
 }
 
-// Unused here: a real function declared to keep the file's symbol count (docs/c2-regalloc.md).
+// Unused here: real functions declared to keep the file's symbol count (docs/c2-regalloc.md);
+// SaveUnits stands in for the ids the weapon slot header moved.
+void __stdcall SaveUnits(void* file);
 void __stdcall NopRetC_B(int, int, int);
 
 struct Vec3_004851c0 {
