@@ -12,6 +12,10 @@
 </p>
 
 <p align="center">
+  <a href="https://discord.gg/MDU9T5wZY">Join the Byte Tactics Discord</a>
+</p>
+
+<p align="center">
   <a href="#progress">Progress</a> ·
   <a href="#next-steps">Next steps</a> ·
   <a href="#quick-start">Quick start</a> ·
