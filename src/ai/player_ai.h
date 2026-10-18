@@ -47,6 +47,7 @@ struct Pos_00409160 {
     Pos_00409160(short ax, short ay) : unknown_4(0) { x = ax; y = ay; }
 };
 
+// Own view, not vec3.h: it has constructors.
 struct Vec3_00409160 {
     int x, y, z;
     Vec3_00409160(int ax, int ay, int az) : x(ax), y(ay), z(az) {}

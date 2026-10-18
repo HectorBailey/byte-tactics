@@ -13,9 +13,7 @@ class Order;
 class HapiBank;
 
 #pragma pack(push, 1)
-struct Vec3_0043a1f0 {
-    int x, y, z;
-};
+#include "../util/vec3.h"
 
 class CobScript;
 class Slot_0043a1f0;
@@ -95,7 +93,7 @@ struct SaveDesc_0043a1f0 {             // the 0x3a-byte snapshot, read and writt
     unsigned char flag5;               // +0x09
     unsigned int flags6;               // +0x0a
     int last_id;                       // +0x0e
-    Vec3_0043a1f0 pos;                 // +0x12
+    Vec3 pos;                          // +0x12
     int start;                         // +0x1e
     int cached;                        // +0x22
     int field_26;                      // +0x26, the order's unitType (+0x36); +0x00 has the name
@@ -110,7 +108,6 @@ struct SaveDesc_0043a1f0 {             // the 0x3a-byte snapshot, read and writt
 
 #include "../units/unit_ref.h"
 
-#include "../util/vec3.h"
 #include "air_maneuver_order.h"
 
 // Unused here: forward declarations of real functions; their symbol ids keep
@@ -126,9 +123,13 @@ void InitMissionStatus();
 void SetUpEndMissionScreen();
 void StartScreenFade();
 void StepScreenFade();
+void BeginMouseScroll();
 void ScheduleFadeTick();
 int IsFadeDone();
 void StepPaletteFade();
+void DrawEndGameFrame();
+int AreStatBarsComplete();
+void ClearPictureCache();
 
 class Slot_0043a1f0 {
 public:
@@ -252,7 +253,7 @@ public:
     virtual void OrStatusFlags(unsigned int);
 
     PathOrderAttach link;              // +0x12
-    Vec3_0043a1f0 pos;                 // +0x22
+    Vec3 pos;                          // +0x22
     int start;                         // +0x2e
     int cached;                        // +0x32
     int unitType;                      // +0x36
@@ -275,7 +276,7 @@ public:
     void ReattachFxToUnit();
     void SetAttachedFx(OrderFx* obj);
     void AttachApproachRadiusGoal(int* p, int n);
-    void AttachRingApproachGoal(Vec3_0043a1f0* pos, int radius1, int radius2);
+    void AttachRingApproachGoal(Vec3* pos, int radius1, int radius2);
     void AttachBuildFootprintMarker(Point16 cell, Point16 size);
     void MergeFlagsFromTable(int k);
     // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
@@ -518,7 +519,7 @@ void Order::AttachApproachRadiusGoal(int* p, int n)
 }
 
 // FUNCTION: 0x438a00
-void Order::AttachRingApproachGoal(Vec3_0043a1f0* pos, int radius1, int radius2)
+void Order::AttachRingApproachGoal(Vec3* pos, int radius1, int radius2)
 {
     if (!(unit->def->flags32 & 0x800)) {
         RingApproach* obj = new RingApproach(this, pos->x, pos->z, radius1, radius2);

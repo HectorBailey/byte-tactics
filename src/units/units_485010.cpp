@@ -153,6 +153,7 @@ union Fixed_004853b0 {
     FixedParts_004853b0 parts;
 };
 
+// Own view, not vec3.h: each coordinate is 16.16 fixed point.
 struct Vec3_004853b0 {
     Fixed_004853b0 x;
     Fixed_004853b0 y;
@@ -1395,18 +1396,19 @@ void __stdcall KillPlayerUnits(unsigned char player)
 }
 
 // Unused here: real functions declared to keep the file's symbol count (docs/c2-regalloc.md);
-// SaveUnits stands in for the ids the weapon slot header moved.
+// SaveUnits stands in for the ids the weapon slot header moved, the rest for the local Vec3 view.
 void __stdcall SaveUnits(void* file);
 void __stdcall NopRetC_B(int, int, int);
-
-struct Vec3_004851c0 {
-    int x;
-    int y;
-    int z;
-};
+void UpdateMouseScroll();
+void UpdateEdgeScroll();
+void CenterCameraOnRadarClick();
+void CenterCameraOnStartPosition();
+void RegisterDataArchives();
+int GetCdPathMismatch();
+void CreateGameObject();
 
 // FUNCTION: 0x4851c0
-int __stdcall FindHighestPointOnLine(Vec3_004851c0 a, Vec3_004851c0 b)
+int __stdcall FindHighestPointOnLine(Vec3 a, Vec3 b)
 {
     // dz, then dx, as named locals written back into b before the copy; y stays in place on b.
     int dz = b.z - a.z;
@@ -1414,7 +1416,7 @@ int __stdcall FindHighestPointOnLine(Vec3_004851c0 a, Vec3_004851c0 b)
     b.y -= a.y;
     int dx = b.x - a.x;
     b.x = dx;
-    Vec3_004851c0 d = b;
+    Vec3 d = b;
     // n computed in each arm with one `n++` after: the two tails merge.
     int n;
     if (abs(dx) < abs(dz))

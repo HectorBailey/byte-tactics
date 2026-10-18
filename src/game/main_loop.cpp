@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include "../network/packet_manager.h"
+#include "../util/vec3.h"
 
 #pragma pack(push, 1)
 // The loading flags at +0x38d75. The bitfield overlay is not volatile (so the
@@ -81,12 +82,6 @@ struct Settings_00496e10 {
     int flag_4;                        // +0x4
     int flag_8;                        // +0x8
     int flag_c;                        // +0xc
-};
-
-struct Vec3_00437320 {
-    int x;
-    int y;
-    int z;
 };
 
 #include "../map/mission.h"
@@ -581,7 +576,7 @@ void __stdcall SpawnCommanderAtStartPos(int team, int startpos)
     p->size2 = (float)(v >= 200 ? v : 200);
 
     FixedPos_00496ee0 pos;
-    if (g_game->net->GetStartPosition((Vec3_00437320*)&pos, startpos)) {
+    if (g_game->net->GetStartPosition((Vec3*)&pos, startpos)) {
         unsigned short id = FindUnitTypeId(
             g_game->names[g_game->players[team].info->side].name);
         CreateUnit(team, id, pos, 1, 1, 0);

@@ -687,7 +687,7 @@ address,size,file,symbol,status,similarity
 0x436c30,1613,src/map/map_list.cpp,?LoadMissionData@Mission@@QAEXPADPAVTdfFile@@@Z,matched,100.0
 0x437280,127,src/map/map_list.cpp,?FreeMissionData@Mission@@QAEXXZ,matched,100.0
 0x437300,31,src/map/map_list.cpp,?CountStartPositions@Mission@@QAEHXZ,matched,100.0
-0x437320,116,src/map/map_list.cpp,?GetStartPosition@Mission@@QAEHPAUVec3_00437320@@H@Z,matched,100.0
+0x437320,116,src/map/map_list.cpp,?GetStartPosition@Mission@@QAEHPAUVec3@@H@Z,matched,100.0
 0x4373a0,477,src/map/map_list.cpp,?ComputeMapChecksum@Mission@@QAEHXZ,matched,100.0
 0x437580,639,src/map/map_load.cpp,?insert@?$vector@VMapCacheEntry@@V?$allocator@VMapCacheEntry@@@std@@@std@@QAEXPAVMapCacheEntry@@IABV3@@Z,matched,100.0
 0x437800,27,src/map/map_load.cpp,??4MapCacheEntry@@QAEAAV0@ABV0@@Z,matched,100.0
@@ -730,7 +730,7 @@ address,size,file,symbol,status,similarity
 0x4388b0,21,src/orders/order_queue_4384a0.cpp,?ReattachFxToUnit@Order@@QAEXXZ,matched,100.0
 0x4388d0,89,src/orders/order_queue_4384a0.cpp,?SetAttachedFx@Order@@QAEXPAVOrderFx@@@Z,matched,100.0
 0x438930,196,src/orders/order_queue_4384a0.cpp,?AttachApproachRadiusGoal@Order@@QAEXPAHH@Z,matched,100.0
-0x438a00,205,src/orders/order_queue_4384a0.cpp,?AttachRingApproachGoal@Order@@QAEXPAUVec3_0043a1f0@@HH@Z,matched,100.0
+0x438a00,205,src/orders/order_queue_4384a0.cpp,?AttachRingApproachGoal@Order@@QAEXPAUVec3@@HH@Z,matched,100.0
 0x438ad0,191,src/orders/order_queue_4384a0.cpp,?AttachBuildFootprintMarker@Order@@QAEXUPoint16@@0@Z,matched,100.0
 0x438b90,69,src/orders/order_queue_4384a0.cpp,?MergeFlagsFromTable@Order@@QAEXH@Z,matched,100.0
 0x438be0,27,src/orders/order_queue_4384a0.cpp,?GetOrderFlags@@YGHPAX@Z,matched,100.0
@@ -1780,7 +1780,7 @@ address,size,file,symbol,status,similarity
 0x485010,88,src/units/units_485010.cpp,?GetCellHeight@@YGHPAUPoint16_00485010@@@Z,matched,100.0
 0x485070,208,src/units/units_485070.cpp,?GetGroundHeight@@YGHPAUPos_00485070@@@Z,matched,100.0
 0x485140,117,src/units/units_485010.cpp,?GetCellMeanHeight@@YGHPAUPos_00485070@@@Z,matched,100.0
-0x4851c0,354,src/units/units_485010.cpp,?FindHighestPointOnLine@@YGHUVec3_004851c0@@0@Z,matched,100.0
+0x4851c0,354,src/units/units_485010.cpp,?FindHighestPointOnLine@@YGHUVec3@@0@Z,matched,100.0
 0x485330,117,src/units/units_485010.cpp,?GetCellPosition@@YGXHHPAUPos_00485070@@@Z,matched,100.0
 0x4853b0,106,src/units/units_485010.cpp,?ClampPositionToMap@@YGXPAUVec3_004853b0@@@Z,matched,100.0
 0x485420,115,src/units/units_485010.cpp,?ShareMapInfo@@YGXEE@Z,matched,100.0
@@ -1850,7 +1850,7 @@ address,size,file,symbol,status,similarity
 0x48a0f0,99,src/units/unit_targets.cpp,?ClearWeaponTarget@@YGXPAVUnit@@H@Z,matched,100.0
 0x48a160,33,src/units/unit_targets.cpp,?ResetWeaponTarget@@YGXPAVUnit@@H@Z,matched,100.0
 0x48a190,77,src/units/unit_targets.cpp,?GetWeaponTargetUnit@@YGPAVUnit@@PAV1@H@Z,matched,100.0
-0x48a1e0,604,src/units/unit_targets.cpp,?GetWeaponTargetPos@@YGHPAVUnit@@PAUVec3_0048a1e0@@H@Z,matched,100.0
+0x48a1e0,604,src/units/unit_targets.cpp,?GetWeaponTargetPos@@YGHPAVUnit@@PAUVec3@@H@Z,matched,100.0
 0x48a440,71,src/units/unit_targets.cpp,?IsTargetingUnit@@YGHPAVUnit@@0@Z,matched,100.0
 0x48a490,857,src/units/unit_targets.cpp,?AlignUnitToGround@@YGXPAVUnit@@@Z,matched,100.0
 0x48a7f0,122,src/units/unit_position.cpp,?SnapUnitToGround@@YGXPAVUnit@@@Z,matched,100.0
@@ -2504,14 +2504,14 @@ address,size,file,symbol,status,similarity
 0x4b6ba0,129,src/util/math.cpp,?ComputeChecksum@@YGHPAEH@Z,matched,100.0
 0x4b6c30,101,src/util/math_4b6c30.cpp,?RandomInt@@YGHH@Z,matched,100.0
 0x4b6ca0,19,src/util/math.cpp,?SeedRandom@@YGXI@Z,matched,100.0
-0x4b6cc0,134,src/util/math.cpp,?RotateByAngles@@YGXPAUVec3_004b6cc0@@0PAF@Z,matched,100.0
-0x4b6d50,69,src/util/math.cpp,?RotateAboutZ@@YGXPAUVec3_004b6cc0@@0H@Z,matched,100.0
-0x4b6da0,69,src/util/math.cpp,?RotateAboutY@@YGXPAUVec3_004b6cc0@@0H@Z,matched,100.0
-0x4b6df0,69,src/util/math.cpp,?RotateAboutX@@YGXPAUVec3_004b6cc0@@0H@Z,matched,100.0
+0x4b6cc0,134,src/util/math.cpp,?RotateByAngles@@YGXPAUVec3@@0PAF@Z,matched,100.0
+0x4b6d50,69,src/util/math.cpp,?RotateAboutZ@@YGXPAUVec3@@0H@Z,matched,100.0
+0x4b6da0,69,src/util/math.cpp,?RotateAboutY@@YGXPAUVec3@@0H@Z,matched,100.0
+0x4b6df0,69,src/util/math.cpp,?RotateAboutX@@YGXPAUVec3@@0H@Z,matched,100.0
 0x4b6e40,49,src/util/math.cpp,?ApproxDistance@@YGHHH@Z,matched,100.0
 0x4b6e80,39,src/util/math.cpp,?DotProduct@@YGNMMMMMM@Z,matched,100.0
 0x4b6eb0,71,src/util/math.cpp,?VectorFromTo@@YG?AUVec3f_004b6eb0@@U1@0@Z,matched,100.0
-0x4b6f00,101,src/util/math.cpp,?VectorFromToInt@@YG?AUVec3f_004b6eb0@@UVec3_004b6cc0@@0@Z,matched,100.0
+0x4b6f00,101,src/util/math.cpp,?VectorFromToInt@@YG?AUVec3f_004b6eb0@@UVec3@@0@Z,matched,100.0
 0x4b6f70,115,src/util/math.cpp,?CrossProduct@@YG?AUVec3f_004b6eb0@@U1@0@Z,matched,100.0
 0x4b6ff0,113,src/util/math.cpp,?NormalizeVector@@YG?AUVec3f_004b6eb0@@U1@@Z,matched,100.0
 0x4b7070,41,src/util/math.cpp,?VectorLengthFloat@@YGMMMM@Z,matched,100.0

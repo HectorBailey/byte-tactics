@@ -11,7 +11,7 @@
 struct MissionUnit;
 struct MissionRule;
 struct MissionFeature;
-struct Vec3_00437320;
+struct Vec3;
 
 class Mission {
 public:
@@ -83,7 +83,7 @@ public:
     void LoadMissionData(char* name, TdfFile* parser);
     void FreeMissionData();
     int CountStartPositions();
-    int GetStartPosition(Vec3_00437320* out, int id);
+    int GetStartPosition(Vec3* out, int id);
     int ComputeMapChecksum();
 };
 

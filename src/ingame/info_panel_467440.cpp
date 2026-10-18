@@ -6,14 +6,10 @@
 
 #pragma pack(push, 1)
 
-struct Vec3_00467440 {
-    int x;
-    int y;
-    int z;
-};
+#include "../util/vec3.h"
 
 union UnitPos_00467440 {
-    Vec3_00467440 vec;
+    Vec3 vec;
     short half[6];                     // the words of x, y and z: [1] x whole, [3] y whole, [5] z whole
 };
 
@@ -101,7 +97,7 @@ public:
     virtual void MarkUnitsInRadarOrSonarRadius(Unit* unit);
     int radarRangeSq;                  // +0x4
     int sonarRangeSq;                  // +0x8
-    Vec3_00467440 pos;                 // +0xc
+    Vec3 pos;                          // +0xc
 };
 
 class RadarJamVisitor {
@@ -116,8 +112,8 @@ public:
 
 extern Game* g_game;
 
-void __stdcall VisitObjectsInRange(Vec3_00467440* pos, int range, void* visitor);
-bool __stdcall HasReadyUnitInRange(int player, Vec3_00467440* p, int range);
+void __stdcall VisitObjectsInRange(Vec3* pos, int range, void* visitor);
+bool __stdcall HasReadyUnitInRange(int player, Vec3* p, int range);
 
 static inline int IsExplored_00467440(PlayerInfo_00467440* p, UnitPos_00467440* pos)
 {
@@ -177,7 +173,7 @@ void UpdateSensorRadarAndCloak(void)
                 if (a <= b) {
                     a = b;
                 }
-                Vec3_00467440* pp = &u->pos.vec;
+                Vec3* pp = &u->pos.vec;
                 DetectionVisitor v;
                 v.radarRangeSq = t;
                 v.sonarRangeSq = s;
@@ -193,13 +189,13 @@ void UpdateSensorRadarAndCloak(void)
         if ((u->flags & 0x10000000) && (ff = u->playerIndex, 1) && ff != pl->index && (u->activateFlags & 1)) {
             if (u->def->radardistancejam != 0) {
                 int r = (int)u->def->radardistancejam << 16;
-                Vec3_00467440* pp = &u->pos.vec;
+                Vec3* pp = &u->pos.vec;
                 RadarJamVisitor v;
                 VisitObjectsInRange(pp, r, &v);
             }
             if (u->def->sonardistancejam != 0) {
                 int r2 = (int)u->def->sonardistancejam << 16;
-                Vec3_00467440* pp2 = &u->pos.vec;
+                Vec3* pp2 = &u->pos.vec;
                 SonarJamVisitor v;
                 VisitObjectsInRange(pp2, r2, &v);
             }

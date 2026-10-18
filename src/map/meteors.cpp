@@ -24,12 +24,6 @@ struct Game {
 
 #include "../util/vec3.h"
 
-struct Vec3_00437de0 {
-    int x;
-    int y;
-    int z;
-};
-
 #include "../util/hapi_bank.h"
 
 #include "../util/tdf.h"
@@ -85,7 +79,7 @@ extern Point16 g_meteorTarget;         // target
 WeaponDef* __stdcall FindWeaponByName(char* name);
 int __cdecl FUN_004b70ef(short angle, int scale);
 int __cdecl FUN_004b7123(short angle, int scale);
-int __stdcall SpawnProjectile(void* player, Vec3_00437de0* pos, Vec3_00437de0* vel, int count);
+int __stdcall SpawnProjectile(void* player, Vec3* pos, Vec3* vel, int count);
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
 void __stdcall FatalError(char* text);
 
@@ -178,7 +172,7 @@ void UpdateMeteors()
     if (g_meteorActive != 0) {
         if (g_meteorNextHitTime <= g_game->gameTick) {
             g_meteorNextHitTime = g_meteorSpawnInterval + g_game->gameTick;
-            Vec3_00437de0 vel;
+            Vec3 vel;
             vel.x = ((g_meteorTarget.x - g_meteorOrigin.x) << 20) / 90;
             vel.y = -15 << 16;
             vel.z = ((g_meteorTarget.y - g_meteorOrigin.y) << 20) / 90;
@@ -186,12 +180,12 @@ void UpdateMeteors()
             // The radius shift is its own statement.
             int radius = r << 16;
             int angle = (int)((__int64)rand() * 0x10000 / 0x8000);
-            Vec3_00437de0 offset;
+            Vec3 offset;
             offset.x = -FUN_004b70ef(angle, radius);
             offset.y = 0;
             offset.z = -FUN_004b7123(angle, radius);
             // The offset is copied into pos as a struct: keeps the first stores of pos.x, pos.y.
-            Vec3_00437de0 pos = offset;
+            Vec3 pos = offset;
             pos.x += g_meteorOrigin.x << 20;
             pos.y = -vel.y * 90;
             pos.z += g_meteorOrigin.y << 20;

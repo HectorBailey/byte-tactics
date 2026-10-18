@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "vec3.h"
+
 extern const char g_errorCaption[];  // "Error"
 extern unsigned int g_randomSeed;
 
@@ -39,19 +41,13 @@ void __stdcall SeedRandom(unsigned int seed)
     g_randomSeed = (seed ^ 0x66e29572) | 1;
 }
 
-struct Vec3_004b6cc0 {
-    int x;
-    int y;
-    int z;
-};
-
 // Fixed-point rotation helper written in assembly.
 void __cdecl FUN_004b7173(short angle, int* xy);
 void __cdecl FUN_004b7173(int angle, int* xy);
 
 // Rotates a vector by three angles (one per axis pair).
 // FUNCTION: 0x4b6cc0
-void __stdcall RotateByAngles(Vec3_004b6cc0* in, Vec3_004b6cc0* out, short* angles)
+void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles)
 {
     int a[2];
     int b[2];
@@ -71,7 +67,7 @@ void __stdcall RotateByAngles(Vec3_004b6cc0* in, Vec3_004b6cc0* out, short* angl
 // Rotates a vector about the third axis: sibling of 0x4b6df0, which rotates
 // (y, z) instead of (x, y).
 // FUNCTION: 0x4b6d50
-void __stdcall RotateAboutZ(Vec3_004b6cc0* in, Vec3_004b6cc0* out, int angle)
+void __stdcall RotateAboutZ(Vec3* in, Vec3* out, int angle)
 {
     int xy[2];
     xy[0] = in->x;
@@ -84,7 +80,7 @@ void __stdcall RotateAboutZ(Vec3_004b6cc0* in, Vec3_004b6cc0* out, int angle)
 
 // Rotates a vector in the x/z plane.
 // FUNCTION: 0x4b6da0
-void __stdcall RotateAboutY(Vec3_004b6cc0* in, Vec3_004b6cc0* out, int angle)
+void __stdcall RotateAboutY(Vec3* in, Vec3* out, int angle)
 {
     int xz[2];
     xz[0] = in->x;
@@ -96,7 +92,7 @@ void __stdcall RotateAboutY(Vec3_004b6cc0* in, Vec3_004b6cc0* out, int angle)
 }
 
 // FUNCTION: 0x4b6df0
-void __stdcall RotateAboutX(Vec3_004b6cc0* in, Vec3_004b6cc0* out, int angle)
+void __stdcall RotateAboutX(Vec3* in, Vec3* out, int angle)
 {
     int yz[2];
     yz[0] = in->y;
@@ -147,7 +143,7 @@ Vec3f_004b6eb0 __stdcall VectorFromTo(Vec3f_004b6eb0 from, Vec3f_004b6eb0 to)
 }
 
 // FUNCTION: 0x4b6f00
-Vec3f_004b6eb0 __stdcall VectorFromToInt(Vec3_004b6cc0 from, Vec3_004b6cc0 to)
+Vec3f_004b6eb0 __stdcall VectorFromToInt(Vec3 from, Vec3 to)
 {
     Vec3f_004b6eb0 r;
     r.x = (float)(to.x - from.x);
