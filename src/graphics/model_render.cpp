@@ -239,6 +239,7 @@ struct Game {
 };
 #pragma pack(pop)
 
+// Kept: its Vec3 is a union and DrawObjectState is spelled for this file's types.
 // The memory cache behind the composite buffer: the arena the pictures are
 // allocated from and the handles that keep them.
 class CMemoryCache {

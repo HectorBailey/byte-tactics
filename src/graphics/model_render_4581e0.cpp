@@ -359,13 +359,4 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, List_459c70* list,
 
 // Only AllocBitmap and AllocTwoPlaneBitmap are called here; the other
 // members' symbol ids put MeasureModel in the window it matches in.
-class CMemoryCache {
-public:
-    int InitCache(unsigned int size);
-    void FreeCache();
-    int AllocHandle(void** handle, int size);
-    int AllocBitmap(GafFrame** handle, int w, int h);
-    int AllocTwoPlaneBitmap(GafFrame** handle, int w, int h);
-    void FlushCache();
-    void ReleaseHandle(int handle);
-};
+#include "memory_cache.h"
