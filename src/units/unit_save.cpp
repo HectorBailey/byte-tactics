@@ -126,7 +126,7 @@ struct Unit {
     char gap_8a[8];
     void* def;                     // +0x92
     char gap_96[4];
-    void* script;                     // +0x9a
+    class CobScript* script;          // +0x9a
     char gap_9e[0xa];
     unsigned short id;                  // +0xa8
     char gap_aa[2];
@@ -348,7 +348,7 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
         ((Order*)unit->list)->ReattachFxToUnit();
     sprintf(script, "Script%i", i);
     file->OpenNamedBox(script);
-    ((CobScript*)unit->script)->LoadScriptState(file);
+    unit->script->LoadScriptState(file);
 
     // Plain array indexing in this field order: it anchors the loop pointer.
     for (int j = 0; j < 3; j++) {
@@ -392,7 +392,7 @@ void __stdcall SaveUnits(HapiBank* file)
 
             sprintf(script, "Script%i", count);
             file->OpenNamedBox(script);
-            ((CobScript*)unit->script)->SaveScriptState(file);
+            unit->script->SaveScriptState(file);
 
             int n = 0;
             Order* c = (Order*)unit->list;
