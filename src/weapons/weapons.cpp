@@ -129,6 +129,7 @@ union Fixed_0049abb0 {
     } parts;
 };
 
+// Kept: y is a fixed-point type.
 struct Vec3_0049abb0 {
     int x;
     Fixed_0049abb0 y;
@@ -1104,6 +1105,7 @@ union Fixed_0049aa80 {
     struct { unsigned short fraction; short whole; } parts;
 };
 
+// Kept: y is a fixed-point type.
 struct Vec3_0049aa80 {
     int x;                             // +0x0 (16.16 fixed point)
     Fixed_0049aa80 y;                  // +0x4
@@ -1310,15 +1312,11 @@ done:
     g_game->projectileCount = count;
 }
 
-struct Vec3_0049af90 {
-    int x, y, z;
-};
-
 #pragma pack(push, 1)
 struct Projectile_0049af90 {
     WeaponDef* type;                   // +0x0
     char unknown_4[0x28 - 0x4];
-    Vec3_0049af90 pos;                 // +0x28
+    Vec3 pos;                          // +0x28
     char unknown_34[0x6b - 0x34];
 };
 
@@ -1326,14 +1324,14 @@ struct Projectile_0049af90 {
 // at 0x49a120, a view of which is in the gap file, holds the other.
 struct ProjectileDetonatePacket {
     unsigned char type;                // +0x0
-    Vec3_0049af90 aim;                 // +0x1
+    Vec3 aim;                          // +0x1
     unsigned char weaponIndex;         // +0xd
 };
 #pragma pack(pop)
 
 void __stdcall DetonateProjectile(Projectile_0049af90* proj, int flag);
 
-static inline int SamePos(const Vec3_0049af90& a, const Vec3_0049af90& b)
+static inline int SamePos(const Vec3& a, const Vec3& b)
 {
     return a.x == b.x && a.z == b.z && a.y == b.y;
 }
@@ -1393,6 +1391,7 @@ void __stdcall DetonateUnitWeapon(Unit* unit, int second)
 
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 
+// Kept: it has a subtraction and Length the shared Vec3 lacks.
 struct Vec3_0049b3e0 {
     int x;
     Fixed y;
@@ -1465,10 +1464,6 @@ Vec3_0049b3e0* __stdcall GetProjectileAimPoint(Proj_0049b3e0* p)
     return &p->target;
 }
 
-struct Vec3_0049b520 {
-    int x, y, z;
-};
-
 struct Unit_0049b520 {
     WeaponDef* type;                   // +0x0
     int x;                             // +0x4
@@ -1492,7 +1487,7 @@ union Fixed_0049b520 {
 // than 27000 (about 148 degrees) away while the type's burnBlow flag (bit 23 of
 // +0x111) is set, the function gives up and returns 0. Otherwise it returns 1.
 // FUNCTION: 0x49b520
-int __stdcall TurnUnitTowardsPoint(Unit_0049b520* unit, Vec3_0049b520* target)
+int __stdcall TurnUnitTowardsPoint(Unit_0049b520* unit, Vec3* target)
 {
     WeaponDef* type = unit->type;
     // Declared dx, dy, dz in this order: it decides the stack slot assignment.

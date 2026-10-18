@@ -2093,7 +2093,7 @@ address,size,file,symbol,status,similarity
 0x49b000,129,src/weapons/weapons.cpp,?DetonateUnitWeapon@@YGXPAUUnit@@H@Z,matched,100.0
 0x49b090,844,src/weapons/weapons.cpp,?CheckProjectileCollision@@YGXPAUWeaponDef@@PAUProj_0049b090@@@Z,matched,100.0
 0x49b3e0,317,src/weapons/weapons.cpp,?GetProjectileAimPoint@@YGPAUVec3_0049b3e0@@PAUProj_0049b3e0@@@Z,matched,100.0
-0x49b520,347,src/weapons/weapons.cpp,?TurnUnitTowardsPoint@@YGHPAUUnit_0049b520@@PAUVec3_0049b520@@@Z,matched,100.0
+0x49b520,347,src/weapons/weapons.cpp,?TurnUnitTowardsPoint@@YGHPAUUnit_0049b520@@PAUVec3@@@Z,matched,100.0
 0x49b680,88,src/weapons/weapons.cpp,?ComputeVelocityFromAngles@@YGXPAUObject_0049b680@@@Z,matched,100.0
 0x49b6e0,64,src/weapons/weapons.cpp,?AllocProjectile@@YGPAUProjectile_0049b6e0@@XZ,matched,100.0
 0x49b720,1853,src/weapons/weapons_49b720.cpp,?UpdateProjectiles@@YGXXZ,matched,100.0
