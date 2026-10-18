@@ -437,8 +437,11 @@ void FreeWeaponArray(void)
 
 #pragma pack(push, 1)
 
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
-void Unused_00499ab0(int a, int b, int c, int d, int e, int f);
+struct Vec3_00499ab0 {
+    int x;
+    int y;
+    int z;
+};
 
 struct Kind_00499ab0 {
     char unknown_0[4];
@@ -483,8 +486,8 @@ int __stdcall BroadcastPacket(int player, void* data, int size);
 // initialised here; see the note in the bug list.
 // FUNCTION: 0x499ab0
 void __stdcall SendWeaponFirePacket(Unit* unit, Obj_00499ab0* source,
-                            Obj_00499ab0* target, Vec3* a,
-                            Vec3* b)
+                            Obj_00499ab0* target, Vec3_00499ab0* a,
+                            Vec3_00499ab0* b)
 {
     WeaponFirePacket packet;
     if (g_game->netGameFlagsWord & 1) {
@@ -502,8 +505,11 @@ void __stdcall SendWeaponFirePacket(Unit* unit, Obj_00499ab0* source,
     }
 }
 
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
-void Unused_00499ba0v(int a, int b, int c, int d, int e, int f);
+struct Vec3_00499ba0 {
+    int x;
+    int y;
+    int z;
+};
 
 #pragma pack(push, 1)
 // Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
@@ -513,7 +519,7 @@ void Unused_00499ba0(int a, int b, int c, int d, int e, int f);
 int __cdecl GetLocalDpid();
 
 // FUNCTION: 0x499ba0
-void __stdcall BroadcastWeaponFire(char param_1, Vec3* a, Vec3* b)
+void __stdcall BroadcastWeaponFire(char param_1, Vec3_00499ba0* a, Vec3_00499ba0* b)
 {
     WeaponFirePacket packet;
     if (g_game->netGameFlagsWord & 1) {
@@ -779,13 +785,16 @@ void __stdcall DetonateProjectile(Projectile_00499eb0* projectile, Unit* unit)
 // Builds a zeroed 0x6b-byte parameter block (owner, position, kind 10) and
 // hands it to ApplyAreaDamage (an ebp-framed __stdcall routine in a gap).
 
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
-void Unused_0049a0c0v(int a, int b, int c, int d, int e, int f);
+struct Vec3_0049a0c0 {
+    int x;
+    int y;
+    int z;
+};
 
 #pragma pack(push, 1)
 struct Params_0049a0c0 {
     void* owner;                       // +0x0
-    Vec3 pos;                          // +0x4
+    Vec3_0049a0c0 pos;                 // +0x4
     char unknown_10[0x42];
     int ownerUnit;                     // +0x52
     char unknown_56[0x10];
@@ -794,10 +803,10 @@ struct Params_0049a0c0 {
 };
 #pragma pack(pop)
 
-void __stdcall ApplyAreaDamage(Params_0049a0c0* params, Vec3* pos);
+void __stdcall ApplyAreaDamage(Params_0049a0c0* params, Vec3_0049a0c0* pos);
 
 // FUNCTION: 0x49a0c0
-void __stdcall ApplyAreaDamageAt(void* owner, Vec3* pos)
+void __stdcall ApplyAreaDamageAt(void* owner, Vec3_0049a0c0* pos)
 {
     Params_0049a0c0 p;
     memset(&p, 0, sizeof(p));
@@ -813,8 +822,11 @@ void __stdcall ApplyAreaDamageAt(void* owner, Vec3* pos)
 // declarations stay here for the symbol ids the functions after it match at.
 #include <math.h>
 
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
-void Unused_0049a120v(int a, int b, int c, int d, int e, int f);
+struct Vec3_0049a120 {
+    int x;                             // +0x0 (16.16)
+    int y;                             // +0x4
+    int z;                             // +0x8
+};
 
 // A 16.16 fixed-point value and its whole part.
 union Fixed_0049a120 {
@@ -846,7 +858,7 @@ struct Holder_0049a120;
 
 struct Unit_0049a120 {
     char unknown_0[0x6a];
-    Vec3 pos;                          // +0x6a
+    Vec3_0049a120 pos;                 // +0x6a
     char unknown_76[0x92 - 0x76];
     UnitDef* def;                      // +0x92
     Holder_0049a120* player;           // +0x96
@@ -857,9 +869,9 @@ struct Unit_0049a120 {
 
 struct Weapon_0049a120 {
     WeaponDef* def;                    // +0x0
-    Vec3 pos;                          // +0x4
+    Vec3_0049a120 pos;                 // +0x4
     char unknown_10[0x28 - 0x10];
-    Vec3 aim;                          // +0x28
+    Vec3_0049a120 aim;                 // +0x28
     char unknown_34[0x52 - 0x34];
     Unit_0049a120* attacker;           // +0x52
     char unknown_56[0x66 - 0x56];
@@ -895,7 +907,7 @@ struct Cell {
 
 struct Spot_0049a120 {
     char unknown_0[8];
-    Vec3 pos;                          // +0x8
+    Vec3_0049a120 pos;                 // +0x8
     char unknown_14[0x30 - 0x14];
 };
 
@@ -951,12 +963,12 @@ struct Hits_0049a120 {
 Cell* __stdcall GetMapCell(int x, int y);
 int __stdcall ApplyWeaponDamage(Weapon_0049a120* weapon, Unit_0049a120* target, float scale);
 void __stdcall DetonateProjectile(Weapon_0049a120* weapon, Unit_0049a120* unit);
-int __stdcall VectorLength(Vec3* v);
-Vec3 __stdcall GetFootprintCentre(CellPos_0049a120* cell, FeatureDef_0049a120* def);
+int __stdcall VectorLength(Vec3_0049a120* v);
+Vec3_0049a120 __stdcall GetFootprintCentre(CellPos_0049a120* cell, FeatureDef_0049a120* def);
 void __stdcall DamageFeature(Cell* cell, int x, int z, WeaponDef* def);
 int __stdcall BroadcastPacket(int id, void* data, int size);
 
-static inline int Length(Vec3* v)
+static inline int Length(Vec3_0049a120* v)
 {
     double x = v->x;
     double y = v->y;
@@ -971,9 +983,9 @@ static inline Unit_0049a120* UnitFromId(unsigned short id)
     return (Unit_0049a120*)&g_game->units[id];
 }
 
-static inline Vec3 Sub(const Vec3& a, const Vec3& b)
+static inline Vec3_0049a120 Sub(const Vec3_0049a120& a, const Vec3_0049a120& b)
 {
-    Vec3 r;
+    Vec3_0049a120 r;
     r.x = a.x - b.x;
     r.y = a.y - b.y;
     r.z = a.z - b.z;
