@@ -589,7 +589,7 @@ void UpdateMenuSparks()
             }
             s++;
         } while (--count);
-        MarkLayerChanged((char*)g_game + 0x519);
+        MarkLayerChanged((char*)&g_game->gui);
     }
 }
 
@@ -1349,19 +1349,19 @@ void RunFrontendStateMachine(void)
             PresentFrontendFrame();
             return;
         case 2:
-            if (memcmp((char*)g_game + 0x39201, g_dpspGuidModem, 0x10) == 0) {
+            if (memcmp((char*)&g_game->providerGuid[0], g_dpspGuidModem, 0x10) == 0) {
                 SetState(0x14, 0x547, g_frontendSourceFile);
                 SetSubState(1, 0x548, g_frontendSourceFile);
                 OpenModemDialog();
                 return;
             }
-            if (memcmp((char*)g_game + 0x39201, g_dpspGuidSerial, 0x10) == 0) {
+            if (memcmp((char*)&g_game->providerGuid[0], g_dpspGuidSerial, 0x10) == 0) {
                 SetState(0x14, 0x54e, g_frontendSourceFile);
                 SetSubState(1, 0x54f, g_frontendSourceFile);
                 OpenSerialDialog();
                 return;
             }
-            if (memcmp((char*)g_game + 0x39201, g_dpspGuidTcpip, 0x10) == 0) {
+            if (memcmp((char*)&g_game->providerGuid[0], g_dpspGuidTcpip, 0x10) == 0) {
                 SetState(0x14, 0x555, g_frontendSourceFile);
                 SetSubState(1, 0x556, g_frontendSourceFile);
                 OpenTcpDialog();
@@ -1405,13 +1405,13 @@ void RunFrontendStateMachine(void)
             HAPINET_guaranteepackets(1);
             SetSubState(1, 0x587, g_frontendSourceFile);
             ResetPlayerSlots();
-            if (memcmp((char*)g_game + 0x39201, g_dpspGuidModem, 0x10) == 0 ||
-                memcmp((char*)g_game + 0x39201, g_dpspGuidSerial, 0x10) == 0) {
+            if (memcmp((char*)&g_game->providerGuid[0], g_dpspGuidModem, 0x10) == 0 ||
+                memcmp((char*)&g_game->providerGuid[0], g_dpspGuidSerial, 0x10) == 0) {
                 if (g_game->dplayAddressDialogFlags.b0) {
                     SetSubState(0x11, 0x58f, g_frontendSourceFile);
                     return;
                 }
-                *(V4i*)((char*)g_game + 0x2ba2) = DAT_004fdaf0;
+                g_game->field_2ba2 = DAT_004fdaf0;
             }
             OpenSelectGameDialog();
             ShowFrontendErrorText();
@@ -1429,7 +1429,7 @@ void RunFrontendStateMachine(void)
         case 19:
             g_game->players[(unsigned char)g_game->localPlayer].info->bit6 = 1;
         case 18:
-            if (JoinNetGame(*(V4i*)((char*)g_game + 0x2ba2), (unsigned char)g_game->localPlayer) == 0) {
+            if (JoinNetGame(g_game->field_2ba2, (unsigned char)g_game->localPlayer) == 0) {
                 SetSubState(0, 0x5b3, g_frontendSourceFile);
                 return;
             }

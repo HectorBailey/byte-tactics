@@ -949,30 +949,30 @@ void __stdcall HandleNewGameClick(Gui* menu)
             *(unsigned char*)(*(int*)((char*)g_game + 0x1cd5) + 0x96) = 1;
             SaveSettings();
             if (g_anyMissionMode != 0) {
-                *(unsigned char*)((char*)g_game + 0x2bc0) = 0x10;
+                g_game->frontendSubstateRequest = 0x10;
                 return;
             }
-            *(unsigned char*)((char*)g_game + 0x2bc0) = 0x0f;
+            g_game->frontendSubstateRequest = 0x0f;
             return;
         }
         goto End;
     } else {
         if (IsCurrentGadgetNamed(menu, "PrevMenu")) {
             PlaySoundByName("Previous", 0);
-            *(unsigned char*)((char*)g_game + 0x2bc0) = 3;
+            g_game->frontendSubstateRequest = 3;
             SetCursorMode(0x14);
             return;
         }
         if (IsCurrentGadgetNamed(menu, "Difficulty")) {
             PlaySoundByName("SmlButton", 0);
             // If/else-if chain into one shared exit: a switch or per-arm return changes registers.
-            int diff = *(int*)((char*)g_game + 0x37eee);
+            int diff = g_game->difficulty;
             if (diff == 0) {
-                *(int*)((char*)g_game + 0x37eee) = 1;
+                g_game->difficulty = 1;
             } else if (diff == 1) {
-                *(int*)((char*)g_game + 0x37eee) = 2;
+                g_game->difficulty = 2;
             } else if (diff == 2) {
-                *(int*)((char*)g_game + 0x37eee) = 0;
+                g_game->difficulty = 0;
             } else {
                 goto End;
             }
@@ -989,7 +989,7 @@ void __stdcall HandleNewGameClick(Gui* menu)
         PlaySoundByName("SideSelect2", 0);
         index = FindGadgetIndex(entries, "Side1", 1);
         *(int*)((char*)entries + index * 0x15b + 0x1f) = 0x1f;
-        *(int*)((char*)g_game + 0x37ef2) = 1;
+        g_game->flag_37ef2 = 1;
         *(unsigned char*)(*(int*)(playerInfo + 0x1b8a) + 0x95) = 1;
         *(unsigned char*)(*(int*)(playerInfo + 0x1cd5) + 0x95) = 0;
         if (g_campaignSimplifiedLayout == 0)
@@ -1007,7 +1007,7 @@ ArmSide:
         PlaySoundByName("SideSelect", 0);
         index = FindGadgetIndex(entries, "Side0", 1);
         *(int*)((char*)entries + index * 0x15b + 0x1f) = 0x1f;
-        *(int*)((char*)g_game + 0x37ef2) = 0;
+        g_game->flag_37ef2 = 0;
         *(unsigned char*)(*(int*)(playerInfo + 0x1b8a) + 0x95) = 0;
         *(unsigned char*)(*(int*)(playerInfo + 0x1cd5) + 0x95) = 1;
         FillCampaignListInline(*(unsigned char*)(*(int*)((char*)g_game + 0x14b * g_game->localPlayer + 0x1b8a) + 0x95));
@@ -1396,8 +1396,8 @@ void OpenMissionBriefing(void)
     RemapPaletteToClosestIndices(&g_game->gui, (char*)g_game + 0x143a7, (char*)g_game + 0x5cb);
 
     gadgets = g_game->gui.layer->entries;
-    strcpy((char*)gadgets + 0xcc, "Start");
-    strcpy((char*)gadgets + 0xdc, "PrevMenu");
+    strcpy((char*)&gadgets->text_b6[22], "Start");
+    strcpy((char*)&gadgets->text_b6[38], "PrevMenu");
 
     i = FindGadgetIndex(gadgets, "MOREBAR", 0xe);
     gadgets[i].attribs &= ~0x10;
@@ -1525,7 +1525,7 @@ void OpenMissionBriefing(void)
 int CountComputerSlots()
 {
     int count = 0;
-    int num_items = *(int*)((char*)g_game + 0x38d81);
+    int num_items = g_game->numSkirmishPlayers;
     if (num_items > 0) {
         Item* ptr = g_game->options;
         do {

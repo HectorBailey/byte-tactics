@@ -542,8 +542,8 @@ void __stdcall UpdateGameSelection(Gui* menu, Gadget* entry)
     }
 
     int password = msg.group.b & 1;
-    SetGadgetActiveByName((char*)g_game + 0x519, "PASSWORDTEXT", password);
-    SetGadgetActiveByName((char*)g_game + 0x519, "PASSWORD", password);
+    SetGadgetActiveByName((char*)&g_game->gui, "PASSWORDTEXT", password);
+    SetGadgetActiveByName((char*)&g_game->gui, "PASSWORD", password);
     MarkChanged(menu);
 }
 
@@ -1585,7 +1585,7 @@ void OpenSerialDialog()
     gadget->owner = g_game;
     gadget->cb1c = 0;
     LoadPictureCached(0, 0, 0, 0);
-    HAPINET_initlobbiedconnection((char*)g_game + 0x14);
+    HAPINET_initlobbiedconnection((char*)&g_game->session);
     ConfigureListBoxByName(&g_game->gui, "PORTS", "COM1\0COM2\0COM3\0COM4", 4, 0);
     ConfigureListBoxByName(&g_game->gui, "SPEEDS", "115200\0" "57600\0" "38400\0" "19200\0" "14400\0" "9600", 6, 0);
 
@@ -1621,8 +1621,8 @@ void FillAccountList(void)
     }
     Gadget* entry = FindGadgetChecked(g_game->gui.layer->entries, "ACCOUNTS");
     int player = entry->index;
-    ConfigureListBoxByName((char*)g_game + 0x519, "ACCOUNTS", g_modemAccountNames, 20, 0);
-    SetListBoxScrollByName((char*)g_game + 0x519, "ACCOUNTS", player);
+    ConfigureListBoxByName((char*)&g_game->gui, "ACCOUNTS", g_modemAccountNames, 20, 0);
+    SetListBoxScrollByName((char*)&g_game->gui, "ACCOUNTS", player);
 }
 
 // Copies the selected account's name and number into the NAME and NUMBER
@@ -1632,9 +1632,9 @@ void RefreshAccountList(void)
 {
     Gadget* entry = FindGadgetChecked(g_game->gui.layer->entries, "ACCOUNTS");
     if (entry != 0 && g_modemAccounts != 0) {
-        GetGadgetText((char*)g_game + 0x519, "NAME",
+        GetGadgetText((char*)&g_game->gui, "NAME",
                      g_modemAccounts[entry->index].name);
-        GetGadgetText((char*)g_game + 0x519, "NUMBER",
+        GetGadgetText((char*)&g_game->gui, "NUMBER",
                      g_modemAccounts[entry->index].number);
         char* buffer = g_modemAccountNames;
         *buffer = 0;
@@ -1643,8 +1643,8 @@ void RefreshAccountList(void)
             buffer += strlen(g_modemAccounts[i].name) + 1;
         }
         int player = FindGadgetChecked(g_game->gui.layer->entries, "ACCOUNTS")->index;
-        ConfigureListBoxByName((char*)g_game + 0x519, "ACCOUNTS", g_modemAccountNames, 20, 0);
-        SetListBoxScrollByName((char*)g_game + 0x519, "ACCOUNTS", player);
+        ConfigureListBoxByName((char*)&g_game->gui, "ACCOUNTS", g_modemAccountNames, 20, 0);
+        SetListBoxScrollByName((char*)&g_game->gui, "ACCOUNTS", player);
     }
 }
 
@@ -1696,9 +1696,9 @@ static inline void LoadAccount_00442a30()
 {
     Gadget* entry = FindGadgetChecked(g_game->gui.layer->entries, "ACCOUNTS");
     if (entry != 0 && g_modemAccounts != 0) {
-        GetGadgetText((char*)g_game + 0x519, "NAME",
+        GetGadgetText((char*)&g_game->gui, "NAME",
                      g_modemAccounts[entry->index].name);
-        GetGadgetText((char*)g_game + 0x519, "NUMBER",
+        GetGadgetText((char*)&g_game->gui, "NUMBER",
                      g_modemAccounts[entry->index].number);
         FillAccountList();
     }
@@ -1763,7 +1763,7 @@ void __stdcall HandleModemDialogClick(Gui* gadget)
         LoadAccount_00442a30();
         SelectGadgetByIndex(gadget, FindGadgetIndex(entries, "JOIN", 1));
         TrySetFocus(gadget, FindGadgetIndex(entries, "JOIN", 1));
-        strcpy((char*)entries + 0xcc, "JOIN");
+        strcpy((char*)&entries->label[0], "JOIN");
         MarkChanged(gadget);
         ClearSelectedGadget(gadget);
         return;
@@ -2205,7 +2205,7 @@ int __stdcall CloneServiceSlot(Gadget* entries, int param_2, short param_3, int 
     Gadget* d = &entries[index];
     Gadget* s = &entries[param_2];
     *d = *s;
-    SetTranslatedText((char*)g_game + 0x519, index, param_4, 0);
+    SetTranslatedText((char*)&g_game->gui, index, param_4, 0);
     strcpy(d->name, param_5);
     d->y = param_3;
     d->active = 1;
@@ -3462,10 +3462,10 @@ void __stdcall RefreshAlliesScreen(int param_1)
         sprintf(logo, "LOGO%d", i);
         sprintf(ally, "ALLY%d", i);
         sprintf(teamicons, "TEAMICONS%d", i);
-        SetGadgetActiveByName((char*)g_game + 0x519, player, 0);
-        SetGadgetActiveByName((char*)g_game + 0x519, logo, 0);
-        SetGadgetActiveByName((char*)g_game + 0x519, ally, 0);
-        SetGadgetActiveByName((char*)g_game + 0x519, teamicons, 0);
+        SetGadgetActiveByName((char*)&g_game->gui, player, 0);
+        SetGadgetActiveByName((char*)&g_game->gui, logo, 0);
+        SetGadgetActiveByName((char*)&g_game->gui, ally, 0);
+        SetGadgetActiveByName((char*)&g_game->gui, teamicons, 0);
 
         Player* p = &g_game->players[i];
         // Two helpers, not one: gives the register rotation of the second sprintf group.
@@ -3488,10 +3488,10 @@ void __stdcall RefreshAlliesScreen(int param_1)
                 }
             }
 
-            SetTranslatedTextByName((char*)g_game + 0x519, player, name, 0x80);
-            SetGadgetActiveByName((char*)g_game + 0x519, player, 1);
+            SetTranslatedTextByName((char*)&g_game->gui, player, name, 0x80);
+            SetGadgetActiveByName((char*)&g_game->gui, player, 1);
             sprintf(live, "LIVEPLYR%d", i);
-            SetGadgetName((char*)g_game + 0x519, player, live);
+            SetGadgetName((char*)&g_game->gui, player, live);
 
             if (p->active != 0
                 && IsType_00447380(p)
@@ -3505,18 +3505,18 @@ void __stdcall RefreshAlliesScreen(int param_1)
                     && IsType_00447380(q)
                     && q->index != 10
                     && (q->unitCount != 0 || q->unitsCreated == 0)) {
-                    SetGadgetActiveByName((char*)g_game + 0x519, ally, 1);
+                    SetGadgetActiveByName((char*)&g_game->gui, ally, 1);
                 }
             }
 
             sprintf(live, "LIVEALLY%d", i);
-            SetGadgetName((char*)g_game + 0x519, ally, live);
+            SetGadgetName((char*)&g_game->gui, ally, live);
 
             if (p->alliance == local->alliance && p->alliance != 5) {
-                SetGadgetGrayedOutByName((char*)g_game + 0x519, live, 1);
+                SetGadgetGrayedOutByName((char*)&g_game->gui, live, 1);
             }
 
-            SetGadgetActiveByName((char*)g_game + 0x519, teamicons, 1);
+            SetGadgetActiveByName((char*)&g_game->gui, teamicons, 1);
 
             int value;
             if (p->active != 0 && (p->type == 1 || p->type == 2)
@@ -3525,7 +3525,7 @@ void __stdcall RefreshAlliesScreen(int param_1)
             } else {
                 value = 1;
             }
-            SetGadgetGrayedOutByName((char*)g_game + 0x519, teamicons, value);
+            SetGadgetGrayedOutByName((char*)&g_game->gui, teamicons, value);
 
             Gadget* e2 = FindGadgetChecked_E(entries, logo);
             if (e2 != 0) {
@@ -4530,7 +4530,7 @@ void* __stdcall ListSaveGameFiles(int* out)
     int count = CountDirectoryEntries(path, 0);
     *out = count;
     if (count == 0) {
-        ConfigureListBoxByName((char*)g_game + 0x519, g_gamesGadgetName, DAT_005119b8, 0, 0);
+        ConfigureListBoxByName((char*)&g_game->gui, g_gamesGadgetName, DAT_005119b8, 0, 0);
         return 0;
     }
     g_saveListFileNames = (char*)GameAllocIgnoreTag(g_savegameNamesName, count << 8);
@@ -4538,7 +4538,7 @@ void* __stdcall ListSaveGameFiles(int* out)
     memset(g_saveListDisplayNames, 0, *out << 8);
     memset(g_saveListFileNames, 0, *out << 8);
     ScanDirectory(path, g_saveListFileNames, 0, 0, 0, 1);
-    ConfigureListBoxByName((char*)g_game + 0x519, g_gamesGadgetName, g_saveListFileNames, *out, 0);
+    ConfigureListBoxByName((char*)&g_game->gui, g_gamesGadgetName, g_saveListFileNames, *out, 0);
     return *out ? g_saveListFileNames : 0;
 }
 

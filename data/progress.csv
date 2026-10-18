@@ -1183,7 +1183,7 @@ address,size,file,symbol,status,similarity
 0x45b9b0,105,src/frontend/options.cpp,?SetSliderFromValue@@YGXPAUGadget@@H@Z,matched,100.0
 0x45ba20,63,src/frontend/options.cpp,?ReadSliderValue@@YGHPAUGadget@@@Z,matched,100.0
 0x45ba60,138,src/frontend/options.cpp,?SetGadgetStatusAndText@@YGXHHPAD0@Z,matched,100.0
-0x45baf0,14,src/frontend/options.cpp,?ClearGadgetText@@YGXPAXH@Z,matched,100.0
+0x45baf0,14,src/frontend/options.cpp,?ClearGadgetText@@YGXPAUGadget@@H@Z,matched,100.0
 0x45bb00,228,src/frontend/options.cpp,?UpdateVideoModeLabel@@YGXPAUMenu_0045b800@@PAUGadget@@@Z,matched,100.0
 0x45bbf0,194,src/frontend/options.cpp,?HandleVideoModeSlider@@YGXPAUMenu_0045b800@@H@Z,matched,100.0
 0x45bcc0,81,src/frontend/options.cpp,?ApplyBrightnessAndVolume@@YGXXZ,matched,100.0
@@ -2361,7 +2361,7 @@ address,size,file,symbol,status,similarity
 0x4afd40,27,src/gui/file_list.cpp,?EnableBlinkWords@@YGXH@Z,matched,100.0
 0x4afd60,27,src/gui/file_list.cpp,?DisableBlinkWords@@YGXH@Z,matched,100.0
 0x4afd80,271,src/gui/file_list.cpp,?AddBlinkWord@@YGHPAUDialog@@PBDHHHHMM@Z,matched,100.0
-0x4afe90,35,src/gui/file_list.cpp,?ClearBlinkWord@@YGXPAXH@Z,matched,100.0
+0x4afe90,35,src/gui/file_list.cpp,?ClearBlinkWord@@YGXPAUDialog@@H@Z,matched,100.0
 0x4afec0,60,src/gui/file_list.cpp,?ClearBlinkWords@@YGXPAUDialog@@@Z,matched,100.0
 0x4aff00,389,src/gui/file_list.cpp,?DrawBlinkWords@@YGXPAUDialog@@@Z,matched,100.0
 0x4b0090,193,src/gui/listbox.cpp,?DrawBevelBorder@@YGXPAXPAURect@@HEH@Z,matched,100.0
