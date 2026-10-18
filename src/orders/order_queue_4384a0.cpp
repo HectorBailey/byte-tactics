@@ -14,28 +14,13 @@ class HapiBank;
 
 #pragma pack(push, 1)
 #include "../util/vec3.h"
+#include "../units/unit_def.h"
 
 class CobScript;
 class Slot_0043a1f0;
 
 struct Owner_0043a1f0 {
     Slot_0043a1f0* slot;               // +0x0
-};
-
-struct UnitType {                      // 0x249 bytes
-    char unknown_0[0x20];
-    char name[0x20];                   // +0x20
-    char unknown_40[0x18a - 0x40];
-    float metalCost;                   // +0x18a
-    char unknown_18e[0x1fa - 0x18e];
-    unsigned int maxHealth;            // +0x1fa
-    unsigned short field_1fe;          // +0x1fe
-    char unknown_200[0x241 - 0x200];
-    union {
-        unsigned char flags;           // +0x241
-        unsigned int flags32;          // +0x241
-    };
-    char unknown_245[0x249 - 0x245];
 };
 
 struct Unit {                          // 0x118 bytes
@@ -46,7 +31,7 @@ struct Unit {                          // 0x118 bytes
     char unknown_64[0x86 - 0x64];
     int carrier;                      // +0x86
     char unknown_8a[0x92 - 0x8a];
-    UnitType* def;                     // +0x92
+    UnitDef* def;                     // +0x92
     char unknown_96[0x9a - 0x96];
     CobScript* script;                 // +0x9a
     char unknown_9e[0xa8 - 0x9e];
@@ -80,7 +65,7 @@ struct Game {
     char unknown_1435b[0x1438f - 0x1435b];
     int unitDefCount;                  // +0x1438f
     char unknown_14393[0x1439b - 0x14393];
-    UnitType* unitDefs;                // +0x1439b
+    UnitDef* unitDefs;                // +0x1439b
     char unknown_1439f[0x38a47 - 0x1439f];
     unsigned int gameTick;             // +0x38a47
 };
@@ -350,7 +335,7 @@ void __stdcall StopBuildingScript(Unit* obj, Order* target)
 // FUNCTION: 0x438650
 int __stdcall ComputeReclaimDamagePulse(Unit* a, Unit* b, int n)
 {
-    UnitType* bt = b->def;
+    UnitDef* bt = b->def;
     float v = bt->metalCost > 10.0f ? bt->metalCost : 10.0f;
     // The 64-bit numerator is built by hand (signed 32-bit chain in lo, zero hi):
     // keeps the multiply order and the unsigned fild qword.
@@ -361,7 +346,7 @@ int __stdcall ComputeReclaimDamagePulse(Unit* a, Unit* b, int n)
             int hi;
         } w;
     } p;
-    p.w.lo = a->def->field_1fe * ((a->killCount + 5) / 5) * (int)bt->maxHealth * n;
+    p.w.lo = a->def->buildRate * ((a->killCount + 5) / 5) * (int)bt->maxHealth * n;
     p.w.hi = 0;
     int r = (int)((double)p.q / (v * 300.0f));
     if (r <= 1) {
@@ -495,7 +480,7 @@ void Order::SetAttachedFx(OrderFx* obj)
 // FUNCTION: 0x438930
 void Order::AttachApproachRadiusGoal(int* p, int n)
 {
-    if ((unit->def->flags32 & 0x800) == 0) {
+    if ((unit->def->flags1 & 0x800) == 0) {
         ApproachRadius* obj = new ApproachRadius((Source_0044cf60*)this, p[0], p[2], n);
         if (unit->motion) {
             if (attached) {
@@ -521,7 +506,7 @@ void Order::AttachApproachRadiusGoal(int* p, int n)
 // FUNCTION: 0x438a00
 void Order::AttachRingApproachGoal(Vec3* pos, int radius1, int radius2)
 {
-    if (!(unit->def->flags32 & 0x800)) {
+    if (!(unit->def->flags1 & 0x800)) {
         RingApproach* obj = new RingApproach(this, pos->x, pos->z, radius1, radius2);
         if (unit->motion) {
             if (attached) {
@@ -549,7 +534,7 @@ void Order::AttachRingApproachGoal(Vec3* pos, int radius1, int radius2)
 // FUNCTION: 0x438ad0
 void Order::AttachBuildFootprintMarker(Point16 cell, Point16 size)
 {
-    if (!(unit->def->flags32 & 0x800)) {
+    if (!(unit->def->flags1 & 0x800)) {
         PointMarker* obj = new PointMarker(this, cell, size);
         if (unit->motion) {
             if (attached) {
@@ -645,7 +630,7 @@ short __stdcall ResolveUnitTypeKey(HapiBank* file, unsigned short id)
     int i, n = 0;
     unsigned short k = 0;
     for (i = 1; i < g_game->unitDefCount; i++, n++) {
-        if (!(g_game->unitDefs[(unsigned short)i].flags & 0x20)) {
+        if (!((unsigned char)g_game->unitDefs[(unsigned short)i].flags1 & 0x20)) {
             if (k == id)
                 return n;
             k++;
@@ -839,7 +824,7 @@ int Order::SerializeToSave(Unit* punit, HapiBank* file, char* name)
         char buf2[0x80];
         sprintf(buf2, "UTYPENAME%4d", id);
         if (!file->HasItem(buf2) && id >= 1 && id < g_game->unitDefCount)
-            file->SetStringItem(buf2, g_game->unitDefs[id].name);
+            file->SetStringItem(buf2, g_game->unitDefs[id].unitname);
     }
 
     if (desc.field_4 != 0) {
