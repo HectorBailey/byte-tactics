@@ -47,6 +47,7 @@ struct PlayerData {
     unsigned char color;               // +0x96
 };
 
+// Kept: the shared headers' declarations move three functions' allocation.
 struct Player {
     int active;                        // +0x00
     char unknown_4[0x27 - 0x4];

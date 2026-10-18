@@ -340,6 +340,7 @@ struct PlayerData {
     unsigned char flags;               // +0x97
 };
 
+// Kept: Player::info's view collides with the local PlayerInfo used for Unit::info.
 struct Player {
     int active;                        // +0x0
     char unknown_4[0x23];
