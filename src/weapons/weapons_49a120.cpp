@@ -2,6 +2,7 @@
 #include <math.h>
 #include <string.h>
 #include "../util/vec3.h"
+#include "../ai/squad_manager.h"
 
 // A 16.16 fixed-point value and its whole part.
 union Fixed_0049a120 {
@@ -58,12 +59,6 @@ struct Weapon_0049a120 {
     unsigned char owner;               // +0x66
     char unknown_67[0x69 - 0x67];
     unsigned short flags;              // +0x69
-};
-
-// Not ai/squad_manager.h: its declarations take more symbol ids than this view, and 0x49a120 matches only with this count.
-class SquadManager {
-public:
-    void MarkOwnerNetDirtyFromDamageSplit(Weapon_0049a120* weapon, int enemyDamage, int friendlyDamage);
 };
 
 struct Holder_0049a120 {
@@ -375,5 +370,6 @@ void __stdcall ApplyAreaDamage(Weapon_0049a120* weapon, Vec3* pos)
     }
 
     if (weapon->attacker)
-        weapon->attacker->player->object->MarkOwnerNetDirtyFromDamageSplit(weapon, enemyDamage, friendlyDamage);
+        // The damage split's Obj_00406f50 parameter is this weapon object.
+        weapon->attacker->player->object->MarkOwnerNetDirtyFromDamageSplit((Obj_00406f50*)weapon, enemyDamage, friendlyDamage);
 }
