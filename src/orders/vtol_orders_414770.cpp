@@ -39,29 +39,7 @@ void __stdcall ClearWeaponTarget(Unit*, int);
 void __stdcall DetonateUnitWeapon(Unit*, int);
 void __stdcall DrawUnit(void*, Unit*);
 
-struct Order {
-    char unknown_0[5];
-    unsigned char state;               // +0x5
-    unsigned int flags;                // +0x6
-    char unknown_a[0x22 - 0xa];
-    Vec3 pos;                          // +0x22
-    char unknown_2e[0x36 - 0x2e];
-    int time;                          // +0x36
-    void AnnounceStatusIfFlagged(const char*);
-    void SetAttachedFx(int);
-    void SetDeadlineTicks(int ticks);
-    // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
-    void ReattachFxToUnit();
-    void MergeFlagsFromTable(int k);
-    void AttachRingApproachGoal(Vec3* pos, int radius1, int radius2);
-    Order(Unit* unit, void* file, char* name);
-    void OrStatusFlags(unsigned int flags);
-    void AttachApproachRadiusGoal(Vec3* pos, int radius);
-    void AttachBuildFootprintMarker(Point16 cell, Point16 size);
-    Unit* Target();
-    void Wait();
-    Vec3* Position();
-};
+#include "order.h"
 
 class Class_0044e2d0 {
 public:
@@ -99,7 +77,7 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
         unit->motion->SetFlightMode(unit, 2);
         Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);
         obj->SetAltitude(unit->def->altitude / 2);
-        order->SetAttachedFx((int)obj);
+        order->SetAttachedFx((OrderFx*)obj);
         order->flags |= flags | 0xe0;
     }
 }
@@ -130,7 +108,7 @@ int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags)
         break;
     case 1: {
         Class_0044e2d0* obj = new Class_0044e2d0(order, order->pos);
-        order->SetAttachedFx((int)obj);
+        order->SetAttachedFx((OrderFx*)obj);
         order->flags = 0xe0;
         return 1;
     }

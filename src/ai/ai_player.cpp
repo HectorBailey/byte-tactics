@@ -82,6 +82,7 @@ struct UnitWeaponSlot {                // 0x1c bytes, one of a unit's three
     unsigned char flags;               // +0x1b
 };
 
+// Local Order view: the file's own Vec3 conflicts with order.h.
 struct Order {
     char unknown_0[0x42];
     unsigned int flags;                // +0x42
