@@ -40,6 +40,7 @@ struct Unit {
     void ReleaseWeapons(int);
     void SetStateBits(int, int);
 };
+// Local Order view: the file's own Vec3 conflicts with order.h.
 struct Order {
     char pad0[5]; unsigned char state; unsigned int flags;
     char padA[0x22 - 0xa]; Vec3 pos;

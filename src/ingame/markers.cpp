@@ -131,6 +131,7 @@ struct Unit {
     unsigned int flags_rest : 27;
 };
 
+// Local Order view: the file's own Vec3 conflicts with order.h.
 struct Order {
     char unknown_0[4];
     unsigned char kind;               // +0x4

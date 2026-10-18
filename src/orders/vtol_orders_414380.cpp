@@ -61,6 +61,7 @@ struct UnitRef {
     // The empty do-while is a debug check that compiles to nothing.
     Unit* Get() { do {} while (0); return ptr; }
 };
+// Local Order view: the file's own Vec3 conflicts with order.h.
 struct Order {
     char pad0[5]; unsigned char state;
     unsigned int flags;

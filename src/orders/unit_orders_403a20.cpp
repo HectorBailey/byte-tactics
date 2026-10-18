@@ -38,6 +38,8 @@ struct Unit {
     // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
     void SetStateBits(int, int);
 };
+
+// Local Order view: the file's own Vec3 conflicts with order.h.
 struct Order {
     char pad0[5]; unsigned char state;
     unsigned int flags;

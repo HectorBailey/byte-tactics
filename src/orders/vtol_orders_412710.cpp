@@ -74,6 +74,7 @@ struct Unit {
 int __stdcall IsUnitCommander(Unit*);
 void __stdcall AlignUnitToGround(Unit*);
 
+// Local Order view: the file's own Vec3 conflicts with order.h.
 struct Order {
     char pad0[5]; unsigned char state; unsigned int flags;
     char padA[0x16 - 0xa]; Unit* target;
