@@ -19,6 +19,7 @@ void __cdecl operator delete(void* p);
 
 extern char* g_game;                   // 0x511de8, frame at +0x38a47
 
+// Own view, not vec3.h: it has operator-.
 struct Vec3_00473d50 {
     int x;
     int y;

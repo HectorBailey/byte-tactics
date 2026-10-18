@@ -66,7 +66,7 @@ public:
     virtual int IsFinished();                           // slot 3, 0x474f80
     virtual void Emit();                                // slot 4, 0x474df0
     virtual int IsEmitDue();                            // slot 5, 0x475440
-    virtual void Init(Vec3_00474d50* pos, int limit, int a, int b, int c,
+    virtual void Init(Vec3* pos, int limit, int a, int b, int c,
                               int alt);                 // slot 6, 0x474d50
 };
 
@@ -85,12 +85,12 @@ public:
         lists[index].push_back(*(Elem_00473500*)&p);
     }
 
-    void AddSmoke(Vec3_00474d50* pos, int limit, int emitPeriod, int holdPeriod,
+    void AddSmoke(Vec3* pos, int limit, int emitPeriod, int holdPeriod,
                       int lifetime, short index, int alt);
 };
 
 // FUNCTION: 0x471820
-void ParticleLists::AddSmoke(Vec3_00474d50* pos, int limit, int emitPeriod,
+void ParticleLists::AddSmoke(Vec3* pos, int limit, int emitPeriod,
                                   int holdPeriod, int lifetime, short index, int alt)
 {
     SmokeParticles* p = new SmokeParticles;

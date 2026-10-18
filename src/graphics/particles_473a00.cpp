@@ -4,6 +4,7 @@
 // The nano spark: moved by Step, drawn as one pixel by DrawParticle when the
 // local player can see it, and dropped once IsExpired.
 
+// Own view, not vec3.h: it has operator+=.
 struct Vec3_004739b0 {
     int x, y, z;
     Vec3_004739b0& operator+=(const Vec3_004739b0& o)

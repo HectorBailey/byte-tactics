@@ -51,7 +51,7 @@ void __stdcall DrawFrameBlended(void* dest, void* src, int x, int y);
 struct TimedSubParticle {
     void* data;                        // +0x00, the animation
     union {
-        Vec3_00475150 pos;             // +0x04
+        Vec3 pos;                      // +0x04
         Position_00475150 posw;
     };
     int limit;                         // +0x10, the rounds it lives
