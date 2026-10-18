@@ -659,7 +659,7 @@ TdfFile* __stdcall FindFeatureFile(char* name)
 {
     for (TdfFile** p = s_featureTdfParsers->begin(); p < s_featureTdfParsers->end(); p++) {
         (*p)->ResetCurrentRecord();
-        if (((TdfFile*)*p)->SelectRecord(name))
+        if ((*p)->SelectRecord(name))
             return *p;
     }
     return 0;
