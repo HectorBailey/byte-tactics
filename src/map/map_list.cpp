@@ -151,11 +151,7 @@ struct MissionFeature {
 
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 
-struct Vec3_00437320 {
-    int x;                             // +0x0
-    int y;                             // +0x4
-    int z;                             // +0x8
-};
+#include "../util/vec3.h"
 
 // The reference-counted string handle: 0x4c91a0 is its copy constructor and
 // 0x4c9390 its release, and 0x4c91b0 builds one from a C string. In the game
@@ -1278,7 +1274,7 @@ int Mission::CountStartPositions()
 // Finds the type-1 entry with the given id and returns its position (16.16
 // fixed point, y = 0) in `out`. Returns 0 if there is none.
 // FUNCTION: 0x437320
-int Mission::GetStartPosition(Vec3_00437320* out, int id)
+int Mission::GetStartPosition(Vec3* out, int id)
 {
     for (int i = 0; i < ruleCount; i++) {
         if (rules[i].type == 1 && rules[i].id == id) {

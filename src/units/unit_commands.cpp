@@ -11,9 +11,7 @@
 struct Item_00485940;
 
 #pragma pack(push, 1)
-struct Vec3_00487bf0 {
-    int x, y, z;
-};
+#include "../util/vec3.h"
 
 #include "../util/angles.h"
 
@@ -29,7 +27,7 @@ struct Unit {
     UnitWeaponSlot weapons[3];         // +0x4, stride 0x1c
     char unknown_58[0x64 - 0x58];
     Angles16 angles;               // +0x64
-    Vec3_00487bf0 pos;                 // +0x6a
+    Vec3 pos;                 // +0x6a
     char unknown_76[0x92 - 0x76];
     Def_00488310* def;                 // +0x92
     Player* player;                    // +0x96
@@ -67,9 +65,9 @@ public:
 };
 
 void __stdcall AddOrder(MissionType kind, int remove, Unit* owner,
-                            int id, Vec3_00487bf0* pos, int param_6, int param_7);
+                            int id, Vec3* pos, int param_6, int param_7);
 void __stdcall GetOrderType(MissionType* out, int mode, Unit* unit,
-                            int target, Vec3_00487bf0* pos);
+                            int target, Vec3* pos);
 int __stdcall FindMissionUnit(char* name, Table_00487bf0* table, int value);
 unsigned short __stdcall FindUnitTypeId(const char* name);
 void __stdcall AttachUnitToPiece(Unit* unit, int target, int a, int b);
@@ -83,7 +81,7 @@ void __stdcall RunInitialMission(Unit* unit, char* text, Table_00487bf0* table)
 {
     int count;
     // Locals stay grouped in small structs: loose scalars get a different frame order.
-    struct { float f1, f2; int n; Vec3_00487bf0 pos; int move; } L;
+    struct { float f1, f2; int n; Vec3 pos; int move; } L;
     Outs_t out;
     char buf[256];
     int processed = 0, selected = 0;
@@ -271,7 +269,7 @@ struct MissionUnit {               // 0x24 bytes
     char* name;                       // +0x0
     char* ident;                      // +0x4
     char* initialMission;             // +0x8
-    Vec3_00487bf0 pos;                // +0xc
+    Vec3 pos;                // +0xc
     short angle;                      // +0x18
     short health;                     // +0x1a
     int creationCountdown;            // +0x1c
@@ -303,9 +301,9 @@ struct Game {
 extern Game* g_game;
 
 UnitType_00488b10* __stdcall FindUnitType(const char* name);
-void __stdcall SnapWorldPosToFootprint(UnitType_00488b10* type, Vec3_00487bf0* pos);
+void __stdcall SnapWorldPosToFootprint(UnitType_00488b10* type, Vec3* pos);
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short id,
-                                      Vec3_00487bf0 pos, int a, int b, int c);
+                                      Vec3 pos, int a, int b, int c);
 void __stdcall FatalError(char* message);
 
 // Needed though unused: dropping it moves the f108 multiply onto the other register.

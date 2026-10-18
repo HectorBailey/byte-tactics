@@ -508,6 +508,7 @@ struct Vec {
     int z;
 };
 
+// Own view, not vec3.h: this file defines its own fixed-point Vec3 and Point16.
 struct Vec3_40b0d0 {
     int x;
     int y;
@@ -522,6 +523,7 @@ struct Struct_0040bab0 {
     int a, b, c;
 };
 
+// Own view, not vec3.h: it has the Length member and operator-.
 struct Vec3_0040beb0 {
     int x;
     int y;

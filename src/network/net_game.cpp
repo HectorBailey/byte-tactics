@@ -59,9 +59,7 @@ public:
 
 #include "../util/angles.h"
 
-struct Vec3_00456050 {
-    int x, y, z;
-};
+#include "../util/vec3.h"
 
 struct Ring_00453640 {                 // 0x48 bytes, 30 of them at g_game+0x12ef
     char text[0x40];                   // +0x00
@@ -188,7 +186,7 @@ struct Player {
 struct Unit {
     char unknown_0[0x64];
     Angles16 angles;               // +0x64
-    Vec3_00456050 pos;            // +0x6a
+    Vec3 pos;                      // +0x6a
     char unknown_76[0x96 - 0x76];
     Player* player;                    // +0x96
     CobScript* script;                 // +0x9a
@@ -1269,7 +1267,7 @@ struct UnitCreatePacket {
     unsigned char type;                // +0x0
     short defIndex;                    // +0x1
     short unitId;                      // +0x3
-    Vec3_00456050 pos;                 // +0x5
+    Vec3 pos;                          // +0x5
     Angles16 angles;               // +0x11
 };
 

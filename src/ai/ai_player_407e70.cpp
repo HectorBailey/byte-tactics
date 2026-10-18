@@ -28,6 +28,7 @@ struct Game {
 
 extern Game* g_game;
 
+// Own view, not vec3.h: it has constructors and operator+=.
 struct Vec3_00407d40 {
     int x, y, z;
 

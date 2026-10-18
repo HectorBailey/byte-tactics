@@ -10,6 +10,7 @@ struct Game {
 
 extern Game* g_game;
 
+// Own view, not vec3.h: it has a Game constructor.
 struct Vec3_00407d40 {
     int x, y, z;
 

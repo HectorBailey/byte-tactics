@@ -36,12 +36,10 @@ struct Game {
     unsigned short mapFlags;             // +0x14281
 };
 #include "../units/unit_def.h"
-struct Vec3_00465ac0 {
-    int x, y, z;
-};
+#include "../util/vec3.h"
 struct Unit {
     char unknown_0[0x6a];
-    Vec3_00465ac0 pos;                   // +0x6a
+    Vec3 pos;                            // +0x6a
     char unknown_76[0x92 - 0x76];
     UnitDef* def;                        // +0x92
     Map_00465ac0* player;                // +0x96

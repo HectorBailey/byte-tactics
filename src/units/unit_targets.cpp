@@ -70,16 +70,12 @@ struct UnitType {
     unsigned int f241;                 // +0x241, bits 12 and 26
 };
 
-struct Vec3_0048a1e0 {
-    int x;
-    int y;
-    int z;
-};
+#include "../util/vec3.h"
 
 // The object at the start of a unit.
 struct Body_0048a1e0 {
     char unknown_0[8];
-    Vec3_0048a1e0 offset;              // +0x8
+    Vec3 offset;              // +0x8
     char unknown_14[0x20 - 0x14];
     int sight;                         // +0x20
     char unknown_24[0x2a - 0x24];
@@ -670,7 +666,7 @@ Unit* __stdcall GetWeaponTargetUnit(Unit* obj, int index)
     return &g_game->units[p->a];
 }
 
-int __stdcall GetGroundHeight(Vec3_0048a1e0* pos);
+int __stdcall GetGroundHeight(Vec3* pos);
 void __stdcall GetSweetSpot(Unit* def, int pos);
 
 // The intact tail block: writing the three adds in their natural x,y,z order
@@ -678,9 +674,9 @@ void __stdcall GetSweetSpot(Unit* def, int pos);
 // adds z,y,x. Passing the three products through a static helper that
 // returns the vector by value makes all three writes land in memory before the
 // adds are read, and the original's x,y,z schedule falls out.
-static Vec3_0048a1e0 offset_0048a1e0(Body_0048a1e0* m, __int64 s)
+static Vec3 offset_0048a1e0(Body_0048a1e0* m, __int64 s)
 {
-    Vec3_0048a1e0 d;
+    Vec3 d;
     d.x = (int)(((__int64)m->offset.x * s) >> 16);
     d.y = (int)(((__int64)m->offset.y * s) >> 16);
     d.z = (int)(((__int64)m->offset.z * s) >> 16);
@@ -688,7 +684,7 @@ static Vec3_0048a1e0 offset_0048a1e0(Body_0048a1e0* m, __int64 s)
 }
 
 // FUNCTION: 0x48a1e0
-int __stdcall GetWeaponTargetPos(Unit* unit, Vec3_0048a1e0* pos, int index)
+int __stdcall GetWeaponTargetPos(Unit* unit, Vec3* pos, int index)
 {
     Entry_004898b0* e = &unit->weapons[index];
     if (e->point.b != (short)0x8000) {
@@ -714,7 +710,7 @@ int __stdcall GetWeaponTargetPos(Unit* unit, Vec3_0048a1e0* pos, int index)
     GetSweetSpot(def, (int)pos);
     if ((e->flags & 2) && !(e->target->field_111 & 0x2000000) && def->motion != 0
         && unit->killCount > 5 && e->target->radius != 0) {
-        Vec3_0048a1e0 d;
+        Vec3 d;
         d.x = unit->pos.x - pos->x;
         d.y = unit->pos.y - pos->y;
         d.z = unit->pos.z - pos->z;

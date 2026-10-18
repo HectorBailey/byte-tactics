@@ -42,6 +42,8 @@ class DamagedAllyCollector;
 class AssaultTimer;
 class EscortTimer;
 class SquadScoutTimer;
+// Unused here: its symbol id keeps DrawProjectiles (0x49be60) matching (docs/c2-regalloc.md).
+int GetTickRate();
 
 
 #include "../network/player.h"
