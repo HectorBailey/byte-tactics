@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <windows.h>
 #include "../util/hapi_bank.h"
+#include "../units/unit_def.h"
 
 extern void* DAT_005119b8;
 
@@ -65,10 +66,6 @@ struct Param_0048e010 {
 };
 
 #pragma pack(push, 1)
-struct UnitType {
-    char unknown_0[0x20];
-    char name[0x20];                   // +0x20
-};
 
 struct Owner_0048ea40 {
     char unknown_0[0x95];
@@ -88,7 +85,7 @@ struct Unit {
     char unknown_7a[0x86 - 0x7a];
     Unit* carrier;                     // +0x86
     char unknown_8a[0x92 - 0x8a];
-    UnitType* def;                     // +0x92
+    UnitDef* def;                      // +0x92
     Link_0048ea40* player;             // +0x96
     char unknown_9a[0xa6 - 0x9a];
     short unitDefIndex;                    // +0xa6
@@ -603,7 +600,7 @@ extern char g_celebratedKey[]; // "Celebrated"
 void VictoryKillEnemyCommander::OnUnitDied(Unit* unit)
 {
     if (unit->playerIndex == 1) {
-        if (_strcmpi(unit->def->name, g_game->sideDefs[unit->player->owner->side].commander) == 0) {
+        if (_strcmpi(unit->def->unitname, g_game->sideDefs[unit->player->owner->side].commander) == 0) {
             satisfied = 1;
             if (celebrated == 0) {
                 PlaySoundByName("Victory Condition", 0);
@@ -783,7 +780,7 @@ void VictoryBuildUnitType::LoadState(HapiBank* obj)
 // FUNCTION: 0x48eeb0
 void VictoryCaptureUnitType::OnUnitCaptured(Unit* unit)
 {
-    if (unit->playerIndex == 1 && _strcmpi(name, unit->def->name) == 0) {
+    if (unit->playerIndex == 1 && _strcmpi(name, unit->def->unitname) == 0) {
         satisfied = 1;
         if (celebrated == 0) {
             PlaySoundByName("Victory Condition", 0);
@@ -827,7 +824,7 @@ int VictoryKillAllOfType::VisitUnit(Unit* unit)
 // FUNCTION: 0x48efb0
 void VictoryKillAllOfType::OnUnitDied(Unit* unit)
 {
-    if (satisfied == 0 && unit->playerIndex == 1 && _strcmpi(name, unit->def->name) == 0) {
+    if (satisfied == 0 && unit->playerIndex == 1 && _strcmpi(name, unit->def->unitname) == 0) {
         id = FindUnitTypeId(name);
         count = 0;
         g_game->units2.ForEach(this);
@@ -869,7 +866,7 @@ extern char g_numLeftToKillKey[]; // "NumLeftToKill"
 // FUNCTION: 0x48f0f0
 void VictoryKillUnitType::OnUnitDied(Unit* unit)
 {
-    if (numLeftToKill > 0 && unit->playerIndex == 1 && _strcmpi(name, unit->def->name) == 0) {
+    if (numLeftToKill > 0 && unit->playerIndex == 1 && _strcmpi(name, unit->def->unitname) == 0) {
         if (--numLeftToKill <= 0) {
             satisfied = 1;
             if (celebrated == 0) {
@@ -919,7 +916,7 @@ int VictoryMoveUnitToRadius::IsSatisfied()
 void VictoryMoveUnitToRadius::VisitUnit(Unit* unit)
 {
     if (unit->playerIndex == 0) {
-        if (name[0] != 0 && _strcmpi(name, unit->def->name) != 0) {
+        if (name[0] != 0 && _strcmpi(name, unit->def->unitname) != 0) {
             return;
         }
         if ((unit->flags & 0x20) && unit->buildLeft == 0.0f && unit->postTransferHoldoff == 0
@@ -957,7 +954,7 @@ void VictoryMoveUnitToRadius::LoadState(HapiBank* obj)
 // FUNCTION: 0x48f370
 int VictoryUnitTypePassesX::VisitUnit(Unit* unit)
 {
-    if (name[0] == 0 || _strcmpi(name, unit->def->name) == 0) {
+    if (name[0] == 0 || _strcmpi(name, unit->def->unitname) == 0) {
         if (abs(unit->cell - x) <= 2) {
             satisfied = 1;
             if (celebrated == 0) {
@@ -1006,7 +1003,7 @@ void VictoryUnitTypePassesX::LoadState(HapiBank* obj)
 // FUNCTION: 0x48f4c0
 int VictoryUnitTypePassesZ::VisitUnit(Unit* unit)
 {
-    if (name[0] == 0 || _strcmpi(name, unit->def->name) == 0) {
+    if (name[0] == 0 || _strcmpi(name, unit->def->unitname) == 0) {
         if (abs(unit->field_78 - z) <= 2) {
             satisfied = 1;
             if (celebrated == 0) {
@@ -1085,7 +1082,7 @@ void VictoryTimerRunsOut::LoadState(HapiBank* obj)
 void DefeatCommanderKilled::OnUnitDied(Unit* unit)
 {
     if (unit->playerIndex == 0) {
-        if (_strcmpi(unit->def->name, g_game->sideDefs[unit->player->owner->side].commander) == 0) {
+        if (_strcmpi(unit->def->unitname, g_game->sideDefs[unit->player->owner->side].commander) == 0) {
             satisfied = 1;
         }
     }
@@ -1162,7 +1159,7 @@ void DefeatAllUnitsKilled::LoadState(HapiBank* obj)
 // FUNCTION: 0x48f8c0
 void DefeatUnitTypeKilled::OnUnitDied(Unit* unit)
 {
-    if (_strcmpi(name, unit->def->name) == 0) {
+    if (_strcmpi(name, unit->def->unitname) == 0) {
         if (--numLeftToKill <= 0) {
             satisfied = 1;
         }
@@ -1209,7 +1206,7 @@ int DefeatAllUnitsKilledOfType::VisitUnit(Unit* unit)
 // FUNCTION: 0x48f9d0
 void DefeatAllUnitsKilledOfType::OnUnitDied(Unit* unit)
 {
-    if (_strcmpi(name, unit->def->name) == 0) {
+    if (_strcmpi(name, unit->def->unitname) == 0) {
         id = FindUnitTypeId(name);
         count = 0;
         g_game->units.ForEach(this);
@@ -1593,8 +1590,6 @@ static inline Vec3 operator-(const Vec3& p, const Vec3& q)
     r.z = p.z - q.z;
     return r;
 }
-
-#include "../units/unit_def.h"
 
 // The flags at +0x241 read as the original's bitfield; the header keeps the
 // plain word.

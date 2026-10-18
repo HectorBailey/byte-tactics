@@ -18,11 +18,7 @@ struct Point16_437840 {
 };
 
 #pragma pack(push, 1)
-struct UnitType_437840 {
-    char unknown_0[0x1ce];
-    float extractsMetal;               // +0x1ce
-    float windGenerator;               // +0x1d2
-};
+#include "../units/unit_def.h"
 
 struct Unit {
     char unknown_0[0x58];
@@ -32,7 +28,7 @@ struct Unit {
     char unknown_7a[0x7e - 0x7a];
     Point16_437840 footprint;          // +0x7e
     char unknown_82[0x92 - 0x82];
-    UnitType_437840* def;              // +0x92
+    UnitDef* def;              // +0x92
     char unknown_96[0x9a - 0x96];
     CobScript* script;                 // +0x9a
 };
@@ -210,7 +206,7 @@ void __stdcall UpdateMetalExtraction(Unit* unit)
 // FUNCTION: 0x437910
 void __stdcall UpdateWindGenerator(Unit* unit)
 {
-    if (unit->def->windGenerator > 0.0f && g_game->windEnabled) {
+    if (unit->def->windgenerator > 0.0f && g_game->windEnabled) {
         unit->script->StartScriptWithArgs("SetDirection", 0, 0, 1, g_game->windDirection, 0, 0, 0);
         unit->script->StartScriptWithArgs("SetSpeed", 0, 0, 1, g_game->windSpeed << 4, 0, 0, 0);
     }
