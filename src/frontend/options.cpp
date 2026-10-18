@@ -22,10 +22,7 @@ extern "C" __declspec(dllimport) int __cdecl wsprintfA(char* out, const char* fo
 // The mission or game-mode object at g_game+0x391e9.
 #include "../map/mission.h"
 
-class CMemoryCache {
-public:
-    void FlushCache();
-};
+#include "../graphics/memory_cache.h"
 
 class Class_004a1080;
 class Object_004a0570;

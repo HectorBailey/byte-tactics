@@ -31,6 +31,7 @@ public:
     float timeMul;                     // +0xd58
 };
 
+// Kept: its two declarations are the file's symbol count (docs/c2-regalloc.md).
 class CMemoryCache {
 public:
     void ClearPointers();

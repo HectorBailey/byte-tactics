@@ -70,6 +70,7 @@ void __stdcall DrawPolygonEdges(GafFrame* view, Vertex_0045a610* points, int cou
 // `this` through in ecx, and spells the parameters (image, model, palette).
 // It stays in its own file: merged, one of the copy loop's two pointer loads
 // is scheduled before the other, one instruction off.
+// Kept as a view: swapping in memory_cache.h reorders the copy loop's loads.
 class CMemoryCache {
 public:
     void DrawPieceEdges(GafFrame* view, Model_00458fa0* model, int color);

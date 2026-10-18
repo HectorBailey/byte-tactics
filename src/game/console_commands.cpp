@@ -121,6 +121,7 @@ struct PathMap {
     int fixed;                         // +0x54
 };
 
+// Kept: the full header's member list moves five functions' allocation.
 class CMemoryCache {
 public:
     void FlushCache();
