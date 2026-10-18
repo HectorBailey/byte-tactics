@@ -75,7 +75,7 @@ struct UnitType {
 // The object at the start of a unit.
 struct Body_0048a1e0 {
     char unknown_0[8];
-    Vec3 offset;              // +0x8
+    Vec3 offset;                       // +0x8
     char unknown_14[0x20 - 0x14];
     int sight;                         // +0x20
     char unknown_24[0x2a - 0x24];

@@ -127,7 +127,7 @@ void BeginMouseScroll();
 void ScheduleFadeTick();
 int IsFadeDone();
 void StepPaletteFade();
-void DrawEndGameFrame();
+int DrawEndGameFrame();
 int AreStatBarsComplete();
 void ClearPictureCache();
 
