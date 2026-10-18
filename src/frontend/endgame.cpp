@@ -184,6 +184,7 @@ struct Options {
     int difficulty;                    // +0x228
 };
 
+// Kept: its name span runs 0x2b to 0x73; the header splits it at 0x49.
 class Player {                         // 0x14b bytes
 public:
     Player();
