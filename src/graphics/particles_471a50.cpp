@@ -52,11 +52,7 @@ struct Elem_00473500 {                 // the vector's element (see 0x473500.cpp
     TimedSubParticles* p;
 };
 
-struct Vec3_00475150 {
-    int x;
-    int y;
-    int z;
-};
+#include "../util/vec3.h"
 
 struct TimedSubParticle {
     int unknown[8];
@@ -75,7 +71,7 @@ public:
     virtual int IsFinished();                           // slot 3, 0x475330
     virtual void Emit();                                // slot 4, 0x4751c0
     virtual int IsEmitDue();                            // slot 5, 0x4750f0
-    virtual void Init(Vec3_00475150* p, int a, int b, int c);          // slot 6
+    virtual void Init(Vec3* p, int a, int b, int c);    // slot 6
 };
 
 // The owner of the per-index lists.
@@ -93,12 +89,12 @@ public:
         lists[index].push_back(*(Elem_00473500*)&p);
     }
 
-    void AddTimedSubParticles(Vec3_00475150* pos, int emitPeriod, int holdPeriod,
+    void AddTimedSubParticles(Vec3* pos, int emitPeriod, int holdPeriod,
                               int lifetime, short index);
 };
 
 // FUNCTION: 0x471a50
-void ParticleLists::AddTimedSubParticles(Vec3_00475150* pos, int emitPeriod,
+void ParticleLists::AddTimedSubParticles(Vec3* pos, int emitPeriod,
                                         int holdPeriod, int lifetime, short index)
 {
     TimedSubParticles* e = new TimedSubParticles;

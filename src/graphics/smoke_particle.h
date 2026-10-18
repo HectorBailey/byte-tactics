@@ -7,11 +7,7 @@
 #ifndef SMOKE_PARTICLE_H
 #define SMOKE_PARTICLE_H
 
-struct Vec3_00474d50 {
-    int x;
-    int y;
-    int z;
-};
+#include "../util/vec3.h"
 
 // The smoke puff's 16.16 position halves.
 struct Position_00475470 {             // 16.16 fixed point; only high words read
@@ -27,7 +23,7 @@ struct Position_00475470 {             // 16.16 fixed point; only high words rea
 struct SmokeParticle {
     void* data;                        // +0x00, the animation
     union {
-        Vec3_00474d50 pos;             // +0x04
+        Vec3 pos;                      // +0x04
         Position_00475470 posw;
     };
     int limit;                         // +0x10, the rounds it lives

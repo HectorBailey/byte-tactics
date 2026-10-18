@@ -13,11 +13,7 @@
 
 struct TimedSubParticle;
 
-struct Vec3_00475150 {
-    int x;
-    int y;
-    int z;
-};
+#include "../util/vec3.h"
 
 // Vtable 0x4fd638, constructor 0x4750b0, ??_G 0x475110; 0x34 bytes.
 class TimedSubParticles : public ParticleSystem {
@@ -27,7 +23,7 @@ public:
     int emitPeriod;                                     // +0x1c, the emit period
     int holdPeriod;                                     // +0x20
     int maxFrame;                                       // +0x24, the frame count - 1
-    Vec3_00475150 pos;                                  // +0x28
+    Vec3 pos;                                           // +0x28
 
     TimedSubParticles();
     virtual void Update();                              // slot 1, 0x475600
@@ -35,7 +31,7 @@ public:
     virtual int IsFinished();                           // slot 3, 0x475330
     virtual void Emit();                                // slot 4, 0x4751c0
     virtual int IsEmitDue();                            // slot 5, 0x4750f0
-    virtual void Init(Vec3_00475150* pos, int a, int b, int c); // slot 6, 0x475150
+    virtual void Init(Vec3* pos, int a, int b, int c);  // slot 6, 0x475150
 };
 
 #endif

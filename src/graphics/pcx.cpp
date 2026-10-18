@@ -431,11 +431,7 @@ int __stdcall SaveScreenshot(char* dirPath, char* namePrefix)
 
 // A 3DO object (0x34 bytes) with its vertices, its primitives and the links to
 // the sibling and child objects.
-struct Vec3_004cb2f0 {
-    int x;
-    int y;
-    int z;
-};
+#include "../util/vec3.h"
 
 struct Primitive_004cb2f0 {            // 0x20 bytes
     int colorIndex;                    // +0x0
@@ -459,7 +455,7 @@ struct Object_004cb2f0 {
     int z;                             // +0x18
     int name;                          // +0x1c
     int always0;                       // +0x20
-    Vec3_004cb2f0* vertices;           // +0x24
+    Vec3* vertices;                    // +0x24
     Primitive_004cb2f0* elems;         // +0x28
     Object_004cb2f0* sibling;          // +0x2c
     Object_004cb2f0* child;            // +0x30
@@ -539,7 +535,7 @@ void __stdcall RelocateObject(int delta, Object_004cb2f0* node)
         node->name += delta;
     if (node->always0)
         node->always0 += delta;
-    node->vertices = (Vec3_004cb2f0*)((char*)node->vertices + delta);
+    node->vertices = (Vec3*)((char*)node->vertices + delta);
     node->elems = (Primitive_004cb2f0*)((char*)node->elems + delta);
     if (node->sibling) {
         node->sibling = (Object_004cb2f0*)((char*)node->sibling + delta);
@@ -613,16 +609,16 @@ int __stdcall GetObjectHeight(Object_004cb2f0* node)
     return best;
 }
 
-void __stdcall AddObjectBounds(Object_004cb2f0* obj, Vec3_004cb2f0* offset,
-                            Vec3_004cb2f0* lo, Vec3_004cb2f0* hi, int arg);
+void __stdcall AddObjectBounds(Object_004cb2f0* obj, Vec3* offset,
+                            Vec3* lo, Vec3* hi, int arg);
 
 // Computes the bounding box of an object tree: clears the two output corners
 // and walks the tree from a zero offset.
 // FUNCTION: 0x4cb650
-void __stdcall GetObjectBounds(Object_004cb2f0* obj, Vec3_004cb2f0* lo,
-                            Vec3_004cb2f0* hi, int arg)
+void __stdcall GetObjectBounds(Object_004cb2f0* obj, Vec3* lo,
+                            Vec3* hi, int arg)
 {
-    Vec3_004cb2f0 offset;
+    Vec3 offset;
     lo->x = 0;
     lo->y = 0;
     lo->z = 0;
@@ -638,16 +634,16 @@ void __stdcall GetObjectBounds(Object_004cb2f0* obj, Vec3_004cb2f0* lo,
 // Expands a bounding box (lo, hi) with the vertices of an object and, if arg is
 // set, of its two children, translated by offset.
 // FUNCTION: 0x4cb6a0
-void __stdcall AddObjectBounds(Object_004cb2f0* obj, Vec3_004cb2f0* offset,
-                            Vec3_004cb2f0* lo, Vec3_004cb2f0* hi, int arg)
+void __stdcall AddObjectBounds(Object_004cb2f0* obj, Vec3* offset,
+                            Vec3* lo, Vec3* hi, int arg)
 {
-    Vec3_004cb2f0 local;
+    Vec3 local;
     local.x = obj->x + offset->x;
     local.y = offset->y + obj->y;
     local.z = obj->z + offset->z;
     if (obj->vertexCount > 2) {
         for (int i = 0; i < obj->vertexCount; i++) {
-            Vec3_004cb2f0* v = &obj->vertices[i];
+            Vec3* v = &obj->vertices[i];
             if (v->x + local.x > hi->x) hi->x = v->x + local.x;
             if (v->x + local.x < lo->x) lo->x = v->x + local.x;
             if (v->y + local.y > hi->y) hi->y = v->y + local.y;

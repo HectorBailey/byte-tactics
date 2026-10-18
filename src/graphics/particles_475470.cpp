@@ -11,11 +11,7 @@
 // window of the symbol count.
 #include <io.h>
 
-struct Vec3_00474d50 {
-    int x;
-    int y;
-    int z;
-};
+#include "../util/vec3.h"
 
 struct Position_00475470 {             // 16.16 fixed point; only high words read
     short xFrac;
@@ -120,7 +116,7 @@ static inline int IsVisible(Player* map, Position_00475470* pos)
 struct SmokeParticle {
     void* data;                        // +0x00, the animation
     union {
-        Vec3_00474d50 pos;             // +0x04
+        Vec3 pos;                      // +0x04
         Position_00475470 posw;
     };
     int limit;                         // +0x10, the rounds it lives
@@ -159,7 +155,7 @@ public:
     int holdPeriod;                                     // +0x20
     int maxFrame;                                       // +0x24, the frame count - 1
     int altAnimation;                                   // +0x28, the other animation
-    Vec3_00474d50 pos;                                  // +0x2c
+    Vec3 pos;                                           // +0x2c
 
     SmokeParticles();
     virtual void Update();                              // slot 1, 0x475340
@@ -167,7 +163,7 @@ public:
     virtual int IsFinished();                           // slot 3, 0x474f80
     virtual void Emit();                                // slot 4, 0x474df0
     virtual int IsEmitDue();                            // slot 5, 0x475440
-    virtual void Init(Vec3_00474d50* pos, int limit, int a, int b, int c,
+    virtual void Init(Vec3* pos, int limit, int a, int b, int c,
                               int alt);                 // slot 6, 0x474d50
 };
 

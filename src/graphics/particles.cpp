@@ -53,6 +53,7 @@ struct Elem_00470f00 {
 // members and their Length; the teleport records' owner scales the vector
 // between two positions with operator-= style members below.
 #pragma pack(push, 1)
+// Own view, not vec3.h: it has operator-.
 struct Vec3_004736e0 {
     int x;
     int y;
@@ -143,6 +144,7 @@ public:
     void insert(char* where, int count, const TeleportParticle& val);
 };
 
+// Own view, not vec3.h: it has operator+=.
 struct Vec3_004739b0 {
     int x, y, z;
     Vec3_004739b0& operator+=(const Vec3_004739b0& o)
@@ -182,6 +184,7 @@ public:
     int IsExpired(int value);
 };
 
+// Own view, not vec3.h: its ids keep the wake draw (0x4745e0) matching.
 struct Vec3_00473b50 {
     int x;
     int y;
@@ -215,6 +218,7 @@ struct Seg_00473b50 {
         (g).end.z -= (g).start.z;            \
     }
 
+// Own view, not vec3.h: it has operator-.
 struct Vec3_004742c0 {
     int x;
     int y;
@@ -294,6 +298,7 @@ struct Pair_00474880 {
 };
 
 // A 16.16 point; the jitter in Emit writes the high halves.
+// Own view, not vec3.h: its coordinates are Pair unions.
 struct Vec3_00474760 {
     union {
         int x;
@@ -514,6 +519,7 @@ struct Lists_00471fd0 {
     std::vector<ParticleSystem*> lists[10];
 };
 
+// Own view, not vec3.h: its ids keep the wake draw (0x4745e0) matching.
 struct Vec3_004720d0 {                 // the 12-byte argument struct
     int x, y, z;
 };
@@ -580,7 +586,7 @@ struct Lists_00472530 {
     }
 };
 
-// The smoke and TimedSubParticles systems' point types.
+// Own views, not vec3.h: their ids keep the wake draw (0x4745e0) matching.
 struct Vec3_00472630 {
     int x;
     int y;
@@ -605,6 +611,14 @@ struct Vec3_00474cd0 {
     int z;
 };
 
+// Declarations only: their ids keep the wake draw (0x4745e0) matching.
+int AreAllPlayersReady(void);
+int CountActiveAIPlayers(void);
+int CheckMapCrc(void);
+int GetCpuFamily(void);
+char IsGonzo(void);
+void RegisterUnitOrders(void);
+void EnableAICommands(void);
 // The smoke puff's position views and the record.
 #include "smoke_particle.h"
 
@@ -626,7 +640,7 @@ struct Position_00475150 {             // 16.16 fixed point; only high words rea
 struct TimedSubParticle {
     void* data;                        // +0x00, the animation
     union {
-        Vec3_00475150 pos;             // +0x04
+        Vec3 pos;                      // +0x04
         Position_00475150 posw;
     };
     int limit;                         // +0x10, the rounds it lives
@@ -648,7 +662,7 @@ public:
     int holdPeriod;                                     // +0x20
     int maxFrame;                                       // +0x24, the frame count - 1
     int altAnimation;                                   // +0x28, the other animation
-    Vec3_00474d50 pos;                                  // +0x2c
+    Vec3 pos;                                           // +0x2c
 
     SmokeParticles();
     virtual void Update();                              // slot 1, 0x475340
@@ -656,7 +670,7 @@ public:
     virtual int IsFinished();                           // slot 3, 0x474f80
     virtual void Emit();                                // slot 4, 0x474df0
     virtual int IsEmitDue();                            // slot 5, 0x475440
-    virtual void Init(Vec3_00474d50* pos, int limit, int a, int b, int c,
+    virtual void Init(Vec3* pos, int limit, int a, int b, int c,
                               int alt);                 // slot 6, 0x474d50
 };
 
@@ -2099,7 +2113,7 @@ int SmokeParticle::IsExpired(int unused)
 // Slot 6. Sibling of 0x475150 (same base call, position copy and virtual
 // call).
 // FUNCTION: 0x474d50
-void SmokeParticles::Init(Vec3_00474d50* p, int limit, int a, int b, int c,
+void SmokeParticles::Init(Vec3* p, int limit, int a, int b, int c,
                                   int alt)
 {
     SetLifetime(c);
@@ -2130,7 +2144,7 @@ void SmokeParticles::Emit()
     if (periods > 0) {
         records.reserve(periods + records.size());
     }
-    Vec3_00474d50* p = &pos;
+    Vec3* p = &pos;
     std::vector<SmokeParticle>* v = &records;
     for (int i = 1; i != 0; i--) {
         SmokeParticle rec;
@@ -2205,7 +2219,7 @@ int TimedSubParticle::IsExpired(int unused)
 
 // Slot 6.
 // FUNCTION: 0x475150
-void TimedSubParticles::Init(Vec3_00475150* p, int a, int b, int c)
+void TimedSubParticles::Init(Vec3* p, int a, int b, int c)
 {
     SetLifetime(c);
     pos = *p;
@@ -2230,7 +2244,7 @@ void TimedSubParticles::Emit()
     // The two pointers have to be locals: the original hoists both addresses
     // into callee saved registers before the loop, and reads the record's
     // position and the vector's _Last through them.
-    Vec3_00475150* p = &pos;
+    Vec3* p = &pos;
     std::vector<TimedSubParticle>* v = &records;
     // One-trip countdown loop stays: the original keeps it as a counter.
     int i = 1;
