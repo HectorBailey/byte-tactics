@@ -437,6 +437,7 @@ void FreeWeaponArray(void)
 
 #pragma pack(push, 1)
 
+// Kept: its symbol ids keep the file matching.
 struct Vec3_00499ab0 {
     int x;
     int y;
@@ -505,6 +506,7 @@ void __stdcall SendWeaponFirePacket(Unit* unit, Obj_00499ab0* source,
     }
 }
 
+// Kept: its symbol ids keep the file matching.
 struct Vec3_00499ba0 {
     int x;
     int y;
@@ -785,6 +787,7 @@ void __stdcall DetonateProjectile(Projectile_00499eb0* projectile, Unit* unit)
 // Builds a zeroed 0x6b-byte parameter block (owner, position, kind 10) and
 // hands it to ApplyAreaDamage (an ebp-framed __stdcall routine in a gap).
 
+// Kept: its symbol ids keep the file matching.
 struct Vec3_0049a0c0 {
     int x;
     int y;
@@ -822,6 +825,7 @@ void __stdcall ApplyAreaDamageAt(void* owner, Vec3_0049a0c0* pos)
 // declarations stay here for the symbol ids the functions after it match at.
 #include <math.h>
 
+// Kept: its symbol ids keep the file matching.
 struct Vec3_0049a120 {
     int x;                             // +0x0 (16.16)
     int y;                             // +0x4
