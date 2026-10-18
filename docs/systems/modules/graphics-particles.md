@@ -44,7 +44,7 @@ These are point tests at the particle position, not tests of its entire sprite r
 
 Screen placement uses whole X-scrollX+128 and whole Z-whole Y/2-scrollY+32, with several helpers narrowing to signed short. Sprite families use [GAF blended drawing](graphics-gaf.md). Nano and wake families use inclusive rectangles from left/top to left/top+1, yielding solid 2 by 2 indexed pixels through [FillRectangle](graphics-draw.md).
 
-[Battle composition](../../../src/ingame/info_panel_468cf0.cpp) requests lists 0/1/2 early, 3/4 later, then 5/6/7, 8 and finally 9 around its other scene passes. Some calls have option gates. A list number is a presentation-layer choice by the caller, not a player ID or exclusive particle type. Existing call sites use layer 2 for wakes, 6 for construction/reclaim nanos, 7 for scripted thrust/bubbles and 9 for much weapon/smoke work. Teleport and feature callers use other layers. [Simulation scheduling](../../../src/ingame/dialogs_493340.cpp) invokes UpdateParticles separately from those draw calls.
+[Battle composition](../../../src/ingame/info_panel_468cf0.cpp) requests lists 0/1/2 early, 3/4 later, then 5/6/7, 8 and finally 9 around its other scene passes. Some calls have option gates. A list number is a presentation-layer choice by the caller, not a player ID or exclusive particle type. Existing call sites use layer 2 for wakes, 6 for construction/reclaim nanos, 7 for scripted thrust/bubbles and 9 for much weapon/smoke work. Teleport and feature callers use other layers. [Simulation scheduling](../../../src/ingame/game_dialogs.cpp) invokes UpdateParticles separately from those draw calls.
 
 ## 5. Teleport streams
 

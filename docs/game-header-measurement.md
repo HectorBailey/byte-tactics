@@ -305,7 +305,7 @@ forward-declared, and `type clash` the numbered view against the header's type.
 | `src/ingame/camera.cpp` | does not compile | member `origin_x`, `origin_y`, `screen_w`, `value_142f7` +2; incomplete `Mission` |
 | `src/ingame/control_panel.cpp` | does not compile | redefines `Arg_00419670`, `Player`; member `buildTypes`, `flags`, `menu`, `orderState` +2 |
 | `src/ingame/control_panel_41bde0.cpp` | does not compile | member `flags` |
-| `src/ingame/dialogs_493340.cpp` | does not compile | redefines `FrameTimers`, `Player`; member `bit11_37ebe`, `bit6_37ebe`, `bits_2bee`, `menu` +2 |
+| `src/ingame/game_dialogs.cpp` | does not compile | redefines `FrameTimers`, `Player`; member `bit11_37ebe`, `bit6_37ebe`, `bits_2bee`, `menu` +2 |
 | `src/ingame/info_panel.cpp` | does not compile | redefines `FrameTimers`, `Handle`, `Sub_004679a0_a`, `Sub_004679a0_b`; member `color`, `color_00467a50`, `colors`, `f_37e23` +9 |
 | `src/ingame/info_panel_467440.cpp` | does not compile | member `numPlayers` |
 | `src/ingame/info_panel_468cf0.cpp` | does not compile | redefines `FrameTimers`; member `bits_37f2f`, `bits_3923b`, `colors`, `cursorScreenX` +21; incomplete `Data_0046d970`, `Feature`, `Unit` |

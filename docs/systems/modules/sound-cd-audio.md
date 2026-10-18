@@ -98,7 +98,7 @@ NopRet4 (`0x4cd9b0`) and NopRet4_B (`0x4cee40`) are one-argument no-op entries. 
 
 ## 10. Activity-driven music consumer
 
-UpdateCdCategoryByActivity (`0x494e70`) is owned by the dialog module, not this group, but supplies an important category caller in [dialogs_493340.cpp](../../../src/ingame/dialogs_493340.cpp). Under its match/loading gates it samples on a greater-than-30-tick interval into a 30-slot ring. After more than ten stable samples it totals the ring and its latest five samples.
+UpdateCdCategoryByActivity (`0x494e70`) is owned by the dialog module, not this group, but supplies an important category caller in [game_dialogs.cpp](../../../src/ingame/game_dialogs.cpp). Under its match/loading gates it samples on a greater-than-30-tick interval into a 30-slot ring. After more than ten stable samples it totals the ring and its latest five samples.
 
 From category zero, either total above 50 or recent above 30 requests category one only when the local player also has more than 30 units. From category one, total below ten and recent zero plus more than 60 stable samples requests zero. A changed requested mode resets the stable counter. It then advances/clears the next ring slot and records its sample time. AddCdActivitySample adds to the current ring bucket. These numeric thresholds establish a hysteresis-like low/high-activity policy; the CD module itself does not inspect weapons or determine whether a ship is in combat.
 
