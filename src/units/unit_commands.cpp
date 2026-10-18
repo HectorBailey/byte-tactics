@@ -27,7 +27,7 @@ struct Unit {
     UnitWeaponSlot weapons[3];         // +0x4, stride 0x1c
     char unknown_58[0x64 - 0x58];
     Angles16 angles;               // +0x64
-    Vec3 pos;                 // +0x6a
+    Vec3 pos;                          // +0x6a
     char unknown_76[0x92 - 0x76];
     Def_00488310* def;                 // +0x92
     Player* player;                    // +0x96
@@ -269,7 +269,7 @@ struct MissionUnit {               // 0x24 bytes
     char* name;                       // +0x0
     char* ident;                      // +0x4
     char* initialMission;             // +0x8
-    Vec3 pos;                // +0xc
+    Vec3 pos;                         // +0xc
     short angle;                      // +0x18
     short health;                     // +0x1a
     int creationCountdown;            // +0x1c
