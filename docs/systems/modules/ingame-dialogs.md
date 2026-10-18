@@ -2,7 +2,7 @@
 
 ## Scope and state
 
-The `ingame/dialogs` group owns 23 entries in `0x493340..0x495860`, all in [dialogs_493340.cpp](../../../src/ingame/dialogs_493340.cpp). It includes sharing/chat/unit-information dialogs, tab-menu handling, score-panel rendering, music-activity sampling, frame pacing, the simulation-step loop and debug event dispatch. Completing only its pacing functions would leave most of its responsibilities undocumented.
+The `ingame/dialogs` group owns 23 entries in `0x493340..0x495860`, all in [game_dialogs.cpp](../../../src/ingame/game_dialogs.cpp). It includes sharing/chat/unit-information dialogs, tab-menu handling, score-panel rendering, music-activity sampling, frame pacing, the simulation-step loop and debug event dispatch. Completing only its pacing functions would leave most of its responsibilities undocumented.
 
 The routines share game state but use several independent flags: orders-panel bits track modal interface state, lobby dirty bits select tab/chat presentation, PlayerInfo controls player role/options, and pause/lag/faster bits describe pacing. GUI layer callbacks receive a hot-gadget index of -1 for teardown. Their teardown branches free owned display/list resources or clear flags; a button event is a different path.
 

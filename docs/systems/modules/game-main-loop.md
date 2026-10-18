@@ -4,7 +4,7 @@
 
 The `game/main_loop` group owns ten entries from `0x496790` to `0x497180`, all in [main_loop.cpp](../../../src/game/main_loop.cpp). It runs one battle-frame pass, changes callbacks while entering menus/loading, applies mission options, and supplies starting-resource and commander helpers. Its full scope extends beyond the first battle-loop function.
 
-An application frame, a battle pass and a simulation tick are different operations. The application dispatcher invokes the current game callback. MainLoopTick can run zero or several simulation ticks and then draw one battle frame. The actual pacing calculation and per-tick subsystem loop are in [dialogs_493340.cpp](../../../src/ingame/dialogs_493340.cpp), described in [time and simulation](../02-time-simulation.md). This reference covers how the owning frame calls and gates them, without counting that unfinished neighboring module as completed.
+An application frame, a battle pass and a simulation tick are different operations. The application dispatcher invokes the current game callback. MainLoopTick can run zero or several simulation ticks and then draw one battle frame. The actual pacing calculation and per-tick subsystem loop are in [game_dialogs.cpp](../../../src/ingame/game_dialogs.cpp), described in [time and simulation](../02-time-simulation.md). This reference covers how the owning frame calls and gates them, without counting that unfinished neighboring module as completed.
 
 ## Profiling snapshot and simulation branches
 

@@ -8,7 +8,7 @@ An application frame processes Windows/game input and calls the handler for the 
 
 These are related but not interchangeable. Rendering can occur without a simulation tick; a battle iteration can run several ticks; a subsystem can be invoked each tick but perform expensive work only on a deadline. The engine also uses a loading thread during match setup, which is outside this ordinary battle-tick schedule.
 
-Primary anchors: [application frame](../../src/ingame/screenshots.cpp), `0x499890`; [battle loop](../../src/game/main_loop.cpp), `0x496790`; [pacing and simulation](../../src/ingame/dialogs_493340.cpp), `0x495230`, `0x495490`.
+Primary anchors: [application frame](../../src/ingame/screenshots.cpp), `0x499890`; [battle loop](../../src/game/main_loop.cpp), `0x496790`; [pacing and simulation](../../src/ingame/game_dialogs.cpp), `0x495230`, `0x495490`.
 
 ## 2. Application-frame dispatch
 
@@ -28,7 +28,7 @@ The pacer's elapsed quantity comes from `GetTicks`, not directly from a call who
 
 Weapon loading and several gameplay calculations establish a convention of 30 simulation ticks per gameplay second. Converting that to wall-clock speed requires the timer contract and effective pacing conditions. This chapter records the actual multiplier and gates without claiming every machine always simulates exactly 30 ticks per wall second.
 
-Evidence: [speed controls](../../src/game/game_state.cpp), `0x490df0`, `0x490ee0`, `0x490f10`; [pacing](../../src/ingame/dialogs_493340.cpp), `0x495230`; [weapon time conversions](../../src/weapons/weapon_types.cpp).
+Evidence: [speed controls](../../src/game/game_state.cpp), `0x490df0`, `0x490ee0`, `0x490f10`; [pacing](../../src/ingame/game_dialogs.cpp), `0x495230`; [weapon time conversions](../../src/weapons/weapon_types.cpp).
 
 ## 4. Budgeting simulation steps
 
@@ -54,7 +54,7 @@ Repeated capped budgets increment a hysteresis counter. Above ten, that counter 
 
 The stored fractional remainder comes from the precap floor operation. Whole steps discarded by the five-step cap are not explicitly added back into that fractional value in this routine. This is an adaptive budget policy, not an unlimited catch-up loop promising to replay every elapsed interval immediately.
 
-Evidence for all budgeting details: [UpdateFramePacing](../../src/ingame/dialogs_493340.cpp), `0x495230`.
+Evidence for all budgeting details: [UpdateFramePacing](../../src/ingame/game_dialogs.cpp), `0x495230`.
 
 ## 5. Battle-loop gates and pause
 
@@ -93,7 +93,7 @@ After all pending steps, the routine invokes its post-step hooks and expires sel
 
 This table records the direct call sequence. A called subsystem can invoke other systems internally, create events, or defer work; the table should not be interpreted as proof of one isolated execution per object.
 
-Evidence: [RunGameSteps](../../src/ingame/dialogs_493340.cpp), `0x495490`.
+Evidence: [RunGameSteps](../../src/ingame/game_dialogs.cpp), `0x495490`.
 
 ## 7. Order-dependent consequences
 
@@ -103,7 +103,7 @@ Economy runs after unit actions in this major schedule. Construction requests ca
 
 Sensors are updated from the player phase, after the unit and projectile phases. Targeting can use maintained information rather than a globally rebuilt current sensor state immediately before every shot. The detailed authority and list-maintenance rules belong to the sight/combat chapters.
 
-Evidence: [tick order](../../src/ingame/dialogs_493340.cpp), `0x495490`; [requests and settlement](../../src/game/economy.cpp), [player update](../../src/game/players_464290.cpp), `0x464f80`.
+Evidence: [tick order](../../src/ingame/game_dialogs.cpp), `0x495490`; [requests and settlement](../../src/game/economy.cpp), [player update](../../src/game/players_464290.cpp), `0x464f80`.
 
 ## 8. Per-unit execution
 

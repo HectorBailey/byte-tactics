@@ -287,7 +287,7 @@ uv run python3 build/scratch/6334/swap.py                    # the 83 verdicts
 | `src/game/victory.cpp` | does not compile | C2039 is not a member of 'Unit' |
 | `src/ingame/control_panel.cpp` | does not compile | C2011 'class' type redefinition |
 | `src/ingame/control_panel_41bde0.cpp` | does not compile | C2039 is not a member of 'Unit' |
-| `src/ingame/dialogs_493340.cpp` | does not compile | C2039 is not a member of 'Unit' |
+| `src/ingame/game_dialogs.cpp` | does not compile | C2039 is not a member of 'Unit' |
 | `src/ingame/info_panel.cpp` | does not compile | C2039 is not a member of 'Unit' |
 | `src/ingame/info_panel_467440.cpp` | does not compile | C2027 use of undefined type 'Player' |
 | `src/ingame/info_panel_46a610.cpp` | does not compile | C2440 '=' : cannot convert from 'struct SpotState *' to 'struct ObjectState *' |

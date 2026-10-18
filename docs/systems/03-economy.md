@@ -211,7 +211,7 @@ Sharing commands configure local thresholds and flags under multiplayer conditio
 
 The main tick invokes resource sharing for the local player in the qualifying network/packet-manager path after the main world phases. This timing can matter relative to settlement, reports, and later shots.
 
-Evidence: [starting balances](../../src/game/players_464290.cpp), `0x465e30`; [sharing commands](../../src/game/share_commands.cpp), `0x419340`, `0x419400`; [sharing scheduling](../../src/ingame/dialogs_493340.cpp), `0x495490`.
+Evidence: [starting balances](../../src/game/players_464290.cpp), `0x465e30`; [sharing commands](../../src/game/share_commands.cpp), `0x419340`, `0x419400`; [sharing scheduling](../../src/ingame/game_dialogs.cpp), `0x495490`.
 
 ## 14. Persistence, network reports, and HUD values
 
