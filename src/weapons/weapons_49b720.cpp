@@ -12,6 +12,7 @@
 
 #pragma pack(push, 1)
 
+// Kept: y is a union of the fixed-point parts and the view has operator+=.
 struct Vec3_0049b720 {
     int x;
     union {

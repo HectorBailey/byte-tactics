@@ -129,6 +129,7 @@ union Fixed_0049abb0 {
     } parts;
 };
 
+// Kept: y is a fixed-point type.
 struct Vec3_0049abb0 {
     int x;
     Fixed_0049abb0 y;
@@ -436,11 +437,8 @@ void FreeWeaponArray(void)
 
 #pragma pack(push, 1)
 
-struct Vec3_00499ab0 {
-    int x;
-    int y;
-    int z;
-};
+// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
+void Unused_00499ab0(int a, int b, int c, int d, int e, int f);
 
 struct Kind_00499ab0 {
     char unknown_0[4];
@@ -485,8 +483,8 @@ int __stdcall BroadcastPacket(int player, void* data, int size);
 // initialised here; see the note in the bug list.
 // FUNCTION: 0x499ab0
 void __stdcall SendWeaponFirePacket(Unit* unit, Obj_00499ab0* source,
-                            Obj_00499ab0* target, Vec3_00499ab0* a,
-                            Vec3_00499ab0* b)
+                            Obj_00499ab0* target, Vec3* a,
+                            Vec3* b)
 {
     WeaponFirePacket packet;
     if (g_game->netGameFlagsWord & 1) {
@@ -504,11 +502,8 @@ void __stdcall SendWeaponFirePacket(Unit* unit, Obj_00499ab0* source,
     }
 }
 
-struct Vec3_00499ba0 {
-    int x;
-    int y;
-    int z;
-};
+// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
+void Unused_00499ba0v(int a, int b, int c, int d, int e, int f);
 
 #pragma pack(push, 1)
 // Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
@@ -518,7 +513,7 @@ void Unused_00499ba0(int a, int b, int c, int d, int e, int f);
 int __cdecl GetLocalDpid();
 
 // FUNCTION: 0x499ba0
-void __stdcall BroadcastWeaponFire(char param_1, Vec3_00499ba0* a, Vec3_00499ba0* b)
+void __stdcall BroadcastWeaponFire(char param_1, Vec3* a, Vec3* b)
 {
     WeaponFirePacket packet;
     if (g_game->netGameFlagsWord & 1) {
@@ -784,16 +779,13 @@ void __stdcall DetonateProjectile(Projectile_00499eb0* projectile, Unit* unit)
 // Builds a zeroed 0x6b-byte parameter block (owner, position, kind 10) and
 // hands it to ApplyAreaDamage (an ebp-framed __stdcall routine in a gap).
 
-struct Vec3_0049a0c0 {
-    int x;
-    int y;
-    int z;
-};
+// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
+void Unused_0049a0c0v(int a, int b, int c, int d, int e, int f);
 
 #pragma pack(push, 1)
 struct Params_0049a0c0 {
     void* owner;                       // +0x0
-    Vec3_0049a0c0 pos;                 // +0x4
+    Vec3 pos;                          // +0x4
     char unknown_10[0x42];
     int ownerUnit;                     // +0x52
     char unknown_56[0x10];
@@ -802,10 +794,10 @@ struct Params_0049a0c0 {
 };
 #pragma pack(pop)
 
-void __stdcall ApplyAreaDamage(Params_0049a0c0* params, Vec3_0049a0c0* pos);
+void __stdcall ApplyAreaDamage(Params_0049a0c0* params, Vec3* pos);
 
 // FUNCTION: 0x49a0c0
-void __stdcall ApplyAreaDamageAt(void* owner, Vec3_0049a0c0* pos)
+void __stdcall ApplyAreaDamageAt(void* owner, Vec3* pos)
 {
     Params_0049a0c0 p;
     memset(&p, 0, sizeof(p));
@@ -821,11 +813,8 @@ void __stdcall ApplyAreaDamageAt(void* owner, Vec3_0049a0c0* pos)
 // declarations stay here for the symbol ids the functions after it match at.
 #include <math.h>
 
-struct Vec3_0049a120 {
-    int x;                             // +0x0 (16.16)
-    int y;                             // +0x4
-    int z;                             // +0x8
-};
+// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
+void Unused_0049a120v(int a, int b, int c, int d, int e, int f);
 
 // A 16.16 fixed-point value and its whole part.
 union Fixed_0049a120 {
@@ -857,7 +846,7 @@ struct Holder_0049a120;
 
 struct Unit_0049a120 {
     char unknown_0[0x6a];
-    Vec3_0049a120 pos;                 // +0x6a
+    Vec3 pos;                          // +0x6a
     char unknown_76[0x92 - 0x76];
     UnitDef* def;                      // +0x92
     Holder_0049a120* player;           // +0x96
@@ -868,9 +857,9 @@ struct Unit_0049a120 {
 
 struct Weapon_0049a120 {
     WeaponDef* def;                    // +0x0
-    Vec3_0049a120 pos;                 // +0x4
+    Vec3 pos;                          // +0x4
     char unknown_10[0x28 - 0x10];
-    Vec3_0049a120 aim;                 // +0x28
+    Vec3 aim;                          // +0x28
     char unknown_34[0x52 - 0x34];
     Unit_0049a120* attacker;           // +0x52
     char unknown_56[0x66 - 0x56];
@@ -906,7 +895,7 @@ struct Cell {
 
 struct Spot_0049a120 {
     char unknown_0[8];
-    Vec3_0049a120 pos;                 // +0x8
+    Vec3 pos;                          // +0x8
     char unknown_14[0x30 - 0x14];
 };
 
@@ -962,12 +951,12 @@ struct Hits_0049a120 {
 Cell* __stdcall GetMapCell(int x, int y);
 int __stdcall ApplyWeaponDamage(Weapon_0049a120* weapon, Unit_0049a120* target, float scale);
 void __stdcall DetonateProjectile(Weapon_0049a120* weapon, Unit_0049a120* unit);
-int __stdcall VectorLength(Vec3_0049a120* v);
-Vec3_0049a120 __stdcall GetFootprintCentre(CellPos_0049a120* cell, FeatureDef_0049a120* def);
+int __stdcall VectorLength(Vec3* v);
+Vec3 __stdcall GetFootprintCentre(CellPos_0049a120* cell, FeatureDef_0049a120* def);
 void __stdcall DamageFeature(Cell* cell, int x, int z, WeaponDef* def);
 int __stdcall BroadcastPacket(int id, void* data, int size);
 
-static inline int Length(Vec3_0049a120* v)
+static inline int Length(Vec3* v)
 {
     double x = v->x;
     double y = v->y;
@@ -982,9 +971,9 @@ static inline Unit_0049a120* UnitFromId(unsigned short id)
     return (Unit_0049a120*)&g_game->units[id];
 }
 
-static inline Vec3_0049a120 Sub(const Vec3_0049a120& a, const Vec3_0049a120& b)
+static inline Vec3 Sub(const Vec3& a, const Vec3& b)
 {
-    Vec3_0049a120 r;
+    Vec3 r;
     r.x = a.x - b.x;
     r.y = a.y - b.y;
     r.z = a.z - b.z;
@@ -1104,6 +1093,7 @@ union Fixed_0049aa80 {
     struct { unsigned short fraction; short whole; } parts;
 };
 
+// Kept: y is a fixed-point type.
 struct Vec3_0049aa80 {
     int x;                             // +0x0 (16.16 fixed point)
     Fixed_0049aa80 y;                  // +0x4
@@ -1310,15 +1300,11 @@ done:
     g_game->projectileCount = count;
 }
 
-struct Vec3_0049af90 {
-    int x, y, z;
-};
-
 #pragma pack(push, 1)
 struct Projectile_0049af90 {
     WeaponDef* type;                   // +0x0
     char unknown_4[0x28 - 0x4];
-    Vec3_0049af90 pos;                 // +0x28
+    Vec3 pos;                          // +0x28
     char unknown_34[0x6b - 0x34];
 };
 
@@ -1326,14 +1312,14 @@ struct Projectile_0049af90 {
 // at 0x49a120, a view of which is in the gap file, holds the other.
 struct ProjectileDetonatePacket {
     unsigned char type;                // +0x0
-    Vec3_0049af90 aim;                 // +0x1
+    Vec3 aim;                          // +0x1
     unsigned char weaponIndex;         // +0xd
 };
 #pragma pack(pop)
 
 void __stdcall DetonateProjectile(Projectile_0049af90* proj, int flag);
 
-static inline int SamePos(const Vec3_0049af90& a, const Vec3_0049af90& b)
+static inline int SamePos(const Vec3& a, const Vec3& b)
 {
     return a.x == b.x && a.z == b.z && a.y == b.y;
 }
@@ -1393,6 +1379,7 @@ void __stdcall DetonateUnitWeapon(Unit* unit, int second)
 
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 
+// Kept: it has a subtraction and Length the shared Vec3 lacks.
 struct Vec3_0049b3e0 {
     int x;
     Fixed y;
@@ -1465,10 +1452,6 @@ Vec3_0049b3e0* __stdcall GetProjectileAimPoint(Proj_0049b3e0* p)
     return &p->target;
 }
 
-struct Vec3_0049b520 {
-    int x, y, z;
-};
-
 struct Unit_0049b520 {
     WeaponDef* type;                   // +0x0
     int x;                             // +0x4
@@ -1492,7 +1475,7 @@ union Fixed_0049b520 {
 // than 27000 (about 148 degrees) away while the type's burnBlow flag (bit 23 of
 // +0x111) is set, the function gives up and returns 0. Otherwise it returns 1.
 // FUNCTION: 0x49b520
-int __stdcall TurnUnitTowardsPoint(Unit_0049b520* unit, Vec3_0049b520* target)
+int __stdcall TurnUnitTowardsPoint(Unit_0049b520* unit, Vec3* target)
 {
     WeaponDef* type = unit->type;
     // Declared dx, dy, dz in this order: it decides the stack slot assignment.
