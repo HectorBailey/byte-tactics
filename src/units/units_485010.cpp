@@ -9,9 +9,7 @@
 #include <string.h>
 #include <stddef.h>
 
-// Kept: with mission.h, FindHighestPointOnLine (0x4851c0) stays at 83.9% and
-// GetCellMeanHeight (0x485140) at 95.5% (100% bytes at some id counts, but not
-// with a resolved reference); 0 to 60 one-id probes do not match both.
+// Kept, not mission.h: the header moves FindHighestPointOnLine (0x4851c0) and GetCellMeanHeight (0x485140).
 class Mission {
 public:
     int GetGameType();

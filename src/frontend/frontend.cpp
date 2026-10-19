@@ -12,8 +12,7 @@
 
 #include "../util/tdf.h"
 
-// Kept: with sound/sound.h before tdf.h, mission.h or player.h, OpenMainMenu
-// (0x4263b0) comes out at 99.6% (same 971 bytes).
+// Kept, not sound/sound.h: the header before tdf.h, mission.h or player.h moves OpenMainMenu (0x4263b0).
 class Sound {
 public:
     int HasCdPlayerWindow();

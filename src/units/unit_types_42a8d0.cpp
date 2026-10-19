@@ -96,9 +96,7 @@ public:
 };
 
 // The override file (units\NAME.OVR).
-// Not util/hapi_bank.h: that class has the bank member at +0x0, which moves
-// OvrFile's table and changes this function's frame; with the header 0x42a8d0
-// falls to 84.3% (84.5% with the id fillers below removed).
+// Kept, not util/hapi_bank.h: its bank member at +0x0 moves OvrFile's table and changes 0x42a8d0's frame.
 class HapiBank {
 public:
     HapiBank* InitBank();
