@@ -980,6 +980,7 @@ void Pathfinder::StartSearch(Target* t)
     }
 
     // Each early exit is its own `Finish(); return;`, not a goto to a shared block.
+    // The casts below stay: the call has to name OrderFx::AddFlags, which Target has not.
     if (target->IsGoal(start.x, start.y)) {
         ((OrderFx*)target)->AddFlags(0x100);
         Finish();
