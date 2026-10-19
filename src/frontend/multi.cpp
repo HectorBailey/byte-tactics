@@ -823,9 +823,9 @@ struct UnitType_00446f50 {
     } flags2;
 };
 
-struct Event_44c220 {
+struct Event_44c220 {                   // UnitSyncEntry: the map's changed entries
     int fbiChecksum;                   // +0x00
-    int field_4;                       // +0x04
+    int scriptChecksum;                // +0x04, UnitSyncEntry::y
     short enabled;                     // +0x08
     short peerEnabled;                 // +0x0a
     int max;                           // +0x0c
