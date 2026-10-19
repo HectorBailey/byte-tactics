@@ -555,7 +555,7 @@ static inline Vec3_0040beb0 operator-(const Vec3_0040beb0& p, const Vec3_0040beb
     return r;
 }
 
-struct Class_004800c0 {
+struct UnitVectorHolder {
 public:
     void EraseSwapBack(Unit**);
 };
@@ -1822,7 +1822,7 @@ Unit* __stdcall FindWeaponTarget(Unit* unit,unsigned char weapon,int useRange)
         if(candidates.empty()) break;
         std::vector<Unit*>::iterator it=candidates.begin()+RandomInt(candidates.size());
         Unit* target=*it;
-        ((Class_004800c0*)&candidates)->EraseSwapBack(it);
+        ((UnitVectorHolder*)&candidates)->EraseSwapBack(it);
         if((target->flags&0x10000000) && !(target->flags&0x4000) &&
            ((target->def->flags1&0x8000) || ai || (g_game->matchFlags&4)) &&
            ((unit->def->flags1&0x10000000) || WeaponCanReachUnit(unit,target,weapon)) &&

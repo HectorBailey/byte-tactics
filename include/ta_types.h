@@ -483,7 +483,7 @@ class Class_0047fa30;
 class SpeechQueue;
 class Class_0047ffa0;
 class Class_00480020;
-class Class_004800c0;
+class UnitVectorHolder;
 class IntDynArray;
 class Squad;
 class Class_00480c30;
@@ -3241,7 +3241,7 @@ public:
     Class_004b73b0* InitArgs(void);
 };
 
-class Class_004800c0 {  // 0x10 bytes, 2 views
+class UnitVectorHolder {  // 0x10 bytes, 2 views
 public:
     std::vector<Unit*> units;  // +0x0
     Unit** EraseSwapBack(Unit**);
