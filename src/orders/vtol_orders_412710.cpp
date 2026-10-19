@@ -28,8 +28,22 @@ public:
     void SetFlightMode(Unit* unit, int state);
 };
 
-class Class_0044e6c0 { public: void SetAltitude(int); };
-class Class_0044e730 { public: void SetApproachRadius(short); };
+// Unused here: real declarations that keep the symbol ids the separate setter
+// views took, after their methods moved to Class_0044e2d0 (docs/c2-regalloc.md).
+struct Amount;
+struct Blk;
+struct Packet;
+class LosLine;
+class MapCache;
+class MeteorParams;
+class OrderBase;
+class MissionOrderTable;
+struct MovementClassTable;
+class OpenHeap;
+class AIProfileParser;
+struct FrameTable;
+class AssaultTimer;
+class EscortTimer;
 
 #pragma pack(push, 1)
 struct UnitDef {
@@ -115,6 +129,8 @@ class Class_0044e2d0 {
 public:
     char unknown_0[0x36];
     Class_0044e2d0(Order* order, const Vec3& pos);
+    void SetAltitude(int);
+    void SetApproachRadius(short);
 };
 #pragma pack(pop)
 
@@ -162,7 +178,7 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
     if ((unit->motion->flags & 3) == 1) {
         unit->motion->SetFlightMode(unit, 2);
         Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);
-        ((Class_0044e6c0*)obj)->SetAltitude(unit->def->altitude / 2);
+        obj->SetAltitude(unit->def->altitude / 2);
         order->SetAttachedFx((int)obj);
         order->flags |= flags | 0xe0;
     }
@@ -214,7 +230,7 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
         Vec3 off = Offset(RandomInt(0x4000) + angle - 0x2000, dist / 2);
         Vec3 p = unit->pos + off;
         Class_0044e2d0* obj = new Class_0044e2d0(order, p);
-        ((Class_0044e730*)obj)->SetApproachRadius(0x80);
+        obj->SetApproachRadius(0x80);
         order->SetAttachedFx((int)obj);
         order->flags = 0x100e8;
         return 1;
@@ -226,7 +242,7 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
         else
             SetWeaponTargetPos(unit, &order->pos, 0);
         Class_0044e2d0* obj = new Class_0044e2d0(order, order->pos);
-        ((Class_0044e730*)obj)->SetApproachRadius(speed);
+        obj->SetApproachRadius(speed);
         order->SetAttachedFx((int)obj);
         order->flags = 0x100e8;
         return 1;
@@ -236,7 +252,7 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
         Vec3 off = Offset(angle, speed * 0x30000);
         Vec3 p = order->pos + off;
         Class_0044e2d0* obj = new Class_0044e2d0(order, p);
-        ((Class_0044e730*)obj)->SetApproachRadius(RandomInt(0x80) + 0x80);
+        obj->SetApproachRadius(RandomInt(0x80) + 0x80);
         order->SetAttachedFx((int)obj);
         order->flags = 0x100ea;
         return 1;
@@ -261,7 +277,7 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
         sum.z = unit->pos.z + off.z;
         Vec3 p = sum;
         Class_0044e2d0* obj = new Class_0044e2d0(order, p);
-        ((Class_0044e730*)obj)->SetApproachRadius(0x80);
+        obj->SetApproachRadius(0x80);
         order->SetAttachedFx((int)obj);
         order->flags = 0x100ea;
         // The empty Dummy() calls make the landed ~vector call _Destroy out of

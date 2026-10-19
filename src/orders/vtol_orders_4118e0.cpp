@@ -92,9 +92,9 @@ public:
     void SetAltitude(int);
     void SetApproachRadius(short);
 };
-class Class_0044e250 {
+// The base is the explicit-position view above, so the inherited setters need no cast.
+class Class_0044e250 : public Class_0044e2d0 {
 public:
-    char unknown_0[0x36];
     // The pad index parameters are int, not char: the original loads a full dword.
     Class_0044e250(Order* order, Unit* unit, int value);
 };
@@ -199,8 +199,7 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
     }
     case 2: {
         Class_0044e250* obj = new Class_0044e250(order, order->target.owner, -1);
-        // The setters live in Class_0044e2d0; obj is another constructor view of the same object.
-        ((Class_0044e2d0*)obj)->SetApproachRadius(0xa0);
+        obj->SetApproachRadius(0xa0);
         order->SetAttachedFx((int)obj);
         order->flags = 0xe8;
         return 1;
@@ -213,7 +212,7 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
             return 0;
         }
         Class_0044e250* obj = new Class_0044e250(order, order->target.owner, order->angle);
-        ((Class_0044e2d0*)obj)->SetApproachRadius(0x30);
+        obj->SetApproachRadius(0x30);
         order->SetAttachedFx((int)obj);
         order->flags = 0xe8;
         return 1;
@@ -231,9 +230,9 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
         }
         Class_0044e250* obj = new Class_0044e250(order, order->target.owner, order->angle);
         if (unit->cargo)
-            ((Class_0044e2d0*)obj)->SetAltitude(unit->cargo->def->field_170);
+            obj->SetAltitude(unit->cargo->def->field_170);
         else
-            ((Class_0044e2d0*)obj)->SetAltitude(0);
+            obj->SetAltitude(0);
         unit->script->StartScript("EndTransport", 0, 1);
         order->SetAttachedFx((int)obj);
         order->SetDeadlineTicks(0xf);

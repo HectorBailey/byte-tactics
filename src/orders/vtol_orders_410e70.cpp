@@ -23,8 +23,22 @@ public:
     void SetFlightMode(Unit* unit, int state);
 };
 
-class Class_0044e6c0 { public: void SetAltitude(int); };
-class Class_0044e730 { public: void SetApproachRadius(short); };
+// Unused here: real declarations that keep the symbol ids the separate setter
+// views took, after their methods moved to Class_0044e2d0 (docs/c2-regalloc.md).
+struct Amount;
+struct Blk;
+struct Packet;
+class LosLine;
+class MapCache;
+class MeteorParams;
+class OrderBase;
+class MissionOrderTable;
+struct MovementClassTable;
+class OpenHeap;
+class LandingPadList;
+class AIProfileParser;
+struct FrameTable;
+class AssaultTimer;
 
 #pragma pack(push, 1)
 #include "../units/unit_def.h"
@@ -66,6 +80,8 @@ class Class_0044e2d0 {
 public:
     char unknown_0[0x36];
     Class_0044e2d0(Order* order, const Vec3& pos);
+    void SetAltitude(int);
+    void SetApproachRadius(short);
 };
 #pragma pack(pop)
 
@@ -114,7 +130,7 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
     if ((unit->motion->flags & 3) == 1) {
         unit->motion->SetFlightMode(unit, 2);
         Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);
-        ((Class_0044e6c0*)obj)->SetAltitude(unit->def->altitude / 2);
+        obj->SetAltitude(unit->def->altitude / 2);
         order->SetAttachedFx((int)obj);
         order->flags |= flags | 0xe0;
     }
@@ -134,7 +150,7 @@ int __stdcall VtolPatrolOrder(Unit* unit, Order* order, int flags)
         short angle = GetHeadingBetween(&unit->pos, &order->pos);
         Vec3 dest = AddVec3(order->pos, Offset(angle, 0x1400000));
         Class_0044e2d0* obj = new Class_0044e2d0(order, dest);
-        ((Class_0044e730*)obj)->SetApproachRadius(0x150);
+        obj->SetApproachRadius(0x150);
         order->SetAttachedFx((int)obj);
         order->flags |= 0xe0;
         // Landing block stays inline, no helper: the landed path returns 0
