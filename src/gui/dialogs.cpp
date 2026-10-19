@@ -56,12 +56,8 @@ struct Flags_004ab400 {
 // A mouse event, 0x18 bytes (gui.h's pointX to pointDoubleClick).
 #include "mouse_event.h"
 
-struct Rect_004b6720 {
-    int left;
-    int top;
-    int right;
-    int bottom;
-};
+// The rectangle of four ints, left, top, right and bottom.
+#include "../graphics/rect.h"
 
 #include "gui.h"
 
@@ -76,7 +72,6 @@ struct Record_004ab2b0 {
 
 // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int PlaceFeature(int, int, int, int, int);
-void __stdcall UpdateAllCellHeightRanges();
 void __stdcall ClearBorderFeatures();
 
 struct Record_004ab310 {
@@ -133,8 +128,8 @@ extern void __cdecl ClearKeyQueue(void);
 extern void __stdcall CommitTextEdit(Gui* menu, int index, char* text,
                                    int maxLength, int clear);
 
-extern int __stdcall PointInRect(Rect_004b6720* r, int x, int y);
-extern int __stdcall RectsOverlap(Rect_004b6720* a, Rect_004b6720* b);
+extern int __stdcall PointInRect(Rect* r, int x, int y);
+extern int __stdcall RectsOverlap(Rect* a, Rect* b);
 extern void __stdcall DrawSurface(void* dest, void* image, int x, int y);
 
 extern void __stdcall InitGafSequence(Ref_004ab400* ref, Src_004ab400* src, int index);
@@ -146,8 +141,8 @@ extern void __stdcall AdvanceGafSequence(Ref_004ab400* ref, int step);
 extern int __stdcall PeekMouseEvent(MouseEvent* out);
 extern void __stdcall GetCurrentMouseEvent(MouseEvent* out);
 extern void __stdcall PopMouseEvent(MouseEvent* out);
-extern void __stdcall GetGadgetScreenRect(Gadget* table, int index, Rect_004b6720* out);
-extern int __stdcall IsPointInRect(Rect_004b6720* r, int px, int py);
+extern void __stdcall GetGadgetScreenRect(Gadget* table, int index, Rect* out);
+extern int __stdcall IsPointInRect(Rect* r, int px, int py);
 
 extern void __stdcall DrawTextInput(Gui* control, int index);
 extern int __stdcall GetTextPixelWidth(unsigned char* text);
@@ -169,7 +164,7 @@ static inline int FindPanel_004aa8f0(Layer* layer)
 
 // Fills the bounding rectangle of a gadget entry (the body of GetGadgetRect at
 // 0x4a1630, which the compiler inlined into LoadGuiLayer).
-static inline void GetGadgetRect_inlined(Gadget* entry, Rect_004b6720* rect)
+static inline void GetGadgetRect_inlined(Gadget* entry, Rect* rect)
 {
     if (entry->type == 0) {
         rect->left = 0;
@@ -204,7 +199,7 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
     if (flags & 0x800) {
         Layer* cur = menu->layer;
         if (cur != 0) {
-            GetGadgetRect_inlined(cur->entries, (Rect_004b6720*)rect);
+            GetGadgetRect_inlined(cur->entries, (Rect*)rect);
             FadeRectangle(cur->entries->u.assets.surface, rect, -0x18);
             if (menu->layer != 0)
                 menu->layer->redraw = 1;
@@ -382,7 +377,7 @@ int __stdcall IsPointInEntryRect(Gui* obj)
     if (!obj->layer)
         return 0;
     Gadget* info = obj->layer->entries;
-    Rect_004b6720 r;
+    Rect r;
     r.left = info->x;
     r.top = info->y;
     r.right = r.left + info->width - 1;
@@ -414,9 +409,9 @@ void __stdcall ClearSelectedGadget(void* gui)
 }
 
 // FUNCTION: 0x4ab0b0
-int __stdcall BlitLayers(Layer* node, void* surface, Rect_004b6720* clipRect)
+int __stdcall BlitLayers(Layer* node, void* surface, Rect* clipRect)
 {
-    Rect_004b6720 rect;
+    Rect rect;
     if (node == 0) {
         return 0;
     }
@@ -445,7 +440,7 @@ finish:
 // FUNCTION: 0x4ab170
 void __stdcall BlitMenuLayers(Gui* gui, unsigned int* surface, int* rect)
 {
-    BlitLayers(gui->layer, surface, (Rect_004b6720*)rect);
+    BlitLayers(gui->layer, surface, (Rect*)rect);
 }
 
 // FUNCTION: 0x4ab190
@@ -694,7 +689,7 @@ void __stdcall UpdateCursorAndMouse(Gui* p)
     MouseEvent e;
     if (PeekMouseEvent(&e) != 0) {
         if (p->layer != 0) {
-            Rect_004b6720 r;
+            Rect r;
             GetGadgetScreenRect(p->layer->entries, 0, &r);
             if (IsPointInRect(&r, e.x, e.y) != 0 || e.keyFlags == 0) {
                 PopMouseEvent(&e);
@@ -917,7 +912,7 @@ void __stdcall UpdateMenu(Gui* menu);
 int __stdcall SelectFontForEntry(Gadget* entries, int index);
 int GetFont();
 int __stdcall GetTextWidth(int font, unsigned char* text);
-int __stdcall FillRectangle(void* surface, Rect_004b6720* rect, int color);
+int __stdcall FillRectangle(void* surface, Rect* rect, int color);
 int __stdcall SetPaletteColors(unsigned char* src, int start, int count);
 
 struct FileHandle;
@@ -1394,7 +1389,7 @@ void __stdcall DrawColorGrid(Gui* obj)
     void* surface = gadgets->u.assets.surface;
     int x0 = grid->x + gadgets->x;
     int y = gadgets->y + grid->y;
-    Rect_004b6720 rect;
+    Rect rect;
     for (int row = 0; row < 16; row++) {
         for (int col = 0; col < 16; col++) {
             rect.left = x0 + col * 8;
