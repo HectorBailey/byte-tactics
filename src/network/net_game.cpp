@@ -390,7 +390,7 @@ extern Game* g_game;
 extern char* g_leftGameTexts[8];
 extern int g_usePacketManager;
 extern PacketManager g_packetManager;
-extern char DAT_005119b8[];
+extern char g_emptyStringLiteral[];
 
 int __stdcall HAPINET_setplayername(void* net, int dpid, DPNAME* name, int flags);
 int __stdcall HAPINET_getplayername(void* net, unsigned long id, void* data, unsigned long* size);
@@ -1077,7 +1077,7 @@ void UpdateNetGameInfo(void)
     if (g_game->players[g_game->localPlayer].info->started) {
         g_game->settings.bits_475.flag_475_5 = 1;
     }
-    HAPINET_updategameinfo(g_game->net, name, DAT_005119b8, d, c, b, a);
+    HAPINET_updategameinfo(g_game->net, name, g_emptyStringLiteral, d, c, b, a);
 }
 
 // The index of the first connected player, or 10 when there is none.
@@ -1409,7 +1409,7 @@ void CreateNetGame(void)
     g_game->players[g_game->localPlayer].info->host = 1;
     BuildGameInfo(name, &d, &c, &b, &a);
     g_game->numPlayers = 0;
-    HAPINET_createnewgame(g_game->session, name, DAT_005119b8, d, c, b, a);
+    HAPINET_createnewgame(g_game->session, name, g_emptyStringLiteral, d, c, b, a);
 }
 
 static inline int PlayerId_004515d0(unsigned char i)
@@ -1505,7 +1505,7 @@ int __stdcall JoinNetGame(Guid_4517b0 guid, int player)
             int v = IsOnlineConfigLoaded();
             char* s = &g_onlineLobbyPlayerName;
             if (v == 0)
-                s = DAT_005119b8;
+                s = g_emptyStringLiteral;
 
             DPNAME* n2 = net->name;
             if (n2 != 0) {
@@ -2682,7 +2682,7 @@ void __stdcall HandleTimeoutDialog(Gui* gadget)
         if (strlen(entry->text)) {
             SendChatMessage(&g_game->players[g_game->localPlayer], entry->text, 4, 0);
             g_game->flag0 = 1;
-            strcpy(entry->text, DAT_005119b8);
+            strcpy(entry->text, g_emptyStringLiteral);
         }
         BeginTextEdit(g_game->message, FindGadgetIndex(g_game->layer_531->entries, "TALK", 3));
         ClearSelectedGadget(g_game->message);

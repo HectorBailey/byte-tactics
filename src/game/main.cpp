@@ -129,7 +129,7 @@ extern char* g_appName;
 extern char* g_windowClassName;
 extern int g_cmdlineDisplaySeed;
 extern char g_preferredLanguage[];
-extern char DAT_005119b8[];
+extern char g_emptyStringLiteral[];
 extern int g_cdTrackCategory;
 extern int g_cdNeedsReopenAfterFocus;
 extern DWORD g_lastSoundReapTick;
@@ -291,9 +291,9 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     size14 = 0x32;
     if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, g_audioCdShellKey, 0, 0xf003f, &hKey) == 0) {
         if (RegQueryValueExA(hKey, NULL, NULL, &type, (LPBYTE)buf40, &size20) == 0) {
-            RegSetValueExA(hKey, NULL, 0, type, (const BYTE*)DAT_005119b8, 1);
+            RegSetValueExA(hKey, NULL, 0, type, (const BYTE*)g_emptyStringLiteral, 1);
         } else {
-            strcpy(buf40, DAT_005119b8);
+            strcpy(buf40, g_emptyStringLiteral);
         }
         size14 = 0x32;
         ReadGameRegistryValue(g_cdShellValueName, buf74, (int*)&size14);
@@ -350,7 +350,7 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                        (DWORD)strlen(buf40) + 1);
         RegFlushKey(hKey);
         RegCloseKey(hKey);
-        strcpy(buf40, DAT_005119b8);
+        strcpy(buf40, g_emptyStringLiteral);
         WriteGameRegistryValue(g_cdShellValueName, buf40, 0x32);
     }
     ShutdownEnvironment(&g_displayContext);

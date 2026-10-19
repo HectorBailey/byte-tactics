@@ -42,7 +42,7 @@ extern "C" int __cdecl _strcmpi(const char* str1, const char* str2);
 
 extern int g_defaultCommandHandler;
 extern int g_defaultCommandMask;
-extern char DAT_005119b8[];
+extern char g_emptyStringLiteral[];
 
 // The reference-counted string handle: a pointer to the characters with the
 // reference count in the int just before them.
@@ -376,7 +376,7 @@ int __stdcall ExecuteCommand(CommandArgs* obj, int mask)
 {
     int result = 0;
     if (obj->count >= 1) {
-        StringRef key((char*)obj->GetArg(0, (int)DAT_005119b8));
+        StringRef key((char*)obj->GetArg(0, (int)g_emptyStringLiteral));
         key.MakeLower();
         HandlerSlot_004b7900* h = Find_004b7900(key.data);
         if (h != 0 && (h->mask & mask)) {

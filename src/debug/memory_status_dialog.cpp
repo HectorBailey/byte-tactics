@@ -21,7 +21,7 @@ extern unsigned int g_freeBlockWraps;
 extern unsigned int g_allocSerial;
 extern unsigned int g_liveAllocCount;
 extern unsigned int g_liveAllocPeak;
-extern char DAT_005119b8;
+extern char g_emptyStringLiteral;
 extern char g_memStatusLastText[];
 extern char* g_memoryStatusWindowName;
 
@@ -178,7 +178,7 @@ int MemoryStatusDialog::HandleMemoryStatusMessage(unsigned int msg, int wParam, 
         rate_add(&rates, delta, speed);
         prevAllocSerial = g_allocSerial;
 
-        buf[0] = DAT_005119b8;
+        buf[0] = g_emptyStringLiteral;
         memset(buf + 1, 0, sizeof(buf) - 1);
 
         if (g_bytesRequestedHi != 0) {

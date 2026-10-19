@@ -61,7 +61,7 @@ struct Game {
 #pragma pack(pop)
 
 extern Game* g_game;
-extern char DAT_005119b8[];
+extern char g_emptyStringLiteral[];
 
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
 void* __stdcall LoadGaf(char* path);
@@ -186,13 +186,13 @@ void __stdcall LoadSideData(void)
         parser.ResetCurrentRecord();
         if (!parser.SelectRecord(name))
             break;
-        if (parser.current->GetFieldString(name, "name", 0x1e, DAT_005119b8))
+        if (parser.current->GetFieldString(name, "name", 0x1e, g_emptyStringLiteral))
             strcpy(s->name, name);
-        if (parser.current->GetFieldString(name, "nameprefix", 4, DAT_005119b8))
+        if (parser.current->GetFieldString(name, "nameprefix", 4, g_emptyStringLiteral))
             strcpy(s->nameprefix, name);
-        if (parser.current->GetFieldString(name, "commander", 0x20, DAT_005119b8))
+        if (parser.current->GetFieldString(name, "commander", 0x20, g_emptyStringLiteral))
             strcpy(s->commander, name);
-        if (parser.current->GetFieldString(name, "font", 0x100, DAT_005119b8)) {
+        if (parser.current->GetFieldString(name, "font", 0x100, g_emptyStringLiteral)) {
             void* font;
             BuildDataPath(fontPath, "fonts", name, "FNT");
             font = HAPI_LoadFile(fontPath, 0);

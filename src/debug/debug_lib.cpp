@@ -4168,8 +4168,8 @@ bool __cdecl FileExists(char* dir, char* name)
 // (everything from the first backslash on, and any ';' comment, is dropped),
 // and the two usual source roots are tried in turn, MFC first, then the CRT.
 // g_msdevDirRead is the "MSDevDir already read" flag, g_crtSourceRoot the CRT root,
-// g_mfcSourceRoot the MFC root, DAT_005119b8 the empty default prefix.
-extern char DAT_005119b8[];
+// g_mfcSourceRoot the MFC root, g_emptyStringLiteral the empty default prefix.
+extern char g_emptyStringLiteral[];
 extern char g_msdevDirRead;
 extern char g_crtSourceRoot[0x1e8];
 extern char g_mfcSourceRoot[0x1e8];
@@ -4179,7 +4179,7 @@ extern char g_mfcSourceRoot[0x1e8];
 // FUNCTION: 0x4de8a0
 void __cdecl GetSourceFilePath(char* out, char* name)
 {
-    char* dir = DAT_005119b8;
+    char* dir = g_emptyStringLiteral;
     if (strchr(name, '\\') == 0) {
         if (!g_msdevDirRead) {
             g_msdevDirRead = 1;
@@ -4310,7 +4310,7 @@ void __cdecl FormatSystemInfo(char* dest, int destLen)
     char exeName[1000];
     char* p;
 
-    buf[0] = DAT_005119b8[0];
+    buf[0] = g_emptyStringLiteral[0];
     memset(buf + 1, 0, 1999);
 
     now = time(NULL);
@@ -4424,7 +4424,7 @@ public:
     {
         id = s;
         if (id == 0)
-            id = DAT_005119b8;
+            id = g_emptyStringLiteral;
         text[0] = 0;
     }
 };
@@ -5895,7 +5895,7 @@ extern unsigned int g_freeBlockWraps;
 extern unsigned int g_allocSerial;
 extern unsigned int g_liveAllocCount;
 extern unsigned int g_liveAllocPeak;
-extern char DAT_005119b8[];
+extern char g_emptyStringLiteral[];
 extern char g_memStatusLastText[];
 
 void __cdecl OpenUrl(HWND hwnd, char* url, char* ext);

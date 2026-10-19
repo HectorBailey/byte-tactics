@@ -252,7 +252,7 @@ public:
 };
 
 extern Game* g_game;
-extern char DAT_005119b8[];
+extern char g_emptyStringLiteral[];
 extern int g_packetModes[];
 extern int g_usePacketManager;
 extern PacketManager g_packetManager;
@@ -534,7 +534,7 @@ int HandleNetPackets()
                     BuildGameInfo(name, &d, &c, &b, &a);
                     if (LocalPlayer()->info->started)
                         g_game->settings.flags_475 |= 0x20;
-                    HAPINET_updategameinfo(g_game->session, name, DAT_005119b8, d, c, b, a);
+                    HAPINET_updategameinfo(g_game->session, name, g_emptyStringLiteral, d, c, b, a);
                 }
                 break;
             }

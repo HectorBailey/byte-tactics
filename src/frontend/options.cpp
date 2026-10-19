@@ -636,7 +636,7 @@ extern char g_testGadgetName[];        // "TEST"
 extern char g_volTextGadgetName[];     // "VOLTEXT"
 extern char g_modeGadgetName[];        // "MODE"
 extern char g_explodeSoundFile[];      // "sounds\\explode.wav"
-extern char DAT_005119b8[];
+extern char g_emptyStringLiteral[];
 extern int g_cmdlineDplayProvider;
 extern int g_cmdlineHostMode;
 extern char g_cmdlineHostGameName[];
@@ -2383,7 +2383,7 @@ void __stdcall FillHelpPage(Gui* sub, int page, int lineCount)
             if (pp->first < pp->last) {
                 do {
                     wsprintfA(key, "Line%d", pp->first);
-                    if (parser.current->GetFieldString(value, key, 0x80, DAT_005119b8)) {
+                    if (parser.current->GetFieldString(value, key, 0x80, g_emptyStringLiteral)) {
                         AddLine(pp, layer, value, y);
                         y += 0x12;
                     }

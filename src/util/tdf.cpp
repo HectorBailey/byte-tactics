@@ -72,7 +72,7 @@ inline void _Destroy(TdfField* p)
 }
 }
 
-extern char DAT_005119b8[];
+extern char g_emptyStringLiteral[];
 void __cdecl GameFreeThunk(void* p);
 char* __cdecl GameStrdup(char* text);
 char* ComputeChecksum(char* text, int len);
@@ -474,7 +474,7 @@ StringRef TdfRecord::MakeTrimmedString(char* start, char* end)
         p++;
     start = p;
     if (start >= end) {
-        StringRef empty(DAT_005119b8);
+        StringRef empty(g_emptyStringLiteral);
         return empty;
     }
     char* last = end - 1;

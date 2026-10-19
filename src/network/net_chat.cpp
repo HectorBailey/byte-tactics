@@ -74,7 +74,7 @@ struct Game {
 #include "../graphics/rect.h"
 
 extern Game* g_game;
-extern char DAT_005119b8[];
+extern char g_emptyStringLiteral[];
 
 void __stdcall PlaySoundByName(char* name, int param_2);
 int __stdcall IsScreenNamed(void* obj, const char* name);
@@ -135,8 +135,8 @@ void __stdcall SendChatMessage(Player* from, char* text, int key, char* to)
 {
     char buf[200];
 
-    sprintf(buf, "<%s%s%s> %s", from->fullName, to ? "->" : DAT_005119b8,
-            to ? to : DAT_005119b8, text);
+    sprintf(buf, "<%s%s%s> %s", from->fullName, to ? "->" : g_emptyStringLiteral,
+            to ? to : g_emptyStringLiteral, text);
     SendChatPacket(buf);
     if (g_game->mapInfo->GetGameType() == 3) {
         ReportGameChat(buf);

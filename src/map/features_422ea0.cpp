@@ -51,7 +51,7 @@ struct Game {
 
 extern Game* g_game;
 extern List_00422ea0* s_featureTdfParsers;
-extern char DAT_005119b8[];
+extern char g_emptyStringLiteral[];
 
 unsigned short __stdcall LoadFeatureType(char* name);
 
@@ -99,15 +99,15 @@ void ResolveFeatureLinks()
         features = &g_game->features;
         do {
             TdfRecord* parser = (TdfRecord*)FindEntry((*features)[i].name)->parser;
-            if (parser->GetFieldString(buf, "featuredead", 0x100, DAT_005119b8))
+            if (parser->GetFieldString(buf, "featuredead", 0x100, g_emptyStringLiteral))
                 (*features)[i].dead = FeatureIndex(buf);
             else
                 (*features)[i].dead = 0xffff;
-            if (parser->GetFieldString(buf, "featurereclamate", 0x100, DAT_005119b8))
+            if (parser->GetFieldString(buf, "featurereclamate", 0x100, g_emptyStringLiteral))
                 (*features)[i].reclamate = FeatureIndex(buf);
             else
                 (*features)[i].reclamate = 0xffff;
-            if (parser->GetFieldString(buf, "featureburnt", 0x100, DAT_005119b8))
+            if (parser->GetFieldString(buf, "featureburnt", 0x100, g_emptyStringLiteral))
                 (*features)[i].burnt = FeatureIndex(buf);
             else
                 (*features)[i].burnt = 0xffff;

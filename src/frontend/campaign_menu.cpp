@@ -174,7 +174,7 @@ struct Game {
 
 // GLOBAL: 0x511de8
 extern Game* g_game;
-extern char DAT_005119b8[];            // ""
+extern char g_emptyStringLiteral[];    // ""
 extern char* g_briefingWrappedText;
 extern int g_briefingPageIndex;
 extern int g_briefingPaginateReset;
@@ -408,7 +408,7 @@ int __stdcall BuildCampaignNameList(char** out, int side)
         BuildDataPath(path, "camps", q, "tdf");
         if ((&parser)->LoadFile(path)) {
             if ((&parser)->SelectRecord("HEADER")) {
-                parser.current->GetFieldString(name, "campaignside", 0x40, DAT_005119b8);
+                parser.current->GetFieldString(name, "campaignside", 0x40, g_emptyStringLiteral);
                 if (strcmp(g_game->names[side], name) == 0 || strcmp("ALL", name) == 0) {
                     found++;
                     p = AppendName_00476a60(p, q);
@@ -596,7 +596,7 @@ void DrawHelpPage()
 
     if (nextPage == 0) {
         if (g_briefingPageIndex == 0)
-            SetTranslatedTextByName(&g_game->gui, "MOREBAR", DAT_005119b8, 0);
+            SetTranslatedTextByName(&g_game->gui, "MOREBAR", g_emptyStringLiteral, 0);
         else
             SetTranslatedTextByName(&g_game->gui, "MOREBAR",
                          Translate("BACK TO START"), 0);
@@ -610,7 +610,7 @@ void DrawHelpPage()
 
     for (int i = linesPerPage * g_briefingPageIndex;
          i < (g_briefingPageIndex + 1) * linesPerPage; i++) {
-        AddTextGadget(dialog, "TextRegion", DAT_005119b8, textX, y, -1, 2);
+        AddTextGadget(dialog, "TextRegion", g_emptyStringLiteral, textX, y, -1, 2);
         // The gadget index is count itself, incremented here.
         count++;
         char* dst = gadgets[count].text_b6;

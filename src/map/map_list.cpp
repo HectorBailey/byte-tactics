@@ -11,7 +11,7 @@
 
 class StringRef;
 
-extern char DAT_005119b8[];
+extern char g_emptyStringLiteral[];
 
 #pragma pack(push, 1)
 struct Slot_00436860 {
@@ -361,7 +361,7 @@ Mission::Mission(int owner_)
     missionName[0] = 0;
     text_b14[0] = 0;
     type = owner_;
-    LoadCampaign(DAT_005119b8);
+    LoadCampaign(g_emptyStringLiteral);
 }
 
 // Destructor of Mission (constructor 0x434f70, sibling 0x437280).
@@ -435,14 +435,14 @@ void Mission::LoadCampaign(char* file)
     list.Unload();
     strcpy(campaign, file);
     for (int i = 0; i < 9; i++)
-        SetNameSlot(i, DAT_005119b8);
+        SetNameSlot(i, g_emptyStringLiteral);
     if (strlen(file) != 0) {
         BuildCampaignFilePath(0, "camps", campaign, "TDF");
         if (strlen(file) != 0) {
             if (!list.LoadFile(GetNameSlot(0))) {
                 wsprintfA(msg, "The requested campaign file, %s, does not exist.", GetNameSlot(0));
                 OpenMessageBox(g_game->messages, msg, 0x1e0, 1, 1);
-                LoadCampaign(DAT_005119b8);
+                LoadCampaign(g_emptyStringLiteral);
                 return;
             }
         }
@@ -507,13 +507,13 @@ void Mission::SetNameSlot(int index, char* text)
 // (an inlined copy of 0x4353b0.cpp). With a side prefix (GetPreferredLanguage) it
 // first tries "<dir>-<side>\<name>.<ext>" and keeps it when that file opens;
 // otherwise it uses "<dir>\<name>.<ext>". An empty name stores the blank
-// string DAT_005119b8.
+// string g_emptyStringLiteral.
 // FUNCTION: 0x435430
 void Mission::BuildCampaignFilePath(int index, char* dir, char* name, char* ext)
 {
     char path[256];
     if (strlen(name) == 0) {
-        SetNameSlot(index, DAT_005119b8);
+        SetNameSlot(index, g_emptyStringLiteral);
         return;
     }
     char* side = (char*)GetPreferredLanguage();
@@ -855,7 +855,7 @@ int Mission::LoadMission(char* map)
             return 0;
         }
         GetLocalizedString(&list, missionName, "missionname", 0x100, 0);
-        int found = list.current->GetFieldString(path, "missionfile", 0x100, DAT_005119b8);
+        int found = list.current->GetFieldString(path, "missionfile", 0x100, g_emptyStringLiteral);
         if (found) {
             char file[0x100];
             BuildDataPath(file, "Maps", path, "OTA");
@@ -912,26 +912,26 @@ int Mission::LoadMission(char* map)
         return 0;
     }
     headerChecksum = *(int*)((char*)parser.current + 0x25);
-    GetLocalizedString(&parser, value, "brief", 0x100, DAT_005119b8);
+    GetLocalizedString(&parser, value, "brief", 0x100, g_emptyStringLiteral);
     BuildCampaignFilePath(2, "camps\\briefs", value, "TXT");
     LoadBriefing();
-    GetLocalizedString(&parser, value, "narration", 0x100, DAT_005119b8);
+    GetLocalizedString(&parser, value, "narration", 0x100, g_emptyStringLiteral);
     BuildCampaignFilePath(3, "camps\\briefs", value, "WAV");
-    GetLocalizedString(&parser, value, "missionhint", 0x100, DAT_005119b8);
+    GetLocalizedString(&parser, value, "missionhint", 0x100, g_emptyStringLiteral);
     BuildCampaignFilePath(4, "camps\\hints", value, "TXT");
-    parser.current->GetFieldString(value, "glamour", 0x100, DAT_005119b8);
-    BuildCampaignFilePath(5, DAT_005119b8, value, "PCX");
-    parser.current->GetFieldString(value, "glamoursound", 0x100, DAT_005119b8);
+    parser.current->GetFieldString(value, "glamour", 0x100, g_emptyStringLiteral);
+    BuildCampaignFilePath(5, g_emptyStringLiteral, value, "PCX");
+    parser.current->GetFieldString(value, "glamoursound", 0x100, g_emptyStringLiteral);
     BuildCampaignFilePath(8, "camps\\briefs", value, "WAV");
-    parser.current->GetFieldString(value, "UseOnlyUnits", 0x100, DAT_005119b8);
+    parser.current->GetFieldString(value, "UseOnlyUnits", 0x100, g_emptyStringLiteral);
     BuildCampaignFilePath(6, "camps\\useonly", value, "TDF");
     g_game->mapping = parser.current->GetFieldInt("mapping", 0);
     g_game->lineOfSight = parser.current->GetFieldInt("lineofsight", 0);
     g_game->singleLOSType = 1;
     g_game->singleCommanderDeath = 0;
-    parser.current->GetFieldString(memory, "memory", 0x80, DAT_005119b8);
-    parser.current->GetFieldString(numPlayers, "numplayers", 0x80, DAT_005119b8);
-    parser.current->GetFieldString(planet, "Planet", 0x80, DAT_005119b8);
+    parser.current->GetFieldString(memory, "memory", 0x80, g_emptyStringLiteral);
+    parser.current->GetFieldString(numPlayers, "numplayers", 0x80, g_emptyStringLiteral);
+    parser.current->GetFieldString(planet, "Planet", 0x80, g_emptyStringLiteral);
     g_game->noMovie = parser.current->GetFieldInt("nomovie", 0);
     parser.current->GetFieldString(desc, "missiondescription", 0x80, "No description available");
     strcpy(lower, desc);
@@ -961,11 +961,11 @@ int Mission::LoadMission(char* map)
     startMetal[1] = (float)parser.current->GetFieldInt("ComputerMetal", 0);
     startEnergy[1] = (float)parser.current->GetFieldInt("ComputerEnergy", 0);
     surfaceMetal = parser.current->GetFieldInt("SurfaceMetal", 0);
-    parser.current->GetFieldString(value, "aiprofile", 0x100, DAT_005119b8);
+    parser.current->GetFieldString(value, "aiprofile", 0x100, g_emptyStringLiteral);
     BuildCampaignFilePath(7, "ai", value, "txt");
     if (!GetNameSlot(7))
         BuildCampaignFilePath(7, "ai", "default", "txt");
-    parser.current->GetFieldString(meteor.name, "MeteorWeapon", 0x20, DAT_005119b8);
+    parser.current->GetFieldString(meteor.name, "MeteorWeapon", 0x20, g_emptyStringLiteral);
     if (strlen(meteor.name) != 0) {
         meteor.radius = parser.current->GetFieldInt("MeteorRadius", 0);
         meteor.density = GetFloat(parser.current, "MeteorDensity");
@@ -1070,7 +1070,7 @@ int Mission::SelectSchema(int type, TdfFile* parser, char* schema)
             sprintf(name, "Schema %i", n);
             if (!parser->SelectRecord(name))
                 break;
-            if (!parser->current->GetFieldString(kind, "type", 0x20, DAT_005119b8))
+            if (!parser->current->GetFieldString(kind, "type", 0x20, g_emptyStringLiteral))
                 continue;
             if (_strcmpi(kind, names[d]) != 0)
                 continue;
@@ -1085,7 +1085,7 @@ int Mission::SelectSchema(int type, TdfFile* parser, char* schema)
                 TdfRecord* specials = parser->current;
                 TdfRecord* s;
                 for (int i = 0; (s = specials->GetSubRecord(i)) != 0; i++) {
-                    if (s->GetFieldString(what, "specialwhat", 0x10, DAT_005119b8)) {
+                    if (s->GetFieldString(what, "specialwhat", 0x10, g_emptyStringLiteral)) {
                         static int len = strlen("StartPos");
                         if (_strnicmp(what, "StartPos", len) == 0)
                             count++;
@@ -1132,11 +1132,11 @@ void Mission::LoadMissionData(char* name, TdfFile* parser)
         count = 0;
     for (i = 0; i < count; i++) {
         TdfRecord* s = list->GetSubRecord(i);
-        if (s->GetFieldString(buf, "Unitname", 0x400, DAT_005119b8))
+        if (s->GetFieldString(buf, "Unitname", 0x400, g_emptyStringLiteral))
             total += strlen(buf) + 1;
-        if (s->GetFieldString(buf, "Ident", 0x400, DAT_005119b8))
+        if (s->GetFieldString(buf, "Ident", 0x400, g_emptyStringLiteral))
             total += strlen(buf) + 1;
-        if (s->GetFieldString(buf, "InitialMission", 0x400, DAT_005119b8))
+        if (s->GetFieldString(buf, "InitialMission", 0x400, g_emptyStringLiteral))
             total += strlen(buf) + 1;
     }
     // Own local, computed before unitCount is stored: keeps the count in ecx.
@@ -1148,19 +1148,19 @@ void Mission::LoadMissionData(char* name, TdfFile* parser)
     for (i = 0; i < count; i++) {
         MissionUnit* u = &units[i];
         TdfRecord* s = list->GetSubRecord(i);
-        if (s->GetFieldString(strings, "Unitname", 0x400, DAT_005119b8)) {
+        if (s->GetFieldString(strings, "Unitname", 0x400, g_emptyStringLiteral)) {
             u->name = strings;
             strings += strlen(strings) + 1;
         } else {
             u->name = 0;
         }
-        if (s->GetFieldString(strings, "Ident", 0x400, DAT_005119b8)) {
+        if (s->GetFieldString(strings, "Ident", 0x400, g_emptyStringLiteral)) {
             u->ident = strings;
             strings += strlen(strings) + 1;
         } else {
             u->ident = 0;
         }
-        if (s->GetFieldString(strings, "InitialMission", 0x400, DAT_005119b8)) {
+        if (s->GetFieldString(strings, "InitialMission", 0x400, g_emptyStringLiteral)) {
             u->initialMission = strings;
             strings += strlen(strings) + 1;
         } else {
@@ -1195,7 +1195,7 @@ void Mission::LoadMissionData(char* name, TdfFile* parser)
         MissionRule* r = &rules[i];
         r->type = 0;
         TdfRecord* s = list->GetSubRecord(i);
-        if (s->GetFieldString(text, "specialwhat", 0x100, DAT_005119b8)) {
+        if (s->GetFieldString(text, "specialwhat", 0x100, g_emptyStringLiteral)) {
             static int len = strlen("StartPos");
             if (_strnicmp(text, "StartPos", len) == 0) {
                 r->type = 1;
@@ -1225,7 +1225,7 @@ void Mission::LoadMissionData(char* name, TdfFile* parser)
     for (i = 0; i < count; i++) {
         MissionFeature* f = &features[i];
         TdfRecord* s = list->GetSubRecord(i);
-        if (!s->GetFieldString(f->name, "Featurename", 0x80, DAT_005119b8))
+        if (!s->GetFieldString(f->name, "Featurename", 0x80, g_emptyStringLiteral))
             f->name[0] = 0;
         f->x = s->GetFieldInt("XPos", -1);
         f->z = s->GetFieldInt("ZPos", -1);

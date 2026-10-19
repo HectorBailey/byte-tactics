@@ -58,7 +58,7 @@ public:
 };
 
 extern char g_extTdf[];
-extern char DAT_005119b8[];
+extern char g_emptyStringLiteral[];
 extern char g_meteorWeaponName[];
 extern int g_meteorSpawnMagnitude;     // strike radius
 extern int g_meteorSpawnInterval;      // ticks between meteors
@@ -250,7 +250,7 @@ void MeteorParams::LoadMeteorDefaults()
     BuildDataPath(path, "gamedata", "meteor", g_extTdf);
     if (parser.LoadFile(path)
         && parser.SelectRecord("Default")) {
-        if (parser.current->GetFieldString((char*)this, "MeteorWeapon", 0x20, DAT_005119b8)) {
+        if (parser.current->GetFieldString((char*)this, "MeteorWeapon", 0x20, g_emptyStringLiteral)) {
             radius = parser.current->GetFieldInt("MeteorRadius", 0);
             density = (float)parser.current->GetFieldDouble("MeteorDensity", 0.0);
             duration = (float)parser.current->GetFieldDouble("MeteorDuration", 0.0);

@@ -464,7 +464,7 @@ void __stdcall CmdSFX(CommandArgs* args);
 
 // GLOBAL: 0x511de8
 extern Game* g_game;
-extern char DAT_005119b8[];
+extern char g_emptyStringLiteral[];
 extern char g_commandLineBuf[];
 extern int g_messageBytesReceived;
 extern int g_messageBytesSent;
@@ -577,7 +577,7 @@ void __stdcall CmdAI(CommandArgs* args)
 // FUNCTION: 0x416310
 void __stdcall CmdAssign(CommandArgs* args)
 {
-    MissionType kind(args->GetArg(1, DAT_005119b8));
+    MissionType kind(args->GetArg(1, g_emptyStringLiteral));
     if (kind.index) {
         int a = args->GetIntArg(1, 0);
         int b = args->GetIntArg(2, 0);
@@ -614,7 +614,7 @@ void __stdcall CmdBurnOne(void* args)
 // FUNCTION: 0x4163d0
 void __stdcall CmdFeature(CommandArgs* args)
 {
-    unsigned short id = FindFeatureType(args->GetArg(1, DAT_005119b8));
+    unsigned short id = FindFeatureType(args->GetArg(1, g_emptyStringLiteral));
     if (id != 0xffff) {
         void* target = GetMapCell(g_game->point.x, g_game->point.y);
         PlaceFeature(target, id, 0, 0, 10);
@@ -746,7 +746,7 @@ void __stdcall CmdSearch(CommandArgs* args)
         g_game->pathfinder->value = args->GetIntArg(1, 0);
     }
     if (args->count == 3) {
-        g_game->pathfinder->fixed = (int)(atof(args->GetArg(2, DAT_005119b8)) * 65536.0);
+        g_game->pathfinder->fixed = (int)(atof(args->GetArg(2, g_emptyStringLiteral)) * 65536.0);
     }
 }
 
@@ -780,7 +780,7 @@ void __stdcall CmdSound3D(int unused)
 // FUNCTION: 0x416860
 void __stdcall CmdMove(CommandArgs* args)
 {
-    if (_strcmpi(args->GetArg(0, DAT_005119b8), "move") == 0) {
+    if (_strcmpi(args->GetArg(0, g_emptyStringLiteral), "move") == 0) {
         int dx = args->GetIntArg(1, 0);
         g_game->pos.x += dx << 20;
         int dz = args->GetIntArg(2, 0);
@@ -883,11 +883,11 @@ void __stdcall CmdGive(CommandArgs* args)
         Player* p = &g_game->players[i];
         if (p->active != 0 && (p->type == 1 || p->type == 2 || p->type == 3)
             && p->index != 10) {
-            if (_strcmpi(args->GetArg(3, DAT_005119b8), "metal") == 0) {
+            if (_strcmpi(args->GetArg(3, g_emptyStringLiteral), "metal") == 0) {
                 TransferEnergy(g_game->localPlayer, args->GetIntArg(1, 0),
                              (float)args->GetIntArg(2, 0), 1);
             }
-            if (_strcmpi(args->GetArg(3, DAT_005119b8), "energy") == 0) {
+            if (_strcmpi(args->GetArg(3, g_emptyStringLiteral), "energy") == 0) {
                 TransferMetal(g_game->localPlayer, args->GetIntArg(1, 0),
                              (float)args->GetIntArg(2, 0), 1);
             }
@@ -961,11 +961,11 @@ void __stdcall CmdNoShake(int unused)
 // FUNCTION: 0x416e90
 void __stdcall CmdNow(CommandArgs* args)
 {
-    if (args->count==6 && !strcmp(args->GetArg(1,DAT_005119b8),"Film") &&
-        !strcmp(args->GetArg(2,DAT_005119b8),"Chris") &&
-        !strcmp(args->GetArg(3,DAT_005119b8),"Include") &&
-        !strcmp(args->GetArg(4,DAT_005119b8),"Reload") &&
-        !strcmp(args->GetArg(5,DAT_005119b8),"Assert"))
+    if (args->count==6 && !strcmp(args->GetArg(1,g_emptyStringLiteral),"Film") &&
+        !strcmp(args->GetArg(2,g_emptyStringLiteral),"Chris") &&
+        !strcmp(args->GetArg(3,g_emptyStringLiteral),"Include") &&
+        !strcmp(args->GetArg(4,g_emptyStringLiteral),"Reload") &&
+        !strcmp(args->GetArg(5,g_emptyStringLiteral),"Assert"))
         g_game->uiOptionFlags|=2;
     else g_game->uiOptionFlags&=~2;
 }
@@ -1080,7 +1080,7 @@ void __stdcall CmdClock(int unused)
 void __stdcall CmdFilm(CommandArgs* args)
 {
     if (args->count > 1) {
-        strcpy(g_game->path, args->GetArg(1, DAT_005119b8));
+        strcpy(g_game->path, args->GetArg(1, g_emptyStringLiteral));
         if (g_game->path[strlen(g_game->path) - 1] == '\\' ||
             g_game->path[strlen(g_game->path) - 1] == '/')
             g_game->path[strlen(g_game->path) - 1] = 0;
@@ -1105,7 +1105,7 @@ void __stdcall CmdSave(CommandArgs* args)
 {
     char path[256];
     if (args->count > 1) {
-        sprintf(path, "savegame\\%s.sav", args->GetArg(1, DAT_005119b8));
+        sprintf(path, "savegame\\%s.sav", args->GetArg(1, g_emptyStringLiteral));
         MakeDirectoryPath("savegame");
         SaveGameFile(path, "Generic Game Description", 0x29a);
     }
@@ -1118,7 +1118,7 @@ void __stdcall CmdSave(CommandArgs* args)
 void __stdcall CmdReload(CommandArgs* args)
 {
     if (args->count > 1) {
-        short id = FindUnitTypeId(args->GetArg(1, DAT_005119b8));
+        short id = FindUnitTypeId(args->GetArg(1, g_emptyStringLiteral));
         if (id) {
             KillUnitsOfType(id);
             ReloadUnitType(id);
@@ -1206,7 +1206,7 @@ void __stdcall CmdMakePoster(CommandArgs* args)
         w = args->GetIntArg(1, 0);
     if (args->count > 2)
         h = args->GetIntArg(2, 0);
-    if (_strcmpi(args->GetArg(1, DAT_005119b8), "all") == 0) {
+    if (_strcmpi(args->GetArg(1, g_emptyStringLiteral), "all") == 0) {
         w = g_game->mapPixelWidth;
         h = g_game->mapPixelHeight;
     }
@@ -1262,7 +1262,7 @@ void __stdcall CmdInclude(CommandArgs* args)
     int info;
     char path[60];
 
-    sprintf(path, "debugdat\\%s.txt", args->GetArg(0, DAT_005119b8));
+    sprintf(path, "debugdat\\%s.txt", args->GetArg(0, g_emptyStringLiteral));
     void* file = HAPI_OpenFileRead(path);
     if (file != 0) {
         pos = g_game->pos;
@@ -1283,7 +1283,7 @@ void __stdcall DefaultCommandHandler(CommandArgs* args)
     int count=0;
     for (unsigned short i=1;i<g_game->unitDefCount;++i) {
         UnitDef* def=&g_game->unitDefs[i];
-        if (MatchWildcard(def->unitname,args->GetArg(0,DAT_005119b8))) {
+        if (MatchWildcard(def->unitname,args->GetArg(0,g_emptyStringLiteral))) {
             if (count) pos.x-=def->modelMinX;
             SnapWorldPosToFootprint(def,&pos);
             CreateUnit(args->GetIntArg(1,0),i,pos,1,1,0);
@@ -1297,7 +1297,7 @@ void __stdcall DefaultCommandHandler(CommandArgs* args)
         int size;
         char path[60];
         // The original unbounded formatting can overflow path for a long argument.
-        sprintf(path,"debugdat\\%s.txt",args->GetArg(0,DAT_005119b8));
+        sprintf(path,"debugdat\\%s.txt",args->GetArg(0,g_emptyStringLiteral));
         void* file=HAPI_OpenFileRead(path);
         if (file) {
             saved=g_game->pos;
@@ -1708,7 +1708,7 @@ void __stdcall CmdPrintWeights(CommandArgs* args)
             Player* p = &g_game->players[i];
             if (p->active != 0 && (p->type == 1 || p->type == 2 || p->type == 3)
                 && p->index != 10) {
-                FILE* f = fopen(args->GetArg(2, DAT_005119b8), "w+b");
+                FILE* f = fopen(args->GetArg(2, g_emptyStringLiteral), "w+b");
                 if (f != 0) {
                     DumpPlayerAI(args->GetIntArg(1, 0), f);
                     fclose(f);
