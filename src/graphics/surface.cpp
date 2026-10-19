@@ -1999,48 +1999,6 @@ void __stdcall DrawLitTexturedPolygon(GafFrame* target, GafFrame* texture, int* 
         }
 }
 
-// Append of the reference-counted string handle: concatenates other's
-// characters onto this handle's, allocating a new block whose first int is
-// the reference count, then releasing the old block. The handle points at the
-// characters; the count is the int just before them (see 0x4c91a0, 0x4c9290,
-// 0x4c93b0, 0x4c93f0). The class is named after this address because it has
-// no name in data/symbols.csv.
-class Class_004c90b0 {
-public:
-    char* ptr;              // refcount lives in the dword before ptr
-
-    bool IsEmpty() const { return *ptr == 0; }
-
-    Class_004c90b0* Append(const Class_004c90b0& other);
-};
-
-// FUNCTION: 0x4c90b0
-Class_004c90b0* Class_004c90b0::Append(const Class_004c90b0& other)
-{
-    // Bool helper, not a plain pointer test: gives the original emptiness-test code.
-    if (!other.IsEmpty()) {
-        // Declared before the strlen locals: sets the second strcpy destination encoding.
-        char* chars;
-        int n = (int)strlen(ptr);
-        int m = (int)strlen(other.ptr);
-        int len = n + m + 1;
-        int* lp = &len;                   // opaque store: keeps the +1 and +5 apart
-        *lp += 5;
-        int* block = (int*)malloc(len);
-        *block = 1;
-        chars = (char*)(block + 1);
-        strcpy(chars, ptr);
-        strcpy(chars + n, other.ptr);
-        ((int*)ptr)[-1]--;
-        int* old = (int*)ptr - 1;
-        if (((int*)ptr)[-1] == 0) {
-            free(old);
-        }
-        ptr = chars;
-    }
-    return this;
-}
-
 extern int g_emptyStringRefs;
 extern void* g_emptyString;
 
@@ -2088,9 +2046,54 @@ public:
         }
         return data;
     }
-    int IsEmpty() const;
+    bool IsEmpty() const { return *data == 0; }
     StringRef SubString(int start, int end) const;
 };
+
+// Append of the reference-counted string handle: concatenates other's
+// characters onto this handle's, allocating a new block whose first int is
+// the reference count, then releasing the old block. The handle points at the
+// characters; the count is the int just before them (see 0x4c91a0, 0x4c9290,
+// 0x4c93b0, 0x4c93f0).
+// FUNCTION: 0x4c90b0
+StringRef* StringRef::Append(const StringRef& other)
+{
+    // Bool helper, not a plain pointer test: gives the original emptiness-test code.
+    if (!other.IsEmpty()) {
+        // Declared before the strlen locals: sets the second strcpy destination encoding.
+        char* chars;
+        int n = (int)strlen(data);
+        int m = (int)strlen(other.data);
+        int len = n + m + 1;
+        int* lp = &len;                   // opaque store: keeps the +1 and +5 apart
+        *lp += 5;
+        int* block = (int*)malloc(len);
+        *block = 1;
+        chars = (char*)(block + 1);
+        strcpy(chars, data);
+        strcpy(chars + n, other.data);
+        ((int*)data)[-1]--;
+        int* old = (int*)data - 1;
+        if (((int*)data)[-1] == 0) {
+            free(old);
+        }
+        data = chars;
+    }
+    return this;
+}
+
+// Ten declarations hold the symbol ids the separate Append view took, so the
+// functions after it keep their allocation (docs/c2-regalloc.md).
+class Filler_4c90b0_1;
+class Filler_4c90b0_2;
+class Filler_4c90b0_3;
+class Filler_4c90b0_4;
+class Filler_4c90b0_5;
+class Filler_4c90b0_6;
+class Filler_4c90b0_7;
+class Filler_4c90b0_8;
+class Filler_4c90b0_9;
+class Filler_4c90b0_10;
 
 // FUNCTION: 0x4c9180 ??0StringRef@@QAE@XZ
 StringRef::StringRef()
