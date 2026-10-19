@@ -119,6 +119,9 @@ struct Struct_00440a70 {
 void SetMemFussyDefault(void);
 void AbortProgram(void);
 
+// Kept: with mission.h, SetPassMapCell (0x4404c0) comes out 59.6% (62 bytes
+// against 60) and RefreshPassMap (0x440830) 72.3% (224 against 242); 0 to 40
+// probes find no matching count.
 class Mission {
 public:
     int GetTerrainLength();
