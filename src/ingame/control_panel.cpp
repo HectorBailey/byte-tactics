@@ -323,7 +323,8 @@ struct Game {
     char unknown_14233[0x14281 - 0x14233];
     unsigned short mapFlags;           // +0x14281
     char unknown_14283[0x142cb - 0x14283];
-    char field_142cb[0x142f1 - 0x142cb]; // +0x142cb, the radar viewport rectangle
+    int minimapViewRect[4];           // +0x142cb, the radar viewport rectangle
+    char unknown_142db[0x142f1 - 0x142db];
     CameraFlags viewDirtyFlags;        // +0x142f1
     Unit* cameraFollowUnit;            // +0x142f3
     Follow_0041ca10* cameraFollowTrackObj;  // +0x142f7
@@ -1586,7 +1587,7 @@ void ClampCameraPosition()
     } else if (g_game->scrollY > maxY) {
         g_game->scrollY = maxY;
     }
-    CalcRadarViewportRect(g_game->field_142cb);
+    CalcRadarViewportRect(g_game->minimapViewRect);
 }
 #pragma auto_inline(on)
 

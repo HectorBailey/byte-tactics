@@ -402,7 +402,7 @@ struct Game {
     void* logos;                       // +0x148d7
     union {                            // +0x148db
         Logos_00445110* logos32;
-        int field_148db;
+        int playerColorLogosSeq;
     };
     char unknown_148df[0x37e1b - 0x148df]; // +0x148df
     int offscreen;                     // +0x37e1b
@@ -3530,7 +3530,7 @@ void __stdcall RefreshAlliesScreen(int param_1)
             Gadget* e2 = FindGadgetChecked_E(entries, logo);
             if (e2 != 0) {
                 e2->visible = 1;
-                e2->hotspotGaf = g_game->field_148db;
+                e2->hotspotGaf = g_game->playerColorLogosSeq;
                 e2->frame = p->info->color;
                 e2->hotspotFlags &= ~1;
             }
@@ -4275,7 +4275,7 @@ void RefreshBattleRoomRows()
             if (e) {
                 e->visible = (p->info->color == 0xff && !ready) ? 0 : 1;
                 e->c8_0 = !ready;
-                e->hotspotGaf = g_game->field_148db;
+                e->hotspotGaf = g_game->playerColorLogosSeq;
                 e->frame = p->info->color;
             }
             sprintf(name, "PLAYER%d", n);

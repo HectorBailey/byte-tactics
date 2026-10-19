@@ -227,7 +227,7 @@ struct Game {
     union {                             // +0x519
         Menu_00497ce0 menu;
         struct {
-            int field_519;
+            int guiRoot;
             int gaf;
             char unknown_521[0x531 - 0x521];
             int field_531;
@@ -938,12 +938,12 @@ void LoadingScreenFrame(void)
 
     if (!g_game->loadingFlags.bits.started) {
         while (g_game->field_531 != 0) {
-            CloseTopScreen(&g_game->field_519);
+            CloseTopScreen(&g_game->guiRoot);
         }
-        DisableKeyCommands(&g_game->field_519);
+        DisableKeyCommands(&g_game->guiRoot);
         if (g_game->cursorMode != 0x14) {
             g_game->cursorMode = 0x14;
-            SetCursorAnimation(&g_game->field_519, (void*)g_game->cursorHourglass);
+            SetCursorAnimation(&g_game->guiRoot, (void*)g_game->cursorHourglass);
         }
         SetFont(g_game->fontComix);
         SetPaletteColors(g_game->paletteRgba, 0, 0x100);
@@ -951,7 +951,7 @@ void LoadingScreenFrame(void)
             SaveSettings();
         }
         while (g_game->field_531 != 0) {
-            CloseTopScreen(&g_game->field_519);
+            CloseTopScreen(&g_game->guiRoot);
         }
         BlankScreen();
         g_game->screenWidth = 0x280;
@@ -969,7 +969,7 @@ void LoadingScreenFrame(void)
         }
         BuildDataPath(aux, "palettes", "guipal", "PAL");
         surfaceHandle = HAPI_LoadFile((unsigned int*)aux, 0);
-        RemapPaletteToClosestIndices(&g_game->field_519, g_game->paletteRgba, surfaceHandle);
+        RemapPaletteToClosestIndices(&g_game->guiRoot, g_game->paletteRgba, surfaceHandle);
         GameFreeThunk(surfaceHandle);
         g_game->lastSimBudgetTick = GetTicks();
         g_game->simStepsPending = 0;

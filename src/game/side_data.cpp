@@ -51,7 +51,7 @@ struct Game {
     char unknown_0[0x148d7];
     union {
         void* logos;                   // +0x148d7
-        int field_148d7;
+        int logosGaf;
     };
     void* logos32;                     // +0x148db
     char unknown_148df[0x37f39 - 0x148df];
@@ -83,9 +83,9 @@ void LoadLogos()
 // FUNCTION: 0x431920
 void FreeLogos(void)
 {
-    int val = g_game->field_148d7;
+    int val = g_game->logosGaf;
     GameFreeThunk((int*)val);
-    g_game->field_148d7 = 0;
+    g_game->logosGaf = 0;
 }
 
 // Parses the x1/y1/x2/y2 fields of the current TDF node into four ints.
