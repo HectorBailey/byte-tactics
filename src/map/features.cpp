@@ -476,8 +476,10 @@ struct Game {
 #pragma pack(pop)
 
 // The reference-counted string handle (StringRef elsewhere). It keeps this
-// view: under /Gi the length of the type's name moves this file's symbol ids,
-// and 0x424050, 0x424840 and 0x424890 only match at the current ones.
+// view: under /Gi the type's name moves this file's symbol ids. As StringRef,
+// place.py builds an exe six bytes off at 0x424988 (SaveFeatures+0xf8);
+// tools/check.py matches the three functions under its own .pdb path, which
+// hides that difference.
 class Class_004c9390 {
 public:
     char* data;                        // +0x0
