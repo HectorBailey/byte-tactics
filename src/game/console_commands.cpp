@@ -292,6 +292,10 @@ public:
     void SubstituteArgs(CommandArgs* other);
 };
 
+// Kept, not sound/sound.h: with the header five functions move, CmdDoubleShot
+// (0x417030) to 28.6%, CmdMakePoster (0x417600) to 42.4%, DrawWorldDeltaLine
+// (0x417c70) to 74.5%, DrawCellContours (0x4181d0) to 95.7% and
+// DrawMapDebugOverlay (0x418310) to 99.6%; include placement does not change it.
 class Sound {
 public:
     void PlayCdTrack(int index, int flag);
