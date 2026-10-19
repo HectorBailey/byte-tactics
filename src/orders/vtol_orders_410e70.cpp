@@ -23,8 +23,22 @@ public:
     void SetFlightMode(Unit* unit, int state);
 };
 
-class Class_0044e6c0 { public: void SetAltitude(int); };
-class Class_0044e730 { public: void SetApproachRadius(short); };
+// Fourteen declarations hold the symbol ids the separate setter views took, after
+// the two methods moved to Class_0044e2d0 (docs/c2-regalloc.md).
+class Filler_410e70_1;
+class Filler_410e70_2;
+class Filler_410e70_3;
+class Filler_410e70_4;
+class Filler_410e70_5;
+class Filler_410e70_6;
+class Filler_410e70_7;
+class Filler_410e70_8;
+class Filler_410e70_9;
+class Filler_410e70_10;
+class Filler_410e70_11;
+class Filler_410e70_12;
+class Filler_410e70_13;
+class Filler_410e70_14;
 
 #pragma pack(push, 1)
 #include "../units/unit_def.h"
@@ -66,6 +80,8 @@ class Class_0044e2d0 {
 public:
     char unknown_0[0x36];
     Class_0044e2d0(Order* order, const Vec3& pos);
+    void SetAltitude(int);
+    void SetApproachRadius(short);
 };
 #pragma pack(pop)
 
@@ -114,7 +130,7 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
     if ((unit->motion->flags & 3) == 1) {
         unit->motion->SetFlightMode(unit, 2);
         Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);
-        ((Class_0044e6c0*)obj)->SetAltitude(unit->def->altitude / 2);
+        obj->SetAltitude(unit->def->altitude / 2);
         order->SetAttachedFx((int)obj);
         order->flags |= flags | 0xe0;
     }
@@ -134,7 +150,7 @@ int __stdcall VtolPatrolOrder(Unit* unit, Order* order, int flags)
         short angle = GetHeadingBetween(&unit->pos, &order->pos);
         Vec3 dest = AddVec3(order->pos, Offset(angle, 0x1400000));
         Class_0044e2d0* obj = new Class_0044e2d0(order, dest);
-        ((Class_0044e730*)obj)->SetApproachRadius(0x150);
+        obj->SetApproachRadius(0x150);
         order->SetAttachedFx((int)obj);
         order->flags |= 0xe0;
         // Landing block stays inline, no helper: the landed path returns 0
