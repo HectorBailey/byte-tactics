@@ -2082,18 +2082,18 @@ StringRef* StringRef::Append(const StringRef& other)
     return this;
 }
 
-// Ten declarations hold the symbol ids the separate Append view took, so the
-// functions after it keep their allocation (docs/c2-regalloc.md).
-class Filler_4c90b0_1;
-class Filler_4c90b0_2;
-class Filler_4c90b0_3;
-class Filler_4c90b0_4;
-class Filler_4c90b0_5;
-class Filler_4c90b0_6;
-class Filler_4c90b0_7;
-class Filler_4c90b0_8;
-class Filler_4c90b0_9;
-class Filler_4c90b0_10;
+// Unused here: real declarations that keep the symbol ids the separate Append
+// view took, so the functions after it keep their allocation (docs/c2-regalloc.md).
+class LosLine;
+class MapCache;
+class MeteorParams;
+class OrderBase;
+class MissionOrderTable;
+struct MovementClassTable;
+class OpenHeap;
+class LandingPadList;
+class AIProfileParser;
+struct FrameTable;
 
 // FUNCTION: 0x4c9180 ??0StringRef@@QAE@XZ
 StringRef::StringRef()
