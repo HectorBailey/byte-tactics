@@ -44,31 +44,7 @@ struct Entry_004898b0 {                // 0x1c bytes
     unsigned char flags;               // +0x1b
 };
 
-// The unit's type.
-struct UnitType {
-    char unknown_0[0x152];
-    int count;                         // +0x152, entries of ids
-    short* ids;                        // +0x156, the unit ids it can build
-    char unknown_15a[0x186 - 0x15a];
-    float energyCost;                  // +0x186
-    float metalCost;                   // +0x18a
-    char unknown_18e[0x192 - 0x18e];
-    int sight;                         // +0x192
-    char unknown_196[0x19e - 0x196];
-    int field_19e;                     // +0x19e
-    char unknown_1a2[0x1aa - 0x1a2];
-    int f1aa;                          // +0x1aa, damage scale as 16.16 fixed point
-    char unknown_1ae[0x1ba - 0x1ae];
-    unsigned short field_1ba;          // +0x1ba
-    char unknown_1bc[0x1ea - 0x1bc];
-    int field_1ea;                     // +0x1ea
-    char unknown_1ee[0x1fa - 0x1ee];
-    unsigned int maxhp;                // +0x1fa
-    char unknown_1fe[0x22f - 0x1fe];
-    unsigned char mobile;              // +0x22f, zero means it has no speeds
-    char unknown_230[0x241 - 0x230];
-    unsigned int f241;                 // +0x241, bits 12 and 26
-};
+#include "unit_def.h"
 
 #include "../util/vec3.h"
 
@@ -104,7 +80,7 @@ public:
         int z;                         // +0x72
     } pos;
     char unknown_76[0x92 - 0x76];
-    UnitType* def;                     // +0x92
+    UnitDef* def;                     // +0x92
     Player* player;                    // +0x96
     CobScript* script;                 // +0x9a
     char unknown_9e[0xa2 - 0x9e];
@@ -174,7 +150,7 @@ static inline float spd(int v)
 }
 
 // FUNCTION: 0x489280
-char* __stdcall MakePropList(UnitType* obj)
+char* __stdcall MakePropList(UnitDef* obj)
 {
     char* buf = (char*)GameAllocIgnoreTag("PropList", 0xc0);
     memset(buf, 0, 0xc0);
@@ -190,23 +166,23 @@ char* __stdcall MakePropList(UnitType* obj)
     wsprintfA(p, "%d", (int)obj->metalCost);
     p += strlen(p) + 1;
 
-    wsprintfA(p, "%d", obj->field_1ea);
+    wsprintfA(p, "%d", obj->buildtime);
     p += strlen(p) + 1;
 
     wsprintfA(p, "\n");
     p += strlen(p) + 1;
 
     if (obj->mobile) {
-        sprintf(p, "%.1f %s ", (double)GetTickRate() * spd(obj->sight) * 0.4,
+        sprintf(p, "%.1f %s ", (double)GetTickRate() * spd(obj->maxvelocity) * 0.4,
                 Translate("m/s"));
         p += strlen(p) + 1;
 
-        sprintf(p, "%.2f %s", (double)GetTickRate() * spd(obj->field_19e) * 0.4,
+        sprintf(p, "%.2f %s", (double)GetTickRate() * spd(obj->acceleration) * 0.4,
                 Translate("m/s/s"));
         p += strlen(p) + 1;
 
         sprintf(p, "%.0f %s",
-                (double)GetTickRate() * obj->field_1ba * 0.0054931640625,
+                (double)GetTickRate() * (unsigned short)obj->turnrate * 0.0054931640625,
                 Translate("deg/s"));
     } else {
         sprintf(p, "%s", Translate("N/A"));
@@ -226,7 +202,7 @@ char* __stdcall MakePropList(UnitType* obj)
 int __stdcall UnitCanBuild(Unit* unit, short id)
 {
     for (int i = 0; i < unit->def->count; i++) {
-        if (unit->def->ids[i] == id)
+        if (((short*)unit->def->ids)[i] == id)  // header has unsigned short*; the original compares signed shorts
             return 1;
     }
     return 0;
@@ -436,7 +412,7 @@ void __stdcall DamageUnit(Unit* source, Unit* target, int amount, int type, unsi
     int dmg;
     if (type != 10) {
         if ((target->activateFlags & 2) && amount < 0x7530)
-            amount = (int)(((__int64)target->def->f1aa * amount) >> 0x10);
+            amount = (int)(((__int64)target->def->damagemodifier * amount) >> 0x10);
         int armour = target->killCount / 5;
         if (armour > 5)
             armour = 5;
@@ -513,8 +489,8 @@ void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
         return;
 
     if (ev->damageKind == 10) {
-        unit->health = (short)((unsigned int)(unit->health + ev->amount) < unit->def->maxhp
-                           ? unit->health + ev->amount : unit->def->maxhp);
+        unit->health = (short)((unsigned int)(unit->health + ev->amount) < unit->def->maxHealth
+                           ? unit->health + ev->amount : unit->def->maxHealth);
         return;
     }
 
@@ -539,7 +515,7 @@ void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
             if (!(unit->flags & 0x4000)) {
                 Player* owner = unit->player;
                 if (owner->active && (owner->type == 1 || owner->type == 2)) {
-                    if (!(unit->def->f241 & 0x4000000)) {
+                    if (!(unit->def->flags1 & 0x4000000)) {
                         MissionType kind(s_paralyze_00508d80);
                         Order* e = unit->list;
                         if (e && e->kind == kind) {
@@ -565,7 +541,7 @@ void __stdcall ApplyUnitDamage(UnitDamagePacket* ev)
             int a = FUN_004b7123(ev->headingByte << 8, 400);
             int b = FUN_004b70ef(ev->headingByte << 8, 400);
             unit->script->StartScriptWithArgs(s_HitByWeapon_00508d74, 0, 0, 2, a, b, 0, 0);
-            int pct = unit->health * 100 / unit->def->maxhp;
+            int pct = unit->health * 100 / unit->def->maxHealth;
             if (pct < 0)
                 pct = 0;
             if (pct > 100)
@@ -592,7 +568,7 @@ void __stdcall ParalyzeUnit(Unit* unit, int ticks)
     if (!owner->active)
         return;
     if (owner->type == 1 || owner->type == 2) {
-        if (!(unit->def->f241 & 0x4000000)) {
+        if (!(unit->def->flags1 & 0x4000000)) {
             MissionType kind("paralyze");
             Order* effect = unit->list;
             if (effect && effect->kind == kind) {
@@ -826,7 +802,7 @@ void __stdcall AlignUnitToGround(Unit* u)
             int H0 = b0 + ((c0 - b0) * fx) / 16;
             int H1 = b1 + ((c1 - b1) * fx) / 16;
             hs[k].wx = wx;
-            if ((u->def->f241 & 0x1000) && (u->flags & 0x10000000)
+            if ((u->def->flags1 & 0x1000) && (u->flags & 0x10000000)
                 && !(u->flags & 0x4000)) {
                 // Stored through the array, then read back into H.
                 hs[k].h = H0 + ((H1 - H0) * fz) / 16;
@@ -835,7 +811,7 @@ void __stdcall AlignUnitToGround(Unit* u)
                 hs[k].h = max(H, sea);
                 // short p and `* 2048`, not `<< 11`: keeps the 0x1f mask and 16-bit add.
                 short p = (short)(((GetTicks() & 0x1f) + k * 8) * 2048 + u->hoverBobPhase);
-                int s = u->def->sight / 2;
+                int s = u->def->maxvelocity / 2;
                 // Owner kept in a local across the 64-bit helper calls.
                 Body_0048a1e0* o = u->motion;
                 int q = o->sight;
