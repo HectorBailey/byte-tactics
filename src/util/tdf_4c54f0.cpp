@@ -15,7 +15,7 @@
 #include <new>
 
 extern char g_language[256];
-extern char DAT_005119b8[];
+extern char g_emptyStringLiteral[];
 
 void __cdecl AllocNotifyNop(int);
 
@@ -163,7 +163,7 @@ void __stdcall LoadTranslations(char* filename, char* section)
             index = 0;
             while (f.SelectRecordAt(index)) {
                 f.current->CopyRecordName(name, 0xff);
-                f.current->GetFieldString(value, g_language, 0xff, DAT_005119b8);
+                f.current->GetFieldString(value, g_language, 0xff, g_emptyStringLiteral);
                 if (strlen(value) != 0) {
                     StringRef key(name);
                     TdfField* e;
@@ -237,7 +237,7 @@ int __stdcall FindTranslation(char* name)
 
 // Looks a key up in a TDF section: builds the key by prepending the current
 // section name (g_language), tries that first and falls back to the plain
-// key. def (or the empty default DAT_005119b8) is the TDF default value.
+// key. def (or the empty default g_emptyStringLiteral) is the TDF default value.
 // file is the open file object, its section parser at +4.
 // FUNCTION: 0x4c58a0
 int __stdcall GetLocalizedString(TdfFile* file, char* dst, char* key, size_t size,
@@ -253,9 +253,9 @@ int __stdcall GetLocalizedString(TdfFile* file, char* dst, char* key, size_t siz
         if (r) return 1;
         return file->current->GetFieldString(dst, key, size, def);
     }
-    r = file->current->GetFieldString(dst, full, size, DAT_005119b8);
+    r = file->current->GetFieldString(dst, full, size, g_emptyStringLiteral);
     if (r) return 1;
-    return file->current->GetFieldString(dst, key, size, DAT_005119b8);
+    return file->current->GetFieldString(dst, key, size, g_emptyStringLiteral);
 }
 
 // The vector<TdfField> helpers are protected: a derived class takes their

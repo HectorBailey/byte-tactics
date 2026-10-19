@@ -424,7 +424,7 @@ AssignFn_004336c0 g_assign_004336c0 = &Outer_004336c0::operator=;
 
 // FUNCTION: 0x4336c0 ??1?$vector@UElem_004336c0@@V?$allocator@UElem_004336c0@@@std@@@std@@QAE@XZ
 
-extern char DAT_005119b8[];
+extern char g_emptyStringLiteral[];
 
 // FUNCTION: 0x4336f0
 void LosLine::LoadLosLine(TdfFile* obj, short line, short mode)
@@ -433,7 +433,7 @@ void LosLine::LoadLosLine(TdfFile* obj, short line, short mode)
     char buf[0x200];
 
     sprintf(name, "line%d", line + 1);
-    if (obj->current->GetFieldString(buf, name, 0x200, DAT_005119b8) != 0) {
+    if (obj->current->GetFieldString(buf, name, 0x200, g_emptyStringLiteral) != 0) {
         char* tok = strtok(buf, ", ");
         if (tok == 0)
             return;

@@ -234,7 +234,7 @@ extern char* g_libraryDateStamp;                                                
 extern char* g_performanceWindowName;                                                                           // 0x50d660, 4 bytes; 1 of 1 files
 extern char g_performanceDialogError[36];                                                                       // 0x50d6b4, 36 bytes; 1 of 1 files
 extern char* g_memoryStatusWindowName;                                                                          // 0x50d72c, 4 bytes; 2 of 2 files
-extern char DAT_005119b8[8];                                                                                    // 0x5119b8, 8 bytes; 32 of 34 files (conflicting: shape)
+extern char g_emptyStringLiteral[8];                                                                            // 0x5119b8, 8 bytes; 32 of 34 files (conflicting: shape)
 extern PlayerAI* g_playerAI[10];                                                                                // 0x5119c0, 40 bytes; 2 of 3 files (conflicting: struct names only)
 extern int g_playerBudgetCap[10];                                                                               // 0x5119e8, 40 bytes; 1 of 1 files
 extern int g_playerTickLoad[10];                                                                                // 0x511a10, 40 bytes; 1 of 1 files
@@ -358,7 +358,7 @@ extern int g_packetModes[45];                                                   
 extern char* g_loungeChatter;                                                                                   // 0x512c74, 4 bytes; 1 of 1 files
 extern int g_loungeRefreshTime;                                                                                 // 0x512c78, 4 bytes; 1 of 1 files
 extern unsigned int g_timeoutTimerStart;                                                                        // 0x512c7c, 4 bytes; 1 of 1 files
-extern unsigned char g_cmdlineDplayProvider[336];                                                                         // 0x512c80, 336 bytes; int in 3 of 4 files (conflicting: shape), but used past its end
+extern unsigned char g_cmdlineDplayProvider[336];                                                               // 0x512c80, 336 bytes; int in 3 of 4 files (conflicting: shape), but used past its end
 extern char g_onlineDllPath[260];                                                                               // 0x512dd0, 260 bytes; 3 of 3 files
 extern unsigned char DAT_00512ed4[20];                                                                          // 0x512ed4, 20 bytes; nothing refers to it
 extern int g_onlineConfigLoaded;                                                                                // 0x512ee8, 4 bytes; 2 of 2 files

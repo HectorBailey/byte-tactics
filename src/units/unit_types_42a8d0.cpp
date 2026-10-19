@@ -190,7 +190,7 @@ static TdfFile* s_weaponTdfParsers;
 static int s_weaponTdfLoadedCount;
 static int s_weaponTdfAllocCount;
 
-extern char DAT_005119b8[];
+extern char g_emptyStringLiteral[];
 
 int FUN_0041d8a0();
 int GetCdPathMismatch();
@@ -303,11 +303,11 @@ int LoadUnitInfo()
                 return 0;
             }
             GetLocalizedString(&parser, u->name, "name", 0x20, 0);
-            parser.GetString(u->unitname, "unitname", 0x20, DAT_005119b8);
-            parser.GetString(u->side, "side", 0x1e, DAT_005119b8);
-            parser.GetString(u->aiWeight, "ai_weight", 0x40, DAT_005119b8);
-            parser.GetString(u->aiLimit, "ai_limit", 0x40, DAT_005119b8);
-            if (parser.GetString(u->objectname, "objectname", 0x20, DAT_005119b8) == 0)
+            parser.GetString(u->unitname, "unitname", 0x20, g_emptyStringLiteral);
+            parser.GetString(u->side, "side", 0x1e, g_emptyStringLiteral);
+            parser.GetString(u->aiWeight, "ai_weight", 0x40, g_emptyStringLiteral);
+            parser.GetString(u->aiLimit, "ai_limit", 0x40, g_emptyStringLiteral);
+            if (parser.GetString(u->objectname, "objectname", 0x20, g_emptyStringLiteral) == 0)
                 strcpy(u->objectname, u->unitname);
             u->buildcostenergy = (float)parser.GetInt("buildcostenergy", 0);
             u->buildcostmetal = (float)parser.GetInt("buildcostmetal", 0);
@@ -367,7 +367,7 @@ int LoadUnitInfo()
     }
     g_game->unitDefCount = count;
     if (oldcount != count && !bad)
-        ShowErrorBox(Translate("Incompatible units found.  They will be ignored.  Please download the latest version of the game."), DAT_005119b8);
+        ShowErrorBox(Translate("Incompatible units found.  They will be ignored.  Please download the latest version of the game."), g_emptyStringLiteral);
     ProtectBlockReadOnly(g_game->unitDefs);
     return 1;
 }

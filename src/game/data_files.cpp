@@ -113,7 +113,7 @@ struct Game {
 #pragma pack(pop)
 
 extern Game* g_game;
-extern char DAT_005119b8[];
+extern char g_emptyStringLiteral[];
 
 void* __cdecl GameAllocIgnoreTag(const char* name, int size);
 void* __cdecl GameReallocTagged(void* block, const char* name, unsigned int size);
@@ -138,7 +138,7 @@ void CheckGpfVersion()
     BuildDataPath(path, "gamedata", "version", "tdf");
     if ((&parser)->LoadFile(path)) {
         if ((&parser)->SelectRecord("Version")) {
-            if (parser.current->GetFieldString(buf, "GPFVersion", 0x40, DAT_005119b8)) {
+            if (parser.current->GetFieldString(buf, "GPFVersion", 0x40, g_emptyStringLiteral)) {
                 found = 1;
                 if (_strcmpi("v3.0", buf) != 0) {
                     OpenMessageBox(g_game->messageBox,
@@ -283,7 +283,7 @@ int __stdcall LoadSoundByName(char* name, const char* file)
     if (name != 0)
         strncpy(g_game->soundNames[g_game->soundCount], name, 0x20);
     else
-        strcpy(g_game->soundNames[g_game->soundCount], DAT_005119b8);
+        strcpy(g_game->soundNames[g_game->soundCount], g_emptyStringLiteral);
     g_game->soundCount++;
     return i;
 }
@@ -509,7 +509,7 @@ void LoadGameResources()
         if (!(&parser)->SelectRecord(buf))
             break;
         // Kept in an int local before the test: gives cmp instead of test.
-        int intgaf = parser.current->GetFieldString(buf, "intgaf", 0x1e, DAT_005119b8);
+        int intgaf = parser.current->GetFieldString(buf, "intgaf", 0x1e, g_emptyStringLiteral);
         if (intgaf != 0) {
             char* side = (char*)LoadAnimGaf(buf);
             if (side) {

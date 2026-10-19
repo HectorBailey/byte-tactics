@@ -22,7 +22,7 @@ extern unsigned char g_perfEnabled;     // profiling is on
 extern unsigned char g_perfDisplayInDebugger;  // reports go to the debugger too
 extern unsigned char g_perfDisplayInWindow;  // reports go to the log
 extern char g_reportIndentText[];       // the indent of the current report
-extern char DAT_005119b8[];             // ""
+extern char g_emptyStringLiteral[];     // ""
 
 // A report for the log: its name and its text.
 class NameKey {
@@ -34,7 +34,7 @@ public:
     {
         name = name_;
         if (!name_)
-            name = DAT_005119b8;
+            name = g_emptyStringLiteral;
         text[0] = 0;
     }
 };

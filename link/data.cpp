@@ -321,7 +321,7 @@ char* g_libraryDateStamp = (char*)"Library date stamp: Jun 30 1998 16:08:53";  /
 char* g_performanceWindowName = (char*)"Performance status";  // 0x50d660 .data
 char g_performanceDialogError[36] = "Performance dialog failed to open";  // 0x50d6b4 .data
 char* g_memoryStatusWindowName = (char*)"Memory Status";  // 0x50d72c .data
-char DAT_005119b8[8];  // 0x5119b8 .bss
+char g_emptyStringLiteral[8];  // 0x5119b8 .bss
 PlayerAI* g_playerAI[10];  // 0x5119c0 .bss
 int g_playerBudgetCap[10];  // 0x5119e8 .bss
 int g_playerTickLoad[10];  // 0x511a10 .bss

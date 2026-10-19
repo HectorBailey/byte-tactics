@@ -4329,7 +4329,7 @@ address,name
 0x50d72c,g_memoryStatusWindowName
 0x50d980,g_pentiumEvents
 0x50da00,g_pentiumProEvents
-0x5119b8,DAT_005119b8
+0x5119b8,g_emptyStringLiteral
 0x5119c0,g_playerAI
 0x5119e8,g_playerBudgetCap
 0x511a10,g_playerTickLoad

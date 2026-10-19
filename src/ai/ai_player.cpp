@@ -567,7 +567,7 @@ public:
 
 extern Game* g_game;
 extern int g_aiCommandsEnabled;
-extern char DAT_005119b8[];
+extern char g_emptyStringLiteral[];
 extern PlayerAI* g_playerAI[];
 
 void __stdcall ScaleUnitWeights(int player, UnitTypeSet* set, float value, int count);
@@ -695,10 +695,10 @@ void __stdcall CmdPlan(CommandArgs* args)
 {
     g_aiCommandsEnabled = 0;
     for (int i = 1; i < args->count; ++i) {
-        if (!_strcmpi(args->GetArg(1, DAT_005119b8), "any")) g_aiCommandsEnabled = 1;
-        if (g_game->difficulty == 0 && !_strcmpi(args->GetArg(i, DAT_005119b8), "easy")) g_aiCommandsEnabled = 1;
-        if (g_game->difficulty == 1 && !_strcmpi(args->GetArg(i, DAT_005119b8), "medium")) g_aiCommandsEnabled = 1;
-        if (g_game->difficulty == 2 && !_strcmpi(args->GetArg(i, DAT_005119b8), "hard")) g_aiCommandsEnabled = 1;
+        if (!_strcmpi(args->GetArg(1, g_emptyStringLiteral), "any")) g_aiCommandsEnabled = 1;
+        if (g_game->difficulty == 0 && !_strcmpi(args->GetArg(i, g_emptyStringLiteral), "easy")) g_aiCommandsEnabled = 1;
+        if (g_game->difficulty == 1 && !_strcmpi(args->GetArg(i, g_emptyStringLiteral), "medium")) g_aiCommandsEnabled = 1;
+        if (g_game->difficulty == 2 && !_strcmpi(args->GetArg(i, g_emptyStringLiteral), "hard")) g_aiCommandsEnabled = 1;
     }
 }
 
@@ -722,7 +722,7 @@ void __stdcall CmdWeight(CommandArgs* args)
         int count;
         UnitTypeSet set;
         memset(&set, 0, sizeof(set));
-        set.AddTypeOrCategory(args->GetArg(1, DAT_005119b8), &count);
+        set.AddTypeOrCategory(args->GetArg(1, g_emptyStringLiteral), &count);
         float value = args->GetFloatArg(2, 0);
         // A narrow index, as in 0x406e40: MSVC then counts the loop down in a
         // separate register.
@@ -741,7 +741,7 @@ void __stdcall CmdLimit(CommandArgs* args)
         int count;
         UnitTypeSet set;
         memset(&set, 0, sizeof(set));
-        set.AddTypeOrCategory(args->GetArg(1, DAT_005119b8), &count);
+        set.AddTypeOrCategory(args->GetArg(1, g_emptyStringLiteral), &count);
         int value = args->GetIntArg(2, 0);
         // A narrow index: MSVC then counts the loop down in a separate
         // register instead of testing the player offset.

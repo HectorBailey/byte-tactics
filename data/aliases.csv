@@ -76,3 +76,4 @@ StringRef::StringRef,0x4c91a0,"the copy constructor, the same class as 0x4c9180;
 StringRef::StringRef,0x4c91b0,"the constructor from text, the same class as 0x4c9180; the overloads share one name in data/symbols.csv, so callers of this one resolve here"
 StringRef::StringRef,0x4c9230,"the constructor from text and a length, the same class as 0x4c9180; the overloads share one name in data/symbols.csv, so callers of this one resolve here"
 Class_004c9390::ReleaseRef,0x4c9390,"the string handle's release under the view class src/map/features.cpp keeps (its /Gi symbol ids depend on the name's length); the handle is StringRef elsewhere"
+??_C@_00A@?$AA@,0x5119b8,"the empty string literal; the CRT and STL code reference it under this generated spelling, and the tree also spells the address g_emptyStringLiteral"

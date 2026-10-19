@@ -152,7 +152,7 @@ char* __stdcall Translate(char* text);
 void __stdcall DrawButton(Dialog* param_1, int param_2);
 void __stdcall SelectAdjacentGadget(Dialog* menu, int value);
 
-extern char DAT_005119b8[];
+extern char g_emptyStringLiteral[];
 
 static inline int FindEntry(Entry_0049f8c0* entries, char* name)
 {
@@ -399,7 +399,7 @@ Entry_0049f8c0* __stdcall FindGadgetChecked_B(Entry_0049f8c0* entries, char* nam
 // FUNCTION: 0x4a0090
 void __stdcall UpdateHelpText(Dialog* obj)
 {
-    char* text = DAT_005119b8;
+    char* text = g_emptyStringLiteral;
     if (obj->index != -1) {
         obj->used = obj->index;
         text = obj->holder->entries[obj->index].key;
@@ -4273,7 +4273,7 @@ struct Point {                          // 24 bytes, copied with rep movsd
 #pragma pack(pop)
 
 extern char DAT_00502a20[];
-extern char DAT_005119b8[];
+extern char g_emptyStringLiteral[];
 extern int DAT_0051fbac;
 extern int DAT_0051fbb0;
 extern int DAT_0051fbb4;
@@ -6447,7 +6447,7 @@ static inline void SelectCurrentByName(Gui* menu, Gadget* entries, int sel)
 // The real UpdateHelpText (0x4a0090), inlined here by /Ob2.
 static inline void UpdateHelpText(Gui* obj)
 {
-    char* text = DAT_005119b8;
+    char* text = g_emptyStringLiteral;
     if (obj->hoverGadgetIndex != -1) {
         obj->prevHoverGadget = obj->hoverGadgetIndex;
         text = obj->layer->entries[obj->hoverGadgetIndex].helpKey;

@@ -181,7 +181,7 @@ struct Game {
 
 extern Game* g_game;
 extern char g_pathSepBackslash[];
-extern char DAT_005119b8[];
+extern char g_emptyStringLiteral[];
 
 int __stdcall FindGadgetIndexBySubstring(int value, const char* name);
 void __stdcall ClearGroupStatus(Gui* gui, int handle);
@@ -288,7 +288,7 @@ void __stdcall BuildScreenshotPath(char* out, const char* dir, const char* name,
             needSep = true;
         }
     }
-    sprintf(out, "%s%s%s*.%s", dir, needSep ? g_pathSepBackslash : DAT_005119b8, name, ext);
+    sprintf(out, "%s%s%s*.%s", dir, needSep ? g_pathSepBackslash : g_emptyStringLiteral, name, ext);
     int handle = HAPI_FindFirst(out, &fd, -1, 1);
     if (handle >= 0) {
         do {
@@ -299,7 +299,7 @@ void __stdcall BuildScreenshotPath(char* out, const char* dir, const char* name,
         } while (HAPI_FindNext(handle, &fd) == 0);
         HAPI_FindClose(handle);
     }
-    sprintf(out, "%s%s%s%04i.%s", dir, needSep ? g_pathSepBackslash : DAT_005119b8, name, max + 1, ext);
+    sprintf(out, "%s%s%s%04i.%s", dir, needSep ? g_pathSepBackslash : g_emptyStringLiteral, name, max + 1, ext);
 }
 
 // Screenshot writer: renders the map in screen-sized tiles into an offscreen

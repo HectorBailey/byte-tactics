@@ -26,7 +26,7 @@ struct State_004be320 {
     int itemCount;                  // +0x61c
 };
 
-extern char DAT_005119b8[];
+extern char g_emptyStringLiteral[];
 
 State_004be320* GetDisplay(void);
 void __stdcall HAPI_ClearShadowFlags(ArchiveDirectory* list);
@@ -45,6 +45,6 @@ void HAPI_ResolveShadowedFiles(void)
                     HAPI_ClearShadowFlags(list->entries[j].dir);
             }
         }
-        HAPI_MarkShadowedFiles(DAT_005119b8, -1, 1);
+        HAPI_MarkShadowedFiles(g_emptyStringLiteral, -1, 1);
     }
 }
