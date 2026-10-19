@@ -4519,6 +4519,7 @@ void __stdcall DrawLabel(Gui* obj, int index)
 
     if (entries[index].flag_148 & 1) {
         Gadget* entries2 = obj->layer->entries;
+        // Calling GetGadgetRect_inlined here drops DecrementKnobPos (0x4a96d0) to 86.8%.
         Rect rect2;
         if (entries2[index].type == 0) {
             rect2.left = 0;
@@ -4607,6 +4608,7 @@ void __stdcall DrawGadgetGlyph(Gui* obj, int index)
     if (glyph == 0)
         return;
     // One struct local, not four scalars: keeps right/bottom stored and the frame size.
+    // Calling GetGadgetRect_inlined here drops DecrementKnobPos (0x4a96d0) to 86.8%.
     Rect rect;
     if (e->type == 0) {
         rect.left = 0;
@@ -4643,6 +4645,7 @@ void __stdcall DrawButton(Gui* menu, int index)
     void* surface;
     Gadget* me;
     // Declaration order matters: rect before flagy and t, textw last.
+    // Calling GetGadgetRect_inlined here drops DecrementKnobPos (0x4a96d0) to 86.8%.
     Rect rect;
     int x;
     int width;
