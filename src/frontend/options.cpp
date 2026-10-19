@@ -455,7 +455,7 @@ struct Object_0045da90 {
 struct Object_0045de30 {
     char unknown_0[4];
     Gadget* entries;           // +0x04
-    void (__stdcall *fn)(void* obj, int arg);   // +0x08
+    void (__stdcall *fn)(Object_0045da90* obj);   // +0x08
 };
 
 struct Menu_0045de30 {
@@ -483,7 +483,7 @@ struct Menu_0045e5e0 {
 struct Object_0045ed50 {
     char unknown_0[4];
     Gadget* entries;           // +0x04
-    void (__stdcall* fn)(void* obj, int arg);   // +0x08
+    void (__stdcall* fn)(Gui* gui);   // +0x08
 };
 
 struct Rule_0045f1d0 {                 // 0x18 bytes, the record g_game->options is
@@ -819,8 +819,10 @@ void __stdcall HandleGammaSlider(Menu_0045b800* obj, int unused);
 void __stdcall HandleMusicOptionsClick(int value);
 void __stdcall HandleMusicVolumeSlider(Menu_0045b800* obj, int unused);
 void __stdcall HandleEffectsVolumeSlider(Menu_0045b800* obj, int unused);
-void __stdcall HandleSoundOptionsClick(void* obj, int arg);
-void __stdcall HandleSpeedOptionsClick(void* obj, int arg);
+// Unused here: real functions declared to keep the file's symbol count.
+void __stdcall CopyDwordPair(int* dest, int* src);
+void __stdcall CopyOneByte(char* dest, char* src);
+void __stdcall UpdatePlayerAI(int player);
 void __stdcall HandleGameSpeedSlider(Menu_0045b800* obj, int unused);
 void __stdcall HandleScreenSlider(Menu_0045b800* obj, int unused);
 void __stdcall HandleMaxLinesSlider(Menu_0045b800* obj, int unused);

@@ -775,7 +775,7 @@ public:
 
 extern int g_errorLogWritten;
 
-char __cdecl AvWriteDetectStub();
+char __cdecl AvWriteDetectStub(unsigned long);
 char* __cdecl GetExceptionName(unsigned long code);
 void __cdecl NormalizeLineEndings(char* buf, int size);
 void __cdecl FormatSystemInfo(char* dst, int size);
