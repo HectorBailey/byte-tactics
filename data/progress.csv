@@ -1707,7 +1707,7 @@ address,size,file,symbol,status,similarity
 0x47fd70,557,src/sound/sound.cpp,?PlaySpeech@SpeechQueue@@QAEXHHH@Z,matched,100.0
 0x47ffa0,123,src/sound/sound.cpp,?RemoveSpeechAt@SpeechQueue@@QAEXH@Z,matched,100.0
 0x480020,160,src/sound/sound.cpp,?RemoveSpeechOfId@SpeechQueue@@QAEXPAUUnit@@@Z,matched,100.0
-0x4800c0,60,src/sound/sound.cpp,?EraseSwapBack@Class_004800c0@@QAEPAPAUUnit@@PAPAU2@@Z,matched,100.0
+0x4800c0,60,src/sound/sound.cpp,?EraseSwapBack@UnitVectorHolder@@QAEPAPAUUnit@@PAPAU2@@Z,matched,100.0
 0x480100,93,src/sound/sound.cpp,?EraseByValue@IntDynArray@@QAEHH@Z,matched,100.0
 0x480160,42,src/sound/sound.cpp,??0Squad@@QAE@HH@Z,matched,100.0
 0x480190,86,src/units/squads.cpp,?CreateSquads@@YGXPAUPlayerView@@@Z,matched,100.0

@@ -820,7 +820,7 @@ void SpeechQueue::RemoveSpeechOfId(Unit* unit)
 #include <vector>
 #include <algorithm>
 
-class Class_004800c0 {
+class UnitVectorHolder {
 public:
     typedef std::vector<Unit*> UnitVector;
     UnitVector units;       // allocator +0x0, _First +0x4, _Last +0x8, _End +0xc
@@ -833,7 +833,7 @@ public:
 // remain) and returns where, which now holds the moved element. The only
 // caller (0x40b8b2) passes a slot of this same vector.
 // FUNCTION: 0x4800c0
-Class_004800c0::UnitVector::iterator Class_004800c0::EraseSwapBack(UnitVector::iterator where)
+UnitVectorHolder::UnitVector::iterator UnitVectorHolder::EraseSwapBack(UnitVector::iterator where)
 {
     UnitVector::iterator last = units.end() - 1;
     *where = *last;

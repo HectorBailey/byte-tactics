@@ -1695,7 +1695,7 @@ address,name
 0x47fd70,SpeechQueue::PlaySpeech
 0x47ffa0,SpeechQueue::RemoveSpeechAt
 0x480020,SpeechQueue::RemoveSpeechOfId
-0x4800c0,Class_004800c0::EraseSwapBack
+0x4800c0,UnitVectorHolder::EraseSwapBack
 0x480100,IntDynArray::EraseByValue
 0x480160,Squad::Squad
 0x480190,CreateSquads
