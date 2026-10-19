@@ -11,6 +11,7 @@ void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 #include "cob_script.h"
 
 #include "../map/cell.h"
+#include "../util/vec3.h"
 
 struct Point16_437840 {
     short x;
@@ -104,14 +105,10 @@ struct List_458810 {
 };
 #pragma pack(pop)
 
-struct Vec3_458810;
-
 class UnitTable {
 public:
     int BuildObjectPicture(List_458810* list, int param_2, int param_3);
 };
-
-struct Vec3_458810 { int x; int y; int z; };
 
 struct State_0045a790 {
     char unknown_0[0x14];
@@ -142,18 +139,18 @@ public:
     int AllocTwoPlaneBitmap(GafFrame** handle, int w, int h);
     void FlushCache();
     void ReleaseHandle(int id);
-    void DrawObjectState(List_458810* list, Vec3_458810* result);
+    void DrawObjectState(List_458810* list, Vec3* result);
     void CopyPicture(GafFrame* source);
     void BuildShadow(State_0045a790* obj, GafFrame* dest);
-    void DrawPiece(List_458810* list, Vec3_458810* param_2, void* param_3,
+    void DrawPiece(List_458810* list, Vec3* param_2, void* param_3,
         PieceInfo_458810* info, Vertex_458810* vertices, unsigned char kind, int visible);
-    void DrawObjectPicture(void* param_1, List_458810* list, Vec3_458810 coords, int visible);
-    void DrawObjectPieces(Vec3_458810* result, List_458810* list, Vec3_458810 v, int visible);
+    void DrawObjectPicture(void* param_1, List_458810* list, Vec3 coords, int visible);
+    void DrawObjectPieces(Vec3* result, List_458810* list, Vec3 v, int visible);
     void MeasureShadow(int* w, int* h, int* x, int* y, void* obj);
     void DrawShadowShape(GafFrame* img, void* obj);
 };
 
-void CMemoryCache::DrawObjectPieces(Vec3_458810* result, List_458810* list, Vec3_458810 v, int visible)
+void CMemoryCache::DrawObjectPieces(Vec3* result, List_458810* list, Vec3 v, int visible)
 {
     if (list->bitmap != 0) {
         DrawObjectPicture(result, list, v, visible);
@@ -409,7 +406,7 @@ int __stdcall GetHandleSize(int param_1)
 }
 
 // FUNCTION: 0x458810
-void CMemoryCache::DrawObjectState(List_458810* list, Vec3_458810* result)
+void CMemoryCache::DrawObjectState(List_458810* list, Vec3* result)
 {
     int rebuild = 0;
     int x = g_game->scrollX << 16;
@@ -449,7 +446,7 @@ void CMemoryCache::DrawObjectState(List_458810* list, Vec3_458810* result)
         list->shadow = 0;
         this->BuildObjectPicture(list, 0, 1);
     }
-    Vec3_458810 coords;
+    Vec3 coords;
     coords.x = x;
     coords.z = z;
     DrawObjectPieces(result, list, coords, visible);
