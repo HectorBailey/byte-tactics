@@ -279,6 +279,11 @@ struct Sub_0044e190 {
     int range;                         // +0xdc
 };
 
+// Kept, not units/unit_def.h: with the header five functions miss,
+// AppendGoalCell 98.9%, ApproxDistExcess 77.6%, ApproxDist 98.9%,
+// PathOrder::FillWorldPos 99.2% and SetPathOrder 99.3%, and 0 to 100 one-id
+// probes never match all five at one count. The +0x241 flag22 test must also
+// stay a 1-bit field, which the header's flags1 lacks.
 #pragma pack(push, 1)
 struct UnitDef {
     char unknown_0[0x21c];

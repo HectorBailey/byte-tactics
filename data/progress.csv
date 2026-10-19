@@ -1824,7 +1824,7 @@ address,size,file,symbol,status,similarity
 0x488fb0,649,src/units/unit_commands.cpp,?insert@?$vector@VUnitCategory@@V?$allocator@VUnitCategory@@@std@@@std@@QAEXPAVUnitCategory@@IABV3@@Z,matched,100.0
 0x489240,27,src/units/unit_commands.cpp,?AssignCategory@UnitCategory@@QAEPAXPAH@Z,matched,100.0
 0x489260,27,src/units/unit_commands.cpp,??0UnitCategory@@QAE@ABV0@@Z,matched,100.0
-0x489280,618,src/units/unit_targets.cpp,?MakePropList@@YGPADPAUUnitType@@@Z,matched,100.0
+0x489280,618,src/units/unit_targets.cpp,?MakePropList@@YGPADPAVUnitDef@@@Z,matched,100.0
 0x4894f0,68,src/units/unit_targets.cpp,?UnitCanBuild@@YGHPAVUnit@@F@Z,matched,100.0
 0x489540,49,src/units/unit_targets.cpp,?LinkToUnit@UnitRef@@QAEXPAVUnit@@@Z,matched,100.0
 0x489580,53,src/units/unit_targets.cpp,?UnlinkFromUnit@UnitRef@@QAEXXZ,matched,100.0
