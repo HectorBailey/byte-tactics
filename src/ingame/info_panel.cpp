@@ -174,12 +174,12 @@ struct Team_004689c0 {                 // 347 bytes
 
 struct Sub_004679a0_a {
     char unknown_0[1];
-    int field_1;                       // +0x01
+    int energyAmountDisp;              // +0x01
     char unknown_5[0xd - 0x5];
-    int field_d;                       // +0x0d
+    int metalAmountDisp;               // +0x0d
     char unknown_11[0x19 - 0x11];
-    int field_19;                      // +0x19
-    int field_1d;                      // +0x1d
+    int energyStorage;                 // +0x19
+    int metalStorage;                  // +0x1d
 };
 
 struct Sub_004679a0_b {
@@ -537,7 +537,7 @@ void SonarJamVisitor::ApplySonarJamFlag(Unit* unit)
 void LoadLightBar()
 {
     Sub_004679a0_a* a = &g_game->resources;
-    a->field_1 = a->field_d = a->field_19 = a->field_1d = 0;
+    a->energyAmountDisp = a->metalAmountDisp = a->energyStorage = a->metalStorage = 0;
     Sub_004679a0_b* b = &g_game->selectionInfoCache;
     b->field_30 = 0;
     b->lightbar = 0;
