@@ -340,7 +340,10 @@ struct PlayerData {
     unsigned char flags;               // +0x97
 };
 
-// Kept: Player::info's view collides with the local PlayerInfo used for Unit::info.
+// Kept: including network/player.h and player_info.h moves the three /Gi
+// functions 0x424050, 0x424840 and 0x424890 (place.py is six bytes off at
+// 0x424988, SaveFeatures+0xf8); 0 to 400 one-id probes do not recover them.
+// Unit::info at +0x96 is this Player-slot view, not PlayerInfo.
 struct Player {
     int active;                        // +0x0
     char unknown_4[0x23];
@@ -350,14 +353,14 @@ struct Player {
     char unknown_74[0xd7];
 };
 
-struct PlayerInfo {
+struct PlayerSlot {
     char unknown_0[4];
     int id;                            // +0x4
 };
 
 struct Unit {
     char unknown_0[0x96];
-    PlayerInfo* info;                  // +0x96
+    PlayerSlot* info;                  // +0x96
     char unknown_9a[0xbc - 0x9a];
     float energy;                      // +0xbc
     char unknown_c0[0xd4 - 0xc0];
