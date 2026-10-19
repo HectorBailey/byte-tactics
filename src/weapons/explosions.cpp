@@ -134,6 +134,10 @@ struct Size {
     int z;                             // +0x10
 };
 
+// Kept, not network/player.h with player_info.h: with both headers and 14
+// one-id probes, 16 of 17 functions match under place.py's path, but
+// DrawExplodedPieceFaces (0x4211d0) stays two bytes short (87.3%) in its
+// vertex-projection loop, and 0 to 40 probes do not recover it.
 struct PlayerInfoView {
     char unknown_0[0x96];
     unsigned char color;               // +0x96
