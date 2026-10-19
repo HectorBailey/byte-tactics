@@ -21,24 +21,24 @@ struct Vec3 {
 struct Unit;
 class UnitMotion { public: char pad0[0x2e]; unsigned char flags; void SetFlightMode(Unit*,int); };
 
-// Fourteen declarations hold the symbol ids the two setter views took, after their
-// methods moved to Class_0044e2d0 (docs/c2-regalloc.md).
-class Filler_414380_1;
-class Filler_414380_2;
-class Filler_414380_3;
-class Filler_414380_4;
-class Filler_414380_5;
-class Filler_414380_6;
-class Filler_414380_7;
-class Filler_414380_8;
-class Filler_414380_9;
-class Filler_414380_10;
-class Filler_414380_11;
-class Filler_414380_12;
-class Filler_414380_13;
-class Filler_414380_14;
-class Filler_414380_15;
-class Filler_414380_16;
+// Unused here: real declarations that keep the symbol ids the separate setter
+// views took, after their methods moved to Class_0044e2d0 (docs/c2-regalloc.md).
+struct Amount;
+struct Blk;
+struct Packet;
+class LosLine;
+class MapCache;
+class MeteorParams;
+class OrderBase;
+class MissionOrderTable;
+struct MovementClassTable;
+class OpenHeap;
+class LandingPadList;
+class AIProfileParser;
+struct FrameTable;
+class AssaultTimer;
+class EscortTimer;
+class SquadScoutTimer;
 class Class_0044e720 { public: void SetHeading(int); };
 class MissionType { public: unsigned char index; MissionType(const char*); };
 

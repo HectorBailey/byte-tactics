@@ -64,22 +64,22 @@ public:
 struct Game { char pad0[0x1422b]; int width, height; char pad14233[0x142b7-0x14233]; int overflowBucket; };
 #pragma pack(pop)
 extern Game* g_game;
-// Fourteen declarations hold the symbol ids the two setter views took, after their
-// methods moved to Class_0044e2d0 (docs/c2-regalloc.md).
-class Filler_4103e0_1;
-class Filler_4103e0_2;
-class Filler_4103e0_3;
-class Filler_4103e0_4;
-class Filler_4103e0_5;
-class Filler_4103e0_6;
-class Filler_4103e0_7;
-class Filler_4103e0_8;
-class Filler_4103e0_9;
-class Filler_4103e0_10;
-class Filler_4103e0_11;
-class Filler_4103e0_12;
-class Filler_4103e0_13;
-class Filler_4103e0_14;
+// Unused here: real declarations that keep the symbol ids the separate setter
+// views took, after their methods moved to Class_0044e2d0 (docs/c2-regalloc.md).
+struct Amount;
+struct Blk;
+struct Packet;
+class LosLine;
+class MapCache;
+class MeteorParams;
+class OrderBase;
+class MissionOrderTable;
+struct MovementClassTable;
+class AIProfileParser;
+struct FrameTable;
+class SquadScoutTimer;
+class SpatialTimer;
+struct Account_004b4d70;
 void __stdcall AttachUnitToPiece(Unit*, Unit*, char, char);
 short __stdcall GetHeadingBetween(Vec3*, Vec3*);
 union Fixed { int value; struct { unsigned short frac; short whole; } parts; };

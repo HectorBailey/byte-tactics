@@ -28,22 +28,22 @@ public:
     void SetFlightMode(Unit* unit, int state);
 };
 
-// Fourteen declarations hold the symbol ids the separate setter views took, after
-// the two methods moved to Class_0044e2d0 (docs/c2-regalloc.md).
-class Filler_412710_1;
-class Filler_412710_2;
-class Filler_412710_3;
-class Filler_412710_4;
-class Filler_412710_5;
-class Filler_412710_6;
-class Filler_412710_7;
-class Filler_412710_8;
-class Filler_412710_9;
-class Filler_412710_10;
-class Filler_412710_11;
-class Filler_412710_12;
-class Filler_412710_13;
-class Filler_412710_14;
+// Unused here: real declarations that keep the symbol ids the separate setter
+// views took, after their methods moved to Class_0044e2d0 (docs/c2-regalloc.md).
+struct Amount;
+struct Blk;
+struct Packet;
+class LosLine;
+class MapCache;
+class MeteorParams;
+class OrderBase;
+class MissionOrderTable;
+struct MovementClassTable;
+class OpenHeap;
+class AIProfileParser;
+struct FrameTable;
+class AssaultTimer;
+class EscortTimer;
 
 #pragma pack(push, 1)
 struct UnitDef {
