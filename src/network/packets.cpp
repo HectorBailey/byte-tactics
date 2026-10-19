@@ -290,8 +290,8 @@ public:
 
 struct Msg_00461900 {
     char unknown_0[0x10];
-    int field_10;                      // +0x10
-    int field_14;                      // +0x14
+    int value;                         // +0x10
+    int dpid;                          // +0x14
 };
 
 class PacketManager {
@@ -598,13 +598,13 @@ int PacketManager::SendAllQueued(int force)
     return 1;
 }
 
-// Puts one dword (the message's field_10, or -1 when field_14 is set) in the
+// Puts one dword (the message's value, or -1 when dpid is set) in the
 // send buffer and sends it; the send is the body of SendToDPID, inlined.
 // FUNCTION: 0x461900
 int PacketManager::SendFrameState(int from, Msg_00461900* msg)
 {
-    *(int*)buffer = msg->field_14 ? -1 : msg->field_10;
-    SendTo(from, msg->field_14, buffer, size);
+    *(int*)buffer = msg->dpid ? -1 : msg->value;
+    SendTo(from, msg->dpid, buffer, size);
     size = buffer ? 4 : 0;
     return 1;
 }

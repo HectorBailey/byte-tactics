@@ -86,9 +86,9 @@ struct Unit_459200 {
 };
 
 struct Piece_459200 {
-    int field_0;                       // +0x0
+    int modelPiece;                    // +0x0
     char unknown_4[0x22 - 0x4];
-    int field_22;                      // +0x22
+    int pointList;                     // +0x22
     char unknown_26[2];
     unsigned short flags;              // +0x28
     char unknown_2a[0x36 - 0x2a];
@@ -271,8 +271,8 @@ void CMemoryCache::DrawObjectPicture(int param_2, Model_459200* model, Vec3_4592
             DrawFrameBlended(param_2, bmp, v.p.x.whole + 0x80, z);
         for (int i = model->count - 1; i >= 0; i--) {
             if ((1 & model->pieces[i].flags) && !(model->pieces[i].flags & 2)) {
-                    DrawPiece(model, param_2, &cv, model->pieces[i].field_0,
-                                 model->pieces[i].field_22, model->owner->playerIndex, useColor);
+                    DrawPiece(model, param_2, &cv, model->pieces[i].modelPiece,
+                                 model->pieces[i].pointList, model->owner->playerIndex, useColor);
                 }
         }
         Unit_459200* unit = model->owner->cargo;
@@ -281,7 +281,7 @@ void CMemoryCache::DrawObjectPicture(int param_2, Model_459200* model, Vec3_4592
                 for (int i = unit->state->count - 1; i >= 0; i--) {
                     Piece_459200* piece = &unit->state->pieces[i];
                     if (piece->flags & 1) {
-                        DrawPiece(unit->state, param_2, &cv, piece->field_0, piece->field_22,
+                        DrawPiece(unit->state, param_2, &cv, piece->modelPiece, piece->pointList,
                                      unit->state->owner->playerIndex, useColor);
                     }
                 }
