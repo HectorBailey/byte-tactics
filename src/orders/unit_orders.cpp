@@ -1157,8 +1157,7 @@ struct FeatureSpot {
 
 #include "../map/cell.h"
 
-// Kept: with mission.h, ReclaimUnitOrder (0x404730) is 89.0% and HelpBuildOrder
-// (0x403f70) 78.7% (756 bytes against 768); 0 to 60 probes find no match.
+// Kept, not mission.h: the header moves ReclaimUnitOrder (0x404730) and HelpBuildOrder (0x403f70).
 class Mission {
 public:
     int GetGameType();

@@ -340,9 +340,7 @@ struct PlayerData {
     unsigned char flags;               // +0x97
 };
 
-// Kept: including network/player.h and player_info.h moves the three /Gi
-// functions 0x424050, 0x424840 and 0x424890 (place.py is six bytes off at
-// 0x424988, SaveFeatures+0xf8); 0 to 400 one-id probes do not recover them.
+// Kept, not network/player.h with player_info.h: the headers move the three /Gi functions 0x424050, 0x424840 and 0x424890.
 // Unit::info at +0x96 is this Player-slot view, not PlayerInfo.
 struct Player {
     int active;                        // +0x0
