@@ -1966,13 +1966,7 @@ struct Object_004a2580 {
     char unknown_0[0x18];
     Holder_004a2580* holder;           // +0x18
     char unknown_1c[0x8b2 - 0x1c];
-    unsigned char field_8b2;           // +0x8b2
-    char unknown_8b3[0x8c1 - 0x8b3];
-    unsigned char field_8c1;           // +0x8c1
-    char unknown_8c2[0x8c3 - 0x8c2];
-    unsigned char field_8c3;           // +0x8c3
-    char unknown_8c4[0x8c6 - 0x8c4];
-    unsigned char field_8c6;           // +0x8c6
+    unsigned char hudPaletteIndices[256]; // +0x8b2, GuiRoot's palette remap output
 };
 
 struct Font_004a2580 {
@@ -2058,8 +2052,8 @@ void __stdcall DrawSliderBar(Object_004a2580* obj, int index)
 
     GafEntry* gl = e->sliderGaf;
     if (gl == 0) {
-        DrawRaisedBox(surface, r1, obj->field_8b2, obj->field_8c3, obj->field_8c6);
-        DrawSunkenBox(surface, r2, obj->field_8b2, obj->field_8c3, obj->field_8c6);
+        DrawRaisedBox(surface, r1, obj->hudPaletteIndices[0], obj->hudPaletteIndices[0x11], obj->hudPaletteIndices[0x14]);
+        DrawSunkenBox(surface, r2, obj->hudPaletteIndices[0], obj->hudPaletteIndices[0x11], obj->hudPaletteIndices[0x14]);
     } else {
         short w = e->width;
         short h = e->height;
@@ -2129,7 +2123,7 @@ void __stdcall DrawSliderBar(Object_004a2580* obj, int index)
 
     if (e->attribs & 4) {
         int cur = GetTextKeyColor();
-        SetTextColors(obj->field_8c1, cur);
+        SetTextColors(obj->hudPaletteIndices[0xf], cur);
         char buf[0x10];
         // Original bug, kept as it is: the copy at 0x4a2a26 (strlen with repne
         // scasb, then rep movsd/rep movsb) is unbounded and the source field runs

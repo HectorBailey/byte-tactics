@@ -608,8 +608,8 @@ struct FreeObj_0045e100 {
 struct Menu_004604a0 {
     int unknown_0;
     int unknown_4;
-    int field_8;
-    int field_c;
+    int fontSlot0;                    // +0x8, GuiRoot pFontSlot0
+    int fontSlot1;                    // +0xc, GuiRoot pFontSlot1
     int unknown_10;
     int language;                     // +0x14
     char unknown_18[0x1c - 0x18];
@@ -2683,11 +2683,11 @@ void OpenRestartDialog()
     dialog->handler = HandleRestartDialogClick;
     LoadPictureCached("drestart", 0, 0, 0);
     int index = FindGadgetIndex(gadgets, "MISSIONNAME", 5);
-    menu->language = menu->field_c;
+    menu->language = menu->fontSlot1;
     char* text = WordWrapText((Menu_004604a0*)&g_game->gui,
                               g_game->mapInfo->GetMissionName(),
                               gadgets[index].width, -1);
-    menu->language = menu->field_8;
+    menu->language = menu->fontSlot0;
     char* first = strtok(text, "\n");
     SetTranslatedTextByName((Menu_004604a0*)&g_game->gui, "MISSIONNAME", (int)first, 0x80);
     char* second = strtok(0, "\n");
