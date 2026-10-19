@@ -2760,7 +2760,9 @@ struct Holder_004a3780 {
     int selected;                      // +0x20
 };
 
-struct Rect_004a3780 { int x0, y0, x1, y1; };
+// Unused here: the symbol ids this declaration takes keep the allocation after
+// the Rect_004a3780 view was dropped (docs/c2-regalloc.md).
+int LowerBoundOrderTypes(int, int, int, int, int, int);
 
 struct Point_004a3780 {                // 0x18 bytes, copied with rep movsd x6
     int x;                             // +0x00
@@ -2770,9 +2772,9 @@ struct Point_004a3780 {                // 0x18 bytes, copied with rep movsd x6
 
 // True when the point lies inside the rect, edges included (the body of IsPointInRect
 // at 0x4a1920, which the compiler inlined here).
-static inline int PointInListRect(const Rect_004a3780& r, const Point_004a3780& p)
+static inline int PointInListRect(const Rect& r, const Point_004a3780& p)
 {
-    return p.x >= r.x0 && p.x <= r.x1 && p.y >= r.y0 && p.y <= r.y1;
+    return p.x >= r.left && p.x <= r.right && p.y >= r.top && p.y <= r.bottom;
 }
 
 struct Object_004a3780 {
@@ -2857,13 +2859,13 @@ int __stdcall HandleListBoxInput(Object_004a3780* obj, int index, int param_3)
     int orig_sel = me->u.list.selected;
     if (me->u.list.rowCount == 0)
         return 0;
-    Rect_004a3780 r;
+    Rect r;
     unsigned int flags;
     // Called on &entries[index], not me: with me the y1 lea operands swap.
     GetGadgetRect(&entries[index], (Rect*)&r);
     int n = 0;
-    r.y0 += 2;
-    r.y1 -= 3;
+    r.top += 2;
+    r.bottom -= 3;
     Point_004a3780 point = obj->point;
     point.x -= entries[0].x;
     point.y -= entries[0].y;
@@ -2882,7 +2884,7 @@ int __stdcall HandleListBoxInput(Object_004a3780* obj, int index, int param_3)
             if (me->u.list.rowCount == 0) goto skip0;
             if (!(me->attribs & 0x200))
                 goto ret1;
-            me->u.list.selected = (point.y - r.y0) / span + me->u.list.firstRow;
+            me->u.list.selected = (point.y - r.top) / span + me->u.list.firstRow;
             if (me->u.list.selected < 0)
                 goto above;
             if (me->u.list.selected - me->u.list.firstRow > step - 1)
@@ -2917,7 +2919,7 @@ skip0:;
         flags = me->attribs;
         if (flags & 0x10) {
             // Stores straight into me->u.list.selected and tests the field; clamps written plainly.
-            me->u.list.selected = (point.y - r.y0) / span + me->u.list.firstRow;
+            me->u.list.selected = (point.y - r.top) / span + me->u.list.firstRow;
             if (me->u.list.selected >= 0) {
                 if (me->u.list.selected - me->u.list.firstRow > step - 1)
                     me->u.list.selected = me->u.list.firstRow + step - 1;
@@ -2951,7 +2953,7 @@ skip0:;
             // k is declared after the pointer choice, not before the if (flag8).
             int k = me->u.list.firstRow;
             // remain stays declared before n2.
-            int remain = point.y - r.y0 - 2;
+            int remain = point.y - r.top - 2;
             int n2 = 0;
             for (;;) {
                 GafFrame* row = flag8 ? fixed : (*ip)->row;
@@ -2985,7 +2987,7 @@ ret1:
             return 1;
         }
         obj->changed = 1;
-    } else if (point.y < r.y0) {
+    } else if (point.y < r.top) {
         if (me->u.list.firstRow > 0 && me->u.list.sortKey < (int)GetTicks()) {
             me->u.list.sortKey = GetTicks() + 2;
             if (me->u.list.selected > me->u.list.firstRow)
@@ -3004,7 +3006,7 @@ ret1:
             me->u.list.selected = 0;
             goto finish;
         }
-    } else if (point.y > r.y1) {
+    } else if (point.y > r.bottom) {
         if (me->u.list.firstRow < me->u.list.maxFirstRow && me->u.list.sortKey < (int)GetTicks()) {
             me->u.list.sortKey = GetTicks() + 2;
             me->u.list.firstRow++;
@@ -3255,7 +3257,7 @@ int __stdcall HandleLabelInput(Object_0049fc50* obj, int index, char key)
 {
     Gadget* entries = obj->holder->entries;
     Gadget* entry = &entries[index];
-    struct Rect_0049fc50 { int x1, y1, x2, y2; } rect;
+    Rect rect;
     Point_0049fc50 point;
     int rel_x, rel_y;
 
@@ -3263,14 +3265,14 @@ int __stdcall HandleLabelInput(Object_0049fc50* obj, int index, char key)
         return 0;
 
     if (entry->type == 0) {
-        rect.x1 = 0;
-        rect.y1 = 0;
+        rect.left = 0;
+        rect.top = 0;
     } else {
-        rect.x1 = entry->x;
-        rect.y1 = entry->y;
+        rect.left = entry->x;
+        rect.top = entry->y;
     }
-    rect.x2 = entry->width + rect.x1 - 1;
-    rect.y2 = entry->height + rect.y1 - 1;
+    rect.right = entry->width + rect.left - 1;
+    rect.bottom = entry->height + rect.top - 1;
 
     memcpy(&point, &obj->point, 24);
 
@@ -3278,12 +3280,12 @@ int __stdcall HandleLabelInput(Object_0049fc50* obj, int index, char key)
     rel_y = point.y - entries->y;
 
     if (IsMouseButtonMessage(obj, 1)) {
-        if (rel_x < rect.x1 || rel_x > rect.x2 || rel_y < rect.y1 || rel_y > rect.y2)
+        if (rel_x < rect.left || rel_x > rect.right || rel_y < rect.top || rel_y > rect.bottom)
             goto fail;
         TrySetFocus(obj, index);
         SetClickMode(obj, 1);
     } else if (IsMouseButtonMessage(obj, 2)) {
-        if (rel_x < rect.x1 || rel_x > rect.x2 || rel_y < rect.y1 || rel_y > rect.y2)
+        if (rel_x < rect.left || rel_x > rect.right || rel_y < rect.top || rel_y > rect.bottom)
             goto fail;
         TrySetFocus(obj, index);
         SetClickMode(obj, 2);
@@ -3295,7 +3297,7 @@ fail:
     if (HasMouseKeyFlags(obj, 3))
         goto check_queue;
     obj->focus = -1;
-    if (rel_x < rect.x1 || rel_x > rect.x2 || rel_y < rect.y1 || rel_y > rect.y2)
+    if (rel_x < rect.left || rel_x > rect.right || rel_y < rect.top || rel_y > rect.bottom)
         goto check_queue;
     return 1;
 
@@ -3343,6 +3345,8 @@ unsigned int __cdecl GetTicks();
 
 // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 extern int Pad_a4620_e0;
+// The Rect_0049fc50 view that was dropped above took seven ids of its own.
+int AccessRegistryValue(int, int, int, int, int, int);
 
 // FUNCTION: 0x4a4620
 void __stdcall ScheduleGadgetEndTick(Dialog_4a4620* obj, int i)
@@ -3381,7 +3385,9 @@ struct Dialog_4a4660 {
     void *fallbackSurface;
 };
 
-struct Rect_004a4660 { int left, top, right, bottom; };
+// Unused here: the symbol ids this declaration takes keep the allocation after
+// the Rect_004a4660 view was dropped (docs/c2-regalloc.md).
+int InitProjectile(int, int, int, int, int, int);
 // Unused here: real functions declared to keep the file's symbol count.
 char* __stdcall BuildScrollItems2(char* names, int a, int b);
 void* __stdcall AllocZeroedWithTickOffset(unsigned int size);
@@ -3391,8 +3397,8 @@ struct Language_004a4660 { char unknown_0[0xc]; unsigned short *glyphs; };
 struct LanguageRoot_004a4660 { char unknown_0[0x14]; Language_004a4660 *language; };
 
 void __stdcall LockScreen(void *);
-void __stdcall FillBevelBox(void *, Rect_004a4660 *, unsigned int, unsigned int, unsigned int);
-void __stdcall FillRectangle(void *, Rect_004a4660 *, int);
+void __stdcall FillBevelBox(void *, Rect *, unsigned int, unsigned int, unsigned int);
+int __stdcall FillRectangle(void *, Rect *, int);
 void __stdcall DrawTextClipped(void *, char *, int, int, int, int);
 char* __stdcall GetGafFrame(void* glyphs, int c);
 int GetFont();
@@ -3433,7 +3439,7 @@ void __stdcall DrawProgressBarGadget(Dialog_4a4660 *obj, int index)
         surface = *(void **)((char *)obj + 0xcd2);
     LockScreen(surface);
 
-    Rect_004a4660 rect;
+    Rect rect;
     rect.left = entry->x;
     rect.top = entry->y;
     rect.right = entry->width + entry->x;
@@ -3701,11 +3707,13 @@ extern int __stdcall HasMouseKeyFlags(Dialog_4a4b50* obj, unsigned int mask);
 extern void __stdcall SetClickMode(Dialog_4a4b50* obj, int value);
 extern int __stdcall TrySetFocus(Dialog_4a4b50* obj, int index);
 
-struct Rect_004a4b50 { int left, top, right, bottom; };
+// Unused here: the symbol ids this declaration takes keep the allocation after
+// the Rect_004a4b50 view was dropped (docs/c2-regalloc.md).
+int FireVLaunchProjectile(int, int, int, int, int, int);
 
 // True when the point lies inside the rect, edges included (the body of IsPointInRect
 // at 0x4a1920, which the compiler inlined here).
-static inline int PointInHotspotRect(const Rect_004a4b50& r, const Point_004a4b50& p)
+static inline int PointInHotspotRect(const Rect& r, const Point_004a4b50& p)
 {
     return p.x >= r.left && p.x <= r.right && p.y >= r.top && p.y <= r.bottom;
 }
@@ -3716,7 +3724,7 @@ int __stdcall HandleHotspotInput(Dialog_4a4b50* obj, int index)
     Gadget* entries = obj->table->entries;
     // Entries are indexed as entries[index], not through a stored pointer.
     // 16-byte stack struct: gives the frame its size.
-    Rect_004a4b50 r;
+    Rect r;
     if (entries[index].type == 0) {
         r.left = 0;
         r.top = 0;
@@ -3866,7 +3874,9 @@ struct Dialog_4a4d70 {
     void* fallback;                    // +0xcd2
 };
 
-struct Rect_004a4d70 { int left, top, right, bottom; };
+// Unused here: the symbol ids this declaration takes keep the allocation after
+// the Rect_004a4d70 view was dropped (docs/c2-regalloc.md).
+int CalcAimAngles(int, int, int, int, int, int);
 // Unused here: real functions declared to keep the file's symbol count.
 void __stdcall CenterCameraOnPoint(int a, int b, int c);
 void __stdcall AnnouncePlayerLeft(int id);
@@ -3887,8 +3897,8 @@ char* __stdcall GetGafFrame(void* glyphs, int c);
 void __stdcall SetTextColors(int colour, int font);
 int GetTextKeyColor();
 int __stdcall DrawListboxFrame(Dialog_4a4d70* obj, int index, void* bmp);
-void __stdcall CopySurfaceRect(void* dst, void* src, Rect_004a4d70* rect, int* pos);
-int __stdcall FillRectangle(void* surface, Rect_004a4d70* rect, int colour);
+void __stdcall CopySurfaceRect(void* dst, void* src, Rect* rect, int* pos);
+int __stdcall FillRectangle(void* surface, Rect* rect, int colour);
 void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw, int style);
 // The colour parameter must be int: forces the zero extension of the colour load.
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2,
@@ -3949,7 +3959,7 @@ void __stdcall DrawTextInput(Dialog_4a4d70* obj, int index)
 
     Gadget* me = &entries[index];
 
-    Rect_004a4d70 rect;
+    Rect rect;
     if (me->type == 0) {
         rect.left = 0;
         rect.top = 0;
@@ -4843,6 +4853,13 @@ void __stdcall DrawButton(Gui* menu, int index)
         FadeRectangle(surface, &rect, -0x14);
     }
 }
+
+// Unused here: real functions declared to keep the symbol ids of the knob
+// functions below, which sit in a narrow window of their own
+// (docs/c2-regalloc.md).
+int DrawRangeCircle(int, int, int, int, int, int, int);
+void AddTextGadget(int, int, int, int, int, int, int);
+int DirectionFromStep(int, int);
 
 // FUNCTION: 0x4a69d0
 void __stdcall ClearAllStatus(Gui* param_1)

@@ -2273,7 +2273,7 @@ address,size,file,symbol,status,similarity
 0x4ab040,17,src/gui/dialogs.cpp,?HasLayer@@YGHPAUGui@@@Z,matched,100.0
 0x4ab060,50,src/gui/dialogs.cpp,?IsScreenNamed@@YGHPAUGui@@PBD@Z,matched,100.0
 0x4ab0a0,14,src/gui/dialogs.cpp,?ClearSelectedGadget@@YGXPAX@Z,matched,100.0
-0x4ab0b0,188,src/gui/dialogs.cpp,?BlitLayers@@YGHPAULayer@@PAXPAURect_004b6720@@@Z,matched,100.0
+0x4ab0b0,188,src/gui/dialogs.cpp,?BlitLayers@@YGHPAULayer@@PAXPAURect@@@Z,matched,100.0
 0x4ab170,26,src/gui/dialogs.cpp,?BlitMenuLayers@@YGXPAUGui@@PAIPAH@Z,matched,100.0
 0x4ab190,17,src/gui/dialogs.cpp,?SetDescListCleanupFlag@@YGXHH@Z,matched,100.0
 0x4ab1b0,215,src/gui/dialogs.cpp,?AddTextGadget@@YGXPAULayer@@PAD1HFHH@Z,matched,100.0
