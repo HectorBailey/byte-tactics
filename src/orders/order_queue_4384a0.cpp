@@ -73,7 +73,7 @@ struct Game {
 struct SaveDesc_0043a1f0 {             // the 0x3a-byte snapshot, read and written raw
     unsigned short unitType;           // +0x00
     unsigned short ownerType;          // +0x02
-    int field_4;                       // +0x04
+    int attachedType;                  // +0x04, the attachment's kind (OrderFx::GetType)
     unsigned char kind;                // +0x08
     unsigned char flag5;               // +0x09
     unsigned int flags6;               // +0x0a
@@ -81,7 +81,7 @@ struct SaveDesc_0043a1f0 {             // the 0x3a-byte snapshot, read and writt
     Vec3 pos;                          // +0x12
     int start;                         // +0x1e
     int cached;                        // +0x22
-    int field_26;                      // +0x26, the order's unitType (+0x36); +0x00 has the name
+    int orderUnitType;                 // +0x26, the unit type the order applies to (Order's unitType at +0x36)
     int radius;                        // +0x2a
     int progress;                      // +0x2e
     unsigned int flags;                // +0x32
@@ -728,7 +728,7 @@ Order::Order(Unit* punit, HapiBank* file, char* name)
     pos = desc.pos;
     start = desc.start;
     cached = desc.cached;
-    unitType = desc.field_26;
+    unitType = desc.orderUnitType;
     radius = desc.radius;
     progress = desc.progress;
     flags = desc.flags;
@@ -742,7 +742,7 @@ Order::Order(Unit* punit, HapiBank* file, char* name)
 
     char buf3[0x20];
     sprintf(buf3, "%s%s", name, "g");
-    switch (desc.field_4) {
+    switch (desc.attachedType) {
     case 2:
         attached = new Class_0044de80((int)this, file, buf3);
         return;
@@ -795,7 +795,7 @@ int Order::SerializeToSave(Unit* punit, HapiBank* file, char* name)
     // fresh read of link.owner keeps the compiler from dropping the third test.
     Unit* o = link.owner;
     desc.ownerType = (o != 0 && (link.owner->flags & 0x10000000) != 0 && link.owner != 0) ? o->id : 0;
-    desc.field_4 = attached ? attached->GetType() : 0;
+    desc.attachedType = attached ? attached->GetType() : 0;
     desc.kind = kind;
     desc.flag5 = flag5;
     desc.flags6 = flags6;
@@ -803,7 +803,7 @@ int Order::SerializeToSave(Unit* punit, HapiBank* file, char* name)
     desc.pos = pos;
     desc.start = start;
     desc.cached = cached;
-    desc.field_26 = unitType;
+    desc.orderUnitType = unitType;
     desc.radius = radius;
     desc.progress = progress;
     desc.flags = flags;
@@ -827,7 +827,7 @@ int Order::SerializeToSave(Unit* punit, HapiBank* file, char* name)
             file->SetStringItem(buf2, g_game->unitDefs[id].unitname);
     }
 
-    if (desc.field_4 != 0) {
+    if (desc.attachedType != 0) {
         char buf3[0x20];
         sprintf(buf3, "%s%s", name, "g");
         attached->SerializeToSave(this, file, buf3);
