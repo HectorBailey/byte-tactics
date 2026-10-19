@@ -5,7 +5,9 @@
 //
 // The unit's resource account is a class at +0xbc whose owner pointer is at
 // +0x30 (unit+0xec); 0x401180..0x4012a0 are its methods and 0x401320 is the
-// end-of-tick update, all defined above without FUNCTION lines.
+// end-of-tick update, all defined above without FUNCTION lines. It is not
+// game/unit_resources.h's UnitResources: those method bodies must stay in this
+// file to inline into 0x401360, and the header would define them out of line.
 #include <ddraw.h>
 // <float.h> after <ddraw.h>: the file's symbol count decides the x87 code of UseEnergy.
 #include <float.h>
