@@ -277,8 +277,8 @@ struct Game {
     };
     char playerIndex;
     union {
-        unsigned char flags_2a44;      // +0x2a44
-        unsigned short flags_2a44_w;
+        unsigned char netGameFlags;      // +0x2a44
+        unsigned short netGameFlagsWord;
         GameFlags_2a44 flags;
         struct {
             unsigned char leaving : 1;
@@ -870,7 +870,7 @@ int __stdcall AddNetPlayer(int id)
     p->id = id;
     p->lastHeard = GetTicks();
     g_game->numPlayers++;
-    if (g_game->flags_2a44_w & 1) {
+    if (g_game->netGameFlagsWord & 1) {
         for (int i = 0; i < 10; i++) {
             Player* q = &g_game->players[i];
             if (q->active != 0 && (q->type == 1 || q->type == 2)) {
@@ -912,14 +912,14 @@ void InitNetConnection()
 // FUNCTION: 0x450dd0
 void CloseNetSession()
 {
-    if (g_game->flags_2a44_w & 1) {
+    if (g_game->netGameFlagsWord & 1) {
         if (g_usePacketManager != 0) {
             g_packetManager.SendAllQueued(1);
         }
         if (!IsReporterDllLoaded()) {
             HAPINET_uninitmultiplay(g_game->net);
         }
-        g_game->flags_2a44_w &= 0xfffe;
+        g_game->netGameFlagsWord &= 0xfffe;
     }
 }
 
@@ -938,7 +938,7 @@ void LeaveNetGame()
     if (g_usePacketManager != 0) {
         g_packetManager.SendAllQueued(1);
     }
-    if (g_game->flags_2a44_w & 1) {
+    if (g_game->netGameFlagsWord & 1) {
         for (int i = 0; i < 10; i++) {
             if (IsPlaying_00450e20(&g_game->players[i])) {
                 RemovePlayer(g_game->players[i].id);
@@ -1006,7 +1006,7 @@ static inline int IsPlaying_00450f90(Player* player)
 void BroadcastPlayerInfo()
 {
     SideDataPacket packet;
-    if (g_game->flags_2a44_w & 1) {
+    if (g_game->netGameFlagsWord & 1) {
         for (int i = 0; i < 10; i++) {
             Player* player = &g_game->players[i];
             if (IsPlaying_00450f90(player)) {
@@ -1574,7 +1574,7 @@ int __stdcall JoinNetGame(Guid_4517b0 guid, int player)
 
         CreateLocalPlayer(player, 1);
         HAPINET_enumplayers((Net_4517b0*)g_game->net, 0, (void*)EnumPlayersCallback, 0, 0);
-        if (g_game->flags_2a44 & 1) {
+        if (g_game->netGameFlags & 1) {
             for (int i = 0; i < 10; i++) {
                 Player* q = &g_game->players[i];
                 if (q->active != 0 && (q->state == 1 || q->state == 2)) {
@@ -1606,7 +1606,7 @@ int __stdcall JoinNetGame(Guid_4517b0 guid, int player)
 // FUNCTION: 0x451b60
 void RemoveLocalPlayers()
 {
-    if (!(g_game->flags_2a44_w & 1))
+    if (!(g_game->netGameFlagsWord & 1))
         return;
     for (int i = 0; i < 10; i++) {
         if (g_game->players[i].active != 0
@@ -1670,7 +1670,7 @@ int __stdcall SendPacketToPlayer(int from, int to, unsigned char* packet, int si
     else
         toPlayer = &g_game->players[FindSlotByDpid(to)];
 
-    if ((g_game->flags_2a44 & 1) && fromPlayer != 0 && fromPlayer->active != 0 &&
+    if ((g_game->netGameFlags & 1) && fromPlayer != 0 && fromPlayer->active != 0 &&
         (fromPlayer->state == 1 || fromPlayer->state == 2) &&
         fromPlayer->rejectReason == 0 && toPlayer != 0 && toPlayer->active != 0 &&
         toPlayer->state == 3 && toPlayer->rejectReason == 0) {
@@ -1717,7 +1717,7 @@ int __stdcall BroadcastPacket(int id, unsigned char* packet, int size)
         return 0;
     if (p->rejectReason != 0)
         return 0;
-    if ((g_game->flags_2a44 & 1) != 0) {
+    if ((g_game->netGameFlags & 1) != 0) {
         if (g_game->duplicatePlayerTypeFlag == 0) {
             if (g_usePacketManager != 0)
                 return g_packetManager.QueueOnChannel(id, g_packetChannels, (int)packet, size);
@@ -1741,7 +1741,7 @@ int __stdcall BroadcastPacket(int id, unsigned char* packet, int size)
                 g_broadcastPeersSeen[c] = 1;
         }
     }
-    // Single shared return: makes the flags_2a44 test a forward je.
+    // Single shared return: makes the netGameFlags test a forward je.
     return 1;
 }
 
@@ -1885,14 +1885,14 @@ void __stdcall ReleasePacketData(Class_00451fd0* obj)
         GameFreeThunk(obj->buffer);
         obj->buffer = 0;
     }
-    if (g_game->flags_2a44 & 1) {
+    if (g_game->netGameFlags & 1) {
         if (g_usePacketManager != 0) {
             g_packetManager.SendAllQueued(1);
         }
         if (!IsReporterDllLoaded()) {
             HAPINET_uninitmultiplay(g_game->session);
         }
-        g_game->flags_2a44_w &= 0xfffe;
+        g_game->netGameFlagsWord &= 0xfffe;
     }
 }
 
@@ -2554,7 +2554,7 @@ int __stdcall ReceiveNetPacket(void)
 {
     int size;
 
-    if (!(g_game->flags_2a44 & 1))
+    if (!(g_game->netGameFlags & 1))
         return 0;
 
     size = g_game->recvPacketSize;
@@ -2944,7 +2944,7 @@ int __stdcall SendScriptCallNoArgsByName(Unit* obj, char* name)
 {
     UnitScriptCallPacket packet;
     int index = obj->script->FindScript(name);
-    if (!(g_game->flags_2a44 & 1)) {
+    if (!(g_game->netGameFlags & 1)) {
         return 0;
     }
     packet.type = 0x10;
@@ -2962,7 +2962,7 @@ int __stdcall SendScriptCallNoArgsByName(Unit* obj, char* name)
 int __stdcall SendScriptCallNoArgs(Unit* obj, short index)
 {
     UnitScriptCallPacket packet;
-    if (!(g_game->flags_2a44 & 1)) {
+    if (!(g_game->netGameFlags & 1)) {
         return 0;
     }
     packet.type = 0x10;
@@ -2984,7 +2984,7 @@ int __stdcall SendScriptCallByName(Unit* obj, char* name, char argCount,
 {
     UnitScriptCallPacket packet;
     short index = obj->script->FindScript(name);
-    if (!(g_game->flags_2a44 & 1)) {
+    if (!(g_game->netGameFlags & 1)) {
         return 0;
     }
     packet.type = 0x10;
@@ -3005,7 +3005,7 @@ int __stdcall SendScriptCall(Unit* obj, short index, char argCount,
                            int arg0, int arg1, int arg2, int arg3)
 {
     UnitScriptCallPacket packet;
-    if (!(g_game->flags_2a44 & 1)) {
+    if (!(g_game->netGameFlags & 1)) {
         return 0;
     }
     packet.type = 0x10;
@@ -3078,7 +3078,7 @@ void SendNetHeartbeat()
     }
 
     Msg20_00456310 msg;
-    if (g_game->flags_2a44 & 1) {
+    if (g_game->netGameFlags & 1) {
         for (int i = 0; i < 10; i++) {
             Player* p = &g_game->players[i];
             if (p->active != 0 && (p->type == 1 || p->type == 2)) {
@@ -3895,7 +3895,7 @@ int CountCombatPlayers()
 // FUNCTION: 0x457d30
 void __stdcall UpdateResourceSharing(Player* player)
 {
-    if ((g_game->flags_2a44 & 1) == 0)
+    if ((g_game->netGameFlags & 1) == 0)
         return;
 
     if (g_game->gameTick % 60 == 0) {
