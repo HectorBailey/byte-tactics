@@ -54,12 +54,45 @@ struct Spawn;
 struct UnitType;
 struct Player;
 
-class Mission {
-public:
-    char unknown_0[0xd4c];
-    int waterDoesDamage;               // +0xd4c
-    int waterDamage;                   // +0xd50
-};
+#include "../map/mission.h"
+
+// 35 one-id declarations of real functions (docs/c2-regalloc.md): the
+// header's declarations move SendUnitStates' register window; these restore it.
+void AbortProgram(void);
+void BeginMouseScroll(void);
+void BroadcastPlayerInfo(void);
+void CenterCameraOnRadarClick(void);
+void CheckPlayerTimeouts(void);
+void ClampCameraPosition(void);
+void ClampCameraTarget(void);
+void ClearCameraFollowState(void);
+void ClearPointers(void);
+void ClearRef(void);
+void ClearSelection(void);
+void ClearSpeechEntries(void);
+void ClearSpeechList(void);
+void CreatePerformanceDialog(void);
+void CycleMessageUnits(void);
+void DestroyPreCleanup(void);
+void DispatchOrdersPanelPageFlags(void);
+void EmptyAtexitHandler(void);
+void EmptyPostSimStepHook(void);
+void EmptyPostSimStepHook_B(void);
+void EmptyPostSimStepHook_C(void);
+void EnableAICommands(void);
+void EndMouseScroll(void);
+void ExpireEyeballs(void);
+void ExpireOldestMessage(void);
+void FillAccountList(void);
+void FindLocalCommander(void);
+void FocusNextLocalUnit(void);
+void FreeExplosions(void);
+void FreeGameFonts(void);
+void FreeLogos(void);
+void FreeSideFonts(void);
+void FUN_00406f40(void);
+void FUN_004161f0(void);
+void GonzoAtexitHandler(void);
 
 #include "../network/player.h"
 
