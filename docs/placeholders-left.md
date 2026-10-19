@@ -119,6 +119,10 @@ member keeps its placeholder name.
 | `Entry_004df590.field_0` | `src/debug/debug_lib.cpp` | no evidence: the performance window compares it as an int with another entry's and with a name pointer; the exe has no name for it |
 | `Data1.field_0`, `Data2.field_0` | `src/debug/debug_lib.cpp` | not members of a type of their own: the int and the char that `NameMapInsertResult::Assign` (0x4e2a10) copies into the two halves of the pair |
 | `Settings.field_471` | `src/network/net_game.cpp`, `src/network/net_game_453d40.cpp` | no evidence: the first dword of the 80-byte block at g_game+0x471, declared and never read in either view |
+| `Dialog.field_13` | `src/gui/file_list.cpp` | no evidence: declared and never read or written |
+| `Game.field_37e98` | `src/frontend/options.cpp` | no evidence: `DrawOptionsScrollBar` (0x45ffb0) sets it to 1 after drawing the flip frame and nothing reads it |
+| `FreeObj_0045e100.field_4`, `FreeObj_0045e100.field_14` | `src/frontend/options.cpp` | no evidence: both are freed through `GameFreeThunk` from `top->userData` in `HandleVisualOptionsClick` (0x45e100); no view of the 0x18-byte object assigns them in `src/` |
+| `Game.field_2ba2` | `src/frontend/frontend.cpp` | no evidence: assigned the 16-byte constant at `DAT_004fdaf0` and passed to `JoinNetGame`; Thaldren names the selected provider GUID (g_game+0x39201), not this value |
 
 ## Globals
 
