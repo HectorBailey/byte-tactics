@@ -56,43 +56,43 @@ struct Player;
 
 #include "../map/mission.h"
 
-// 35 one-id declarations (docs/c2-regalloc.md): the header's declarations
-// move SendUnitStates' register window; these restore it.
-extern int probe_msn_0;
-extern int probe_msn_1;
-extern int probe_msn_2;
-extern int probe_msn_3;
-extern int probe_msn_4;
-extern int probe_msn_5;
-extern int probe_msn_6;
-extern int probe_msn_7;
-extern int probe_msn_8;
-extern int probe_msn_9;
-extern int probe_msn_10;
-extern int probe_msn_11;
-extern int probe_msn_12;
-extern int probe_msn_13;
-extern int probe_msn_14;
-extern int probe_msn_15;
-extern int probe_msn_16;
-extern int probe_msn_17;
-extern int probe_msn_18;
-extern int probe_msn_19;
-extern int probe_msn_20;
-extern int probe_msn_21;
-extern int probe_msn_22;
-extern int probe_msn_23;
-extern int probe_msn_24;
-extern int probe_msn_25;
-extern int probe_msn_26;
-extern int probe_msn_27;
-extern int probe_msn_28;
-extern int probe_msn_29;
-extern int probe_msn_30;
-extern int probe_msn_31;
-extern int probe_msn_32;
-extern int probe_msn_33;
-extern int probe_msn_34;
+// 35 one-id declarations of real functions (docs/c2-regalloc.md): the
+// header's declarations move SendUnitStates' register window; these restore it.
+void AbortProgram(void);
+void BeginMouseScroll(void);
+void BroadcastPlayerInfo(void);
+void CenterCameraOnRadarClick(void);
+void CheckPlayerTimeouts(void);
+void ClampCameraPosition(void);
+void ClampCameraTarget(void);
+void ClearCameraFollowState(void);
+void ClearPointers(void);
+void ClearRef(void);
+void ClearSelection(void);
+void ClearSpeechEntries(void);
+void ClearSpeechList(void);
+void CreatePerformanceDialog(void);
+void CycleMessageUnits(void);
+void DestroyPreCleanup(void);
+void DispatchOrdersPanelPageFlags(void);
+void EmptyAtexitHandler(void);
+void EmptyPostSimStepHook(void);
+void EmptyPostSimStepHook_B(void);
+void EmptyPostSimStepHook_C(void);
+void EnableAICommands(void);
+void EndMouseScroll(void);
+void ExpireEyeballs(void);
+void ExpireOldestMessage(void);
+void FillAccountList(void);
+void FindLocalCommander(void);
+void FocusNextLocalUnit(void);
+void FreeExplosions(void);
+void FreeGameFonts(void);
+void FreeLogos(void);
+void FreeSideFonts(void);
+void FUN_00406f40(void);
+void FUN_004161f0(void);
+void GonzoAtexitHandler(void);
 
 #include "../network/player.h"
 
