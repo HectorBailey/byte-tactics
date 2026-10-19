@@ -70,6 +70,9 @@ struct Weapon {
     int coverage;                     // +0xe0
 };
 
+// Not weapons/unit_weapon_slot.h: with the header 0x438c00 falls to 89.5%
+// (one byte longer) and 0x439740 to 95.4%; 0 to 40 extern int id probes do
+// not recover either.
 struct UnitWeaponSlot {                // 0x1c bytes
     char unknown_0[0xc];              // the aim target pair and the aim callback
     Weapon* weapon;                   // +0xc
