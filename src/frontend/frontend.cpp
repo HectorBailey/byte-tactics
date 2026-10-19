@@ -194,7 +194,7 @@ extern Game* g_game;
 extern char g_frontendErrorText[];
 
 // GLOBAL: 0x512c80
-extern int DAT_00512c80;
+extern int g_cmdlineDplayProvider;
 
 // GLOBAL: 0x503004
 extern char g_frontendSourceFile[];
@@ -1117,7 +1117,7 @@ void RunFrontendStateMachine(void)
             SetMissionType(0);
             g_game->lobbyUiDirtyFlags.b4 = 0;
             OpenMainMenu();
-            if (DAT_00512c80 == 0) {
+            if (g_cmdlineDplayProvider == 0) {
                 SetSubState(1, 0x40d, g_frontendSourceFile);
                 SetCursorOverlayEnabled(1);
                 return;

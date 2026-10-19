@@ -4451,7 +4451,7 @@ address,name
 0x512c74,g_loungeChatter
 0x512c78,g_loungeRefreshTime
 0x512c7c,g_timeoutTimerStart
-0x512c80,DAT_00512c80
+0x512c80,g_cmdlineDplayProvider
 0x512c84,g_cmdlineHostMode
 0x512c8c,DAT_00512c8c
 0x512c94,g_netFrameRateConfig

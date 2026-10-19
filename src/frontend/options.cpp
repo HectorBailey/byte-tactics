@@ -637,7 +637,7 @@ extern char g_volTextGadgetName[];     // "VOLTEXT"
 extern char g_modeGadgetName[];        // "MODE"
 extern char g_explodeSoundFile[];      // "sounds\\explode.wav"
 extern char DAT_005119b8[];
-extern int DAT_00512c80;
+extern int g_cmdlineDplayProvider;
 extern int g_cmdlineHostMode;
 extern char g_cmdlineHostGameName[];
 extern char g_cmdlineTcpJoinAddress[];
@@ -911,7 +911,7 @@ void __stdcall SetHostGameName(int flag, char* text)
 void __stdcall SetDirectPlayProvider(int param_1)
 {
     if (param_1 == 1 || param_1 == 2 || param_1 == 3 || param_1 == 4) {
-        DAT_00512c80 = param_1;
+        g_cmdlineDplayProvider = param_1;
     }
 }
 

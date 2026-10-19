@@ -358,7 +358,7 @@ extern int g_packetModes[45];                                                   
 extern char* g_loungeChatter;                                                                                   // 0x512c74, 4 bytes; 1 of 1 files
 extern int g_loungeRefreshTime;                                                                                 // 0x512c78, 4 bytes; 1 of 1 files
 extern unsigned int g_timeoutTimerStart;                                                                        // 0x512c7c, 4 bytes; 1 of 1 files
-extern unsigned char DAT_00512c80[336];                                                                         // 0x512c80, 336 bytes; int in 3 of 4 files (conflicting: shape), but used past its end
+extern unsigned char g_cmdlineDplayProvider[336];                                                                         // 0x512c80, 336 bytes; int in 3 of 4 files (conflicting: shape), but used past its end
 extern char g_onlineDllPath[260];                                                                               // 0x512dd0, 260 bytes; 3 of 3 files
 extern unsigned char DAT_00512ed4[20];                                                                          // 0x512ed4, 20 bytes; nothing refers to it
 extern int g_onlineConfigLoaded;                                                                                // 0x512ee8, 4 bytes; 2 of 2 files
@@ -604,8 +604,8 @@ extern long g_squashThreadLockTicket;                                           
 //   0x4fcfb8 DAT_004fcfb8: defined in src/data/guids.cpp
 //   0x4fd2f8 g_orderFxVtable: defined in src/data/vtables.cpp
 //   0x512344 g_missionOrderTableBegin: part of another global: g_missionOrderTableVec+0x4
-//   0x512ca8 g_cmdlineHostGameName: part of another global: DAT_00512c80+0x28
-//   0x512d48 g_onlineLobbyPlayerName: part of another global: DAT_00512c80+0xc8
+//   0x512ca8 g_cmdlineHostGameName: part of another global: g_cmdlineDplayProvider+0x28
+//   0x512d48 g_onlineLobbyPlayerName: part of another global: g_cmdlineDplayProvider+0xc8
 //   0x51e574 g_onlineReportPlayers: PlayerInfo_0046c2a0** (1), PlayerInfo_0046bce0** (1), int* (1)
 //   0x51e57c g_onlineReportScoreBoards: ScoreBoard_0046c2a0** (1), ScoreBoard_0046bce0** (1), void* (1)
 //   0x51e59c IUUnitSyncEntry::IU?$pair::?$_Tree::_Nilrefs: defined in src/network/unit_sync.cpp
@@ -646,10 +646,10 @@ extern long g_squashThreadLockTicket;                                           
 //   0x512770 g_serialPortNumber: char[] (1), Serial_00441c30 (1)
 //   0x5129d0 g_sendCondenser: defined in src/network/net_condenser.cpp
 //   0x5129f8 g_receiveCondenser: defined in src/network/net_condenser.cpp
-//   0x512c84 g_cmdlineHostMode: part of another global: DAT_00512c80+0x4
-//   0x512c98 DAT_00512c98: part of another global: DAT_00512c80+0x18
-//   0x512d28 g_onlineLobbyPassword: part of another global: DAT_00512c80+0xa8
-//   0x512d90 g_cmdlineTcpJoinAddress: part of another global: DAT_00512c80+0x110
+//   0x512c84 g_cmdlineHostMode: part of another global: g_cmdlineDplayProvider+0x4
+//   0x512c98 DAT_00512c98: part of another global: g_cmdlineDplayProvider+0x18
+//   0x512d28 g_onlineLobbyPassword: part of another global: g_cmdlineDplayProvider+0xa8
+//   0x512d90 g_cmdlineTcpJoinAddress: part of another global: g_cmdlineDplayProvider+0x110
 //   0x512f49 g_optionsBackupUnitChat: part of another global: g_optionsPrefsSnapshot+0x31
 //   0x51e548 g_riReportGameChat: int (__stdcall*)(int, char*) (1), int (__stdcall*)(int, int) (1)
 //   0x51e550 g_onlineReportScores: char** (1), int (1)
@@ -736,19 +736,19 @@ extern long g_squashThreadLockTicket;                                           
 //   0x512370 DAT_00512370: part of another global: MovementClassTable::g_movementClasses+0x18
 //   0x512774 g_serialBaudRate: part of another global: g_serialPortNumber+0x4
 //   0x512a28 g_packetHandlerType2: part of another global: g_packetHandlers+0x8
-//   0x512c8c DAT_00512c8c: part of another global: DAT_00512c80+0xc
-//   0x512c94 g_netFrameRateConfig: part of another global: DAT_00512c80+0x14
-//   0x512ce8 g_lobbyMapName: part of another global: DAT_00512c80+0x68
-//   0x512d68 g_lobbyLock: part of another global: DAT_00512c80+0xe8
-//   0x512d6c g_lobbyMaxUnits: part of another global: DAT_00512c80+0xec
-//   0x512d70 g_lobbyEnergy: part of another global: DAT_00512c80+0xf0
-//   0x512d74 g_lobbyMetal: part of another global: DAT_00512c80+0xf4
-//   0x512d78 g_lobbyCommander: part of another global: DAT_00512c80+0xf8
-//   0x512d7c g_lobbyLineOfSight: part of another global: DAT_00512c80+0xfc
-//   0x512d80 g_lobbyCheating: part of another global: DAT_00512c80+0x100
-//   0x512d84 g_lobbyFixedLoc: part of another global: DAT_00512c80+0x104
-//   0x512d88 g_lobbyMapping: part of another global: DAT_00512c80+0x108
-//   0x512d8c g_lobbyWatching: part of another global: DAT_00512c80+0x10c
+//   0x512c8c DAT_00512c8c: part of another global: g_cmdlineDplayProvider+0xc
+//   0x512c94 g_netFrameRateConfig: part of another global: g_cmdlineDplayProvider+0x14
+//   0x512ce8 g_lobbyMapName: part of another global: g_cmdlineDplayProvider+0x68
+//   0x512d68 g_lobbyLock: part of another global: g_cmdlineDplayProvider+0xe8
+//   0x512d6c g_lobbyMaxUnits: part of another global: g_cmdlineDplayProvider+0xec
+//   0x512d70 g_lobbyEnergy: part of another global: g_cmdlineDplayProvider+0xf0
+//   0x512d74 g_lobbyMetal: part of another global: g_cmdlineDplayProvider+0xf4
+//   0x512d78 g_lobbyCommander: part of another global: g_cmdlineDplayProvider+0xf8
+//   0x512d7c g_lobbyLineOfSight: part of another global: g_cmdlineDplayProvider+0xfc
+//   0x512d80 g_lobbyCheating: part of another global: g_cmdlineDplayProvider+0x100
+//   0x512d84 g_lobbyFixedLoc: part of another global: g_cmdlineDplayProvider+0x104
+//   0x512d88 g_lobbyMapping: part of another global: g_cmdlineDplayProvider+0x108
+//   0x512d8c g_lobbyWatching: part of another global: g_cmdlineDplayProvider+0x10c
 //   0x512f2c g_optionsBackupInterfaceType: part of another global: g_optionsPrefsSnapshot+0x14
 //   0x512f38 g_optionsBackupVisualFlags: part of another global: g_optionsPrefsSnapshot+0x20
 //   0x512f3a g_optionsBackupGamma: part of another global: g_optionsPrefsSnapshot+0x22

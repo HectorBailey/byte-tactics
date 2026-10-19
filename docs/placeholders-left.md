@@ -135,7 +135,7 @@ member keeps its placeholder name.
 | `DAT_0051234c` | `src/orders/order_list.cpp` | `g_MissionOrderTableCapacityEnd` | not a global of its own: an unused declaration kept for the symbol ids it counts, the `_End` at +0xc of the vector at 0x512340 |
 | `DAT_0051e598` | `src/network/unit_sync.cpp`, `src/network/unit_sync_46d2e0.cpp` | `g_pSyncMapC_NilNode` | already named by the compiler that emits it: `IUUnitSyncEntry::IU?$pair::?$_Tree::_Nil`; renaming the hand spelling makes `tools/check.py` demand that decorated name |
 | `DAT_0051e59c` | `src/network/unit_sync.cpp` | `g_nSyncMapC_NilNodeRefs` | the same for the map's `_Nilrefs`: `IUUnitSyncEntry::IU?$pair::?$_Tree::_Nilrefs` |
-| `DAT_00512c8c` | `src/network/net_game.cpp` | none | a view of the online configuration block (`DAT_00512c80`) at +0xc: read only in `JoinLobbyGame`, clamped to 10 and passed as the lobby's max player count to `HAPINET_createorjoinlobbygame`, while the block itself has no name yet (Thaldren names the fields at +0, +4, +0x14 and +0x28 but not this one) |
+| `DAT_00512c8c` | `src/network/net_game.cpp` | none | a view of the online configuration block (`g_cmdlineDplayProvider`) at +0xc: read only in `JoinLobbyGame`, clamped to 10 and passed as the lobby's max player count to `HAPINET_createorjoinlobbygame` (Thaldren names the fields at +0, +4, +0x14 and +0x28 but not this one) |
 | `DAT_004fc978` | `src/data/unused.cpp` | none | unreferenced: a compiled function's pooled float constant, 2.0f |
 | `DAT_004fcc48` | `src/data/unused.cpp` | none | unreferenced: a compiled function's pooled double constant, 2.0 |
 | `DAT_004fd2e4` | `src/data/unused.cpp` | none | unreferenced: a compiled function's pooled float constant, 2.0f |
@@ -163,7 +163,7 @@ member keeps its placeholder name.
 | `DAT_0051276c` | `src/frontend/multi.cpp` | none | write-only: the first battle-room slot's field_19 is copied into it; nothing reads it |
 | `DAT_00512288` | `src/frontend/frontend.cpp` | none | read only, never written: compared with `GetTicks()` in `HandleFrontendDebugKey`; no source sets it |
 | `DAT_00511c20` | `src/game/console_commands.cpp`, `src/ingame/control_panel.cpp`, `src/network/net_stats.cpp` | none | write-only: the net-stats reset functions store a tick in it; nothing reads it |
-| `DAT_00512c98` | `src/game/statistics.cpp`, `src/network/net_game.cpp` | none | a view of the online configuration block (`DAT_00512c80`) at +0x18: a 16-byte player name read as the username fallback, while the block itself has no name yet |
+| `DAT_00512c98` | `src/game/statistics.cpp`, `src/network/net_game.cpp` | none | a view of the online configuration block (`g_cmdlineDplayProvider`) at +0x18: a 16-byte player name read as the username fallback |
 | `DAT_0051e6cc` | `src/game/game_load.cpp` | none | not a global of its own: the +4 view of `g_loadingBarFlashAlpha`; folding it into the array moves `LoadingScreenFrame`'s expression temporaries (docs/c2-regalloc.md) |
 | `DAT_00501fcc` | `src/game/console_commands.cpp` | none | unreferenced: the zero-initialised 4 bytes between `g_cheatCommands` and `g_debugCommands` |
 | `DAT_004fd4cc` | `src/graphics/model_render.cpp`, `src/graphics/model_render_4581e0.cpp` | none | no evidence: a pooled float constant, 5.0f, the shade scale the original wrote inline |
