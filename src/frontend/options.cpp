@@ -24,7 +24,7 @@ extern "C" __declspec(dllimport) int __cdecl wsprintfA(char* out, const char* fo
 
 #include "../graphics/memory_cache.h"
 
-class Class_004a1080;
+class Dialog_004a04f0;
 class Object_004a0570;
 class Object_004a1450;
 struct Dialog;
@@ -755,7 +755,7 @@ void __stdcall SetKeyboardInput(Sub_00460680* sub, int value);
 void __stdcall SetKeyboardInput(Gui* sub, int value);
 
 int __stdcall SetButtonStageByName(void* obj, char* name, int value);
-int __stdcall SetButtonStageByName(Class_004a1080* obj, char* name, int value);
+int __stdcall SetButtonStageByName(Dialog_004a04f0* obj, char* name, int value);
 void __stdcall SetGadgetActiveByName(void* obj, char* name, int value);
 void __stdcall SetGadgetActiveByName(Object_004a0570* obj, char* name, int value);
 void __stdcall SetGadgetActiveByName(Menu_0045e5e0* menu, char* name, int value);
@@ -1507,8 +1507,8 @@ void TickMusicOptions()
 // FUNCTION: 0x45d130
 void UpdateMusicGadgets()
 {
-    SetButtonStageByName((Class_004a1080*)&g_game->gui, "NOTRAK", g_game->flags_37f14.notrak & 1);
-    SetButtonStageByName((Class_004a1080*)&g_game->gui, "TRACKMODE", g_game->cdMode - 1);
+    SetButtonStageByName((Dialog_004a04f0*)&g_game->gui, "NOTRAK", g_game->flags_37f14.notrak & 1);
+    SetButtonStageByName((Dialog_004a04f0*)&g_game->gui, "TRACKMODE", g_game->cdMode - 1);
     SetGadgetGrayedOutByName((Object_004a1450*)&g_game->gui, "MUSICVOL", (char)(~g_game->flags_37f14.notrak & 1));
     SetGrayedOutByName((Dialog*)&g_game->gui, "CDPREV", (char)(~g_game->flags_37f14.notrak & 1));
     SetGrayedOutByName((Dialog*)&g_game->gui, "CDSTOP", (char)(~g_game->flags_37f14.notrak & 1));
@@ -1680,7 +1680,7 @@ void OpenMusicOptions()
 // FUNCTION: 0x45d9d0
 void UpdateSoundGadgets()
 {
-    SetButtonStageByName((Class_004a1080*)&g_game->gui, g_modeGadgetName, g_game->soundFlags.byte & 7);
+    SetButtonStageByName((Dialog_004a04f0*)&g_game->gui, g_modeGadgetName, g_game->soundFlags.byte & 7);
     SetGadgetActiveByName((Object_004a0570*)&g_game->gui, g_volTextGadgetName, (g_game->soundFlags.byte & 7) != 0);
     SetGadgetGrayedOutByName((Object_004a1450*)&g_game->gui, g_fxVolGadgetName, (g_game->soundFlags.byte & 7) == 0);
     SetGadgetGrayedOutByName((Object_004a1450*)&g_game->gui, g_testGadgetName, (g_game->soundFlags.byte & 7) == 0);
