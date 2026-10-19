@@ -458,7 +458,7 @@ struct PlayerSlot {
 
 // One symbol id (docs/c2-regalloc.md): this type's name and the merged
 // PlayerInfo views move the count that 0x40bb00's allocation follows.
-extern int playerSlotId;
+void StopAllSounds(void);
 
 // The players array and its info-array view at +0x1b8e. The union is the
 // compiler's anonymous one, so both names stay reachable.
