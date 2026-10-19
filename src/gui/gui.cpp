@@ -6581,8 +6581,7 @@ int __stdcall UpdateMenu(Gui* menu)
         int ptY = pt.y;
         box.right = entries->width + box.left - 1;
         box.bottom = entries->height + box.top - 1;
-        SetCursorHover(menu, pt.x >= box.left && pt.x <= box.right &&
-                           ptY >= box.top && ptY <= box.bottom);
+        SetCursorHover(menu, PointInButtonRect(&box, pt.x, ptY));
     }
 
     int saved = menu->hoverGadgetIndex;
