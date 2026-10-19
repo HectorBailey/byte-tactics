@@ -1,4 +1,7 @@
 // Decompiled by space-bunny-free, Haiku, nemotron-3.5-lightning-free. Names are provisional.
+// statistics_46c2a0.cpp stays split: FillScoreTables reads g_game through its
+// own Game view (players at +0x1b63, map at +0x391e9), which this file's Game
+// view (the reporter DLL fields) cannot also declare.
 #include <string.h>
 #include <windows.h>
 
