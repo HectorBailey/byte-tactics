@@ -2832,7 +2832,7 @@ address,size,file,symbol,status,similarity
 0x4c8020,1845,src/graphics/surface.cpp,?DrawLitTexturedSpan@@YGXHPAHPAUGafFrame@@1@Z,matched,100.0
 0x4c8760,1094,src/graphics/surface.cpp,?DrawTexturedPolygon@@YGXPAUGafFrame@@0PAH1@Z,matched,100.0
 0x4c8bb0,1279,src/graphics/surface.cpp,?DrawLitTexturedPolygon@@YGXPAUGafFrame@@0PAH1@Z,matched,100.0
-0x4c90b0,195,src/graphics/surface.cpp,?Append@Class_004c90b0@@QAEPAV1@ABV1@@Z,matched,100.0
+0x4c90b0,195,src/graphics/surface.cpp,?Append@StringRef@@QAEPAV1@ABV1@@Z,matched,100.0
 0x4c9180,22,src/graphics/surface.cpp,??0StringRef@@QAE@XZ,matched,100.0
 0x4c91a0,16,src/graphics/surface.cpp,??0StringRef@@QAE@ABV0@@Z,matched,100.0
 0x4c91b0,117,src/graphics/surface.cpp,??0StringRef@@QAE@PBD@Z,matched,100.0

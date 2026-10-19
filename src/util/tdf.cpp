@@ -512,7 +512,7 @@ int TdfRecord::GetRecordName()
 // Unused here: classes and prototypes of the neighbouring files, declared for
 // the symbol ids that GetRecordName's own class took before it joined TdfRecord
 // and that the string handle's views took before they became one class.
-class Class_004c90b0;
+struct Packet;
 class TranslationTable;
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 int WalkFrameChain(int, int, int, int, int, int, int, int, int, int);

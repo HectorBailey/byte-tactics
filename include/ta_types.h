@@ -703,7 +703,7 @@ struct Class_004c5c60;
 struct Class_004c61f0;
 struct Class_004c6890;
 struct Class_004c6b10;
-class Class_004c90b0;
+class StringRef;
 class Class_004c9180;
 class Class_004c91b0;
 class Class_004c9230;
@@ -17501,11 +17501,11 @@ struct Display_004c8020 {  // 0xc8 bytes, 1 view
     unsigned char* palette;  // +0xc4
 };
 
-class Class_004c90b0 {  // 0x4 bytes, 1 view
+class StringRef {       // 0x4 bytes, 1 view
 public:
     char* ptr;  // +0x0
     unsigned char IsEmpty(void);
-    Class_004c90b0* Append(Class_004c90b0&);
+    StringRef* Append(StringRef&);
 };
 
 class Class_004c9230 {  // 0x4 bytes, 1 view

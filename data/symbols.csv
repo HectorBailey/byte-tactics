@@ -2827,7 +2827,7 @@ address,name
 0x4c8020,DrawLitTexturedSpan
 0x4c8760,DrawTexturedPolygon
 0x4c8bb0,DrawLitTexturedPolygon
-0x4c90b0,Class_004c90b0::Append
+0x4c90b0,StringRef::Append
 0x4c9180,StringRef::StringRef
 0x4c9290,StringRef::MakeLower
 0x4c9310,StringRef::MakeUpper
@@ -4016,7 +4016,7 @@ address,name
 0x4fc6e8,g_groundOrders
 0x4fc920,Zero_004fc920$S6354
 0x4fc960,??_7DamagedAllyCollector@@6B@
-0x4fc968,Zero_004fc968$S34907
+0x4fc968,Zero_004fc968$S34908
 0x4fc980,??_7SquadTimer@@6B@
 0x4fc988,??_7AssaultTimer@@6B@
 0x4fc990,??_7EscortTimer@@6B@
