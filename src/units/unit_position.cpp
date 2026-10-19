@@ -54,12 +54,45 @@ struct Spawn;
 struct UnitType;
 struct Player;
 
-class Mission {
-public:
-    char unknown_0[0xd4c];
-    int waterDoesDamage;               // +0xd4c
-    int waterDamage;                   // +0xd50
-};
+#include "../map/mission.h"
+
+// 35 one-id declarations (docs/c2-regalloc.md): the header's declarations
+// move SendUnitStates' register window; these restore it.
+extern int probe_msn_0;
+extern int probe_msn_1;
+extern int probe_msn_2;
+extern int probe_msn_3;
+extern int probe_msn_4;
+extern int probe_msn_5;
+extern int probe_msn_6;
+extern int probe_msn_7;
+extern int probe_msn_8;
+extern int probe_msn_9;
+extern int probe_msn_10;
+extern int probe_msn_11;
+extern int probe_msn_12;
+extern int probe_msn_13;
+extern int probe_msn_14;
+extern int probe_msn_15;
+extern int probe_msn_16;
+extern int probe_msn_17;
+extern int probe_msn_18;
+extern int probe_msn_19;
+extern int probe_msn_20;
+extern int probe_msn_21;
+extern int probe_msn_22;
+extern int probe_msn_23;
+extern int probe_msn_24;
+extern int probe_msn_25;
+extern int probe_msn_26;
+extern int probe_msn_27;
+extern int probe_msn_28;
+extern int probe_msn_29;
+extern int probe_msn_30;
+extern int probe_msn_31;
+extern int probe_msn_32;
+extern int probe_msn_33;
+extern int probe_msn_34;
 
 #include "../network/player.h"
 
