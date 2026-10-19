@@ -150,3 +150,13 @@ reason is what stopped it. A module whose row list is empty is one file.
 | weapons/explosions | src/weapons/explosions_420d20.cpp | Gap region (`data/functions.csv`): `tools/gapcheck.py` sizes a region by the file it is in, so it cannot share explosions.cpp. |
 | units/unit_types | src/units/unit_types_42a8d0.cpp | Gap region (`data/functions.csv`): `tools/gapcheck.py` sizes a region by the file it is in, so it cannot share unit_types.cpp. |
 | ingame/selection | src/ingame/selection_48cf30.cpp | Merged (with the module's Unit, UnitDef and Game views), the position arithmetic of the offset order takes the other operand order (96.6% in place after 0x48cd80, 83.4% at the end of the file); 0 to 12 added declarations do not move it. The file matches only within five symbol ids of its own count. |
+| frontend/endgame | src/frontend/endgame_41dc20.cpp | Gap region (`data/functions.csv`): `tools/gapcheck.py` sizes a region by the file it is in, so it cannot share endgame.cpp. |
+| frontend/frontend | src/frontend/frontend_428bc0.cpp | Merged, `CodeChecksumFailed`'s `return 0` is visible to its callers and inlined into every checksum check, deleting the branch; it must stay out of their translation unit. |
+| frontend/options | src/frontend/options_45c820.cpp | Its own declaration context decides the match; with options.cpp's types and includes it stops matching. |
+| game/economy | src/game/economy_401360.cpp | The resource account's methods must stay in this file to inline into `UpdatePlayerEconomy` (0x401360); the included headers also decide the float-add operand order. |
+| game/game_load | src/game/game_load_497c70.cpp | Gap region (`data/functions.csv`): `tools/gapcheck.py` sizes a region by the file it is in, so it cannot share game_load.cpp. |
+| gui/dialogs | src/gui/dialogs_4ac970.cpp | Matches only while its file's symbol ids stay small; no header set or declaration count in dialogs.cpp reaches them. |
+| orders/order_targets | src/orders/order_targets_44da00.cpp | Its `std::copy` specialization changes the vector instantiations 0x44d0e0 and 0x44d560 share. |
+| orders/order_targets | src/orders/order_targets_44ec30.cpp | `// FLAGS: /Gi`, which the merged file cannot carry; `/Gi` also moves 0x44e3c0's registers. |
+| runtime/basic_string | src/runtime/basic_string_4c4fa0.cpp | Gap region (`data/functions.csv`): `_Copy` has a try/catch frame and no FPO record, and `tools/gapcheck.py` sizes a region by the file it is in. |
+| game/victory | src/game/victory_490230.cpp | `mission_conditions.h` records it: `CheckVictory` matches only in a file of its own, where few enough symbols come before it to keep its SIB operand order. |
