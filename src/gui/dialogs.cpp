@@ -56,9 +56,7 @@ struct Flags_004ab400 {
 // A mouse event, 0x18 bytes (gui.h's pointX to pointDoubleClick).
 #include "mouse_event.h"
 
-// The rectangle of four ints, left, top, right and bottom. The shared header
-// costs one symbol id the view it replaces did not, and the block below pays
-// for it (docs/c2-regalloc.md).
+// The rectangle of four ints, left, top, right and bottom.
 #include "../graphics/rect.h"
 
 #include "gui.h"
@@ -73,8 +71,6 @@ struct Record_004ab2b0 {
 };
 
 // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
-// One declaration fewer than before: the shared rect.h include above took the
-// id it held (docs/c2-regalloc.md).
 int PlaceFeature(int, int, int, int, int);
 void __stdcall ClearBorderFeatures();
 

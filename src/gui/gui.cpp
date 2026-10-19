@@ -2762,7 +2762,7 @@ struct Holder_004a3780 {
 
 // Unused here: the symbol ids this declaration takes keep the allocation after
 // the Rect_004a3780 view was dropped (docs/c2-regalloc.md).
-int LowerBoundOrderTypes(int, int, int, int, int, int);
+int ScanDirectory(int, int, int, int, int, int);
 
 struct Point_004a3780 {                // 0x18 bytes, copied with rep movsd x6
     int x;                             // +0x00
