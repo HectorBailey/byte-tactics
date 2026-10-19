@@ -9,9 +9,11 @@
 // The lean <windows.h> and the two symbol-only headers below are what the
 // symbol-id windows of the drawing functions (0x417bb0 to 0x418310) need
 // (docs/c2-regalloc.md); the full <windows.h> moves them out.
-// The members of CommandArgs and Sound that nothing here calls take the symbol
-// ids the (CommandArgs*) casts of the commands above 0x4181d0 used to, which
-// its window needs. The commands with a void* parameter keep their casts.
+// The members of Sound that nothing here calls take the symbol ids the
+// (CommandArgs*) casts of the commands above 0x4181d0 used to, which its
+// window needs; the two CommandArgs members that took the same ids are gone,
+// their ids are in ScanDirectory's real parameter list below. The commands
+// with a void* parameter keep their casts.
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <stdio.h>
@@ -287,9 +289,8 @@ public:
     char* GetArg(int index, char* fallback);
     int Tokenize(char* text, char* end);
     CommandArgs* InitArgs();
-    // Not called here: the two take the ids of removed casts (see the top).
-    void ShiftArgs(int n);
-    void SubstituteArgs(CommandArgs* other);
+    // The two members that nothing here calls are gone: their ids are
+    // ScanDirectory's real parameter list below (docs/c2-regalloc.md).
 };
 
 // Kept, not sound/sound.h: the header moves CmdDoubleShot (0x417030), CmdMakePoster (0x417600), DrawWorldDeltaLine (0x417c70), DrawCellContours (0x4181d0) and DrawMapDebugOverlay (0x418310).
@@ -312,8 +313,9 @@ public:
 
 // Unused here: the symbol ids this declaration takes keep the allocation after
 // the Sound join (docs/c2-regalloc.md). The unit_def.h include above takes the
-// ids the rest of the parameter list used to, so the declaration keeps two.
-int ScanDirectory(char*, char*);
+// ids the rest of the parameter list used to, so the declaration keeps the six
+// parameters ScanDirectory really has.
+int ScanDirectory(int, int, int, int, int, int);
 
 struct Display_00417a60 {
     char unknown_0[0xf0];

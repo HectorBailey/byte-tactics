@@ -139,7 +139,7 @@ int __stdcall IsKeyDown(int a);
 void EndGameFrame();
 void RunEndGameState(void);
 void MenuFrame();
-void __cdecl LeaveNetGameCallback();
+void __cdecl LeaveNetGameCallback(int param);
 
 // FUNCTION: 0x498f70
 void __stdcall HandleLeftClick(MouseEvent* mouse)
