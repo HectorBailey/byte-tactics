@@ -14,7 +14,7 @@ struct Entry_0044c420 {                // DESCLIST / PICLIST gadget
     short firstRow;                    // +0xbc
     char unknown_be[0xc0 - 0xbe];
     short count;                       // +0xc0 picture slot count
-    void* field_c2;                    // +0xc2 freed scratch
+    void* listText;                    // +0xc2 the DESCLIST text lines, freed here
     void* rows;                        // +0xc6 freed scratch
     char unknown_ca[0xd6 - 0xca];
     char* flags;                       // +0xd6 per-item flags, freed
@@ -116,7 +116,7 @@ void __stdcall HandleRestrictionsClick(Menu_0044c420* menu)
         GameFreeThunk(desc->rows);
         GameFreeThunk(g_unitRestrictPics);
         g_unitRestrictPics = 0;
-        GameFreeThunk(desc->field_c2);
+        GameFreeThunk(desc->listText);
         SetDescListCleanupFlag((int)menu, 1);
         if (IsHostLocal() != 0) {
             for (i = 0; i < g_game->unitDefCount; i++) {
