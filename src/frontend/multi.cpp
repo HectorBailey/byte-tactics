@@ -463,7 +463,7 @@ void __stdcall HandleNewMultiClick(Gui* gadget);
 // GLOBAL: 0x511de8
 extern Game* g_game;
 extern char g_onlineLobbyPassword;
-extern int DAT_00512c80;
+extern int g_cmdlineDplayProvider;
 extern GUID g_dpspGuidModem;
 extern GUID g_dpspGuidTcpip;
 extern GUID g_dpspGuidIpx;

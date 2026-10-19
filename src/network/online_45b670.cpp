@@ -4,7 +4,7 @@
 #include <windows.h>
 #include <string.h>
 
-extern int DAT_00512c80[0x54];      // the online configuration, 0x150 bytes
+extern int g_cmdlineDplayProvider[0x54];  // the online configuration, 0x150 bytes
 // GLOBAL: 0x512dd0
 extern char g_onlineDllPath[MAX_PATH + 1];
 extern int g_onlineConfigLoaded;
@@ -63,10 +63,10 @@ static int LoadConfigFile(char* file, void* config, int size)
 int __stdcall Onl_LoadConfigFile(char* file)
 {
     g_onlineConfigLoaded = 0;
-    memset(DAT_00512c80, 0, sizeof(DAT_00512c80));
+    memset(g_cmdlineDplayProvider, 0, sizeof(g_cmdlineDplayProvider));
     try {
         if (LoadOnline() && CheckVersion())
-            g_onlineConfigLoaded = LoadConfigFile(file, DAT_00512c80, sizeof(DAT_00512c80));
+            g_onlineConfigLoaded = LoadConfigFile(file, g_cmdlineDplayProvider, sizeof(g_cmdlineDplayProvider));
     } catch (...) {
         g_onlineConfigLoaded = 0;
     }

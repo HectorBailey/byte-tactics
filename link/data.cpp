@@ -445,7 +445,7 @@ int g_packetModes[45];  // 0x512bc0 .bss (the type runs past the next known addr
 char* g_loungeChatter;  // 0x512c74 .bss
 int g_loungeRefreshTime;  // 0x512c78 .bss
 unsigned int g_timeoutTimerStart;  // 0x512c7c .bss
-unsigned char DAT_00512c80[336];  // 0x512c80 .bss (the type runs past the next known address, 0x512c80+0x4)
+unsigned char g_cmdlineDplayProvider[336];  // 0x512c80 .bss (the type runs past the next known address, 0x512c80+0x4)
 char g_onlineDllPath[260];  // 0x512dd0 .bss
 unsigned char DAT_00512ed4[20];  // 0x512ed4 .bss
 int g_onlineConfigLoaded;  // 0x512ee8 .bss
