@@ -1002,7 +1002,7 @@ extern int g_edgeSpan;
 
 struct Chunk {
     int field_0;
-    int field_4;
+    int high;
 };
 
 struct Range {
@@ -1026,14 +1026,14 @@ void __stdcall InterpEdgeUvFromScanline(int value, Range* out, int at_low, int a
     Chunk* table = g_edgeTable;
     int j = g_edgeListPrev[i];
     g_edgeHighIndex = j;
-    while (value > table[j].field_4) {
+    while (value > table[j].high) {
         j = g_edgeListPrev[j];
         i = g_edgeListPrev[i];
         g_edgeHighIndex = j;
         g_edgeLowIndex = i;
     }
-    int hi = table[j].field_4;
-    int lo = table[i].field_4;
+    int hi = table[j].high;
+    int lo = table[i].high;
     int size = hi - lo;
     int offset = hi - value;
     g_edgeSpan = size;
@@ -1079,14 +1079,14 @@ void __stdcall InterpEdgeUvFromScanline_B(int value, Range* out, int at_low, int
     Chunk* table = g_edgeTable;
     int j = g_edgeListNext[i];
     g_edgeHighIndexB = j;
-    while (value > table[j].field_4) {
+    while (value > table[j].high) {
         j = g_edgeListNext[j];
         i = g_edgeListNext[i];
         g_edgeHighIndexB = j;
         g_edgeLowIndexB = i;
     }
-    int hi = table[j].field_4;
-    int lo = table[i].field_4;
+    int hi = table[j].high;
+    int lo = table[i].high;
     int size = hi - lo;
     int offset = hi - value;
     g_edgeSpanB = size;
