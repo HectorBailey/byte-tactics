@@ -157,8 +157,8 @@ struct Game {
         unsigned short pauseFlags;      // +0x38a51
         Flags_00495e90_38a51 flags_38a51;
     };
-    char field_38a53[0x38b53 - 0x38a53];
-    char field_38b53[0x38c53 - 0x38b53];
+    char movieDir[0x100];           // +0x38a53, the directory holding MOVIE*
+    char moviePath[0x100];          // +0x38b53, the frame file built there
     int movieCaptureIndex;              // +0x38c53
     int movieOutputRate;
     int nextMovieFrameTick;             // +0x38c5b
@@ -609,7 +609,7 @@ void HandleGameKey(void)
                 // path[0x100] and data[4] (case 0xf8) pin the frame size.
                 char path[0x100];
                 char findData[0x118];
-                sprintf(path, "%s\\MOVIE*", g_game->field_38a53);
+                sprintf(path, "%s\\MOVIE*", g_game->movieDir);
                 int h = HAPI_FindFirst(path, findData, -1, 1);
                 if (h >= 0) {
                     do {
@@ -620,11 +620,11 @@ void HandleGameKey(void)
                     HAPI_FindClose(h);
                 }
                 g_game->movieCaptureIndex++;
-                sprintf(g_game->field_38b53, "%s\\MOVIE%03i",
-                        g_game->field_38a53, g_game->movieCaptureIndex);
-                MakeDirectoryPath(g_game->field_38b53);
+                sprintf(g_game->moviePath, "%s\\MOVIE%03i",
+                        g_game->movieDir, g_game->movieCaptureIndex);
+                MakeDirectoryPath(g_game->moviePath);
                 DrawBattleFrame(0, 1);
-                SaveScreenshot(g_game->field_38b53, "FRAM");
+                SaveScreenshot(g_game->moviePath, "FRAM");
                 g_game->nextMovieFrameTick = g_game->gameTick;
             }
         }

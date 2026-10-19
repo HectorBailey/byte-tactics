@@ -206,8 +206,8 @@ struct Game {
     char unknown_2851[0x2a43 - 0x2851];
     unsigned char playerIndex;            // +0x2a43
     char unknown_2a44[0x2c8e - 0x2a44];
-    unsigned short field_2c8e;            // +0x2c8e
-    unsigned short field_2c90;            // +0x2c90
+    unsigned short cursorMapCellX;        // +0x2c8e
+    unsigned short cursorMapCellZ;        // +0x2c90
     char unknown_2c92[0x2cba - 0x2c92];
     unsigned short hoverUnitId;           // +0x2cba
     unsigned short cellFeature;           // +0x2cbc
@@ -311,11 +311,11 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
         DrawString(surface, (unsigned char*)text, 0x190, pfstate, -1);
 
         int v = g_game->mapWidthTiles;
-        v *= (short)g_game->field_2c90;
-        v += (short)g_game->field_2c8e;
+        v *= (short)g_game->cursorMapCellZ;
+        v += (short)g_game->cursorMapCellX;
         unsigned char c = g_game->heightMap[v].shade;
-        sprintf(text, "XYH: %d %d %d\n", (short)g_game->field_2c8e,
-                (short)g_game->field_2c90, c);
+        sprintf(text, "XYH: %d %d %d\n", (short)g_game->cursorMapCellX,
+                (short)g_game->cursorMapCellZ, c);
         DrawString(surface, (unsigned char*)text, 0x208, pfstate, -1);
         return;
     }

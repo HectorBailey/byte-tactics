@@ -256,7 +256,7 @@ struct Game {
     int viewTop;                         // +0x142bf
     int viewRight;                       // +0x142c3
     int viewBottom;                      // +0x142c7
-    char field_142cb[0x142db - 0x142cb]; // +0x142cb
+    int minimapViewRect[4];              // +0x142cb
     void* finalSurface;                  // +0x142db
     void* mappedSurface;                 // +0x142df
     void* pictureSurface;                // +0x142e3
@@ -480,7 +480,7 @@ void __stdcall DrawRadar(void* param_1)
     if (g_game->timer.word.flags.pending) {
         g_game->timer.word.flags.pending = 0;
         DrawSurface(param_1, g_game->finalSurface, g_game->minimapGadgetX, g_game->minimapGadgetY);
-        DrawRectangle(param_1, g_game->field_142cb, g_game->hudPalette14);
+        DrawRectangle(param_1, g_game->minimapViewRect, g_game->hudPalette14);
     }
 }
 
