@@ -145,6 +145,9 @@ struct Path_0043d6d0 {
     TargetData_0043d6d0* motion;       // +0x0
 };
 
+// A view of UnitDef (units/unit_def.h). It stays local: including the header
+// adds declarations that drop seven functions (0x43b1f0, 0x43b400, 0x43c720,
+// 0x43cd20, 0x43d6d0, 0x43dc00, 0x43dd20) by one to three bytes each.
 struct UnitType_0043cd20 {           // 0x249 bytes
     char unknown_0[0x20];
     char name[0x20];                 // +0x20
