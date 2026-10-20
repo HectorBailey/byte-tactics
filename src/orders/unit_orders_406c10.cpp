@@ -10,9 +10,7 @@
 // type is Unit* (see 0x406c00.cpp).
 #include <vector>
 
-struct Unit {
-    int unknown_0;
-};
+#include "../units/unit.h"
 
 typedef std::vector<Unit*> Vec_00406c10;
 typedef Vec_00406c10::iterator (Vec_00406c10::*UcopyFn_00406c10)(
