@@ -51,10 +51,6 @@ extern int g_playBufferLooping;
 
 extern const GUID IID_IDirectSound3DBuffer;
 
-struct Pos_004cf570 {
-    int x, y, z;
-};
-
 struct IDirectSound3DBuffer : public IUnknown {
     virtual HRESULT __stdcall GetAllParameters(void* p) = 0;
     virtual HRESULT __stdcall GetConeAngles(LPDWORD a, LPDWORD b) = 0;
