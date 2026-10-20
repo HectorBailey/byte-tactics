@@ -524,136 +524,11 @@ struct GafEntry;
 struct GafFrame;
 struct Gui;
 
-// The file's one Gadget view: every entry list below and the functions at the
-// end share it. The per-function views were joined onto it.
-#pragma pack(push, 1)
-struct Gadget {                         // 0x15b bytes, one GUI list entry
-    unsigned char type;                 // +0x00
-    unsigned char team;                 // +0x01
-    char name[0x11];                    // +0x02 (strncpy 0x10)
-    short x;                            // +0x13
-    short y;                            // +0x15
-    short width;                        // +0x17
-    short height;                       // +0x19
-    int attribs;                        // +0x1b
-    int colours;                        // +0x1f
-    int image;                          // +0x23
-    char textureNumber;                 // +0x27
-    signed char tab;                    // +0x28
-    unsigned char active;               // +0x29
-    char unknown_2a;
-    void* archive;                      // +0x2b
-    GafEntry* gaf;                      // +0x2f
-    char helpKey[0xb4 - 0x33];          // +0x33
-    unsigned char resourceFlags;        // +0xb4
-    char unknown_b5;
-    union {
-        short count;                    // +0xb6 (entry 0 only)
-        char text[0x80];                // +0xb6
-        struct {                        // entry 0
-            char unknown_b6[2];
-            void* saveUnder;            // +0xb8, the SAVE UNDER bitmap
-            void* surface;              // +0xbc, the GUI SURFACE bitmap
-            void* archive;              // +0xc0
-            GafEntry* background;       // +0xc4
-        } assets;
-        struct {                        // type 12
-            char unknown_b6[2];
-            GafFrame* glyph;                    // +0xb8
-            unsigned short flag;        // +0xbc, bit 0 set by type 12
-        } frame;
-        struct {                        // type 2
-            int sortKey;                // +0xb6
-            short selected;             // +0xba
-            short firstRow;             // +0xbc
-            short maxFirstRow;          // +0xbe
-            short rowCount;             // +0xc0
-            char* listText;             // +0xc2, the list's text lines
-            void* rows;                 // +0xc6, the cell or item array
-            GafEntry* gaf;              // +0xca
-            void (__stdcall* callback)(Gui*, Gadget*);  // +0xce
-            char unknown_d2[4];
-            union {
-                int language;           // +0xd6
-                void* filebuf;          // +0xd6, buffer type 7/8 loads
-            };
-            short scroll;               // +0xda
-        } list;
-        struct {                        // entry 0
-            char unknown_b6[0x16];
-            char choice[0x10];          // +0xcc
-            char choice2[0x10];         // +0xdc
-        } names;
-        struct {                        // type 6, a hotspot
-            void (__stdcall* callback)(Gui*, Gadget*);  // +0xb6
-            char unknown_ba[4];
-            GafEntry* gaf;              // +0xbe
-            GafFrame* frame;            // +0xc2
-            short index;                // +0xc6
-            unsigned char flags;        // +0xc8
-        } hotspot;
-        struct {                        // type 13, a progress bar
-            int total;                  // +0xb6, the divisor of the fill
-            int value;                  // +0xba
-            int max;                    // +0xbe
-            int interval;               // +0xc2
-            int next;                   // +0xc6
-            float step;                 // +0xca
-            int active;                 // +0xce
-            int showText;               // +0xd2
-        } anim;
-    } u;
-    union {                             // +0x136
-        short range;
-        struct {
-            unsigned char stages;       // +0x136
-            unsigned char stageIndex;   // +0x137
-        };
-    };
-    short status;                       // +0x138 (the text length limit of a text input)
-    union {                             // +0x13a
-        struct {
-            unsigned char quickKey;
-            unsigned char frameBase;
-            union {                     // +0x13c
-                unsigned char grayedout;
-                unsigned short flag;    // bit 0 set by type 1
-                struct {
-                    unsigned short flag_bit : 1;
-                    unsigned short unknown_13c_1 : 15;
-                };
-                int max;
-            };
-        };
-        GafEntry* inputGaf;
-        struct {
-            char unknown_13a_b[0x14e - 0x13a];
-            GafEntry* sliderGaf;        // +0x14e
-            unsigned char sliderStyle;  // +0x152
-        };
-        struct {
-            char unknown_13a_c[0x140 - 0x13a];
-            short knobPos;              // +0x140
-            short knobSize;             // +0x142
-            void (__stdcall* sliderCallback)(Gui*, int);      // +0x144
-            short unknown_148;
-            int sliderUser;             // +0x14a
-        };
-        struct {
-            char unknown_13a_d[0x147 - 0x13a];
-            unsigned char hotkey;       // +0x147
-            unsigned int flag_148;      // +0x148, bit 0 set by type 5
-        };
-    };
-    char unknown_153[0x157 - 0x153];
-    int sliderLocked;                   // +0x157
-};
-#pragma pack(pop)
+#include "gadget.h"
 
 #pragma pack(push, 1)
 
 // Unused here: real declarations that keep the file's symbol count.
-void OpenInGameOptions();
 void RegisterEmptyAtexit();
 void EmptyAtexitHandler();
 void ResetChatHudIndices();
@@ -1646,7 +1521,7 @@ void __stdcall DrawListBox(Dialog_4a1b40* obj, int index)
         step = me->u.list.scroll;
     unsigned int flags;
     flags = me->attribs;
-    if ((flags & 0x10) && me->u.list.listText && 0 != me->u.list.rowCount) {
+    if ((flags & 0x10) && me->u.list.field_c2 && 0 != me->u.list.rowCount) {
         // Separate from cellRect: one shared rect changes the spill homes.
         Rect rowRect;
         int i;
@@ -1664,7 +1539,7 @@ void __stdcall DrawListBox(Dialog_4a1b40* obj, int index)
         if (i == entries->u.count + 1) { SetFont(g_guiContext->current); }
         GetFont();
         font = GetTextKeyColor();
-        char* q = SkipTextLines(me->u.list.listText, me->u.list.firstRow);
+        char* q = SkipTextLines(me->u.list.field_c2, me->u.list.firstRow);
         int line = 0;
         int y = me->u.list.firstRow;
         yoff = 0;
@@ -2549,7 +2424,7 @@ void __stdcall ConfigureListBoxByName(Dialog_4a32a0* param_1, char* name, int bi
         me = 0;
     }
     me->u.list.rowCount = (short)count;
-    me->u.list.listText = (char*)bitmap;
+    me->u.list.field_c2 = (char*)bitmap;
     me->attribs |= 0x10;
     me->u.list.scroll =
         (short)((me->u.list.scroll > FontHeight_004a32a0() + 1) ? (int)me->u.list.scroll : FontHeight_004a32a0() + 1);
@@ -2887,7 +2762,7 @@ int __stdcall HandleListBoxInput(Object_004a3780* obj, int index, int param_3)
                 me->u.list.selected = me->u.list.firstRow + step - 1;
             if (me->u.list.selected >= me->u.list.rowCount - 1)
                 me->u.list.selected = me->u.list.rowCount - 1;
-            s = SkipTextLines(me->u.list.listText, me->u.list.selected);
+            s = SkipTextLines(me->u.list.field_c2, me->u.list.selected);
             if (strncmp(DAT_00502a20, s, 2) != 0)
                 goto ret1;
             me->u.list.selected = orig_sel;
@@ -2924,7 +2799,7 @@ skip0:;
                 if (me->u.list.selected < 0)
                     me->u.list.selected = 0;
                 if (flags & 0x200) {
-                    s = SkipTextLines(me->u.list.listText, me->u.list.selected);
+                    s = SkipTextLines(me->u.list.field_c2, me->u.list.selected);
                     if (strncmp(DAT_00502a20, s, 2) == 0)
                         me->u.list.selected = orig_sel;
                 }
@@ -2991,8 +2866,8 @@ ret1:
             me->u.list.firstRow--;
             me->u.list.selected--;
             short sel = me->u.list.selected;
-            if (me->u.list.listText != 0) {
-                s = SkipTextLines(me->u.list.listText, sel < 0 ? 0 : sel);
+            if (me->u.list.field_c2 != 0) {
+                s = SkipTextLines(me->u.list.field_c2, sel < 0 ? 0 : sel);
                 if (strncmp(DAT_00502a20, s, 2) == 0)
                     me->u.list.selected = orig_sel;
             }
@@ -3007,8 +2882,8 @@ ret1:
             me->u.list.sortKey = GetTicks() + 2;
             me->u.list.firstRow++;
             me->u.list.selected = me->u.list.firstRow + step - 1;
-            if (me->u.list.listText != 0) {
-                s = SkipTextLines(me->u.list.listText, me->u.list.selected);
+            if (me->u.list.field_c2 != 0) {
+                s = SkipTextLines(me->u.list.field_c2, me->u.list.selected);
                 if (strncmp(DAT_00502a20, s, 2) == 0)
                     me->u.list.selected = orig_sel;
             }
@@ -5635,7 +5510,7 @@ int __stdcall RenderLayer(Gui* menu, unsigned int flags)
         if (menu->str_9b6[0])
             strcpy(buf2, menu->str_9b6);
         g = 0;
-        if (entries[i].resourceFlags & 1) {
+        if (entries[i].shown & 1) {
             entries[i].archive = 0;
             entries[i].gaf = 0;
             GetAnimsPath(menu, buf1);
@@ -5793,7 +5668,7 @@ int __stdcall RenderLayer(Gui* menu, unsigned int flags)
             Gadget* cur = &entries[i];
             cur->colours = 0;
             pf = &cur->attribs;
-            if ((cur->attribs & 0x1800) || (cur->resourceFlags & 1))
+            if ((cur->attribs & 0x1800) || (cur->shown & 1))
                 break;
             AssignQuickKey(menu, i);
             strncpy(textbuf, entries[i].name, 0x10);
@@ -6033,7 +5908,7 @@ int __stdcall RenderLayer(Gui* menu, unsigned int flags)
         FreeSurface(entries[0].u.assets.surface);
         entries[0].u.assets.surface = 0;
         for (int j = 0; j < 1 + entries[0].u.count; j = j + 1) {
-            if ((entries[j].resourceFlags & 1) && entries[j].archive)
+            if ((entries[j].shown & 1) && entries[j].archive)
                 GameFreeThunk(entries[j].archive);
             switch (entries[j].type) {
             case 0:
@@ -6225,8 +6100,8 @@ void __stdcall ListBoxSelectUp(Gui* param_1, int index)
             last--;
             me->u.list.firstRow = last;
         }
-        if (me->u.list.listText != 0) {
-            char* line = SkipTextLines(me->u.list.listText, prev);
+        if (me->u.list.field_c2 != 0) {
+            char* line = SkipTextLines(me->u.list.field_c2, prev);
             if (strncmp(DAT_00502a20, line, 2) == 0) {
                 me->u.list.selected = isel;
             }
@@ -6296,8 +6171,8 @@ void __stdcall ListBoxSelectDown(Gui* param_1, int index)
             if (next >= me->u.list.rowCount - 1) {
                 me->u.list.selected = me->u.list.rowCount - 1;
             }
-            if (me->u.list.listText != 0) {
-                char* line = SkipTextLines(me->u.list.listText, me->u.list.selected);
+            if (me->u.list.field_c2 != 0) {
+                char* line = SkipTextLines(me->u.list.field_c2, me->u.list.selected);
                 if (strncmp(DAT_00502a20, line, 2) == 0) {
                     me->u.list.selected = isel;
                 }
