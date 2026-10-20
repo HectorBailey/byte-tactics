@@ -6,9 +6,7 @@
 // 0x40aa40 and 0x40ad80 call it.
 #include <vector>
 
-struct Unit {
-    int unknown_0;
-};
+#include "../units/unit.h"
 
 typedef std::vector<Unit*> Vec_00408f30;
 typedef void (Vec_00408f30::*InsertFn_00408f30)(
