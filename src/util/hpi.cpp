@@ -1291,7 +1291,7 @@ struct HapiBuf {
 };
 
 // The 20-byte "HAPI" header written at the front of a package.
-struct Hapi_004bd160 {
+struct HapiHeader {
     char magic[4];
     char a4;
     char a5;
@@ -1344,7 +1344,7 @@ int __stdcall HAPI_PackDirectory(char* srcname, char* dstname, void (__cdecl* cb
     off = HAPI_BuildArchiveDirectory(srcname, &sb, (int*)&extra);
 
     {
-        struct Hapi_004bd160* h = (struct Hapi_004bd160*)sb.buf;
+        struct HapiHeader* h = (struct HapiHeader*)sb.buf;
         unsigned int m;
         unsigned int t;
         unsigned char k;
@@ -1406,7 +1406,7 @@ int __stdcall HAPI_PackDirectory(char* srcname, char* dstname, void (__cdecl* cb
 
 #pragma pack(push, 1)
 // A file's record in a package directory: the offset of its data and its size.
-struct Node_004bd3b0 {
+struct HpiEntry {
     unsigned int offset; // +0
     unsigned int size;   // +4
     unsigned char flags; // +8
@@ -1500,7 +1500,7 @@ unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf* out, int*
                     e += k;
                     e->data = nodeOff;
                     // Addressed through e->data: this second use of e keeps the store unfolded.
-                    Node_004bd3b0* node = (Node_004bd3b0*)(out->buf + e->data);
+                    HpiEntry* node = (HpiEntry*)(out->buf + e->data);
                     node->size = fd.size;
                     node->offset = 0;
                     node->flags = 0;

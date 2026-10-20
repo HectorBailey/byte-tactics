@@ -83,15 +83,15 @@ struct Unit {
     unsigned int flags;                // +0x110
 };
 
-struct Slot_0047fd70 {
+struct SoundSlot {
     int count;                         // +0x0
     char* table1;                      // +0x4
     char* table2;                      // +0x8
 };
 
-struct SoundCat_0047fd70 {
+struct SoundCategory {
     char unknown_0[0x40];
-    Slot_0047fd70 slots[24];           // +0x40
+    SoundSlot slots[24];           // +0x40
 };
 
 // The header's type, kept local: its explored sizes are ints where these
@@ -128,7 +128,7 @@ struct Game {
     int soundCount;                    // +0x33a0f
     int sounds[256];                   // +0x33a13
     char soundNames[512][0x20];        // +0x33e13
-    SoundCat_0047fd70* soundCategories;     // +0x37e13
+    SoundCategory* soundCategories;     // +0x37e13
     char unknown_37e17[0x37f0c - 0x37e17];
     int fxVolume;                      // +0x37f0c
     char unknown_37f10[0x37f17 - 0x37f10];
@@ -183,7 +183,7 @@ public:
 };
 
 // One of the 24 sound messages: priority, repeat delay, text and the frame it is next allowed.
-struct Message_0047fad0 {
+struct SoundMessage {
     int priority;                      // +0x0
     int cooldown;                      // +0x4
     int unknown_8;
@@ -195,7 +195,7 @@ struct Message_0047fad0 {
 
 extern Game* g_game;
 extern SpeechQueue* g_speechQueue;
-extern Message_0047fad0 g_speechTypes[24];
+extern SoundMessage g_speechTypes[24];
 extern int g_noDirectSound;            // NoDirectSound
 extern int g_useWindowsSound;          // UseWindowsSound
 extern int g_playLooping;
@@ -742,7 +742,7 @@ void SpeechQueue::PlaySpeech(int index, int param_2, int param_3)
     int slot = entries[index].kind;
     unsigned int catIndex = 0;
     catIndex = (unsigned short)entries[index].unit->def->soundcategory;
-    SoundCat_0047fd70* cat = &g_game->soundCategories[catIndex];
+    SoundCategory* cat = &g_game->soundCategories[catIndex];
     int count = cat->slots[slot].count;
     int idx = (int)((__int64)rand() * count / 0x8000);
 

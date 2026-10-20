@@ -12,8 +12,8 @@
 #include <string.h>
 #include <math.h>
 
-struct Node_004d0b10;
-extern Node_004d0b10* g_squashDictTree;
+struct SquashNode;
+extern SquashNode* g_squashDictTree;
 extern char* g_squashWindow;
 
 // Frees the window buffer allocated by 0x4d0a70.
@@ -43,7 +43,7 @@ int LzssFreeTree()
 }
 
 // The LZSS binary-tree node; the array holds 0x1000 nodes and the root.
-struct Node_004d0b10 {
+struct SquashNode {
     unsigned short parent;           // +0x0
     unsigned short smaller;          // +0x2
     unsigned short larger;           // +0x4
@@ -175,7 +175,7 @@ int __stdcall LzssAddString(int pos, int* out)
             best = n;
             *out = cur;
             if (n >= 0x11) {
-                Node_004d0b10* par = &g_squashDictTree[g_squashDictTree[cur].parent];
+                SquashNode* par = &g_squashDictTree[g_squashDictTree[cur].parent];
                 if (par->smaller == (unsigned short)cur)
                     par->smaller = pos;
                 else
@@ -263,7 +263,7 @@ int __stdcall LzssCompress(unsigned char *dest, unsigned char *src, int len) {
         }
         return -1;
     }
-    g_squashDictTree = (Node_004d0b10 *)calloc(0x1001, 6);
+    g_squashDictTree = (SquashNode *)calloc(0x1001, 6);
     if (g_squashDictTree == 0) {
         printf("Could not alloc compression tree.\n");
         if (state.own == 0) {
@@ -506,7 +506,7 @@ int __stdcall LzssSetPreset(unsigned char* src, int len)
         printf("Could not alloc decompression window.\n");
         return -1;
     }
-    g_squashDictTree = (Node_004d0b10*)calloc(0x1001, 6);
+    g_squashDictTree = (SquashNode*)calloc(0x1001, 6);
     if (g_squashDictTree == 0) {
         printf("Could not alloc compression tree.\n");
         return -1;

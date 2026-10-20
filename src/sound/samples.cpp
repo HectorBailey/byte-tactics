@@ -153,14 +153,14 @@ extern Sound* g_cdPlayer;
 extern HANDLE g_squashThreadLockEvent;
 extern int g_squashThreadLockTicket;
 
-struct Entry_004d0a10 {
+struct SquashNode {
     short a;                 // +0x0
     short b;                 // +0x2
     short c;                 // +0x4
 };
 
 struct Struct_00526ff0 {
-    Entry_004d0a10 entries[0x1000];
+    SquashNode entries[0x1000];
     short field_6000;        // +0x6000
     short field_6002;        // +0x6002
     short field_6004;        // +0x6004
