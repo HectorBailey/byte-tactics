@@ -18,7 +18,7 @@ struct Owner { char pad0[0x108]; unsigned char allied[0x3e]; unsigned char index
 class UnitMotion { public: char pad0[0x2e]; unsigned char flags; void SetFlightMode(Unit*, int); };
 struct Unit {
     UnitMotion* motion; char pad4[4]; Weapon weapons[3]; Order* list;
-    char pad60[10]; Vec3 pos; char pad76[8]; short width; short depth; int spatialBucket; int carrier;
+    char pad60[10]; Vec3 pos; char pad76[8]; Point16 footprint; int spatialBucket; int carrier;
     char pad8a[8]; UnitDef* def; Owner* player; char pad9a[12]; unsigned short unitDefIndex;
     char pada8[0xf0-0xa8]; Unit* attacker; char padf4[0x108-0xf4]; short health;
     char pad10a[6]; unsigned int flags;
