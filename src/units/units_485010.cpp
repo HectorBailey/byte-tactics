@@ -230,7 +230,7 @@ struct Unit {                          // 0x118 bytes
     char unknown_58[0x64 - 0x58];
     Angles16 angles;                   // +0x64
     Pos_00485a40 pos;                  // +0x6a
-    ShortPair_485a40 screen;           // +0x76
+    ShortPair_485a40 cell;             // +0x76
     short losCacheCellX;                    // +0x7a
     short losCacheCellZ;                    // +0x7c
     ShortPair_485a40 footprint;        // +0x7e
@@ -619,8 +619,8 @@ void __stdcall ResetWeaponTarget(Unit* unit, int index);
 void __stdcall SetUnitSquad(Unit* unit, int param_2);
 int __stdcall RandomInt(int range);
 
-// Sets up a unit from its unit type: flags, offsets, screen position, weapon
-// targets and the squad. The screen Y projection uses the passed position Z.
+// Sets up a unit from its unit type: flags, offsets, cell position, weapon
+// targets and the squad. The cell Y projection uses the passed position Z.
 // FUNCTION: 0x485a40
 void __stdcall InitUnitFromType(Unit* unit, Pos_00485a40 pos, int param_5)
 {
@@ -661,10 +661,10 @@ void __stdcall InitUnitFromType(Unit* unit, Pos_00485a40 pos, int param_5)
     unit->pos = pos;
 
     ShortPair_485a40 off = unit->footprint;
-    ShortPair_485a40 screen;
-    screen.x = (short)((pos.x - off.x * 0x80000 + 0x80000) >> 20);
-    screen.y = (short)((pos.z - off.y * 0x80000 + 0x80000) >> 20);
-    unit->screen = screen;
+    ShortPair_485a40 cell;
+    cell.x = (short)((pos.x - off.x * 0x80000 + 0x80000) >> 20);
+    cell.y = (short)((pos.z - off.y * 0x80000 + 0x80000) >> 20);
+    unit->cell = cell;
 
     unit->angles.heading = (short)(RandomInt(unit->def->buildangle)
                                     + (0x8000 - unit->def->buildangle / 2));
@@ -1013,7 +1013,7 @@ void __stdcall CreateUnitCorpse(Unit* unit, int depth, int flag)
         id = g_game->features[id].next;
     }
     if (id < 0xfffb) {
-        void* target = GetMapCell(unit->screen.x, unit->screen.y);
+        void* target = GetMapCell(unit->cell.x, unit->cell.y);
         if (target != 0) {
             Pos_00485070* pos = (Pos_00485070*)&unit->pos;
             if (GetGroundHeight(pos) <= g_game->seaLevel) {
