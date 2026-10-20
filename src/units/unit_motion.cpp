@@ -13,26 +13,10 @@ void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 #include "../map/cell.h"
 #include "../util/vec3.h"
 
-struct Point16_437840 {
-    short x;
-    short y;
-};
-
 #pragma pack(push, 1)
 #include "../units/unit_def.h"
 
-struct Unit {
-    char unknown_0[0x58];
-    float extraction;                  // +0x58
-    char unknown_5c[0x76 - 0x5c];
-    Point16_437840 cell;               // +0x76
-    char unknown_7a[0x7e - 0x7a];
-    Point16_437840 footprint;          // +0x7e
-    char unknown_82[0x92 - 0x82];
-    UnitDef* def;              // +0x92
-    char unknown_96[0x9a - 0x96];
-    CobScript* script;                 // +0x9a
-};
+#include "unit.h"
 
 struct Game {
     char unknown_0[0x1431f];
@@ -182,7 +166,7 @@ void __stdcall UpdateMetalExtraction(Unit* unit)
     if (unit->def->extractsMetal > 0.0f) {
         Fixed_437840 total;
         total.value = 0;
-        Point16_437840 fp = unit->footprint;
+        Point16 fp = unit->footprint;
         for (int y = unit->cell.y; y < unit->cell.y + fp.y; y++) {
             for (int x = unit->cell.x; x < unit->cell.x + fp.x; x++) {
                 Cell* c = GetMapCell(x, y);
