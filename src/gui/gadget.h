@@ -57,7 +57,7 @@ struct Gadget {                         // 0x15b bytes, one GUI list entry
             short firstRow;             // +0xbc, the first line shown
             short maxFirstRow;          // +0xbe, the largest value of firstRow
             short rowCount;             // +0xc0, the number of lines or items
-            char* field_c2;             // +0xc2, the text lines
+            char* listText;             // +0xc2, the text lines
             void* rows;                 // +0xc6, the cell or item array
             GafEntry* gaf;              // +0xca
             void (__stdcall* callback)(Gui*, Gadget*);  // +0xce
