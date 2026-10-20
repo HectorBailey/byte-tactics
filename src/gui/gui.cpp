@@ -1521,7 +1521,7 @@ void __stdcall DrawListBox(Dialog_4a1b40* obj, int index)
         step = me->u.list.scroll;
     unsigned int flags;
     flags = me->attribs;
-    if ((flags & 0x10) && me->u.list.field_c2 && 0 != me->u.list.rowCount) {
+    if ((flags & 0x10) && me->u.list.listText && 0 != me->u.list.rowCount) {
         // Separate from cellRect: one shared rect changes the spill homes.
         Rect rowRect;
         int i;
@@ -1539,7 +1539,7 @@ void __stdcall DrawListBox(Dialog_4a1b40* obj, int index)
         if (i == entries->u.count + 1) { SetFont(g_guiContext->current); }
         GetFont();
         font = GetTextKeyColor();
-        char* q = SkipTextLines(me->u.list.field_c2, me->u.list.firstRow);
+        char* q = SkipTextLines(me->u.list.listText, me->u.list.firstRow);
         int line = 0;
         int y = me->u.list.firstRow;
         yoff = 0;
@@ -2424,7 +2424,7 @@ void __stdcall ConfigureListBoxByName(Dialog_4a32a0* param_1, char* name, int bi
         me = 0;
     }
     me->u.list.rowCount = (short)count;
-    me->u.list.field_c2 = (char*)bitmap;
+    me->u.list.listText = (char*)bitmap;
     me->attribs |= 0x10;
     me->u.list.scroll =
         (short)((me->u.list.scroll > FontHeight_004a32a0() + 1) ? (int)me->u.list.scroll : FontHeight_004a32a0() + 1);
@@ -2762,7 +2762,7 @@ int __stdcall HandleListBoxInput(Object_004a3780* obj, int index, int param_3)
                 me->u.list.selected = me->u.list.firstRow + step - 1;
             if (me->u.list.selected >= me->u.list.rowCount - 1)
                 me->u.list.selected = me->u.list.rowCount - 1;
-            s = SkipTextLines(me->u.list.field_c2, me->u.list.selected);
+            s = SkipTextLines(me->u.list.listText, me->u.list.selected);
             if (strncmp(DAT_00502a20, s, 2) != 0)
                 goto ret1;
             me->u.list.selected = orig_sel;
@@ -2799,7 +2799,7 @@ skip0:;
                 if (me->u.list.selected < 0)
                     me->u.list.selected = 0;
                 if (flags & 0x200) {
-                    s = SkipTextLines(me->u.list.field_c2, me->u.list.selected);
+                    s = SkipTextLines(me->u.list.listText, me->u.list.selected);
                     if (strncmp(DAT_00502a20, s, 2) == 0)
                         me->u.list.selected = orig_sel;
                 }
@@ -2866,8 +2866,8 @@ ret1:
             me->u.list.firstRow--;
             me->u.list.selected--;
             short sel = me->u.list.selected;
-            if (me->u.list.field_c2 != 0) {
-                s = SkipTextLines(me->u.list.field_c2, sel < 0 ? 0 : sel);
+            if (me->u.list.listText != 0) {
+                s = SkipTextLines(me->u.list.listText, sel < 0 ? 0 : sel);
                 if (strncmp(DAT_00502a20, s, 2) == 0)
                     me->u.list.selected = orig_sel;
             }
@@ -2882,8 +2882,8 @@ ret1:
             me->u.list.sortKey = GetTicks() + 2;
             me->u.list.firstRow++;
             me->u.list.selected = me->u.list.firstRow + step - 1;
-            if (me->u.list.field_c2 != 0) {
-                s = SkipTextLines(me->u.list.field_c2, me->u.list.selected);
+            if (me->u.list.listText != 0) {
+                s = SkipTextLines(me->u.list.listText, me->u.list.selected);
                 if (strncmp(DAT_00502a20, s, 2) == 0)
                     me->u.list.selected = orig_sel;
             }
@@ -6100,8 +6100,8 @@ void __stdcall ListBoxSelectUp(Gui* param_1, int index)
             last--;
             me->u.list.firstRow = last;
         }
-        if (me->u.list.field_c2 != 0) {
-            char* line = SkipTextLines(me->u.list.field_c2, prev);
+        if (me->u.list.listText != 0) {
+            char* line = SkipTextLines(me->u.list.listText, prev);
             if (strncmp(DAT_00502a20, line, 2) == 0) {
                 me->u.list.selected = isel;
             }
@@ -6171,8 +6171,8 @@ void __stdcall ListBoxSelectDown(Gui* param_1, int index)
             if (next >= me->u.list.rowCount - 1) {
                 me->u.list.selected = me->u.list.rowCount - 1;
             }
-            if (me->u.list.field_c2 != 0) {
-                char* line = SkipTextLines(me->u.list.field_c2, me->u.list.selected);
+            if (me->u.list.listText != 0) {
+                char* line = SkipTextLines(me->u.list.listText, me->u.list.selected);
                 if (strncmp(DAT_00502a20, line, 2) == 0) {
                     me->u.list.selected = isel;
                 }

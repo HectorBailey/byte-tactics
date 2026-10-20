@@ -136,7 +136,7 @@ extern Game* g_game;
 extern char* g_savegameDir;
 extern char g_emptyStringLiteral[];
 extern const char g_invalidSavegameText[]; // "Invalid savegame file"
-extern char g_savegameRadarFrame[];
+extern GafFrame g_savegameRadarFrame;
 extern char* g_savegameFileNames;
 extern char* g_savegameDescs;
 extern char* g_savegameSideList;
@@ -252,8 +252,8 @@ void __stdcall ShowSavedGameInfo()
                 FreeSurface(g_savegameRadarPreview);
             g_savegameRadarPreview = (char*)LoadSurface(file);
             if (g_savegameRadarPreview != 0) {
-                FrameFromSurface(g_savegameRadarFrame, g_savegameRadarPreview);
-                radar->u.list.field_c2 = g_savegameRadarFrame;
+                FrameFromSurface(&g_savegameRadarFrame, g_savegameRadarPreview);
+                radar->u.hotspot.frame = &g_savegameRadarFrame;
             }
             SetGadgetActiveByName(menu, "RADAR", g_savegameRadarPreview != 0);
 
