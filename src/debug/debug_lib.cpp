@@ -4885,7 +4885,7 @@ public:
 };
 
 struct Entry_004df590 {
-    int field_0;                       // +0x0
+    int event;                         // +0x0
     LPARAM text;                       // +0x4
     int flags_8;                       // +0x8
     char* name;                        // +0xc
@@ -5134,7 +5134,7 @@ BOOL PerformanceDialog::HandlePerformanceMessage(UINT msg, WPARAM wParam, LPARAM
                                 int n = 0;
                                 for (int k = 0; k < count; k++) {
                                     if (entries[k].flags_8 & nmask) {
-                                        if (entries[k].field_0 == (int)entries[j].name) {
+                                        if (entries[k].event == (int)entries[j].name) {
                                             g_pmcEvent0[1 - b] = entries[k];
                                             SendDlgItemMessageA(hwnd,
                                                 (LOWORD(wParam) == 0x3ed) ? 0x3ee : 0x3ed,
@@ -5274,7 +5274,7 @@ BOOL PerformanceDialog::HandlePerformanceMessage(UINT msg, WPARAM wParam, LPARAM
             for (int j = 0; j < count; j++) {
                 Entry_004df590* e = &entries[j];
                 if (entries[j].flags_8 & mask) {
-                    if (e->field_0 == g_pmcEvent0[i].field_0)
+                    if (e->event == g_pmcEvent0[i].event)
                         sel = n;
                     n++;
                     SendDlgItemMessageA(hwnd, id, 0x143, 0, e->text);
@@ -6266,9 +6266,9 @@ void InitPerformanceEvents(void)
             EventEntry* e1 = &g_pmcEvent1;
             EventEntry* e0 = &g_pmcEvent0[0];
             for (int i = 0; i < count; i++) {
-                if (e0->field_0 == table[i].field_0)
+                if (e0->event == table[i].event)
                     *e0 = table[i];
-                if (e1->field_0 == table[i].field_0)
+                if (e1->event == table[i].event)
                     *e1 = table[i];
             }
             if (g_pmcEvent0[0].text == 0)
@@ -6542,18 +6542,18 @@ void NameMapTree::RotateRight(_Nodeptr _X)
 }
 
 struct Data1 {
-    int field_0;
+    int ptr;                           // +0x0
 };
 
 struct Data2 {
-    char field_0;
+    char inserted;                     // +0x0
 };
 
 // FUNCTION: 0x4e2a10
 NameMapInsertResult* NameMapInsertResult::Assign(const Data1* iter, const Data2* inserted)
 {
-    *(int*)&first = iter->field_0;
-    *(char*)&second = inserted->field_0;
+    *(int*)&first = iter->ptr;
+    *(char*)&second = inserted->inserted;
     return this;
 }
 
