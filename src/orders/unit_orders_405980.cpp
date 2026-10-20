@@ -8,7 +8,7 @@ struct Unit;
 #pragma pack(push, 1)
 #include "../units/unit_def.h"
 #include "../network/player.h"
-struct Unit { char pad0[0x6a]; Vec3 pos; char pad76[0x92-0x76]; UnitDef* def; Player* player; };
+#include "../units/unit.h"
 #include "order.h"
 #pragma pack(pop)
 class DamagedAllyCollector {
