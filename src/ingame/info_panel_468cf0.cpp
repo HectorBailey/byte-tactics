@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <memory.h>
+
+#include "../map/cell.h"
 typedef unsigned char byte;
 typedef unsigned short ushort;
 typedef unsigned int uint;
@@ -108,15 +110,6 @@ struct Resources {          // g_game+0x37e3f, 33 bytes
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-struct Tile_00468cf0 {       // 0xd bytes
-  char unknown_0[4];
-  byte height;               // +0x04
-  char unknown_5[3];
-  ushort feature;            // +0x08, a feature index; 0xfffb and up is none
-  char unknown_a[2];
-  byte flags;                // +0x0c
-};
-
 struct Feature_00468cf0 {    // 0x100 bytes
   char unknown_0[0x94];
   short footprintX;          // +0x94
@@ -129,7 +122,7 @@ struct Feature_00468cf0 {    // 0x100 bytes
 #pragma pack(pop)
 
 struct Unit_00468cf0;
-struct MapGrid { Unit_00468cf0 **buf; Unit_00468cf0 ***cursor; ushort *count; char pad1[0x2c]; int width; int height; char pad2[0x10]; int stride; int rows; char pad3[0x34]; Tile_00468cf0 *tiles; };
+struct MapGrid { Unit_00468cf0 **buf; Unit_00468cf0 ***cursor; ushort *count; char pad1[0x2c]; int width; int height; char pad2[0x10]; int stride; int rows; char pad3[0x34]; Cell *tiles; };
 struct Bits8 { ushort b0:1; ushort b1:1; ushort b2:1; ushort b3:1; ushort b4:1; ushort b5:1; ushort b6:1; ushort b7:1; };
 struct UnitFlags { uint kind:2; uint b2:1; uint b3:1; uint b4:1; uint b5:1; uint b6:1; uint b7:1; };
 
@@ -183,7 +176,7 @@ struct Unit_00468cf0 {                 // 0x118 bytes
 };
 
 // A side's panel layout at g_game+0x37f3d, stride 0x232 (Thaldren: SideDef).
-struct SideDef_00468cf0 {
+struct SideDef {
   char aName[0x1e];                   // +0x000
   char aNamePrefix[4];                // +0x01e
   char aCommander[0x20];              // +0x022
@@ -309,7 +302,7 @@ struct Game {
     Bits8 bits_37f2f;
   };
   char unknown_37f31[0x37f3d - 0x37f31];
-  SideDef_00468cf0 sideDefs[5];         // +0x37f3d, stride 0x232
+  SideDef sideDefs[5];         // +0x37f3d, stride 0x232
   char unknown_38a37[0x38a47 - 0x38a37];
   unsigned int gameTick;                // +0x38a47
   char unknown_38a4b[0x38a51 - 0x38a4b];
@@ -364,7 +357,7 @@ static void DrawResourcePanel(Surface *ctx, PlayerState_00468cf0 *pl, Resources 
   Rect bar, box;
   char text[32];
   int side = pl->info->bSideId;
-  SideDef_00468cf0 *sideDef = &g_game->sideDefs[side];
+  SideDef *sideDef = &g_game->sideDefs[side];
   SetFont((int)sideDef->pFontData);
   GetFontHeight();
   byte *pal = &g_game->colors[0];
@@ -576,7 +569,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
     i = 0;
     while (i < h) {
       x = x0;
-      Tile_00468cf0 *tile = mv->tiles + (mv->width * y + x);
+      Cell *tile = mv->tiles + (mv->width * y + x);
       int c = 0;
       while (c < w) {
         tile->flags &= 0xfb;
@@ -617,7 +610,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
             DrawUnit((int)&ctx, (int)u);
         }
       }
-      Tile_00468cf0 *tile = mv->tiles + (y * mv->width + x0);
+      Cell *tile = mv->tiles + (y * mv->width + x0);
       for (int c = 0; c < w; c++, tile++) {
         x = x0 + c;
 
