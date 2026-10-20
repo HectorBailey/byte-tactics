@@ -34,20 +34,20 @@ void RegisterVtolOrders(void);
 
 extern LosTables g_losTables;
 
-struct MapSize_00481d50 {
+struct MapSize {
     unsigned int width;                // +0x0
     unsigned int height;               // +0x4
 };
 
-struct ByteMap_00481d50 {
+struct ByteMap {
     unsigned char* data;               // +0x0
-    MapSize_00481d50 size;             // +0x4
+    MapSize size;             // +0x4
     unsigned char& at(int x, int y) { return data[y * size.width + x]; }
 };
 
-struct Map_00481d50 {
+struct PlayerView {
     char unknown_0[0x7c];
-    ByteMap_00481d50 explored;         // +0x7c
+    ByteMap explored;         // +0x7c
     char unknown_88[0x146 - 0x88];
     unsigned char playerIndex;         // +0x146
 };
@@ -92,7 +92,7 @@ GafFrame* __stdcall GetGafFrame(unsigned short* table, int index);
 // FUNCTION: 0x481d50
 void __stdcall RemoveLineOfSight(SightQuery* params)
 {
-    if (((Map_00481d50*)params->player)->playerIndex == g_game->playerIndex) {
+    if (((PlayerView*)params->player)->playerIndex == g_game->playerIndex) {
         g_game->flag3 = 0;
         g_game->flags_142f1_mapChanged = 1;
     }
@@ -113,7 +113,7 @@ void __stdcall RemoveLineOfSight(SightQuery* params)
                 : (short)g_losTables.GetLosTableCount() - 1);
         short count = table->GetLosLineCount();
         short i = 0;
-        ((Map_00481d50*)params->player)->explored.at(x, y)--;
+        ((PlayerView*)params->player)->explored.at(x, y)--;
         int ref = *params->frameIdx;
         for (i = 0; i < count; i++) {
             LosLine* line = table->GetLosLine(i);
@@ -140,7 +140,7 @@ void __stdcall RemoveLineOfSight(SightQuery* params)
                     int d1 = cell[1] - ref;
                     int d0 = cell[0] - ref;
                     if (d0 * bestIdx > bestDiff * j1) {
-                        ((Map_00481d50*)params->player)
+                        ((PlayerView*)params->player)
                             ->explored.at((short)dx, (short)dy)--;
                         if (d1 * bestIdx > bestDiff * j1) {
                             bestIdx = j1;
@@ -171,7 +171,7 @@ void __stdcall RemoveLineOfSight(SightQuery* params)
         if (nx >= limitX)
             return;
         for (int i = ny; i < limitY; i++) {
-            ByteMap_00481d50* ex = &((Map_00481d50*)params->player)->explored;
+            ByteMap* ex = &((PlayerView*)params->player)->explored;
             unsigned char* dst = ex->data + (y + i) * ex->size.width + nx + x;
             unsigned char* src = frame->pixelsOrLayers + i * frame->width + nx;
             for (int j = nx; j < limitX; j++) {
