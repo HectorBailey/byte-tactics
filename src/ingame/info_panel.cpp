@@ -184,7 +184,7 @@ struct Sub_004679a0_a {
 
 struct Sub_004679a0_b {
     char unknown_0[0x30];
-    int field_30;                      // +0x30
+    int panel;                         // +0x30
     unsigned short* lightbar;          // +0x34
 };
 
@@ -539,7 +539,7 @@ void LoadLightBar()
     Sub_004679a0_a* a = &g_game->resources;
     a->energyAmountDisp = a->metalAmountDisp = a->energyStorage = a->metalStorage = 0;
     Sub_004679a0_b* b = &g_game->selectionInfoCache;
-    b->field_30 = 0;
+    b->panel = 0;
     b->lightbar = 0;
     unsigned short* frames = FindGafEntry(g_game->gaf, "LIGHTBAR");
     g_game->selectionInfoCache.lightbar = (unsigned short*)GetGafFrame(frames, 1);

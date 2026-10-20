@@ -266,7 +266,7 @@ struct BuildList_0041ace0 {            // 0xbd bytes
 // One player's side name (0x232 bytes); 0x419560 reads the dword at +0x224.
 struct SideName {
     char name[0x224];                  // +0x0
-    int field_224;                     // +0x224
+    int gameTick;                      // +0x224
     char unknown_228[0x232 - 0x228];
 };
 
@@ -475,7 +475,7 @@ static inline void CellToWorld(Point16 origin, Point16 c, Vec3* v)
 // FUNCTION: 0x419560
 void InitCommands()
 {
-    DAT_00511c20 = g_game->sideNames[4].field_224;
+    DAT_00511c20 = g_game->sideNames[4].gameTick;
     g_messageBytesReceived = 0;
     g_messageBytesSent = 0;
     // The second field of the second table is cleared through a walking
