@@ -93,19 +93,7 @@ struct Pos_4589c0 {
 
 // A 0x18-byte frame header followed by its pixel planes: the picture the
 // object-picture builder allocates, its shadow and the scratch frames.
-struct GafFrame {
-    unsigned short width;              // +0x00
-    unsigned short height;             // +0x02
-    short dx;                          // +0x04
-    short dy;                          // +0x06
-    unsigned char colour;              // +0x08
-    unsigned char flag9;               // +0x09
-    unsigned char count;               // +0x0a
-    unsigned char kind;                // +0x0b
-    char unknown_c[4];
-    unsigned char* pixels;             // +0x10
-    unsigned char* shade;              // +0x14
-};
+#include "gaf_frame.h"
 
 struct Surface_4589c0 {
     int width;                         // +0x00
@@ -349,7 +337,7 @@ public:
 // Unused here: the symbol ids these declarations take keep the allocation,
 // standing in for the four view classes merged into CMemoryCache above
 // (docs/c2-regalloc.md).
-void CountMessage(unsigned char, int, int);
+int DirectionFromStep(int, int);
 void CountPacket(int, int, int);
 void SetCameraPosition(int, int, int);
 void StartScreenShake(int, int, int);
@@ -492,8 +480,8 @@ int UnitTable::BuildObjectPicture(Model_459200* list, int param_2, int param_3)
     }
     GafFrame* bitmap = list->bitmap;
     if (bitmap != 0) {
-        bitmap->dx = (short)oy;
-        bitmap->dy = (short)ox;
+        bitmap->xOffset = (short)oy;
+        bitmap->yOffset = (short)ox;
         // kind is an int parameter so the byte at owner+0xff is pushed zero-extended.
         if ((owner->flags & 0x20000000) != 0
             && (*(unsigned char*)&g_game->visualFlags & 0x20) != 0) {
@@ -524,12 +512,12 @@ void UnitTable::DrawPieces(GafFrame* bitmap, Model_459200* list,
             mode = 1;
             shadow->width = (unsigned short)(bitmap->width << 1);
             shadow->height = (unsigned short)(bitmap->height << 1);
-            shadow->flag9 = 0;
-            shadow->colour = 1;
-            shadow->dx = (short)(bitmap->dx << 1);
-            shadow->dy = (short)(bitmap->dy << 1);
-            memset(shadow->shade, 0, shadow->width * shadow->height);
-            memset(shadow->pixels, 1, shadow->width * shadow->height);
+            shadow->compressed = 0;
+            shadow->transparency = 1;
+            shadow->xOffset = (short)(bitmap->xOffset << 1);
+            shadow->yOffset = (short)(bitmap->yOffset << 1);
+            memset(shadow->scratch, 0, shadow->width * shadow->height);
+            memset(shadow->pixelsOrLayers, 1, shadow->width * shadow->height);
             // Last in the shadow branch.
             src = bitmap;
             bitmap = shadow;
@@ -566,8 +554,8 @@ void UnitTable::DrawPieces(GafFrame* bitmap, Model_459200* list,
                     vertex[k].y = z - (y >> 1);
                     if (mode) vertex[k].z = y/2 + shade_bias(list->owner);
                     else vertex[k].z = y + shade_bias(list->owner);
-                    vertex[k].x += (short)bitmap->dx;
-                    vertex[k].y += (short)bitmap->dy;
+                    vertex[k].x += (short)bitmap->xOffset;
+                    vertex[k].y += (short)bitmap->yOffset;
                     verts++;
                 }
 
@@ -615,9 +603,9 @@ void UnitTable::DrawPieces(GafFrame* bitmap, Model_459200* list,
     if (g_game->visualFlags.bits.antiAlias) {
         if (mode != 0) {
             DownsampleFrame(bitmap, src);
-            unsigned char* s = (unsigned char*)src->shade;
+            unsigned char* s = (unsigned char*)src->scratch;
             if (s != 0) {
-                unsigned char* d = (unsigned char*)bitmap->shade;
+                unsigned char* d = (unsigned char*)bitmap->scratch;
                 for (int y = 0; y < src->height; y++) {
                     int x = src->width;
                     while (x--) {
@@ -685,10 +673,10 @@ void CMemoryCache::DrawObjectPieces(int param_1, Model_459200* list, Vec3 v, int
 // FUNCTION: 0x4587b0
 void __stdcall HalveFrame(GafFrame* src, GafFrame* dst)
 {
-    unsigned char* d = dst->shade;
+    unsigned char* d = dst->scratch;
     if (d == 0)
         return;
-    unsigned char* s = src->shade;
+    unsigned char* s = src->scratch;
     for (int y = 0; y < dst->height; y++) {
         unsigned int n = dst->width;
         while (n--) {
@@ -756,10 +744,10 @@ void CMemoryCache::MergeIntoComposite(GafFrame* bmp, Model_459200* model)
         }
         child = child->cargoNext;
     }
-    int x0 = -bmp->dx;
-    int x1 = bmp->width - bmp->dx;
-    int y0 = -bmp->dy;
-    int y1 = bmp->height - bmp->dy;
+    int x0 = -bmp->xOffset;
+    int x1 = bmp->width - bmp->xOffset;
+    int y0 = -bmp->yOffset;
+    int y1 = bmp->height - bmp->yOffset;
     if (minX < x0) x0 = minX;
     if (maxX > x1) x1 = maxX;
     if (minY < y0) y0 = minY;
@@ -770,33 +758,33 @@ void CMemoryCache::MergeIntoComposite(GafFrame* bmp, Model_459200* model)
     y0 = -y0;
     this->bitmap->width = (unsigned short)newW;
     this->bitmap->height = (unsigned short)newH;
-    this->bitmap->dx = (short)x0;
-    this->bitmap->dy = (short)y0;
-    this->bitmap->colour = bmp->colour;
+    this->bitmap->xOffset = (short)x0;
+    this->bitmap->yOffset = (short)y0;
+    this->bitmap->transparency = bmp->transparency;
     if (newW == bmp->width && newH == bmp->height) {
-        memcpy(this->bitmap->pixels, bmp->pixels, bmp->width * bmp->height);
-        memcpy(this->bitmap->shade, bmp->shade, bmp->width * bmp->height);
+        memcpy(this->bitmap->pixelsOrLayers, bmp->pixelsOrLayers, bmp->width * bmp->height);
+        memcpy(this->bitmap->scratch, bmp->scratch, bmp->width * bmp->height);
     } else {
         short sdx = 0;
         short sdy = 0;
         // All swaps and save/restores go through the inline Swap(T&, T&).
-        Swap(bmp->dx, sdx);
-        Swap(bmp->dy, sdy);
+        Swap(bmp->xOffset, sdx);
+        Swap(bmp->yOffset, sdy);
         Surface_4589c0 surface;
         SurfaceFromFrame(&surface, this->bitmap);
-        memset(this->bitmap->pixels, this->bitmap->colour,
+        memset(this->bitmap->pixelsOrLayers, this->bitmap->transparency,
                this->bitmap->height * this->bitmap->width);
-        memset(this->bitmap->shade, 0, this->bitmap->height * this->bitmap->width);
+        memset(this->bitmap->scratch, 0, this->bitmap->height * this->bitmap->width);
         DrawFrame((Surface*)&surface, bmp,
-                     this->bitmap->dx - sdx, this->bitmap->dy - sdy);
+                     this->bitmap->xOffset - sdx, this->bitmap->yOffset - sdy);
         // Read before the first swap.
-        surface.bits = this->bitmap->shade;
-        Swap(bmp->pixels, bmp->shade);
+        surface.bits = this->bitmap->scratch;
+        Swap(bmp->pixelsOrLayers, bmp->scratch);
         DrawFrame((Surface*)&surface, bmp,
-                     this->bitmap->dx - sdx, this->bitmap->dy - sdy);
-        Swap(bmp->pixels, bmp->shade);
-        Swap(bmp->dx, sdx);
-        Swap(bmp->dy, sdy);
+                     this->bitmap->xOffset - sdx, this->bitmap->yOffset - sdy);
+        Swap(bmp->pixelsOrLayers, bmp->scratch);
+        Swap(bmp->xOffset, sdx);
+        Swap(bmp->yOffset, sdy);
     }
     ShadeByIntensity(this->bitmap, model);
 }
@@ -826,18 +814,18 @@ void CMemoryCache::RecolorByShade(GafFrame* img, unsigned char level, int above,
     else
         low = level - 4;
     for (int i = 0; i < img->width * img->height; i++) {
-        unsigned char* p = &img->pixels[i];
-        if (img->pixels[i] != img->colour) {
+        unsigned char* p = &img->pixelsOrLayers[i];
+        if (img->pixelsOrLayers[i] != img->transparency) {
             int c;
-            if (img->shade[i] < low)
+            if (img->scratch[i] < low)
                 c = below;
-            else if (img->shade[i] >= level)
+            else if (img->scratch[i] >= level)
                 c = above;
             else
                 c = between;
             switch (c) {
             case -2:
-                *p = img->colour;
+                *p = img->transparency;
                 break;
             case -1:
                 break;
@@ -851,7 +839,7 @@ void CMemoryCache::RecolorByShade(GafFrame* img, unsigned char level, int above,
 // FUNCTION: 0x458dd0
 int CMemoryCache::ShadeByIntensity(GafFrame* image, Model_459200* model)
 {
-    if (image->shade == 0)
+    if (image->scratch == 0)
         return 0;
 
     Unit_459200* owner = model->owner;
@@ -909,12 +897,12 @@ GafFrame* CMemoryCache::MakeSilhouette(GafFrame* src)
 {
     bitmap->width = src->width;
     bitmap->height = src->height;
-    bitmap->dx = src->dx;
-    bitmap->dy = src->dy;
-    bitmap->colour = src->colour;
-    memcpy(bitmap->pixels, src->pixels, src->width * src->height);
-    if (src->shade)
-        memcpy(bitmap->shade, src->shade, src->width * src->height);
+    bitmap->xOffset = src->xOffset;
+    bitmap->yOffset = src->yOffset;
+    bitmap->transparency = src->transparency;
+    memcpy(bitmap->pixelsOrLayers, src->pixelsOrLayers, src->width * src->height);
+    if (src->scratch)
+        memcpy(bitmap->scratch, src->scratch, src->width * src->height);
     ZeroFramePixels(bitmap);
     return bitmap;
 }
@@ -978,8 +966,8 @@ void CMemoryCache::DrawShadowShape(GafFrame* view, Model_459200* model)
                         verts[j].x = (short)(v->x >> 16) + (y >> 2);
                         verts[j].y = (short)(-v->z >> 16) - (y >> 2);
                         verts[j].z = y + 25;
-                        verts[j].x += view->dx;
-                        verts[j].y += view->dy;
+                        verts[j].x += view->xOffset;
+                        verts[j].y += view->yOffset;
                         v++;
                     }
                     Face_459c70* seg = info->faces;

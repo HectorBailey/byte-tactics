@@ -12,19 +12,7 @@ struct Pos_4589c0 {
     Pos_4589c0(int a, int b, int c) { x = a; y = b; z = c; }
 };
 
-struct GafFrame {
-    unsigned short width;           // +0x00
-    unsigned short height;          // +0x02
-    short dx;                       // +0x04
-    short dy;                       // +0x06
-    unsigned char colour;           // +0x08
-    unsigned char flag9;            // +0x09
-    unsigned char count;            // +0x0a
-    unsigned char kind;             // +0x0b
-    char unknown_c[4];
-    unsigned char* pixels;          // +0x10
-    unsigned char* shade;           // +0x14
-};
+#include "gaf_frame.h"
 
 struct Surface_4589c0 {
     int width;                      // +0x00
@@ -239,7 +227,7 @@ void CMemoryCache::DrawObjectPicture(int param_2, Model_459200* model, Vec3_4592
     int y = v.p.z.whole - (altitude >> 1) + 0x20;
     short dx = v.p.y.whole;
 
-    if (bmp->shade == 0) {
+    if (bmp->scratch == 0) {
         GameFlags_459200 gameFlags = g_game->visualFlags;
         if (gameFlags.whole & 4) {
             f = ((UnitDefFlags_459200*)model->owner->def)->flags;
