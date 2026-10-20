@@ -75,7 +75,7 @@ int StepTowards(int, int, int);
 
 #include "../network/player.h"
 
-struct FindData_00495930 {
+struct FindData {
     char unknown_0[0x14];
     char name[260];                    // +0x14
 };
@@ -280,7 +280,7 @@ void __stdcall SetOrSelectStopOrder(int set)
 void __stdcall BuildScreenshotPath(char* out, const char* dir, const char* name, const char* ext)
 {
     bool needSep = false;
-    FindData_00495930 fd;
+    FindData fd;
     int max = 0;
 
     if (*dir != 0) {
