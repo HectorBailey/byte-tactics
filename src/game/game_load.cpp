@@ -155,11 +155,7 @@ struct Pos_00498d00 {
     Fixed_00498d00 z;                   // +0x8
 };
 
-struct Rect_00498d00 {
-    int x;                              // +0x0
-    int y;                              // +0x4
-    int unknown_8[4];
-};
+#include "../gui/mouse_event.h"
 
 struct Pos_00498da0 {
     unsigned int x;                     // +0x0
@@ -260,7 +256,7 @@ struct Game {
     unsigned char localPlayer;          // +0x2a42
     unsigned char playerIndex;          // +0x2a43
     char unknown_2a44[0x2c76 - 0x2a44];
-    Rect_00498d00 view;                 // +0x2c76
+    MouseEvent view;                 // +0x2c76
     Point_00498da0 point;               // +0x2c8e
     char unknown_2c92[0x2caa - 0x2c92];
     Pos_00498da0 pos;                   // +0x2caa
@@ -1130,7 +1126,7 @@ void __stdcall OffsetWorldPosFromView(Point_00498cd0* p, View_00498cd0* view, in
 // FUNCTION: 0x498d00
 void __stdcall MinimapCursorToWorldPos(Pos_00498d00* out)
 {
-    Rect_00498d00 r = g_game->view;
+    MouseEvent r = g_game->view;
     int dx = r.x - g_game->minimapGadgetX;
     int dy = r.y - g_game->minimapGadgetY;
     memset(out, 0, sizeof(Pos_00498d00));

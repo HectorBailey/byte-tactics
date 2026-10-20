@@ -123,8 +123,10 @@ struct Display {
 
 #include "../network/player_info.h"
 
-// Unused here: a real function declared to keep the file's symbol count (docs/c2-regalloc.md).
-int StepTowards(int, int, int);
+// Unused here: real functions declared to keep the file's symbol count (docs/c2-regalloc.md).
+void InitMemoryCache();
+void InitExplosions();
+void RegisterUnitOrders();
 
 // The per-player statistics row: 41e420 indexes the seven ints at +0x1e;
 // 41dc20's names for them stay as their own view, unused here, since the
@@ -377,7 +379,8 @@ void HandleNetPackets();
 void __stdcall ReportGameEvent(int event);
 const char* __stdcall GetRejectReasonText(unsigned reason);
 int GetTickRate();
-void __stdcall GetCurrentMouseEvent(int* event);
+struct MouseEvent;
+void __stdcall GetCurrentMouseEvent(MouseEvent* event);
 int PopKey();
 void __stdcall DrawOutlinedString(void* surface, const char* text, int color, int color2, int y);
 void ShowSoftwareCursor();
@@ -1135,7 +1138,7 @@ void __stdcall RunEndGameState()
         } else {
             if(!g_endGameGlamourSoundStarted) { StartGlamourSound(); g_endGameGlamourSoundStarted=1; }
             if(g_game->deadline<GetTicks()) {
-                GetCurrentMouseEvent(event);
+                GetCurrentMouseEvent((MouseEvent*)event);
                 if(PopKey() || g_game->cursorKeyFlags) {
                     g_game->sound->StopStream();
                     OpenEndMissionScreen(); EnableEndMissionButtons(); FillEndGameStatistics();
