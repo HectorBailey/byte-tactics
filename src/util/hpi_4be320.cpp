@@ -10,19 +10,19 @@ struct ArchiveDirectory {
     ArchiveEntry* entries;          // +0x4
 };
 
-struct Node_004be320 {
+struct ArchiveDirectoryNode {
     char unknown_0[0x10];
     ArchiveDirectory* list;         // +0x10
 };
 
-struct Item_004be320 {
+struct ArchiveItem {
     char unknown_0[8];
-    Node_004be320* node;            // +0x8
+    ArchiveDirectoryNode* node;            // +0x8
 };
 
 struct State_004be320 {
     char unknown_0[0x618];
-    Item_004be320** items;          // +0x618
+    ArchiveItem** items;          // +0x618
     int itemCount;                  // +0x61c
 };
 

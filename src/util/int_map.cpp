@@ -27,7 +27,7 @@ struct Data_004b2450 {
     int offset_28;    // +0x28
 };
 
-struct Pair8_004b2450 {
+struct CobScriptReloc {
     int unknown_0;    // +0x00
     int offset;       // +0x04
 };
@@ -55,7 +55,7 @@ static void Relocate(Data_004b2450* data)
     data->offset_24 += (int)data;
     data->offset_28 += (int)data;
     for (int k = 0; k < data->count_3; k++)
-        ((Pair8_004b2450*)data->offset_28)[k].offset += (int)data;
+        ((CobScriptReloc*)data->offset_28)[k].offset += (int)data;
 }
 
 // FUNCTION: 0x4b2450
