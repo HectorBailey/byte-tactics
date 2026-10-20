@@ -1225,7 +1225,7 @@ int Sound::ReadWaveFormat(void* file, int* sampleRate, int* bitsPerSample, int* 
     unsigned int pos;
     unsigned int len;
     unsigned int n;
-    char fmt[0x10];
+    WaveFormat fmt;
 
     HAPI_SeekFile(file, 4);
     HAPI_readfromfile(file, &total, 4);
@@ -1252,10 +1252,10 @@ int Sound::ReadWaveFormat(void* file, int* sampleRate, int* bitsPerSample, int* 
     }
     if (n < 0x10)
         return 0;
-    HAPI_readfromfile(file, fmt, 0x10);
-    *sampleRate = *(int*)(fmt + 4);
-    *bitsPerSample = *(unsigned short*)(fmt + 14);
-    *channels = *(unsigned short*)(fmt + 2);
+    HAPI_readfromfile(file, &fmt, 0x10);
+    *sampleRate = fmt.nSamplesPerSec;
+    *bitsPerSample = fmt.wBitsPerSample;
+    *channels = fmt.nChannels;
     return 1;
 }
 
