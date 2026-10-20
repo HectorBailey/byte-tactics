@@ -99,12 +99,12 @@ void LoadSoundCategories()
         g_game->soundCategories = (Entry_0042f740*)GameAllocIgnoreTag("Sound Categories", size);
         memset(g_game->soundCategories, 0, size);
         for (int i = 0; i < g_game->soundCategoryCount; i++) {
-            char* rec = (char*)g_game->soundCategories + i * 0x160;
+            Entry_0042f740* rec = &g_game->soundCategories[i];
             obj.ResetCurrentRecord();
             if (obj.SelectRecordAt(i)) {
-                obj.current->CopyRecordName(rec, 0x3f);
+                obj.current->CopyRecordName((char*)rec, 0x3f);
                 p = g_speechCategories;
-                int* vals = (int*)(rec + 0x4c);
+                int* vals = &rec->slots[1].count;
                 // Compared as signed ints, not pointers: keeps jl instead of jb.
                 while ((int)p < (int)(g_speechCategories + 23)) {
                     ReadSoundEntry((Source_0042f450*)&obj, p->name, vals);
