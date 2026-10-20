@@ -133,18 +133,20 @@ unsigned short __stdcall GetGafFrameDuration(Obj_004b7f70* param1)
 
 // A GAF frame header: its size and origin, the colour key, the two flag
 // bytes, the child count, and the pointers to its one or two pixel planes.
+// The header's members copied here: including gaf_frame.h moves
+// DownsampleFrame's two byte loads (0x4b95a0, docs/c2-regalloc.md).
 struct GafFrame {
-    unsigned short width;              // +0x0
-    unsigned short height;             // +0x2
-    short x;                           // +0x4
-    short y;                           // +0x6
-    unsigned char colour;              // +0x8
-    unsigned char flag9;               // +0x9
-    unsigned char count;               // +0xa
-    unsigned char kind;                // +0xb
-    int reserved;                      // +0xc
-    unsigned char* plane0;             // +0x10
-    unsigned char* plane1;             // +0x14
+    unsigned short width;              // +0x00
+    unsigned short height;             // +0x02
+    short xOffset;                     // +0x04
+    short yOffset;                     // +0x06
+    unsigned char transparency;        // +0x08, the key colour
+    unsigned char compressed;          // +0x09
+    unsigned char layers;              // +0x0a
+    unsigned char blend;               // +0x0b
+    int reserved;                      // +0x0c
+    unsigned char* pixelsOrLayers;     // +0x10
+    unsigned char* scratch;            // +0x14, the second plane
 };
 
 int __stdcall LockScreen(Surface* out);
@@ -177,10 +179,10 @@ void __stdcall DrawFrame(Surface* dst, GafFrame* bmp, int x, int y)
             dst = (Surface*)&screen;
     }
     if (bmp != 0) {
-        if (bmp->count > 0) {
-            for (int i = 0; i < (int)bmp->count; i++) {
-                GafFrame* e = ((GafFrame**)bmp->plane0)[i];
-                if (e->kind > 0)
+        if (bmp->layers > 0) {
+            for (int i = 0; i < (int)bmp->layers; i++) {
+                GafFrame* e = ((GafFrame**)bmp->pixelsOrLayers)[i];
+                if (e->blend > 0)
                     DrawFrameBlended(dst, e, x, y);
                 else
                     DrawFrame(dst, e, x, y);
@@ -194,22 +196,22 @@ void __stdcall DrawFrame(Surface* dst, GafFrame* bmp, int x, int y)
             other.right = bmp->width - 1;
             other.top = 0;
             other.bottom = bmp->height - 1;
-            rect.left = x - bmp->x;
-            rect.top = y - bmp->y;
+            rect.left = x - bmp->xOffset;
+            rect.top = y - bmp->yOffset;
             rect.right = rect.left + bmp->width - 1;
             rect.bottom = rect.top + bmp->height - 1;
             dst->GetClipRect(&bounds);
             ClipRects(&other, &rect, &bounds);
             if (rect.right >= rect.left && rect.bottom >= rect.top &&
                 other.right >= other.left && other.bottom >= other.top) {
-                if (bmp->flag9 == 0) {
+                if (bmp->compressed == 0) {
                     desc.width = bmp->width;
                     desc.pitch = bmp->width;
                     desc.height = bmp->height;
-                    desc.pixels = bmp->plane0;
-                    BlitRectKeyed(dst, &desc, &other, &rect, bmp->colour);
+                    desc.pixels = bmp->pixelsOrLayers;
+                    BlitRectKeyed(dst, &desc, &other, &rect, bmp->transparency);
                 } else {
-                    BlitCompressed(dst->pixels, dst->pitch, &rect, bmp->plane0, &other);
+                    BlitCompressed(dst->pixels, dst->pitch, &rect, bmp->pixelsOrLayers, &other);
                 }
             }
         }
@@ -239,10 +241,10 @@ void __stdcall DrawFrameOpaque(Surface* dst, GafFrame* bmp, int x, int y)
             dst = (Surface*)&screen;
     }
     if (bmp != 0) {
-        if (bmp->count > 0) {
-            for (int i = 0; i < (int)bmp->count; i++) {
-                GafFrame* e = ((GafFrame**)bmp->plane0)[i];
-                if (e->kind > 0)
+        if (bmp->layers > 0) {
+            for (int i = 0; i < (int)bmp->layers; i++) {
+                GafFrame* e = ((GafFrame**)bmp->pixelsOrLayers)[i];
+                if (e->blend > 0)
                     DrawFrameBlended(dst, e, x, y);
                 else
                     DrawFrame(dst, e, x, y);
@@ -256,22 +258,22 @@ void __stdcall DrawFrameOpaque(Surface* dst, GafFrame* bmp, int x, int y)
             other.right = bmp->width - 1;
             other.top = 0;
             other.bottom = bmp->height - 1;
-            rect.left = x - bmp->x;
-            rect.top = y - bmp->y;
+            rect.left = x - bmp->xOffset;
+            rect.top = y - bmp->yOffset;
             rect.right = rect.left + bmp->width - 1;
             rect.bottom = rect.top + bmp->height - 1;
             dst->GetClipRect(&bounds);
             ClipRects(&other, &rect, &bounds);
             if (rect.right >= rect.left && rect.bottom >= rect.top &&
                 other.right >= other.left && other.bottom >= other.top) {
-                if (bmp->flag9 == 0) {
+                if (bmp->compressed == 0) {
                     desc.width = bmp->width;
                     desc.pitch = bmp->width;
                     desc.height = bmp->height;
-                    desc.pixels = bmp->plane0;
+                    desc.pixels = bmp->pixelsOrLayers;
                     BlitRect(dst, &desc, &other, &rect);
                 } else {
-                    BlitCompressed(dst->pixels, dst->pitch, &rect, bmp->plane0, &other);
+                    BlitCompressed(dst->pixels, dst->pitch, &rect, bmp->pixelsOrLayers, &other);
                 }
             }
         }
@@ -367,16 +369,16 @@ void __stdcall DrawFrameBlended(Surface* surface, GafFrame* frame, int x, int y)
         }
 
         if (frame != 0) {
-            if (frame->count > 0) {
-                for (int i = 0; i < frame->count; i++)
-                    DrawFrameBlended(surface, ((GafFrame**)frame->plane0)[i], x, y);
+            if (frame->layers > 0) {
+                for (int i = 0; i < frame->layers; i++)
+                    DrawFrameBlended(surface, ((GafFrame**)frame->pixelsOrLayers)[i], x, y);
             } else {
                 Rect screen_rect;
                 Rect sprite_rect = { 0, 0, frame->width - 1, frame->height - 1 };
                 int w = frame->width;
                 int h = frame->height;
-                screen_rect.left = x - frame->x;
-                screen_rect.top = y - frame->y;
+                screen_rect.left = x - frame->xOffset;
+                screen_rect.top = y - frame->yOffset;
                 screen_rect.right = w + screen_rect.left - 1;
                 screen_rect.bottom = h + screen_rect.top - 1;
                 Bounds_src_004b8310 bs;
@@ -384,17 +386,17 @@ void __stdcall DrawFrameBlended(Surface* surface, GafFrame* frame, int x, int y)
                 ClipRects(&sprite_rect, &screen_rect, &bs.bounds);
                 if (screen_rect.right >= screen_rect.left && screen_rect.bottom >= screen_rect.top
                     && sprite_rect.right >= sprite_rect.left && sprite_rect.bottom >= sprite_rect.top) {
-                    if (frame->flag9 == 0) {
+                    if (frame->compressed == 0) {
                         Src_004b8310& src = bs.src;
                         src.width = frame->width;
                         src.height = frame->height;
                         src.pitch = frame->width;
-                        src.pixels = (GafFrame**)frame->plane0;
+                        src.pixels = (GafFrame**)frame->pixelsOrLayers;
                         BlitRectBlended(surface, &src, &sprite_rect, &screen_rect,
-                            frame->colour, d->alphaTable);
+                            frame->transparency, d->alphaTable);
                     } else {
                         BlitCompressedBlended(surface->pixels, surface->pitch, &screen_rect,
-                            (GafFrame**)frame->plane0, &sprite_rect, d->alphaTable);
+                            (GafFrame**)frame->pixelsOrLayers, &sprite_rect, d->alphaTable);
                     }
                 }
             }
@@ -425,7 +427,7 @@ void __stdcall DrawFrameGray(Surface* surface, GafFrame* frame, int x, int y)
 {
     Display_004b8310* d = GetDisplay();
     // Flag tested as bit 0x100 of the word: fuses into a byte test at +0xf1.
-    if ((d->flags.word & 0x100) != 0 && frame->flag9 == 0) {
+    if ((d->flags.word & 0x100) != 0 && frame->compressed == 0) {
         Surface screen;
         if (surface == 0) {
             int locked = LockScreen(&screen);
@@ -433,9 +435,9 @@ void __stdcall DrawFrameGray(Surface* surface, GafFrame* frame, int x, int y)
                 surface = (Surface*)&screen;
         }
         if (frame != 0) {
-            if (frame->count > 0) {
-                for (int i = 0; i < frame->count; i++)
-                    DrawFrameGray(surface, ((GafFrame**)frame->plane0)[i], x, y);
+            if (frame->layers > 0) {
+                for (int i = 0; i < frame->layers; i++)
+                    DrawFrameGray(surface, ((GafFrame**)frame->pixelsOrLayers)[i], x, y);
             } else {
                 Rect other;
                 Rect rect;
@@ -443,8 +445,8 @@ void __stdcall DrawFrameGray(Surface* surface, GafFrame* frame, int x, int y)
                 other.right = frame->width - 1;
                 other.top = 0;
                 other.bottom = frame->height - 1;
-                rect.left = x - frame->x;
-                rect.top = y - frame->y;
+                rect.left = x - frame->xOffset;
+                rect.top = y - frame->yOffset;
                 rect.right = rect.left + frame->width - 1;
                 rect.bottom = rect.top + frame->height - 1;
                 Rect bounds;
@@ -456,15 +458,15 @@ void __stdcall DrawFrameGray(Surface* surface, GafFrame* frame, int x, int y)
                     s.width = frame->width;
                     s.height = frame->height;
                     s.pitch = frame->width;
-                    s.pixels = (unsigned char*)frame->plane0;
+                    s.pixels = (unsigned char*)frame->pixelsOrLayers;
                     s.zPriority = 10000;
                     s.colorKey = -1;
-                    s.x = frame->x;
-                    s.y = frame->y;
+                    s.x = frame->xOffset;
+                    s.y = frame->yOffset;
                     s.flag0 = 1;
                     s.flag1 = 0;
                     ResetClipRect((int*)&s);
-                    BlitRectRemapDest(surface, &s, &other, &rect, frame->colour, d->grayTable);
+                    BlitRectRemapDest(surface, &s, &other, &rect, frame->transparency, d->grayTable);
                 }
             }
         }
@@ -493,16 +495,16 @@ void __stdcall DrawFrameGray(Surface* surface, GafFrame* frame, int x, int y)
 void __stdcall EraseFrameDithered(Surface* dst, GafFrame* bmp, int x, int y, int parity)
 {
     Surface screen;
-    if (bmp->flag9 == 0) {
+    if (bmp->compressed == 0) {
         if (dst == 0) {
             int ok = LockScreen(&screen);
             if (ok != 0)
                 dst = (Surface*)&screen;
         }
         if (bmp != 0) {
-            if (bmp->count > 0) {
-                for (int i = 0; i < (int)bmp->count; i++) {
-                    GafFrame* e = ((GafFrame**)bmp->plane0)[i];
+            if (bmp->layers > 0) {
+                for (int i = 0; i < (int)bmp->layers; i++) {
+                    GafFrame* e = ((GafFrame**)bmp->pixelsOrLayers)[i];
                     EraseFrameDithered(dst, e, x, y, parity);
                 }
             } else {
@@ -513,8 +515,8 @@ void __stdcall EraseFrameDithered(Surface* dst, GafFrame* bmp, int x, int y, int
                 other.top = 0;
                 other.right = bmp->width - 1;
                 other.bottom = bmp->height - 1;
-                rect.left = x - bmp->x;
-                rect.top = y - bmp->y;
+                rect.left = x - bmp->xOffset;
+                rect.top = y - bmp->yOffset;
                 rect.right = rect.left + bmp->width - 1;
                 rect.bottom = rect.top + bmp->height - 1;
                 dst->GetClipRect(&bounds);
@@ -523,7 +525,7 @@ void __stdcall EraseFrameDithered(Surface* dst, GafFrame* bmp, int x, int y, int
                     other.right >= other.left && other.bottom >= other.top) {
                     // `sy` must be a plain local here, not other.top++: pins stack slots and loop order.
                     for (int yy = rect.top, sy = other.top; yy <= rect.bottom; yy++, sy++) {
-                        unsigned char* s = (unsigned char*)bmp->plane0
+                        unsigned char* s = (unsigned char*)bmp->pixelsOrLayers
                             + sy * bmp->width + other.left;
                         unsigned char* d = dst->pixels
                             + yy * dst->pitch + rect.left;
@@ -533,7 +535,7 @@ void __stdcall EraseFrameDithered(Surface* dst, GafFrame* bmp, int x, int y, int
                             s++;
                         }
                         while (d <= end) {
-                            if (*s != bmp->colour)
+                            if (*s != bmp->transparency)
                                 *d = 0;
                             d += 2;
                             s += 2;
@@ -556,11 +558,11 @@ void __stdcall SurfaceFromFrame(Surface* dst, GafFrame* src)
     dst->width = src->width;
     dst->height = src->height;
     dst->pitch = src->width;
-    dst->pixels = src->plane0;
+    dst->pixels = src->pixelsOrLayers;
     dst->zPriority = 10000;
     dst->colorKey = -1;
-    dst->x = src->x;
-    dst->y = src->y;
+    dst->x = src->xOffset;
+    dst->y = src->yOffset;
     dst->flag1 = 0;
     dst->flag0 = 1;
     ResetClipRect((int*)dst);
@@ -593,13 +595,13 @@ void __stdcall FrameFromSurface(GafFrame* dst, Src_004b8ae0* src)
     dst->width = src->a;
     dst->height = src->b;
     dst->width = src->c;
-    dst->plane0 = (unsigned char*)src->d;
-    dst->x = src->e;
-    dst->y = src->f;
-    dst->flag9 = 0;
-    dst->colour = 0xff;
-    dst->count = 0;
-    dst->kind = 0;
+    dst->pixelsOrLayers = (unsigned char*)src->d;
+    dst->xOffset = src->e;
+    dst->yOffset = src->f;
+    dst->compressed = 0;
+    dst->transparency = 0xff;
+    dst->layers = 0;
+    dst->blend = 0;
 }
 
 // One 8-byte entry of a GAF sequence: the frame's timer value.
@@ -793,13 +795,13 @@ GafFrame* __stdcall AllocFrame(const char* name, int width, int height)
     }
     p->width = width;
     p->height = height;
-    p->plane0 = (unsigned char*)(p + 1);
-    p->plane1 = 0;
-    p->x = 0;
-    p->y = 0;
-    p->flag9 = 0;
-    p->count = 0;
-    p->kind = 0;
+    p->pixelsOrLayers = (unsigned char*)(p + 1);
+    p->scratch = 0;
+    p->xOffset = 0;
+    p->yOffset = 0;
+    p->compressed = 0;
+    p->layers = 0;
+    p->blend = 0;
     return p;
 }
 // FUNCTION: 0x4b8e00 ?AllocDepthFrame@@YGPAUGafFrame@@IHH@Z
@@ -808,25 +810,25 @@ GafFrame* __stdcall AllocDepthFrame(unsigned int heap, int width, int height)
     int size = height * width;
     GafFrame* b = (GafFrame*)GameAllocIgnoreTag((const char*)heap, size * 2 + sizeof(GafFrame));
     unsigned char* p = (unsigned char*)(b + 1);
-    b->plane0 = p;
+    b->pixelsOrLayers = p;
     b->height = height;
     p += size;
-    b->plane1 = p;
+    b->scratch = p;
     b->width = width;
-    b->x = 0;
-    b->y = 0;
-    b->flag9 = 0;
-    b->count = 0;
-    b->kind = 0;
+    b->xOffset = 0;
+    b->yOffset = 0;
+    b->compressed = 0;
+    b->layers = 0;
+    b->blend = 0;
     return b;
 }
 // FUNCTION: 0x4b8e50
 void __stdcall ClearFrame(GafFrame* b, int color)
 {
-    if (b->flag9 == 0) {
-        memset(b->plane0, color, b->width * b->height);
-        if (b->plane1 != 0) {
-            memset(b->plane1, 0, b->width * b->height);
+    if (b->compressed == 0) {
+        memset(b->pixelsOrLayers, color, b->width * b->height);
+        if (b->scratch != 0) {
+            memset(b->scratch, 0, b->width * b->height);
         }
     }
 }
@@ -861,12 +863,12 @@ void __stdcall DrawFrameShadow(Surface* dst, GafFrame* bmp, int x, int y)
                 dst = (Surface*)&screen;
         }
         if (bmp != 0) {
-            if (bmp->count > 0) {
-                for (int i = 0; i < (int)bmp->count; i++) {
-                    GafFrame* e = ((GafFrame**)bmp->plane0)[i];
+            if (bmp->layers > 0) {
+                for (int i = 0; i < (int)bmp->layers; i++) {
+                    GafFrame* e = ((GafFrame**)bmp->pixelsOrLayers)[i];
                     DrawFrameShadow(dst, e, x, y);
                 }
-            } else if (bmp->plane0 != 0) {
+            } else if (bmp->pixelsOrLayers != 0) {
                 Rect other;
                 Rect rect;
                 Rect bounds;
@@ -875,22 +877,22 @@ void __stdcall DrawFrameShadow(Surface* dst, GafFrame* bmp, int x, int y)
                 other.right = bmp->width - 1;
                 other.top = 0;
                 other.bottom = bmp->height - 1;
-                rect.left = x - bmp->x;
-                rect.top = y - bmp->y;
+                rect.left = x - bmp->xOffset;
+                rect.top = y - bmp->yOffset;
                 rect.right = rect.left + bmp->width - 1;
                 rect.bottom = rect.top + bmp->height - 1;
                 dst->GetClipRect(&bounds);
                 ClipRects(&other, &rect, &bounds);
                 if (rect.right >= rect.left && rect.bottom >= rect.top &&
                     other.right >= other.left && other.bottom >= other.top) {
-                    if (bmp->flag9 == 0) {
+                    if (bmp->compressed == 0) {
                         desc.width = bmp->width;
                         desc.pitch = bmp->width;
                         desc.height = bmp->height;
-                        desc.pixels = bmp->plane0;
-                        BlitRectShadow(dst, &desc, &other, &rect, bmp->colour, d->lightTable);
+                        desc.pixels = bmp->pixelsOrLayers;
+                        BlitRectShadow(dst, &desc, &other, &rect, bmp->transparency, d->lightTable);
                     } else {
-                        BlitCompressedShadow(dst->pixels, dst->pitch, &rect, bmp->plane0, &other, d->lightTable);
+                        BlitCompressedShadow(dst->pixels, dst->pitch, &rect, bmp->pixelsOrLayers, &other, d->lightTable);
                     }
                 }
             }
@@ -911,15 +913,15 @@ GafFrame* __stdcall AllocDepthFrame(const char* name, int width, int height)
     GafFrame* b = (GafFrame*)GameAllocIgnoreTag(name, size * 2 + sizeof(GafFrame));
     unsigned char* p = (unsigned char*)(b + 1);
     b->width = width;
-    b->plane0 = p;
+    b->pixelsOrLayers = p;
     b->height = height;
     p += size;
-    b->plane1 = p;
-    b->x = 0;
-    b->y = 0;
-    b->flag9 = 0;
-    b->count = 0;
-    b->kind = 0;
+    b->scratch = p;
+    b->xOffset = 0;
+    b->yOffset = 0;
+    b->compressed = 0;
+    b->layers = 0;
+    b->blend = 0;
     return b;
 }
 
@@ -931,12 +933,12 @@ void* __stdcall BuildLensFrame(int w, int h, int lens)
     if (!f)
         return 0;
     f->width /= 2;
-    unsigned short* p = (unsigned short*)f->plane0;
+    unsigned short* p = (unsigned short*)f->pixelsOrLayers;
     // hw and hh stay short: the int w / 2 lives in the dead lens slot.
     short hw = w / 2;
-    f->x = hw;
+    f->xOffset = hw;
     short hh = h / 2;
-    f->y = hh;
+    f->yOffset = hh;
     for (int y = 0; y < h; y++) {
         for (int x = 0; x < w; x++) {
             int dx = x - hw;
@@ -977,17 +979,17 @@ static void SwapPtr(unsigned char*& a, unsigned char*& b)
 // FUNCTION: 0x4b9360
 void __stdcall DrawLens(void* dst, GafFrame* sprite, int x, int y)
 {
-    SwapPtr(sprite->plane0, sprite->plane1);
+    SwapPtr(sprite->pixelsOrLayers, sprite->scratch);
 
     Surface surface;
     surface.width = sprite->width;
     surface.pitch = sprite->width;
     surface.height = sprite->height;
-    surface.pixels = sprite->plane0;
+    surface.pixels = sprite->pixelsOrLayers;
     surface.zPriority = 10000;
     surface.colorKey = -1;
-    surface.x = sprite->x;
-    surface.y = sprite->y;
+    surface.x = sprite->xOffset;
+    surface.y = sprite->yOffset;
     surface.flag0 = 1;
     surface.flag1 = 0;
     ResetClipRect((int*)&surface);
@@ -999,18 +1001,18 @@ void __stdcall DrawLens(void* dst, GafFrame* sprite, int x, int y)
     srcRect.bottom = surface.height - 1;
 
     Rect dstRect;
-    dstRect.left = x - sprite->x;
-    dstRect.right = x + surface.width - sprite->x - 1;
-    dstRect.top = y - sprite->y;
-    dstRect.bottom = y + surface.height - sprite->y - 1;
+    dstRect.left = x - sprite->xOffset;
+    dstRect.right = x + surface.width - sprite->xOffset - 1;
+    dstRect.top = y - sprite->yOffset;
+    dstRect.bottom = y + surface.height - sprite->yOffset - 1;
 
     CopySurfaceRect(&surface, dst, &dstRect, &srcRect);
 
-    SwapPtr(sprite->plane0, sprite->plane1);
+    SwapPtr(sprite->pixelsOrLayers, sprite->scratch);
 
     int n = sprite->width * sprite->height;
-    unsigned char* cmap = sprite->plane1;
-    unsigned short* idx = (unsigned short*)sprite->plane0;
+    unsigned char* cmap = sprite->scratch;
+    unsigned short* idx = (unsigned short*)sprite->pixelsOrLayers;
     unsigned char* out = cmap + n;
     int i = n;
     while (i != 0) {
@@ -1019,7 +1021,7 @@ void __stdcall DrawLens(void* dst, GafFrame* sprite, int x, int y)
         if (c != 32000)
             v = cmap[c];
         else
-            v = sprite->colour;
+            v = sprite->transparency;
         *out = v;
         out++;
         cmap++;
@@ -1028,10 +1030,10 @@ void __stdcall DrawLens(void* dst, GafFrame* sprite, int x, int y)
     }
 
     int m = sprite->width * sprite->height;
-    int saved = (int)sprite->plane0;
-    sprite->plane0 = sprite->plane1 + m;
+    int saved = (int)sprite->pixelsOrLayers;
+    sprite->pixelsOrLayers = sprite->scratch + m;
     DrawFrame((Surface*)dst, sprite, x, y);
-    sprite->plane0 = (unsigned char*)saved;
+    sprite->pixelsOrLayers = (unsigned char*)saved;
 }
 // FUNCTION: 0x4b94c0
 void __stdcall GrabBackground(void* dst, GafFrame* sprite, int x, int y)
@@ -1040,11 +1042,11 @@ void __stdcall GrabBackground(void* dst, GafFrame* sprite, int x, int y)
     surface.width = sprite->width;
     surface.height = sprite->height;
     surface.pitch = sprite->width;
-    surface.pixels = sprite->plane0;
+    surface.pixels = sprite->pixelsOrLayers;
     surface.zPriority = 10000;
     surface.colorKey = -1;
-    surface.x = sprite->x;
-    surface.y = sprite->y;
+    surface.x = sprite->xOffset;
+    surface.y = sprite->yOffset;
     surface.flag0 = 1;
     surface.flag1 = 0;
     ResetClipRect((int*)&surface);
@@ -1056,10 +1058,10 @@ void __stdcall GrabBackground(void* dst, GafFrame* sprite, int x, int y)
     srcRect.bottom = surface.height - 1;
 
     Rect dstRect;
-    dstRect.left = x - sprite->x;
-    dstRect.right = surface.width + x - sprite->x - 1;
-    dstRect.top = y - sprite->y;
-    dstRect.bottom = surface.height + y - sprite->y - 1;
+    dstRect.left = x - sprite->xOffset;
+    dstRect.right = surface.width + x - sprite->xOffset - 1;
+    dstRect.top = y - sprite->yOffset;
+    dstRect.bottom = surface.height + y - sprite->yOffset - 1;
 
     CopySurfaceRect(&surface, dst, &dstRect, &srcRect);
 }
@@ -1069,9 +1071,9 @@ void __stdcall GrabBackground(void* dst, GafFrame* sprite, int x, int y)
 void __stdcall ZeroFramePixels(GafFrame* image)
 {
     int count = image->height * image->width;
-    unsigned char* p = image->plane0;
+    unsigned char* p = image->pixelsOrLayers;
     while (count--) {
-        if (*p != image->colour) {
+        if (*p != image->transparency) {
             *p = 0;
         }
         p++;
@@ -1083,12 +1085,12 @@ void __stdcall ZeroFramePixels(GafFrame* image)
 // FUNCTION: 0x4b96e0
 void __stdcall TintFrameBelow(GafFrame* image, unsigned char level)
 {
-    unsigned char* p = image->plane0;
-    unsigned char* m = image->plane1;
+    unsigned char* p = image->pixelsOrLayers;
+    unsigned char* m = image->scratch;
     int count = image->height * image->width;
     Display_004b8310* pal = GetDisplay();
     while (count--) {
-        if (*m <= level && *p != image->colour) {
+        if (*m <= level && *p != image->transparency) {
             *p = pal->blueTable[*p];
         }
         p++;
@@ -1114,9 +1116,9 @@ void __stdcall DrawFrameScaledBlended(Surface* dst, GafFrame* bmp, int x, int y,
         if (ok != 0)
             dst = (Surface*)&screen;
     }
-    if (bmp->count > 0) {
-        for (int i = 0; i < (int)bmp->count; i++)
-            DrawFrameScaledBlended(dst, ((GafFrame**)bmp->plane0)[i], x, y, sx, sy);
+    if (bmp->layers > 0) {
+        for (int i = 0; i < (int)bmp->layers; i++)
+            DrawFrameScaledBlended(dst, ((GafFrame**)bmp->pixelsOrLayers)[i], x, y, sx, sy);
     } else {
         // The rects are declared before w and h: sets the order of the edge leas.
         Rect src;
@@ -1124,8 +1126,8 @@ void __stdcall DrawFrameScaledBlended(Surface* dst, GafFrame* bmp, int x, int y,
         Rect bounds;
         int w = (int)(bmp->width * sx);
         int h = (int)(bmp->height * sy);
-        int dx = (int)(bmp->x * sx);
-        int dy = (int)(bmp->y * sy);
+        int dx = (int)(bmp->xOffset * sx);
+        int dy = (int)(bmp->yOffset * sy);
         if (w > 0 && h > 0) {
             dest.left = x - dx;
             dest.top = y - dy;
@@ -1153,8 +1155,8 @@ void __stdcall DrawFrameScaledBlended(Surface* dst, GafFrame* bmp, int x, int y,
                     int col = dest.left;
                     int rowBase = row * dst->pitch;
                     for (int fx = src.left << 16; col <= dest.right; col++, fx += stepX) {
-                        unsigned char c = ((unsigned char*)bmp->plane0)[(fx >> 16) + srcRow];
-                        if (c != bmp->colour) {
+                        unsigned char c = ((unsigned char*)bmp->pixelsOrLayers)[(fx >> 16) + srcRow];
+                        if (c != bmp->transparency) {
                             unsigned char* p = rowBase + col + dst->pixels;
                             *p = d->alphaTable[(c << 8) + *p];
                         }
@@ -1181,10 +1183,10 @@ void __stdcall DrawFrameScaled(Surface* dst, GafFrame* bmp, int x, int y, double
         if (ok != 0)
             dst = (Surface*)&screen;
     }
-    if (bmp->count > 0) {
-        for (int i = 0; i < (int)bmp->count; i++) {
-            GafFrame* e = ((GafFrame**)bmp->plane0)[i];
-            if (e->kind > 0)
+    if (bmp->layers > 0) {
+        for (int i = 0; i < (int)bmp->layers; i++) {
+            GafFrame* e = ((GafFrame**)bmp->pixelsOrLayers)[i];
+            if (e->blend > 0)
                 DrawFrameScaledBlended(dst, e, x, y, sx, sy);
             else
                 DrawFrameScaled(dst, e, x, y, sx, sy);
@@ -1196,8 +1198,8 @@ void __stdcall DrawFrameScaled(Surface* dst, GafFrame* bmp, int x, int y, double
         Rect bounds;
         int w = (int)(bmp->width * sx);
         int h = (int)(bmp->height * sy);
-        int dx = (int)(bmp->x * sx);
-        int dy = (int)(bmp->y * sy);
+        int dx = (int)(bmp->xOffset * sx);
+        int dy = (int)(bmp->yOffset * sy);
         if (w > 0 && h > 0) {
             dest.left = x - dx;
             dest.top = y - dy;
@@ -1228,8 +1230,8 @@ void __stdcall DrawFrameScaled(Surface* dst, GafFrame* bmp, int x, int y, double
                     int srcRow = (y >> 16) * bmp->width;
                     int rowBase = x * dst->pitch;
                     for (int fx = src.left << 16; col <= dest.right; col++, fx += stepX) {
-                        unsigned char c = ((unsigned char*)bmp->plane0)[(fx >> 16) + srcRow];
-                        if (c != bmp->colour) {
+                        unsigned char c = ((unsigned char*)bmp->pixelsOrLayers)[(fx >> 16) + srcRow];
+                        if (c != bmp->transparency) {
                             dst->pixels[rowBase + col] = c;
                         }
                     }
@@ -1257,8 +1259,8 @@ void __stdcall DrawFrameScaled(Surface* dst, GafFrame* bmp, int x, int y, double
 void __stdcall CutOutFrame(GafFrame* src, GafFrame* dst, int x, int y)
 {
     int srcCol, dstCol, srcRow, dstRow;
-    x += src->x - dst->x;
-    y = (dst->y - src->y) - y;
+    x += src->xOffset - dst->xOffset;
+    y = (dst->yOffset - src->yOffset) - y;
     // Plain if/else, not an initialisation plus override: fixes the clip block.
     if (y < 0) {
         srcRow = -y;
@@ -1281,12 +1283,12 @@ void __stdcall CutOutFrame(GafFrame* src, GafFrame* dst, int x, int y)
     for (; srcRow < src->height; srcRow++, dstRow++) {
         if (dstRow >= dst->height)
             break;
-        unsigned char* s = src->plane0 + srcRow * src->width + srcCol;
-        unsigned char* d = dst->plane0 + dstRow * dst->width + dstCol;
+        unsigned char* s = src->pixelsOrLayers + srcRow * src->width + srcCol;
+        unsigned char* d = dst->pixelsOrLayers + dstRow * dst->width + dstCol;
         int i = n;
         while (i != 0) {
-            if (*s != src->colour)
-                *d = dst->colour;
+            if (*s != src->transparency)
+                *d = dst->transparency;
             s++;
             d++;
             i--;
@@ -1303,7 +1305,7 @@ int __stdcall CompressRow(char* dest, char* src, int width, unsigned char key);
 int __stdcall CompressFrame(unsigned char* dest, GafFrame* img)
 {
     int total = 0;
-    unsigned char* src = img->plane0;
+    unsigned char* src = img->pixelsOrLayers;
     int width = img->width;
     int height = img->height;
     while (height-- > 0) {
@@ -1312,7 +1314,7 @@ int __stdcall CompressFrame(unsigned char* dest, GafFrame* img)
             len = (unsigned short*)dest;
             dest += 2;
         }
-        int n = CompressRow((char*)dest, (char*)src, width, img->colour);
+        int n = CompressRow((char*)dest, (char*)src, width, img->transparency);
         src += width;
         total += n + 2;
         if (dest) {
@@ -1498,13 +1500,13 @@ int __stdcall CompressRow(char* dest, char* src, int width, unsigned char key)
 // FUNCTION: 0x4ba1b0
 void __stdcall CutFrameBelow(GafFrame* image, unsigned char level)
 {
-    unsigned char* p = image->plane0;
-    unsigned char* m = image->plane1;
+    unsigned char* p = image->pixelsOrLayers;
+    unsigned char* m = image->scratch;
     int count = image->height * image->width;
     Display_004b8310* pal = GetDisplay();
     while (count--) {
         if (*m <= level) {
-            *p = image->colour;
+            *p = image->transparency;
         }
         p++;
         m++;
@@ -1527,16 +1529,16 @@ void __stdcall DrawFrameLit(Surface* surface, GafFrame* frame, int x, int y, int
         }
 
         if (frame != 0) {
-            if (frame->count > 0) {
-                for (int i = 0; i < frame->count; i++)
-                    DrawFrameBlended(surface, ((GafFrame**)frame->plane0)[i], x, y);
+            if (frame->layers > 0) {
+                for (int i = 0; i < frame->layers; i++)
+                    DrawFrameBlended(surface, ((GafFrame**)frame->pixelsOrLayers)[i], x, y);
             } else {
                 Rect screen_rect;
                 Rect sprite_rect = { 0, 0, frame->width - 1, frame->height - 1 };
                 int w = frame->width;
                 int h = frame->height;
-                screen_rect.left = x - frame->x;
-                screen_rect.top = y - frame->y;
+                screen_rect.left = x - frame->xOffset;
+                screen_rect.top = y - frame->yOffset;
                 screen_rect.right = w + screen_rect.left - 1;
                 screen_rect.bottom = h + screen_rect.top - 1;
                 Bounds_src_004b8310 bs;
@@ -1544,16 +1546,16 @@ void __stdcall DrawFrameLit(Surface* surface, GafFrame* frame, int x, int y, int
                 ClipRects(&sprite_rect, &screen_rect, &bs.bounds);
                 if (screen_rect.right >= screen_rect.left && screen_rect.bottom >= screen_rect.top
                     && sprite_rect.right >= sprite_rect.left && sprite_rect.bottom >= sprite_rect.top) {
-                    if (frame->flag9 == 0) {
+                    if (frame->compressed == 0) {
                         Src_004b8310& src = bs.src;
                         src.width = frame->width;
                         src.height = frame->height;
                         src.pitch = frame->width;
-                        src.pixels = (GafFrame**)frame->plane0;
+                        src.pixels = (GafFrame**)frame->pixelsOrLayers;
                         BlitRectBlended(surface, &src, &sprite_rect, &screen_rect, paletteRow, d->lightTable);
                     } else {
                         BlitCompressedLit(surface->pixels, surface->pitch, &screen_rect,
-                            (GafFrame**)frame->plane0, &sprite_rect, d->lightTable + (paletteRow << 8));
+                            (GafFrame**)frame->pixelsOrLayers, &sprite_rect, d->lightTable + (paletteRow << 8));
                     }
                 }
             }
@@ -1569,20 +1571,20 @@ void __stdcall DrawFrameDepth(GafFrame* src, GafFrame* dst, int x, int y, int le
 {
     int yoff;
     int xoff;
-    xoff = dst->x - src->x + x;
-    yoff = dst->y - src->y + y;
+    xoff = dst->xOffset - src->xOffset + x;
+    yoff = dst->yOffset - src->yOffset + y;
     if (xoff < 0 || yoff < 0) {
         return;
     }
-    unsigned char* sp0 = src->plane0;
-    unsigned char* sp1 = src->plane1;
+    unsigned char* sp0 = src->pixelsOrLayers;
+    unsigned char* sp1 = src->scratch;
     for (int row = 0; row < src->height; row++) {
-        unsigned char* dp0 = xoff + dst->plane0 + dst->width * (yoff + row);
-        unsigned char* dp1 = xoff + dst->plane1 + dst->width * (yoff + row);
+        unsigned char* dp0 = xoff + dst->pixelsOrLayers + dst->width * (yoff + row);
+        unsigned char* dp1 = xoff + dst->scratch + dst->width * (yoff + row);
         int n = src->width;
         while (n--) {
             unsigned char c = *sp0;
-            if (c != src->colour && *dp1 <= *sp1 + level) {
+            if (c != src->transparency && *dp1 <= *sp1 + level) {
                 *dp0 = c;
                 *dp1 = *sp1 + level;
             }
@@ -1604,16 +1606,16 @@ void __stdcall DownsampleFrame(GafFrame* src, GafFrame* dst)
     int row = 0;
     for (; row < dst->height; row++) {
         for (int x = 0; x < dst->width; x++) {
-            unsigned char* p = src->plane0 + (row * src->width + x) * 2;
+            unsigned char* p = src->pixelsOrLayers + (row * src->width + x) * 2;
             unsigned char* table = pal->alphaTable;
-            unsigned char* q = src->plane0 + (row * 2 + 1) * src->width + x * 2;
+            unsigned char* q = src->pixelsOrLayers + (row * 2 + 1) * src->width + x * 2;
             int a = p[0];
             int b = p[1];
             int p1 = table[(a << 8) + b];
             int c = q[0];
             int d = q[1];
             int p2 = table[(c << 8) + d];
-            dst->plane0[row * dst->width + x] = table[(p1 << 8) + p2];
+            dst->pixelsOrLayers[row * dst->width + x] = table[(p1 << 8) + p2];
         }
     }
 }

@@ -9,12 +9,7 @@ struct Vertex_0045a610 {
     int z;
 };
 
-struct GafFrame {
-    short width;                     // +0x0
-    short height;                    // +0x2
-    short xOffset;                   // +0x4, added to every vertex x
-    short yOffset;                   // +0x6, added to every vertex y
-};
+#include "gaf_frame.h"
 
 struct Face_00458fa0 {
     int unknown_0;
