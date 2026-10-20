@@ -72,34 +72,17 @@ void ResetAIPlayers();
 void RegisterVtolOrders();
 void StepAllGafSequences();
 void ResetNetStats();
-void InitCommands();
-int UpdatePlacementGhostValidity();
-void RefreshSelectionOrders();
 void DispatchOrdersPanelPageFlags();
 void ResetCameraState();
 void FindLocalCommander();
 void ClampCameraPosition();
 void ClampCameraTarget();
 void UpdateScreenShake();
-void UpdateCameraFollow();
-void BeginMouseScroll();
-void EndMouseScroll();
-void UpdateMouseScroll();
-void UpdateEdgeScroll();
-void CenterCameraOnRadarClick();
-void CenterCameraOnStartPosition();
-void RegisterDataArchives();
-int GetCdPathMismatch();
-void CreateGameObject();
-void InitMissionStatus();
-void SetUpEndMissionScreen();
 
 // Unused here: forward declarations of real functions, one id each, where the
 // merged ArcOrder view stood; they keep the allocation of the classes declared
 // after it (docs/c2-regalloc.md).
-void StartScreenFade();
 void StepScreenFade();
-void ScheduleFadeTick();
 int IsFadeDone();
 void StepPaletteFade();
 void FillEndGameStatistics();
@@ -430,16 +413,7 @@ public:
 
 #pragma pack(push, 2)
 
-class BitWriter {
-public:
-    int bit;                           // +0x0 current word index
-    int index;                         // +0x4 bits used in the current word
-    int capacity;                      // +0x8
-    unsigned int* data;                // +0xc
-    unsigned int buffer[0x100];        // +0x10
-    void GrowBuffer();
-    void WriteBits(int value, int bits);
-};
+#include "../network/bit_writer.h"
 
 // The path target: the flag word at +8, the linked order at +0x16 and the
 // position at +0x26. One class in several files' views: the constructors and
@@ -534,10 +508,7 @@ struct Owner_004895c0 {
 
 #include "path_order_attach.h"
 
-class UnitRef {
-public:
-    void Unlink();
-};
+#include "../units/unit_ref.h"
 
 extern void* g_pathOrderVtable[];
 extern void* g_airManeuverOrderVtable[];
@@ -563,25 +534,7 @@ struct Rec_0044de80 {
 
 #pragma pack(pop)
 
-// Reads bit fields from an array of dwords, lowest bits first.
-// Bit reader, see src/network/net_stats.cpp.
-class BitReader {
-public:
-    unsigned int* data;                // +0x00
-    int index;                         // +0x04
-    int bit;                           // +0x08
-    int ReadBits(int bits);
-
-    int ReadBit()
-    {
-        int r = (data[index] & (1 << bit)) != 0;
-        if (++bit == 32) {
-            bit = 0;
-            index++;
-        }
-        return r;
-    }
-};
+#include "../network/bit_reader.h"
 
 struct Owner_0044e080;
 class Pathfinder;
@@ -1027,12 +980,7 @@ void LoadTextureGafs();
 void FreeTextureGafs();
 void FreeUnitInfo();
 void RefreshUnitInfo();
-void CheckDownloadableFlags();
 void AddDownloadBuildOptions();
-void LoadUnitTypes();
-void FreeUnitTypes();
-void LoadDownloadMenus();
-void FreeDownloadMenus();
 // Two more, for the declaration PatrolGoal::DeserializeNetUnitState no longer needs.
 void StartScreenFade();
 void StepScreenFade();
@@ -2563,16 +2511,16 @@ void AiSearchGoal::SerializeNetUnitState(BitWriter* stream)
         n = 0;
     }
     if (owner->target->occupyFlags & 4) {
-        stream->data[stream->bit] |= 1 << stream->index;
+        stream->data[stream->index] |= 1 << stream->bit;
     }
-    stream->index++;
-    if (stream->index == 0x20) {
-        stream->index = 0;
-        stream->bit++;
-        if (stream->bit == stream->capacity) {
+    stream->bit++;
+    if (stream->bit == 0x20) {
+        stream->bit = 0;
+        stream->index++;
+        if (stream->index == stream->capacity) {
             stream->GrowBuffer();
         }
-        stream->data[stream->bit] = 0;
+        stream->data[stream->index] = 0;
     }
     stream->WriteBits(n, 2);
     for (int i = 0; i < n; i++) {
