@@ -1,11 +1,8 @@
 // Decompiled by DeepSeek V4.1 Flash, deepseek-v4.1-flash, Opus, Sonnet and Haiku. Names are provisional.
 
+#include "../gui/mouse_event.h"
+
 #pragma pack(push, 1)
-struct Rect_0041d0f0 {
-    int x;                             // +0x0
-    int y;                             // +0x4
-    int unknown_8[4];
-};
 
 struct Entry_0041d1f0 {
     int type;                          // +0x0
@@ -23,7 +20,7 @@ public:
 
 struct Game {
     char unknown_0[0x2c76];
-    Rect_0041d0f0 view;                // +0x2c76
+    MouseEvent view;                // +0x2c76
     char unknown_2c8e[0x1422b - 0x2c8e];
     int mapPixelWidth;                 // +0x1422b
     int mapPixelHeight;                // +0x1422f
@@ -80,7 +77,7 @@ static inline void SetPos(int x, int y)
 // FUNCTION: 0x41d0f0
 void CenterCameraOnRadarClick()
 {
-    Rect_0041d0f0 r = g_game->view;
+    MouseEvent r = g_game->view;
     int y = g_game->mapPixelHeight * (r.y - g_game->minimapGadgetY) / g_game->minimapGadgetH - g_game->viewPixelHeight / 2;
     int x = g_game->mapPixelWidth * (r.x - g_game->minimapGadgetX) / g_game->minimapGadgetW - g_game->viewPixelWidth / 2;
     g_game->scrollX = x;

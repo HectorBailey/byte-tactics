@@ -2764,15 +2764,11 @@ struct Holder_004a3780 {
 // the Rect_004a3780 view was dropped (docs/c2-regalloc.md).
 int ScanDirectory(int, int, int, int, int, int);
 
-struct Point_004a3780 {                // 0x18 bytes, copied with rep movsd x6
-    int x;                             // +0x00
-    int y;                             // +0x04
-    int unknown_08[4];                 // +0x08
-};
+#include "mouse_event.h"
 
 // True when the point lies inside the rect, edges included (the body of IsPointInRect
 // at 0x4a1920, which the compiler inlined here).
-static inline int PointInListRect(const Rect& r, const Point_004a3780& p)
+static inline int PointInListRect(const Rect& r, const MouseEvent& p)
 {
     return p.x >= r.left && p.x <= r.right && p.y >= r.top && p.y <= r.bottom;
 }
@@ -2781,7 +2777,7 @@ struct Object_004a3780 {
     char unknown_00[0x18];
     Holder_004a3780* holder;           // +0x18
     char unknown_1c[0x3c - 0x1c];
-    Point_004a3780 point;              // +0x3c
+    MouseEvent point;                   // +0x3c
     char unknown_54[0x60 - 0x54];
     int hotGadgetIndex;                // +0x60
     int focus;                         // +0x64
@@ -2866,7 +2862,7 @@ int __stdcall HandleListBoxInput(Object_004a3780* obj, int index, int param_3)
     int n = 0;
     r.top += 2;
     r.bottom -= 3;
-    Point_004a3780 point = obj->point;
+    MouseEvent point = obj->point;
     point.x -= entries[0].x;
     point.y -= entries[0].y;
     int i = SelectFontForEntry_inlined(entries, index);
@@ -3088,22 +3084,21 @@ struct Holder_004a4170 {
     int dirty;                         // +0x14, set when off changed
 };
 
-struct Point_004a4170 {                // 24 bytes, copied with rep movsd
-    int x;
-    int y;
-    int unknown_08[4];
-};
+// Unused here: the symbol ids these declarations take replace the local view
+// the shared MouseEvent header removes (docs/c2-regalloc.md).
+void __stdcall InitMemoryCache();
+int __stdcall CheckDirectXVersion(int, int, int, int, int);
 
 struct Object_004a4170 {
     char unknown_00[0x18];
     Holder_004a4170* holder;           // +0x18
     char unknown_1c[0x3c - 0x1c];
-    Point_004a4170 point;              // +0x3c, the mouse, table relative
+    MouseEvent point;                   // +0x3c, the mouse, table relative
     char unknown_54[0x64 - 0x54];
     int focus;                         // +0x64, -1 when nothing has the focus
     char unknown_68[0x78 - 0x68];
     int knobDragging;                  // +0x78, non-zero while dragging
-    Point_004a4170 saved;              // +0x7c, the mouse when the drag began
+    MouseEvent saved;                   // +0x7c, the mouse when the drag began
     short dragKnobPos;                 // +0x94, off when the drag began
 };
 
@@ -3141,7 +3136,7 @@ void __stdcall HandleSliderInput(Object_004a4170* obj, int index)
     if (e->sliderLocked)
         return;
 
-    Point_004a4170 p = obj->point;
+    MouseEvent p = obj->point;
     p.x -= entries->x;
     p.y -= entries->y;
     int r1[4];
@@ -3226,18 +3221,18 @@ struct Holder_0049fc50 {
     Gadget* entries;           // +0x4
 };
 
-struct Point_0049fc50 {
-    int x;
-    int y;
-    int unknown_8[4];
-};
+// Unused here: the symbol ids these declarations take replace the local view
+// the shared MouseEvent header removes (docs/c2-regalloc.md).
+void __stdcall InitMemoryCache();
+int __stdcall CheckDirectXVersion(int, int, int, int, int);
+void __cdecl FreeMemoryCache();
 
 #pragma pack(push, 1)
 struct Object_0049fc50 {
     char unknown_0[0x18];
     Holder_0049fc50* holder;           // +0x18
     char unknown_1c[0x3c - 0x1c];
-    Point_0049fc50 point;              // +0x3c to +0x50
+    MouseEvent point;                   // +0x3c to +0x50
     char unknown_54[0x64 - 0x54];
     int focus;                         // +0x64
     char unknown_68[0xcc6 - 0x68];
@@ -3258,7 +3253,7 @@ int __stdcall HandleLabelInput(Object_0049fc50* obj, int index, char key)
     Gadget* entries = obj->holder->entries;
     Gadget* entry = &entries[index];
     Rect rect;
-    Point_0049fc50 point;
+    MouseEvent point;
     int rel_x, rel_y;
 
     if (entry->hotkey == 0 && (entry->attribs & 0x10))
