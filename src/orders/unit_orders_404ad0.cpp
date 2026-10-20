@@ -13,19 +13,7 @@
 
 #include "../units/unit_def.h"
 
-struct Unit {
-    // +0x0 holds the unit's UnitMotion pointer; only its non-nullness is read
-    // here, and an int spelling keeps the file's symbol count (docs/c2-regalloc.md).
-    int motion;                        // +0x0
-    char unknown_4[0x66 - 0x4];
-    unsigned short heading;            // +0x66
-    char unknown_68[0x6a - 0x68];
-    Vec3 pos;                          // +0x6a
-    char unknown_76[0x92 - 0x76];
-    UnitDef* def;                      // +0x92
-    char unknown_96[0xb0 - 0x96];
-    int workTime;                      // +0xb0
-};
+#include "../units/unit.h"
 
 #include "order.h"
 

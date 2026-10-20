@@ -9,9 +9,7 @@
 // type is Unit* (see 0x406c00.cpp).
 #include <vector>
 
-struct Unit {
-    int unknown_0;
-};
+#include "../units/unit.h"
 
 typedef std::vector<Unit*> Vec_00406c40;
 typedef void (Vec_00406c40::*UfillFn_00406c40)(
