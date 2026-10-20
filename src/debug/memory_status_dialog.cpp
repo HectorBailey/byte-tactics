@@ -32,14 +32,15 @@ void ResetAllocStats(void);
 double GetTimeSeconds(void);
 char __cdecl FormatWorkingSet(char* dest);
 
-struct Rate_004e0b90 {
+// The last ten rate samples and their total.
+struct RateWindow {
     double table[10]; double total; int index; int unknown_5c;
 };
 
 // Free function shape: the quotient is computed inside the helper, so the
 // divisor stays on the x87 stack and the divide becomes three fxch plus
 // fdiv st(2), as in the original.
-static void __inline rate_add(Rate_004e0b90* r, int delta, double dt)
+static void __inline rate_add(RateWindow* r, int delta, double dt)
 {
     double speed = (double)delta / dt;
     r->total = speed + r->total - r->table[r->index];
@@ -89,7 +90,7 @@ public:
     int left;                          // +0x08
     int top;                           // +0x0c
     double time;                       // +0x10
-    Rate_004e0b90 rates;              // +0x18
+    RateWindow rates;                  // +0x18
     char flag_78;                      // +0x78
     unsigned char workingSet;          // +0x79
 

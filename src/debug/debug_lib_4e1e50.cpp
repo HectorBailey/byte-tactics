@@ -9,15 +9,15 @@ void InitPerformanceEvents(void);
 bool __cdecl ProgramPerfEvent(unsigned int effect, unsigned int level, char f1, char f2);
 
 // One of the two performance counters the profiler reads.
-struct Counter_004e1e50 {
+struct PerformanceCounter {
     unsigned int event;                 // +0x0, the event it counts
     const char* name;                   // +0x4
     int unknown_8;
     unsigned int base;                  // +0xc, the event it is shown as a share of
 };
 
-extern Counter_004e1e50 g_pmcEvent0;
-extern Counter_004e1e50 g_pmcEvent1;
+extern PerformanceCounter g_pmcEvent0;
+extern PerformanceCounter g_pmcEvent1;
 extern unsigned char g_perfEnabled;     // profiling is on
 extern unsigned char g_perfDisplayInDebugger;  // reports go to the debugger too
 extern unsigned char g_perfDisplayInWindow;  // reports go to the log
