@@ -12,7 +12,7 @@ struct Struct_00499200_531 {
     int entries;                       // +0x4, the layer's gadget array
 };
 
-struct BitFlags16_00499200 {
+struct GameFlagBits {
     unsigned short b0:1;
     unsigned short b1:1;
     unsigned short b2:1;
@@ -31,9 +31,9 @@ struct BitFlags16_00499200 {
     unsigned short b15:1;
 };
 
-union Flags16_00499200 {
+union GameFlags16 {
     unsigned short value;
-    BitFlags16_00499200 bits;
+    GameFlagBits bits;
 };
 
 #include "../map/mission.h"
@@ -51,7 +51,7 @@ struct Game {
     char unknown_29a4[0x2a3c - 0x29a4];
     unsigned short numPlayers;         // +0x2a3c
     char unknown_2a3e[0x2a44 - 0x2a3e];
-    Flags16_00499200 netGameFlags;     // +0x2a44
+    GameFlags16 netGameFlags;     // +0x2a44
     char unknown_2a46[0x2c76 - 0x2a46];
     MouseEvent mouse;                  // +0x2c76
     char unknown_2c8e[0x2c92 - 0x2c8e];
@@ -96,7 +96,7 @@ struct Game {
     int frontendState;                 // +0x391f1
     void (*handler)(void);             // +0x391f5
     char unknown_391f9[0x3923b - 0x391f9];
-    Flags16_00499200 endGameFlags;     // +0x3923b
+    GameFlags16 endGameFlags;     // +0x3923b
     char unknown_3923d[0x39249 - 0x3923d];
     int restartMissionRequest;         // +0x39249
 };

@@ -4,7 +4,7 @@
 
 #include "../map/mission.h"
 
-struct Input_00499890 {
+struct MouseInput {
     int fields[6];
 };
 
@@ -20,7 +20,7 @@ struct Game {
     char unknown_10[0x519 - 0x10];
     char menu[0x10];
     char unknown_529[0x2c76 - 0x529];
-    Input_00499890 selected;
+    MouseInput selected;
     char unknown_2c8e[0x37ebe - 0x2c8e];
     unsigned short ordersPanelFlags;
     char unknown_37ec0[0x37f2f - 0x37ec0];
@@ -49,7 +49,7 @@ void ToggleFullScreen();
 void __stdcall PopUntilNamedLayout(int);
 void __stdcall MakeDirectoryPath(char*);
 int __stdcall GetTicks();
-void __stdcall PeekMouseEvent(Input_00499890*);
+void __stdcall PeekMouseEvent(MouseInput*);
 void __stdcall UpdateMenu(void*);
 void UpdateCdCategoryByActivity();
 void PlayNextSpeech();
@@ -60,8 +60,8 @@ void __stdcall SaveScreenshot(char*, char*);
 // FUNCTION: 0x499890
 void MainFrameTick()
 {
-    Input_00499890 first;
-    Input_00499890 second;
+    MouseInput first;
+    MouseInput second;
     char path[0x100];
     int key = PeekKey();
 
