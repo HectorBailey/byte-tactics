@@ -5585,7 +5585,8 @@ struct Sub_004e0570 {
     Sub_004e0570() { memset(table, 0, sizeof(table)); }
 };
 
-struct Rate_004e0b90 {
+// The last ten rate samples and their total.
+struct RateWindow {
     double table[10]; double total; int index; int unknown_5c;
 };
 
@@ -5905,7 +5906,7 @@ char __cdecl FormatWorkingSet(char* dest);
 // Free function shape: the quotient is computed inside the helper, so the
 // divisor stays on the x87 stack and the divide becomes three fxch plus
 // fdiv st(2), as in the original.
-static void __inline rate_add(Rate_004e0b90* r, int delta, double dt)
+static void __inline rate_add(RateWindow* r, int delta, double dt)
 {
     double speed = (double)delta / dt;
     r->total = speed + r->total - r->table[r->index];

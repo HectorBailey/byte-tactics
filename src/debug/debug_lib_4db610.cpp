@@ -18,7 +18,7 @@ public:
 
 // The map's allocator: std::allocator whose node allocation (_Charalloc, the
 // hook <xtree>'s _Buynode uses) is the pool at 0x4ddd70.
-class PoolAlloc_004db610 : public std::allocator<int> {
+class FreeBlockMapAllocator : public std::allocator<int> {
 public:
     char* _Charalloc(size_t n)
     {
@@ -26,12 +26,13 @@ public:
     }
 };
 
-struct Pair_004db610 {
+// One free block: its base offset and its length.
+struct FreeBlockEntry {
     unsigned int offset;               // +0x0
     int length;                        // +0x4
 };
 
-typedef std::map<unsigned int, int, std::less<unsigned int>, PoolAlloc_004db610>
+typedef std::map<unsigned int, int, std::less<unsigned int>, FreeBlockMapAllocator>
     Map_004db610;
 
 class FreeBlockMap {
@@ -39,7 +40,7 @@ public:
     Map_004db610 freeMap;              // +0x0
     int total;                         // +0x10
 
-    void AddFreeBlock(Pair_004db610 p);
+    void AddFreeBlock(FreeBlockEntry p);
 
     void* operator new(size_t n) { return GlobalAlloc(0, n); }
 
@@ -60,7 +61,7 @@ public:
                 m = VirtualAlloc(0, len + 0x2000, MEM_RESERVE, PAGE_READWRITE);
             }
             total = total + len;
-            Pair_004db610 pair;
+            FreeBlockEntry pair;
             pair.offset = (unsigned int)m;
             pair.length = len;
             AddFreeBlock(pair);
