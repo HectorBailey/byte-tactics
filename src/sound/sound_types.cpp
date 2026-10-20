@@ -10,7 +10,7 @@ struct Source_0042f450 {
     TdfRecord* tdf;                    // +0x4
 };
 
-struct SoundInfo_005086fc {
+struct SpeechCategory {
     char* name;                         // +0x0
     int unknown_4[5];                   // +0x4
 };
@@ -42,7 +42,7 @@ struct Game {
 extern Game* g_game;
 extern char g_emptyStringLiteral[];
 extern char g_sayChoiceArrayName[];
-extern SoundInfo_005086fc g_speechCategories[];
+extern SpeechCategory g_speechCategories[];
 
 int __cdecl GameReallocTagged(int block, char* name, int size);
 void __cdecl GameFreeThunk(int* p);
@@ -90,7 +90,7 @@ void LoadSoundCategories()
     TdfFile obj;
     char name[32];
     char path[256];
-    SoundInfo_005086fc* p;
+    SpeechCategory* p;
 
     BuildDataPath(path, "gamedata", "sound", "TDF");
     if (obj.LoadFile(path)) {
