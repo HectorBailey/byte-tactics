@@ -69,14 +69,14 @@ static inline bool operator==(const StringRef& a, const StringRef& b)
     return strcmp(a.data, b.data) == 0;
 }
 
-struct NameLess_004b7620 {
+struct CommandNameLess {
     bool operator()(const char* a, const char* b) const
     {
         return _strcmpi(a, b) < 0;
     }
 };
 
-struct NameNe_004b7620 {
+struct CommandNameNe {
     bool operator()(const StringRef& a, const StringRef& b) const
     {
         return !(a == b);
@@ -277,7 +277,7 @@ void __stdcall RegisterCommand(const char* name, Handler_004b7620 fn, int mask)
     StringRef key(name);
     CommandEntry* first = s_commandTable.begin();
     CommandEntry* last = s_commandTable.end();
-    NameLess_004b7620 less;
+    CommandNameLess less;
     const char* k = key.data;
     while (first != last) {
         CommandEntry* mid = first + (last - first) / 2;
@@ -288,7 +288,7 @@ void __stdcall RegisterCommand(const char* name, Handler_004b7620 fn, int mask)
     }
     // int* slot: the original stores through [esi]/[esi+4].
     int* slot;
-    if (first == s_commandTable.end() || NameNe_004b7620()(first->handle, key)) {
+    if (first == s_commandTable.end() || CommandNameNe()(first->handle, key)) {
         CommandEntry e(key, Pair_004b7620(0, 0));
         int index = first - s_commandTable.begin();
         s_commandTable.insert(first, e);
@@ -309,7 +309,7 @@ void __stdcall RegisterCommands(ConsoleCommand* rec)
         StringRef key(rec->name);
         CommandEntry* first = s_commandTable.begin();
         CommandEntry* last = s_commandTable.end();
-        NameLess_004b7620 less;
+        CommandNameLess less;
         const char* k = key.data;
         while (first != last) {
             CommandEntry* mid = first + (last - first) / 2;
@@ -320,7 +320,7 @@ void __stdcall RegisterCommands(ConsoleCommand* rec)
         }
         // int* slot: the original stores through [esi]/[esi+4].
         int* slot;
-        if (first == s_commandTable.end() || NameNe_004b7620()(first->handle, key)) {
+        if (first == s_commandTable.end() || CommandNameNe()(first->handle, key)) {
             CommandEntry e(key, Pair_004b7620(0, 0));
             int index = first - s_commandTable.begin();
             s_commandTable.insert(first, e);
@@ -347,7 +347,7 @@ struct HandlerSlot_004b7900 {
 
 static inline HandlerSlot_004b7900* Find_004b7900(const char* key)
 {
-    NameLess_004b7620 less;
+    CommandNameLess less;
     CommandEntry* first = s_commandTable.begin();
     CommandEntry* last = s_commandTable.end();
     while (first != last) {
