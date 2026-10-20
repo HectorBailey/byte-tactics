@@ -16,16 +16,8 @@ struct WeaponDef { char pad0[0x111]; unsigned int flags; };
 struct Weapon { char pad0[8]; WeaponDef* def; char padc[11]; unsigned char flags; char pad18[4]; };
 #include "../units/unit_def.h"
 struct Owner { char pad0[0x108]; unsigned char allied[0x3e]; unsigned char index; };
-struct Unit {
-    char pad0[8]; Weapon weapons[3]; Order* list;
-    char pad60[10]; Vec3 pos; char pad76[8]; short width; char pad80[6]; int carrier;
-    char pad8a[8]; UnitDef* def; Owner* player; char pad9a[12]; unsigned short unitDefIndex;
-    char pada8[0xf0-0xa8]; Unit* attacker; char padf4[0x108-0xf4]; short health;
-    char pad10a[6]; unsigned int flags;
-    void ReleaseWeapons(int);
-    // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
-    void SetStateBits(int, int);
-};
+#include "../units/unit.h"
+#include "../network/player.h"
 struct Order { Unit* Target() { return target; } Vec3* Position() { return &pos; } char pad0[4]; MissionType kind; unsigned char state; unsigned int flags; char pada[12]; Unit* target; char pad1a[8]; Vec3 pos; char pad2e[8]; int radius; char pad3a[8]; unsigned int capabilities; void AnnounceStatusIfFlagged(const char*); void SetAttachedFx(int); void AttachApproachRadiusGoal(Vec3*, int); void SetDeadlineTicks(int); Order(MissionType, Unit*, Vec3*, int, int, int); char unknown_46[0x10];           // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
     void ReattachFxToUnit();
     void MergeFlagsFromTable(int k);
@@ -59,7 +51,7 @@ int __stdcall FollowGroundOrder(Unit* unit, Order* order, int flags)
     case 0: {
         order->AnnounceStatusIfFlagged("Guarding");
         unit->ReleaseWeapons(3);
-        order->radius=(unit->width + order->target->width + 2) << 4;
+        order->radius=(unit->footprint.x + order->target->footprint.x + 2) << 4;
         int distance=order->radius << 16;
         short angle=RandomInt(0x10000);
         order->pos=Offset(angle,distance);
@@ -72,8 +64,8 @@ int __stdcall FollowGroundOrder(Unit* unit, Order* order, int flags)
             if (IssueAttackOrder(unit,attacker,1)) { order->flags=0; return 3; }
             if (unit->flags & 0x300000) {
                 for (unsigned char i=0;i<3;++i) {
-                    Weapon* weapon=&unit->weapons[i];
-                    if ((weapon->flags&2) && (weapon->flags&0x10) && !((unsigned char)(weapon->def->flags >> 26)&1)) {
+                    UnitWeaponSlot* weapon=&unit->weapons[i];
+                    if ((weapon->flags&2) && (weapon->flags&0x10) && !((unsigned char)(weapon->weapon->flags >> 26)&1)) {
                         Unit* target=GetWeaponTargetUnit(unit,i);
                         if (!target || !WeaponCanReachUnit(unit,target,i) || Contains(unit->def->weaponCategories[i],target->unitDefIndex))
                             SetWeaponTargetUnit(unit,attacker,i);
