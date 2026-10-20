@@ -6,15 +6,12 @@
 // that pointer from esi to edx.
 #include <stdlib.h>
 
-#pragma pack(push, 1)
-struct Sub_0041bde0 {
-    char unknown_0[0x22e];
-    unsigned char pageCount;             // +0x22e
-};
+#include "../units/unit_def.h"
 
+#pragma pack(push, 1)
 struct Unit {
     char unknown_0[0x92];
-    Sub_0041bde0* def;                   // +0x92
+    UnitDef* def;                        // +0x92
     char unknown_96[0xa6 - 0x96];
     short unitDefIndex;                      // +0xa6
     char unknown_a8[0x110 - 0xa8];
@@ -51,14 +48,14 @@ void __stdcall StepBuildMenuPage(int toggle)
                 if (!unit->menuOpen) {
                     unit->menuOpen = 1;
                     unit->page = 1;
-                } else if (unit->page == unit->def->pageCount - 1) {
+                } else if (unit->page == unit->def->buildMenuPageCount - 1) {
                     unit->menuOpen = 0;
                 } else {
                     unit->page++;
                 }
             } else {
-                // Compared as page == pageCount - 1; keeps the original load order.
-                if (unit->page == unit->def->pageCount - 1)
+                // Compared as page == buildMenuPageCount - 1; keeps the original load order.
+                if (unit->page == unit->def->buildMenuPageCount - 1)
                     unit->page = 1;
                 else
                     unit->page++;
