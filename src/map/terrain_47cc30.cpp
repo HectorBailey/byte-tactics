@@ -30,12 +30,6 @@ struct UnitRec_0047cc30 {               // 0x118 bytes
 
 #include "../util/vec3.h"
 
-struct Position_0047cc30 {
-    int x;
-    int y;
-    int z;
-};
-
 union Flags_0047cc30 {
     struct {
         unsigned int unknown_0 : 27;
@@ -50,7 +44,7 @@ struct Obj_0047cc30 {
     char unknown_4[0x26 - 0x4];
     int field_26;                       // +0x26
     char unknown_2a[0x6a - 0x2a];
-    Position_0047cc30 position;         // +0x6a
+    Vec3 position;         // +0x6a
     Point16 pos;                 // +0x76
     char unknown_7a[4];
     Point16 footprint;           // +0x7e
@@ -129,7 +123,7 @@ void __stdcall AddUnitToMap(Obj_0047cc30* obj)
             goto remove;
     }
     {
-        Position_0047cc30 p = obj->position;
+        Vec3 p = obj->position;
         SetOwner_0047cc30(obj,
             &g_game->owners[(p.x >> 23) + (p.z >> 23) * g_game->bucketCols]);
     }

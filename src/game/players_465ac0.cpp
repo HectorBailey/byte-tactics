@@ -56,9 +56,6 @@ struct Position_00465ac0 {              // 16.16 fixed point; only high words re
     short zFrac;
     short z;                            // +0xa
 };
-struct Pos_00465ac0 {                   // 16.16 fixed point
-    int x, y, z;
-};
 #pragma pack(pop)
 
 extern Game* g_game;
@@ -135,7 +132,7 @@ int __stdcall IsUnitVisibleToPlayer(Map_00465ac0* map, Unit* u)
         return 1;
     if (u->activateFlags & 4)
         return 0;
-    Pos_00465ac0 p;
+    Vec3 p;
     p.x = u->def->modelMinX + u->pos.x;
     p.y = u->def->modelMaxY + u->pos.y;
     p.z = u->def->modelMinZ + u->pos.z;
