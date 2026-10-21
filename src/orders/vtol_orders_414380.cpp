@@ -39,7 +39,16 @@ struct FrameTable;
 class AssaultTimer;
 class EscortTimer;
 class SquadScoutTimer;
-class Class_0044e720 { public: void SetHeading(int); };
+// PathOrder: the order object the constructor below builds. Its definition is
+// in order_targets.cpp; here only the setters this order calls are declared
+// (0x44e6c0, 0x44e720 and 0x44e730).
+class PathOrder {
+public:
+    char data[0x36];
+    void SetAltitude(int);
+    void SetApproachRadius(int);
+    void SetHeading(int);
+};
 class MissionType { public: unsigned char index; MissionType(const char*); };
 
 class PathOrderAttach { public: void SetUnit(Unit*); };
@@ -107,12 +116,11 @@ struct Game {
     char pad0[0x1439b]; UnitDef* unitDefs;
     char pad1439f[0x38a47-0x1439f]; unsigned int tick;
 };
-class Class_0044e2d0 {
+// A constructor view of PathOrder, named after the address of the constructor
+// it models (its decorated name is in data/aliases.csv).
+class Class_0044e2d0 : public PathOrder {
 public:
-    char data[0x36];
     Class_0044e2d0(Order*, const Vec3&);
-    void SetAltitude(int);
-    void SetApproachRadius(int);
 };
 #pragma pack(pop)
 extern Game* g_game;
@@ -152,6 +160,7 @@ static inline short Angle(Vec3* a,Vec3* b) { return FUN_004b715a(a->x-b->x,a->z-
 // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int CheckDirectXVersion(int, int, int, int, int);
 struct Feature;
+void CollectSelectedUnits();
 // Stays in a file of its own: it matches only in this file's symbol context.
 // FUNCTION: 0x414380
 int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
@@ -201,7 +210,7 @@ int __stdcall VtolHelpBuildOrder(Unit* unit,Order* order,int flags)
             angle+=0xdb6e;
             Vec3 pos=order->target.Get()->pos-Offset(angle,range);
             Class_0044e2d0* move=new Class_0044e2d0(order,pos);
-            ((Class_0044e720*)move)->SetHeading((unsigned short)angle);
+            move->SetHeading((unsigned short)angle);
             order->SetAttachedFx((int)move);
         }
         int rate=0; rate=unit->def->buildRate;
