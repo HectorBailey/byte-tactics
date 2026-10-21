@@ -11,6 +11,7 @@
 #include <string.h>
 
 #include "../util/tdf.h"
+#include "../util/point.h"
 
 // The original files included <windows.h>; the only thing the code uses from
 // it is wsprintfA, declared here so its many declarations stay out of the file.
@@ -488,13 +489,9 @@ struct Surface_0045fbc0 {
     int data[12];
 };
 
-struct Point_45ffb0 {
-    int x;
-    int y;
-};
 
 struct Quad_45ffb0 {
-    Point_45ffb0 p[4];
+    Point p[4];
 };
 
 struct Entry_45ffb0 {
