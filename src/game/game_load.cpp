@@ -133,10 +133,7 @@ struct PlayerRec_00497f40 {             // 0x14b bytes, array at g_game+0x1b63
 typedef PlayerRec_00497f40 PlayerInfo_00497f40;
 typedef PlayerRec_00497f40 PlayerRec_00497ce0;
 
-struct Point_00498cd0 {
-    int x;                              // +0x0
-    int y;                              // +0x4
-};
+#include "../util/point.h"
 
 struct View_00498cd0 {
     char unknown_0[0x2c];
@@ -165,6 +162,8 @@ struct Pos_00498da0 {
 
 #include "../graphics/rect.h"
 
+// Kept: the shared vec3.h moves 0x497f40 to 97.3%, and the five filler ids
+// that put it back move 0x498cd0 to 50.0% (docs/c2-regalloc.md).
 struct Point_00498da0 {
     short x;                            // +0x0
     short y;                            // +0x2
@@ -1116,7 +1115,7 @@ void LoadingScreenFrame(void)
 // Converts a point by the view origin at +0x2c/+0x30 (less a 0x80 by 0x20
 // border) and passes it on to ClampWorldPosToTerrain.
 // FUNCTION: 0x498cd0
-void __stdcall OffsetWorldPosFromView(Point_00498cd0* p, View_00498cd0* view, int param_3)
+void __stdcall OffsetWorldPosFromView(Point* p, View_00498cd0* view, int param_3)
 {
     ClampWorldPosToTerrain((view->x - 0x80) + p->x, (view->y - 0x20) + p->y, param_3);
 }

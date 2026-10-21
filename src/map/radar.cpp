@@ -9,13 +9,10 @@
 #include <math.h>
 #include <ddraw.h>
 
-struct Point_4665d0 {
-    int x;
-    int y;
-};
+#include "../util/point.h"
 
 struct Quad_4665d0 {
-    Point_4665d0 p[4];
+    Point p[4];
 };
 
 struct Surface_4665d0 {

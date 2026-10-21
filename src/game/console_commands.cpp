@@ -359,6 +359,8 @@ public:
     virtual void Method_28(int ctx);
 };
 
+// Kept: the shared point.h moves 0x4181d0 to 98.6% and no count of filler
+// declarations puts it back (docs/c2-regalloc.md).
 struct Point_00417f60 {
     int x;
     int y;
