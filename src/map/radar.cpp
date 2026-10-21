@@ -85,7 +85,7 @@ union Flags14281_00466dc0 {
 
 #include "../network/player_info.h"
 
-struct MapSize_00466dc0 {
+struct MapSize {
     unsigned int width;                  // +0x80
     unsigned int height;                 // +0x84
 
@@ -95,9 +95,9 @@ struct MapSize_00466dc0 {
     }
 };
 
-struct ByteMap_00466dc0 {
+struct ByteMap {
     unsigned char* data;                 // +0x0
-    MapSize_00466dc0 size;               // +0x4
+    MapSize size;                        // +0x4
 
     int Index(int x, int y) { return size.width * y + x; }
     unsigned char Get(int x, int y) { return data[Index(x, y)]; }
@@ -107,7 +107,7 @@ struct Player {
     char unknown_0[0x27];
     PlayerInfo* info;               // +0x27
     char unknown_2b[0x7c - 0x2b];
-    ByteMap_00466dc0 explored;           // +0x7c
+    ByteMap explored;               // +0x7c
     char unknown_88[0x14b - 0x88];
 };
 
@@ -562,7 +562,7 @@ static inline int OnRadarShort_00466dc0(Player* pi, int px, int py)
     if (!pi->explored.size.Contains(tx, ty)) {
         return 0;
     }
-    ByteMap_00466dc0* b = &pi->explored;
+    ByteMap* b = &pi->explored;
     return (g_game->visibilityMask[b->Index(tx, ty)] &
             (1 << g_game->playerIndex)) != 0;
 }
