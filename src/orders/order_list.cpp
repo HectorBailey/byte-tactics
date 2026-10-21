@@ -283,7 +283,6 @@ struct Game {
     char unknown_1439f[0x38a47 - 0x1439f];
     union {
         unsigned int frame;            // +0x38a47
-        int field_38a47;               // +0x38a47
         unsigned int gameTick;         // +0x38a47
     };
 };
@@ -1983,7 +1982,7 @@ void UnitMotion::UpdatePosition(Unit* u)
     if (pos.x == u->pos.x && pos.z == u->pos.z && pos.y == u->pos.y && m == u->mode)
         return;
 
-    lastMoveTick = g_game->field_38a47;
+    lastMoveTick = g_game->gameTick;
     Point draft = u->footprint;
     // Field by field, with draft.x * 0x80000 (a << 19 evaluates draft.x first).
     Point cell;

@@ -14,7 +14,6 @@ struct Game {
     // plain int.
     union {
         unsigned int gameTick;       // +0x38a47
-        int field_38a47;             // +0x38a47
     };
 };
 #pragma pack(pop)
@@ -200,9 +199,9 @@ void UpdateMeteors()
 void StartMeteorShower()
 {
     g_meteorActive = 1;
-    g_meteorStrikeEndTime = g_meteorShowerDuration + g_game->field_38a47;
+    g_meteorStrikeEndTime = g_meteorShowerDuration + g_game->gameTick;
     g_meteorNextStrikeTime = g_meteorScheduleGap + g_meteorStrikeEndTime;
-    g_meteorNextHitTime = g_game->field_38a47;
+    g_meteorNextHitTime = g_game->gameTick;
     g_meteorTarget = MakePoint((int)((__int64)rand() * g_game->mapWidthTiles / 0x8000),
                              (int)((__int64)rand() * g_game->mapHeightTiles / 0x8000));
     g_meteorOrigin = AddPoints(MakePoint((int)((__int64)rand() * 30 / 0x8000) - 15,
