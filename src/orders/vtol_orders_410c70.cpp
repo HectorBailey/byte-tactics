@@ -11,13 +11,13 @@ inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull(dest,
 #include <vector>
 #pragma pack(push, 1)
 #include "../units/unit_def.h"
-struct Owner { char pad0[0x108]; unsigned char allied[0x3e]; unsigned char index; };
-struct Unit { char pad0[0x92]; UnitDef* def; Owner* player; };
+#include "../units/unit.h"
+#include "../network/player.h"
 #pragma pack(pop)
 class GroundAllyVisitor {
 public:
     virtual void CollectGroundAlly(Unit*);
-    Owner* owner;
+    Player* owner;
     std::vector<Unit*>* units;
     Unit* self;
 };

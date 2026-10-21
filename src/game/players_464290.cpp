@@ -34,17 +34,7 @@ struct UnitDef;
 #include "../units/unit_def.h"
 
 // A unit. Only the fields these functions use are named.
-struct Unit {
-    char unknown_0[0xbc];
-    float resourceSlot;                    // +0xbc
-    char unknown_c0[0xd4 - 0xc0];
-    float metalMake;                   // +0xd4
-    char unknown_d8[0xec - 0xd8];
-    Player* owner;                     // +0xec
-    char unknown_f0[0x110 - 0xf0];
-    unsigned int flags;                // +0x110
-    char unknown_114[0x118 - 0x114];
-};
+#include "../units/unit.h"
 
 #include "../network/player_info.h"
 
@@ -499,7 +489,7 @@ void FreePlayers()
 {
     for (Player* p = g_game->players; p <= g_game->players + 10; p++) {
         // Fields reached as indices off q: keeps two induction variables.
-        int* q = (int*)((char*)p + 0x84);
+        int* q = &p->exploredHeight;
         q[-1] = 0;
         q[0] = 0;
         delete[] ((void**)q)[-2];
@@ -958,10 +948,10 @@ void __stdcall UpdatePlayers()
                                     // pointer is forwarded from the first block
                                     // instead and the second `mov eax,
                                     // [esi+0xec]` disappears.
-                                    float* slot = &unit->resourceSlot;
+                                    float* slot = (float*)&unit->resourceSlot;
                                     float f = (float)self->energy * kHundred;
-                                    if (unit->owner->active != 0 &&
-                                        unit->owner->type == 2) {
+                                    if (unit->resourceSlot.player->active != 0 &&
+                                        unit->resourceSlot.player->type == 2) {
                                         switch (g_game->difficulty) {
                                         case 0: f = *slot - f * kNegHalf; break;
                                         case 1: f = *slot - f * kNegSeven; break;
@@ -973,10 +963,10 @@ void __stdcall UpdatePlayers()
                                     *slot = f;
                                 }
                                 {
-                                    float* slot = &unit->metalMake;
+                                    float* slot = &unit->resourceSlot.metalMake;
                                     float f = (float)self->metal * kHundred;
-                                    if (unit->owner->active != 0 &&
-                                        unit->owner->type == 2) {
+                                    if (unit->resourceSlot.player->active != 0 &&
+                                        unit->resourceSlot.player->type == 2) {
                                         switch (g_game->difficulty) {
                                         case 0: f = *slot - f * kNegHalf; break;
                                         case 1: f = *slot - f * kNegSeven; break;

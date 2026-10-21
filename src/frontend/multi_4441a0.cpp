@@ -5,23 +5,14 @@
 #include <string.h>
 
 #include "../gui/gadget.h"
+#include "../gui/layer.h"
+#include "../gui/gui.h"
 
 #pragma pack(push, 1)
-struct Holder_004441a0 {
-    int unknown_0;
-    Gadget* entries;                    // +0x4
-};
 
-struct Menu_004441a0 {
-    char unknown_0[0x18];
-    Holder_004441a0* holder;            // +0x18
-    char unknown_1c[0x60 - 0x1c];
-    int selected;                       // +0x60
-};
-
-struct Conn_004441a0 {
-    void* data;
-    int size;
+struct HapinetProviderConnEntry {
+    void* pConnectionBlob;
+    int dwCbConnectionBlob;
 };
 
 struct Game_004441a0 {
@@ -29,7 +20,7 @@ struct Game_004441a0 {
     void* descriptions;                 // +0x2a4b
     char unknown_2a4f[0x2a9f - 0x2a4f];
     void* guids;                        // +0x2a9f
-    Conn_004441a0* conns;               // +0x2aa3
+    HapinetProviderConnEntry* conns;               // +0x2aa3
     char unknown_2aa7[0x2bc0 - 0x2aa7];
     char frontendSubstateRequest;       // +0x2bc0
 };
@@ -57,20 +48,20 @@ void OpenOptionsPanel();
 
 // The SELPROV.GUI menu's handler.
 // FUNCTION: 0x4441a0
-void __stdcall HandleSelectProviderClick(Menu_004441a0* menu)
+void __stdcall HandleSelectProviderClick(Gui* menu)
 {
-    Gadget* entries = menu->holder->entries;
+    Gadget* entries = menu->layer->entries;
     int i;
     // Unused id and cur, and the names link/message/result/msg, set the stack slot order.
     int id;
     int cur;
-    if (menu->selected == -1) {
+    if (menu->hotGadgetIndex == -1) {
         if (g_game->guids != 0) {
             GameFreeThunk(g_game->guids);
             for (i = 0; i < 10; i++) {
-                if (g_game->conns[i].data != 0) {
-                    GameFreeThunk(g_game->conns[i].data);
-                    g_game->conns[i].data = 0;
+                if (g_game->conns[i].pConnectionBlob != 0) {
+                    GameFreeThunk(g_game->conns[i].pConnectionBlob);
+                    g_game->conns[i].pConnectionBlob = 0;
                 }
             }
             GameFreeThunk(g_game->conns);
@@ -86,9 +77,9 @@ void __stdcall HandleSelectProviderClick(Menu_004441a0* menu)
         PlaySoundByName("BigButton", 0);
         return;
     }
-    if (_strnicmp(entries[menu->selected].name, "SERVICE", 7) == 0) {
+    if (_strnicmp(entries[menu->hotGadgetIndex].name, "SERVICE", 7) == 0) {
         PlaySoundByName("BigButton", 0);
-        int link = atoi(entries[menu->selected].name + 7);
+        int link = atoi(entries[menu->hotGadgetIndex].name + 7);
         char message[0x140];
         message[0] = 0;
         int result = 2;
@@ -112,7 +103,7 @@ void __stdcall HandleSelectProviderClick(Menu_004441a0* menu)
         ClearSelectedGadget(menu);
         return;
     }
-    if (FindGadgetIndex(entries, "PREVMENU", 0xe) == menu->selected) {
+    if (FindGadgetIndex(entries, "PREVMENU", 0xe) == menu->hotGadgetIndex) {
         g_game->frontendSubstateRequest = 3;
         PlaySoundByName("Previous", 0);
         return;

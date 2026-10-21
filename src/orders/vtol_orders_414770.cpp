@@ -115,7 +115,7 @@ int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags)
     case 2:
         if (flags & 0x40)
             return 8;
-        order->time = (int)(30.0f - (f->value + f->metal) * -0.5f);
+        order->time = (int)(30.0f - (f->metal + f->energy) * -0.5f);
         QueueUnitSpeech(unit, 11, 0);
         return 1;
     case 3:
