@@ -14,7 +14,10 @@ class StringRef;
 extern char g_emptyStringLiteral[];
 
 #pragma pack(push, 1)
-struct Slot_00436860 {
+// One slot of the skirmish block at Game+0x29a0: the same 0x18-byte
+// SkirmishPlayerSlot that frontend/skirmish_menu.cpp declares, the array
+// Thaldren calls SkirmishInfo.aPlayers.
+struct SkirmishPlayerSlot {
     int active;                        // +0x0
     char unknown_4[0x14];
 };
@@ -22,7 +25,7 @@ struct Slot_00436860 {
 struct Game {
     char unknown_0[0x519];
     char messages[0x29a0 - 0x519];     // +0x519
-    Slot_00436860* options;            // +0x29a0
+    SkirmishPlayerSlot* options;       // +0x29a0
     char unknown_29a4[0x2a3c - 0x29a4];
     unsigned short numPlayers;         // +0x2a3c
     char unknown_2a3e[0x2c28 - 0x2a3e];
@@ -180,15 +183,17 @@ public:
     StringRef SubString(int start, int end) const;
 };
 
-struct Header_004373a0 {
-    int magic;                         // +0x00
-    int width;                         // +0x04
-    int height;                        // +0x08
-    int unknown_0c;                    // +0x0c
-    int plotOffset;                    // +0x10
-    int unknown_14;                    // +0x14
-    int unknown_18;                    // +0x18
-    int features;                      // +0x1c
+// The TNT map file's header, read whole at the start of the file (Thaldren's
+// TntHeader, data/thaldren/structs.csv).
+struct TntHeader {
+    unsigned int version;              // +0x00
+    int widthTiles;                    // +0x04
+    int heightTiles;                   // +0x08
+    int tileMapOffset;                 // +0x0c
+    int mapDataOffset;                 // +0x10
+    int tileGfxOffset;                 // +0x14
+    unsigned int tileCount;            // +0x18
+    int featureCount;                  // +0x1c
     int featureOffset;                 // +0x20
     char unknown_24[0x40 - 0x24];
 };
@@ -1320,19 +1325,19 @@ int Mission::ComputeMapChecksum()
     if (file == 0) {
         return 0;
     }
-    Header_004373a0 header;
+    TntHeader header;
     HAPI_readfromfile(file, &header, 0x40);
-    if (header.magic != 0x2000) {
+    if (header.version != 0x2000) {
         return 0;
     }
     tntChecksum = tntChecksum ^ ComputeChecksum((unsigned char*)&header, 0x40);
-    int size = header.width * header.height * 4;
+    int size = header.widthTiles * header.heightTiles * 4;
     void* data = GameAllocIgnoreTag("Raw Plot Data", size);
-    HAPI_SeekFile(file, header.plotOffset);
+    HAPI_SeekFile(file, header.mapDataOffset);
     HAPI_readfromfile(file, data, size);
     tntChecksum = tntChecksum ^ ComputeChecksum((unsigned char*)data, size);
     GameFreeThunk(data);
-    size = header.features * 0x84;
+    size = header.featureCount * 0x84;
     if (size > 0) {
         data = GameAllocIgnoreTag("Raw Feature Data", size);
         HAPI_SeekFile(file, header.featureOffset);
