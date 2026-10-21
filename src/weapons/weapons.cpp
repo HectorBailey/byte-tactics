@@ -311,7 +311,7 @@ int HAPINET_enumconnections(void*, void*, unsigned long, void*, unsigned long, v
 int PickRandomReclaimableResourcesInRadius(int, int, int, int, int, int);
 int CreateUnit(int, int, int, int, int, int);
 
-struct Projectile_00499eb0;
+struct Projectile;
 struct MapFeature_0049b090;
 
 // The game state, as the weapon code sees it. The time word keeps one name per
@@ -360,7 +360,7 @@ struct Game {
         Proj_0049c740* cameraFollowTrackObj;  // +0x142f7
         Projectile_0049c880* tracked;
         void* selected;                // 499a30's spelling
-        Projectile_00499eb0* selectedProjectile; // 499e50's and 499eb0's
+        Projectile* selectedProjectile;    // 499e50's and 499eb0's
     };
     char unknown_142fb[0x1431f - 0x142fb];
     int scrollX;                       // +0x1431f
@@ -569,9 +569,9 @@ void __stdcall RockUnit(Object_00499c10* obj, Source_00499c10* src)
 // own copy of it, typed against its own Vec3.
 struct Projectile {
     WeaponDef* type;                   // +0x0, Thaldren's pWeapon
-    Vec3 pos;                          // +0x4
+    Vec3_0049b720 pos;                 // +0x4, the fixed-point view the explosion calls take
     char unknown_10[0x28 - 0x10];
-    Vec3 aim;                          // +0x28
+    Vec3_0049b720 aim;                 // +0x28
     char unknown_34[0x52 - 0x34];
     Unit* ownerUnit;                   // +0x52, Thaldren's pOwnerUnit
     char unknown_56[0x66 - 0x56];
@@ -696,25 +696,18 @@ int __stdcall ApplyWeaponDamage(Projectile* weapon, Unit* target,
 
 #pragma pack(push, 1)
 
-struct Projectile_00499eb0 {
-    WeaponDef* type;
-    Vec3_0049b720 position;
-    char unknown_10[0x52 - 0x10];
-    Unit* unit;
-    char unknown_56[0x66 - 0x56];
-    unsigned char owner;
-    char unknown_67[2];
-    // Stays unsigned short: gives the single byte OR with 2.
-    unsigned short flags;
-};
+// Unused here: real declarations for their symbol ids, which keep the
+// functions after them matching (docs/c2-regalloc.md).
+void __stdcall GetLocalizedString(void* parser, char* dst, char* key, int size, char* def);
+void BroadcastPlayerInfo();
 
 #pragma pack(pop)
 
 // FUNCTION: 0x499e50
-void __stdcall UntrackProjectile(Projectile_00499eb0* projectile)
+void __stdcall UntrackProjectile(Projectile* projectile)
 {
     if (projectile == g_game->selected) {
-        g_game->cameraSnapPos = g_game->selectedProjectile->position;
+        g_game->cameraSnapPos = g_game->selectedProjectile->pos;
         g_game->cameraSnapTicks = projectile->type->holdTime;
         g_game->selected = 0;
     }
@@ -726,21 +719,23 @@ void __stdcall AccumulateScreenShake(int a, int b, int c);void __stdcall AddExpl
 void __stdcall EmitWhiteSmoke(Vec3_0049b720* position, int value);
 // The sound id stays unsigned int: gives the original's zero extension.
 void __stdcall PlaySoundAt(unsigned int sound, Vec3_0049b720* position, int value);
-int __stdcall ApplyWeaponDamage(Projectile_00499eb0* projectile, Unit* unit, float scale);
-void __stdcall ApplyAreaDamage(Projectile_00499eb0* projectile, Vec3_0049b720* position);
+int __stdcall ApplyWeaponDamage(Projectile* projectile, Unit* unit, float scale);
+void __stdcall ApplyAreaDamage(Projectile* projectile, Vec3_0049b720* position);
+// Unused here: a real declaration for its symbol ids (docs/c2-regalloc.md).
+void __stdcall KillFeature(int x, int z, int flag);
 
 // FUNCTION: 0x499eb0
-void __stdcall DetonateProjectile(Projectile_00499eb0* projectile, Unit* unit)
+void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit)
 {
     int hostile = 0;
     WeaponDef* type = projectile->type;
-    Vec3_0049b720* position = &projectile->position;
+    Vec3_0049b720* position = &projectile->pos;
     unsigned char* value = (unsigned char*)GetMapCellAtPosition(position);
     if (value != 0)
         hostile = value[5] < g_game->seaLevel;
     if (!type->flags.b.noExplode) {
         if (projectile == g_game->selected) {
-            g_game->cameraSnapPos = g_game->selectedProjectile->position;
+            g_game->cameraSnapPos = g_game->selectedProjectile->pos;
             g_game->cameraSnapTicks = projectile->type->holdTime;
             g_game->selected = 0;
         }
@@ -748,7 +743,7 @@ void __stdcall DetonateProjectile(Projectile_00499eb0* projectile, Unit* unit)
     }
     if (g_game->mapInfo->noSeaLevelTrigger && hostile && !unit) {
         if (projectile == g_game->selected) {
-            g_game->cameraSnapPos = g_game->selectedProjectile->position;
+            g_game->cameraSnapPos = g_game->selectedProjectile->pos;
             g_game->cameraSnapTicks = projectile->type->holdTime;
             g_game->selected = 0;
         }
@@ -766,16 +761,16 @@ void __stdcall DetonateProjectile(Projectile_00499eb0* projectile, Unit* unit)
         else
             AddExplosionEffect(position, type->explosionSeq, 0, hostile);
     }
-    unsigned int player = projectile->owner;
+    unsigned int player = projectile->ownerPlayer;
     Player* record = &g_game->players[player];
     if (!record->active || record->type != 3) {
         if (type->areaOfEffect <= 0x10 && unit) {
             int damage = ApplyWeaponDamage(projectile, unit, 1.0f);
-            Unit* source = projectile->unit;
+            Unit* source = projectile->ownerUnit;
             if (source) {
                 int a = 0;
                 int b = 0;
-                if (projectile->owner != unit->playerIndex)
+                if (projectile->ownerPlayer != unit->playerIndex)
                     a = damage;
                 else
                     b = damage;
