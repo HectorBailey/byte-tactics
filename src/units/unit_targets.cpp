@@ -33,7 +33,7 @@ struct Target_0048a1e0 {
     char unknown_0[0x68];
     int radius;                        // +0x68
     char unknown_6c[0x111 - 0x6c];
-    unsigned int field_111;            // +0x111
+    unsigned int weaponFlags;            // +0x111
 };
 
 struct Entry_004898b0 {                // 0x1c bytes
@@ -108,7 +108,7 @@ public:
         unsigned int flags;            // +0x110
         struct {
             char unknown_110;
-            unsigned int field_111;    // +0x111
+            unsigned int weaponFlags;    // +0x111
         };
     };
     char unknown_115[0x118 - 0x115];
@@ -684,7 +684,7 @@ int __stdcall GetWeaponTargetPos(Unit* unit, Vec3* pos, int index)
         return 0;
     }
     GetSweetSpot(def, (int)pos);
-    if ((e->flags & 2) && !(e->target->field_111 & 0x2000000) && def->motion != 0
+    if ((e->flags & 2) && !(e->target->weaponFlags & 0x2000000) && def->motion != 0
         && unit->killCount > 5 && e->target->radius != 0) {
         Vec3 d;
         d.x = unit->pos.x - pos->x;

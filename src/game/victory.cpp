@@ -81,7 +81,7 @@ struct Unit {
     int motion;                       // +0x0
     char unknown_4[0x76 - 0x4];
     short cell;                    // +0x76
-    short field_78;                    // +0x78
+    short cellZ;                      // +0x78, the high word of dwMapCellXZ
     char unknown_7a[0x86 - 0x7a];
     Unit* carrier;                     // +0x86
     char unknown_8a[0x92 - 0x8a];
@@ -1004,7 +1004,7 @@ void VictoryUnitTypePassesX::LoadState(HapiBank* obj)
 int VictoryUnitTypePassesZ::VisitUnit(Unit* unit)
 {
     if (name[0] == 0 || _strcmpi(name, unit->def->unitname) == 0) {
-        if (abs(unit->field_78 - z) <= 2) {
+        if (abs(unit->cellZ - z) <= 2) {
             satisfied = 1;
             if (celebrated == 0) {
                 PlaySoundByName("Victory Condition", 0);
@@ -1290,7 +1290,7 @@ void DefeatAnyUnitPassesX::LoadState(HapiBank* obj)
 // FUNCTION: 0x48fc40
 int DefeatAnyUnitPassesZ::VisitUnit(Unit* unit)
 {
-    int diff = abs((int)unit->field_78 - z);
+    int diff = abs((int)unit->cellZ - z);
 
     if (diff <= 2) {
         satisfied = 1;
