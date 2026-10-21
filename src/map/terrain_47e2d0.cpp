@@ -5,16 +5,7 @@
 struct UnitDef;
 
 #pragma pack(push, 1)
-struct Unit {
-    char unknown_0[0x7e];
-    Point16 footprint;                 // +0x7e
-    char unknown_82[0x92 - 0x82];
-    UnitDef* def;                      // +0x92
-    char unknown_96[0xa8 - 0x96];
-    unsigned short id;                 // +0xa8
-    char unknown_aa[0xff - 0xaa];
-    unsigned char playerIndex;         // +0xff
-};
+#include "../units/unit.h"
 
 #include "../units/unit_def.h"
 

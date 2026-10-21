@@ -115,9 +115,9 @@ struct Slot_0048cd80 {
 
 // One side's SideDef record (0x232 bytes): the commander name read at +0x22
 // is what FocusCommander matches against a unit type name.
-struct Name_0048d630 {
+struct SideDef {
     char unknown_0[0x22];              // +0x00
-    char name[0x20];                   // +0x22, the commander name
+    char aCommander[0x20];             // +0x22, the commander name
     char unknown_42[0x232 - 0x42];
 };
 
@@ -163,7 +163,7 @@ struct Game {
     char unknown_37e9e[0x37ebe - 0x37e9e];
     Orders_37ebe ordersPanelFlags;     // +0x37ebe
     char unknown_37ec0[0x37f3d - 0x37ec0];
-    Name_0048d630 sideDefs[5];         // +0x37f3d, one SideDef per side
+    SideDef sideDefs[5];         // +0x37f3d, one SideDef per side
 };
 #pragma pack(pop)
 
@@ -900,7 +900,7 @@ void __cdecl ClearCameraFollowState(void);
 void __stdcall FocusCommander(int param_1)
 {
     Player* team = &g_game->players[g_game->playerIndex];
-    char* playerName = g_game->sideDefs[team->info->side].name;
+    char* playerName = g_game->sideDefs[team->info->side].aCommander;
     Unit* last = team->unitsEnd;
     for (Unit* u = team->unitsBegin; u <= last; u++) {
         if (u->flags.done && u->buildLeft == 0.0f && u->postTransferHoldoff == 0

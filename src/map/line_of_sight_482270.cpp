@@ -36,22 +36,22 @@ void ResetNetStats(void);
 
 extern LosTables g_losTables;
 
-struct MapSize_482270 {
+struct MapSize {
     unsigned int width;                // +0x0
     unsigned int height;               // +0x4
 };
 
-struct ByteMap_482270 {
+struct ByteMap {
     unsigned char* data;               // +0x0
-    MapSize_482270 size;               // +0x4
+    MapSize size;               // +0x4
     unsigned char& at(int x, int y) { return data[y * size.width + x]; }
 };
 
 #include "grid.h"
 
-struct Player_482270 {
+struct PlayerView {
     char unknown_0[0x7c];
-    ByteMap_482270 grid;              // +0x7c
+    ByteMap explored;          // +0x7c
     char unknown_88[0x146 - 0x88];
     unsigned char playerIndex;         // +0x146
 };
@@ -93,7 +93,7 @@ GafFrame* __stdcall GetGafFrame(unsigned short* table, int index);
 // FUNCTION: 0x482270
 void __stdcall AddLineOfSight(SightQuery* params)
 {
-    if (((Player_482270*)params->player)->playerIndex == g_game->playerIndex) {
+    if (((PlayerView*)params->player)->playerIndex == g_game->playerIndex) {
         g_game->flag3 = 0;
         g_game->flagA = 1;
     }
@@ -116,7 +116,7 @@ void __stdcall AddLineOfSight(SightQuery* params)
                 : (short)g_losTables.GetLosTableCount() - 1);
         short count = table->GetLosLineCount();
         short i = 0;
-        ((Player_482270*)params->player)->grid.at(x, y)++;
+        ((PlayerView*)params->player)->explored.at(x, y)++;
         int ref = *params->frameIdx;
         for (i = 0; i < count; i++) {
             LosLine* line = table->GetLosLine(i);
@@ -143,8 +143,8 @@ void __stdcall AddLineOfSight(SightQuery* params)
                     int d1 = cell[1] - ref;
                     int d0 = cell[0] - ref;
                     if (d0 * bestIdx > bestDiff * j1) {
-                        ((Player_482270*)params->player)
-                            ->grid.at((short)dx, (short)dy)++;
+                        ((PlayerView*)params->player)
+                            ->explored.at((short)dx, (short)dy)++;
                         if (d1 * bestIdx > bestDiff * j1) {
                             bestIdx = j1;
                             bestDiff = d1;
@@ -176,7 +176,7 @@ void __stdcall AddLineOfSight(SightQuery* params)
             return;
         for (int i = ny; i < limitY; i++) {
             // Named ex local: shapes the destination address.
-            ByteMap_482270* ex = &((Player_482270*)params->player)->grid;
+            ByteMap* ex = &((PlayerView*)params->player)->explored;
             unsigned char* dst = ex->data + (y + i) * ex->size.width + nx + x;
             unsigned char* src = frame->pixelsOrLayers + i * frame->width + nx;
             // Counted j loop: lets the compiler turn it into dec/jne.

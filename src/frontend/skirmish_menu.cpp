@@ -22,33 +22,7 @@ struct Backdrop {
     Gaf* gaf;                          // +0xc0
 };
 
-struct Gadget {                        // GUI entry, 0x15b bytes
-    char unknown_0[0x1b];
-    int attribs;                       // +0x1b
-    char unknown_1f[0x33 - 0x1f];
-    char text[0xb6 - 0x33];            // +0x33
-    short count;                       // +0xb6
-    char unknown_b8[2];
-    short selected;                    // +0xba
-    char unknown_bc[2];
-    void* frames;                      // +0xbe
-    char* items;                       // +0xc2
-    unsigned short frame;              // +0xc6
-    char unknown_c8[6];
-    void (__stdcall* onSelect)(Gui*, int);   // +0xce
-    void* records;                     // +0xd2
-    char unknown_d6[0x136 - 0xd6];
-    union {                            // +0x136
-        short range;
-        struct {
-            unsigned char stages;      // +0x136
-            unsigned char stageIndex;  // +0x137
-        };
-    };
-    char unknown_138[0x144 - 0x138];
-    void (__stdcall* sliderCallback)(Gui*, int); // +0x144
-    char unknown_148[0x15b - 0x148];
-};
+#include "../gui/gadget.h"
 
 #include "../gui/gui.h"
 
@@ -140,13 +114,13 @@ void RefreshAllyIcons(void)
                 }
                 switch (count) {
                 case 0:
-                    gadget->frame = 10;
+                    gadget->u.hotspot.index = 10;
                     break;
                 case 1:
-                    gadget->frame = team * 2 + 1;
+                    gadget->u.hotspot.index = team * 2 + 1;
                     break;
                 default:
-                    gadget->frame = team * 2;
+                    gadget->u.hotspot.index = team * 2;
                     break;
                 }
             }
@@ -236,8 +210,8 @@ static void NewColour(int playerIndex)
     if (index != -1) {
         Gadget* e = &entries[index];
         if (e != 0) {
-            e->frames = g_game->logos32;
-            e->frame = (unsigned short)g_game->options->players[playerIndex].color;
+            e->u.hotspot.gaf = (GafEntry*)g_game->logos32;
+            e->u.hotspot.index = (unsigned short)g_game->options->players[playerIndex].color;
         }
     }
 }
@@ -455,7 +429,7 @@ void RefreshSkirmishSetup()
     int index;
 
     Gadget* entries = g_game->gui.layer->entries;
-    g_game->options->baseGadgetCount = entries[0].count;
+    g_game->options->baseGadgetCount = entries[0].u.count;
     BuildSkirmishPlayerRows();
 
     int empty = 1;
@@ -532,8 +506,8 @@ void RefreshSkirmishSetup()
             if (index != -1) {
                 Gadget* gadget = &entries[index];
                 if (gadget != 0) {
-                    gadget->frames = g_game->logos32;
-                    gadget->frame = g_game->options->players[i].color;
+                    gadget->u.hotspot.gaf = (GafEntry*)g_game->logos32;
+                    gadget->u.hotspot.index = g_game->options->players[i].color;
                 }
             }
 
@@ -542,8 +516,8 @@ void RefreshSkirmishSetup()
             if (index != -1) {
                 Gadget* gadget = &entries[index];
                 if (gadget != 0) {
-                    gadget->frame = 10;
-                    gadget->frames = teamIcons;
+                    gadget->u.hotspot.index = 10;
+                    gadget->u.hotspot.gaf = (GafEntry*)teamIcons;
                 }
             }
         }
@@ -556,10 +530,10 @@ void RefreshSkirmishSetup()
         Gadget* g = &entries[index];
         if (g_game->options->fixedLocations != 0) {
             g->stageIndex = 0;
-            strcpy(g->text, Translate("Commanders are placed at pre-determined locations."));
+            strcpy(g->helpKey, Translate("Commanders are placed at pre-determined locations."));
         } else {
             g->stageIndex = 1;
-            strcpy(g->text, Translate("Commanders are randomly placed on the battle field."));
+            strcpy(g->helpKey, Translate("Commanders are randomly placed on the battle field."));
         }
     }
 
@@ -568,10 +542,10 @@ void RefreshSkirmishSetup()
         Gadget* g = &entries[index];
         if (g_game->options->commanderDeath != 0) {
             g->stageIndex = 0;
-            strcpy(g->text, Translate("Game ends when commander is destroyed."));
+            strcpy(g->helpKey, Translate("Game ends when commander is destroyed."));
         } else {
             g->stageIndex = 1;
-            strcpy(g->text, Translate("Game continues after Commander is destroyed."));
+            strcpy(g->helpKey, Translate("Game continues after Commander is destroyed."));
         }
     }
 
@@ -580,10 +554,10 @@ void RefreshSkirmishSetup()
         Gadget* g = &entries[index];
         if (g_game->options->mapping != 0) {
             g->stageIndex = 0;
-            strcpy(g->text, Translate("Terrain is blacked out until explored."));
+            strcpy(g->helpKey, Translate("Terrain is blacked out until explored."));
         } else {
             g->stageIndex = 1;
-            strcpy(g->text, Translate("Terrain is visible."));
+            strcpy(g->helpKey, Translate("Terrain is visible."));
         }
     }
 
@@ -592,13 +566,13 @@ void RefreshSkirmishSetup()
         Gadget* g = &entries[index];
         if (g_game->options->lineOfSight == 0) {
             g->stageIndex = 0;
-            strcpy(g->text, Translate("All mapped terrain is visible."));
+            strcpy(g->helpKey, Translate("All mapped terrain is visible."));
         } else if (g_game->options->losType == 1) {
             g->stageIndex = 1;
-            strcpy(g->text, Translate("Terrain elevations affect a unit's view."));
+            strcpy(g->helpKey, Translate("Terrain elevations affect a unit's view."));
         } else {
             g->stageIndex = 2;
-            strcpy(g->text, Translate("Terrain elevations do not affect a unit's view."));
+            strcpy(g->helpKey, Translate("Terrain elevations do not affect a unit's view."));
         }
     }
 
@@ -710,9 +684,9 @@ void __stdcall HandleSkirmishMapClick(Gui* menu)
 
     if (menu->hotGadgetIndex == -1) {
         Gadget* pic = FindGadgetChecked_E(g_game->gui.layer->entries, "MAPPIC");
-        if (pic->items != 0) {
-            GameFreeThunk(pic->items);
-            pic->items = 0;
+        if (pic->u.list.listText != 0) {
+            GameFreeThunk(pic->u.list.listText);
+            pic->u.list.listText = 0;
         }
         GameFreeThunk(list->items);
         GameFreeThunk(list);
@@ -730,7 +704,7 @@ void __stdcall HandleSkirmishMapClick(Gui* menu)
         PlaySoundByName("SmallButton", 0);
     }
     Gadget* g = FindGadgetChecked(entries, "MAPNAMES");
-    strncpy(g_game->options->mapName, SkipTextLines(g->items, g->selected), 0x100);
+    strncpy(g_game->options->mapName, SkipTextLines(g->u.list.listText, g->u.list.selected), 0x100);
     g_game->mapInfo->LoadMissionByName(g_game->options->mapName);
     strncpy(buffer, g_game->options->mapName, 0x100);
     SetControlTextByName(menu, "MapName", buffer);
@@ -743,7 +717,7 @@ void ShowSelectedMapInfo();
 void __stdcall UpdateSkirmishMapSelection(Gui* menu, int unused)
 {
     Gadget* g = FindGadgetChecked(menu->layer->entries, "MAPNAMES");
-    if (g_game->mapInfo->LoadMissionByName(SkipTextLines(g->items, g->selected)) != 0) {
+    if (g_game->mapInfo->LoadMissionByName(SkipTextLines(g->u.list.listText, g->u.list.selected)) != 0) {
         ShowSelectedMapInfo();
     }
 }
@@ -781,7 +755,7 @@ void OpenSkirmishMapSelector()
     LoadMapList(&data->items, 0, 0);
     SortFileList(data->items, 0, 0, n);
     ConfigureListBoxByName(&g_game->gui, "MAPNAMES", data->items, n, 0);
-    FindGadgetChecked(layer->entries, "MAPNAMES")->onSelect = UpdateSkirmishMapSelection;
+    FindGadgetChecked(layer->entries, "MAPNAMES")->u.list.callback = (void (__stdcall*)(Gui*, Gadget*))UpdateSkirmishMapSelection;
 
     for (int i = 0; i < n; i++) {
         if (strcmp(g_game->options->mapName, SkipTextLines(data->items, i)) == 0) {
@@ -791,7 +765,7 @@ void OpenSkirmishMapSelector()
     }
 
     Gadget* g = FindGadgetChecked(g_game->gui.layer->entries, "MAPNAMES");
-    if (g_game->mapInfo->LoadMissionByName(SkipTextLines(g->items, g->selected)) != 0) {
+    if (g_game->mapInfo->LoadMissionByName(SkipTextLines(g->u.list.listText, g->u.list.selected)) != 0) {
         ShowSelectedMapInfo();
     }
     SetKeyboardInput(&g_game->gui, 1);
@@ -846,8 +820,8 @@ void __stdcall CyclePlayerColor(int reverse)
     if (index != -1) {
         Gadget* gadget = &entries[index];
         if (gadget != 0) {
-            gadget->frames = g_game->logos32;
-            gadget->frame = (unsigned short)g_game->options->players[current].color;
+            gadget->u.hotspot.gaf = (GafEntry*)g_game->logos32;
+            gadget->u.hotspot.index = (unsigned short)g_game->options->players[current].color;
         }
     }
     MarkChanged(&g_game->gui);
@@ -1093,9 +1067,9 @@ void __stdcall HandleSkirmishClick(Gui* menu)
         int index = FindGadgetIndex(entries, "CommanderDeath", 1);
         Gadget* e = &entries[index];
         if (g_game->options->commanderDeath != 0)
-            strcpy(e->text, Translate("Game ends when commander is destroyed."));
+            strcpy(e->helpKey, Translate("Game ends when commander is destroyed."));
         else
-            strcpy(e->text, Translate("Game continues after Commander is destroyed."));
+            strcpy(e->helpKey, Translate("Game continues after Commander is destroyed."));
         UpdateHelpText(&g_game->gui);
     } else if (IsCurrentGadgetNamed(menu, "StartLocation")) {
         PlaySoundByName("Skirmish", 0);
@@ -1104,9 +1078,9 @@ void __stdcall HandleSkirmishClick(Gui* menu)
         int index = FindGadgetIndex(entries, "StartLocation", 1);
         Gadget* e = &entries[index];
         if (g_game->options->fixedLocations != 0)
-            strcpy(e->text, Translate("Commanders are placed at pre-determined locations."));
+            strcpy(e->helpKey, Translate("Commanders are placed at pre-determined locations."));
         else
-            strcpy(e->text, Translate("Commanders are randomly placed on the battle field."));
+            strcpy(e->helpKey, Translate("Commanders are randomly placed on the battle field."));
         UpdateHelpText(&g_game->gui);
     } else if (IsCurrentGadgetNamed(menu, "Mapping")) {
         PlaySoundByName("Skirmish", 0);
@@ -1115,9 +1089,9 @@ void __stdcall HandleSkirmishClick(Gui* menu)
         int index = FindGadgetIndex(entries, "Mapping", 1);
         Gadget* e = &entries[index];
         if (g_game->options->mapping != 0)
-            strcpy(e->text, Translate("Terrain is blacked out until explored."));
+            strcpy(e->helpKey, Translate("Terrain is blacked out until explored."));
         else
-            strcpy(e->text, Translate("Terrain is visible."));
+            strcpy(e->helpKey, Translate("Terrain is visible."));
         UpdateHelpText(&g_game->gui);
     } else if (IsCurrentGadgetNamed(menu, "LineOfSight")) {
         PlaySoundByName("Skirmish", 0);
@@ -1128,14 +1102,14 @@ void __stdcall HandleSkirmishClick(Gui* menu)
             t->lineOfSight = 1;
             // The losType stores precede the strcpy.
             g_game->options->losType = 1;
-            strcpy(e->text, Translate("Terrain elevations affect a unit's view."));
+            strcpy(e->helpKey, Translate("Terrain elevations affect a unit's view."));
         } else if (t->losType == 1) {
             t->losType = 0;
-            strcpy(e->text, Translate("Terrain elevations do not affect a unit's view."));
+            strcpy(e->helpKey, Translate("Terrain elevations do not affect a unit's view."));
         } else {
             t->lineOfSight = 0;
             g_game->options->losType = 1;
-            strcpy(e->text, Translate("All mapped terrain is visible."));
+            strcpy(e->helpKey, Translate("All mapped terrain is visible."));
         }
         UpdateHelpText(&g_game->gui);
     } else if (IsCurrentGadgetNamed(menu, "SelectMap")) {
@@ -1218,7 +1192,7 @@ void __stdcall HandleSkirmishCheatText(Cheat* cheat)
         g_game->numSkirmishPlayers = code;
         SaveNumSkirmishPlayers();
         LoadSettings();
-        cheat->text->target->count = g_game->options->baseGadgetCount;
+        cheat->text->target->u.count = g_game->options->baseGadgetCount;
         RefreshSkirmishSetup();
         PlaySoundByName(g_skirmishCheatSoundName, 0);
         SelectAdjacentGadget(cheat, 1);

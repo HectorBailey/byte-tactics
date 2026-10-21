@@ -36,7 +36,7 @@ struct Unit {
     char unknown_114[0x118 - 0x114];
 };
 
-struct MapSize_00467440 {
+struct MapSize {
     unsigned int width;                // +0x0
     unsigned int height;               // +0x4
 
@@ -46,9 +46,9 @@ struct MapSize_00467440 {
     }
 };
 
-struct ByteMap_00467440 {
+struct ByteMap {
     unsigned char* data;               // +0x0
-    MapSize_00467440 size;             // +0x4
+    MapSize size;             // +0x4
 
     unsigned char Get(int x, int y) { return data[size.width * y + x]; }
 };
@@ -63,7 +63,7 @@ struct PlayerInfo_00467440 {
     char unknown_6f[0x73 - 0x6f];
     char type;                         // +0x73
     char unknown_74[0x7c - 0x74];
-    ByteMap_00467440 explored;         // +0x7c
+    ByteMap explored;         // +0x7c
     char unknown_88[0x108 - 0x88];
     unsigned char allied[1];           // +0x108
     char unknown_109[0x146 - 0x109];

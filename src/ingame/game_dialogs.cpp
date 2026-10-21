@@ -59,25 +59,7 @@ struct Gui;
 #include "../network/player.h"
 #include "../network/player_info.h"
 
-struct Unit {
-    char unknown_0[0x86];
-    int carrier;                      // +0x86
-    int cargo;                      // +0x8a
-    char unknown_8e[0xa6 - 0x8e];
-    unsigned short unitDefIndex;       // +0xa6
-    char unknown_a8[0xf0 - 0xa8];
-    int attacker;                      // +0xf0
-    unsigned char lastAttackerSlot;            // +0xf4
-    char unknown_f5[0x110 - 0xf5];
-    union {
-        unsigned int flags;            // +0x110
-        struct {
-            unsigned int bits_110 : 14;
-            unsigned int flag_110 : 1;
-        };
-    };
-    char unknown_114[0x118 - 0x114];
-};
+#include "../units/unit.h"
 
 struct Saved {                         // 10 bytes
     int a;                             // +0x00
@@ -1327,7 +1309,7 @@ void __stdcall HandleDebugHotkey(int eventType)
         Unit* u = &g_game->units[g_game->hoverUnitId];
         if (u->unitDefIndex != 0) {
             u->lastAttackerSlot = 10;
-            u->flag_110 = 1;
+            u->flags |= 0x4000;
             u->attacker = 0;
         }
         break;

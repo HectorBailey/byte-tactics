@@ -25,7 +25,7 @@ public:
 };
 
 // One key/value entry of a section: two reference-counted string handles.
-struct Elem_004c2f60 {
+struct TdfEntry {
     StringRef a;                // +0x0 key
     StringRef b;                // +0x4 value
 };
@@ -35,7 +35,7 @@ void __stdcall ReleasePair(char* p);
 namespace std {
 // The entries are released by a plain function rather than by an element
 // destructor, so the vector's destroy loop calls this once per element.
-inline void _Destroy(Elem_004c2f60* p)
+inline void _Destroy(TdfEntry* p)
 {
     ReleasePair((char*)p);
 }
@@ -52,7 +52,7 @@ public:
     int* name;                                 // +0x0
     std::vector<TdfRecord*> children;        // +0x4 (_First at +0x8)
     char unknown_14;                           // +0x14
-    std::vector<Elem_004c2f60> entries;        // +0x15 (_First at +0x19)
+    std::vector<TdfEntry> entries;        // +0x15 (_First at +0x19)
 
     TdfRecord(char* name, char* text, char** nextblock, char* path);
 

@@ -267,20 +267,20 @@ typedef Vec_004c5b70::iterator (Vec_004c5b70::*UcopyFn_004c5b70)(
 typedef void (Vec_004c5b70::*UfillFn_004c5b70)(
     Vec_004c5b70::iterator, Vec_004c5b70::size_type, const TdfField&);
 
-struct Access_004c5b70 : Vec_004c5b70 {
+struct TdfFieldAccess : Vec_004c5b70 {
     static DestroyFn_004c5b70 destroy;
     static UcopyFn_004c5b70 ucopy;
     static UfillFn_004c5b70 ufill;
 };
 
 // FUNCTION: 0x4c5b70 ?_Destroy@?$vector@UTdfField@@V?$allocator@UTdfField@@@std@@@std@@IAEXPAUTdfField@@0@Z
-DestroyFn_004c5b70 Access_004c5b70::destroy = &Access_004c5b70::_Destroy;
+DestroyFn_004c5b70 TdfFieldAccess::destroy = &TdfFieldAccess::_Destroy;
 
 // FUNCTION: 0x4c5bc0 ?_Ucopy@?$vector@UTdfField@@V?$allocator@UTdfField@@@std@@@std@@IAEPAUTdfField@@PBU3@0PAU3@@Z
-UcopyFn_004c5b70 Access_004c5b70::ucopy = &Access_004c5b70::_Ucopy;
+UcopyFn_004c5b70 TdfFieldAccess::ucopy = &TdfFieldAccess::_Ucopy;
 
 // FUNCTION: 0x4c5c20 ?_Ufill@?$vector@UTdfField@@V?$allocator@UTdfField@@@std@@@std@@IAEXPAUTdfField@@IABU3@@Z
-UfillFn_004c5b70 Access_004c5b70::ufill = &Access_004c5b70::_Ufill;
+UfillFn_004c5b70 TdfFieldAccess::ufill = &TdfFieldAccess::_Ufill;
 
 // lower_bound over the sorted vector held by the global at 0x51fdb8, keyed by
 // the string handle in the first field of each 8-byte element (0x4c5740

@@ -134,38 +134,6 @@ struct Unit {
     char unknown_114[0x118 - 0x114];
 };
 
-struct MapSize_00467440 {
-    unsigned int width;                // +0x0
-    unsigned int height;               // +0x4
-
-    int Contains(unsigned int tx, unsigned int ty)
-    {
-        return tx < width && ty < height;
-    }
-};
-
-struct ByteMap_00467440 {
-    unsigned char* data;               // +0x0
-    MapSize_00467440 size;             // +0x4
-
-    unsigned char Get(int x, int y) { return data[size.width * y + x]; }
-};
-
-struct PlayerInfo_00467440 {
-    void* active;                      // +0x0
-    char unknown_4[0x27 - 0x4];
-    PlayerInfo* data;                  // +0x27
-    char unknown_2b[0x67 - 0x2b];
-    Unit* unitsBegin;                  // +0x67
-    Unit* unitsEnd;                    // +0x6b
-    char unknown_6f[0x7c - 0x6f];
-    ByteMap_00467440 explored;         // +0x7c
-    char unknown_88[0x144 - 0x88];
-    unsigned short unitCount;          // +0x144
-    unsigned char index;               // +0x146
-    char unknown_147[0x14b - 0x147];
-};
-
 struct Team_004689c0 {                 // 347 bytes
     char unknown_0[4];
     unsigned char* data;               // +0x4
@@ -238,7 +206,7 @@ struct Game {
         };
     };
     char unknown_ddb[0x1b63 - 0xddb];
-    PlayerInfo_00467440 players[10];          // +0x1b63, stride 0x14b
+    Player players[10];                // +0x1b63, stride 0x14b
     char unknown_2851[0x2a3c - 0x2851];
     unsigned short numPlayers;         // +0x2a3c
     char unknown_2a3e[0x2a42 - 0x2a3e];
@@ -319,7 +287,7 @@ struct Game {
     char unknown_391bf[0x391f9 - 0x391bf];
     int fontComix;                     // +0x391f9
 
-    PlayerInfo_00467440* Current() { return &players[playerIndex]; }
+    Player* Current() { return &players[playerIndex]; }
 };
 
 class DetectionVisitor {
@@ -675,7 +643,7 @@ void DrawLightBars()
     SetOffscreenSurface(surf);
     FillSurface(surf, 0);
 
-    int side = g_game->players[g_game->playerIndex].data->side;
+    int side = g_game->players[g_game->playerIndex].info->side;
 
     short* bar = (short*)GetGafFrame(g_game->sidePanelTopSeq[side], 0);
     DrawFrame(surf, bar, bar[2] + 0x81, bar[3]);

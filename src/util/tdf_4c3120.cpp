@@ -36,12 +36,12 @@ void __cdecl operator delete(void* p);
 void* __cdecl GameAllocIgnoreTag(char* name, int size);
 
 #pragma pack(push, 1)
-struct Inner_004c51b0 {
+struct TdfFieldList {
     std::vector<TdfField> v;
 };
 
-struct Entries_004c51b0 {
-    Inner_004c51b0 v;
+struct TdfEntries {
+    TdfFieldList v;
 };
 
 class TdfRecord {
@@ -49,7 +49,7 @@ public:
     int* name;                                 // +0x0
     std::vector<TdfRecord*> children;        // +0x4
     char unknown_14;                           // +0x14
-    Entries_004c51b0 entries;                  // +0x15
+    TdfEntries entries;                  // +0x15
 
     TdfRecord(char* name, char* text, char** nextblock, char* path);
 

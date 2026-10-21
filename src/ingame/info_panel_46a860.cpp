@@ -47,18 +47,15 @@ struct Snapshot_0046a860 {
 #include "../network/player.h"
 
 #include "../graphics/rect.h"
+#include "../map/cell.h"
 
-struct WeaponDef_0046a860;
 struct Unit_0046a860;
 
 #include "../units/unit_def.h"
 
+#include "../weapons/weapon_def.h"
+
 #pragma pack(push, 1)
-// A weapon type (Thaldren: WeaponDef); only the reload time is read here.
-struct WeaponDef_0046a860 {
-    char unknown_0[0xe4];
-    unsigned short reloadTime;        // +0xe4
-};
 
 // A unit, 0x118 bytes, the elements of the array at g_game+0x14357. The two
 // signednesses of +0x108 both appear in this file, so the field is a union.
@@ -91,6 +88,7 @@ struct Unit_0046a860 {
 
 // A feature's 0x100-byte record, the elements of the table at g_game+0x1426f
 // (Thaldren: FeatureDef).
+// Kept: its flags byte is +0xff; map/feature.h has flags at +0xfe.
 struct Feature_0046a860 {
     char name[0x80];                  // +0x000
     char description[0x14];           // +0x080
@@ -99,13 +97,6 @@ struct Feature_0046a860 {
     float metal;                      // +0x0f0
     char unknown_f4[0xff - 0xf4];
     unsigned char flags;              // +0x0ff
-};
-
-// One map cell, 13 bytes, the elements of the table at g_game+0x14287.
-struct Cell_0046a860 {
-    char unknown_0[4];
-    unsigned char shade;              // +0x04
-    char unknown_5[0x0d - 0x5];
 };
 
 #include "../graphics/gaf_frame.h"
@@ -154,7 +145,7 @@ struct Flags46b_3923b { unsigned short b0:1; unsigned short b1:1; };
 // use. The bit word shares a union with this view's bitfield type.
 #pragma pack(push, 1)
 // A side's panel layout at g_game+0x37f3d, stride 0x232 (Thaldren: SideDef).
-struct SideDef_0046a860 {
+struct SideDef {
     char aName[0x1e];                   // +0x000
     char aNamePrefix[4];                // +0x01e
     char aCommander[0x20];              // +0x022
@@ -216,7 +207,7 @@ struct Game {
     char unknown_14237[0x1426f - 0x14237];
     Feature_0046a860* features;           // +0x1426f
     char unknown_14273[0x14287 - 0x14273];
-    Cell_0046a860* heightMap;             // +0x14287
+    Cell* heightMap;                      // +0x14287
     char unknown_1428b[0x1431f - 0x1428b];
     int scrollX;                          // +0x1431f
     int scrollY;                         // +0x14323
@@ -237,7 +228,7 @@ struct Game {
     char unknown_37e27[0x37e60 - 0x37e27];
     Snapshot_0046a860 selectionInfoCache; // +0x37e60
     char unknown_37e9c[0x37f3d - 0x37e9c];
-    SideDef_0046a860 sideDefs[5];         // +0x37f3d, stride 0x232
+    SideDef sideDefs[5];                  // +0x37f3d, stride 0x232
     char unknown_38a37[0x38a3b - 0x38a37];
     int simStepsPending;                  // +0x38a3b
     char unknown_38a3f[0x38a47 - 0x38a3f];
@@ -313,7 +304,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
         int v = g_game->mapWidthTiles;
         v *= (short)g_game->cursorMapCellZ;
         v += (short)g_game->cursorMapCellX;
-        unsigned char c = g_game->heightMap[v].shade;
+        unsigned char c = g_game->heightMap[v].height;
         sprintf(text, "XYH: %d %d %d\n", (short)g_game->cursorMapCellX,
                 (short)g_game->cursorMapCellZ, c);
         DrawString(surface, (unsigned char*)text, 0x208, pfstate, -1);
@@ -344,7 +335,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
         int* out = snapshot.weapons;
         // Keep both `*out = -1` stores (nested ifs): the extra use sets the register of out.
         for (int i = 0; i < 3; i++, out++, slot += 0x1c) {
-            WeaponDef_0046a860* weapon = *(WeaponDef_0046a860**)(slot - 0xf);
+            WeaponDef* weapon = *(WeaponDef**)(slot - 0xf);
             if (weapon->reloadTime > 0x1e) {
                 if (*(unsigned char*)slot & 2)
                     *out = *(unsigned short*)(slot - 7);
@@ -376,7 +367,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
     Player* playerInfo = &g_game->players[player];
     PlayerInfo* info = playerInfo->info;
     int side = info->side;
-    SideDef_0046a860* panel = &g_game->sideDefs[side];
+    SideDef* panel = &g_game->sideDefs[side];
     SetFont((int)panel->pFontData);
     int y = 0x81;
     do {
