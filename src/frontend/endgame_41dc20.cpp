@@ -14,7 +14,7 @@
 #include "../network/player_info.h"
 
 #pragma pack(push, 1)
-struct Stat_0041dc20 {                 // 0x3a bytes
+struct EndGamePlayerStat {                 // 0x3a bytes
     char name[30];                     // +0x00
     int kills;                         // +0x1e
     int losses;                        // +0x22
@@ -31,7 +31,7 @@ struct Game_0041dc20 {
     char unknown_2851[0x38a47 - 0x2851];
     unsigned int gameTick;             // +0x38a47
     char unknown_38a4b[0x38dd9 - 0x38a4b];
-    Stat_0041dc20 stats[10];           // +0x38dd9
+    EndGamePlayerStat stats[10];           // +0x38dd9
     char unknown_3901d[0x3918f - 0x3901d];
     int maxKills;                      // +0x3918f
     int maxLosses;                     // +0x39193
@@ -62,7 +62,7 @@ extern Game_0041dc20* g_game;
 // FUNCTION: 0x41dc20
 void CollectEndGameStats()
 {
-    Stat_0041dc20* stats = g_game->stats;
+    EndGamePlayerStat* stats = g_game->stats;
     g_game->won = g_game->bit4_3923b;
     if (g_game->mapInfo->GetGameType() == 1) {
         g_game->mission = g_game->mapInfo->GetMissionIndex();
