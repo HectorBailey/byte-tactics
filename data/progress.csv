@@ -2549,7 +2549,7 @@ address,size,file,symbol,status,similarity
 0x4b86e0,481,src/graphics/gaf.cpp,?DrawFrameGray@@YGXPAUSurface@@PAUGafFrame@@HH@Z,matched,100.0
 0x4b88d0,427,src/graphics/gaf.cpp,?EraseFrameDithered@@YGXPAUSurface@@PAUGafFrame@@HHH@Z,matched,100.0
 0x4b8a80,89,src/graphics/gaf.cpp,?SurfaceFromFrame@@YGXPAUSurface@@PAUGafFrame@@@Z,matched,100.0
-0x4b8ae0,69,src/graphics/gaf.cpp,?FrameFromSurface@@YGXPAUGafFrame@@PAUSrc_004b8ae0@@@Z,matched,100.0
+0x4b8ae0,69,src/graphics/gaf.cpp,?FrameFromSurface@@YGXPAUGafFrame@@PAUSurface@@@Z,matched,100.0
 0x4b8b30,81,src/graphics/gaf.cpp,?InitGafSequence@@YGXPAURef_004b8b30@@PAUSrc_004b8b30@@H@Z,matched,100.0
 0x4b8b90,91,src/graphics/gaf.cpp,?StepGafSequence@@YGHPAURef_004b8b30@@@Z,matched,100.0
 0x4b8bf0,101,src/graphics/gaf.cpp,?AdvanceGafSequence@@YGXPAURef_004b8bf0@@F@Z,matched,100.0

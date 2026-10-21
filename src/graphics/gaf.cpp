@@ -568,6 +568,13 @@ void __stdcall SurfaceFromFrame(Surface* dst, GafFrame* src)
     ResetClipRect((int*)dst);
 }
 
+// Unused here: real declarations that hold the symbol ids the local surface
+// view used to take, so the frame functions keep their allocation
+// (docs/c2-regalloc.md).
+Surface* __stdcall AllocSurface(char* name, int width, int height);
+void __stdcall FreeSurface(Surface* obj);
+int __stdcall SetPageFlipping(int enable);
+
 // Unused here: real functions declared to keep the file's symbol count.
 void __stdcall DrawBattleFrame(int param_1, int param_2);
 void __stdcall HAPI_FindClose(int handle);
