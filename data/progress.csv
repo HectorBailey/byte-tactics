@@ -1160,7 +1160,7 @@ address,size,file,symbol,status,similarity
 0x45a470,156,src/graphics/model_render.cpp,?MakeSilhouette@CMemoryCache@@QAEPAUGafFrame@@PAU2@@Z,matched,100.0
 0x45a510,254,src/graphics/model_render.cpp,?MeasureShadow@CMemoryCache@@QAEXPAH000PAUModel_459200@@@Z,matched,100.0
 0x45a610,379,src/graphics/model_render.cpp,?DrawShadowShape@CMemoryCache@@QAEXPAUGafFrame@@PAUModel_459200@@@Z,matched,100.0
-0x45a790,307,src/units/unit_motion.cpp,?BuildShadow@CMemoryCache@@QAEXPAUState_0045a790@@PAUGafFrame@@@Z,matched,100.0
+0x45a790,307,src/units/unit_motion.cpp,?BuildShadow@CMemoryCache@@QAEXPAUObjectState@@PAUGafFrame@@@Z,matched,100.0
 0x45a8d0,116,src/graphics/model_render.cpp,?CreateObjectState@@YGPAUModel_459200@@PAUObject3do@@@Z,matched,100.0
 0x45a950,322,src/graphics/model_render.cpp,?CreatePlayerObjectState@@YGPAUModel_459200@@PAUObject3do@@PAUBuildList_0045a950@@H@Z,matched,100.0
 0x45aaa0,100,src/graphics/model_render.cpp,?FreeObjectState@@YGXPAUModel_459200@@@Z,matched,100.0
