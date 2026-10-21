@@ -75,6 +75,9 @@ public:
 };
 
 #pragma pack(push, 1)
+// Kept, not unit_def.h: the handlers read flags1 and flags2 as bit fields, bytes
+// and dwords, which the header declares as two plain words, and the parse order
+// of this file's declarations sets the ids its functions match at.
 struct UnitDef {
     char unknown_0[0x14a];
     Point16 footprint;                 // +0x14a

@@ -31,6 +31,8 @@ struct Unit;
 #include "unit_motion.h"
 
 
+// Kept, not unit_def.h: including it costs five symbol ids and 0x412d40 drops
+// to 97.5% (the attack lead's registers follow the file's count).
 #pragma pack(push, 1)
 struct UnitDef {
     char pad0[0x192]; int maxvelocity;

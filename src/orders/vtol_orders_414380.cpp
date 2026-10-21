@@ -43,6 +43,8 @@ class Class_0044e720 { public: void SetHeading(int); };
 class MissionType { public: unsigned char index; MissionType(const char*); };
 
 class PathOrderAttach { public: void SetUnit(Unit*); };
+// Kept, not unit_def.h: including it moves the bounds-add registers in 0x414380
+// (91.0%, and 92.4% with the ids moved back).
 #pragma pack(push, 1)
 struct UnitDef {
     char pad0[0x14a]; Point origin;
