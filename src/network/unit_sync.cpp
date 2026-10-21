@@ -153,7 +153,7 @@ struct Name_0046c620 {                  // 17 bytes, the player's name
     char flag;
 };
 
-struct Net_4c97b0 {                     // the object at g_game+0x14
+struct HapinetSession {                 // the object at g_game+0x14
     Name_0046c620 name;                 // +0x00
     char unknown_11[0x4c9 - 0x11];
     int created;                        // +0x4c9
@@ -182,8 +182,8 @@ struct UnitSync;
 #pragma pack(push, 1)
 struct Game {
     char unknown_0[0x14];
-    Net_4c97b0 session;                 // +0x14
-    char unknown_25[0x1b67 - 0x14 - sizeof(Net_4c97b0)];
+    HapinetSession session;             // +0x14
+    char unknown_25[0x1b67 - 0x14 - sizeof(HapinetSession)];
     PlayerEntry_0046d6c0 players[10];   // +0x1b67
     char unknown_283d[0x2a30 - 0x1b67 - sizeof(PlayerEntry_0046d6c0) * 10];
     UnitSync* sync;                     // +0x2a30
@@ -216,8 +216,8 @@ extern int g_reportFlags;
 extern void (*g_riIntervalTimer)(void);
 extern int (__stdcall* g_riReportGameChat)(int, int);
 
-Rect_0046c620* __stdcall GetSessionGuidInstance(Net_4c97b0* p);
-int __stdcall GetCreatedLobbyInterface(Net_4c97b0* p);
+Rect_0046c620* __stdcall GetSessionGuidInstance(HapinetSession* p);
+int __stdcall GetCreatedLobbyInterface(HapinetSession* p);
 int __stdcall QueryOnlineFlags(int mode);
 int __stdcall RIReport(int, Rect_0046c620*, void*, int, Name_0046c620*, int,
                            int, int, void*, void*);

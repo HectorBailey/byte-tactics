@@ -887,9 +887,9 @@ class MissionCondition;
 struct ConnInfo_443ff0;
 struct Conn_00443cb0;
 struct Conn_443ff0;
-struct Conn_4ca100;
+struct HapinetProviderConnEntry;
 struct Connection_004ca450;
-struct Connection_4c9a70;
+struct DPLCONNECTION;
 union Coord_00407ae0;
 union Coord_004239c0;
 union Coord_0044f2a0;
@@ -1496,7 +1496,7 @@ struct Net_004c9e50;
 struct Net_004ca450;
 struct Net_004ca6a0;
 struct Net_4517b0;
-struct Net_4c97b0;
+struct HapinetSession;
 struct Net_4c9800;
 struct Net_4c9840;
 struct Net_4c9890;
@@ -17560,7 +17560,7 @@ public:
     virtual int __stdcall Send(unsigned long, unsigned long, unsigned long, void*, unsigned long);
 };
 
-struct Net_4c97b0 {  // 0x4c9 bytes, 1 view
+struct HapinetSession {  // 0x4c9 bytes, 1 view
     char unknown_0[1221];
     DirectPlay_4c97b0* dp;  // +0x4c5
 };
@@ -17741,7 +17741,7 @@ struct Net_004c9920 {  // 0x4e1 bytes, 1 view
     int maxPlayers;  // +0x4dd
 };
 
-struct Connection_4c9a70 {  // 0xc bytes, 1 view
+struct DPLCONNECTION {      // 0xc bytes, 1 view
     char unknown_0[8];
     DPSessionDesc_4c9a70* desc;  // +0x8
 };
@@ -17777,7 +17777,7 @@ public:
     virtual int __stdcall Slot09(void);
     virtual int __stdcall Slot10(void);
     virtual int __stdcall Slot11(void);
-    virtual int __stdcall SetConnectionSettings(unsigned long, unsigned long, Connection_4c9a70*);
+    virtual int __stdcall SetConnectionSettings(unsigned long, unsigned long, DPLCONNECTION*);
 };
 
 struct Net_4c9a70 {  // 0x4d9 bytes, 1 view
@@ -17787,7 +17787,7 @@ struct Net_4c9a70 {  // 0x4d9 bytes, 1 view
     void* dp;  // +0x4c5
     void* field_4c9;  // +0x4c9
     Lobby_4c9a70* lobby;  // +0x4cd
-    Connection_4c9a70* connection;  // +0x4d1
+    DPLCONNECTION* connection;      // +0x4d1
     int connection_size;  // +0x4d5
 };
 
@@ -18028,7 +18028,7 @@ struct Net_4c9fd0 {  // 0x4c9 bytes, 1 view
     DirectPlay_4c9fd0* dp;  // +0x4c5
 };
 
-struct Conn_4ca100 {  // 0x8 bytes, 1 view
+struct HapinetProviderConnEntry {  // 0x8 bytes, 1 view
     void* data;  // +0x0
     unsigned long size;  // +0x4
 };
@@ -18043,7 +18043,7 @@ struct DPName_004ca6a0 {  // 0x10 bytes, 2 views
 struct Net_4ca100 {  // 0x4e9 bytes, 1 view
     char unknown_0[1073];
     V4i* guids;  // +0x431
-    Conn_4ca100* conns;  // +0x435
+    HapinetProviderConnEntry* conns;  // +0x435
     char* names;  // +0x439
     char unknown_43d[168];
     int field_4e5;  // +0x4e5
