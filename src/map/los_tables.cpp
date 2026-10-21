@@ -62,15 +62,15 @@ struct Elem_00432be0 {
     ~Elem_00432be0() { ((StringRef*)this)->ReleaseRef(); }
 };
 
-struct Entry_00432cf0 {
-    StringRef name;         // +0x0
-    int value;                 // +0x4
+struct WeaponDef_DamagePair {
+    StringRef unitName;         // +0x0
+    int damage;                 // +0x4
 
-    void* AssignPair(Entry_00432cf0* param);
+    void* AssignPair(WeaponDef_DamagePair* param);
 };
 
 // An 8-byte element: the string handle and the int after it, the same pair as
-// Entry_00432cf0.
+// WeaponDef_DamagePair.
 struct Elem_432cb0 {
     StringRef handle;               // +0x0
     int value;                         // +0x4
@@ -201,10 +201,10 @@ void* StringRef::FUN_00432c20(unsigned char param_1)
     return this;
 }
 
-// std::vector<Entry_00432cf0>::_Ucopy(first, last, dest): copy-constructs
+// std::vector<WeaponDef_DamagePair>::_Ucopy(first, last, dest): copy-constructs
 // {string handle, int} pairs into raw storage (the placement-new construct of
 // 0x432cf0 below). Called with ecx set to the vector.
-typedef std::vector<Entry_00432cf0> Vec_00432c40;
+typedef std::vector<WeaponDef_DamagePair> Vec_00432c40;
 typedef Vec_00432c40::iterator (Vec_00432c40::*UcopyFn_00432c40)(
     Vec_00432c40::const_iterator, Vec_00432c40::const_iterator, Vec_00432c40::iterator);
 
@@ -213,7 +213,7 @@ struct Access_00432c40 : Vec_00432c40 {
     static UcopyFn_00432c40 fn;
 };
 
-// FUNCTION: 0x432c40 ?_Ucopy@?$vector@UEntry_00432cf0@@V?$allocator@UEntry_00432cf0@@@std@@@std@@IAEPAUEntry_00432cf0@@PBU3@0PAU3@@Z
+// FUNCTION: 0x432c40 ?_Ucopy@?$vector@UWeaponDef_DamagePair@@V?$allocator@UWeaponDef_DamagePair@@@std@@@std@@IAEPAUWeaponDef_DamagePair@@PBU3@0PAU3@@Z
 UcopyFn_00432c40 Access_00432c40::fn = &Access_00432c40::_Ucopy;
 
 // std::fill over an array of 8-byte string handles (compare the
@@ -241,22 +241,22 @@ Elem_432cb0* __stdcall AssignRangeBack(Elem_432cb0* param_1, Elem_432cb0* param_
     return param_3;
 }
 
-// std::allocator<Entry_00432cf0>::construct: placement-new copy of a string
+// std::allocator<WeaponDef_DamagePair>::construct: placement-new copy of a string
 // handle plus an int. Taking the member's address makes the compiler emit the
 // template instantiation out of line.
-typedef std::allocator<Entry_00432cf0> Alloc_00432cf0;
-typedef void (Alloc_00432cf0::*ConstructFn_00432cf0)(Entry_00432cf0*, const Entry_00432cf0&);
+typedef std::allocator<WeaponDef_DamagePair> Alloc_00432cf0;
+typedef void (Alloc_00432cf0::*ConstructFn_00432cf0)(WeaponDef_DamagePair*, const WeaponDef_DamagePair&);
 
-// FUNCTION: 0x432cf0 ?construct@?$allocator@UEntry_00432cf0@@@std@@QAEXPAUEntry_00432cf0@@ABU3@@Z
+// FUNCTION: 0x432cf0 ?construct@?$allocator@UWeaponDef_DamagePair@@@std@@QAEXPAUWeaponDef_DamagePair@@ABU3@@Z
 ConstructFn_00432cf0 g_construct_00432cf0 = &Alloc_00432cf0::construct;
 
 // A reference-counted string handle, with the count in the dword before the
 // characters, and an int after it.
 // FUNCTION: 0x432d20
-void* Entry_00432cf0::AssignPair(Entry_00432cf0* param)
+void* WeaponDef_DamagePair::AssignPair(WeaponDef_DamagePair* param)
 {
-    name.Assign(&param->name);
-    value = param->value;
+    unitName.Assign(&param->unitName);
+    damage = param->damage;
     return this;
 }
 

@@ -605,11 +605,11 @@ address,size,file,symbol,status,similarity
 0x432be0,19,src/map/los_tables.cpp,?size@?$vector@UElem_00432be0@@V?$allocator@UElem_00432be0@@@std@@@std@@QBEIXZ,matched,100.0
 0x432c00,30,src/map/los_tables.cpp,?FUN_00432c00@StringRef@@QAEPAXE@Z,matched,100.0
 0x432c20,30,src/map/los_tables.cpp,?FUN_00432c20@StringRef@@QAEPAXE@Z,matched,100.0
-0x432c40,55,src/map/los_tables.cpp,?_Ucopy@?$vector@UEntry_00432cf0@@V?$allocator@UEntry_00432cf0@@@std@@@std@@IAEPAUEntry_00432cf0@@PBU3@0PAU3@@Z,matched,100.0
+0x432c40,55,src/map/los_tables.cpp,?_Ucopy@?$vector@UWeaponDef_DamagePair@@V?$allocator@UWeaponDef_DamagePair@@@std@@@std@@IAEPAUWeaponDef_DamagePair@@PBU3@0PAU3@@Z,matched,100.0
 0x432c80,46,src/map/los_tables.cpp,?AssignRange@@YGXPAUElem_432cb0@@00@Z,matched,100.0
 0x432cb0,51,src/map/los_tables.cpp,?AssignRangeBack@@YGPAUElem_432cb0@@PAU1@00@Z,matched,100.0
-0x432cf0,33,src/map/los_tables.cpp,?construct@?$allocator@UEntry_00432cf0@@@std@@QAEXPAUEntry_00432cf0@@ABU3@@Z,matched,100.0
-0x432d20,27,src/map/los_tables.cpp,?AssignPair@Entry_00432cf0@@QAEPAXPAU1@@Z,matched,100.0
+0x432cf0,33,src/map/los_tables.cpp,?construct@?$allocator@UWeaponDef_DamagePair@@@std@@QAEXPAUWeaponDef_DamagePair@@ABU3@@Z,matched,100.0
+0x432d20,27,src/map/los_tables.cpp,?AssignPair@WeaponDef_DamagePair@@QAEPAXPAU1@@Z,matched,100.0
 0x432d40,612,src/map/los_tables.cpp,?SortUnitTypes@@YGXPAVUnitDef@@0P6GHABV1@1@ZH@Z,matched,100.0
 0x432fb0,244,src/map/los_tables.cpp,?InsertionSortUnitTypes@@YGXPAVUnitDef@@0P6GHABV1@1@ZPAX@Z,matched,100.0
 0x4330b0,119,src/map/los_tables.cpp,?FreeTables@LosTables@@QAEXXZ,matched,100.0
