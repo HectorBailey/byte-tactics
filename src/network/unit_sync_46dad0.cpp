@@ -7,22 +7,10 @@
 #include <vector>
 
 #include "../units/unit_def.h"
-
-struct Data_0046dad0 {
-    char unknown_0[0x94];
-    unsigned char kind;     // +0x94
-};
+#include "player.h"
+#include "player_info.h"
 
 #pragma pack(push, 1)
-struct PlayerInfo_0046dad0 {
-    int active;  // +0x0
-    int id;      // +0x4
-    char unknown_8[0x27 - 0x8];
-    Data_0046dad0* data; // +0x27
-    char unknown_2b[0x73 - 0x2b];
-    unsigned char type; // +0x73
-    char unknown_74[0x14b - 0x74]; // the record's stride in g_game->players
-};
 
 struct UnitSyncPacket { // 0xe bytes
     unsigned char type;  // +0x0
@@ -34,7 +22,7 @@ struct UnitSyncPacket { // 0xe bytes
 
 struct Game {
     char unknown_0[0x1b63];
-    PlayerInfo_0046dad0 players[10]; // +0x1b63
+    Player players[10]; // +0x1b63
     char unknown_2851[0x1438f - 0x2851];
     int unitDefCount; // +0x1438f
     char unknown_14393[0x1439b - 0x14393];
@@ -165,8 +153,8 @@ void UnitSync::ProcessSync() {
             do {
                 int live = 0;
                 for (int i = 0; i < 10; i++) {
-                    PlayerInfo_0046dad0* p = &g_game->players[i];
-                    if (p->active != 0 && p->type == 3 && p->data->kind == 1 &&
+                    Player* p = &g_game->players[i];
+                    if (p->active != 0 && p->type == 3 && p->info->kind == 1 &&
                         it->id == p->id) {
                         live = 1;
                         break;
@@ -182,8 +170,8 @@ void UnitSync::ProcessSync() {
         }
 
         for (int i = 0; i < 10; i++) {
-            PlayerInfo_0046dad0* p = &g_game->players[i];
-            if (p->active != 0 && p->type == 3 && p->data->kind == 1) {
+            Player* p = &g_game->players[i];
+            if (p->active != 0 && p->type == 3 && p->info->kind == 1) {
                 int found = 0;
                 for (std::vector<SyncPlayerRecord>::iterator j = players.begin(); j != players.end();
                      ++j) {
