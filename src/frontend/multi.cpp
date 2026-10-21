@@ -84,7 +84,7 @@ struct Gadget {                        // 0x15b bytes
             char unknown_b6b[0xba - 0xb6];
             union {                    // +0xba
                 short selected;
-                unsigned char field_ba_byte;
+                unsigned char indexByte;
                 short index;
             };
             union {                    // +0xbc
@@ -2237,7 +2237,7 @@ void __stdcall HandleLogoSelectClick(Gui* param_1)
     if (IsCurrentGadgetNamed(param_1, "LOGOS") || IsCurrentGadgetNamed(param_1, "SELECT")) {
         Player* player = &g_game->players[g_game->localPlayer];
         Gadget* entry = FindGadgetChecked(entries, "LOGOS");
-        player->info->color = ((char*)layout)[entry->field_ba_byte];
+        player->info->color = ((char*)layout)[entry->indexByte];
         g_game->flag0 = 1;
         RequestPlayerColor(player->info->color);
         return;
