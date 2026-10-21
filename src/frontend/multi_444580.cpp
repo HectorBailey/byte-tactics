@@ -4,35 +4,12 @@
 #include <string.h>
 
 #pragma pack(push, 1)
-struct Entry_00444580 {                 // a gadget of the menu, 0x15b bytes
-    short unknown_0;
-    char name[0x13];                    // +0x02
-    short y;                            // +0x15
-    char unknown_17[0x19 - 0x17];
-    short height;                       // +0x19
-    int attribs;                        // +0x1b
-    int colours;                        // +0x1f
-    char unknown_23[0x29 - 0x23];
-    char active;                        // +0x29
-    char unknown_2a[0xb6 - 0x2a];
-    short count;                        // +0xb6 (entry 0 only)
-    char unknown_b8[0xcc - 0xb8];
-    char choice[0x15b - 0xcc];          // +0xcc (entry 0 only)
-};
 
-struct Layer {
-    int unknown_0;
-    Entry_00444580* entries;            // +0x4
-};
 
 #include "../gui/gui.h"
+#include "../gui/gadget.h"
+#include "../gui/layer.h"
 
-struct Gadget_00444580 {
-    int unknown_0;
-    Entry_00444580* entries;            // +0x4
-    void (__stdcall* handler)(void*);   // +0x8
-    int userData;                       // +0xc
-};
 
 struct HapinetProviderConnEntry {
     void* pConnectionBlob;
@@ -68,7 +45,7 @@ extern char DAT_004fcfb8[];
 void __stdcall CloseTopScreen(void* menu);
 void __stdcall SetPaletteColors(unsigned char* palette, int first, int count);
 void __stdcall RemapPaletteToClosestIndices(void* menu, void* palette, void* copy);
-Gadget_00444580* __stdcall LoadGuiLayer(void* menu, char* name, int size);
+Layer* __stdcall LoadGuiLayer(Gui* menu, char* name, int size);
 void __stdcall HandleSelectProviderClick(void* menu);
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
@@ -87,9 +64,9 @@ void __stdcall RenderLayer(void* menu, int value);
 // this spelling (one local, `index`) also matches 0x4444d0 itself, and it is
 // the one that gives this function's frame (two more locals add two slots).
 // It is static here so that the object does not define 0x4444d0 a second time.
-static int __stdcall CloneServiceSlot(Entry_00444580* entries, int from, short y, int source, char* name)
+static int __stdcall CloneServiceSlot(Gadget* entries, int from, short y, int source, char* name)
 {
-    int index = ++entries[0].count;
+    int index = ++entries[0].u.count;
     entries[index] = entries[from];
     SetTranslatedText(&g_game->gui, index, source, 0);
     strcpy(entries[index].name, name);
@@ -111,9 +88,9 @@ void FillProviderList()
         CloseTopScreen(&g_game->gui);
     SetPaletteColors(g_game->paletteRgba, 0, 0x100);
     RemapPaletteToClosestIndices(&g_game->gui, g_game->paletteRgba, g_game->gui.palette);
-    Gadget_00444580* menu = LoadGuiLayer(&g_game->gui, "SELPROV.GUI", 0x80);
-    menu->handler = HandleSelectProviderClick;
-    menu->userData = (int)g_game;
+    Layer* menu = LoadGuiLayer(&g_game->gui, "SELPROV.GUI", 0x80);
+    menu->handler = (void (__stdcall*)(void*))HandleSelectProviderClick;
+    menu->data = g_game;
     LoadPictureCached("selconnect2", 1, 0, 0);
     g_game->descriptions = GameAllocIgnoreTag("PROVIDER DESCRIPTIONS", 0x500);
     g_game->guids = GameAllocIgnoreTag("PROVIDER GUIDS", 0xa0);
@@ -123,7 +100,7 @@ void FillProviderList()
     g_game->mapInfo->RefreshMapList(1);
     HAPINET_uninitmultiplay(g_game->net);
     HAPINET_getconnections(g_game->net, g_game->guids, g_game->conns, g_game->descriptions, DAT_004fcfb8);
-    Entry_00444580* entries = menu->entries;
+    Gadget* entries = menu->entries;
     // The names tmpl, y, k and n, at function scope, set the stack slot order.
     int tmpl = FindGadgetIndex(entries, "SERVICEX", 1);
     int y;
@@ -148,7 +125,7 @@ void FillProviderList()
             }
         }
     }
-    strcpy(entries->choice, "SELECT");
+    strcpy(entries->u.names.choice, "SELECT");
     ConfigureListBoxByName(&g_game->gui, "DPLAY", g_game->descriptions, g_game->count, 0);
     OrLabelAttribs();
     SetKeyboardInput(&g_game->gui, 1);
