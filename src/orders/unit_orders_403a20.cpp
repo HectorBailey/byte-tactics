@@ -109,10 +109,10 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
     switch (state) {
     case 0: {
         UnitDef* def = &Definitions()[order->type];
-        Point cell = WorldToCell(order->pos, (Point&)def->f14a);
-        CellToWorld((Point&)def->f14a, cell, &order->pos);
+        Point cell = WorldToCell(order->pos, (Point&)def->footprint);
+        CellToWorld((Point&)def->footprint, cell, &order->pos);
         order->retries = 0;
-        order->AttachBuildFootprintMarker(cell, (Point&)def->f14a);
+        order->AttachBuildFootprintMarker(cell, (Point&)def->footprint);
         order->flags = 0xe0;
         return 1;
     }
@@ -122,7 +122,7 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
             Fixed distance;
             distance.value = (int)_hypot(unit->pos.x - order->pos.x, unit->pos.z - order->pos.z);
             int gap = distance.whole - (int)(_hypot(unit->footprint.x, unit->footprint.y) * 8.0);
-            gap += (int)(_hypot(def->footprintx, def->footprintz) * -8.0);
+            gap += (int)(_hypot(def->footprint.x, def->footprint.y) * -8.0);
             unsigned int range = 0;
             range = unit->def->buildRange;
             if (gap > (int)range) {
@@ -130,7 +130,7 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
                 return 8;
             }
         }
-        if (!CanPlaceUnitFootprint(def, 0, WorldToCell(order->pos, (Point&)Definitions()[order->type].f14a), 1)) {
+        if (!CanPlaceUnitFootprint(def, 0, WorldToCell(order->pos, (Point&)Definitions()[order->type].footprint), 1)) {
             if (!order->retries)
                 QueueUnitSpeech(unit, 7, "Waiting for target area to clear");
             else if (order->retries > 10) {
