@@ -2,9 +2,6 @@
 // settled ones from the #6655 measurement. Types with a shared header are included;
 // the headerless ones it holds by value are laid out in front, pointer targets are
 // forward declarations. Flags_0045c570 at +0x37f19 is spelled from its neighbours.
-// The player array uses GamePlayer, a copy of network/player.h's Player: including
-// that header here moves 16,866 bytes of the linked exe (all code identical; one
-// extra 16-byte FPO record at the end), so the copy stays until that is solved.
 #ifndef GAME_H
 #define GAME_H
 
@@ -22,6 +19,7 @@
 #include "../graphics/handle.h"
 #include "../ingame/frame_timers.h"
 #include "../network/settings.h"
+#include "../network/player.h"
 #include "../map/grid.h"
 #include "../graphics/handle.h"
 #include "../ingame/frame_timers.h"
@@ -76,7 +74,6 @@ struct Obj_00406f50;
 struct Object3do;
 struct PathMap;
 struct PieceFrame;
-struct GamePlayer;
 struct PlayerRef;
 struct Point_0041cd50;
 struct Rect;
@@ -107,92 +104,6 @@ struct ByteMap_00408090 {  // 0xc bytes
 };
 
 
-
-struct GamePlayer {  // 0x14b bytes
-    int active;  // +0x0
-    int id;  // +0x4
-    int field_8;  // +0x8
-    int field_c;  // +0xc
-    int messages;  // +0x10
-    unsigned int ping;  // +0x14
-    int ticks;  // +0x18
-    int last_time;  // +0x1c
-    unsigned char progress;  // +0x20
-    unsigned char field_21;  // +0x21
-    unsigned char field_22;  // +0x22
-    char unknown_23[4];
-    Data_0046d970* info;  // +0x27
-    char name[16];  // +0x2b
-    char unknown_3b[14];
-    char name_49[1];  // +0x49
-    char unknown_4a[29];
-    Unit* unitsBegin;  // +0x67
-    Unit* unitsEnd;  // +0x6b
-    unsigned short firstIndex;  // +0x6f
-    unsigned short lastIndex;  // +0x71
-    unsigned char type;  // +0x73
-    int field_74;  // +0x74
-    Class_00480160* squads;  // +0x78
-    ByteMap_00408090 explored;  // +0x7c
-    int seenCount;  // +0x88
-    float metal;  // +0x8c
-    int field_90;  // +0x90
-    unsigned char field_94;  // +0x94
-    unsigned char field_95;  // +0x95
-    unsigned char field_96;  // +0x96
-    unsigned char f97_0 : 1;  // +0x97
-    unsigned char f97_rest : 7;
-    float energy;  // +0x98
-    char unknown_9c[1];
-    unsigned char f9d_0 : 2;  // +0x9d
-    unsigned char f9d_2 : 1;
-    unsigned char f9d_rest : 5;
-    char unknown_9e;  // +0x9e
-    char unknown_9f[1];
-    int fa0;  // +0xa0
-    float energyCapacity;  // +0xa4
-    float metalCapacity;  // +0xa8
-    char unknown_ac[8];
-    double field_b4;  // +0xb4
-    char unknown_bc[8];
-    double field_c4;  // +0xc4
-    double field_cc;  // +0xcc
-    char unknown_d4[8];
-    float width;  // +0xdc
-    float height;  // +0xe0
-    float share_metal;  // +0xe4
-    float share_energy;  // +0xe8
-    PlayerRef* econ;  // +0xec
-    int field_f0;  // +0xf0
-    int ff4;  // +0xf4
-    int ff8;  // +0xf8
-    short field_fc;  // +0xfc
-    short field_fe;  // +0xfe
-    short f100;  // +0x100
-    short f102;  // +0x102
-    short field_104;  // +0x104
-    short field_106;  // +0x106
-    char allied[1];  // +0x108
-    char unknown_109[10];
-    unsigned char field_113[11];  // +0x113
-    unsigned char t0[11];  // +0x11e
-    char allied_129[10];  // +0x129
-    char unknown_133[1];
-    unsigned char team_134[11];  // +0x134
-    unsigned char alliance;  // +0x13f
-    int field_140;  // +0x140
-    short field_144;  // +0x144
-    unsigned char field_146;  // +0x146
-    unsigned char field_147;  // +0x147
-    unsigned char field_148;  // +0x148
-    unsigned short flag_149 : 1;  // +0x149
-    unsigned short rest_149 : 15;
-    float GetEnergy(void);
-    int IsAllied(unsigned char);
-    void Clear(void);
-    void FUN_00463c60(int);
-    float GetMetal(void);
-};
 
 struct Arg_00419670 {  // 0x18 bytes
     int x;  // +0x0
@@ -417,7 +328,7 @@ struct Game {  // 0x3924d bytes
     int count;  // +0x4f9
     int field_4fd;  // +0x4fd
     char unknown_501[16];
-    GamePlayer* slowest;  // +0x511
+    Player* slowest;  // +0x511
     int lag;  // +0x515
     char unknown_519[100];
     int team_index;  // +0x57d
@@ -444,7 +355,7 @@ struct Game {  // 0x3924d bytes
     char unknown_11ef[256];
     Entry_00463ca0 entries[30];  // +0x12ef
     int field_1b5f;  // +0x1b5f
-    GamePlayer players[10];  // +0x1b63
+    Player players[10];  // +0x1b63
     char unknown_2851[331];
     int field_299c;  // +0x299c
     Entry_00479620* options;  // +0x29a0
@@ -851,8 +762,8 @@ struct Game {  // 0x3924d bytes
     char unknown_39245[4];
     int field_39249;  // +0x39249
     Game(void);
-    GamePlayer* Current(void);
-    GamePlayer* Current2(void);
+    Player* Current(void);
+    Player* Current2(void);
 };
 
 struct Bits_0045c570 {  // 0x2 bytes
