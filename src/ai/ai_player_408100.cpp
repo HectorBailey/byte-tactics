@@ -32,30 +32,39 @@ struct UnitDef_00408100 {
     unsigned int unknown_bits13 : 19;
 };
 
-struct Order_00408100 {
-    char unknown_0[0x42];
-    unsigned int flags;                // +0x42
-};
-
 struct Unit_00408100 {
     char unknown_0[0x5c];
-    Order_00408100* list;              // +0x5c
+    Order* list;                       // +0x5c
     char unknown_60[0x6a - 0x60];
     Vec3 pos;                          // +0x6a
     char unknown_76[0x92 - 0x76];
     UnitDef_00408100* def;             // +0x92
 };
 
-struct Item_00408100 {                 // 0x249 bytes
-    char unknown_0[0x249];
-};
+// Unused here: the symbol ids these declarations take stand where the removed
+// Item_00408100 and Order_00408100 views stood, keeping 0x408100's allocation
+// (docs/c2-regalloc.md).
+int CountActiveAIPlayers(void);
+int CountComputerPlayers(void);
+int CountHumanPlayers(void);
+int ExpireOldestMessage(void);
+int AreAllSlotsEmpty(void);
+int CheckAlliedVictory(void);
+int CheckMapCrc(void);
+int FindFreeSlot(void);
+int FindOpenSlot(void);
+int GetCpuFamily(void);
+char IsMemFussy();
+int GetCdPosition(void);
+int GetBuildSiteHeight(void);
+int GetDebugFillPattern(void);
 
 struct Game_00408100 {
     char unknown_0[0x1422b];
     int mapPixelWidth;                 // +0x1422b
     int mapPixelHeight;                // +0x1422f
     char unknown_14233[0x1439b - 0x14233];
-    Item_00408100* unitDefs;           // +0x1439b
+    UnitDef* unitDefs;                 // +0x1439b
     char unknown_1439f[0x38a47 - 0x1439f];
     unsigned int gameTick;             // +0x38a47
 };
@@ -74,7 +83,7 @@ extern Game_00408100* g_game;
 
 void __stdcall GetBasePosition(int index, Vec3* out);
 unsigned short __stdcall ChooseBuildOption(unsigned int player, Unit_00408100* unit);
-int __stdcall FindBuildPosition(unsigned int player, Vec3* from, Item_00408100* item, Vec3* out);
+int __stdcall FindBuildPosition(unsigned int player, Vec3* from, UnitDef* item, Vec3* out);
 int __stdcall GetBuilderCount(unsigned int player);
 MissionType __stdcall GetOrderType(unsigned char mode, Unit_00408100* unit, Unit_00408100* target, Vec3* pos);
 void __stdcall AddOrder(MissionType kind, int remove, Unit_00408100* unit, Unit_00408100* target, Vec3* pos, int param_6, int param_7);

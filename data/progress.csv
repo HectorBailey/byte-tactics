@@ -128,7 +128,7 @@ address,size,file,symbol,status,similarity
 0x40ad70,15,src/ai/ai_player.cpp,?ProbeUnitDefEnergyRate@@YGXHHH@Z,matched,100.0
 0x40ad80,834,src/ai/ai_player.cpp,?GetVisibleEnemiesInRadius@@YGXHPBUVec@@HHPAV?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@@Z,matched,100.0
 0x40b0d0,229,src/ai/ai_player.cpp,?HasReadyUnitInRange@@YG_NHPAUVec3_40b0d0@@H@Z,matched,100.0
-0x40b1c0,244,src/ai/ai_player_40b1c0.cpp,?SumUnitRatingsInRange@@YGHHPAUVec_0040b1c0@@H@Z,matched,100.0
+0x40b1c0,244,src/ai/ai_player_40b1c0.cpp,?SumUnitRatingsInRange@@YGHHPAUVec3@@H@Z,matched,100.0
 0x40b2c0,85,src/ai/ai_player.cpp,?UpdatePlayerAI@@YGXH@Z,matched,100.0
 0x40b320,68,src/ai/ai_player.cpp,?CreatePlayerAI@@YGXH@Z,matched,100.0
 0x40b370,19,src/ai/ai_player.cpp,?RebuildFeatureCells@@YGXH@Z,matched,100.0
