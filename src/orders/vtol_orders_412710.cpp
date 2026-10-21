@@ -45,6 +45,8 @@ struct FrameTable;
 class AssaultTimer;
 class EscortTimer;
 
+// Kept, not unit_def.h: including it costs five symbol ids and 0x412710 drops
+// to 96.2% (the health test's registers follow the file's count).
 #pragma pack(push, 1)
 struct UnitDef {
     char pad0[0x1fa]; unsigned int maxHealth;

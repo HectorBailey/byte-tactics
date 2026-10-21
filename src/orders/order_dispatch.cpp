@@ -47,6 +47,8 @@ struct Flags_0043e490 {
     unsigned int b15_31 : 17;
 };
 
+// Kept, not unit_def.h: this file reads flags1 and flags2 as bit fields and the
+// first weapon slot, which the header declares as plain words and a WeaponDef*.
 struct UnitDef {
     char unknown_0[0x156];
     int f156; // +0x156

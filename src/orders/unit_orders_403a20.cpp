@@ -18,14 +18,9 @@ struct Unit;
 #include "mission_type.h"
 
 #include "path_order_attach.h"
+#include "../units/unit_def.h"
+
 #pragma pack(push, 1)
-struct UnitDef {
-    char pad0[0x14a]; Point origin;
-    char pad14e[0x15e-0x14e]; Vec3 min, max;
-    char pad176[0x1fe-0x176]; unsigned short buildRate;
-    char pad200[0x212-0x200]; unsigned short buildRange;
-    char pad214[0x249-0x214];
-};
 struct Unit {
     char pad0[0x66]; short heading;
     char pad68[2]; Vec3 pos;
@@ -91,8 +86,12 @@ static inline void CellToWorld(Point origin, Point c, Vec3* v)
     v->x = (origin.x + c.x * 2) << 19;
     v->z = (origin.y + c.y * 2) << 19;
 }
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
+// Unused here: the symbol ids these declarations take stand where the UnitDef
+// view stood, keeping 0x403a20's allocation (docs/c2-regalloc.md).
 struct Feature;
+int __stdcall IsUnitCommander(Unit*);
+void __stdcall DrawUnit(void*, Unit*);
+void CmdMem(int);
 // FUNCTION: 0x403a20
 int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
 {
@@ -110,10 +109,10 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
     switch (state) {
     case 0: {
         UnitDef* def = &Definitions()[order->type];
-        Point cell = WorldToCell(order->pos, def->origin);
-        CellToWorld(def->origin, cell, &order->pos);
+        Point cell = WorldToCell(order->pos, (Point&)def->f14a);
+        CellToWorld((Point&)def->f14a, cell, &order->pos);
         order->retries = 0;
-        order->AttachBuildFootprintMarker(cell, def->origin);
+        order->AttachBuildFootprintMarker(cell, (Point&)def->f14a);
         order->flags = 0xe0;
         return 1;
     }
@@ -123,7 +122,7 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
             Fixed distance;
             distance.value = (int)_hypot(unit->pos.x - order->pos.x, unit->pos.z - order->pos.z);
             int gap = distance.whole - (int)(_hypot(unit->footprint.x, unit->footprint.y) * 8.0);
-            gap += (int)(_hypot(def->origin.x, def->origin.y) * -8.0);
+            gap += (int)(_hypot(def->footprintx, def->footprintz) * -8.0);
             unsigned int range = 0;
             range = unit->def->buildRange;
             if (gap > (int)range) {
@@ -131,7 +130,7 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
                 return 8;
             }
         }
-        if (!CanPlaceUnitFootprint(def, 0, WorldToCell(order->pos, Definitions()[order->type].origin), 1)) {
+        if (!CanPlaceUnitFootprint(def, 0, WorldToCell(order->pos, (Point&)Definitions()[order->type].f14a), 1)) {
             if (!order->retries)
                 QueueUnitSpeech(unit, 7, "Waiting for target area to clear");
             else if (order->retries > 10) {
@@ -166,8 +165,8 @@ int __stdcall MobileBuildOrder(Unit* unit, Order* order, int flags)
             Vec3 start;
             GetNanoPiecePosition(unit, &start);
             Vec3 bounds[2];
-            bounds[0] = order->target->pos + order->target->def->min;
-            bounds[1] = order->target->pos + order->target->def->max;
+            bounds[0] = order->target->pos + (Vec3&)order->target->def->modelMinX;
+            bounds[1] = order->target->pos + (Vec3&)order->target->def->modelMaxX;
             EmitNanoParticles(&start, bounds, 6);
         }
         unit->workTime = g_game->tick + 300;
