@@ -25,7 +25,7 @@ struct Unit;
 
 struct Map {
     char unknown_0[0x620];
-    int field_620;                     // +0x620
+    int totalPhys;                     // +0x620, DisplayContext dwTotalPhys
 };
 
 // The original declares the tag as a struct here (the decorated name of
@@ -258,7 +258,7 @@ void __stdcall SetupPlayerSlot(int player, char type)
     p->rejectReason = 0;
 
     if (p->active != 0 && (p->type == 1 || p->type == 2)) {
-        p->info->memory = g_game->displayContext->field_620 / 0x100000 + 1;
+        p->info->memory = g_game->displayContext->totalPhys / 0x100000 + 1;
     }
 
     if (g_game->mapInfo->GetGameType() == 1) {
