@@ -186,22 +186,22 @@ union Fixed {
     struct { short lo; short hi; } p;
 };
 
-struct MapSize_0047d2e0 {
+struct MapSize {
     unsigned int width;
     unsigned int height;
     int Contains(unsigned int tx, unsigned int ty) { return tx < width && ty < height; }
 };
 
-struct ByteMap_0047d2e0 {
+struct ByteMap {
     unsigned char* data;
-    MapSize_0047d2e0 size;
+    MapSize size;
     int Contains(int x, int y) { return x < size.width && y < size.height; }
     unsigned char Get(int x, int y) { return data[size.width * y + x]; }
 };
 
 struct Los_0047d2e0 {
     char unknown_0[0x7c];
-    ByteMap_0047d2e0 explored;
+    ByteMap explored;
 };
 
 struct Node_0047cb00 {
