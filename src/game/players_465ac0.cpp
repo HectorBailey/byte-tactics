@@ -37,17 +37,7 @@ struct Game {
 };
 #include "../units/unit_def.h"
 #include "../util/vec3.h"
-struct Unit {
-    char unknown_0[0x6a];
-    Vec3 pos;                            // +0x6a
-    char unknown_76[0x92 - 0x76];
-    UnitDef* def;                        // +0x92
-    Map_00465ac0* player;                // +0x96
-    char unknown_9a[0x10e - 0x9a];
-    unsigned char activateFlags;         // +0x10e
-    char unknown_10f[0x110 - 0x10f];
-    unsigned int flags;                  // +0x110
-};
+#include "../units/unit.h"
 struct Position_00465ac0 {              // 16.16 fixed point; only high words read
     short xFrac;
     short x;                            // +0x2
@@ -128,7 +118,7 @@ static inline int IsVisible3(Map_00465ac0* map, Position_00465ac0* pos)
 // FUNCTION: 0x465ac0
 int __stdcall IsUnitVisibleToPlayer(Map_00465ac0* map, Unit* u)
 {
-    if (u->player == map)
+    if ((Map_00465ac0*)u->player == map)
         return 1;
     if (u->activateFlags & 4)
         return 0;

@@ -44,36 +44,7 @@ struct UnitInfo {
 
 #include "../units/unit_def.h"
 
-struct Unit {
-    char unknown_0[0x58];
-    float extraction;                  // +0x58
-    char unknown_5c[0x92 - 0x5c];
-    UnitDef* def;                      // +0x92
-    char unknown_96[0xb0 - 0x96];
-    unsigned int workTime;             // +0xb0
-    char unknown_b4[0xbc - 0xb4];
-    UnitResources resourceSlot;        // +0xbc (player at +0xec)
-    char unknown_f0[0x104 - 0xf0];
-    float buildLeft;                   // +0x104
-    char unknown_108[0x10e - 0x108];
-    unsigned char activateFlags;       // +0x10e
-    char cobStateFlags;
-    union {
-        unsigned int flags;            // +0x110
-        struct {
-            unsigned int bits0 : 11;
-            unsigned int bit11 : 1;
-            unsigned int bits12 : 20;
-        };
-    };
-    char unknown_114[0x118 - 0x114];
-    void SetStateBits(int which, int on);
-    // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
-    int CountCargo();
-    int CanReclaim(void*);
-    void ClaimWeapons(unsigned char);
-    void ReleaseWeapons(unsigned char);
-};
+#include "../units/unit.h"
 
 struct Game {
     char unknown_0[0x1b63];
