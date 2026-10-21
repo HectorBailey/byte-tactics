@@ -2731,9 +2731,9 @@ address,size,file,symbol,status,similarity
 0x4c2bb0,20,src/gui/mouse.cpp,?ClearMouseEventQueue@@YGXXZ,matched,100.0
 0x4c2bd0,234,src/gui/mouse.cpp,?InitMouse@@YGXHH@Z,matched,100.0
 0x4c2cc0,156,src/gui/mouse.cpp,?ShutdownMouse@@YGXXZ,matched,100.0
-0x4c2d60,115,src/gui/mouse.cpp,?PopMouseEvent@@YGHPAUEvent_4c2d60@@@Z,matched,100.0
-0x4c2de0,80,src/gui/mouse.cpp,?PeekMouseEvent@@YGHPAUEvent_4c2d60@@@Z,matched,100.0
-0x4c2e30,98,src/gui/mouse.cpp,?PushMouseEvent@@YGXPAUEvent_4c2d60@@@Z,matched,100.0
+0x4c2d60,115,src/gui/mouse.cpp,?PopMouseEvent@@YGHPAUMouseEvent@@@Z,matched,100.0
+0x4c2de0,80,src/gui/mouse.cpp,?PeekMouseEvent@@YGHPAUMouseEvent@@@Z,matched,100.0
+0x4c2e30,98,src/gui/mouse.cpp,?PushMouseEvent@@YGXPAUMouseEvent@@@Z,matched,100.0
 0x4c2ea0,13,src/util/tdf.cpp,??0TdfFile@@QAE@XZ,matched,100.0
 0x4c2eb0,171,src/util/tdf_4c51b0.cpp,??1TdfFile@@QAE@XZ,matched,100.0
 0x4c2f60,434,src/util/tdf_4c2f60.cpp,?LoadFile@TdfFile@@QAEHPAD@Z,matched,100.0

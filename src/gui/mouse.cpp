@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "../graphics/gaf_frame.h"
+#include "mouse_event.h"
 
 #pragma pack(push, 2)
 
@@ -14,14 +15,6 @@ struct Desc_004c25e0 {
     int width;                         // +0x0
     int height;                        // +0x4
     int pitch;                         // +0x8
-};
-
-// A mouse event, 0x18 bytes: the cursor position (the rectangle at +0x196)
-// and the event's own fields.
-struct Event_4c2d60 {
-    int x;                             // +0x0
-    int y;                             // +0x4
-    int data[4];                       // +0x8
 };
 
 // The local the lock and blit calls fill with a locked surface.
@@ -37,10 +30,10 @@ struct Obj_004c2380 {
     unsigned short bit11_15 : 5;
     char unknown_f2[0x186 - 0xf2];
     int capacity;                      // +0x186
-    Event_4c2d60* entries;             // +0x18a
+    MouseEvent* entries;               // +0x18a
     int head;                          // +0x18e
     int tail;                          // +0x192
-    Event_4c2d60 rect;                 // +0x196, the last mouse event
+    MouseEvent rect;                   // +0x196, the last mouse event
     int count;                         // +0x1ae
     GafFrame* sprite;                  // +0x1b2
     int x;                             // +0x1b6
@@ -80,10 +73,10 @@ void __cdecl MouseThreadProc(int param);
 
 // The copy must stay memcpy: a struct assignment computes the source with
 // mov/add, not lea.
-static inline void GetRect(Event_4c2d60* out)
+static inline void GetRect(MouseEvent* out)
 {
     Obj_004c2380* p = GetDisplay();
-    memcpy(out, &p->rect, sizeof(Event_4c2d60));
+    memcpy(out, &p->rect, sizeof(MouseEvent));
 }
 
 // The cursor thread's lock, held on the "MOUS" tag.
@@ -141,7 +134,7 @@ void DrawSoftwareCursor()
 {
     Obj_004c2380* obj = GetDisplay();
     if (obj->mode != 1 && obj->count <= 0) {
-        Event_4c2d60 r;
+        MouseEvent r;
         GetRect(&r);
         DrawFrame(0, obj->sprite, r.x, r.y);
     }
@@ -290,7 +283,7 @@ void __fastcall ShowSoftwareCursor(void)
             DrawSurface(o->saved, 0, -o->x, -o->y);
             Obj_004c2380* o2 = GetDisplay();
             if (o2->mode != 1 && o2->count <= 0) {
-                Event_4c2d60 r;
+                MouseEvent r;
                 GetRect(&r);
                 DrawFrame(0, o2->sprite, r.x, r.y);
             }
@@ -381,7 +374,7 @@ void __stdcall InitMouse(int count, int start)
 {
     Obj_004c2380* p = (Obj_004c2380*)GetDisplay();
     p->capacity = count;
-    p->entries = (Event_4c2d60*)GameAllocIgnoreTag("MOUSE EVENTS", count * 0x18);
+    p->entries = (MouseEvent*)GameAllocIgnoreTag("MOUSE EVENTS", count * 0x18);
     Obj_004c2380* q = (Obj_004c2380*)GetDisplay();
     q->head = 0;
     q->tail = 0;
@@ -438,7 +431,7 @@ void ShutdownMouse()
 }
 
 // FUNCTION: 0x4c2d60
-int __stdcall PopMouseEvent(Event_4c2d60* out)
+int __stdcall PopMouseEvent(MouseEvent* out)
 {
     Obj_004c2380* q = GetDisplay();
     if (q->head == q->tail) {
@@ -455,7 +448,7 @@ int __stdcall PopMouseEvent(Event_4c2d60* out)
 // Peeks at the next event in the queue without removing it (compare the
 // pop at 0x4c2d60).
 // FUNCTION: 0x4c2de0
-int __stdcall PeekMouseEvent(Event_4c2d60* out)
+int __stdcall PeekMouseEvent(MouseEvent* out)
 {
     Obj_004c2380* q = GetDisplay();
     if (q->head == q->tail) {
@@ -469,7 +462,7 @@ int __stdcall PeekMouseEvent(Event_4c2d60* out)
 // Pushes an event onto the queue unless it is full (compare the pop at
 // 0x4c2d60).
 // FUNCTION: 0x4c2e30
-void __stdcall PushMouseEvent(Event_4c2d60* ev)
+void __stdcall PushMouseEvent(MouseEvent* ev)
 {
     Obj_004c2380* q = GetDisplay();
     if ((q->head + 1) % q->capacity != q->tail) {
