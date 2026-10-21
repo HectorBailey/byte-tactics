@@ -45,12 +45,6 @@ struct Entry_004931d0 {
     void* handler;                     // +0xce
 };
 
-struct Gadget_004931d0 {
-    char unknown_0[4];
-    Entry_004931d0* info;              // +0x4
-    void (__stdcall* handler)(Gui*);   // +0x8
-    void* context;                     // +0xc
-};
 
 // The DELETE block's path buffer and the count it rebuilds the "GAMES" list
 // with, plus the "GAMES" entry the GAMES/LOAD/GAMENAME block looks up and
@@ -195,7 +189,7 @@ void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
 void __cdecl operator delete(void* p);
 void* __cdecl operator new(unsigned int size);
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
-Gadget_004931d0* __stdcall LoadGuiLayer(char* sub, const char* name, int flags);
+Layer* __stdcall LoadGuiLayer(char* sub, const char* name, int flags);
 int __stdcall IsCurrentGadgetNamed(Gui* gadget, char* name);
 int __stdcall IsCurrentGadgetNamed(Gui* gadget, char* name);
 void __stdcall ClearSelectedGadget(Gui* menu);
@@ -663,9 +657,9 @@ void ShowSaveGameScreen()
 // FUNCTION: 0x4931d0
 void ShowLoadGameScreen()
 {
-    Gadget_004931d0* gadget = LoadGuiLayer((char*)&g_game->message[0], "LOADGAME.GUI", 0x980);
-    gadget->handler = LoadGameScreenHandler;
-    gadget->context = g_game;
+    Layer* gadget = LoadGuiLayer((char*)&g_game->message[0], "LOADGAME.GUI", 0x980);
+    gadget->handler = (void (__stdcall*)(void*))LoadGameScreenHandler;
+    gadget->data = g_game;
     LoadPictureCached("DLOADGAME2", 0, 0, 0);
     int count;
     if (ListSavedGames(&count) == 0) {
@@ -679,7 +673,7 @@ void ShowLoadGameScreen()
     ConfigureListBoxByName((char*)&g_game->message[0], "GAMES", g_savegameDescs, count, 0);
     SetGadgetActiveByName((char*)&g_game->message[0], "DELETE", 0);
     SetGadgetActiveByName((char*)&g_game->message[0], "GAMENAME", 0);
-    Entry_004931d0* entry = FindGadgetChecked(gadget->info, "GAMES");
+    Entry_004931d0* entry = FindGadgetChecked((void*)gadget->entries, "GAMES");
     if (entry != 0) {
         entry->handler = (void*)SavedGameSelectHandler;
     }

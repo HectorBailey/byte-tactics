@@ -14,44 +14,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../network/player_info.h"
 // First: gives g_game a symbol id below 65536.
 #include "ta_types.h"
 
 #pragma pack(push, 1)
-struct PlayerInfo_00449bb0 {
-    char map[0x8b];                     // +0x00
-    unsigned short width;               // +0x8b
-    unsigned short height;              // +0x8d
-    char unknown_8f[0x97 - 0x8f];
-    unsigned short f97_0 : 1;           // +0x97, host
-    unsigned short f97_rest : 15;
-    unsigned short memory;              // +0x99
-    struct {
-        unsigned short low : 4;         // +0x9b
-        unsigned short started : 1;
-        unsigned short ready : 1;
-        unsigned short bit6 : 1;
-        unsigned short watching : 1;
-        unsigned short mapping : 1;
-        unsigned short los : 1;
-        unsigned short losType : 1;
-        unsigned short commander : 2;
-        // Unsigned short, not signed: the writes compute the value before masking.
-        unsigned short cheating : 1;
-        unsigned short fixedloc : 1;
-        unsigned short closed : 1;
-    } b;
-    unsigned short f9d_0 : 2;           // +0x9d
-    unsigned short f9d_2 : 1;
-    unsigned short f9d_rest : 13;
-    char unknown_9f[0xa1 - 0x9f];
-    unsigned short energy;              // +0xa1
-    unsigned short metal;               // +0xa3
-    unsigned short maxUnits;            // +0xa5
-    unsigned char versionMajor;         // +0xa7
-    unsigned char versionMinor;         // +0xa8
-    int mapCrc;                         // +0xa9
-};
 
 struct Gadget_00449bb0;
 struct Gui_00449bb0;
@@ -217,13 +184,13 @@ void __stdcall UpdateEnergyText(Gui_00449bb0* gui, int unused)
 
     if (value != 0) {
         int shown = ReadSliderValue(value) / 100 * 100;
-        PlayerInfo_00449bb0* info;
+        PlayerInfo* info;
 
         _itoa(shown, text, 10);
         SetTranslatedTextByName(gui, "ENERGYTEXT", text, 0);
-        info = (PlayerInfo_00449bb0*)g_game->players[g_game->localPlayer].info;
+        info = (PlayerInfo*)g_game->players[g_game->localPlayer].info;
         info->energy = (unsigned short)(shown / 100);
-        if (info->f97_0 & 1) {
+        if (info->host & 1) {
             BroadcastPlayerInfo();
             UpdateNetGameInfo();
         }
@@ -255,7 +222,7 @@ void OpenBattleRoom()
     int metal = 1000;
     Layer_00449bb0* layer;
     Player* player;
-    PlayerInfo_00449bb0* info;
+    PlayerInfo* info;
     Gadget_00449bb0* entries;
     short host;
     short isHost;
@@ -266,9 +233,9 @@ void OpenBattleRoom()
     g_game->dirty = 1;
     memset(g_game->playerIds, 0, sizeof(g_game->playerIds));
     // info before player: stores the player pointer without its 0x1b63 bias.
-    info = (PlayerInfo_00449bb0*)g_game->players[g_game->localPlayer].info;
+    info = (PlayerInfo*)g_game->players[g_game->localPlayer].info;
     player = &g_game->players[g_game->localPlayer];
-    host = info->f97_0;
+    host = info->host;
     g_game->lobbyInitScratch = 0;
     if (host)
         g_game->maxUnits = g_game->unitLimit;
@@ -307,7 +274,7 @@ void OpenBattleRoom()
                 g_game->commanderDeath = commander;
                 // Block-local pointer: the original forms 0x1b63 first, then reads +0x27.
                 Player* p = &g_game->players[g_game->localPlayer];
-                ((PlayerInfo_00449bb0*)p->info)->b.commander = commander;
+                ((PlayerInfo*)p->info)->commander = commander;
             }
         }
         if (g_lobbyEnergy)
@@ -317,32 +284,32 @@ void OpenBattleRoom()
         if (g_lobbyLineOfSight) {
             switch (g_lobbyLineOfSight) {
             case 1:
-                info->b.los = 1;
-                info->b.losType = 1;
+                info->los = 1;
+                info->losType = 1;
                 break;
             case 2:
-                info->b.los = 1;
-                info->b.losType = 0;
+                info->los = 1;
+                info->losType = 0;
                 break;
             case 3:
-                info->b.los = 0;
+                info->los = 0;
                 break;
             }
         }
         if (g_lobbyCheating)
-            info->b.cheating = g_lobbyCheating == 2;
+            info->cheating = g_lobbyCheating == 2;
         if (g_lobbyFixedLoc)
-            info->b.fixedloc = g_lobbyFixedLoc == 1;
+            info->fixedloc = g_lobbyFixedLoc == 1;
         if (g_lobbyMapping)
-            info->b.mapping = g_lobbyMapping == 1;
+            info->mapping = g_lobbyMapping == 1;
         if (g_lobbyWatching)
-            info->b.watching = g_lobbyWatching == 2;
+            info->watching = g_lobbyWatching == 2;
     } else if (host) {
-        info->b.mapping = g_game->mapping;
-        info->b.los = g_game->los;
-        info->b.losType = g_game->losType;
-        info->b.fixedloc = g_game->options->fixedloc;
-        info->b.commander = g_game->commander;
+        info->mapping = g_game->mapping;
+        info->los = g_game->los;
+        info->losType = g_game->losType;
+        info->fixedloc = g_game->options->fixedloc;
+        info->commander = g_game->commander;
     }
 
     if (!host || g_game->locked) {
@@ -355,10 +322,10 @@ void OpenBattleRoom()
     *g_game->chatter = 0;
     {
         Gadget_00449bb0* mem = FindGadgetChecked_C(g_game->gui.table->entries, "MEMx");
-        mem->colour = ((PlayerInfo_00449bb0*)player->info)->memory < ((Class_00435920*)g_game->map)->GetTerrainSizeTier() ? 0xc : 0;
-        sprintf(mem->text, "%d", ((PlayerInfo_00449bb0*)g_game->players[g_game->localPlayer].info)->memory);
+        mem->colour = ((PlayerInfo*)player->info)->memory < ((Class_00435920*)g_game->map)->GetTerrainSizeTier() ? 0xc : 0;
+        sprintf(mem->text, "%d", ((PlayerInfo*)g_game->players[g_game->localPlayer].info)->memory);
     }
-    isHost = ((PlayerInfo_00449bb0*)g_game->players[g_game->localPlayer].info)->f97_0;
+    isHost = ((PlayerInfo*)g_game->players[g_game->localPlayer].info)->host;
     CreateUnitSync(isHost);
     SetGadgetActiveByName(&g_game->gui, "START", g_game->net->AllPlayersSynced());
     SetGrayedOutByName(&g_game->gui, "START",
