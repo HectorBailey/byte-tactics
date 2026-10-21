@@ -123,8 +123,10 @@ struct WeaponDef {
 #include "../util/angles.h"
 #include "../weapons/unit_weapon_slot.h"
 
-// A partial view of UnitDef (units/unit_def.h) with flags1 as a bit field, which the header lacks.
-struct UnitType_00466dc0 {
+// A partial view of UnitDef (units/unit_def.h), kept as a view of its own here
+// because its two flag words are read as the bit fields of Flags241_00466dc0
+// and a byte.
+struct UnitDef {
     char unknown_0[0x204];
     short radardistance;                 // +0x204
     short sonardistance;                 // +0x206
@@ -148,7 +150,7 @@ struct Unit {
     char unknown_72[2];
     short zWhole;                        // +0x74, the whole part of pos.z
     char unknown_76[0x1c];
-    UnitType_00466dc0* def;              // +0x92
+    UnitDef* def;              // +0x92
     char unknown_96[0x10];
     short unitDefIndex;                      // +0xa6
     short id;                      // +0xa8
@@ -163,23 +165,29 @@ struct Unit {
     char unknown_114[0x4];
 };
 
-struct Projectile_00466dc0 {
-    WeaponDef* shot;                     // +0x0
+// Thaldren's Projectile (0x6b bytes): the record g_game's projectile array
+// holds, named as the weapons files name it. The 16.16 position at +0x4 is read
+// as three words, and through the short view below as halves.
+struct Projectile {
+    WeaponDef* type;                     // +0x0, Thaldren's pWeapon
     int posx;                            // +0x4
     int posy;                            // +0x8
     int posz;                            // +0xc
     char unknown_10[0x52 - 0x10];
-    Unit* owner;                         // +0x52
+    Unit* ownerUnit;                     // +0x52, Thaldren's pOwnerUnit
     char unknown_56[0x66 - 0x56];
-    unsigned char player;                // +0x66
+    unsigned char ownerPlayer;           // +0x66, Thaldren's bOwnerPlayer
     char unknown_67[0x6b - 0x67];
 };
 
+// The same record seen from the position half at +0xa: the owner and the
+// player byte land at q+0x48 and q+0x5c. Kept as its own view because folding
+// its reads into Projectile costs the 7 symbol ids DrawRadarUnits matches at.
 struct Tail_00466dc0 {
     char unknown_0[0x48];
-    Unit* owner;                         // q+0x48
+    Unit* ownerUnit;                     // q+0x48
     char unknown_4c[0x5c - 0x4c];
-    unsigned char player;                // q+0x5c
+    unsigned char ownerPlayer;           // q+0x5c
 };
 
 // The four shorts at +0x142e7 are named minimapGadgetX/Y/W/H, originX/
@@ -234,7 +242,7 @@ struct Game {
     short hoverUnitId;                   // +0x2cba
     char unknown_2cbc[0x141f3 - 0x2cbc];
     int projectileCount;                 // +0x141f3
-    Projectile_00466dc0* projectiles;    // +0x141f7
+    Projectile* projectiles;             // +0x141f7
     char unknown_141fb[0x1422b - 0x141fb];
     int mapPixelWidth;                   // +0x1422b
     int mapPixelHeight;                  // +0x1422f
@@ -603,7 +611,7 @@ void DrawRadarUnits(void)
     Unit* end = g_game->unitsEnd;
     if (u <= end) {
         do {
-            UnitType_00466dc0*& type = u->def;
+            UnitDef*& type = u->def;
             if (u->unitDefIndex != 0) {
                 if (enabled != 0 || (u->flags.all & 0x300) != 0 ||
                     u->playerIndex == g_game->playerIndex) {
@@ -672,7 +680,7 @@ void DrawRadarUnits(void)
         } while (u <= g_game->unitsEnd);
     }
 
-    Projectile_00466dc0* p = g_game->projectiles;
+    Projectile* p = g_game->projectiles;
     int i = 0;
     if (g_game->projectileCount > 0) {
         short* q = (short*)((char*)p + 0xa);
@@ -681,27 +689,24 @@ void DrawRadarUnits(void)
             int x = (int)g_game->minimapGadgetW * px / g_game->mapPixelWidth;
             int py = q[2] - ((int)q[0] >> 1);
             int y = (int)g_game->minimapGadgetH * py / g_game->mapPixelHeight;
-            if ((p->shot->flags.all & 0x60000000) == 0) {
-                if ((p->shot->flags.all & 0x40) == 0) {
+            if ((p->type->flags.all & 0x60000000) == 0) {
+                if ((p->type->flags.all & 0x40) == 0) {
                     if (OnRadar_00466dc0(px, py) ||
-                        ((Tail_00466dc0*)q)->player ==
-                            g_game->playerIndex) {
+                        ((Tail_00466dc0*)q)->ownerPlayer == g_game->playerIndex) {
                         DrawPixel(surface, x, y, base[0xe]);
                     }
                 }
             } else {
                 if (OnRadar_00466dc0(px, py) ||
-                    ((Tail_00466dc0*)((char*)q))->owner->playerIndex ==
-                        g_game->playerIndex) {
+                    ((Tail_00466dc0*)q)->ownerUnit->playerIndex == g_game->playerIndex) {
                     DrawFrame(surface,
                         GetGafFrame(g_game->nuclogo,
-                            Player_Get(
-                                ((Tail_00466dc0*)q)->player)->info->color),
+                            Player_Get(((Tail_00466dc0*)q)->ownerPlayer)->info->color),
                         x, y);
                 }
             }
             i++;
-            p = (Projectile_00466dc0*)((char*)p + 0x6b);
+            p = (Projectile*)((char*)p + 0x6b);
             q = (short*)((char*)q + 0x6b);
         } while (i < g_game->projectileCount);
     }
