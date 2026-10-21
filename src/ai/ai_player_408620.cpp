@@ -1,15 +1,12 @@
 // Decompiled by DeepSeek V4.1 Flash. Names are provisional.
 #include <windows.h>
 
-#pragma pack(push, 1)
-struct Item_00408620 {                 // 0x249 bytes
-    char unknown_0[0x20];
-    char name[0x249 - 0x20];           // +0x20
-};
+#include "../units/unit_def.h"
 
+#pragma pack(push, 1)
 struct Game {
     char unknown_0[0x1439b];
-    Item_00408620* unitDefs;           // +0x1439b
+    UnitDef* unitDefs;                 // +0x1439b
 };
 #pragma pack(pop)
 
@@ -38,5 +35,5 @@ void BuildTimer::TryIssueIdleFactoryBuildOrder(Obj_00408620* unit)
         return;
     unsigned short idx = ChooseBuildOption(player, unit);
     if (idx != 0)
-        QueueBuildOrder(g_game->unitDefs[idx].name, unit, 1);
+        QueueBuildOrder(g_game->unitDefs[idx].unitname, unit, 1);
 }

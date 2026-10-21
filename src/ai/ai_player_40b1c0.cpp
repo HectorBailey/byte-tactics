@@ -3,28 +3,22 @@
 // `range` of `pos`; the distance is the 64-bit high product (>> 32).
 
 #include <vector>
+#include "../util/vec3.h"
 #pragma pack(push, 1)
-struct Vec_0040b1c0 {
-    int x;
-    int y;
-    int z;
-};
-
 struct Unit {
     char unknown_0[0x6a];
-    Vec_0040b1c0 pos;                  // +0x6a
+    Vec3 pos;                          // +0x6a
     char unknown_76[0xa6 - 0x76];
     unsigned short unitDefIndex;       // +0xa6
 };
 
-#include "../util/vec3.h"
 #include "player_ai.h"
 #pragma pack(pop)
 
 extern PlayerAI* g_playerAI[];
 
 // FUNCTION: 0x40b1c0
-int __stdcall SumUnitRatingsInRange(int player, Vec_0040b1c0* pos, int range)
+int __stdcall SumUnitRatingsInRange(int player, Vec3* pos, int range)
 {
     int total = 0;
     PlayerAI* p = g_playerAI[player];
