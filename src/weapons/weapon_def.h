@@ -9,10 +9,11 @@
 
 struct Table_00499cd0;
 
-// One word of weapon flags. `b` has a field for every bit, named by the TDF key
-// the loader (0x42e440) sets it from; `value` is the raw word for the mask
-// tests and the shifts that read bits 30 and 31.
-union Flags_0049d580 {
+// Thaldren's WeaponFlags: one word of weapon flags at +0x111. `b` has a field
+// for every bit, named by the TDF key the loader (0x42e440) sets it from;
+// `value` is the raw word for the mask tests and the shifts that read bits 30
+// and 31.
+union WeaponFlags {
     struct {
         unsigned int lineOfSight : 1;                 // bit 0
         unsigned int ballistic : 1;                   // bit 1
@@ -103,7 +104,7 @@ struct WeaponDef {
     unsigned char colour;             // +0x10d, the palette index of the line
     unsigned char colour2;            // +0x10e, the second line's palette index
     char unknown_10f[0x111 - 0x10f];
-    Flags_0049d580 flags;             // +0x111
+    WeaponFlags flags;                 // +0x111
 };
 
 #pragma pack(pop)
