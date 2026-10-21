@@ -26,12 +26,15 @@ public:
     unsigned int fbiChecksum;          // +0x13e
     int scriptChecksum;                // +0x142
     int weaponHashXor;                 // +0x146
+    // The footprint, one pair rather than an int placeholder and two shorts.
+    // Not a Point16: ai_player.cpp, which includes this header, declares its own
+    // fixed-point Vec3 and Point16, so util/vec3.h cannot be included here. The
+    // union wrapper stays for the symbol count (docs/c2-regalloc.md).
     union {
-        int f14a;                      // +0x14a
         struct {
-            short footprintx;          // +0x14a
-            short footprintz;          // +0x14c
-        };
+            short x;                   // +0x14a
+            short y;                   // +0x14c
+        } footprint;
     };
     union {
         int f14e;                      // +0x14e

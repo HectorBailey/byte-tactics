@@ -1600,7 +1600,7 @@ bool PlayerAI::FindCellNearFeatures(UnitDef* type, Vec3* pos, std::vector<Elem_0
     std::vector<Elem_0040cc40> heap;
     heap.reserve(list->size());
     int rangeSq = range * range;
-    Point16 center = WorldToCell(*pos, *(Point16*)&type->f14a);
+    Point16 center = WorldToCell(*pos, *(Point16*)&type->footprint);
     for (std::vector<Elem_0040cc40>::iterator p = list->begin(); p != list->end(); p++) {
         int d = DistSq(p->pos, center);
         if (d <= rangeSq) {
@@ -1616,8 +1616,8 @@ bool PlayerAI::FindCellNearFeatures(UnitDef* type, Vec3* pos, std::vector<Elem_0
     Point16 result;
     while (!heap.empty()) {
         Point16 cell = heap.front().pos;
-        cell.x -= (type->footprintx - 3) / 2;
-        cell.y -= (type->footprintz - 3) / 2;
+        cell.x -= (type->footprint.x - 3) / 2;
+        cell.y -= (type->footprint.y - 3) / 2;
         int d = DistSq(cell, center);
         if (limit >= 0 && d > limit + 160)
             break;
@@ -1652,8 +1652,8 @@ Elem_0040cc40::Elem_0040cc40(const Elem_0040cc40& o) : pos(o.pos), key(o.key)
 // FUNCTION: 0x40a5d0
 bool PlayerAI::FindRandomPlacementCell(UnitDef* type, Vec3* pos, int range, Point16* out)
 {
-    int areaY = type->footprintz;
-    int areaX = type->footprintx;
+    int areaY = type->footprint.y;
+    int areaX = type->footprint.x;
     int threshold = g_game->mapInfo->surfaceMetal * areaY * areaX * 2;
     Point16 spacing = type->minwaterdepth < 0 ? spacing0 : spacing1;
     Point16 offset = type->minwaterdepth < 0 ? offset0 : offset1;
@@ -1662,9 +1662,9 @@ bool PlayerAI::FindRandomPlacementCell(UnitDef* type, Vec3* pos, int range, Poin
         int dist = RandomInt(range) << 16;
         int angle = RandomInt(0x10000);
         Vec3 v = Direction(angle, dist) + *pos;
-        Point16 cell = WorldToCell(v, *(Point16*)&type->f14a);
-        cell.x = cell.x / spacing.x * spacing.x + offset.x + RandomInt(spacing.x - margin - type->footprintx);
-        cell.y = cell.y / spacing.y * spacing.y + offset.y + RandomInt(spacing.y - margin - type->footprintz);
+        Point16 cell = WorldToCell(v, *(Point16*)&type->footprint);
+        cell.x = cell.x / spacing.x * spacing.x + offset.x + RandomInt(spacing.x - margin - type->footprint.x);
+        cell.y = cell.y / spacing.y * spacing.y + offset.y + RandomInt(spacing.y - margin - type->footprint.y);
         if (CanPlaceUnitFootprint(type, 0, cell, 1) && GetBuildSiteMetal() <= threshold) {
             if (out)
                 *out = cell;
@@ -1953,7 +1953,7 @@ int __stdcall FindBuildPosition(int player, const Vec3* from, UnitDef* type, Vec
         result=ai->FindCellNearFeatures(type,&pos,&ai->cells,ai->searchRadius*4,&cell);
     else result=ai->FindRandomPlacementCell(type,&pos,ai->searchRadius,&cell);
     if (result) {
-        CellToWorld(out,cell,*(Point16*)&type->f14a);
+        CellToWorld(out,cell,*(Point16*)&type->footprint);
         ai->searchRadius=0;
     }
     return result;

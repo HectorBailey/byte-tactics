@@ -282,7 +282,7 @@ int Unit::CanLoad(Unit* other)
         return 0;
     if (!other->motion)
         return 0;
-    if (theirDef->footprintx > ourDef->capacity)
+    if (theirDef->footprint.x > ourDef->capacity)
         return 0;
     if ((other->flags & 3) == 2)
         return 0;
