@@ -60,7 +60,8 @@ struct ProjFlags_0049b720 {
     unsigned short rest : 10;
 };
 
-struct Proj_0049b720 {
+// Thaldren's Projectile (0x6b bytes): the record the update loop below walks.
+struct Projectile {
     WeaponDef* type;                   // +0x0
     Vec3_0049b720 pos;                 // +0x4
     Vec3_0049b720 start;               // +0x10
@@ -70,17 +71,17 @@ struct Proj_0049b720 {
     short heading;                     // +0x36
     short pitch;                       // +0x38
     unsigned int speed;                // +0x3a
-    unsigned int range;                // +0x3e
-    unsigned int f42;                  // +0x42
-    unsigned int f46;                  // +0x46
-    unsigned int f4a;                  // +0x4a
+    unsigned int distance;             // +0x3e, Thaldren's nDistance
+    unsigned int spawnTick;            // +0x42, Thaldren's dwSpawnTick
+    unsigned int expireTick;           // +0x46, Thaldren's dwExpireTick
+    unsigned int nextSmokeTick;        // +0x4a, Thaldren's dwNextSmokeTick
     int f4e;                           // +0x4e
-    Unit* unit;                        // +0x52
+    Unit* ownerUnit;                   // +0x52, Thaldren's pOwnerUnit
     void* f56;                         // +0x56
     char unknown_5a[0x60 - 0x5a];
-    unsigned short counter;            // +0x60
-    unsigned short piece;              // +0x62
-    short f64;                         // +0x64
+    unsigned short burstRemaining;     // +0x60, Thaldren's wBurstRemaining
+    unsigned short weaponPiece;        // +0x62, Thaldren's nWeaponPiece
+    short propellerSpin;               // +0x64, Thaldren's nPropellerSpin
     char unknown_66[0x69 - 0x66];
     ProjFlags_0049b720 flags;          // +0x69
 };
@@ -93,13 +94,13 @@ struct Net_0049b720 {
 struct Game {
     char unknown_0[0x141f3];
     int projectileCount;               // +0x141f3
-    Proj_0049b720* projectiles;        // +0x141f7
+    Projectile* projectiles;           // +0x141f7
     char unknown_141fb[0x14263 - 0x141fb];
     int gravity;                       // +0x14263
     char unknown_14267[0x1427f - 0x14267];
     unsigned char seaLevel;            // +0x1427f
     char unknown_14280[0x142f7 - 0x14280];
-    Proj_0049b720* cameraFollowTrackObj;  // +0x142f7
+    Projectile* cameraFollowTrackObj;     // +0x142f7
     char unknown_142fb[0x1433f - 0x142fb];
     Vec3_0049b720 cameraSnapPos;       // +0x1433f
     unsigned short cameraSnapTicks;    // +0x1434b
@@ -118,10 +119,10 @@ struct Game {
 extern Game* g_game;
 
 void __stdcall CompactProjectiles();
-void __stdcall CheckProjectileCollision(WeaponDef* type, Proj_0049b720* p);
-Vec3_0049b720* __stdcall GetProjectileAimPoint(Proj_0049b720* p);
-int __stdcall TurnUnitTowardsPoint(Proj_0049b720* p, Vec3_0049b720* target);
-void __stdcall DetonateProjectile(Proj_0049b720* p, void* unit);
+void __stdcall CheckProjectileCollision(WeaponDef* type, Projectile* p);
+Vec3_0049b720* __stdcall GetProjectileAimPoint(Projectile* p);
+int __stdcall TurnUnitTowardsPoint(Projectile* p, Vec3_0049b720* target);
+void __stdcall DetonateProjectile(Projectile* p, void* unit);
 void __stdcall GetWeaponPiecePosition(Unit* unit, Vec3_0049b720* out, unsigned char weapon, int piece);
 int __stdcall PlaySoundAt(int sound, Vec3_0049b720* pos, int flag);
 void __stdcall EmitWhiteSmoke(Vec3_0049b720* pos, short kind);
@@ -133,9 +134,9 @@ int __cdecl FUN_004b7123(short angle, int scale);
 
 // A copy of AllocProjectile (matched in its own file), the function just before
 // this one in the original source; defined here so that /Ob2 inlines it.
-Proj_0049b720* AllocProjectile()
+Projectile* AllocProjectile()
 {
-    Proj_0049b720* p = 0;
+    Projectile* p = 0;
     if (g_game->projectileCount < 300) {
         p = &g_game->projectiles[g_game->projectileCount++];
         p->flags.dead = 0;
@@ -151,7 +152,7 @@ static inline void Fall(Vec3_0049b720* v)
     v->y -= g_game->gravity;
 }
 
-static inline void Remove(Proj_0049b720* p)
+static inline void Remove(Projectile* p)
 {
     if (p == g_game->cameraFollowTrackObj) {
         g_game->cameraSnapPos = g_game->cameraFollowTrackObj->pos;
@@ -168,36 +169,36 @@ void UpdateProjectiles()
 {
     int n = g_game->projectileCount;
     for (int i = 0; i < n; i++) {
-        Proj_0049b720* p = &g_game->projectiles[i];
+        Projectile* p = &g_game->projectiles[i];
         // type is read before oldY: orders the two spill stores.
         WeaponDef* type = p->type;
         int oldY = p->pos.yw.hi;
 
-        if (p->counter != 0) {
-            if (g_game->gameTick >= p->f42 + type->burstRate) {
-                if (type->burstRate >= 5 || (p->counter & 1)) {
+        if (p->burstRemaining != 0) {
+            if (g_game->gameTick >= p->spawnTick + type->burstRate) {
+                if (type->burstRate >= 5 || (p->burstRemaining & 1)) {
                     unsigned char w;
                     for (w = 0; w < 3; w++) {
-                        if (p->unit->weapons[w].weapon == type)
+                        if (p->ownerUnit->weapons[w].weapon == type)
                             break;
                     }
-                    GetWeaponPiecePosition(p->unit, &p->pos, w, p->piece);
+                    GetWeaponPiecePosition(p->ownerUnit, &p->pos, w, p->weaponPiece);
                 }
-                p->counter--;
-                p->f42 += type->burstRate;
-                Proj_0049b720* q = AllocProjectile();
+                p->burstRemaining--;
+                p->spawnTick += type->burstRate;
+                Projectile* q = AllocProjectile();
                 if (q) {
                     *q = *p;
-                    q->f42 = g_game->gameTick;
+                    q->spawnTick = g_game->gameTick;
                     if (type->flags.b.soundTrigger)
                         PlaySoundAt(type->sound, &p->pos, 0);
                     if (type->lifetime != 0)
-                        q->f46 = g_game->gameTick + type->lifetime;
+                        q->expireTick = g_game->gameTick + type->lifetime;
                     else
-                        q->f46 = (p->range + 0x100000) / p->speed + g_game->gameTick;
+                        q->expireTick = (p->distance + 0x100000) / p->speed + g_game->gameTick;
                     if (type->lifeRand != 0)
-                        q->f46 += RandomInt(type->lifeRand) - (type->lifeRand >> 1);
-                    q->counter = 0;
+                        q->expireTick += RandomInt(type->lifeRand) - (type->lifeRand >> 1);
+                    q->burstRemaining = 0;
                     if (type->spread != 0) {
                         short ang = RandomInt(type->spread) + (short)(p->heading - (type->spread >> 1));
                         int t = FUN_004b7123(p->pitch, type->speed);
@@ -205,17 +206,17 @@ void UpdateProjectiles()
                         p->vel.z = -FUN_004b7123(ang, t);
                     }
                 }
-                if (p->counter == 0)
+                if (p->burstRemaining == 0)
                     Remove(p);
             }
             continue;
         }
 
         if (type->flags.b.propeller)
-            p->f64 += 0x400;
+            p->propellerSpin += 0x400;
 
         if (type->flags.b.selfProp) {
-            if (p->f46 > g_game->gameTick) {
+            if (p->expireTick > g_game->gameTick) {
                 if (type->flags.b.waterWeapon && p->pos.yw.hi >= g_game->seaLevel) {
                     Fall(&p->vel);
                     p->pitch = 0;
@@ -248,7 +249,7 @@ void UpdateProjectiles()
                 Fall(&p->vel);
                 if (type->flags.b.twoPhase) {
                     if (p->flags.state == 0) {
-                        p->f46 = g_game->gameTick + p->type->flightTime;
+                        p->expireTick = g_game->gameTick + p->type->flightTime;
                         p->flags.state++;
                         if (!p->type->flags.b.tracks) {
                             p->f56 = 0;
@@ -260,12 +261,12 @@ void UpdateProjectiles()
             p->pos += p->vel;
             CheckProjectileCollision(type, p);
         } else if (type->flags.b.lineOfSight) {
-            if (p->f46 > g_game->gameTick) {
+            if (p->expireTick > g_game->gameTick) {
                 p->pos += p->vel;
                 if (type->flags.b.beamWeapon) {
                     if (p->flags.b0)
                         p->start += p->vel;
-                    else if (g_game->gameTick > p->f42 + type->duration)
+                    else if (g_game->gameTick > p->spawnTick + type->duration)
                         p->flags.b0 = 1;
                 }
                 CheckProjectileCollision(type, p);
@@ -274,7 +275,7 @@ void UpdateProjectiles()
             }
         } else if (type->flags.b.ballistic) {
             if (type->lifetime != 0) {
-                if (p->f46 > g_game->gameTick) {
+                if (p->expireTick > g_game->gameTick) {
                     p->pos += p->vel;
                     p->pos += g_game->wind;
                     p->vel.y -= g_game->gravity;
@@ -304,9 +305,9 @@ void UpdateProjectiles()
         }
 
         if (!p->flags.dead) {
-            if (type->flags.b.smokeTrail && p->f46 > g_game->gameTick && p->f4a < g_game->gameTick) {
+            if (type->flags.b.smokeTrail && p->expireTick > g_game->gameTick && p->nextSmokeTick < g_game->gameTick) {
                 EmitWhiteSmoke(&p->pos, 9);
-                p->f4a += type->smokeRate;
+                p->nextSmokeTick += type->smokeRate;
             }
             if (oldY > g_game->seaLevel && p->pos.yw.hi <= g_game->seaLevel) {
                 Cell* cell = GetMapCellAtPosition(&p->pos);
