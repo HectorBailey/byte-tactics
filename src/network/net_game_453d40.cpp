@@ -161,7 +161,7 @@ struct SideDataPacket {
 struct PlayerIdPacket {
     unsigned char type;                // +0x0
     int id;                            // +0x1
-    int field_5;                       // +0x5
+    int value;                         // +0x5, the integrity packet's second dword
 };
 
 // A feature's damage (0x0f): the sub-command (a weapon index or 0xfd to
@@ -904,7 +904,7 @@ int HandleNetPackets()
             PlayerIdPacket* integrity = (PlayerIdPacket*)packet;
             if (g_usePacketManager)
                 g_packetManager.HandleIntegrityNop(g_game->from_id, integrity->id,
-                                                   integrity->field_5);
+                                                   integrity->value);
             break;
         }
         case 33: {
