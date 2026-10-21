@@ -21,8 +21,8 @@ struct Feature {
     char* burnweapon;                  // +0xe4
     unsigned short burnTime;           // +0xe8
     unsigned short damage;             // +0xea
-    float metal;                       // +0xec
-    float value;                       // +0xf0
+    float energy;                      // +0xec, the reclaim energy
+    float metal;                       // +0xf0, the reclaim metal
     unsigned short dead;               // +0xf4
     unsigned short burnt;              // +0xf6
     unsigned short reclamate;          // +0xf8

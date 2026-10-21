@@ -88,6 +88,7 @@ struct Unit_0046a860 {
 
 // A feature's 0x100-byte record, the elements of the table at g_game+0x1426f
 // (Thaldren: FeatureDef).
+// Kept: its flags byte is +0xff; map/feature.h has flags at +0xfe.
 struct Feature_0046a860 {
     char name[0x80];                  // +0x000
     char description[0x14];           // +0x080
