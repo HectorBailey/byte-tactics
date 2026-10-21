@@ -34,9 +34,9 @@ struct Gadget_00444580 {
     int userData;                       // +0xc
 };
 
-struct Conn_00444580 {
-    void* data;
-    int size;
+struct HapinetProviderConnEntry {
+    void* pConnectionBlob;
+    int dwCbConnectionBlob;
 };
 
 #include "../map/mission.h"
@@ -51,7 +51,7 @@ struct Game_00444580 {
     void* descriptions;                 // +0x2a4b
     char unknown_2a4f[0x2a9f - 0x2a4f];
     void* guids;                        // +0x2a9f
-    Conn_00444580* conns;               // +0x2aa3
+    HapinetProviderConnEntry* conns;               // +0x2aa3
     char unknown_2aa7[0x143a7 - 0x2aa7];
     unsigned char paletteRgba[0x391e9 - 0x143a7];  // +0x143a7
     Mission* mapInfo;                   // +0x391e9
@@ -117,7 +117,7 @@ void FillProviderList()
     LoadPictureCached("selconnect2", 1, 0, 0);
     g_game->descriptions = GameAllocIgnoreTag("PROVIDER DESCRIPTIONS", 0x500);
     g_game->guids = GameAllocIgnoreTag("PROVIDER GUIDS", 0xa0);
-    g_game->conns = (Conn_00444580*)GameAllocIgnoreTag("DPLAY CONNECTIONS", 0x50);
+    g_game->conns = (HapinetProviderConnEntry*)GameAllocIgnoreTag("DPLAY CONNECTIONS", 0x50);
     if (g_game->conns != 0)
         memset(g_game->conns, 0, 0x50);
     g_game->mapInfo->RefreshMapList(1);
