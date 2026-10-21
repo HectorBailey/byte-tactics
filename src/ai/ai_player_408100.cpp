@@ -70,6 +70,8 @@ struct Game_00408100 {
 };
 #pragma pack(pop)
 
+// Partial view of the squad Group ai_player.cpp declares. It keeps its own
+// name because this file includes ta_types.h, which already defines Group.
 struct Group_00408100 {
     char unknown_0[0x10];
     std::vector<Unit_00408100*> units; // +0x10
