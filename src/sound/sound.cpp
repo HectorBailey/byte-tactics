@@ -2,6 +2,7 @@
 // Sound start-up and shutdown, the sound-name tables and the queue of unit speech.
 
 #include <windows.h>
+#include "../util/vec3.h"
 #include <dsound.h>
 #include <stddef.h>
 #include <string.h>
@@ -50,9 +51,6 @@ union Pos_0047f300 {
     };
 };
 
-struct Vector3_0047f300 {
-    int x, y, z;
-};
 
 #pragma pack(push, 1)
 struct Packet_0047f0c0 {
@@ -513,7 +511,7 @@ int __stdcall PlaySoundAt(int index, Pos_0047f300* pos, int param_3)
     }
     if (vis != 0) {
         if (g_game->sound->Is3DEnabled()) {
-            Vector3_0047f300 p;
+            Vec3 p;
             p.x = pos->x - g_game->scrollX - (g_game->viewWidthTiles / 2) * 16;
             p.z = g_game->scrollY + (g_game->viewHeightTiles / 2) * 16
                 + (pos->y >> 1) - pos->z;
