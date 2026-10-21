@@ -52,7 +52,9 @@ union Word_0049b720 {
     } s;
 };
 
-struct ProjFlags_0049b720 {
+// Thaldren's wFlags bits: the projectile's flags word at +0x69, one field per
+// bit the update loop tests.
+struct ProjectileFlags {
     unsigned short b0 : 1;
     unsigned short dead : 1;
     unsigned short b2 : 2;
@@ -83,7 +85,7 @@ struct Projectile {
     unsigned short weaponPiece;        // +0x62, Thaldren's nWeaponPiece
     short propellerSpin;               // +0x64, Thaldren's nPropellerSpin
     char unknown_66[0x69 - 0x66];
-    ProjFlags_0049b720 flags;          // +0x69
+    ProjectileFlags flags;             // +0x69, Thaldren's wFlags
 };
 
 struct Net_0049b720 {
