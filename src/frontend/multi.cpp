@@ -84,8 +84,7 @@ struct Gadget {                        // 0x15b bytes
             char unknown_b6b[0xba - 0xb6];
             union {                    // +0xba
                 short selected;
-                short field_ba;
-                unsigned char field_ba_byte;
+                unsigned char indexByte;
                 short index;
             };
             union {                    // +0xbc
@@ -2238,7 +2237,7 @@ void __stdcall HandleLogoSelectClick(Gui* param_1)
     if (IsCurrentGadgetNamed(param_1, "LOGOS") || IsCurrentGadgetNamed(param_1, "SELECT")) {
         Player* player = &g_game->players[g_game->localPlayer];
         Gadget* entry = FindGadgetChecked(entries, "LOGOS");
-        player->info->color = ((char*)layout)[entry->field_ba_byte];
+        player->info->color = ((char*)layout)[entry->indexByte];
         g_game->flag0 = 1;
         RequestPlayerColor(player->info->color);
         return;
@@ -4856,7 +4855,7 @@ void UnitRestrictDialogFrame()
 void __stdcall ShowSelectedUnitCosts(void* panel, Gadget* unit)
 {
     char buf[20];
-    UnitType_00446f50* def = &g_game->unitDefs[unit->records[unit->field_ba].unitIndex];
+    UnitType_00446f50* def = &g_game->unitDefs[unit->records[unit->index].unitIndex];
     sprintf(buf, "%d", (int)def->energyCost);
     SetTranslatedTextByName(panel, "ENERGYTEXT", (char*)buf, 0);
     sprintf(buf, "%d", (int)def->metalCost);
@@ -4992,7 +4991,7 @@ void OpenUnitRestrictions()
 
     {
         Gui* gui = &g_game->gui;
-        UnitType_00446f50* type = &g_game->unitDefs[desc->records[desc->field_ba].unitIndex];
+        UnitType_00446f50* type = &g_game->unitDefs[desc->records[desc->index].unitIndex];
         char buf[0x14];
         sprintf(buf, "%d", (int)type->energyCost);
         SetTranslatedTextByName(gui, "ENERGYTEXT", buf, 0);
