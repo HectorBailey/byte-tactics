@@ -5,8 +5,10 @@
 // the 3DO object trees, and the exception filter that restores the display.
 #include <string.h>
 
-struct PCX_004caa40 {
-    unsigned char* data;     // +0x0 the decoded 8-bit pixels
+// One decoded PCX file: the 8-bit pixels, the 0x300-byte colour map and the
+// size the header gave.
+struct PcxImage {
+    unsigned char* pixels;   // +0x0 the decoded 8-bit pixels
     unsigned char* palette;  // +0x4 the 0x300 byte colour map
     int width;               // +0x8
     int height;              // +0xc
@@ -54,20 +56,20 @@ static inline void FUN_row(void* file, unsigned char* p, int x)
 // The colour map is read by seeking back 0x300 from the end of the file (that
 // is ftell, not a size), so the body is decoded from the 0x80 byte header on.
 // FUNCTION: 0x4caa40
-int __stdcall DecodePcx(void* file, PCX_004caa40* pcx)
+int __stdcall DecodePcx(void* file, PcxImage* pcx)
 {
     unsigned char header[0x80];
     memset(pcx, 0, 16);
     if (HAPI_readfromfile(file, header, 0x80) == 0x80 && header[0] == 0x0a && header[1] == 5) {
         pcx->width = *(unsigned short*)(header + 8) - *(unsigned short*)(header + 4) + 1;
         pcx->height = *(unsigned short*)(header + 10) - *(unsigned short*)(header + 6) + 1;
-        pcx->data = (unsigned char*)GameAllocIgnoreTag("PCX BODY", pcx->width * pcx->height);
+        pcx->pixels = (unsigned char*)GameAllocIgnoreTag("PCX BODY", pcx->width * pcx->height);
         pcx->palette = (unsigned char*)GameAllocIgnoreTag("COLOR MAP", 0x300);
         HAPI_SeekFile(file, HAPI_FileLength(file) - 0x300);
         HAPI_readfromfile(file, pcx->palette, 0x300);
         HAPI_SeekFile(file, 0x80);
         {
-            unsigned char* p = pcx->data;
+            unsigned char* p = pcx->pixels;
             int rows;
             int w;
             w = pcx->width;
@@ -88,24 +90,24 @@ extern void* __stdcall HAPI_OpenFileAppend(void* thing);
 extern void __stdcall HAPI_CloseFile(void* file);
 extern unsigned int __stdcall HAPI_WriteFile(void* file, void* buf, unsigned int size);
 
-// PCX file header (128 bytes).
-struct Header_004cac40 {
-    unsigned char a;            // manufacturer
-    unsigned char b;            // version
-    unsigned char c;            // encoding
-    unsigned char d;            // bits per pixel
-    unsigned short e;           // xmin
-    unsigned short f;           // ymin
-    short g;                    // xmax
-    short h;                    // ymax
-    short i;                    // horizontal resolution
-    short j;                    // vertical resolution
-    unsigned char palette[0x30];
-    unsigned char k;            // reserved
-    unsigned char l;            // planes
-    unsigned short m;           // bytes per line
-    unsigned short n;           // palette info
-    unsigned char rest[0x3a];
+// PCX file header (128 bytes), the layout the format gives it.
+struct PcxHeader {
+    unsigned char manufacturer;   // +0x00, 0x0a in the files it reads
+    unsigned char version;        // +0x01, 5
+    unsigned char encoding;       // +0x02, 1 for run length
+    unsigned char bitsPerPixel;   // +0x03, 8
+    unsigned short xmin;          // +0x04
+    unsigned short ymin;          // +0x06
+    short xmax;                   // +0x08
+    short ymax;                   // +0x0a
+    short hres;                   // +0x0c, the writer stores the width here
+    short vres;                   // +0x0e
+    unsigned char palette[0x30];  // +0x10, the 16-colour palette
+    unsigned char reserved;       // +0x40
+    unsigned char planes;         // +0x41, 1
+    unsigned short bytesPerLine;  // +0x42
+    unsigned short paletteInfo;   // +0x44
+    unsigned char rest[0x3a];     // +0x46
 };
 
 // Writes a PCX file: opens `filename` through HAPI_OpenFileAppend, writes the 128
@@ -117,7 +119,7 @@ struct Header_004cac40 {
 // FUNCTION: 0x4cac40
 int __stdcall WritePcx(void* filename, unsigned char* data, int width, int height, unsigned char* block)
 {
-    Header_004cac40 hdr;
+    PcxHeader hdr;
     void* file = HAPI_OpenFileAppend(filename);
     int total;
     int rows;
@@ -137,20 +139,20 @@ int __stdcall WritePcx(void* filename, unsigned char* data, int width, int heigh
         goto out;
 
     memset(&hdr, 0, 0x80);
-    hdr.a = 10;
-    hdr.b = 5;
-    hdr.c = 1;
-    hdr.d = 8;
-    hdr.e = 0;
-    hdr.f = 0;
-    hdr.g = (short)(width - 1);
-    hdr.h = (short)(height - 1);
-    hdr.i = (short)width;
-    hdr.j = (short)height;
+    hdr.manufacturer = 10;
+    hdr.version = 5;
+    hdr.encoding = 1;
+    hdr.bitsPerPixel = 8;
+    hdr.xmin = 0;
+    hdr.ymin = 0;
+    hdr.xmax = (short)(width - 1);
+    hdr.ymax = (short)(height - 1);
+    hdr.hres = (short)width;
+    hdr.vres = (short)height;
     memcpy(hdr.palette, block, 0x30);
-    hdr.n = 0;
-    hdr.l = 1;
-    hdr.m = (unsigned short)width;
+    hdr.paletteInfo = 0;
+    hdr.planes = 1;
+    hdr.bytesPerLine = (unsigned short)width;
     if (HAPI_WriteFile(file, &hdr, 0x80) != 0x80)
         goto out;
 
@@ -232,13 +234,13 @@ out:
 
 #include <windows.h>
 
-// An image: the surface header that LoadPcx fills and the display hands out.
-struct Bitmap_004caec0 {
-    int width;                         // +0x0
-    int height;                        // +0x4
-    int pitch;                         // +0x8
-    unsigned char* data;               // +0xc
-};
+// The surface header that LoadPcx fills and the display hands out.
+#include "../graphics/surface.h"
+
+// Unused here: the symbol ids these declarations take keep 0x4cb6a0 matching
+// once the header above is in front of it (docs/c2-regalloc.md).
+int __stdcall LockScreen(Surface* s);
+int __stdcall UnlockScreen(Surface* s);
 
 // The display object: its window, the surface in use and the palette.
 #pragma pack(push, 1)
@@ -246,7 +248,7 @@ struct Game_004caec0 {
     char unknown_0[0x40];
     HWND hwnd;                         // +0x40
     char unknown_44[0xbc - 0x44];
-    Bitmap_004caec0* bitmap;           // +0xbc
+    Surface* bitmap;                   // +0xbc
     char unknown_c0[0x1c];
     int useOverrideSurface;            // +0xdc
     char unknown_e0[0x1b2 - 0xe0];
@@ -261,7 +263,7 @@ Game_004caec0* GetDisplay();
 // Saves a bitmap as an image file with the current palette: the game's
 // PALETTEENTRY table at +0x214 is converted to packed RGB triples first.
 // FUNCTION: 0x4caec0
-void __stdcall SaveSurfacePcx(char* name, Bitmap_004caec0* bitmap)
+void __stdcall SaveSurfacePcx(char* name, Surface* bitmap)
 {
     unsigned char pal[256 * 3];
     Game_004caec0* game = GetDisplay();
@@ -270,11 +272,11 @@ void __stdcall SaveSurfacePcx(char* name, Bitmap_004caec0* bitmap)
         pal[i * 3 + 1] = game->palette[i].peGreen;
         pal[i * 3 + 2] = game->palette[i].peBlue;
     }
-    WritePcx(name, bitmap->data, bitmap->width, bitmap->height, pal);
+    WritePcx(name, bitmap->pixels, bitmap->width, bitmap->height, pal);
 }
 
 void* __stdcall HAPI_OpenFileRead(char* path);
-Bitmap_004caec0* __stdcall AllocSurface(char* name, int width, int height);
+Surface* __stdcall AllocSurface(char* name, int width, int height);
 void __stdcall FreeSurface(void* p);
 void __cdecl GameFreeThunk(void* p);
 
@@ -285,13 +287,13 @@ void __cdecl GameFreeThunk(void* p);
 // 0x300-byte colour map. Returns the image, or 0 when the file is missing, is
 // not the expected PCX variant, or the image allocation fails.
 // FUNCTION: 0x4caf30
-Bitmap_004caec0* __stdcall LoadPcx(char* path, unsigned char* outPalette)
+Surface* __stdcall LoadPcx(char* path, unsigned char* outPalette)
 {
     void* file = HAPI_OpenFileRead(path);
     if (file == 0)
         return 0;
     int ok;
-    PCX_004caa40 pcx;
+    PcxImage pcx;
     unsigned char header[0x80];
     if (HAPI_readfromfile(file, header, 0x80) != 0x80 || header[0] != 0x0a || header[1] != 5) {
         HAPI_CloseFile(file);
@@ -299,7 +301,7 @@ Bitmap_004caec0* __stdcall LoadPcx(char* path, unsigned char* outPalette)
     }
     int width = *(unsigned short*)(header + 8) - *(unsigned short*)(header + 4) + 1;
     int height = *(unsigned short*)(header + 10) - *(unsigned short*)(header + 6) + 1;
-    Bitmap_004caec0* image = AllocSurface(path, width, height);
+    Surface* image = AllocSurface(path, width, height);
     if (image == 0) {
         HAPI_CloseFile(file);
         return 0;
@@ -308,7 +310,7 @@ Bitmap_004caec0* __stdcall LoadPcx(char* path, unsigned char* outPalette)
     ok = DecodePcx(file, &pcx);
     HAPI_CloseFile(file);
     if (ok) {
-        memcpy(image->data, pcx.data, height * width);
+        memcpy(image->pixels, pcx.pixels, height * width);
     }
     if (outPalette != 0) {
         unsigned char* s = pcx.palette;
@@ -322,7 +324,7 @@ Bitmap_004caec0* __stdcall LoadPcx(char* path, unsigned char* outPalette)
         }
     }
     GameFreeThunk(pcx.palette);
-    GameFreeThunk(pcx.data);
+    GameFreeThunk(pcx.pixels);
     if (!ok) {
         FreeSurface(image);
     }
@@ -340,7 +342,7 @@ int __stdcall LoadPcxPalette(char* path, unsigned int* out)
     void* file = HAPI_OpenFileRead(path);
     if (file == 0)
         return 0;
-    PCX_004caa40 pcx;
+    PcxImage pcx;
     unsigned char header[0x80];
     PALETTEENTRY pal[0x100];
     if (HAPI_readfromfile(file, header, 0x80) != 0x80) {
@@ -364,7 +366,7 @@ int __stdcall LoadPcxPalette(char* path, unsigned int* out)
     }
     memcpy(out, pal, 0x400);
     GameFreeThunk(pcx.palette);
-    GameFreeThunk(pcx.data);
+    GameFreeThunk(pcx.pixels);
     return 1;
 }
 
@@ -372,16 +374,16 @@ int __stdcall LoadPcxPalette(char* path, unsigned int* out)
 #include <io.h>
 #include <stdlib.h>
 
-struct FindData_004cb170 {
-    char unknown_0[0x14];
-    char name[260];                    // +0x14
-};
+// Unused here: the symbol ids these declarations take keep 0x4cb6a0 matching
+// (docs/c2-regalloc.md).
+void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y);
+struct GafFrame;
 
 extern char g_pathSepBackslash[];
 extern char g_emptyStringLiteral[];
 
-int __stdcall HAPI_FindFirst(const char* path, FindData_004cb170* fd, int a, int b);
-int __stdcall HAPI_FindNext(int handle, FindData_004cb170* fd);
+int __stdcall HAPI_FindFirst(const char* path, struct _finddata_t* fd, int state, char recursive);
+int __stdcall HAPI_FindNext(int handle, struct _finddata_t* fd);
 void __stdcall HAPI_FindClose(int handle);
 
 // FUNCTION: 0x4cb170
@@ -390,7 +392,7 @@ int __stdcall SaveScreenshot(char* dirPath, char* namePrefix)
     Game_004caec0* game = GetDisplay();
     int flag = 0;
     char filename[260];
-    FindData_004cb170 fd;
+    struct _finddata_t fd;
     unsigned char pal[768];
     int best = 0;
 
@@ -419,21 +421,21 @@ int __stdcall SaveScreenshot(char* dirPath, char* namePrefix)
     sep = flag ? g_pathSepBackslash : g_emptyStringLiteral;
     sprintf(filename, "%s%s%s%04i.pcx", dirPath, sep, namePrefix, best + 1);
 
-    Bitmap_004caec0* bitmap = game->bitmap;
+    Surface* bitmap = game->bitmap;
     Game_004caec0* g = GetDisplay();
     for (int i = 0; i < 256; i++) {
         pal[i * 3] = g->palette[i].peRed;
         pal[i * 3 + 1] = g->palette[i].peGreen;
         pal[i * 3 + 2] = g->palette[i].peBlue;
     }
-    return WritePcx(filename, bitmap->data, bitmap->width, bitmap->height, pal);
+    return WritePcx(filename, bitmap->pixels, bitmap->width, bitmap->height, pal);
 }
 
 // A 3DO object (0x34 bytes) with its vertices, its primitives and the links to
 // the sibling and child objects.
 #include "../util/vec3.h"
 
-struct Primitive_004cb2f0 {            // 0x20 bytes
+struct Primitive3do {                  // 0x20 bytes
     int colorIndex;                    // +0x0
     int count;                         // +0x4
     int always0;                       // +0x8
@@ -445,7 +447,7 @@ struct Primitive_004cb2f0 {            // 0x20 bytes
     int unknown_14[3];
 };
 
-struct Object_004cb2f0 {
+struct Object3do {
     int version;                       // +0x0
     int vertexCount;                   // +0x4
     int count;                         // +0x8 primitives
@@ -456,14 +458,14 @@ struct Object_004cb2f0 {
     int name;                          // +0x1c
     int always0;                       // +0x20
     Vec3* vertices;                    // +0x24
-    Primitive_004cb2f0* elems;         // +0x28
-    Object_004cb2f0* sibling;          // +0x2c
-    Object_004cb2f0* child;            // +0x30
+    Primitive3do* elems;               // +0x28
+    Object3do* sibling;                // +0x2c
+    Object3do* child;                  // +0x30
 };
 
 // Average of the y of the vertices selected by a list of 16-bit indices.
 // FUNCTION: 0x4cb2f0
-int __stdcall AveragePrimitiveY(Object_004cb2f0* table, Primitive_004cb2f0* list)
+int __stdcall AveragePrimitiveY(Object3do* table, Primitive3do* list)
 {
     int sum = 0;
     int n = list->count;
@@ -475,9 +477,9 @@ int __stdcall AveragePrimitiveY(Object_004cb2f0* table, Primitive_004cb2f0* list
 }
 
 // FUNCTION: 0x4cb330
-void __stdcall SwapPrimitives(Primitive_004cb2f0* a, Primitive_004cb2f0* b)
+void __stdcall SwapPrimitives(Primitive3do* a, Primitive3do* b)
 {
-    Primitive_004cb2f0 tmp = *a;
+    Primitive3do tmp = *a;
     *a = *b;
     *b = tmp;
 }
@@ -486,16 +488,16 @@ void __stdcall SwapPrimitives(Primitive_004cb2f0* a, Primitive_004cb2f0* b)
 // sorts the remaining elements ascending by the integer average of the y of
 // the vertices each element's `count` ushort indices select.
 // FUNCTION: 0x4cb370
-void __stdcall SortPrimitives(Object_004cb2f0* node)
+void __stdcall SortPrimitives(Object3do* node)
 {
     if (node->index != -1 && node->count > 0) {
-        Primitive_004cb2f0* elems = node->elems;
-        Primitive_004cb2f0 temp = elems[node->index];
+        Primitive3do* elems = node->elems;
+        Primitive3do temp = elems[node->index];
         elems[node->index] = elems[0];
         elems[0] = temp;
         node->index = 0;
     }
-    Primitive_004cb2f0* e;
+    Primitive3do* e;
     int i;
     int swapped;
     do {
@@ -508,14 +510,14 @@ void __stdcall SortPrimitives(Object_004cb2f0* node)
             for (int k = e->count; k > 0; k--)
                 a += node->vertices[*q++].y;
             a /= e->count;
-            Primitive_004cb2f0* p = e + 1;
+            Primitive3do* p = e + 1;
             unsigned short* r = p->indices;
             int b = 0;
             for (int j = p->count; j > 0; j--)
                 b += node->vertices[*r++].y;
             b /= p->count;
             if (a > b) {
-                Primitive_004cb2f0 t = *e;
+                Primitive3do t = *e;
                 *e = *p;
                 *p = t;
                 swapped = 1;
@@ -529,24 +531,24 @@ void __stdcall SortPrimitives(Object_004cb2f0* node)
 // its sibling and child nodes, then hands the node to SortPrimitives.
 // Any common header must be included: it makes always0 compile to lea.
 // FUNCTION: 0x4cb4c0
-void __stdcall RelocateObject(int delta, Object_004cb2f0* node)
+void __stdcall RelocateObject(int delta, Object3do* node)
 {
     if (node->name)
         node->name += delta;
     if (node->always0)
         node->always0 += delta;
     node->vertices = (Vec3*)((char*)node->vertices + delta);
-    node->elems = (Primitive_004cb2f0*)((char*)node->elems + delta);
+    node->elems = (Primitive3do*)((char*)node->elems + delta);
     if (node->sibling) {
-        node->sibling = (Object_004cb2f0*)((char*)node->sibling + delta);
+        node->sibling = (Object3do*)((char*)node->sibling + delta);
         RelocateObject(delta, node->sibling);
     }
     if (node->child) {
-        node->child = (Object_004cb2f0*)((char*)node->child + delta);
+        node->child = (Object3do*)((char*)node->child + delta);
         RelocateObject(delta, node->child);
     }
     // Pointer walking the element array: the loop needs it.
-    Primitive_004cb2f0* e = node->elems;
+    Primitive3do* e = node->elems;
     for (int i = 0; i < node->count; i++, e++) {
         if (e->always0)
             e->always0 += delta;
@@ -566,7 +568,7 @@ void* __stdcall Load3do(char* param)
     if (result == 0) {
         return 0;
     }
-    RelocateObject((int)result, (Object_004cb2f0*)result);
+    RelocateObject((int)result, (Object3do*)result);
     return result;
 }
 
@@ -574,7 +576,7 @@ void* __stdcall Load3do(char* param)
 // own offset, recursing into the sibling and then the child (the child call
 // became a loop).
 // FUNCTION: 0x4cb590
-void __stdcall MirrorObject(Object_004cb2f0* obj)
+void __stdcall MirrorObject(Object3do* obj)
 {
     for (int i = 0; i < obj->vertexCount; i++) {
         obj->vertices[i].x = -obj->vertices[i].x;
@@ -591,7 +593,7 @@ void __stdcall MirrorObject(Object_004cb2f0* obj)
 // Walks a list of nodes (and, recursively, their children) and returns the
 // largest vertex y plus the owning node's y offset, or 0 if none.
 // FUNCTION: 0x4cb5f0
-int __stdcall GetObjectHeight(Object_004cb2f0* node)
+int __stdcall GetObjectHeight(Object3do* node)
 {
     int best = 0;
     for (; node; node = node->sibling) {
@@ -609,13 +611,13 @@ int __stdcall GetObjectHeight(Object_004cb2f0* node)
     return best;
 }
 
-void __stdcall AddObjectBounds(Object_004cb2f0* obj, Vec3* offset,
+void __stdcall AddObjectBounds(Object3do* obj, Vec3* offset,
                             Vec3* lo, Vec3* hi, int arg);
 
 // Computes the bounding box of an object tree: clears the two output corners
 // and walks the tree from a zero offset.
 // FUNCTION: 0x4cb650
-void __stdcall GetObjectBounds(Object_004cb2f0* obj, Vec3* lo,
+void __stdcall GetObjectBounds(Object3do* obj, Vec3* lo,
                             Vec3* hi, int arg)
 {
     Vec3 offset;
@@ -634,7 +636,7 @@ void __stdcall GetObjectBounds(Object_004cb2f0* obj, Vec3* lo,
 // Expands a bounding box (lo, hi) with the vertices of an object and, if arg is
 // set, of its two children, translated by offset.
 // FUNCTION: 0x4cb6a0
-void __stdcall AddObjectBounds(Object_004cb2f0* obj, Vec3* offset,
+void __stdcall AddObjectBounds(Object3do* obj, Vec3* offset,
                             Vec3* lo, Vec3* hi, int arg)
 {
     Vec3 local;
@@ -671,7 +673,7 @@ public:
     BmpWriter* Init();
     void Close();
     bool Open(const char* name, int w, int h);
-    bool WriteRows(Bitmap_004caec0* image, int x, int rows, int unused_4, int y,
+    bool WriteRows(Surface* image, int x, int rows, int unused_4, int y,
                       int unused_6, int srcY);
 };
 
@@ -785,7 +787,7 @@ bool BmpWriter::Open(const char* name, int w, int h)
 // of the image, bottom-up, each padded to a multiple of 4 bytes. Returns
 // false when the seek or a write fails.
 // FUNCTION: 0x4cb940
-bool BmpWriter::WriteRows(Bitmap_004caec0* image, int x, int rows, int unused_4,
+bool BmpWriter::WriteRows(Surface* image, int x, int rows, int unused_4,
                                   int y, int unused_6, int srcY)
 {
     int stride = (image->width + 3) & ~3;
@@ -793,7 +795,7 @@ bool BmpWriter::WriteRows(Bitmap_004caec0* image, int x, int rows, int unused_4,
         return false;
     }
     for (int i = rows - 1; i >= 0; i--) {
-        if (fwrite(image->data + image->pitch * (i + srcY), stride, 1, file) != 1) {
+        if (fwrite(image->pixels + image->pitch * (i + srcY), stride, 1, file) != 1) {
             return false;
         }
     }
@@ -806,7 +808,7 @@ bool BmpWriter::WriteRows(Bitmap_004caec0* image, int x, int rows, int unused_4,
 // caller just passed to Open, which stores it in bmp.height), so
 // `bmp.height - n` is always 0 and the seek always lands on dataOffset.
 // FUNCTION: 0x4cb9e0
-int __stdcall SaveBmp(char* name, Bitmap_004caec0* image)
+int __stdcall SaveBmp(char* name, Surface* image)
 {
     BmpWriter bmp;
     bool ok;
@@ -823,7 +825,7 @@ int __stdcall SaveBmp(char* name, Bitmap_004caec0* image)
             goto done;
         }
         for (int i = n - 1; i >= 0; i--) {
-            if (fwrite(image->data + i * image->pitch, stride, 1, bmp.file) != 1) {
+            if (fwrite(image->pixels + i * image->pitch, stride, 1, bmp.file) != 1) {
                 ok = false;
                 goto done;
             }
