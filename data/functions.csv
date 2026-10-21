@@ -3729,7 +3729,7 @@ address,size,kind,name,params,locals,seh,frame_pointer,calls,game_calls,callers
 0x4f39d0,128,library,__ld12told,2,3,0,0,1,0,2
 0x4f3a50,56,library,__atodbl,2,3,0,0,2,0,1
 0x4f3a90,56,library,__atoldbl,2,3,0,0,2,0,0
-0x4f3ad0,56,library,,2,3,0,0,2,0,1
+0x4f3ad0,56,library,__atoflt,2,3,0,0,2,0,1
 0x4f3b10,145,library,__fptostr,3,0,0,1,0,0,3
 0x4f3bb0,139,library,__fltout2,4,10,0,0,2,0,3
 0x4f3c40,190,library,___dtold,2,0,0,1,0,0,1
