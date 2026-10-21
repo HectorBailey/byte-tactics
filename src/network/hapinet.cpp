@@ -142,11 +142,10 @@ public:
 // and service provider GUIDs, the session description, the DirectPlay and
 // lobby interfaces, the enumeration buffers and the counters.
 struct Net_4c97b0 {
-    char name[0x10];                  // +0x0
-    char unknown_10;                  // +0x10
-    char longName[16];                // +0x11
-    char shortName[16];               // +0x21
-    char unknown_31[0x431 - 0x31];    // +0x31
+    char sessionName[0x11];           // +0x0, aSessionName
+    char playerLongName[16];          // +0x11
+    char playerShortName[16];         // +0x21
+    char unusedAfterPlayerShortName[0x431 - 0x31]; // +0x31
     GUID_004c9920* guids;             // +0x431
     Conn_4ca100* conns;               // +0x435
     char* names;                      // +0x439
@@ -154,9 +153,9 @@ struct Net_4c97b0 {
     GUID_004c9920 sp;                 // +0x44d
     SessionDesc_4c9890 desc;          // +0x45d
     int hwnd;                         // +0x4ad
-    char unknown_4b1[4];              // +0x4b1
-    unsigned long from;               // +0x4b5
-    unsigned long to;                 // +0x4b9
+    char unusedAfterHwnd[4];          // +0x4b1
+    unsigned long recvFromId;         // +0x4b5
+    unsigned long recvToId;           // +0x4b9
     GameRec_4c9c50* games;            // +0x4bd
     DirectPlay_4c97b0* dp1;           // +0x4c1
     DirectPlay_4c97b0* dp;            // +0x4c5
@@ -164,7 +163,7 @@ struct Net_4c97b0 {
     Lobby_4c9a70* lobby;              // +0x4cd
     Connection_4c9a70* connection;    // +0x4d1
     int connection_size;              // +0x4d5
-    char compressionOff[4];           // +0x4d9, a dword: nonzero stops outgoing compression
+    char disableOutgoingCompression[4]; // +0x4d9, a dword: nonzero stops outgoing compression
     int maxPlayers;                   // +0x4dd
     int enumTimeout;                  // +0x4e1
     int providerCount;                // +0x4e5
@@ -355,7 +354,7 @@ int __stdcall HAPINET_receivepacket(Net_4c97b0* net, void* data, unsigned long* 
     HapinetTrace((int)"HAPINET_receivepacket\n");
     int result = 0x887700aa;
     if (net->dp != 0) {
-        result = net->dp->Receive(&net->from, &net->to, 1, data, size);
+        result = net->dp->Receive(&net->recvFromId, &net->recvToId, 1, data, size);
     }
     return result;
 }
@@ -369,7 +368,7 @@ int __stdcall HAPINET_updategameinfo(Net_4c97b0* net, char* name, char* data, in
 {
     HapinetTrace("HAPINET_updategameinfo\n");
     if (net->dp != 0) {
-        strncpy(net->name, name, 0x10);
+        strncpy(net->sessionName, name, 0x10);
         net->desc.dwSize = 0x50;
         net->desc.dwUser4 = a;
         net->desc.dwUser3 = b;
@@ -629,7 +628,7 @@ int __stdcall HAPINET_joingame(Net_4c97b0* net, GUID_004c9920 guid)
                     if (net->dp->GetSessionDesc(p, &size) == 0) {
                         net->desc.guidInstance = p->guidInstance;
                         if (p->lpszSessionName != 0)
-                            lstrcpynA(net->name, p->lpszSessionName, 0x11);
+                            lstrcpynA(net->sessionName, p->lpszSessionName, 0x11);
                     }
                     GameFreeThunk(p);
                 }
@@ -809,8 +808,8 @@ int __stdcall HAPINET_addplayer(Net_4c97b0* net, unsigned long* id, char* shortN
         dpname.dwFlags = 0;
         dpname.lpszShortNameA = shortName;
         dpname.lpszLongNameA = longName;
-        strncpy(net->longName, longName, 16);
-        strncpy(net->shortName, shortName, 16);
+        strncpy(net->playerLongName, longName, 16);
+        strncpy(net->playerShortName, shortName, 16);
         PlayerData_004ca6a0 data;
         memset(&data, 0, sizeof(data));
         strncpy(data.name, name, 16);
