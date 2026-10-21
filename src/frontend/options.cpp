@@ -30,7 +30,7 @@ class Object_004a0570;
 class Object_004a1450;
 struct Dialog;
 struct Surface;
-struct Mode_0045e4c0;
+struct Mode;
 struct Link_0045ead0;
 struct GadgetOwner_004605c0;
 struct Screen_0045e100;
@@ -38,7 +38,7 @@ struct Gui;
 
 #pragma pack(push, 1)
 
-struct ModeList_0045b800;
+struct ModeList;
 struct Menu_0045b800;
 
 // The 0x15b-byte menu control record, one type for every view of it below:
@@ -58,18 +58,6 @@ struct Holder_0045b800 {
 struct Menu_0045b800 {
     char unknown_0[0x18];
     Holder_0045b800* holder;            // +0x18
-};
-
-// One entry of a video mode list at an entry's +0x14a.
-struct Mode_0045b800 {
-    int width;                          // +0x0
-    int height;                         // +0x4
-    char unknown_8[4];
-};
-
-struct ModeList_0045b800 {
-    int count;                          // +0x0
-    Mode_0045b800* modes;               // +0x4
 };
 
 // The flag bits at g_game+0x2a44, an unaligned word in the original.
@@ -411,13 +399,6 @@ struct Menu_0045de30 {
     void* holder;                      // +0x18
 };
 
-struct List_0045e5e0 {                 // the "SELECT VIDEO MODE" object
-    int count;                         // +0x0
-    Mode_0045e4c0* modes;              // +0x4
-    char unknown_8[0xc];
-    char* buffer;                      // +0x14
-};
-
 struct Holder_0045e5e0 {
     char unknown_0[4];
     Gadget* entries;           // +0x4
@@ -464,16 +445,22 @@ struct Sub_0045cf60 {
     int changed;                       // +0xcca
 };
 
-// The display mode record, shared by the sorter and the video mode page.
-struct Mode_0045e4c0 {
+// The "SELECT VIDEO MODE" object: the mode count, the modes and the
+// available-mode text buffer. The slider and the sorter see the same object.
+struct ModeList {
+    int count;                         // +0x00
+    Mode* modes;                       // +0x04
+    char unknown_8[0x14 - 0x8];        // +0x08
+    char* available;                   // +0x14
+    char unknown_18[0x20 - 0x18];      // +0x18
+};
+
+// The display mode record, shared by the video mode page, the sorter and the
+// "SELECT VIDEO MODE" list.
+struct Mode {
     int width;                       // +0x0
     int height;                      // +0x4
     int refreshRate;                 // +0x8
-};
-
-struct ModeList_0045e4c0 {
-    int count;                       // +0x0
-    Mode_0045e4c0* modes;            // +0x4
 };
 
 // One help page's worth of lines: the strings used when a line has no
@@ -509,6 +496,12 @@ void ResetNetStats();
 void __stdcall StartScreenShake(int dx, int dy, int value);
 void __stdcall KillFeature(int x, int z, int flag);
 void __stdcall ToggleShareLos(int unused);
+// Unused here: real functions declared for their symbol ids. The five mode
+// views this file used to declare are one Mode and one ModeList now, and these
+// keep the ids the functions after them match at (docs/c2-regalloc.md).
+void __stdcall DrawTextClipped(int a, char* text, int x, int y, int w, int h);
+void __stdcall WriteScreenshot(char* dir, char* name, int x, int y, int w, int h);
+int __stdcall ScanDirectory(char* path, void* buffer, char* p3, int p4, int p5, int p6);
 
 struct Link_0045ead0 {
     void* obj;                                 // +0x0
@@ -783,8 +776,8 @@ void ShowSaveGameScreen();
 void __cdecl GameFreeThunk(void* p);
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 int __stdcall IsScreenNamed(Gui* gui, const char* name);
-void __stdcall SortDisplayModes(List_0045e5e0* list);
-int __stdcall GetDisplayModes(List_0045e5e0* list);
+void __stdcall SortDisplayModes(ModeList* list);
+int __stdcall GetDisplayModes(ModeList* list);
 int FindHostSlot();
 char* __cdecl _itoa(int value, char* buf, int radix);
 char* __stdcall WordWrapText(Menu_004604a0* menu, char* text, int width, int index);
@@ -937,11 +930,11 @@ void __stdcall ClearGadgetText(Gadget* e, int param_2)
 void __stdcall UpdateVideoModeLabel(Menu_0045b800* param_1, Gadget* param_2)
 {
     int i = 0;
-    int count = ((ModeList_0045b800*)param_2->sliderUser)->count;
+    int count = ((ModeList*)param_2->sliderUser)->count;
     if (count > 0) {
         Game* g = g_game;
         int w = g->displayWidth;
-        Mode_0045b800* m = ((ModeList_0045b800*)param_2->sliderUser)->modes;
+        Mode* m = ((ModeList*)param_2->sliderUser)->modes;
         do {
             if (w != m->width)
                 goto next;
@@ -978,9 +971,9 @@ void __stdcall HandleVideoModeSlider(Menu_0045b800* obj, int unused)
     // stay above the if. If FindGadgetChecked_D ever returned 0 the original would
     // have read through a null pointer; that is a real bug in the game code.
     Gadget* e = FindGadgetChecked_D(obj->holder->entries, "VIDSLDR");
-    ModeList_0045b800* list = (ModeList_0045b800*)e->sliderUser;
+    ModeList* list = (ModeList*)e->sliderUser;
     if (e != 0) {
-        Mode_0045b800* r = &list->modes[SliderValue(e)];
+        Mode* r = &list->modes[SliderValue(e)];
         sprintf(FindGadgetChecked_C(obj->holder->entries, "VIDVAL") + 0xb6, "%d X %d", r->width, r->height);
         g_game->displayWidth = r->width;
         g_game->displayHeight = r->height;
@@ -1858,7 +1851,7 @@ void __stdcall HandleVisualOptionsClick(Gui* gui)
 }
 
 // FUNCTION: 0x45e4c0
-void __stdcall SortDisplayModes(ModeList_0045e4c0* list)
+void __stdcall SortDisplayModes(ModeList* list)
 {
     // j first: the merged file's declaration context needs this order.
     int j, i;
@@ -1867,7 +1860,7 @@ void __stdcall SortDisplayModes(ModeList_0045e4c0* list)
             if (list->modes[j].width < list->modes[i].width
                 || (list->modes[j].width == list->modes[i].width
                     && list->modes[j].height < list->modes[i].height)) {
-                Mode_0045e4c0 tmp = list->modes[i];
+                Mode tmp = list->modes[i];
                 list->modes[i] = list->modes[j];
                 list->modes[j] = tmp;
             }
@@ -1910,13 +1903,13 @@ void __stdcall OpenVisualOptions(int param_1)
     layer->handler = HandleVisualOptionsClick;
 
     if (!(g_game->flags_37ebe.byte & 1)) {
-        List_0045e5e0* list = (List_0045e5e0*)GameAllocIgnoreTag("SELECT VIDEO MODE", 0x20);
+        ModeList* list = (ModeList*)GameAllocIgnoreTag("SELECT VIDEO MODE", 0x20);
         layer->data = list;
-        list->modes = (Mode_0045e4c0*)GameAllocIgnoreTag("DISPLAY MODES", 0x4b0);
+        list->modes = (Mode*)GameAllocIgnoreTag("DISPLAY MODES", 0x4b0);
         if (GetDisplayModes(list) != 0) {
             SortDisplayModes(list);
-            list->buffer = (char*)GameAllocIgnoreTag("AVAILABLE MODES", list->count << 8);
-            list->buffer[0] = 0;
+            list->available = (char*)GameAllocIgnoreTag("AVAILABLE MODES", list->count << 8);
+            list->available[0] = 0;
             if (FindGadgetIndex(layer->entries, "VIDSLDR", 0xe) != -1) {
                 Gadget* e = FindGadgetChecked_D(layer->entries, "VIDSLDR");
                 e->max = list->count - 1;
@@ -1926,7 +1919,7 @@ void __stdcall OpenVisualOptions(int param_1)
                 for (int j = 0; j < list->count; j++) {
                     // Computed inside the loop body: hoisted after the count guard.
                     int w = g_game->displayWidth;
-                    Mode_0045e4c0* mode = &list->modes[j];
+                    Mode* mode = &list->modes[j];
                     if (w == mode->width && g_game->displayHeight == mode->height) {
                         int max = e->max;
                         int value = j;
