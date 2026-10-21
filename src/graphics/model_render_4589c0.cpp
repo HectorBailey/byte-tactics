@@ -14,19 +14,6 @@ struct Pos_4589c0 {
 
 #include "gaf_frame.h"
 
-struct Surface_4589c0 {
-    int width;                      // +0x00
-    int height;                     // +0x04
-    int pitch;                      // +0x08
-    void* bits;                     // +0x0c
-    int field_10;                   // +0x10
-    int field_14;                   // +0x14
-    unsigned short x;               // +0x18
-    unsigned short y;               // +0x1a
-    char unknown_1c[0x10];
-    unsigned int flag0 : 1;         // +0x2c
-    unsigned int flag1 : 1;
-};
 
 struct Model_459200;
 
@@ -143,7 +130,7 @@ union Vec3_459200 {
 
 class Surface;
 
-void __stdcall SurfaceFromFrame(Surface_4589c0* dst, GafFrame* src);
+void __stdcall SurfaceFromFrame(Surface* dst, GafFrame* src);
 void __stdcall DrawFrame(Surface* dst, GafFrame* bmp, int x, int y);
 
 template <class T> inline void Swap(T& a, T& b)
