@@ -22,35 +22,37 @@ void __cdecl operator delete(void* p);
 struct MovementClass;
 unsigned int __stdcall GetPassMapFootprintValueWithEdgeStrips(MovementClass* obj, int x, int y);
 
+// A TdfFile view (its current section at +0x4). Kept whole: deleting the 7 ids
+// a type costs moves SetPassMapCell out of the window it matches in.
 struct Source_00440340 {
     char unknown_0[4];
-    TdfRecord* tdf;                    // +0x4
+    TdfRecord* current;                // +0x4, the TdfFile's current section
 };
 
 #include "../util/vec3.h"
 
 #pragma pack(push, 2)
-struct Unit_00440af0 {
+struct UnitMotion {
     char unknown_0[0x26];
-    unsigned int lastTick;             // +0x26
+    unsigned int pathLockStamp;        // +0x26
 };
 
 struct Object_00440af0 {
-    Unit_00440af0* unit;               // +0x0
+    UnitMotion* motion;                // +0x0
     char unknown_4[0x76 - 0x4];
-    Point16 a;               // +0x76
+    Point16 cell;                      // +0x76
     char unknown_7a[0x7e - 0x7a];
-    Point16 b;               // +0x7e
+    Point16 footprint;                 // +0x7e
 };
 #pragma pack(pop)
 
 #pragma pack(push, 1)
 struct Record_00440af0 {
-    Unit_00440af0* unit;               // +0x0
+    UnitMotion* motion;                // +0x0
     char unknown_4[0x76 - 0x4];
-    Point16 a;               // +0x76
+    Point16 cell;                      // +0x76
     char unknown_7a[0x7e - 0x7a];
-    Point16 b;               // +0x7e
+    Point16 footprint;                 // +0x7e
     char unknown_82[0x110 - 0x82];
     unsigned int flags;                // +0x110
     char unknown_114[0x118 - 0x114];
@@ -100,15 +102,16 @@ struct MovementClassTable {
     static MovementClassTable g_movementClasses;
 };
 
-// The pathfinder's dirty-list view of the unit object 0x440a70 refreshes from
-// (0x440af0 / 0x440be0 declare the same bytes as Object_00440af0).
+// The pathfinder's dirty-list view of a Unit (Thaldren's UnitInstance: the
+// motion pointer, the map cell, the footprint), the one 0x440a70 refreshes
+// from (0x440af0 / 0x440be0 declare the same bytes as Object_00440af0).
 #pragma pack(push, 2)
 struct Struct_00440a70 {
-    Unit_00440af0* unit;               // +0x0
+    UnitMotion* motion;                // +0x0
     char unknown_4[0x76 - 0x4];
-    Point16 a;               // +0x76
+    Point16 cell;                      // +0x76
     char unknown_7a[0x7e - 0x7a];
-    Point16 b;               // +0x7e
+    Point16 footprint;                 // +0x7e
 };
 #pragma pack(pop)
 
@@ -213,14 +216,14 @@ MovementClass::~MovementClass()
 // FUNCTION: 0x440340
 void MovementClass::ReadMoveInfo(Source_00440340* src)
 {
-    footprintX = src->tdf->GetFieldInt("FootPrintX", 0);
-    footprintZ = src->tdf->GetFieldInt("FootPrintZ", 0);
-    maxWaterDepth = src->tdf->GetFieldInt("maxwaterdepth", maxWaterDepth);
-    minWaterDepth = src->tdf->GetFieldInt("minwaterdepth", minWaterDepth);
-    maxSlope = src->tdf->GetFieldInt("maxslope", maxSlope);
-    badSlope = src->tdf->GetFieldInt("badslope", maxSlope / 2);
-    maxWaterSlope = src->tdf->GetFieldInt("maxwaterslope", maxWaterSlope);
-    badWaterSlope = src->tdf->GetFieldInt("badwaterslope", maxWaterSlope / 2);
+    footprintX = src->current->GetFieldInt("FootPrintX", 0);
+    footprintZ = src->current->GetFieldInt("FootPrintZ", 0);
+    maxWaterDepth = src->current->GetFieldInt("maxwaterdepth", maxWaterDepth);
+    minWaterDepth = src->current->GetFieldInt("minwaterdepth", minWaterDepth);
+    maxSlope = src->current->GetFieldInt("maxslope", maxSlope);
+    badSlope = src->current->GetFieldInt("badslope", maxSlope / 2);
+    maxWaterSlope = src->current->GetFieldInt("maxwaterslope", maxWaterSlope);
+    badWaterSlope = src->current->GetFieldInt("badwaterslope", maxWaterSlope / 2);
     if (maxSlope > maxWaterSlope)
         maxSlope = maxWaterSlope;
     if (badSlope > maxSlope)
@@ -490,17 +493,17 @@ static inline void UpdateAll(Point16 a, Point16 b)
 // FUNCTION: 0x440a70
 void __stdcall RefreshPassMapsForUnit(Struct_00440a70* p)
 {
-    if (p->unit != 0) {
-        unsigned int last = p->unit->lastTick;
-        p->unit->lastTick = g_game->gameTick;
+    if (p->motion != 0) {
+        unsigned int last = p->motion->pathLockStamp;
+        p->motion->pathLockStamp = g_game->gameTick;
         for (int i = 0; i < 32; i++) {
             if (last < MovementClassTable::g_movementClasses.entries[i].lastTick) {
-                ((MovementClass*)&MovementClassTable::g_movementClasses.entries[i])->RefreshPassMap(p->a, p->b);
+                ((MovementClass*)&MovementClassTable::g_movementClasses.entries[i])->RefreshPassMap(p->cell, p->footprint);
             }
         }
         return;
     }
-    UpdateAll(p->a, p->b);
+    UpdateAll(p->cell, p->footprint);
 }
 
 // Refreshes one entry of a pathfinder's dirty list for the object at p (see
@@ -516,22 +519,22 @@ void MovementClass::RefreshMovedUnits(Object_00440af0* p)
     }
     unsigned int start = now - 0x1e;
     lastTick = start;
-    unsigned int prev = p->unit->lastTick;
-    p->unit->lastTick = g_game->gameTick;
+    unsigned int prev = p->motion->pathLockStamp;
+    p->motion->pathLockStamp = g_game->gameTick;
     if (prev < old) {
-        this->RefreshPassMap(p->a, p->b);
+        this->RefreshPassMap(p->cell, p->footprint);
     }
     if (start != old) {
         for (Record_00440af0* r = &g_game->units[1]; r <= g_game->unitsEnd; r++) {
-            if ((r->flags & 0x10000000) != 0 && r->unit != 0) {
-                unsigned int t = r->unit->lastTick;
+            if ((r->flags & 0x10000000) != 0 && r->motion != 0) {
+                unsigned int t = r->motion->pathLockStamp;
                 if (t >= old && t < start) {
-                    this->RefreshPassMap(r->a, r->b);
+                    this->RefreshPassMap(r->cell, r->footprint);
                 }
             }
         }
     }
-    p->unit->lastTick = prev;
+    p->motion->pathLockStamp = prev;
 }
 
 // One entry of the table at 0x512358 (see 0x440a70): refreshes it for an
@@ -539,8 +542,8 @@ void MovementClass::RefreshMovedUnits(Object_00440af0* p)
 // FUNCTION: 0x440be0
 void MovementClass::RefreshUnitIfStale(Object_00440af0* p)
 {
-    if (p->unit->lastTick < lastTick) {
-        this->RefreshPassMap(p->a, p->b);
+    if (p->motion->pathLockStamp < lastTick) {
+        this->RefreshPassMap(p->cell, p->footprint);
     }
 }
 

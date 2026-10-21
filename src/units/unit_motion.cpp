@@ -94,9 +94,11 @@ public:
     int BuildObjectPicture(List_458810* list, int param_2, int param_3);
 };
 
-struct State_0045a790 {
+// The state behind Unit+0x9e (Thaldren's UnitObjectState): the frame
+// BuildShadow fills at +0x14.
+struct ObjectState {
     char unknown_0[0x14];
-    GafFrame* sprite;                  // +0x14 the picture built here
+    GafFrame* shadowFrame;             // +0x14, Thaldren's pShadowFrame
     char unknown_18[0x22 - 0x18];
 };
 
@@ -125,7 +127,7 @@ public:
     void ReleaseHandle(int id);
     void DrawObjectState(List_458810* list, Vec3* result);
     void CopyPicture(GafFrame* source);
-    void BuildShadow(State_0045a790* obj, GafFrame* dest);
+    void BuildShadow(ObjectState* obj, GafFrame* dest);
     void DrawPiece(List_458810* list, Vec3* param_2, void* param_3,
         PieceInfo_458810* info, Vertex_458810* vertices, unsigned char kind, int visible);
     void DrawObjectPicture(void* param_1, List_458810* list, Vec3 coords, int visible);
@@ -456,9 +458,9 @@ void CMemoryCache::CopyPicture(GafFrame* source)
 // of the state, the scratch image at this->image is cleared to its key
 // colour and the pieces are drawn into it (DrawShadowShape), the background image
 // is blitted over it, and the run length compressed result becomes the state's
-// sprite (CompressFrame, then a one plane bitmap from the arena).
+// shadow frame (CompressFrame, then a one plane bitmap from the arena).
 // FUNCTION: 0x45a790
-void CMemoryCache::BuildShadow(State_0045a790* obj, GafFrame* dest)
+void CMemoryCache::BuildShadow(ObjectState* obj, GafFrame* dest)
 {
     int w, h, x, y;
     MeasureShadow(&w, &h, &x, &y, obj);
@@ -471,8 +473,8 @@ void CMemoryCache::BuildShadow(State_0045a790* obj, GafFrame* dest)
     DrawShadowShape(image, obj);
     CutOutFrame(dest, image, 5, 0);
     int size = CompressFrame(image->scratch, image);
-    AllocBitmap(&obj->sprite, size, 1);
-    GafFrame* bmp = obj->sprite;
+    AllocBitmap(&obj->shadowFrame, size, 1);
+    GafFrame* bmp = obj->shadowFrame;
     memcpy(bmp->pixelsOrLayers, image->scratch, size);
     bmp->width = image->width;
     bmp->height = image->height;
