@@ -135,7 +135,6 @@ def mangled_prefixes(qualname: str) -> list[str]:
 ALIASES = ROOT / "data/aliases.csv"
 CONSTANTS = ROOT / "data/constants.csv"
 PATCHES = ROOT / "data/exe_patches.csv"
-ALIAS_MAP: dict[str, set[int]] = {}
 
 
 def load_constants() -> set[tuple[int, int]]:
@@ -157,6 +156,19 @@ def load_aliases() -> dict[str, set[int]]:
             for row in csv.DictReader(fh):
                 out.setdefault(row["name"], set()).add(int(row["address"], 16))
     return out
+
+
+_ALIASES: dict[str, set[int]] | None = None
+
+
+def alias_map() -> dict[str, set[int]]:
+    """The aliases, loaded once. compare() runs on a thread pool in
+    tools/checkall.py, so the map must never be cleared or rebuilt while
+    another thread reads it (issue #7056)."""
+    global _ALIASES
+    if _ALIASES is None:
+        _ALIASES = load_aliases()
+    return _ALIASES
 
 
 def load_symbols() -> dict[str, int]:
@@ -375,8 +387,6 @@ def compare(orig: Original, obj: CoffObject, address: int, want: str | None = No
     the bytes are compared: the result has the symbol and bytes_match but no
     references, score or diff (tools/progress.py's first pass needs no more)."""
     symbols = load_symbols() if symbols is None else symbols
-    ALIAS_MAP.clear()
-    ALIAS_MAP.update(load_aliases())
     picked, err = select_function(obj, want, qualname)
     if not picked:
         return Result(address, "", 0, 0, False, 0.0, error=err)
@@ -553,7 +563,7 @@ def check_vtable(orig, obj, sec, start, target, symbols) -> str:
         # The reverse: the slot's function already has another name (a method
         # inherited from a base class keeps the base's name).
         held = [n for n, a in symbols.items() if a == fn]
-        if (known is None and held and fn not in ALIAS_MAP.get(name, ())
+        if (known is None and held and fn not in alias_map().get(name, ())
                 and not any(is_placeholder(h, fn) or same_slot_function(h, name, fn) for h in held)):
             return (f"vtable slot {off // 4} is {fn:#x}, already named '{held[0]}' in data/symbols.csv; "
                     "declare it under that name (a base class's method if it is inherited)")
@@ -576,7 +586,7 @@ def static_stem(name: str) -> str:
 
 def lookup(off, sym_name, target, symbols, by_addr) -> Ref:
     name = base_name(sym_name)
-    if target in ALIAS_MAP.get(name, ()):
+    if target in alias_map().get(name, ()):
         return Ref(off, sym_name, target, "ok", "duplicate copy (data/aliases.csv)")
     # A placeholder name carries its own address: it must be where the original points.
     m = PLACEHOLDER.search(name.split("::")[-1])
