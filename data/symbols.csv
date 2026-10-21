@@ -3653,6 +3653,7 @@ address,name
 0x4f39d0,_ld12told
 0x4f3a50,_atodbl
 0x4f3a90,_atoldbl
+0x4f3ad0,_atoflt
 0x4f3b10,_fptostr
 0x4f3bb0,_fltout2
 0x4f3c40,__dtold
