@@ -499,7 +499,7 @@ void FreePlayers()
 {
     for (Player* p = g_game->players; p <= g_game->players + 10; p++) {
         // Fields reached as indices off q: keeps two induction variables.
-        int* q = (int*)((char*)p + 0x84);
+        int* q = &p->exploredHeight;
         q[-1] = 0;
         q[0] = 0;
         delete[] ((void**)q)[-2];
