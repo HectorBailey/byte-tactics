@@ -98,7 +98,7 @@ struct UnitType {
     char unknown_0[0x20];
     char unitname[0x20];               // +0x20
     char unknown_40[0x111 - 0x40];
-    unsigned int field_111;            // +0x111
+    unsigned int weaponFlags;            // +0x111
     char unknown_115[0x14a - 0x115];
     Point16 origin;                   // +0x14a
     char unknown_14e[0x156 - 0x14e];
@@ -1078,7 +1078,7 @@ void __stdcall HandleBuildPanelClick(Gui* menu)
                         QueueBuildOrder(text, unit, -1);
                 }
                 if (unit->flags.bits.flag_29
-                    || (((UnitType*)unit->weapons[0].weapon)->field_111 & 0x10000000))
+                    || (((UnitType*)unit->weapons[0].weapon)->weaponFlags & 0x10000000))
                     RefreshBuildCountTexts(menu, unit);
                 MarkChanged(&g_game->gui);
             }
