@@ -4,8 +4,9 @@
 #include <windows.h>
 #include <ddraw.h>
 
-// The open Smacker movie (smackw32.dll's SMK struct).
-struct Smk_0047c3a0 {
+// The open Smacker movie (smackw32.dll's SMK struct); the DLL names the format
+// SMK and its files end in .smk.
+struct Smk {
     unsigned int version;               // +0x0
     unsigned int width;                 // +0x4
     unsigned int height;                // +0x8
@@ -30,15 +31,15 @@ struct Smk_0047c3a0 {
 // 38 SmackSoundUseDirectSound.
 extern "C" __declspec(dllimport) int __stdcall SmackSoundEnable(HWND hwnd);
 extern "C" __declspec(dllimport) int __stdcall SmackSoundUseDirectSound(void* sound);
-extern "C" __declspec(dllimport) Smk_0047c3a0* __stdcall SmackOpen(char* path, unsigned int flags, int extra);
-extern "C" __declspec(dllimport) unsigned int __stdcall SmackSoundOnOff(Smk_0047c3a0* smk, unsigned int on);
-extern "C" __declspec(dllimport) void __stdcall SmackGoto(Smk_0047c3a0* smk, unsigned int frame);
-extern "C" __declspec(dllimport) void __stdcall SmackDoFrame(Smk_0047c3a0* smk);
-extern "C" __declspec(dllimport) void __stdcall SmackNextFrame(Smk_0047c3a0* smk);
-extern "C" __declspec(dllimport) void __stdcall SmackToBuffer(Smk_0047c3a0* smk, unsigned int left, unsigned int top, unsigned int width, unsigned int height, unsigned int bufferHeight, void* buffer);
-extern "C" __declspec(dllimport) int __stdcall SmackToBufferRect(Smk_0047c3a0* smk, int flag);
+extern "C" __declspec(dllimport) Smk* __stdcall SmackOpen(char* path, unsigned int flags, int extra);
+extern "C" __declspec(dllimport) unsigned int __stdcall SmackSoundOnOff(Smk* smk, unsigned int on);
+extern "C" __declspec(dllimport) void __stdcall SmackGoto(Smk* smk, unsigned int frame);
+extern "C" __declspec(dllimport) void __stdcall SmackDoFrame(Smk* smk);
+extern "C" __declspec(dllimport) void __stdcall SmackNextFrame(Smk* smk);
+extern "C" __declspec(dllimport) void __stdcall SmackToBuffer(Smk* smk, unsigned int left, unsigned int top, unsigned int width, unsigned int height, unsigned int bufferHeight, void* buffer);
+extern "C" __declspec(dllimport) int __stdcall SmackToBufferRect(Smk* smk, int flag);
 // Ordinal 32: SmackWait, the DLL's export name.
-extern "C" __declspec(dllimport) unsigned int __stdcall SmackWait(Smk_0047c3a0* smack);
+extern "C" __declspec(dllimport) unsigned int __stdcall SmackWait(Smk* smack);
 
 // smackw32.dll ordinal 18 (SmackClose), called through its import slot.
 extern "C" __declspec(dllimport) void __stdcall SmackClose(void* smack);
@@ -46,7 +47,7 @@ extern "C" __declspec(dllimport) void __stdcall SmackClose(void* smack);
 // The 0x54 byte statistics block SmackSummary fills in. Six of the twenty-one
 // fields are never printed, and the seven printed before TotalBlitTime are
 // read from further in than the DLL writes.
-struct SmkStats_0047c530 {
+struct SmkStats {
     unsigned int totalTime;            // +0x00 divisor of the frame rate
     unsigned int unknown_04;           // +0x04
     unsigned int openTime;             // +0x08 "Time to Open File"
@@ -71,9 +72,11 @@ struct SmkStats_0047c530 {
 };
 
 // smackw32.dll ordinal 20, called through its import slot.
-extern "C" __declspec(dllimport) void __stdcall SmackSummary(Smk_0047c3a0* smk, SmkStats_0047c530* stats);
+extern "C" __declspec(dllimport) void __stdcall SmackSummary(Smk* smk, SmkStats* stats);
 
-struct Surfaces_0047bdf0 {
+// The DirectDraw objects the player blits through, the set MoviePlayer::surfaces
+// holds.
+struct Surfaces {
     IDirectDraw* ddraw;              // +0x0
     IDirectDrawSurface* primary;     // +0x4
     IDirectDrawSurface* back;        // +0x8
@@ -87,7 +90,7 @@ struct Display_0047bdf0 {
     char unknown_28[0x40 - 0x28];
     HWND hwnd;                       // +0x40
     char unknown_44[0x84 - 0x44];
-    Surfaces_0047bdf0 surfaces;      // +0x84
+    Surfaces surfaces;      // +0x84
     char unknown_98[0xf0 - 0x98];
     unsigned short flags;            // +0xf0
 };
@@ -120,7 +123,7 @@ void FlipScreen();
 
 // The game's DDSURFACEDESC is 0x6c bytes, so it is not the DirectDraw 1 layout
 // in <ddraw.h> here; only the fields this function writes are named.
-struct SurfaceDesc_0047bf70 {
+struct SurfaceDesc {
     DWORD dwSize;                      // +0x00
     DWORD dwFlags;                     // +0x04
     DWORD dwHeight;                    // +0x08
@@ -132,7 +135,7 @@ struct SurfaceDesc_0047bf70 {
 
 // The object smackw32.dll ordinal 2 hands back (a SmackBuf); only the colour
 // remap arguments SmackColorRemap takes from it are named.
-struct Smk_0047bf70_b {
+struct SmackBuf {
     char unknown_0[0x2c];
     DWORD paletteColors;               // +0x2c
     char unknown_30[0x3c - 0x30];
@@ -146,9 +149,9 @@ extern int __stdcall DirectDrawCreateThunk(int guid, void *display, int zero);
 // smackw32.dll's buffer API, imported by ordinal: ordinal 2 opens the decoder
 // state (HWND, HDC, 640, 480, 0, 0), ordinal 5 takes the movie's 256 colour
 // palette, and ordinal 25 is given the movie and three fields of that state.
-extern "C" __declspec(dllimport) Smk_0047bf70_b *__stdcall SmackBufferOpen(HWND hwnd, HDC hdc, int width, int height, int flags, int background);
-extern "C" __declspec(dllimport) void __stdcall SmackBufferNewPalette(Smk_0047bf70_b *smk, unsigned char *rgb, unsigned short flag);
-extern "C" __declspec(dllimport) void __stdcall SmackColorRemap(Smk_0047c3a0 *smk, DWORD *palette, DWORD paletteColors, DWORD paletteType);
+extern "C" __declspec(dllimport) SmackBuf *__stdcall SmackBufferOpen(HWND hwnd, HDC hdc, int width, int height, int flags, int background);
+extern "C" __declspec(dllimport) void __stdcall SmackBufferNewPalette(SmackBuf *smk, unsigned char *rgb, unsigned short flag);
+extern "C" __declspec(dllimport) void __stdcall SmackColorRemap(Smk *smk, DWORD *palette, DWORD paletteColors, DWORD paletteType);
 
 typedef void (__stdcall *GetPixelFormatFn)(void* self, DDPIXELFORMAT* format);
 
@@ -159,7 +162,7 @@ struct SmackerSurface {
 
 class MoviePlayer {
 public:
-    Smk_0047c3a0* smack;               // +0x0
+    Smk* smack;               // +0x0
     unsigned int frame;                // +0x4, the last full frame seen
     int stopped;                       // +0x8, the movie is done or stopped
     HWND hwnd;                         // +0xc
@@ -167,10 +170,10 @@ public:
     int paletteResult;                 // +0x410
     int hasSurfaces;                   // +0x414
     char unknown_418[0x528 - 0x418];
-    Surfaces_0047bdf0 surfaces;        // +0x528
+    Surfaces surfaces;        // +0x528
     char unknown_53c[0x544 - 0x53c];
-    Surfaces_0047bdf0* wrapper;        // +0x544
-    SurfaceDesc_0047bf70 surfaceDesc;  // +0x548
+    Surfaces* wrapper;        // +0x544
+    SurfaceDesc surfaceDesc;  // +0x548
 
     MoviePlayer(char* path, int a, int b, int c, int d, int e);
     void ReadSystemPalette(int unused);
@@ -283,7 +286,7 @@ int MoviePlayer::SetupDirectDraw()
         SetWindowPos(hwnd, 0, 0, 0, smack->width, smack->height, 2);
     }
     if (smack->newPalette) {
-        Smk_0047bf70_b *smk = SmackBufferOpen(hwnd, 0, 0x280, 0x1e0, 0, 0);
+        SmackBuf *smk = SmackBufferOpen(hwnd, 0, 0x280, 0x1e0, 0, 0);
         SmackBufferNewPalette(smk, &smack->rgb[0][0], smack->palType);
         SmackColorRemap(smack, &smk->palette, smk->paletteColors, smk->paletteType);
     }
@@ -411,7 +414,7 @@ void MoviePlayer::PlayFrame(HWND hwnd)
 // FUNCTION: 0x47c530
 void MoviePlayer::WriteSmackStats()
 {
-    SmkStats_0047c530 stats;
+    SmkStats stats;
     SmackSummary(smack, &stats);
     FILE* file = fopen("stats.txt", "w");
     if (file) {
