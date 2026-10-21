@@ -18,17 +18,9 @@ void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 
 #include "unit.h"
 
-struct Game {
-    char unknown_0[0x1431f];
-    int scrollX;                       // +0x1431f
-    int scrollY;                       // +0x14323
-    char unknown_14327[0x37ed8 - 0x14327];
-    unsigned short windDirection;      // +0x37ed8
-    int windSpeed;                     // +0x37eda
-    char unknown_37ede[0x37ee2 - 0x37ede];
-    int windEnabled;                   // +0x37ee2
-};
 #pragma pack(pop)
+
+#include "../game/game.h"
 
 union Fixed_437840 {
     int value;
@@ -395,8 +387,8 @@ int __stdcall GetHandleSize(int param_1)
 void CMemoryCache::DrawObjectState(List_458810* list, Vec3* result)
 {
     int rebuild = 0;
-    int x = g_game->scrollX << 16;
-    int z = g_game->scrollY << 16;
+    int x = g_game->scroll_x << 16;
+    int z = g_game->scroll_y << 16;
     int visible;
     Unit_458810* owner = list->owner;
     if (owner->flags & 0x20000000) {
