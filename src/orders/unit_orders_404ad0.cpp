@@ -66,7 +66,7 @@ int __stdcall ReclaimOrder(Unit* unit, Order* order, int flags)
     case 1: {
         if (flags & 0x40)
             return 8;
-        order->time = (int)(15.0f - (f->metal + f->value) * -0.5f);
+        order->time = (int)(15.0f - (f->energy + f->metal) * -0.5f);
         Vec3 pos;
         pos.x = (size.x + cell.x * 2) << 19;
         pos.z = (size.y + cell.y * 2) << 19;
