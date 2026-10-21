@@ -749,16 +749,18 @@ struct Layout_00444930 {
     void* seqs;                            // +0x1c
 };
 
-// The display mode list 0x4461d0 and 0x446310 share.
-struct Mode_00446310 {
+// The display mode record the mode screens' lists hold.
+struct Mode {
     int width;                             // +0x00
     int height;                            // +0x04
     int refreshRate;                       // +0x08
 };
 
+// The display mode list the mode screens share: the count, the modes and
+// the available-mode text buffer.
 struct ModeList {
     int count;                             // +0x00
-    Mode_00446310* modes;                  // +0x04
+    Mode* modes;                           // +0x04
     char unknown_8[0x14 - 0x8];            // +0x08
     char* available;                       // +0x14
     char unknown_18[0x20 - 0x18];          // +0x18
@@ -2914,7 +2916,7 @@ void __stdcall HandleDisplayModesClick(Gui* gui)
     if (IsCurrentGadgetNamed(gui, "MODES") || IsCurrentGadgetNamed(gui, "SELECT")) {
         Player* player = &g_game->players[g_game->localPlayer];
         Gadget* entry = FindGadgetChecked(gadgets, "MODES");
-        Mode_00446310* mode = &obj->modes[entry->selected];
+        Mode* mode = &obj->modes[entry->selected];
         g_game->displayWidth = mode->width;
         g_game->displayHeight = mode->height;
         player->info->width = (unsigned short)mode->width;
@@ -2944,7 +2946,7 @@ void CyclePlayerDisplayMode(void)
 {
     ModeList* obj = (ModeList*)GameAllocIgnoreTag("SELECT VIDEO MODE", 0x20);
     obj->available = 0;
-    obj->modes = (Mode_00446310*)GameAllocIgnoreTag("DISPLAY MODES", 0x4b0);
+    obj->modes = (Mode*)GameAllocIgnoreTag("DISPLAY MODES", 0x4b0);
 
     if (GetDisplayModes(obj) != 0) {
         SortDisplayModes(obj);
@@ -2965,7 +2967,7 @@ void CyclePlayerDisplayMode(void)
                     if (i >= count)
                         i = 0;
                 }
-                Mode_00446310& mode = obj->modes[i];
+                Mode& mode = obj->modes[i];
                 player->info->width = (unsigned short)mode.width;
                 player->info->height = (unsigned short)mode.height;
                 BroadcastPlayerInfo();
