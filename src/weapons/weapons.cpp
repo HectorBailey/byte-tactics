@@ -871,15 +871,17 @@ struct Unit_0049a120 {
     char unknown_100[0x118 - 0x100];
 };
 
-struct Weapon_0049a120 {
-    WeaponDef* def;                    // +0x0
+// Thaldren's Projectile (0x6b bytes): the same record as the one the
+// 0x49a120 gap file reads.
+struct Projectile {
+    WeaponDef* type;                   // +0x0, Thaldren's pWeapon
     Vec3_0049a120 pos;                 // +0x4
     char unknown_10[0x28 - 0x10];
     Vec3_0049a120 aim;                 // +0x28
     char unknown_34[0x52 - 0x34];
-    Unit_0049a120* attacker;           // +0x52
+    Unit_0049a120* ownerUnit;          // +0x52, Thaldren's pOwnerUnit
     char unknown_56[0x66 - 0x56];
-    unsigned char owner;               // +0x66
+    unsigned char ownerPlayer;         // +0x66, Thaldren's bOwnerPlayer
     char unknown_67[0x69 - 0x67];
     unsigned short flags;              // +0x69
 };
@@ -965,8 +967,8 @@ struct Hits_0049a120 {
 };
 
 Cell* __stdcall GetMapCell(int x, int y);
-int __stdcall ApplyWeaponDamage(Weapon_0049a120* weapon, Unit_0049a120* target, float scale);
-void __stdcall DetonateProjectile(Weapon_0049a120* weapon, Unit_0049a120* unit);
+int __stdcall ApplyWeaponDamage(Projectile* weapon, Unit_0049a120* target, float scale);
+void __stdcall DetonateProjectile(Projectile* weapon, Unit_0049a120* unit);
 int __stdcall VectorLength(Vec3_0049a120* v);
 Vec3_0049a120 __stdcall GetFootprintCentre(CellPos_0049a120* cell, FeatureDef_0049a120* def);
 void __stdcall DamageFeature(Cell* cell, int x, int z, WeaponDef* def);
