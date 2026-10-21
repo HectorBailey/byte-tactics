@@ -8,6 +8,7 @@
 #include <stdlib.h>
 
 #include "rect.h"
+#include "../gui/mouse_event.h"
 
 // +0xf0: the display context's state flags. Set through the bitfield and read
 // whole by SetFullScreen.
@@ -145,31 +146,11 @@ struct ModeList_004b5330 {
     Mode_004b5330* modes;              // +0x4
 };
 
-// A point the mouse code starts from: the 24 bytes of Event_4b5cc0.
-struct View_4b5980 {
-    int x;
-    int y;
-    int buttons;
-    int time;
-    int message;
-    int flag;
-};
-
 #include "surface.h"
 
 struct BitmapInfo_004b5510 {
     BITMAPINFOHEADER bmiHeader;
     RGBQUAD bmiColors[256];
-};
-
-// 24 byte event packet shared with SetCurrentMouseEvent and PushMouseEvent.
-struct Event_4b5cc0 {
-    int x;          // +0x00
-    int y;          // +0x04
-    int buttons;    // +0x08
-    int time;       // +0x0c
-    int message;    // +0x10
-    int flag;       // +0x14
 };
 
 // One entry of the timer table at g_timerSlots: ten slots, then g_timerCount
@@ -195,7 +176,7 @@ extern LONG g_gfxBlitLockOwner;
 extern HANDLE g_gfxBlitLockEvent;
 
 void SaveStartDirectory(void);
-void __stdcall SetCurrentMouseEvent(int* p);
+void __stdcall SetCurrentMouseEvent(MouseEvent* p);
 void __stdcall InitKeyQueue(int size);
 void __stdcall InitMouse(int count, int start);
 int __stdcall AllocShadeTable(App_4b5980* d);
@@ -206,7 +187,7 @@ int __stdcall AllocBlueTable(App_4b5980* d);
 long __stdcall WindowProc(HWND hwnd, unsigned int msg, unsigned int wparam, unsigned int lparam);
 void __stdcall PushKeyCode(int v);
 void __stdcall HandleVirtualKey(int v, int flag);
-void __stdcall PushMouseEvent(Event_4b5cc0* ev);
+void __stdcall PushMouseEvent(MouseEvent* ev);
 int __stdcall DirectDrawCreateThunk(int guid, void *display, int zero);
 void __stdcall InitSurface(Surface *s, int width, int height, int a, int b);
 int __stdcall LockScreen(Surface *s);
@@ -668,13 +649,13 @@ int __stdcall InitEnvironment(App_4b5980* d)
     d->flags.bits.sound_opt = (d->videoFlags >> 9) & 1;
     InitKeyQueue(0x1e);
     InitMouse(0x14, d->flags.bits.sound_opt);
-    View_4b5980 view;
+    MouseEvent view;
     view.x = 0;
     view.y = 0;
-    view.buttons = 0;
+    view.keyFlags = 0;
     d->lastDir = 0;
     SaveStartDirectory();
-    SetCurrentMouseEvent((int *)&view);
+    SetCurrentMouseEvent(&view);
 
     d->items = 0;
     d->itemCount = 0;
@@ -764,7 +745,7 @@ int __stdcall InitEnvironment(App_4b5980* d)
 long __stdcall WindowProc(HWND hwnd, unsigned int msg, unsigned int wparam,
                             unsigned int lparam)
 {
-    Event_4b5cc0 e;
+    MouseEvent e;
     switch (msg) {
     case WM_CREATE:
         return 0;
@@ -802,11 +783,11 @@ long __stdcall WindowProc(HWND hwnd, unsigned int msg, unsigned int wparam,
     case WM_MOUSEMOVE:
         e.x = lparam & 0xffff;
         e.y = (lparam >> 16) & 0xffff;
-        e.buttons = wparam;
-        e.time = GetTickCount() * g_display->tickScale / 1000;
-        e.flag = 0;
-        e.message = msg;
-        SetCurrentMouseEvent((int*)&e);
+        e.keyFlags = wparam;
+        e.scaledTick = GetTickCount() * g_display->tickScale / 1000;
+        e.dblClick = 0;
+        e.msg = msg;
+        SetCurrentMouseEvent(&e);
         return 0;
     case WM_LBUTTONDOWN:
     case WM_LBUTTONUP:
@@ -814,17 +795,17 @@ long __stdcall WindowProc(HWND hwnd, unsigned int msg, unsigned int wparam,
     case WM_RBUTTONUP:
         e.x = lparam & 0xffff;
         e.y = (lparam >> 16) & 0xffff;
-        e.buttons = wparam;
-        e.time = GetTickCount() * g_display->tickScale / 1000;
-        e.flag = 0;
+        e.keyFlags = wparam;
+        e.scaledTick = GetTickCount() * g_display->tickScale / 1000;
+        e.dblClick = 0;
         break;
     case WM_LBUTTONDBLCLK:
     case WM_RBUTTONDBLCLK:
         e.x = lparam & 0xffff;
         e.y = (lparam >> 16) & 0xffff;
-        e.buttons = wparam;
-        e.time = GetTickCount() * g_display->tickScale / 1000;
-        e.flag = 1;
+        e.keyFlags = wparam;
+        e.scaledTick = GetTickCount() * g_display->tickScale / 1000;
+        e.dblClick = 1;
         break;
     case 0x219:
         if (g_display->callback != 0)
@@ -868,7 +849,7 @@ long __stdcall WindowProc(HWND hwnd, unsigned int msg, unsigned int wparam,
     default:
         return DefWindowProcA(hwnd, msg, wparam, lparam);
     }
-    e.message = msg;
+    e.msg = msg;
     PushMouseEvent(&e);
     return 0;
 }
