@@ -1,5 +1,7 @@
 // Decompiled by GPT-6, finished by deepseek-v4.1-flash, verified by GPT-6.1-sol, finished by space-bunny-free, edited by deepseek-v4.1, finished by deepseek-v4.1-flash. Names are provisional.
 // The rest of the class is in ai_player_407e70.cpp.
+struct SquadManager;  // the struct key stays in the mangled name of 0x407d40
+
 #pragma pack(push, 1)
 #include "../game/game.h"
 #pragma pack(pop)
@@ -24,7 +26,6 @@ struct Vec3_00407d40 {
     Vec3_00407d40(int ax, int ay, int az) : x(ax), y(ay), z(az) {}
 };
 
-struct SquadManager;  // the struct key stays in the mangled name of 0x407d40
 #include "squad_manager.h"
 
 // Vtable 0x4fc980, constructor 0x407350, ??_G 0x407390.
