@@ -1406,6 +1406,9 @@ struct LanguageRoot_004a1b40 {
     Language_004a1b40* language;        // +0x14
 };
 
+// Kept: this file spells Point for its 24-byte mouse-event view below, and the
+// shared point.h moves 0x4a2580 and 0x4a3eb0 out of their symbol-id windows
+// (docs/c2-regalloc.md). The two views below stay with this one.
 struct Point_004a1b40 { int x; int y; };
 struct Quad_004a1b40 { Point_004a1b40 points[4]; };
 
@@ -3449,6 +3452,7 @@ struct Dialog_4a4980 {
 };
 #pragma pack(pop)
 
+// Kept with the 0x4a1b40 view above.
 struct Point_004a4980 {
     int x;
     int y;
@@ -3545,6 +3549,7 @@ struct Explosion;
 #pragma pack(push, 1)
 
 struct Dialog_4a4b50;
+// Kept with the 0x4a1b40 view above.
 struct Point_004a4b50 { int x, y; };
 
 
