@@ -610,11 +610,11 @@ address,name
 0x432be0,UElem_00432be0::?$vector::size
 0x432c00,StringRef::FUN_00432c00
 0x432c20,StringRef::FUN_00432c20
-0x432c40,UEntry_00432cf0::?$vector::_Ucopy
+0x432c40,UWeaponDef_DamagePair::?$vector::_Ucopy
 0x432c80,AssignRange
 0x432cb0,AssignRangeBack
-0x432cf0,UEntry_00432cf0::?$allocator::construct
-0x432d20,Entry_00432cf0::AssignPair
+0x432cf0,UWeaponDef_DamagePair::?$allocator::construct
+0x432d20,WeaponDef_DamagePair::AssignPair
 0x432d40,SortUnitTypes
 0x432fb0,InsertionSortUnitTypes
 0x4330b0,LosTables::FreeTables

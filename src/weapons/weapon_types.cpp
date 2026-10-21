@@ -39,26 +39,27 @@ static inline bool Less(const char* a, const char* b) {
     return _strcmpi(a, b) < 0;
 }
 
-// One entry of a weapon's damage table: a unit name and its damage.
-struct Entry_00432cf0 {
-    StringRef name; // +0x0
-    int value;           // +0x4
+// One entry of a weapon's DAMAGE table: a unit name and its damage (Thaldren's
+// WeaponDef_DamagePair, data/thaldren/structs.csv).
+struct WeaponDef_DamagePair {
+    StringRef unitName; // +0x0
+    int damage;         // +0x4
 
-    Entry_00432cf0(const StringRef& n, int v) : name(n), value(v) {}
+    WeaponDef_DamagePair(const StringRef& n, int v) : unitName(n), damage(v) {}
 };
 
 #pragma pack(push, 1)
 // The damage table, kept sorted by name.
 struct Table_00499cd0 {
     char less;                     // +0x0
-    std::vector<Entry_00432cf0> v; // +0x1
+    std::vector<WeaponDef_DamagePair> v; // +0x1
 
-    Entry_00432cf0* LowerBound(const char* key) {
-        Entry_00432cf0* first = v.begin();
-        Entry_00432cf0* last = v.end();
+    WeaponDef_DamagePair* LowerBound(const char* key) {
+        WeaponDef_DamagePair* first = v.begin();
+        WeaponDef_DamagePair* last = v.end();
         while (first != last) {
-            Entry_00432cf0* mid = first + (last - first) / 2;
-            if (Less(mid->name.ptr, key))
+            WeaponDef_DamagePair* mid = first + (last - first) / 2;
+            if (Less(mid->unitName.ptr, key))
                 first = mid + 1;
             else
                 last = mid;
@@ -292,15 +293,15 @@ model_done:
                     w->table = new Table_00499cd0;
                 StringRef name(key);
                 Table_00499cd0* m = w->table;
-                Entry_00432cf0* e = m->LowerBound(name.ptr);
+                WeaponDef_DamagePair* e = m->LowerBound(name.ptr);
                 // insert called here, not in a helper (inline depth); e assigned
-                // first, then &e->value taken in each arm.
+                // first, then &e->damage taken in each arm.
                 int* r;
-                if (e == m->v.end() || Ne(e->name, name)) {
-                    e = m->v.insert(e, Entry_00432cf0(name, 0));
-                    r = &e->value;
+                if (e == m->v.end() || Ne(e->unitName, name)) {
+                    e = m->v.insert(e, WeaponDef_DamagePair(name, 0));
+                    r = &e->damage;
                 } else {
-                    r = &e->value;
+                    r = &e->damage;
                 }
                 *r = value;
             }
