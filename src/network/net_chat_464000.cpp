@@ -1,14 +1,5 @@
 // Decompiled by Opus. Names are provisional.
-struct ChatHudEntry {
-    char unknown_0[0x1e];
-    unsigned char flags;   // +0x1e
-    char unknown_1f[0x29];
-};
-
-struct Game {
-    char unknown_0[0x1318];
-    ChatHudEntry entries[30];
-};
+#include "../game/game.h"
 
 extern Game* g_game;
 int ScrollToNextMessageUnit(void);
