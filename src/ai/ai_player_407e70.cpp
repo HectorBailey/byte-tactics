@@ -109,7 +109,9 @@ struct Unit {
 };
 #pragma pack(pop)
 
-struct Group_00407e90 {
+// A player's squad group, the same 0x20-byte record ai_player.cpp declares as
+// Group (one of Player's squads).
+struct Group {
     Player* player;                     // +0x0
     int id;                             // +0x4
     char unknown_8[0x10 - 0x8];
@@ -187,7 +189,7 @@ void SpatialTimer::OnTimer()
     // Computed first or the sum folds into one lea.
     int delay = RandomInt(150) + 30;
     next = g_game->gameTick + delay;
-    if (((Group_00407e90*)group)->units.empty())
+    if (((Group*)group)->units.empty())
         return;
     // Unused on purpose: it emits the operator delete call after the loop.
     std::vector<Unit*> unused;
@@ -198,7 +200,7 @@ void SpatialTimer::OnTimer()
         step = Offset(angle, 0x1400000);
     }
     probe += step;
-    if (IsVisible(((Group_00407e90*)group)->player, (Position_00408090*)&probe)) {
+    if (IsVisible(((Group*)group)->player, (Position_00408090*)&probe)) {
         int r = SumUnitRatingsInRange(player, &probe, 0xa0);
         // Operand order: the bestRating roll is called first.
         if (RandomInt(r) > RandomInt(bestRating)) {
@@ -206,8 +208,8 @@ void SpatialTimer::OnTimer()
             best = probe;
         }
     }
-    for (std::vector<Unit*>::iterator it = ((Group_00407e90*)group)->units.begin();
-         it != ((Group_00407e90*)group)->units.end(); ++it) {
+    for (std::vector<Unit*>::iterator it = ((Group*)group)->units.begin();
+         it != ((Group*)group)->units.end(); ++it) {
         Unit* u = *it;
         if (((UnitDefFlags_00407e90*)u->def)->flag4) {
             if (u->motion || WeaponCanReachPos(u, &u->pos, &best, 0)) {
