@@ -14,10 +14,16 @@
 #include "surface.h"
 #include "../util/point.h"
 
-struct Span_004c0330 {
-    int left;                          // +0x0
-    int right;                         // +0x4
-    int unknown_8[8];
+// One scanline of a polygon: the two ends, their 16.16 depth and shade, the
+// same shape and stride draw.cpp's Span has. This file only reads the ends.
+struct Span {
+    int x1;                            // +0x0
+    int x2;                            // +0x4
+    char unknown_8[0x18 - 0x8];
+    int z1;                            // +0x18 (16.16)
+    int z2;                            // +0x1c (16.16)
+    int s1;                            // +0x20 (16.16)
+    int s2;                            // +0x24 (16.16)
 };
 
 int __stdcall LockScreen(Surface* out);
@@ -37,7 +43,7 @@ int __stdcall ScanFillPolygon(Surface* surface, Point* points, int n, unsigned c
 {
     Surface screen;
     Rect clip;
-    Span_004c0330 span[0x800];
+    Span span[0x800];
     int locked;
     int minY;
     int maxY;
@@ -111,7 +117,7 @@ int __stdcall ScanFillPolygon(Surface* surface, Point* points, int n, unsigned c
         return 0;
     }
 
-    Span_004c0330* sp = span;
+    Span* sp = span;
     i = minIdx;
     do {
         j = i - 1;
@@ -132,7 +138,7 @@ int __stdcall ScanFillPolygon(Surface* surface, Point* points, int n, unsigned c
             if (y1 > clip.bottom)
                 y1 = clip.bottom;
             for (int y = y0; y < y1; y++) {
-                sp->left = fx >> 16;
+                sp->x1 = fx >> 16;
                 fx += slope;
                 sp++;
             }
@@ -164,7 +170,7 @@ int __stdcall ScanFillPolygon(Surface* surface, Point* points, int n, unsigned c
             if (y1 > clip.bottom)
                 y1 = clip.bottom;
             for (int y = y0; y < y1; y++) {
-                sp->right = fx >> 16;
+                sp->x2 = fx >> 16;
                 fx += slope;
                 sp++;
             }
@@ -174,17 +180,17 @@ int __stdcall ScanFillPolygon(Surface* surface, Point* points, int n, unsigned c
             i = 0;
     } while (i != maxIdx);
 
-    Span_004c0330* s = span;
+    Span* s = span;
     for (i = minY; i < maxY; i++) {
-        if (s->right > clip.right)
-            s->right = clip.right;
-        if (s->left < clip.left)
-            s->left = clip.left;
-        int w = s->right - s->left;
+        if (s->x2 > clip.right)
+            s->x2 = clip.right;
+        if (s->x1 < clip.left)
+            s->x1 = clip.left;
+        int w = s->x2 - s->x1;
         // Fill value read through an int lvalue; the parameter stays unsigned char
         // (the mangled name depends on it).
         if (w > 0)
-            memset(surface->pixels + surface->pitch * i + s->left, *(int *)&color, w);
+            memset(surface->pixels + surface->pitch * i + s->x1, *(int *)&color, w);
         s++;
     }
     if (locked)
