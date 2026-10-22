@@ -95,21 +95,9 @@ struct Pos_4589c0 {
 // object-picture builder allocates, its shadow and the scratch frames.
 #include "gaf_frame.h"
 
-struct Surface_4589c0 {
-    int width;                         // +0x00
-    int height;                        // +0x04
-    int pitch;                         // +0x08
-    void* bits;                        // +0x0c
-    int zPriority;                     // +0x10
-    int colorKey;                      // +0x14
-    unsigned short x;                  // +0x18
-    unsigned short y;                  // +0x1a
-    char unknown_1c[0x10];
-    unsigned int flag0 : 1;            // +0x2c
-    unsigned int flag1 : 1;
-};
-
-class Surface;
+// The frame the shadow draw builds is a Surface: SurfaceFromFrame (0x4b8ae0)
+// takes one, and it is what DrawFrame draws.
+#include "surface.h"
 
 // One primitive of a model node: its vertex indices, its picture and its
 // flags.
@@ -341,9 +329,6 @@ int DirectionFromStep(int, int);
 void CountPacket(int, int, int);
 void SetCameraPosition(int, int, int);
 void StartScreenShake(int, int, int);
-void AccumulateScreenShake(int, int, int);
-void CenterCameraOnPoint(int, int, int);
-void SetMissionStatus(int, int, int);
 
 // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int RIReport(int, int, int, int, int, int, int, int, int, int);
@@ -365,7 +350,7 @@ void __stdcall DrawLitTexturedPolygon(GafFrame* surface, void* pic, void* poly, 
 void __stdcall FillPolygon(void* surface, Point* points, int count, int flags);
 void __stdcall DrawFrameQuad(void* surface, void* pic, Point* points, void* src);
 void __stdcall DrawPolygonEdges(GafFrame* view, Vec3* points, int count, int color);
-void __stdcall SurfaceFromFrame(Surface_4589c0* dst, GafFrame* src);
+void __stdcall SurfaceFromFrame(Surface* dst, GafFrame* src);
 void __stdcall DrawFrame(Surface* dst, GafFrame* bmp, int x, int y);
 int __stdcall GetGroundHeight(Pos_459200* p);
 void __stdcall DrawFrameBlended(int param_1, GafFrame* param_2, int x, int y);
@@ -770,7 +755,7 @@ void CMemoryCache::MergeIntoComposite(GafFrame* bmp, Model_459200* model)
         // All swaps and save/restores go through the inline Swap(T&, T&).
         Swap(bmp->xOffset, sdx);
         Swap(bmp->yOffset, sdy);
-        Surface_4589c0 surface;
+        Surface surface;
         SurfaceFromFrame(&surface, this->bitmap);
         memset(this->bitmap->pixelsOrLayers, this->bitmap->transparency,
                this->bitmap->height * this->bitmap->width);
@@ -778,7 +763,7 @@ void CMemoryCache::MergeIntoComposite(GafFrame* bmp, Model_459200* model)
         DrawFrame((Surface*)&surface, bmp,
                      this->bitmap->xOffset - sdx, this->bitmap->yOffset - sdy);
         // Read before the first swap.
-        surface.bits = this->bitmap->scratch;
+        surface.pixels = this->bitmap->scratch;
         Swap(bmp->pixelsOrLayers, bmp->scratch);
         DrawFrame((Surface*)&surface, bmp,
                      this->bitmap->xOffset - sdx, this->bitmap->yOffset - sdy);
@@ -1282,6 +1267,16 @@ void __fastcall TransformPieces(Model_459200* owner, Piece_459c70* piece,
         deep = 1;
     }
 }
+
+// Unused here: the symbol ids these declarations take keep PoseModel's
+// allocation after the Surface include above (docs/c2-regalloc.md).
+Surface* __stdcall AllocSurface(char* name, int width, int height);
+void __stdcall FreeSurface(Surface* surface);
+int __stdcall LockScreen(Surface* out);
+int __stdcall UnlockScreen(Surface* s);
+int __stdcall SetPageFlipping(int enable);
+void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y);
+void __cdecl BlitSurface(Surface* dst, Surface* src, int x, int y);
 
 // The two functions below are kept after 0x45b150 and out of address order:
 // defined at their addresses their bodies' symbol ids would move the register
