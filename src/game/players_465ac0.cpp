@@ -120,7 +120,7 @@ int __stdcall IsUnitVisibleToPlayer(Map_00465ac0* map, Unit* u)
 {
     if ((Map_00465ac0*)u->player == map)
         return 1;
-    if (u->activateFlags & 4)
+    if (u->cloaked)
         return 0;
     Vec3 p;
     p.x = u->def->modelMinX + u->pos.x;
