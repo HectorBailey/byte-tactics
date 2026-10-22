@@ -22,7 +22,7 @@ struct Position_00475470 {             // 16.16 fixed point; only high words rea
     short z;                           // +0xa
 };
 
-struct MapSize_00475470 {
+struct MapSize {
     unsigned int width;                // +0x0
     unsigned int height;               // +0x4
     int Contains(unsigned int tx, unsigned int ty)
@@ -31,9 +31,9 @@ struct MapSize_00475470 {
     }
 };
 
-struct ByteMap_00475470 {
+struct ByteMap {
     unsigned char* data;               // +0x0
-    MapSize_00475470 size;             // +0x4
+    MapSize size;                      // +0x4
     int Index(int x, int y) { return size.width * y + x; }
     // Get goes through Index: the extra register shapes both arms.
     unsigned char Get(int x, int y) { return data[Index(x, y)]; }
@@ -44,7 +44,7 @@ struct ByteMap_00475470 {
 // ByteMap this fog test needs.
 struct Player {
     char unknown_0[0x7c];
-    ByteMap_00475470 explored;         // +0x7c
+    ByteMap explored;                  // +0x7c
     char unknown_88[0x14b - 0x88];
 };
 
@@ -99,7 +99,7 @@ static inline int IsSeen(Player* map, Position_00475470* pos)
     }
     // Pointer local declared after the Contains test: the extra register
     // makes the width load materialise.
-    ByteMap_00475470* b = &map->explored;
+    ByteMap* b = &map->explored;
     return (g_game->visibilityMask[b->Index(tx, ty)] &
             (1 << g_game->playerIndex)) != 0;
 }

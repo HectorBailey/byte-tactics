@@ -22,7 +22,7 @@ struct Pos_00474b80 {
     short y;                       // +0x08 (record +0x0e)
 };
 
-struct MapSize_00474b80 {
+struct MapSize {
     unsigned int width;            // +0x80
     unsigned int height;           // +0x84
 
@@ -32,9 +32,9 @@ struct MapSize_00474b80 {
     }
 };
 
-struct ByteMap_00474b80 {
+struct ByteMap {
     unsigned char* data;           // +0x7c
-    MapSize_00474b80 size;         // +0x80
+    MapSize size;                  // +0x80
 
     unsigned char Get(int x, int y) { return data[size.width * y + x]; }
 };
@@ -43,7 +43,7 @@ struct ByteMap_00474b80 {
 // ByteMap this fog test needs.
 struct Player {
     char unknown_0[0x7c];
-    ByteMap_00474b80 explored;     // +0x7c
+    ByteMap explored;// +0x7c
     char unknown_88[0x14b - 0x88];
 };
 

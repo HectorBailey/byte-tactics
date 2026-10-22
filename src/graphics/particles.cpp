@@ -675,7 +675,7 @@ public:
 };
 
 // The explored-cell views of the smoke draws.
-struct MapSize_004745e0 {
+struct MapSize {
     unsigned int width;             // +0x80
     unsigned int height;            // +0x84
 
@@ -685,16 +685,16 @@ struct MapSize_004745e0 {
     }
 };
 
-struct ByteMap_004745e0 {
+struct ByteMap {
     unsigned char* data;            // +0x7c
-    MapSize_004745e0 size;          // +0x80
+    MapSize size;                   // +0x80
 
     unsigned char Get(int tx, int ty) { return data[size.width * ty + tx]; }
 };
 
 struct Map_004745e0 {               // one entry of g_game->players
     char unknown_0[0x7c];
-    ByteMap_004745e0 explored;      // +0x7c
+    ByteMap explored;               // +0x7c
     char unknown_88[0x14b - 0x88];
 };
 
