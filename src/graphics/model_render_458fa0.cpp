@@ -3,11 +3,8 @@
 // the register choice.
 #include <windows.h>
 
-struct Vertex_0045a610 {
-    int x;
-    int y;
-    int z;
-};
+// The vertices are 16.16 vec3s: DrawPolygonEdges (0x4c0820) spells them Vec3.
+#include "../util/vec3.h"
 
 #include "gaf_frame.h"
 
@@ -32,7 +29,7 @@ struct PieceInfo_00458fa0 {
 struct Piece_00458310 {
     PieceInfo_00458fa0* info;         // +0x0
     char unknown_4[0x22 - 0x4];
-    Vertex_0045a610* vertices;        // +0x22
+    Vec3* vertices;                   // +0x22
     char unknown_26[0x28 - 0x26];
     unsigned char flags;              // +0x28
     char unknown_29[0x36 - 0x29];
@@ -59,7 +56,7 @@ struct Model_00458fa0 {
 };
 #pragma pack(pop)
 
-void __stdcall DrawPolygonEdges(GafFrame* view, Vertex_0045a610* points, int count, int color);
+void __stdcall DrawPolygonEdges(GafFrame* view, Vec3* points, int count, int color);
 
 // A method that ignores `this`: its one caller (0x458dd0, MATCH) passes its own
 // `this` through in ecx, and spells the parameters (image, model, palette).
@@ -74,8 +71,8 @@ public:
 // FUNCTION: 0x458fa0
 void CMemoryCache::DrawPieceEdges(GafFrame* view, Model_00458fa0* model, int color)
 {
-    Vertex_0045a610 verts[2000];
-    Vertex_0045a610 tmp[25];
+    Vec3 verts[2000];
+    Vec3 tmp[25];
     int faceno = 0;
     int i = model->pieceCount - 1;
     if (i >= 0) {
@@ -86,7 +83,7 @@ void CMemoryCache::DrawPieceEdges(GafFrame* view, Model_00458fa0* model, int col
             do {} while (0);  // emits no code; the match needs it (header note 2)
             if (flags & 1) {
                 PieceInfo_00458fa0* info = piece->info;
-                Vertex_0045a610* v = piece->vertices;
+                Vec3* v = piece->vertices;
                 for (int j = 0; j < info->vertexCount; j++, v++) {
                     int bright = model->owner->map->brightFaces ? 125 : 50;
                     int x = (short)(v->x >> 16);

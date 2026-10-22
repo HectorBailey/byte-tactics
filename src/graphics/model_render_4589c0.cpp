@@ -19,6 +19,9 @@ struct Model_459200;
 
 #include "../units/unit_def.h"
 
+// The int arm of the Vec3_459200 union is the plain Vec3 of util/vec3.h.
+#include "../util/vec3.h"
+
 // The unit def's type flags at +0x241 (Thaldren's UnitTypeFlags): bit 25 is noshadow and
 // bit 30 is digger.
 #pragma pack(push, 1)
@@ -115,16 +118,10 @@ struct Pos_459200 {
     Fixed_459200 z;
 };
 
-struct Ints_459200 {
-    int x;
-    int y;
-    int z;
-};
-
 union Vec3_459200 {
     int v[3];
     Pos_459200 p;
-    Ints_459200 i;
+    Vec3 i;
 };
 #pragma pack(pop)
 
