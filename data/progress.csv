@@ -2460,7 +2460,7 @@ address,size,file,symbol,status,similarity
 0x4b5070,619,src/graphics/display.cpp,?CheckDirectXVersion@@YGHHHHHH@Z,matched,100.0
 0x4b52e0,80,src/graphics/display.cpp,?InitDisplayDefaults@@YGXPAUApp_4b5980@@@Z,matched,100.0
 0x4b5330,57,src/graphics/display.cpp,?EnumModesCallback@@YGJPAU_DDSURFACEDESC@@PAX@Z,matched,100.0
-0x4b5370,411,src/graphics/display.cpp,?GetDisplayModes@@YGHPAUModeList_004b5330@@@Z,matched,100.0
+0x4b5370,411,src/graphics/display.cpp,?GetDisplayModes@@YGHPAUDisplayModeList@@@Z,matched,100.0
 0x4b5510,1017,src/graphics/display.cpp,?SetFullScreen@@YGHH@Z,matched,100.0
 0x4b5910,34,src/graphics/display.cpp,?ToggleFullScreen@@YGXXZ,matched,100.0
 0x4b5940,57,src/graphics/display.cpp,?SetResolution@@YGXHH@Z,matched,100.0
