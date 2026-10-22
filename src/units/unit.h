@@ -56,7 +56,11 @@ struct Unit {
     int workTime;                      // +0xb0
     char unknown_b4[4];                // +0xb4, no view names it
     unsigned short killCount;          // +0xb8
-    unsigned short netDirtyFlags;      // +0xba
+    // The net pending mask, one bit each: SetUnitValue sets `dirty` with a
+    // single or, which a byte member would not give.
+    unsigned short unknown_ba : 2;
+    unsigned short dirty : 1;          // +0xba bit 2
+    unsigned short unknown_ba_3 : 13;
     UnitResources resourceSlot;        // +0xbc, 0x34 bytes
     Unit* attacker;                    // +0xf0
     unsigned char lastAttackerSlot;    // +0xf4
@@ -72,8 +76,17 @@ struct Unit {
     float buildLeft;                   // +0x104
     short health;                      // +0x108
     char unknown_10a[4];               // +0x10a
-    unsigned char activateFlags;       // +0x10e
-    unsigned char cobStateFlags;       // +0x10f
+    // The script's activation and COB state bits, one bit each: a bit test
+    // rather than a byte compare, which is what the original codegen does.
+    unsigned char on : 1;              // +0x10e bit 0
+    unsigned char on2 : 1;             // +0x10e bit 1
+    unsigned char cloaked : 1;         // +0x10e bit 2, the cloak range ring
+    unsigned char unknown_10e : 5;
+    unsigned char bit0 : 1;            // +0x10f bit 0
+    unsigned char bit1 : 1;
+    unsigned char bit2 : 1;
+    unsigned char bit3 : 1;
+    unsigned char unknown_10f : 4;
     unsigned int flags;                // +0x110
     unsigned int zBufferFlag;          // +0x114
 
