@@ -54,7 +54,7 @@ struct Point_004c0c70 {
 };
 
 // The two ends of the segment being drawn.
-struct Segment_004bf060 {
+struct Segment {
     Point* from;
     Point* to;
 };
@@ -401,7 +401,7 @@ unsigned int __stdcall ReadPixel(Surface* surface, int x, int y)
 //
 // check.py prints MATCH (508 bytes). Two source shapes carry the match and
 // both are needed:
-// - the segment ends walk the array through the local Segment_004bf060. With
+// - the segment ends walk the array through the local Segment. With
 //   two plain `Point*` locals (however they are spelled, in either order, or
 //   with an index) MSVC 5 folds them into a single induction variable biased
 //   to a middle field, and then one callee-saved register is free, so the
@@ -424,7 +424,7 @@ int __stdcall DrawPolyline(Surface* surface, Point* points,
         Surface screen;
         result = LockScreen(&screen);
         if (result != 0) {
-            Segment_004bf060 seg;
+            Segment seg;
             seg.from = points;
             seg.to = points + 1;
             int n = count - 1;
@@ -452,7 +452,7 @@ int __stdcall DrawPolyline(Surface* surface, Point* points,
             UnlockScreen(&screen);
         }
     } else {
-        Segment_004bf060 seg;
+        Segment seg;
         seg.from = points;
         seg.to = points + 1;
         int n = count - 1;
