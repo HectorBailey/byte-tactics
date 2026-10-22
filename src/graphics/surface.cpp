@@ -19,8 +19,9 @@ void StepPaletteFade(void);
 int IsFadeDone(void);
 
 // The display flags word at +0xf0: set through the bitfield, read whole
-// (FlipScreen) or as its low byte (FillSurface).
-union Flags_004c61b0 {
+// (FlipScreen) or as its low byte (FillSurface). graphics/gaf.cpp reads the
+// same word as Flags_004b8310.
+union DisplayFlags {
     unsigned short word;
     unsigned char byte;
     struct {
@@ -85,7 +86,7 @@ struct Display {
     char unknown_e0[0xe4 - 0xe0];
     int field_e4;                      // +0xe4
     char unknown_e8[0xf0 - 0xe8];
-    Flags_004c61b0 flags;              // +0xf0
+    DisplayFlags flags;                // +0xf0
     char unknown_f2[0x196 - 0xf2];
     int rect_x;                        // +0x196
     int rect_y;                        // +0x19a
@@ -160,8 +161,12 @@ struct Display {
 };
 #pragma pack(pop)
 
-// COM interface (slot 27 = +0x6c is the tested method).
-class Intf_004c6210 {
+// The DirectDraw surface interface as this file calls it: 28 slots, in the
+// order <ddraw.h> declares them (slot 21 is GetPixelFormat, which
+// graphics/movies.cpp calls through the same number, and slot 27 is Restore,
+// which RestoreSurfaces tests). These declarations also hold the symbol ids
+// that FillSurface and the two textured span fills need (docs/c2-regalloc.md).
+class DirectDrawSurface {
 public:
     virtual int __stdcall Slot00();
     virtual int __stdcall Slot01();
@@ -190,13 +195,16 @@ public:
     virtual int __stdcall Slot24();
     virtual int __stdcall Slot25();
     virtual int __stdcall Slot26();
-    virtual int __stdcall Slot27();
+    virtual int __stdcall Restore();
 };
 
-struct Arg_004c6210 {
+// The DirectDraw objects the display holds: the driver and its two surfaces.
+// graphics/movies.cpp reads the same set (its Surfaces, with the clipper and
+// the palette that follow at +0xc and +0x10).
+struct Surfaces {
     int ddraw;                         // +0x0
-    Intf_004c6210* primary;            // +0x4
-    Intf_004c6210* back;               // +0x8
+    DirectDrawSurface* primary;        // +0x4
+    DirectDrawSurface* back;           // +0x8
 };
 
 Display* GetDisplay(void);
@@ -371,15 +379,15 @@ void __stdcall SetRestoreSurface(int surface)
 // COM-like interfaces; slot 27 (+0x6c) is tested first and its non-zero
 // result aborts the blit.
 // FUNCTION: 0x4c6210
-int __stdcall RestoreSurfaces(Arg_004c6210* arg)
+int __stdcall RestoreSurfaces(Surfaces* arg)
 {
     Display* d = GetDisplay();
     if (d->offscreenDC != 0)
         return 0;
 
-    int r = arg->primary->Slot27();
+    int r = arg->primary->Restore();
     if (r == 0) {
-        r = arg->back->Slot27();
+        r = arg->back->Restore();
         if (r == 0) {
             Surface screen;
             LockScreen(&screen);
@@ -1195,7 +1203,9 @@ void __stdcall DrawQuadRow(int row, int* rect, Surface* surf, GafFrame* info)
     }
 }
 
-struct Quad_004c7580 {
+// A quadrilateral of four screen points; ingame/dialogs_493340.cpp declares the
+// same shape as Quad.
+struct Quad {
     Point p[4];
 };
 
@@ -1218,7 +1228,7 @@ void __stdcall DrawQuadRow(int y, int* rect, void* surf, void* info);
 
 // FUNCTION: 0x4c7580
 void __stdcall DrawFrameQuad(void* surf, GafFrame* bmp,
-                            Quad_004c7580* dst, Quad_004c7580* src)
+                            Quad* dst, Quad* src)
 {
     if (bmp == 0)
         return;
@@ -1237,7 +1247,7 @@ void __stdcall DrawFrameQuad(void* surf, GafFrame* bmp,
         locked = 0;
     }
 
-    Quad_004c7580 tmp;
+    Quad tmp;
     if (src == 0) {
         src = &tmp;
         tmp.p[0].x = 0;
