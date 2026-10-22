@@ -568,20 +568,12 @@ void __stdcall SurfaceFromFrame(Surface* dst, GafFrame* src)
     ResetClipRect((int*)dst);
 }
 
-// A 0x14-byte surface as 0x4b8ae0 reads it: size, pitch, bits and the two
-// origin words.
-struct Src_004b8ae0 {
-    unsigned short a;               // +0x0
-    char unknown_2[2];
-    unsigned short b;               // +0x4
-    char unknown_6[2];
-    unsigned short c;               // +0x8
-    char unknown_a[2];
-    int d;                          // +0xc
-    char unknown_10[8];
-    unsigned short e;               // +0x18
-    unsigned short f;               // +0x1a
-};
+// Unused here: real declarations that hold the symbol ids the local surface
+// view used to take, so the frame functions keep their allocation
+// (docs/c2-regalloc.md).
+Surface* __stdcall AllocSurface(char* name, int width, int height);
+void __stdcall FreeSurface(Surface* obj);
+int __stdcall SetPageFlipping(int enable);
 
 // Unused here: real functions declared to keep the file's symbol count.
 void __stdcall DrawBattleFrame(int param_1, int param_2);
@@ -590,14 +582,14 @@ void __stdcall HAPI_FindClose(int handle);
 // Initialises a frame from a surface description. The width is written
 // twice in the original (first the surface's width, then its pitch).
 // FUNCTION: 0x4b8ae0
-void __stdcall FrameFromSurface(GafFrame* dst, Src_004b8ae0* src)
+void __stdcall FrameFromSurface(GafFrame* dst, Surface* src)
 {
-    dst->width = src->a;
-    dst->height = src->b;
-    dst->width = src->c;
-    dst->pixelsOrLayers = (unsigned char*)src->d;
-    dst->xOffset = src->e;
-    dst->yOffset = src->f;
+    dst->width = src->width;
+    dst->height = src->height;
+    dst->width = src->pitch;
+    dst->pixelsOrLayers = src->pixels;
+    dst->xOffset = src->x;
+    dst->yOffset = src->y;
     dst->compressed = 0;
     dst->transparency = 0xff;
     dst->layers = 0;
