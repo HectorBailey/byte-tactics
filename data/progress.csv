@@ -1156,7 +1156,7 @@ address,size,file,symbol,status,similarity
 0x459200,1506,src/graphics/model_render_4589c0.cpp,?DrawObjectPicture@CMemoryCache@@QAEXHPAUModel_459200@@TVec3_459200@@H@Z,matched,100.0
 0x4597f0,61,src/graphics/model_render.cpp,?SetLightVector@@YGXHHH@Z,matched,100.0
 0x459830,1082,src/graphics/model_render.cpp,?DrawPieces@UnitTable@@QAEXPAUGafFrame@@PAUModel_459200@@HH@Z,matched,100.0
-0x459c70,2047,src/graphics/model_render_4581e0.cpp,?DrawLitPieces@UnitTable@@QAEXPAUGafFrame@@PAUList_459c70@@HH@Z,matched,100.0
+0x459c70,2047,src/graphics/model_render_4581e0.cpp,?DrawLitPieces@UnitTable@@QAEXPAUGafFrame@@PAUModel_459200@@HH@Z,matched,100.0
 0x45a470,156,src/graphics/model_render.cpp,?MakeSilhouette@CMemoryCache@@QAEPAUGafFrame@@PAU2@@Z,matched,100.0
 0x45a510,254,src/graphics/model_render.cpp,?MeasureShadow@CMemoryCache@@QAEXPAH000PAUModel_459200@@@Z,matched,100.0
 0x45a610,379,src/graphics/model_render.cpp,?DrawShadowShape@CMemoryCache@@QAEXPAUGafFrame@@PAUModel_459200@@@Z,matched,100.0
