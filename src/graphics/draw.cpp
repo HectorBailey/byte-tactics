@@ -59,32 +59,35 @@ struct Segment {
     Point* to;
 };
 
-// The display object's fade tables at +0xc4 and the screen size at +0xd4.
+// The display object's shade and light tables at +0xc4 and +0xc8, and the
+// screen size at +0xd4. A fade darkens through the shade table and brightens
+// through the light one.
 struct Engine_004bf4d0 {
     char unknown_0[0xc4];
-    unsigned char* fade_neg;           // +0xc4
-    unsigned char* fade_pos;           // +0xc8
+    unsigned char* shadeTable;         // +0xc4
+    unsigned char* lightTable;         // +0xc8
     char unknown_cc[0xd4 - 0xcc];
     int width;                         // +0xd4
     int height;                        // +0xd8
 };
 
-// The display object's colour table at +0xc8.
+// The display object's light table at +0xc8, the one DrawLitLine draws through.
 struct App_004bec70 {
     char unknown_0[0xc8];
-    unsigned int* palette;             // +0xc8
+    unsigned char* lightTable;         // +0xc8
 };
 
-// The display object's colour table at +0xc0.
+// The display object's alpha table at +0xc0, the one DrawBlendedLine draws
+// through (a 256 by 256 byte matrix, indexed level first).
 struct App_004bed70 {
     char unknown_0[0xc0];
-    unsigned int* palette;             // +0xc0
+    unsigned char* alphaTable;         // +0xc0
 };
 
-// The display object's shaded palette table at +0xc4.
+// The display object's shade table at +0xc4, indexed level first.
 struct App_004c0b10 {
     char unknown_0[0xc4];
-    unsigned char* shade;              // +0xc4
+    unsigned char* shadeTable;         // +0xc4
 };
 
 // The display object's grey table at +0xcc and its flags at +0xf1.
@@ -114,7 +117,7 @@ int __stdcall UnlockScreen(Surface* s);
 int __stdcall ClipLine(Surface* dst, int* x0, int* y0, int* x1, int* y1);
 void __cdecl BlitLine(Surface* dst, int x0, int y0, int x1, int y1, int color);
 void __cdecl BlitLineRemapped(Surface* dst, int x0, int y0, int x1, int y1,
-                              int color, unsigned int* palette);
+                              int color, unsigned char* table);
 int __stdcall GetDisplay();
 int __stdcall ClipRectangle(Surface* surface, Rect* r);
 void __cdecl FillSolidRect(Surface* s, Rect* r, int color);
@@ -274,7 +277,7 @@ Surface* __stdcall DrawLitLine(Surface* surface, int x0, int y0,
                                          int x1, int y1, int color)
 {
     App_004bec70* app = (App_004bec70*)GetDisplay();
-    if (!app->palette)
+    if (!app->lightTable)
         return 0;
     Surface* ret;
     if (surface == 0) {
@@ -282,12 +285,12 @@ Surface* __stdcall DrawLitLine(Surface* surface, int x0, int y0,
         ret = (Surface*)LockScreen(&screen);
         if (ret) {
             if (ClipLine(&screen, &x0, &y0, &x1, &y1))
-                BlitLineRemapped(&screen, x0, y0, x1, y1, color, app->palette);
+                BlitLineRemapped(&screen, x0, y0, x1, y1, color, app->lightTable);
             UnlockScreen(&screen);
         }
     } else {
         if (ClipLine(surface, &x0, &y0, &x1, &y1))
-            BlitLineRemapped(surface, x0, y0, x1, y1, color, app->palette);
+            BlitLineRemapped(surface, x0, y0, x1, y1, color, app->lightTable);
         ret = (Surface*)1;
     }
     return ret;
@@ -311,12 +314,12 @@ Surface* __stdcall DrawBlendedLine(Surface* surface, int x0, int y0,
         ret = (Surface*)LockScreen(&screen);
         if (ret) {
             if (ClipLine(&screen, &x0, &y0, &x1, &y1))
-                BlitLineRemapped(&screen, x0, y0, x1, y1, color, app->palette);
+                BlitLineRemapped(&screen, x0, y0, x1, y1, color, app->alphaTable);
             UnlockScreen(&screen);
         }
     } else {
         if (ClipLine(surface, &x0, &y0, &x1, &y1))
-            BlitLineRemapped(surface, x0, y0, x1, y1, color, app->palette);
+            BlitLineRemapped(surface, x0, y0, x1, y1, color, app->alphaTable);
         ret = (Surface*)1;
     }
     return ret;
@@ -587,7 +590,7 @@ int __stdcall FadeRectangle(Surface* surface, Rect* rect, int level)
         if (level < 0) {
             if (level < -0x20)
                 level = -0x20;
-            table = engine->fade_neg;
+            table = engine->shadeTable;
             level += 0x20;
             if (table == 0)
                 return 0;
@@ -595,7 +598,7 @@ int __stdcall FadeRectangle(Surface* surface, Rect* rect, int level)
         } else {
             if (level > 0x1f)
                 level = 0x1f;
-            table = engine->fade_pos;
+            table = engine->lightTable;
             if (table == 0)
                 return 0;
             t = table + (level << 8);
@@ -1283,7 +1286,7 @@ int __stdcall DrawPolygonEdges(GafFrame* surf, Vec3* pts, int count,
 // the cached start, same value because start is span->x1 after the clamp)
 // flips the commutative add destination to edx and matches.
 //
-// Inert: `(app->shade + (si << 8))[color]` and `*(app->shade + (si << 8) + color)`
+// Inert: `(app->shadeTable + (si << 8))[color]` and `*(app->shadeTable + (si << 8) + color)`
 // for the shade lookup, do/while for the depth loop (73.2 percent), `for (; count;
 // count--)`, an `int zi`, a `w`-less head with cached z1/s1/x1/x2 locals
 // (47 to 52 percent).
@@ -1326,7 +1329,7 @@ void __stdcall FillShadedSpan(int row, Span* span, GafFrame* surf, unsigned char
                 unsigned char zi = z >> 16;
                 if (*d <= zi) {
                     int si = s >> 16;
-                    *p = app->shade[(si << 8) + color];
+                    *p = app->shadeTable[(si << 8) + color];
                     *d = zi;
                 }
                 p++;
@@ -1337,7 +1340,7 @@ void __stdcall FillShadedSpan(int row, Span* span, GafFrame* surf, unsigned char
         } else {
             while (count--) {
                 int si = s >> 16;
-                *p++ = app->shade[(si << 8) + color];
+                *p++ = app->shadeTable[(si << 8) + color];
                 s += ds;
             }
         }
