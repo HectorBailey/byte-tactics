@@ -33,7 +33,7 @@ union Flags_4b5980 {
 
 // The frame counter at +0x1da: milliseconds accumulated since the last sample,
 // the last tick, the frames since then and the rate of the last second.
-struct FrameCounter_4b66a0 {
+struct FrameCounter {
     int accum;                       // +0x0
     unsigned int lastTick;           // +0x4
     int frames;                      // +0x8
@@ -104,7 +104,7 @@ struct App_4b5980 {
     Flags_4b5980 flags;                  // +0xf0, work area top
     char wa_rest[0xfc - 0xf2];
     char unknown_fc[0x1da - 0xfc];
-    FrameCounter_4b66a0 counter;         // +0x1da
+    FrameCounter counter;               // +0x1da
     Rect startMode;                      // +0x1ea
     int startWidth;                      // +0x1fa
     int startHeight;                     // +0x1fe
@@ -133,41 +133,42 @@ struct DXVersion {
 
 typedef int (__stdcall *FN_DIRECTXSETUPGETVERSION)(DWORD* major, DWORD* minor);
 
-// One display mode, as the EnumModesCallback enum callback stores it.
-struct Mode_004b5330 {
+// One display mode, as the EnumModesCallback enum callback stores it for
+// GetDisplayModes.
+struct DisplayMode {
     DWORD width;                       // +0x0
     DWORD height;                      // +0x4
     DWORD refreshRate;                 // +0x8
 };
 
 // The caller's list: a count and the array of modes to fill.
-struct ModeList_004b5330 {
+struct DisplayModeList {
     int count;                         // +0x0
-    Mode_004b5330* modes;              // +0x4
+    DisplayMode* modes;                // +0x4
 };
 
 #include "surface.h"
 
-struct BitmapInfo_004b5510 {
+struct BitmapInfo {
     BITMAPINFOHEADER bmiHeader;
     RGBQUAD bmiColors[256];
 };
 
 // One entry of the timer table at g_timerSlots: ten slots, then g_timerCount
 // counts them.
-struct Timer_4b63f0 {
+struct TimerSlot {
     void* callback;                    // +0
     int id;                            // +4, the handle the callback removes
     int interval;                      // +8, -1 when the slot is free
     int countdown;                     // +0xc
 };
 
-typedef void (__stdcall *TimerCb_4b63f0)(int);
+typedef void (__stdcall *TimerCallback)(int);
 
 extern App_4b5980* g_display;
 extern void (__cdecl *g_closeHandler)(int);
 extern int g_closeHandlerArg;
-extern Timer_4b63f0 g_timerSlots[10];
+extern TimerSlot g_timerSlots[10];
 extern int g_timerSlot0Interval;       // the interval field of the first slot
 extern int g_timerCount;
 extern unsigned int g_lastTimerTick;   // last tick count, in game ticks
@@ -377,8 +378,8 @@ void __stdcall InitDisplayDefaults(App_4b5980* p)
 // FUNCTION: 0x4b5330
 HRESULT __stdcall EnumModesCallback(DDSURFACEDESC* desc, void* context)
 {
-    ModeList_004b5330* list = (ModeList_004b5330*)context;
-    Mode_004b5330* mode = &list->modes[list->count];
+    DisplayModeList* list = (DisplayModeList*)context;
+    DisplayMode* mode = &list->modes[list->count];
     if (desc->ddpfPixelFormat.dwRGBBitCount == 8) {
         mode->width = desc->dwWidth;
         mode->height = desc->dwHeight;
@@ -392,7 +393,7 @@ HRESULT __stdcall EnumModesCallback(DDSURFACEDESC* desc, void* context)
 // from a fixed table plus the two big desktop sizes when the screen is big
 // enough; in DirectDraw mode they come from EnumDisplayModes. Returns 1.
 // FUNCTION: 0x4b5370
-int __stdcall GetDisplayModes(ModeList_004b5330* list)
+int __stdcall GetDisplayModes(DisplayModeList* list)
 {
     if (g_display->dib) {
         int width;
@@ -468,7 +469,7 @@ int __stdcall SetFullScreen(int mode) {
     int lockResult;
     App_4b5980 *d;
     DDSURFACEDESC ddsd;
-    BitmapInfo_004b5510 bmi;
+    BitmapInfo bmi;
     Surface surf;
     DDSCAPS caps;
     HRESULT hr;
@@ -964,7 +965,7 @@ void UpdateTimers()
         if (p[0] >= 0) {
             if ((p[1] -= diff) <= 0) {
                 int arg = p[-1];
-                TimerCb_4b63f0 fn = (TimerCb_4b63f0)p[-2];
+                TimerCallback fn = (TimerCallback)p[-2];
                 fn(arg);
                 p[1] = p[0];
             }
@@ -974,7 +975,7 @@ void UpdateTimers()
 }
 
 // FUNCTION: 0x4b63f0
-int __stdcall AddTimer(int interval, int id, TimerCb_4b63f0 callback)
+int __stdcall AddTimer(int interval, int id, TimerCallback callback)
 {
     unsigned int now = (GetTickCount() * g_display->tickScale) / 1000;
     int diff = (int)now - g_lastTimerTick;
@@ -984,7 +985,7 @@ int __stdcall AddTimer(int interval, int id, TimerCb_4b63f0 callback)
     do {
         if (*p >= 0) {
             if ((p[1] -= diff) <= 0) {
-                TimerCb_4b63f0 fn = (TimerCb_4b63f0)p[-2];
+                TimerCallback fn = (TimerCallback)p[-2];
                 fn(p[-1]);
                 p[1] = *p;             // reload the whole interval
             }
@@ -1047,7 +1048,7 @@ unsigned long GetMilliseconds(void)
 // FUNCTION: 0x4b6570
 int __stdcall DrawFrameRate()
 {
-    FrameCounter_4b66a0* c = &g_display->counter;
+    FrameCounter* c = &g_display->counter;
     unsigned int now = GetTickCount();
     c->accum += now - c->lastTick;
     c->lastTick = now;
