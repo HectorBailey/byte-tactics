@@ -1570,9 +1570,9 @@ address,name
 0x475880,UNanoParticle::?$vector::_Ucopy
 0x4758c0,UTeleportParticle::?$vector::insert
 0x475bd0,UThrustParticle::?$vector::insert
-0x475ef0,UElement_00475ef0::?$vector::insert
-0x476210,UElem_00476210::?$vector::insert
-0x476490,UElem_00476490::?$vector::insert
+0x475ef0,UWakeParticle::?$vector::insert
+0x476210,USmokeParticle::?$vector::insert
+0x476490,UTimedSubParticle::?$vector::insert
 0x476710,UNanoParticle::?$vector::_Ufill
 0x476740,DrawBitmapBackground
 0x4767e0,GetSideCount
