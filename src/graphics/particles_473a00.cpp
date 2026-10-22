@@ -30,7 +30,7 @@ struct Pos_004739b0 {
 
 #include "rect.h"
 
-struct MapSize_00473a00 {
+struct MapSize {
     unsigned int width;              // +0x0
     unsigned int height;             // +0x4
 
@@ -40,9 +40,9 @@ struct MapSize_00473a00 {
     }
 };
 
-struct ByteMap_00473a00 {
+struct ByteMap {
     unsigned char* data;             // +0x0
-    MapSize_00473a00 size;           // +0x4
+    MapSize size;                    // +0x4
 
     unsigned char Get(int x, int y) { return data[size.width * y + x]; }
 };
@@ -51,7 +51,7 @@ struct ByteMap_00473a00 {
 // width/index pair this fog arm needs.
 struct Player {
     char unknown_0[0x7c];
-    ByteMap_00473a00 explored;       // +0x7c
+    ByteMap explored;// +0x7c
     char unknown_88[0x14b - 0x88];   // stride 331
 };
 
