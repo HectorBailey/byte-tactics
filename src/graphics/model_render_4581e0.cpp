@@ -58,9 +58,9 @@ struct GafFrame {
 };
 
 #pragma pack(push, 1)
-// The unit record this model belongs to: model_render.cpp calls the same record
-// Unit_459200 (def at +0x92, flags at +0x110, zBufferFlag at +0x114).
-struct Unit_459200 {
+// The unit record this model belongs to: the layout the other model_render
+// files view (def at +0x92, flags at +0x110, zBufferFlag at +0x114).
+struct UnitInstance {
     char unknown_0[0x92];
     char* def;                       // +0x92
     char unknown_96[0xff - 0x96];
@@ -72,7 +72,7 @@ struct Unit_459200 {
     unsigned char zBufferFlag;       // +0x114
 };
 
-struct FaceFlags_459c70 {
+struct Model3doPrimFlags {
     union {
         unsigned int raw;
         struct {
@@ -84,7 +84,7 @@ struct FaceFlags_459c70 {
     };
 };
 
-struct Face_459c70 {
+struct Model3doPrimitive {
     int unknown_0;                   // +0x00
     int count;                       // +0x04
     int unknown_8;                   // +0x08
@@ -92,45 +92,46 @@ struct Face_459c70 {
     void* pic;                       // +0x10
     int unknown_14;                  // +0x14
     unsigned short* color;           // +0x18
-    FaceFlags_459c70 flags;          // +0x1c
+    Model3doPrimFlags flags;         // +0x1c
 };
 
-struct PieceInfo_459c70 {
+struct Model3do {
     char unknown_0[4];
     int vertexCount;                 // +0x04
     int faceCount;                   // +0x08
     int firstFace;                   // +0x0c
-    char unknown_10[8];
-    unsigned short* color;           // +0x18
+    int box_x;                       // +0x10
+    int box_y;                       // +0x14
+    int box_z;                       // +0x18
     char unknown_1c[0xc];
-    Face_459c70* faces;              // +0x28
+    Model3doPrimitive* faces;        // +0x28
 };
 
-struct PieceFlags_459c70 {
+struct ObjectPieceFlags {
     unsigned short visible : 1;
     unsigned short colored : 1;
     unsigned short lit : 1;
     unsigned short rest : 13;
 };
 
-struct Piece_459c70 {
-    PieceInfo_459c70* info;          // +0x00
+struct ObjectPiece {
+    Model3do* info;                  // +0x00
     char unknown_4[0x22 - 0x04];
     Vec3* vertices;                  // +0x22
     char unknown_26[0x28 - 0x26];
-    PieceFlags_459c70 flags;         // +0x28
+    ObjectPieceFlags flags;          // +0x28
     char unknown_2a[0x36 - 0x2a];
 };
 
-// The model's piece list: model_render.cpp and model_render_4589c0.cpp call the
-// same record Model_459200 (count, owner, bitmap, pieces at +0x22).
-struct Model_459200 {
+// The model's piece list: the record the other model_render files view (count,
+// owner, bitmap, pieces at +0x22).
+struct UnitObjectState {
     int count;                       // +0x00
     char unknown_4[8];
-    Unit_459200* owner;             // +0x0c
+    UnitInstance* owner;             // +0x0c
     GafFrame* bitmap;                // +0x10
     char unknown_14[0x22 - 0x14];
-    Piece_459c70 pieces[1];          // +0x22
+    ObjectPiece pieces[1];           // +0x22
 };
 #pragma pack(pop)
 
@@ -140,13 +141,13 @@ struct UnitTable {
     char unknown_0[0x10];
     GafFrame* shadow;                // +0x10
 
-    void MeasureModel(int* width, int* height, int* originX, int* originY, Model_459200* model, Vec3* offset);
-    int BuildObjectPicture(Model_459200* list, int param_2, int param_3);
-    void DrawPieces(GafFrame* bitmap, Model_459200* list, int kind, int useColor);
-    void DrawLitPieces(GafFrame* bitmap, Model_459200* list, int kind, int useColor);
+    void MeasureModel(int* width, int* height, int* originX, int* originY, UnitObjectState* model, Vec3* offset);
+    int BuildObjectPicture(UnitObjectState* list, int param_2, int param_3);
+    void DrawPieces(GafFrame* bitmap, UnitObjectState* list, int kind, int useColor);
+    void DrawLitPieces(GafFrame* bitmap, UnitObjectState* list, int kind, int useColor);
 };
 
-static __inline int shade_bias(Unit_459200* owner)
+static __inline int shade_bias(UnitInstance* owner)
 {
     bool c = ((*(unsigned int*)(owner->def + 0x241) >> 30) & 1) != 0;
     return c ? 125 : 50;
@@ -154,7 +155,7 @@ static __inline int shade_bias(Unit_459200* owner)
 
 // The 50 or 125 bias the original materialises separately in each arm of the
 // doubled-bitmap test, once per projected vertex.
-static __inline int shade_bias(Model_459200* list)
+static __inline int shade_bias(UnitObjectState* list)
 {
     bool c = ((*(unsigned int*)(list->owner->def + 0x241) >> 30) & 1) != 0;
     return c ? 125 : 50;
@@ -168,10 +169,10 @@ static __inline int shade_bias(Model_459200* list)
 // Must stay the first function in the file: compiled later, a lea in the
 // summing loop moves above the fadd.
 // FUNCTION: 0x459c70
-void UnitTable::DrawLitPieces(GafFrame* bitmap, Model_459200* list,
+void UnitTable::DrawLitPieces(GafFrame* bitmap, UnitObjectState* list,
     int kind, int useColor)
 {
-    PieceInfo_459c70* info;
+    Model3do* info;
     Poly_459c70 poly[25];
     float accum[2000][3];
     Vec3f normal[2000];
@@ -239,7 +240,7 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, Model_459200* list,
                     weight[k] = 0;
                 }
 
-                Face_459c70* face;
+                Model3doPrimitive* face;
                 int fi;
                 if (info->firstFace != -1) {
                     face = info->faces + 1;
