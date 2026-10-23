@@ -13,13 +13,16 @@
 
 #include "../util/vec3.h"
 
-struct Position_00475470 {             // 16.16 fixed point; only high words read
-    short xFrac;
-    short x;                           // +0x2
-    short yFrac;
-    short y;                           // +0x6
-    short zFrac;
-    short z;                           // +0xa
+// A 16.16 fixed-point value: the whole part in the high half.
+struct Fixed {
+    unsigned short frac;
+    short whole;
+};
+
+struct FixedVec3 {
+    Fixed x;
+    Fixed y;
+    Fixed z;
 };
 
 struct MapSize {
@@ -80,20 +83,20 @@ int __stdcall GetGafFrameCount(void* ptr);
 void* __stdcall GetGafFrame(void* a, int b);
 void __stdcall DrawFrameBlended(void* dest, void* src, int x, int y);
 
-static inline int IsExplored(Player* map, Position_00475470* pos)
+static inline int IsExplored(Player* map, FixedVec3* pos)
 {
-    int tx = pos->x >> 5;
-    int ty = (pos->z - (pos->y >> 1)) >> 5;
+    int tx = pos->x.whole >> 5;
+    int ty = (pos->z.whole - (pos->y.whole >> 1)) >> 5;
     if (map->explored.size.Contains(tx, ty) && map->explored.Get(tx, ty))
         return 1;
     return 0;
 }
 
 // The body of the matched 0x408090.
-static inline int IsSeen(Player* map, Position_00475470* pos)
+static inline int IsSeen(Player* map, FixedVec3* pos)
 {
-    int tx = pos->x >> 5;
-    int ty = (pos->z - (pos->y >> 1)) >> 5;
+    int tx = pos->x.whole >> 5;
+    int ty = (pos->z.whole - (pos->y.whole >> 1)) >> 5;
     if (!map->explored.size.Contains(tx, ty)) {
         return 0;
     }
@@ -104,7 +107,7 @@ static inline int IsSeen(Player* map, Position_00475470* pos)
             (1 << g_game->playerIndex)) != 0;
 }
 
-static inline int IsVisible(Player* map, Position_00475470* pos)
+static inline int IsVisible(Player* map, FixedVec3* pos)
 {
     if ((g_game->mapFlags & 2) == 2)
         return IsExplored(map, pos);
@@ -117,7 +120,7 @@ struct SmokeParticle {
     void* data;                        // +0x00, the animation
     union {
         Vec3 pos;                      // +0x04
-        Position_00475470 posw;
+        FixedVec3 posw;
     };
     int limit;                         // +0x10, the rounds it lives
     int count;                         // +0x14, the rounds so far (the frame)
@@ -129,21 +132,14 @@ struct SmokeParticle {
     int IsExpired(int unused);
     void DrawIfVisible(void* dest, short px, short py)
     {
-        short sx = posw.x - px + 0x80;
-        short sy = posw.z - (posw.y >> 1) - py + 0x20;
+        short sx = posw.x.whole - px + 0x80;
+        short sy = posw.z.whole - (posw.y.whole >> 1) - py + 0x20;
         if (IsVisible(&g_game->players[g_game->playerIndex], &posw))
             DrawFrameBlended(dest, GetGafFrame(data, count), sx, sy);
     }
 };
 
 typedef std::vector<SmokeParticle> Vec_00474cd0;
-
-// The particle vector, to call its out-of-line insert under this name.
-class Class_00476210 {
-public:
-    void insert(Vec_00474cd0::iterator p, unsigned int m,
-                const SmokeParticle& x);
-};
 
 #include "particle_system.h"
 

@@ -5,7 +5,7 @@
 #include "../ai/squad_manager.h"
 
 // A 16.16 fixed-point value and its whole part.
-union Fixed_0049a120 {
+union Fixed {
     int raw;
     struct {
         unsigned short frac;
@@ -14,9 +14,9 @@ union Fixed_0049a120 {
 };
 
 struct FixedVec3 {
-    Fixed_0049a120 x;
-    Fixed_0049a120 y;
-    Fixed_0049a120 z;
+    Fixed x;
+    Fixed y;
+    Fixed z;
 };
 
 struct CellPos_0049a120 {
@@ -278,7 +278,7 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
                         d.z = 0;
                     }
                 }
-                Fixed_0049a120 dist;
+                Fixed dist;
                 dist.raw = Length(&d);
                 int distance = dist.part.whole;
                 if (distance < radius) {
@@ -324,13 +324,13 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
             int distance;
             if ((cell->flags & 1) && spot) {
                 Vec3 v = Sub(*pos, spot->pos);
-                Fixed_0049a120 dist;
+                Fixed dist;
                 dist.raw = VectorLength(&v);
                 distance = dist.part.whole;
             } else {
                 Vec3 p = GetFootprintCentre(&at, &g_game->features[feature]);
                 Vec3 v = Sub(*pos, p);
-                Fixed_0049a120 dist;
+                Fixed dist;
                 dist.raw = (int)sqrt((double)v.x * v.x + (double)v.y * v.y + (double)v.z * v.z);
                 distance = dist.part.whole;
             }

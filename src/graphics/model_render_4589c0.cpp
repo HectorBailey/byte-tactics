@@ -3,8 +3,6 @@
 #include <string.h>
 #include <stdio.h>
 
-union Fixed { int value; struct { unsigned short fraction; short whole; }; };
-
 struct Pos_4589c0 {
     int x;
     int y;
@@ -107,20 +105,20 @@ struct Game {
     GameFlags_459200 visualFlags;
 };
 
-struct Fixed_459200 {
+struct Fixed {
     unsigned short frac;
     short whole;
 };
 
-struct Pos_459200 {
-    Fixed_459200 x;
-    Fixed_459200 y;
-    Fixed_459200 z;
+struct FixedVec3 {
+    Fixed x;
+    Fixed y;
+    Fixed z;
 };
 
 union Vec3_459200 {
     int v[3];
-    Pos_459200 p;
+    FixedVec3 p;
     Vec3 i;
 };
 #pragma pack(pop)
@@ -157,7 +155,7 @@ struct CMemoryCache : UnitTable {
     GafFrame* MakeSilhouette(GafFrame* src);
 };
 
-int __stdcall GetGroundHeight(Pos_459200* p);
+int __stdcall GetGroundHeight(FixedVec3* p);
 void __stdcall DrawFrameBlended(int param_1, GafFrame* param_2, int x, int y);
 void __stdcall DrawFrameDepth(GafFrame* bmp, GafFrame* param_2, int x, int y, int z);
 void __stdcall TintFrameBelow(GafFrame* param_1, int value);
@@ -206,7 +204,7 @@ void CMemoryCache::DrawObjectPicture(int param_2, Model_459200* model, Vec3_4592
     v.v[0] = model->owner->pos_x - v.v[0];
     v.v[1] = model->owner->pos_y;
     v.v[2] = model->owner->pos_z - cv.v[2];
-    int altitude = GetGroundHeight((Pos_459200*)&model->owner->pos_x);
+    int altitude = GetGroundHeight((FixedVec3*)&model->owner->pos_x);
     int z = v.p.z.whole - (v.p.y.whole >> 1) + 0x20;
     int y = v.p.z.whole - (altitude >> 1) + 0x20;
     short dx = v.p.y.whole;

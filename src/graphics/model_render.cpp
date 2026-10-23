@@ -50,7 +50,7 @@ union Fixed {
     };
 };
 
-struct Pos_459200 {
+struct FixedVec3 {
     Fixed x;
     Fixed y;
     Fixed z;
@@ -65,7 +65,7 @@ union Vec3 {
         int y;
         int z;
     };
-    Pos_459200 p;
+    FixedVec3 p;
 };
 
 struct Vec3f { float x; float y; float z; };
@@ -352,7 +352,7 @@ void __stdcall DrawFrameQuad(void* surface, void* pic, Point* points, void* src)
 void __stdcall DrawPolygonEdges(GafFrame* view, Vec3* points, int count, int color);
 void __stdcall SurfaceFromFrame(Surface* dst, GafFrame* src);
 void __stdcall DrawFrame(Surface* dst, GafFrame* bmp, int x, int y);
-int __stdcall GetGroundHeight(Pos_459200* p);
+int __stdcall GetGroundHeight(FixedVec3* p);
 void __stdcall DrawFrameBlended(int param_1, GafFrame* param_2, int x, int y);
 void __stdcall DrawFrameDepth(GafFrame* bmp, GafFrame* param_2, int x, int y, int z);
 void __stdcall TintFrameBelow(GafFrame* param_1, int value);

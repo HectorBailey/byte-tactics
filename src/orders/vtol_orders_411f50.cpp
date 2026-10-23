@@ -23,14 +23,16 @@ struct Vec3 {
         return r;
     }
 };
-// A 16.16 fixed-point position seen as its fraction and whole halves.
+// A 16.16 fixed-point value: the whole part in the high half.
+struct Fixed {
+    unsigned short frac;
+    short whole;
+};
+
 struct FixedVec3 {
-    unsigned short xf;
-    short x;
-    unsigned short yf;
-    short y;
-    unsigned short zf;
-    short z;
+    Fixed x;
+    Fixed y;
+    Fixed z;
 };
 
 struct Unit;
@@ -181,7 +183,7 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
     }
     if (target)
         order->pos = target->pos;
-    if (order->range && (int)_hypot(unit->fixedPos.x - order->start.x, unit->fixedPos.z - order->start.y) >= order->range)
+    if (order->range && (int)_hypot(unit->fixedPos.x.whole - order->start.x, unit->fixedPos.z.whole - order->start.y) >= order->range)
         return 5;
     unsigned int state = 0;
     state = order->state;
