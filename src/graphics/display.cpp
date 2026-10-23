@@ -12,7 +12,7 @@
 
 // +0xf0: the display context's state flags. Set through the bitfield and read
 // whole by SetFullScreen.
-union Flags_4b5980 {
+union DisplayFlags {
     unsigned short value;
     struct {
         unsigned short opt : 1;        // bit 0
@@ -71,7 +71,7 @@ struct DirectDrawState {
 // ints after it sit at 0x1ea, 0x1fa and 0x1fe, and videoFlags is a word at
 // +0x202.
 #pragma pack(push, 2)
-struct App_4b5980 {
+struct DisplayContext {
     HINSTANCE hInstance;                 // +0x00
     int nCmdShow;                        // +0x04
     char* className;                     // +0x08
@@ -101,7 +101,7 @@ struct App_4b5980 {
     char unknown_e4[0xe8 - 0xe4];
     int tickScale;                       // +0xe8, ticks per second
     int wa_left;                         // +0xec, work area left
-    Flags_4b5980 flags;                  // +0xf0, work area top
+    DisplayFlags flags;                  // +0xf0, work area top
     char wa_rest[0xfc - 0xf2];
     char unknown_fc[0x1da - 0xfc];
     FrameCounter counter;               // +0x1da
@@ -165,7 +165,7 @@ struct TimerSlot {
 
 typedef void (__stdcall *TimerCallback)(int);
 
-extern App_4b5980* g_display;
+extern DisplayContext* g_display;
 extern void (__cdecl *g_closeHandler)(int);
 extern int g_closeHandlerArg;
 extern TimerSlot g_timerSlots[10];
@@ -180,11 +180,11 @@ void SaveStartDirectory(void);
 void __stdcall SetCurrentMouseEvent(MouseEvent* p);
 void __stdcall InitKeyQueue(int size);
 void __stdcall InitMouse(int count, int start);
-int __stdcall AllocShadeTable(App_4b5980* d);
-int __stdcall AllocAlphaTable(App_4b5980* d);
-int __stdcall AllocLightTable(App_4b5980* d);
-int __stdcall AllocGrayTable(App_4b5980* d);
-int __stdcall AllocBlueTable(App_4b5980* d);
+int __stdcall AllocShadeTable(DisplayContext* d);
+int __stdcall AllocAlphaTable(DisplayContext* d);
+int __stdcall AllocLightTable(DisplayContext* d);
+int __stdcall AllocGrayTable(DisplayContext* d);
+int __stdcall AllocBlueTable(DisplayContext* d);
 long __stdcall WindowProc(HWND hwnd, unsigned int msg, unsigned int wparam, unsigned int lparam);
 void __stdcall PushKeyCode(int v);
 void __stdcall HandleVirtualKey(int v, int flag);
@@ -197,11 +197,11 @@ int __stdcall UnlockScreen(Surface *s);
 int __stdcall SetPaletteColors(PALETTEENTRY *entries, int start, int count);
 void DestroyPreCleanup(void);
 void ShutdownMouse(void);
-void __stdcall FreeAlphaTable(App_4b5980* obj);
-void __stdcall FreeShadeTable(App_4b5980* obj);
-void __stdcall FreeLightTable(App_4b5980* obj);
-void __stdcall FreeGrayTable(App_4b5980* obj);
-void __stdcall FreeBlueTable(App_4b5980* obj);
+void __stdcall FreeAlphaTable(DisplayContext* obj);
+void __stdcall FreeShadeTable(DisplayContext* obj);
+void __stdcall FreeLightTable(DisplayContext* obj);
+void __stdcall FreeGrayTable(DisplayContext* obj);
+void __stdcall FreeBlueTable(DisplayContext* obj);
 void __stdcall HAPI_CloseArchive(void* item);
 void __cdecl GameFreeThunk(void* p);
 
@@ -211,7 +211,7 @@ void __cdecl GameFreeThunk(void* p);
 // FUNCTION: 0x4b4f50
 int ApplyPalette()
 {
-    App_4b5980* d = g_display;
+    DisplayContext* d = g_display;
     if (d->hpalette) {
         HDC dc = GetDC(g_display->hwnd);
         SelectPalette(dc, g_display->hpalette, FALSE);
@@ -236,7 +236,7 @@ void __stdcall SetCloseHandler(void (__cdecl *callback)(int), int param)
 // Releases the display's DirectDraw objects (palette, surfaces, then the
 // DirectDraw object itself) and clears the pointers.
 // FUNCTION: 0x4b4ff0
-void __stdcall ReleaseDirectDraw(App_4b5980* d)
+void __stdcall ReleaseDirectDraw(DisplayContext* d)
 {
     if (d->draw.ddraw) {
         if (d->draw.palette) {
@@ -361,7 +361,7 @@ fail:
 }
 
 // FUNCTION: 0x4b52e0
-void __stdcall InitDisplayDefaults(App_4b5980* p)
+void __stdcall InitDisplayDefaults(DisplayContext* p)
 {
     p->videoFlags &= 0xfc00;
     p->startWidth = 640;
@@ -451,7 +451,7 @@ int __stdcall GetDisplayModes(DisplayModeList* list)
 // under the display lock at g_gfxBlitLockHeld, and finally reloads the palette.
 //
 // Takes the DC by reference: the original reloads it at the block head.
-static inline void FreeGdi_004b5510(App_4b5980 *d, HDC &dc)
+static inline void FreeGdi_004b5510(DisplayContext *d, HDC &dc)
 {
     if (dc)
         DeleteDC(dc);
@@ -467,7 +467,7 @@ static inline void FreeGdi_004b5510(App_4b5980 *d, HDC &dc)
 // FUNCTION: 0x4b5510
 int __stdcall SetFullScreen(int mode) {
     int lockResult;
-    App_4b5980 *d;
+    DisplayContext *d;
     DDSURFACEDESC ddsd;
     BitmapInfo bmi;
     Surface surf;
@@ -623,7 +623,7 @@ void __stdcall SetResolution(int x, int y)
 // +0xf0, which is the rectangle's `top`, and the flag word is overwritten
 // three instructions later, so the fetch is pointless.
 // FUNCTION: 0x4b5980
-int __stdcall InitEnvironment(App_4b5980* d)
+int __stdcall InitEnvironment(DisplayContext* d)
 {
     g_display = d;
     MEMORYSTATUS mem;
@@ -859,7 +859,7 @@ long __stdcall WindowProc(HWND hwnd, unsigned int msg, unsigned int wparam,
 // the five cached objects, releases the DirectDraw surfaces and the GDI
 // objects, then asks for the work area again.
 // FUNCTION: 0x4b6110
-void __stdcall ShutdownEnvironment(App_4b5980* d)
+void __stdcall ShutdownEnvironment(DisplayContext* d)
 {
     DestroyPreCleanup();
     ShutdownMouse();
