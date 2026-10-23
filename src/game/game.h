@@ -304,13 +304,13 @@ struct Flags_0045c570 {  // 2 bytes, the sound flag word
 
 struct Game {  // 0x3924d bytes
     char unknown_0;  // +0x0
-    unsigned char field_1;  // +0x1
-    unsigned char field_2;  // +0x2
-    unsigned char field_3;  // +0x3
+    unsigned char gameVersionMajor;  // +0x1
+    unsigned char gameVersionMinor;  // +0x2
+    unsigned char gameVersionBuild;  // +0x3
     char* build_date;  // +0x4
     char* build_time;  // +0x8
     Ctx_00499890* unknown_c;  // +0xc
-    Class_004cdb40* field_10;  // +0x10
+    Class_004cdb40* sound;     // +0x10
     char session[4];  // +0x14
     char unknown_18[1069];
     V4i* guids;  // +0x445
@@ -357,7 +357,7 @@ struct Game {  // 0x3924d bytes
     int lobbySyncTick;  // +0x1b5f
     Player players[10];  // +0x1b63
     char unknown_2851[331];
-    int field_299c;  // +0x299c
+    int duplicateIds;  // +0x299c
     Entry_00479620* options;  // +0x29a0
     int loaded[10];  // +0x29a4
     char unknown_29cc[4];
@@ -367,7 +367,7 @@ struct Game {  // 0x3924d bytes
     int startPosShuffleReady;  // +0x2a28
     char unknown_2a2c[4];
     Class_0046d040* sync;        // +0x2a30
-    int field_2a34;  // +0x2a34
+    int recvPacketSize;  // +0x2a34
     unsigned char* buffer;  // +0x2a38
     unsigned short numPlayers;  // +0x2a3c
     unsigned short tail;  // +0x2a3e
@@ -416,7 +416,7 @@ struct Game {  // 0x3924d bytes
     int boxEndHeight;  // +0x2ca2
     int boxEndZ;     // +0x2ca6
     Vec3 pos;  // +0x2caa
-    int field_2cb6;  // +0x2cb6
+    int boxStartTick;  // +0x2cb6
     unsigned short hoverUnitId;  // +0x2cba
     unsigned short cellFeature;  // +0x2cbc
     char selected_2cbe;  // +0x2cbe
@@ -431,10 +431,10 @@ struct Game {  // 0x3924d bytes
     Def_0049d270 weapons[256];  // +0x2cf3
     int projectileCount;  // +0x141f3
     Obj_00406f50* projectiles;  // +0x141f7
-    void* field_141fb;  // +0x141fb
-    void* field_141ff;  // +0x141ff
-    void* field_14203;  // +0x14203
-    PathMap* field_14207;  // +0x14207
+    void* sortUnitList;  // +0x141fb
+    void* sortIndices;  // +0x141ff
+    void* sortLineCount;  // +0x14203
+    PathMap* pathfinder;   // +0x14207
     FeatureSpot* spots;  // +0x1420b
     Unit* unit;  // +0x1420f
     char unknown_14213[8];
@@ -521,10 +521,10 @@ struct Game {  // 0x3924d bytes
     char unknown_1437f[4];
     void* xform;  // +0x14383
     void* projected;  // +0x14387
-    void* field_1438b;  // +0x1438b
+    void* assemPts;     // +0x1438b
     int count_1438f;  // +0x1438f
-    int field_14393;  // +0x14393
-    int field_14397;  // +0x14397
+    int unitDefCountBits;  // +0x14393
+    int unitDefEnumDirty;  // +0x14397
     UnitDef* defs;  // +0x1439b
     char unknown_1439f[8];
     char field_143a7[4];  // +0x143a7
@@ -542,9 +542,9 @@ struct Game {  // 0x3924d bytes
     void* unknown_147d3;  // +0x147d3
     int fire1;  // +0x147d7
     int alfboom1;  // +0x147db
-    void* field_147df;  // +0x147df
-    void* field_147e3;  // +0x147e3
-    void* field_147e7;  // +0x147e7
+    void* radlogo;      // +0x147df
+    void* radlogohigh;  // +0x147e3
+    void* nuclogo;      // +0x147e7
     void* src1;  // +0x147eb
     void* src2;  // +0x147ef
     void* unknown_147f3;  // +0x147f3
@@ -592,18 +592,18 @@ struct Game {  // 0x3924d bytes
     void** blocks;  // +0x148e3
     int count_148e7;  // +0x148e7
     int* data_148eb;  // +0x148eb
-    int field_148ef;  // +0x148ef
+    int gafAnimClearedSlot;  // +0x148ef
     int fxGaf;  // +0x148f3
     int igTitles;  // +0x148f7
     int vismasks;  // +0x148fb
     int fog;  // +0x148ff
-    int field_14903;  // +0x14903
+    int cursors;      // +0x14903
     int array_14907[1];  // +0x14907
     char unknown_1490b[16];
     int count_1491b;  // +0x1491b
     Debris_00420f30 debris[300];  // +0x1491f
     List_00420960* lists[3];  // +0x1ab8f
-    void* field_1ab9b;  // +0x1ab9b
+    void* explosionLensFrame;  // +0x1ab9b
     Object3do slots[300];  // +0x1ab9f
     char vertices[300][96];  // +0x1e88f
     PieceFrame frames[300][6];  // +0x2590f
@@ -615,9 +615,9 @@ struct Game {  // 0x3924d bytes
     char soundFiles[256][32];  // +0x35e13
     Entry_0042f740* entries_37e13;  // +0x37e13
     int entry_count;  // +0x37e17
-    int field_37e1b;  // +0x37e1b
+    int offscreen;    // +0x37e1b
     int width_37e1f;  // +0x37e1f
-    int field_37e23;  // +0x37e23
+    int screenHeight;  // +0x37e23
     Rect rect;  // +0x37e27
     int viewWidth;  // +0x37e37
     int viewHeight;  // +0x37e3b
@@ -625,7 +625,7 @@ struct Game {  // 0x3924d bytes
     Sub_004679a0_b b;  // +0x37e60
     int field_37e98;  // +0x37e98
     unsigned short unitIndex;  // +0x37e9c
-    unsigned short field_37e9e;  // +0x37e9e
+    unsigned short unitDefIndex;  // +0x37e9e
     char name[30];  // +0x37ea0
     unsigned short flags_37ebe;  // +0x37ebe
     unsigned short moveOrder : 3;  // +0x37ec0
@@ -634,22 +634,22 @@ struct Game {  // 0x3924d bytes
     unsigned short flags_7 : 9;
     char unknown_37ec2[2];
     unsigned int windCounter;  // +0x37ec4
-    int field_37ec8;  // +0x37ec8
+    int windSpeedDenominator;  // +0x37ec8
     int windX;  // +0x37ecc
     int windY;  // +0x37ed0
     int windZ;  // +0x37ed4
     unsigned short windDirection;  // +0x37ed8
     int windSpeed;  // +0x37eda
-    float field_37ede;  // +0x37ede
+    float windFraction;  // +0x37ede
     int windEnabled;  // +0x37ee2
     unsigned short field_37ee6;  // +0x37ee6
-    unsigned short field_37ee8;  // +0x37ee8
+    unsigned short lobbyInitScratch;  // +0x37ee8
     unsigned short maxUnits;  // +0x37eea
     unsigned short maxUnits_37eec;  // +0x37eec
     int difficulty;  // +0x37eee
     int flag_37ef2;  // +0x37ef2
-    int field_37ef6;  // +0x37ef6
-    int field_37efa;  // +0x37efa
+    int battleCommanderDeath;  // +0x37ef6
+    int interfaceType;  // +0x37efa
     int mode;  // +0x37efe
     int screenchat;  // +0x37f02
     Flags_00495e90_37f06 flags_37f06;  // +0x37f06
@@ -657,17 +657,17 @@ struct Game {  // 0x3924d bytes
     int volume1;  // +0x37f0c
     int volume2;  // +0x37f10
     unsigned short flags_37f14;  // +0x37f14
-    unsigned char field_37f16;  // +0x37f16
-    unsigned char field_37f17;  // +0x37f17
-    unsigned char field_37f18;  // +0x37f18
+    unsigned char cdMode;       // +0x37f16
+    unsigned char unitChat;     // +0x37f17
+    unsigned char unitChatText;  // +0x37f18
     Flags_0045c570 soundFlags;  // +0x37f19
     int width_37f1b;  // +0x37f1b
     int height_37f1f;  // +0x37f1f
-    int field_37f23;  // +0x37f23
+    int textScroll;   // +0x37f23
     int max_lines;  // +0x37f27
     int mousespeed;  // +0x37f2b
-    unsigned short field_37f2f;  // +0x37f2f
-    unsigned int field_37f31;  // +0x37f31
+    unsigned short uiOptionFlags;  // +0x37f2f
+    unsigned int lobbyTimeoutSecs;  // +0x37f31
     char unknown_37f35[4];
     int sides;  // +0x37f39
     char names[1][562];  // +0x37f3d
@@ -675,7 +675,7 @@ struct Game {  // 0x3924d bytes
     unsigned int lastTick;  // +0x38a37
     int frames_38a3b;  // +0x38a3b
     int scrollScale;  // +0x38a3f
-    int field_38a43;  // +0x38a43
+    int carry;        // +0x38a43
     int gameTick;     // +0x38a47
     unsigned short speedCtrl;    // +0x38a4b
     short field_38a4d;  // +0x38a4d
@@ -689,19 +689,19 @@ struct Game {  // 0x3924d bytes
     unsigned int nextMovieFrameTick;  // +0x38c5b
     int valueSet;  // +0x38c5f
     int valueSet_38c63;  // +0x38c63
-    int field_38c67;  // +0x38c67
+    int unusedAfterMovieOutputRateDirty;  // +0x38c67
     char saveName[1];  // +0x38c6b
     char unknown_38c6c[255];
-    int field_38d6b;  // +0x38d6b
+    int pendingSaveStore;  // +0x38d6b
     char progress;  // +0x38d6f
     unsigned char loadProgress;  // +0x38d70
-    unsigned char field_38d71;  // +0x38d71
+    unsigned char loadPctUnits;  // +0x38d71
     unsigned char loadPercent;  // +0x38d72
     unsigned char progress_38d73;  // +0x38d73
     unsigned char shade;  // +0x38d74
     unsigned short net_flags;  // +0x38d75
     Class_00472200* lists_38d77;  // +0x38d77
-    void* field_38d7b;  // +0x38d7b
+    void* moviePlayer;  // +0x38d7b
     unsigned short flags_38d7f;  // +0x38d7f
     int playerCount;  // +0x38d81
     Class_0046a400 timers;  // +0x38d85
@@ -725,7 +725,7 @@ struct Game {  // 0x3924d bytes
     char unknown_3908f[256];
     int maxStats[7];  // +0x3918f
     int mission;  // +0x391ab
-    int field_391af;  // +0x391af
+    int won;          // +0x391af
     int unitInfoHoverTrack;  // +0x391b3
     unsigned short unitInfoHoverUnitId;  // +0x391b7
     int unitBuilderHoverTrack;  // +0x391b9
