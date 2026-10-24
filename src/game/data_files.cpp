@@ -746,18 +746,7 @@ void FreeTextureGafs()
 
 // The reference-counted string handle: a pointer to the characters with the
 // reference count in the int just before them.
-class StringRef {
-public:
-    char* p;                           // refcount lives in the dword before p
-
-    StringRef(const StringRef& other);
-    StringRef(const char* text);
-    ~StringRef() { ReleaseRef(); }
-    void ReleaseRef();
-    StringRef* Assign(const StringRef* other);
-    StringRef* AssignText(const char* text);
-    StringRef* MakeLower();
-};
+#include "../util/string_ref.h"
 
 int __stdcall ComputeChecksum(unsigned char* data, int len);
 void __stdcall ListDirectory(const char* pattern, int flags, std::vector<StringRef>* out);
@@ -795,7 +784,7 @@ void __stdcall ComputeUnitScriptChecksum(UnitDef* def)
     ListDirectory(path, 0, &files);
 
     for (unsigned int i = 0; i < files.size(); i++) {
-        BuildDataPath(path, "guis", files[i].p, "gui");
+        BuildDataPath(path, "guis", files[i].ptr, "gui");
         void* data2 = HAPI_LoadFile(path, &size);
         if (data2) {
             def->scriptChecksum ^= ComputeChecksum((unsigned char*)data2, size);
