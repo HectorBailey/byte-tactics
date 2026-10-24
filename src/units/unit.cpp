@@ -6,6 +6,7 @@
 #include <ddraw.h>
 
 #include "cob_script.h"
+#include "../weapons/unit_weapon_slot.h"
 
 // Unused here: the symbol ids these declarations take keep SetStateBits (0x48b090)
 // matching (docs/c2-regalloc.md).
@@ -27,31 +28,9 @@ void SetMemFussyDefault(void);
 class Unit;
 
 #pragma pack(push, 1)
-struct Point_004898b0 {
-    short a;                           // +0x0
-    short b;                           // +0x2
-};
-
-union Flags_004898b0 {
-    struct {
-        unsigned char bit0 : 1;
-        unsigned char bit1 : 1;        // tested with test al, 2
-        unsigned char bit2 : 1;
-        unsigned char bit3 : 1;
-        unsigned char bit4 : 1;        // tested with test al, 0x10
-        unsigned char rest : 3;
-    } bits;
-    unsigned char all;
-};
-
-struct Entry_004898b0 {                // 0x1c bytes
-    Point_004898b0 point;              // +0x0
-    char unknown_4[0x1b - 4];
-    Flags_004898b0 flags;              // +0x1b
-};
-
 // Bit 19 is a one-bit bitfield (MSVC shifts it down to test it), while bit 8
-// of the same word is tested as a plain mask.
+// of the same word is tested as a plain mask. Kept as a view: unit_def.h keeps
+// flags2 as a plain int, and the shift is what 0x489a90 emits.
 union Flags_00489a90 {
     struct {
         unsigned int unknown_0 : 19;
@@ -59,13 +38,6 @@ union Flags_00489a90 {
         unsigned int unknown_1 : 12;
     } bits;
     int all;
-};
-
-struct Node_00489a90 {
-    char unknown_0[0x86];
-    Unit* owner;                       // +0x86
-    char unknown_8a[4];
-    Node_00489a90* next;               // +0x8e
 };
 
 struct Game {
@@ -103,7 +75,7 @@ public:
 class Unit {
 public:
     int motion;                        // +0x0
-    Entry_004898b0 weapons[3];         // +0x4
+    UnitWeaponSlot weapons[3];         // +0x4, stride 0x1c
     char unknown_58[0x6e - 0x58];
     union {
         int f6e;                       // +0x6e, 16.16
@@ -112,9 +84,10 @@ public:
             short f70;                 // +0x70
         };
     };
-    char unknown_72[0x8a - 0x72];
-    Node_00489a90* cargo;           // +0x8a, list head of the cargo count
-    char unknown_8e[4];
+    char unknown_72[0x86 - 0x72];
+    Unit* carrier;                     // +0x86, the unit this one is loaded on
+    Unit* cargo;                       // +0x8a, list head of the cargo count
+    Unit* cargoNext;                   // +0x8e
     UnitDef* def;                      // +0x92
     Player* player;                    // +0x96
     CobScript* script;                 // +0x9a
@@ -156,14 +129,14 @@ void Unit::ReleaseWeapons(unsigned char index)
         this->ReleaseWeapons(1);
         index = 2;
     }
-    Entry_004898b0* e = &weapons[index];
-    if (e->flags.bits.bit1 != 0 && e->flags.bits.bit4 == 0) {
-        e->flags.bits.bit4 = 1;
+    UnitWeaponSlot* e = &weapons[index];
+    if ((e->flags & 2) != 0 && (e->flags & 0x10) == 0) {
+        e->flags |= 0x10;
         int i = index;
-        Point_004898b0* p = &weapons[i].point;
-        if (p->a != 0 || p->b != (short)0x8000) {
-            p->a = 0;
-            p->b = (short)0x8000;
+        UnitWeaponSlot* p = &weapons[i];
+        if (p->aimTargetXOrUnitId != 0 || p->aimTargetZOrUnitSentinel != (short)0x8000) {
+            p->aimTargetXOrUnitId = 0;
+            p->aimTargetZOrUnitSentinel = (short)0x8000;
             script->FindScript("StartBuilding");
             script->StartScriptWithArgs("TargetCleared", 0, 0, 1, i, 0, 0, 0);
         }
@@ -185,15 +158,14 @@ void Unit::ClaimWeapons(unsigned char index)
         this->ClaimWeapons(1);
         index = 2;
     }
-    Entry_004898b0* e = &weapons[index];
-    if (e->flags.bits.bit1 != 0 && e->flags.bits.bit4 != 0) {
-        // Bitfield view, not a byte mask: a mask folds the element offset into the address.
-        e->flags.bits.bit4 = 0;
+    UnitWeaponSlot* e = &weapons[index];
+    if ((e->flags & 2) != 0 && (e->flags & 0x10) != 0) {
+        e->flags &= ~0x10;
         int i = index;
-        Point_004898b0* p = &weapons[i].point;
-        if (p->a != 0 || p->b != (short)0x8000) {
-            p->a = 0;
-            p->b = (short)0x8000;
+        UnitWeaponSlot* p = &weapons[i];
+        if (p->aimTargetXOrUnitId != 0 || p->aimTargetZOrUnitSentinel != (short)0x8000) {
+            p->aimTargetXOrUnitId = 0;
+            p->aimTargetZOrUnitSentinel = (short)0x8000;
             script->FindScript("StartBuilding");
             script->StartScriptWithArgs("TargetCleared", 0, 0, 1, i, 0, 0, 0);
         }
@@ -258,11 +230,11 @@ fail:
 int Unit::CountCargo()
 {
     int count = 0;
-    Node_00489a90* node = cargo;
+    Unit* node = cargo;
     while (node) {
-        if (node->owner == this)
+        if (node->carrier == this)
             count++;
-        node = node->next;
+        node = node->cargoNext;
     }
     return count;
 }
@@ -309,9 +281,24 @@ static inline unsigned char GainedBits(unsigned char was, int is) { return (unsi
 
 static inline unsigned char AsByte(unsigned char bits) { return (unsigned char)bits; }
 
-// Unused here: a real declaration from the neighbouring COB code, kept
-// because its symbol ids are what SetStateBits matches at (docs/c2-regalloc.md).
+// Unused here: their symbol ids are what SetStateBits (0x48b090) matches at
+// (docs/c2-regalloc.md). They stand where the removed Point_004898b0,
+// Flags_004898b0, Entry_004898b0 and Node_00489a90 views stood.
 void FreeCobScript(int);
+int CheckMapCrc();
+int FindUnusedLogo();
+int LoadUnitInfo();
+void AddDownloadBuildOptions();
+void BuildAllPassMaps(void);
+void CheckDownloadableFlags();
+void FreeDownloadMenus();
+void FreeMovementClasses(void);
+void FreeUnitCategories();
+void FreeUnitInfo();
+void FreeUnitMemory(void);
+void FreeUnitTypes();
+void InitUnitCategories();
+void KillAllUnits(void);
 
 // FUNCTION: 0x48b090
 void Unit::SetStateBits(int mask, int set)
