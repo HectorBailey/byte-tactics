@@ -3,6 +3,9 @@
 #include "../graphics/rect.h"
 #include "../graphics/gaf_frame.h"
 
+#include "gui.h"
+#include "layer.h"
+
 struct Bits_004b0230 {
     unsigned short count;            // +0x0
     char unknown_2[0x28 - 0x2];
@@ -22,24 +25,6 @@ struct Surface_004b0230 {
     int tiles_x;                     // +0x0
     int tiles_y;                     // +0x4
     char unknown_8[0xbc - 0x8];
-};
-
-struct Holder_004b0230 {
-    char unknown_0[4];
-    char* entries;                   // +0x4
-};
-
-struct Object_004b0230 {
-    char unknown_0[4];
-    Gaf_004b0230* gaf;               // +0x4
-    char unknown_8[0x18 - 0x8];
-    Holder_004b0230* holder;         // +0x18
-    char unknown_1c[0x8b2 - 0x1c];
-    unsigned char dark;              // +0x8b2
-    char unknown_8b3[0x8c3 - 0x8b3];
-    unsigned char light;             // +0x8c3
-    char unknown_8c4[2];
-    unsigned char fill;              // +0x8c6
 };
 
 int __stdcall DrawLine(void* surface, int x0, int y0, int x1, int y1, unsigned char color);
@@ -93,10 +78,10 @@ void __stdcall DrawBevelBorderDarkFirst(void* surface, Rect* rect, int dark, int
 // set is laid out as a 3x3 border around the rectangle, rows 0/3/6 and columns
 // 0/1/2 of the set, stepping by the first child's width and height, the last
 // row and column pinned to the far edges; with one child or less it is blitted
-// at the origin. The colours are the object's bytes at +0x8b2 (dark), +0x8c3
-// (light) and +0x8c6 (fill).
+// at the origin. The colours are the GUI's: colours[0] is the dark one,
+// colours[0x11] the light one and colours[0x14] the fill.
 // FUNCTION: 0x4b0230
-void __stdcall DrawListboxFrame(Object_004b0230* obj, int index, Bits_004b0230* bmp)
+void __stdcall DrawListboxFrame(Gui* obj, int index, Bits_004b0230* bmp)
 {
     char* entries;
     int col;
@@ -117,13 +102,13 @@ void __stdcall DrawListboxFrame(Object_004b0230* obj, int index, Bits_004b0230* 
     Cell_004b0230* cell;
     int h;
     GafFrame* sub;
-    entries = obj->holder->entries;
+    entries = (char*)obj->layer->entries;
     GetGadgetRectByIndex(entries, index, &rect);
 
     if (bmp == 0) {
         if (obj->gaf == 0)
             return;
-        bmp = FindGafEntry(obj->gaf, "Listbox");
+        bmp = FindGafEntry((Gaf_004b0230*)obj->gaf, "Listbox");
         if (bmp == 0)
             return;
         rect.left -= 3;
@@ -132,7 +117,7 @@ void __stdcall DrawListboxFrame(Object_004b0230* obj, int index, Bits_004b0230* 
         rect.bottom += 3;
     }
 
-    surface = *(Surface_004b0230**)(obj->holder->entries + 0xbc);
+    surface = *(Surface_004b0230**)((char*)obj->layer->entries + 0xbc);
     cell = (Cell_004b0230*)FindBackgroundCell(entries, index);
 
     if (cell != 0) {
@@ -141,7 +126,7 @@ void __stdcall DrawListboxFrame(Object_004b0230* obj, int index, Bits_004b0230* 
                 DrawSurface(surface, cell, x, y);
             }
         }
-        DrawBevelBorderDarkFirst(surface, &rect, obj->dark, obj->light, obj->fill);
+        DrawBevelBorderDarkFirst(surface, &rect, obj->colours[0], obj->colours[0x11], obj->colours[0x14]);
     } else if (bmp != 0) {
         if (bmp->count > 1) {
             sub = GetGafFrame(bmp, 0);
@@ -184,8 +169,8 @@ void __stdcall DrawListboxFrame(Object_004b0230* obj, int index, Bits_004b0230* 
             DrawFrame(surface, p, 0, 0);
         }
     } else {
-        FillRectangle(surface, &rect, obj->fill);
-        DrawBevelBorderDarkFirst(surface, &rect, obj->dark, obj->light, obj->fill);
+        FillRectangle(surface, &rect, obj->colours[0x14]);
+        DrawBevelBorderDarkFirst(surface, &rect, obj->colours[0], obj->colours[0x11], obj->colours[0x14]);
     }
 }
 
