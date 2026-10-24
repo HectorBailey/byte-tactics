@@ -1147,7 +1147,7 @@ int __stdcall WeaponCanReachPos(Unit* a1, Vec3_0049aa80* a2, Vec3_0049aa80* a3, 
     if (wdef->flags.b.waterWeapon)
         return 1;
 
-    if (a2->y.parts.whole + a1->utype->field_170 <= g_game->seaLevel)
+    if (a2->y.parts.whole + a1->utype->modelMaxYHigh <= g_game->seaLevel)
         return 0;
 
     if (wdef->flags.b.ballistic) {
@@ -1207,14 +1207,14 @@ int __stdcall WeaponCanReachUnit(Unit* unit1, Unit* unit2, unsigned char weapon)
         if (!(unit2->utype->flags1 & 0x80000) && unit2->pos_0049abb0.y.parts.whole > g_game->seaLevel)
             return 0;
         // Written (height >> 1) + whole: sets the add's operand order.
-        if ((unit2->utype->flags1 & 0x1000) && (unit2->utype->field_170 >> 1) + unit2->pos_0049abb0.y.parts.whole > g_game->seaLevel)
+        if ((unit2->utype->flags1 & 0x1000) && (unit2->utype->modelMaxYHigh >> 1) + unit2->pos_0049abb0.y.parts.whole > g_game->seaLevel)
             return 0;
         return Dist2_0049abb0(&unit1->pos_0049abb0, &unit2->pos_0049abb0) <= w->range * w->range;
     }
 
-    if (unit1->pos_0049abb0.y.parts.whole + unit1->utype->field_170 <= g_game->seaLevel)
+    if (unit1->pos_0049abb0.y.parts.whole + unit1->utype->modelMaxYHigh <= g_game->seaLevel)
         return 0;
-    if (unit2->pos_0049abb0.y.parts.whole + unit2->utype->field_170 <= g_game->seaLevel)
+    if (unit2->pos_0049abb0.y.parts.whole + unit2->utype->modelMaxYHigh <= g_game->seaLevel)
         return 0;
     if (w->flags.b.toAirWeapon && (unit2->flags & 3) != 2)
         return 0;

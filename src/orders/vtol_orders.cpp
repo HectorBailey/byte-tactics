@@ -186,7 +186,7 @@ struct UnitDef {
                 int modelMaxY;         // +0x16e, max.y
                 struct {
                     short unknown_16e;
-                    short field_170;   // +0x170, the top half of max.y
+                    short modelMaxYHigh;  // +0x170, the top half of max.y
                 };
             };
             short unknown_172;
@@ -1011,7 +1011,7 @@ int __stdcall VtolUnloadOrder(Unit* unit, Order* order, int flags)
         if (CanPlaceUnitFootprint(cargo->def, 0, WorldToCell(order->pos, cargo->footprint), 1)) {
             Class_0044e2d0* obj = new Class_0044e2d0(order, order->pos);
             // Through an int local: passing the expression straight sign-extends differently.
-            int h = unit->cargo->def->field_170;
+            int h = unit->cargo->def->modelMaxYHigh;
             obj->SetAltitude(h);
             order->SetAttachedFx((int)obj);
             order->flags = 0xe8;
