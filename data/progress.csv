@@ -2175,7 +2175,7 @@ address,size,file,symbol,status,similarity
 0x4a0570,111,src/gui/gui.cpp,?SetGadgetActiveByName@@YGXPAUDialog_004a04f0@@PADH@Z,matched,100.0
 0x4a05e0,494,src/gui/gui.cpp,?AssignQuickKey@@YGXPAUDialog_004a04f0@@H@Z,matched,100.0
 0x4a07d0,164,src/gui/gui.cpp,?SetGadgetTextByName@@YGXPAUDialog_004a04f0@@PAD1@Z,matched,100.0
-0x4a0880,112,src/gui/gui_4a0880.cpp,?SetGadgetText@@YGXPAUObject_004a0880@@HPAD@Z,matched,100.0
+0x4a0880,112,src/gui/gui_4a0880.cpp,?SetGadgetText@@YGXPAUGui@@HPAD@Z,matched,100.0
 0x4a08f0,207,src/gui/gui.cpp,?TranslateGadgetItems@@YGXPAUDialog_004a04f0@@H@Z,matched,100.0
 0x4a09c0,545,src/gui/gui.cpp,?SetTranslatedText@@YGXPAUDialog_004a04f0@@HPADH@Z,matched,100.0
 0x4a0bf0,116,src/gui/gui.cpp,?SetTranslatedTextByName@@YGXPAUDialog_004a04f0@@PAD1H@Z,matched,100.0
