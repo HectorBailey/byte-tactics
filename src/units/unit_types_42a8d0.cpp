@@ -28,6 +28,8 @@ namespace ta {
 #include <ta_types.h>
 }
 
+// Kept local, not util/string_ref.h: the header moves LoadUnitInfo (0x42a8d0)
+// to 99.7%.
 class StringRef {
 public:
     char* data;

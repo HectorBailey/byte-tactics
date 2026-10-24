@@ -46,27 +46,11 @@ extern char g_emptyStringLiteral[];
 
 // The reference-counted string handle: a pointer to the characters with the
 // reference count in the int just before them.
-class StringRef {
-public:
-    char* data;                        // +0x0, count in the dword before
-
-    StringRef(const StringRef& other);
-    StringRef(const char* text);
-    StringRef(const char* text, int len);
-    ~StringRef() { ReleaseRef(); }
-    void ReleaseRef();
-    StringRef* Assign(const StringRef* other);
-    StringRef* Append(const StringRef& other);
-    StringRef* MakeLower();
-    StringRef* MakeUpper();
-    StringRef* AssignText(const char* text);
-    char* GetUnique();
-    StringRef SubString(int start, int end) const;
-};
+#include "string_ref.h"
 
 static inline bool operator==(const StringRef& a, const StringRef& b)
 {
-    return strcmp(a.data, b.data) == 0;
+    return strcmp(a.ptr, b.ptr) == 0;
 }
 
 struct CommandNameLess {
@@ -256,10 +240,10 @@ void __stdcall RegisterCommand(const char* name, Handler_004b7620 fn, int mask)
     CommandEntry* first = s_commandTable.begin();
     CommandEntry* last = s_commandTable.end();
     CommandNameLess less;
-    const char* k = key.data;
+    const char* k = key.ptr;
     while (first != last) {
         CommandEntry* mid = first + (last - first) / 2;
-        if (less(mid->handle.data, k))
+        if (less(mid->handle.ptr, k))
             first = mid + 1;
         else
             last = mid;
@@ -288,10 +272,10 @@ void __stdcall RegisterCommands(ConsoleCommand* rec)
         CommandEntry* first = s_commandTable.begin();
         CommandEntry* last = s_commandTable.end();
         CommandNameLess less;
-        const char* k = key.data;
+        const char* k = key.ptr;
         while (first != last) {
             CommandEntry* mid = first + (last - first) / 2;
-            if (less(mid->handle.data, k))
+            if (less(mid->handle.ptr, k))
                 first = mid + 1;
             else
                 last = mid;
@@ -330,12 +314,12 @@ static inline HandlerSlot_004b7900* Find_004b7900(const char* key)
     CommandEntry* last = s_commandTable.end();
     while (first != last) {
         CommandEntry* mid = first + (last - first) / 2;
-        if (less(mid->handle.data, key))
+        if (less(mid->handle.ptr, key))
             first = mid + 1;
         else
             last = mid;
     }
-    if (first == s_commandTable.end() || less(key, first->handle.data))
+    if (first == s_commandTable.end() || less(key, first->handle.ptr))
         return 0;
     return (HandlerSlot_004b7900*)&first->value1;
 }
@@ -356,7 +340,7 @@ int __stdcall ExecuteCommand(CommandArgs* obj, int mask)
     if (obj->count >= 1) {
         StringRef key((char*)obj->GetArg(0, (int)g_emptyStringLiteral));
         key.MakeLower();
-        HandlerSlot_004b7900* h = Find_004b7900(key.data);
+        HandlerSlot_004b7900* h = Find_004b7900(key.ptr);
         if (h != 0 && (h->mask & mask)) {
             result = h->mask;
             h->fn(obj);

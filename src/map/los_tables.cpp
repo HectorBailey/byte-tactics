@@ -30,6 +30,9 @@
 #include <vector>
 #include "los_tables.h"
 
+// Kept local, not util/string_ref.h: the two scalar deleting destructors
+// 0x432c00 and 0x432c20 are StringRef members here, and declaring them in the
+// header would cost every other file their ids.
 // The reference-counted string handle: a pointer to the characters with the
 // reference count in the int just before them. The views in this file are the
 // copy constructor 0x4c91a0, the assignment 0x4c93b0, ReleaseRef 0x4c9390 and

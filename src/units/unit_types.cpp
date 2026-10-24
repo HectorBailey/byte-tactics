@@ -330,6 +330,8 @@ public:
     void SetCurrentRecord(int record);
 };
 
+// Kept local, not util/string_ref.h: the header's extra members move
+// AddDownloadBuildOptions (0x42be30) to 75.2% and LoadUnitTypes (0x42d2e0) to 99.7%.
 // The reference-counted string handle: a pointer to the characters with the
 // reference count in the int just before them.
 class StringRef {

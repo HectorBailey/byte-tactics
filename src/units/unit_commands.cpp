@@ -585,29 +585,7 @@ Item_00485940** __stdcall Partition(Item_00485940** first, Item_00485940** last,
 // The reference-counted string handle: a pointer to the characters with the
 // reference count in the int just before them (0x4c91a0 copies, 0x4c91b0
 // builds from text, 0x4c9390 releases, 0x4c93b0 assigns).
-class StringRef {
-public:
-    char* data;                        // +0x0, count in the dword before
-
-    StringRef(const StringRef& other);
-    StringRef(const char* text);
-    StringRef(const char* text, int len);
-    ~StringRef() { ReleaseRef(); }
-    StringRef& operator=(const StringRef& other)
-    {
-        Assign(&other);
-        return *this;
-    }
-    void ReleaseRef();
-    StringRef* Assign(const StringRef* other);
-    StringRef* Append(const StringRef& other);
-    StringRef* MakeLower();
-    StringRef* MakeUpper();
-    StringRef* AssignText(const char* text);
-    char* GetUnique();
-    int IsEmpty() const;
-    StringRef SubString(int start, int end) const;
-};
+#include "../util/string_ref.h"
 
 // No explicit destructor: the implicit one destroys name through
 // StringRef's destructor (an explicit name.ReleaseRef() would release it
@@ -740,12 +718,12 @@ UnitTypeSet* __stdcall GetCategoryMask(char* name)
     for (; 0 < n; ) {
         int n2 = n / 2;
         UnitCategory* m = first + n2;
-        if (_strcmpi(m->name.data, name) < 0)
+        if (_strcmpi(m->name.ptr, name) < 0)
             first = ++m, n -= n2 + 1;
         else
             n = n2;
     }
-    if (first != s_unitCategories.end() && _strcmpi(first->name.data, name) == 0)
+    if (first != s_unitCategories.end() && _strcmpi(first->name.ptr, name) == 0)
         return (UnitTypeSet*)first->value;
 
     UnitTypeSet* p = new UnitTypeSet;
