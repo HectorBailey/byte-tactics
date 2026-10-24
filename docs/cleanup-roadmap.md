@@ -37,7 +37,9 @@ obvious one.
    parameter, a forward declaration 1. **Data members cost nothing.** So adding or
    renaming fields inside a file is safe; adding types, member functions or forward
    declarations, or including a big shared header, can break matches. Nine files
-   only match with `include/ta_types.h` at its exact current size.
+   only match with `include/ta_types.h` at its exact current size, so it cannot be
+   regenerated; its names are kept current in place by `uv run tools/gametypes.py
+   --rename-only`, which moves no id.
 2. **Casts are sometimes load-bearing.** In `side_data_431a60.cpp` a
    `TdfRecord*` local in place of the cast drops the function to 89%. A cast can only come out if the whole file
    still matches afterwards.
