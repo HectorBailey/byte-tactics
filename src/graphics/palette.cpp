@@ -12,7 +12,7 @@
 #pragma pack(push, 1)
 struct DisplayContext {
     char unknown_0[0x44];
-    int dib;                           // +0x44, the DIB section
+    HBITMAP dib;                       // +0x44, the DIB section
     HDC dc;                            // +0x48
     HPALETTE hpalette;                 // +0x4c
     char unknown_50[0x94 - 0x50];
@@ -34,7 +34,9 @@ struct DisplayContext {
     unsigned short has_c8 : 1;         // bit 7
     unsigned short has_cc : 1;         // bit 8
     unsigned short has_d0 : 1;         // bit 9
-    unsigned short bit10_15 : 6;
+    unsigned short sound_opt : 1;      // bit 10
+    unsigned short quitting : 1;       // bit 11
+    unsigned short bit12 : 4;          // bits 12 to 15
     char unknown_f2[0x214 - 0xf2];
     unsigned int entries[256];         // +0x214
     int paletteBrightness;             // +0x614, read as a float by SetPaletteColors
