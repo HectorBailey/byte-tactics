@@ -1942,14 +1942,14 @@ void __stdcall OpenVisualOptions(int param_1)
         layer->data = (void*)i;
         // Redundant test: keeps the MAP/VID loops in this shape.
         if (g_game->flags_37ebe.byte & 1) {
-            for (i = 0; i <= ((Holder_0045e5e0*)g_game->gui.layer)->entries->u.count; i++) {
-                if (strncmp(((Holder_0045e5e0*)g_game->gui.layer)->entries[i].name, "MAP", strlen("MAP")) == 0) {
-                    SetGadgetActiveByName(&g_game->gui, ((Holder_0045e5e0*)g_game->gui.layer)->entries[i].name, 0);
+            for (i = 0; i <= g_game->gui.layer->entries->u.count; i++) {
+                if (strncmp(g_game->gui.layer->entries[i].name, "MAP", strlen("MAP")) == 0) {
+                    SetGadgetActiveByName(&g_game->gui, g_game->gui.layer->entries[i].name, 0);
                 }
             }
-            for (i = 0; i <= ((Holder_0045e5e0*)g_game->gui.layer)->entries->u.count; i++) {
-                if (strncmp(((Holder_0045e5e0*)g_game->gui.layer)->entries[i].name, "VID", strlen("VID")) == 0) {
-                    SetGadgetActiveByName(&g_game->gui, ((Holder_0045e5e0*)g_game->gui.layer)->entries[i].name, 0);
+            for (i = 0; i <= g_game->gui.layer->entries->u.count; i++) {
+                if (strncmp(g_game->gui.layer->entries[i].name, "VID", strlen("VID")) == 0) {
+                    SetGadgetActiveByName(&g_game->gui, g_game->gui.layer->entries[i].name, 0);
                 }
             }
         }

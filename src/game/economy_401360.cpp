@@ -324,11 +324,11 @@ void __stdcall UpdatePlayerEconomy(Player* p)
             if (u->bit11) {
                 if (!(u->flags & 0x1000) && u->workTime <= g_game->gameTick) {
                     int cost = (int)((u->flags & 0xc) > 0 ? u->def->cloakcostmoving : u->def->cloakcost);
-                    ((Unit*)u)->SetStateBits(4, u->resourceSlot.SpendEnergy(cost));
+                    u->SetStateBits(4, u->resourceSlot.SpendEnergy(cost));
                 } else
-                    ((Unit*)u)->SetStateBits(4, 0);
+                    u->SetStateBits(4, 0);
             } else
-                ((Unit*)u)->SetStateBits(4, 0);
+                u->SetStateBits(4, 0);
         }
         producedA[0] += u->resourceSlot.res[0].produced;
         usedA[0] += u->resourceSlot.res[0].used;

@@ -103,7 +103,7 @@ void __stdcall AddLineOfSight(SightQuery* params)
             return;
         // Clamp written inline as the GetLosTable argument, with no temporary.
         // One cast stays: without it the register allocation of the loop below moves.
-        LosTable* table = (LosTable*)((LosTables*)&g_losTables)->GetLosTable(
+        LosTable* table = (LosTable*)(&g_losTables)->GetLosTable(
             (params->sightDistance / 32 < 0 ? 0 : params->sightDistance / 32) <
                     (short)g_losTables.GetLosTableCount() - 1
                 ? (params->sightDistance / 32 < 0 ? 0 : params->sightDistance / 32)
