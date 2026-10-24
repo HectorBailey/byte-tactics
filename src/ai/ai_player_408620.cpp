@@ -8,7 +8,7 @@
 #pragma pack(push, 1)
 struct Game {
     char unknown_0[0x1439b];
-    UnitDef* defs;                     // +0x1439b
+    UnitDef* unitDefs;                 // +0x1439b
 };
 #pragma pack(pop)
 
@@ -32,5 +32,5 @@ void BuildTimer::TryIssueIdleFactoryBuildOrder(Unit* unit)
         return;
     unsigned short idx = ChooseBuildOption(player, unit);
     if (idx != 0)
-        QueueBuildOrder(g_game->defs[idx].unitname, unit, 1);
+        QueueBuildOrder(g_game->unitDefs[idx].unitname, unit, 1);
 }
