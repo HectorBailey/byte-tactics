@@ -16,54 +16,29 @@ class UnitRef;
 class PathOrderAttach;
 class Order;
 
-// One virtual slot, called on the object a link belongs to.
+// One virtual slot, called on the object a link belongs to. No header names
+// it, so it stays this file's view.
 class Listener_004896f0 {
 public:
     virtual void Notify(int code);
 };
 
 #pragma pack(push, 1)
-struct Point_004898b0 {
-    short a;                           // +0x0
-    short b;                           // +0x2
-};
-
-// What an entry's pointer at +0xc leads to.
-struct Target_0048a1e0 {
-    char unknown_0[0x68];
-    int radius;                        // +0x68
-    char unknown_6c[0x111 - 0x6c];
-    unsigned int weaponFlags;            // +0x111
-};
-
-struct Entry_004898b0 {                // 0x1c bytes
-    Point_004898b0 point;              // +0x0
-    char unknown_4[0xc - 4];
-    Target_0048a1e0* target;           // +0xc
-    char unknown_10[0x1b - 0x10];
-    unsigned char flags;               // +0x1b
-};
-
 #include "unit_def.h"
+
+#include "../weapons/unit_weapon_slot.h"
+#include "../weapons/weapon_def.h"
 
 #include "../util/vec3.h"
 
-// The object at the start of a unit.
-struct Body_0048a1e0 {
-    char unknown_0[8];
-    Vec3 offset;                       // +0x8
-    char unknown_14[0x20 - 0x14];
-    int sight;                         // +0x20
-    char unknown_24[0x2a - 0x24];
-    int age;                           // +0x2a
-};
+#include "../orders/unit_motion.h"
 
 #include "../network/player.h"
 
 class Unit {
 public:
-    Body_0048a1e0* motion;             // +0x0
-    Entry_004898b0 weapons[3];         // +0x4
+    UnitMotion* motion;                // +0x0
+    UnitWeaponSlot weapons[3];         // +0x4, stride 0x1c
     char unknown_58[0x5c - 0x58];
     Order* list;                       // +0x5c
     char unknown_60[0x64 - 0x60];
@@ -610,10 +585,10 @@ void __stdcall SetWeaponTargetPos(char* param_1, int* param_2, int param_3)
 // FUNCTION: 0x48a0f0
 void __stdcall ClearWeaponTarget(Unit* unit, int index)
 {
-    Point_004898b0* p = &unit->weapons[index].point;
-    if (p->a != 0 || p->b != (short)0x8000) {
-        p->a = 0;
-        p->b = (short)0x8000;
+    UnitWeaponSlot* p = &unit->weapons[index];
+    if (p->aimTargetXOrUnitId != 0 || p->aimTargetZOrUnitSentinel != (short)0x8000) {
+        p->aimTargetXOrUnitId = 0;
+        p->aimTargetZOrUnitSentinel = (short)0x8000;
         unit->script->FindScript("StartBuilding");
         unit->script->StartScriptWithArgs("TargetCleared", 0, 0, 1, index, 0, 0, 0);
     }
@@ -622,9 +597,9 @@ void __stdcall ClearWeaponTarget(Unit* unit, int index)
 // FUNCTION: 0x48a160
 void __stdcall ResetWeaponTarget(Unit* obj, int index)
 {
-    Point_004898b0* p = &obj->weapons[index].point;
-    p->a = 0;
-    p->b = (short)0x8000;
+    UnitWeaponSlot* p = &obj->weapons[index];
+    p->aimTargetXOrUnitId = 0;
+    p->aimTargetZOrUnitSentinel = (short)0x8000;
 }
 
 // Returns the unit a target entry (see 0x48a160) points at, or 0 when the
@@ -632,14 +607,14 @@ void __stdcall ResetWeaponTarget(Unit* obj, int index)
 // FUNCTION: 0x48a190
 Unit* __stdcall GetWeaponTargetUnit(Unit* obj, int index)
 {
-    Point_004898b0* p = &obj->weapons[index].point;
-    if (p->b != (short)0x8000) {
+    UnitWeaponSlot* p = &obj->weapons[index];
+    if (p->aimTargetZOrUnitSentinel != (short)0x8000) {
         return 0;
     }
-    if (p->a == 0) {
+    if (p->aimTargetXOrUnitId == 0) {
         return 0;
     }
-    return &g_game->units[p->a];
+    return &g_game->units[p->aimTargetXOrUnitId];
 }
 
 int __stdcall GetGroundHeight(Vec3* pos);
@@ -650,48 +625,48 @@ void __stdcall GetSweetSpot(Unit* def, int pos);
 // adds z,y,x. Passing the three products through a static helper that
 // returns the vector by value makes all three writes land in memory before the
 // adds are read, and the original's x,y,z schedule falls out.
-static Vec3 offset_0048a1e0(Body_0048a1e0* m, __int64 s)
+static Vec3 offset_0048a1e0(UnitMotion* m, __int64 s)
 {
     Vec3 d;
-    d.x = (int)(((__int64)m->offset.x * s) >> 16);
-    d.y = (int)(((__int64)m->offset.y * s) >> 16);
-    d.z = (int)(((__int64)m->offset.z * s) >> 16);
+    d.x = (int)(((__int64)m->velocity.x * s) >> 16);
+    d.y = (int)(((__int64)m->velocity.y * s) >> 16);
+    d.z = (int)(((__int64)m->velocity.z * s) >> 16);
     return d;
 }
 
 // FUNCTION: 0x48a1e0
 int __stdcall GetWeaponTargetPos(Unit* unit, Vec3* pos, int index)
 {
-    Entry_004898b0* e = &unit->weapons[index];
-    if (e->point.b != (short)0x8000) {
-        pos->x = e->point.a << 16;
-        pos->z = e->point.b << 16;
+    UnitWeaponSlot* e = &unit->weapons[index];
+    if (e->aimTargetZOrUnitSentinel != (short)0x8000) {
+        pos->x = e->aimTargetXOrUnitId << 16;
+        pos->z = e->aimTargetZOrUnitSentinel << 16;
         pos->y = max(GetGroundHeight(pos), g_game->seaLevel) << 16;
         return 1;
     }
-    if (e->point.a == 0) {
+    if (e->aimTargetXOrUnitId == 0) {
         return 0;
     }
-    Unit* def = &g_game->units[e->point.a];
+    Unit* def = &g_game->units[e->aimTargetXOrUnitId];
     if (def->unitDefIndex == 0) {
-        Entry_004898b0* f = &unit->weapons[index];
-        if (f->point.a != 0 || f->point.b != (short)0x8000) {
-            e->point.a = 0;
-            e->point.b = (short)0x8000;
+        UnitWeaponSlot* f = &unit->weapons[index];
+        if (f->aimTargetXOrUnitId != 0 || f->aimTargetZOrUnitSentinel != (short)0x8000) {
+            e->aimTargetXOrUnitId = 0;
+            e->aimTargetZOrUnitSentinel = (short)0x8000;
             unit->script->FindScript("StartBuilding");
             unit->script->StartScriptWithArgs("TargetCleared", 0, 0, 1, index, 0, 0, 0);
         }
         return 0;
     }
     GetSweetSpot(def, (int)pos);
-    if ((e->flags & 2) && !(e->target->weaponFlags & 0x2000000) && def->motion != 0
-        && unit->killCount > 5 && e->target->radius != 0) {
+    if ((e->flags & 2) && !(e->weapon->flags.value & 0x2000000) && def->motion != 0
+        && unit->killCount > 5 && e->weapon->speed != 0) {
         Vec3 d;
         d.x = unit->pos.x - pos->x;
         d.y = unit->pos.y - pos->y;
         d.z = unit->pos.z - pos->z;
         int dist = (int)sqrt((double)d.x * d.x + (double)d.y * d.y + (double)d.z * d.z);
-        int scale = (int)(((__int64)dist << 16) / e->target->radius);
+        int scale = (int)(((__int64)dist << 16) / e->weapon->speed);
         scale = (int)((scale * (__int64)0xcccc) >> 16);
         __int64 s = scale;
         d = offset_0048a1e0(def->motion, s);
@@ -706,7 +681,7 @@ int __stdcall GetWeaponTargetPos(Unit* unit, Vec3* pos, int index)
 int __stdcall IsTargetingUnit(Unit* list, Unit* obj)
 {
     for (int i = 0; i < 3; i++) {
-        if (list->weapons[i].point.b == -0x8000 && list->weapons[i].point.a == obj->id) {
+        if (list->weapons[i].aimTargetZOrUnitSentinel == -0x8000 && list->weapons[i].aimTargetXOrUnitId == obj->id) {
             return 1;
         }
     }
@@ -813,14 +788,14 @@ void __stdcall AlignUnitToGround(Unit* u)
                 short p = (short)(((GetTicks() & 0x1f) + k * 8) * 2048 + u->hoverBobPhase);
                 int s = u->def->maxvelocity / 2;
                 // Owner kept in a local across the 64-bit helper calls.
-                Body_0048a1e0* o = u->motion;
-                int q = o->sight;
+                UnitMotion* o = u->motion;
+                int q = o->speed;
                 if (q >= s)
                     q = s;
                 // The 64-bit part is one expression, not an __int64 local.
                 int w = (int)((((__int64)q << 16) / s));
                 int mm = 2 - (int)((((__int64)w * 2) >> 16));
-                unsigned int n = g_game->gameTick - o->age;
+                unsigned int n = g_game->gameTick - o->lastMoveTick;
                 // Clamp inline as a ternary, not a separate if.
                 mm -= (unsigned int)(mm * (n < 60 ? n : 60)) / 60;
                 hs[k].h = FUN_004b7123(p, mm) + hs[k].h;
