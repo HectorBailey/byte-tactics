@@ -11,29 +11,7 @@
 // The reference-counted string handle: a pointer to the characters with the
 // reference count in the int just before them (see 0x4c91a0, 0x4c9390 and
 // 0x4c93b0 for the copy, release and assign views).
-class StringRef {
-public:
-    char* ptr;                         // +0x0
-
-    StringRef(const StringRef& other);
-    StringRef(const char* text);
-    StringRef(const char* text, int len);
-    StringRef& operator=(const StringRef& other)
-    {
-        Assign((StringRef*)&other);
-        return *this;
-    }
-    ~StringRef() { ReleaseRef(); }
-    void ReleaseRef();
-    StringRef* Assign(StringRef* other);
-    StringRef* Append(const StringRef& other);
-    StringRef* MakeLower();
-    StringRef* MakeUpper();
-    StringRef* AssignText(const char* text);
-    char* GetUnique();
-    int IsEmpty() const;
-    StringRef SubString(int start, int end) const;
-};
+#include "string_ref.h"
 
 typedef std::vector<StringRef> Vec_004be6c0;
 typedef void (Vec_004be6c0::*InsertFn_004be6c0)(

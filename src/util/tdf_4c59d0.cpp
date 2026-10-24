@@ -3,13 +3,7 @@
 // instantiation the 0x4c54f0 map code calls.
 #include <stddef.h>
 
-class StringRef {
-public:
-    char* p;
-
-    StringRef();
-    StringRef(const StringRef& other);
-};
+#include "string_ref.h"
 
 struct TdfField {
     StringRef a;                    // +0x0

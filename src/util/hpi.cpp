@@ -1013,6 +1013,8 @@ int __stdcall CountDirectoryEntries(const char* path, int flag)
     return count;
 }
 
+// Kept local, not util/string_ref.h: the header moves HAPI_OpenFile (0x4bb2e0)
+// to 94.5% and HAPI_PackDirectory (0x4bd160) to 99.1%.
 // The caller's std::vector<StringRef>, written by hand so that insert
 // (0x4be6c0, which has its own file) stays an out-of-line call under its real
 // name. The handle is a pointer to the characters with the reference count in

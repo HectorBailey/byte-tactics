@@ -22,29 +22,7 @@ void __cdecl AllocNotifyNop(int);
 // The reference-counted string handle (see tdf.cpp): 0x4c9180 builds the
 // empty one, 0x4c91a0 copies, 0x4c91b0 builds from text, 0x4c9390 releases,
 // 0x4c93b0 assigns and 0x4c93f0 assigns from a C string.
-class StringRef {
-public:
-    char* ptr;
-
-    StringRef();
-    StringRef(const StringRef& other);
-    StringRef(const char* text);
-    StringRef(const char* text, int len);
-    ~StringRef() { ReleaseRef(); }
-    StringRef& operator=(const StringRef& other)
-    {
-        Assign(&other);
-        return *this;
-    }
-    void ReleaseRef();
-    StringRef* Assign(const StringRef* other);
-    StringRef* Append(const StringRef& other);
-    StringRef* MakeLower();
-    StringRef* MakeUpper();
-    StringRef* AssignText(const char* text);
-    char* GetUnique();
-    StringRef SubString(int start, int end) const;
-};
+#include "string_ref.h"
 
 // Unused here: the symbol ids these declarations take keep the allocation of
 // the functions below (docs/c2-regalloc.md).

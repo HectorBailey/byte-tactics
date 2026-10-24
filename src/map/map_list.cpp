@@ -160,28 +160,7 @@ void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 // 0x4c9390 its release, and 0x4c91b0 builds one from a C string. In the game
 // the constructors share one class and one name, which data/symbols.csv
 // cannot hold twice, so this file spells them all StringRef.
-class StringRef {
-public:
-    char* data;                        // +0x0, count in the dword before
-
-    StringRef();
-    StringRef(const StringRef& other);
-    StringRef(const char* text);
-    StringRef(const char* text, int len);
-    ~StringRef() { ReleaseRef(); }
-    StringRef& operator=(const StringRef& other)
-    {
-        Assign(&other);
-        return *this;
-    }
-    void ReleaseRef();
-    StringRef* Assign(const StringRef* other);
-    StringRef* Append(const StringRef& other);
-    StringRef* MakeLower();
-    StringRef* MakeUpper();
-    StringRef* AssignText(const char* text);
-    StringRef SubString(int start, int end) const;
-};
+#include "../util/string_ref.h"
 
 // The TNT map file's header, read whole at the start of the file (Thaldren's
 // TntHeader, data/thaldren/structs.csv).
@@ -312,11 +291,11 @@ int __stdcall LoadMapList(void** out, int param_2, int param_3)
     for (s.i = 0; s.i < s.count; s.i++) {
         // The buffers are members of one struct, name before lower: same reason.
         struct A { char name[256]; char lower[256]; char path[256]; } a;
-        BuildDataPath(a.path, "Maps", files[s.i].data, "OTA");
+        BuildDataPath(a.path, "Maps", files[s.i].ptr, "OTA");
         TdfFile parser;
         if (parser.LoadFile(a.path) != 0
             && g_game->mapInfo->SelectSchema(3, &parser, 0) != 0) {
-            strcpy(a.name, files[s.i].data);
+            strcpy(a.name, files[s.i].ptr);
             StripExtension(a.name);
             strcpy(a.lower, a.name);
             _strlwr(a.lower);
@@ -1316,7 +1295,7 @@ int Mission::ComputeMapChecksum()
     // The two pointers stay separate globals: a single std::vector would
     // reference s_mapCache with a displacement, the wrong address.
     for (it = g_mapCacheBegin; it != g_mapCacheEnd; it++) {
-        if (_strcmpi(it->handle.data, name) == 0) {
+        if (_strcmpi(it->handle.ptr, name) == 0) {
             tntChecksum = it->tntChecksum;
             return headerChecksum ^ tntChecksum;
         }

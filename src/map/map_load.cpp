@@ -11,24 +11,7 @@
 // The reference-counted string handle: a pointer to the characters with the
 // reference count in the int just before them. The views in this file are the
 // copy constructor 0x4c91a0, the assignment 0x4c93b0 and ReleaseRef 0x4c9390.
-class StringRef {
-public:
-    char* ptr;                         // +0x0, count in the dword before
-
-    StringRef(const StringRef& other);
-    StringRef(const char* text);
-    StringRef(const char* text, int len);
-    ~StringRef() { ReleaseRef(); }
-    void ReleaseRef();
-    void Assign(const StringRef& param);
-    StringRef* Append(const StringRef& other);
-    StringRef* MakeLower();
-    StringRef* MakeUpper();
-    StringRef* AssignText(const char* text);
-    char* GetUnique();
-    int IsEmpty() const;
-    StringRef SubString(int start, int end) const;
-};
+#include "../util/string_ref.h"
 
 // Declares its own copy constructor and operator=: implicit ones get inlined into insert.
 class MapCacheEntry {
@@ -114,7 +97,7 @@ InsertFn_00437580 g_insert_00437580 = &Vec_00437580::insert;
 // FUNCTION: 0x437800
 MapCacheEntry& MapCacheEntry::operator=(const MapCacheEntry& other)
 {
-    ((StringRef*)this)->Assign(other.handle);
+    ((StringRef*)this)->Assign(&other.handle);
     tntChecksum = other.tntChecksum;
     return *this;
 }

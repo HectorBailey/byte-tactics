@@ -23,6 +23,8 @@
 // reference count in the int just before them. 0x4c9180 builds the empty one,
 // 0x4c91a0 copies, 0x4c91b0 builds from text, 0x4c9390 releases and 0x4c93b0
 // assigns.
+// Kept local, not util/string_ref.h: the header moves std::logic_error's copy
+// constructor (0x4c35c0) to 88.1% and _Doraise (0x4c3740) to 84.7%.
 class StringRef {
 public:
     char* ptr;                         // count in the dword before ptr
