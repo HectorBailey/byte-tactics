@@ -3,6 +3,7 @@
 #include <string.h>
 #include "../util/vec3.h"
 #include "../ai/squad_manager.h"
+#include "../network/player.h"
 
 // A 16.16 fixed-point value and its whole part.
 union Fixed {
@@ -19,14 +20,10 @@ struct FixedVec3 {
     Fixed z;
 };
 
-struct CellPos_0049a120 {
-    short x;
-    short z;
-};
-
 #pragma pack(push, 1)
 
 #include "weapon_def.h"
+#include "../map/feature.h"
 
 // Not units/unit_def.h: the header takes 0x49a120 out of its symbol-id window.
 struct UnitDef_0049a120 {
@@ -35,14 +32,12 @@ struct UnitDef_0049a120 {
     Vec3 boxMax;                       // +0x16a
 };
 
-struct Holder_0049a120;
-
 struct Unit_0049a120 {
     char unknown_0[0x6a];
     Vec3 pos;                          // +0x6a
     char unknown_76[0x92 - 0x76];
     UnitDef_0049a120* def;             // +0x92
-    Holder_0049a120* player;           // +0x96
+    Player* player;                    // +0x96
     char unknown_9a[0xff - 0x9a];
     unsigned char playerIndex;         // +0xff
     char unknown_100[0x118 - 0x100];
@@ -62,13 +57,6 @@ struct Projectile {
     unsigned short flags;              // +0x69
 };
 
-struct Holder_0049a120 {
-    char unknown_0[4];
-    int playerId;                      // +0x4
-    char unknown_8[0x74 - 8];
-    SquadManager* object;              // +0x74
-};
-
 struct Cell {
     unsigned short unit;               // +0x0
     unsigned short unit2;              // +0x2
@@ -84,14 +72,12 @@ struct Cell {
     unsigned char flags;               // +0xc
 };
 
+// Kept as a view: the declarations ingame/feature_spot.h brings move the spot
+// address arithmetic in 0x49a120 (docs/c2-regalloc.md).
 struct Spot_0049a120 {
     char unknown_0[8];
     Vec3 pos;                          // +0x8
     char unknown_14[0x30 - 0x14];
-};
-
-struct FeatureDef_0049a120 {
-    char unknown_0[0x100];
 };
 
 // One view of the 0xe byte projectile detonate packet (type 0xe): the
@@ -112,7 +98,7 @@ struct Game_0049a120 {
     int mapWidthTiles;                 // +0x14233
     int mapHeightTiles;                // +0x14237
     char unknown_1423b[0x1426f - 0x1423b];
-    FeatureDef_0049a120* features;     // +0x1426f
+    Feature* features;                 // +0x1426f
     char unknown_14273[0x14287 - 0x14273];
     Cell* heightMap;                   // +0x14287
     char unknown_1428b[0x14357 - 0x1428b];
@@ -168,7 +154,7 @@ Cell* __stdcall GetMapCell(int x, int y);
 int __stdcall ApplyWeaponDamage(Projectile* weapon, Unit_0049a120* target, float scale);
 void __stdcall DetonateProjectile(Projectile* weapon, Unit_0049a120* unit);
 int __stdcall VectorLength(Vec3* v);
-Vec3 __stdcall GetFootprintCentre(CellPos_0049a120* cell, FeatureDef_0049a120* def);
+Vec3 __stdcall GetFootprintCentre(Point16* cell, Feature* def);
 void __stdcall DamageFeature(Cell* cell, int x, int z, WeaponDef* def);
 int __stdcall BroadcastPacket(int id, void* data, int size);
 
@@ -316,10 +302,10 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
             if (feature >= 0xfffb)
                 continue;
             int index = cell - g_game->heightMap;
-            CellPos_0049a120 cp;
+            Point16 cp;
             cp.x = index % g_game->mapWidthTiles;
-            cp.z = index / g_game->mapWidthTiles;
-            CellPos_0049a120 at = cp;
+            cp.y = index / g_game->mapWidthTiles;
+            Point16 at = cp;
             Spot_0049a120* spot = &g_game->spots[cell->spot];
             int distance;
             if ((cell->flags & 1) && spot) {
@@ -361,16 +347,16 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
                 packet.type = 0xe;
                 packet.aim = other->aim;
                 packet.weaponIndex = other->type->index;
-                BroadcastPacket(weapon->ownerUnit->player->playerId, &packet, sizeof(packet));
+                BroadcastPacket(weapon->ownerUnit->player->id, &packet, sizeof(packet));
                 packet.type = 0xe;
                 packet.aim = weapon->aim;
                 packet.weaponIndex = weapon->type->index;
-                BroadcastPacket(weapon->ownerUnit->player->playerId, &packet, sizeof(packet));
+                BroadcastPacket(weapon->ownerUnit->player->id, &packet, sizeof(packet));
             }
         }
     }
 
     if (weapon->ownerUnit)
         // The damage split's Obj_00406f50 parameter is this weapon object.
-        weapon->ownerUnit->player->object->MarkOwnerNetDirtyFromDamageSplit((Obj_00406f50*)weapon, enemyDamage, friendlyDamage);
+        weapon->ownerUnit->player->ai->MarkOwnerNetDirtyFromDamageSplit((Obj_00406f50*)weapon, enemyDamage, friendlyDamage);
 }
