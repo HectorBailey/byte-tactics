@@ -1008,7 +1008,7 @@ struct Elem_00434020;
 struct Elem_00434360;
 struct Elem_00434360_2;
 struct Elem_00434a60;
-struct Elem_0043c390;
+struct MissionOrderTableEntry;
 struct Elem_0043ca70;
 struct Elem_00441c30;
 struct Elem_0044ce90;
@@ -6547,14 +6547,14 @@ struct Owner_0043ad50 {  // 0x64 bytes, 1 view
     Node_0043ad50* list_b;  // +0x60
 };
 
-struct Elem_0043c390 {  // 0x19 bytes, 8 views
+struct MissionOrderTableEntry {  // 0x19 bytes, 8 views
     char unknown_0[4];
     int (__stdcall *notify)(void*, Order*, int);  // +0x4
     char unknown_8[13];
     char* name;  // +0x15
-    int operator<(Elem_0043c390&);
-    int operator==(Elem_0043c390&);
-    int operator!=(Elem_0043c390&);
+    int operator<(MissionOrderTableEntry&);
+    int operator==(MissionOrderTableEntry&);
+    int operator!=(MissionOrderTableEntry&);
 };
 
 class MissionOrderTable {  // 0xc bytes, 1 view

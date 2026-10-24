@@ -514,7 +514,7 @@ int g_mapLoadFlag;  // 0x51e6c0 .bss
 unsigned int g_cdMismatchDefeatTick;  // 0x51e6c4 .bss
 unsigned char g_loadingBarFlashAlpha[8];  // 0x51e6c8 .bss
 int g_shareDialogPlayerNetIds[10];  // 0x51e6d0 .bss
-char g_savegameRadarFrame[24];  // 0x51e6f8 .bss
+unsigned char g_savegameRadarFrame[24];  // 0x51e6f8 .bss
 int g_cdActivitySampleRing[30];  // 0x51e710 .bss
 char g_chatDraftText[136];  // 0x51e788 .bss
 unsigned char g_scorePanelLossFlash[10];  // 0x51e810 .bss (the type runs past the next known address, 0x51e810+0x8)
