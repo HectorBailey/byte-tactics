@@ -17,10 +17,10 @@ struct Item_00485940;
 
 #include "../network/player.h"
 
-struct Def_00488310 {
-    char unknown_0[0x1fa];
-    int f1fa;                          // +0x1fa
-};
+// `struct` before the header, as the original had it: it decides the class key
+// in the decorated names of the functions that take a UnitDef.
+struct UnitDef;
+#include "unit_def.h"
 
 struct Unit {
     int motion;                       // +0x0
@@ -29,7 +29,7 @@ struct Unit {
     Angles16 angles;               // +0x64
     Vec3 pos;                          // +0x6a
     char unknown_76[0x92 - 0x76];
-    Def_00488310* def;                 // +0x92
+    UnitDef* def;                      // +0x92
     Player* player;                    // +0x96
     char unknown_9a[0xa6 - 0x9a];
     unsigned short unitDefIndex;       // +0xa6
@@ -374,7 +374,7 @@ void __cdecl CreateMissionUnits()
         if (u) {
             // The mask is 0xffffff80, not 0x80: keeps the byte zero-extension.
             u->flags = (u->flags & ~0x8000) | ((e->flags & 0xffffff80) << 8);
-            u->health = (unsigned short)((unsigned)(u->def->f1fa * e->health) / 100);
+            u->health = (unsigned short)((unsigned)(u->def->maxHealth * e->health) / 100);
             u->angles.heading = e->angle;
             units[i] = u;
         }
@@ -501,6 +501,10 @@ static inline int RangeSize_00488810(Item_00485940** low, Item_00485940** high)
 }
 
 void __stdcall QuickSort(Item_00485940** first, Item_00485940** last, Pred_00488810 pred, int unused);
+
+// A declaration ahead of the definition below: the symbol id it takes is what
+// keeps QuickSort's allocation (docs/c2-regalloc.md).
+void __stdcall FreeUnitCategories();
 
 // FUNCTION: 0x488810
 void __stdcall QuickSort(Item_00485940** first, Item_00485940** last, Pred_00488810 pred, int unused)
