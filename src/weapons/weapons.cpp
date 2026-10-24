@@ -3077,26 +3077,14 @@ struct Proj_0049be60 {
     unsigned short flags;              // +0x69
 };
 
-struct MapSize_0049be60 {
-    unsigned int width;                // +0x0
-    unsigned int height;               // +0x4
+#pragma pack(pop)
 
-    int Contains(unsigned int tx, unsigned int ty)
-    {
-        return tx < width && ty < height;
-    }
-};
+#include "../map/byte_map.h"
 
-struct ByteMap_0049be60 {
-    unsigned char* data;               // +0x0
-    MapSize_0049be60 size;             // +0x4
-
-    unsigned char Get(int x, int y) { return data[size.width * y + x]; }
-};
-
+#pragma pack(push, 1)
 struct PlayerInfo_0049be60 {
     char unknown_0[0x7c];
-    ByteMap_0049be60 explored;         // +0x7c
+    ByteMap explored;                  // +0x7c
 };
 #pragma pack(pop)
 
