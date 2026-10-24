@@ -174,10 +174,6 @@ public:
 
 #include "../map/mission.h"
 
-struct Struct_00487af0 {
-    char unknown_0[4];
-    int* field_4;                      // +0x4
-};
 #pragma pack(pop)
 
 #include "../util/hapi_bank.h"
@@ -494,13 +490,17 @@ void __stdcall SaveUnits(HapiBank* file)
     }
 }
 
+// The mission's unit list is a std::vector<Unit*>, the type unit_commands.cpp
+// passes; included here so the type is complete.
+#include <vector>
+
 // The element address has to go through this helper: written inline as
-// param_2->field_4[i++] the strength reducer turns the loop into a pointer
+// (*param_2)[i++] the strength reducer turns the loop into a pointer
 // walk (add eax, 4 plus the loaded value in a register), while the original
 // recomputes esi*4 with a lea and compares straight from memory.
-static inline int* Elem_00487af0(int* arr, int i)
+static inline int* Elem_00487af0(std::vector<Unit*>* units, int i)
 {
-    return arr + i;
+    return (int*)&(*units)[i];
 }
 
 // Looks a name up in the class-name list at Mission+0xdac (one entry
@@ -512,12 +512,12 @@ static inline int* Elem_00487af0(int* arr, int i)
 // `i++` sits inside the subscript, so the first test is array[0] with i
 // already 1, and a match on array[0] leaves i = 1.
 // FUNCTION: 0x487af0
-int __stdcall FindMissionUnit(char* name, Struct_00487af0* param_2, int value)
+int __stdcall FindMissionUnit(char* name, std::vector<Unit*>* param_2, int value)
 {
     int i = 0;
 
     if (value) {
-        while (*Elem_00487af0(param_2->field_4, i++) != value) {
+        while (*Elem_00487af0(param_2, i++) != value) {
             if (i >= g_game->mapInfo->unitCount)
                 return 0;
         }
@@ -526,10 +526,10 @@ int __stdcall FindMissionUnit(char* name, Struct_00487af0* param_2, int value)
         return 0;
     for (; i < g_game->mapInfo->unitCount; i++) {
         MissionUnit* e = &g_game->mapInfo->units[i];
-        if (e->ident && _strcmpi(e->ident, name) == 0 && param_2->field_4[i])
-            return param_2->field_4[i];
-        if (e->name && _strcmpi(e->name, name) == 0 && param_2->field_4[i])
-            return param_2->field_4[i];
+        if (e->ident && _strcmpi(e->ident, name) == 0 && (int)(*param_2)[i])
+            return (int)(*param_2)[i];
+        if (e->name && _strcmpi(e->name, name) == 0 && (int)(*param_2)[i])
+            return (int)(*param_2)[i];
     }
     return 0;
 }

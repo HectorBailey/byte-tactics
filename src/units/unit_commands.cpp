@@ -49,12 +49,51 @@ struct Unit {
     void SetStateBits(unsigned char mask, int set);
 };
 
-struct Table_00487bf0 {
-    char allocator_byte;
-    char pad[3];
-    Unit** ids;                        // +0x4
-};
 #pragma pack(pop)
+
+// The container declarations are here, before the types below, because
+// FindMissionUnit's parameter is a std::vector<Unit*>*: its complete type has
+// to be known where the declaration is.
+// Needed though unused: dropping it moves the f108 multiply onto the other register.
+#include <math.h>
+// Included only for its declarations, which the symbol counter of CreateMissionUnits needs.
+#include <memory.h>
+#include <vector>
+
+// std::vector<Unit*> is specialised here rather than taken from <vector>
+// because MSVC 5 inlines _Ufill's body into the real (count, value)
+// constructor, while the original calls the out-of-line copy (0x406c40) that
+// the game's own vector object holds. Everything else is the real container:
+// allocator::allocate gives the `if (_N < 0) _N = 0` clamp and operator new
+// (not new[]), and ~vector's deallocate is the operator delete at the end.
+namespace std {
+template<> class vector<Unit*, allocator<Unit*> > {
+public:
+    typedef Unit* T;
+    typedef allocator<Unit*> A;
+    typedef A::size_type size_type;
+
+    vector(size_type _N, const T& _V = T(), const A& _Al = A())
+        : allocator(_Al)
+    {
+        _First = allocator.allocate(_N, (void *)0);
+        _Ufill(_First, _N, _V);
+        _Last = _First + _N;
+        _End = _Last;
+    }
+    ~vector()
+        { allocator.deallocate(_First, _End - _First); }
+    T& operator[](size_type _P)
+        { return (*(_First + _P)); }
+
+protected:
+    A allocator;                       // +0x0
+    T* _First;                         // +0x4
+    T* _Last;                          // +0x8
+    T* _End;                           // +0xc
+    void _Ufill(T* _F, size_type _N, const T& _X);
+};
+}
 
 class MissionType {
 public:
@@ -68,7 +107,7 @@ void __stdcall AddOrder(MissionType kind, int remove, Unit* owner,
                             int id, Vec3* pos, int param_6, int param_7);
 void __stdcall GetOrderType(MissionType* out, int mode, Unit* unit,
                             int target, Vec3* pos);
-int __stdcall FindMissionUnit(char* name, Table_00487bf0* table, int value);
+int __stdcall FindMissionUnit(char* name, std::vector<Unit*>* units, int value);
 unsigned short __stdcall FindUnitTypeId(const char* name);
 void __stdcall AttachUnitToPiece(Unit* unit, int target, int a, int b);
 
@@ -77,7 +116,7 @@ struct Outs_t {
 };
 
 // FUNCTION: 0x487bf0
-void __stdcall RunInitialMission(Unit* unit, char* text, Table_00487bf0* table)
+void __stdcall RunInitialMission(Unit* unit, char* text, std::vector<Unit*>* units)
 {
     int count;
     // Locals stay grouped in small structs: loose scalars get a different frame order.
@@ -139,7 +178,7 @@ void __stdcall RunInitialMission(Unit* unit, char* text, Table_00487bf0* table)
         case 'G':
         case 'g': {
             sscanf(buf + 1, " %[a-zA-Z0-9_.]", buf);
-            int target = FindMissionUnit(buf, table, 0);
+            int target = FindMissionUnit(buf, units, 0);
             if (target != 0) {
                 GetOrderType(&out.g, 7, unit, target, 0);
                 AddOrder(out.g, 1, unit, target, 0, 0, 0);
@@ -213,7 +252,7 @@ void __stdcall RunInitialMission(Unit* unit, char* text, Table_00487bf0* table)
                 count = sscanf(buf + 2, " %[a-zA-Z0-9.]", buf);
                 int target = 0;
                 if (count == 1)
-                    target = FindMissionUnit(buf, table, 0);
+                    target = FindMissionUnit(buf, units, 0);
                 if (target == 0)
                     target = (int)unit;
                 AddOrder("WAITFORATTACK", 1, unit, target,
@@ -243,7 +282,7 @@ void __stdcall RunInitialMission(Unit* unit, char* text, Table_00487bf0* table)
         case 'I':
         case 'i': {
             sscanf(buf + 1, " %[a-zA-Z0-9_.]", buf);
-            int target = FindMissionUnit(buf, table, 0);
+            int target = FindMissionUnit(buf, units, 0);
             if (target != 0)
                 AttachUnitToPiece(unit, target, -1, 0);
             break;
@@ -299,46 +338,7 @@ Unit* __stdcall CreateUnit(unsigned char player, unsigned short id,
                                       Vec3 pos, int a, int b, int c);
 void __stdcall FatalError(char* message);
 
-// Needed though unused: dropping it moves the f108 multiply onto the other register.
-#include <math.h>
-// Included only for its declarations, which the symbol counter of CreateMissionUnits needs.
-#include <memory.h>
-#include <vector>
 
-// std::vector<Unit*> is specialised here rather than taken from <vector>
-// because MSVC 5 inlines _Ufill's body into the real (count, value)
-// constructor, while the original calls the out-of-line copy (0x406c40) that
-// the game's own vector object holds. Everything else is the real container:
-// allocator::allocate gives the `if (_N < 0) _N = 0` clamp and operator new
-// (not new[]), and ~vector's deallocate is the operator delete at the end.
-namespace std {
-template<> class vector<Unit*, allocator<Unit*> > {
-public:
-    typedef Unit* T;
-    typedef allocator<Unit*> A;
-    typedef A::size_type size_type;
-
-    vector(size_type _N, const T& _V = T(), const A& _Al = A())
-        : allocator(_Al)
-    {
-        _First = allocator.allocate(_N, (void *)0);
-        _Ufill(_First, _N, _V);
-        _Last = _First + _N;
-        _End = _Last;
-    }
-    ~vector()
-        { allocator.deallocate(_First, _End - _First); }
-    T& operator[](size_type _P)
-        { return (*(_First + _P)); }
-
-protected:
-    A allocator;                       // +0x0
-    T* _First;                         // +0x4
-    T* _Last;                          // +0x8
-    T* _End;                           // +0xc
-    void _Ufill(T* _F, size_type _N, const T& _X);
-};
-}
 
 // FUNCTION: 0x488310
 void __cdecl CreateMissionUnits()
@@ -375,7 +375,7 @@ void __cdecl CreateMissionUnits()
     for (int j = 0; j < g_game->mapInfo->unitCount; j++) {
         MissionUnit* e = &g_game->mapInfo->units[j];
         if (e->initialMission && units[j])
-            RunInitialMission(units[j], e->initialMission, (Table_00487bf0*)&units);
+            RunInitialMission(units[j], e->initialMission, &units);
     }
     if (g_game->mapInfo->unitCount <= 0)
         g_game->victoryConditions->Deactivate();
@@ -495,9 +495,10 @@ static inline int RangeSize_00488810(Item_00485940** low, Item_00485940** high)
 
 void __stdcall QuickSort(Item_00485940** first, Item_00485940** last, Pred_00488810 pred, int unused);
 
-// A declaration ahead of the definition below: the symbol id it takes is what
-// keeps QuickSort's allocation (docs/c2-regalloc.md).
+// Declarations ahead of their definitions below: the symbol ids they take are
+// what keep QuickSort's allocation (docs/c2-regalloc.md).
 void __stdcall FreeUnitCategories();
+void __stdcall ResetCameraState();
 
 // FUNCTION: 0x488810
 void __stdcall QuickSort(Item_00485940** first, Item_00485940** last, Pred_00488810 pred, int unused)
