@@ -104,6 +104,7 @@ struct UnitType_0049d000 {
 };
 
 #include "weapon_def.h"
+#include "../map/feature.h"
 
 union Fbb_0049d580 {
     unsigned short value;
@@ -312,8 +313,6 @@ int PickRandomReclaimableResourcesInRadius(int, int, int, int, int, int);
 int CreateUnit(int, int, int, int, int, int);
 
 struct Projectile;
-struct MapFeature_0049b090;
-
 // The game state, as the weapon code sees it. The time word keeps one name per
 // view (now, frame, gameTick, teamColor); the two tracked-projectile pointers
 // are one union, 499a30's selected and 49c740's tracked.
@@ -349,7 +348,7 @@ struct Game {
     char unknown_14257[0x14263 - 0x14257];
     int gravity;                       // +0x14263
     char unknown_14267[0x1426f - 0x14267];
-    MapFeature_0049b090* features;     // +0x1426f
+    Feature* features;                 // +0x1426f
     char unknown_14273[0x1427f - 0x14273];
     unsigned char seaLevel;            // +0x1427f
     char debugMode;
@@ -408,7 +407,6 @@ typedef Vec3 Vec3_0049b720;
 struct Unit;
 struct Spot_0049a120;
 struct FeatureDef_0049a120;
-struct MapFeature_0049b090;
 struct Cell;
 
 #pragma pack(pop)
@@ -2880,12 +2878,9 @@ void CenterCameraOnRadarClick();
 // 0x49be60 after the TdfFile global below.
 #pragma pack(push, 1)
 
-// The feature records are an array of these, indexed as `features[f * 256]`.
-struct MapFeature_0049b090 {
-    char unknown_0[0xfa];
-    unsigned char height;             // +0xfa
-    char unknown_fb[0x100 - 0xfb];
-};
+// Unused here: the symbol ids this declaration takes stand where the map feature
+// view stood, which keeps 0x49be60's row arithmetic (docs/c2-regalloc.md).
+void __stdcall SetWeaponFireHandler(WeaponDef*);
 
 union Flags_0049b090 {
     unsigned char value;
@@ -2991,7 +2986,7 @@ void __stdcall CheckProjectileCollision(WeaponDef* type, Proj_0049b090* proj)
         short cx = proj->px.s.hi / 16;
         short cz = proj->pz.s.hi / 16;
         unsigned short f = cell->feature;
-        MapFeature_0049b090* mf;
+        Feature* mf;
         // The `!(f == 0xfffe)` chain shape sets the block order.
         if (f < 0xfffb) {
             if (f < g_game->featureCount)
