@@ -100,15 +100,16 @@ void __stdcall PushHeapSiftUp(Entry_40d670* first, int hole, int top, Entry_40d6
     first[hole] = val;
 }
 
-// Own definition, not vec3.h: it has the member operator!= that TracePath inlines.
-struct Point16 {
-    short x;
-    short y;
-    int operator!=(const Point16& o) const
-    {
-        return x != o.x || y != o.y;
-    }
-};
+#include "../util/vec3.h"
+
+// A free operator, not a member: nothing else that includes vec3.h needs one,
+// and a member would cost every one of those files its three symbol ids.
+inline int operator!=(const Point16& a, const Point16& b)
+{
+    return a.x != b.x || a.y != b.y;
+}
+
+
 
 struct NodeData {
     Point16 pos;                       // +0x0
@@ -850,6 +851,11 @@ void Pathfinder::TracePath()
     }
     path->SetWaypoints(out, count);
 }
+
+// Unused here: the symbol ids these declarations take are the ones the shared
+// vec3.h costs, which keeps ProbeStraightPath's allocation.
+struct FrameTable;
+struct MovementClassTable;
 
 // Bug-style path probe: walks straight towards the goal (x first, then y)
 // until blocked, then follows the obstacle's outline both ways at once until
