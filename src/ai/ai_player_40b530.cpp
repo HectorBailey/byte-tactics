@@ -5,10 +5,9 @@ namespace std {
 inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull(dest, &src); }
 }
 #include <vector>
+#include "../units/unit.h"
 struct Vec { int x,y,z; };
 #pragma pack(push,1)
-struct Def { char pad[0x241]; unsigned flags; };
-struct Unit { char pad[0x6a]; Vec pos; char pad76[0x92-0x76]; Def* def; char pad96[0x10e-0x96]; unsigned char active; };
 struct Owner { char pad[0x25]; std::vector<Unit*> factories; };
 #pragma pack(pop)
 extern Owner* g_playerAI[];
@@ -19,7 +18,7 @@ void __stdcall GetFactoriesInRadius(int player,const Vec* pos,int radius,std::ve
     radius*=radius;
     for(std::vector<Unit*>::iterator it=list.begin();it!=list.end();++it) {
         Unit* unit=*it;
-        if((unit->def->flags&0x40) && (unit->def->flags&0x200) && (unit->active&1)) {
+        if((unit->def->flags1&0x40) && (unit->def->flags1&0x200) && (unit->on)) {
             int dz=pos->z-unit->pos.z;
             int dx=pos->x-unit->pos.x;
             int d=(int)(((__int64)dx*dx)>>32)+(int)(((__int64)dz*dz)>>32);
