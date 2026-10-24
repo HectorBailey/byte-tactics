@@ -11,6 +11,8 @@
 // where the 0x80 arm tests both of its divisors first.
 
 #include "gadget.h"
+#include "gui.h"
+#include "layer.h"
 
 #include "../graphics/gaf_frame.h"
 
@@ -24,29 +26,17 @@ struct List_004a3ef0 {
     unsigned short* glyphs;            // +0x0c
 };
 
-struct Holder_004a3ef0 {
-    int current;                       // +0x00
-    Gadget* entries;                   // +0x04
-    char unknown_08[0x14 - 0x08];
-    List_004a3ef0* list;               // +0x14
-};
-
-struct Dialog {
-    char unknown_0[0x18];
-    Holder_004a3ef0* holder;           // +0x18
-};
-
-extern Holder_004a3ef0* g_guiContext;
+extern Gui* g_guiContext;
 
 void __stdcall SetFont(int id);
 int __stdcall GetGafFrame(unsigned short* seq, int frame);
 int GetFontHeight();
-void __stdcall DrawSliderBar(Dialog* gui, int gadgetIndex);
+void __stdcall DrawSliderBar(Gui* gui, int gadgetIndex);
 
 // The one helper for every GetGafFrame glyph fetch.
 static inline GafFrame* GetGlyph_004a3ef0(unsigned char c)
 {
-    return (GafFrame*)GetGafFrame(g_guiContext->list->glyphs, c);
+    return (GafFrame*)GetGafFrame(((List_004a3ef0*)g_guiContext->language)->glyphs, c);
 }
 
 static inline int Find_004a3ef0(Gadget* entries, unsigned char kind)
@@ -70,9 +60,9 @@ static inline int LineSize_004a3ef0(Gadget* e)
 }
 
 // FUNCTION: 0x4a3ef0
-void __stdcall DrawSlider(Dialog* gui, int gadgetIndex)
+void __stdcall DrawSlider(Gui* gui, int gadgetIndex)
 {
-    Gadget* entries = gui->holder->entries;
+    Gadget* entries = gui->layer->entries;
     Gadget* me = &entries[gadgetIndex];
     unsigned char kind = me->team;
     int found = Find_004a3ef0(entries, kind);
@@ -96,9 +86,9 @@ void __stdcall DrawSlider(Dialog* gui, int gadgetIndex)
                     }
                 }
                 if (i == entries->u.count + 1) {
-                    SetFont(g_guiContext->current);
+                    SetFont(g_guiContext->font);
                 }
-                int size = (g_guiContext->list == 0) ? GetFontHeight()
+                int size = (g_guiContext->language == 0) ? GetFontHeight()
                     : GetGlyph_004a3ef0(0x49)->height + 2;
                 int numerator = e->height - 2;
                 int denominator = (e->u.list.scroll > size + 1) ? e->u.list.scroll : size + 1;
