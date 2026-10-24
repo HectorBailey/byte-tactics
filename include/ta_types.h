@@ -13993,7 +13993,7 @@ struct FindData_00495930 {  // 0x118 bytes, 1 view
 
 struct BmpWriter {  // 0x10 bytes, 2 views
     char unknown_0[12];
-    int field_c;  // +0xc
+    int file;  // +0xc
     BmpWriter* Init(void);
 };
 

@@ -2130,7 +2130,12 @@ def rename_types_header(path: Path, layouts: list["Layout"],
     view of the same size), or by the class a member's own name gives. A field takes the
     joined type's name for the same offset, and a member the name symbols.csv gives its
     address. A rename that would leave two declarations with one name is not made, and
-    every such case is printed."""
+    every such case is printed.
+
+    The type names are decided and written first, and the fields and members are read out
+    of the header as it stands after them: a type renamed here is then looked up under its
+    new name in the same run, so one run reaches the fixed point and a second run changes
+    nothing."""
     head, blocks, tail = split_header(path.read_text())
     by_node: dict[tuple[str, str], "Layout"] = {}
     by_stem: dict[str, list["Layout"]] = defaultdict(list)
@@ -2142,11 +2147,10 @@ def rename_types_header(path: Path, layouts: list["Layout"],
                 by_stem[stem].append(lay)
             if lay not in by_view[view]:
                 by_view[view].append(lay)
-    names = set(re.findall(r"^(?:struct|class|union) (\w+);", "".join(head + tail), re.M))
-    names |= {name for name, _, _ in blocks}
-    stats = Counter()
-    renamed: dict[str, str] = {}
-    for name, size, lines in blocks:
+
+    def block_layout(name: str, size: int) -> "Layout | None":
+        """The joined type a header block is: by the address in its name, the file's view
+        of that name, or the name the joined type itself has."""
         lay = None
         address = ADDRESS_NAME.match(name)
         if address:
@@ -2163,6 +2167,16 @@ def rename_types_header(path: Path, layouts: list["Layout"],
         if lay is None:
             same = [l for l in layouts if l.name == name and l.size == size]
             lay = same[0] if len(same) == 1 else None
+        return lay
+
+    names = set(re.findall(r"^(?:struct|class|union) (\w+);", "".join(head + tail), re.M))
+    names |= {name for name, _, _ in blocks}
+    stats = Counter()
+    renamed: dict[str, str] = {}
+    # 1. The type names, before any field is looked up.
+    for name, size, lines in blocks:
+        lay = block_layout(name, size)
+        address = ADDRESS_NAME.match(name)
         body = "".join(lines)
         new = name
         if lay is not None and ADDRESS_NAME.match(lay.name):
@@ -2191,6 +2205,17 @@ def rename_types_header(path: Path, layouts: list["Layout"],
             names -= {name}
             names.add(new)
             stats["types"] += 1
+    text = "".join(head) + "".join("".join(lines) for _, _, lines in blocks) + "".join(tail)
+    for old, new in renamed.items():
+        text = re.sub(rf"\b{re.escape(old)}\b", new, text)
+
+    # 2. The fields and members, under the names the header has now.
+    head, blocks, tail = split_header(text)
+    for name, size, lines in blocks:
+        lay = block_layout(name, size)
+        if lay is not None and ADDRESS_NAME.match(lay.name):
+            lay = None
+        body = "".join(lines)
         if lay is not None:
             fields = {m[1]: m[2] for m in lay.members if m[0] == "field"}
             for i, line in enumerate(lines):
@@ -2201,8 +2226,8 @@ def rename_types_header(path: Path, layouts: list["Layout"],
                 field = fields[int(offset.group(1), 16)]
                 width = next(m[5] for m in lay.members
                              if m[0] == "field" and m[1] == int(offset.group(1), 16))
-                size = decl_size(line)
-                if (re.fullmatch(r"[A-Za-z_]\w*", field) and (size is None or size == width)
+                width_of_decl = decl_size(line)
+                if (re.fullmatch(r"[A-Za-z_]\w*", field) and (width_of_decl is None or width_of_decl == width)
                         and not re.search(rf"\b{re.escape(field)}\b", body)):
                     lines[i] = line.replace(mark.group(0), field, 1)
                     body = "".join(lines)
@@ -2218,8 +2243,6 @@ def rename_types_header(path: Path, layouts: list["Layout"],
                 stats["members"] += 1
         stats["members left"] += len(FUN_NAME.findall(body))
     text = "".join(head) + "".join("".join(lines) for _, _, lines in blocks) + "".join(tail)
-    for old, new in renamed.items():
-        text = re.sub(rf"\b{re.escape(old)}\b", new, text)
     return text, stats
 
 
