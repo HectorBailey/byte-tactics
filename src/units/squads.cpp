@@ -20,21 +20,8 @@ struct Unit {
     char unknown_b0[0x118 - 0xb0];
 };
 
-// A player's squad group: the 0x20-byte record ai_player.cpp and
-// ai_player_407e70.cpp declare as Group, and the elements of Player::groups.
-// It has no header of its own yet (see the pull request).
-struct Group {
-    Player* player;                    // +0x0
-    int id;                            // +0x4
-    int field_8;                       // +0x8
-    int field_c;                       // +0xc
-    std::vector<Unit*> units;          // +0x10
-
-    Group(Player* a, int b)
-        : player(a), id(b), field_8(0), field_c(0)
-    {
-    }
-};
+// A player's squad group, the elements of Player::groups.
+#include "group.h"
 #pragma pack(pop)
 
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);

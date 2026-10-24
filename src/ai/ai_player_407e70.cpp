@@ -109,8 +109,9 @@ struct Unit {
 };
 #pragma pack(pop)
 
-// A player's squad group, the same 0x20-byte record ai_player.cpp declares as
-// Group (one of Player's squads).
+// A player's squad group, the same 0x20-byte record units/group.h declares.
+// Kept here: that header's Group constructor and Send move OnTimer (0x407e90)
+// (docs/c2-regalloc.md).
 struct Group {
     Player* player;                     // +0x0
     int id;                             // +0x4

@@ -277,14 +277,8 @@ struct Economy {                       // a unit's resources
     float cost;                        // +0x98
 };
 
-struct Group {                         // 0x20 bytes, one of a player's squads
-    Player* player;                    // +0x0
-    int id;                            // +0x4
-    char unknown_8[0x10 - 0x8];
-    std::vector<Unit*> units;          // +0x10
-
-    void Send(unsigned char mode, int remove, Unit* target, Vec3* pos, int flags, int extra);
-};
+// 0x20 bytes, one of a player's squads.
+#include "../units/group.h"
 
 void __stdcall OrderSquad(Player*, int, unsigned char, int, Unit*, Vec3*, int, int);
 
@@ -408,14 +402,14 @@ char IsMemSet();
 char IsPentiumOrBetter();
 
 // Unused here: the symbol ids these declarations take keep GetBuildRating (0x40bb00)
-// matching now that the weapon slot view is one type (docs/c2-regalloc.md).
+// matching now that the weapon slot view and Group come from headers
+// (docs/c2-regalloc.md).
 void RegisterUnitOrders(void);
 void RegisterGroundOrders(void);
 void RegisterVtolOrders(void);
 void StepAllGafSequences(void);
 void ResetNetStats(void);
 void InitCommands(void);
-int UpdatePlacementGhostValidity(void);
 
 // Unused here: these take the symbol ids of the removed argument-list view, which
 // keep GetBuildRating (0x40bb00) matching (docs/c2-regalloc.md).
