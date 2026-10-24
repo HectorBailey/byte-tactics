@@ -25,7 +25,7 @@ from check import (COMPILE_SCHEME, DEFAULT_FLAGS, ROOT, SYMBOLS, Original, annot
                    compile_source)
 from coff import parse_object
 from issues import BANDS
-from sources import gap_annotations, sources as files_of_kind
+from sources import gap_annotations, include_hash, sources as files_of_kind
 
 README = ROOT / "README.md"
 PROGRESS = ROOT / "data/progress.csv"
@@ -38,8 +38,8 @@ NOT_LEARNED = ("$", "??_C@", "__real@", "??_G", "??_E")
 LOCAL_STATIC = re.compile(r"@\?[0-9A-P]{1,4}@\?\?")
 
 
-def compile_cached(src: Path, include_hash: str):
-    key = hashlib.sha256(src.read_bytes() + include_hash.encode() + (DEFAULT_FLAGS + COMPILE_SCHEME).encode()).hexdigest()[:16]
+def compile_cached(src: Path, ihash: str):
+    key = hashlib.sha256(src.read_bytes() + ihash.encode() + (DEFAULT_FLAGS + COMPILE_SCHEME).encode()).hexdigest()[:16]
     stamp = ROOT / "build/progress" / src.relative_to(ROOT / "src").with_suffix(".key")
     obj = stamp.with_suffix(".obj")
     if stamp.exists() and stamp.read_text() == key and obj.exists():
@@ -169,8 +169,7 @@ def main() -> None:
             if e.name:
                 symbols.setdefault("_imp__" + e.name.decode(), e.address)
 
-    include_hash = hashlib.sha256(b"".join(
-        p.read_bytes() for p in sorted((ROOT / "include").rglob("*")) if p.is_file())).hexdigest()
+    ihash = include_hash()
     work = []
     # Gap regions are checked by tools/gapcheck.py, and runtime library code is
     # not game functions (tools/place.py places it): only game files count.
@@ -182,7 +181,7 @@ def main() -> None:
     # Compiling is the slow part (one Wine process per file), so do it in parallel.
     sources = sorted({src for _, _, src in work})
     with ThreadPoolExecutor(max_workers=os.cpu_count() or 4) as pool:
-        compiled = dict(zip(sources, pool.map(lambda s: compile_cached(s, include_hash), sources)))
+        compiled = dict(zip(sources, pool.map(lambda s: compile_cached(s, ihash), sources)))
 
     conflicts: list[str] = []
     objects: dict[Path, object] = {}

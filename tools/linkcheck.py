@@ -42,7 +42,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from check import COMPILE_SCHEME, DEFAULT_FLAGS, ROOT, base_name, load_symbols
-from sources import link_order, source_files
+from sources import include_hash, link_order, source_files
 
 SRC = ROOT / "src"
 LIBDIR = ROOT / "toolchain/msvc5-sp3/LIB"
@@ -173,12 +173,6 @@ def read_object(src: str, data: bytes) -> ObjectInfo:
             lo, hi = info.addends.get(target, (addend, addend))
             info.addends[target] = (min(lo, addend), max(hi, addend))
     return info
-
-
-def include_hash() -> str:
-    """The same hash tools/progress.py folds into its cache keys."""
-    return hashlib.sha256(b"".join(
-        p.read_bytes() for p in sorted((ROOT / "include").rglob("*")) if p.is_file())).hexdigest()
 
 
 def load_objects(quiet: bool = False) -> tuple[list[ObjectInfo], list[str]]:

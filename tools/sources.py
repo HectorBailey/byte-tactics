@@ -32,6 +32,7 @@ moving a file between folders does not change the order.
 
 import argparse
 import csv
+import hashlib
 import re
 import sys
 from functools import lru_cache
@@ -47,6 +48,22 @@ NAME_ADDRESS = re.compile(r"(?:^|_)(?:0x)?([0-9a-fA-F]{6,8})$")
 # The order of the kinds in link_order (and of the folders the files had before
 # docs/tidy-up.md: src/data, src/gap, src/lib, src/unsorted).
 KINDS = ("data", "gap", "library", "game")
+# A header the compiler reads, wherever it lives: include/ is on its INCLUDE
+# path, and the sources' own headers sit next to them.
+HEADER_SUFFIXES = (".h", ".hpp", ".inl")
+
+
+def include_hash() -> str:
+    """A hash of every header the build can include.
+
+    Every compile cache folds this into its object's key, so an edit to a
+    shared header recompiles the files that include it instead of handing back
+    an object built from the header's old bytes.
+    """
+    headers = [p for p in sorted((ROOT / "include").rglob("*")) if p.is_file()]
+    headers += [p for p in sorted(SRC.rglob("*"))
+                if p.is_file() and p.suffix in HEADER_SUFFIXES]
+    return hashlib.sha256(b"".join(p.read_bytes() for p in headers)).hexdigest()
 
 
 # --- annotations ----------------------------------------------------------------
