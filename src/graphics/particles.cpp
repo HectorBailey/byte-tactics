@@ -665,23 +665,8 @@ public:
                               int alt);                 // slot 6, 0x474d50
 };
 
-// The explored-cell views of the smoke draws.
-struct MapSize {
-    unsigned int width;             // +0x80
-    unsigned int height;            // +0x84
-
-    int Contains(int col, int row)
-    {
-        return (unsigned int)col < width && (unsigned int)row < height;
-    }
-};
-
-struct ByteMap {
-    unsigned char* data;            // +0x7c
-    MapSize size;                   // +0x80
-
-    unsigned char Get(int tx, int ty) { return data[size.width * ty + tx]; }
-};
+// The explored map of the smoke draws.
+#include "../map/byte_map.h"
 
 struct Map_004745e0 {               // one entry of g_game->players
     char unknown_0[0x7c];

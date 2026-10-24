@@ -30,22 +30,7 @@ struct Pos_004739b0 {
 
 #include "rect.h"
 
-struct MapSize {
-    unsigned int width;              // +0x0
-    unsigned int height;             // +0x4
-
-    int Contains(unsigned int tx, unsigned int ty)
-    {
-        return tx < width && ty < height;
-    }
-};
-
-struct ByteMap {
-    unsigned char* data;             // +0x0
-    MapSize size;                    // +0x4
-
-    unsigned char Get(int x, int y) { return data[size.width * y + x]; }
-};
+#include "../map/byte_map.h"
 
 // The header's type, kept local: its explored pointer cannot spell the
 // width/index pair this fog arm needs.

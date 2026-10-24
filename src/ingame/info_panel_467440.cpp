@@ -36,6 +36,8 @@ struct Unit {
     char unknown_114[0x118 - 0x114];
 };
 
+// Kept, not map/byte_map.h: the header's helpers move UpdateSensorRadarAndCloak
+// (0x467440) to 96.1%.
 struct MapSize {
     unsigned int width;                // +0x0
     unsigned int height;               // +0x4
