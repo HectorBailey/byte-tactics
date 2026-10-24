@@ -413,12 +413,7 @@ guard:
     }
 }
 
-class CommandArgs {
-public:
-    char unknown_0[0xd0];
-    int count;
-    CommandArgs* InitArgs();
-};
+#include "../util/command_args.h"
 
 char* __stdcall HAPI_LoadFile(const char* name, int* size);
 int __stdcall ExecuteCommandText(char* text, int len, CommandArgs* vars, int param_4);

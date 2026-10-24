@@ -278,7 +278,10 @@ struct Game {
 
 #pragma pack(pop)
 
-// Command arguments.
+// Command arguments. Kept, not util/command_args.h: the header's ten more
+// declarations move DrawCellContours (0x4181d0) and DrawMapDebugOverlay
+// (0x418310). The two members that nothing here calls are gone: their ids are
+// ScanDirectory's real parameter list below (docs/c2-regalloc.md).
 class CommandArgs {
 public:
     char* args[0x34];                  // +0x00
@@ -289,8 +292,6 @@ public:
     char* GetArg(int index, char* fallback);
     int Tokenize(char* text, char* end);
     CommandArgs* InitArgs();
-    // The two members that nothing here calls are gone: their ids are
-    // ScanDirectory's real parameter list below (docs/c2-regalloc.md).
 };
 
 // Kept, not sound/sound.h: the header moves CmdDoubleShot (0x417030), CmdMakePoster (0x417600), DrawWorldDeltaLine (0x417c70), DrawCellContours (0x4181d0) and DrawMapDebugOverlay (0x418310).
