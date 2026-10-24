@@ -1804,8 +1804,8 @@ address,size,file,symbol,status,similarity
 0x486fd0,162,src/units/unit_save.cpp,?LoadUnits@@YGXPAVHapiBank@@@Z,matched,100.0
 0x487080,1595,src/units/unit_save.cpp,?LoadUnit@@YGPAUUnit@@GPAVHapiBank@@@Z,matched,100.0
 0x4876c0,1062,src/units/unit_save.cpp,?SaveUnits@@YGXPAVHapiBank@@@Z,matched,100.0
-0x487af0,241,src/units/unit_save.cpp,?FindMissionUnit@@YGHPADPAUStruct_00487af0@@H@Z,matched,100.0
-0x487bf0,1811,src/units/unit_commands.cpp,?RunInitialMission@@YGXPAUUnit@@PADPAUTable_00487bf0@@@Z,matched,100.0
+0x487af0,241,src/units/unit_save.cpp,?FindMissionUnit@@YGHPADPAV?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@H@Z,matched,100.0
+0x487bf0,1811,src/units/unit_commands.cpp,?RunInitialMission@@YGXPAUUnit@@PADPAV?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@@Z,matched,100.0
 0x488310,596,src/units/unit_commands.cpp,?CreateMissionUnits@@YAXXZ,matched,100.0
 0x488570,657,src/units/unit_commands.cpp,?GiveUnitToPlayer@@YGXPAUUnit@@PAUPlayer@@PAUOwnershipTransferPacket@@@Z,matched,100.0
 0x488810,263,src/units/unit_commands.cpp,?QuickSort@@YGXPAPAUItem_00485940@@0P6GHPAU1@1@ZH@Z,matched,100.0
