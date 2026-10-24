@@ -75,8 +75,8 @@ struct SmkStats {
 extern "C" __declspec(dllimport) void __stdcall SmackSummary(Smk* smk, SmkStats* stats);
 
 // The DirectDraw objects the player blits through, the set MoviePlayer::surfaces
-// holds.
-struct Surfaces {
+// holds. The same five objects display.cpp names DirectDrawState.
+struct DirectDrawState {
     IDirectDraw* ddraw;              // +0x0
     IDirectDrawSurface* primary;     // +0x4
     IDirectDrawSurface* back;        // +0x8
@@ -90,7 +90,7 @@ struct Display_0047bdf0 {
     char unknown_28[0x40 - 0x28];
     HWND hwnd;                       // +0x40
     char unknown_44[0x84 - 0x44];
-    Surfaces surfaces;      // +0x84
+    DirectDrawState surfaces;  // +0x84
     char unknown_98[0xf0 - 0x98];
     unsigned short flags;            // +0xf0
 };
@@ -170,9 +170,9 @@ public:
     int paletteResult;                 // +0x410
     int hasSurfaces;                   // +0x414
     char unknown_418[0x528 - 0x418];
-    Surfaces surfaces;        // +0x528
+    DirectDrawState surfaces;  // +0x528
     char unknown_53c[0x544 - 0x53c];
-    Surfaces* wrapper;        // +0x544
+    DirectDrawState* wrapper;  // +0x544
     SurfaceDesc surfaceDesc;  // +0x548
 
     MoviePlayer(char* path, int a, int b, int c, int d, int e);

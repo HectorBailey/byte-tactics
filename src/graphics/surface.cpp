@@ -25,9 +25,19 @@ union DisplayFlags {
     unsigned short word;
     unsigned char byte;
     struct {
-        unsigned short flag0 : 1;
-        unsigned short flag1 : 1;
-        unsigned short bit2_15 : 14;
+        unsigned short opt : 1;        // bit 0
+        unsigned short bit1 : 1;       // bit 1, full screen
+        unsigned short gdi : 1;        // bit 2
+        unsigned short bit3 : 1;       // bit 3
+        unsigned short bit4 : 1;       // bit 4
+        unsigned short has_c0 : 1;     // bit 5
+        unsigned short has_c4 : 1;     // bit 6
+        unsigned short has_c8 : 1;     // bit 7
+        unsigned short has_cc : 1;     // bit 8
+        unsigned short has_d0 : 1;     // bit 9
+        unsigned short sound_opt : 1;  // bit 10
+        unsigned short quitting : 1;   // bit 11
+        unsigned short bit12 : 4;      // bits 12 to 15
     } bits;
 };
 
@@ -36,15 +46,15 @@ union DisplayFlags {
 struct Screen {
     char unknown_0[0x8];
     IDirectDrawSurface* primary;       // +0x8
-    IDirectDrawSurface* surface;       // +0xc
+    IDirectDrawSurface* back;          // +0xc
     char unknown_10[0x18 - 0x10];
 
     // Lock in a one-expression method: gives the separate surface reload.
-    int LockSurface(DDSURFACEDESC* p) { return surface->Lock(0, p, 0x801, 0); }
+    int LockSurface(DDSURFACEDESC* p) { return back->Lock(0, p, 0x801, 0); }
     int LockPrimary(DDSURFACEDESC* p) { return primary->Lock(0, p, DDLOCK_WAIT, 0); }
     void UnlockPrimary() { primary->Unlock(0); }
-    void UnlockSurface() { surface->Unlock(0); }
-    void UnlockRect(LPRECT p) { surface->Unlock(p); }
+    void UnlockSurface() { back->Unlock(0); }
+    void UnlockRect(LPRECT p) { back->Unlock(p); }
 };
 
 // One entry of the screen lock stack: a surface and the flag saying which
@@ -65,8 +75,8 @@ extern LockEntry g_screenLocks[];
 struct Display {
     char unknown_0[0x40];
     HWND hwnd;                         // +0x40
-    HDC offscreenDC;                   // +0x44
-    HDC sourceDC;                      // +0x48
+    HBITMAP dib;                       // +0x44
+    HDC dc;                            // +0x48
     HPALETTE hpalette;                 // +0x4c
     Surface cached;                    // +0x50
     Screen screen;                     // +0x80
@@ -77,11 +87,11 @@ struct Display {
     IDirectDrawSurface* lastBackBuffer;  // +0xb4
     char unknown_b8[0xbc - 0xb8];
     Surface* overrideSurface;          // +0xbc
-    char unknown_c0[0xc4 - 0xc0];
+    unsigned char* alphaTable;         // +0xc0
     unsigned char* shadeTable;         // +0xc4, 256 entries per light level
     unsigned char* lightTable;         // +0xc8
     unsigned char* grayTable;          // +0xcc
-    char unknown_d0[0xd4 - 0xd0];
+    unsigned char* blueTable;          // +0xd0
     int width;                         // +0xd4
     int height;                        // +0xd8
     int useOverrideSurface;            // +0xdc
@@ -108,11 +118,11 @@ struct Display {
             *out = *overrideSurface;
             return 1;
         }
-        if (offscreenDC != 0) {
+        if (dib != 0) {
             *out = cached;
             return 1;
         }
-        if (screen.surface == 0)
+        if (screen.back == 0)
             return 0;
         DDSURFACEDESC desc;
         desc.dwSize = sizeof(desc);
@@ -138,7 +148,7 @@ struct Display {
     // Method of the display object: this is the call result.
     int LockPrimary(Surface* out)
     {
-        if (offscreenDC != 0) {
+        if (dib != 0) {
             *out = cached;
             return 1;
         }
@@ -201,8 +211,8 @@ public:
 };
 
 // The DirectDraw objects the display holds: the driver and its two surfaces.
-// graphics/movies.cpp reads the same set (its Surfaces, with the clipper and
-// the palette that follow at +0xc and +0x10).
+// graphics/movies.cpp reads the same set (its DirectDrawState, with the
+// clipper and the palette that follow at +0xc and +0x10).
 struct Surfaces {
     int ddraw;                         // +0x0
     DirectDrawSurface* primary;        // +0x4
@@ -252,8 +262,8 @@ int GetScreenLockCount(void)
 static inline int UnlockScreenInline(Surface* s)
 {
     Display* d = GetDisplay();
-    if (d->offscreenDC == 0 && d->useOverrideSurface == 0) {
-        if (d->screen.surface == 0)
+    if (d->dib == 0 && d->useOverrideSurface == 0) {
+        if (d->screen.back == 0)
             return 0;
         d->screen.UnlockSurface();
         if (g_screenLockCount > 0)
@@ -303,8 +313,8 @@ int __stdcall LockScreen(Surface* out)
 int __stdcall UnlockScreen(Surface* s)
 {
     Display* d = GetDisplay();
-    if (d->offscreenDC == 0 && d->useOverrideSurface == 0) {
-        if (d->screen.surface == 0)
+    if (d->dib == 0 && d->useOverrideSurface == 0) {
+        if (d->screen.back == 0)
             return 0;
         d->screen.UnlockSurface();
         if (g_screenLockCount > 0)
@@ -332,18 +342,18 @@ int __stdcall LockPrimary(Surface* out)
 int __stdcall UnlockPrimary(Surface* unused, RECT* r1, RECT* r2)
 {
     Display* d = GetDisplay();
-    if (d->offscreenDC != 0) {
+    if (d->dib != 0) {
         HDC dc = GetDC(d->hwnd);
         SelectPalette(dc, d->hpalette, FALSE);
         RealizePalette(dc);
         if (r1 != 0) {
             BitBlt(dc, r1->left, r1->top, r1->right - r1->left,
-                   r1->bottom - r1->top, d->sourceDC, r1->left, r1->top,
+                   r1->bottom - r1->top, d->dc, r1->left, r1->top,
                    SRCCOPY);
         }
         if (r2 != 0) {
             BitBlt(dc, r2->left, r2->top, r2->right - r2->left,
-                   r2->bottom - r2->top, d->sourceDC, r2->left, r2->top,
+                   r2->bottom - r2->top, d->dc, r2->left, r2->top,
                    SRCCOPY);
         }
         ReleaseDC(d->hwnd, dc);
@@ -362,7 +372,7 @@ int __stdcall UnlockPrimary(Surface* unused, RECT* r1, RECT* r2)
 int __stdcall SetPageFlipping(int enable)
 {
     Display* obj = GetDisplay();
-    obj->flags.bits.flag0 = enable;
+    obj->flags.bits.opt = enable;
     if (enable && obj->haveBackBuffer == 0) {
         return 0;
     }
@@ -384,7 +394,7 @@ void __stdcall SetRestoreSurface(int surface)
 int __stdcall RestoreSurfaces(Surfaces* arg)
 {
     Display* d = GetDisplay();
-    if (d->offscreenDC != 0)
+    if (d->dib != 0)
         return 0;
 
     int r = arg->primary->Restore();
@@ -396,7 +406,7 @@ int __stdcall RestoreSurfaces(Surfaces* arg)
             BlitSurface(&screen, d->activeSurface, r, r);
 
             Display* d2 = GetDisplay();
-            if (d2->offscreenDC == 0 && d2->useOverrideSurface == 0 && d2->screen.surface != 0) {
+            if (d2->dib == 0 && d2->useOverrideSurface == 0 && d2->screen.back != 0) {
                 d2->screen.UnlockRect((LPRECT)r);
                 if (g_screenLockCount > 0)
                     g_screenLockCount--;
@@ -410,8 +420,8 @@ int __stdcall RestoreSurfaces(Surfaces* arg)
 static inline int UnlockScreenInline()
 {
     Display* d = GetDisplay();
-    if (d->offscreenDC == 0 && d->useOverrideSurface == 0) {
-        if (d->screen.surface == 0)
+    if (d->dib == 0 && d->useOverrideSurface == 0) {
+        if (d->screen.back == 0)
             return 0;
         d->screen.UnlockSurface();
         if (g_screenLockCount > 0)
@@ -430,12 +440,12 @@ static inline int UnlockScreenInline()
 void RestoreScreen(void)
 {
     Display* d = GetDisplay();
-    if (d->flags.bits.flag1) {
+    if (d->flags.bits.bit1) {
         if (d->screen.primary->IsLost() == DDERR_SURFACELOST) {
             Display* d2 = GetDisplay();
-            if (d2->offscreenDC == 0) {
+            if (d2->dib == 0) {
                 if (d->screen.primary->Restore() == 0) {
-                    if (d->screen.surface->Restore() == 0) {
+                    if (d->screen.back->Restore() == 0) {
                         Surface screen;
                         LockScreen(&screen);
                         BlitSurface(&screen, d2->activeSurface, 0, 0);
@@ -444,7 +454,7 @@ void RestoreScreen(void)
                 }
             }
         }
-        d->lastBackBuffer = d->screen.surface;
+        d->lastBackBuffer = d->screen.back;
     }
     d->useOverrideSurface = 0;
 }
@@ -481,11 +491,11 @@ static inline void Unlock(LONG held)
 static inline HRESULT RestoreSurfacesInline(Display* d)
 {
     Display* dd = GetDisplay();
-    if (dd->offscreenDC != 0)
+    if (dd->dib != 0)
         return 0;
     HRESULT hr = d->screen.primary->Restore();
     if (hr == 0) {
-        hr = d->screen.surface->Restore();
+        hr = d->screen.back->Restore();
         if (hr == 0) {
             Surface screen;
             LockScreen(&screen);
@@ -523,7 +533,7 @@ void FlipScreen(void)
         HDC hdc = GetDC(d->hwnd);
         SelectPalette(hdc, d->hpalette, 0);
         RealizePalette(hdc);
-        BitBlt(hdc, 0, 0, p->width, d->cached.height, d->sourceDC, 0, 0, SRCCOPY);
+        BitBlt(hdc, 0, 0, p->width, d->cached.height, d->dc, 0, 0, SRCCOPY);
         ReleaseDC(d->hwnd, hdc);
         Unlock(held);
         return;
@@ -575,7 +585,7 @@ void FlipScreen(void)
 
     int hr;
     while (1) {
-        hr = d->screen.primary->Blt(&rect, d->screen.surface, &src, 0x1000000, 0);
+        hr = d->screen.primary->Blt(&rect, d->screen.back, &src, 0x1000000, 0);
         if (hr == 0)
             return;
         if (hr != 0x887601c2)
@@ -674,8 +684,8 @@ int __stdcall FillSurface(Surface* surface, int colour)
             Fade_004c6890 fade;
             fade.amount = 100;
             fade.colour = colour;
-            if (((Driver_004c6890*)obj->screen.surface)->table->fade(
-                    (Driver_004c6890*)obj->screen.surface, 0, 0, 0, 0x1000400, &fade) != 0)
+            if (((Driver_004c6890*)obj->screen.back)->table->fade(
+                    (Driver_004c6890*)obj->screen.back, 0, 0, 0, 0x1000400, &fade) != 0)
                 ret = 0;
             return ret;
         }
@@ -685,8 +695,8 @@ int __stdcall FillSurface(Surface* surface, int colour)
         Fade_004c6890 fade;
         fade.amount = 100;
         fade.colour = colour;
-        if (((Driver_004c6890*)obj->screen.surface)->table->fade(
-                (Driver_004c6890*)obj->screen.surface, 0, 0, 0, 0x1000400, &fade) != 0)
+        if (((Driver_004c6890*)obj->screen.back)->table->fade(
+                (Driver_004c6890*)obj->screen.back, 0, 0, 0, 0x1000400, &fade) != 0)
             ret = 0;
     }
     return ret;

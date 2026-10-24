@@ -288,15 +288,19 @@ union Flags_004b8310 {
     unsigned short word;               // +0xf0
     unsigned char byte;                // +0xf0
     struct {
-        unsigned short bit0 : 1;
-        unsigned short bit1 : 1;
-        unsigned short bit2 : 1;
-        unsigned short bit3 : 1;
-        unsigned short bit4 : 1;
-        unsigned short has_obj_c0 : 1; // bit 5
-        unsigned short has_obj_c4 : 1; // bit 6
-        unsigned short has_obj_c8 : 1; // bit 7
-        unsigned short bit8_15 : 8;
+        unsigned short opt : 1;        // bit 0
+        unsigned short bit1 : 1;       // bit 1, full screen
+        unsigned short gdi : 1;        // bit 2
+        unsigned short bit3 : 1;       // bit 3
+        unsigned short bit4 : 1;       // bit 4
+        unsigned short has_c0 : 1;     // bit 5
+        unsigned short has_c4 : 1;     // bit 6
+        unsigned short has_c8 : 1;     // bit 7
+        unsigned short has_cc : 1;     // bit 8
+        unsigned short has_d0 : 1;     // bit 9
+        unsigned short sound_opt : 1;  // bit 10
+        unsigned short quitting : 1;   // bit 11
+        unsigned short bit12 : 4;      // bits 12 to 15
     } bits;
 };
 
@@ -847,7 +851,7 @@ void __cdecl BlitCompressedShadow(unsigned char* pixels, int pitch, Rect* rect,
 void __stdcall DrawFrameShadow(Surface* dst, GafFrame* bmp, int x, int y)
 {
     Display_004b8310* d = GetDisplay();
-    if (d->flags.bits.has_obj_c8 == 1) {
+    if (d->flags.bits.has_c8 == 1) {
         Surface screen;
         if (dst == 0) {
             int ok = LockScreen(&screen);
