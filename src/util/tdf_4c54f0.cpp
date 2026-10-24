@@ -54,8 +54,8 @@ struct TdfField {
 namespace std {
 inline void _Destroy(TdfField* p)
 {
-    ((StringRef*)&p->value)->ReleaseRef();
-    ((StringRef*)&p->key)->ReleaseRef();
+    (&p->value)->ReleaseRef();
+    (&p->key)->ReleaseRef();
 }
 }
 
