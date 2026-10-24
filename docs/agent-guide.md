@@ -1778,7 +1778,15 @@ name (`std::_Lockit::_Lockit` is 0x4e39b0).
   attempts had blamed the source for what one header fixed (0x43def0, 64% to
   94%). The score can repeat with a period (about 525 declarations there);
   sweeping N from 0 to 400 in steps of 4 with parallel `check.py --sym` runs
-  takes about 5 seconds.
+  takes about 5 seconds. `tools/idpad.py <file> <addr> [<addr> ...]` does the
+  real-declaration form of this search: it tries paddings of 0 to 40 ids made
+  of prototypes from `include/ta_protos.h` (and the removal of each existing
+  "Unused here" block), compiles them in parallel and prints the block that
+  makes the listed functions MATCH, smallest first. It also reports the same
+  file on `--base` (origin/main by default). The candidates must be compiled
+  at a path of the original's length, since the front end's counter moves 4
+  ids per character of the source path; the tool does that in a short scratch
+  directory at the root of the checkout and removes it afterwards.
 - **Two weights sharing one local**: with `a - t` and `b - t` on the same local
   `t`, MSVC 5 computes `-t` once with `neg` and adds it. If the original has
   two separate `sub`s, give each weight its own local holding the same value.
