@@ -45,7 +45,9 @@ struct Unit {                          // 0x118 bytes
     void ReleaseWeapons(int param_1);
 };
 
-struct Entry_0043a1f0 {                // 0x19-byte entries at g_missionOrderTableBegin
+// Thaldren's MissionOrderTableEntry (0x19 bytes: tick at +4, draw mask +0xc,
+// default flags +0x11, lookup name +0x15).
+struct MissionOrderTableEntry {                // 0x19-byte entries at g_missionOrderTableBegin
     char unknown_0[4];
     void (__stdcall* notify)(Unit* unit, Order* obj, int code);            // +0x4
     char unknown_8[0x11 - 0x8];
@@ -124,7 +126,7 @@ public:
 };
 
 int __stdcall OrderTypeNameLess(int param_1, char* param_2);
-Entry_0043a1f0* __stdcall LowerBoundOrderTypes(Entry_0043a1f0* first, Entry_0043a1f0* last,
+MissionOrderTableEntry* __stdcall LowerBoundOrderTypes(MissionOrderTableEntry* first, MissionOrderTableEntry* last,
                                        char* const& value, int(__stdcall* pred)(int, char*),
                                        int* unused);
 Unit* __stdcall LoadUnit(unsigned short id, void* file);
@@ -134,8 +136,8 @@ void __stdcall SendScriptCall(Unit* obj, int index, int param_3, int param_4, in
 void __stdcall QueueUnitSpeech(Unit* unit, int kind, char* text);
 
 extern Game* g_game;
-extern Entry_0043a1f0* g_missionOrderTableBegin;
-extern Entry_0043a1f0* g_missionOrderTableEnd;
+extern MissionOrderTableEntry* g_missionOrderTableBegin;
+extern MissionOrderTableEntry* g_missionOrderTableEnd;
 
 // The 0x10-byte link at +0x12: its constructor puts the object in its
 // owner's list; 0x489650 is its destructor.
@@ -380,11 +382,11 @@ extern int __cdecl _strcmpi(const char*, const char*);
 // FUNCTION: 0x438760
 MissionType::MissionType(const char* name)
 {
-    Entry_0043a1f0* first = g_missionOrderTableBegin;
+    MissionOrderTableEntry* first = g_missionOrderTableBegin;
     int n = g_missionOrderTableEnd - g_missionOrderTableBegin;
     for (; 0 < n; ) {
         int n2 = n / 2;
-        Entry_0043a1f0* m = first;
+        MissionOrderTableEntry* m = first;
         m += n2;
         int less = _strcmpi(m->name, name) < 0;
         if (less)
@@ -641,7 +643,7 @@ short __stdcall ResolveUnitTypeKey(HapiBank* file, unsigned short id)
 
 static unsigned char KindByName_0043a420(char* s)
 {
-    Entry_0043a1f0* e = LowerBoundOrderTypes(g_missionOrderTableBegin, g_missionOrderTableEnd, s, OrderTypeNameLess, 0);
+    MissionOrderTableEntry* e = LowerBoundOrderTypes(g_missionOrderTableBegin, g_missionOrderTableEnd, s, OrderTypeNameLess, 0);
     if (e == g_missionOrderTableEnd || _strcmpi(e->name, s) != 0)
         return 0;
     return (unsigned char)(e - g_missionOrderTableBegin);
@@ -652,7 +654,7 @@ static unsigned char KindByIndex_0043a420(unsigned char want)
     // Stays a helper with idx declared before k: inline, the scan keeps its counter in ECX.
     int idx = 0;
     int k = 0;
-    for (Entry_0043a1f0* p = g_missionOrderTableBegin; p <= g_missionOrderTableEnd; p++, idx++) {
+    for (MissionOrderTableEntry* p = g_missionOrderTableBegin; p <= g_missionOrderTableEnd; p++, idx++) {
         if (!(p->flag14 & 1)) {
             if (k == want)
                 break;
