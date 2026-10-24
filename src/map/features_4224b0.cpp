@@ -20,22 +20,22 @@ struct List_004224b0 {
     TdfFile** last;                     // +0x8
 };
 
-struct Seq_004224b0 {
+struct AnimSrc {
     unsigned short count;               // +0x0
     unsigned char kind;                 // +0x2
 };
 
-struct Gaf_004224b0;
+struct Gaf;
 
-struct Ref_004224b0 {
+struct Anim {
     unsigned short index;               // +0x0
     unsigned short value;               // +0x2
     unsigned char kind;                 // +0x4
     char unknown_5[3];
-    Seq_004224b0* src;                  // +0x8
+    AnimSrc* src;                  // +0x8
 };
 
-struct FeatureDef_004224b0 {
+struct Feature {
     char name[0x80];                    // +0x00
     char description[0x14];             // +0x80
     short footprintx;                   // +0x94
@@ -44,17 +44,17 @@ struct FeatureDef_004224b0 {
         void* object;                   // +0x98
         char filename[0x10];            // +0x98
     };
-    Gaf_004224b0* anims;                // +0xa8
-    Seq_004224b0* seq;                  // +0xac
-    Seq_004224b0* seqshad;              // +0xb0
-    Seq_004224b0* seqburn;              // +0xb4
-    Seq_004224b0* seqburnshad;          // +0xb8
-    Seq_004224b0* seqdie;               // +0xbc
-    Seq_004224b0* seqdieshad;           // +0xc0
-    Seq_004224b0* seqreclamate;         // +0xc4
-    Seq_004224b0* seqreclamateshad;     // +0xc8
-    Ref_004224b0 ref;                   // +0xcc
-    Ref_004224b0 refshad;               // +0xd8
+    Gaf* anims;                // +0xa8
+    AnimSrc* seq;                  // +0xac
+    AnimSrc* seqshad;              // +0xb0
+    AnimSrc* seqburn;              // +0xb4
+    AnimSrc* seqburnshad;          // +0xb8
+    AnimSrc* seqdie;               // +0xbc
+    AnimSrc* seqdieshad;           // +0xc0
+    AnimSrc* seqreclamate;         // +0xc4
+    AnimSrc* seqreclamateshad;     // +0xc8
+    Anim ref;                   // +0xcc
+    Anim refshad;               // +0xd8
     char* burnweapon;                   // +0xe4
     short sparktime;                    // +0xe8
     short damage;                       // +0xea
@@ -86,7 +86,7 @@ struct Game {
     char unknown_0[0x14253];
     int featureCount;                   // +0x14253
     char unknown_14257[0x1426f - 0x14257];
-    FeatureDef_004224b0* features;      // +0x1426f
+    Feature* features;      // +0x1426f
 };
 #pragma pack(pop)
 
@@ -98,10 +98,10 @@ void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const
 void __stdcall FatalError(char* path);
 void* __cdecl GameReallocTagged(void* p, const char* name, unsigned int size);
 void* __stdcall LoadObject3d(const char* name);
-Gaf_004224b0* __stdcall LoadGaf(char* path);
-Seq_004224b0* __stdcall FindGafEntry(Gaf_004224b0* gaf, const char* name);
+Gaf* __stdcall LoadGaf(char* path);
+AnimSrc* __stdcall FindGafEntry(Gaf* gaf, const char* name);
 char* __stdcall FindWeaponByName(char* name);
-void __stdcall InitGafSequence(Ref_004224b0* ref, Seq_004224b0* src, int index);
+void __stdcall InitGafSequence(Anim* ref, AnimSrc* src, int index);
 
 // FindFeatureFile, inlined
 static inline TdfFile* FindEntry(char* name)
@@ -115,7 +115,7 @@ static inline TdfFile* FindEntry(char* name)
 }
 
 // FindOptionalGafEntry, inlined
-static inline Seq_004224b0* SeqByName(Gaf_004224b0* gaf, int unused, char* name)
+static inline AnimSrc* SeqByName(Gaf* gaf, int unused, char* name)
 {
     if (strlen(name) == 0) {
         return 0;
@@ -126,7 +126,7 @@ static inline Seq_004224b0* SeqByName(Gaf_004224b0* gaf, int unused, char* name)
 // Reads one seqname-style field into *out: the sequence named by key from the
 // feature's GAF, or 0. The tested lookup goes through an int local: it changes
 // the zero compare.
-static inline void LoadFeatureSeq(TdfRecord* rec, char* key, char* seqname, Gaf_004224b0* anims, Seq_004224b0** out)
+static inline void LoadFeatureSeq(TdfRecord* rec, char* key, char* seqname, Gaf* anims, AnimSrc** out)
 {
     int ok = rec->GetFieldString(seqname, key, 0x100, g_emptyStringLiteral);
     if (ok)
@@ -137,7 +137,7 @@ static inline void LoadFeatureSeq(TdfRecord* rec, char* key, char* seqname, Gaf_
 
 // The same read for the burn, die and reclaim sequences, which play once: the
 // sequence's loop flag is cleared.
-static inline void LoadFeatureSeqOnce(TdfRecord* rec, char* key, char* seqname, Gaf_004224b0* anims, Seq_004224b0** out)
+static inline void LoadFeatureSeqOnce(TdfRecord* rec, char* key, char* seqname, Gaf* anims, AnimSrc** out)
 {
     int ok = rec->GetFieldString(seqname, key, 0x100, g_emptyStringLiteral);
     if (ok) {
@@ -156,7 +156,7 @@ static inline void LoadFeatureSeqOnce(TdfRecord* rec, char* key, char* seqname, 
 // FUNCTION: 0x4224b0
 int __stdcall LoadFeatureType(char* name)
 {
-    Gaf_004224b0* anims;
+    Gaf* anims;
     int j;
     // Tested TDF lookups go through an int local: it changes the zero compare.
     int ok;
@@ -169,9 +169,9 @@ int __stdcall LoadFeatureType(char* name)
         sprintf(path, "Record \"%s\" missing from feature files", name);
         FatalError(path);
     }
-    g_game->features = (FeatureDef_004224b0*)GameReallocTagged(g_game->features, "FEATURES",
+    g_game->features = (Feature*)GameReallocTagged(g_game->features, "FEATURES",
                                                           (g_game->featureCount + 1) * 0x100);
-    FeatureDef_004224b0* def = &g_game->features[g_game->featureCount];
+    Feature* def = &g_game->features[g_game->featureCount];
     strncpy(def->name, name, 0x80);
     entry->current->GetFieldString(def->description, "Description", 0x14, g_emptyStringLiteral);
     def->footprintx = entry->current->GetFieldInt("footprintx", 0);
