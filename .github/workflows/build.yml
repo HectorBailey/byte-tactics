@@ -122,6 +122,22 @@ jobs:
             toolchain/thirdparty
           key: ${{ steps.toolchain.outputs.cache-primary-key }}
 
+      # Every source file's object (tools/progress.py's cache), keyed per file
+      # on its bytes, the include tree and the compiler flags. A fresh
+      # checkout has none of them, so without this each run compiles all 276
+      # files and that is most of the build's minute.
+      - name: Restore the compiled objects
+        id: objects
+        uses: actions/cache/restore@v4
+        with:
+          path: build/progress
+          # The exact key misses after every commit, so the prefix pulls in the
+          # newest cache and the per-file keys keep what still applies: a pull
+          # request that touches one file compiles one file.
+          key: objects-${{ hashFiles('src/**', 'include/**') }}
+          restore-keys: |
+            objects-
+
       - name: Unpack the icon and cursor
         env:
           # Indexed rather than `a && x || y`, which would fall back to the
@@ -160,3 +176,15 @@ jobs:
             exit 1
           fi
           echo "MD5 $md5: the shipped exe"
+
+      # As with the toolchain: a pull_request_target run saves into main's
+      # cache, and an object is an input to the link, so a fork could plant one
+      # that makes source which does not match build the shipped exe. The step
+      # also runs only after the MD5 check, so nothing a failing run made is
+      # kept.
+      - name: Save the compiled objects
+        if: steps.objects.outputs.cache-hit != 'true' && github.event_name != 'pull_request_target'
+        uses: actions/cache/save@v4
+        with:
+          path: build/progress
+          key: ${{ steps.objects.outputs.cache-primary-key }}
