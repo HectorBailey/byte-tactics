@@ -525,7 +525,7 @@ struct Game {  // 0x3924d bytes
     int count_1438f;  // +0x1438f
     int unitDefCountBits;  // +0x14393
     int unitDefEnumDirty;  // +0x14397
-    UnitDef* defs;  // +0x1439b
+    UnitDef* unitDefs;  // +0x1439b
     char unknown_1439f[8];
     char field_143a7[4];  // +0x143a7
     char unknown_143ab[1020];
