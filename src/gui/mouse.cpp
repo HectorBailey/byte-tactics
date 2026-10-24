@@ -6,21 +6,10 @@
 #include <string.h>
 
 #include "../graphics/gaf_frame.h"
+#include "../graphics/surface.h"
 #include "mouse_event.h"
 
 #pragma pack(push, 2)
-
-// A saved-background surface descriptor at +0x1be.
-struct Desc_004c25e0 {
-    int width;                         // +0x0
-    int height;                        // +0x4
-    int pitch;                         // +0x8
-};
-
-// The local the lock and blit calls fill with a locked surface.
-struct Surface_004c23e0 {
-    int data[12];
-};
 
 // The GUI object GetDisplay returns: the fields the mouse code uses.
 struct Obj_004c2380 {
@@ -38,9 +27,9 @@ struct Obj_004c2380 {
     GafFrame* sprite;                  // +0x1b2
     int x;                             // +0x1b6
     int y;                             // +0x1ba
-    Desc_004c25e0* saved;              // +0x1be
-    Desc_004c25e0* under;              // +0x1c2
-    Desc_004c25e0* work;               // +0x1c6
+    Surface* saved;                    // +0x1be, the saved-background surfaces
+    Surface* under;                    // +0x1c2
+    Surface* work;                     // +0x1c6
     int running;                       // +0x1ca, the thread's handle
     int mode;                          // +0x1ce
     int visible;                       // +0x1d2
@@ -57,7 +46,7 @@ extern HANDLE g_gfxBlitLockEvent;
 
 void __cdecl BlitSurface(void* dst, void* src, int x, int y);
 void __stdcall DrawFrame(void* dst, GafFrame* bmp, int x, int y);
-void __stdcall DrawSurface(Desc_004c25e0* dst, Desc_004c25e0* bmp, int x, int y);
+void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y);
 int __stdcall LockPrimary(void* out);
 int __stdcall UnlockPrimary(void* unused, RECT* r1, RECT* r2);
 void __stdcall ResetClipRect(void* d);
@@ -147,8 +136,8 @@ void DrawSoftwareCursor()
 void __stdcall RestoreCursorBackground(Obj_004c2380* obj)
 {
     if (obj->visible) {
-        Desc_004c25e0* bmp = obj->saved;
-        Surface_004c23e0 s;
+        Surface* bmp = obj->saved;
+        Surface s;
         if (LockPrimary(&s)) {
             BlitSurface(&s, bmp, obj->x, obj->y);
             RECT r;
@@ -177,7 +166,7 @@ void HideSoftwareCursor()
 void __stdcall CaptureBackgroundAndDrawCursor(Obj_004c2380* obj)
 {
     if (obj->visible) {
-        Surface_004c23e0 s;
+        Surface s;
         if (LockPrimary(&s)) {
             RECT r;
             POINT pt;
@@ -210,7 +199,7 @@ void __stdcall CaptureBackgroundAndDrawCursor(Obj_004c2380* obj)
 void __stdcall RedrawMouseCursor(Obj_004c2380* app)
 {
     // info doubles as the first rect for BlitSurface: no separate rect local.
-    Surface_004c23e0 info;
+    Surface info;
     RECT r1;
     RECT r2;
     POINT pt;
@@ -379,9 +368,9 @@ void __stdcall InitMouse(int count, int start)
     q->head = 0;
     q->tail = 0;
     p->sprite = 0;
-    p->saved = (Desc_004c25e0*)AllocSurface("SAVEMOUSE 1", 0x640, 1);
-    p->under = (Desc_004c25e0*)AllocSurface("SAVEMOUSE 2", 0x640, 1);
-    p->work = (Desc_004c25e0*)AllocSurface("SAVEMOUSE 3", 0x640, 1);
+    p->saved = (Surface*)AllocSurface("SAVEMOUSE 1", 0x640, 1);
+    p->under = (Surface*)AllocSurface("SAVEMOUSE 2", 0x640, 1);
+    p->work = (Surface*)AllocSurface("SAVEMOUSE 3", 0x640, 1);
     p->count = 1;
     p->visible = 0;
     p->mode = 0;
