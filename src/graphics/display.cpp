@@ -13,7 +13,7 @@
 // +0xf0: the display context's state flags. Set through the bitfield and read
 // whole by SetFullScreen.
 union DisplayFlags {
-    unsigned short value;
+    unsigned short word;
     struct {
         unsigned short opt : 1;        // bit 0
         unsigned short bit1 : 1;       // bit 1, full screen
@@ -88,12 +88,14 @@ struct DisplayContext {
     char unknown_50[0x80 - 0x50];
     void (__cdecl *callback)(int, int, int); // +0x80
     DirectDrawState draw;                // +0x84
-    Rect mode;                           // +0xa0
+    Rect clip;                           // +0xa0
     HFONT font;                          // +0xb0
-    char unknown_b4[0xc4 - 0xb4];
-    int shadeTable;                      // +0xc4
-    int lightTable;                      // +0xc8
-    char unknown_cc[0xd4 - 0xcc];
+    char unknown_b4[0xc0 - 0xb4];
+    unsigned char* alphaTable;           // +0xc0
+    unsigned char* shadeTable;           // +0xc4
+    unsigned char* lightTable;           // +0xc8
+    unsigned char* grayTable;            // +0xcc
+    unsigned char* blueTable;            // +0xd0
     int width;                           // +0xd4
     int height;                          // +0xd8
     int useOverrideSurface;              // +0xdc
@@ -497,7 +499,7 @@ int __stdcall SetFullScreen(int mode) {
                  SWP_NOZORDER | SWP_NOMOVE);
 
     if (mode != 0) {
-        g_display->flags.value |= 2;
+        g_display->flags.word |= 2;
 
         hr = DirectDrawCreateThunk(0, &dd->ddraw, 0);
         if (hr == DD_OK) {
@@ -558,7 +560,7 @@ int __stdcall SetFullScreen(int mode) {
         } else
             goto fail;
     } else {
-        g_display->flags.value &= ~2;
+        g_display->flags.word &= ~2;
 
         void *bits;
         HDC hdc = GetDC(d->hwnd);
@@ -668,7 +670,7 @@ int __stdcall InitEnvironment(DisplayContext* d)
     // bits 1..8 of the video flags become bits 2..9 of the flag word
     // Named int local: adds the temporary the original's second flag update has.
     int subsys = (d->videoFlags & 0x1fe) << 1;
-    d->flags.value = (d->flags.value & 0xfc03) | subsys | 1;
+    d->flags.word = (d->flags.word & 0xfc03) | subsys | 1;
     if (d->flags.bits.has_c4) {
         AllocShadeTable(d);
     } else {
@@ -693,7 +695,7 @@ int __stdcall InitEnvironment(DisplayContext* d)
         d->hpalette = 0;
         d->dib = 0;
         d->callback = 0;
-        d->mode = d->startMode;
+        d->clip = d->startMode;
         d->wc.lpfnWndProc = (WNDPROC)WindowProc;
         d->wc.style = 8;
         d->wc.hInstance = d->hInstance;

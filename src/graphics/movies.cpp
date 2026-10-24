@@ -89,7 +89,8 @@ struct Display_0047bdf0 {
     void* sound;                     // +0x24
     char unknown_28[0x40 - 0x28];
     HWND hwnd;                       // +0x40
-    char unknown_44[0x84 - 0x44];
+    HBITMAP dib;                     // +0x44
+    char unknown_48[0x84 - 0x48];
     DirectDrawState surfaces;  // +0x84
     char unknown_98[0xf0 - 0x98];
     unsigned short flags;            // +0xf0

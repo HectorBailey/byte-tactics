@@ -82,7 +82,7 @@ struct Display {
     Screen screen;                     // +0x80
     Surface* activeSurface;            // +0x98
     int haveBackBuffer;                // +0x9c
-    Rect vec;                          // +0xa0
+    Rect clip;                         // +0xa0
     char unknown_b0[0xb4 - 0xb0];
     IDirectDrawSurface* lastBackBuffer;  // +0xb4
     char unknown_b8[0xbc - 0xb8];
@@ -137,7 +137,7 @@ struct Display {
         out->zPriority = 10000;
         out->colorKey = -1;
         out->flag0 = 0;
-        out->clip = vec;
+        out->clip = clip;
         if (g_screenLockCount < 10) {
             g_screenLocks[g_screenLockCount].surface = out;
             g_screenLocks[g_screenLockCount].flag = 0;
@@ -167,7 +167,7 @@ struct Display {
         out->zPriority = 10000;
         out->colorKey = -1;
         out->flag0 = 0;
-        out->clip = vec;
+        out->clip = clip;
         return 1;
     }
 };
