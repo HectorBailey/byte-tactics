@@ -2071,6 +2071,176 @@ def reorder_header(path: Path, layouts: list["Layout"], ranges: list[tuple[int, 
     return text, [n for n in order if n in moved]
 
 
+# The marks a rename works from: a header type's line, and the stale names it may carry.
+FUN_NAME = re.compile(r"\bFUN_([0-9a-f]{8})\b")
+FIELD_NAME = re.compile(r"\bfield_([0-9a-fx]+)\b")
+FIELD_OFFSET = re.compile(r"// \+0x([0-9a-f]+)\s*$")
+ADDRESS_NAME = re.compile(r"^(\w+)_([0-9a-f]{7,8})$")
+
+
+def symbols_by_address() -> dict[int, str]:
+    """data/symbols.csv as {address: the name the original has there}."""
+    with (ROOT / "data" / "symbols.csv").open() as f:
+        return {int(r["address"], 16): r["name"] for r in csv.DictReader(f)}
+
+
+def real_name(name: str | None) -> tuple[str | None, str | None]:
+    """(member, class) from a name symbols.csv gives, when it is a real one.
+
+    `CommandArgs::GetArg`, `?GetArg@CommandArgs@@QAEHH@Z` and a plain `Foo` all name a
+    function; `FUN_004b73c0`, `DAT_004fc980` and a `::FUN_` member do not."""
+    if not name or name.startswith(("FUN_", "DAT_", "??", "?")):
+        return None, None
+    plain = re.compile(r"[A-Za-z_]\w*")
+    if "::" in name:
+        cls, _, member = name.rpartition("::")
+        # A template's own expansion (std::_Tree::iterator) is no game name.
+        if not plain.fullmatch(member) or member.startswith("FUN_"):
+            return None, None
+        return member, (cls if plain.fullmatch(cls) and cls != "std" else None)
+    if plain.fullmatch(name):
+        return name, None
+    return None, None
+
+
+SIZES = {"char": 1, "short": 2, "int": 4, "long": 4, "float": 4, "double": 8,
+         "__int64": 8, "bool": 1, "long long": 8}
+
+
+def decl_size(line: str) -> int | None:
+    """The bytes a field's declaration takes, or None when its type is a named one."""
+    text = line.split("//", 1)[0].strip().rstrip(";").strip()
+    if "*" in text or "::" in text or "<" in text:
+        return None if "<" in text else 4
+    array = re.search(r"\[(\d+)\]\s*$", text)
+    count = int(array.group(1)) if array else 1
+    text = re.sub(r"\[\d+\]\s*$", "", text)
+    text = re.sub(r"\b(unsigned|signed)\b", "", text).replace("  ", " ").strip()
+    for word in ("__int64", "long long", "double", "float", "short", "char", "int", "long", "bool"):
+        if re.search(rf"\b{re.escape(word)}\b", text):
+            return SIZES[word] * count
+    return None
+
+
+def rename_types_header(path: Path, layouts: list["Layout"],
+                        symbols: dict[int, str]) -> tuple[str, dict]:
+    """An existing header with the stale names replaced, every declaration kept in place.
+
+    A type takes the joined type's name, found by the file its address names (that file's
+    view of the same size), or by the class a member's own name gives. A field takes the
+    joined type's name for the same offset, and a member the name symbols.csv gives its
+    address. A rename that would leave two declarations with one name is not made, and
+    every such case is printed."""
+    head, blocks, tail = split_header(path.read_text())
+    by_node: dict[tuple[str, str], "Layout"] = {}
+    by_stem: dict[str, list["Layout"]] = defaultdict(list)
+    by_view: dict[str, list["Layout"]] = defaultdict(list)
+    for lay in layouts:
+        for stem, view in lay.nodes:
+            by_node[(stem, view)] = lay
+            if lay not in by_stem[stem]:
+                by_stem[stem].append(lay)
+            if lay not in by_view[view]:
+                by_view[view].append(lay)
+    names = set(re.findall(r"^(?:struct|class|union) (\w+);", "".join(head + tail), re.M))
+    names |= {name for name, _, _ in blocks}
+    stats = Counter()
+    renamed: dict[str, str] = {}
+    for name, size, lines in blocks:
+        lay = None
+        address = ADDRESS_NAME.match(name)
+        if address:
+            stem = address.group(2).zfill(8)
+            hit = by_node.get((stem, name))
+            lay = hit if hit is not None and hit.size == size else None
+            if lay is None:
+                same = [l for l in by_stem.get(stem, []) if l.size == size]
+                lay = same[0] if len(same) == 1 else None
+        if lay is None:
+            # The same view name, in a file the address does not name.
+            same = [l for l in by_view.get(name, []) if l.size == size]
+            lay = same[0] if len(same) == 1 else None
+        if lay is None:
+            same = [l for l in layouts if l.name == name and l.size == size]
+            lay = same[0] if len(same) == 1 else None
+        body = "".join(lines)
+        new = name
+        if lay is not None and ADDRESS_NAME.match(lay.name):
+            lay = None
+        # Only a stale (address-named) type is renamed: the files that include the
+        # header use the names it already has, and a plain name is one of those.
+        if address and lay is not None and lay.name != name and not ADDRESS_NAME.match(lay.name):
+            if lay.name in names:
+                stats["types left"] += 1
+                print(f"  {name}: '{lay.name}' is already declared: left as it is")
+            else:
+                new = lay.name
+        elif address and lay is None:
+            # The member's own name gives the class it belongs to.
+            classes = {real_name(symbols.get(int(a, 16)))[1] for a in FUN_NAME.findall(body)}
+            classes.discard(None)
+            if len(classes) == 1:
+                candidate = classes.pop()
+                if candidate in names:
+                    stats["types left"] += 1
+                    print(f"  {name}: '{candidate}' is already declared: left as it is")
+                else:
+                    new = candidate
+        if new != name:
+            renamed[name] = new
+            names -= {name}
+            names.add(new)
+            stats["types"] += 1
+        if lay is not None:
+            fields = {m[1]: m[2] for m in lay.members if m[0] == "field"}
+            for i, line in enumerate(lines):
+                mark = FIELD_NAME.search(line)
+                offset = FIELD_OFFSET.search(line.rstrip("\r\n"))
+                if not mark or not offset or int(offset.group(1), 16) not in fields:
+                    continue
+                field = fields[int(offset.group(1), 16)]
+                width = next(m[5] for m in lay.members
+                             if m[0] == "field" and m[1] == int(offset.group(1), 16))
+                size = decl_size(line)
+                if (re.fullmatch(r"[A-Za-z_]\w*", field) and (size is None or size == width)
+                        and not re.search(rf"\b{re.escape(field)}\b", body)):
+                    lines[i] = line.replace(mark.group(0), field, 1)
+                    body = "".join(lines)
+                    stats["fields"] += 1
+        for i, line in enumerate(lines):
+            mark = FUN_NAME.search(line)
+            if not mark:
+                continue
+            member = real_name(symbols.get(int(mark.group(1), 16)))[0]
+            if member and not re.search(rf"\b{re.escape(member)}\b", body):
+                lines[i] = line.replace(mark.group(0), member, 1)
+                body = "".join(lines)
+                stats["members"] += 1
+        stats["members left"] += len(FUN_NAME.findall(body))
+    text = "".join(head) + "".join("".join(lines) for _, _, lines in blocks) + "".join(tail)
+    for old, new in renamed.items():
+        text = re.sub(rf"\b{re.escape(old)}\b", new, text)
+    return text, stats
+
+
+def rename_prototypes(path: Path, symbols: dict[int, str]) -> tuple[str, dict]:
+    """A header of free prototypes with the stale names replaced by symbols.csv's."""
+    text = path.read_text()
+    stats = Counter()
+    declared = set(re.findall(r"\b(\w+)\s*\(", text))
+
+    def sub(m: re.Match) -> str:
+        member = real_name(symbols.get(int(m.group(1), 16)))[0]
+        if member is None or member in declared:
+            stats["prototypes left"] += 1
+            return m.group(0)
+        declared.add(member)
+        stats["prototypes"] += 1
+        return member
+
+    return FUN_NAME.sub(sub, text), stats
+
+
 def compiles(header: Path) -> str | None:
     """None when a file including only the header compiles, else the compiler's errors."""
     work = ROOT / "build" / "typeshdr"
@@ -2300,6 +2470,9 @@ def main() -> int:
                     "unit's own types) after all the others")
     ap.add_argument("--reorder", type=Path, metavar="HEADER",
                     help="rearrange this existing header for --last instead of writing a new one")
+    ap.add_argument("--rename-only", action="store_true",
+                    help="rename the stale names in the existing headers (include/ta_types.h and "
+                    "include/ta_protos.h) in place, keeping every declaration and its order")
     ap.add_argument("--jobs", type=int, default=min(8, os.cpu_count() or 4))
     ap.add_argument("--dump", type=Path, help="write the extracted views as JSON and stop")
     ap.add_argument("--stats", action="store_true", help="list the types left out and the joins refused")
@@ -2308,6 +2481,7 @@ def main() -> int:
     ap.add_argument("--verify", action="store_true",
                     help="compile the header with a check of every size and field offset")
     args = ap.parse_args()
+    chosen = args.out
     if args.reorder and not args.last:
         ap.error("--reorder needs at least one --last LO-HI")
     # --explain only reports: it writes the header only when --out names a file, so a
@@ -2324,6 +2498,26 @@ def main() -> int:
     p = Program(files, definers, declared_names(), system_names())
     p.build()
     layouts = p.layouts()
+    if args.rename_only:
+        symbols = symbols_by_address()
+        for path in ([chosen] if chosen is not None else
+                     [OUT, ROOT / "include" / "ta_protos.h"]):
+            if path == OUT:
+                text, stats = rename_types_header(path, layouts, symbols)
+            else:
+                text, stats = rename_prototypes(path, symbols)
+            path.write_text(text)
+            counts = ", ".join(f"{stats[k]} {k}" for k in
+                               ("types", "fields", "members", "prototypes") if stats[k])
+            left = ", ".join(f"{stats[k]} {k}" for k in
+                             ("types left", "members left", "prototypes left") if stats[k])
+            print(f"{path.relative_to(ROOT)}: renamed {counts or 'nothing'}"
+                  + (f"; left {left}" if left else ""))
+            errors = compiles(path)
+            if errors:
+                print(f"{path.relative_to(ROOT)} does not compile:\n{errors}")
+                return 1
+        return 0
     if args.reorder:
         text, moved = reorder_header(args.reorder, layouts, args.last)
         args.out.parent.mkdir(parents=True, exist_ok=True)
