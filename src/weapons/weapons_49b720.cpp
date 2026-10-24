@@ -33,23 +33,14 @@ struct Vec3_0049b720 {
 };
 
 #include "weapon_def.h"
+#include "unit_weapon_slot.h"
 
-struct Weapon_0049b720 {
-    char unknown_0[0x10];
-    WeaponDef* weapon;                 // +0x10
-    char unknown_14[0x1c - 0x14];
-};
-
+// The unit's three weapon slots, which the burst branch walks. The view stays
+// rather than including unit.h, whose declarations move the ballistic compare
+// in 0x49b720 (docs/c2-regalloc.md).
 struct Unit {
-    Weapon_0049b720 weapons[3];
-};
-
-union Word_0049b720 {
-    int i;
-    struct {
-        unsigned short lo;
-        short hi;
-    } s;
+    char unknown_0[0x4];
+    UnitWeaponSlot weapons[3];         // +0x4, stride 0x1c
 };
 
 // Thaldren's wFlags bits: the projectile's flags word at +0x69, one field per
