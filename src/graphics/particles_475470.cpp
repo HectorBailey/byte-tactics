@@ -25,6 +25,7 @@ struct FixedVec3 {
     Fixed z;
 };
 
+// Kept, not map/byte_map.h: the header's helpers move Render (0x475470) to 96.0%.
 struct MapSize {
     unsigned int width;                // +0x0
     unsigned int height;               // +0x4

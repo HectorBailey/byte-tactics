@@ -186,6 +186,8 @@ union Fixed {
     struct { short lo; short hi; } p;
 };
 
+// Kept, not map/byte_map.h: the header's helpers move CanBuildAt (0x47d2e0)
+// to 94.3%.
 struct MapSize {
     unsigned int width;
     unsigned int height;

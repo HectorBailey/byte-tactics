@@ -82,6 +82,8 @@ union Flags14281_00466dc0 {
 
 #include "../network/player_info.h"
 
+// Kept, not map/byte_map.h: the header's helpers move InitRadar (0x4669b0) to
+// 90.5% and DrawRadarUnits (0x466dc0) to 96.3%.
 struct MapSize {
     unsigned int width;                  // +0x80
     unsigned int height;                 // +0x84

@@ -22,22 +22,7 @@ struct Pos_00474b80 {
     short y;                       // +0x08 (record +0x0e)
 };
 
-struct MapSize {
-    unsigned int width;            // +0x80
-    unsigned int height;           // +0x84
-
-    int Contains(int col, int row)
-    {
-        return (unsigned int)col < width && (unsigned int)row < height;
-    }
-};
-
-struct ByteMap {
-    unsigned char* data;           // +0x7c
-    MapSize size;                  // +0x80
-
-    unsigned char Get(int x, int y) { return data[size.width * y + x]; }
-};
+#include "../map/byte_map.h"
 
 // The header's type, kept local: its explored pointer cannot spell the
 // ByteMap this fog test needs.

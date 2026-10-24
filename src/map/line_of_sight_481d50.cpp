@@ -34,16 +34,7 @@ void RegisterVtolOrders(void);
 
 extern LosTables g_losTables;
 
-struct MapSize {
-    unsigned int width;                // +0x0
-    unsigned int height;               // +0x4
-};
-
-struct ByteMap {
-    unsigned char* data;               // +0x0
-    MapSize size;             // +0x4
-    unsigned char& at(int x, int y) { return data[y * size.width + x]; }
-};
+#include "byte_map.h"
 
 struct PlayerView {
     char unknown_0[0x7c];
