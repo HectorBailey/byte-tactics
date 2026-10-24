@@ -258,13 +258,6 @@ void __stdcall RunInitialMission(Unit* unit, char* text, Table_00487bf0* table)
 }
 
 #pragma pack(push, 1)
-struct UnitType_00488b10 {              // 0x249 bytes
-    char unknown_0[0x20];
-    char name[0x21e - 0x20];            // +0x20
-    unsigned short id;                  // +0x21e
-    char unknown_220[0x249 - 0x220];
-};
-
 struct MissionUnit {               // 0x24 bytes
     char* name;                       // +0x0
     char* ident;                      // +0x4
@@ -289,7 +282,7 @@ struct Game {
     char unknown_1426b[0x1438f - 0x1426b];
     int unitDefCount;                 // +0x1438f
     char unknown_14393[0x1439b - 0x14393];
-    UnitType_00488b10* unitDefs;      // +0x1439b
+    UnitDef* unitDefs;      // +0x1439b
     char unknown_1439f[0x37ede - 0x1439f];
     float windFraction;               // +0x37ede
     char unknown_37ee2[0x391e9 - 0x37ee2];
@@ -300,8 +293,8 @@ struct Game {
 
 extern Game* g_game;
 
-UnitType_00488b10* __stdcall FindUnitType(const char* name);
-void __stdcall SnapWorldPosToFootprint(UnitType_00488b10* type, Vec3* pos);
+UnitDef* __stdcall FindUnitType(const char* name);
+void __stdcall SnapWorldPosToFootprint(UnitDef* type, Vec3* pos);
 Unit* __stdcall CreateUnit(unsigned char player, unsigned short id,
                                       Vec3 pos, int a, int b, int c);
 void __stdcall FatalError(char* message);
@@ -356,7 +349,7 @@ void __cdecl CreateMissionUnits()
     std::vector<Unit*> units(n);       // loops re-read mapInfo->unitCount themselves
     for (int i = 0; i < g_game->mapInfo->unitCount; i++) {
         MissionUnit* e = &g_game->mapInfo->units[i];
-        UnitType_00488b10* item = FindUnitType(e->name);
+        UnitDef* item = FindUnitType(e->name);
         if (item == 0) {
             units[i] = 0;
             continue;
@@ -655,23 +648,23 @@ static inline int Less_00488a50(const char* a, const char* b)
 // the name at +0x20 case-insensitively, returning the entry whose name matches
 // exactly (0 when there is none).
 // FUNCTION: 0x488a50
-UnitType_00488b10* __stdcall FindUnitType(const char* name)
+UnitDef* __stdcall FindUnitType(const char* name)
 {
     // `end` before `lo`: the order decides which registers the base loads use.
-    UnitType_00488b10* end = g_game->unitDefs + g_game->unitDefCount;
-    UnitType_00488b10* lo = g_game->unitDefs + 1;
+    UnitDef* end = g_game->unitDefs + g_game->unitDefCount;
+    UnitDef* lo = g_game->unitDefs + 1;
     int n = (int)(end - lo);
     while (n > 0) {
         int half = n / 2;
-        UnitType_00488b10* mid = lo + half;
-        if (Less_00488a50(mid->name, name)) {
+        UnitDef* mid = lo + half;
+        if (Less_00488a50(mid->unitname, name)) {
             lo = mid + 1;
             n = n - half - 1;
         } else {
             n = half;
         }
     }
-    if (lo != end && _strcmpi(name, lo->name) == 0)
+    if (lo != end && _strcmpi(name, lo->unitname) == 0)
         return lo;
     return 0;
 }
@@ -685,20 +678,20 @@ UnitType_00488b10* __stdcall FindUnitType(const char* name)
 unsigned short __stdcall FindUnitTypeId(const char* name)
 {
     // `last` before `first`: the order decides the register of the table base.
-    UnitType_00488b10* last = g_game->unitDefs + g_game->unitDefCount;
-    UnitType_00488b10* first = g_game->unitDefs + 1;
+    UnitDef* last = g_game->unitDefs + g_game->unitDefCount;
+    UnitDef* first = g_game->unitDefs + 1;
     int n = ((char*)last - (char*)first) / 0x249;
     while (n > 0) {
         int mid = n / 2;
-        UnitType_00488b10* e = first + mid;
-        if (_strcmpi(e->name, name) < 0) {
+        UnitDef* e = first + mid;
+        if (_strcmpi(e->unitname, name) < 0) {
             first = e + 1;
             n = n - mid - 1;
         } else {
             n = mid;
         }
     }
-    if (first == last || _strcmpi(name, first->name) != 0)
+    if (first == last || _strcmpi(name, first->unitname) != 0)
         first = 0;
     if (first)
         return first->id;
@@ -766,20 +759,20 @@ UnitTypeSet* __stdcall GetCategoryMask(char* name)
 
 // Search and final comparison stay one inlined helper: it fixes the register
 // use and the opposite strcmpi argument orders.
-static inline UnitType_00488b10* FindByName(UnitType_00488b10* first, UnitType_00488b10* last, char* text)
+static inline UnitDef* FindByName(UnitDef* first, UnitDef* last, char* text)
 {
     int n = (int)((char*)last - (char*)first) / 0x249;
     while (n > 0) {
         int m = n / 2;
-        UnitType_00488b10* e = first + m;
-        if (_strcmpi(e->name, text) < 0) {
+        UnitDef* e = first + m;
+        if (_strcmpi(e->unitname, text) < 0) {
             n = n - m - 1;
             first = e + 1;
         } else {
             n = m;
         }
     }
-    if (first == last || _strcmpi(text, first->name) != 0)
+    if (first == last || _strcmpi(text, first->unitname) != 0)
         return 0;
     return first;
 }
@@ -787,9 +780,9 @@ static inline UnitType_00488b10* FindByName(UnitType_00488b10* first, UnitType_0
 // FUNCTION: 0x488d30
 void UnitTypeSet::AddTypeOrCategory(char* text, int* out)
 {
-    UnitType_00488b10* base = g_game->unitDefs;
-    UnitType_00488b10* last = base + g_game->unitDefCount;
-    UnitType_00488b10* first = FindByName(base + 1, last, text);
+    UnitDef* base = g_game->unitDefs;
+    UnitDef* last = base + g_game->unitDefCount;
+    UnitDef* first = FindByName(base + 1, last, text);
     unsigned short v = first ? first->id : 0;
     if (v != 0) {
         bits[v >> 5] |= 1 << (v & 31);
