@@ -38,6 +38,8 @@ public:
     void FreeBuffer();
 };
 
+// Unused here: the symbol ids this type takes keep 0x41dfc0 and 0x41f0a0 matching
+// (docs/c2-regalloc.md).
 struct Amount {
     int current;                       // +0x0
     int required;                      // +0x4
@@ -57,52 +59,7 @@ struct Data {
     char unknown_18[8];
 };
 
-struct Gui;
-
-// One 0x15b-byte GUI entry. The views disagree about the bytes at +0xba:
-// 41ea30's and 41f7f0's Amount against 41ec50's short selected and 41e420's
-// image pointer at +0xbe; the union keeps both readings.
-struct Gadget {
-    unsigned char type;                // +0x0
-    char unknown_1;
-    char name[0x11];                   // +0x2
-    short x;                           // +0x13
-    short y;                           // +0x15
-    short width;                       // +0x17
-    short height;                      // +0x19
-    int attribs;                       // +0x1b
-    int color;                         // +0x1f
-    int color2;                        // +0x23
-    char unknown_27[2];
-    unsigned char flag;                // +0x29
-    char unknown_2a[0xb6 - 0x2a];
-    short count;                       // +0xb6
-    char unknown_b8[2];
-    union {                            // +0xba
-        Amount amount;                 // 41ea30's and 41f7f0's
-        struct {
-            short selected;            // 41ec50's
-            char unknown_bc[2];
-            void* image;               // +0xbe, 41e420's
-            char unknown_c2[4];
-            unsigned short frame;      // +0xc6, 41e420's
-        };
-    };
-    char unknown_c8[0xcc - 0xc8];
-    char okName[0x10];                 // +0xcc, entry 0 only
-    char unknown_dc[0x136 - 0xdc];
-    union {                            // +0x136
-        short range;
-        struct {
-            unsigned char stages;      // +0x136
-            unsigned char stageIndex;  // +0x137
-        };
-    };
-    char unknown_138[0x142 - 0x138];
-    short knobSize;                    // +0x142
-    void (__stdcall* sliderCallback)(Gui*, int); // +0x144
-    char unknown_148[0x15b - 0x148];
-};
+#include "../gui/gadget.h"
 
 struct Layer;
 #include "../gui/gui.h"
@@ -608,16 +565,16 @@ void FillEndGameStatistics(void)
             if (idx != -1) {
                 Gadget* e = &entries[idx];
                 if (e) {
-                    e->image = g_game->logos32;
-                    e->frame = g_game->players[i].info->color;
+                    e->u.hotspot.gaf = (GafEntry*)g_game->logos32;
+                    e->u.hotspot.index = g_game->players[i].info->color;
                 }
             }
             menu->language = menu->values[1];
             int h = GetFontLineHeight();
             AddTextGadget(g_game->gui.layer, "TEXT", g_game->slots[i].name, 0x10,
                          (0x14 - h) / 2 + bar.h.y, -1, 2);
-            entries[entries->count].attribs = 2;
-            entries[entries->count].width = 0x5a;
+            entries[entries->u.count].attribs = 2;
+            entries[entries->u.count].width = 0x5a;
             menu->language = menu->values[0];
             STAT_BAR(0, 0x70, "Kills%d")
             STAT_BAR(1, 0xba, "Losses%d")
@@ -631,15 +588,17 @@ void FillEndGameStatistics(void)
     }
 }
 
+// Unused here: the symbol id this declaration takes keeps 0x41ea30's allocation (docs/c2-regalloc.md).
+void RegisterGroundOrders();
+
 // FUNCTION: 0x41ea30
 int AreStatBarsComplete(void)
 {
     Gadget* entries = g_game->gui.layer->entries;
-    int count = entries->count;
+    int count = entries->u.count;
     for (int i = 0; i < count; i++) {
         if (entries[i].type == 0xd) {
-            Amount* amount = &entries[i].amount;
-            if (entries[i].flag == 0 || amount->current < amount->required) {
+            if (entries[i].active == 0 || entries[i].u.anim.value < entries[i].u.anim.max) {
                 return 0;
             }
         }
@@ -779,7 +738,7 @@ void __stdcall HandleEndMissionClick(Gui* gadget)
         g_game->frontendSubstateRequest = 10;
         SetCursorOverlayEnabled(1);
         SetCursorMode(0x14);
-        if (g_game->mapInfo->SelectMission(FindGadgetChecked(entries, "Missions")->selected)) {
+        if (g_game->mapInfo->SelectMission(FindGadgetChecked(entries, "Missions")->u.list.selected)) {
             EnterMainMenuState();
             g_game->bit2_2a44 = 0;
             g_game->bit3_2a44 = 1;
@@ -871,7 +830,7 @@ void __stdcall OpenEndMissionScreen()
     if (next) {
         g_game->mapInfo->SelectMission(g_game->mission);
         LoadPictureCached("outcome1", 1, 1, 0);
-        strcpy(layer->entries->okName, "Start");
+        strcpy(layer->entries->u.names.choice, "Start");
     } else {
         LoadPictureCached("outcome0", 1, 1, 0);
         SelectGadgetByName(&g_game->gui, "MainMenu");
@@ -1022,10 +981,10 @@ int DrawEndGameFrame()
 static inline int StatsComplete()
 {
     Gadget* entries=g_game->gui.layer->entries;
-    int count=entries->count;
+    int count=entries->u.count;
     for(int i=0;i<count;++i) {
         if(entries[i].type==13) {
-            if(!entries[i].flag || entries[i].amount.current<entries[i].amount.required) return 0;
+            if(!entries[i].active || entries[i].u.anim.value<entries[i].u.anim.max) return 0;
         }
     }
     return 1;
