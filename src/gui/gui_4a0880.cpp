@@ -1,27 +1,18 @@
 // Decompiled by Opus. Names are provisional.
-#include <string.h>
+// strcpy and strlen are declared here, not through <string.h>: the two headers
+// below cost symbol ids, and this shorter list is what keeps 0x4a0880 matching.
+extern "C" char* __cdecl strcpy(char*, const char*);
+extern "C" unsigned int __cdecl strlen(const char*);
 
 #include "gadget.h"
-
-struct Data_004a0880 {
-    int next;                  // +0x0
-    Gadget* entries;           // +0x4
-};
-
-struct Object_004a0880 {
-    char unknown_0[0x18];
-    Data_004a0880* data;               // +0x18
-    char unknown_1c[0x64 - 0x1c];
-    int current;                       // +0x64
-    char unknown_68[0x74 - 0x68];
-    int length;                        // +0x74
-};
+#include "gui.h"
+#include "layer.h"
 
 // FUNCTION: 0x4a0880
-void __stdcall SetGadgetText(Object_004a0880* obj, int index, char* text)
+void __stdcall SetGadgetText(Gui* obj, int index, char* text)
 {
-    strcpy(obj->data->entries[index].u.text, text);
-    if (obj->current == index) {
-        obj->length = strlen(text);
+    strcpy(obj->layer->entries[index].u.text, text);
+    if (obj->focus == index) {
+        obj->cursor = strlen(text);
     }
 }
