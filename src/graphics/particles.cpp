@@ -622,17 +622,8 @@ void EnableAICommands(void);
 // The smoke puff's position views and the record.
 #include "smoke_particle.h"
 
-// The TimedSubParticles 16.16 position and the class.
+// The TimedSubParticles class.
 #include "timed_sub_particles.h"
-
-struct Position_00475150 {             // 16.16 fixed point; only high words read
-    short xFrac;
-    short x;                           // +0x2
-    short yFrac;
-    short y;                           // +0x6, the height
-    short zFrac;
-    short z;                           // +0xa
-};
 
 #include "rect.h"
 
@@ -641,7 +632,7 @@ struct TimedSubParticle {
     void* data;                        // +0x00, the animation
     union {
         Vec3 pos;                      // +0x04
-        Position_00475150 posw;
+        FixedVec3 posw;
     };
     int limit;                         // +0x10, the rounds it lives
     int count;                         // +0x14, the rounds so far (the frame)
@@ -2201,8 +2192,8 @@ void TimedSubParticle::Step()
 // FUNCTION: 0x475040
 void TimedSubParticle::DrawParticle(void* dest, short px, short py)
 {
-    short sy = posw.z - (posw.y >> 1) - py + 0x20;
-    short sx = posw.x - px + 0x80;
+    short sy = posw.z.whole - (posw.y.whole >> 1) - py + 0x20;
+    short sx = posw.x.whole - px + 0x80;
     DrawFrameBlended(dest, GetGafFrame(data, count), sx, sy);
 }
 

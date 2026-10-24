@@ -10,16 +10,19 @@
 #include <stdlib.h>
 #include <vector>
 
-// The TimedSubParticles 16.16 position and the class.
+// The TimedSubParticles class.
 #include "timed_sub_particles.h"
 
-struct Position_00475150 {             // 16.16 fixed point; only high words read
-    short xFrac;
-    short x;                           // +0x2
-    short yFrac;
-    short y;                           // +0x6, the height
-    short zFrac;
-    short z;                           // +0xa
+// A 16.16 fixed-point value: the whole part in the high half.
+struct Fixed {
+    unsigned short frac;
+    short whole;
+};
+
+struct FixedVec3 {
+    Fixed x;
+    Fixed y;
+    Fixed z;
 };
 
 #pragma pack(push, 1)
@@ -52,7 +55,7 @@ struct TimedSubParticle {
     void* data;                        // +0x00, the animation
     union {
         Vec3 pos;                      // +0x04
-        Position_00475150 posw;
+        FixedVec3 posw;
     };
     int limit;                         // +0x10, the rounds it lives
     int count;                         // +0x14, the rounds so far (the frame)
@@ -64,16 +67,10 @@ struct TimedSubParticle {
     int IsExpired(int unused);
     void Draw(void* dest, short px, short py)
     {
-        short sy = posw.z - (posw.y >> 1) - py + 0x20;
-        short sx = posw.x - px + 0x80;
+        short sy = posw.z.whole - (posw.y.whole >> 1) - py + 0x20;
+        short sx = posw.x.whole - px + 0x80;
         DrawFrameBlended(dest, GetGafFrame(data, count), sx, sy);
     }
-};
-
-// The particle vector, to call its out-of-line insert under this name.
-class Vec_00476490 {
-public:
-    void insert(TimedSubParticle* pos, int count, const TimedSubParticle* src);
 };
 
 #include "particle_system.h"

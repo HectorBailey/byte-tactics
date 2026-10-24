@@ -170,14 +170,6 @@ struct Pos_004739b0 {
 
 #include "rect.h"
 
-struct Position_00475150 {             // 16.16 fixed point; only high words read
-    short xFrac;
-    short x;                           // +0x2
-    short yFrac;
-    short y;                           // +0x6, the height
-    short zFrac;
-    short z;                           // +0xa
-};
 #pragma pack(pop)
 
 #include "../network/player.h"
@@ -236,7 +228,7 @@ struct TimedSubParticle {
     void* data;                        // +0x00, the animation
     union {
         Vec3 pos;                      // +0x04
-        Position_00475150 posw;
+        FixedVec3 posw;
     };
     int limit;                         // +0x10, the rounds it lives
     int count;                         // +0x14, the rounds so far (the frame)
