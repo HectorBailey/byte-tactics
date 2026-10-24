@@ -57,18 +57,20 @@ struct Game {
     void* sources[6];                   // +0x147f7
 };
 
-// The 0x30-byte record StartExplodePiece consumes.
-struct Header_00481140 {
-    void* obj;                         // +0x00
+// The 0x30-byte record StartExplodePiece consumes, explosions.cpp's
+// ExplodedPiece. Its flag word stays a plain unsigned int here: a 1-bit field
+// would truncate the masks 0x481140 writes. It has no header of its own.
+struct ExplodedPiece {
+    void* unit;                        // +0x00
     int index;                         // +0x04
-    int r1;                            // +0x08
-    int r2;                            // +0x0c
-    int r3;                            // +0x10
-    int x;                             // +0x14
-    int y;                             // +0x18
-    int z;                             // +0x1c
-    int f20;                           // +0x20
-    int f24;                           // +0x24
+    int angVelZ;                       // +0x08
+    int angVelX;                       // +0x0c
+    int angVelY;                       // +0x10
+    int vel_x;                         // +0x14
+    int vel_y;                         // +0x18
+    int vel_z;                         // +0x1c
+    int ticks;                         // +0x20
+    int scale;                         // +0x24
     unsigned int bits;                 // +0x28
     void* rec;                         // +0x2c
 };
@@ -86,7 +88,7 @@ void __stdcall EmitWakeParticles(int, int, int, short);
 void __stdcall EmitWhiteSmoke(int, short);
 void __stdcall EmitBlackSmoke(int, short);
 int __stdcall RandomInt(int range);
-void __stdcall StartExplodePiece(Header_00481140* h);
+void __stdcall StartExplodePiece(ExplodedPiece* h);
 void __stdcall AddExplosionEffect(void* pos, void* src, int index, int flag);
 void __stdcall AttachUnitToPiece(Unit* unit, Unit* transporter, int a, int b);
 int __stdcall CanPlaceUnitFootprint(UnitDef* type, short a, Point16 position, int b);
@@ -463,23 +465,23 @@ void UnitScript::EmitSfx(int a, int b)
 void UnitScript::ExplodePiece(int a, unsigned int b)
 {
     if (!(b & 0x20)) {
-        Header_00481140 h;
-        h.obj = state->unit;
+        ExplodedPiece h;
+        h.unit = state->unit;
         h.index = a;
-        h.r1 = RandomInt(3000);
-        h.r2 = RandomInt(3000);
-        h.r3 = RandomInt(3000);
-        h.x = (0x14 - RandomInt(0x28)) << 14;
-        h.y = RandomInt(10) << 16;
-        h.z = (0x14 - RandomInt(0x28)) << 14;
-        h.f20 = 900;
-        // h.f24 is stored after the OR in this arm and before it in the else arm.
+        h.angVelZ = RandomInt(3000);
+        h.angVelX = RandomInt(3000);
+        h.angVelY = RandomInt(3000);
+        h.vel_x = (0x14 - RandomInt(0x28)) << 14;
+        h.vel_y = RandomInt(10) << 16;
+        h.vel_z = (0x14 - RandomInt(0x28)) << 14;
+        h.ticks = 900;
+        // h.scale is stored after the OR in this arm and before it in the else arm.
         if (b & 1) {
             h.bits = (h.bits & ~0x30) | ((b & 2) << 4);
-            h.f24 = 1;
+            h.scale = 1;
             h.bits |= 4;
         } else {
-            h.f24 = 0;
+            h.scale = 0;
             h.bits = (h.bits & ~0x34) | ((b & 2) << 3);
         }
         h.bits = (h.bits & ~2) | ((b >> 2) & 2);
