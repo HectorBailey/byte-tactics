@@ -452,7 +452,7 @@ address,size,file,symbol,status,similarity
 0x421da0,178,src/weapons/explosions.cpp,?FindFeatureAtPos@@YGGPAUVec3@@PAUPoint16@@1@Z,matched,100.0
 0x421e60,67,src/map/features.cpp,?GetCellFeature@@YGGPAUCell@@@Z,matched,100.0
 0x421eb0,108,src/map/features.cpp,?GetFootprintCentre@@YG?AUVec3@@PAUPoint16@@PAUFeature@@@Z,matched,100.0
-0x421f20,288,src/map/features_421f20.cpp,?InitFeatureAnimPool@@YGXPAUList_00421f20@@@Z,matched,100.0
+0x421f20,288,src/map/features_421f20.cpp,?InitFeatureAnimPool@@YGXPAUList@@@Z,matched,100.0
 0x422040,298,src/map/features.cpp,?StampFeatureMetal@@YGXXZ,matched,100.0
 0x422170,306,src/map/features.cpp,?FreeFeaturePool@@YGXXZ,matched,100.0
 0x4222b0,38,src/map/features.cpp,?FindOptionalGafEntry@@YGPAXPAXHPAD@Z,matched,100.0

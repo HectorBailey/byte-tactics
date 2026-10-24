@@ -238,7 +238,9 @@ union Slot {
 
 class Mission;
 
-struct Flags_004848e0 {
+// The game's visual flags word at +0x37f06, Thaldren's GameState wVisualFlags.
+// Nine other views of the word name the member visualFlags.
+struct VisualFlags {
     unsigned short damagebars : 1;
     unsigned short antiAlias : 1;
     unsigned short shadows : 1;
@@ -301,7 +303,7 @@ struct Game {
     int viewPixelWidth;                // +0x37e37
     int viewPixelHeight;               // +0x37e3b
     char unknown_37e3f[0x37f06 - 0x37e3f];
-    Flags_004848e0 visualFlags;        // +0x37f06
+    VisualFlags visualFlags;           // +0x37f06
     char unknown_37f08[0x38a47 - 0x37f08];
     unsigned int gameTick;             // +0x38a47
     char unknown_38a4b[0x38d6b - 0x38a4b];
