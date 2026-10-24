@@ -2024,53 +2024,7 @@ void __stdcall DrawLitTexturedPolygon(GafFrame* target, GafFrame* texture, int* 
 extern int g_emptyStringRefs;
 extern void* g_emptyString;
 
-// The reference-counted string handle: a pointer to the characters with the
-// reference count in the int just before them. The constructors are
-// 0x4c9180 (empty), 0x4c91a0 (copy) and 0x4c91b0 (from text); copying and
-// assignment bump the count and ReleaseRef decrements it and frees the block
-// at zero. 0x4c9230 builds from a length, 0x4c9290 and 0x4c9310 change the
-// case, 0x4c93f0 assigns text and 0x4c9490 takes a substring.
-class StringRef {
-public:
-    char* data;              // refcount lives in the dword before data
-
-    StringRef();
-    StringRef(const StringRef& other);
-    StringRef(const char* text);
-    StringRef(const char* text, int len);
-    ~StringRef() { ReleaseRef(); }
-    StringRef& operator=(const StringRef& other)
-    {
-        Assign(&other);
-        return *this;
-    }
-    StringRef* Assign(const StringRef* other);
-    void ReleaseRef();
-    StringRef* Append(const StringRef& other);
-    StringRef* MakeLower();
-    StringRef* MakeUpper();
-    StringRef* AssignText(const char* text);
-    // Copies the characters into a block of their own unless the count is 1.
-    char* GetUnique()
-    {
-        int len = (int)strlen(data);
-        if (*(int*)(data - 4) != 1) {
-            int* block = (int*)malloc(len + 5);
-            *block = 1;
-            char* copy = (char*)(block + 1);
-            strcpy(copy, data);
-            (*(int*)(data - 4))--;
-            if (*(int*)(data - 4) == 0) {
-                free(data - 4);
-            }
-            data = copy;
-            return copy;
-        }
-        return data;
-    }
-    bool IsEmpty() const { return *data == 0; }
-    StringRef SubString(int start, int end) const;
-};
+#include "../util/string_ref.h"
 
 // Append of the reference-counted string handle: concatenates other's
 // characters onto this handle's, allocating a new block whose first int is
@@ -2084,22 +2038,22 @@ StringRef* StringRef::Append(const StringRef& other)
     if (!other.IsEmpty()) {
         // Declared before the strlen locals: sets the second strcpy destination encoding.
         char* chars;
-        int n = (int)strlen(data);
-        int m = (int)strlen(other.data);
+        int n = (int)strlen(ptr);
+        int m = (int)strlen(other.ptr);
         int len = n + m + 1;
         int* lp = &len;                   // opaque store: keeps the +1 and +5 apart
         *lp += 5;
         int* block = (int*)malloc(len);
         *block = 1;
         chars = (char*)(block + 1);
-        strcpy(chars, data);
-        strcpy(chars + n, other.data);
-        ((int*)data)[-1]--;
-        int* old = (int*)data - 1;
-        if (((int*)data)[-1] == 0) {
+        strcpy(chars, ptr);
+        strcpy(chars + n, other.ptr);
+        ((int*)ptr)[-1]--;
+        int* old = (int*)ptr - 1;
+        if (((int*)ptr)[-1] == 0) {
             free(old);
         }
-        data = chars;
+        ptr = chars;
     }
     return this;
 }
@@ -2121,14 +2075,14 @@ struct FrameTable;
 StringRef::StringRef()
 {
     g_emptyStringRefs++;
-    data = (char*)&g_emptyString;
+    ptr = (char*)&g_emptyString;
 }
 
 // FUNCTION: 0x4c91a0 ??0StringRef@@QAE@ABV0@@Z
 StringRef::StringRef(const StringRef& other)
 {
-    data = other.data;
-    ((int*)data)[-1]++;
+    ptr = other.ptr;
+    ((int*)ptr)[-1]++;
 }
 
 // FUNCTION: 0x4c91b0 ??0StringRef@@QAE@PBD@Z
@@ -2144,7 +2098,7 @@ StringRef::StringRef(const char* text)
         chars = (char*)(block + 1);
         strcpy(chars, text);
     }
-    data = chars;
+    ptr = chars;
 }
 
 // The constructor from the first len characters of a string: a null string
@@ -2154,14 +2108,14 @@ StringRef::StringRef(const char* text, int len)
 {
     if (text == 0) {
         g_emptyStringRefs++;
-        data = (char*)&g_emptyString;
+        ptr = (char*)&g_emptyString;
     } else {
         int* block = (int*)malloc(len + 1 + sizeof(int));
         *block = 1;
         char* chars = (char*)(block + 1);
         strncpy(chars, text, len);
         chars[len] = 0;
-        data = chars;
+        ptr = chars;
     }
 }
 
@@ -2190,9 +2144,9 @@ extern "C" void __cdecl free(void*);
 // FUNCTION: 0x4c9390
 void StringRef::ReleaseRef()
 {
-    ((int*)data)[-1]--;
-    int* p = (int*)data - 1;
-    if (((int*)data)[-1] == 0) {
+    ((int*)ptr)[-1]--;
+    int* p = (int*)ptr - 1;
+    if (((int*)ptr)[-1] == 0) {
         free(p);
     }
 }
@@ -2205,9 +2159,9 @@ void StringRef::ReleaseRef()
 StringRef* StringRef::AssignText(const char* text)
 {
     // The release, phrased as in the destructor body 0x4c9390.
-    ((int*)data)[-1]--;
-    int* old = (int*)data - 1;
-    if (((int*)data)[-1] == 0)
+    ((int*)ptr)[-1]--;
+    int* old = (int*)ptr - 1;
+    if (((int*)ptr)[-1] == 0)
         free(old);
     char* chars;
     if (text == 0 || *text == 0) {
@@ -2219,21 +2173,21 @@ StringRef* StringRef::AssignText(const char* text)
         chars = (char*)(block + 1);
         strcpy(chars, text);
     }
-    data = chars;
+    ptr = chars;
     return this;
 }
 
-// Substring of the handle: returns a new handle for data[start..end), with
+// Substring of the handle: returns a new handle for ptr[start..end), with
 // start clamped to 0 and end to the string length.
 // FUNCTION: 0x4c9490
 StringRef StringRef::SubString(int start, int end) const
 {
-    int len = strlen(data);
+    int len = strlen(ptr);
     if (start < 0)
         start = 0;
     if (end > len)
         end = len;
     if (start >= end)
         return StringRef();
-    return StringRef(data + start, end - start);
+    return StringRef(ptr + start, end - start);
 }
