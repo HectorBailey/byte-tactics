@@ -194,7 +194,6 @@ extern int g_campaignSimplifiedLayout;
 extern char g_tdfExtension[];          // "TDF"
 extern char g_star[];                  // "*"
 extern char g_campsDirName[];          // "camps"
-extern int DAT_00511de8;               // the same pointer as g_game
 
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
 int __stdcall CountDirectoryEntries(const char* path, int flag);
@@ -1541,12 +1540,11 @@ int CountComputerSlots()
 // FUNCTION: 0x479500
 int __cdecl CountHumanSlots()
 {
-    int* g_game = (int*)DAT_00511de8;
     int count = 0;
-    int num = *(int*)((int)g_game + 0x38d81);
+    int num = *(int*)((char*)g_game + 0x38d81);
 
     if (num > 0) {
-        int* arr = *(int**)((int)g_game + 0x29a0);
+        int* arr = *(int**)((char*)g_game + 0x29a0);
         while (num != 0) {
             if (*arr == 1) {
                 count++;
