@@ -21,25 +21,25 @@
 
 #pragma pack(push, 1)
 
-struct FP_0043d6d0 {
+struct FixedParts {
     unsigned int frac : 16;
     int whole : 16;
 };
 
-union Fixed_0043d6d0 {
+union Fixed {
     int value;
-    FP_0043d6d0 parts;
+    FixedParts parts;
 };
 
-static inline Fixed_0043d6d0 MakeFixed_0043d6d0(int i)
+static inline Fixed MakeFixed(int i)
 {
-    Fixed_0043d6d0 f;
+    Fixed f;
     f.parts.frac = 0;
     f.parts.whole = i;
     return f;
 }
 
-inline int operator>(const Fixed_0043d6d0& a, const Fixed_0043d6d0& b) { return a.value > b.value; }
+inline int operator>(const Fixed& a, const Fixed& b) { return a.value > b.value; }
 
 #define MAXM_0043d6d0(a, b) ((a) > (b) ? (a) : (b))
 
@@ -53,7 +53,7 @@ struct Vec3 {
     int x;
     union {
         int y;
-        Fixed_0043d6d0 fy;
+        Fixed fy;
         struct {
             unsigned short yFraction;
             short yWhole;
@@ -104,8 +104,8 @@ inline Vec3 operator+(const Vec3& a, const Vec3& b)
 
 // The temporary the position is built through (the derived type is what
 // makes the compiler materialise it).
-struct Vec3Init_0043a1f0 : Vec3 {
-    Vec3Init_0043a1f0(int a, int b, int c) { x = a; y = b; z = c; }
+struct Vec3Init : Vec3 {
+    Vec3Init(int a, int b, int c) { x = a; y = b; z = c; }
 };
 
 struct Point {
@@ -116,8 +116,8 @@ struct Point {
 
 // A 4-byte point of two shorts, and the temporary the constructor builds it
 // through (the derived type is what makes the compiler keep the temporary).
-struct PointInit_0043a1f0 : Point {
-    PointInit_0043a1f0(short a, short b) { x = a; y = b; }
+struct PointInit : Point {
+    PointInit(short a, short b) { x = a; y = b; }
 };
 
 #include "../util/angles.h"
@@ -631,7 +631,7 @@ void __stdcall EnsurePatrolReturnOrder(Unit* p, Order* item)
 // adds a second base that rules it out.
 // FUNCTION: 0x43a0c0
 Order::Order(unsigned char k, Unit* o, Vec3* p, int a, int b, int c)
-    : kind(k), link(o, 0), start(PointInit_0043a1f0(0, 0)), cached(PointInit_0043a1f0(0, 0)),
+    : kind(k), link(o, 0), start(PointInit(0, 0)), cached(PointInit(0, 0)),
       id(a), amount(b), progress(c), created(g_game->gameTick)
 {
     // Through the inline method: a plain `link.value = this` reorders the
@@ -641,7 +641,7 @@ Order::Order(unsigned char k, Unit* o, Vec3* p, int a, int b, int c)
     flags6 = 0;
     subFlags = 0;
     wakeFrame = -1;
-    pos = p ? *p : Vec3Init_0043a1f0(0, 0, 0);
+    pos = p ? *p : Vec3Init(0, 0, 0);
     flags = g_missionOrderTableBegin[k & 0xff].orderFlags;
     unit = 0;
     next = 0;
@@ -1958,7 +1958,7 @@ void UnitMotion::UpdatePosition(Unit* u)
         v = GetPiecePosition(u->carrier, u->transportPiece);
         if (u->def->b19) {
             // MAX stays a macro over the Fixed union with a prvalue second operand.
-            v.fy = MAXM_0043d6d0(v.fy, MakeFixed_0043d6d0(u->def->draft * 0xffff + g_game->seaLevel));
+            v.fy = MAXM_0043d6d0(v.fy, MakeFixed(u->def->draft * 0xffff + g_game->seaLevel));
         }
         SetUnitPosition(u, v, mode);
         Angles16 o = GetPieceAngles(u->carrier, u->transportPiece);

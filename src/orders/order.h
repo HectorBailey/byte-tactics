@@ -21,7 +21,7 @@ struct Point;
 struct Link_004895c0;
 struct SaveDesc_0043a1f0;
 struct Head_0043a1f0;
-struct Entry_0043a1f0;
+struct MissionOrderTableEntry;
 struct Vec3_0043a1f0;
 
 #pragma pack(push, 1)
