@@ -120,7 +120,10 @@ says so, and it stays.
    matches again).
 2. Fix it if the fix reads as plausible source: the patterns are in
    `docs/agent-guide.md`, and `uv run tools/check.py <addr>` shows the
-   difference.
+   difference. When only the file's symbol count moved (a header brought ids
+   in or took them away), `uv run tools/idpad.py <file> <addr> [<addr> ...]`
+   searches for the real unused declarations that bring the listed functions
+   back and prints the block to add.
 3. Otherwise leave that part out: a function that only matches in a file of
    its own stays in one, with a one-line comment at its declaration saying
    why. Say so in the pull request.
