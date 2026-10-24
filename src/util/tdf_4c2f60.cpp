@@ -12,17 +12,7 @@
 
 // The reference-counted string handle: a pointer to the characters with the
 // reference count in the int just before them.
-class StringRef {
-public:
-    char* p;                           // count in the dword before p
-
-    StringRef(const StringRef& other);
-    void ReleaseRef();
-    StringRef* Assign(const StringRef* other);
-    StringRef* Append(const StringRef& other);
-    StringRef* MakeLower();
-    StringRef* MakeUpper();
-};
+#include "string_ref.h"
 
 // One key/value entry of a section: two reference-counted string handles.
 struct TdfEntry {
