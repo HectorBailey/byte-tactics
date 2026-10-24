@@ -2366,7 +2366,7 @@ address,size,file,symbol,status,similarity
 0x4aff00,389,src/gui/file_list.cpp,?DrawBlinkWords@@YGXPAUDialog@@@Z,matched,100.0
 0x4b0090,193,src/gui/listbox.cpp,?DrawBevelBorder@@YGXPAXPAURect@@HEH@Z,matched,100.0
 0x4b0160,193,src/gui/listbox.cpp,?DrawBevelBorderDarkFirst@@YGXPAXPAURect@@HHH@Z,matched,100.0
-0x4b0230,631,src/gui/listbox.cpp,?DrawListboxFrame@@YGXPAUObject_004b0230@@HPAUBits_004b0230@@@Z,matched,100.0
+0x4b0230,631,src/gui/listbox.cpp,?DrawListboxFrame@@YGXPAUGui@@HPAUBits_004b0230@@@Z,matched,100.0
 0x4b04b0,47,src/gui/listbox.cpp,?FillBevelBox@@YGXPAXPAURect@@HHH@Z,matched,100.0
 0x4b04e0,47,src/gui/listbox.cpp,?FillBevelBoxDarkFirst@@YGXPAXPAURect@@HHH@Z,matched,100.0
 0x4b0510,116,src/gui/listbox.cpp,?DrawRaisedBox@@YGXPAXPAURect@@HEH@Z,matched,100.0
