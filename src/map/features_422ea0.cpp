@@ -30,7 +30,7 @@ struct List_00422ea0 {
     TdfFile** last;                     // +0x8
 };
 
-struct FeatureDef_00422ea0 {
+struct Feature {
     char name[0xf4];
     unsigned short dead;                // +0xf4
     unsigned short burnt;               // +0xf6
@@ -43,7 +43,7 @@ struct Game {
     char unknown_0[0x14253];
     int featureCount;                   // +0x14253
     char unknown_14257[0x1426f - 0x14257];
-    FeatureDef_00422ea0* features;      // +0x1426f
+    Feature* features;      // +0x1426f
     char unknown_14273[0x38d72 - 0x14273];
     unsigned char loadPercent;          // +0x38d72
 };
@@ -92,7 +92,7 @@ static inline unsigned short FeatureIndex(char* name)
 void ResolveFeatureLinks()
 {
     char buf[0x100];
-    FeatureDef_00422ea0** features;
+    Feature** features;
     int i = 0;
     int* count = &g_game->featureCount;
     if (*count > 0) {
