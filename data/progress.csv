@@ -1813,7 +1813,7 @@ address,size,file,symbol,status,similarity
 0x488960,98,src/units/unit_commands.cpp,?Partition@@YGPAPAUItem_00485940@@PAPAU1@0PAU1@P6GH11@Z@Z,matched,100.0
 0x4889d0,42,src/units/unit_commands.cpp,_$E5,matched,100.0
 0x488a00,67,src/units/unit_commands.cpp,_$E3,matched,100.0
-0x488a50,191,src/units/unit_commands.cpp,?FindUnitType@@YGPAUUnitType_00488b10@@PBD@Z,matched,100.0
+0x488a50,191,src/units/unit_commands.cpp,?FindUnitType@@YGPAUUnitDef@@PBD@Z,matched,100.0
 0x488b10,203,src/units/unit_commands.cpp,?FindUnitTypeId@@YGGPBD@Z,matched,100.0
 0x488be0,11,src/units/unit_commands.cpp,?InitUnitCategories@@YGXXZ,matched,100.0
 0x488bf0,90,src/units/unit_commands.cpp,?FreeUnitCategories@@YGXXZ,matched,100.0

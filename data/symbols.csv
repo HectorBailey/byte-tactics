@@ -4554,7 +4554,7 @@ address,name
 0x51e698,g_cmdSingEnabled
 0x51e69c,g_playLooping
 0x51e6a0,g_losTables
-0x51e6b0,s_unitCategories$S5682
+0x51e6b0,s_unitCategories$S5675
 0x51e6c0,g_mapLoadFlag
 0x51e6c4,g_cdMismatchDefeatTick
 0x51e6c8,g_loadingBarFlashAlpha
