@@ -94,7 +94,7 @@ address,size,file,symbol,status,similarity
 0x408100,1221,src/ai/ai_player_408100.cpp,?OnTimer@ScoutTimer@@UAEXXZ,matched,100.0
 0x4085d0,40,src/ai/ai_player.cpp,??0ScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z,matched,100.0
 0x408600,32,src/ai/ai_player.cpp,??_GScoutTimer@@UAEPAXI@Z,matched,100.0
-0x408620,71,src/ai/ai_player_408620.cpp,?TryIssueIdleFactoryBuildOrder@BuildTimer@@QAEXPAUObj_00408620@@@Z,matched,100.0
+0x408620,71,src/ai/ai_player_408620.cpp,?TryIssueIdleFactoryBuildOrder@BuildTimer@@QAEXPAUUnit@@@Z,matched,100.0
 0x408670,92,src/ai/ai_player.cpp,?UpdateConverter@@YGXPAUUnit@@@Z,matched,100.0
 0x4086d0,268,src/ai/ai_player.cpp,?OnTimer@BuildTimer@@UAEXXZ,matched,100.0
 0x4087e0,40,src/ai/ai_player.cpp,??0BuildTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z,matched,100.0
