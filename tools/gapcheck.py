@@ -116,8 +116,8 @@ class RegionResult:
 
 def compile_gap(src: Path) -> tuple[Path | None, str]:
     """The region's object, through tools/progress.py's cache (build/progress/gap/)."""
-    from linkcheck import include_hash
     from progress import compile_cached
+    from sources import include_hash
     return compile_cached(src, include_hash())
 
 

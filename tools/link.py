@@ -64,9 +64,9 @@ from pathlib import Path
 
 from check import COMPILE_SCHEME, DEFAULT_FLAGS, ROOT, winpath
 from linkcheck import (CRT_LIBS, IMPORT_LIBS, Demangle, MEMBER_STATIC, address_of,
-                       archive_symbols, base_name, data_symbol, include_hash, library_symbols,
+                       archive_symbols, base_name, data_symbol, library_symbols,
                        load_known, read_object, type_size)
-from sources import relative
+from sources import include_hash, relative
 from sources import sources as files_of_kind
 
 SRC = ROOT / "src"

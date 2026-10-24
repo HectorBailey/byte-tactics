@@ -29,7 +29,7 @@ from pathlib import Path
 
 from check import DEFAULT_FLAGS, ROOT, compile_source
 from coff import parse_object
-from sources import link_order
+from sources import include_hash, link_order
 
 PROGRESS = ROOT / "data/progress.csv"
 GLOBALS = ROOT / "data/globals.csv"
@@ -342,8 +342,8 @@ def typedefs(obj, table: TypeTable) -> dict[str, object]:
     return out
 
 
-def compile_cached(src: Path, include_hash: str) -> Path | None:
-    key = hashlib.sha256(src.read_bytes() + include_hash.encode() + FLAGS.encode()).hexdigest()[:16]
+def compile_cached(src: Path, ihash: str) -> Path | None:
+    key = hashlib.sha256(src.read_bytes() + ihash.encode() + FLAGS.encode()).hexdigest()[:16]
     stamp = ROOT / "build/types" / src.relative_to(ROOT / "src").with_suffix(".key")
     obj = stamp.with_suffix(".obj")
     if stamp.exists() and stamp.read_text() == key and obj.exists():
@@ -389,11 +389,9 @@ def main():
     wanted = {"matched", "partial"} if args.partial else {"matched"}
     symbol_address = {r["symbol"]: int(r["address"], 16) for r in rows if r["status"] in wanted}
     sources = link_order(list({ROOT / r["file"] for r in rows if r["status"] in wanted}))
-    include = ROOT / "include"
-    include_hash = hashlib.sha256(b"".join(
-        p.read_bytes() for p in sorted(include.rglob("*")) if p.is_file())).hexdigest() if include.exists() else ""
+    ihash = include_hash()
     with ThreadPoolExecutor(max_workers=os.cpu_count() or 4) as pool:
-        objects = list(pool.map(lambda s: compile_cached(s, include_hash), sources))
+        objects = list(pool.map(lambda s: compile_cached(s, ihash), sources))
 
     variants: dict[str, Counter] = defaultdict(Counter)
     funcs: dict[str, dict] = {}
