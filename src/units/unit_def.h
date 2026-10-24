@@ -55,7 +55,7 @@ public:
         int modelMaxY;                 // +0x16e
         struct {
             short unknown_16e;
-            short field_170;           // +0x170
+            short modelMaxYHigh;       // +0x170
         };
     };
     int modelMaxZ;                     // +0x172

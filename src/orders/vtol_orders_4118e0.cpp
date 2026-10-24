@@ -230,7 +230,7 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
         }
         Class_0044e250* obj = new Class_0044e250(order, order->target.owner, order->angle);
         if (unit->cargo)
-            obj->SetAltitude(unit->cargo->def->field_170);
+            obj->SetAltitude(unit->cargo->def->modelMaxYHigh);
         else
             obj->SetAltitude(0);
         unit->script->StartScript("EndTransport", 0, 1);

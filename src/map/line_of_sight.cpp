@@ -120,7 +120,7 @@ void RegisterGroundOrders();
 // Keeps its own view: with unit_def.h's symbol ids RecalculateLineOfSight (0x4816a0) no longer matches.
 struct UnitDef {
     char unknown_0[0x170];
-    unsigned char field_170;           // +0x170
+    unsigned char modelMaxYHigh;       // +0x170
     char unknown_171[0x202 - 0x171];
     short range;                       // +0x202
 };
@@ -507,7 +507,7 @@ void __stdcall RemoveUnitLineOfSight(Unit* unit)
     p.sightDistance = unit->def->range;
     p.frameIdx = unit->losSightFrameIdx;
     p.pos = unit->pos;
-    p.eyeHeight = unit->def->field_170;
+    p.eyeHeight = unit->def->modelMaxYHigh;
     int minY = (g_game->seaLevel + 1) << 16;
     if (p.pos.y < minY) {
         p.pos.y = minY;
@@ -622,7 +622,7 @@ void __stdcall UpdateUnitLineOfSight(Unit* unit)
     p.sightDistance = unit->def->range;
     p.frameIdx = unit->losSightFrameIdx;
     p.pos = unit->pos;
-    p.eyeHeight = unit->def->field_170;
+    p.eyeHeight = unit->def->modelMaxYHigh;
     int minY = (g_game->seaLevel + 1) << 16;
     if (p.pos.y < minY) {
         p.pos.y = minY;
@@ -1518,7 +1518,7 @@ void __stdcall RecalculateLineOfSight(int arg)
         params.sightDistance = u->def->range;
         params.frameIdx = u->losSightFrameIdx;
         params.pos = u->pos;
-        params.eyeHeight = u->def->field_170;
+        params.eyeHeight = u->def->modelMaxYHigh;
         if (params.pos.y < (int)((g_game->seaLevel + 1) << 16))
             params.pos.y = (g_game->seaLevel + 1) << 16;
         if ((g_game->mapFlags.raw & 2) == 2) {
@@ -1735,7 +1735,7 @@ void __stdcall RevealNewUnit(Unit* unit)
     p.sightDistance = unit->def->range;
     p.frameIdx = unit->losSightFrameIdx;
     p.pos = unit->pos;
-    p.eyeHeight = unit->def->field_170;
+    p.eyeHeight = unit->def->modelMaxYHigh;
     int min_y = (g_game->seaLevel + 1) << 16;
     if (p.pos.y < min_y) {
         p.pos.y = min_y;
