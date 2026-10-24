@@ -39,35 +39,7 @@ static inline bool Less(const char* a, const char* b) {
     return _strcmpi(a, b) < 0;
 }
 
-// One entry of a weapon's DAMAGE table: a unit name and its damage (Thaldren's
-// WeaponDef_DamagePair, data/thaldren/structs.csv).
-struct WeaponDef_DamagePair {
-    StringRef unitName; // +0x0
-    int damage;         // +0x4
-
-    WeaponDef_DamagePair(const StringRef& n, int v) : unitName(n), damage(v) {}
-};
-
-#pragma pack(push, 1)
-// The damage table, kept sorted by name.
-struct Table_00499cd0 {
-    char less;                     // +0x0
-    std::vector<WeaponDef_DamagePair> v; // +0x1
-
-    WeaponDef_DamagePair* LowerBound(const char* key) {
-        WeaponDef_DamagePair* first = v.begin();
-        WeaponDef_DamagePair* last = v.end();
-        while (first != last) {
-            WeaponDef_DamagePair* mid = first + (last - first) / 2;
-            if (Less(mid->unitName.ptr, key))
-                first = mid + 1;
-            else
-                last = mid;
-        }
-        return first;
-    }
-};
-#pragma pack(pop)
+#include "weapon_damage.h"
 
 void __stdcall SetWeaponFireHandler(WeaponDef*);
 
@@ -131,7 +103,7 @@ void LoadWeaponTypes()
 
 // Loads one weapon from a .TDF section: the numbers and flags, the model, the
 // explosion animations, the sounds and the DAMAGE sub-section, which goes into
-// a table sorted by unit name (w->table).
+// a table sorted by unit name (w->damageOverrides).
 // FUNCTION: 0x42e440
 void __stdcall LoadWeaponType(TdfRecord* parser) {
     char* id = (char*)parser->GetRecordName();
@@ -289,16 +261,16 @@ model_done:
         while (key) {
             if (_strcmpi(key, "default") != 0) {
                 int value = damage->GetFieldInt(key, 0);
-                if (!w->table)
-                    w->table = new Table_00499cd0;
+                if (!w->damageOverrides)
+                    w->damageOverrides = new WeaponDef_DamageMap;
                 StringRef name(key);
-                Table_00499cd0* m = w->table;
+                WeaponDef_DamageMap* m = w->damageOverrides;
                 WeaponDef_DamagePair* e = m->LowerBound(name.ptr);
                 // insert called here, not in a helper (inline depth); e assigned
                 // first, then &e->damage taken in each arm.
                 int* r;
-                if (e == m->v.end() || Ne(e->unitName, name)) {
-                    e = m->v.insert(e, WeaponDef_DamagePair(name, 0));
+                if (e == m->entries.end() || Ne(e->unitName, name)) {
+                    e = m->entries.insert(e, WeaponDef_DamagePair(name, 0));
                     r = &e->damage;
                 } else {
                     r = &e->damage;
@@ -324,9 +296,9 @@ void FreeWeaponTypes()
             o->model = 0;
             o->modelName[0] = 0;
         }
-        if (o->table) {
-            delete o->table;
-            o->table = 0;
+        if (o->damageOverrides) {
+            delete o->damageOverrides;
+            o->damageOverrides = 0;
         }
         i++;
     }
