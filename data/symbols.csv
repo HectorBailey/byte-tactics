@@ -779,8 +779,8 @@ address,name
 0x43c050,RegisterAllOrderTypes
 0x43c350,ClearOrderTypeTable
 0x43c360,MissionOrderTable::GetCount
-0x43c390,UElem_0043c390::?$vector::_Destroy
-0x43c3a0,UElem_0043c390::?$vector::insert
+0x43c390,UMissionOrderTableEntry::?$vector::_Destroy
+0x43c3a0,UMissionOrderTableEntry::?$vector::insert
 0x43c6b0,LowerBoundOrderTypes
 0x43c720,SortOrderTypes
 0x43c940,InsertShiftOrderTypes

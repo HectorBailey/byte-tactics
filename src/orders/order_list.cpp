@@ -335,27 +335,28 @@ static inline short PosXWhole(Unit* unit) { return *(short*)((char*)&unit->pos +
 static inline short PosZWhole(Unit* unit) { return *(short*)((char*)&unit->pos + 0xa); }
 
 // One 25-byte record of the global order-type table at 0x512344 (a
-// std::vector's _First): the status text at +0, a per-kind notify callback at
-// +4, the draw mask at +0xc and its name at +0x15.
-struct Elem_0043c390 {
-    int value;                         // +0x0, the status string
-    int (__stdcall* notify)(void* unit, Order* obj, unsigned int code); // +4
+// std::vector's _First), Thaldren's MissionOrderTableEntry: the status text at
+// +0, a per-kind tick callback at +4, the draw mask at +0xc, the default
+// order flags at +0x11 and the lookup name at +0x15.
+struct MissionOrderTableEntry {
+    int displayName;                   // +0x0, the status string
+    int (__stdcall* tick)(void* unit, Order* obj, unsigned int code); // +4
     char unknown_8[0xc - 8];
-    int drawMask;                      // +0xc, the flags 0x439b30 masks
+    int displayMask;                   // +0xc, the flags 0x439b30 masks
     char unknown_10[0x11 - 0x10];
-    unsigned int flags;                // +0x11, default flags of the kind
-    char* name;                        // +0x15
+    unsigned int orderFlags;           // +0x11, default flags of the kind
+    char* lookupName;                  // +0x15
 
     // Only so the explicit instantiation of the rest of the vector compiles.
-    int operator<(const Elem_0043c390&) const { return 0; }
-    int operator==(const Elem_0043c390&) const { return 0; }
-    int operator!=(const Elem_0043c390&) const { return 0; }
+    int operator<(const MissionOrderTableEntry&) const { return 0; }
+    int operator==(const MissionOrderTableEntry&) const { return 0; }
+    int operator!=(const MissionOrderTableEntry&) const { return 0; }
 };
 
 #pragma pack(pop)
 
 extern Game* g_game;
-extern Elem_0043c390* g_missionOrderTableBegin;
+extern MissionOrderTableEntry* g_missionOrderTableBegin;
 
 void __stdcall DeleteOrder(Unit* owner, Order* node);
 
@@ -387,23 +388,23 @@ void __stdcall DrawOrderOverlays(Unit* unit, unsigned int mask, void* obj,
     Vec3 pos = unit->pos;
     bool done = false;
     for (Order* e = unit->list; e != 0; e = e->next) {
-        if (g_missionOrderTableBegin[e->kind].drawMask & mask & 1) {
+        if (g_missionOrderTableBegin[e->kind].displayMask & mask & 1) {
             pos = base;
             DrawBuildFootprint(obj, sel, e, &pos, flag);
         }
-        if (g_missionOrderTableBegin[e->kind].drawMask & mask & 2) {
+        if (g_missionOrderTableBegin[e->kind].displayMask & mask & 2) {
             pos = base;
             DrawPathAnim(obj, sel, e, &pos, flag);
         }
-        if (g_missionOrderTableBegin[e->kind].drawMask & mask & 4) {
+        if (g_missionOrderTableBegin[e->kind].displayMask & mask & 4) {
             pos = base;
             DrawOrderRangeRing(obj, sel, e, &pos, flag);
         }
-        if (g_missionOrderTableBegin[e->kind].drawMask & mask & 8) {
+        if (g_missionOrderTableBegin[e->kind].displayMask & mask & 8) {
             pos = base;
             DrawWeaponCoverage(obj, sel, e, &pos, flag);
         }
-        if (g_missionOrderTableBegin[e->kind].drawMask & mask & 0x10) {
+        if (g_missionOrderTableBegin[e->kind].displayMask & mask & 0x10) {
             if (!done) {
                 DrawUnitRangeRings(obj, sel, e, &pos, flag);
                 done = true;
@@ -478,9 +479,9 @@ int __stdcall GetOrderTarget(int param_1)
 int __stdcall GetOrderName(Unit* obj)
 {
     if (obj && obj->list) {
-        return g_missionOrderTableBegin[obj->list->kind].value;
+        return g_missionOrderTableBegin[obj->list->kind].displayName;
     }
-    return g_missionOrderTableBegin[0].value;
+    return g_missionOrderTableBegin[0].displayName;
 }
 
 // Finds the object's list node of the given kind; the kind table's flag
@@ -489,7 +490,7 @@ int __stdcall GetOrderName(Unit* obj)
 Order* __stdcall FindOrderByType(Unit* obj, unsigned char kind)
 {
     Order* n;
-    if (g_missionOrderTableBegin[kind].flags & 0x40000)
+    if (g_missionOrderTableBegin[kind].orderFlags & 0x40000)
         n = obj->list2;
     else
         n = obj->list;
@@ -641,7 +642,7 @@ Order::Order(unsigned char k, Unit* o, Vec3* p, int a, int b, int c)
     subFlags = 0;
     wakeFrame = -1;
     pos = p ? *p : Vec3Init_0043a1f0(0, 0, 0);
-    flags = g_missionOrderTableBegin[k & 0xff].flags;
+    flags = g_missionOrderTableBegin[k & 0xff].orderFlags;
     unit = 0;
     next = 0;
     attached = 0;
@@ -915,8 +916,8 @@ void InitCommands();
 int UpdatePlacementGhostValidity();
 void RefreshSelectionOrders();
 
-typedef std::vector<Elem_0043c390> Vec_0043c390;
-typedef int(__stdcall* Pred_0043c390)(const Elem_0043c390&, const Elem_0043c390&);
+typedef std::vector<MissionOrderTableEntry> Vec_0043c390;
+typedef int(__stdcall* Pred_0043c390)(const MissionOrderTableEntry&, const MissionOrderTableEntry&);
 
 // The movement state saved as "u%04xmob".
 struct Record_0043dd70 {
@@ -982,9 +983,9 @@ public:
 #pragma pack(pop)
 
 extern Game* g_game;
-extern Elem_0043c390* g_missionOrderTableBegin;
+extern MissionOrderTableEntry* g_missionOrderTableBegin;
 extern int g_missionOrderTableEnd;
-extern Elem_0043c390 g_readyOrder[];
+extern MissionOrderTableEntry g_readyOrder[];
 extern signed char g_slopeSpeedFactor[];
 
 void* __cdecl operator new(unsigned int size);
@@ -1006,7 +1007,7 @@ void __stdcall AddOrder(unsigned char kind, int remove, Unit* owner, int id, int
 int __stdcall FindWeaponTarget(Unit* unit, int a, int b);
 void __stdcall ClearWeaponTarget(Unit* unit, int index);
 int __stdcall RandomInt(int n);
-int __stdcall CompareOrderTypeNames(const Elem_0043c390& a, const Elem_0043c390& b);
+int __stdcall CompareOrderTypeNames(const MissionOrderTableEntry& a, const MissionOrderTableEntry& b);
 void RegisterGroundOrders();
 void RegisterVtolOrders();
 void RegisterAICommands();
@@ -1079,7 +1080,7 @@ void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount)
 {
     Order* node;
     if (amount > 0) {
-        if (g_missionOrderTableBegin[kind & 0xff].flags & 0x40000)
+        if (g_missionOrderTableBegin[kind & 0xff].orderFlags & 0x40000)
             node = owner->list2;
         else
             node = owner->list;
@@ -1095,7 +1096,7 @@ void __stdcall AdjustBuildCount(int kind, Unit* owner, int id, int amount)
     }
     for (;;) {
         Order* found = 0;
-        if (g_missionOrderTableBegin[kind & 0xff].flags & 0x40000)
+        if (g_missionOrderTableBegin[kind & 0xff].orderFlags & 0x40000)
             node = owner->list2;
         else
             node = owner->list;
@@ -1306,7 +1307,7 @@ void __stdcall RunOrders(Unit* unit)
         node->flags6 = 0;
         if (pending & 0x10000)
             ClearTargets_0043b7c0(unit);
-        switch (g_missionOrderTableBegin[node->kind].notify(node->unit, node, pending)) {
+        switch (g_missionOrderTableBegin[node->kind].tick(node->unit, node, pending)) {
         case 3:
             Wait_0043b7c0(node, 0xf);
             break;
@@ -1388,7 +1389,7 @@ void __stdcall RunSecondaryOrders(Unit* p)
         if (child->flags6 == 0 || g_game->frame >= child->wakeFrame) {
             child->flags6 = 0;
             // Case order (3, 1, 0, 2/4, 5/8/9, 6/7, default) sets the body layout.
-            switch (g_missionOrderTableBegin[child->kind].notify(child->unit, child, 0)) {
+            switch (g_missionOrderTableBegin[child->kind].tick(child->unit, child, 0)) {
             case 3: {
                 // Ask again in a while. The temporary keeps the sum from being
                 // folded into one lea, which is what the original does.
@@ -1432,21 +1433,21 @@ static Vec_0043c390 g_missionOrderTableVec;
 
 // std::_Unguarded_insert
 // FUNCTION: 0x43c940
-inline void __stdcall InsertShiftOrderTypes(Elem_0043c390* _L, Elem_0043c390 _V, Pred_0043c390 _P)
+inline void __stdcall InsertShiftOrderTypes(MissionOrderTableEntry* _L, MissionOrderTableEntry _V, Pred_0043c390 _P)
 {
-    for (Elem_0043c390* _M = _L; _P(_V, *--_M); _L = _M)
+    for (MissionOrderTableEntry* _M = _L; _P(_V, *--_M); _L = _M)
         *_L = *_M;
     *_L = _V;
 }
 
 // std::_Insertion_sort_1
 // FUNCTION: 0x43c990
-inline void __stdcall InsertionSortOrderTypes(Elem_0043c390* _F, Elem_0043c390* _L, Pred_0043c390 _P,
-                                   Elem_0043c390*)
+inline void __stdcall InsertionSortOrderTypes(MissionOrderTableEntry* _F, MissionOrderTableEntry* _L, Pred_0043c390 _P,
+                                   MissionOrderTableEntry*)
 {
     if (_F != _L)
-        for (Elem_0043c390* _M = _F; ++_M != _L; ) {
-            Elem_0043c390 _V = *_M;
+        for (MissionOrderTableEntry* _M = _F; ++_M != _L; ) {
+            MissionOrderTableEntry _V = *_M;
             if (!_P(_V, *_F))
                 InsertShiftOrderTypes(_M, _V, _P);
             else {
@@ -1457,7 +1458,7 @@ inline void __stdcall InsertionSortOrderTypes(Elem_0043c390* _F, Elem_0043c390* 
 }
 
 // std::_Insertion_sort
-inline void _Insertion_sort_0043bc90(Elem_0043c390* _F, Elem_0043c390* _L, Pred_0043c390 _P)
+inline void _Insertion_sort_0043bc90(MissionOrderTableEntry* _F, MissionOrderTableEntry* _L, Pred_0043c390 _P)
 {
     InsertionSortOrderTypes(_F, _L, _P, std::_Val_type(_F));
 }
@@ -1467,7 +1468,7 @@ inline void _Insertion_sort_0043bc90(Elem_0043c390* _F, Elem_0043c390* _L, Pred_
 // fewer than its callers push (0x60); the error cancels against 0x43cb20, which
 // pops 0x28 for 0x24 bytes of arguments.
 // FUNCTION: 0x43ca70
-inline Elem_0043c390 __stdcall MedianOrderTypes(Elem_0043c390 _X, Elem_0043c390 _Y, Elem_0043c390 _Z,
+inline MissionOrderTableEntry __stdcall MedianOrderTypes(MissionOrderTableEntry _X, MissionOrderTableEntry _Y, MissionOrderTableEntry _Z,
                                             Pred_0043c390 _P)
 {
     if (_P(_X, _Y))
@@ -1478,8 +1479,8 @@ inline Elem_0043c390 __stdcall MedianOrderTypes(Elem_0043c390 _X, Elem_0043c390 
 
 // std::_Unguarded_partition
 // FUNCTION: 0x43cb20
-inline Elem_0043c390* __stdcall PartitionOrderTypes(Elem_0043c390* _F, Elem_0043c390* _L,
-                                             Elem_0043c390 _Piv, Pred_0043c390 _P)
+inline MissionOrderTableEntry* __stdcall PartitionOrderTypes(MissionOrderTableEntry* _F, MissionOrderTableEntry* _L,
+                                             MissionOrderTableEntry _Piv, Pred_0043c390 _P)
 {
     for (; ; ++_F) {
         for (; _P(*_F, _Piv); ++_F)
@@ -1494,12 +1495,12 @@ inline Elem_0043c390* __stdcall PartitionOrderTypes(Elem_0043c390* _F, Elem_0043
 
 // std::_Sort
 // FUNCTION: 0x43c720
-inline void __stdcall SortOrderTypes(Elem_0043c390* _F, Elem_0043c390* _L, Pred_0043c390 _P,
-                                   Elem_0043c390*)
+inline void __stdcall SortOrderTypes(MissionOrderTableEntry* _F, MissionOrderTableEntry* _L, Pred_0043c390 _P,
+                                   MissionOrderTableEntry*)
 {
     for (; std::_SORT_MAX < _L - _F; ) {
-        Elem_0043c390* _M = PartitionOrderTypes(_F, _L, MedianOrderTypes(Elem_0043c390(*_F),
-            Elem_0043c390(*(_F + (_L - _F) / 2)), Elem_0043c390(*(_L - 1)), _P), _P);
+        MissionOrderTableEntry* _M = PartitionOrderTypes(_F, _L, MedianOrderTypes(MissionOrderTableEntry(*_F),
+            MissionOrderTableEntry(*(_F + (_L - _F) / 2)), MissionOrderTableEntry(*(_L - 1)), _P), _P);
         if (_L - _M <= _M - _F)
             SortOrderTypes(_M, _L, _P, std::_Val_type(_F)), _L = _M;
         else
@@ -1508,21 +1509,21 @@ inline void __stdcall SortOrderTypes(Elem_0043c390* _F, Elem_0043c390* _L, Pred_
 }
 
 // std::_Sort_0
-inline void _Sort_0_0043bc90(Elem_0043c390* _F, Elem_0043c390* _L, Pred_0043c390 _P,
-                             Elem_0043c390*)
+inline void _Sort_0_0043bc90(MissionOrderTableEntry* _F, MissionOrderTableEntry* _L, Pred_0043c390 _P,
+                             MissionOrderTableEntry*)
 {
     if (_L - _F <= std::_SORT_MAX)
         _Insertion_sort_0043bc90(_F, _L, _P);
     else {
-        SortOrderTypes(_F, _L, _P, (Elem_0043c390*)0);
+        SortOrderTypes(_F, _L, _P, (MissionOrderTableEntry*)0);
         _Insertion_sort_0043bc90(_F, _F + std::_SORT_MAX, _P);
         for (_F += std::_SORT_MAX; _F != _L; ++_F)
-            InsertShiftOrderTypes(_F, Elem_0043c390(*_F), _P);
+            InsertShiftOrderTypes(_F, MissionOrderTableEntry(*_F), _P);
     }
 }
 
 // std::sort with a predicate
-inline void sort_0043bc90(Elem_0043c390* _F, Elem_0043c390* _L, Pred_0043c390 _P)
+inline void sort_0043bc90(MissionOrderTableEntry* _F, MissionOrderTableEntry* _L, Pred_0043c390 _P)
 {
     _Sort_0_0043bc90(_F, _L, _P, std::_Val_type(_F));
 }
@@ -1536,7 +1537,7 @@ extern int DAT_0051234c;
 // std::vector at 0x512340) and sorts the whole table by name. The record has a
 // per-kind notify callback at +4 (0x43bad0 calls it) and its name at +0x15.
 // FUNCTION: 0x43bc90
-void __stdcall RegisterOrderTypes(Elem_0043c390* from, int count)
+void __stdcall RegisterOrderTypes(MissionOrderTableEntry* from, int count)
 {
     // Own statement: `size() + count` in one expression swaps the lea operands.
     int sz = g_missionOrderTableVec.size();
@@ -1546,9 +1547,9 @@ void __stdcall RegisterOrderTypes(Elem_0043c390* from, int count)
 }
 
 // FUNCTION: 0x43c020
-int __stdcall CompareOrderTypeNames(const Elem_0043c390& a, const Elem_0043c390& b)
+int __stdcall CompareOrderTypeNames(const MissionOrderTableEntry& a, const MissionOrderTableEntry& b)
 {
-    return _strcmpi(a.name, b.name) < 0 ? 1 : 0;
+    return _strcmpi(a.lookupName, b.lookupName) < 0 ? 1 : 0;
 }
 
 // Registers this module's own entry of the global registration table (the
@@ -1577,7 +1578,7 @@ int MissionOrderTable::GetCount(void)
     return first == 0 ? 0 : (last - first) / 0x19;
 }
 
-// std::vector<Elem_0043c390>::_Destroy(first, last) from MSVC 5's <vector>:
+// std::vector<MissionOrderTableEntry>::_Destroy(first, last) from MSVC 5's <vector>:
 // empty for a trivial element type. Its callers (0x43bc90, 0x43c050)
 // inline vector::reserve on the global vector of 25-byte records at
 // 0x512340 and call this with ecx set to it.
@@ -1588,35 +1589,35 @@ struct Access_0043c390 : Vec_0043c390 {
     static DestroyFn_0043c390 fn;
 };
 
-// FUNCTION: 0x43c390 ?_Destroy@?$vector@UElem_0043c390@@V?$allocator@UElem_0043c390@@@std@@@std@@IAEXPAUElem_0043c390@@0@Z
+// FUNCTION: 0x43c390 ?_Destroy@?$vector@UMissionOrderTableEntry@@V?$allocator@UMissionOrderTableEntry@@@std@@@std@@IAEXPAUMissionOrderTableEntry@@0@Z
 DestroyFn_0043c390 Access_0043c390::fn = &Access_0043c390::_Destroy;
 
-// std::vector<Elem_0043c390>::insert(iterator, size_type, const _Ty&) of
+// std::vector<MissionOrderTableEntry>::insert(iterator, size_type, const _Ty&) of
 // MSVC 5's <vector>, the three-argument insert, emitted out of line: the two
 // callers (0x43bc90 and 0x43c050) insert one 25-byte record at a time into the
 // global table at 0x512340. It calls the global operator new (0x4b4f10) and
 // delete (0x4b4f20). The element is the same 25-byte record as the one
 // _Destroy (0x43c390) destroys.
 // Explicit instantiation: the member is emitted itself, not inlined into a wrapper.
-template class std::vector<Elem_0043c390>;
+template class std::vector<MissionOrderTableEntry>;
 
-// FUNCTION: 0x43c3a0 ?insert@?$vector@UElem_0043c390@@V?$allocator@UElem_0043c390@@@std@@@std@@QAEXPAUElem_0043c390@@IABU3@@Z
+// FUNCTION: 0x43c3a0 ?insert@?$vector@UMissionOrderTableEntry@@V?$allocator@UMissionOrderTableEntry@@@std@@@std@@QAEXPAUMissionOrderTableEntry@@IABU3@@Z
 
 // std::_Lower_bound(first, last, value, pred, (int*)0) over a sorted table of
 // 25-byte entries (the order-type table at 0x512344..0x512348), instantiated
 // in a file compiled with __stdcall as the default; the one caller (0x43a513)
 // passes the case-insensitive name compare 0x43a940.
-typedef int (__stdcall* Pred_0043c6b0)(const Elem_0043c390& entry, char* name);
+typedef int (__stdcall* Pred_0043c6b0)(const MissionOrderTableEntry& entry, char* name);
 
 // FUNCTION: 0x43c6b0
-Elem_0043c390* __stdcall LowerBoundOrderTypes(Elem_0043c390* first, Elem_0043c390* last,
+MissionOrderTableEntry* __stdcall LowerBoundOrderTypes(MissionOrderTableEntry* first, MissionOrderTableEntry* last,
                                       char* const& value, Pred_0043c6b0 pred, int*)
 {
     int n = 0;
     n += last - first;
     for (; 0 < n; ) {
         int n2 = n / 2;
-        Elem_0043c390* m = first;
+        MissionOrderTableEntry* m = first;
         m += n2;
         if (pred(*m, value))
             first = ++m, n -= n2 + 1;

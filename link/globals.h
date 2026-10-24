@@ -34,7 +34,7 @@ extern const float DAT_004fd4cc;                                                
 extern signed char g_dirDeltaX[8];                                                                              // 0x4fd670, 8 bytes; 2 of 2 files
 extern signed char g_dirDeltaZ[8];                                                                              // 0x4fd678, 8 bytes; 2 of 2 files
 extern float g_buildPercentScale;                                                                               // 0x4fd750, 4 bytes; 1 of 1 files
-extern unsigned char DAT_004fdaf0[16];                                                                          // 0x4fdaf0, 16 bytes; V4i by value in 1 of 2 files (conflicting: struct names only)
+extern unsigned char DAT_004fdaf0[16];                                                                          // 0x4fdaf0, 16 bytes; _GUID by value in 1 of 2 files (conflicting: struct names only)
 extern double g_shadeStep;                                                                                      // 0x4fdbe8, 8 bytes; 1 of 1 files
 extern char g_hapiCopyright[40];                                                                                // 0x4fdbf0, 40 bytes; 1 of 1 files
 extern int g_aiCommandsEnabled;                                                                                 // 0x501774, 4 bytes; 1 of 1 files
@@ -427,7 +427,7 @@ extern int g_mapLoadFlag;                                                       
 extern unsigned int g_cdMismatchDefeatTick;                                                                     // 0x51e6c4, 4 bytes; 1 of 1 files
 extern "C" unsigned char g_loadingBarFlashAlpha[8];                                                             // 0x51e6c8, 4 bytes; extern "C" (no type) with the globals inside it
 extern int g_shareDialogPlayerNetIds[10];                                                                       // 0x51e6d0, 40 bytes; 1 of 1 files
-extern char g_savegameRadarFrame[24];                                                                           // 0x51e6f8, 24 bytes; 1 of 1 files
+extern unsigned char g_savegameRadarFrame[24];                                                                  // 0x51e6f8, 24 bytes; GafFrame by value in 1 of 1 files
 extern int g_cdActivitySampleRing[30];                                                                          // 0x51e710, 120 bytes; 2 of 2 files
 extern char g_chatDraftText[136];                                                                               // 0x51e788, 136 bytes; 1 of 1 files
 extern unsigned char g_scorePanelLossFlash[10];                                                                 // 0x51e810, 10 bytes; 2 of 2 files
@@ -461,7 +461,7 @@ extern int DAT_0051fbac;                                                        
 extern int DAT_0051fbb0;                                                                                        // 0x51fbb0, 4 bytes; 1 of 1 files
 extern int DAT_0051fbb4;                                                                                        // 0x51fbb4, 4 bytes; 1 of 1 files
 extern unsigned char DAT_0051fbd4[4];                                                                           // 0x51fbd4, 4 bytes; nothing refers to it
-extern unsigned char g_timerSlots[172];                                                                         // 0x51fbd8, 172 bytes; Timer_4b63f0[10] by value in 1 of 1 files
+extern unsigned char g_timerSlots[172];                                                                         // 0x51fbd8, 172 bytes; TimerSlot[10] by value in 1 of 1 files
 extern unsigned int g_lastTimerTick;                                                                            // 0x51fc84, 4 bytes; 1 of 1 files
 extern unsigned int g_randomSeed;                                                                               // 0x51fc88, 4 bytes; 2 of 2 files
 extern unsigned char DAT_0051fc8c[4];                                                                           // 0x51fc8c, 4 bytes; nothing refers to it
@@ -610,7 +610,7 @@ extern long g_squashThreadLockTicket;                                           
 //   0x51e57c g_onlineReportScoreBoards: ScoreBoard_0046c2a0** (1), ScoreBoard_0046bce0** (1), void* (1)
 //   0x51e59c IUUnitSyncEntry::IU?$pair::?$_Tree::_Nilrefs: defined in src/network/unit_sync.cpp
 //   0x51e6a0 g_losTables: defined in src/map/line_of_sight.cpp
-//   0x51fba4 g_guiContext: Root_004a32a0* (1), Holder_004a3ef0* (1), int* (1)
+//   0x51fba4 g_guiContext: Root_004a32a0* (1), Gui* (1), int* (1)
 //   0x528a54 std::IH::IU?$pair::?$_Tree::_Nil: defined in src/debug/debug_lib_4db610.cpp
 //   0x529e9c g_gdperfDriverReady: char (2), bool (1)
 //   0x4fc9a0 g_spatialTimerVtable: defined in src/data/vtables.cpp
@@ -660,10 +660,10 @@ extern long g_squashThreadLockTicket;                                           
 //   0x51f2e4 g_savegameDescs: int* (1), char* (1)
 //   0x51f2e8 g_savegameSideList: int* (1), char* (1)
 //   0x51f2ec g_savegameRadarPreview: int* (1), char* (1)
-//   0x51fbd0 g_display: App_4b5980* (1), void* (1)
+//   0x51fbd0 g_display: DisplayContext* (1), void* (1)
 //   0x526ff4 g_squashWindow: void* (1), char* (1)
 //   0x529500 QBDUValue_004e17c0::PBDU?$pair::?$_Tree::_Nilrefs: defined in src/debug/debug_lib.cpp
-//   0x529e00 g_pmcEvent0: Counter_004e1e50 (1), Entry_004df590[] (1)
+//   0x529e00 g_pmcEvent0: PerformanceCounter (1), Entry_004df590[] (1)
 //   0x529e10 g_pmcEvent1: part of another global: g_pmcEvent0+0x10
 //   0x529f48 _tls_index: library
 //   0x4fc474 DAT_004fc474: defined in src/data/unused.cpp
