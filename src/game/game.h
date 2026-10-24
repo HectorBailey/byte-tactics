@@ -322,7 +322,7 @@ struct Game {  // 0x3924d bytes
     char unknown_4d1[20];
     Net_4517b0* field_4e5;  // +0x4e5
     char unknown_4e9[4];
-    int field_4ed;  // +0x4ed
+    int compressionOff;  // +0x4ed
     int netMode;  // +0x4f1
     char unknown_4f5[4];
     int count;  // +0x4f9
@@ -337,19 +337,19 @@ struct Game {  // 0x3924d bytes
     int field_589;  // +0x589
     char unknown_58d[2110];
     unsigned char textColor;  // +0xdcb
-    unsigned char field_dcc;  // +0xdcc
+    unsigned char hudPalette1;  // +0xdcc
     char unknown_dcd[1];
-    unsigned char field_dce;  // +0xdce
-    unsigned char field_dcf;  // +0xdcf
+    unsigned char hudPalette3;  // +0xdce
+    unsigned char color1;     // +0xdcf
     char unknown_dd0[3];
     unsigned char color2;  // +0xdd3
-    unsigned char field_dd4;  // +0xdd4
+    unsigned char hudPalette9;  // +0xdd4
     unsigned char field_dd5;  // +0xdd5
     char unknown_dd6[1];
-    unsigned char field_dd7;  // +0xdd7
+    unsigned char hudPalette12;  // +0xdd7
     char unknown_dd8[1];
     unsigned char unknown_dd9;  // +0xdd9
-    unsigned char field_dda;  // +0xdda
+    unsigned char shadowColor;  // +0xdda
     char unknown_ddb[1040];
     void* surface;  // +0x11eb
     char unknown_11ef[256];
@@ -439,7 +439,7 @@ struct Game {  // 0x3924d bytes
     Unit* unit;  // +0x1420f
     char unknown_14213[8];
     int list_1421b;  // +0x1421b
-    void** field_1421f;  // +0x1421f
+    void** grid;         // +0x1421f
     int baseX;  // +0x14223
     int baseY;  // +0x14227
     int mapWidth;  // +0x1422b
@@ -473,7 +473,7 @@ struct Game {  // 0x3924d bytes
     char unknown_142ab[4];
     int field_142af;  // +0x142af
     int field_142b3;  // +0x142b3
-    int field_142b7;  // +0x142b7
+    int overflowBucket;  // +0x142b7
     Rect viewLimit;  // +0x142bb
     char unknown_142cb[16];
     void* finalSurface;  // +0x142db
@@ -583,8 +583,8 @@ struct Game {  // 0x3924d bytes
     int cursorFindSite;  // +0x148bf
     int cursorRed;  // +0x148c3
     int cursorGrn;  // +0x148c7
-    unsigned short* field_148cb;  // +0x148cb
-    int field_148cf;  // +0x148cf
+    unsigned short* cursorNormal;  // +0x148cb
+    int cursorHourglass;  // +0x148cf
     int pathIcon;  // +0x148d3
     void* logos;  // +0x148d7
     void* logos32;  // +0x148db
@@ -678,7 +678,7 @@ struct Game {  // 0x3924d bytes
     int carry;        // +0x38a43
     int gameTick;     // +0x38a47
     unsigned short speedCtrl;    // +0x38a4b
-    short field_38a4d;  // +0x38a4d
+    short effectiveGameSpeed;  // +0x38a4d
     short streak;  // +0x38a4f
     unsigned short otherFlags;  // +0x38a51
     char installPath[1];  // +0x38a53
