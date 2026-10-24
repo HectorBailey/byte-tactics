@@ -57,23 +57,9 @@ struct Game {
     void* sources[6];                   // +0x147f7
 };
 
-// The 0x30-byte record StartExplodePiece consumes, explosions.cpp's
-// ExplodedPiece. Its flag word stays a plain unsigned int here: a 1-bit field
-// would truncate the masks 0x481140 writes. It has no header of its own.
-struct ExplodedPiece {
-    void* unit;                        // +0x00
-    int index;                         // +0x04
-    int angVelZ;                       // +0x08
-    int angVelX;                       // +0x0c
-    int angVelY;                       // +0x10
-    int vel_x;                         // +0x14
-    int vel_y;                         // +0x18
-    int vel_z;                         // +0x1c
-    int ticks;                         // +0x20
-    int scale;                         // +0x24
-    unsigned int bits;                 // +0x28
-    void* rec;                         // +0x2c
-};
+// The 0x30-byte record StartExplodePiece consumes, whose flag word this file
+// writes whole.
+#include "../weapons/exploded_piece.h"
 #pragma pack(pop)
 
 extern Game* g_game;
@@ -459,8 +445,9 @@ void UnitScript::EmitSfx(int a, int b)
 // first `h.bits & ~0x30` in each arm, and the three merge assignments, all
 // load the uninitialised local). Only bits 6 and up survive the masks, so
 // whatever the stack held leaks into the record StartExplodePiece copies.
-// `b` must stay unsigned (shr, not sar) and the header's flag dword a plain
-// unsigned int: a 1-bit field would truncate `(b & 2) << 4`.
+// `b` must stay unsigned (shr, not sar) and the flag word be written through
+// the plain unsigned int arm of ExplodedPiece: a 1-bit field would truncate
+// `(b & 2) << 4`.
 // FUNCTION: 0x481140
 void UnitScript::ExplodePiece(int a, unsigned int b)
 {

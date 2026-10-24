@@ -166,13 +166,10 @@ struct Net {
 
 // Unused here: the symbol ids these declarations take keep UpdateExplosions
 // and BreakPieceIntoDebris in the register windows they match in now that
-// CMemoryCache comes from a shared header (docs/c2-regalloc.md).
-void WriteScreenshot(char*, char*, int, int, int, int);
+// CMemoryCache and ExplodedPiece come from shared headers (docs/c2-regalloc.md).
 void SetCameraPosition(int, int, int);
 void StartScreenShake(int, int, int);
 void AccumulateScreenShake(int, int, int);
-void CenterCameraOnPoint(int, int, int);
-void SetMissionStatus(int, int, int);
 
 #include "../graphics/memory_cache.h"
 
@@ -207,27 +204,8 @@ struct PieceRec {
     char unknown_2a[0x36 - 0x2a];
 };
 
-// An exploding piece: the 0x30-byte header each pool slot starts with.
-struct ExplodedPiece {
-    Unit* unit;                        // +0x00
-    int index;                         // +0x04
-    int angVelZ;                       // +0x08
-    int angVelX;                       // +0x0c
-    int angVelY;                       // +0x10
-    int vel_x;                         // +0x14
-    int vel_y;                         // +0x18
-    int vel_z;                         // +0x1c
-    int ticks;                         // +0x20
-    int scale;                         // +0x24
-    unsigned int b0 : 1;               // +0x28
-    unsigned int b1 : 1;
-    unsigned int b2 : 1;
-    unsigned int b3 : 1;
-    unsigned int b4 : 1;
-    unsigned int b5 : 1;
-    unsigned int rest : 26;
-    PieceRec* rec;                     // +0x2c
-};
+// The 0x30-byte header each pool slot starts with.
+#include "exploded_piece.h"
 
 struct ExplodedBlock {
     ExplodedPiece header;              // +0x00
