@@ -599,9 +599,11 @@ void __stdcall ApplyWeaponHit(Projectile* weapon, Unit* target)
 
 extern "C" int __cdecl _strcmpi(const char* str1, const char* str2);
 
-struct Pair_00499cd0 {
-    char* name;                     // +0x0
-    int value;                      // +0x4
+// The same record as weapon_damage.h's pair, read with a plain name. Kept
+// local: that header's pair holds a StringRef, which this file has none of.
+struct WeaponDef_DamagePair {
+    char* unitName;                 // +0x0
+    int damage;                     // +0x4
 };
 
 struct NameLess_00499cd0 {
@@ -612,10 +614,10 @@ struct NameLess_00499cd0 {
 };
 
 #pragma pack(push, 1)
-struct Table_00499cd0 {
+struct WeaponDef_DamageMap {
     char unknown_0[5];
-    Pair_00499cd0* first;           // +0x5
-    Pair_00499cd0* last;            // +0x9
+    WeaponDef_DamagePair* first;    // +0x5
+    WeaponDef_DamagePair* last;     // +0x9
 };
 
 // Unused here: real declarations for their symbol ids, which keep the
@@ -635,21 +637,21 @@ short __cdecl FUN_004b715a(int x, int z);
 void __stdcall DamageUnit(Unit* source, Unit* target,
                             int amount, int type, unsigned short extra);
 
-static inline int* Find_00499cd0(Table_00499cd0* table, char* name)
+static inline int* Find_00499cd0(WeaponDef_DamageMap* table, char* name)
 {
     NameLess_00499cd0 less;
-    Pair_00499cd0* first = table->first;
-    Pair_00499cd0* last = table->last;
+    WeaponDef_DamagePair* first = table->first;
+    WeaponDef_DamagePair* last = table->last;
     while (first != last) {
-        Pair_00499cd0* mid = first + (last - first) / 2;
-        if (less(mid->name, name))
+        WeaponDef_DamagePair* mid = first + (last - first) / 2;
+        if (less(mid->unitName, name))
             first = mid + 1;
         else
             last = mid;
     }
-    if (first == table->last || less(name, first->name))
+    if (first == table->last || less(name, first->unitName))
         return 0;
-    return &first->value;
+    return &first->damage;
 }
 
 // Damage a weapon does to a target. The weapon's type holds a base damage
@@ -665,9 +667,9 @@ int __stdcall ApplyWeaponDamage(Projectile* weapon, Unit* target,
 {
     WeaponDef* def = weapon->type;
     int damage = def->damage;
-    Table_00499cd0* table = def->table;
-    if (table) {
-        int* p = Find_00499cd0(table, target->utype->unitname);
+    WeaponDef_DamageMap* map = def->damageOverrides;
+    if (map) {
+        int* p = Find_00499cd0(map, target->utype->unitname);
         if (p)
             damage = *p;
     }

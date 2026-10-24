@@ -7,7 +7,7 @@
 
 #pragma pack(push, 1)
 
-struct Table_00499cd0;
+struct WeaponDef_DamageMap;
 
 // Thaldren's WeaponFlags: one word of weapon flags at +0x111. `b` has a field
 // for every bit, named by the TDF key the loader (0x42e440) sets it from;
@@ -59,7 +59,7 @@ struct WeaponDef {
     char name[0x20];                  // +0x0, the TDF section name
     char description[0x40];           // +0x20
     void* fire;                       // +0x60, the fire routine (WeaponFireFn in weapons.cpp)
-    Table_00499cd0* table;           // +0x64, the name-keyed damage overrides
+    WeaponDef_DamageMap* damageOverrides; // +0x64, the name-keyed damage overrides
     int speed;                        // +0x68, 49b720's maxSpeed
     int startSpeed;                   // +0x6c, the speed of the launch
     int acceleration;                 // +0x70, 49b720's accel

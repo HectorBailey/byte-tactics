@@ -1995,7 +1995,7 @@ struct Table_0041ace0;
 struct Table_004611e0;
 struct Table_0047acd0;
 struct Table_0047ae60;
-struct Table_00499cd0;
+struct WeaponDef_DamageMap;
 struct Table_004aedd0;
 struct Table_004b08c0;
 struct Table_004b3630;
@@ -3154,7 +3154,7 @@ struct UnitMotion {      // 0x115 bytes, 58 views
     unsigned char flag : 1;
     unsigned char rest : 5;
     char unknown_2f[53];
-    Table_00499cd0* table;  // +0x64
+    WeaponDef_DamageMap* table;  // +0x64
     int f_68;  // +0x68
     int f_6c;  // +0x6c
     int f_70;  // +0x70
@@ -14173,7 +14173,7 @@ struct NameLess_00499cd0 {  // 0x1 bytes, 1 view
     unsigned char operator()(char*, char*);
 };
 
-struct Table_00499cd0 {  // 0xd bytes, 1 view
+struct WeaponDef_DamageMap {  // 0xd bytes, 1 view
     char unknown_0[5];
     Pair_00419560* first;  // +0x5
     Pair_00419560* last;  // +0x9
