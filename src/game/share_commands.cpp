@@ -23,11 +23,7 @@ struct Game {
 
 extern Game* g_game;
 
-// Command arguments.
-class CommandArgs {
-public:
-    int GetIntArg(int index, int fallback);
-};
+#include "../util/command_args.h"
 
 void __stdcall AddMessage(char* text, int key, int value, int last);
 void BroadcastPlayerInfo();

@@ -36,7 +36,9 @@
 #pragma pack(push, 1)
 
 // The AI commands' argument list. 0x406c90 reads count and the Get* helpers;
-// 0x409f80 and 0x40a040 call InitArgs through the same object.
+// 0x409f80 and 0x40a040 call InitArgs through the same object. Kept, not
+// util/command_args.h: that header's plain count leaves GetBuildRating
+// (0x40bb00) at 77.5%, and the union's type ids below put it back.
 class CommandArgs {
 public:
     char unknown_0[0xd0];

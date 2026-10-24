@@ -115,31 +115,9 @@ CommandEntry::CommandEntry(const StringRef& h, Pair_004b7620 pp) : handle(h)
     *(Pair_004b7620*)&value1 = pp;
 }
 
-class CommandArgs {
-public:
-    char* args[0x14];                  // +0x00 token pointers
-    char buffer[0x7e];                 // +0x50 the tokens' text
-    char unknown_ce[2];
-    int count;                         // +0xd0 token count
-
-    void Tokenize(char* text, char* end);
-    CommandArgs* InitArgs();
-    int GetArg(int index, int default_val);
-    int GetIntArg(int index, int default_val);
-    float GetFloatArg(int index, float default_val);
-    void ShiftArgs(int n);
-
-    // Inline copy of the range-checked getter at 0x4b73c0; its redundant
-    // range check folds away but the extra use of `other` decides registers.
-    char* GetArgPtr(int index, char* def)
-    {
-        if (index < 0 || index >= count) return def;
-        return args[index];
-    }
-
-    // Replaces each "%N" argument with argument N of another list.
-    void SubstituteArgs(CommandArgs* other);
-};
+// The class is here, after s_commandTable, so that its declarations count
+// after that vector's symbol id (data/symbols.csv's s_commandTable$S4554).
+#include "command_args.h"
 
 // The original calls these out of line from ExecuteCommand (GetArg) and
 // ExecuteCommandText (InitArgs, Tokenize); in this file /Ob2 would inline
