@@ -38,11 +38,10 @@ struct Unit {
     int CanRepair(Unit*);
 };
 #include "order.h"
-// The order object the constructor builds, the class order_targets.cpp defines.
-class PathOrder {
+class Class_0044e2d0 {
 public:
     char unknown_0[0x36];
-    PathOrder(Order* order, const Vec3& pos);
+    Class_0044e2d0(Order* order, const Vec3& pos);
     void SetAltitude(int);
 };
 #pragma pack(pop)
@@ -75,7 +74,7 @@ inline void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags
     unit->SetStateBits(1, 1);
     if ((unit->motion->flags & 3) == 1) {
         unit->motion->SetFlightMode(unit, 2);
-        PathOrder* obj = new PathOrder((Order*)order, unit->pos);
+        Class_0044e2d0* obj = new Class_0044e2d0((Order*)order, unit->pos);
         obj->SetAltitude(unit->def->altitude / 2);
         order->SetAttachedFx((OrderFx*)obj);
         order->flags |= flags | 0xe0;
@@ -132,7 +131,7 @@ int __stdcall VtolRepairPatrolOrder(Unit* unit, Order* order, unsigned int flags
         case 1: {
             if (flags & 0xe0)
                 return 6;
-            PathOrder* obj = new PathOrder(order, order->pos);
+            Class_0044e2d0* obj = new Class_0044e2d0(order, order->pos);
             obj->SetAltitude(unit->def->altitude);
             order->SetAttachedFx((OrderFx*)obj);
             order->SetDeadlineTicks(0x2d);

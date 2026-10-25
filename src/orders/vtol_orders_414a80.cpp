@@ -66,12 +66,10 @@ struct Order {
     Vec3* Position();
 };
 
-// The order object the vtol orders build: PathOrder, the class order_targets.cpp
-// defines.
-class PathOrder {
+class Class_0044e2d0 {
 public:
     char unknown_0[0x36];
-    PathOrder(Order* order, const Vec3& pos);
+    Class_0044e2d0(Order* order, const Vec3& pos);
     void SetAltitude(int);
 };
 #pragma pack(pop)
@@ -101,7 +99,7 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
     unit->SetStateBits(1, 1);
     if ((unit->motion->flags & 3) == 1) {
         unit->motion->SetFlightMode(unit, 2);
-        PathOrder* obj = new PathOrder(order, unit->pos);
+        Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);
         obj->SetAltitude(unit->def->altitude / 2);
         order->SetAttachedFx((int)obj);
         order->flags |= flags | 0xe0;
@@ -141,7 +139,7 @@ int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
         Point origin = unit->footprint;
         Point cell = WorldToCell(order->pos, origin);
         CellToWorldPos(cell, &order->pos, origin);
-        PathOrder* obj = new PathOrder(order, order->target.Get()->pos);
+        Class_0044e2d0* obj = new Class_0044e2d0(order, order->target.Get()->pos);
         order->SetAttachedFx((int)obj);
         order->flags |= 0x100e8;
         QueueUnitSpeech(unit, 11, 0);

@@ -78,12 +78,10 @@ struct Game {
     char pad0[0x1422b]; int width; int height;
     char pad14233[0x142b7 - 0x14233]; int overflowBucket;
 };
-// The order object the vtol orders build: PathOrder, the class order_targets.cpp
-// defines.
-class PathOrder {
+class Class_0044e2d0 {
 public:
     char unknown_0[0x36];
-    PathOrder(Order* order, const Vec3& pos);
+    Class_0044e2d0(Order* order, const Vec3& pos);
     void SetAltitude(int);
     void SetApproachRadius(short);
 };
@@ -141,7 +139,7 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
     unit->SetStateBits(1, 1);
     if ((unit->motion->flags & 3) == 1) {
         unit->motion->SetFlightMode(unit, 2);
-        PathOrder* obj = new PathOrder(order, unit->pos);
+        Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);
         obj->SetAltitude(unit->def->altitude / 2);
         order->SetAttachedFx((int)obj);
         order->flags |= flags | 0xe0;
@@ -178,7 +176,7 @@ int __stdcall AirToAirOrder(Unit* unit, Order* order, int flags)
         centre.z = g_game->height / 2 << 16;
         short angle = GetHeadingBetween(&unit->pos, &centre);
         Vec3 dest = AddVec3(unit->pos, Offset(angle, 0x3200000));
-        PathOrder* obj = new PathOrder(order, dest);
+        Class_0044e2d0* obj = new Class_0044e2d0(order, dest);
         obj->SetApproachRadius(0x80);
         order->flags |= 0xe0;
         order->SetAttachedFx((int)obj);

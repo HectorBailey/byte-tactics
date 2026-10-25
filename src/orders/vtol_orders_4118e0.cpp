@@ -85,17 +85,15 @@ struct Order {
 };
 // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int __stdcall DirectionFromStep(int, int);
-// The order object the vtol orders build: PathOrder, the class order_targets.cpp
-// defines.
-class PathOrder {
+class Class_0044e2d0 {
 public:
     char unknown_0[0x36];
-    PathOrder(Order* order, const Vec3& pos);
+    Class_0044e2d0(Order* order, const Vec3& pos);
     void SetAltitude(int);
     void SetApproachRadius(short);
 };
 // The base is the explicit-position view above, so the inherited setters need no cast.
-class Class_0044e250 : public PathOrder {
+class Class_0044e250 : public Class_0044e2d0 {
 public:
     // The pad index parameters are int, not char: the original loads a full dword.
     Class_0044e250(Order* order, Unit* unit, int value);
@@ -137,7 +135,7 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
     unit->SetStateBits(1, 1);
     if ((unit->motion->flags & 3) == 1) {
         unit->motion->SetFlightMode(unit, 2);
-        PathOrder* obj = new PathOrder(order, unit->pos);
+        Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);
         obj->SetAltitude(unit->def->altitude / 2);
         order->SetAttachedFx((int)obj);
         order->flags |= flags | 0xe0;
@@ -192,7 +190,7 @@ int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
         }
         Vec3 dest = Add(order->target.owner->pos, Offset(order->angle, radius << 16));
         order->angle += 0x4000;
-        PathOrder* obj = new PathOrder(order, dest);
+        Class_0044e2d0* obj = new Class_0044e2d0(order, dest);
         obj->SetApproachRadius(0x80);
         order->SetAttachedFx((int)obj);
         order->flags = 0xe8;
