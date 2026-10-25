@@ -34,12 +34,14 @@ extern int __stdcall RemoveTimer(int handle);
 extern int __stdcall AddTimer(int delay, int id, void (__stdcall* callback)(void*));
 extern void __stdcall OnCdFadeTimer(void* unused);
 
-struct App_004b6220 {
+// The display context GetDisplay returns, the type graphics/display.cpp and
+// util/hpi.cpp name DisplayContext: the window handle at +0x40.
+struct DisplayContext {
     char unknown_0[0x40];
     HWND hwnd;                         // +0x40
 };
 
-extern App_004b6220* GetDisplay();
+extern DisplayContext* GetDisplay();
 
 struct FileHandle;
 
@@ -51,6 +53,9 @@ extern int g_playBufferLooping;
 
 extern const GUID IID_IDirectSound3DBuffer;
 
+// Stays a view of its own, not util/vec3.h's Vec3: the Sound methods take it,
+// and renaming it in sound.h moves six functions in the files that include
+// that header (docs/c2-regalloc.md).
 struct Pos_004cf570 {
     int x, y, z;
 };
@@ -153,20 +158,20 @@ extern Sound* g_cdPlayer;
 extern HANDLE g_squashThreadLockEvent;
 extern int g_squashThreadLockTicket;
 
+// The LZSS tree node, the layout sqsh.cpp's SquashNode has: parent, smaller
+// child, larger child.
 struct SquashNode {
-    short a;                 // +0x0
-    short b;                 // +0x2
-    short c;                 // +0x4
+    unsigned short parent;           // +0x0
+    unsigned short smaller;          // +0x2
+    unsigned short larger;           // +0x4
 };
 
-struct Struct_00526ff0 {
-    SquashNode entries[0x1000];
-    short field_6000;        // +0x6000
-    short field_6002;        // +0x6002
-    short field_6004;        // +0x6004
+// The tree: 0x1000 nodes and, after them, the root at index 0x1000.
+struct SquashTree {
+    SquashNode nodes[0x1001];
 };
 
-extern Struct_00526ff0* g_squashDictTree;
+extern SquashTree* g_squashDictTree;
 
 extern void* g_squashWindow;
 
@@ -1306,12 +1311,12 @@ void InitLzssLock()
 // FUNCTION: 0x4d0a10
 void __stdcall LzssInitTree(int index)
 {
-    g_squashDictTree->field_6000 = 0;
-    g_squashDictTree->field_6004 = (short)index;
-    g_squashDictTree->field_6002 = 0;
-    g_squashDictTree->entries[index].a = 0x1000;
-    g_squashDictTree->entries[index].c = 0;
-    g_squashDictTree->entries[index].b = 0;
+    g_squashDictTree->nodes[0x1000].parent = 0;
+    g_squashDictTree->nodes[0x1000].larger = (short)index;
+    g_squashDictTree->nodes[0x1000].smaller = 0;
+    g_squashDictTree->nodes[index].parent = 0x1000;
+    g_squashDictTree->nodes[index].larger = 0;
+    g_squashDictTree->nodes[index].smaller = 0;
 }
 
 // FUNCTION: 0x4d0a70
@@ -1327,6 +1332,6 @@ int __cdecl LzssAllocWindow(void)
 int LzssAllocTree()
 {
     void* p = calloc(0x1001, 6);
-    g_squashDictTree = (Struct_00526ff0*)p;
+    g_squashDictTree = (SquashTree*)p;
     return p ? 0 : -1;
 }

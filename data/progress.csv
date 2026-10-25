@@ -3006,7 +3006,7 @@ address,size,file,symbol,status,similarity
 0x4d1670,385,src/util/sqsh.cpp,?LzssSetPreset@@YGHPAEH@Z,matched,100.0
 0x4d1800,13,src/util/sqsh.cpp,?LzssDisablePreset@@YGHXZ,matched,100.0
 0x4d1810,13,src/util/sqsh.cpp,?LzssEnablePreset@@YGHXZ,matched,100.0
-0x4d1820,333,src/util/sqsh.cpp,?SquashPack@@YGHPAUChunk_4d1820@@PAHPADHHH@Z,matched,100.0
+0x4d1820,333,src/util/sqsh.cpp,?SquashPack@@YGHPAUSquashContainerHeader@@PAHPADHHH@Z,matched,100.0
 0x4d1970,296,src/util/sqsh.cpp,?SquashUnpack@@YGHPAD0@Z,matched,100.0
 0x4d1aa0,81,src/util/sqsh.cpp,?SquashMaxPackedSize@@YGIIH@Z,matched,100.0
 0x4d1b00,61,src/util/sqsh.cpp,?SquashGetPackType@@YGHPAE@Z,matched,100.0
@@ -3014,7 +3014,7 @@ address,size,file,symbol,status,similarity
 0x4d1b70,35,src/util/sqsh.cpp,?SquashEncrypt@@YGHPADI@Z,matched,100.0
 0x4d1ba0,35,src/util/sqsh.cpp,?SquashDecrypt@@YGHPAEI@Z,matched,100.0
 0x4d1bd0,35,src/util/sqsh.cpp,?SquashChecksum@@YGHPAEH@Z,matched,100.0
-0x4d1c00,81,src/util/sqsh.cpp,?SquashDumpHeader@@YGXPAUChunk_4d1820@@@Z,matched,100.0
+0x4d1c00,81,src/util/sqsh.cpp,?SquashDumpHeader@@YGXPAUSquashContainerHeader@@@Z,matched,100.0
 0x4d1c60,24,src/util/sqsh.cpp,?SquashErrorString@@YGPAXH@Z,matched,100.0
 0x4d80b0,17,src/debug/debug_lib.cpp,?SetMemFussyDefault@@YGXXZ,matched,100.0
 0x4d80d0,87,src/debug/debug_lib.cpp,?IsMemFussy@@YGDXZ,matched,100.0
