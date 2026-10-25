@@ -8,10 +8,7 @@
 #include <windows.h>
 #include <vector>
 
-// Kept local, not util/vec3.h: the header's symbol ids change this function's registers.
-struct Vec3 {
-    int x, y, z;
-};
+#include "../util/vec3.h"
 
 #include "mission_type.h"
 
@@ -25,13 +22,8 @@ public:
 
 // Unused here: real declarations that keep the symbol ids the separate setter
 // views took, after their methods moved to Class_0044e2d0 (docs/c2-regalloc.md).
-struct Amount;
-struct Blk;
-struct Packet;
-class LosLine;
-class MapCache;
-class MeteorParams;
-class OrderBase;
+// Seven that stood here went when util/vec3.h took their place: the header
+// declares Point16 beside Vec3, seven ids more than the local Vec3 cost.
 class MissionOrderTable;
 struct MovementClassTable;
 class OpenHeap;
