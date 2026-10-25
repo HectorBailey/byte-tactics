@@ -40,10 +40,12 @@ struct Order { char pad0[4]; MissionType kind; unsigned char state; unsigned int
     int Advance(int distance);
 };
 
-class Class_0044e2d0 {
+// The order object the vtol orders build: PathOrder, the class order_targets.cpp
+// defines.
+class PathOrder {
 public:
     char data[0x36];
-    Class_0044e2d0(Order*, const Vec3&);
+    PathOrder(Order*, const Vec3&);
     void SetAltitude(int);
     void SetApproachRadius(int);
 };
@@ -84,7 +86,7 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
             center.z=(g_game->height/2)<<16;
             short angle=GetHeadingBetween(&unit->pos,&center);
             Vec3 pos=AddVec3(unit->pos,Direction(angle,0x3200000));
-            Class_0044e2d0* move=new Class_0044e2d0(order,pos);
+            PathOrder* move=new PathOrder(order,pos);
             move->SetApproachRadius(128);
             order->flags|=0xe0;
             order->SetAttachedFx((int)move);
@@ -102,7 +104,7 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
                 unit->SetStateBits(1,1);
                 if ((unit->motion->flags&3)==1) {
                     unit->motion->SetFlightMode(unit,2);
-                    Class_0044e2d0* move=new Class_0044e2d0(order,unit->pos);
+                    PathOrder* move=new PathOrder(order,unit->pos);
                     move->SetAltitude(unit->def->altitude/2);
                     order->SetAttachedFx((int)move);
                     order->flags|=0xe0;
@@ -183,7 +185,7 @@ int __stdcall VtolFollowOrder(Unit* unit, Order* order, int flags)
             if ((unsigned char)(unit->flags>>31)&1)
                 pos=order->target->pos+Offset(angle,(unit->weapons[0].def->range+160)<<16);
             else pos=order->target->pos+Offset(angle,0x1400000);
-            Class_0044e2d0* move=new Class_0044e2d0(order,pos);
+            PathOrder* move=new PathOrder(order,pos);
             move->SetApproachRadius(128);
             order->SetAttachedFx((int)move);
             order->SetDeadlineTicks(30);
