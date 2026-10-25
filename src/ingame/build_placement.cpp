@@ -117,7 +117,7 @@ int BroadcastPendingViewState();
 void ResetChatHudIndices();
 void ApplySlotsToGamePlayers();
 void ClearSelection();
-int __stdcall SelectUnitsInBox(void* p);
+int __stdcall SelectUnitsInBox(MouseEvent* p);
 unsigned short __stdcall PickUnitUnderCursor();
 int __stdcall ResolveCursorModeForSelection(char mode);
 void ShutdownIngameSystems();

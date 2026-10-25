@@ -97,16 +97,14 @@ void WalkFrameChain(int*, int*, int, int, int*, int, int*, int*, int, int*);
 
 #include "../graphics/gaf_frame.h"
 
-struct Src_004b8ae0 {
-    char unknown_0[0xbc];
-};
-
-struct SrcHolder_00495a30 {
-    char unknown_0[0xbc];
-    Src_004b8ae0* frame;                    // +0xbc
-};
-
 #include "../graphics/surface.h"
+
+// The display context at g_display, whose only member read here is the
+// override surface at +0xbc (Thaldren's DisplayContext.pOverrideSurface).
+struct DisplayContext {
+    char unknown_0[0xbc];
+    Surface* overrideSurface;               // +0xbc
+};
 
 struct Game {
     char unknown_0[0x519];
@@ -194,7 +192,7 @@ void __cdecl SetOutOfMemoryHandler(int param);
 void __stdcall InstallOutOfMemoryHandler();
 void __stdcall SurfaceFromFrame(Surface* dst, void* src);
 void* __stdcall GetDisplay();
-void __stdcall FrameFromSurface(GafFrame* dst, Src_004b8ae0* src);
+void __stdcall FrameFromSurface(GafFrame* dst, Surface* src);
 void __stdcall SetCameraPosition(int x, int y, int z);
 void __stdcall CollectVisibleUnitIds();
 void __stdcall DrawBattleFrame(int param_1, int param_2);
@@ -317,6 +315,7 @@ void ClampCameraTarget(void);
 void UpdateScreenShake(void);
 void UpdateCameraFollow(void);
 void BeginMouseScroll(void);
+void RegisterUnitOrders(void);
 // FUNCTION: 0x495a30
 void __stdcall WriteScreenshot(char* dir, char* name, int x, int y, int w, int h)
 {
@@ -369,7 +368,7 @@ void __stdcall WriteScreenshot(char* dir, char* name, int x, int y, int w, int h
 
             g_game->textLines = 0;
             SurfaceFromFrame(&surf, bm);
-            FrameFromSurface(&pal, ((SrcHolder_00495a30*)GetDisplay())->frame);
+            FrameFromSurface(&pal, ((DisplayContext*)GetDisplay())->overrideSurface);
 
             pal.transparency = 0;
             int row = 0;

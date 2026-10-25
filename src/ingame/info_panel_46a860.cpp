@@ -30,15 +30,17 @@ int __stdcall FillRectangle(void* surface, void* rect, int color);
 #include "../map/mission.h"
 
 #pragma pack(push, 1)
-struct Snapshot_0046a860 {
+// The selection info cache at g_game+0x37e60 (Thaldren's SelectionInfoCache,
+// 0x3c bytes): the copy of the hovered entry the panel is drawn from.
+struct SelectionInfoCache {
     int orderName;
     unsigned short selected, health, build;
     int weapons[3];
     float values[4];
     unsigned short targetType, targetHealth, feature;
     int button;
-    int nTotalUnitsPanelSlide;        // +0x30
-    unsigned short* pLightbarFrame;   // +0x34, cached lightbar frame
+    int totalUnitsPanelSlide;         // +0x30
+    unsigned short* lightbarFrame;    // +0x34, cached lightbar frame
     int optionsLightbarDirty;         // +0x38
 };
 #pragma pack(pop)
@@ -101,6 +103,8 @@ struct Feature_0046a860 {
 
 #include "../graphics/gaf_frame.h"
 
+#include "../gui/layer.h"
+
 // The display context at g_game+0xc; only two fields are read here.
 struct Display_0046a860 {
     char unknown_0[0x9c];
@@ -109,11 +113,6 @@ struct Display_0046a860 {
     unsigned char flags;              // +0x0f0, low byte of the state flags word
 };
 
-// The object g_game+0x531 points at (0x495860's shape).
-struct Struct_0046a860 {
-    int unknown_0;
-    int value;                        // +0x4
-};
 #pragma pack(pop)
 
 static void DrawBar_0046a860(void* surface, Rect* bounds, int value, int maximum, int dy,
@@ -187,7 +186,7 @@ struct Game {
     char unknown_0[0xc];
     Display_0046a860* displayContext;    // +0xc
     char unknown_10[0x531 - 0x10];
-    Struct_0046a860* layer;               // +0x531
+    Layer* layer;                         // +0x531
     char unknown_535[0x581 - 0x535];
     int selected;                         // +0x581
     char unknown_585[0xdcb - 0x585];
@@ -226,7 +225,7 @@ struct Game {
     int screenWidth;                      // +0x37e1f
     int screenHeight;                     // +0x37e23
     char unknown_37e27[0x37e60 - 0x37e27];
-    Snapshot_0046a860 selectionInfoCache; // +0x37e60
+    SelectionInfoCache selectionInfoCache;  // +0x37e60
     char unknown_37e9c[0x37f3d - 0x37e9c];
     SideDef sideDefs[5];                  // +0x37f3d, stride 0x232
     char unknown_38a37[0x38a3b - 0x38a37];
@@ -249,7 +248,7 @@ struct Game {
 // FUNCTION: 0x46a860
 void __stdcall DrawUnitInfoPanel(void* surface) {
     int yOffset = g_game->screenHeight - g_game->baseHeight;
-    Snapshot_0046a860 snapshot;
+    SelectionInfoCache snapshot;
     memset(&snapshot, 0, sizeof(snapshot));
     char text[256];
 
@@ -314,8 +313,8 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
     snapshot.button = g_game->selected;
     snapshot.selected = g_game->hoverUnitId;
     snapshot.feature = g_game->cellFeature;
-    snapshot.pLightbarFrame = g_game->selectionInfoCache.pLightbarFrame;
-    snapshot.nTotalUnitsPanelSlide = g_game->selectionInfoCache.nTotalUnitsPanelSlide;
+    snapshot.lightbarFrame = g_game->selectionInfoCache.lightbarFrame;
+    snapshot.totalUnitsPanelSlide = g_game->selectionInfoCache.totalUnitsPanelSlide;
 
     if (snapshot.selected != 0) {
         Unit_0046a860* unit = g_game->units + snapshot.selected;
@@ -382,7 +381,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
     } while (y < g_game->screenWidth);
 
     if (snapshot.button != -1) {
-        strncpy(text, (char*)(snapshot.button * 0x15b + g_game->layer->value + 2), 0x10);
+        strncpy(text, (char*)g_game->layer->entries + snapshot.button * 0x15b + 2, 0x10);
         text[0x10] = 0;
         unsigned short type = FindUnitTypeId(text);
         if (type != 0) {

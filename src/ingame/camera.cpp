@@ -2,20 +2,17 @@
 
 #include "../gui/mouse_event.h"
 
+#include "../map/mission.h"
+
 #pragma pack(push, 1)
 
-struct Entry_0041d1f0 {
+// One entry of the map's rule list (Thaldren's MissionRule, 0xc bytes): type 1
+// is a StartPos, and its coordinates are where the camera starts.
+struct MissionRule {
     int type;                          // +0x0
     int id;                            // +0x4
     short x;                           // +0x8
     short z;                           // +0xa
-};
-
-class Class_0041d1f0_net {
-public:
-    char unknown_0[0xdb4];
-    Entry_0041d1f0* entries;           // +0xdb4
-    int entry_count;                   // +0xdb8
 };
 
 struct Game {
@@ -49,7 +46,7 @@ struct Game {
     int viewPixelWidth;                // +0x37e37
     int viewPixelHeight;               // +0x37e3b
     char unknown_37e3f[0x391e9 - 0x37e3f];
-    Class_0041d1f0_net* mapInfo;       // +0x391e9
+    Mission* mapInfo;                  // +0x391e9
 };
 #pragma pack(pop)
 
@@ -96,8 +93,8 @@ void CenterCameraOnRadarClick()
 void CenterCameraOnStartPosition()
 {
     int i = 0;
-    Entry_0041d1f0* e = g_game->mapInfo->entries;
-    int count = g_game->mapInfo->entry_count;
+    MissionRule* e = g_game->mapInfo->rules;
+    int count = g_game->mapInfo->ruleCount;
     for (; i < count; i++, e++) {
         if (e->type == 1 && e->id == 0) {
             SetPos(e->x - g_game->viewPixelWidth / 2, e->z - g_game->viewPixelHeight / 2);
