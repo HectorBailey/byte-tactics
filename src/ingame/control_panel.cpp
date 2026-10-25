@@ -30,6 +30,9 @@ public:
 
 struct Option_00419560;
 
+// One row of g_messageBytesByType (an int[2] per message type) with names
+// instead of subscripts: 0x419560 clears the second word of each row through a
+// walking pointer of this type.
 struct Pair_00419560 {
     int a;
     int b;
@@ -47,7 +50,7 @@ struct Nano_0041b8d0;
 struct Gadget;
 struct Layer;
 struct Gui;
-struct BuildList_0041ace0;
+struct DownloadMenuFile;
 
 #include "../game/unit_resources.h"
 
@@ -111,7 +114,7 @@ struct UnitType {
     char unknown_1ee[0x1fa - 0x1ee];
     unsigned int maxHealth;            // +0x1fa
     char unknown_1fe[0x21e - 0x1fe];
-    short id;                          // +0x21e
+    unsigned short id;                 // +0x21e
     char unknown_220[0x22e - 0x220];
     unsigned char buildMenuPageCount;  // +0x22e
     unsigned char mobile;              // +0x22f
@@ -234,7 +237,9 @@ union Orders {
     OrdersBits bits;
 };
 
-struct BitFlags_004197d0 {
+// The battle input flags at +0x2cc6 (Thaldren's bBattleInputFlags): a byte
+// whose bit 6 is the build placement result.
+struct InputFlagBits {
     unsigned char b0:1;
     unsigned char b1:1;
     unsigned char b2:1;
@@ -245,22 +250,25 @@ struct BitFlags_004197d0 {
     unsigned char b7:1;
 };
 
-union Flags_004197d0 {
+union InputFlags {
     unsigned char value;
-    BitFlags_004197d0 bits;
+    InputFlagBits bits;
 };
 
-// A unit type's extra build menu entry (0x25 bytes).
-struct BuildEntry_0041ace0 {
-    short typeId;                      // +0x00
-    unsigned char page;                // +0x02
-    unsigned char slot;                // +0x03
-    char name[0x21];                   // +0x04
+// One slot of a unit type's extra build menu, 0x25 bytes (Thaldren's
+// DownloadMenuSlot): the type it builds, the page and gadget button it goes to
+// and the unit name to show.
+struct DownloadMenuSlot {
+    unsigned short unitDefIndex;       // +0x00
+    unsigned char menuPage;            // +0x02, counted from 1
+    unsigned char button;              // +0x03, the gadget, four on from the first
+    char unitName[0x20];               // +0x04
+    char unknown_24;
 };
 
-struct BuildList_0041ace0 {            // 0xbd bytes
-    int count;                         // +0x00
-    BuildEntry_0041ace0 entries[5];    // +0x04
+struct DownloadMenuFile {              // 0xbd bytes, Thaldren's DownloadMenuFile
+    int slotCount;                     // +0x00
+    DownloadMenuSlot slots[5];         // +0x04
 };
 
 // One player's side name (0x232 bytes); 0x419560 reads the dword at +0x224.
@@ -287,7 +295,9 @@ union CameraFlags {
     unsigned char lo;
 };
 
-struct Follow_0041ca10 {
+// The projectile the camera follows (Thaldren's
+// GameState.pCameraFollowTrackObj).
+struct Projectile {
     int unknown_0;                     // +0x0
     Vec3 pos;                          // +0x4
 };
@@ -315,7 +325,7 @@ struct Game {
     char unknown_2cb6[0x2cc3 - 0x2cb6];
     unsigned char orderMode;           // +0x2cc3
     unsigned short buildTypeIndex;     // +0x2cc4
-    Flags_004197d0 inputFlags;         // +0x2cc6
+    InputFlags inputFlags;             // +0x2cc6
     CursorState cursor;                // +0x2cc7
     char unknown_2cf3[0x1422b - 0x2cf3];
     int mapPixelWidth;                 // +0x1422b
@@ -327,7 +337,7 @@ struct Game {
     char unknown_142db[0x142f1 - 0x142db];
     CameraFlags viewDirtyFlags;        // +0x142f1
     Unit* cameraFollowUnit;            // +0x142f3
-    Follow_0041ca10* cameraFollowTrackObj;  // +0x142f7
+    Projectile* cameraFollowTrackObj;  // +0x142f7
     char unknown_142fb[0x1431f - 0x142fb];
     int scrollX;                       // +0x1431f
     int scrollY;                       // +0x14323
@@ -372,7 +382,7 @@ struct Game {
     };
     char unknown_390eb[0x391c7 - 0x390eb];
     int buildListCount;                // +0x391c7
-    BuildList_0041ace0* buildLists;    // +0x391cb
+    DownloadMenuFile* buildLists;      // +0x391cb
 };
 
 #pragma pack(pop)
@@ -1156,14 +1166,14 @@ void __stdcall OpenBuildMenuGui(Unit* unit, char* guiName, int page)
             layer->handler = (void (__stdcall*)(void*))HandleBuildPanelClick;
             layer->data = 0;
             for (int i = 0; i < g_game->buildListCount; i++) {
-                for (int j = 0; j < g_game->buildLists[i].count; j++) {
-                    BuildList_0041ace0* lists = g_game->buildLists;
+                for (int j = 0; j < g_game->buildLists[i].slotCount; j++) {
+                    DownloadMenuFile* lists = g_game->buildLists;
                     // The entry in a local: the address lea's base and index order follows it.
-                    BuildEntry_0041ace0* entry = &lists[i].entries[j];
-                    if (unit->def->id == entry->typeId
-                        && entry->page - 1 == page) {
-                        char* src = entry->name;
-                        Gadget* e = &layer->entries[entry->slot + 4];
+                    DownloadMenuSlot* entry = &lists[i].slots[j];
+                    if (unit->def->id == entry->unitDefIndex
+                        && entry->menuPage - 1 == page) {
+                        char* src = entry->unitName;
+                        Gadget* e = &layer->entries[entry->button + 4];
                         e->flag_bit = 0;
                         e->commonAttribs = 4;
                         strcpy(e->name, src);
