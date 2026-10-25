@@ -2,18 +2,19 @@
 // Sums the player's signed byte table (at +0x91) over the units within
 // `range` of `pos`; the distance is the 64-bit high product (>> 32).
 
+// Unused: <math.h>'s declarations keep the index and the table base in the
+// registers the original lookup uses (docs/c2-regalloc.md).
+#include <math.h>
 #include <vector>
-#include "../util/vec3.h"
-#pragma pack(push, 1)
-struct Unit {
-    char unknown_0[0x6a];
-    Vec3 pos;                          // +0x6a
-    char unknown_76[0xa6 - 0x76];
-    unsigned short unitDefIndex;       // +0xa6
-};
 
+#include "../util/vec3.h"
+
+// PlayerAI's members are laid out packed, so it stays inside the pragma.
+#pragma pack(push, 1)
 #include "player_ai.h"
 #pragma pack(pop)
+
+#include "../units/unit.h"
 
 extern PlayerAI* g_playerAI[];
 
