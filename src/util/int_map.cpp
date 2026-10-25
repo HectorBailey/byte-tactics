@@ -13,26 +13,32 @@
 // definition of s_cobScriptCache.
 #include <map>
 
-struct Data_004b2450 {
-    int unknown_0;    // +0x00
-    int count_1;      // +0x04
-    int count_2;      // +0x08
-    int unknown_c;    // +0x0c
-    int checksum;     // +0x10
-    int count_3;      // +0x14
-    int offset_18;    // +0x18
-    int offset_1c;    // +0x1c
-    int offset_20;    // +0x20
-    int offset_24;    // +0x24
-    int offset_28;    // +0x28
+// The loaded COB script data: the header the file starts with and the tables
+// that follow it in the same buffer. The type the other views of it (cob.cpp's
+// ScriptTable, units_485010.cpp's) share a name with; its pointers are held as
+// ints because Relocate adds the buffer's address to them as integers.
+struct ScriptTable {
+    int unknown_0;                   // +0x00
+    int count;                       // +0x04, of the scripts
+    int pieceCount;                  // +0x08
+    int unknown_c;                   // +0x0c
+    int staticCount;                 // +0x10
+    int namedLocalCount;             // +0x14
+    int entries;                     // +0x18, each script's code offset
+    int names;                       // +0x1c
+    int pieceNames;                  // +0x20
+    int code;                        // +0x24
+    int namedLocals;                 // +0x28
 };
 
-struct CobScriptReloc {
-    int unknown_0;    // +0x00
-    int offset;       // +0x04
+// One named local of the script: its index and the name's address in the
+// buffer, held as an int because Relocate adds to it as an integer.
+struct CobNamedLocalEntry {
+    int index;        // +0x00
+    int name;         // +0x04
 };
 
-extern Data_004b2450* __stdcall HAPI_LoadFile(char* name, int reserved);
+extern ScriptTable* __stdcall HAPI_LoadFile(char* name, int reserved);
 extern int __stdcall HAPI_FileLengthByName(char* name);
 extern int __stdcall ComputeChecksum(unsigned char* data, int len);
 extern void __cdecl GameFreeThunk(void* x);
@@ -43,25 +49,25 @@ static std::map<int, int> s_cobScriptCache;
 
 // The size of this helper decides whether the compiler expands map::insert
 // into LoadCobScript; the original left that call out of line.
-static void Relocate(Data_004b2450* data)
+static void Relocate(ScriptTable* data)
 {
-    data->offset_18 += (int)data;
-    data->offset_1c += (int)data;
-    for (int i = 0; i < data->count_1; i++)
-        ((int*)data->offset_1c)[i] += (int)data;
-    data->offset_20 += (int)data;
-    for (int j = 0; j < data->count_2; j++)
-        ((int*)data->offset_20)[j] += (int)data;
-    data->offset_24 += (int)data;
-    data->offset_28 += (int)data;
-    for (int k = 0; k < data->count_3; k++)
-        ((CobScriptReloc*)data->offset_28)[k].offset += (int)data;
+    data->entries += (int)data;
+    data->names += (int)data;
+    for (int i = 0; i < data->count; i++)
+        ((int*)data->names)[i] += (int)data;
+    data->pieceNames += (int)data;
+    for (int j = 0; j < data->pieceCount; j++)
+        ((int*)data->pieceNames)[j] += (int)data;
+    data->code += (int)data;
+    data->namedLocals += (int)data;
+    for (int k = 0; k < data->namedLocalCount; k++)
+        ((CobNamedLocalEntry*)data->namedLocals)[k].name += (int)data;
 }
 
 // FUNCTION: 0x4b2450
-Data_004b2450* __stdcall LoadCobScript(char* name)
+ScriptTable* __stdcall LoadCobScript(char* name)
 {
-    Data_004b2450* data = HAPI_LoadFile(name, 0);
+    ScriptTable* data = HAPI_LoadFile(name, 0);
     if (data == 0)
         return 0;
     int sum = ComputeChecksum((unsigned char*)data, HAPI_FileLengthByName(name));
