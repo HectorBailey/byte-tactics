@@ -302,12 +302,9 @@ void __stdcall SetDefaultCommandHandler(int callback, int mask)
     g_defaultCommandMask = mask;
 }
 
-struct HandlerSlot_004b7900 {
-    Handler_004b7620 fn;               // +0x4
-    int mask;                          // +0x8
-};
-
-static inline HandlerSlot_004b7900* Find_004b7900(const char* key)
+// The table element's two ints at +4/+8, the handler and its mask, the same
+// pair Pair_004b7620 describes.
+static inline Pair_004b7620* Find_004b7900(const char* key)
 {
     CommandNameLess less;
     CommandEntry* first = s_commandTable.begin();
@@ -321,7 +318,7 @@ static inline HandlerSlot_004b7900* Find_004b7900(const char* key)
     }
     if (first == s_commandTable.end() || less(key, first->handle.ptr))
         return 0;
-    return (HandlerSlot_004b7900*)&first->value1;
+    return (Pair_004b7620*)&first->value1;
 }
 
 // Runs the command in obj: takes its first argument, lowercases it, looks the
@@ -329,7 +326,7 @@ static inline HandlerSlot_004b7900* Find_004b7900(const char* key)
 // mask matches the given mask, or else the global default handler registered by
 // 0x4b78e0. Returns the mask of the handler that ran, or 0.
 //
-// The handler is called through a reinterpreted HandlerSlot view of the two
+// The handler is called through a reinterpreted Pair_004b7620 view of the two
 // ints at +4/+8 of the element.
 // The original calls this out of line from ExecuteCommandText.
 #pragma auto_inline(off)
@@ -340,10 +337,10 @@ int __stdcall ExecuteCommand(CommandArgs* obj, int mask)
     if (obj->count >= 1) {
         StringRef key((char*)obj->GetArg(0, (int)g_emptyStringLiteral));
         key.MakeLower();
-        HandlerSlot_004b7900* h = Find_004b7900(key.ptr);
+        Pair_004b7620* h = Find_004b7900(key.ptr);
         if (h != 0 && (h->mask & mask)) {
             result = h->mask;
-            h->fn(obj);
+            ((void (__stdcall*)(void*))h->fn)(obj);
         } else if (g_defaultCommandHandler != 0 && (g_defaultCommandMask & mask)) {
             result = g_defaultCommandMask;
             ((void (__stdcall *)(void*))g_defaultCommandHandler)(obj);

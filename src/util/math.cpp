@@ -125,7 +125,9 @@ double __stdcall DotProduct(float ax, float ay, float az,
     return result;
 }
 
-struct Vec3f_004b6eb0 {
+// A vector of three floats, the type explosions.cpp and the two model_render
+// files already name Vec3f.
+struct Vec3f {
     float x;
     float y;
     float z;
@@ -133,9 +135,9 @@ struct Vec3f_004b6eb0 {
 
 // Difference to - from, passed and returned by value.
 // FUNCTION: 0x4b6eb0
-Vec3f_004b6eb0 __stdcall VectorFromTo(Vec3f_004b6eb0 from, Vec3f_004b6eb0 to)
+Vec3f __stdcall VectorFromTo(Vec3f from, Vec3f to)
 {
-    Vec3f_004b6eb0 r;
+    Vec3f r;
     r.x = to.x - from.x;
     r.y = to.y - from.y;
     r.z = to.z - from.z;
@@ -143,9 +145,9 @@ Vec3f_004b6eb0 __stdcall VectorFromTo(Vec3f_004b6eb0 from, Vec3f_004b6eb0 to)
 }
 
 // FUNCTION: 0x4b6f00
-Vec3f_004b6eb0 __stdcall VectorFromToInt(Vec3 from, Vec3 to)
+Vec3f __stdcall VectorFromToInt(Vec3 from, Vec3 to)
 {
-    Vec3f_004b6eb0 r;
+    Vec3f r;
     r.x = (float)(to.x - from.x);
     r.y = (float)(to.y - from.y);
     r.z = (float)(to.z - from.z);
@@ -156,7 +158,7 @@ Vec3f_004b6eb0 __stdcall VectorFromToInt(Vec3 from, Vec3 to)
 // differences emit nothing, but without them MSVC copies r to the return
 // buffer with the stores interleaved (three registers instead of four).
 // FUNCTION: 0x4b6f70
-Vec3f_004b6eb0 __stdcall CrossProduct(Vec3f_004b6eb0 a, Vec3f_004b6eb0 b)
+Vec3f __stdcall CrossProduct(Vec3f a, Vec3f b)
 {
     float yz = a.y * b.z;
     float zy = a.z * b.y;
@@ -164,7 +166,7 @@ Vec3f_004b6eb0 __stdcall CrossProduct(Vec3f_004b6eb0 a, Vec3f_004b6eb0 b)
     float xz = a.x * b.z;
     float xy = a.x * b.y;
     float yx = a.y * b.x;
-    Vec3f_004b6eb0 r;
+    Vec3f r;
     r.z = (float)(xy - yx);
     r.x = (float)(yz - zy);
     r.y = (float)(zx - xz);
@@ -174,10 +176,10 @@ Vec3f_004b6eb0 __stdcall CrossProduct(Vec3f_004b6eb0 a, Vec3f_004b6eb0 b)
 // Returns v scaled to unit length. The vector is passed and returned by value
 // (the results are spilled into v's own stack slots before being copied out).
 // FUNCTION: 0x4b6ff0
-Vec3f_004b6eb0 __stdcall NormalizeVector(Vec3f_004b6eb0 v)
+Vec3f __stdcall NormalizeVector(Vec3f v)
 {
     // Squares stay in their own locals: an inline sum hoists the x87 loads.
-    Vec3f_004b6eb0 sq;
+    Vec3f sq;
     sq.x = v.x * v.x;
     sq.y = v.y * v.y;
     sq.z = v.z * v.z;
