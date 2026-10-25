@@ -30,6 +30,7 @@ union Fixed {
 #include "../graphics/rect.h"
 #include "../util/angles.h"
 #include "../units/unit_def.h"
+#include "../gui/mouse_event.h"
 
 // The flags dword at +0x110 mixes plain masks with bitfields: a bitfield test
 // is a shift, a masked test is an and, and a byte test is a byte load, so the
@@ -464,17 +465,12 @@ void MarkLocalVisibleUnits(void)
 // screen coordinates, marks every unit of the local player inside it
 // selected, then normalises the player's selection state and reports how
 // many units ended up selected.
-struct Select_0048c390 {
-    char unknown_0[8];
-    unsigned int flags;                 // +8
-};
-
 extern char s_SelectMultipleUnits_00508d8c[];
 
 int __stdcall PlaySoundByName(char* msg, int a);
 
 // FUNCTION: 0x48c390
-int __stdcall SelectUnitsInBox(void* param_1)
+int __stdcall SelectUnitsInBox(MouseEvent* param_1)
 {
     int found = 0;
     // Declared in the order ymin, xmin, ymax, xmax, reading g_game->scrollX/Y
@@ -486,7 +482,7 @@ int __stdcall SelectUnitsInBox(void* param_1)
     int t;
     if (ymin > ymax) { t = ymin; ymin = ymax; ymax = t; }
     if (xmin > xmax) { t = xmin; xmin = xmax; xmax = t; }
-    int toggle = (((Select_0048c390*)param_1)->flags >> 2) & 1;
+    int toggle = (param_1->keyFlags >> 2) & 1;
     if (!toggle) {
         for (Unit* v = g_game->units; v <= g_game->unitsEnd; v++)
             v->flags.raw &= 0xffffff2f;
@@ -580,13 +576,8 @@ int __stdcall HitTestUnitScreenHull(Unit* obj, Point* p)
 // from every unit, restores bit 6 (0x40) on the local player's units in the
 // selection list and sets bit 4 on the selected unit, then refreshes the
 // orders menu through g_game+0x37ebe.
-struct Param_0048c7f0 {
-    char unknown_0[8];
-    unsigned char flags;                // +0x8
-};
-
 // FUNCTION: 0x48c7f0
-void __stdcall ClickSelectHoverUnit(Param_0048c7f0* param)
+void __stdcall ClickSelectHoverUnit(MouseEvent* param)
 {
     Unit* unit = !g_game->hoverUnitId ? 0 : &g_game->units[g_game->hoverUnitId];
     if (unit == 0)
@@ -602,7 +593,7 @@ void __stdcall ClickSelectHoverUnit(Param_0048c7f0* param)
     if (unit->carrier != 0 && !(unit->carrier->flags.raw & 0x40000000))
         return;
 
-    if (param->flags & 4) {
+    if (param->keyFlags & 4) {
         unit->flags.selected = !unit->flags.selected;
         if (unit->flags.selected)
             QueueUnitSpeech(unit, 1, 0);

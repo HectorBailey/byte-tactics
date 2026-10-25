@@ -1876,9 +1876,9 @@ address,size,file,symbol,status,similarity
 0x48c150,60,src/ingame/selection.cpp,?ClearUnitSelectFlags@@YGXXZ,matched,100.0
 0x48c190,386,src/ingame/selection.cpp,?FindNextSelectedUnit@@YGPAUUnit@@PAU1@H@Z,matched,100.0
 0x48c320,109,src/ingame/selection.cpp,?MarkLocalVisibleUnits@@YGXXZ,matched,100.0
-0x48c390,773,src/ingame/selection.cpp,?SelectUnitsInBox@@YGHPAX@Z,matched,100.0
+0x48c390,773,src/ingame/selection.cpp,?SelectUnitsInBox@@YGHPAUMouseEvent@@@Z,matched,100.0
 0x48c6a0,331,src/ingame/selection.cpp,?HitTestUnitScreenHull@@YGHPAUUnit@@PAUPoint@@@Z,matched,100.0
-0x48c7f0,447,src/ingame/selection.cpp,?ClickSelectHoverUnit@@YGXPAUParam_0048c7f0@@@Z,matched,100.0
+0x48c7f0,447,src/ingame/selection.cpp,?ClickSelectHoverUnit@@YGXPAUMouseEvent@@@Z,matched,100.0
 0x48c9b0,109,src/ingame/selection.cpp,?DeselectIfIneligible@@YGXPAUUnit@@@Z,matched,100.0
 0x48ca20,513,src/ingame/selection.cpp,?CollectSelectedUnits@@YGXPAV?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@@Z,matched,100.0
 0x48cc30,323,src/ingame/selection.cpp,?DrawSelectedUnitOrderOverlays@@YGXPAXPAPAUUnit@@@Z,matched,100.0
