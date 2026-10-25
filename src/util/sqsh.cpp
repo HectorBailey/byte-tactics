@@ -561,8 +561,10 @@ int LzssEnablePreset()
 // Builds a "SQSH" compressed chunk: header, then the (optionally
 // compressed and encrypted) data.
 #pragma pack(push, 1)
-struct Chunk_4d1820 {
-    int marker;                      // +0x00 "SQSH"
+// Thaldren's SquashContainerHeader (0x13 bytes): the header SquashPack writes
+// in front of a "SQSH" chunk and SquashUnpack reads back.
+struct SquashContainerHeader {
+    int magic;                       // +0x00 "SQSH"
     unsigned char version;           // +0x04
     unsigned char method;            // +0x05
     unsigned char encrypt;           // +0x06
@@ -577,9 +579,9 @@ void __stdcall _compress(char* out, int* outSize, char* in, int size);
 static inline unsigned int encryptByte(unsigned int i, char* out) { return (i ^ out[i]) + i; }
 
 // FUNCTION: 0x4d1820
-int __stdcall SquashPack(Chunk_4d1820* chunk, int* chunkSize, char* data, int size, int method, int encrypt)
+int __stdcall SquashPack(SquashContainerHeader* chunk, int* chunkSize, char* data, int size, int method, int encrypt)
 {
-    Chunk_4d1820 header, * payload = chunk + 1;
+    SquashContainerHeader header, * payload = chunk + 1;
     char* out = (char*)payload;
     if ((char*)payload == 0) {
         return 6;
@@ -622,7 +624,7 @@ int __stdcall SquashPack(Chunk_4d1820* chunk, int* chunkSize, char* data, int si
             } while (0);
         } while (0);
     }
-    memcpy(&header.marker, "SQSH", 4);
+    memcpy(&header.magic, "SQSH", 4);
     header.version = 2;
     header.method = method;
     header.encrypt = encrypt;
@@ -645,9 +647,9 @@ int __stdcall _uncompress(unsigned char* dest, unsigned long* destLen, unsigned 
 // FUNCTION: 0x4d1970
 int __stdcall SquashUnpack(char* dest, char* data)
 {
-    Chunk_4d1820 header;
+    SquashContainerHeader header;
     // Separate from data, which is advanced past the header: keeps the address.
-    Chunk_4d1820* chunk = (Chunk_4d1820*)data;
+    SquashContainerHeader* chunk = (SquashContainerHeader*)data;
     memcpy(&header, data, 0x13);
     if (memcmp(&header, "SQSH", 4) != 0) {
         return 1;
@@ -772,7 +774,7 @@ int __stdcall SquashChecksum(unsigned char* data, int size)
 }
 
 // FUNCTION: 0x4d1c00
-void __stdcall SquashDumpHeader(Chunk_4d1820* header)
+void __stdcall SquashDumpHeader(SquashContainerHeader* header)
 {
     printf("\nheader.packType     = %d\n", header->method);
     printf("header.encryptType  = %d\n", header->encrypt);
