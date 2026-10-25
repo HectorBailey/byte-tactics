@@ -11,18 +11,17 @@
 #include <math.h>
 #include <vector>
 
-struct Point { short x, y; };
-// Kept local, not util/vec3.h: the header's symbol ids change this function's registers.
-struct Vec3 {
-    int x, y, z;
-    Vec3 operator+(const Vec3& other) const {
-        Vec3 r;
-        r.x = x + other.x;
-        r.y = y + other.y;
-        r.z = z + other.z;
-        return r;
-    }
-};
+#include "../util/vec3.h"
+
+// A free operator, not a member: util/vec3.h declares Vec3 without methods.
+static inline Vec3 operator+(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
 // A 16.16 fixed-point value: the whole part in the high half.
 struct Fixed {
     unsigned short frac;
@@ -82,7 +81,7 @@ struct Order {
     char pad0[5]; unsigned char state; unsigned int flags;
     char padA[0x12 - 0xa]; PathOrderAttach target;
     Vec3 pos;
-    Point start;                       // +0x2e
+    Point16 start;                     // +0x2e
     char pad32[0x3e - 0x32]; int range;
     unsigned int flags_42;
     char pad46[0x4a - 0x46]; int next;
@@ -98,7 +97,7 @@ struct Order {
     Order(Unit* unit, void* file, char* name);
     void OrStatusFlags(unsigned int flags);
     void AttachApproachRadiusGoal(Vec3* pos, int radius);
-    void AttachBuildFootprintMarker(Point cell, Point size);
+    void AttachBuildFootprintMarker(Point16 cell, Point16 size);
     Unit* Target();
     void Wait();
     Vec3* Position();
