@@ -98,11 +98,15 @@ every function you touch must still print MATCH and the exe must keep its MD5:
 ```sh
 uv run tools/checkall.py <every address in the files you touched>
 uv run tools/place.py               # must end with MD5 8e74a1dffa1f5988624c52048f5b20cd
+uv run tools/place.py --no-orig --strict   # the same MD5, built as CI builds it
 uv run tools/modules.py --check
 ```
 
 `place.py` compiles every changed file, so run it once at the end, not after
-each edit. `tools/rename.py` runs its own checks; the issue says which flags.
+each edit. With `orig/TotalA.exe` present it takes each call's target from the
+original, so a call that only resolves by name to the wrong function still
+gives the right MD5; `--no-orig --strict` resolves every call by name alone,
+as CI does, and catches it. `tools/rename.py` runs its own checks; the issue says which flags.
 
 **Why harmless-looking edits break matches.** MSVC 5's register allocation
 depends on a symbol counter that grows with every declaration before a
@@ -140,6 +144,10 @@ Rules:
 - When files are gathered into one, keep every model's credit from their first
   lines in the new file's first line, and every `// FUNCTION:`, `// GLOBAL:`
   and `// FLAGS:` line.
+- A renamed class or function keeps the exact parameter types of its
+  definition. A view declared with other types gets a decorated name that no
+  definition has, and the build without the original then sends its calls to
+  another overload (#7244).
 - A name needs evidence (strings, callers, Thaldren's names in
   `data/thaldren/`). A name with no evidence stays a placeholder.
 - Only report MATCH for functions where the checker printed MATCH.
@@ -177,7 +185,7 @@ Closes #<N>
 
 Model: <tool> / <model>
 
-Checks: checkall <matched> of <total> MATCH; place.py MD5 8e74a1dffa1f5988624c52048f5b20cd; modules.py --check passes
+Checks: checkall <matched> of <total> MATCH; place.py MD5 8e74a1dffa1f5988624c52048f5b20cd, with and without --no-orig --strict; modules.py --check passes
 
 Left out:
 - what the issue asked for that you did not do, and why (or "none")

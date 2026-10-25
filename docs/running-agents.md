@@ -141,6 +141,15 @@ Run from the main checkout, on `main`:
      the pull request, lists any function that matches on `main` but would
      stop matching (usually two files disagreeing on a callee's name), and
      flags forbidden constructs.
+   - Run `uv run tools/place.py --no-orig --strict` on the pull request
+     merged into `main` (or on the whole batch, stacked, when merging several).
+     It must end with MD5 8e74a1dffa1f5988624c52048f5b20cd. `review.sh` and a
+     plain `place.py` do not catch a call that resolves by name to the wrong
+     function, since `place.py` with the original takes each call's target
+     from it; this build does what CI does (#7244 passed both and broke main).
+   - Merge only once the pull request's "Build from source" run has passed, or
+     the no-orig build above has. A fork's run waits for a maintainer's
+     approval, so for a fork the local no-orig build is the check.
    - Read the files for made-up names, and fix bad matches before merging.
    - Squash-merge with a commit message in the project's format:
      `gh pr merge <PR> --squash --delete-branch --subject "Add: ..." --body "..."`.
