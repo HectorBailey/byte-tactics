@@ -48,7 +48,8 @@ static inline void MulFixed(int& v, int f)
     v = (int)(((__int64)v * f) >> 16);
 }
 
-// A 16.16 position or velocity.
+// Own Vec3, not vec3.h: a 16.16 position or velocity, with constructors,
+// Length, Scale and its operators.
 struct Vec3 {
     int x;
     union {
