@@ -51,7 +51,7 @@ struct Data_0046d970;
 struct Debris_00420f30;
 struct Def_0049d270;
 struct Desc_004437c0;
-struct Entry_0042f740;
+struct SoundCategory;
 struct Entry_00463ca0;
 struct Entry_00479620;
 struct Eye_00482130;
@@ -613,7 +613,7 @@ struct Game {  // 0x3924d bytes
     char soundNames[1][32];  // +0x33e13
     char unknown_33e33[8160];
     char soundFiles[256][32];  // +0x35e13
-    Entry_0042f740* entries_37e13;  // +0x37e13
+    SoundCategory* entries_37e13;  // +0x37e13
     int entry_count;  // +0x37e17
     int offscreen;    // +0x37e1b
     int width_37e1f;  // +0x37e1f

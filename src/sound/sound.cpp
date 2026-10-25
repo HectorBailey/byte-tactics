@@ -30,12 +30,17 @@ public:
     void SetMaxBuffers(int count);
 };
 
-struct SoundParams_0047ed40 {
+// The display context GetDisplay returns, the type graphics/display.cpp and
+// util/hpi.cpp name DisplayContext: the window handle at +0x40, an int here
+// because the original reads it as one.
+struct DisplayContext {
     char unknown_0[0x40];
     int hwnd;
 };
 
-union Pos_0047f300 {
+// A position in 16.16 fixed point: the six short words are the high and low
+// half of each coordinate, the ints the whole value.
+union FixedPosition {
     struct {
         short xFrac;                   // +0x0
         short x;                       // +0x2
@@ -52,19 +57,15 @@ union Pos_0047f300 {
 };
 
 
+// The 0x13 "play this sound" message: the sound's index and, in the positional
+// form, where it plays. Both senders fill in the header and send all 0x12
+// bytes.
 #pragma pack(push, 1)
-struct Packet_0047f0c0 {
+struct SoundPacket {
     unsigned char type;                // +0x0
     unsigned char flag;                // +0x1
     int index;                         // +0x2
-    int unknown_6[3];                  // +0x6
-};
-
-struct Packet_0047f300 {
-    unsigned char type;                // +0x0
-    unsigned char flag;                // +0x1
-    int index;                         // +0x2
-    Pos_0047f300 pos;                  // +0x6
+    FixedPosition pos;                 // +0x6
 };
 
 // The unit type at a unit's +0x92.
@@ -104,7 +105,7 @@ struct Player {
 
 struct Game {
     char unknown_0[0xc];
-    SoundParams_0047ed40* displayContext;  // +0xc
+    DisplayContext* displayContext;  // +0xc
     Sound* sound;                      // +0x10
     char unknown_14[0x1b63 - 0x14];
     Player players[10];       // +0x1b63
@@ -395,7 +396,7 @@ int __stdcall PlaySoundByIndex(int index, int param_2)
         if (g_game->fxVolume != 0 && (g_game->soundFlags & 7) != 0
             && g_noDirectSound == 0) {
             if (param_2) {
-                Packet_0047f0c0 packet;
+                SoundPacket packet;
                 packet.type = 0x13;
                 packet.flag = 1;
                 packet.index = index;
@@ -459,7 +460,7 @@ static inline int MapContains(unsigned int w, unsigned int h, int tx, int ty)
 // param_3 is set, and picks the near (-585) or far (-1585) variant depending on
 // whether the position is inside the screen rectangle.
 // FUNCTION: 0x47f300
-int __stdcall PlaySoundAt(int index, Pos_0047f300* pos, int param_3)
+int __stdcall PlaySoundAt(int index, FixedPosition* pos, int param_3)
 {
     if (g_useWindowsSound)
         return PlaySoundByIndex(index, param_3);
@@ -475,7 +476,7 @@ int __stdcall PlaySoundAt(int index, Pos_0047f300* pos, int param_3)
     int sound = g_game->sounds[index];
 
     if (param_3) {
-        Packet_0047f300 packet;
+        SoundPacket packet;
         packet.type = 0x13;
         packet.flag = 1;
         packet.index = index;
@@ -537,7 +538,7 @@ int __stdcall PlaySoundAt(int index, Pos_0047f300* pos, int param_3)
 // FUNCTION: 0x47f610
 void __stdcall PlaySoundAtByName(char* name, int param_2, int param_3)
 {
-    PlaySoundAt(FindSound(name), (Pos_0047f300*)param_2, param_3);
+    PlaySoundAt(FindSound(name), (FixedPosition*)param_2, param_3);
 }
 
 // Ages the sound driver held in g_speechQueue: if the list is not empty, and

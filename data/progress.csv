@@ -575,7 +575,7 @@ address,size,file,symbol,status,similarity
 0x42e310,289,src/weapons/weapon_types.cpp,?LoadWeaponTypes@@YGXXZ,matched,100.0
 0x42e440,3923,src/weapons/weapon_types.cpp,?LoadWeaponType@@YGXPAVTdfRecord@@@Z,matched,100.0
 0x42f3a0,167,src/weapons/weapon_types.cpp,?FreeWeaponTypes@@YGXXZ,matched,100.0
-0x42f450,297,src/sound/sound_types.cpp,?ReadSoundEntry@@YGHPAUSource_0042f450@@PADPAH@Z,matched,100.0
+0x42f450,297,src/sound/sound_types.cpp,?ReadSoundEntry@@YGHPAVTdfFile@@PADPAH@Z,matched,100.0
 0x42f580,448,src/sound/sound_types.cpp,?LoadSoundCategories@@YGXXZ,matched,100.0
 0x42f740,149,src/sound/sound_types.cpp,?FreeSoundCategories@@YGXXZ,matched,100.0
 0x42f7e0,215,src/sound/sound_types.cpp,?LoadAllSound@@YGXXZ,matched,100.0
@@ -1691,7 +1691,7 @@ address,size,file,symbol,status,similarity
 0x47f1a0,101,src/sound/sound.cpp,?PlaySoundByName@@YGXPADH@Z,matched,100.0
 0x47f210,121,src/sound/sound.cpp,?PlayLoopingSoundByName@@YGXPADH@Z,matched,100.0
 0x47f290,106,src/sound/sound.cpp,?PlaySoundFile@@YGHPAD@Z,matched,100.0
-0x47f300,775,src/sound/sound.cpp,?PlaySoundAt@@YGHHPATPos_0047f300@@H@Z,matched,100.0
+0x47f300,775,src/sound/sound.cpp,?PlaySoundAt@@YGHHPATFixedPosition@@H@Z,matched,100.0
 0x47f610,106,src/sound/sound.cpp,?PlaySoundAtByName@@YGXPADHH@Z,matched,100.0
 0x47f680,196,src/sound/sound.cpp,?PlayNextSpeech@@YGXXZ,matched,100.0
 0x47f750,37,src/sound/sound.cpp,?StopAllSounds@@YGXXZ,matched,100.0
