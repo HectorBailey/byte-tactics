@@ -34,24 +34,7 @@ struct Cell {
 
 #include "../network/player.h"
 
-struct Unit {
-    // +0x0 holds the unit's UnitMotion pointer; only its non-nullness is read
-    // here, and an int spelling keeps the file's symbol count (docs/c2-regalloc.md).
-    int motion;                        // +0x0
-    char unknown_4[0x64 - 0x4];
-    Angles16 angles;                      // +0x64
-    Vec3 pos;                          // +0x6a
-    char unknown_76[0x92 - 0x76];
-    UnitDef* def;                      // +0x92
-    Player* player;                    // +0x96
-    char unknown_9a[0xb0 - 0x9a];
-    int workTime;                      // +0xb0
-    char unknown_b4[0xff - 0xb4];
-    unsigned char playerIndex;         // +0xff
-    char unknown_100[0x104 - 0x100];
-    float buildLeft;                   // +0x104
-    short health;                      // +0x108
-};
+#include "../units/unit.h"
 
 #include "order.h"
 
