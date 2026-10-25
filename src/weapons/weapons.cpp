@@ -2006,58 +2006,54 @@ int __stdcall FireWeaponByFlags(Object_0049d0c0* obj, int a, int b, int d, int c
 }
 
 #pragma pack(push, 1)
-struct Entry_0049d120 {              // 0x1c bytes
-    char unknown_0[0xc];
-    WeaponDef* def;                  // +0xc
-    char unknown_10[0x1a - 0x10];
-    unsigned char active;            // +0x1a
-    char unknown_1b;
-};
-
-struct Table_0049d120 {
+struct Unit_0049d120 {
     char unknown_0[4];
     // Only three entries are declared: the index is masked to a byte, but the
     // fields below have to land on 0x6a and 0xff, which fixes the array size.
-    Entry_0049d120 entries[3];       // +0x4
+    // Thaldren's UnitInstance: the three weapon slots at +0x4, the position at
+    // +0x6a and the owner slot at +0xff.
+    UnitWeaponSlot entries[3];       // +0x4
     char unknown_58[0x6a - 0x58];
     Vec3 pos;                        // +0x6a
     char unknown_76[0xff - 0x76];
-    char player;                     // +0xff
+    char playerIndex;                // +0xff
 };
 
+// Thaldren's Projectile (0x6b bytes): a second view of the record 0x49b720
+// walks, holding only the fields this search reads.
 struct Proj_0049d120 {               // 0x6b bytes
-    WeaponDef* def;                  // +0x0
+    WeaponDef* type;                 // +0x0
     char unknown_4[0x28 - 0x4];
-    Vec3 pos;                        // +0x28
+    Vec3 aim;                        // +0x28
     char unknown_34[0x56 - 0x34];
-    Proj_0049d120* ref;              // +0x56
+    Proj_0049d120* interceptedProjectile; // +0x56
     char unknown_5a[0x66 - 0x5a];
-    char player;                     // +0x66
+    char ownerPlayer;                // +0x66
     char unknown_67[0x6b - 0x67];
 };
 #pragma pack(pop)
 
 // FUNCTION: 0x49d120
-Proj_0049d120* __stdcall FindTargetableProjectile(Table_0049d120* table, int index)
+Proj_0049d120* __stdcall FindTargetableProjectile(Unit_0049d120* table, int index)
 {
-    Entry_0049d120* entry = &table->entries[index & 0xff];
+    UnitWeaponSlot* entry = &table->entries[index & 0xff];
     // Flag read before the radius, shift inside its initialiser: else the flag
     // load hoists into the prologue.
-    if (!entry->active)
+    if (!entry->stockpile)
         return 0;
-    int radius = entry->def->coverage << 16;
+    int radius = entry->weapon->coverage << 16;
     // projs is read before projCount: keeps g_game in ecx.
     Proj_0049d120* proj = (Proj_0049d120*)g_game->projectiles;
     int count = g_game->projCount;
     for (int i = 0; i < count; i++, proj++) {
-        if (proj->player != table->player) {
+        if (proj->ownerPlayer != table->playerIndex) {
             // Nested ifs, not one && chain: else the bitfield test folds into a mem test.
-            if (proj->def->flags.b.targetable) {
-                if ((unsigned)(table->pos.x - proj->pos.x + radius) <= 2u * radius) {
-                    if ((unsigned)(table->pos.z - proj->pos.z + radius) <= 2u * radius) {
+            if (proj->type->flags.b.targetable) {
+                if ((unsigned)(table->pos.x - proj->aim.x + radius) <= 2u * radius) {
+                    if ((unsigned)(table->pos.z - proj->aim.z + radius) <= 2u * radius) {
                         int j;
                         for (j = 0; j < g_game->projCount; j++)
-                            if (((Proj_0049d120*)g_game->projectiles)[j].ref == proj)
+                            if (((Proj_0049d120*)g_game->projectiles)[j].interceptedProjectile == proj)
                                 break;
                         if (j == g_game->projCount)
                             return proj;
