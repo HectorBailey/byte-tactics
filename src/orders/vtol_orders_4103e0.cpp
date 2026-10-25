@@ -54,12 +54,10 @@ void RegisterDataArchives();
 void CreateGameObject();
 void InitMissionStatus();
 
-// The order object the vtol orders build: PathOrder, the class order_targets.cpp
-// defines.
-class PathOrder {
+class Class_0044e2d0 {
 public:
     char data[0x36];
-    PathOrder(Order*, const Vec3&);
+    Class_0044e2d0(Order*, const Vec3&);
     void SetApproachRadius(int);
     void SetAltitude(int);
 };
@@ -67,7 +65,7 @@ struct Game { char pad0[0x1422b]; int width, height; char pad14233[0x142b7-0x142
 #pragma pack(pop)
 extern Game* g_game;
 // Unused here: real declarations that keep the symbol ids the separate setter
-// views took, after their methods moved to PathOrder (docs/c2-regalloc.md).
+// views took, after their methods moved to Class_0044e2d0 (docs/c2-regalloc.md).
 struct Amount;
 struct Blk;
 struct Packet;
@@ -120,7 +118,7 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
         center.z=(g_game->height/2)<<16;
         short angle=GetHeadingBetween(&unit->pos,&center);
         Vec3 pos=AddVec3(unit->pos,Offset(angle,0x3200000));
-        PathOrder* move=new PathOrder(order,pos);
+        Class_0044e2d0* move=new Class_0044e2d0(order,pos);
         move->SetApproachRadius(128);
         order->flags|=0xe0;
         order->SetAttachedFx((OrderFx*)move);
@@ -141,7 +139,7 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
                 unit->SetStateBits(1,1);
                 if ((unit->motion->flags&3)==1) {
                     unit->motion->SetFlightMode(unit,2);
-                    PathOrder* move=new PathOrder(order,unit->pos);
+                    Class_0044e2d0* move=new Class_0044e2d0(order,unit->pos);
                     move->SetAltitude(unit->def->altitude/2);
                     order->SetAttachedFx((OrderFx*)move);
                     order->flags|=0xe0;
@@ -167,7 +165,7 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
         if (target && IssueAttackOrder(unit,target,0)) return 5;
         if (flags&0xe0) order->angle+=-RandomInt(0x2000)-0x5555;
         Vec3 pos=AddVec3(order->pos,Offset((short)order->angle,(unit->weapons[0].def->range+160)<<16));
-        PathOrder* move=new PathOrder(order,pos);
+        Class_0044e2d0* move=new Class_0044e2d0(order,pos);
         move->SetApproachRadius(128);
         order->SetAttachedFx((OrderFx*)move);
         order->SetDeadlineTicks(RandomInt(30)+30);

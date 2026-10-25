@@ -29,7 +29,7 @@ public:
 };
 
 // Unused here: real declarations that keep the symbol ids the separate setter
-// views took, after their methods moved to PathOrder (docs/c2-regalloc.md).
+// views took, after their methods moved to Class_0044e2d0 (docs/c2-regalloc.md).
 struct Amount;
 struct Blk;
 struct Packet;
@@ -127,12 +127,10 @@ int __stdcall GetUnitCount(int, unsigned int);
 struct Game {
     char pad0[0x142b7]; int overflowBucket;
 };
-// The order object the vtol orders build: PathOrder, the class order_targets.cpp
-// defines.
-class PathOrder {
+class Class_0044e2d0 {
 public:
     char unknown_0[0x36];
-    PathOrder(Order* order, const Vec3& pos);
+    Class_0044e2d0(Order* order, const Vec3& pos);
     void SetAltitude(int);
     void SetApproachRadius(short);
 };
@@ -181,7 +179,7 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
     unit->SetStateBits(1, 1);
     if ((unit->motion->flags & 3) == 1) {
         unit->motion->SetFlightMode(unit, 2);
-        PathOrder* obj = new PathOrder(order, unit->pos);
+        Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);
         obj->SetAltitude(unit->def->altitude / 2);
         order->SetAttachedFx((int)obj);
         order->flags |= flags | 0xe0;
@@ -233,7 +231,7 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
         int angle = GetHeadingBetween(&unit->pos, &order->pos);
         Vec3 off = Offset(RandomInt(0x4000) + angle - 0x2000, dist / 2);
         Vec3 p = unit->pos + off;
-        PathOrder* obj = new PathOrder(order, p);
+        Class_0044e2d0* obj = new Class_0044e2d0(order, p);
         obj->SetApproachRadius(0x80);
         order->SetAttachedFx((int)obj);
         order->flags = 0x100e8;
@@ -245,7 +243,7 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
             SetWeaponTargetUnit(unit, order->target, 0);
         else
             SetWeaponTargetPos(unit, &order->pos, 0);
-        PathOrder* obj = new PathOrder(order, order->pos);
+        Class_0044e2d0* obj = new Class_0044e2d0(order, order->pos);
         obj->SetApproachRadius(speed);
         order->SetAttachedFx((int)obj);
         order->flags = 0x100e8;
@@ -255,7 +253,7 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
         short angle = FUN_004b715a(unit->pos.x - order->pos.x, unit->pos.z - order->pos.z);
         Vec3 off = Offset(angle, speed * 0x30000);
         Vec3 p = order->pos + off;
-        PathOrder* obj = new PathOrder(order, p);
+        Class_0044e2d0* obj = new Class_0044e2d0(order, p);
         obj->SetApproachRadius(RandomInt(0x80) + 0x80);
         order->SetAttachedFx((int)obj);
         order->flags = 0x100ea;
@@ -280,7 +278,7 @@ int __stdcall AirToGroundOrder(Unit* unit, Order* order, int flags)
         sum.y = unit->pos.y + off.y;
         sum.z = unit->pos.z + off.z;
         Vec3 p = sum;
-        PathOrder* obj = new PathOrder(order, p);
+        Class_0044e2d0* obj = new Class_0044e2d0(order, p);
         obj->SetApproachRadius(0x80);
         order->SetAttachedFx((int)obj);
         order->flags = 0x100ea;
