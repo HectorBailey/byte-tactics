@@ -2407,7 +2407,7 @@ address,size,file,symbol,status,similarity
 0x4b2040,590,src/units/cob.cpp,?LoadScriptState@CobScript@@QAEHPAVHapiBank@@@Z,matched,100.0
 0x4b2290,169,src/util/int_map.cpp,_$E6,matched,100.0
 0x4b2340,272,src/util/int_map.cpp,_$E4,matched,100.0
-0x4b2450,227,src/util/int_map.cpp,?LoadCobScript@@YGPAUData_004b2450@@PAD@Z,matched,100.0
+0x4b2450,227,src/util/int_map.cpp,?LoadCobScript@@YGPAUScriptTable@@PAD@Z,matched,100.0
 0x4b2540,423,src/util/int_map.cpp,?FreeCobScript@@YGXH@Z,matched,100.0
 0x4b26f0,336,src/util/int_map.cpp,?GetCobChecksum@@YGHH@Z,matched,100.0
 0x4b2840,14,src/util/int_map.cpp,?begin@?$_Tree@HU?$pair@HH@std@@U_Kfn@?$map@HHU?$less@H@std@@V?$allocator@H@2@@2@U?$less@H@2@V?$allocator@H@2@@std@@QAE?AViterator@12@XZ,matched,100.0

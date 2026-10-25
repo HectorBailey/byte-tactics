@@ -20,22 +20,25 @@ struct ArchiveItem {
     ArchiveDirectoryNode* node;            // +0x8
 };
 
-struct State_004be320 {
+// The display context GetDisplay returns, the type graphics/display.cpp and
+// util/hpi.cpp name DisplayContext: the open archives' items at +0x618 and
+// their count at +0x61c.
+struct DisplayContext {
     char unknown_0[0x618];
-    ArchiveItem** items;          // +0x618
-    int itemCount;                  // +0x61c
+    ArchiveItem** items;              // +0x618
+    int itemCount;                    // +0x61c
 };
 
 extern char g_emptyStringLiteral[];
 
-State_004be320* GetDisplay(void);
+DisplayContext* GetDisplay(void);
 void __stdcall HAPI_ClearShadowFlags(ArchiveDirectory* list);
 void __stdcall HAPI_MarkShadowedFiles(char* name, int a, int b);
 
 // FUNCTION: 0x4be320
 void HAPI_ResolveShadowedFiles(void)
 {
-    State_004be320* state = GetDisplay();
+    DisplayContext* state = GetDisplay();
     if (state->itemCount > 0) {
         for (int i = 0; i < state->itemCount; i++) {
             ArchiveDirectory* list = state->items[i]->node->list;
