@@ -5,25 +5,23 @@
 
 #include "../util/tdf.h"
 
-struct Source_0042f450 {
-    char unknown_0[4];
-    TdfRecord* tdf;                    // +0x4
-};
-
 struct SpeechCategory {
     char* name;                         // +0x0
     int unknown_4[5];                   // +0x4
 };
 
-struct Slot_0042f740 {
+// The 0x160-byte record of one sound category, the type sound.cpp names
+// SoundCategory: its name, then 24 slots of a count and two buffers. The two
+// buffers are int* here because ReadSoundEntry walks them by index.
+struct SoundSlot {
     int count;                         // +0x00
     int* a;                            // +0x04
     int* b;                            // +0x08
 };
 
-struct Entry_0042f740 {
+struct SoundCategory {
     char unknown_0[0x40];
-    Slot_0042f740 slots[0x18];         // +0x40
+    SoundSlot slots[0x18];             // +0x40
 };
 
 struct IDirectSoundBuffer;
@@ -34,7 +32,7 @@ struct Game {
     int soundCount;                    // +0x33a0f
     IDirectSoundBuffer** sounds[1];    // +0x33a13
     char unknown_33a17[0x37e13 - 0x33a17];
-    Entry_0042f740* soundCategories;   // +0x37e13
+    SoundCategory* soundCategories;   // +0x37e13
     int soundCategoryCount;            // +0x37e17
 };
 #pragma pack(pop)
@@ -48,22 +46,22 @@ int __cdecl GameReallocTagged(int block, char* name, int size);
 void __cdecl GameFreeThunk(int* p);
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
-int __stdcall ReadSoundEntry(Source_0042f450* source, char* key, int* out);
+int __stdcall ReadSoundEntry(TdfFile* source, char* key, int* out);
 void __stdcall LoadSoundByName(char* name, char* value);
 void LoadSoundCategories();
 void FreeSoundCategories();
 void __stdcall FreeSoundSet(IDirectSoundBuffer** set);
 
 // FUNCTION: 0x42f450
-int __stdcall ReadSoundEntry(Source_0042f450* source, char* key, int* out)
+int __stdcall ReadSoundEntry(TdfFile* source, char* key, int* out)
 {
     char text[0x40];
     char value[0x40];
     char textKey[0x100];
 
-    if (source->tdf->GetFieldString(value, key, 0x40, g_emptyStringLiteral) != 0) {
+    if (source->current->GetFieldString(value, key, 0x40, g_emptyStringLiteral) != 0) {
         sprintf(textKey, "%s%s", key, "text");
-        if (source->tdf->GetFieldString(text, textKey, 0x40, g_emptyStringLiteral) == 0)
+        if (source->current->GetFieldString(text, textKey, 0x40, g_emptyStringLiteral) == 0)
             text[0] = 0;
         out[1] = GameReallocTagged(out[1], g_sayChoiceArrayName, (out[0] + 1) * 0x40);
         out[2] = GameReallocTagged(out[2], g_sayChoiceArrayName, (out[0] + 1) * 0x40);
@@ -96,10 +94,10 @@ void LoadSoundCategories()
     if (obj.LoadFile(path)) {
         g_game->soundCategoryCount = obj.root->GetSubRecordCount();
         int size = g_game->soundCategoryCount * 0x160;
-        g_game->soundCategories = (Entry_0042f740*)GameAllocIgnoreTag("Sound Categories", size);
+        g_game->soundCategories = (SoundCategory*)GameAllocIgnoreTag("Sound Categories", size);
         memset(g_game->soundCategories, 0, size);
         for (int i = 0; i < g_game->soundCategoryCount; i++) {
-            Entry_0042f740* rec = &g_game->soundCategories[i];
+            SoundCategory* rec = &g_game->soundCategories[i];
             obj.ResetCurrentRecord();
             if (obj.SelectRecordAt(i)) {
                 obj.current->CopyRecordName((char*)rec, 0x3f);
@@ -107,10 +105,10 @@ void LoadSoundCategories()
                 int* vals = &rec->slots[1].count;
                 // Compared as signed ints, not pointers: keeps jl instead of jb.
                 while ((int)p < (int)(g_speechCategories + 23)) {
-                    ReadSoundEntry((Source_0042f450*)&obj, p->name, vals);
+                    ReadSoundEntry(&obj, p->name, vals);
                     for (int n = 1; ; n++) {
                         sprintf(name, "%s%i", p->name, n);
-                        if (!ReadSoundEntry((Source_0042f450*)&obj, name, vals))
+                        if (!ReadSoundEntry(&obj, name, vals))
                             break;
                     }
                     p++;
@@ -127,7 +125,7 @@ void FreeSoundCategories()
 {
     if (g_game->soundCategoryCount > 0) {
         for (int i = 0; i < g_game->soundCategoryCount; i++) {
-            Entry_0042f740* e = &g_game->soundCategories[i];
+            SoundCategory* e = &g_game->soundCategories[i];
             for (int j = 0; j < 0x18; j++) {
                 if (e->slots[j].count > 0) {
                     GameFreeThunk(e->slots[j].a);
