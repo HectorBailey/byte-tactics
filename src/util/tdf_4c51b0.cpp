@@ -10,6 +10,9 @@
 // reference count in the int just before them.
 #include "string_ref.h"
 
+// Kept local, not util/tdf_field.h: the header's declared destructor makes
+// ??_GTdfField (0x4c51b0) call 0x4c5190 instead of releasing the handles
+// inline, which drops the function to 80%.
 struct TdfField {
     StringRef a;                // +0x0 key
     StringRef b;                // +0x4 value

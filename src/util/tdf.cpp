@@ -51,6 +51,9 @@ public:
 
 // One entry of a section or of the translations: a key and a value. The
 // compiler's destructor of the pair (0x4c5190) releases both handles.
+// Kept local, not util/tdf_field.h: that header includes util/string_ref.h,
+// which moves std::logic_error's copy constructor (0x4c35c0) and _Doraise
+// (0x4c3740) off their windows.
 // FUNCTION: 0x4c5190 ??1TdfField@@QAE@XZ
 struct TdfField {
     StringRef key;                  // +0x0
