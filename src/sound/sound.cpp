@@ -71,16 +71,7 @@ struct SoundPacket {
 // The unit type at a unit's +0x92.
 #include "../units/unit_def.h"
 
-struct Unit {
-    char unknown_0[0x92];
-    UnitDef* def;                      // +0x92
-    char unknown_96[0xa8 - 0x96];
-    unsigned short id;           // +0xa8
-    char unknown_aa[0xff - 0xaa];
-    unsigned char playerIndex;         // +0xff
-    char unknown_100[0x110 - 0x100];
-    unsigned int flags;                // +0x110
-};
+#include "../units/unit.h"
 
 struct SoundSlot {
     int count;                         // +0x0
