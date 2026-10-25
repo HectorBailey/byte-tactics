@@ -13,15 +13,21 @@
 #include "archive_entry.h"
 
 #pragma pack(push, 1)
-struct Node_004bd830 {
-    char unknown_0[0xc];
+// The header of the archive item a handle points at, the view hpi.cpp names
+// Header: the key at +0xc and the root directory at +0x10.
+struct Header {
+    char magic[4];                       // +0x0
+    unsigned char version[4];            // +0x4
+    unsigned int size;                   // +0x8
     unsigned char obfuscate;             // +0xc
+    char unknown_d[3];
+    ArchiveDirectory* list;              // +0x10
 };
 
 struct OPENHAPIFILE {
     FILE* fp;                            // +0x0
     int pos;                             // +0x4
-    Node_004bd830* node;                 // +0x8
+    Header* node;                        // +0x8
     int count;                           // +0xc
     int unknown_10;                      // +0x10
     char name[0x100];                    // +0x14
@@ -45,7 +51,7 @@ int __stdcall SquashPack(void* chunk, int* chunkSize, char* data,
 unsigned int __stdcall SquashMaxPackedSize(unsigned int value, int mode);
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 void __cdecl GameFreeThunk(void* p);
-// This forward declaration, Node_004bd830 and the casts in nblocks all stay.
+// This forward declaration and the casts in nblocks all stay.
 void __stdcall HAPI_WriteArchiveData(char* path, char* base, int off, FILE* f,
                             void (__cdecl* cb)(unsigned), unsigned extra,
                             int key, int flags);
