@@ -11,11 +11,7 @@
 // The reference-counted string handle: a pointer to the characters with the
 // reference count in the int just before them.
 #include "string_ref.h"
-
-struct TdfField {
-    StringRef a;                // +0x0 key
-    StringRef b;                // +0x4 value
-};
+#include "tdf_field.h"
 
 void __cdecl GameFreeThunk(int* param_1);
 void* __cdecl operator new(unsigned int size);

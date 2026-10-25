@@ -40,15 +40,7 @@ static inline bool Ne(const StringRef& a, const StringRef& b)
     return !(a == b);
 }
 
-// One entry of the translations: a key and a value, both string handles. Its
-// destructor (0x4c5190) is in tdf.cpp.
-struct TdfField {
-    StringRef key;                  // +0x0
-    StringRef value;                // +0x4
-
-    TdfField(const StringRef& a, const StringRef& b);
-    ~TdfField();
-};
+#include "tdf_field.h"
 
 // The destroy loop of the entry vector releases the two handles inline.
 namespace std {

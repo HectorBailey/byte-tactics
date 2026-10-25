@@ -4,11 +4,7 @@
 #include <stddef.h>
 
 #include "string_ref.h"
-
-struct TdfField {
-    StringRef a;                    // +0x0
-    StringRef b;                    // +0x4
-};
+#include "tdf_field.h"
 
 void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* p);
