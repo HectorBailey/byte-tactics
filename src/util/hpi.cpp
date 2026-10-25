@@ -115,7 +115,8 @@ struct OPENHAPIFILE {
 
 // The display context the open archives hang from: the list of open archives
 // at +0x618, the start directory at +0x628 and the last directory set at
-// +0x728.
+// +0x728. Its own view, not graphics/display_context.h: the archives at
+// +0x618 are OPENHAPIFILE** here, void** in that header.
 struct DisplayContext {
     char unknown_0[0x618];
     OPENHAPIFILE** files;              // +0x618

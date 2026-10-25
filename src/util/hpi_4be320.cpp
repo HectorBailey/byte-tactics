@@ -22,7 +22,8 @@ struct ArchiveItem {
 
 // The display context GetDisplay returns, the type graphics/display.cpp and
 // util/hpi.cpp name DisplayContext: the open archives' items at +0x618 and
-// their count at +0x61c.
+// their count at +0x61c. Its own view, not graphics/display_context.h: the
+// items at +0x618 are ArchiveItem** here, void** in that header.
 struct DisplayContext {
     char unknown_0[0x618];
     ArchiveItem** items;              // +0x618

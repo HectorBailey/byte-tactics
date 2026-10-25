@@ -34,12 +34,7 @@ extern int __stdcall RemoveTimer(int handle);
 extern int __stdcall AddTimer(int delay, int id, void (__stdcall* callback)(void*));
 extern void __stdcall OnCdFadeTimer(void* unused);
 
-// The display context GetDisplay returns, the type graphics/display.cpp and
-// util/hpi.cpp name DisplayContext: the window handle at +0x40.
-struct DisplayContext {
-    char unknown_0[0x40];
-    HWND hwnd;                         // +0x40
-};
+#include "../graphics/display_context.h"
 
 extern DisplayContext* GetDisplay();
 

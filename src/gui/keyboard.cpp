@@ -4,20 +4,7 @@
 #include <windows.h>
 #include <string.h>
 
-#pragma pack(push, 1)
-// The display object GetDisplay returns. The key ring buffer and the cursor
-// word are named from Thaldren's DisplayContext (data/thaldren/structs.csv),
-// which lists the same offsets.
-struct DisplayContext {
-    char unknown_0[0xf2];
-    int mappedKeyQueueCap;             // +0xf2
-    int mappedKeyQueue[30];            // +0xf6
-    int mappedKeyWriteIdx;             // +0x16e
-    int mappedKeyReadIdx;              // +0x172
-    char unknown_176[0x1d2 - 0x176];
-    int cursorOverlayEnabled;          // +0x1d2
-};
-#pragma pack(pop)
+#include "../graphics/display_context.h"
 
 DisplayContext* GetDisplay(void);
 
