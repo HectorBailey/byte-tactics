@@ -21,7 +21,7 @@ public:
 };
 
 // Unused here: real declarations that keep the symbol ids the separate setter
-// views took, after their methods moved to Class_0044e2d0 (docs/c2-regalloc.md).
+// views took, after their methods moved to PathOrder (docs/c2-regalloc.md).
 // Seven that stood here went when util/vec3.h took their place: the header
 // declares Point16 beside Vec3, seven ids more than the local Vec3 cost.
 class MissionOrderTable;
@@ -68,10 +68,13 @@ struct Order {
     Vec3* Position();
     int Advance(int distance);
 };
-class Class_0044e2d0 {
+// The order object the vtol orders build: PathOrder, the class order_targets.cpp
+// defines. The constructor keeps that definition's argument types so the call
+// reaches it by name.
+class PathOrder {
 public:
     char unknown_0[0x36];
-    Class_0044e2d0(Order* order, const Vec3& pos);
+    PathOrder(Order* order, const Vec3& pos);
     void SetAltitude(int);
     void SetApproachRadius(short);
 };
@@ -121,7 +124,7 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
     unit->SetStateBits(1, 1);
     if ((unit->motion->flags & 3) == 1) {
         unit->motion->SetFlightMode(unit, 2);
-        Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);
+        PathOrder* obj = new PathOrder(order, unit->pos);
         obj->SetAltitude(unit->def->altitude / 2);
         order->SetAttachedFx((int)obj);
         order->flags |= flags | 0xe0;
@@ -141,7 +144,7 @@ int __stdcall VtolPatrolOrder(Unit* unit, Order* order, int flags)
             return 6;
         short angle = GetHeadingBetween(&unit->pos, &order->pos);
         Vec3 dest = AddVec3(order->pos, Offset(angle, 0x1400000));
-        Class_0044e2d0* obj = new Class_0044e2d0(order, dest);
+        PathOrder* obj = new PathOrder(order, dest);
         obj->SetApproachRadius(0x150);
         order->SetAttachedFx((int)obj);
         order->flags |= 0xe0;
