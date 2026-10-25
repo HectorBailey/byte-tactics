@@ -4,25 +4,22 @@
 #include <windows.h>
 #include <string.h>
 
-#pragma pack(push, 2)
-struct Queue_004c1ab0 {
-    char unknown_0[0xf2];
-    int size;                          // +0xf2
-    int entries[30];                   // +0xf6
-    int head;                          // +0x16e
-    int tail;                          // +0x172
-};
-#pragma pack(pop)
-
 #pragma pack(push, 1)
-struct DisplayContext
-{
-    char unknown_0[0x1d2];
-    int field_at_0x1d2;
+// The display object GetDisplay returns. The key ring buffer and the cursor
+// word are named from Thaldren's DisplayContext (data/thaldren/structs.csv),
+// which lists the same offsets.
+struct DisplayContext {
+    char unknown_0[0xf2];
+    int mappedKeyQueueCap;             // +0xf2
+    int mappedKeyQueue[30];            // +0xf6
+    int mappedKeyWriteIdx;             // +0x16e
+    int mappedKeyReadIdx;              // +0x172
+    char unknown_176[0x1d2 - 0x176];
+    int cursorOverlayEnabled;          // +0x1d2
 };
 #pragma pack(pop)
 
-Queue_004c1ab0* GetDisplay(void);
+DisplayContext* GetDisplay(void);
 
 extern int g_gfxBlitLockHeld;
 extern HANDLE g_gfxBlitLockEvent;
@@ -31,9 +28,9 @@ extern HANDLE g_gfxBlitLockEvent;
 // FUNCTION: 0x4c1a40
 void ClearKeyQueue(void)
 {
-    Queue_004c1ab0* q = GetDisplay();
-    q->head = 0;
-    q->tail = 0;
+    DisplayContext* q = GetDisplay();
+    q->mappedKeyWriteIdx = 0;
+    q->mappedKeyReadIdx = 0;
 }
 
 // Sibling of 0x4c1ab0/0x4c1b00/0x4c1b20: (re)initialises the ring buffer,
@@ -41,15 +38,15 @@ void ClearKeyQueue(void)
 // FUNCTION: 0x4c1a60
 void __stdcall InitKeyQueue(int size)
 {
-    Queue_004c1ab0* q = GetDisplay();
+    DisplayContext* q = GetDisplay();
     if (size <= 0x1e)
-        q->size = size;
+        q->mappedKeyQueueCap = size;
     else
-        q->size = 0x1e;
+        q->mappedKeyQueueCap = 0x1e;
 
     q = GetDisplay();
-    q->head = 0;
-    q->tail = 0;
+    q->mappedKeyWriteIdx = 0;
+    q->mappedKeyReadIdx = 0;
 }
 
 // FUNCTION: 0x4c1aa0
@@ -62,17 +59,17 @@ void DestroyPreCleanup(void)
 // FUNCTION: 0x4c1ab0
 int PopKey(void)
 {
-    Queue_004c1ab0* q = GetDisplay();
+    DisplayContext* q = GetDisplay();
     int v;
-    if (q->head == q->tail) {
+    if (q->mappedKeyWriteIdx == q->mappedKeyReadIdx) {
         v = 0;
     } else {
-        // Next index in a local, entry read as entries[next - 1]: sets the load order.
-        int next = q->tail + 1;
-        v = q->entries[next - 1];
-        q->tail++;
-        if (q->tail == q->size)
-            q->tail = 0;
+        // Next index in a local, entry read as mappedKeyQueue[next - 1]: sets the load order.
+        int next = q->mappedKeyReadIdx + 1;
+        v = q->mappedKeyQueue[next - 1];
+        q->mappedKeyReadIdx++;
+        if (q->mappedKeyReadIdx == q->mappedKeyQueueCap)
+            q->mappedKeyReadIdx = 0;
     }
     return v;
 }
@@ -80,13 +77,13 @@ int PopKey(void)
 // FUNCTION: 0x4c1b00
 int __cdecl PeekKey()
 {
-    Queue_004c1ab0* q = GetDisplay();
-    int head = q->head;
-    int tail = q->tail;
-    if (head == tail) {
+    DisplayContext* q = GetDisplay();
+    int writeIdx = q->mappedKeyWriteIdx;
+    int readIdx = q->mappedKeyReadIdx;
+    if (writeIdx == readIdx) {
         return 0;
     }
-    return q->entries[tail];
+    return q->mappedKeyQueue[readIdx];
 }
 
 // Pushes an entry onto the small ring buffer that 0x4c1ab0 pops and 0x4c1b00
@@ -98,14 +95,14 @@ int __cdecl PeekKey()
 // FUNCTION: 0x4c1b20
 void __stdcall PushKeyCode(int v)
 {
-    Queue_004c1ab0* q = GetDisplay();
-    // Store indexes with `next`, but the full test recomputes q->head + 1 itself.
-    int next = q->head + 1;
-    if ((q->head + 1) % q->size != q->tail) {
-        q->entries[next - 1] = v;
-        q->head++;
-        if (q->head == q->size)
-            q->head = 0;
+    DisplayContext* q = GetDisplay();
+    // Store the index with `next`, but the full test recomputes the write index itself.
+    int next = q->mappedKeyWriteIdx + 1;
+    if ((q->mappedKeyWriteIdx + 1) % q->mappedKeyQueueCap != q->mappedKeyReadIdx) {
+        q->mappedKeyQueue[next - 1] = v;
+        q->mappedKeyWriteIdx++;
+        if (q->mappedKeyWriteIdx == q->mappedKeyQueueCap)
+            q->mappedKeyWriteIdx = 0;
     }
 }
 #pragma auto_inline(on)
@@ -146,14 +143,14 @@ int __stdcall IsKeyDown(int key)
 // PushKeyCode, inlined at the constant-key cases.
 static inline void PushKey(int v)
 {
-    Queue_004c1ab0* q = GetDisplay();
-    int next = q->head + 1;
-    if ((q->head + 1) % q->size == q->tail)
+    DisplayContext* q = GetDisplay();
+    int next = q->mappedKeyWriteIdx + 1;
+    if ((q->mappedKeyWriteIdx + 1) % q->mappedKeyQueueCap == q->mappedKeyReadIdx)
         return;
-    q->entries[next - 1] = v;
-    q->head++;
-    if (q->head == q->size)
-        q->head = 0;
+    q->mappedKeyQueue[next - 1] = v;
+    q->mappedKeyWriteIdx++;
+    if (q->mappedKeyWriteIdx == q->mappedKeyQueueCap)
+        q->mappedKeyWriteIdx = 0;
 }
 
 // FUNCTION: 0x4c1d50
@@ -231,7 +228,7 @@ void InitBlitLock()
 void __stdcall SetCursorOverlayEnabled(int param)
 {
     DisplayContext* obj = (DisplayContext*)GetDisplay();
-    obj->field_at_0x1d2 = param;
+    obj->cursorOverlayEnabled = param;
 }
 
 // FUNCTION: 0x4c22f0
