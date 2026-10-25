@@ -161,7 +161,8 @@ struct Mission;
 struct Game {
     char unknown_0[0x14357];
     Unit* units;                        // +0x14357
-    char unknown_1435b[0x391e9 - 0x1435b];
+    Unit* unitsEnd;                     // +0x1435b
+    char unknown_1435f[0x391e9 - 0x1435f];
     Mission* mapInfo;                   // +0x391e9
 };
 
@@ -240,7 +241,7 @@ Unit* __stdcall LoadUnit(unsigned short id, HapiBank* file)
     if (id == 0)
         unit = 0;
     else
-        unit = (Unit*)(*(char**)((char*)g_game + 0x14357) + id * 0x118);
+        unit = (Unit*)((char*)g_game->units + id * 0x118);
     if (unit == 0 || (unit->flags & 0x10000000))
         return unit;
 
@@ -378,8 +379,8 @@ void __stdcall SaveUnits(HapiBank* file)
     Unit* end = 0;
     Unit* unit;
     file->OpenAccount("Units");
-    end = *(Unit**)((char*)g_game + 0x1435b);
-    unit = *(Unit**)((char*)g_game + 0x14357);
+    end = g_game->unitsEnd;
+    unit = g_game->units;
     for (; unit <= end; unit = (Unit*)((char*)unit + 0x118)) {
         if (unit->flags & 0x10000000) {
             SaveRec rec;
@@ -410,7 +411,7 @@ void __stdcall SaveUnits(HapiBank* file)
                 ((UnitMotion*)unit->motion)->SaveMotion(unit, file);
             ((UnitResources*)((char*)unit + 0xbc))->SaveUnitAccounts((UnitInfo*)unit, file);
 
-            strcpy(rec.name, (char*)(*(char**)((char*)unit + 0x92) + 0x20));
+            strcpy(rec.name, (char*)unit->def + 0x20);
             rec.player = unit->playerIndex;
             rec.id = unit->id;
 
