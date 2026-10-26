@@ -53,7 +53,10 @@ The build with the original writes build/place/layout.csv, everything it
 took from the original's bytes to lay the image out; data/layout.csv is the
 recorded copy (--write-layout), from which --no-orig (or a checkout without
 orig/TotalA.exe) builds the same exe with nothing of the original but the
-art, and checks it against the recorded hashes. See docs/linking.md.
+art, and checks it against the recorded hashes. See docs/linking.md. A
+location recorded there has no name the build from source can find, so the
+build with the original fails when it has one that data/layout.csv lacks:
+the name the source gives is wrong, and recording the target would hide it.
 
 Every relocation is checked against the address the original uses at that
 spot, and the image is compared with the original byte for byte (the
@@ -444,6 +447,9 @@ class Placer:
         # object's copy of the same literal, constant or file static).
         self.same: dict[tuple[int, int], list[tuple[int, int, int]]] = defaultdict(list)
         self.overrides: dict[int, int] = {}         # relocation site -> target, from data/layout.csv
+        # site -> what the reference names and resolves to (unreplayable): for
+        # place.py to say which calls data/layout.csv has to record.
+        self.override_info: dict[int, dict] = {}
         # Library function names by address, for refs_agree: data/functions.csv's,
         # corrected as members are placed.
         self.named_at: dict[int, str] = {}
@@ -847,7 +853,10 @@ class Placer:
             as (object, section, lo, hi, address);
           * relocation site -> target for the references left (the other
             copy of std::_Lockit, the names whose address only the
-            original's bytes gave)."""
+            original's bytes gave).
+
+        self.override_info records, for each site, the name the reference
+        gives and where it resolves by name alone, for place.py to report."""
         def failing():
             for piece in self.pieces:
                 obj = piece.obj
@@ -860,11 +869,13 @@ class Placer:
                         continue
                     sym = obj.syms[symidx]
                     offset = sym.value + (ours if rtype == REL_DIR32 and sym.name.startswith(".") else 0)
-                    if self.replay_target(obj, sym, offset) != target:
-                        yield site, target, obj, sym, offset
+                    resolved = self.replay_target(obj, sym, offset)
+                    if resolved != target:
+                        yield site, target, obj, sym, offset, resolved, piece.label, rtype
 
+        fails = list(failing())
         same = []
-        for site, target, obj, sym, offset in list(failing()):
+        for site, target, obj, sym, offset, resolved, label, rtype in fails:
             if sym.section <= 0 or self.address_in(obj, sym.section, offset) is not None:
                 continue
             sec = obj.secs[sym.section - 1]
@@ -872,7 +883,9 @@ class Placer:
             va = target - sym.value + lo
             self.same[(id(obj), sym.section)].append((lo, hi, va))
             same.append((obj, sym.section, lo, hi, va))
-        return same, {site: target for site, target, *_ in failing()}
+        for site, target, obj, sym, offset, resolved, label, rtype in fails:
+            self.override_info[site] = {"name": sym.name, "resolved": resolved, "label": label, "rtype": rtype}
+        return same, {site: target for site, target, *_ in fails}
 
     def relocate_replay(self) -> None:
         """Resolve every relocation of the placed pieces by name, and where
@@ -2023,6 +2036,55 @@ def layout_rows(placer: Placer) -> list[dict]:
     return rows
 
 
+def recorded_relocs() -> set[int]:
+    """The relocation sites data/layout.csv records a target for."""
+    if not LAYOUT.exists():
+        return set()
+    with LAYOUT.open() as fh:
+        return {int(r["address"], 16) for r in csv.DictReader(fh) if r["kind"] == "reloc"}
+
+
+def report_unrecorded_relocs(placer: Placer) -> int:
+    """The call sites this build has to record that data/layout.csv does not,
+    printed with the name each reference gives and the address the original
+    calls; the count, for main() to fail on.
+
+    A build without the original resolves each reference by name, so a site
+    only lands where the original does if the name it gives leads there. One
+    that does not (a declaration no definition has: a signature Cavedog's
+    headers guessed wrong) is a source error, and --write-layout would hide
+    it by recording where the call goes instead of fixing the name.
+
+    Only calls are looked at: a data reference to one of several copies of a
+    literal or a constant (`??_C@...`, `$T...`) is a normal location to
+    record, and data/layout.csv is full of them."""
+    if not LAYOUT.exists():
+        return 0                       # main() has said it is missing
+    recorded = recorded_relocs()
+    new = []
+    for r in placer.layout:
+        if r["kind"] != "reloc":
+            continue
+        site = int(r["address"], 16)
+        if site in recorded or placer.override_info[site]["rtype"] != REL_REL32:
+            continue
+        new.append((site, int(r["object"], 16)))
+    new.sort()
+    if not new:
+        return 0
+    print(f"\n{len(new)} call site(s) of this build are not in {LAYOUT.relative_to(ROOT)}: a build without "
+          "the original resolves them by name, and the name does not lead where the original calls.")
+    for site, target in new:
+        info = placer.override_info[site]
+        resolved = info["resolved"]
+        where = "nothing" if resolved is None else f"{resolved:#x}"
+        print(f"  {site:#x} in {info['label']}: {info['name']} resolves to {where}, "
+              f"the original calls {target:#x}")
+    print(f"  The usual fix is the declaration the call goes through (a name or a signature no definition "
+          f"has), not --write-layout.")
+    return len(new)
+
+
 def write_layout(rows: list[dict], path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="") as fh:
@@ -2288,6 +2350,7 @@ def main() -> None:
     if replaying and args.write_layout:
         raise SystemExit("--write-layout needs orig/TotalA.exe")
 
+    unrecorded = 0
     if replaying:
         print("building from data/layout.csv, without the original")
         img, placer = replay(args.jobs)
@@ -2297,9 +2360,11 @@ def main() -> None:
         if args.write_layout:
             write_layout(placer.layout, LAYOUT)
             print(f"wrote {LAYOUT.relative_to(ROOT)}: {len(placer.layout):,} rows")
-        elif not LAYOUT.exists() or LAYOUT.read_text() != (OUT_DIR / "layout.csv").read_text():
-            print(f"{LAYOUT.relative_to(ROOT)} is not this build's layout ({(OUT_DIR / 'layout.csv').relative_to(ROOT)}): "
-                  "run with --write-layout to update it")
+        else:
+            if not LAYOUT.exists() or LAYOUT.read_text() != (OUT_DIR / "layout.csv").read_text():
+                print(f"{LAYOUT.relative_to(ROOT)} is not this build's layout "
+                      f"({(OUT_DIR / 'layout.csv').relative_to(ROOT)}): run with --write-layout to update it")
+            unrecorded = report_unrecorded_relocs(placer)
     if not args.no_exe_patches:
         from exepatch import apply_placed
         apply_placed(img.out, img.base)
@@ -2318,6 +2383,8 @@ def main() -> None:
     if not args.no_exe_patches and not check_hashes(data):
         total += 1
     if args.strict and total:
+        raise SystemExit(1)
+    if unrecorded:
         raise SystemExit(1)
 
 
