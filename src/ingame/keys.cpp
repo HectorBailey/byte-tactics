@@ -99,12 +99,7 @@ void WalkFrameChain(int*, int*, int, int, int*, int, int*, int*, int, int*);
 
 #include "../graphics/surface.h"
 
-// The display context at g_display, whose only member read here is the
-// override surface at +0xbc (Thaldren's DisplayContext.pOverrideSurface).
-struct DisplayContext {
-    char unknown_0[0xbc];
-    Surface* overrideSurface;               // +0xbc
-};
+#include "../graphics/display_context.h"
 
 struct Game {
     char unknown_0[0x519];

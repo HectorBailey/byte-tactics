@@ -69,7 +69,9 @@ struct DirectDrawState {
 
 // The display context at g_display. Packed to 2: the mode struct and the two
 // ints after it sit at 0x1ea, 0x1fa and 0x1fe, and videoFlags is a word at
-// +0x202.
+// +0x202. Its own view, not graphics/display_context.h: the methods it calls
+// on the DirectDraw objects and the flag bits it names are one pointer and one
+// word in that header.
 #pragma pack(push, 2)
 struct DisplayContext {
     HINSTANCE hInstance;                 // +0x00

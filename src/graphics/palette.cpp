@@ -9,6 +9,8 @@
 // The display context at g_display, as this module sees it: the GDI and
 // DirectDraw palettes, the table buffers at +0xc0 to +0xd0, the flags at
 // +0xf0 and the palette table at +0x214. display.cpp has the whole object.
+// Its own view, not graphics/display_context.h: it names the flag bits, reads
+// the entries as ints and the brightness at +0x614 as a float over an int.
 #pragma pack(push, 1)
 struct DisplayContext {
     char unknown_0[0x44];
