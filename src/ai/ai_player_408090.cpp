@@ -1,4 +1,11 @@
 // Decompiled by Opus. Names are provisional.
+// The first argument is the caller's player record, the same one
+// ai_player_407e70.cpp reads: its explored map starts at +0x7c, so the size the
+// test below indexes the visibility mask by is at +0x80. Its own Game view
+// stays local, since game/game.h's declarations move this function
+// (docs/c2-regalloc.md).
+
+#include "../map/byte_map.h"
 
 #pragma pack(push, 1)
 struct Game {
@@ -7,22 +14,12 @@ struct Game {
     char unknown_2a44[0x14273 - 0x2a44];
     unsigned short* visibilityMask;     // +0x14273
 };
+
+struct Player {
+    char unknown_0[0x7c];
+    ByteMap explored;                   // +0x7c
+};
 #pragma pack(pop)
-
-struct MapSize_00408090 {
-    unsigned int width;                 // +0x0
-    unsigned int height;                // +0x4
-
-    int Contains(unsigned int tx, unsigned int ty)
-    {
-        return tx < width && ty < height;
-    }
-};
-
-struct Map_00408090 {
-    char unknown_0[0x80];
-    MapSize_00408090 size;              // +0x80
-};
 
 struct Position_00408090 {              // 16.16 fixed point; only high words read
     short xFrac;
@@ -36,12 +33,12 @@ struct Position_00408090 {              // 16.16 fixed point; only high words re
 extern Game* g_game;
 
 // FUNCTION: 0x408090
-int __stdcall IsPointVisible(Map_00408090* map, Position_00408090* pos)
+int __stdcall IsPointVisible(Player* player, Position_00408090* pos)
 {
     int tx = pos->x >> 5;
     int ty = (pos->z - (pos->y >> 1)) >> 5;
-    if (!map->size.Contains(tx, ty)) {
+    if (!player->explored.size.Contains(tx, ty)) {
         return 0;
     }
-    return (g_game->visibilityMask[map->size.width * ty + tx] & (1 << g_game->playerIndex)) != 0;
+    return (g_game->visibilityMask[player->explored.size.width * ty + tx] & (1 << g_game->playerIndex)) != 0;
 }
