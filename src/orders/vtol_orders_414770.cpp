@@ -41,10 +41,13 @@ void __stdcall DrawUnit(void*, Unit*);
 
 #include "order.h"
 
-class Class_0044e2d0 {
+// The order object the vtol orders build: PathOrder, the class order_targets.cpp
+// defines. The constructor keeps that definition's argument types so the call
+// reaches it by name.
+class PathOrder {
 public:
     char unknown_0[0x36];
-    Class_0044e2d0(Order* order, const Vec3& pos);
+    PathOrder(Order* order, const Vec3& pos);
     void SetAltitude(int);
 };
 
@@ -75,14 +78,14 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
     unit->SetStateBits(1, 1);
     if ((unit->motion->flags & 3) == 1) {
         unit->motion->SetFlightMode(unit, 2);
-        Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);
+        PathOrder* obj = new PathOrder(order, unit->pos);
         obj->SetAltitude(unit->def->altitude / 2);
         order->SetAttachedFx((OrderFx*)obj);
         order->flags |= flags | 0xe0;
     }
 }
 
-// Order handler "Reclaiming" (second variant, driven by a Class_0044e2d0
+// Order handler "Reclaiming" (second variant, driven by a PathOrder
 // move object rather than the turn/approach states of 0x404ad0).
 // Stays in a file of its own: it matches only in this file's symbol context.
 // FUNCTION: 0x414770
@@ -107,7 +110,7 @@ int __stdcall VtolReclaimOrder(Unit* unit, Order* order, int flags)
         }
         break;
     case 1: {
-        Class_0044e2d0* obj = new Class_0044e2d0(order, order->pos);
+        PathOrder* obj = new PathOrder(order, order->pos);
         order->SetAttachedFx((OrderFx*)obj);
         order->flags = 0xe0;
         return 1;

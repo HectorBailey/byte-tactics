@@ -424,7 +424,7 @@ struct Order;
 struct Owner_0044e080;
 struct Source_0044e250;
 struct Source_0044e2d0;
-struct Vec3_0044e2d0;
+struct Vec3;
 struct Source_0044e330;
 struct Vec3_0044e330;
 #include "path_order_attach.h"
@@ -468,7 +468,7 @@ public:
     PathOrder(Owner_0044e080* owner_, BitReader* reader);
     PathOrder(Order* order, Unit* unit);
     PathOrder(Source_0044e250* source, int unit, short value);
-    PathOrder(Source_0044e2d0* source, const Vec3_0044e2d0& p);
+    PathOrder(Order* source, const Vec3& p);
     PathOrder(Source_0044e330* source, int unit, const Vec3_0044e330& p);
     void SetAltitude(int param_1);
     void SetHeading(short v);
@@ -576,12 +576,15 @@ struct Source_0044e250 {
     Unit* unit;                        // +0xe
 };
 
+// Unused since 0x44e2d0 took Order for the order: the forward declaration
+// above and this definition keep the ids the constructors after them
+// allocate by (docs/c2-regalloc.md).
 struct Source_0044e2d0 {
     char unknown_0[0xe];
     int unit;                          // +0xe
 };
 
-struct Vec3_0044e2d0 {
+struct Vec3 {
     int x;
     int y;
     int z;
@@ -1816,8 +1819,8 @@ PathOrder::PathOrder(Source_0044e250* source, int unit, short value)
 
 // Another constructor of the class built by 0x44e330 and 0x44e250 (vtable
 // g_pathOrderVtable), with a type of 0x20 and the position passed in.
-// FUNCTION: 0x44e2d0 ??0PathOrder@@QAE@PAUSource_0044e2d0@@ABUVec3_0044e2d0@@@Z
-PathOrder::PathOrder(Source_0044e2d0* source, const Vec3_0044e2d0& p)
+// FUNCTION: 0x44e2d0 ??0PathOrder@@QAE@PAUOrder@@ABUVec3@@@Z
+PathOrder::PathOrder(Order* source, const Vec3& p)
     : OrderFx((int)source), ref(0, 0), pos(*(const Vec3_0044e3c0*)&p)
 {
     vtable = g_pathOrderVtable;

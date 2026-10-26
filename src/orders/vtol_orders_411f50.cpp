@@ -108,10 +108,13 @@ struct Struct_Game391e9 {
 struct Game {
     char pad0[0x391e9]; Struct_Game391e9* mapInfo;
 };
-class Class_0044e2d0 {
+// The order object the vtol orders build: PathOrder, the class order_targets.cpp
+// defines. The constructor keeps that definition's argument types so the call
+// reaches it by name.
+class PathOrder {
 public:
     char unknown_0[0x36];
-    Class_0044e2d0(Order* order, const Vec3& pos);
+    PathOrder(Order* order, const Vec3& pos);
     void SetAltitude(int);
     void SetApproachRadius(short);
 };
@@ -158,7 +161,7 @@ void __stdcall PrepVtolClimb(Unit* unit, Order* order, unsigned int flags)
     unit->SetStateBits(1, 1);
     if ((unit->motion->flags & 3) == 1) {
         unit->motion->SetFlightMode(unit, 2);
-        Class_0044e2d0* obj = new Class_0044e2d0(order, unit->pos);
+        PathOrder* obj = new PathOrder(order, unit->pos);
         obj->SetAltitude(unit->def->altitude / 2);
         order->SetAttachedFx((int)obj);
         order->flags |= flags | 0xe0;
@@ -241,11 +244,11 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         // attackrunlength is added in a second statement: one sum changes the x87 order.
         int time = (int)(x * unit->motion->field_22) + 1;
         time += def->attackrunlength;
-        Class_0044e2d0* obj;
+        PathOrder* obj;
         if (order->target.owner)
-            obj = (Class_0044e2d0*)new Class_0044e190(order, order->target.owner);
+            obj = (PathOrder*)new Class_0044e190(order, order->target.owner);
         else
-            obj = new Class_0044e2d0(order, order->pos);
+            obj = new PathOrder(order, order->pos);
         obj->SetApproachRadius(time);
         order->SetAttachedFx((int)obj);
         order->SetDeadlineTicks(1);
@@ -287,7 +290,7 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
 
 static inline void AttachMove(Order* order, const Vec3& dest, short radius)
 {
-    Class_0044e2d0* obj = new Class_0044e2d0(order, dest);
+    PathOrder* obj = new PathOrder(order, dest);
     obj->SetApproachRadius(radius);
     order->SetAttachedFx((int)obj);
 }

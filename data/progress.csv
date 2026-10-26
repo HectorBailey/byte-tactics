@@ -976,7 +976,7 @@ address,size,file,symbol,status,similarity
 0x44e080,258,src/orders/order_targets.cpp,??0PathOrder@@QAE@PAUOwner_0044e080@@PAVBitReader@@@Z,matched,100.0
 0x44e190,183,src/orders/order_targets.cpp,??0PathOrder@@QAE@PAUOrder@@PAUUnit@@@Z,matched,100.0
 0x44e250,113,src/orders/order_targets.cpp,??0PathOrder@@QAE@PAUSource_0044e250@@HF@Z,matched,100.0
-0x44e2d0,95,src/orders/order_targets.cpp,??0PathOrder@@QAE@PAUSource_0044e2d0@@ABUVec3_0044e2d0@@@Z,matched,100.0
+0x44e2d0,95,src/orders/order_targets.cpp,??0PathOrder@@QAE@PAUOrder@@ABUVec3@@@Z,matched,100.0
 0x44e330,111,src/orders/order_targets.cpp,??0PathOrder@@QAE@PAUSource_0044e330@@HABUVec3_0044e330@@@Z,matched,100.0
 0x44e3a0,22,src/orders/order_targets.cpp,?KeepAfterComplete@PathOrder@@QAEHXZ,matched,100.0
 0x44e3c0,355,src/orders/order_targets.cpp,?FillWorldPos@PathOrder@@QAEHPAUVec3_0044e3c0@@@Z,matched,100.0
