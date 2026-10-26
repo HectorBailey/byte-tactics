@@ -57,8 +57,9 @@ namespace ta {
 #include <ta_types.h>
 }
 
-// A 16.16 position or velocity, and the fixed-point halves the VTOL code
-// reads from it (the fraction and whole parts of x, y and z).
+// Own Vec3, not vec3.h: a 16.16 position or velocity whose fixed-point halves
+// the VTOL code reads (the fraction and whole parts of x, y and z), and it has
+// operator+=, -=, + and -.
 struct Vec3 {
     union { int x; struct { unsigned short xf; short xw; }; };
     union { int y; struct { unsigned short yf; short yw; }; };
