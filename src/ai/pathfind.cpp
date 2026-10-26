@@ -229,16 +229,17 @@ extern const Table_0040d880 g_turnCosts;
 extern signed char g_dirDeltaX[];      // dx per direction
 extern signed char g_dirDeltaZ[];      // dy per direction
 
-class Planner_0040eb70;
+// Unused here: the symbol ids of these two declarations take the place of the
+// movement view this file used to define, which keeps ExpandNeighbour's
+// allocation (docs/c2-regalloc.md).
+void CreatePathfinder();
+void DestroyPathfinder();
+
+class UnitMotion;
 
 #pragma pack(push, 1)
-struct Owner_0040eb70 {
-    Planner_0040eb70* planner;         // +0x0
-    void* owner;                       // +0x4, the movement class
-};
-
 struct Unit {                          // 0x118 bytes
-    Owner_0040eb70* motion;            // +0x0
+    UnitMotion* motion;                // +0x0
     char unknown_4[0x66 - 0x4];
     unsigned short heading;            // +0x66
     char unknown_68[0x76 - 0x68];
@@ -297,7 +298,8 @@ public:
     void SetWaypoints(Point16* points, int count);
 };
 
-class Planner_0040eb70 {
+// The path object at UnitMotion::obj, as far as the search uses it.
+class Iface_0043dd20 {
 public:
     virtual void unused0();
     virtual void unused1();
@@ -786,6 +788,19 @@ void Pathfinder::ExpandNeighbour(NodeData* from, PathCell* fromCell, int turn)
     }
 }
 
+// The movement view this file used to define is orders/unit_motion.h's, included
+// here rather than above: its declarations move the allocation of the functions
+// before it (docs/c2-regalloc.md).
+#include "../orders/unit_motion.h"
+
+// Unused here: the symbol ids these declarations take stand in for what the
+// include above costs the functions from 0x40e160 on (docs/c2-regalloc.md).
+void EnableAICommands(void);
+void RegisterAICommands(void);
+void ResetAIPlayers(void);
+int TryClaimRepath(void);
+void FreeMovementClasses(void);
+
 // Pops the best node from an open list and expands it on the navigation grid.
 // FUNCTION: 0x40df00
 int Pathfinder::ExpandBestNode()
@@ -963,7 +978,8 @@ greedy:
 // FUNCTION: 0x40e630
 void Pathfinder::StartSearch(Target* t)
 {
-    owner = (MovementClass*)object->motion->owner;
+    // The header holds the movement class as an int; the search keeps its pointer.
+    owner = (MovementClass*)object->motion->movementClass;
     target = t;
     start = object->cell;
     owner->RefreshMovedUnits((Object_00440af0*)object);
@@ -1149,8 +1165,8 @@ void Pathfinder::RunSearches()
             else
                 (*c)++;
             Unit* u = cursor[player];
-            if (u->unitDefIndex != 0 && u->motion != 0 && u->motion->owner != 0) {
-                path = u->motion->planner->GetPath();
+            if (u->unitDefIndex != 0 && u->motion != 0 && u->motion->movementClass != 0) {
+                path = u->motion->obj->GetPath();
                 if (path != 0) {
                     object = u;
                     steps += 100;
