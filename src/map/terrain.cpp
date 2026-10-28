@@ -29,6 +29,15 @@
 #include <vector>
 #include <shlobj.h>
 
+// Unused here: the symbol ids these declarations take keep CanBuildAt (0x47d2e0)
+// in the window it matches in (docs/c2-regalloc.md).
+void RegisterUnitOrders(void);
+void RegisterGroundOrders(void);
+void EnableAICommands(void);
+void RegisterAICommands(void);
+void ResetAIPlayers(void);
+void FreeMovementClasses(void);
+
 struct Unit;
 
 #pragma pack(push, 1)

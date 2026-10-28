@@ -15,6 +15,8 @@
 void RegisterUnitOrders(void);
 void RegisterGroundOrders(void);
 void SetMemFussyDefault(void);
+void AbortProgram(void);
+void NopAfterFeatureEnum(void);
 
 void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* p);
@@ -107,11 +109,6 @@ void __stdcall PushHeapSiftUp(Entry_40d670* first, int hole, int top, Entry_40d6
 }
 
 #include "../util/vec3.h"
-
-// Unused here, and declared again with the movement includes below: the two
-// declarations are what keep ExpandNeighbour (0x40da70) and the functions from
-// 0x40e160 on in their windows (docs/c2-regalloc.md).
-void EnableAICommands(void);
 
 // A free operator, not a member: nothing else that includes vec3.h needs one,
 // and a member would cost every one of those files its three symbol ids.
@@ -503,7 +500,7 @@ public:
     }
     void Release()
     {
-        owner->RefreshUnitIfStale((Object_00440af0*)object);
+        owner->RefreshUnitIfStale((Unit*)object);
         object = 0;
         owner = 0;
     }
@@ -984,7 +981,7 @@ void Pathfinder::StartSearch(Target* t)
     owner = (MovementClass*)object->motion->movementClass;
     target = t;
     start = object->cell;
-    owner->RefreshMovedUnits((Object_00440af0*)object);
+    owner->RefreshMovedUnits((Unit*)object);
     ResetTable();
     ClearDirtyCells();
 
@@ -1039,7 +1036,7 @@ void Pathfinder::StartSearch(Target* t)
 // FUNCTION: 0x40e9a0
 void Pathfinder::ReleaseHeldPathLock()
 {
-    owner->RefreshUnitIfStale((Object_00440af0*)object);
+    owner->RefreshUnitIfStale((Unit*)object);
     object = 0;
     owner = 0;
 }
