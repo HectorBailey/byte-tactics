@@ -23,9 +23,32 @@
 #include <ddraw.h>
 #include <math.h>
 
-struct Gadget;
+#include "../gui/gadget.h"
+
+// Unused here: the symbol ids these declarations take keep 0x441220, 0x441460,
+// 0x4468c0 and 0x447b10 matching (docs/c2-regalloc.md).
+void RegisterAICommands(void);
+void FUN_00406f40(void);
+void RegisterVtolOrders(void);
+void StepAllGafSequences(void);
+void ResetNetStats(void);
+void FUN_004161f0(void);
+int UpdatePlacementGhostValidity(void);
+void RefreshSelectionOrders(void);
+void DispatchOrdersPanelPageFlags(void);
+void ResetCameraState(void);
+void FindLocalCommander(void);
+void ClampCameraPosition(void);
+void ClampCameraTarget(void);
+void UpdateScreenShake(void);
+void UpdateCameraFollow(void);
+void BeginMouseScroll(void);
+void EndMouseScroll(void);
+void UpdateMouseScroll(void);
+void UpdateEdgeScroll(void);
+void CenterCameraOnRadarClick(void);
+
 struct Layer;
-struct Gui;
 struct Game;
 struct Record_00446f50;
 struct Options_00446f50;
@@ -36,124 +59,6 @@ class UnitSync;
 
 #pragma pack(push, 1)
 
-// The 0x15b-byte menu control record. Entry 0 holds the count at +0xb6; the
-// other entries hold NUL terminated text there. +0xcc is entry 0's label,
-// +0xce the two-argument handler the menu calls for its own entries, and
-// +0xd2 the record the entry is bound to. The views of the three parts are
-// one type here: +0xb6's text, count and entry_text, +0xc2's text pointer,
-// +0xce's handler and +0xd6's flags keep their part's name.
-struct Gadget {                        // 0x15b bytes
-    union {                            // +0x00
-        unsigned char type;
-        unsigned char state;
-    };
-    char team;                         // +0x01
-    char name[0x11];                   // +0x02
-    short x;                           // +0x13
-    short y;                           // +0x15
-    short width;                       // +0x17
-    short height;                      // +0x19
-    int attribs;                       // +0x1b
-    int colours;                       // +0x1f
-    int colour;                        // +0x23
-    char unknown_27[0x29 - 0x27];      // +0x27
-    union {                            // +0x29
-        char active;
-        unsigned char visible;
-    };
-    char unknown_2a[0xb6 - 0x2a];      // +0x2a
-    union {                            // +0xb6
-        char text[0x138 - 0xb6];       // the list or label text
-        short count;                   // entry 0's count
-        char entry_text[0xcc - 0xb6];  // one entry's own text
-        struct {                       // entry 0's label
-            char unknown_b6l[0xcc - 0xb6];
-            char label[0x138 - 0xcc];  // +0xcc
-        };
-        struct {                       // the unit restrictions' flags list
-            char unknown_b6f[0xbe - 0xb6];
-            union {
-                int hotspotGaf;        // +0xbe
-                struct {
-                    short unknown_be;
-                    short count;       // +0xc0, the list's length
-                } list;
-            };
-        };
-        struct {                       // the dialog's own fields
-            char unknown_b6b[0xba - 0xb6];
-            union {                    // +0xba
-                short selected;
-                unsigned char indexByte;
-                short index;
-            };
-            union {                    // +0xbc
-                struct {
-                    char unknown_bc[0xc0 - 0xbc];
-                    unsigned short rowCount;   // +0xc0
-                };
-                struct {
-                    short firstRow;    // +0xbc
-                    char unknown_be2[0xc0 - 0xbe];
-                };
-            };
-            union {                    // +0xc2
-                char* text_c2;
-                void* hotspotFrame;
-            };
-            union {                    // +0xc6
-                char unknown_c6[0xcc - 0xc6];
-                void* rows;            // +0xc6
-                struct {
-                    short frame;       // +0xc6
-                    union {
-                        unsigned int hotspotFlags; // +0xc8
-                        struct {
-                            unsigned int c8_0 : 1;
-                            unsigned int c8_rest : 31;
-                        };
-                    };
-                };
-            };
-            char unknown_cc[0xce - 0xcc];  // +0xcc
-            union {                    // +0xce
-                void (__stdcall* handler)(Gui* menu, Gadget* entry);
-                void (__stdcall* onSelect)(Gui* menu, int index);
-                void* callback;
-            };
-            union {                    // +0xd2
-                int data;
-                Record_00446f50* records;
-            };
-            union {                    // +0xd6
-                char* flags;
-                unsigned char* bits;
-            };
-            short scroll;              // +0xda
-            char unknown_dc[0x138 - 0xdc]; // +0xdc
-        };
-    };
-    unsigned short status;             // +0x138
-    unsigned char quickKey;            // +0x13a
-    char unknown_13b;                  // +0x13b
-    union {                            // +0x13c
-        int max;
-        struct {
-            unsigned short field_13c_bit : 1;
-            unsigned short unknown_13d : 15;
-        };
-        struct {
-            unsigned short b13c_0 : 1;
-            unsigned short b13c_rest : 15;
-        };
-    };
-    short knobPos;                     // +0x140
-    short knobSize;                    // +0x142
-    void (__stdcall* sliderCallback)(Gui* menu, int index); // +0x144
-    char unknown_148[2];               // +0x148
-    void* sliderUser;                  // +0x14a
-    char unknown_14e[0x15b - 0x14e];   // +0x14e
-};
 
 
 // The 16-byte group copied out of g_game+0x2b6e.
@@ -496,7 +401,7 @@ void __stdcall SelectGadgetByIndex(void* menu, int index);
 
 static inline void Apply_00441220(unsigned short* p, unsigned short r, int ge, Gadget* entry)
 {
-    unsigned short on = (unsigned short)(((entry->rowCount == 0) | (ge == 0)) & 1);
+    unsigned short on = (unsigned short)(((entry->u.list.rowCount == 0) | (ge == 0)) & 1);
     *p = (unsigned short)((r | on) | (*p & 0xfffe));
 }
 
@@ -510,8 +415,8 @@ void __stdcall UpdateGameSelection(Gui* menu, Gadget* entry)
     Gadget* gd;
     unsigned short on;
     unsigned short r;
-    int idx = entry->index;
-    Group_00441220* rec = (Group_00441220*)((char*)entry->records + idx * 0x54 + 4);
+    int idx = entry->u.list.selected;
+    Group_00441220* rec = (Group_00441220*)((char*)entry->u.list.records + idx * 0x54 + 4);
     Msg_00441220 msg;
     msg.group = *rec;
     memcpy(g_game->buffer, &msg, 185);
@@ -1186,7 +1091,7 @@ void __stdcall HandleNewMultiClick(Gui* gadget)
         lstrcpynA(g_game->password, pw + 0xb6, 0xb);
         gi = FindGadgetIndex(entries, "GAMENAME", 3);
         dst = namebuf;                 // copied through a pointer, as in the original
-        strcpy(dst, entries[gi].text);
+        strcpy(dst, entries[gi].u.text);
         if (strlen(namebuf) == 0) {
             BeginTextEdit(gadget, gi);
             ClearSelectedGadget(gadget);
@@ -1194,7 +1099,7 @@ void __stdcall HandleNewMultiClick(Gui* gadget)
             return;
         }
         ni = FindGadgetIndex(entries, "NICKNAME", 3);
-        strcpy(nickbuf, entries[ni].text);
+        strcpy(nickbuf, entries[ni].u.text);
         if (strlen(nickbuf) == 0) {
             BeginTextEdit(gadget, ni);
             ClearSelectedGadget(gadget);
@@ -1511,7 +1416,7 @@ void OpenTcpDialog()
 // FUNCTION: 0x442380
 void __stdcall SetSerialBaudFromGadget(Gui* menu, Gadget* entry)
 {
-    int value = entry->index;
+    int value = entry->u.list.selected;
     if (value >= 0) {
         g_serialBaudRate = g_serialBaudRateTable[value];
     }
@@ -1520,7 +1425,7 @@ void __stdcall SetSerialBaudFromGadget(Gui* menu, Gadget* entry)
 // FUNCTION: 0x4423a0
 void __stdcall SetSerialPortFromGadget(Gui* menu, Gadget* entry)
 {
-    int val = entry->index;
+    int val = entry->u.list.selected;
     if (val >= 0) {
         g_serialPortNumber.unknown_0 = val + 1;
     }
@@ -1570,9 +1475,9 @@ void __stdcall HandleSerialDialogClick(Gui* gadget)
         ClearSelectedGadget(gadget);
         return;
     }
-    a = FindGadgetChecked(entries, "SPEEDS")->index;
+    a = FindGadgetChecked(entries, "SPEEDS")->u.list.selected;
     WriteGameRegistryValue("SERBAUD", &a, 4);
-    a = FindGadgetChecked(entries, "PORTS")->index;
+    a = FindGadgetChecked(entries, "PORTS")->u.list.selected;
     WriteGameRegistryValue("SERPORT", &a, 4);
 }
 
@@ -1600,10 +1505,10 @@ void OpenSerialDialog()
         SetListBoxScrollByName(&g_game->gui, "PORTS", value);
     }
     Gadget* entry = FindGadgetChecked(gadget->entries, "PORTS");
-    entry->handler = SetSerialPortFromGadget;
+    entry->u.list.callback = SetSerialPortFromGadget;
     SetSerialPortFromGadget(&g_game->gui, entry);
     Gadget* speeds = FindGadgetChecked(gadget->entries, "SPEEDS");
-    speeds->handler = SetSerialBaudFromGadget;
+    speeds->u.list.callback = SetSerialBaudFromGadget;
     SetSerialBaudFromGadget(&g_game->gui, speeds);
     SetKeyboardInput(&g_game->gui, 1);
     RenderLayer(&g_game->gui, 0x40);
@@ -1621,7 +1526,7 @@ void FillAccountList(void)
         buffer += strlen(g_modemAccounts[i].name) + 1;
     }
     Gadget* entry = FindGadgetChecked(g_game->gui.layer->entries, "ACCOUNTS");
-    int player = entry->index;
+    int player = entry->u.list.selected;
     ConfigureListBoxByName((char*)&g_game->gui, "ACCOUNTS", g_modemAccountNames, 20, 0);
     SetListBoxScrollByName((char*)&g_game->gui, "ACCOUNTS", player);
 }
@@ -1634,16 +1539,16 @@ void RefreshAccountList(void)
     Gadget* entry = FindGadgetChecked(g_game->gui.layer->entries, "ACCOUNTS");
     if (entry != 0 && g_modemAccounts != 0) {
         GetGadgetText((char*)&g_game->gui, "NAME",
-                     g_modemAccounts[entry->index].name);
+                     g_modemAccounts[entry->u.list.selected].name);
         GetGadgetText((char*)&g_game->gui, "NUMBER",
-                     g_modemAccounts[entry->index].number);
+                     g_modemAccounts[entry->u.list.selected].number);
         char* buffer = g_modemAccountNames;
         *buffer = 0;
         for (int i = 0; i < 20; i++) {
             strcpy(buffer, g_modemAccounts[i].name);
             buffer += strlen(g_modemAccounts[i].name) + 1;
         }
-        int player = FindGadgetChecked(g_game->gui.layer->entries, "ACCOUNTS")->index;
+        int player = FindGadgetChecked(g_game->gui.layer->entries, "ACCOUNTS")->u.list.selected;
         ConfigureListBoxByName((char*)&g_game->gui, "ACCOUNTS", g_modemAccountNames, 20, 0);
         SetListBoxScrollByName((char*)&g_game->gui, "ACCOUNTS", player);
     }
@@ -1656,7 +1561,7 @@ void RefreshAccountList(void)
 // FUNCTION: 0x4428f0
 void __stdcall ShowSelectedAccount(Gui* menu, Gadget* player)
 {
-    int entry = player->index;
+    int entry = player->u.list.selected;
     if (entry >= 0) {
         SetTranslatedTextByName(menu, "NAME", g_modemAccounts[entry].name, 0);
         SetTranslatedTextByName(menu, "NUMBER", g_modemAccounts[entry].number, 0);
@@ -1674,7 +1579,7 @@ void __stdcall ShowSelectedAccount(Gui* menu, Gadget* player)
 void SaveModemNumbers(void)
 {
     if (g_modemAccounts != 0) {
-        short count = FindGadgetChecked(g_game->gui.layer->entries, "ACCOUNTS")->index;
+        short count = FindGadgetChecked(g_game->gui.layer->entries, "ACCOUNTS")->u.list.selected;
         if (count > 0) {
             Entry_004426e0 temp;
             memcpy(&temp, &g_modemAccounts[count], 0x102);
@@ -1698,9 +1603,9 @@ static inline void LoadAccount_00442a30()
     Gadget* entry = FindGadgetChecked(g_game->gui.layer->entries, "ACCOUNTS");
     if (entry != 0 && g_modemAccounts != 0) {
         GetGadgetText((char*)&g_game->gui, "NAME",
-                     g_modemAccounts[entry->index].name);
+                     g_modemAccounts[entry->u.list.selected].name);
         GetGadgetText((char*)&g_game->gui, "NUMBER",
-                     g_modemAccounts[entry->index].number);
+                     g_modemAccounts[entry->u.list.selected].number);
         FillAccountList();
     }
 }
@@ -1710,7 +1615,7 @@ static inline void LoadAccount_00442a30()
 static inline void SaveModemNumbers_00442a30()
 {
     if (g_modemAccounts != 0) {
-        short count = FindGadgetChecked(g_game->gui.layer->entries, "ACCOUNTS")->index;
+        short count = FindGadgetChecked(g_game->gui.layer->entries, "ACCOUNTS")->u.list.selected;
         if (count > 0) {
             Entry_004426e0 temp;
             memcpy(&temp, &g_modemAccounts[count], 0x102);
@@ -1764,7 +1669,7 @@ void __stdcall HandleModemDialogClick(Gui* gadget)
         LoadAccount_00442a30();
         SelectGadgetByIndex(gadget, FindGadgetIndex(entries, "JOIN", 1));
         TrySetFocus(gadget, FindGadgetIndex(entries, "JOIN", 1));
-        strcpy((char*)&entries->label[0], "JOIN");
+        strcpy((char*)&entries->u.names.choice[0], "JOIN");
         MarkChanged(gadget);
         ClearSelectedGadget(gadget);
         return;
@@ -1896,11 +1801,11 @@ void __stdcall OpenModemDialog()
                             p += strlen(g_modemAccounts[i].name) + 1;
                         }
                         Gadget* entry = FindGadgetChecked(g_game->gui.layer->entries, "ACCOUNTS");
-                        int player = entry->index;
+                        int player = entry->u.list.selected;
                         ConfigureListBoxByName(&g_game->gui, "ACCOUNTS", g_modemAccountNames, 20, 0);
                         SetListBoxScrollByName(&g_game->gui, "ACCOUNTS", player);
                         entry = FindGadgetChecked(gadget->entries, "ACCOUNTS");
-                        entry->handler = ShowSelectedAccount;
+                        entry->u.list.callback = ShowSelectedAccount;
                         ShowSelectedAccount(&g_game->gui, entry);
                     }
                 }
@@ -2069,7 +1974,7 @@ void __stdcall HandleSelectGameClick(Gui* param_1)
         char* pass;
         unsigned int b;
 
-        *(Desc_004437c0*)g_game->game_info = g_game->desc[e->index];
+        *(Desc_004437c0*)g_game->game_info = g_game->desc[e->u.list.selected];
         msg.group = *(Group_00441220*)((char*)g_game + 0x2b6e);
         flags = *(unsigned int*)((char*)&msg.group + 2);
         ver = *(unsigned int*)((char*)&msg.group + 0xe) & 0xff;
@@ -2161,12 +2066,12 @@ void OpenSelectGameDialog()
     SetTranslatedTextByName(&g_game->gui, "NICKNAME", g_game->nickname, 10);
     SetGrayedOutByName(&g_game->gui, "JOIN", 1);
     SetGrayedOutByName(&g_game->gui, "WATCH", 1);
-    for (i = 1; i < gadget->entries->count; i++) {
+    for (i = 1; i < gadget->entries->u.count; i++) {
         if (gadget->entries[i].type == 2) {
             // Indexed inline and bound by reference: no named entries pointer local.
             Gadget& e = gadget->entries[i];
-            e.handler = UpdateGameSelection;
-            e.data = (int)g_game->desc;
+            e.u.list.callback = UpdateGameSelection;
+            e.u.list.records = g_game->desc;
         }
     }
     RenderLayer(&g_game->gui, 0x40);
@@ -2202,7 +2107,7 @@ void OpenSelectGameDialog()
 // FUNCTION: 0x4444d0
 int __stdcall CloneServiceSlot(Gadget* entries, int param_2, short param_3, int param_4, char* param_5)
 {
-    int index = ++entries[0].count;
+    int index = ++entries[0].u.count;
     Gadget* d = &entries[index];
     Gadget* s = &entries[param_2];
     *d = *s;
@@ -2239,7 +2144,8 @@ void __stdcall HandleLogoSelectClick(Gui* param_1)
     if (IsCurrentGadgetNamed(param_1, "LOGOS") || IsCurrentGadgetNamed(param_1, "SELECT")) {
         Player* player = &g_game->players[g_game->localPlayer];
         Gadget* entry = FindGadgetChecked(entries, "LOGOS");
-        player->info->color = ((char*)layout)[entry->indexByte];
+        // +0xba is read as a byte here, where gadget.h names the short it overlaps.
+        player->info->color = ((char*)layout)[*(unsigned char*)&entry->u.list.selected];
         g_game->flag0 = 1;
         RequestPlayerColor(player->info->color);
         return;
@@ -2267,13 +2173,13 @@ void ShowSelectedMapInfo()
     SetTranslatedTextByName(&g_game->gui, "SIZE", (char*)buffer, 0);
 
     Gadget* entry = FindGadgetChecked_E(g_game->gui.layer->entries, "MAPPIC");
-    if (entry->hotspotFrame != 0) {
-        GameFreeThunk(entry->hotspotFrame);
-        entry->hotspotFrame = 0;
+    if (entry->u.hotspot.frame != 0) {
+        GameFreeThunk(entry->u.hotspot.frame);
+        entry->u.hotspot.frame = 0;
     }
     void* bmp = LoadRadarPic(
         (char*)g_game->mapInfo->GetNameSlot(1), &outX, &outY);
-    entry->hotspotFrame = bmp;
+    entry->u.hotspot.frame = (GafFrame*)bmp;
     if (bmp != 0) {
         ResizeRadarPicture(bmp, entry->width, entry->height, outX << 4, outY << 4);
     }
@@ -2310,7 +2216,7 @@ void OpenViewMapDialog()
 void __stdcall UpdateMapSelection(Gui* menu, int unused)
 {
     Gadget* g = FindGadgetChecked(menu->layer->entries, "MAPNAMES");
-    if (g_game->mapInfo->LoadMissionByName(SkipTextLines(g->text_c2, g->selected)) == 0) {
+    if (g_game->mapInfo->LoadMissionByName(SkipTextLines(g->u.list.listText, g->u.list.selected)) == 0) {
         SetGadgetActiveByName(menu, "MAPPIC", 0);
     } else {
         SetGadgetActiveByName(menu, "MAPPIC", 1);
@@ -2326,9 +2232,9 @@ void __stdcall HandleMapSelectClick(Gui* param_1)
 
     if (param_1->hotGadgetIndex == -1) {
         Gadget* entry = FindGadgetChecked_E(g_game->gui.layer->entries, "MAPPIC");
-        if (entry->text_c2 != 0) {
-            GameFreeThunk(entry->text_c2);
-            entry->text_c2 = 0;
+        if (entry->u.list.listText != 0) {
+            GameFreeThunk(entry->u.list.listText);
+            entry->u.list.listText = 0;
         }
         GameFreeThunk(layout->items);
         GameFreeThunk(layout);
@@ -2341,7 +2247,7 @@ void __stdcall HandleMapSelectClick(Gui* param_1)
         PlaySoundByName("Multi", 0);
         Gadget* g = FindGadgetChecked(entries, "MAPNAMES");
         g_game->mapInfo->LoadMissionByName(
-            SkipTextLines(g->text_c2, g->selected));
+            SkipTextLines(g->u.list.listText, g->u.list.selected));
 
         Player* player = &g_game->players[g_game->localPlayer];
         strcpy(player->info->map,
@@ -2417,7 +2323,8 @@ void OpenMultiMapSelector()
     LoadMapList(&data->items, 0, 0);
     SortFileList(data->items, 0, 0, n);
     ConfigureListBoxByName(&g_game->gui, "MAPNAMES", data->items, n, 0);
-    FindGadgetChecked(layer->entries, "MAPNAMES")->onSelect = UpdateMapSelection;
+    // gadget.h types the callback slot; the handler keeps the int it ignores.
+    FindGadgetChecked(layer->entries, "MAPNAMES")->u.list.callback = (void (__stdcall*)(Gui*, Gadget*))UpdateMapSelection;
 
     for (int i = 0; i < n; i++) {
         if (strcmp(g_oldMapName, SkipTextLines(data->items, i)) == 0) {
@@ -2429,7 +2336,7 @@ void OpenMultiMapSelector()
     Gui* menu = &g_game->gui;
     Gadget* g = FindGadgetChecked(menu->layer->entries, "MAPNAMES");
     if (g_game->mapInfo->LoadMissionByName(
-            SkipTextLines(g->text_c2, g->selected)) == 0) {
+            SkipTextLines(g->u.list.listText, g->u.list.selected)) == 0) {
         SetGadgetActiveByName(menu, "MAPPIC", 0);
     } else {
         SetGadgetActiveByName(menu, "MAPPIC", 1);
@@ -2478,7 +2385,7 @@ void OpenLogoSelectDialog()
     }
     Gadget* logo = FindGadgetChecked(gui->entries, "LOGOS");
     if (logo != 0) {
-        logo->callback = CacheLogosGadgetIndex;
+        logo->u.list.callback = (void (__stdcall*)(Gui*, Gadget*))CacheLogosGadgetIndex;
     }
     int index = FindGadgetIndex(gui->entries, "LOGOS", 2);
     if (index != -1) {
@@ -2492,13 +2399,13 @@ void OpenLogoSelectDialog()
 // FUNCTION: 0x445300
 void __stdcall ExpandGadgetTextToType5(Gadget* param_1)
 {
-    if (param_1->state == 1) {
+    if (param_1->type == 1) {
         Head_00444930 tmp = *(Head_00444930*)param_1;
         int index = FindGadgetIndex(g_game->gui.layer->entries, param_1->name, 0xe);
         TruncateGadgetText(&g_game->gui, index);
         param_1->y += 2;
-        param_1->state = 5;
-        strcpy(param_1->entry_text, tmp.text);
+        param_1->type = 5;
+        strcpy(param_1->u.text, tmp.text);
         param_1->attribs |= 0x10;
     }
 }
@@ -2595,8 +2502,8 @@ static void CloneFix_004455b0(Gadget* rec)
     int index = FindGadgetIndex(g_game->gui.layer->entries, rec->name, 0xe);
     TruncateGadgetText(&g_game->gui, index);
     rec->y += 2;
-    rec->state = 5;
-    strcpy(rec->entry_text, tmp.text);
+    rec->type = 5;
+    strcpy(rec->u.text, tmp.text);
     rec->attribs |= 0x10;
 }
 
@@ -2626,11 +2533,11 @@ void __cdecl BuildPlayerSlotGadgets(void)
             dst->y += p * 20;
             dst->team = 0;
             dst->active = 1;
-            if (dst->state != 5) {
+            if (dst->type != 5) {
                 switch (t) {
                 case 0:
                     if (p == g_game->localPlayer) {
-                        if (dst->state == 1)
+                        if (dst->type == 1)
                             CloneFix_004455b0(dst);
                         dst->attribs = 1;
                     } else {
@@ -2639,7 +2546,7 @@ void __cdecl BuildPlayerSlotGadgets(void)
                     break;
                 case 1:
                     if (p != g_game->localPlayer) {
-                        dst->field_13c_bit = 1;
+                        dst->flag_bit = 1;
                         dst->status = 0;
                     }
                     break;
@@ -2660,7 +2567,7 @@ void __cdecl BuildPlayerSlotGadgets(void)
                     dst->active = 0;
                     break;
                 case 6:
-                    if (p != g_game->localPlayer && dst->state == 1)
+                    if (p != g_game->localPlayer && dst->type == 1)
                         CloneFix_004455b0(dst);
                     if (*(int*)&g_game->players[p] != 0 &&
                         (&g_game->players[p])->type == 2)
@@ -2675,7 +2582,7 @@ void __cdecl BuildPlayerSlotGadgets(void)
                     SetButtonStageByName((Dialog_004a04f0*)&g_game->gui, dst->name, 10);
                     break;
                 default:
-                    if (dst->state == 1)
+                    if (dst->type == 1)
                         CloneFix_004455b0(dst);
                     break;
                 }
@@ -2691,7 +2598,7 @@ void __cdecl BuildPlayerSlotGadgets(void)
         index = FindGadgetIndex(base, name, 0xe);
         if (index != -1) {
             Gadget* rec = (Gadget*)(base + 0x15b * index);
-            if (rec->state == 1)
+            if (rec->type == 1)
                 CloneFix_004455b0(rec);
         }
         sprintf(name, "READY%d", g_game->localPlayer);
@@ -2817,7 +2724,7 @@ void __stdcall BindNamedSliderWithCallback(char* name, int param_2, int param_3,
         gadget->sliderCallback = callback;
         gadget->knobPos = param_3;
         SetSliderFromValue(gadget, gadget->knobPos);
-        gadget->sliderUser = g_game;
+        gadget->sliderUser = (int)g_game;
     }
     callback(menu, index);
     MarkChanged(menu);
@@ -2916,7 +2823,7 @@ void __stdcall HandleDisplayModesClick(Gui* gui)
     if (IsCurrentGadgetNamed(gui, "MODES") || IsCurrentGadgetNamed(gui, "SELECT")) {
         Player* player = &g_game->players[g_game->localPlayer];
         Gadget* entry = FindGadgetChecked(gadgets, "MODES");
-        Mode* mode = &obj->modes[entry->selected];
+        Mode* mode = &obj->modes[entry->u.list.selected];
         g_game->displayWidth = mode->width;
         g_game->displayHeight = mode->height;
         player->info->width = (unsigned short)mode->width;
@@ -3481,7 +3388,7 @@ void __stdcall RefreshAlliesScreen(int param_1)
             lstrcpynA(name, p->name, 0x80);
 
             int idx = FindGadgetIndex(entries, player, 0xe);
-            if (entries[idx].state == 1) {
+            if (entries[idx].type == 1) {
                 Gadget* e = FindGadgetOrNull(entries, player);
                 if (e != 0 && (e->attribs & 0x4000)) {
                     strcat(name, "|");
@@ -3530,10 +3437,11 @@ void __stdcall RefreshAlliesScreen(int param_1)
 
             Gadget* e2 = FindGadgetChecked_E(entries, logo);
             if (e2 != 0) {
-                e2->visible = 1;
-                e2->hotspotGaf = g_game->playerColorLogosSeq;
-                e2->frame = p->info->color;
-                e2->hotspotFlags &= ~1;
+                e2->active = 1;
+                e2->u.hotspot.gaf = (GafEntry*)g_game->playerColorLogosSeq;
+                e2->u.hotspot.index = p->info->color;
+                // +0xc8 is a flags word here, where gadget.h names only its first byte.
+                *(unsigned int*)&e2->u.hotspot.flags &= ~1;
             }
 
             n++;
@@ -3854,7 +3762,7 @@ void __stdcall HandleBattleRoomClick(Gui* gadget)
             if (CheckMapCrc_00447b10()) {
                 p->info->bit5 = GetGadgetStatus(&g_game->gui, FindGadgetIndex(entries, text, 1));
                 if (p->info->host) {
-                    strcpy(entries->label, "START");
+                    strcpy(entries->u.names.choice, "START");
                     g_game->gui.layer->current = FindGadgetIndex(entries, "START", 1);
                 }
                 for (int j = 0; j < 10; j++) {
@@ -3887,7 +3795,7 @@ void __stdcall HandleBattleRoomClick(Gui* gadget)
     }
     if (IsCurrentGadgetNamed(gadget, "MESSAGE")) {
         Gadget* box = FindGadgetChecked_B(entries, "MESSAGE");
-        char* msg = box->text;
+        char* msg = box->u.text;
         if (strlen(msg) != 0) {
             if (_strcmpi(msg, "+syncerr") == 0) {
                 char* s = g_game->sync->GetSyncStatusText();
@@ -4143,16 +4051,16 @@ void RefreshBattleRoomRows()
         }
     }
     UpdateBattleRoomFlags();
-    output->list.count = count;
+    output->u.list.rowCount = count;
 
     Gadget* mapname = FindGadgetChecked_C(g_game->gui.layer->entries, "MAPNAME");
     char* map = g_game->mapInfo->GetMissionName();
     if (!g_game->mapInfo->HasMissionName()) {
-        mapname->colour = 0xc;
+        mapname->image = 0xc;
         SetTranslatedTextByName(&g_game->gui, "MAPNAME", "NOT SELECTED", 0);
     } else {
         char* cur = g_game->mapInfo->GetTranslatedName();
-        str = mapname->text;
+        str = mapname->u.text;
         int differs = strcmp(str, cur);
         if (differs) {
             if (IsScreenNamed(&g_game->gui, "viewmap.gui"))
@@ -4161,7 +4069,7 @@ void RefreshBattleRoomRows()
                 g_game->mapInfo->LoadMissionByName(map);
         }
         if (!CheckMapCrc_00448c70()) {
-            mapname->colour = ((int)GetTicks() / 30 & 1) ? 0xc : 0;
+            mapname->image = ((int)GetTicks() / 30 & 1) ? 0xc : 0;
             if (differs) {
                 SendChatMessage(me, Translate("does not have this map"), 4, 0);
                 me->info->bit5 = 0;
@@ -4172,7 +4080,7 @@ void RefreshBattleRoomRows()
             if (!g_game->players[g_game->localPlayer].info->host)
                 SetGadgetGrayedOutByName(&g_game->gui, "MAP", 1);
         } else {
-            mapname->colour = 0;
+            mapname->image = 0;
             SetGadgetGrayedOutByName(&g_game->gui, "MAP", 0);
         }
         strcpy(str, g_game->mapInfo->GetTranslatedName());
@@ -4231,39 +4139,39 @@ void RefreshBattleRoomRows()
             sprintf(name, "LOGO%d", n);
             e = FindGadgetChecked_E(entries, name);
             if (e)
-                e->visible = 0;
+                e->active = 0;
             sprintf(name, "SIDE%d", n);
             e = FindGadgetOrNull(entries, name);
             if (e)
-                e->visible = 0;
+                e->active = 0;
             if (n != g_game->localPlayer) {
                 sprintf(name, "ALLY%d", n);
                 e = FindGadgetOrNull(entries, name);
                 if (e)
-                    e->visible = 0;
+                    e->active = 0;
             }
             sprintf(name, "TEAMICONS%d", n);
             e = FindGadgetOrNull(entries, name);
             if (e)
-                e->visible = 0;
+                e->active = 0;
             sprintf(name, "RES%d", n);
             e = FindGadgetChecked_C(entries, name);
             if (e)
-                e->visible = 0;
+                e->active = 0;
             sprintf(name, "PING%d", n);
             e = FindGadgetChecked_C(entries, name);
             if (e)
-                e->visible = 0;
+                e->active = 0;
             sprintf(name, "MEM%d", n);
             e = FindGadgetChecked_C(entries, name);
             if (e)
-                e->visible = 0;
+                e->active = 0;
             sprintf(name, "READY%d", n);
             e = FindGadgetOrNull(entries, name);
             if (e) {
-                e->b13c_0 = 1;
+                e->flag_bit = 1;
                 e->status = 0;
-                e->visible = 0;
+                e->active = 0;
             }
         } else {
             sprintf(name, "CD%d", n);
@@ -4274,10 +4182,14 @@ void RefreshBattleRoomRows()
             sprintf(name, "LOGO%d", n);
             e = FindGadgetChecked_E(entries, name);
             if (e) {
-                e->visible = (p->info->color == 0xff && !ready) ? 0 : 1;
-                e->c8_0 = !ready;
-                e->hotspotGaf = g_game->playerColorLogosSeq;
-                e->frame = p->info->color;
+                e->active = (p->info->color == 0xff && !ready) ? 0 : 1;
+                // +0xc8 is a flags word here, where gadget.h names only its first
+                // byte; bit 0 keeps the word-wide read-modify-write.
+                *(unsigned int*)&e->u.hotspot.flags =
+                    (*(unsigned int*)&e->u.hotspot.flags & 0xfffffffeu)
+                    | ((unsigned int)(!ready) & 1u);
+                e->u.hotspot.gaf = (GafEntry*)g_game->playerColorLogosSeq;
+                e->u.hotspot.index = p->info->color;
             }
             sprintf(name, "PLAYER%d", n);
             strncpy(text, p->name, 0x1e);
@@ -4288,7 +4200,7 @@ void RefreshBattleRoomRows()
             e = FindGadgetOrNull(entries, name);
             if (e) {
                 UpdateSideGadget_00448c70(n);
-                e->visible = 1;
+                e->active = 1;
                 SetGadgetGrayedOutByName(&g_game->gui, name, (IsLocal_00448c70(p) && !ready) ? 0 : 1);
             }
             sprintf(name, "ALLY%d", n);
@@ -4296,7 +4208,7 @@ void RefreshBattleRoomRows()
             if (e) {
                 SetButtonStageByName((Dialog_004a04f0*)&g_game->gui, name,
                              me->alliedBy[n] << 1 | me->allied[n]);
-                e->visible = (IsLocalHuman_00448c70(p) || IsWatching_00448c70(p)
+                e->active = (IsLocalHuman_00448c70(p) || IsWatching_00448c70(p)
                               || IsLocalAI_00448c70(p) || IsRemoteAI_00448c70(p)
                               || IsWatching_00448c70(local)) ? 0 : 1;
                 SetGadgetGrayedOutByName(&g_game->gui, name, ready);
@@ -4305,7 +4217,7 @@ void RefreshBattleRoomRows()
             e = FindGadgetOrNull(entries, name);
             if (e) {
                 // `|| 0` emits no code but gives the 1-before-0 layout.
-                e->visible = (IsWatching_00448c70(p) || 0) ? 0 : 1;  // see the top
+                e->active = (IsWatching_00448c70(p) || 0) ? 0 : 1;  // see the top
                 SetGadgetGrayedOutByName(&g_game->gui, name, (IsLocal_00448c70(p) && !ready) ? 0 : 1);
             }
             sprintf(name, "RES%d", n);
@@ -4319,43 +4231,43 @@ void RefreshBattleRoomRows()
             } else {
                 e = FindGadgetChecked_C(entries, name);
                 if (e)
-                    e->visible = 1;
+                    e->active = 1;
             }
             sprintf(name, "PING%d", n);
             e = FindGadgetChecked_C(entries, name);
             if (IsRemoteHuman_00448c70(p)) {
                 if (e) {
-                    str = e->text;
+                    str = e->u.text;
                     _itoa(p->ping, str, 10);
                     if (IsHostLocal())
                         strcat(str, g_game->sync->IsPlayerSynced(GetSlotDpid(n)) ? ":s" : "");
                     if (minPing >= p->ping)
                         minPing = p->ping;
-                    e->visible = 1;
+                    e->active = 1;
                 }
             } else {
                 SetTranslatedTextByName(&g_game->gui, name, "n/a", 0);
                 if (e)
-                    e->visible = 1;
+                    e->active = 1;
             }
             sprintf(name, "MEM%d", n);
             e = FindGadgetChecked_C(entries, name);
             // Full tail in each arm, not shared: gives p and n their registers.
             if (!IsLocalHuman_00448c70(p) && !IsRemoteHuman_00448c70(p)) {
-                sprintf(e->text, "%s", "n/a");
-                e->colour = p->info->memory < g_game->mapInfo->GetTerrainSizeTier() ? 0xc : 0;
-                e->visible = 1;
+                sprintf(e->u.text, "%s", "n/a");
+                e->image = p->info->memory < g_game->mapInfo->GetTerrainSizeTier() ? 0xc : 0;
+                e->active = 1;
             } else {
-                sprintf(e->text, "%d", p->info->memory);
-                e->colour = p->info->memory < g_game->mapInfo->GetTerrainSizeTier() ? 0xc : 0;
-                e->visible = 1;
+                sprintf(e->u.text, "%d", p->info->memory);
+                e->image = p->info->memory < g_game->mapInfo->GetTerrainSizeTier() ? 0xc : 0;
+                e->active = 1;
             }
             sprintf(name, "READY%d", n);
             e = FindGadgetOrNull(entries, name);
             if (e) {
                 e->status = g_game->players[n].info->bit5;
-                e->visible = 1;
-                e->b13c_0 = !IsLocalHuman_00448c70(p);
+                e->active = 1;
+                e->flag_bit = !IsLocalHuman_00448c70(p);
             }
         }
     }
@@ -4485,7 +4397,7 @@ void CopySelectedGameName()
     Gadget* games = FindGadgetChecked(gadgets, "GAMES");
     int index = FindGadgetIndex(gadgets, "GAMENAME", 3);
     char* name;
-    if (games->selected > -1 && (name = SkipTextLines(g_saveListDisplayNames, games->selected)) != 0 && strlen(name) != 0)
+    if (games->u.list.selected > -1 && (name = SkipTextLines(g_saveListDisplayNames, games->u.list.selected)) != 0 && strlen(name) != 0)
         SetGadgetText(menu, index, name);
     else
         SetGadgetText(menu, index, g_emptyStringLiteral);
@@ -4506,7 +4418,7 @@ void __stdcall HandleLoadListClick(Gui* menu)
         PlaySoundByName("Options", 0);
         Gadget* games = FindGadgetChecked(gadgets, "GAMES");
         sprintf(g_game->saveName, "%s\\%s", g_savegameDir,
-                SkipTextLines(g_saveListFileNames, games->selected));
+                SkipTextLines(g_saveListFileNames, games->u.list.selected));
         LoadUnitRestrictListFile(g_game->saveName);
         Layer_00446f50* inner = menu->layer;
         menu->layer = inner->next;
@@ -4551,7 +4463,7 @@ void __stdcall ShowSelectedSaveGame(int unused1, int unused2)
     Gadget* games = FindGadgetChecked(gadgets, "GAMES");
     int index = FindGadgetIndex(gadgets, "GAMENAME", 3);
     char* name;
-    if (games->selected > -1 && (name = SkipTextLines(g_saveListDisplayNames, games->selected)) != 0 && strlen(name) != 0)
+    if (games->u.list.selected > -1 && (name = SkipTextLines(g_saveListDisplayNames, games->u.list.selected)) != 0 && strlen(name) != 0)
         SetGadgetText(menu, index, name);
     else
         SetGadgetText(menu, index, g_emptyStringLiteral);
@@ -4581,7 +4493,7 @@ void __stdcall HandleSaveGameClick(Gui* menu)
         Gadget* games = FindGadgetChecked(entries, "GAMES");
         char buf[0x100];
         sprintf(buf, "%s\\%s", g_savegameDir,
-                SkipTextLines(g_saveListFileNames, games->selected));
+                SkipTextLines(g_saveListFileNames, games->u.list.selected));
         RemoveFile(buf);
         int count;
         ListSaveGameFiles(&count);
@@ -4600,8 +4512,8 @@ void __stdcall HandleSaveGameClick(Gui* menu)
         Gadget* games2 = FindGadgetChecked(gadgets, "GAMES");
         int index = FindGadgetIndex(gadgets, "GAMENAME", 3);
         char* name;
-        if (games2->selected > -1 &&
-            (name = SkipTextLines(g_saveListDisplayNames, games2->selected)) != 0 &&
+        if (games2->u.list.selected > -1 &&
+            (name = SkipTextLines(g_saveListDisplayNames, games2->u.list.selected)) != 0 &&
             strlen(name) != 0)
             SetGadgetText(menu2, index, name);
         else
@@ -4613,7 +4525,7 @@ void __stdcall HandleSaveGameClick(Gui* menu)
         IsCurrentGadgetNamed(menu, "GAMENAME")) {
         PlaySoundByName("Options", 0);
         int idx = FindGadgetIndex(entries, "GAMENAME", 3);
-        char* name = entries[idx].text;
+        char* name = entries[idx].u.text;
         if (strlen(name) != 0) {
             BuildDataPath(g_game->saveName, g_savegameDir, name, "LST");
             SaveUnitRestrictListFile(g_game->saveName);
@@ -4654,7 +4566,7 @@ void __stdcall OpenSaveGameDialog()
         SetGadgetActiveByName(&g_game->gui, "DELETE", 0);
     Gadget* games = FindGadgetChecked(layer->entries, "GAMES");
     if (games != 0)
-        games->callback = ShowSelectedSaveGame;
+        games->u.list.callback = (void (__stdcall*)(Gui*, Gadget*))ShowSelectedSaveGame;
     int index = FindGadgetIndex(layer->entries, "GAMENAME", 3);
     layer->entries[index].attribs |= 2;
 
@@ -4663,7 +4575,7 @@ void __stdcall OpenSaveGameDialog()
     Gadget* games2 = FindGadgetChecked(entries, "GAMES");
     int index2 = FindGadgetIndex(entries, "GAMENAME", 3);
     char* name;
-    if (games2->selected > -1 && (name = SkipTextLines(g_saveListDisplayNames, games2->selected)) != 0 && strlen(name) != 0)
+    if (games2->u.list.selected > -1 && (name = SkipTextLines(g_saveListDisplayNames, games2->u.list.selected)) != 0 && strlen(name) != 0)
         SetGadgetText(menu, index2, name);
     else
         SetGadgetText(menu, index2, g_emptyStringLiteral);
@@ -4708,14 +4620,14 @@ void OpenLoadListDialog()
     SetGadgetActiveByName(&g_game->gui, "GAMENAME", 0);
     Gadget* entry = FindGadgetChecked(gadget->entries, "GAMES");
     if (entry != 0) {
-        entry->callback = (void*)ShowSelectedSaveGame;
+        entry->u.list.callback = (void (__stdcall*)(Gui*, Gadget*))ShowSelectedSaveGame;
     }
     Gui* menu = &g_game->gui;
     void* gadgets = g_game->gui.layer->entries;
     Gadget* games = FindGadgetChecked(gadgets, "GAMES");
     int index = FindGadgetIndex(gadgets, "GAMENAME", 3);
     char* name;
-    if (games->selected > -1 && (name = SkipTextLines(g_saveListDisplayNames, games->selected)) != 0 && strlen(name) != 0)
+    if (games->u.list.selected > -1 && (name = SkipTextLines(g_saveListDisplayNames, games->u.list.selected)) != 0 && strlen(name) != 0)
         SetGadgetText(menu, index, name);
     else
         SetGadgetText(menu, index, g_emptyStringLiteral);
@@ -4743,11 +4655,11 @@ void __stdcall HandleUnitCountSlider(void* obj, char* gadget)
     } else {
         _itoa(value, buf, 10);
     }
-    g_unitRestrictEntries[n + desc->firstRow].max = value;
+    g_unitRestrictEntries[n + desc->u.list.firstRow].max = value;
     g_game->sync->SetUnitLimit(
-        &g_game->unitDefs[g_unitRestrictEntries[n + desc->firstRow].unitIndex], value);
-    desc->flags[n + desc->firstRow] = g_unitRestrictEntries[n + desc->firstRow].peerEnabled == 0;
-    desc->flags[n + desc->firstRow] |= g_unitRestrictEntries[n + desc->firstRow].max == 0 ? 2 : 0;
+        &g_game->unitDefs[g_unitRestrictEntries[n + desc->u.list.firstRow].unitIndex], value);
+    ((char*)desc->u.list.filebuf)[n + desc->u.list.firstRow] = g_unitRestrictEntries[n + desc->u.list.firstRow].peerEnabled == 0;
+    ((char*)desc->u.list.filebuf)[n + desc->u.list.firstRow] |= g_unitRestrictEntries[n + desc->u.list.firstRow].max == 0 ? 2 : 0;
     SetTranslatedTextByName(obj, count, (char*)buf, 0);
 }
 
@@ -4766,7 +4678,7 @@ void __stdcall UpdateUnitSliders(Gui* param_1, int unused)
 
     desc = FindGadgetChecked(param_1->layer->entries, "DESCLIST");
     human = IsHostLocal();
-    base = desc->firstRow;
+    base = desc->u.list.firstRow;
 
     for (i = 0; i < 12; i++) {
         sprintf(name, "SLIDER%d", i);
@@ -4776,7 +4688,7 @@ void __stdcall UpdateUnitSliders(Gui* param_1, int unused)
                 en = 1;
             else
                 en = 0;
-            desc->flags[base + i] = en != 0;
+            ((char*)desc->u.list.filebuf)[base + i] = en != 0;
             value = g_unitRestrictEntries[base + i].max;
             if (value == -1)
                 value = slider->max;
@@ -4794,7 +4706,7 @@ void LoadUnitPortrait()
     char path[256];
     Gadget* pic = FindGadgetChecked(g_game->gui.layer->entries, "PICLIST");
     if (g_unitRestrictPicLoadIndex == 0) {
-        g_unitRestrictRecordCursor = (int)pic->rows;
+        g_unitRestrictRecordCursor = (int)pic->u.list.rows;
         g_unitRestrictPicCursor = (int)g_unitRestrictPics;
     }
     int i = g_unitRestrictPicLoadIndex++;
@@ -4837,12 +4749,12 @@ void UnitRestrictDialogFrame()
 
     while (g_game->sync->PopChangedEntry(&event) != 0) {
         n++;
-        for (int i = 0; i < entry->list.count; i++) {
+        for (int i = 0; i < entry->u.list.rowCount; i++) {
             if (event.fbiChecksum == g_game->unitDefs[g_unitRestrictEntries[i].unitIndex].fbiChecksum) {
-                entry->flags[i] = (event.peerEnabled == 0);
+                ((unsigned char*)entry->u.list.filebuf)[i] = (event.peerEnabled == 0);
                 g_unitRestrictEntries[i].peerEnabled = event.peerEnabled;
                 g_unitRestrictEntries[i].max = event.max;
-                entry->flags[i] |= (event.max != 0) ? 0 : 2;
+                ((unsigned char*)entry->u.list.filebuf)[i] |= (event.max != 0) ? 0 : 2;
             }
         }
     }
@@ -4857,7 +4769,7 @@ void UnitRestrictDialogFrame()
 void __stdcall ShowSelectedUnitCosts(void* panel, Gadget* unit)
 {
     char buf[20];
-    UnitType_00446f50* def = &g_game->unitDefs[unit->records[unit->index].unitIndex];
+    UnitType_00446f50* def = &g_game->unitDefs[((Record_00446f50*)unit->u.list.records)[unit->u.list.selected].unitIndex];
     sprintf(buf, "%d", (int)def->energyCost);
     SetTranslatedTextByName(panel, "ENERGYTEXT", (char*)buf, 0);
     sprintf(buf, "%d", (int)def->metalCost);
@@ -4886,7 +4798,7 @@ void __stdcall BindNamedSliderWithCallback_0044c7e0(char* name, int max, int val
         gadget->sliderCallback = callback;
         gadget->knobPos = value;
         SetSliderFromValue(gadget, gadget->knobPos);
-        gadget->sliderUser = g_game;
+        gadget->sliderUser = (int)g_game;
     }
     callback(gui, index);
     MarkChanged(gui);
@@ -4917,15 +4829,15 @@ void OpenUnitRestrictions()
     entries = layer->entries;
     flags = (char*)GameAllocIgnoreTag("FLAGS", g_game->unitDefCount);
     desc = FindGadgetChecked(entries, "DESCLIST");
-    desc->callback = ShowSelectedUnitCosts;
-    desc->flags = flags;
-    desc->scroll = 0x20;
+    desc->u.list.callback = (void (__stdcall*)(Gui*, Gadget*))ShowSelectedUnitCosts;
+    desc->u.list.filebuf = flags;
+    desc->u.list.scroll = 0x20;
     desc->attribs |= 0x100;
 
     pic = FindGadgetChecked(layer->entries, "PICLIST");
-    pic->flags = flags;
+    pic->u.list.filebuf = flags;
     pic->attribs |= 0x180;
-    pic->scroll = desc->scroll;
+    pic->u.list.scroll = desc->u.list.scroll;
 
     pics = (int*)GameAllocIgnoreTag("UNITPICARRAY", g_game->unitDefCount * 0x18);
     memset(pics, 0, g_game->unitDefCount * 0x18);
@@ -4933,7 +4845,7 @@ void OpenUnitRestrictions()
     *(int*)text = 0;
 
     g_unitRestrictEntries = (Record_00446f50*)GameAllocIgnoreTag("UNITSRESTRICTINFO", g_game->unitDefCount * 0x62);
-    desc->records = g_unitRestrictEntries;
+    desc->u.list.records = g_unitRestrictEntries;
     for (i = 0; i < g_game->unitDefCount; i++)
         g_unitRestrictEntries[i].unitIndex = 0;
 
@@ -4980,7 +4892,7 @@ void OpenUnitRestrictions()
         Gadget* slider;
         sprintf(name, "SLIDER%d", i);
         slider = FindGadgetChecked_D(entries, name);
-        slider->sliderUser = slider;
+        slider->sliderUser = (int)slider;
         slider->max = 0x65;
         slider->sliderCallback = (void (__stdcall*)(Gui*, int))HandleUnitCountSlider;
     }
@@ -4993,7 +4905,7 @@ void OpenUnitRestrictions()
 
     {
         Gui* gui = &g_game->gui;
-        UnitType_00446f50* type = &g_game->unitDefs[desc->records[desc->index].unitIndex];
+        UnitType_00446f50* type = &g_game->unitDefs[((Record_00446f50*)desc->u.list.records)[desc->u.list.selected].unitIndex];
         char buf[0x14];
         sprintf(buf, "%d", (int)type->energyCost);
         SetTranslatedTextByName(gui, "ENERGYTEXT", buf, 0);

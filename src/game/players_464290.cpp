@@ -138,6 +138,8 @@ struct Screen {
     void (__stdcall *callback)(Gadget*); // +0x8
 };
 
+// Not gui/gadget.h's entry: the watching dialog's callback is handed the screen
+// it loaded, whose form sits at +0x18 and whose selected line at +0x60.
 struct Gadget {
     char unknown_0[0x18];
     Screen* screen;                    // +0x18
