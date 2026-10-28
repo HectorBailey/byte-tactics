@@ -73,8 +73,8 @@ struct WeaponDef {
     char data[0x115];
 };
 
-struct Holder_00453640;
 #include "../gui/gui.h"
+#include "../gui/gadget.h"
 #include "../gui/layer.h"
 struct Net_4517b0;
 // The forward declaration takes one symbol id: Unused_00452960 has one parameter fewer.
@@ -235,10 +235,7 @@ struct Game {
         char menu[0x1b63 - 0x519];     // +0x519
         struct {
             char message[0x531 - 0x519];
-            union {
-                Holder_00453640* layer;    // +0x531
-                Layer* layer_531;
-            };
+            Layer* layer;              // +0x531
             char unknown_535[0x12ef - 0x535];
             Ring_00453640 chatHudRing[30];  // +0x12ef
             int lobbySyncTick;         // +0x1b5f
@@ -1211,27 +1208,6 @@ struct Class_00451fd0 {
     };
 };
 
-struct Entry_00453640 {                // gadget returned by FindGadgetChecked
-    char unknown_0[0xc0];
-    short count;                       // +0xc0
-};
-
-struct Holder_00453640 {
-    int unknown_0;                     // +0x00
-    Entry_00453640* entries;           // +0x04
-};
-
-struct Entry_004538f0 {
-    char unknown_0[0xb6];
-    char text[0x15b - 0xb6];           // +0xb6
-};
-
-// The 0x15b-byte entry table returned by FindGadgetChecked.
-struct OutEntry_00453a50 {
-    char unknown_0[0x19];
-    short height;                      // +0x19
-};
-
 // The dialog object returned by LoadGuiLayer.
 struct Gui_00453a50 {
     char unknown_0[4];
@@ -1371,7 +1347,7 @@ void __stdcall HandlePlayerEconomy(void* packet, Player* player);
 void __stdcall SetGameSpeed(int speed, int param_2);
 void __stdcall PlaySoundByName(char* name, int param_2);
 int __stdcall IsCurrentGadgetNamed(Gui* gadget, char* name);
-Entry_004538f0* __stdcall FindGadgetChecked_B(Entry_004538f0* entries, char* name);
+Gadget* __stdcall FindGadgetChecked_B(Gadget* entries, char* name);
 int __stdcall SendChatMessage(Player* from, char* text, int key, char* to);
 int __stdcall FindGadgetIndex(void* gadgets, const char* name, int flag);
 void __stdcall BeginTextEdit(void* menu, int index);
@@ -2607,7 +2583,7 @@ static inline unsigned char FindPlayerIndex_00453640(int id)
 // FUNCTION: 0x453640
 void UpdateTimeoutDialog()
 {
-    Entry_00453640* entry = (Entry_00453640*)FindGadgetChecked(g_game->layer->entries, "OUTPUT");
+    Gadget* entry = (Gadget*)FindGadgetChecked(g_game->layer->entries, "OUTPUT");
 
     if (g_loungeRefreshTime < GetTicks()) {
         g_loungeRefreshTime = GetTicks() + 2;
@@ -2617,7 +2593,7 @@ void UpdateTimeoutDialog()
     memset(g_loungeChatter, 0, 0xa00);
 
     int tail = g_game->chatHudWriteIdx;
-    int count = entry->count;
+    int count = entry->u.list.rowCount;
     int idx = tail;
     for (int n = 1; n < count - 1; n++) {
         if (idx == g_game->chatHudReadIdx)
@@ -2664,7 +2640,7 @@ void UpdateTimeoutDialog()
 // FUNCTION: 0x4538f0
 void __stdcall HandleTimeoutDialog(Gui* gadget)
 {
-    Entry_004538f0* entries = (Entry_004538f0*)gadget->layer->entries;
+    Gadget* entries = (Gadget*)gadget->layer->entries;
 
     if (gadget->hotGadgetIndex == -1) {
         PlaySoundByName("Previous", 0);
@@ -2674,13 +2650,13 @@ void __stdcall HandleTimeoutDialog(Gui* gadget)
         return;
     }
     if (IsCurrentGadgetNamed(gadget, "TALK")) {
-        Entry_004538f0* entry = FindGadgetChecked_B(entries, "TALK");
-        if (strlen(entry->text)) {
-            SendChatMessage(&g_game->players[g_game->localPlayer], entry->text, 4, 0);
+        Gadget* entry = FindGadgetChecked_B(entries, "TALK");
+        if (strlen(entry->u.text)) {
+            SendChatMessage(&g_game->players[g_game->localPlayer], entry->u.text, 4, 0);
             g_game->flag0 = 1;
-            strcpy(entry->text, g_emptyStringLiteral);
+            strcpy(entry->u.text, g_emptyStringLiteral);
         }
-        BeginTextEdit(g_game->message, FindGadgetIndex(g_game->layer_531->entries, "TALK", 3));
+        BeginTextEdit(g_game->message, FindGadgetIndex(g_game->layer->entries, "TALK", 3));
         ClearSelectedGadget(g_game->message);
         MarkChanged(g_game->message);
         return;
@@ -2737,7 +2713,7 @@ void __stdcall OpenTimeoutDialog(int id)
     g_loungeChatter = p;
     memset(p, 0, 0x780);
 
-    OutEntry_00453a50* out = (OutEntry_00453a50*)FindGadgetChecked(entries, "OUTPUT");
+    Gadget* out = (Gadget*)FindGadgetChecked(entries, "OUTPUT");
     ConfigureListBoxByName(g_game->menu, "OUTPUT", g_loungeChatter,
                  (int)out->height / (GetFontLineHeight() + 2), 0);
 
