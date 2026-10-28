@@ -10,6 +10,12 @@
 #include <ddraw.h>
 #include <vector>
 
+// Unused here: the symbol ids these declarations take keep the file's functions
+// matching (docs/c2-regalloc.md).
+void RegisterUnitOrders(void);
+void RegisterGroundOrders(void);
+void SetMemFussyDefault(void);
+
 void* __cdecl operator new(unsigned int size);
 void __cdecl operator delete(void* p);
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
@@ -101,6 +107,11 @@ void __stdcall PushHeapSiftUp(Entry_40d670* first, int hole, int top, Entry_40d6
 }
 
 #include "../util/vec3.h"
+
+// Unused here, and declared again with the movement includes below: the two
+// declarations are what keep ExpandNeighbour (0x40da70) and the functions from
+// 0x40e160 on in their windows (docs/c2-regalloc.md).
+void EnableAICommands(void);
 
 // A free operator, not a member: nothing else that includes vec3.h needs one,
 // and a member would cost every one of those files its three symbol ids.
@@ -237,20 +248,9 @@ void DestroyPathfinder();
 
 class UnitMotion;
 
-#pragma pack(push, 1)
-struct Unit {                          // 0x118 bytes
-    UnitMotion* motion;                // +0x0
-    char unknown_4[0x66 - 0x4];
-    unsigned short heading;            // +0x66
-    char unknown_68[0x76 - 0x68];
-    Point16 cell;                      // +0x76
-    char unknown_7a[0xa6 - 0x7a];
-    short unitDefIndex;                    // +0xa6
-    char unknown_a8[0x118 - 0xa8];
-};
-
 #include "../network/player.h"
 
+#pragma pack(push, 1)
 struct Game {
     char unknown_0[0x1b63];
     Player players[10];                // +0x1b63
@@ -788,13 +788,15 @@ void Pathfinder::ExpandNeighbour(NodeData* from, PathCell* fromCell, int turn)
     }
 }
 
-// The movement view this file used to define is orders/unit_motion.h's, included
-// here rather than above: its declarations move the allocation of the functions
-// before it (docs/c2-regalloc.md).
+// The movement and the unit this file used to define are orders/unit_motion.h's
+// UnitMotion and units/unit.h's Unit, included here rather than above: their
+// declarations move the allocation of the functions before them
+// (docs/c2-regalloc.md).
 #include "../orders/unit_motion.h"
+#include "../units/unit.h"
 
-// Unused here: the symbol ids these declarations take stand in for what the
-// include above costs the functions from 0x40e160 on (docs/c2-regalloc.md).
+// Unused here: the symbol ids these declarations take stand in for what the two
+// includes above cost the functions from 0x40e160 on (docs/c2-regalloc.md).
 void EnableAICommands(void);
 void RegisterAICommands(void);
 void ResetAIPlayers(void);
