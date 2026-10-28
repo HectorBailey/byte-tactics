@@ -46,6 +46,9 @@ struct Position_00408090 {              // 16.16 fixed point; only high words re
     short z;                            // +0xa
 };
 
+// Own views, not map/byte_map.h's MapSize and ByteMap: that header's version has
+// Index and at as well, and its ids move OnTimer (0x407e90) off its registers
+// (docs/c2-regalloc.md).
 struct MapSize_00408090 {
     unsigned int width;                 // +0x0
     unsigned int height;                // +0x4
