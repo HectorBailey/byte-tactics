@@ -10,8 +10,8 @@
 #define MOVEMENT_CLASS_H
 
 struct Point16;
-struct Source_00440340;
 struct Object_00440af0;
+class TdfFile;
 
 class MovementClass {
 public:
@@ -31,7 +31,7 @@ public:
 
     MovementClass();
     ~MovementClass();
-    void ReadMoveInfo(Source_00440340* src);
+    void ReadMoveInfo(TdfFile* src);
     void ResizePassMap(unsigned int w, unsigned int h);
     void SetPassMapCell(int x, int y, int value);
     void RefreshPassMap(Point16 a, Point16 b);

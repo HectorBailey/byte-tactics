@@ -229,6 +229,7 @@ struct Game {
 };
 
 // The game's movement classes: 0x20-byte entries in a 32-entry table.
+class TdfFile;
 class MovementClass {
 public:
     int* name;                         // +0x0
@@ -247,7 +248,7 @@ public:
 
     MovementClass();
     ~MovementClass();
-    void ReadMoveInfo(void* parser);
+    void ReadMoveInfo(TdfFile* parser);
 };
 
 struct MovementClassTable {

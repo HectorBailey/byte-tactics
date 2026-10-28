@@ -22,13 +22,6 @@ void __cdecl operator delete(void* p);
 struct MovementClass;
 unsigned int __stdcall GetPassMapFootprintValueWithEdgeStrips(MovementClass* obj, int x, int y);
 
-// A TdfFile view (its current section at +0x4). Kept whole: deleting the 7 ids
-// a type costs moves SetPassMapCell out of the window it matches in.
-struct Source_00440340 {
-    char unknown_0[4];
-    TdfRecord* current;                // +0x4, the TdfFile's current section
-};
-
 #include "../util/vec3.h"
 
 #pragma pack(push, 2)
@@ -63,6 +56,13 @@ struct Record_00440af0 {
 #pragma pack(pop)
 
 #include "movement_class.h"
+
+// Unused here: the symbol ids these declarations take keep SetPassMapCell
+// (0x4404c0) in the window it matches in (docs/c2-regalloc.md).
+void RegisterUnitOrders(void);
+void RegisterGroundOrders(void);
+void EnableAICommands(void);
+void RegisterAICommands(void);
 
 // The same 32 bytes as MovementClass under the view 0x440500 builds the map
 // with (the BuildPassMap method).
@@ -214,7 +214,7 @@ MovementClass::~MovementClass()
 // 32-byte entry. The four slope fields are clamped so that each is never larger
 // than its limit.
 // FUNCTION: 0x440340
-void MovementClass::ReadMoveInfo(Source_00440340* src)
+void MovementClass::ReadMoveInfo(TdfFile* src)
 {
     footprintX = src->current->GetFieldInt("FootPrintX", 0);
     footprintZ = src->current->GetFieldInt("FootPrintZ", 0);

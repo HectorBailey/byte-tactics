@@ -817,7 +817,7 @@ address,size,file,symbol,status,similarity
 0x440290,65,src/units/movement_class.cpp,_$E3,matched,100.0
 0x4402e0,53,src/units/movement_class.cpp,??0MovementClass@@QAE@XZ,matched,100.0
 0x440320,28,src/units/movement_class.cpp,??1MovementClass@@QAE@XZ,matched,100.0
-0x440340,222,src/units/movement_class.cpp,?ReadMoveInfo@MovementClass@@QAEXPAUSource_00440340@@@Z,matched,100.0
+0x440340,222,src/units/movement_class.cpp,?ReadMoveInfo@MovementClass@@QAEXPAVTdfFile@@@Z,matched,100.0
 0x440420,70,src/units/movement_class.cpp,?FindMovementClass@@YGPAUMovementClass@@PAD@Z,matched,100.0
 0x440470,79,src/units/movement_class.cpp,?ResizePassMap@MovementClass@@QAEXII@Z,matched,100.0
 0x4404c0,60,src/units/movement_class.cpp,?SetPassMapCell@MovementClass@@QAEXHHH@Z,matched,100.0
