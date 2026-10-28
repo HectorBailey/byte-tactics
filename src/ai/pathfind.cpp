@@ -500,6 +500,7 @@ public:
     }
     void Release()
     {
+        // Kept: object is a Unit* already; the cast stays for the match.
         owner->RefreshUnitIfStale((Unit*)object);
         object = 0;
         owner = 0;
@@ -981,6 +982,7 @@ void Pathfinder::StartSearch(Target* t)
     owner = (MovementClass*)object->motion->movementClass;
     target = t;
     start = object->cell;
+    // Kept: object is a Unit* already; the cast stays for the match.
     owner->RefreshMovedUnits((Unit*)object);
     ResetTable();
     ClearDirtyCells();
@@ -1036,6 +1038,7 @@ void Pathfinder::StartSearch(Target* t)
 // FUNCTION: 0x40e9a0
 void Pathfinder::ReleaseHeldPathLock()
 {
+    // Kept: object is a Unit* already; the cast stays for the match.
     owner->RefreshUnitIfStale((Unit*)object);
     object = 0;
     owner = 0;
