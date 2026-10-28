@@ -8,32 +8,20 @@
 #include <string.h>
 #include <windows.h>
 
-#pragma pack(push, 1)
+// Unused here: the symbol id this declaration takes keeps 0x4abd90 and the
+// palette helpers below matching (docs/c2-regalloc.md).
+void RegisterUnitOrders(void);
 
-struct Layer;
+#pragma pack(push, 1)
 
 // 0x15b-byte GUI control record: entry 0 holds the count at +0xb6 and the
 // dialog's own fields from +0xbc on, the other entries hold NUL terminated
 // text there.
 #include "gadget.h"
 
-// The layer a dialog's +0x18 points at: its entry table at +4 and the
-// installed handler at +8.
-struct Layer {
-    Layer* next;                   // +0x00
-    Gadget* entries;               // +0x04
-    void (__stdcall* handler)(Gui*); // +0x08
-    int data;                      // +0x0c
-    int flags;                     // +0x10
-    int redraw;                    // +0x14
-    int keyboardInput;             // +0x18
-    int cb1c;                      // +0x1c
-    int current;                   // +0x20
-    int surface;                   // +0x24
-    char unknown_28[0x13];
-    int textHandler;               // +0x3b
-    Gadget gadgets[200];           // +0x3f, the entry table the +4 pointer addresses
-};
+// The layer a dialog's +0x18 points at, and the entry table LoadGuiLayer
+// allocates in the same block, right behind the header.
+#include "layer.h"
 
 struct Src_004ab400;
 
@@ -202,7 +190,7 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
             GetGadgetRect_inlined(cur->entries, (Rect*)rect);
             FadeRectangle(cur->entries->u.assets.surface, rect, -0x18);
             if (menu->layer != 0)
-                menu->layer->redraw = 1;
+                menu->layer->dirty = 1;
         } else {
             FadeRectangle(0, 0, -0x18);
         }
@@ -221,7 +209,7 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
         } else {
             layer = (Layer*)GameAllocIgnoreTag(guiName, 0x10f57);
             memset(layer, 0, 0x10f57);
-            entry = layer->gadgets;
+            entry = (Gadget*)(layer + 1);
         }
         if (ReadGuiFile(entry, layerName) != 0) {
           if (mask != 0) {
@@ -275,7 +263,7 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
         layer->flags = 0x80;
     layer->flags |= flags & 0x800;
     if (menu->layer != 0)
-        menu->layer->redraw = 1;
+        menu->layer->dirty = 1;
     if (menu->layer != 0)
         menu->layer->keyboardInput = 0;
     strncpy((char*)&entry->name[0], guiName, 0x10);
@@ -422,15 +410,15 @@ int __stdcall BlitLayers(Layer* node, void* surface, Rect* clipRect)
     rect.right = g->width + rect.left - 1;
     rect.bottom = g->height + rect.top - 1;
     if (clipRect == 0) {
-        if (node->redraw == 1) {
-            node->redraw = 0;
+        if (node->dirty == 1) {
+            node->dirty = 0;
             DrawSurface(surface, g->u.assets.surface, g->x, g->y);
         }
     } else {
-        if (node->redraw != 1 && RectsOverlap(&rect, clipRect) == 0) {
+        if (node->dirty != 1 && RectsOverlap(&rect, clipRect) == 0) {
             goto finish;
         }
-        node->redraw = 0;
+        node->dirty = 0;
         DrawSurface(surface, g->u.assets.surface, g->x, g->y);
     }
 finish:
@@ -493,7 +481,7 @@ void __stdcall AddTextGadget(Layer* obj, char* name, char* text,
 int __stdcall SetBackgroundSurface(Gui* menu, int value)
 {
     if (menu->layer != 0)
-        menu->layer->surface = value;
+        menu->layer->surface = (void*)value;
     return 1;
 }
 
@@ -964,7 +952,7 @@ int __stdcall OpenYesNoDialog(Gui* sub, char* title, char* chc2, char* chc1)
         strcpy(p1->u.text, chc1);
         strcpy(p2->u.text, chc2);
         strcpy(p3->u.text, title);
-        layer->handler = YesNoDialogHandler;
+        layer->handler = (void (__stdcall*)(void*))YesNoDialogHandler;
         return 1;
     }
     return 0;
@@ -1066,7 +1054,7 @@ int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, in
         }
         SetKeyboardInput(gui, 1);
         RenderLayer(gui, 1);
-        layer->handler = MessageBoxHandler;
+        layer->handler = (void (__stdcall*)(void*))MessageBoxHandler;
         MarkChanged(gui);
         UpdateMenu(gui);
         GameFreeThunk(wrapped);
@@ -1092,7 +1080,7 @@ int __stdcall OpenNotExistDialog(Gui* sub, char* name)
         int i = FindGadgetIndex(gadgets, "NAME", 5);
         strcpy(gadgets[i].u.text, name);
         gadgets[i].x = -1;
-        dialog->handler = NotExistDialogHandler;
+        dialog->handler = (void (__stdcall*)(void*))NotExistDialogHandler;
         return 1;
     }
     return 0;
@@ -1128,7 +1116,7 @@ int __stdcall OpenChoice3Dialog(Gui* menu, const char* title, const char* choice
         strcpy(e3->u.text, choice3);
         strcpy(et->u.text, title);
         et->x = 0xffff;
-        dialog->handler = Choice3DialogHandler;
+        dialog->handler = (void (__stdcall*)(void*))Choice3DialogHandler;
         return 1;
     }
     return 0;
@@ -1162,7 +1150,7 @@ int __stdcall OpenInputDialog(Gui* sub, char* title, char* input, char* chc2, ch
         Gadget* g2 = &gadgets[FindGadgetIndex(gadgets, "CHC2", 1)];
         strcpy(g1->u.text, chc1);
         strcpy(g2->u.text, chc2);
-        dialog->handler = InputDialogHandler;
+        dialog->handler = (void (__stdcall*)(void*))InputDialogHandler;
         return 1;
     }
     return 0;
@@ -1460,6 +1448,17 @@ struct Object_004ac970;
 
 // Converts a screen position to the index of a cell in the 16x16 "COLS"
 // colour grid gadget (row * 16 + column, each cell 8 pixels).
+// Unused here: the symbol ids these declarations take keep GetColorCellAt
+// (0x4acbe0) matching (docs/c2-regalloc.md).
+void RegisterGroundOrders(void);
+void EnableAICommands(void);
+void RegisterAICommands(void);
+void FUN_00406f40(void);
+void ResetAIPlayers(void);
+void RegisterVtolOrders(void);
+void StepAllGafSequences(void);
+void ResetNetStats(void);
+
 // FUNCTION: 0x4acbe0
 int __stdcall GetColorCellAt(Gui* obj, int x, int y)
 {
