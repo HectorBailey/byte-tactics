@@ -12,6 +12,8 @@
 
 #include "../util/file_handle.h"
 
+#include "gadget.h"
+
 extern char g_emptyStringLiteral[];
 extern int DAT_0051fba8;
 
@@ -382,17 +384,14 @@ struct StructA_004ada10 {
     short status;
 };
 
-struct StructB_004ada10 {
-    char unknown_0[4];
-    TdfRecord* tdf;
-};
-
 // FUNCTION: 0x4ada10
-void __stdcall ReadStatusField(StructA_004ada10* a, StructB_004ada10* b)
+void __stdcall ReadStatusField(StructA_004ada10* a, TdfFile* b)
 {
-    a->status = (short)b->tdf->GetFieldInt("status", 0);
+    a->status = (short)b->current->GetFieldInt("status", 0);
 }
 
+// Not gadget.h's Gadget: its declarations move 0x4ada40 and 0x4adc70 off
+// their match (94 to 96 percent).
 #pragma pack(push, 2)
 struct Obj_004ada40 {
     char unknown_0[0xb6];
@@ -452,11 +451,6 @@ void __stdcall WriteButtonFields(Obj_004ada40* obj, FileHandle* out, int indent)
     HAPI_WriteFile(out, line, strlen(line));
 }
 
-struct Source_004adc70 {
-    char unknown_0[4];
-    TdfRecord* tdf;                    // +0x4
-};
-
 struct Obj_004adc70 {
     char unknown_0[0xb6];
     char text[0x80];                   // +0xb6
@@ -470,23 +464,23 @@ struct Obj_004adc70 {
 
 // Reads a GUI control's TDF entry: status, text, quickkey, grayedout and
 // stages, into the control object. Argument 1 is the control, argument 2 is
-// the TDF source (its +4 is the key/value table).
+// the TDF file, whose current record is the key/value table.
 // FUNCTION: 0x4adc70
-void __stdcall ReadButtonFields(Obj_004adc70* obj, Source_004adc70* src)
+void __stdcall ReadButtonFields(Obj_004adc70* obj, TdfFile* src)
 {
-    obj->status = (short)src->tdf->GetFieldInt("status", 0);
+    obj->status = (short)src->current->GetFieldInt("status", 0);
     memset(obj->text, 0, 0x80);
-    src->tdf->GetFieldString(obj->text, "text", 0x80, g_emptyStringLiteral);
+    src->current->GetFieldString(obj->text, "text", 0x80, g_emptyStringLiteral);
     strncpy(obj->text, Translate(obj->text), 0x80);
     char local[20];
-    src->tdf->GetFieldString(local, "quickkey", 0x13, g_emptyStringLiteral);
+    src->current->GetFieldString(local, "quickkey", 0x13, g_emptyStringLiteral);
     if (IsCharAlphaA(local[0]))
         obj->quickkey = (unsigned char)local[0];
     else
         obj->quickkey = (unsigned char)atoi(local);
-    int gray = src->tdf->GetFieldInt("grayedout", 0);
+    int gray = src->current->GetFieldInt("grayedout", 0);
     obj->grayedout = (gray ^ obj->grayedout) & 1 ^ obj->grayedout;
-    obj->stages = (unsigned char)src->tdf->GetFieldInt("stages", 0);
+    obj->stages = (unsigned char)src->current->GetFieldInt("stages", 0);
 }
 
 struct Struct_004add60 {
@@ -563,11 +557,6 @@ void __stdcall WriteTextInputFields(Obj_004ade20* obj, FileHandle* out, int inde
     HAPI_WriteFile(out, line, strlen(line));
 }
 
-struct Source_004adf10 {
-    char unknown_0[4];
-    TdfRecord* tdf;                    // +0x4
-};
-
 #pragma pack(push, 1)
 struct Obj_004adf10 {
     char unknown_0[0xb6];
@@ -577,12 +566,12 @@ struct Obj_004adf10 {
 #pragma pack(pop)
 
 // FUNCTION: 0x4adf10
-void __stdcall ReadTextInputFields(Obj_004adf10* obj, Source_004adf10* src)
+void __stdcall ReadTextInputFields(Obj_004adf10* obj, TdfFile* src)
 {
-    obj->maxchars = src->tdf->GetFieldInt("maxchars", 0);
+    obj->maxchars = src->current->GetFieldInt("maxchars", 0);
     if (obj->maxchars > 0x80)
         obj->maxchars = 0x80;
-    src->tdf->GetFieldString(obj->text, "text", 0x80, g_emptyStringLiteral);
+    src->current->GetFieldString(obj->text, "text", 0x80, g_emptyStringLiteral);
     strcpy(obj->text, Translate(obj->text));
 }
 
@@ -636,20 +625,15 @@ void __stdcall WriteSliderFields(Obj_004ae170* obj, FileHandle* out, int indent)
     HAPI_WriteFile(out, line, strlen(line));
 }
 
-struct Source_004ae170 {
-    char unknown_0[4];
-    TdfRecord* tdf;                    // +0x4
-};
-
 // FUNCTION: 0x4ae170
-void __stdcall ReadSliderFields(Obj_004ae170* obj, Source_004ae170* src)
+void __stdcall ReadSliderFields(Obj_004ae170* obj, TdfFile* src)
 {
-    obj->range = src->tdf->GetFieldInt("range", 0);
-    obj->thick = (short)src->tdf->GetFieldInt("thick", 0);
-    obj->knobpos = src->tdf->GetFieldInt("knobpos", 0);
-    obj->knobsize = src->tdf->GetFieldInt("knobsize", 0);
+    obj->range = src->current->GetFieldInt("range", 0);
+    obj->thick = (short)src->current->GetFieldInt("thick", 0);
+    obj->knobpos = src->current->GetFieldInt("knobpos", 0);
+    obj->knobsize = src->current->GetFieldInt("knobsize", 0);
     obj->sliderCallback = 0;
-    src->tdf->GetFieldString(obj->text, "text", 0x80, g_emptyStringLiteral);
+    src->current->GetFieldString(obj->text, "text", 0x80, g_emptyStringLiteral);
     strcpy(obj->text, Translate(obj->text));
 }
 
@@ -674,11 +658,6 @@ void __stdcall WriteTextLinkFields(Obj_004ae230* obj, FileHandle* out, int inden
     HAPI_WriteFile(out, line, strlen(line));
 }
 
-struct Source_004ae300 {
-    char unknown_0[4];
-    TdfRecord* tdf;                    // +0x4
-};
-
 #pragma pack(push, 1)
 struct Obj_004ae300 {
     char unknown_0[0xb6];
@@ -689,14 +668,14 @@ struct Obj_004ae300 {
 #pragma pack(pop)
 
 // FUNCTION: 0x4ae300
-void __stdcall ReadTextLinkFields(Obj_004ae300* obj, Source_004ae300* src)
+void __stdcall ReadTextLinkFields(Obj_004ae300* obj, TdfFile* src)
 {
     obj->hotkey = 0;
     obj->link[0] = 0;
     memset(obj->text, 0, sizeof(obj->text));
-    src->tdf->GetFieldString(obj->text, "text", 0x80, g_emptyStringLiteral);
+    src->current->GetFieldString(obj->text, "text", 0x80, g_emptyStringLiteral);
     strncpy(obj->text, Translate(obj->text), 0x7f);
-    src->tdf->GetFieldString(obj->link, "link", 0x10, g_emptyStringLiteral);
+    src->current->GetFieldString(obj->link, "link", 0x10, g_emptyStringLiteral);
 }
 
 struct Obj_004ae380 {
@@ -721,11 +700,6 @@ void __stdcall WriteHotOrNotField(Obj_004ae380* obj, FileHandle* out, int indent
     HAPI_WriteFile(out, line, strlen(line));
 }
 
-struct Source_004ae410 {
-    char unknown_0[4];
-    TdfRecord* tdf;                    // +0x4
-};
-
 struct Obj_004ae410 {
     char unknown_0[0xc8];
     unsigned int hotornot : 1;         // +0xc8 bit 0
@@ -735,88 +709,54 @@ struct Obj_004ae410 {
 // result goes through an int local; assigning it directly keeps the old field
 // value in a separate register (esi).
 // FUNCTION: 0x4ae410
-void __stdcall ReadHotOrNotField(Obj_004ae410* obj, Source_004ae410* src)
+void __stdcall ReadHotOrNotField(Obj_004ae410* obj, TdfFile* src)
 {
-    int value = src->tdf->GetFieldInt("hotornot", 0);
+    int value = src->current->GetFieldInt("hotornot", 0);
     obj->hotornot = value;
 }
-
-struct Obj_004ae440 {
-    char unknown_0[0xb6];
-    char text[0x80];                   // +0xb6
-};
 
 // Writes the "filename" string of an object as "filename=<text>;" on its own
 // line, indented by the given number of tabs; the reading counterpart is
 // 0x4ae4b0. Sibling of 0x4ae380.
 // FUNCTION: 0x4ae440
-void __stdcall WriteFontFilenameField(Obj_004ae440* obj, FileHandle* out, int indent)
+void __stdcall WriteFontFilenameField(Gadget* obj, FileHandle* out, int indent)
 {
     char tab;
     char line[100];
     tab = '\t';
     for (int i = 0; i < indent; i++)
         HAPI_WriteFile(out, &tab, 1);
-    sprintf(line, "%s=%s;\n", "filename", obj->text);
+    sprintf(line, "%s=%s;\n", "filename", obj->u.text);
     HAPI_WriteFile(out, line, strlen(line));
 }
 
-struct Source_004ae4b0 {
-    char unknown_0[4];
-    TdfRecord* tdf;                    // +0x4
-};
-
-#pragma pack(push, 1)
-struct Obj_004ae4b0 {
-    char unknown_0[0xb6];
-    char text[0x80];                   // +0xb6
-};
-#pragma pack(pop)
-
 // Reads the "filename" key of a TDF entry (sibling of 0x4ae300).
 // FUNCTION: 0x4ae4b0
-void __stdcall ReadFontFilenameField(Obj_004ae4b0* obj, Source_004ae4b0* src)
+void __stdcall ReadFontFilenameField(Gadget* obj, TdfFile* src)
 {
-    src->tdf->GetFieldString(obj->text, "filename", 0x20, g_emptyStringLiteral);
+    src->current->GetFieldString(obj->u.text, "filename", 0x20, g_emptyStringLiteral);
 }
-
-struct Obj_004ae4e0 {
-    char unknown_0[0xb6];
-    char text[0x80];                   // +0xb6
-};
 
 // Writes the "filename" field of an object as "filename=<text>;" on its own
 // line, indented by the given number of tabs; the reading counterpart is
 // 0x4ae4b0.
 // FUNCTION: 0x4ae4e0
-void __stdcall WriteSurfFilenameField(Obj_004ae4e0* obj, FileHandle* out, int indent)
+void __stdcall WriteSurfFilenameField(Gadget* obj, FileHandle* out, int indent)
 {
     char tab;
     char line[100];
     tab = '\t';
     for (int i = 0; i < indent; i++)
         HAPI_WriteFile(out, &tab, 1);
-    sprintf(line, "%s=%s;\n", "filename", obj->text);
+    sprintf(line, "%s=%s;\n", "filename", obj->u.text);
     HAPI_WriteFile(out, line, strlen(line));
 }
 
-struct Source_004ae550 {
-    char unknown_0[4];
-    TdfRecord* tdf;                    // +0x4
-};
-
-#pragma pack(push, 1)
-struct Obj_004ae550 {
-    char unknown_0[0xb6];
-    char text[0x80];                   // +0xb6
-};
-#pragma pack(pop)
-
 // Reads the "filename" key of a TDF entry (byte-identical to 0x4ae4b0).
 // FUNCTION: 0x4ae550
-void __stdcall ReadSurfFilenameField(Obj_004ae550* obj, Source_004ae550* src)
+void __stdcall ReadSurfFilenameField(Gadget* obj, TdfFile* src)
 {
-    src->tdf->GetFieldString(obj->text, "filename", 0x20, g_emptyStringLiteral);
+    src->current->GetFieldString(obj->u.text, "filename", 0x20, g_emptyStringLiteral);
 }
 
 #pragma pack(push, 1)
@@ -850,15 +790,10 @@ struct StructA_004ae610 {
 };
 #pragma pack(pop)
 
-struct StructB_004ae610 {
-    char unknown_0[4];
-    TdfRecord* tdf;                    // +0x4
-};
-
 // FUNCTION: 0x4ae610
-void __stdcall ReadNuttinField(StructA_004ae610* a, StructB_004ae610* b)
+void __stdcall ReadNuttinField(StructA_004ae610* a, TdfFile* b)
 {
-    a->nuttin = b->tdf->GetFieldInt("nuttin", 0);
+    a->nuttin = b->current->GetFieldInt("nuttin", 0);
 }
 
 // Writes a whole GUI file: for each of the object's records, its header, its
@@ -1043,7 +978,7 @@ int __stdcall ReadGuiFile(Elem_004aeac0* obj, char* name)
                 ReadPanelFields((Obj_004ad890*)e, &parser);
                 break;
             case 1:
-                ReadButtonFields((Obj_004adc70*)e, (Source_004adc70*)&parser);
+                ReadButtonFields((Obj_004adc70*)e, &parser);
                 break;
             case 2:
                 e->body.s2.callback = 0;
