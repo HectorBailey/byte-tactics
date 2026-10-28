@@ -77,20 +77,10 @@ struct World_00425b80 {
 };
 
 // The front-end's current screen layer, the object at g_game+0x531: the
-// gadget records at +0x4 (Layer.gadgets, Holder_428b60.entries,
-// Terrain_00425b80.world), the handler at +0x8 and the per-tick callback at
-// +0x1c, and the picture surface at +0x24 (Owner_00428730.surface,
-// Terrain_00425b80.smoke).
-struct Layer {
-    char unknown_0[4];
-    char* gadgets;                     // +0x4
-    void (__stdcall* handler)(void*);  // +0x8
-    int data;                          // +0xc
-    char unknown_10[0x1c - 0x10];
-    void (__stdcall* cb1c)();          // +0x1c
-    char unknown_20[0x24 - 0x20];
-    void* surface;                     // +0x24
-};
+// gadget records at +0x4 (Holder_428b60.entries, Terrain_00425b80.world), the
+// handler at +0x8 and the per-tick callback at +0x1c, and the picture surface
+// at +0x24 (Owner_00428730.surface, Terrain_00425b80.smoke).
+#include "../gui/layer.h"
 
 #include "../gui/gui.h"
 
@@ -521,7 +511,7 @@ void UpdateMenuSparks()
     if (terrain->surface != 0) {
         unsigned char* src = ((Map_00425b80*)terrain->surface)->cells;
         Smoke_00425b80* s = g_menuSparks;
-        unsigned char* dest = ((World_00425b80*)terrain->gadgets)->map->cells;
+        unsigned char* dest = ((World_00425b80*)terrain->entries)->map->cells;
         int count = 100;
         do {
             if (s->active) {
@@ -729,7 +719,7 @@ void __stdcall OpenCloseCdPlayerDialog()
     Layer* gadget = LoadGuiLayer(&g_game->gui, "YESORNO.GUI", 0x100);
     if (gadget != 0) {
         SetKeyboardInput(&g_game->gui, 1);
-        char* entries = gadget->gadgets;
+        char* entries = (char*)gadget->entries;
         char* choice1 = entries + 0x15b * FindGadgetIndex(entries, "CHOICE1", 1);
         char* choice2 = entries + 0x15b * FindGadgetIndex(entries, "CHOICE2", 1);
         strcpy(entries + 0xcc, "CHOICE1");
@@ -798,7 +788,7 @@ void __stdcall OpenMainMenu()
     SetGadgetActiveByName(&g_game->gui, "DebugString", 1);
     SetGadgetTextByName(&g_game->gui, "DebugString", palpath);
 
-    char* gadgets = g_game->gui.layer->gadgets;
+    char* gadgets = (char*)g_game->gui.layer->entries;
     int width = GetTextPixelWidth(palpath);
     short* px = (short*)(gadgets + 0x15b * FindGadgetIndex(gadgets, "DebugString", 5) + 0x13);
     *px += -(width / 2);
@@ -1670,7 +1660,7 @@ after:
 // FUNCTION: 0x428b60
 void OrLabelAttribs(void)
 {
-    Entry_428b60* entries = (Entry_428b60*)g_game->gui.layer->gadgets;
+    Entry_428b60* entries = (Entry_428b60*)g_game->gui.layer->entries;
     for (int i = 1; i <= entries->count; i++) {
         if (entries[i].type == 5) {
             entries[i].attribs |= 8;
