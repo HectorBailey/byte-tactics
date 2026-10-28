@@ -525,10 +525,6 @@ void BlockInfo::SetName(char* newName)
 // The gap functions (0x4d8d70, 0x4d9ab0, 0x4da120, 0x4da2c0) stay in their
 // own files.
 #define NOMINMAX
-#include <windows.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <signal.h>
 #include <ctype.h>
 #include <math.h>
@@ -1599,10 +1595,7 @@ Container_004da9f0<int>* GetFreedBlockRing()
 // files: each inlines a tree helper (or constructs the std::map member) from
 // that file's own view of the types, which cannot agree with the gathered
 // file's one view of each class.
-#include <windows.h>
-#include <string.h>
 #include <set>
-#include <yvals.h>
 #include <map>
 #include <list>
 #include <time.h>
@@ -3483,17 +3476,9 @@ MapInsertResult* MapInsertResult::Assign(int* iter, unsigned char* inserted)
 // window's settings and dialog procedure. The files of the module's fourth
 // part, gathered in address order.
 // Included only for its symbol count: the functions below match at this count.
-#include <math.h>
-#include <windows.h>
-#include <yvals.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <float.h>
-#include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <algorithm>
 
 // A 0x18-byte pooled node, allocated 0x155 at a time (one 0x2000 block).
 extern void* g_freeBlockFreeList;      // free list
@@ -5510,11 +5495,6 @@ void NameMapIter::NextNode()
 // stay in their own files: their views of NameMapTree and NameMapTree
 // disagree with the views the tree methods here compile from.
 #define NOMINMAX
-#include <windows.h>
-#include <stdio.h>
-#include <string.h>
-#include <yvals.h>
-#include <map>
 
 // The trees' shared _Nil node (0x5292c4). Each tree's methods below name it
 // under their own node type, so it is declared as the untyped node pointer.
@@ -6488,10 +6468,6 @@ NameMapInsertResult NameMapTree::InsertOrFind(const Pair_004e2250& _V)
 // The std::_Tree rotations and node allocators, the Cavedog registry key
 // helper with the window position save and restore, and the GDPERF driver
 // calls. 0x4e35b0 (OpenGdperf) is in a gap region and stays in its own file.
-#include <yvals.h>
-#include <windows.h>
-#include <string.h>
-#include <stdlib.h>
 
 typedef _Redbl_004e2250 Redbl;
 

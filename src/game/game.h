@@ -20,9 +20,6 @@
 #include "../ingame/frame_timers.h"
 #include "../network/settings.h"
 #include "../network/player.h"
-#include "../map/grid.h"
-#include "../graphics/handle.h"
-#include "../ingame/frame_timers.h"
 
 #pragma pack(push, 1)
 

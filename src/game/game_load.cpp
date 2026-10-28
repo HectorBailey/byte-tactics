@@ -1121,7 +1121,6 @@ void __stdcall OffsetWorldPosFromView(Point* p, View_00498cd0* view, int param_3
 }
 // Converts the screen position stored at +0x2c76 into a 16.16 world position
 // (scaled from the view origin), with the height taken from the ground there.
-#include <string.h>
 // FUNCTION: 0x498d00
 void __stdcall MinimapCursorToWorldPos(Pos_00498d00* out)
 {

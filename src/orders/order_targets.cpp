@@ -506,7 +506,6 @@ struct Owner_004895c0 {
 };
 #pragma pack(pop)
 
-#include "path_order_attach.h"
 
 #include "../units/unit_ref.h"
 
@@ -642,8 +641,6 @@ struct Pos_0044e6c0 {
     int z;                             // +0x8
 };
 
-#pragma pack(push, 2)
-#pragma pack(pop)
 
 struct Vec3_0044e740 {
     int x;

@@ -1153,8 +1153,6 @@ int __stdcall CreateLocalPlayer(unsigned char playerIndex, int flag)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <process.h>
-#include <string.h>
-#include <stdio.h>
 #include <iostream>
 
 #pragma pack(push, 1)

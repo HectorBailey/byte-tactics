@@ -1150,9 +1150,6 @@ int __stdcall WeaponCanReachPos(Unit* a1, Vec3_0049aa80* a2, Vec3_0049aa80* a3, 
 // Both includes change the register choice in the sea-level tests.
 #include <stdlib.h>
 
-#pragma pack(push, 1)
-
-#pragma pack(pop)
 
 // The vector from point `a` to point `b`. Both operands and the result are by
 // value, which is what makes the line-of-fire block below compile the way the
@@ -1667,7 +1664,6 @@ void __stdcall CopyWeaponVelocityParam(Obj_0049c980* obj, Src_0049c980* src)
     obj->value = 0;
 }
 
-#include <math.h>
 
 short __cdecl FUN_004b715a(int x, int z);
 int __cdecl FUN_004b70ef(short angle, int scale);
@@ -1767,7 +1763,6 @@ int __stdcall FireLineOfSightProjectile(UnitWeaponSlot* fire, Unit* unit,
     return 1;
 }
 
-#include <string.h>
 
 #pragma pack(push, 1)
 struct Shot_0049cc20 {
@@ -2300,7 +2295,6 @@ int __stdcall FireTurretWeapon(Unit* fire, Unit* unit,
 // low half. `test al, 1` at 0x49d58e means the path is only taken when f_1b bit 0 is
 // set, so this is the laser (flags bit 1) aiming path.
 
-#include <stdlib.h>
 
 // True when both of the aim object's angles are within tolerance of the
 // corresponding unit angles. With no tolerance in the type, a moved unit
