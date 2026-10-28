@@ -5,7 +5,8 @@
 // Resolves every feature type's "featuredead", "featurereclamate" and
 // "featureburnt" names to feature type numbers (loading them when needed),
 // updating the load progress byte as it goes.
-// Must stay the only header.
+// <string.h> and map/feature.h are this file's only headers: its parser
+// classes have to stay views of their own.
 #include <string.h>
 
 // Keeps its own view of the parser classes: with the shared tdf.h the inlined
@@ -30,13 +31,8 @@ struct List_00422ea0 {
     TdfFile** last;                     // +0x8
 };
 
-struct Feature {
-    char name[0xf4];
-    unsigned short dead;                // +0xf4
-    unsigned short burnt;               // +0xf6
-    unsigned short reclamate;           // +0xf8
-    char unknown_fa[0x100 - 0xfa];
-};
+// The feature record: map/feature.h's Feature, the 0x100-byte pool element.
+#include "../map/feature.h"
 
 #pragma pack(push, 1)
 struct Game {
