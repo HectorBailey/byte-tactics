@@ -27,9 +27,9 @@
 #include "../network/player.h"
 
 // The flags at +0x241 read as the original's bitfield; the header keeps the
-// plain word.
+// plain word (the same view victory.cpp spells UnitDefFlags_0048dfb0).
 #pragma pack(push, 1)
-struct UnitDefFlags_00467440 {
+struct UnitDefFlags {
     char unknown_0[0x241];
     unsigned int bit0_7 : 8;
     unsigned int bit8 : 1;         // bit 8
@@ -37,47 +37,11 @@ struct UnitDefFlags_00467440 {
 };
 #pragma pack(pop)
 
-// A partial view of UnitDef (the header's fields at the same offsets); it stays for its symbol ids, which 0x467a50 needs.
-struct UnitType_004685a0 {
-    char name[0x152];                  // +0x0
-    int count;                         // +0x152
-    unsigned short* ids;               // +0x156
-    char unknown_15a[0x22f - 0x15a];
-    unsigned char mobile;              // +0x22f
-};
-
 #include "../network/player_info.h"
-
-struct Owner_00467440 {
-    void* active;                      // +0x0
-    char unknown_4[0x27 - 0x4];
-    PlayerInfo* data;                  // +0x27
-    char unknown_2b[0x73 - 0x2b];
-    char type;                         // +0x73
-    char unknown_74[0x108 - 0x74];
-    unsigned char allied[1];           // +0x108
-};
-
-struct PlayerInfo_004685a0 {
-    int f_0;                           // +0x0
-    char unknown_4[0x2b - 4];
-    char name[0x73 - 0x2b];            // +0x2b
-    unsigned char controller;          // +0x73
-    char unknown_74[0x146 - 0x74];
-    unsigned char player;              // +0x146
-    char unknown_147[0x22f - 0x147];
-    unsigned char mobile;              // +0x22f
-};
 
 struct SpotState {
     char unknown_0[0xc];
     void* owner;                       // +0xc
-};
-
-// Unused here: its symbol ids keep DrawRotatedQuadOutline (0x467a50) matching.
-struct Unit_00467960 {
-    char unknown_0[0x110];
-    unsigned int flags;                // +0x110
 };
 
 struct Object_004cb650;
@@ -99,12 +63,10 @@ struct Unit {
     // the same offset, 0x467e50 reads it as a string pointer.
     union {
         UnitDef* def;                  // +0x92
-        UnitType_004685a0* type;
         char* f_92;
     };
     union {
-        Owner_00467440* field_96;      // +0x96
-        PlayerInfo_004685a0* player;
+        Player* player;                // +0x96
         int* f_96;
     };
     char unknown_9a[0x9e - 0x9a];
@@ -134,13 +96,9 @@ struct Unit {
     char unknown_114[0x118 - 0x114];
 };
 
-struct Team_004689c0 {                 // 347 bytes
-    char unknown_0[4];
-    unsigned char* data;               // +0x4
-    char unknown_8[347 - 8];
-};
-
-struct Sub_004679a0_a {
+// The resource bar's per-slot cache at g_game+0x37e3f (Thaldren's
+// ResourceHudCache, 0x21 bytes).
+struct ResourceHudCache {
     char unknown_0[1];
     int energyAmountDisp;              // +0x01
     char unknown_5[0xd - 0x5];
@@ -150,10 +108,12 @@ struct Sub_004679a0_a {
     int metalStorage;                  // +0x1d
 };
 
-struct Sub_004679a0_b {
+// The selection info cache at g_game+0x37e60 (Thaldren's SelectionInfoCache),
+// the record info_panel_46a860.cpp declares under the same name.
+struct SelectionInfoCache {
     char unknown_0[0x30];
-    int panel;                         // +0x30
-    unsigned short* lightbar;          // +0x34
+    int totalUnitsPanelSlide;          // +0x30
+    unsigned short* lightbarFrame;     // +0x34, the cached lightbar frame
 };
 
 #include "../graphics/handle.h"
@@ -177,10 +137,7 @@ struct Feature {
 
 #include "feature_spot.h"
 
-struct Def_004685a0 {
-    char unknown_0[0x20];
-    char name[0x229];                  // +0x20
-};
+#include "../gui/layer.h"
 
 struct Game {
     char unknown_0[0x519];
@@ -190,7 +147,7 @@ struct Game {
     int field_525;                     // +0x525
     char unknown_529[4];
     int field_52d;                     // +0x52d
-    Team_004689c0* layer;              // +0x531
+    Layer* layer;                      // +0x531
     char unknown_535[0x57d - 0x535];
     int team_index;                    // +0x57d
     char unknown_581[0xdcb - 0x581];
@@ -240,7 +197,7 @@ struct Game {
     Point* tempProjectedPts;           // +0x14387
     Point* assemPts;                   // +0x1438b
     char unknown_1438f[0x1439b - 0x1438f];
-    Def_004685a0* unitDefs;            // +0x1439b
+    UnitDef* unitDefs;                 // +0x1439b
     char unknown_1439f[0x1481f - 0x1439f];
     unsigned short* sidePanelTopSeq[5];  // +0x1481f
     unsigned short* sidePanelBotSeq[5];  // +0x14833
@@ -254,8 +211,8 @@ struct Game {
     char unknown_37e27[0x37e3f - 0x37e27];
     union {
         struct {
-            Sub_004679a0_a resources;  // +0x37e3f
-            Sub_004679a0_b selectionInfoCache; // +0x37e60
+            ResourceHudCache resources;    // +0x37e3f
+            SelectionInfoCache selectionInfoCache; // +0x37e60
         };
         struct {
             char unknown_37e3f[0x37e90 - 0x37e3f];
@@ -308,6 +265,7 @@ public:
     virtual void ApplySonarJamFlag(Unit* unit);
 };
 
+#include "../graphics/gaf_frame.h"
 #include "../graphics/rect.h"
 
 struct Colors_00467b60 {
@@ -317,16 +275,15 @@ struct Colors_00467b60 {
     unsigned char full;                // +0xa
 };
 
-struct Quad_467c00 {
+// A quadrilateral of four screen points (the name graphics/surface.cpp and
+// ingame/game_dialogs.cpp give the same shape, for DrawFrameQuad).
+struct Quad {
     Point p[4];
 };
 
-struct Entry_467c00 {
-    unsigned short w;                  // +0
-    unsigned short h;                  // +2
-};
-
-struct Mission_00467e50 {
+// One order of a unit's mission queue (Thaldren's MissionOrder): the phase at
+// +0x5, the attach link's owner at +0x16 and the next order at +0x4a.
+struct MissionOrder {
     char pad_0[5];
     unsigned char state;               // +0x5
     char pad_6[0x16 - 0x6];
@@ -335,13 +292,17 @@ struct Mission_00467e50 {
     void* next;                        // +0x4a
 };
 
-struct MissionName_00467e50 {
+// The order type table entry, the record orders/order_queue_4384a0.cpp's
+// OrderType::GetTableEntry returns; its lookup name at +0x15 is what the info
+// panel shows. order_queue and selection_48cf30.cpp view the same record, and
+// selection_48cf30.cpp spells its type OrderTypeEntry.
+struct OrderTypeEntry {
     char pad_0[0x15];
-    char* name;                        // +0x15
+    char* name;                        // +0x15, the lookup name
 };
 
 struct OrderType {
-    MissionName_00467e50* GetTableEntry();
+    OrderTypeEntry* GetTableEntry();
 };
 
 #include "../graphics/surface.h"
@@ -357,12 +318,17 @@ struct Flags_0046a530 {
     unsigned short rest : 13;
 };
 
+// Left with its address name: ta_types.h carries this file's view of the width
+// and height pair under it.
 struct Size_0046b9d0 {
     short w;
     short h;
 };
 
-class Prim_0046bae0 {                  // a model primitive, 0x20 bytes
+// The model and its primitives (Thaldren's Model3do and Model3doPrimitive,
+// the names graphics/model_render_4581e0.cpp gives the same records), the
+// shape this file draws.
+class Model3doPrimitive {              // a model primitive, 0x20 bytes
 public:
     int colorIndex;                    // +0x00 color
     int count;                         // +0x04 number of vertices
@@ -376,7 +342,7 @@ public:
     unsigned int rest : 30;            // +0x1c
 };
 
-class Object_0046bae0 {                // the model or piece being drawn
+class Model3do {                       // the model or piece being drawn
 public:
     int version;                       // +0x00
     int count;                         // +0x04
@@ -384,7 +350,7 @@ public:
     int firstFace;                     // +0x0c
     char unknown_10[0x24 - 0x10];
     Vec3* verts;                       // +0x24
-    Prim_0046bae0* prims;              // +0x28
+    Model3doPrimitive* prims;          // +0x28
 };
 
 #pragma pack(pop)
@@ -411,7 +377,7 @@ void __stdcall DrawRectangle(void* surface, Rect* rect, int color);
 void __stdcall DrawRectangle(void* surface, void* rect, int color);
 void __stdcall DrawRectangle(int surface, Rect* rect, int color);
 
-void __stdcall DrawFrameQuad(void* surf, void* entry, Quad_467c00* dst, Quad_467c00* src);
+void __stdcall DrawFrameQuad(void* surf, void* entry, Quad* dst, Quad* src);
 
 char* __stdcall Translate(char* text);
 int GetTextKeyColor();
@@ -464,7 +430,7 @@ void DetectionVisitor::MarkUnitsInRadarOrSonarRadius(Unit* unit)
     }
 
     UnitDef* def = unit->def;
-    if (((UnitDefFlags_00467440*)def)->bit8) {
+    if (((UnitDefFlags*)def)->bit8) {
         return;
     }
 
@@ -504,15 +470,15 @@ void SonarJamVisitor::ApplySonarJamFlag(Unit* unit)
 // FUNCTION: 0x4679a0
 void LoadLightBar()
 {
-    Sub_004679a0_a* a = &g_game->resources;
+    ResourceHudCache* a = &g_game->resources;
     a->energyAmountDisp = a->metalAmountDisp = a->energyStorage = a->metalStorage = 0;
-    Sub_004679a0_b* b = &g_game->selectionInfoCache;
-    b->panel = 0;
-    b->lightbar = 0;
+    SelectionInfoCache* b = &g_game->selectionInfoCache;
+    b->totalUnitsPanelSlide = 0;
+    b->lightbarFrame = 0;
     unsigned short* frames = FindGafEntry(g_game->gaf, "LIGHTBAR");
-    g_game->selectionInfoCache.lightbar = (unsigned short*)GetGafFrame(frames, 1);
-    g_game->selectionInfoCache.lightbar[3] = 0;
-    g_game->selectionInfoCache.lightbar[2] = 0;
+    g_game->selectionInfoCache.lightbarFrame = (unsigned short*)GetGafFrame(frames, 1);
+    g_game->selectionInfoCache.lightbarFrame[3] = 0;
+    g_game->selectionInfoCache.lightbarFrame[2] = 0;
 }
 
 // FUNCTION: 0x467a20
@@ -586,19 +552,19 @@ void __stdcall DrawProgressBar(void* surface, int value, int max, Rect* rect, Co
 void __stdcall BlitSideLogoToRect(void* surf, Player* player, Rect* rect, int dy)
 {
     unsigned char idx = player->info->color;
-    Entry_467c00* entry = (Entry_467c00*)*(void**)((char*)g_game->logos32 + idx * 8 + 0x28);
+    GafFrame* entry = (GafFrame*)*(void**)((char*)g_game->logos32 + idx * 8 + 0x28);
 
-    Quad_467c00 src;
+    Quad src;
     src.p[0].x = 0;
     src.p[0].y = 0;
-    src.p[1].x = entry->w;
+    src.p[1].x = entry->width;
     src.p[1].y = 0;
-    src.p[2].x = entry->w;
-    src.p[2].y = entry->h;
+    src.p[2].x = entry->width;
+    src.p[2].y = entry->height;
     src.p[3].x = 0;
-    src.p[3].y = entry->h;
+    src.p[3].y = entry->height;
 
-    Quad_467c00 dst;
+    Quad dst;
     dst.p[0].x = rect->left;
     dst.p[0].y = rect->top + dy;
     dst.p[1].x = rect->right;
@@ -675,7 +641,7 @@ int __stdcall DrawUnitStateProbe(void* surface)
     int lineH;
     int y;
     int prev;
-    Mission_00467e50* m;
+    MissionOrder* m;
 
     if (g_game->unitInfoHoverTrack == 0 || g_game->unitInfoHoverUnitId == 0)
         return 0;
@@ -745,8 +711,8 @@ int __stdcall DrawUnitStateProbe(void* surface)
         if (unit->list != 0) {
             DrawString(surface, "Mission Q:", 0x86, y, -1);
             y += lineH;
-            for (m = (Mission_00467e50*)unit->list; m != 0;
-                 m = (Mission_00467e50*)m->next) {
+            for (m = (MissionOrder*)unit->list; m != 0;
+                 m = (MissionOrder*)m->next) {
                 if (m->target != 0)
                     sprintf(buf, "    '%s' state: %d  tgt: '%s'\n",
                             ((OrderType*)((char*)m + 4))->GetTableEntry()->name,
@@ -762,8 +728,8 @@ int __stdcall DrawUnitStateProbe(void* surface)
         if (unit->list2 != 0) {
             DrawString(surface, "Background Mission Q:", 0x86, y, -1);
             y += lineH;
-            for (m = (Mission_00467e50*)unit->list2; m != 0;
-                 m = (Mission_00467e50*)m->next) {
+            for (m = (MissionOrder*)unit->list2; m != 0;
+                 m = (MissionOrder*)m->next) {
                 if (m->target != 0)
                     sprintf(buf, "    '%s' state: %d  tgt: '%s'\n",
                             ((OrderType*)((char*)m + 4))->GetTableEntry()->name,
@@ -863,7 +829,7 @@ int __stdcall DrawUnitBuilderProbe(void* surface)
         return 0;
     Unit* unit = &g_game->units[g_game->unitBuilderHoverUnitId];
     if ((unit->f_110 & 0x10000000) == 0 || (unit->f_110 & 0x4000) != 0
-            || unit->type->ids == 0) {
+            || unit->def->ids == 0) {
         g_game->unitInfoHoverTrack = 0;
         g_game->unitInfoHoverUnitId = 0;
     }
@@ -891,22 +857,22 @@ int __stdcall DrawUnitBuilderProbe(void* surface)
     y += lineHeight;
     DrawString(surface, "==================", 0x86, y, -1);
     y += lineHeight;
-    sprintf(buf, "uid: %03d '%s'\n", unit->id, (char*)unit->type);
+    sprintf(buf, "uid: %03d '%s'\n", unit->id, (char*)unit->def);
     DrawString(surface, buf, 0x86, y, -1);
     y += lineHeight;
-    char* mobile = unit->type->mobile ? "MOBILE" : "BUILDING";
+    char* mobile = unit->def->mobile ? "MOBILE" : "BUILDING";
     char* remote;
-    if (unit->player->f_0 != 0 && (unit->player->controller == 1 || unit->player->controller == 2))
+    if (unit->player->active != 0 && (unit->player->type == 1 || unit->player->type == 2))
         remote = "LOCAL";
     else
         remote = "REMOTE";
-    sprintf(buf, "playerno: %d '%s' %s - %s\n", unit->player->player, unit->player->name, remote, mobile);
+    sprintf(buf, "playerno: %d '%s' %s - %s\n", unit->player->index, unit->player->name, remote, mobile);
     DrawString(surface, buf, 0x86, y, -1);
     y += lineHeight;
-    sprintf(buf, "controller: %d\n\n", unit->player->controller);
+    sprintf(buf, "controller: %d\n\n", unit->player->type);
     DrawString(surface, buf, 0x86, y, -1);
     y += lineHeight;
-    if (unit->player->f_0 != 0 && (unit->player->controller == 1 || unit->player->controller == 2)) {
+    if (unit->player->active != 0 && (unit->player->type == 1 || unit->player->type == 2)) {
         sprintf(buf, "Units I can build, and the probabilities:\n",
                 ((unit->f_1f & 0x10) ? 'X' : '-'),
                 ((unit->f_3b & 0x10) ? 'X' : '-'),
@@ -914,23 +880,23 @@ int __stdcall DrawUnitBuilderProbe(void* surface)
         DrawString(surface, buf, 0x86, y, -1);
         int i = 0;
         y += lineHeight;
-        if (unit->type->count > 0) {
+        if (unit->def->count > 0) {
             do {
-                unsigned short id = unit->type->ids[i];
+                unsigned short id = unit->def->ids[i];
                 int prob = GetBuildRating(unit->playerIndex, id);
-                Def_004685a0* def = &g_game->unitDefs[id];
+                UnitDef* def = &g_game->unitDefs[id];
                 Rect bar;
                 bar.left = 0x88;
                 bar.top = y + 1;
                 bar.right = 0xa2;
                 bar.bottom = bar.top + lineHeight - 6;
                 Bar_004685a0(surface, &bar, prob);
-                char* name = def->name;
+                char* name = def->unitname;
                 sprintf(buf, "       %3d %% - '%s'\n", prob, name);
                 DrawString(surface, buf, 0x86, y, -1);
                 y += lineHeight;
                 i++;
-            } while (i < unit->type->count);
+            } while (i < unit->def->count);
         }
     }
     g_probePanelBottom = y;
@@ -956,7 +922,7 @@ void __stdcall DrawStatusPanel(Surface* win)
     int v = g_game->panel;
     if (g_statusPanelNextTick < (int)GetMilliseconds()) {
         g_statusPanelNextTick = GetMilliseconds() + 15;
-        if (!IsKeyDown(0x20) || (g_game->team_index != -1 && ((unsigned char*)g_game->layer->data)[g_game->team_index * 347] == 3)) {
+        if (!IsKeyDown(0x20) || (g_game->team_index != -1 && ((unsigned char*)g_game->layer->entries)[g_game->team_index * 347] == 3)) {
             if (v < 0) {
                 if (v == -31)
                     PlaySoundByName("Panel", 0);
@@ -1175,7 +1141,7 @@ void ClampCameraTarget(void);
 
 // FUNCTION: 0x46bae0
 void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,
-                            Object_0046bae0* obj, short* angles)
+                            Model3do* obj, short* angles)
 {
     Vec3* v = obj->verts;
     Vec3* scratch = g_game->tempXformPts;
@@ -1192,7 +1158,7 @@ void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,
     }
 
     int j;
-    Prim_0046bae0* e = obj->prims;
+    Model3doPrimitive* e = obj->prims;
     if (obj->firstFace != -1) {
         e++;
         j = 1;

@@ -1377,7 +1377,7 @@ address,size,file,symbol,status,similarity
 0x46b900,196,src/ingame/info_panel.cpp,?DrawProfileBarLine@@YGXHPBDH@Z,matched,100.0
 0x46b9d0,165,src/ingame/info_panel.cpp,?DrawMapTileSelectionOutline@@YGXPAXPAFUSize_0046b9d0@@H@Z,matched,100.0
 0x46ba80,89,src/ingame/info_panel.cpp,?DrawClosedPolygon@@YGXPAXPAUPoint@@HH@Z,matched,100.0
-0x46bae0,380,src/ingame/info_panel.cpp,?DrawModel3doProjected@@YGXPAXPAUVec3@@PAVObject_0046bae0@@PAF@Z,matched,100.0
+0x46bae0,380,src/ingame/info_panel.cpp,?DrawModel3doProjected@@YGXPAXPAUVec3@@PAVModel3do@@PAF@Z,matched,100.0
 0x46bc60,13,src/ingame/info_panel.cpp,?ReportGameEventCallback@@YGXH@Z,matched,100.0
 0x46bc70,108,src/ingame/info_panel.cpp,?ShowGameMessage@@YGHPADH@Z,matched,100.0
 0x46bce0,542,src/game/statistics.cpp,?AllocScoreTables@@YGHXZ,matched,100.0

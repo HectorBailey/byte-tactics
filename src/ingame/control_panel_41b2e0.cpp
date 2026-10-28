@@ -9,11 +9,23 @@
 #include <memory.h>
 #include "ta_types.h"
 
+// Unused here: the symbol ids these declarations take keep RefreshSelectionOrders
+// (0x41b2e0) matching now that the unit-def table has one view (docs/c2-regalloc.md).
+void RegisterUnitOrders(void);
+void RegisterGroundOrders(void);
 
-// Own views of the unit, UnitDef and game, with the names of units/unit_def.h: the shared header's types have plain words where bitfields are needed.
+// The unit def, the unit and the game keep address names: ta_types.h defines
+// UnitType, Unit and Game, and this include set decides the match, so they
+// cannot take the shared names here. The flag words take the names
+// control_panel.cpp gives them, and the GUI context at g_game+0x519 takes
+// gui/gui.h's.
 #pragma pack(push, 1)
+// UnitDef: the 0x249 bytes units/unit_def.h spells, with the flag words as bit
+// fields (its buildMenuPageCount and unitname included).
 struct UnitType_0041b2e0 {
-    char unknown_0[0x22e];
+    char unknown_0[0x20];
+    char unitname[0x20];               // +0x20
+    char unknown_40[0x22e - 0x40];
     unsigned char buildMenuPageCount;  // +0x22e
     char unknown_22f[0x241 - 0x22f];
     unsigned int flags1;               // +0x241
@@ -35,7 +47,7 @@ struct UnitType_0041b2e0 {
     unsigned int bits15 : 17;
 };
 
-struct UnitFlags_0041b2e0 {
+struct UnitFlags {
     unsigned int bits0 : 4;
     unsigned int selected : 1;         // bit 4
     unsigned int bits5 : 6;
@@ -57,16 +69,11 @@ struct Unit_0041b2e0 {
     char unknown_aa[0x10e - 0xaa];
     unsigned char activateFlags;       // +0x10e
     char cobStateFlags;
-    UnitFlags_0041b2e0 flags;          // +0x110
+    UnitFlags flags;                   // +0x110
     char unknown_114[0x118 - 0x114];
 };
 
-struct BuildType_0041b2e0 {
-    char unknown_0[0x20];
-    char unitname[0x229];              // +0x20
-};
-
-struct Orders_0041b2e0 {
+struct Orders {
     unsigned short unknown_0 : 1;      // +0x37ebe
     unsigned short refresh : 1;        // bit 1
     unsigned short unknown_2 : 10;
@@ -88,13 +95,13 @@ struct Orders_0041b2e0 {
     unsigned short unknown_1 : 15;
 };
 
-struct Menu_0041b2e0 {
+struct Gui {
     char unknown_0[0x10];
 };
 
 struct Game_0041b2e0 {
     char unknown_0[0x519];
-    Menu_0041b2e0 menu;                // +0x519
+    Gui menu;                          // +0x519
     char unknown_529[0x1b63 - 0x529];
     Player players[10];                 // +0x1b63
     char unknown_2851[0x2a42 - 0x2851];
@@ -102,18 +109,18 @@ struct Game_0041b2e0 {
     char unknown_2a43[0x14357 - 0x2a43];
     Unit_0041b2e0* units;              // +0x14357
     char unknown_1435b[0x1439b - 0x1435b];
-    BuildType_0041b2e0* unitDefs;      // +0x1439b
+    UnitType_0041b2e0* unitDefs;       // +0x1439b
     char unknown_1439f[0x37e9c - 0x1439f];
     unsigned short unitIndex;          // +0x37e9c
     char unknown_37e9e[0x37ebe - 0x37e9e];
-    Orders_0041b2e0 orders;            // +0x37ebe
+    Orders orders;            // +0x37ebe
 };
 #pragma pack(pop)
 
 extern Game_0041b2e0* g_game;
 
 int __stdcall PopUntilNamedLayout(int force);
-int __stdcall IsScreenNamed(Menu_0041b2e0* menu, const char* name);
+int __stdcall IsScreenNamed(Gui* menu, const char* name);
 void __stdcall OpenBuildMenuGui(Unit_0041b2e0* unit, char* guiName, int page);
 void __stdcall OpenGeneratorDialog(Unit_0041b2e0* unit);
 
@@ -165,7 +172,7 @@ void RefreshSelectionOrders()
         for (u = (Unit_0041b2e0*)player->unitsBegin; u <= last; u++) {
             if (u->unitDefIndex == 0)
                 continue;
-            UnitFlags_0041b2e0 flags = u->flags;
+            UnitFlags flags = u->flags;
             if (!flags.selected)
                 continue;
             if (first == 0)

@@ -8,6 +8,8 @@
 
 #include "../util/vec3.h"
 
+// Left with its address name: nothing names this view of the position's three
+// whole words.
 union UnitPos_00467440 {
     Vec3 vec;
     short half[6];                     // the words of x, y and z: [1] x whole, [3] y whole, [5] z whole
@@ -17,14 +19,14 @@ union UnitPos_00467440 {
 
 #include "../network/player_info.h"
 
-struct PlayerInfo_00467440;
+struct Player;
 
 struct Unit {
     char unknown_0[0x6a];
     UnitPos_00467440 pos;              // +0x6a
     char unknown_76[0x92 - 0x76];
     UnitDef* def;                      // +0x92
-    PlayerInfo_00467440* player;       // +0x96
+    Player* player;                    // +0x96
     char unknown_9a[0xb0 - 0x9a];
     int workTime;                      // +0xb0
     char unknown_b4[0xff - 0xb4];
@@ -55,10 +57,11 @@ struct ByteMap {
     unsigned char Get(int x, int y) { return data[size.width * y + x]; }
 };
 
-struct PlayerInfo_00467440 {
+// Kept a view of its own at this file's symbol count; the header's names.
+struct Player {
     void* active;                      // +0x0
     char unknown_4[0x27 - 0x4];
-    PlayerInfo* data;                  // +0x27
+    PlayerInfo* info;                  // +0x27
     char unknown_2b[0x67 - 0x2b];
     Unit* unitsBegin;                  // +0x67
     Unit* unitsEnd;                    // +0x6b
@@ -75,7 +78,7 @@ struct PlayerInfo_00467440 {
 
 struct Game {
     char unknown_0[0x1b63];
-    PlayerInfo_00467440 players[10];   // +0x1b63, stride 0x14b
+    Player players[10];                // +0x1b63, stride 0x14b
     char unknown_2851[0x2a3c - 0x2851];
     unsigned short numPlayers;         // +0x2a3c
     char unknown_2a3e[0x2a43 - 0x2a3e];
@@ -90,7 +93,7 @@ struct Game {
     char unknown_1435f[0x38a47 - 0x1435f];
     int gameTick;                      // +0x38a47
 
-    PlayerInfo_00467440* Current() { return &players[playerIndex]; }
+    Player* Current() { return &players[playerIndex]; }
 };
 #pragma pack(pop)
 
@@ -117,7 +120,7 @@ extern Game* g_game;
 void __stdcall VisitObjectsInRange(Vec3* pos, int range, void* visitor);
 bool __stdcall HasReadyUnitInRange(int player, Vec3* p, int range);
 
-static inline int IsExplored_00467440(PlayerInfo_00467440* p, UnitPos_00467440* pos)
+static inline int IsExplored_00467440(Player* p, UnitPos_00467440* pos)
 {
     int tx = pos->half[1] >> 5;
     int ty = (pos->half[5] - (pos->half[3] >> 1)) >> 5;
@@ -126,7 +129,7 @@ static inline int IsExplored_00467440(PlayerInfo_00467440* p, UnitPos_00467440* 
     return 0;
 }
 
-static inline int IsSeen_00467440(PlayerInfo_00467440* p, UnitPos_00467440* pos)
+static inline int IsSeen_00467440(Player* p, UnitPos_00467440* pos)
 {
     int tx = pos->half[1] >> 5;
     int ty = (pos->half[5] - (pos->half[3] >> 1)) >> 5;
@@ -145,7 +148,7 @@ void UpdateSensorRadarAndCloak(void)
     unsigned char player = g_game->playerIndex;
     Unit* first = g_game->units + 1;
     Unit* last = g_game->unitsEnd;
-    PlayerInfo_00467440* pl = &g_game->players[g_game->playerIndex];
+    Player* pl = &g_game->players[g_game->playerIndex];
     Unit* u;
 
     Unit* a;
@@ -154,8 +157,8 @@ void UpdateSensorRadarAndCloak(void)
             a->flags &= ~0x1000;
             if (a->playerIndex == player
                 || (a->player->allied[pl->index] != 0
-                    && (a->player->data->flags_97 & 0x40) != 0)
-                || (*(int*)pl != 0 && (pl->data->flags_9b & 0x40) != 0)) {
+                    && (a->player->info->flags_97 & 0x40) != 0)
+                || (*(int*)pl != 0 && (pl->info->flags_9b & 0x40) != 0)) {
                 a->flags |= 0x300;
             } else {
                 a->flags &= ~0x700;
@@ -226,7 +229,7 @@ void UpdateSensorRadarAndCloak(void)
         if ((f & 0x10000000) && !(f & 0x100) && !(u->activateFlags & 4)) {
             // int, not unsigned char: the latter spills playerIndex.
             int pi = g_game->playerIndex;
-            PlayerInfo_00467440* p2 = g_game->Current();
+            Player* p2 = g_game->Current();
             // unsigned int: an int merges the two zero blocks.
             unsigned int vis;
             if ((g_game->mapFlags & 2) == 2) {

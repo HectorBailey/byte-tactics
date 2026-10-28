@@ -2,11 +2,8 @@
 // g_game+0xc is a pointer, the final test reads a byte at +0xf1 through it.
 #include <stdio.h>
 
+#include "../gui/mouse_event.h"
 #include "../map/mission.h"
-
-struct MouseInput {
-    int fields[6];
-};
 
 struct Ctx_00499890 {
     char unknown_0[0xf1];
@@ -20,7 +17,7 @@ struct Game {
     char unknown_10[0x519 - 0x10];
     char menu[0x10];
     char unknown_529[0x2c76 - 0x529];
-    MouseInput selected;
+    MouseEvent selected;
     char unknown_2c8e[0x37ebe - 0x2c8e];
     unsigned short ordersPanelFlags;
     char unknown_37ec0[0x37f2f - 0x37ec0];
@@ -49,19 +46,19 @@ void ToggleFullScreen();
 void __stdcall PopUntilNamedLayout(int);
 void __stdcall MakeDirectoryPath(char*);
 int __stdcall GetTicks();
-void __stdcall PeekMouseEvent(MouseInput*);
+int __stdcall PeekMouseEvent(MouseEvent* out);
 void __stdcall UpdateMenu(void*);
 void UpdateCdCategoryByActivity();
 void PlayNextSpeech();
-void __stdcall PopMouseEvent(int*);
+int __stdcall PopMouseEvent(MouseEvent* out);
 void UpdateTimers();
 void __stdcall SaveScreenshot(char*, char*);
 
 // FUNCTION: 0x499890
 void MainFrameTick()
 {
-    MouseInput first;
-    MouseInput second;
+    MouseEvent first;
+    MouseEvent second;
     char path[0x100];
     int key = PeekKey();
 
@@ -91,9 +88,9 @@ void MainFrameTick()
     PeekMouseEvent(&second);
     UpdateCdCategoryByActivity();
     PlayNextSpeech();
-    if (first.fields[4] == second.fields[4])
-        PopMouseEvent(g_game->selected.fields);
-    else if (first.fields[4] == 0x205 || first.fields[4] == 0x202)
+    if (first.msg == second.msg)
+        PopMouseEvent(&g_game->selected);
+    else if (first.msg == 0x205 || first.msg == 0x202)
         g_game->selected = first;
     else
         g_game->selected = second;
