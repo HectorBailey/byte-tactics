@@ -52,9 +52,7 @@ void __stdcall CopyDwordIfNonNull(Unit**, Unit* const*);
 namespace std {
 inline void _Construct(Unit** dest, Unit* const& src) { CopyDwordIfNonNull(dest, &src); }
 }
-#include <vector>
 namespace ta {
-#include <ta_types.h>
 }
 
 // Own Vec3, not vec3.h: a 16.16 position or velocity whose fixed-point halves
