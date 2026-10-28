@@ -10,7 +10,7 @@
 #define MOVEMENT_CLASS_H
 
 struct Point16;
-struct Object_00440af0;
+struct Unit;
 class TdfFile;
 
 class MovementClass {
@@ -35,8 +35,8 @@ public:
     void ResizePassMap(unsigned int w, unsigned int h);
     void SetPassMapCell(int x, int y, int value);
     void RefreshPassMap(Point16 a, Point16 b);
-    void RefreshMovedUnits(Object_00440af0* p);
-    void RefreshUnitIfStale(Object_00440af0* p);
+    void RefreshMovedUnits(Unit* p);
+    void RefreshUnitIfStale(Unit* p);
     int InBounds(unsigned int x, unsigned int y)
     {
         return x < width && y < height;

@@ -24,45 +24,13 @@ unsigned int __stdcall GetPassMapFootprintValueWithEdgeStrips(MovementClass* obj
 
 #include "../util/vec3.h"
 
-#pragma pack(push, 2)
-struct UnitMotion {
-    char unknown_0[0x26];
-    unsigned int pathLockStamp;        // +0x26
-};
-
-struct Object_00440af0 {
-    UnitMotion* motion;                // +0x0
-    char unknown_4[0x76 - 0x4];
-    Point16 cell;                      // +0x76
-    char unknown_7a[0x7e - 0x7a];
-    Point16 footprint;                 // +0x7e
-};
-#pragma pack(pop)
-
-#pragma pack(push, 1)
-struct Record_00440af0 {
-    UnitMotion* motion;                // +0x0
-    char unknown_4[0x76 - 0x4];
-    Point16 cell;                      // +0x76
-    char unknown_7a[0x7e - 0x7a];
-    Point16 footprint;                 // +0x7e
-    char unknown_82[0x110 - 0x82];
-    unsigned int flags;                // +0x110
-    char unknown_114[0x118 - 0x114];
-};
+#include "unit.h"
+#include "../orders/unit_motion.h"
 
 // One terrain cell as 0x440500 reads it.
 #include "../map/cell.h"
-#pragma pack(pop)
 
 #include "movement_class.h"
-
-// Unused here: the symbol ids these declarations take keep SetPassMapCell
-// (0x4404c0) in the window it matches in (docs/c2-regalloc.md).
-void RegisterUnitOrders(void);
-void RegisterGroundOrders(void);
-void EnableAICommands(void);
-void RegisterAICommands(void);
 
 // The same 32 bytes as MovementClass under the view 0x440500 builds the map
 // with (the BuildPassMap method).
@@ -102,19 +70,6 @@ struct MovementClassTable {
     static MovementClassTable g_movementClasses;
 };
 
-// The pathfinder's dirty-list view of a Unit (Thaldren's UnitInstance: the
-// motion pointer, the map cell, the footprint), the one 0x440a70 refreshes
-// from (0x440af0 / 0x440be0 declare the same bytes as Object_00440af0).
-#pragma pack(push, 2)
-struct Struct_00440a70 {
-    UnitMotion* motion;                // +0x0
-    char unknown_4[0x76 - 0x4];
-    Point16 cell;                      // +0x76
-    char unknown_7a[0x7e - 0x7a];
-    Point16 footprint;                 // +0x7e
-};
-#pragma pack(pop)
-
 #include "../network/player.h"
 
 // Unused here: real functions declared to keep the symbol ids RefreshPassMap and
@@ -139,8 +94,8 @@ struct Game {
     char unknown_1423b[0x14287 - 0x1423b];
     Cell* heightMap;                   // +0x14287
     char unknown_1428b[0x14357 - 0x1428b];
-    Record_00440af0* units;            // +0x14357
-    Record_00440af0* unitsEnd;         // +0x1435b
+    Unit* units;                       // +0x14357
+    Unit* unitsEnd;                    // +0x1435b
     char unknown_1435f[0x38a47 - 0x1435f];
     unsigned int gameTick;             // +0x38a47
     char unknown_38a4b[0x38d73 - 0x38a4b];
@@ -491,7 +446,7 @@ static inline void UpdateAll(Point16 a, Point16 b)
 // than the object's last update if it has a unit, otherwise every entry in use
 // (an inlined helper taking the two points by value, so they stay in registers).
 // FUNCTION: 0x440a70
-void __stdcall RefreshPassMapsForUnit(Struct_00440a70* p)
+void __stdcall RefreshPassMapsForUnit(Unit* p)
 {
     if (p->motion != 0) {
         unsigned int last = p->motion->pathLockStamp;
@@ -510,7 +465,7 @@ void __stdcall RefreshPassMapsForUnit(Struct_00440a70* p)
 // 0x440a70 / 0x440be0): every unit in the unit table that moved in the window
 // since the last refresh gets the new dirty rectangle drawn.
 // FUNCTION: 0x440af0
-void MovementClass::RefreshMovedUnits(Object_00440af0* p)
+void MovementClass::RefreshMovedUnits(Unit* p)
 {
     unsigned int now = g_game->gameTick;
     unsigned int old = lastTick;
@@ -525,7 +480,7 @@ void MovementClass::RefreshMovedUnits(Object_00440af0* p)
         this->RefreshPassMap(p->cell, p->footprint);
     }
     if (start != old) {
-        for (Record_00440af0* r = &g_game->units[1]; r <= g_game->unitsEnd; r++) {
+        for (Unit* r = &g_game->units[1]; r <= g_game->unitsEnd; r++) {
             if ((r->flags & 0x10000000) != 0 && r->motion != 0) {
                 unsigned int t = r->motion->pathLockStamp;
                 if (t >= old && t < start) {
@@ -540,7 +495,7 @@ void MovementClass::RefreshMovedUnits(Object_00440af0* p)
 // One entry of the table at 0x512358 (see 0x440a70): refreshes it for an
 // object whose unit was last updated before the entry changed.
 // FUNCTION: 0x440be0
-void MovementClass::RefreshUnitIfStale(Object_00440af0* p)
+void MovementClass::RefreshUnitIfStale(Unit* p)
 {
     if (p->motion->pathLockStamp < lastTick) {
         this->RefreshPassMap(p->cell, p->footprint);
