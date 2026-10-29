@@ -6,20 +6,9 @@
 #include "../network/player.h"
 #include "../network/player_info.h"
 
-struct Game {
-    char unknown_0[0x4ed];
-    int compressionOff;                // +0x4ed
-    char unknown_4f1[0x1b63 - 0x4f1];
-    Player players[10];                // +0x1b63
-    char unknown_2851[0x2a42 - 0x2851];
-    unsigned char localPlayer;         // +0x2a42
-    unsigned char playerIndex;         // +0x2a43
-    unsigned char netGameFlags;        // +0x2a44
-    char unknown_2a45[0x391bf - 0x2a45];
-    int showRanges;                    // +0x391bf
-    int showBps;                       // +0x391c3
-};
 #pragma pack(pop)
+
+#include "game.h"
 
 extern Game* g_game;
 
