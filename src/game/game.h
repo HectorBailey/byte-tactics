@@ -567,8 +567,8 @@ struct Game {  // 0x3924d bytes
     void* logos32;  // +0x148db
     int count_148df;  // +0x148df
     void** blocks;  // +0x148e3
-    int count_148e7;  // +0x148e7
-    int* data_148eb;  // +0x148eb
+    int animplayCursorCount;  // +0x148e7
+    void** animplayCursors;  // +0x148eb
     int gafAnimClearedSlot;  // +0x148ef
     int fxGaf;  // +0x148f3
     int igTitles;  // +0x148f7

@@ -7,14 +7,7 @@
 
 #include "../map/mission.h"
 
-#pragma pack(push, 1)
-struct Game {
-    char unknown_0[0x1439b];
-    void* unitDefs;                    // +0x1439b
-    char unknown_1439f[0x24e4a];
-    Mission* mapInfo;                  // +0x391e9
-};
-#pragma pack(pop)
+#include "../game/game.h"
 extern Game* g_game;
 
 extern int __cdecl _strcmpi(const char*, const char*);
