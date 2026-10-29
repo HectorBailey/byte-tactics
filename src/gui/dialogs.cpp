@@ -1446,8 +1446,6 @@ void __stdcall LerpPaletteRange(unsigned char* data, int a, int b)
 // Unused here: the type of the neighbour 0x4ac970, which has a file of its own.
 struct Object_004ac970;
 
-// Converts a screen position to the index of a cell in the 16x16 "COLS"
-// colour grid gadget (row * 16 + column, each cell 8 pixels).
 // Unused here: the symbol ids these declarations take keep GetColorCellAt
 // (0x4acbe0) matching (docs/c2-regalloc.md).
 void RegisterGroundOrders(void);
@@ -1459,6 +1457,8 @@ void RegisterVtolOrders(void);
 void StepAllGafSequences(void);
 void ResetNetStats(void);
 
+// Converts a screen position to the index of a cell in the 16x16 "COLS"
+// colour grid gadget (row * 16 + column, each cell 8 pixels).
 // FUNCTION: 0x4acbe0
 int __stdcall GetColorCellAt(Gui* obj, int x, int y)
 {
