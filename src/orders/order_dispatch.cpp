@@ -10,12 +10,6 @@
 
 #pragma pack(push, 1)
 
-struct Feature_0043e490 {
-    char unknown_0[0xfe];
-    unsigned char flags; // +0xfe
-    char unknown_ff;
-};
-
 struct Node_0043e490 {
     char unknown_0[0x111];
     union {
@@ -115,6 +109,8 @@ struct Pos_0043e490 {
 };
 
 #include "../map/cell.h"
+#include "../map/feature.h"
+
 #include "mission_type.h"
 
 union Flags110_0043f0e0 {
@@ -178,7 +174,7 @@ struct Game {
         int featureCount;
     };
     char unknown_14257[0x1426f - 0x14257];
-    struct Feature_0043e490* features; // +0x1426f
+    Feature* features;   // +0x1426f
     unsigned short* visibilityMask; // +0x14273
     char unknown_14277[0x1427f - 0x14277];
     unsigned char seaLevel;  // +0x1427f
@@ -319,7 +315,7 @@ static inline int Visible(Unit_0043e490* unit, Pos_0043e490* pos) {
 // The feature on a map cell, as GetFeature in 0x4237d0.cpp but with the id in
 // a local: 0xfffe marks a cell covered by a larger feature whose origin cell
 // lies (offsetY, offsetX) cells back.
-static inline Feature_0043e490* GetFeature(Cell* cell) {
+static inline Feature* GetFeature(Cell* cell) {
     if (cell == 0)
         return 0;
     unsigned short id = cell->feature;
@@ -345,7 +341,7 @@ static inline Feature_0043e490* GetFeature(Cell* cell) {
 #define RECLAIM_CHECK(def, unit, pos, mask, result)                  \
     do {                                                             \
         if (((def)->f245 & (mask)) && Visible((unit), (pos))) {      \
-            Feature_0043e490* f = GetFeature(GetMapCellAtPosition(pos));     \
+            Feature* f = GetFeature(GetMapCellAtPosition(pos));     \
             if (f && (f->flags & 0x80))                              \
                 return (result);                                     \
         }                                                            \
