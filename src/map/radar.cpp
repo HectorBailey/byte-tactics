@@ -15,6 +15,8 @@ struct Quad_4665d0 {
     Point p[4];
 };
 
+// graphics/surface.h's Surface, kept as a view: its methods and the Rect it
+// includes move CalcRadarViewportRect (0x466b70) and DrawRadarUnits (0x466dc0).
 struct Surface_4665d0 {
     int width;                          // +0x0
     int height;                         // +0x4

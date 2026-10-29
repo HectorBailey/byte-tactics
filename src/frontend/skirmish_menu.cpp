@@ -35,7 +35,7 @@ struct Data {                          // "SELECT MAP DATA", 0x20 bytes
 
 struct SkirmishPlayerSlot {            // 0x18 bytes
     int active;                        // +0x00
-    int shade;                         // +0x04
+    int side;                          // +0x04
     int team;                          // +0x08
     int metal;                         // +0x0c
     int energy;                        // +0x10
@@ -491,7 +491,7 @@ void RefreshSkirmishSetup()
             }
 
             wsprintfA(buf, "Side%d", i);
-            SetButtonStageByName(&g_game->gui, buf, g_game->options->players[i].shade);
+            SetButtonStageByName(&g_game->gui, buf, g_game->options->players[i].side);
 
             wsprintfA(buf, "Metal%d", i);
             _itoa(g_game->options->players[i].metal, num, 10);
@@ -609,13 +609,13 @@ void ApplySlotsToGamePlayers()
     for (int i = 0; i < g_game->numSkirmishPlayers; i++) {
         if (g_game->options->players[i].active == 1) {
             g_game->players[i].info->color = g_game->options->players[i].color;
-            g_game->players[i].info->side = g_game->options->players[i].shade;
+            g_game->players[i].info->side = g_game->options->players[i].side;
             SetupPlayerSlot(i, 1);
             g_game->playerIndex = i;
             g_game->localPlayer = i;
         } else if (g_game->options->players[i].active == 2) {
             g_game->players[i].info->color = g_game->options->players[i].color;
-            g_game->players[i].info->side = g_game->options->players[i].shade;
+            g_game->players[i].info->side = g_game->options->players[i].side;
             SetupPlayerSlot(i, 2);
         } else {
             SetupPlayerSlot(i, 0);
@@ -655,7 +655,7 @@ void ApplySlotsToGamePlayers()
 void __cdecl CycleCurrentPlayerSide()
 {
     Table* base = g_game->options;
-    int* p = &base->players[base->current].shade;
+    int* p = &base->players[base->current].side;
     *p = (*p + 1) % g_game->sideCount;
 }
 
@@ -995,7 +995,7 @@ void __stdcall HandleSkirmishClick(Gui* menu)
     } else if (strcmp(frame.bf, "Side") == 0) {
         PlaySoundByName("Skirmish", 0);
         Table* t = g_game->options;
-        int* p = &t->players[t->current].shade;
+        int* p = &t->players[t->current].side;
         *p = (*p + 1) % g_game->sideCount;
     } else if (strcmp(frame.bf, "Allies") == 0) {
         PlaySoundByName("Skirmish", 0);
