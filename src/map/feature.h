@@ -31,7 +31,10 @@ struct Feature {
     unsigned char seedChance;          // +0xfc
     unsigned char seedSpread;          // +0xfd
     unsigned char flags;               // +0xfe
-    char unknown_ff;                   // +0xff
+    unsigned char flagsHigh;           // +0xff, the high byte of Thaldren's
+                                       // 16-bit FeatureFlags: bit 1
+                                       // indestructible, bit 2 nodisplayinfo,
+                                       // bit 3 nodrawundergray
 };
 
 #pragma pack(pop)

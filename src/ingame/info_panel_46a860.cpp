@@ -50,6 +50,7 @@ struct SelectionInfoCache {
 
 #include "../graphics/rect.h"
 #include "../map/cell.h"
+#include "../map/feature.h"
 
 struct Unit_0046a860;
 
@@ -86,20 +87,6 @@ struct Unit_0046a860 {
     char unknown_10a[0x110 - 0x10a];
     unsigned int flags;               // +0x110
     char unknown_114[0x118 - 0x114];
-};
-
-// A feature's 0x100-byte record, the elements of the table at g_game+0x1426f
-// (Thaldren's FeatureDef). Kept rather than map/feature.h's Feature: the flags
-// this file tests are the byte at +0xff, the high half of Thaldren's +0xfe
-// wFlags, while the header names the low byte at +0xfe flags.
-struct FeatureDef {
-    char name[0x80];                  // +0x000
-    char description[0x14];           // +0x080
-    char unknown_94[0xec - 0x94];
-    float energy;                     // +0x0ec
-    float metal;                      // +0x0f0
-    char unknown_f4[0xff - 0xf4];
-    unsigned char flags;              // +0x0ff
 };
 
 #include "../graphics/gaf_frame.h"
@@ -198,7 +185,7 @@ struct Game {
     char unknown_2cbe[0x14233 - 0x2cbe];
     int mapWidthTiles;                    // +0x14233
     char unknown_14237[0x1426f - 0x14237];
-    FeatureDef* features;             // +0x1426f
+    Feature* features;                // +0x1426f
     char unknown_14273[0x14287 - 0x14273];
     Cell* heightMap;                      // +0x14287
     char unknown_1428b[0x1431f - 0x1428b];
@@ -496,8 +483,8 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
             }
         }
     } else if (snapshot.feature != 0xffff) {
-        FeatureDef* feature = g_game->features + snapshot.feature;
-        if ((feature->flags & 4) == 0 || (g_game->flagsByte_3923b & 2) != 0) {
+        Feature* feature = g_game->features + snapshot.feature;
+        if ((feature->flagsHigh & 4) == 0 || (g_game->flagsByte_3923b & 2) != 0) {
             char mText[16];
             if (feature->metal != 0.0f)
                 sprintf(mText, " M:%d", (int)feature->metal);
@@ -509,7 +496,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
             else
                 eText[0] = 0;
             char* name = g_game->bits_3923b.b1 ? feature->name : feature->description;
-            if ((feature->flags & 2) == 0)
+            if ((feature->flagsHigh & 2) == 0)
                 sprintf(text, "%s %s%s", Translate(name), mText, eText);
             else
                 strcpy(text, Translate(name));
