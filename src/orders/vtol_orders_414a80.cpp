@@ -20,23 +20,9 @@ struct Unit;
 
 #include "unit_motion.h"
 #include "../units/unit_def.h"
+#include "../units/unit.h"
 
 #pragma pack(push, 1)
-struct Unit {
-    UnitMotion* motion;                  // +0x0
-    char unknown_4[0x6a - 0x4];
-    Vec3 pos;                          // +0x6a
-    char unknown_76[0x7e - 0x76];
-    Point footprint;                   // +0x7e
-    char unknown_82[0x86 - 0x82];
-    int carrier;                      // +0x86
-    char unknown_8a[0x92 - 0x8a];
-    UnitDef* def;                      // +0x92
-    void ClaimWeapons(int);
-    void SetStateBits(int, int);
-    int CanReclaim(Unit*);
-};
-
 #include "../units/unit_ref.h"
 
 struct Order {
@@ -139,7 +125,9 @@ int __stdcall VtolReclaimUnitOrder(Unit* unit, Order* order, unsigned int flags)
     case 1: {
         order->elapsed = ComputeReclaimDamagePulse(unit, target, 15);
         order->duration = 0;
-        Point origin = unit->footprint;
+        // The header's footprint is Point16, the cell helpers take this file's
+        // Point, and the one-dword copy is what the original does.
+        Point origin = *(Point*)&unit->footprint;
         Point cell = WorldToCell(order->pos, origin);
         CellToWorldPos(cell, &order->pos, origin);
         PathOrder* obj = new PathOrder(order, order->target.Get()->pos);
