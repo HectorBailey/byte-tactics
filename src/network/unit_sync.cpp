@@ -162,13 +162,9 @@ struct HapinetSession {                 // the object at g_game+0x14
 
 #include "../map/mission.h"
 #include "../units/unit_def.h"
+#include "player.h"
 
 #pragma pack(push, 1)
-struct PlayerEntry_0046d6c0 {           // 0x14b bytes, one slot of g_game's players
-    int id;                             // +0x0, g_game + 0x1b67
-    char unknown_4[0x14b - 4];
-};
-
 // UnitDef::flags1 (+0x241) read as bit fields.
 struct UnitDefFlags_0046e160 {
     unsigned int bits_0 : 23;
@@ -183,9 +179,9 @@ struct UnitSync;
 struct Game {
     char unknown_0[0x14];
     HapinetSession session;             // +0x14
-    char unknown_25[0x1b67 - 0x14 - sizeof(HapinetSession)];
-    PlayerEntry_0046d6c0 players[10];   // +0x1b67
-    char unknown_283d[0x2a30 - 0x1b67 - sizeof(PlayerEntry_0046d6c0) * 10];
+    char unknown_25[0x1b63 - 0x14 - sizeof(HapinetSession)];
+    Player players[10];                 // +0x1b63
+    char unknown_2849[0x2a30 - 0x1b63 - sizeof(Player) * 10];
     UnitSync* sync;                     // +0x2a30
     char unknown_2a34[0x2a42 - 0x2a30 - sizeof(UnitSync*)];
     unsigned char localPlayer;          // +0x2a42
@@ -339,7 +335,6 @@ struct Unit_0046e330 {
 
 #pragma pack(pop)
 
-#include "player.h"
 #include "player_info.h"
 
 #pragma pack(push, 1)
