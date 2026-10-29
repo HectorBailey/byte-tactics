@@ -27,14 +27,14 @@ struct Settings_00496e10 {
     int flag_c;                         // +0xc
 };
 
-struct ViewFlags_497180 {               // g_game + 0x14281
+struct ViewFlags {               // g_game + 0x14281
     unsigned short bit0 : 1;
     unsigned short bit1 : 1;
     unsigned short bit2 : 1;
     unsigned short rest : 13;
 };
 
-union Fixed_497180 {
+union Fixed {
     int i;                              // 16.16
     struct {
         short frac;
@@ -42,10 +42,10 @@ union Fixed_497180 {
     } h;
 };
 
-struct FixedPos_497180 {
-    Fixed_497180 x;
-    Fixed_497180 y;
-    Fixed_497180 z;
+struct FixedPos {
+    Fixed x;
+    Fixed y;
+    Fixed z;
 };
 
 struct RecFlag_497180 {
@@ -271,7 +271,7 @@ struct Game {
     union { int mapPixelHeight; int worldH; };   // +0x1422f
     char unknown_14233[0x14281 - 0x14233];
     union {                             // +0x14281
-        ViewFlags_497180 mapFlags;
+        ViewFlags mapFlags;
         unsigned short mapFlagsWord;
     };
     char unknown_14283[0x142bb - 0x14283];
@@ -369,7 +369,7 @@ public:
     int GetGameType();
     char* GetMissionName();
     void LoadMissionByName(void* player);
-    int GetStartPosition(FixedPos_497180* pos, int id);
+    int GetStartPosition(FixedPos* pos, int id);
     // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
     void LoadBriefing();
     int CountMissions();
@@ -443,7 +443,7 @@ void RebuildAIFeatureCells();
 void __stdcall SetCameraPosition(int x, int y, int z);
 unsigned short __stdcall FindUnitTypeId(const char* name);
 void __stdcall SpawnCommanderAtStartPos(int team, int startpos);
-void __stdcall CreateUnit(unsigned char team, unsigned short id, FixedPos_497180 pos, int a,
+void __stdcall CreateUnit(unsigned char team, unsigned short id, FixedPos pos, int a,
     int b, int c);
 Gadget_497180* __stdcall LoadGuiLayer(Sub_497180* sub, const char* name, int flags);
 void __stdcall HandleMain2LayoutEvent(Gadget_497180* gadget);
@@ -562,8 +562,8 @@ inline void __stdcall ApplyMissionOptionFlags(Settings_00496e10* s)
 void __cdecl LoadMatch(void*)
 {
     LARGE_INTEGER perfCount;
-    FixedPos_497180 pos;
-    FixedPos_497180 start;
+    FixedPos pos;
+    FixedPos start;
     int order[10];
 
     QueryPerformanceCounter(&perfCount);

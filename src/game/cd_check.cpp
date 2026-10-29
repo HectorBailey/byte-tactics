@@ -9,7 +9,9 @@ class TdfRecord;
 #include "../util/tdf.h"
 
 
-struct FindData_0041d4c0 {
+// The record HAPI_FindFirst and HAPI_FindNext fill; game/data_files.cpp
+// declares the same one for its own scan.
+struct FindData {
     char unknown_0[0x14];
     char name[260];                    // +0x14
 };
@@ -21,8 +23,8 @@ extern int g_cdPathMismatch;
 void HAPI_DropMissingArchives();
 void ChdirToExeDirectory();
 void HAPI_ResolveShadowedFiles();
-int __stdcall HAPI_FindFirst(const char* path, FindData_0041d4c0* fd, int a, int b);
-int __stdcall HAPI_FindNext(int handle, FindData_0041d4c0* fd);
+int __stdcall HAPI_FindFirst(const char* path, FindData* fd, int a, int b);
+int __stdcall HAPI_FindNext(int handle, FindData* fd);
 void __stdcall HAPI_FindClose(int handle);
 int __stdcall HAPI_AddArchive(char* path, int flag);
 char __stdcall FindNextCdDrive(char drive);
@@ -39,7 +41,7 @@ void __cdecl AllocNotifyNop(int);
 // FUNCTION: 0x41d4c0
 void RegisterDataArchives()
 {
-    FindData_0041d4c0 fd;
+    FindData fd;
     char pattern[64];
     char path[256];
     if (DAT_0050289c != 0) {
