@@ -318,7 +318,7 @@ struct Game {  // 0x3924d bytes
     int lobby2;  // +0x4c9
     int local_id;  // +0x4cd
     char unknown_4d1[20];
-    Net_4517b0* field_4e5;  // +0x4e5
+    Net_4517b0* dplConnection;  // +0x4e5
     char unknown_4e9[4];
     int compressionOff;  // +0x4ed
     int netMode;  // +0x4f1
@@ -353,7 +353,7 @@ struct Game {  // 0x3924d bytes
     unsigned char playerIndex;  // +0x2a43
     unsigned char netGameFlags;  // +0x2a44, the low byte; the word is net_game.cpp's netGameFlagsWord
     unsigned char unknown_2a45[1];
-    unsigned char field_2a46;  // +0x2a46
+    unsigned char netOrCdSentinel;  // +0x2a46
     char unknown_2a47[4];
     void* data[15];  // +0x2a4b
     char unknown_2a87[20];
@@ -449,8 +449,8 @@ struct Game {  // 0x3924d bytes
     unsigned int width_142a3;  // +0x142a3
     unsigned int height_142a7;  // +0x142a7
     char unknown_142ab[4];
-    int field_142af;  // +0x142af
-    int field_142b3;  // +0x142b3
+    int worldWidthFixed;  // +0x142af
+    int worldHeightFixed;  // +0x142b3
     int overflowBucket;  // +0x142b7
     Rect viewLimit;  // +0x142bb
     char unknown_142cb[16];
@@ -601,7 +601,7 @@ struct Game {  // 0x3924d bytes
     int viewHeight;  // +0x37e3b
     Sub_004679a0_a a;  // +0x37e3f
     Sub_004679a0_b b;  // +0x37e60
-    int field_37e98;  // +0x37e98
+    int optionsLightbarDirty;  // +0x37e98
     unsigned short unitIndex;  // +0x37e9c
     unsigned short unitDefIndex;  // +0x37e9e
     char name[30];  // +0x37ea0
@@ -620,9 +620,9 @@ struct Game {  // 0x3924d bytes
     int windSpeed;  // +0x37eda
     float windFraction;  // +0x37ede
     int windEnabled;  // +0x37ee2
-    unsigned short field_37ee6;  // +0x37ee6
+    unsigned short maxUnits;  // +0x37ee6
     unsigned short lobbyInitScratch;  // +0x37ee8
-    unsigned short maxUnits;  // +0x37eea
+    unsigned short maxUnitsLobby;  // +0x37eea
     unsigned short maxUnits_37eec;  // +0x37eec
     int difficulty;  // +0x37eee
     int flag_37ef2;  // +0x37ef2
@@ -691,7 +691,7 @@ struct Game {  // 0x3924d bytes
     unsigned int nextTime;  // +0x3905f
     int done;  // +0x39063
     int steps;  // +0x39067
-    int field_3906b;  // +0x3906b
+    int statBarRevealIndex;  // +0x3906b
     int unknown3906f;  // +0x3906f
     int skip;  // +0x39073
     void* lastFrame;  // +0x39077
@@ -723,7 +723,7 @@ struct Game {  // 0x3924d bytes
     void* fontSmlFont;  // +0x391fd
     char field_39201[1];  // +0x39201
     char unknown_39202[15];
-    int field_39211;  // +0x39211
+    int connection;  // +0x39211
     int field_39215;  // +0x39215
     int singleCommanderDeath;  // +0x39219
     int singleMapping;  // +0x3921d

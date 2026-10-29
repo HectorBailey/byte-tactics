@@ -201,8 +201,8 @@ struct Game {
     char unknown_2c82[0x1428f - 0x2c82];
     Grid losHalfResHeightBand;         // +0x1428f
     Grid spatialGrid;                  // +0x1429f
-    int field_142af;                   // +0x142af
-    int field_142b3;                   // +0x142b3
+    int worldWidthFixed;               // +0x142af
+    int worldHeightFixed;              // +0x142b3
     char unknown_142b7[0x14813 - 0x142b7];
     unsigned short* endgameBadgeSeqA;  // +0x14813
     unsigned short* endgameBadgeSeqB;  // +0x14817
@@ -260,7 +260,7 @@ struct Game {
     char unknown_3923d[0x3924d - 0x3923d];
 
     Game() : buildDate("Jul 30 1998"), buildTime("11:16:36"),
-        field_142af(0), field_142b3(0) {}
+        worldWidthFixed(0), worldHeightFixed(0) {}
 };
 #pragma pack(pop)
 
