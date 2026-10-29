@@ -1331,7 +1331,7 @@ address,size,file,symbol,status,similarity
 0x464ad0,19,src/game/players_464290.cpp,?GetNetEnergy@@YGMPAX@Z,matched,100.0
 0x464af0,13,src/game/players_464290.cpp,?GetMetalIncome@@YGMPAX@Z,matched,100.0
 0x464b00,13,src/game/players_464290.cpp,?GetMetalUsage@@YGMPAX@Z,matched,100.0
-0x464b10,19,src/game/players_464290.cpp,?GetNetMetal@@YGMPAUClass_464b10@@@Z,matched,100.0
+0x464b10,19,src/game/players_464290.cpp,?GetNetMetal@@YGMPAUPlayer@@@Z,matched,100.0
 0x464b30,301,src/game/players_464290.cpp,?TransferMetal@@YGXEEMH@Z,matched,100.0
 0x464c60,305,src/game/players_464290.cpp,?TransferEnergy@@YGXEEMH@Z,matched,100.0
 0x464da0,55,src/game/players_464290.cpp,?RefreshOwnedUnitsLineOfSight@@YGXPAUPlayer@@@Z,matched,100.0

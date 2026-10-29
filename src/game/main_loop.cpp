@@ -48,21 +48,16 @@ struct Flags_00496ce0 {
     unsigned short rest : 11;
 };
 
-struct Slot_00497080 {                 // 0x18 bytes
-    char unknown_0[0xc];
+// One player's start options, an array at g_game+0x29a0: the 0x18-byte record
+// frontend/skirmish_menu.cpp builds and players_464290.cpp names a
+// SkirmishPlayerSlot. Its +0xc and +0x10 are the starting metal and energy.
+struct SkirmishPlayerSlot {
+    int active;                        // +0x0
+    int side;                          // +0x4
+    int team;                          // +0x8
     int metal;                         // +0xc
     int energy;                        // +0x10
-    char unknown_14[4];
-};
-
-struct TeamDef_00496ee0 {            // 0x18 bytes, array at g_game+0x29a0
-    char unknown_0[0x4];
-    unsigned char nameIndex;           // +0x4
-    char unknown_5[0xc - 0x5];
-    int size1;                         // +0xc
-    int size2;                         // +0x10
-    unsigned char index2;              // +0x14
-    char unknown_15[0x18 - 0x15];
+    int color;                         // +0x14
 };
 
 struct PlayerName_00496ee0 {            // 0x232 bytes, array at g_game+0x37f5f
@@ -159,10 +154,7 @@ struct Game {
         };
     };
     char unknown_2851[0x29a0 - 0x2851];
-    union {
-        TeamDef_00496ee0* options;             // +0x29a0
-        Slot_00497080* slots;
-    };
+    SkirmishPlayerSlot* slots;                 // +0x29a0
     char unknown_29a4[0x2a3c - 0x29a4];
     unsigned short numPlayers;                 // +0x2a3c
     char unknown_2a3e[0x2a42 - 0x2a3e];
@@ -555,9 +547,10 @@ void __stdcall SetStartingStorageBonus(Struct_00496e90* obj, int height, int wid
 //   (its +0x95 is the index into the name table, its +0x96 the second copied
 //   byte), +0xdc and +0xe0 the two clamped sizes as floats, +0x149 a 1-bit
 //   unsigned short bitfield.
-// - the team definitions are 0x18-byte records behind the pointer at
-//   g_game+0x29a0: +0x4 and +0x14 the two copied bytes, +0xc and +0x10 the two
-//   sizes, +0x10 first stored to +0xdc.
+// - the start options are 0x18-byte records behind the pointer at
+//   g_game+0x29a0: +0x4 the side and +0x14 the colour, both copied a byte at a
+//   time, and +0xc and +0x10 the starting metal and energy, +0x10 stored to the
+//   player's +0xdc first.
 // - the name table at g_game+0x37f5f is 0x232 bytes per entry and the player
 //   index selects the entry, whose name is looked up by FindUnitTypeId.
 // - the position is a Vec3 of 16.16 values; the view is centred on the whole
@@ -566,11 +559,11 @@ void __stdcall SetStartingStorageBonus(Struct_00496e90* obj, int height, int wid
 // FUNCTION: 0x496ee0
 void __stdcall SpawnCommanderAtStartPos(int team, int startpos)
 {
-    g_game->players[team].info->side = g_game->options[team].nameIndex;
-    g_game->players[team].info->color = g_game->options[team].index2;
+    g_game->players[team].info->side = g_game->slots[team].side;
+    g_game->players[team].info->color = g_game->slots[team].color;
     Player* p = &g_game->players[team];
-    int w = g_game->options[team].size2;
-    int v = g_game->options[team].size1;
+    int w = g_game->slots[team].energy;
+    int v = g_game->slots[team].metal;
     p->started = 1;
     p->size1 = (float)(w >= 200 ? w : 200);
     p->size2 = (float)(v >= 200 ? v : 200);
@@ -635,7 +628,7 @@ void InitStartingResourcesFromSkirmish()
     int w = 0;
     for (int i = 0; i < 10; i++) {
         if (IsPlaying(i)) {
-            Slot_00497080* s = &g_game->slots[i];
+            SkirmishPlayerSlot* s = &g_game->slots[i];
             if (s->metal > h)
                 h = s->metal;
             if (s->energy > w)

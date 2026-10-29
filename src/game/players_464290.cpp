@@ -65,11 +65,11 @@ struct Player {
     int exploredHeight;                // +0x84
     int exploredSize;                  // +0x88
     float energy;                      // +0x8c
-    int energyIncome;
+    float energyIncome;                // +0x90
     float energyUsage;                 // +0x94
     float metal;                       // +0x98
-    int metalIncome;
-    int metalUsage;
+    float metalIncome;                 // +0x9c
+    float metalUsage;                  // +0xa0
     int energyCapacity;
     int metalCapacity;
     int totalEnergyProduced;           // +0xac
@@ -113,7 +113,7 @@ struct Player {
 };
 
 struct SkirmishPlayerSlot {            // 0x18 bytes
-    int controller;                    // +0x0
+    int active;                        // +0x0
     char unknown_4[0xc - 0x4];
     int metal;                         // +0xc
     int energy;                        // +0x10
@@ -545,14 +545,8 @@ float __stdcall GetMetalUsage(void* param_1)
     return *(float*)((char*)param_1 + 0xa0);
 }
 
-struct Class_464b10 {
-    char unknown_0[0x9c];
-    float metalIncome;
-    float metalUsage;
-};
-
 // FUNCTION: 0x464b10
-float __stdcall GetNetMetal(Class_464b10* param_1)
+float __stdcall GetNetMetal(Player* param_1)
 {
     return param_1->metalIncome - param_1->metalUsage;
 }
@@ -1147,7 +1141,7 @@ void __stdcall LoadPlayerControllers(HapiBank* file)
     char name[16];
     for (int i = 0; i < 10; i++) {
         Player* player = &g_game->players[i];
-        int* slot = &g_game->options[i].controller;
+        int* slot = &g_game->options[i].active;
         sprintf(name, "Player%i", i);
         if (file->OpenAccount(name)) {
             *slot = file->GetIntegerItem("Controller", 0);
