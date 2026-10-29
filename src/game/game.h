@@ -307,7 +307,7 @@ struct Game {  // 0x3924d bytes
     unsigned char gameVersionBuild;  // +0x3
     char* build_date;  // +0x4
     char* build_time;  // +0x8
-    Ctx_00499890* unknown_c;  // +0xc
+    Ctx_00499890* displayContext;  // +0xc
     Sound* sound;              // +0x10
     char session[4];  // +0x14
     char unknown_18[1069];
@@ -625,24 +625,24 @@ struct Game {  // 0x3924d bytes
     unsigned short maxUnitsLobby;  // +0x37eea
     unsigned short maxUnits_37eec;  // +0x37eec
     int difficulty;  // +0x37eee
-    int flag_37ef2;  // +0x37ef2
+    int side;  // +0x37ef2
     int battleCommanderDeath;  // +0x37ef6
     int interfaceType;  // +0x37efa
     int mode;  // +0x37efe
-    int screenchat;  // +0x37f02
-    Flags_00495e90_37f06 flags_37f06;  // +0x37f06
-    int brightness;  // +0x37f08
-    int volume1;  // +0x37f0c
-    int volume2;  // +0x37f10
-    unsigned short flags_37f14;  // +0x37f14
+    int screenChat;  // +0x37f02
+    Flags_00495e90_37f06 visualFlags;  // +0x37f06
+    int gamma;  // +0x37f08
+    int fxVolume;  // +0x37f0c
+    int musicVolume;  // +0x37f10
+    unsigned short musicFlags;  // +0x37f14
     unsigned char cdMode;       // +0x37f16
     unsigned char unitChat;     // +0x37f17
     unsigned char unitChatText;  // +0x37f18
     Flags_0045c570 soundFlags;  // +0x37f19
-    int width_37f1b;  // +0x37f1b
-    int height_37f1f;  // +0x37f1f
+    int displayWidth;  // +0x37f1b
+    int displayHeight;  // +0x37f1f
     int textScroll;   // +0x37f23
-    int max_lines;  // +0x37f27
+    int textLines;  // +0x37f27
     int mousespeed;  // +0x37f2b
     unsigned short uiOptionFlags;  // +0x37f2f
     unsigned int lobbyTimeoutSecs;  // +0x37f31
@@ -665,8 +665,8 @@ struct Game {  // 0x3924d bytes
     int movieCaptureIndex;  // +0x38c53
     int movieOutputRate;  // +0x38c57
     unsigned int nextMovieFrameTick;  // +0x38c5b
-    int valueSet;  // +0x38c5f
-    int valueSet_38c63;  // +0x38c63
+    int imageOutputDirDirty;  // +0x38c5f
+    int movieOutputRateDirty;  // +0x38c63
     int unusedAfterMovieOutputRateDirty;  // +0x38c67
     char saveName[1];  // +0x38c6b
     char unknown_38c6c[255];
@@ -680,8 +680,8 @@ struct Game {  // 0x3924d bytes
     unsigned short net_flags;  // +0x38d75
     Class_00472200* lists_38d77;  // +0x38d77
     void* moviePlayer;  // +0x38d7b
-    unsigned short flags_38d7f;  // +0x38d7f
-    int playerCount;  // +0x38d81
+    unsigned short allMissionsFlags;  // +0x38d7f
+    int numSkirmishPlayers;  // +0x38d81
     Class_0046a400 timers;  // +0x38d85
     int profileBarsEnabled;  // +0x38dd5
     Slot_0041e420 slots_38dd9[10];  // +0x38dd9
@@ -726,13 +726,13 @@ struct Game {  // 0x3924d bytes
     int connection;  // +0x39211
     int field_39215;  // +0x39215
     int singleCommanderDeath;  // +0x39219
-    int singleMapping;  // +0x3921d
-    int singleLineOfSight;  // +0x39221
+    int mapping;  // +0x3921d
+    int lineOfSight;  // +0x39221
     int singleLOSType;  // +0x39225
     int multiCommanderDeath;  // +0x39229
     int multiMapping;  // +0x3922d
     int multiLineOfSight;  // +0x39231
-    int multiLOSType;  // +0x39235
+    int multiLosTypeElev;  // +0x39235
     short endGameCountdown;  // +0x39239
     unsigned short endGameFlags;  // +0x3923b
     int playMovie;  // +0x3923d
