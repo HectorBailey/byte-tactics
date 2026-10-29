@@ -17,7 +17,10 @@ struct Elem_0046faf0 {                 // 14 bytes
 };
 #pragma pack(pop)
 
-struct Rect_0046e330 {                 // 0x10 bytes
+// The rects map's mapped type (0x10 bytes), the record unit_sync.cpp,
+// unit_sync_46ca60.cpp and unit_sync_46d1a0.cpp call UnitSyncEntry: the unit a
+// sync covers and the box it covers.
+struct UnitSyncEntry {
     int x;                             // +0x0
     int y;                             // +0x4
     short w;                           // +0x8
@@ -78,7 +81,7 @@ public:
 
 class UnitSync {
 public:
-    std::map<unsigned int, Rect_0046e330> rects;   // +0x00
+    std::map<unsigned int, UnitSyncEntry> rects;   // +0x00
     std::vector<UnitSyncPlayer> elems;             // +0x10
     std::list<int> ids;                            // +0x20
     int seqSent;                                   // +0x2c
