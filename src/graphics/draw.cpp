@@ -22,6 +22,12 @@
 
 #include "surface.h"
 
+// Unused here: the symbol ids these declarations take keep 0x4c0b10 and
+// 0x4c1320 matching (docs/c2-regalloc.md).
+void RegisterUnitOrders(void);
+void RegisterGroundOrders(void);
+void EnableAICommands(void);
+
 // The software renderer's target: the row width at +0, the pixel buffer at
 // +0x10 and the depth buffer at +0x14.
 struct GafFrame {
@@ -98,15 +104,11 @@ struct Game_004bfe10 {
     unsigned char flags;               // +0xf1
 };
 
-// The display object at +0x210.
-struct Obj_004c13d0 {
-    char unknown_0[0x210];
-    int keyColor;                      // +0x210
-};
-
-// The display object's text colours at +0x208, +0x20c and +0x210.
+// The display object's text block: the font at +0x204 and the text colours at
+// +0x208, +0x20c and +0x210.
 struct Obj {
-    char unknown_0[0x208];
+    char unknown_0[0x204];
+    int font;                          // +0x204
     int foreColor;                     // +0x208
     int backColor;                     // +0x20c
     int keyColor;                      // +0x210
@@ -1677,12 +1679,12 @@ int __stdcall PointInPolygon(Point* pts, int n, int px, int py)
 // FUNCTION: 0x4c13a0
 void __stdcall SetTextColors(int param_1, int param_2)
 {
-    void* eax = (void*)GetDisplay();
+    Obj* obj = (Obj*)GetDisplay();
     if (param_1 != -1) {
-        *(int*)((unsigned char*)eax + 0x208) = param_1;
+        obj->foreColor = param_1;
     }
     if (param_2 != -1) {
-        *(int*)((unsigned char*)eax + 0x20c) = param_2;
+        obj->backColor = param_2;
     }
 }
 
@@ -1692,7 +1694,7 @@ void __stdcall SetTextColors(int param_1, int param_2)
 // FUNCTION: 0x4c13d0
 void __stdcall SetTextKeyColor(int value)
 {
-    Obj_004c13d0* obj = (Obj_004c13d0*)GetDisplay();
+    Obj* obj = (Obj*)GetDisplay();
     obj->keyColor = value;
 }
 
@@ -1725,8 +1727,8 @@ int GetTextBackColor()
 void __stdcall SetFont(int param_1)
 {
     if (param_1 != 0) {
-        int eax = GetDisplay();
-        *(int*)(eax + 0x204) = param_1;
+        Obj* obj = (Obj*)GetDisplay();
+        obj->font = param_1;
     }
 }
 
@@ -1734,15 +1736,16 @@ void __stdcall SetFont(int param_1)
 // FUNCTION: 0x4c1440
 int GetFont()
 {
-    return *(int*)(GetDisplay() + 0x204);
+    Obj* obj = (Obj*)GetDisplay();
+    return obj->font;
 }
 
 
 // FUNCTION: 0x4c1450
 int GetFontHeight()
 {
-    int temp = GetDisplay();
-    int ptr = *(int*)(temp + 0x204);
+    Obj* temp = (Obj*)GetDisplay();
+    int ptr = temp->font;
     unsigned int result = 0;
     result = *(unsigned char*)ptr;
     return result;
