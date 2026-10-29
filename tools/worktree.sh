@@ -13,9 +13,15 @@ N="${1:?usage: tools/worktree.sh <issue number>}"
 N="${N#\#}"
 DIR="$ROOT/.worktrees/issue-$N"
 
+# Branch from this repository's main, whichever remote holds it: an outside
+# contributor's clone can have their fork as origin and this repository (which
+# the pull request is opened against) as upstream.
+REMOTE="$(git -C "$ROOT" remote -v | awk '$3 == "(fetch)" && $2 ~ /HectorBailey\/byte-tactics/ { print $1; exit }')"
+REMOTE="${REMOTE:-origin}"
+
 if [ ! -d "$DIR" ]; then
-    git -C "$ROOT" fetch -q origin main
-    git -C "$ROOT" worktree add -q -b "issue-$N" "$DIR" origin/main
+    git -C "$ROOT" fetch -q "$REMOTE" main
+    git -C "$ROOT" worktree add -q -b "issue-$N" "$DIR" "$REMOTE/main"
 fi
 ln -sfn "$ROOT/toolchain" "$DIR/toolchain"
 mkdir -p "$DIR/orig" "$DIR/build"
