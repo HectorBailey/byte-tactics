@@ -32,20 +32,10 @@ class AIProfileParser;
 struct FrameTable;
 class AssaultTimer;
 
+#include "../units/unit.h"
+
 #pragma pack(push, 1)
-#include "../units/unit_def.h"
 #include "../network/player.h"
-struct Unit {
-    UnitMotion* motion;
-    char pad4[0x6a - 4]; Vec3 pos;
-    char pad76[0x86 - 0x76]; int carrier;
-    char pad8a[8]; UnitDef* def;
-    Player* player;
-    char pad9a[0x108 - 0x9a]; short health;
-    void ClaimWeapons(int);
-    void ReleaseWeapons(int);
-    void SetStateBits(int, int);
-};
 // Local Order view: the file's own Vec3 conflicts with order.h.
 struct Order {
     char pad0[5]; unsigned char state; unsigned int flags;
@@ -90,12 +80,6 @@ void __stdcall EnsurePatrolReturnOrder(Unit*, Order*);
 Unit* __stdcall FindBestTargetIfFireAtWill(Unit*);
 int __stdcall IssueAttackOrder(Unit*, Unit*, int);
 void __stdcall GetFactoriesInRadius(int player, Vec3* pos, int range, std::vector<Unit*>* out);
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
-int __stdcall VtolMoveOrder(Unit*, Order*, int);
-int __stdcall VtolFollowOrder(Unit*, Order*, int);
-int __stdcall VtolStandbyOrder(Unit*, Order*, int);
-int __stdcall VtolLandIfCanOrder(Unit*, Order*, int);
-
 static inline Vec3 Offset(short angle, int distance)
 {
     Vec3 v;

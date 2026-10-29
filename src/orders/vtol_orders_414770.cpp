@@ -14,24 +14,14 @@ struct Unit;
 void UpdateMouseScroll();
 void UpdateEdgeScroll();
 
+#include "../units/unit.h"
+
+// Unused here: the symbol ids these declarations take keep 0x414770 matching
+// (docs/c2-regalloc.md).
+void RegisterUnitOrders(void);
+
 #pragma pack(push, 1)
 #include "../map/feature.h"
-
-#include "../units/unit_def.h"
-
-struct Unit {
-    UnitMotion* motion;                  // +0x0
-    char unknown_4[0x6a - 0x4];
-    Vec3 pos;                          // +0x6a
-    char unknown_76[0x86 - 0x76];
-    int carrier;                      // +0x86
-    char unknown_8a[0x92 - 0x8a];
-    UnitDef* def;                      // +0x92
-    char unknown_96[0xb0 - 0x96];
-    int workTime;                      // +0xb0
-    void ClaimWeapons(int);
-    void SetStateBits(int, int);
-};
 // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int __stdcall FindLandingPad(Unit*, int);
 unsigned short __stdcall ChooseBuildOption(unsigned int, Unit*);
