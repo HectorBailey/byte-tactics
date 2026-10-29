@@ -26,9 +26,11 @@ static inline Vec3 operator+(const Vec3& a, const Vec3& b)
 
 
 struct Unit_0043e490;
-struct Feature_0043e490;
 
 #include "../units/unit_def.h"
+
+// The 0x100-byte feature record in the pool at +0x1426f.
+#include "../map/feature.h"
 
 #pragma pack(push, 1)
 struct Game {
@@ -40,7 +42,7 @@ struct Game {
     char unknown_14237[0x14253 - 0x14237];
     int featureCount; // +0x14253
     char unknown_14257[0x1426f - 0x14257];
-    Feature_0043e490* features;        // +0x1426f
+    Feature* features;                 // +0x1426f
     unsigned short* visibilityMask;    // +0x14273
     char unknown_14277[0x1427f - 0x14277];
     unsigned char seaLevel;            // +0x1427f
@@ -475,12 +477,6 @@ struct Pos_0043e490 {
 };
 
 #include "../map/cell.h"
-
-struct Feature_0043e490 {
-    char unknown_0[0xfe];
-    unsigned char flags; // +0xfe
-    char unknown_ff;
-};
 #pragma pack(pop)
 
 Cell* __stdcall GetMapCellAtPosition(Pos_0043e490* pos);
@@ -503,7 +499,7 @@ static inline int Visible(Unit_0043e490* unit, Pos_0043e490* pos) {
 // The feature on a map cell, as GetFeature in 0x4237d0.cpp but with the id in
 // a local: 0xfffe marks a cell covered by a larger feature whose origin cell
 // lies (offsetY, offsetX) cells back.
-static inline Feature_0043e490* GetFeature(Cell* cell) {
+static inline Feature* GetFeature(Cell* cell) {
     if (cell == 0)
         return 0;
     unsigned short id = cell->feature;
@@ -529,7 +525,7 @@ static inline Feature_0043e490* GetFeature(Cell* cell) {
 #define RECLAIM_CHECK(def, unit, pos, mask, result)                  \
     do {                                                             \
         if (((def)->flags2 & (mask)) && Visible((unit), (pos))) {      \
-            Feature_0043e490* f = GetFeature(GetMapCellAtPosition(pos));     \
+            Feature* f = GetFeature(GetMapCellAtPosition(pos));             \
             if (f && (f->flags & 0x80))                              \
                 return (result);                                     \
         }                                                            \
