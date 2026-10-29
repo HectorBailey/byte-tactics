@@ -250,7 +250,7 @@ struct Game {
     char unknown_1437f[0x37e1b - 0x1437f];
     void* offscreen;                   // +0x37e1b
     char unknown_37e1f[0x37e98 - 0x37e1f];
-    int field_37e98;                   // +0x37e98
+    int optionsLightbarDirty;          // +0x37e98
     char unknown_37e9c[0x37ebe - 0x37e9c];
     union {
         unsigned char ordersPanelFlags;  // +0x37ebe
@@ -2525,7 +2525,7 @@ void __stdcall DrawOptionsScrollBar(void* surf)
         DrawFrameQuad(surf, &g_optionsFlipFrame, &dst, &src);
         MarkChanged((char*)&g_game->gui);
         g_game->viewDirtyFlags |= 2;
-        g_game->field_37e98 = 1;
+        g_game->optionsLightbarDirty = 1;
     }
 }
 
