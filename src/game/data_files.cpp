@@ -677,21 +677,23 @@ int LoadDefaultPalette()
     return 1;
 }
 
-struct FindData_0042a440 {
+// The record HAPI_FindFirst and HAPI_FindNext fill; game/cd_check.cpp
+// declares the same one for its own scan.
+struct FindData {
     char unknown_0[0x14];
     char name[260];                    // +0x14
 };
 
 int __stdcall CountDirectoryEntries(const char* path, int flag);
-int __stdcall HAPI_FindFirst(const char* path, FindData_0042a440* fd, int a, int b);
-int __stdcall HAPI_FindNext(int handle, FindData_0042a440* fd);
+int __stdcall HAPI_FindFirst(const char* path, FindData* fd, int a, int b);
+int __stdcall HAPI_FindNext(int handle, FindData* fd);
 void __stdcall HAPI_FindClose(int handle);
 
 // FUNCTION: 0x42a440
 void LoadTextureGafs()
 {
     char path[256];
-    FindData_0042a440 fd;
+    FindData fd;
 
     BuildDataPath(path, "textures", "*", "GAF");
     int count = CountDirectoryEntries(path, 0);

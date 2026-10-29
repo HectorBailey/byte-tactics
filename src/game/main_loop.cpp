@@ -81,7 +81,7 @@ struct Settings_00496e10 {
 
 #include "../map/mission.h"
 
-union Fixed_00496ee0 {
+union Fixed {
     int i;                              // 16.16
     struct {
         short frac;
@@ -89,10 +89,10 @@ union Fixed_00496ee0 {
     } h;
 };
 
-struct FixedPos_00496ee0 {
-    Fixed_00496ee0 x;
-    Fixed_00496ee0 y;
-    Fixed_00496ee0 z;
+struct FixedPos {
+    Fixed x;
+    Fixed y;
+    Fixed z;
 };
 
 // The ten team records at g_game+0x1b63 are 0x14b bytes. Three functions view
@@ -295,7 +295,7 @@ void __stdcall SetupPlayerSlot(unsigned char player, unsigned char kind);
 unsigned short __stdcall FindUnitTypeId(const char* name);
 void __stdcall FatalError(char* message);
 void __stdcall SetCameraPosition(int x, int y, int instant);
-void __stdcall CreateUnit(int team, unsigned short id, FixedPos_00496ee0 pos, int a, int b,
+void __stdcall CreateUnit(int team, unsigned short id, FixedPos pos, int a, int b,
     int c);
 
 static inline void Charge(int bucket)
@@ -568,7 +568,7 @@ void __stdcall SpawnCommanderAtStartPos(int team, int startpos)
     p->size1 = (float)(w >= 200 ? w : 200);
     p->size2 = (float)(v >= 200 ? v : 200);
 
-    FixedPos_00496ee0 pos;
+    FixedPos pos;
     if (g_game->net->GetStartPosition((Vec3*)&pos, startpos)) {
         unsigned short id = FindUnitTypeId(
             g_game->names[g_game->players[team].info->side].name);
