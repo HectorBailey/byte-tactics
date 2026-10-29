@@ -16,6 +16,48 @@
 
 #include "../graphics/handle.h"
 
+#include "../units/unit.h"
+
+// Unused here: the symbol ids these declarations take keep 0x46a610 matching (docs/c2-regalloc.md).
+void RegisterUnitOrders(void);
+void RegisterGroundOrders(void);
+void EnableAICommands(void);
+void RegisterAICommands(void);
+void FUN_00406f40(void);
+void ResetAIPlayers(void);
+void RegisterVtolOrders(void);
+void StepAllGafSequences(void);
+void ResetNetStats(void);
+void FUN_004161f0(void);
+void InitCommands(void);
+int UpdatePlacementGhostValidity(void);
+void RefreshSelectionOrders(void);
+void DispatchOrdersPanelPageFlags(void);
+void ResetCameraState(void);
+void FindLocalCommander(void);
+void ClampCameraPosition(void);
+void ClampCameraTarget(void);
+void UpdateScreenShake(void);
+void UpdateCameraFollow(void);
+void BeginMouseScroll(void);
+void EndMouseScroll(void);
+void UpdateMouseScroll(void);
+void UpdateEdgeScroll(void);
+void CenterCameraOnRadarClick(void);
+void CenterCameraOnStartPosition(void);
+void RegisterDataArchives(void);
+int FUN_0041d8a0(void);
+int GetCdPathMismatch(void);
+void CreateGameObject(void);
+void InitMissionStatus(void);
+void SetUpEndMissionScreen(void);
+void StartScreenFade(void);
+void StepScreenFade(void);
+void ScheduleFadeTick(void);
+int IsFadeDone(void);
+void StepPaletteFade(void);
+void FillEndGameStatistics(void);
+
 #pragma pack(push, 1)
 struct Feature {
     char name[0x94];
@@ -36,8 +78,6 @@ struct Feature {
 
 // The unit's model instance state, the pointer at a unit's +0x9e; same view
 // as unit_script.cpp's ObjectState. A live spot carries one at +0x4.
-struct Unit;
-
 struct ObjectState {
     char unknown_0[0xc];
     Unit* unit;                        // +0xc
@@ -57,13 +97,6 @@ struct Cell {
 
 #include "feature_spot.h"
 
-struct Unit {
-    char unknown_0[0x64];
-    Angles16 angles;               // +0x64
-    Vec3 pos;                          // +0x6a
-    char unknown_76[0x9e - 0x76];
-    ObjectState* state;                // +0x9e
-};
 
 struct Game {
     char unknown_0[0x1420b];
