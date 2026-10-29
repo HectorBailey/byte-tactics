@@ -33,29 +33,31 @@ struct Game_0046c2a0 {
 };
 #pragma pack(pop)
 
-struct PlayerInfo_0046c2a0 {           // 0x18 bytes
+// Thaldren's online report records, the ones the stats DLL is handed: a player
+// block with its allies, a score board with its entries, and one entry.
+struct OnlineReportPlayerInfo {        // 0x18 bytes
     char* name;                        // +0x00
     int id;                            // +0x04
     int flags;                         // +0x08
     char* side;                        // +0x0c
     int numAllies;                     // +0x10
-    PlayerInfo_0046c2a0** allies;      // +0x14
+    OnlineReportPlayerInfo** allies;   // +0x14
 };
 
-struct Score_0046c2a0 {                // 8 bytes
+struct OnlineReportStatEntry {         // 0x8 bytes
     char* name;                        // +0x0
     int value;                         // +0x4
 };
 
-struct ScoreBoard_0046c2a0 {           // 0xc bytes
+struct OnlineReportScoreBoard {        // 0xc bytes
     int score;                         // +0x0
     int count;                         // +0x4
-    Score_0046c2a0** scores;           // +0x8
+    OnlineReportStatEntry** scores;    // +0x8
 };
 
 extern Game_0046c2a0* g_game;
-extern PlayerInfo_0046c2a0** g_onlineReportPlayers;
-extern ScoreBoard_0046c2a0** g_onlineReportScoreBoards;
+extern OnlineReportPlayerInfo** g_onlineReportPlayers;
+extern OnlineReportScoreBoard** g_onlineReportScoreBoards;
 extern char* g_sideNames[2];           // "Arm", "Core"
 extern char* g_scoreNames[9];          // "Kills", "Losses", ..., "I am Winner"
 
@@ -84,8 +86,8 @@ int FillScoreTables()
                 g_onlineReportPlayers[i]->flags |= 8;
             g_onlineReportPlayers[i]->side = g_sideNames[p->info->side];
             int n = 0;
-            PlayerInfo_0046c2a0** allies = g_onlineReportPlayers[i]->allies;
-            PlayerInfo_0046c2a0** a = allies;
+            OnlineReportPlayerInfo** allies = g_onlineReportPlayers[i]->allies;
+            OnlineReportPlayerInfo** a = allies;
             for (j = 0; j < 10; j++) {
                 if (j != i && p->allied[j]) {
                     n++;
@@ -100,7 +102,7 @@ int FillScoreTables()
             score += (int)(p->kills * c->killMul);
             g_onlineReportScoreBoards[i]->score = score;
             g_onlineReportScoreBoards[i]->count = 9;
-            Score_0046c2a0* s;
+            OnlineReportStatEntry* s;
             s = g_onlineReportScoreBoards[i]->scores[0];
             s->name = g_scoreNames[0];
             s->value = p->kills;

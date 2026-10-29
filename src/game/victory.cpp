@@ -67,15 +67,7 @@ struct Param_0048e010 {
 
 #pragma pack(push, 1)
 
-struct Owner_0048ea40 {
-    char unknown_0[0x95];
-    unsigned char side;                // +0x95
-};
-
-struct Link_0048ea40 {
-    char unknown_0[0x27];
-    Owner_0048ea40* owner;             // +0x27
-};
+struct Player;
 
 struct Unit {
     int motion;                       // +0x0
@@ -86,7 +78,7 @@ struct Unit {
     Unit* carrier;                     // +0x86
     char unknown_8a[0x92 - 0x8a];
     UnitDef* def;                      // +0x92
-    Link_0048ea40* player;             // +0x96
+    Player* player;                    // +0x96
     char unknown_9a[0xa6 - 0x9a];
     short unitDefIndex;                    // +0xa6
     char unknown_a8[0xfb - 0xa8];
@@ -600,7 +592,7 @@ extern char g_celebratedKey[]; // "Celebrated"
 void VictoryKillEnemyCommander::OnUnitDied(Unit* unit)
 {
     if (unit->playerIndex == 1) {
-        if (_strcmpi(unit->def->unitname, g_game->sideDefs[unit->player->owner->side].commander) == 0) {
+        if (_strcmpi(unit->def->unitname, g_game->sideDefs[unit->player->info->side].commander) == 0) {
             satisfied = 1;
             if (celebrated == 0) {
                 PlaySoundByName("Victory Condition", 0);
@@ -1082,7 +1074,7 @@ void VictoryTimerRunsOut::LoadState(HapiBank* obj)
 void DefeatCommanderKilled::OnUnitDied(Unit* unit)
 {
     if (unit->playerIndex == 0) {
-        if (_strcmpi(unit->def->unitname, g_game->sideDefs[unit->player->owner->side].commander) == 0) {
+        if (_strcmpi(unit->def->unitname, g_game->sideDefs[unit->player->info->side].commander) == 0) {
             satisfied = 1;
         }
     }
@@ -1611,22 +1603,9 @@ struct Struct_004907e0;
 #include "../orders/unit_motion.h"
 #include "../util/angles.h"
 
-struct Target_00490880 {
-    char unknown_0[0x2e];
-    union {
-        unsigned char flags;           // +0x2e
-        struct {
-            unsigned char mode : 2;    // +0x2e bits 0-1
-        };
-    };
-};
-
 #pragma pack(push, 2)
 struct Struct_004907e0 {               // the owner, the object at +0x8
-    union {
-        Target_00490880* target;       // +0x0
-        UnitMotion* obj;               // +0x0
-    };
+    UnitMotion* obj;                   // +0x0
     char pad4[0x64 - 0x4];
     Angles16 angles;                   // +0x64
     Vec3 pos;                 // +0x6a
@@ -1794,7 +1773,7 @@ void LiteGoal::SetPathOrder(void* param)
 // FUNCTION: 0x490880
 void LiteGoal::TickTowardGoal()
 {
-    if ((owner->target->flags & 3) != mode)
+    if ((owner->obj->flags & 3) != mode)
         dirty = 1;
     PackedGoal::TickTowardGoal();
 }
@@ -1821,8 +1800,8 @@ void LiteGoal::SerializeNetUnitState(BitWriter* stream)
         stream->WriteBits(2, 2);
         target->SerializeToBits(stream);
     }
-    stream->WriteBits(owner->target->mode, 2);
-    state = owner->target->mode << 1;     // clears the dirty bit too
+    stream->WriteBits(owner->obj->mode, 2);
+    state = owner->obj->mode << 1;     // clears the dirty bit too
 }
 
 #pragma pack(push, 2)

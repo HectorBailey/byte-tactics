@@ -6,20 +6,11 @@
 // (width +0x80, height +0x84) is used, otherwise the shared visibility bit
 // mask at +0x14273 with this player's bit (g_game+0x2a43).
 #include <memory.h>
+#include "../map/byte_map.h"
 #pragma pack(push, 1)
-struct MapSize_004658e0 {
-    unsigned int width;
-    unsigned int height;
-    int Contains(unsigned int tx, unsigned int ty) { return tx < width && ty < height; }
-};
-struct ByteMap_004658e0 {
-    unsigned char* data;
-    MapSize_004658e0 size;
-    unsigned char Get(int x, int y) { return data[size.width * y + x]; }
-};
 struct Map_004658e0 {
     char unknown_0[0x7c];
-    ByteMap_004658e0 explored;
+    ByteMap explored;
 };
 struct Game {
     char unknown_0[0x2a43];

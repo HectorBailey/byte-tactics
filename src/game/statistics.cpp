@@ -5,15 +5,6 @@
 #include <string.h>
 #include <windows.h>
 
-// A DirectPlay service provider GUID, 16 bytes: the IPX, modem and serial
-// providers, none of which can host a remote console.
-struct Guid_0046bf30 {
-    unsigned long data1;
-    unsigned long data2;
-    unsigned long data3;
-    unsigned long data4;
-};
-
 // The game state LoadReporterDll and ShutdownScoreTables share: the network game
 // at +0x4e5 and the service provider GUID it copies out at +0x39201.
 #pragma pack(push, 1)
@@ -27,23 +18,28 @@ struct Game {
 };
 #pragma pack(pop)
 
-struct PlayerInfo_0046bce0 {     // 0x18 bytes
+// The stats DLL's records (Thaldren's OnlineReportPlayerInfo and
+// OnlineReportScoreBoard), the ones both reporter files read through the two
+// globals; statistics_46c2a0.cpp spells all of their members.
+struct OnlineReportPlayerInfo {     // 0x18 bytes
     char unknown_0[0x14];
-    void* allies;                 // +0x14
+    void* allies;                     // +0x14
 };
 
-struct ScoreBoard_0046bce0 {     // 0xc bytes
+struct OnlineReportScoreBoard {     // 0xc bytes
     char unknown_0[8];
-    void* ppScores;               // +0x8
+    void* ppScores;                   // +0x8
 };
 
 extern Game* g_game;             // 0x511de8
 extern char DAT_00512c98[];      // 0x512c98
-extern Guid_0046bf30 g_dpspGuidIpx;
-extern Guid_0046bf30 g_dpspGuidSerial;
-extern Guid_0046bf30 g_dpspGuidModem;
-extern PlayerInfo_0046bce0** g_onlineReportPlayers;
-extern ScoreBoard_0046bce0** g_onlineReportScoreBoards;
+// The DirectPlay service provider GUIDs: IPX, serial and modem, none of which
+// can host a remote console.
+extern GUID g_dpspGuidIpx;
+extern GUID g_dpspGuidSerial;
+extern GUID g_dpspGuidModem;
+extern OnlineReportPlayerInfo** g_onlineReportPlayers;
+extern OnlineReportScoreBoard** g_onlineReportScoreBoards;
 extern char** g_onlineReportScores;
 extern int g_hapinetOnlineReport;
 extern HMODULE g_reporterDll;
@@ -92,8 +88,8 @@ int AllocScoreTables()
     int failed;
     int i;
 
-    g_onlineReportPlayers = (PlayerInfo_0046bce0**)GameAllocIgnoreTag("PlayersArray", 0x28);
-    g_onlineReportScoreBoards = (ScoreBoard_0046bce0**)GameAllocIgnoreTag("ScoreBoardsArray", 0x28);
+    g_onlineReportPlayers = (OnlineReportPlayerInfo**)GameAllocIgnoreTag("PlayersArray", 0x28);
+    g_onlineReportScoreBoards = (OnlineReportScoreBoard**)GameAllocIgnoreTag("ScoreBoardsArray", 0x28);
     g_onlineReportScores = (char**)GameAllocIgnoreTag("ScoresArray", 0x28);
     if (g_onlineReportPlayers == 0)
         goto failed;
@@ -112,7 +108,7 @@ int AllocScoreTables()
         if (i >= 10)
             break;
         wsprintfA(name, "PlayerInfo%d", i);
-        g_onlineReportPlayers[i] = (PlayerInfo_0046bce0*)GameAllocIgnoreTag(name, 0x18);
+        g_onlineReportPlayers[i] = (OnlineReportPlayerInfo*)GameAllocIgnoreTag(name, 0x18);
         if (g_onlineReportPlayers[i] == 0) {
             failed = 1;
             break;
@@ -124,7 +120,7 @@ int AllocScoreTables()
             break;
         }
         wsprintfA(name, "ScoreBoard%d", i);
-        g_onlineReportScoreBoards[i] = (ScoreBoard_0046bce0*)GameAllocIgnoreTag(name, 0xc);
+        g_onlineReportScoreBoards[i] = (OnlineReportScoreBoard*)GameAllocIgnoreTag(name, 0xc);
         if (g_onlineReportScoreBoards[i] == 0) {
             failed = 1;
             break;
