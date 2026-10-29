@@ -25,26 +25,31 @@ struct Game {
 };
 #pragma pack(pop)
 extern Game* g_game;
-struct Pos_004658e0 {
-    short xFrac;
-    short x;
-    short yFrac;
-    short y;
-    short zFrac;
-    short z;
+// The 16.16 position the fog test builds and reads, the same Fixed and
+// FixedVec3 graphics/particles_475470.cpp declares; only the whole words are
+// read here.
+struct Fixed {
+    unsigned short frac;
+    short whole;
 };
-static inline int IsExplored(ExploredMap* map, Pos_004658e0* pos)
+
+struct FixedVec3 {
+    Fixed x;
+    Fixed y;
+    Fixed z;
+};
+static inline int IsExplored(ExploredMap* map, FixedVec3* pos)
 {
-    int tx = pos->x >> 5;
-    int ty = (pos->z - (pos->y >> 1)) >> 5;
+    int tx = pos->x.whole >> 5;
+    int ty = (pos->z.whole - (pos->y.whole >> 1)) >> 5;
     if (map->explored.size.Contains(tx, ty) && map->explored.Get(tx, ty) != 0)
         return 1;
     return 0;
 }
-static inline int IsSeen(ExploredMap* map, Pos_004658e0* pos)
+static inline int IsSeen(ExploredMap* map, FixedVec3* pos)
 {
-    int tx = pos->x >> 5;
-    int ty = (pos->z - (pos->y >> 1)) >> 5;
+    int tx = pos->x.whole >> 5;
+    int ty = (pos->z.whole - (pos->y.whole >> 1)) >> 5;
     if (!map->explored.size.Contains(tx, ty))
         return 0;
     return (g_game->visibilityMask[map->explored.size.width * ty + tx] &
@@ -57,20 +62,20 @@ int __stdcall IsFootprintVisible(ExploredMap* map, int x, int y, int dx, int dy,
     ExploredMap* m = map;
     // unsigned int: char or int changes the test and the register assignment.
     unsigned int vis;
-    Pos_004658e0 pos;
+    FixedVec3 pos;
     // Kept even though the stores are dead: reproduces the original prologue.
     memset(&pos, 0, sizeof(pos));
-    pos.x = (short)(x << 4);
-    pos.y = size;
-    pos.z = (short)(y << 4);
+    pos.x.whole = (short)(x << 4);
+    pos.y.whole = size;
+    pos.z.whole = (short)(y << 4);
     if ((g_game->mapFlags & 2) == 2)
         vis = IsExplored(m, &pos);
     else
         vis = IsSeen(m, &pos);
     if ((int)vis)
         return 1;
-    pos.x = (short)(pos.x + (dx << 4));
-    pos.z = (short)(pos.z + (dy << 4));
+    pos.x.whole = (short)(pos.x.whole + (dx << 4));
+    pos.z.whole = (short)(pos.z.whole + (dy << 4));
     if ((g_game->mapFlags & 2) == 2)
         return IsExplored(m, &pos);
     return IsSeen(m, &pos);

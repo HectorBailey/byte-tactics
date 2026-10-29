@@ -33,35 +33,40 @@ struct Game {
 #include "../units/unit_def.h"
 #include "../util/vec3.h"
 #include "../units/unit.h"
-struct Position_00465ac0 {              // 16.16 fixed point; only high words read
-    short xFrac;
-    short x;                            // +0x2
-    short yFrac;
-    short y;                            // +0x6
-    short zFrac;
-    short z;                            // +0xa
+// The 16.16 position the fog test builds and reads, the same Fixed and
+// FixedVec3 graphics/particles_475470.cpp declares; only the whole words are
+// read here.
+struct Fixed {
+    unsigned short frac;
+    short whole;
+};
+
+struct FixedVec3 {
+    Fixed x;
+    Fixed y;
+    Fixed z;
 };
 #pragma pack(pop)
 
 extern Game* g_game;
 
-int __stdcall IsPointVisible(ExploredMap* map, Position_00465ac0* pos);
+int __stdcall IsPointVisible(ExploredMap* map, FixedVec3* pos);
 
 // the player's explored byte map, inlined where the game map flags ask for it
-static inline int IsExplored(ExploredMap* map, Position_00465ac0* pos)
+static inline int IsExplored(ExploredMap* map, FixedVec3* pos)
 {
-    int tx = pos->x >> 5;
-    int ty = (pos->z - (pos->y >> 1)) >> 5;
+    int tx = pos->x.whole >> 5;
+    int ty = (pos->z.whole - (pos->y.whole >> 1)) >> 5;
     if (map->explored.size.Contains(tx, ty)) {
         if (map->explored.Get(tx, ty) != 0)
             return 1;
     }
     return 0;
 }
-static inline int IsSeen(ExploredMap* map, Position_00465ac0* pos)
+static inline int IsSeen(ExploredMap* map, FixedVec3* pos)
 {
-    int tx = pos->x >> 5;
-    int ty = (pos->z - (pos->y >> 1)) >> 5;
+    int tx = pos->x.whole >> 5;
+    int ty = (pos->z.whole - (pos->y.whole >> 1)) >> 5;
     if (!map->explored.size.Contains(tx, ty))
         return 0;
     return (g_game->visibilityMask[map->explored.size.width * ty + tx] &
@@ -70,10 +75,10 @@ static inline int IsSeen(ExploredMap* map, Position_00465ac0* pos)
 
 // Plain index here, Get method in IsExplored: one helper for tests 1 to 3
 // does not match.
-static inline int IsExplored2(ExploredMap* map, Position_00465ac0* pos)
+static inline int IsExplored2(ExploredMap* map, FixedVec3* pos)
 {
-    int tx = pos->x >> 5;
-    int ty = (pos->z - (pos->y >> 1)) >> 5;
+    int tx = pos->x.whole >> 5;
+    int ty = (pos->z.whole - (pos->y.whole >> 1)) >> 5;
     if (map->explored.size.Contains(tx, ty)) {
         if (map->explored.data[map->explored.size.width * ty + tx] != 0)
             return 1;
@@ -81,19 +86,19 @@ static inline int IsExplored2(ExploredMap* map, Position_00465ac0* pos)
     return 0;
 }
 // IsVisible and IsVisible2 stay single ternaries, not an if with two returns.
-static inline int IsVisible(ExploredMap* map, Position_00465ac0* pos)
+static inline int IsVisible(ExploredMap* map, FixedVec3* pos)
 {
     return (g_game->mapFlags & 2) == 2 ? IsExplored(map, pos) : IsPointVisible(map, pos);
 }
-static inline int IsVisible2(ExploredMap* map, Position_00465ac0* pos)
+static inline int IsVisible2(ExploredMap* map, FixedVec3* pos)
 {
     return (g_game->mapFlags & 2) == 2 ? IsExplored2(map, pos) : IsPointVisible(map, pos);
 }
 // Branchy shape stays: lets nothing range-track the value.
-static inline int IsExplored3(ExploredMap* map, Position_00465ac0* pos)
+static inline int IsExplored3(ExploredMap* map, FixedVec3* pos)
 {
-    int tx = pos->x >> 5;
-    int ty = (pos->z - (pos->y >> 1)) >> 5;
+    int tx = pos->x.whole >> 5;
+    int ty = (pos->z.whole - (pos->y.whole >> 1)) >> 5;
     if (map->explored.size.Contains(tx, ty)) {
         unsigned char* d = map->explored.data + map->explored.size.width * ty;
         if (d[tx] != 0)
@@ -104,7 +109,7 @@ static inline int IsExplored3(ExploredMap* map, Position_00465ac0* pos)
 
 
 // Stays an if: gives the normalisation on all four exits.
-static inline int IsVisible3(ExploredMap* map, Position_00465ac0* pos)
+static inline int IsVisible3(ExploredMap* map, FixedVec3* pos)
 {
     if ((g_game->mapFlags & 2) == 2)
         return IsExplored3(map, pos);
@@ -125,17 +130,17 @@ int __stdcall IsUnitVisibleToPlayer(ExploredMap* map, Unit* u)
         if (p.y < (g_game->seaLevel << 16))
             return 0;
     }
-    if (IsVisible(map, (Position_00465ac0*)&p))
+    if (IsVisible(map, (FixedVec3*)&p))
         return 1;
     p.x += u->def->modelSizeX;
-    if (IsVisible2(map, (Position_00465ac0*)&p))
+    if (IsVisible2(map, (FixedVec3*)&p))
         return 1;
     p.z += u->def->modelSizeZ;
     p.y -= u->def->modelSizeY;
-    if (IsVisible2(map, (Position_00465ac0*)&p))
+    if (IsVisible2(map, (FixedVec3*)&p))
         return 1;
     p.x -= u->def->modelSizeX;
-    if (IsVisible3(map, (Position_00465ac0*)&p))
+    if (IsVisible3(map, (FixedVec3*)&p))
         return 1;
     return 0;
 }
