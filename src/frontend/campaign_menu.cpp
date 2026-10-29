@@ -1482,7 +1482,7 @@ int CountComputerSlots()
 int __cdecl CountHumanSlots()
 {
     int count = 0;
-    int num = *(int*)((char*)g_game + 0x38d81);
+    int num = g_game->numSkirmishPlayers;
 
     if (num > 0) {
         int* arr = *(int**)((char*)g_game + 0x29a0);

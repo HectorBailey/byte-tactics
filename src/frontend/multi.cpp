@@ -428,7 +428,7 @@ void __stdcall UpdateGameSelection(Gui* menu, Gadget* entry)
     if (index != -1) {
         gd = (Gadget*)((char*)gadgets + index * 0x15b);
         gv = ((value & 0xff) >= (int)g_game->version) ? 1 : 0;
-        p = (unsigned short*)((char*)gd + 0x13c);
+        p = &gd->flag;
         r = (unsigned short)((~flags & 0x80) | (flags >> 8));
         r >>= 3;
         r |= flags & 0x10;
@@ -439,7 +439,7 @@ void __stdcall UpdateGameSelection(Gui* menu, Gadget* entry)
     if (index != -1) {
         gd = (Gadget*)((char*)gadgets + index * 0x15b);
         gv = ((value & 0xff) >= (int)g_game->version) ? 1 : 0;
-        p = (unsigned short*)((char*)gd + 0x13c);
+        p = &gd->flag;
         r = (unsigned short)((flags >> 11) | (flags & 0x10));
         r >>= 4;
         Apply_00441220(p, r, ge, entry);
