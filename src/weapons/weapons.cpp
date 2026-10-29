@@ -64,24 +64,6 @@ struct Type_0049d270 {
     int param;                         // +0x20
 };
 
-struct Point_0049e1a0 {
-    short x;
-    short z;
-};
-
-struct Entry_0049e1a0 {        // 0x1c bytes
-    Point_0049e1a0 point;      // +0x00
-    char* name;                // +0x04
-    int f_8;                   // +0x08
-    WeaponDef* attached;       // +0x0c
-    char unknown_10[0x14 - 0x10];
-    unsigned short f_14; // +0x14, the slot's tick counter
-    short f_16;          // +0x16
-    short f_18;          // +0x18
-    unsigned char f_1a;  // +0x1a
-    unsigned char flags; // +0x1b
-};
-
 #include "../game/unit_resources.h"
 
 struct Owner_0049dd60 {
@@ -96,6 +78,26 @@ struct UnitType_0049d000 {
 
 #include "weapon_def.h"
 #include "../map/feature.h"
+
+// Unused here: the symbol ids these declarations take keep 0x49a890, 0x49aa80
+// and 0x49be60 matching (docs/c2-regalloc.md).
+void FUN_00406f40(void);
+void FUN_004161f0(void);
+int UpdatePlacementGhostValidity(void);
+void CenterCameraOnStartPosition(void);
+void RegisterDataArchives(void);
+int FUN_0041d8a0(void);
+int GetCdPathMismatch(void);
+void CreateGameObject(void);
+void InitMissionStatus(void);
+void SetUpEndMissionScreen(void);
+void StartScreenFade(void);
+void StepScreenFade(void);
+void ScheduleFadeTick(void);
+int IsFadeDone(void);
+void StepPaletteFade(void);
+void FillEndGameStatistics(void);
+int AreStatBarsComplete(void);
 
 union Fbb_0049d580 {
     unsigned short value;
@@ -147,7 +149,7 @@ struct Unit {
         Owner_0049dd60* owner;         // 49dd60's owner
     };
     union {                            // +0x4
-        Entry_0049e1a0 weapons[3];     // 49e1a0's weapon entries, stride 0x1c
+        UnitWeaponSlot weapons[3];     // +0x4, stride 0x1c
         struct {                       // 49d580's fire state
             char unknown_4[4];
             int f_8;                   // +0x8
@@ -396,7 +398,6 @@ typedef Vec3 Vec3_0049b720;
 
 struct Unit;
 struct Spot_0049a120;
-struct FeatureDef_0049a120;
 struct Cell;
 
 #pragma pack(pop)
@@ -836,25 +837,18 @@ struct FixedVec3 {
     Fixed_0049a120 z;
 };
 
-struct CellPos_0049a120 {
-    short x;
-    short z;
-};
-
 #pragma pack(push, 1)
 // Unused here: real functions declared for their symbol ids, which keep
 // 0x49a890 and 0x49aa80 matching (docs/c2-regalloc.md).
 int CloakOnOrder(char*, int, int);
 int GetUnitCount(int, unsigned int);
 
-struct Holder_0049a120;
-
 struct Unit_0049a120 {
     char unknown_0[0x6a];
     Vec3_0049a120 pos;                 // +0x6a
     char unknown_76[0x92 - 0x76];
     UnitDef* def;                      // +0x92
-    Holder_0049a120* player;           // +0x96
+    Player* player;                    // +0x96
     char unknown_9a[0xff - 0x9a];
     unsigned char playerIndex;         // +0xff
     char unknown_100[0x118 - 0x100];
@@ -864,13 +858,6 @@ struct Unit_0049a120 {
 // functions after them matching (docs/c2-regalloc.md).
 void __stdcall EraseFrameDithered(void* surface, void* bmp, int x, int y, int color);
 void AddDownloadBuildOptions();
-
-struct Holder_0049a120 {
-    char unknown_0[4];
-    int playerId;                      // +0x4
-    char unknown_8[0x74 - 8];
-    SquadManager* object;              // +0x74
-};
 
 struct Cell {
     unsigned short unit;               // +0x0
@@ -894,10 +881,6 @@ struct Spot_0049a120 {
     char unknown_0[8];
     Vec3_0049a120 pos;                 // +0x8
     char unknown_14[0x30 - 0x14];
-};
-
-struct FeatureDef_0049a120 {
-    char unknown_0[0x100];
 };
 
 // Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
@@ -949,7 +932,7 @@ Cell* __stdcall GetMapCell(int x, int y);
 int __stdcall ApplyWeaponDamage(Projectile* weapon, Unit_0049a120* target, float scale);
 void __stdcall DetonateProjectile(Projectile* weapon, Unit_0049a120* unit);
 int __stdcall VectorLength(Vec3_0049a120* v);
-Vec3_0049a120 __stdcall GetFootprintCentre(CellPos_0049a120* cell, FeatureDef_0049a120* def);
+Vec3 __stdcall GetFootprintCentre(Point16* cell, Feature* def);
 void __stdcall DamageFeature(Cell* cell, int x, int z, WeaponDef* def);
 int __stdcall BroadcastPacket(int id, void* data, int size);
 
@@ -2692,13 +2675,13 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
     Vec3 aim;
 
     for (i = 0; i < 3; i++) {
-        Entry_0049e1a0* e = &unit->weapons[i];
+        UnitWeaponSlot* e = &unit->weapons[i];
         unsigned char fl = e->flags;
-        WeaponDef* attached = e->attached;
+        WeaponDef* attached = e->weapon;
         if (!(fl & 2))
             continue;
-        if (e->f_14 > 0)
-            e->f_14--;
+        if (e->reloadTimer > 0)
+            e->reloadTimer--;
         if (!GetWeaponTargetPos(unit, &pos, i)) {
             e->flags &= 0xfe;
             continue;
@@ -2707,7 +2690,7 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
             continue;
         if (attached->flags.b.turret) {
             if (!(e->flags & 1)) {
-                WeaponDef* t = e->attached;
+                WeaponDef* t = e->weapon;
                 unsigned short angle;
                 int ok;
                 if (t->flags.b.ballistic) {
@@ -2723,11 +2706,11 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
                     ok = 0;
                 }
                 if (ok) {
-                    e->f_18 = angle;
-                    e->f_16 = heading;
-                    e->f_8 = 0;
+                    e->firePitch = angle;
+                    e->fireHeading = heading;
+                    e->aimCob.nAimCobDone = 0;
                     // Name read afresh for each call, no cached local: lets the two tails merge.
-                    unit->script->StartScriptWithArgs(g_aimScriptNames[(e->flags >> 2) & 3], (Callback*)&e->name, 0, 2,
+                    unit->script->StartScriptWithArgs(g_aimScriptNames[(e->flags >> 2) & 3], (Callback*)&e->aimCob, 0, 2,
                                                heading, angle, 0, 0);
                     SendScriptCallByName(unit, g_aimScriptNames[(e->flags >> 2) & 3], 2, heading, angle, 0, 0);
                     e->flags |= 1;
@@ -2736,20 +2719,20 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
         } else {
             // Via a bool local: testing the bitfield in place shifts the register rotation.
             bool armed = attached->flags.b.vLaunch;
-            if (armed && (!attached->flags.b.stockpile || e->f_1a) && !(e->flags & 1)) {
-                e->f_8 = 0;
-                unit->script->StartScriptWithArgs(g_aimScriptNames[(e->flags >> 2) & 3], (Callback*)&e->name, 0, 2, 0, 0,
+            if (armed && (!attached->flags.b.stockpile || e->stockpile) && !(e->flags & 1)) {
+                e->aimCob.nAimCobDone = 0;
+                unit->script->StartScriptWithArgs(g_aimScriptNames[(e->flags >> 2) & 3], (Callback*)&e->aimCob, 0, 2, 0, 0,
                                            0, 0);
                 SendScriptCallByName(unit, g_aimScriptNames[(e->flags >> 2) & 3], 2, 0, 0, 0, 0);
                 e->flags |= 1;
             }
         }
-        if (e->f_14 != 0)
+        if (e->reloadTimer != 0)
             continue;
         if (WeaponCanReachPos(unit, &unit->pos, &pos, i)) {
             int can = 0;
             if (attached->flags.b.stockpile) {
-                if (e->f_1a)
+                if (e->stockpile)
                     can = 1;
             } else {
                 if (unit->resourceSlot.player->energy >= attached->energyPerShot &&
@@ -2759,10 +2742,10 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
             if (can == 0)
                 continue;
             Unit* fired = GetWeaponTargetUnit(unit, i);
-            if (((WeaponFireFn)attached->fire)(unit, &e->point, fired, &pos) == 0)
+            if (((WeaponFireFn)attached->fire)(unit, (short*)&e->aimTargetXOrUnitId, fired, &pos) == 0)
                 continue;
             if (attached->flags.b.stockpile) {
-                e->f_1a--;
+                e->stockpile--;
                 UpdateBuildMenuIfFocusUnit(unit);
             } else {
                 int n = unit->killCount / 5;
@@ -2770,7 +2753,7 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
                     n = 5;
                 int q = unit->health * 20 / unit->utype->maxHealth;
                 int pct = 100 - n * 6;
-                e->f_14 = (short)((120 - q) * (pct * attached->reloadTime / 100) / 100);
+                e->reloadTimer = (short)((120 - q) * (pct * attached->reloadTime / 100) / 100);
             }
             int m = (attached->flags.b.commandFire) ? 0x800 : 0x400;
             unit->f_ba.w |= m;
