@@ -18,7 +18,8 @@ bool __cdecl WriteGdperf(unsigned long, unsigned long, unsigned long);
 
 // Partial views of features.cpp's cell, spot and record types. The two records
 // take the module's names (features.cpp's AnimRecord and Model); the cell view
-// keeps its own because ta_types.h's Cell has no spot word at +0xa.
+// keeps its own because ta_types.h's Cell has no spot word at +0xa. Both are
+// read packed, so Model stops at the 26 bytes the box holds, not its 28.
 struct Spot_00424c00 {
     char unknown_0[4];
     unsigned short frame;              // +0x4
