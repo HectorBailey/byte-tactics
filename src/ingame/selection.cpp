@@ -108,10 +108,12 @@ union Orders_37ebe {
     };
 };
 
-struct Slot_0048cd80 {
+// One entry of the hot radar unit list at g_game+0x14363 (Thaldren's
+// HotRadarUnitEntry, 0xa bytes): the unit and where its minimap blip is.
+struct HotRadarUnitEntry {
     unsigned short unitId;             // +0x0
-    int x;                             // +0x2
-    int y;                             // +0x6
+    int screenX;                       // +0x2, the minimap gadget x
+    int screenY;                       // +0x6
 };
 
 // One side's SideDef record (0x232 bytes): the commander name read at +0x22
@@ -151,7 +153,7 @@ struct Game {
     Unit* units;                       // +0x14357
     Unit* unitsEnd;                    // +0x1435b
     unsigned short* visibleUnitIdList; // +0x1435f
-    Slot_0048cd80* hotRadarUnitList;   // +0x14363
+    HotRadarUnitEntry* hotRadarUnitList; // +0x14363
     int count;                         // +0x14367
     int hotRadarUnitCount;             // +0x1436b
     unsigned short focusUnitId;        // +0x1436f
@@ -712,11 +714,11 @@ unsigned short __stdcall PickUnitUnderCursor(void)
         }
     } else if (PointInRect(&g_game->minimapHitRect, p->x, p->y)) {
         int best = 99999;
-        Slot_0048cd80* s = g_game->hotRadarUnitList;
+        HotRadarUnitEntry* s = g_game->hotRadarUnitList;
         for (int i = g_game->hotRadarUnitCount; i > 0; i--) {
             // Both coordinates are read through p, dy first.
-            int dy = s->y - p->y;
-            int dx = s->x - p->x;
+            int dy = s->screenY - p->y;
+            int dx = s->screenX - p->x;
             int d = dx * dx + dy * dy;
             if (d < 4 && d < best) {
                 best = d;
