@@ -25,10 +25,13 @@ public:
     int GetFieldString(char* dst, char* key, int size, char* def);
 };
 
-struct List_00422ea0 {
-    int unknown_0;
-    TdfFile** first;                    // +0x4
-    TdfFile** last;                     // +0x8
+// Thaldren's FeatureTdfParserVector, 0x10 bytes: the dummy allocator byte and
+// its pad, then the begin and end pointers. The capacity word at +0xc is not
+// read here, so the view stops after ppEnd.
+struct FeatureTdfParserVector {
+    int unknown_0;                     // +0x0, the allocator byte and its pad
+    TdfFile** ppBegin;                 // +0x4
+    TdfFile** ppEnd;                   // +0x8
 };
 
 // The feature record: map/feature.h's Feature, the 0x100-byte pool element.
@@ -46,7 +49,7 @@ struct Game {
 #pragma pack(pop)
 
 extern Game* g_game;
-extern List_00422ea0* s_featureTdfParsers;
+extern FeatureTdfParserVector* s_featureTdfParsers;
 extern char g_emptyStringLiteral[];
 
 unsigned short __stdcall LoadFeatureType(char* name);
@@ -54,7 +57,7 @@ unsigned short __stdcall LoadFeatureType(char* name);
 // FindFeatureFile, inlined
 static inline TdfFile* FindEntry(char* name)
 {
-    for (TdfFile** p = s_featureTdfParsers->first; p < s_featureTdfParsers->last; p++) {
+    for (TdfFile** p = s_featureTdfParsers->ppBegin; p < s_featureTdfParsers->ppEnd; p++) {
         (*p)->ResetCurrentRecord();
         if ((*p)->SelectRecord(name))
             return *p;

@@ -14,10 +14,13 @@
 
 #include "../util/tdf.h"
 
-struct List_004224b0 {
-    int unknown_0;
-    TdfFile** first;                    // +0x4
-    TdfFile** last;                     // +0x8
+// Thaldren's FeatureTdfParserVector, 0x10 bytes: the dummy allocator byte and
+// its pad, then the begin and end pointers. The capacity word at +0xc is not
+// read here, so the view stops after ppEnd.
+struct FeatureTdfParserVector {
+    int unknown_0;                     // +0x0, the allocator byte and its pad
+    TdfFile** ppBegin;                 // +0x4
+    TdfFile** ppEnd;                   // +0x8
 };
 
 struct AnimSrc {
@@ -91,7 +94,7 @@ struct Game {
 #pragma pack(pop)
 
 extern Game* g_game;
-extern List_004224b0* s_featureTdfParsers;
+extern FeatureTdfParserVector* s_featureTdfParsers;
 extern char g_emptyStringLiteral[];
 
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
@@ -106,7 +109,7 @@ void __stdcall InitGafSequence(Anim* ref, AnimSrc* src, int index);
 // FindFeatureFile, inlined
 static inline TdfFile* FindEntry(char* name)
 {
-    for (TdfFile** p = s_featureTdfParsers->first; p < s_featureTdfParsers->last; p++) {
+    for (TdfFile** p = s_featureTdfParsers->ppBegin; p < s_featureTdfParsers->ppEnd; p++) {
         (*p)->ResetCurrentRecord();
         if ((*p)->SelectRecord(name))
             return *p;
