@@ -3020,7 +3020,10 @@ struct Proj_0049be60 {
 #include "../map/byte_map.h"
 
 #pragma pack(push, 1)
-struct PlayerInfo_0049be60 {
+// A player slot read for the explored grid at +0x7c (network/player.h's
+// explored, exploredWidth and exploredHeight). The same record in every file
+// that tests visibility against it.
+struct ExploredMap {
     char unknown_0[0x7c];
     ByteMap explored;                  // +0x7c
 };
@@ -3034,7 +3037,7 @@ int __stdcall PointInRect(void* region, int x, int y);
 void __stdcall DrawLens(void* dest, void* src, int x, int y);
 void __stdcall DrawLine(void* dest, int x1, int y1, int x2, int y2, unsigned int color);
 int __stdcall GetGafFrameCount(void* gaf);
-int __stdcall IsPointVisible(PlayerInfo_0049be60* pi, Vec3* pos);
+int __stdcall IsPointVisible(ExploredMap* player, Vec3* pos);
 
 // The projectile render pass: it walks the projectile array and draws every
 // live projectile (counter 0) that the local player can see, by the shot kind
@@ -3071,15 +3074,15 @@ void __stdcall DrawProjectiles(void* surface)
             Vec3* pos = &p->pos;
             if ((g_game->mapFlags & 2) == 2) {
                 int col = (int)*(short*)((char*)pos + 2) >> 5;
-                PlayerInfo_0049be60* pi = (PlayerInfo_0049be60*)pb;
+                ExploredMap* playerSlot = (ExploredMap*)pb;
                 int row = ((int)*(short*)((char*)pos + 10)
                            - ((int)*(short*)((char*)pos + 6) >> 1)) >> 5;
-                if (pi->explored.size.Contains(col, row) && pi->explored.Get(col, row))
+                if (playerSlot->explored.size.Contains(col, row) && playerSlot->explored.Get(col, row))
                     visible = 1;
                 else
                     visible = 0;
             } else {
-                visible = IsPointVisible((PlayerInfo_0049be60*)pb, pos);
+                visible = IsPointVisible((ExploredMap*)pb, pos);
             }
             if (visible) {
                 type = p->type;

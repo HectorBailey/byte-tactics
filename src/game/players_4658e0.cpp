@@ -8,7 +8,10 @@
 #include <memory.h>
 #include "../map/byte_map.h"
 #pragma pack(push, 1)
-struct Map_004658e0 {
+// A player slot read for the explored grid at +0x7c (network/player.h's
+// explored, exploredWidth and exploredHeight). The same record in every file
+// that tests visibility against it.
+struct ExploredMap {
     char unknown_0[0x7c];
     ByteMap explored;
 };
@@ -30,7 +33,7 @@ struct Pos_004658e0 {
     short zFrac;
     short z;
 };
-static inline int IsExplored(Map_004658e0* map, Pos_004658e0* pos)
+static inline int IsExplored(ExploredMap* map, Pos_004658e0* pos)
 {
     int tx = pos->x >> 5;
     int ty = (pos->z - (pos->y >> 1)) >> 5;
@@ -38,7 +41,7 @@ static inline int IsExplored(Map_004658e0* map, Pos_004658e0* pos)
         return 1;
     return 0;
 }
-static inline int IsSeen(Map_004658e0* map, Pos_004658e0* pos)
+static inline int IsSeen(ExploredMap* map, Pos_004658e0* pos)
 {
     int tx = pos->x >> 5;
     int ty = (pos->z - (pos->y >> 1)) >> 5;
@@ -48,10 +51,10 @@ static inline int IsSeen(Map_004658e0* map, Pos_004658e0* pos)
             (1 << g_game->playerIndex)) != 0;
 }
 // FUNCTION: 0x4658e0
-int __stdcall IsFootprintVisible(Map_004658e0* map, int x, int y, int dx, int dy, short size)
+int __stdcall IsFootprintVisible(ExploredMap* map, int x, int y, int dx, int dy, short size)
 {
     // Local copy of map: keeps the pointer in eax across both evaluations.
-    Map_004658e0* m = map;
+    ExploredMap* m = map;
     // unsigned int: char or int changes the test and the register assignment.
     unsigned int vis;
     Pos_004658e0 pos;

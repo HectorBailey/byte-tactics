@@ -210,7 +210,10 @@ struct ByteMap {
     unsigned char Get(int x, int y) { return data[size.width * y + x]; }
 };
 
-struct Los_0047d2e0 {
+// A player slot read for the explored grid at +0x7c (network/player.h's
+// explored, exploredWidth and exploredHeight). The same record in every file
+// that tests visibility against it.
+struct ExploredMap {
     char unknown_0[0x7c];
     ByteMap explored;
 };
@@ -465,7 +468,7 @@ struct Position_0047d2e0 {              // 16.16 fixed point, only high words re
 };
 
 // The helpers read the position through the six-short Position cast.
-static inline int IsExplored_0047d2e0(Los_0047d2e0* los, Position_0047d2e0* pos,
+static inline int IsExplored_0047d2e0(ExploredMap* los, Position_0047d2e0* pos,
     Fixed* hgt)
 {
     int tx = pos->x >> 5;
@@ -475,7 +478,7 @@ static inline int IsExplored_0047d2e0(Los_0047d2e0* los, Position_0047d2e0* pos,
     return 0;
 }
 
-static inline int IsSeen_0047d2e0(Los_0047d2e0* los, Position_0047d2e0* pos,
+static inline int IsSeen_0047d2e0(ExploredMap* los, Position_0047d2e0* pos,
     Fixed* hgt, unsigned int bit)
 {
     int tx = pos->x >> 5;
@@ -492,7 +495,7 @@ static inline int IsSeen_0047d2e0(Los_0047d2e0* los, Position_0047d2e0* pos,
 
 // Takes the caller's x but derives ty and the width itself: no spelling in
 // the caller gives the original's width-first multiply.
-static inline unsigned short VisWord_0047d2e0(Los_0047d2e0* los, int tx,
+static inline unsigned short VisWord_0047d2e0(ExploredMap* los, int tx,
     Position_0047d2e0* pos, Fixed* hgt)
 {
     int ty = (pos->z - (hgt->p.hi >> 1)) >> 5;
@@ -541,7 +544,7 @@ Cell* c)
 }
 
 // FUNCTION: 0x47d2e0
-int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Los_0047d2e0* los)
+int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, ExploredMap* los)
 {
     int ok;
     g_lastPlaceHeight = 0;
@@ -716,7 +719,7 @@ void __stdcall ForceNeighborFootprintReclaim(Unit* obj)
 // the raw low 16 bits of the second argument, and that argument is never
 // dereferenced anywhere in the function. So either the parameter really is an
 // owner id dressed up as a pointer, or the original meant other->unit.
-int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, Los_0047d2e0* los);
+int __stdcall CanBuildAt(UnitDef* unit, Point16 cell, short type, ExploredMap* los);
 
 // Returns non-zero when the cell's ground does not take a unit: water, a cliff
 // edge, or a feature type whose name entry has the "steep" bit set.

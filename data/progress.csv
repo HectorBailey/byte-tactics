@@ -1338,8 +1338,8 @@ address,size,file,symbol,status,similarity
 0x464de0,143,src/game/players_464290.cpp,?ContinueWatchingCallback@@YGXPAUGadget@@@Z,matched,100.0
 0x464e70,263,src/game/players_464290.cpp,?ShowContinueWatchingDialog@@YGXXZ,matched,100.0
 0x464f80,2392,src/game/players_464290.cpp,?UpdatePlayers@@YGXXZ,matched,100.0
-0x4658e0,469,src/game/players_4658e0.cpp,?IsFootprintVisible@@YGHPAUMap_004658e0@@HHHHF@Z,matched,100.0
-0x465ac0,865,src/game/players_465ac0.cpp,?IsUnitVisibleToPlayer@@YGHPAUMap_00465ac0@@PAUUnit@@@Z,matched,100.0
+0x4658e0,469,src/game/players_4658e0.cpp,?IsFootprintVisible@@YGHPAUExploredMap@@HHHHF@Z,matched,100.0
+0x465ac0,865,src/game/players_465ac0.cpp,?IsUnitVisibleToPlayer@@YGHPAUExploredMap@@PAUUnit@@@Z,matched,100.0
 0x465e30,371,src/game/players_464290.cpp,?InitPlayerResources@@YGXXZ,matched,100.0
 0x465fb0,147,src/game/players_464290.cpp,?LoadPlayerControllers@@YGXPAVHapiBank@@@Z,matched,100.0
 0x466580,67,src/game/players_464290.cpp,?UpdateBlink@@YGXXZ,matched,100.0
@@ -1662,7 +1662,7 @@ address,size,file,symbol,status,similarity
 0x47cbd0,83,src/map/terrain.cpp,?ClearFootprintAndUnlink@@YGXPAUUnit@@@Z,matched,100.0
 0x47cc30,1199,src/map/terrain_47cc30.cpp,?AddUnitToMap@@YGXPAUObj_0047cc30@@@Z,matched,100.0
 0x47d0e0,505,src/map/terrain_47d0e0.cpp,?RemoveUnitFromMap@@YGXPAUObj_0047db20@@@Z,matched,100.0
-0x47d2e0,1339,src/map/terrain.cpp,?CanBuildAt@@YGHPAUUnitDef@@UPoint16@@FPAULos_0047d2e0@@@Z,matched,100.0
+0x47d2e0,1339,src/map/terrain.cpp,?CanBuildAt@@YGHPAUUnitDef@@UPoint16@@FPAUExploredMap@@@Z,matched,100.0
 0x47d820,333,src/map/terrain_47d820.cpp,?GetFootprintHeight@@YGHPAUUnit_0047d820@@UPoint16@@@Z,matched,100.0
 0x47d970,322,src/map/terrain.cpp,?IsFootprintClear@@YGHPAUUnit@@H@Z,matched,100.0
 0x47dac0,84,src/map/terrain.cpp,?SetYardOpen@@YGXPAUUnit@@H@Z,matched,100.0
