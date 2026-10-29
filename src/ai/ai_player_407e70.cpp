@@ -37,19 +37,24 @@ struct Vec3_00407d40 {
     void operator+=(const Vec3_00407d40& v) { x += v.x; y += v.y; z += v.z; }
 };
 
-struct Position_00408090 {              // 16.16 fixed point; only high words read
-    short xFrac;
-    short x;                            // +0x2
-    short yFrac;
-    short y;                            // +0x6
-    short zFrac;
-    short z;                            // +0xa
+// The 16.16 position the fog test reads, the same Fixed and FixedVec3
+// graphics/particles_475470.cpp (0x475470) declares; only the whole words are
+// read here.
+struct Fixed {
+    unsigned short frac;
+    short whole;
+};
+
+struct FixedVec3 {
+    Fixed x;
+    Fixed y;
+    Fixed z;
 };
 
 // Own views, not map/byte_map.h's MapSize and ByteMap: that header's version has
 // Index and at as well, and its ids move OnTimer (0x407e90) off its registers
 // (docs/c2-regalloc.md).
-struct MapSize_00408090 {
+struct MapSize {
     unsigned int width;                 // +0x0
     unsigned int height;                // +0x4
 
@@ -59,9 +64,9 @@ struct MapSize_00408090 {
     }
 };
 
-struct ByteMap_00408090 {
+struct ByteMap {
     unsigned char* data;                // +0x0
-    MapSize_00408090 size;              // +0x4
+    MapSize size;                       // +0x4
 
     unsigned char Get(int x, int y) { return data[size.width * y + x]; }
 };
@@ -70,22 +75,22 @@ struct ByteMap_00408090 {
 // ByteMap this fog test needs.
 struct Player {
     char unknown_0[0x7c];
-    ByteMap_00408090 explored;          // +0x7c
+    ByteMap explored;                   // +0x7c
 };
 
-int __stdcall IsPointVisible(Player* player, Position_00408090* pos);
+int __stdcall IsPointVisible(Player* player, FixedVec3* pos);
 
-static inline int IsExplored(Player* player, Position_00408090* pos)
+static inline int IsExplored(Player* player, FixedVec3* pos)
 {
     // Plain int: an unsigned tx shortens the shift to 16 bits.
-    int tx = pos->x >> 5;
-    int ty = (pos->z - (pos->y >> 1)) >> 5;
+    int tx = pos->x.whole >> 5;
+    int ty = (pos->z.whole - (pos->y.whole >> 1)) >> 5;
     if (player->explored.size.Contains(tx, ty) && player->explored.Get(tx, ty))
         return 1;
     return 0;
 }
 
-static inline int IsVisible(Player* player, Position_00408090* pos)
+static inline int IsVisible(Player* player, FixedVec3* pos)
 {
     if ((g_game->mapFlags & 2) == 2)
         return IsExplored(player, pos);
@@ -204,7 +209,7 @@ void SpatialTimer::OnTimer()
         step = Offset(angle, 0x1400000);
     }
     probe += step;
-    if (IsVisible(((Group*)group)->player, (Position_00408090*)&probe)) {
+    if (IsVisible(((Group*)group)->player, (FixedVec3*)&probe)) {
         int r = SumUnitRatingsInRange(player, &probe, 0xa0);
         // Operand order: the bestRating roll is called first.
         if (RandomInt(r) > RandomInt(bestRating)) {
