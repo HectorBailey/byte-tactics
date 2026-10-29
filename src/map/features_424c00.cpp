@@ -16,7 +16,10 @@
 void SetMissionStatus(int, int, int);
 bool __cdecl WriteGdperf(unsigned long, unsigned long, unsigned long);
 
-// Own views of the cell, spot and Animating record: the header's differ.
+// Partial views of features.cpp's cell, spot and record types. The two records
+// take the module's names (features.cpp's AnimRecord and Model); the cell view
+// keeps its own because ta_types.h's Cell has no spot word at +0xa. Both are
+// read packed, so Model stops at the 26 bytes the box holds, not its 28.
 struct Spot_00424c00 {
     char unknown_0[4];
     unsigned short frame;              // +0x4
@@ -39,7 +42,7 @@ struct Vec3_00424c00 {
 };
 
 #pragma pack(push, 1)
-struct Anim_00424c00 {
+struct AnimRecord {
     unsigned short x;
     unsigned short y;
     unsigned short feature;
@@ -55,7 +58,7 @@ struct Anim_00424c00 {
 };
 
 // Plain data: a Vec3 with a declared constructor changes the inlining.
-struct Model3D_00424c00 {
+struct Model {
     unsigned short x;
     unsigned short y;
     unsigned short feature;
@@ -155,10 +158,10 @@ void __stdcall LoadFeatures(HapiBank* file)
     n = file->GetIntegerItem("Number of Animating Features", 0);
     file->OpenNamedBox("Animating Features");
     for (k = 0; k < n; k++) {
-        Anim_00424c00 rec;
-        ((Class_004b4c10*)file)->SeekBox(k * sizeof(Anim_00424c00));
-        int got = file->ReadBox(&rec, sizeof(Anim_00424c00));
-        if (got >= sizeof(Anim_00424c00)) {
+        AnimRecord rec;
+        ((Class_004b4c10*)file)->SeekBox(k * sizeof(AnimRecord));
+        int got = file->ReadBox(&rec, sizeof(AnimRecord));
+        if (got >= sizeof(AnimRecord)) {
             Cell_00424c00* c = GetMapCell(rec.x, rec.y);
             unsigned short type = remap[rec.feature];
             PlaceFeature(c, type, 0, 0, 10);
@@ -184,10 +187,10 @@ void __stdcall LoadFeatures(HapiBank* file)
     n = file->GetIntegerItem("Number of 3D Features", 0);
     file->OpenNamedBox("3D Features");
     for (k = 0; k < n; k++) {
-        Model3D_00424c00 rec;
-        ((Class_004b4c10*)file)->SeekBox(k * sizeof(Model3D_00424c00));
-        int got = file->ReadBox(&rec, sizeof(Model3D_00424c00));
-        if (got >= sizeof(Model3D_00424c00)) {
+        Model rec;
+        ((Class_004b4c10*)file)->SeekBox(k * sizeof(Model));
+        int got = file->ReadBox(&rec, sizeof(Model));
+        if (got >= sizeof(Model)) {
             Cell_00424c00* c = GetMapCell(rec.x, rec.y);
             unsigned short type = remap[rec.feature];
             PlaceFeature(c, type, &rec.pos, &rec.rot, 10);
