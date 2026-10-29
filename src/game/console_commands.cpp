@@ -369,7 +369,10 @@ struct Point_00417f60 {
 
 #include "../graphics/rect.h"
 
-// The command records the three tables hold.
+// The command records the three tables hold. Kept, not util/console_command.h:
+// including it moves CmdDoubleShot (0x417030), CmdMakePoster (0x417600),
+// DrawCellContours (0x4181d0) and DrawMapDebugOverlay (0x418310), and no
+// padding brings all four back (docs/c2-regalloc.md).
 struct ConsoleCommand {
     const char* name;                             // +0x0
     void (__stdcall* run)(CommandArgs* args);     // +0x4

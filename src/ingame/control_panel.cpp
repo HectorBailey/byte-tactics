@@ -29,7 +29,7 @@ public:
     MissionType(const MissionType& other);
 };
 
-// The command records the three tables hold: util/commands.cpp defines the
+// The command records the three tables hold: util/console_command.h defines the
 // type of RegisterCommands' parameter, game/console_commands.cpp the arrays.
 struct ConsoleCommand;
 
