@@ -346,7 +346,7 @@ address,size,file,symbol,status,similarity
 0x419560,138,src/ingame/control_panel.cpp,?InitCommands@@YGXXZ,matched,100.0
 0x4195f0,61,src/ingame/control_panel.cpp,?CopyMenuEntryName@@YGXPADG@Z,matched,100.0
 0x419630,53,src/ingame/control_panel.cpp,?MenuEntryNameContains@@YGHPAUGadget@@PADH@Z,matched,100.0
-0x419670,341,src/ingame/control_panel.cpp,?IssueMobileBuildOrders@@YGXPAUArg_00419670@@@Z,matched,100.0
+0x419670,341,src/ingame/control_panel.cpp,?IssueMobileBuildOrders@@YGXPAUMouseEvent@@@Z,matched,100.0
 0x4197d0,368,src/ingame/control_panel.cpp,?UpdatePlacementGhostValidity@@YGHXZ,matched,100.0
 0x419940,98,src/ingame/control_panel.cpp,?SetBuildCountText@@YGXPAUGui@@GH@Z,matched,100.0
 0x4199b0,260,src/ingame/control_panel.cpp,?RefreshBuildCountTexts@@YGXPAUGui@@PAUUnit@@@Z,matched,100.0

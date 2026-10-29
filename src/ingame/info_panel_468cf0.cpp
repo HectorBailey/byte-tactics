@@ -115,7 +115,10 @@ struct Resources {          // g_game+0x37e3f, 33 bytes
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-struct Feature_00468cf0 {    // 0x100 bytes
+// A feature's 0x100-byte record (Thaldren's FeatureDef); the flags read here
+// are the byte at +0xff, the high half of Thaldren's +0xfe wFlags, which
+// map/feature.h does not name.
+struct FeatureDef {          // 0x100 bytes
   char unknown_0[0x94];
   short footprintX;          // +0x94
   short footprintZ;          // +0x96
@@ -232,7 +235,7 @@ struct Game {
     MapGrid sortUnits;                  // the map/sort grid view of this block
     struct {
       char unknown_141fb[0x1426f - 0x141fb];
-      Feature_00468cf0* features;       // +0x1426f
+      FeatureDef* features;         // +0x1426f
       char unknown_14273[0x14280 - 0x14273];
       char debugMode;         // +0x14280
       char unknown_14281[0x1428b - 0x14281];
@@ -556,7 +559,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
       while (c < w) {
         tile->flags &= 0xfb;
         if (tile->feature < 0xfffb) {
-          Feature_00468cf0 *feat = g_game->features + tile->feature;
+          FeatureDef *feat = g_game->features + tile->feature;
           if (feat->height < 10) {
             if ((feat->flags & 8) && ((tile->flags >> 3 & 0xf) != idx)) {
               if (IsFootprintVisible((int)player, x, y, feat->footprintX, feat->footprintZ, tile->height))
@@ -597,7 +600,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
         x = x0 + c;
 
         if (tile->flags & 4) {
-          Feature_00468cf0 *feat = g_game->features + tile->feature;
+          FeatureDef *feat = g_game->features + tile->feature;
           if ((feat->flags & 8) && ((tile->flags >> 3 & 0xf) != idx)) {
             if (IsFootprintVisible((int)player, x, y, (int)feat->footprintX, feat->footprintZ, tile->height))
               BlitFeatureGaf((int)&ctx, (int)tile, x, y);
