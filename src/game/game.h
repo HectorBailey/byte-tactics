@@ -20,6 +20,7 @@
 #include "../ingame/frame_timers.h"
 #include "../network/settings.h"
 #include "../network/player.h"
+#include "../gui/gui.h"
 
 #pragma pack(push, 1)
 
@@ -35,12 +36,12 @@ struct Cell_004816a0;
 struct Class_00437c80;
 struct Class_0045ae80;
 struct Class_0046a400;
-struct Class_0046d040;
 struct Class_00472200;
 struct Class_0047cb00;
 struct Class_00480160;
 struct Class_0048ff40;
-struct Class_004cdb40;
+class Sound;
+class UnitSync;
 struct Conn_443ff0;
 struct Ctx_00499890;
 struct CursorState_0041cc60;
@@ -307,7 +308,7 @@ struct Game {  // 0x3924d bytes
     char* build_date;  // +0x4
     char* build_time;  // +0x8
     Ctx_00499890* unknown_c;  // +0xc
-    Class_004cdb40* sound;     // +0x10
+    Sound* sound;              // +0x10
     char session[4];  // +0x14
     char unknown_18[1069];
     V4i* guids;  // +0x445
@@ -327,29 +328,8 @@ struct Game {  // 0x3924d bytes
     char unknown_501[16];
     Player* slowest;  // +0x511
     int lag;  // +0x515
-    char unknown_519[100];
-    int team_index;  // +0x57d
-    int selected;  // +0x581
-    char unknown_585[4];
-    int field_589;  // +0x589
-    char unknown_58d[2110];
-    unsigned char textColor;  // +0xdcb
-    unsigned char hudPalette1;  // +0xdcc
-    char unknown_dcd[1];
-    unsigned char hudPalette3;  // +0xdce
-    unsigned char color1;     // +0xdcf
-    char unknown_dd0[3];
-    unsigned char color2;  // +0xdd3
-    unsigned char hudPalette9;  // +0xdd4
-    unsigned char field_dd5;  // +0xdd5
-    char unknown_dd6[1];
-    unsigned char hudPalette12;  // +0xdd7
-    char unknown_dd8[1];
-    unsigned char unknown_dd9;  // +0xdd9
-    unsigned char shadowColor;  // +0xdda
-    char unknown_ddb[1040];
-    void* surface;  // +0x11eb
-    char unknown_11ef[256];
+    Gui gui;  // +0x519, the GUI root (gui.h), 0xcf6 bytes
+    char unknown_120f[0xe0];
     Entry_00463ca0 entries[30];  // +0x12ef
     int lobbySyncTick;  // +0x1b5f
     Player players[10];  // +0x1b63
@@ -363,7 +343,7 @@ struct Game {  // 0x3924d bytes
     char unknown_2a24[4];
     int startPosShuffleReady;  // +0x2a28
     char unknown_2a2c[4];
-    Class_0046d040* sync;        // +0x2a30
+    UnitSync* sync;              // +0x2a30
     int recvPacketSize;  // +0x2a34
     unsigned char* buffer;  // +0x2a38
     unsigned short numPlayers;  // +0x2a3c
@@ -519,7 +499,7 @@ struct Game {  // 0x3924d bytes
     void* xform;  // +0x14383
     void* projected;  // +0x14387
     void* assemPts;     // +0x1438b
-    int count_1438f;  // +0x1438f
+    int unitDefCount;  // +0x1438f, units with a UnitDef
     int unitDefCountBits;  // +0x14393
     int unitDefEnumDirty;  // +0x14397
     UnitDef* unitDefs;  // +0x1439b

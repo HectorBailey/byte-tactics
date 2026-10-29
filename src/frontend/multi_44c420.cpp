@@ -37,6 +37,9 @@ union Flags_0044c420 {                 // the dword at +0x245
     } bits;
 };
 
+// game.h's unitDefs is a UnitDef* (units/unit_def.h, the same 0x249-byte
+// record); this file reads the two fields the restriction list tests, so it
+// casts the pointer to its own view at the use.
 struct Item_0044c420 {                 // 0x249-byte unit type instance
     char unknown_0[0x20];
     char name[0x225];                  // +0x20
@@ -56,16 +59,10 @@ struct Menu_0044c420 {
 };
 
 #include "../network/unit_sync.h"
-
-struct Game {
-    char unknown_0[0x2a30];
-    UnitSync* sync;                    // +0x2a30
-    char unknown_2a34[0x1438f - 0x2a34];
-    int unitDefCount;                  // +0x1438f
-    char unknown_14393[0x1439b - 0x14393];
-    Item_0044c420* unitDefs;           // +0x1439b
-};
+#include "../units/unit_def.h"
 #pragma pack(pop)
+
+#include "../game/game.h"
 
 struct Struct_004c6ac0 {
     char unknown_0[0x2c];
@@ -122,7 +119,7 @@ void __stdcall HandleRestrictionsClick(Menu_0044c420* menu)
             for (i = 0; i < g_game->unitDefCount; i++) {
                 type = g_unitRestrictEntries[i].unitIndex;
                 if (type != 0) {
-                    item = &g_game->unitDefs[type];
+                    item = (Item_0044c420*)&g_game->unitDefs[type];
                     if (item->flags2.bits.flag) {
                     } else {
                         if (g_unitRestrictEntries[i].max == 0)
@@ -160,7 +157,7 @@ void __stdcall HandleRestrictionsClick(Menu_0044c420* menu)
         for (i = 0; i < g_game->unitDefCount; i++) {
             type = g_unitRestrictEntries[i].unitIndex;
             if (type != 0) {
-                if ((g_game->unitDefs[type].flags2.raw & 0x10000) == 0)
+                if ((((Item_0044c420*)g_game->unitDefs)[type].flags2.raw & 0x10000) == 0)
                     g_unitRestrictEntries[i].max = 100;
                 else
                     g_unitRestrictEntries[i].max = 0;
@@ -186,8 +183,8 @@ void __stdcall HandleRestrictionsClick(Menu_0044c420* menu)
         for (i = 1; i < g_game->unitDefCount; i++) {
             // The original also tests the address of items[i].name (an array at
             // +0x20, so its address can never be null); kept for byte fidelity.
-            if (g_game->unitDefs[i].flags2.bits.flag) {
-            } else if (g_game->unitDefs[i].name != 0) {
+            if (((Item_0044c420*)g_game->unitDefs)[i].flags2.bits.flag) {
+            } else if (((Item_0044c420*)g_game->unitDefs)[i].name != 0) {
                 g_game->sync->SetUnitLimit(
                     (Unit_0046e330*)&g_game->unitDefs[i], g_unitRestrictOldCounts[n]);
                 n++;

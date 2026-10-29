@@ -11,17 +11,40 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Mission;
+class Mission;
 
 #pragma pack(push, 1)
 #include "../network/player.h"
 
 #include "../network/player_info.h"
 
-// Unused here: real functions declared to keep the file's symbol count (docs/c2-regalloc.md).
+// Unused here: real functions declared to keep the file's symbol count, which
+// game.h's declarations take away (docs/c2-regalloc.md).
 int RIReport(int, int, int, int, int, int, int, int, int, int);
 int CheckDirectXVersion(int, int, int, int, int);
 int AimCobStub(int, int, int, int);
+void RegisterUnitOrders(void);
+void RegisterGroundOrders(void);
+void EnableAICommands(void);
+void RegisterAICommands(void);
+void FUN_00406f40(void);
+void ResetAIPlayers(void);
+void RegisterVtolOrders(void);
+void StepAllGafSequences(void);
+void ResetNetStats(void);
+void FUN_004161f0(void);
+void InitCommands(void);
+int UpdatePlacementGhostValidity(void);
+void RefreshSelectionOrders(void);
+void DispatchOrdersPanelPageFlags(void);
+void ResetCameraState(void);
+void FindLocalCommander(void);
+void ClampCameraPosition(void);
+void ClampCameraTarget(void);
+void UpdateScreenShake(void);
+void UpdateCameraFollow(void);
+void BeginMouseScroll(void);
+void EndMouseScroll(void);
 
 struct Gadget_0044a680 {                // 0x15b bytes
     char unknown_0[0x1b];
@@ -41,41 +64,17 @@ struct Layer {
     Gadget_0044a680* entries;           // +0x4
 };
 
-#include "../gui/gui.h"
-
-struct UnitSync;
-
-struct Game {
-    char unknown_0[0x519];
-    Gui gui;                            // +0x519
-    char unknown_120f[0x1b63 - 0x120f];
-    Player players[10];                 // +0x1b63
-    char unknown_2851[0x2a30 - 0x2851];
-    UnitSync* sync;                     // +0x2a30
-    char unknown_2a34[0x2a3c - 0x2a34];
-    unsigned short numPlayers;          // +0x2a3c
-    char unknown_2a3e[0x2a42 - 0x2a3e];
-    unsigned char localPlayer;          // +0x2a42
-    char unknown_2a43[0x2bc0 - 0x2a43];
-    unsigned char frontendSubstateRequest;  // +0x2bc0
-    char unknown_2bc1[0x2bee - 0x2bc1];
-    unsigned short dirty : 1;           // +0x2bee
-    unsigned short dirty_rest : 15;
-    char unknown_2bf0[0x38a47 - 0x2bf0];
-    int gameTick;                       // +0x38a47
-    char unknown_38a4b[0x391e9 - 0x38a4b];
-    Mission* mapInfo;                   // +0x391e9
-};
 #pragma pack(pop)
 
-struct Mission { int GetTerrainLength(); int ComputeMapChecksum(); void LoadMissionByName(PlayerInfo* info); char* GetMissionName(); };
-struct UnitSync {
-    int AllPlayersSynced();
-    void ProcessSync();
-    // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
-    char* GetSyncStatusText();
-    void CheckUnitAvailable(unsigned int, int);
-    void SendSyncMessage(unsigned char, int, int, int);
+#include "../game/game.h"
+#include "../network/unit_sync.h"
+
+class Mission {
+public:
+    int GetTerrainLength();
+    int ComputeMapChecksum();
+    void LoadMissionByName(PlayerInfo* info);
+    char* GetMissionName();
 };
 
 extern Game* g_game;
@@ -233,9 +232,9 @@ void UpdateBattleRoom()
     g_game->gameTick++;
 
     if (HandleNetPackets())
-        g_game->dirty = 1;
+        g_game->flags |= 1;
     else if (!CheckMapCrc())
-        g_game->dirty = 1;
+        g_game->flags |= 1;
 
     pl = &g_game->players[g_game->localPlayer];
     if (pl->rejectReason != 0) {
@@ -250,7 +249,7 @@ void UpdateBattleRoom()
         entries[idx].colour = 0x18;
     }
 
-    if (g_game->dirty) {
+    if (g_game->flags & 1) {
         if (g_battleRoomSlotsBuilt == 0) {
             BuildPlayerSlotGadgets();
         } else {
@@ -284,7 +283,7 @@ void UpdateBattleRoom()
                 }
             }
         }
-        g_game->dirty = 0;
+        g_game->flags &= ~1;
         if (IsScreenNamed(&g_game->gui, "LOUNGE2.GUI") != 0) {
             if (pl->info->flags_97 & 1) {
                 int synched = g_game->sync->AllPlayersSynced();
@@ -297,16 +296,16 @@ void UpdateBattleRoom()
                     if (start->frame < 8) {
                         start->frame++;
                         MarkChanged(&g_game->gui);
-                        g_game->dirty = 1;
+                        g_game->flags |= 1;
                     }
                     g_startCountdownNextTick += 4;
                     if (start->frame == 4)
                         PlaySoundByName("Panel", 0);
                 }
                 if (start->frame != 0 && start->frame < *start->frames - 1)
-                    g_game->dirty = 1;
+                    g_game->flags |= 1;
                 if (ready != 0) {
-                    g_game->dirty = 1;
+                    g_game->flags |= 1;
                     if (start->frame == 0) {
                         start->frame = 1;
                         g_startCountdownNextTick = GetTicks();
