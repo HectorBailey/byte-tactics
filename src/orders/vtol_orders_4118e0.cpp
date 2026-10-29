@@ -9,7 +9,6 @@
 #include <windows.h>
 #include <math.h>
 
-struct Point { short x, y; };
 #include "../util/vec3.h"
 
 struct Unit;
@@ -38,20 +37,7 @@ struct CalcedExplosion;
 struct WeaponDef {
     char pad0[0xdc]; int range;
 };
-struct Unit {
-    UnitMotion* motion;
-    char pad4[0x10 - 4]; WeaponDef* weapon;   // +0x10, weapons[0].def
-    char pad14[0x6a - 0x14]; Vec3 pos;
-    char pad76[8]; Point footprint;
-    int spatialBucket; int carrier;
-    Unit* cargo;
-    char pad8e[4]; UnitDef* def;
-    char pad96[4]; CobScript* script;
-    char pad9e[0x104 - 0x9e]; float buildLeft;
-    short health;
-    void ClaimWeapons(int);
-    void SetStateBits(int, int);
-};
+#include "../units/unit.h"
 // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 unsigned short __stdcall ChooseBuildOption(unsigned int, Unit*);
 void __stdcall ClearWeaponTarget(Unit*, int);
@@ -169,7 +155,7 @@ int __stdcall FindLandingPad(Unit* unit, int pad)
 // FUNCTION: 0x4118e0
 int __stdcall VtolLandingOrder(Unit* unit, Order* order, int flags)
 {
-    int radius = unit->weapon->range;
+    int radius = unit->weapons[0].weapon->range;
     Unit* host = order->target.owner;
     if (!host) {
         QueueUnitSpeech(unit, 7, "Landing aborted");
