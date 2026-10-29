@@ -12,7 +12,11 @@
 // visibility bit mask.
 #include "../map/byte_map.h"
 #pragma pack(push, 1)
-struct Map_00465ac0 {
+// A player slot read for the explored grid at +0x7c (network/player.h's
+// explored, exploredWidth and exploredHeight). The same record in every file
+// that tests visibility against it; the unit's player pointer is cast to it,
+// since Player itself is not a view of just that grid.
+struct ExploredMap {
     char unknown_0[0x7c];
     ByteMap explored;                    // +0x7c
 };
@@ -41,10 +45,10 @@ struct Position_00465ac0 {              // 16.16 fixed point; only high words re
 
 extern Game* g_game;
 
-int __stdcall IsPointVisible(Map_00465ac0* map, Position_00465ac0* pos);
+int __stdcall IsPointVisible(ExploredMap* map, Position_00465ac0* pos);
 
 // the player's explored byte map, inlined where the game map flags ask for it
-static inline int IsExplored(Map_00465ac0* map, Position_00465ac0* pos)
+static inline int IsExplored(ExploredMap* map, Position_00465ac0* pos)
 {
     int tx = pos->x >> 5;
     int ty = (pos->z - (pos->y >> 1)) >> 5;
@@ -54,7 +58,7 @@ static inline int IsExplored(Map_00465ac0* map, Position_00465ac0* pos)
     }
     return 0;
 }
-static inline int IsSeen(Map_00465ac0* map, Position_00465ac0* pos)
+static inline int IsSeen(ExploredMap* map, Position_00465ac0* pos)
 {
     int tx = pos->x >> 5;
     int ty = (pos->z - (pos->y >> 1)) >> 5;
@@ -66,7 +70,7 @@ static inline int IsSeen(Map_00465ac0* map, Position_00465ac0* pos)
 
 // Plain index here, Get method in IsExplored: one helper for tests 1 to 3
 // does not match.
-static inline int IsExplored2(Map_00465ac0* map, Position_00465ac0* pos)
+static inline int IsExplored2(ExploredMap* map, Position_00465ac0* pos)
 {
     int tx = pos->x >> 5;
     int ty = (pos->z - (pos->y >> 1)) >> 5;
@@ -77,16 +81,16 @@ static inline int IsExplored2(Map_00465ac0* map, Position_00465ac0* pos)
     return 0;
 }
 // IsVisible and IsVisible2 stay single ternaries, not an if with two returns.
-static inline int IsVisible(Map_00465ac0* map, Position_00465ac0* pos)
+static inline int IsVisible(ExploredMap* map, Position_00465ac0* pos)
 {
     return (g_game->mapFlags & 2) == 2 ? IsExplored(map, pos) : IsPointVisible(map, pos);
 }
-static inline int IsVisible2(Map_00465ac0* map, Position_00465ac0* pos)
+static inline int IsVisible2(ExploredMap* map, Position_00465ac0* pos)
 {
     return (g_game->mapFlags & 2) == 2 ? IsExplored2(map, pos) : IsPointVisible(map, pos);
 }
 // Branchy shape stays: lets nothing range-track the value.
-static inline int IsExplored3(Map_00465ac0* map, Position_00465ac0* pos)
+static inline int IsExplored3(ExploredMap* map, Position_00465ac0* pos)
 {
     int tx = pos->x >> 5;
     int ty = (pos->z - (pos->y >> 1)) >> 5;
@@ -100,16 +104,16 @@ static inline int IsExplored3(Map_00465ac0* map, Position_00465ac0* pos)
 
 
 // Stays an if: gives the normalisation on all four exits.
-static inline int IsVisible3(Map_00465ac0* map, Position_00465ac0* pos)
+static inline int IsVisible3(ExploredMap* map, Position_00465ac0* pos)
 {
     if ((g_game->mapFlags & 2) == 2)
         return IsExplored3(map, pos);
     return IsSeen(map, pos);
 }
 // FUNCTION: 0x465ac0
-int __stdcall IsUnitVisibleToPlayer(Map_00465ac0* map, Unit* u)
+int __stdcall IsUnitVisibleToPlayer(ExploredMap* map, Unit* u)
 {
-    if ((Map_00465ac0*)u->player == map)
+    if ((ExploredMap*)u->player == map)
         return 1;
     if (u->cloaked)
         return 0;
