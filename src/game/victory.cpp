@@ -69,27 +69,7 @@ struct Param_0048e010 {
 
 struct Player;
 
-struct Unit {
-    int motion;                       // +0x0
-    char unknown_4[0x76 - 0x4];
-    short cell;                    // +0x76
-    short cellZ;                      // +0x78, the high word of dwMapCellXZ
-    char unknown_7a[0x86 - 0x7a];
-    Unit* carrier;                     // +0x86
-    char unknown_8a[0x92 - 0x8a];
-    UnitDef* def;                      // +0x92
-    Player* player;                    // +0x96
-    char unknown_9a[0xa6 - 0x9a];
-    short unitDefIndex;                    // +0xa6
-    char unknown_a8[0xfb - 0xa8];
-    int postTransferHoldoff;                      // +0xfb
-    unsigned char playerIndex;         // +0xff
-    char unknown_100[0x104 - 0x100];
-    float buildLeft;                   // +0x104
-    char unknown_108[0x110 - 0x108];
-    unsigned int flags;                // +0x110
-    char unknown_114[0x118 - 0x114];
-};
+#include "../units/unit.h"
 
 struct UnitList {
     Unit* first;                       // +0x0
@@ -195,7 +175,7 @@ class VictoryBuildUnitType : public MissionCondition, public Listener_0048ff40 {
 public:
     virtual int VisitUnit(Unit* unit);
     char name[0x20];                     // +0x10
-    short id;                            // +0x30
+    unsigned short id;                   // +0x30
 
     VictoryBuildUnitType(const char* text)
     {
@@ -226,7 +206,7 @@ class VictoryKillAllOfType : public MissionCondition, public Listener_0048ff40 {
 public:
     virtual int VisitUnit(Unit* unit);
     char name[0x20];                     // +0x10
-    short id;                            // +0x30
+    unsigned short id;                   // +0x30
     int count;                           // +0x32
 
     VictoryKillAllOfType(const char* text) { strcpy(name, text); }
@@ -357,7 +337,7 @@ class DefeatAllUnitsKilledOfType : public MissionCondition, public Listener_0048
 public:
     virtual int VisitUnit(Unit* unit);
     char name[0x20];                     // +0x10
-    short id;                            // +0x30
+    unsigned short id;                   // +0x30
     int count;                           // +0x32
 
     DefeatAllUnitsKilledOfType(const char* text) { strcpy(name, text); }
@@ -947,7 +927,7 @@ void VictoryMoveUnitToRadius::LoadState(HapiBank* obj)
 int VictoryUnitTypePassesX::VisitUnit(Unit* unit)
 {
     if (name[0] == 0 || _strcmpi(name, unit->def->unitname) == 0) {
-        if (abs(unit->cell - x) <= 2) {
+        if (abs(unit->cell.x - x) <= 2) {
             satisfied = 1;
             if (celebrated == 0) {
                 PlaySoundByName("Victory Condition", 0);
@@ -996,7 +976,7 @@ void VictoryUnitTypePassesX::LoadState(HapiBank* obj)
 int VictoryUnitTypePassesZ::VisitUnit(Unit* unit)
 {
     if (name[0] == 0 || _strcmpi(name, unit->def->unitname) == 0) {
-        if (abs(unit->cellZ - z) <= 2) {
+        if (abs(unit->cell.y - z) <= 2) {
             satisfied = 1;
             if (celebrated == 0) {
                 PlaySoundByName("Victory Condition", 0);
@@ -1235,7 +1215,7 @@ void DefeatAllUnitsKilledOfType::LoadState(HapiBank* obj)
 // FUNCTION: 0x48fb30
 int DefeatAnyUnitPassesX::VisitUnit(Unit* unit)
 {
-    int diff = abs((int)unit->cell - x);
+    int diff = abs((int)unit->cell.x - x);
 
     if (diff <= 2) {
         satisfied = 1;
@@ -1282,7 +1262,7 @@ void DefeatAnyUnitPassesX::LoadState(HapiBank* obj)
 // FUNCTION: 0x48fc40
 int DefeatAnyUnitPassesZ::VisitUnit(Unit* unit)
 {
-    int diff = abs((int)unit->cellZ - z);
+    int diff = abs((int)unit->cell.y - z);
 
     if (diff <= 2) {
         satisfied = 1;
