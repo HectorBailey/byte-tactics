@@ -20,15 +20,9 @@ struct UnitSyncPacket { // 0xe bytes
     int value;           // +0xa
 };
 
-struct Game {
-    char unknown_0[0x1b63];
-    Player players[10]; // +0x1b63
-    char unknown_2851[0x1438f - 0x2851];
-    int unitDefCount; // +0x1438f
-    char unknown_14393[0x1439b - 0x14393];
-    UnitDef* unitDefs; // +0x1439b
-};
 #pragma pack(pop)
+
+#include "../game/game.h"
 
 // Inline-budget filler, see the header.
 inline int Pass(int v) { return v; }
