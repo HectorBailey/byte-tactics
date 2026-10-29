@@ -351,7 +351,8 @@ struct Game {  // 0x3924d bytes
     unsigned short head;  // +0x2a40
     unsigned char localPlayer;  // +0x2a42
     unsigned char playerIndex;  // +0x2a43
-    unsigned short flags_2a44;  // +0x2a44
+    unsigned char netGameFlags;  // +0x2a44, the low byte; the word is net_game.cpp's netGameFlagsWord
+    unsigned char unknown_2a45[1];
     unsigned char field_2a46;  // +0x2a46
     char unknown_2a47[4];
     void* data[15];  // +0x2a4b
@@ -708,7 +709,7 @@ struct Game {  // 0x3924d bytes
     int unitBuilderHoverTrack;  // +0x391b9
     unsigned short unitBuilderHoverUnitId;  // +0x391bd
     int showRanges;   // +0x391bf
-    char unknown_391c3[4];
+    int showBps;      // +0x391c3
     int buildListCount;  // +0x391c7
     BuildList_0041ace0* buildLists;  // +0x391cb
     char field_391cf[24];  // +0x391cf
