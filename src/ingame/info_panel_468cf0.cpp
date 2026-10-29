@@ -15,6 +15,7 @@
 #include <memory.h>
 
 #include "../map/cell.h"
+#include "../map/feature.h"
 typedef unsigned char byte;
 typedef unsigned short ushort;
 typedef unsigned int uint;
@@ -111,21 +112,6 @@ struct Resources {          // g_game+0x37e3f, 33 bytes
   float energyUse;          // +0x15
   float maxMetal;           // +0x19
   float maxEnergy;          // +0x1d
-};
-#pragma pack(pop)
-
-#pragma pack(push, 1)
-// A feature's 0x100-byte record (Thaldren's FeatureDef); the flags read here
-// are the byte at +0xff, the high half of Thaldren's +0xfe wFlags, which
-// map/feature.h does not name.
-struct FeatureDef {          // 0x100 bytes
-  char unknown_0[0x94];
-  short footprintX;          // +0x94
-  short footprintZ;          // +0x96
-  char unknown_98[0xfa - 0x98];
-  byte height;               // +0xfa
-  char unknown_fb[4];
-  byte flags;                // +0xff
 };
 #pragma pack(pop)
 
@@ -235,7 +221,7 @@ struct Game {
     MapGrid sortUnits;                  // the map/sort grid view of this block
     struct {
       char unknown_141fb[0x1426f - 0x141fb];
-      FeatureDef* features;         // +0x1426f
+      Feature* features;            // +0x1426f
       char unknown_14273[0x14280 - 0x14273];
       char debugMode;         // +0x14280
       char unknown_14281[0x1428b - 0x14281];
@@ -559,9 +545,9 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
       while (c < w) {
         tile->flags &= 0xfb;
         if (tile->feature < 0xfffb) {
-          FeatureDef *feat = g_game->features + tile->feature;
+          Feature *feat = g_game->features + tile->feature;
           if (feat->height < 10) {
-            if ((feat->flags & 8) && ((tile->flags >> 3 & 0xf) != idx)) {
+            if ((feat->flagsHigh & 8) && ((tile->flags >> 3 & 0xf) != idx)) {
               if (IsFootprintVisible((int)player, x, y, feat->footprintX, feat->footprintZ, tile->height))
                 BlitFeatureGaf((int)&ctx, (int)tile, x, y);
             }
@@ -600,8 +586,8 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
         x = x0 + c;
 
         if (tile->flags & 4) {
-          FeatureDef *feat = g_game->features + tile->feature;
-          if ((feat->flags & 8) && ((tile->flags >> 3 & 0xf) != idx)) {
+          Feature *feat = g_game->features + tile->feature;
+          if ((feat->flagsHigh & 8) && ((tile->flags >> 3 & 0xf) != idx)) {
             if (IsFootprintVisible((int)player, x, y, (int)feat->footprintX, feat->footprintZ, tile->height))
               BlitFeatureGaf((int)&ctx, (int)tile, x, y);
           }
