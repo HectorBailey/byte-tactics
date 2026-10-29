@@ -29,7 +29,9 @@ public:
     MissionType(const MissionType& other);
 };
 
-struct Option_00419560;
+// The command records the three tables hold: util/commands.cpp defines the
+// type of RegisterCommands' parameter, game/console_commands.cpp the arrays.
+struct ConsoleCommand;
 
 // One row of g_messageBytesByType (an int[2] per message type) with names
 // instead of subscripts: 0x419560 clears the second word of each row through a
@@ -396,9 +398,9 @@ extern int g_packetsReceived;
 extern int g_packetBytesReceived;
 extern int g_messageCountByType[45][2];
 extern int g_messageBytesByType[45][2];
-extern Option_00419560 g_consoleCommands;
-extern Option_00419560 g_cheatCommands;
-extern Option_00419560 g_debugCommands;
+extern ConsoleCommand g_consoleCommands;
+extern ConsoleCommand g_cheatCommands;
+extern ConsoleCommand g_debugCommands;
 
 // The second part's own views and externs.
 
@@ -413,7 +415,7 @@ void ShowSoftwareCursor();
 void __stdcall GetCurrentMouseEvent(MouseEvent* mouse);
 DisplayContext* GetDisplay();
 
-void __stdcall RegisterCommands(Option_00419560* option);
+void __stdcall RegisterCommands(ConsoleCommand* option);
 void __stdcall SetDefaultCommandHandler(void (__stdcall* callback)(int), int mask);
 void __stdcall DefaultCommandHandler(int args);
 
