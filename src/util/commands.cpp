@@ -67,13 +67,7 @@ struct CommandNameNe {
     }
 };
 
-typedef void (__stdcall *Handler_004b7620)(void*);
-
-struct ConsoleCommand {
-    const char* name;                  // +0x0
-    Handler_004b7620 fn;               // +0x4
-    int mask;                          // +0x8
-};
+#include "console_command.h"
 
 // No explicit destructor: the implicit one destroys handle through
 // StringRef's destructor (an explicit handle.ReleaseRef() would release it
@@ -231,8 +225,11 @@ void ClearDefaultCommandHandler()
 // inserts a new 12-byte element, then stores the handler pointer and its mask
 // into the element. Called by 0x406f00 with "plan", "weight" and "limit". This
 // is the out-of-line form of the inner body of 0x4b7760.
+// The handler is spelled with void*, not the table's CommandArgs*: ai_player.cpp
+// declares this function with that spelling, and the parameter type is part of
+// the name the two are matched by (#7244).
 // FUNCTION: 0x4b7620
-void __stdcall RegisterCommand(const char* name, Handler_004b7620 fn, int mask)
+void __stdcall RegisterCommand(const char* name, void (__stdcall* fn)(void*), int mask)
 {
     // Built before key: the tail copies the pair from this local.
     Pair_004b7620 p((int)fn, mask);
@@ -267,7 +264,7 @@ void __stdcall RegisterCommands(ConsoleCommand* rec)
     // for, not while: puts the record increment after the key destructor.
     for (; rec->name; rec++) {
         int mask = rec->mask;
-        Handler_004b7620 fn = rec->fn;
+        void (__stdcall* fn)(CommandArgs*) = rec->run;
         StringRef key(rec->name);
         CommandEntry* first = s_commandTable.begin();
         CommandEntry* last = s_commandTable.end();
