@@ -17,6 +17,7 @@
 #pragma pack(push, 1)
 
 #include "../util/vec3.h"
+#include "../graphics/display_context.h"
 
 // The copy constructor is only declared: it is never called (the temporary is
 // elided), but declaring it makes MSVC build the by-value argument in place in
@@ -38,15 +39,9 @@ struct Pair_00419560 {
     int b;
 };
 
-struct Arg_00419670 {
-    char unknown_0[8];
-    unsigned int keyFlags;             // +0x8
-};
-
 struct Unit;
 struct Player;
 struct PlayerInfo;
-struct Nano_0041b8d0;
 struct Gadget;
 struct Layer;
 struct Gui;
@@ -54,7 +49,9 @@ struct DownloadMenuFile;
 
 #include "../game/unit_resources.h"
 
-struct Nano_0041b8d0 {
+// The unit's model instance state, the pointer at Unit+0x9e (unit.h's
+// ObjectState; Thaldren's UnitObjectState, whose pDrawFrame is at +0x10).
+struct ObjectState {
     char unknown_0[0x10];
     int drawFrame;                     // +0x10
 };
@@ -176,7 +173,7 @@ struct Unit {
     UnitType* def;                     // +0x92
     Player* player;                    // +0x96
     char unknown_9a[0x9e - 0x9a];
-    Nano_0041b8d0* state;           // +0x9e
+    ObjectState* state;                // +0x9e
     char unknown_a2[0xa6 - 0xa2];
     unsigned short unitDefIndex;           // +0xa6
     unsigned short id;           // +0xa8
@@ -403,15 +400,7 @@ extern Option_00419560 g_consoleCommands;
 extern Option_00419560 g_cheatCommands;
 extern Option_00419560 g_debugCommands;
 
-// The second part's own views and externs: the display its functions read.
-#pragma pack(push, 1)
-struct Display_0041ce90 {
-    char unknown_0[0x40];
-    HWND hwnd;                         // +0x40
-    char unknown_44[0xf0 - 0x44];
-    unsigned char flags_f0;            // +0xf0
-};
-#pragma pack(pop)
+// The second part's own views and externs.
 
 Unit* __stdcall FindNextSelectedUnit(Unit*, int);
 unsigned int* __stdcall GetCategoryMask(char* name);
@@ -422,7 +411,7 @@ void __stdcall SetCursorPosition(int x, int y);
 void HideSoftwareCursor();
 void ShowSoftwareCursor();
 void __stdcall GetCurrentMouseEvent(MouseEvent* mouse);
-Display_0041ce90* GetDisplay();
+DisplayContext* GetDisplay();
 
 void __stdcall RegisterCommands(Option_00419560* option);
 void __stdcall SetDefaultCommandHandler(void (__stdcall* callback)(int), int mask);
@@ -533,7 +522,7 @@ int __stdcall MenuEntryNameContains(Gadget* entries, char* text, int index)
 // order for each of the local player's units with flag 0x10 whose def has
 // flag 0x40. Bit 2 of the argument's keyFlags is passed through.
 // FUNCTION: 0x419670
-void __stdcall IssueMobileBuildOrders(Arg_00419670* arg)
+void __stdcall IssueMobileBuildOrders(MouseEvent* arg)
 {
     unsigned int remove = (arg->keyFlags >> 2) & 1;
     unsigned short index = g_game->buildTypeIndex;
@@ -1941,8 +1930,8 @@ void UpdateEdgeScroll()
     if (speed == 0)
         return;
     GetCurrentMouseEvent(&mouse);
-    Display_0041ce90* d = GetDisplay();
-    if (!(d->flags_f0 & 2)) {
+    DisplayContext* d = GetDisplay();
+    if (!(d->flags & 2)) {
         GetCursorPos(&pt);
         int w = g_game->screenWidth;
         int h = g_game->screenHeight;

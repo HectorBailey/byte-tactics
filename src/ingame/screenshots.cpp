@@ -1,19 +1,17 @@
 // Decompiled by GPT-5.6-Terra, finished by Space Bunny Free. Names are provisional.
-// g_game+0xc is a pointer, the final test reads a byte at +0xf1 through it.
+// g_game+0xc is the display context; the final test is bit 11 of its flags
+// word (the high-byte bit 3 that App_PostWmDestroyOptionalMsg sets while a
+// message box is up).
 #include <stdio.h>
 
 #include "../gui/mouse_event.h"
+#include "../graphics/display_context.h"
 #include "../map/mission.h"
-
-struct Ctx_00499890 {
-    char unknown_0[0xf1];
-    unsigned char flags;
-};
 
 #pragma pack(push, 1)
 struct Game {
     char unknown_0[0xc];
-    Ctx_00499890* displayContext;
+    DisplayContext* displayContext;
     char unknown_10[0x519 - 0x10];
     char menu[0x10];
     char unknown_529[0x2c76 - 0x529];
@@ -95,6 +93,6 @@ void MainFrameTick()
     else
         g_game->selected = second;
     UpdateTimers();
-    if (!(g_game->displayContext->flags & 8))
+    if (!(g_game->displayContext->flags & 0x800))
         g_game->callback();
 }

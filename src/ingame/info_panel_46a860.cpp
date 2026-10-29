@@ -89,9 +89,10 @@ struct Unit_0046a860 {
 };
 
 // A feature's 0x100-byte record, the elements of the table at g_game+0x1426f
-// (Thaldren: FeatureDef).
-// Kept: its flags byte is +0xff; map/feature.h has flags at +0xfe.
-struct Feature_0046a860 {
+// (Thaldren's FeatureDef). Kept rather than map/feature.h's Feature: the flags
+// this file tests are the byte at +0xff, the high half of Thaldren's +0xfe
+// wFlags, while the header names the low byte at +0xfe flags.
+struct FeatureDef {
     char name[0x80];                  // +0x000
     char description[0x14];           // +0x080
     char unknown_94[0xec - 0x94];
@@ -104,14 +105,7 @@ struct Feature_0046a860 {
 #include "../graphics/gaf_frame.h"
 
 #include "../gui/layer.h"
-
-// The display context at g_game+0xc; only two fields are read here.
-struct Display_0046a860 {
-    char unknown_0[0x9c];
-    int haveBackBuffer;               // +0x09c
-    char unknown_a0[0xf0 - 0xa0];
-    unsigned char flags;              // +0x0f0, low byte of the state flags word
-};
+#include "../graphics/display_context.h"
 
 #pragma pack(pop)
 
@@ -184,7 +178,7 @@ struct SideDef {
 
 struct Game {
     char unknown_0[0xc];
-    Display_0046a860* displayContext;    // +0xc
+    DisplayContext* displayContext;       // +0xc
     char unknown_10[0x531 - 0x10];
     Layer* layer;                         // +0x531
     char unknown_535[0x581 - 0x535];
@@ -204,7 +198,7 @@ struct Game {
     char unknown_2cbe[0x14233 - 0x2cbe];
     int mapWidthTiles;                    // +0x14233
     char unknown_14237[0x1426f - 0x14237];
-    Feature_0046a860* features;           // +0x1426f
+    FeatureDef* features;             // +0x1426f
     char unknown_14273[0x14287 - 0x14273];
     Cell* heightMap;                      // +0x14287
     char unknown_1428b[0x1431f - 0x1428b];
@@ -502,7 +496,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
             }
         }
     } else if (snapshot.feature != 0xffff) {
-        Feature_0046a860* feature = g_game->features + snapshot.feature;
+        FeatureDef* feature = g_game->features + snapshot.feature;
         if ((feature->flags & 4) == 0 || (g_game->flagsByte_3923b & 2) != 0) {
             char mText[16];
             if (feature->metal != 0.0f)
