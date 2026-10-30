@@ -58,6 +58,8 @@ void ResolveFeatureLinks(void);
 void PlaceMissionFeatures(void);
 int AllocFeatureSpot(void);
 void UpdateFeatures(void);
+void ShowFrontendErrorText(void);
+void BlankScreen(void);
 void RemoveAllFeatures(void);
 
 struct Gun_0049c9c0 {
@@ -2414,26 +2416,11 @@ struct Aim_0049dd60 {
     unsigned char weapon;
 };
 
-struct Projectile_0049dd60 {
-    char unknown_0[0x1c];
-    int velX;
-    int velY;
-    int velZ;
-    char unknown_28[0x36 - 0x28];
-    short heading;
-    char unknown_38[0x3a - 0x38];
-    int speed;
-    char unknown_3e[0x4e - 0x3e];
-    int targetUnit;
-    char unknown_52[0x69 - 0x52];
-    unsigned short flags;
-};
-
 // Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
 void Unused_0049dd60(int a, int b, int c, int d, int e, int f);
 #pragma pack(pop)
 
-void __stdcall InitProjectile(Projectile_0049dd60*, WeaponDef*, Vec3*, int, int, Unit*);
+void __stdcall InitProjectile(Projectile*, WeaponDef*, Vec3*, int, int, Unit*);
 
 // FUNCTION: 0x49dd60
 int __stdcall FireDroppedWeapon(Unit* unit, Aim_0049dd60* aim,
@@ -2441,9 +2428,9 @@ int __stdcall FireDroppedWeapon(Unit* unit, Aim_0049dd60* aim,
 {
     Vec3 p;
     GetWeaponPiecePosition(unit, &p, aim->weapon >> 2 & 3, -1);
-    Projectile_0049dd60* projectile = 0;
+    Projectile* projectile = 0;
     if (g_game->projectile_count < 300) {
-        projectile = &((Projectile_0049dd60*)g_game->projectiles)[g_game->projectile_count++];
+        projectile = &((Projectile*)g_game->projectiles)[g_game->projectile_count++];
         projectile->flags &= ~2;
         projectile->targetUnit = 0;
     }
