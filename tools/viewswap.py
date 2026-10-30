@@ -17,8 +17,12 @@ For each pair the tool:
    does). Every member the view names must sit at the header member's offset
    with the same width, and a bitfield must match by position and width.
 2. Applies the swap in a scratch copy, never in `src/`: the view's definition
-   goes, its name becomes the header's, the member map is applied to every
-   use of a view-typed name, and the header is included. The copy sits at a
+   goes, its name becomes the header's, the member map is applied to the uses
+   of a view-typed name inside the function that declares it (a name declared
+   before the first `// FUNCTION:` line is a file-scope one and applies
+   everywhere), and the header is included. Scoping the map per function
+   matters in a file with several views: they routinely name their parameter
+   the same, and the map must not reach the other views' functions. The copy sits at a
    path of the original's length (tools/idpad.py's trick), so the compiler's
    symbol counter sees the same path and the comparison is fair.
 3. Compiles it and compares every `// FUNCTION:` address of the file, not
@@ -55,6 +59,8 @@ import idpad
 from trycasts import code_mask
 
 FLAGS = DEFAULT_FLAGS + " /Z7"
+FUNCTION_LINE = re.compile(r"^// FUNCTION: 0x", re.M)
+
 SCRATCH = ROOT / "build" / "scratch" / "viewswap"
 COMPOSITES = (LF_CLASS, LF_STRUCTURE, LF_UNION)
 DEFINITION = re.compile(r"^\s*(?:typedef\s+)?(?:struct|class|union)\s+(\w+)\s*(?::[^{;]*)?\{", re.M)
@@ -203,7 +209,8 @@ def refuse(view: dict, header: dict, mapping: dict[str, str], table: TypeTable) 
         target = mapping.get(field["name"], field["name"])
         hit = member(header, target, table)
         if hit is None:
-            return f"{view['name']}.{field['name']} has no {header['name']}.{target}"
+            return (f"{view['name']}.{field['name']} at +{field['off']:#x} has no "
+                    f"{header['name']}.{target}")
         if hit["off"] != field["off"]:
             return (f"{view['name']}.{field['name']} is at +{field['off']:#x}, "
                     f"{header['name']}.{target} at +{hit['off']:#x}")
@@ -254,14 +261,45 @@ def view_names(text: str, view: str) -> set[str]:
     return {n for n in names if n not in ("struct", "class", "union")}
 
 
-def apply_pair(text: str, view: str, header: str, mapping: dict[str, str]) -> tuple[str, int, int]:
-    """Swap one view for the header in a file's text: (text, uses renamed, definition cut)."""
-    names = view_names(text, view)
+def apply_map(segment: str, names: set[str], mapping: dict[str, str]) -> tuple[str, int]:
+    """Rename the mapped members on the uses of these names: (segment, uses renamed)."""
+    if not names or not mapping:
+        return segment, 0
+    pattern_names = "|".join(map(re.escape, sorted(names)))
     renamed = 0
     for old, new in mapping.items():
-        pattern = re.compile(rf"\b({'|'.join(map(re.escape, names)) or '\\0'})\s*(->|\.)\s*{re.escape(old)}\b")
-        text, n = pattern.subn(lambda m: f"{m.group(1)}{m.group(2)}{new}", text)
+        pattern = re.compile(rf"\b({pattern_names})\s*(->|\.)\s*{re.escape(old)}\b")
+        segment, n = pattern.subn(lambda m: f"{m.group(1)}{m.group(2)}{new}", segment)
         renamed += n
+    return segment, renamed
+
+
+def apply_pair(text: str, view: str, header: str, mapping: dict[str, str]) -> tuple[str, int, int]:
+    """Swap one view for the header in a file's text: (text, uses renamed, definition cut).
+
+    The member map is applied one function at a time, to the names that
+    function declares as the view plus the file-scope ones. Two views in one
+    file often name their parameter the same (`obj`), and a map applied to the
+    whole file would rewrite the other view's function into members it does
+    not have.
+    """
+    starts = [m.start() for m in FUNCTION_LINE.finditer(text)]
+    pieces: list[tuple[str, set[str]]] = []
+    if not starts:
+        pieces.append((text, view_names(text, view)))
+    else:
+        head = text[:starts[0]]
+        file_scope = view_names(head, view)
+        pieces.append((head, file_scope))
+        for start, end in zip(starts, starts[1:] + [len(text)]):
+            pieces.append((text[start:end], view_names(text[start:end], view) | file_scope))
+    renamed = 0
+    out = []
+    for piece, names in pieces:
+        piece, n = apply_map(piece, names, mapping)
+        out.append(piece)
+        renamed += n
+    text = "".join(out)
     text, cut = remove_definition(text, view)
     text = re.sub(rf"\b{re.escape(view)}\b", header, text)
     return text, renamed, 1 if cut else 0
