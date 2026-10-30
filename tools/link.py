@@ -111,7 +111,7 @@ def compile_all(jobs: int) -> tuple[list[Path], list[tuple[Path, str]]]:
     """Every source file's object, through tools/progress.py's cache. The gap
     regions' sources (tools/sources.py's `gap` files) are left out: tools/gapcheck.py's gap_objects
     gives the builds those whose source matches."""
-    from progress import compile_cached
+    from progress import compile_cached, object_is_whole
 
     # In link order: data, library code, then game code (tools/sources.py).
     sources = files_of_kind("data", "library", "game")
@@ -120,7 +120,11 @@ def compile_all(jobs: int) -> tuple[list[Path], list[tuple[Path, str]]]:
     def cached(src: Path) -> bool:
         key = hashlib.sha256(src.read_bytes() + ihash.encode() + (DEFAULT_FLAGS + COMPILE_SCHEME).encode()).hexdigest()[:16]
         stamp = ROOT / "build/progress" / src.relative_to(SRC).with_suffix(".key")
-        return stamp.exists() and stamp.read_text() == key and stamp.with_suffix(".obj").exists()
+        obj = stamp.with_suffix(".obj")
+        # The key only says the source has not changed: the object beside it can
+        # still be one a cut-short compile left behind, and compile_cached builds
+        # that file again, so count it as stale here too (#5777).
+        return stamp.exists() and stamp.read_text() == key and obj.exists() and not object_is_whole(src, obj)
 
     stale = [s for s in sources if not cached(s)]
     if stale:
