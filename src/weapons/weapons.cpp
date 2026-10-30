@@ -50,6 +50,13 @@ int GetTickRate();
 #include "../units/unit_def.h"
 #include "unit_weapon_slot.h"
 
+// Unused here: the symbol ids these declarations take keep 0x49be60 matching (docs/c2-regalloc.md).
+void FreeFeaturePool(void);
+void LoadFeatureFileList(void);
+void FreeFeatureFileList(void);
+void ResolveFeatureLinks(void);
+void PlaceMissionFeatures(void);
+
 struct Gun_0049c9c0 {
     short angle;
     char unknown_2[2];
@@ -1479,23 +1486,14 @@ void __stdcall ComputeVelocityFromAngles(Object_0049b680* obj)
     obj->z = -FUN_004b7123(obj->angle1, r);
 }
 
-#pragma pack(push, 1)
-struct Projectile_0049b6e0 {
-    char unknown_0[0x4e];
-    int targetUnit;                    // +0x4e
-    char unknown_52[0x69 - 0x52];
-    unsigned short flags;              // +0x69
-};
-#pragma pack(pop)
-
 // Takes the next free entry of the 300-entry projectile array (see
 // 0x499a30), resets two of its fields and returns it, or 0 when full.
 // FUNCTION: 0x49b6e0
-Projectile_0049b6e0* AllocProjectile()
+Projectile* AllocProjectile()
 {
-    Projectile_0049b6e0* p = 0;
+    Projectile* p = 0;
     if (g_game->projectileCount < 300) {
-        p = &((Projectile_0049b6e0*)g_game->projectiles)[g_game->projectileCount++];
+        p = &((Projectile*)g_game->projectiles)[g_game->projectileCount++];
         p->flags &= ~2;
         p->targetUnit = 0;
     }
