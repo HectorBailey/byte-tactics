@@ -31,8 +31,12 @@ struct Projectile {
     int aimY;                          // +0x2c
     int aimZ;                          // +0x30
     short turnAccum;                   // +0x34, Thaldren's nTurnAccum
-    unsigned short pitch;              // +0x36, Thaldren's wPitch
-    unsigned short heading;            // +0x38, Thaldren's wHeading
+    // +0x36 and +0x38 are the heading then the pitch: the angles the firing
+    // code writes from the slot's fireHeading and firePitch, and the ones
+    // 0x49be60 draws as Angles16 (bank at +0x34). Thaldren names these two
+    // offsets the other way round (wPitch, wHeading).
+    unsigned short heading;            // +0x36
+    unsigned short pitch;              // +0x38
     int speed;                         // +0x3a, Thaldren's nSpeed
     int distance;                      // +0x3e, Thaldren's nDistance
     unsigned int spawnTick;            // +0x42, Thaldren's dwSpawnTick
