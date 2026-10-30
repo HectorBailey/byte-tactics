@@ -189,22 +189,33 @@ class Views:
         return None
 
     def members(self, view: dict) -> list[tuple[int, str, tuple, dict]]:
-        """(offset, name, type, field) of the view's members, with anonymous
-        unions and structs flattened in (their members are the view's own)."""
+        """(offset, name, type, field) of the view's members. An unnamed union
+        or struct is flattened in, since its members are the view's own. A named
+        one is not: its members are reached through its name, so the field keeps
+        its name even when the type the view records for it is unnamed."""
         out = []
         for f in view["fields"]:
-            if f["type"][0] == "anon":
+            if not f["name"] and f["type"][0] == "anon":
                 for off, name, t, inner in self.members(f["type"][1]):
                     out.append((f["off"] + off, name, t, inner))
             else:
                 out.append((f["off"], f["name"], f["type"], f))
         return out
 
+    def view_of(self, t: tuple | None) -> dict | None:
+        """The view a value of type `t` has here: an unnamed member type's own
+        view, or the view of the named type."""
+        if not t:
+            return None
+        if t[0] == "anon":
+            return t[1]
+        if t[0] == "named":
+            return self.find(type_name(t))
+        return None
+
     def member_named(self, t: tuple | None, name: str) -> tuple | None:
         """The type of the member `name` of a value of type `t`."""
-        if not t or t[0] != "named":
-            return None
-        view = self.find(type_name(t))
+        view = self.view_of(t)
         if view is None:
             return None
         for _, mname, mt, f in self.members(view):
@@ -240,20 +251,33 @@ class Views:
                 if esz != k:
                     continue
                 index: str = e or "0"
+                offset_in_element = c
             else:
-                j, c = divmod(c - off, esz)
+                j, offset_in_element = divmod(c - off, esz)
                 index = str(j)
             head: list[tuple[str, str]] = [("m", name), ("x", index)]
-            if c == 0:
+            if offset_in_element == 0:
                 if same_type(elem, want, want is None):
                     return head, elem
                 continue
             inner_view = self.find(type_name(elem))
             if inner_view is None:
                 continue
-            inner = self.path(inner_view, c, 0, None, want)
+            inner = self.path(inner_view, offset_in_element, 0, None, want)
             if inner:
                 return head + inner[0], inner[1]
+        # A member whose own type is a struct or union: the offset is inside it,
+        # so the path goes through the member's name (#7012).
+        for off, name, t, f in members:
+            if f.get("bits") or not name or t[0] not in ("anon", "named"):
+                continue
+            inner_view = self.view_of(t)
+            size = self.size_of(t)
+            if inner_view is None or size is None or not (off < c < off + size):
+                continue
+            inner = self.path(inner_view, c - off, 0, None, want)
+            if inner:
+                return [("m", name)] + inner[0], inner[1]
         return None
 
 
