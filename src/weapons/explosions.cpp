@@ -782,7 +782,7 @@ void __stdcall StartExplodePiece(ExplodedPiece* piece)
     }
     ExplodedBlock* block = (ExplodedBlock*)g_explodedPieces[index];
     block->header = *piece;
-    PieceRec* dst = (PieceRec*)((char*)block + 0x30);
+    PieceRec* dst = &block->rec;
     block->header.rec = dst;
     *dst = *rec;
     block->header.rec->verts = (Vec3*)((char*)block->header.rec + 0x36);
@@ -805,6 +805,9 @@ void __stdcall StartExplodePiece(ExplodedPiece* piece)
 // (twice, as a box), pushes the back four out along the face normal by
 // param->scale, centres the box on its own origin and copies the face's
 // texture and colour into the object's faces.
+// Unused here: its symbol id keeps the function below matching (docs/c2-regalloc.md).
+void RegisterUnitOrders(void);
+
 // FUNCTION: 0x421700
 void __stdcall BreakPieceIntoDebris(ExplodedPiece* param)
 {

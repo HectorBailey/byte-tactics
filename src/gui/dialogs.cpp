@@ -49,6 +49,10 @@ struct Flags_004ab400 {
 
 #include "gui.h"
 
+// Unused here: the symbol ids these declarations take keep 0x4ac7d0, 0x4acbe0 matching (docs/c2-regalloc.md).
+void FUN_004161f0(void);
+void InitCommands(void);
+
 // The records AddButtonGadget, AddHotspotGadget and AddBarGadget copy into an
 // entry slot: the slot's first bytes viewed as the control's definition.
 struct Record_004ab2b0 {
@@ -338,7 +342,7 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
                 continue;
             }
             if (i == base[1].tab) {
-                SetFont(*(int*)((char*)&base[j] + 0xd6));
+                SetFont(base[j].u.list.language);
                 break;
             }
             i++;
@@ -348,7 +352,7 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
         TrySetFocus(menu, 1);
         menu->layer->current = 1;
         CommitTextEdit(menu, 1, (char*)&sub->u.count,
-                     *(short*)((char*)sub + 0x138), 0);
+                     sub->status, 0);
         ClearKeyQueue();
         }
         return layer;

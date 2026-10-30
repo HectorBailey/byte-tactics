@@ -191,6 +191,9 @@ struct UnitType_0043cd20 {           // 0x249 bytes
 
 #include "../units/cob_script.h"
 
+// Unused here: the symbol ids these declarations take keep 0x43bc90 matching (docs/c2-regalloc.md).
+void EnableAICommands(void);
+
 // The command kind, one byte wide, but not a POD type.
 class MissionType {
 public:
@@ -506,7 +509,7 @@ Order* __stdcall FindOrderByType(Unit* obj, unsigned char kind)
 // FUNCTION: 0x439e80
 void Order::SetDeadlineTicks(int param)
 {
-    *(unsigned int*)((char*)this + 0x6) |= 1;
+    this->flags6 |= 1;
     int val = *(int*)((char*)g_game + 0x38a47);
     *(int*)((char*)this + 0xa) = val + param;
 }
