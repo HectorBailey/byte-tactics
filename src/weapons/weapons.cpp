@@ -77,6 +77,12 @@ void ClearPictureCache(void);
 void OrLabelAttribs(void);
 void EmptyPreFrontendInitHook(void);
 int CodeChecksumFailed(void);
+void EmptyPostSimStepHook(void);
+void EmptyPostSimStepHook_B(void);
+void EmptyPostSimStepHook_C(void);
+int MainLoopContinueStub(void);
+int MainLoopContinueStub_B(void);
+int MainLoopContinueStub_C(void);
 
 struct Gun_0049c9c0 {
     short angle;
@@ -167,8 +173,8 @@ struct Vec3_0049abb0 {
 // +0x4 (49e1a0's three weapon entries, 49d580's fire state and 49c740's and
 // 49e070's weapon slots all overlap there), about +0x0 (49d000's
 // type, 49d270's type and 49dd60's owner), about +0xbc (49e1a0's resources,
-// 49e070's field_e4 and 49c920's and 49c9c0's f_dc and f_e6) and about the flag word (+0x110 in 49c740, 49d880 and 49d270, +0x111 in
-// 49c920 and 49c9c0); the rest keep one name. Size 0x118, the unit array's
+// 49e070's field_e4 and 49c920's f_dc and f_e6) and about the flag word (+0x110 in 49c740, 49d880 and 49d270, +0x111 in
+// 49c920); the rest keep one name. Size 0x118, the unit array's
 // stride.
 struct Unit {
     union {                            // +0x0
@@ -213,7 +219,7 @@ struct Unit {
             char unknown_50[0x64];
             union {
                 short pitch;
-                unsigned int f_68;     // 49c920's and 49c9c0's spelling
+                unsigned int f_68;     // 49c920's spelling
             };
         };
         struct {                       // the aim position at +0x6a
@@ -249,10 +255,10 @@ struct Unit {
         UnitResources resourceSlot;    // 49e1a0's resources
         struct {
             char unknown_bc[0xdc - 0xbc];
-            int f_dc;                  // +0xdc, 49c920's and 49c9c0's
+            int f_dc;                  // +0xdc, 49c920's
             char unknown_e0[0xe4 - 0xe0];
             unsigned short field_e4;   // +0xe4, 49e070's reload time
-            unsigned short f_e6;       // +0xe6, 49c920's and 49c9c0's
+            unsigned short f_e6;       // +0xe6, 49c920's
             char unknown_e8[0xf0 - 0xe8];
         };
     };
@@ -271,7 +277,7 @@ struct Unit {
             unsigned int b30 : 1;
             unsigned int b31 : 1;
         };
-        struct {                       // 49c920's and 49c9c0's view
+        struct {                       // 49c920's view
             unsigned char unknown_110;
             unsigned int flags_111;    // +0x111
             char unknown_115[3];
@@ -1630,44 +1636,20 @@ void __stdcall EmitWeaponSmoke(Vec3* p, short index);
 
 extern char* g_fireScriptNames[4];
 
-#pragma pack(push, 1)
-struct Proj_0049c9c0 {
-    Unit* unit;                        // +0x00
-    char unknown_4[0x1c - 4];
-    int f_1c;                          // +0x1c
-    int f_20;                          // +0x20
-    int f_24;                          // +0x24
-    char unknown_28[0x36 - 0x28];
-    short f_36;                        // +0x36
-    short f_38;                        // +0x38
-    int f_3a;                          // +0x3a
-    int f_3e;                          // +0x3e
-    int f_42;                          // +0x42
-    int f_46;                          // +0x46
-    char unknown_4a[0x4e - 0x4a];
-    int f_4e;                          // +0x4e
-    char unknown_52[0x60 - 0x52];
-    short f_60;                        // +0x60
-    char unknown_62[0x69 - 0x62];
-    unsigned short flags;              // +0x69
-};
-#pragma pack(pop)
-
-void __stdcall InitProjectile(Proj_0049c9c0* proj, WeaponDef* shot,
-                           Vec3* pos, Vec3* aim, int frame,
-                           Unit* unit);
+void __stdcall InitProjectile(Projectile* proj, WeaponDef* shot, Vec3* pos,
+                            Vec3* aim, int field_5, Unit* unit);
 
 // FUNCTION: 0x49c9c0
 int __stdcall FireLineOfSightProjectile(UnitWeaponSlot* fire, Unit* unit,
                            Vec3* p3, Vec3* p4, int param_5)
 {
-    Proj_0049c9c0* proj = 0;
+    Projectile* proj = 0;
     int i = g_game->projectileCount;
     if (i < 0x12c) {
-        proj = (Proj_0049c9c0*)g_game->projectiles + i;
+        proj = (Projectile*)g_game->projectiles + i;
         g_game->projectileCount = i + 1;
         proj->flags &= ~2;
-        proj->f_4e = 0;
+        proj->targetUnit = 0;
     }
     if (!proj)
         return 0;
@@ -1682,34 +1664,34 @@ int __stdcall FireLineOfSightProjectile(UnitWeaponSlot* fire, Unit* unit,
     short a1 = FUN_004b715a(dx, dz);
     // Unsigned: the >> 16 below is a logical shift.
     unsigned int dist = (int)_hypot(dx, dz);
-    proj->f_3e = (int)dist;
+    proj->distance = (int)dist;
     short a2 = FUN_004b715a(-(int)dy.halves[1], (short)(dist >> 16));
-    proj->f_36 = a1;
-    proj->f_38 = a2;
+    proj->heading = a1;
+    proj->pitch = a2;
 
     // The same helper as 0x49c980, inlined here.
     if (fire->weapon->startSpeed) {
-        proj->f_3a = fire->weapon->startSpeed;
+        proj->speed = fire->weapon->startSpeed;
     } else if (!fire->weapon->acceleration) {
-        proj->f_3a = fire->weapon->speed;
+        proj->speed = fire->weapon->speed;
     } else {
-        proj->f_3a = 0;
+        proj->speed = 0;
     }
 
-    proj->f_20 = FUN_004b70ef(a2, proj->f_3a);
-    int t = FUN_004b7123(a2, proj->f_3a);
-    proj->f_1c = -FUN_004b70ef(a1, t);
-    proj->f_24 = -FUN_004b7123(a1, t);
+    proj->velY = FUN_004b70ef(a2, proj->speed);
+    int t = FUN_004b7123(a2, proj->speed);
+    proj->velX = -FUN_004b70ef(a1, t);
+    proj->velZ = -FUN_004b7123(a1, t);
 
     // The same helper as 0x49c920, inlined here.
-    Unit* u = proj->unit;
-    if (u->f_68 != 0 && !(u->flags_111 & 0x8000000))
-        proj->f_46 = (u->f_dc << 16) / u->f_68 + g_game->frame;
+    WeaponDef* u = proj->weapon;
+    if (u->speed != 0 && !u->flags.b.noAutoRange)
+        proj->expireTick = (u->range << 16) / (unsigned int)u->speed + g_game->frame;
     else
-        proj->f_46 = g_game->frame + u->f_e6;
-    proj->f_4e = param_5;
+        proj->expireTick = g_game->frame + u->lifetime;
+    proj->targetUnit = (Unit*)param_5;
 
-    proj->f_60 = fire->weapon->burst;
+    proj->burstRemaining = fire->weapon->burst;
     unit->anims->StartScript(g_fireScriptNames[(fire->flags >> 2) & 3], 0, 0);
     short angle = unit->f_1a[((fire->flags >> 2) & 3) * 7].angle - unit->heading;
     int a = -FUN_004b70ef(angle, 800);
@@ -1721,9 +1703,6 @@ int __stdcall FireLineOfSightProjectile(UnitWeaponSlot* fire, Unit* unit,
     return 1;
 }
 
-
-void __stdcall InitProjectile(Projectile* proj, WeaponDef* shot, Vec3* pos,
-                            Vec3* aim, int field_5, Unit* unit);
 
 // FUNCTION: 0x49cc20
 int __stdcall FireVLaunchProjectile(UnitWeaponSlot* shot, Unit* unit, Vec3* pos,
