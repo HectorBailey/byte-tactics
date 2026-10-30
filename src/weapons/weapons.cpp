@@ -1245,6 +1245,10 @@ done:
 int DrawEndGameFrame(void);
 void RunEndGameState(void);
 void InitMemoryCache(void);
+void FreeMemoryCache(void);
+void InitExplosions(void);
+void FreeExplosions(void);
+void UpdateExplosions(void);
 
 #pragma pack(push, 1)
 // One view of the 0xe byte projectile detonate packet (type 0xe): the sender
@@ -1932,22 +1936,11 @@ struct Unit_0049d120 {
     char playerIndex;                // +0xff
 };
 
-// Thaldren's Projectile (0x6b bytes): a second view of the record 0x49b720
-// walks, holding only the fields this search reads.
-struct Proj_0049d120 {               // 0x6b bytes
-    WeaponDef* type;                 // +0x0
-    char unknown_4[0x28 - 0x4];
-    Vec3 aim;                        // +0x28
-    char unknown_34[0x56 - 0x34];
-    Proj_0049d120* interceptedProjectile; // +0x56
-    char unknown_5a[0x66 - 0x5a];
-    char ownerPlayer;                // +0x66
-    char unknown_67[0x6b - 0x67];
-};
+// The projectile record this search walks is weapons/projectile.h's.
 #pragma pack(pop)
 
 // FUNCTION: 0x49d120
-Proj_0049d120* __stdcall FindTargetableProjectile(Unit_0049d120* table, int index)
+Projectile* __stdcall FindTargetableProjectile(Unit_0049d120* table, int index)
 {
     UnitWeaponSlot* entry = &table->entries[index & 0xff];
     // Flag read before the radius, shift inside its initialiser: else the flag
@@ -1956,17 +1949,17 @@ Proj_0049d120* __stdcall FindTargetableProjectile(Unit_0049d120* table, int inde
         return 0;
     int radius = entry->weapon->coverage << 16;
     // projs is read before projCount: keeps g_game in ecx.
-    Proj_0049d120* proj = (Proj_0049d120*)g_game->projectiles;
+    Projectile* proj = (Projectile*)g_game->projectiles;
     int count = g_game->projCount;
     for (int i = 0; i < count; i++, proj++) {
-        if (proj->ownerPlayer != table->playerIndex) {
+        if ((char)proj->ownerPlayer != table->playerIndex) {
             // Nested ifs, not one && chain: else the bitfield test folds into a mem test.
-            if (proj->type->flags.b.targetable) {
-                if ((unsigned)(table->pos.x - proj->aim.x + radius) <= 2u * radius) {
-                    if ((unsigned)(table->pos.z - proj->aim.z + radius) <= 2u * radius) {
+            if (proj->weapon->flags.b.targetable) {
+                if ((unsigned)(table->pos.x - proj->aimX + radius) <= 2u * radius) {
+                    if ((unsigned)(table->pos.z - proj->aimZ + radius) <= 2u * radius) {
                         int j;
                         for (j = 0; j < g_game->projCount; j++)
-                            if (((Proj_0049d120*)g_game->projectiles)[j].interceptedProjectile == proj)
+                            if (((Projectile*)g_game->projectiles)[j].interceptedProjectile == proj)
                                 break;
                         if (j == g_game->projCount)
                             return proj;
@@ -1979,16 +1972,6 @@ Proj_0049d120* __stdcall FindTargetableProjectile(Unit_0049d120* table, int inde
 }
 
 #pragma pack(push, 1)
-struct Projectile_0049d1e0 {
-    char unknown_0[0x28];
-    Vec3 pos;                          // +0x28
-    char unknown_34[0x52 - 0x34];
-    Unit* owner;                       // +0x52
-    char unknown_56[0x66 - 0x56];
-    char player;                       // +0x66
-    char unknown_67[0x6b - 0x67];
-};
-
 struct Event_0049d1e0 {
     char unknown_0[0xd];
     Vec3 pos;                          // +0xd
@@ -2005,14 +1988,14 @@ static inline int SamePos(Vec3& a, Vec3& b)
 }
 
 // FUNCTION: 0x49d1e0
-Projectile_0049d1e0* __stdcall FindRemoteProjectile(Event_0049d1e0* ev)
+Projectile* __stdcall FindRemoteProjectile(Event_0049d1e0* ev)
 {
     if (!ev->flag)
         return 0;
     char me = g_game->localPlayer;
-    Projectile_0049d1e0* proj = (Projectile_0049d1e0*)g_game->projectiles;
+    Projectile* proj = (Projectile*)g_game->projectiles;
     for (int i = 0; i < g_game->projectileCount; i++, proj++) {
-        if (proj->player != me && SamePos(proj->pos, ev->pos) && proj->owner->id == ev->ownerId)
+        if ((char)proj->ownerPlayer != me && SamePos(*(Vec3*)&proj->aimX, ev->pos) && proj->ownerUnit->id == ev->ownerId)
             return proj;
     }
     return 0;
