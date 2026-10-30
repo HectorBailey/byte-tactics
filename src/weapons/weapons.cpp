@@ -60,6 +60,9 @@ int AllocFeatureSpot(void);
 void UpdateFeatures(void);
 void ShowFrontendErrorText(void);
 void BlankScreen(void);
+void FlushKeyQueue(void);
+void ApplyPendingSubState(void);
+void ResetFrontendState(void);
 void RemoveAllFeatures(void);
 
 struct Gun_0049c9c0 {
@@ -1783,60 +1786,40 @@ int __stdcall FireVLaunchProjectile(Shot_0049cc20* shot, Unit* unit, Vec3* pos,
     return 1;
 }
 
-#pragma pack(push, 1)
-struct Proj_0049cde0 {
-    char unknown_0[0x1c];
-    int dirx;                          // +0x1c
-    int diry;                          // +0x20
-    int dirz;                          // +0x24
-    char unknown_28[0x36 - 0x28];
-    short angle;                       // +0x36
-    short pitch0;                      // +0x38
-    char unknown_3a[0x46 - 0x3a];
-    int time;                          // +0x46
-    char unknown_4a[0x4e - 0x4a];
-    int targetUnit;
-    char unknown_52[0x60 - 0x52];
-    short active;                      // +0x60
-    char unknown_62[0x69 - 0x62];
-    unsigned short flags;              // +0x69
-};
-#pragma pack(pop)
-
-void __stdcall InitProjectile(Proj_0049cde0* proj, WeaponDef* shot, Vec3* pos,
+void __stdcall InitProjectile(Projectile* proj, WeaponDef* shot, Vec3* pos,
                             Vec3* aim, int field_5, Unit* unit);
 
 // FUNCTION: 0x49cde0
 int __stdcall FireBallisticProjectile(UnitWeaponSlot* shot, Unit* unit, Vec3* pos,
                            Vec3* aim, int param_5)
 {
-    Proj_0049cde0* proj = 0;
+    Projectile* proj = 0;
     if (g_game->projCount < 300) {
-        proj = &((Proj_0049cde0*)g_game->projectiles)[g_game->projCount++];
+        proj = &((Projectile*)g_game->projectiles)[g_game->projCount++];
         proj->flags &= ~2;
         proj->targetUnit = 0;
     }
     if (proj) {
         InitProjectile(proj, shot->weapon, pos, 0, g_game->gameTick, unit);
-        proj->angle = shot->fireHeading;
-        proj->pitch0 = shot->firePitch;
+        proj->heading = shot->fireHeading;
+        proj->pitch = shot->firePitch;
         // The whole product is its own statement: inside the assignment the
         // division and multiply sink after the call. The delta is unsigned: the
         // original divides it with an unsigned shift, not idiv.
         int q = ((unsigned int)shot->muzzleAimFromDeltaZ / shot->weapon->speed) * g_game->gravity;
-        proj->diry = FUN_004b70ef(shot->firePitch, shot->weapon->speed) - q;
+        proj->velY = FUN_004b70ef(shot->firePitch, shot->weapon->speed) - q;
         int scale = FUN_004b7123(shot->firePitch, shot->weapon->speed);
-        proj->dirx = -FUN_004b70ef(shot->fireHeading, scale);
-        proj->dirz = -FUN_004b7123(shot->fireHeading, scale);
+        proj->velX = -FUN_004b70ef(shot->fireHeading, scale);
+        proj->velZ = -FUN_004b7123(shot->fireHeading, scale);
         if (shot->weapon->flags.b.burnBlow) {
-            proj->time = (int)_hypot((double)(pos->x - aim->x), (double)(pos->z - aim->z)) / scale
+            proj->expireTick = (int)_hypot((double)(pos->x - aim->x), (double)(pos->z - aim->z)) / scale
                        + g_game->gameTick;
         } else {
-            proj->time = g_game->gameTick + shot->weapon->lifetime;
+            proj->expireTick = g_game->gameTick + shot->weapon->lifetime;
         }
-        // active before targetUnit: the reverse of the natural order is the original's.
-        proj->active = shot->weapon->burst;
-        proj->targetUnit = param_5;
+        // burstRemaining before targetUnit: the reverse of the natural order is the original's.
+        proj->burstRemaining = shot->weapon->burst;
+        proj->targetUnit = (Unit*)param_5;
         unit->anims->StartScript(g_fireScriptNames[(shot->flags >> 2) & 3], 0, 0);
         short angle = unit->aim_0049cde0[(shot->flags >> 2) & 3][0] - unit->heading;
         int a = -FUN_004b70ef(angle, 800);
