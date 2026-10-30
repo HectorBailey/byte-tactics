@@ -1178,6 +1178,11 @@ and the inline budget, so expect more than these numbers.
 - **Settle the duplicates while merging.** The 29 functions defined in
   several files become one definition (or `inline` in a shared header) when
   their unit is merged; `tools/linkcheck.py --verbose` lists them.
+- **Assert every reconciled layout.** When a type's views are merged into one, give its size
+  and each reconciled field offset a `DECOMP_SIZE_ASSERT`/`DECOMP_OFFSET_ASSERT` line in
+  `link/layout_asserts.cpp`. `tools/linkcheck.py` compiles that unit, so a wrong layout fails
+  there instead of quietly moving a match. An assert is a declaration, so it stays out of the
+  compiled sources: the probe above is the measurement, and it is why the file is separate.
 
 ### Phase 3: one name and one prototype per function
 
