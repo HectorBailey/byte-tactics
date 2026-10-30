@@ -876,7 +876,11 @@ never a shared name like `/tmp/a.cpp`.
 and writes an assembly listing you can read directly; iterate that way, then
 confirm with one `check.py` run. `uv run tools/checkall.py <addr> <addr> ...` checks many
 functions at once (in parallel, one summary line each), which suits a batch of
-small functions.
+small functions. When a file holds several address-named views of a type that
+already has a header, run `uv run tools/viewswap.py <file> --pairs pairs.csv`
+(or `--all`) first: it refuses pairs whose layouts disagree, tries each swap
+in a scratch copy and prints which functions moved, with the filler `idpad.py`
+found or that none exists.
 - **Empty functions called with a format string** are debug-print stubs whose
   body was compiled out: declare and define them variadic,
   `void FUN_x(const char* fmt, ...)`.
