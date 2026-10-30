@@ -2107,8 +2107,8 @@ address,size,file,symbol,status,similarity
 0x49cde0,544,src/weapons/weapons.cpp,?FireBallisticProjectile@@YGHPAUUnitWeaponSlot@@PAUUnit@@PAUVec3@@2H@Z,matched,100.0
 0x49d000,188,src/weapons/weapons.cpp,?SpawnProjectileFromUnitMotion@@YGHPAUShot_0049d000@@PAUUnit@@PAUVec3@@@Z,matched,100.0
 0x49d0c0,93,src/weapons/weapons.cpp,?FireWeaponByFlags@@YGHPAUObject_0049d0c0@@HHHH@Z,matched,100.0
-0x49d120,182,src/weapons/weapons.cpp,?FindTargetableProjectile@@YGPAUProj_0049d120@@PAUUnit_0049d120@@H@Z,matched,100.0
-0x49d1e0,129,src/weapons/weapons.cpp,?FindRemoteProjectile@@YGPAUProjectile_0049d1e0@@PAUEvent_0049d1e0@@@Z,matched,100.0
+0x49d120,182,src/weapons/weapons.cpp,?FindTargetableProjectile@@YGPAUProjectile@@PAUUnit_0049d120@@H@Z,matched,100.0
+0x49d1e0,129,src/weapons/weapons.cpp,?FindRemoteProjectile@@YGPAUProjectile@@PAUEvent_0049d1e0@@@Z,matched,100.0
 0x49d270,774,src/weapons/weapons.cpp,?ApplyWeaponFirePacket@@YGXHPAUWeaponFirePacket@@@Z,matched,100.0
 0x49d580,761,src/weapons/weapons.cpp,?FireTurretWeapon@@YGHPAUUnit@@00PAUVec3@@@Z,matched,100.0
 0x49d880,140,src/weapons/weapons.cpp,?AimWithinTolerance@@YGHPAUUnit@@PAUUnitWeaponSlot@@FF@Z,matched,100.0
