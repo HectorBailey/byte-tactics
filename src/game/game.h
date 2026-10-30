@@ -708,7 +708,7 @@ struct Game {  // 0x3924d bytes
     char field_39201[1];  // +0x39201
     char unknown_39202[15];
     int connection;  // +0x39211
-    int field_39215;  // +0x39215
+    int selectedDplayConnection;  // +0x39215
     int singleCommanderDeath;  // +0x39219
     int mapping;  // +0x3921d
     int lineOfSight;  // +0x39221
