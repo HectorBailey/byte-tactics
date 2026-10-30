@@ -21,22 +21,27 @@ struct Player {
 };
 #pragma pack(pop)
 
-struct Position_00408090 {              // 16.16 fixed point; only high words read
-    short xFrac;
-    short x;                            // +0x2
-    short yFrac;
-    short y;                            // +0x6
-    short zFrac;
-    short z;                            // +0xa
+// The 16.16 position the fog test reads, the same Fixed and FixedVec3
+// graphics/particles_475470.cpp (0x475470) declares; only the whole words are
+// read here.
+struct Fixed {
+    unsigned short frac;
+    short whole;
+};
+
+struct FixedVec3 {
+    Fixed x;
+    Fixed y;
+    Fixed z;
 };
 
 extern Game* g_game;
 
 // FUNCTION: 0x408090
-int __stdcall IsPointVisible(Player* player, Position_00408090* pos)
+int __stdcall IsPointVisible(Player* player, FixedVec3* pos)
 {
-    int tx = pos->x >> 5;
-    int ty = (pos->z - (pos->y >> 1)) >> 5;
+    int tx = pos->x.whole >> 5;
+    int ty = (pos->z.whole - (pos->y.whole >> 1)) >> 5;
     if (!player->explored.size.Contains(tx, ty)) {
         return 0;
     }

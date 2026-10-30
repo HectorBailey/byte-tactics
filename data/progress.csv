@@ -90,7 +90,7 @@ address,size,file,symbol,status,similarity
 0x407d40,296,src/ai/ai_player_407d40.cpp,??0SpatialTimer@@QAE@PAUSquadManager@@PAX@Z,matched,100.0
 0x407e70,32,src/ai/ai_player_407e70.cpp,??_GSpatialTimer@@UAEPAXI@Z,matched,100.0
 0x407e90,500,src/ai/ai_player_407e70.cpp,?OnTimer@SpatialTimer@@UAEXXZ,matched,100.0
-0x408090,111,src/ai/ai_player_408090.cpp,?IsPointVisible@@YGHPAUPlayer@@PAUPosition_00408090@@@Z,matched,100.0
+0x408090,111,src/ai/ai_player_408090.cpp,?IsPointVisible@@YGHPAUPlayer@@PAUFixedVec3@@@Z,matched,100.0
 0x408100,1221,src/ai/ai_player_408100.cpp,?OnTimer@ScoutTimer@@UAEXXZ,matched,100.0
 0x4085d0,40,src/ai/ai_player.cpp,??0ScoutTimer@@QAE@PAVSquadManager@@PAUGroup@@@Z,matched,100.0
 0x408600,32,src/ai/ai_player.cpp,??_GScoutTimer@@UAEPAXI@Z,matched,100.0
