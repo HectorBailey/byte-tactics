@@ -296,10 +296,7 @@ union CameraFlags {
 
 // The projectile the camera follows (Thaldren's
 // GameState.pCameraFollowTrackObj).
-struct Projectile {
-    int unknown_0;                     // +0x0
-    Vec3 pos;                          // +0x4
-};
+#include "../weapons/projectile.h"
 
 struct Game {
     char unknown_0[0x519];
@@ -1811,7 +1808,7 @@ void UpdateCameraFollow()
         g_game->cameraSnapTicks--;
         p = &g_game->cameraSnapPos;
     } else if (g_game->cameraFollowTrackObj != 0) {
-        p = &g_game->cameraFollowTrackObj->pos;
+        p = (Vec3*)&g_game->cameraFollowTrackObj->posX;
     } else if (g_game->cameraFollowUnit != 0) {
         if (g_game->cameraFollowUnit->flags.raw & 0x10000000) {
             p = &g_game->cameraFollowUnit->pos;

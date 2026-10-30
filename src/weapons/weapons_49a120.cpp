@@ -43,19 +43,9 @@ struct Unit_0049a120 {
     char unknown_100[0x118 - 0x100];
 };
 
-// Thaldren's Projectile (0x6b bytes): one weapon in flight.
-struct Projectile {
-    WeaponDef* type;                   // +0x0, Thaldren's pWeapon
-    Vec3 pos;                          // +0x4
-    char unknown_10[0x28 - 0x10];
-    Vec3 aim;                          // +0x28
-    char unknown_34[0x52 - 0x34];
-    Unit_0049a120* ownerUnit;          // +0x52, Thaldren's pOwnerUnit
-    char unknown_56[0x66 - 0x56];
-    unsigned char ownerPlayer;         // +0x66, Thaldren's bOwnerPlayer
-    char unknown_67[0x69 - 0x67];
-    unsigned short flags;              // +0x69
-};
+// Thaldren's Projectile (0x6b bytes): one weapon in flight. Its owner is this
+// file's unit view, so the uses cast at the owner.
+#include "projectile.h"
 
 struct Cell {
     unsigned short unit;               // +0x0
@@ -194,7 +184,7 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
 {
     Hits_0049a120 hits;
     memset(&hits, 0, 8);
-    int radius = weapon->type->areaOfEffect >> 1;
+    int radius = weapon->weapon->areaOfEffect >> 1;
     int r = radius / 16 + 1;
     int cx = ((FixedVec3*)pos)->x.part.whole;
     int x0 = cx / 16 - r;
@@ -220,7 +210,7 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
                 continue;
             for (int i = 0; i <= 1; i++) {
                 Unit_0049a120* unit = i ? UnitFromId(cell->unit2) : UnitFromId(cell->unit);
-                if (!unit || unit == weapon->ownerUnit)
+                if (!unit || unit == (Unit_0049a120*)weapon->ownerUnit)
                     continue;
                 if (!hits.AddUnit(unit))
                     continue;
@@ -268,7 +258,7 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
                 dist.raw = Length(&d);
                 int distance = dist.part.whole;
                 if (distance < radius) {
-                    float edge = weapon->type->edgeDamage;
+                    float edge = weapon->weapon->edgeDamage;
                     float scale;
                     if (distance) {
                         float t = (float)distance / radius - 1.0f;
@@ -288,7 +278,7 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
                 }
             }
             // A mask test (bit 14, unitsOnly): the bit-field form changes the code.
-            if (weapon->type->flags.value & 0x4000)
+            if (weapon->weapon->flags.value & 0x4000)
                 continue;
             Cell* origin = cell;
             int fx = x;
@@ -324,39 +314,39 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
                 continue;
             if (!hits.AddFeature(origin))
                 continue;
-            DamageFeature(origin, fx, fz, weapon->type);
+            DamageFeature(origin, fx, fz, weapon->weapon);
         }
     }
 
-    if (weapon->type->flags.b.interceptor) {
+    if (weapon->weapon->flags.b.interceptor) {
         // Every field is read through `other` (no projectiles[j]): the derived
         // pointer is stepped after it.
         Projectile* other = g_game->projectiles;
         for (int j = 0; j < g_game->projectileCount; j++, other++) {
             if ((other->flags & 2) || other == weapon)
                 continue;
-            Vec3* p = &other->pos;
-            int dx = weapon->pos.x - p->x;
-            int dy = weapon->pos.y - p->y;
-            int dz = weapon->pos.z - p->z;
-            int reach = weapon->type->areaOfEffect;
+            Vec3* p = (Vec3*)&other->posX;
+            int dx = weapon->posX - p->x;
+            int dy = weapon->posY - p->y;
+            int dz = weapon->posZ - p->z;
+            int reach = weapon->weapon->areaOfEffect;
             if ((int)(((__int64)dx * dx) >> 32) + (int)(((__int64)dy * dy) >> 32) + (int)(((__int64)dz * dz) >> 32)
                 < reach * reach) {
                 DetonateProjectile(other, 0);
                 ProjectileDetonatePacket packet;
                 packet.type = 0xe;
-                packet.aim = other->aim;
-                packet.weaponIndex = other->type->index;
-                BroadcastPacket(weapon->ownerUnit->player->id, &packet, sizeof(packet));
+                packet.aim = *(Vec3*)&other->aimX;
+                packet.weaponIndex = other->weapon->index;
+                BroadcastPacket(((Unit_0049a120*)weapon->ownerUnit)->player->id, &packet, sizeof(packet));
                 packet.type = 0xe;
-                packet.aim = weapon->aim;
-                packet.weaponIndex = weapon->type->index;
-                BroadcastPacket(weapon->ownerUnit->player->id, &packet, sizeof(packet));
+                packet.aim = *(Vec3*)&weapon->aimX;
+                packet.weaponIndex = weapon->weapon->index;
+                BroadcastPacket(((Unit_0049a120*)weapon->ownerUnit)->player->id, &packet, sizeof(packet));
             }
         }
     }
 
     if (weapon->ownerUnit)
         // The damage split's Obj_00406f50 parameter is this weapon object.
-        weapon->ownerUnit->player->ai->MarkOwnerNetDirtyFromDamageSplit((Obj_00406f50*)weapon, enemyDamage, friendlyDamage);
+        ((Unit_0049a120*)weapon->ownerUnit)->player->ai->MarkOwnerNetDirtyFromDamageSplit((Obj_00406f50*)weapon, enemyDamage, friendlyDamage);
 }
