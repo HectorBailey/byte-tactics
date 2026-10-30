@@ -551,24 +551,12 @@ void __stdcall RockUnit(Object_00499c10* obj, Source_00499c10* src)
 
 #include "../ai/squad_manager.h"
 
-#pragma pack(push, 1)
+// The position and aim words are read as a Vec3 here: the explosion calls take
+// a Vec3*, so the view casts at the use (projectile.h keeps them as ints).
+#include "projectile.h"
 
-// Thaldren's Projectile (0x6b bytes): the weapon record the aim and detonate
-// functions read, position and aim included. The 0x49a120 gap file keeps its
-// own copy of it, typed against its own Vec3.
-struct Projectile {
-    WeaponDef* type;                   // +0x0, Thaldren's pWeapon
-    Vec3_0049b720 pos;                 // +0x4, the fixed-point view the explosion calls take
-    char unknown_10[0x28 - 0x10];
-    Vec3_0049b720 aim;                 // +0x28
-    char unknown_34[0x52 - 0x34];
-    Unit* ownerUnit;                   // +0x52, Thaldren's pOwnerUnit
-    char unknown_56[0x66 - 0x56];
-    unsigned char ownerPlayer;         // +0x66, Thaldren's bOwnerPlayer
-    char unknown_67[0x69 - 0x67];
-    unsigned short flags;              // +0x69
-};
-#pragma pack(pop)
+// Unused here: the symbol ids this declaration takes keep 0x49be60 matching (docs/c2-regalloc.md).
+int ShouldShowNextMission(void);
 
 int __stdcall ApplyWeaponDamage(Projectile* weapon, Unit* target, float scale);
 
@@ -656,7 +644,7 @@ static inline int* Find_00499cd0(WeaponDef_DamageMap* table, char* name)
 int __stdcall ApplyWeaponDamage(Projectile* weapon, Unit* target,
                            float scale)
 {
-    WeaponDef* def = weapon->type;
+    WeaponDef* def = weapon->weapon;
     int damage = def->damage;
     WeaponDef_DamageMap* map = def->damageOverrides;
     if (map) {
@@ -665,8 +653,8 @@ int __stdcall ApplyWeaponDamage(Projectile* weapon, Unit* target,
             damage = *p;
     }
     damage = (int)(damage * scale);
-    short angle = FUN_004b715a(weapon->pos.x - target->pos_0049abb0.x,
-                               weapon->pos.z - target->pos_0049abb0.z) - target->heading;
+    short angle = FUN_004b715a(weapon->posX - target->pos_0049abb0.x,
+                               weapon->posZ - target->pos_0049abb0.z) - target->heading;
     Unit* attacker = weapon->ownerUnit;
     if (attacker) {
         int armour = attacker->killCount / 5;
@@ -679,7 +667,7 @@ int __stdcall ApplyWeaponDamage(Projectile* weapon, Unit* target,
         damage *= 2;
     if (flags->flag8)
         damage /= 2;
-    bool paralyzer = weapon->type->flags.b.paralyzer;
+    bool paralyzer = weapon->weapon->flags.b.paralyzer;
     int type = paralyzer ? 2 : 1;
     DamageUnit(attacker, target, damage, type, angle);
     return damage;
@@ -698,8 +686,8 @@ void BroadcastPlayerInfo();
 void __stdcall UntrackProjectile(Projectile* projectile)
 {
     if (projectile == g_game->selected) {
-        g_game->cameraSnapPos = g_game->selectedProjectile->pos;
-        g_game->cameraSnapTicks = projectile->type->holdTime;
+        g_game->cameraSnapPos = *(Vec3_0049b720*)&g_game->selectedProjectile->posX;
+        g_game->cameraSnapTicks = projectile->weapon->holdTime;
         g_game->selected = 0;
     }
     projectile->flags |= 2;
@@ -719,23 +707,22 @@ void __stdcall KillFeature(int x, int z, int flag);
 void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit)
 {
     int hostile = 0;
-    WeaponDef* type = projectile->type;
-    Vec3_0049b720* position = &projectile->pos;
+    WeaponDef* type = projectile->weapon;
+    Vec3_0049b720* position = (Vec3_0049b720*)&projectile->posX;
     unsigned char* value = (unsigned char*)GetMapCellAtPosition(position);
     if (value != 0)
         hostile = value[5] < g_game->seaLevel;
     if (!type->flags.b.noExplode) {
-        if (projectile == g_game->selected) {
-            g_game->cameraSnapPos = g_game->selectedProjectile->pos;
-            g_game->cameraSnapTicks = projectile->type->holdTime;
+        if (projectile == g_game->selected) {            g_game->cameraSnapPos = *(Vec3_0049b720*)&g_game->selectedProjectile->posX;
+            g_game->cameraSnapTicks = projectile->weapon->holdTime;
             g_game->selected = 0;
         }
         projectile->flags = projectile->flags | 2;
     }
     if (g_game->mapInfo->noSeaLevelTrigger && hostile && !unit) {
         if (projectile == g_game->selected) {
-            g_game->cameraSnapPos = g_game->selectedProjectile->pos;
-            g_game->cameraSnapTicks = projectile->type->holdTime;
+            g_game->cameraSnapPos = *(Vec3_0049b720*)&g_game->selectedProjectile->posX;
+            g_game->cameraSnapTicks = projectile->weapon->holdTime;
             g_game->selected = 0;
         }
         projectile->flags = projectile->flags | 2;
@@ -1206,18 +1193,6 @@ int __stdcall GetWeaponRange(int param1, unsigned int param2)
     return result;
 }
 
-#pragma pack(push, 1)
-struct Projectile_0049ae20 {
-    char unknown_0[0x56];
-    Projectile_0049ae20* interceptedProjectile; // +0x56
-    char unknown_5a[0x67 - 0x5a];
-    short compactIndex;                // +0x67, this projectile's old index
-    unsigned short flag0 : 1;
-    unsigned short dead : 1;           // +0x69 bit 1
-    unsigned short flagRest : 14;
-};
-#pragma pack(pop)
-
 // Compacts the projectile array: entries whose flags bit 1 is set are dropped
 // and the remaining ones are moved down. Each projectile's own old index is
 // written to compactIndex first, so the pointers held at interceptedProjectile
@@ -1226,18 +1201,18 @@ struct Projectile_0049ae20 {
 // FUNCTION: 0x49ae20
 void CompactProjectiles()
 {
-    Projectile_0049ae20* projectiles = (Projectile_0049ae20*)g_game->projectiles;
+    Projectile* projectiles = (Projectile*)g_game->projectiles;
     int count = g_game->projectileCount;
     int n = 0;
-    Projectile_0049ae20* dest = 0;
+    Projectile* dest = 0;
     int i = 0;
     short a[300];
     short b[300];
 
     for (i = 0; i < g_game->projectileCount; i++) {
-        Projectile_0049ae20* p = &projectiles[i];
-        // Read the bitfield into a bool first: gives the shr/test pair.
-        bool dead = p->dead;
+        Projectile* p = &projectiles[i];
+        // Read the flags word into a bool first: gives the shr/test pair.
+        bool dead = (p->flags >> 1) & 1;
         p->compactIndex = (short)i;
         if (dead) {
             if (!dest) {
