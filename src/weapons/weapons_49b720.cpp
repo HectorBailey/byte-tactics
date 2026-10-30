@@ -54,6 +54,9 @@ struct ProjectileFlags {
 };
 
 // Thaldren's Projectile (0x6b bytes): the record the update loop below walks.
+// Kept local: its position, start and velocity are the fixed-point Vec3 below
+// (y is a union of the halves and the view has operator+=), which the header's
+// plain ints cannot spell without moving the loop's arithmetic.
 struct Projectile {
     WeaponDef* type;                   // +0x0
     Vec3_0049b720 pos;                 // +0x4
