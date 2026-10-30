@@ -127,7 +127,11 @@ says so, and it stays.
    difference. When only the file's symbol count moved (a header brought ids
    in or took them away), `uv run tools/idpad.py <file> <addr> [<addr> ...]`
    searches for the real unused declarations that bring the listed functions
-   back and prints the block to add.
+   back and prints the block to add. When a file holds several views of one
+   type, run `uv run tools/viewswap.py <file> --pairs pairs.csv` (or `--all`)
+   first: it refuses pairs whose layouts disagree, tries each swap in a
+   scratch copy and reports which functions moved and the filler that brings
+   them back, before anything under `src/` is edited.
 3. Otherwise leave that part out: a function that only matches in a file of
    its own stays in one, with a one-line comment at its declaration saying
    why. Say so in the pull request.
