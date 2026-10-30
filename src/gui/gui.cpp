@@ -57,6 +57,9 @@ extern Root_004a32a0* g_guiContext;
 
 #include "../graphics/rect.h"
 
+// Unused here: the symbol ids this declaration takes keep the functions below matching (docs/c2-regalloc.md).
+void FUN_00406f40(void);
+
 // Unused here: real declarations that keep the file's symbol count (docs/c2-regalloc.md).
 void ShowFrontendErrorText(void);
 void FreeGameFonts(void);
@@ -207,7 +210,7 @@ void __stdcall RunWhileScreenNamed(Dialog* menu, char* name)
 // FUNCTION: 0x49fa50
 void __stdcall EnableKeyCommands(Dialog* p)
 {
-    *(int*)((char*)p + 0xa2) = 1;
+    p->dirty = 1;
 }
 
 // FUNCTION: 0x49fa70
