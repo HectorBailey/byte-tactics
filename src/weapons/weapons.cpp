@@ -56,6 +56,9 @@ void LoadFeatureFileList(void);
 void FreeFeatureFileList(void);
 void ResolveFeatureLinks(void);
 void PlaceMissionFeatures(void);
+int AllocFeatureSpot(void);
+void UpdateFeatures(void);
+void RemoveAllFeatures(void);
 
 struct Gun_0049c9c0 {
     short angle;
@@ -1292,23 +1295,7 @@ void __stdcall ApplyProjectileHitPacket(int unused, ProjectileDetonatePacket* p)
     }
 }
 
-#pragma pack(push, 1)
-struct Projectile_0049b000 {
-    WeaponDef* weapon;                 // +0x0
-    Vec3_0049abb0 pos;                 // +0x4
-    Vec3_0049abb0 start;               // +0x10
-    char unknown_1c[0x4e - 0x1c];
-    int targetUnit;                    // +0x4e
-    int ownerUnit;                     // +0x52
-    char unknown_56[0x66 - 0x56];
-    unsigned char owner;               // +0x66
-    char unknown_67[0x6b - 0x67];
-};
-#pragma pack(pop)
-
-void __stdcall DetonateProjectile(Projectile_0049b000* proj, int flag);
-
-// Fires one of a unit's two weapons (by type) from the unit's position,
+// Detonates one of a unit's two weapons (by type) at the unit's position,
 // building the projectile on the stack; see 0x49af90 for the projectile.
 // FUNCTION: 0x49b000
 void __stdcall DetonateUnitWeapon(Unit* unit, int second)
@@ -1317,13 +1304,16 @@ void __stdcall DetonateUnitWeapon(Unit* unit, int second)
     WeaponDef* weapon = second ? (WeaponDef*)unit->utype->selfdestructas
                                : (WeaponDef*)unit->utype->explodeas;
     if (weapon) {
-        Projectile_0049b000 proj;
+        Projectile proj;
         proj.weapon = weapon;
-        proj.pos = unit->pos_0049abb0;
-        proj.start = unit->pos_0049abb0;
+        // The position words are a Vec3 to this function: the shared record keeps
+        // them as ints and the unit's copy is its own view, so both sides are
+        // cast at the use.
+        *(Vec3*)&proj.posX = *(Vec3*)&unit->pos_0049abb0;
+        *(Vec3*)&proj.trailX = *(Vec3*)&unit->pos_0049abb0;
         proj.targetUnit = 0;
         proj.ownerUnit = 0;
-        proj.owner = unit->playerIndex;
+        proj.ownerPlayer = unit->playerIndex;
         DetonateProjectile(&proj, 0);
     }
 }
