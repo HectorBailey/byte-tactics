@@ -572,7 +572,7 @@ void __stdcall HandleTalkDialogEvent(Gui* gadget)
     if (IsCurrentGadgetNamed(gadget, g_talkGadgetName)) {
         Gadget* talk = FindGadgetChecked_B(entries, g_talkGadgetName);
         mode = g_game->chatMode;
-        lstrcpynA(buf, (char*)talk + 0xb6, 0x100);
+        lstrcpynA(buf, (char*)&talk->u.count, 0x100);
         char* p = buf;
         while (*p && *p == ' ')
             p++;
