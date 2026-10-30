@@ -717,7 +717,7 @@ struct Game {  // 0x3924d bytes
     char field_391e8;  // +0x391e8
     Mission* mapInfo;  // +0x391e9
     Class_0048ff40* list_391ed;  // +0x391ed
-    int mode_391f1;  // +0x391f1
+    int frontendState;  // +0x391f1, the frontend mode eight other views name this way
     void (__stdcall *handler)(void);  // +0x391f5
     int fontComix;  // +0x391f9
     void* fontSmlFont;  // +0x391fd
