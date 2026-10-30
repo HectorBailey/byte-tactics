@@ -30,7 +30,6 @@ struct AnimEntry_00429700;
 struct Arg_00419670;
 struct Bits_0045c570;
 struct BuildList_0041ace0;
-struct ByteMap_00408090;
 struct Cell;
 struct Cell_004816a0;
 struct Class_00437c80;
@@ -64,7 +63,6 @@ struct Grid;
 struct Handle;
 struct IconSet_00466780;
 struct List_00420960;
-struct MapSize_00408090;
 struct Map_0042e440;
 class Mission;
 struct Net_4517b0;
@@ -86,20 +84,6 @@ struct V4i;
 struct Vec3;
 
 
-struct MapSize_00408090 {  // 0x8 bytes
-    unsigned int width;  // +0x0
-    unsigned int height;  // +0x4
-    int Contains(unsigned int, unsigned int);
-};
-
-struct ByteMap_00408090 {  // 0xc bytes
-    unsigned char* data;  // +0x0
-    MapSize_00408090 size;  // +0x4
-    int Contains(int, int);
-    int Index(int, int);
-    unsigned char Get(int, int);
-    unsigned char& at(int, int);
-};
 
 
 

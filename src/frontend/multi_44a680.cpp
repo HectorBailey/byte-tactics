@@ -45,6 +45,21 @@ void UpdateScreenShake(void);
 void UpdateCameraFollow(void);
 void BeginMouseScroll(void);
 void EndMouseScroll(void);
+void UpdateMouseScroll(void);
+void UpdateEdgeScroll(void);
+void CenterCameraOnRadarClick(void);
+void CenterCameraOnStartPosition(void);
+void RegisterDataArchives(void);
+int FUN_0041d8a0(void);
+int GetCdPathMismatch(void);
+void CreateGameObject(void);
+void InitMissionStatus(void);
+void SetUpEndMissionScreen(void);
+void StartScreenFade(void);
+void StepScreenFade(void);
+void ScheduleFadeTick(void);
+int IsFadeDone(void);
+void StepPaletteFade(void);
 
 struct Gadget_0044a680 {                // 0x15b bytes
     char unknown_0[0x1b];
