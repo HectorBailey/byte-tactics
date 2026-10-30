@@ -538,7 +538,7 @@ void __stdcall RockUnit(Object_00499c10* obj, Source_00499c10* src)
 
 #include "../ai/squad_manager.h"
 
-// Unused here: the symbol ids this declaration takes keep 0x49be60 matching (docs/c2-regalloc.md).
+// Unused here: the symbol ids these declarations take keep 0x49be60 matching (docs/c2-regalloc.md).
 void OpenEndMissionScreen(void);
 void EnableEndMissionButtons(void);
 void ShowEndMissionScreen(void);
@@ -700,7 +700,8 @@ void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit)
     if (value != 0)
         hostile = value[5] < g_game->seaLevel;
     if (!type->flags.b.noExplode) {
-        if (projectile == g_game->selected) {            g_game->cameraSnapPos = *(Vec3_0049b720*)&g_game->selectedProjectile->posX;
+        if (projectile == g_game->selected) {
+            g_game->cameraSnapPos = *(Vec3_0049b720*)&g_game->selectedProjectile->posX;
             g_game->cameraSnapTicks = projectile->weapon->holdTime;
             g_game->selected = 0;
         }
