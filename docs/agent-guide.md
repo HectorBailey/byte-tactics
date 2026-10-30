@@ -880,7 +880,13 @@ small functions. When a file holds several address-named views of a type that
 already has a header, run `uv run tools/viewswap.py <file> --pairs pairs.csv`
 (or `--all`) first: it refuses pairs whose layouts disagree, tries each swap
 in a scratch copy and prints which functions moved, with the filler `idpad.py`
-found or that none exists.
+found or that none exists. A row is `view,header[,member-map]`, and the map
+names the header member each of the view's becomes: a member only the header
+spells differently (`quickkey=quickKey`), or one sitting in a named union
+(`text=u.text`), or a view field as wide as a different header member
+(`grayedout=flag`, 2 bytes in the view, `Gadget.grayedout` being a byte).
+The map applies inside the function that declares the view-typed name, so two
+views in one file that both call their parameter `obj` do not reach each other.
 - **Empty functions called with a format string** are debug-print stubs whose
   body was compiled out: declare and define them variadic,
   `void FUN_x(const char* fmt, ...)`.
