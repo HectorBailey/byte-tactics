@@ -41,7 +41,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from check import COMPILE_SCHEME, DEFAULT_FLAGS, ROOT, base_name, load_symbols
+from check import COMPILE_SCHEME, DEFAULT_FLAGS, ROOT, base_name, compile_source, load_symbols
 from sources import include_hash, link_order, source_files
 
 SRC = ROOT / "src"
@@ -1002,6 +1002,25 @@ def summary_line(rep: Report, total_undef: int, conflicting: int) -> str:
             f"{conflicting:,} of {rep.global_count:,} globals have conflicting types")
 
 
+# --- the layout asserts ---------------------------------------------------------------
+
+LAYOUT_ASSERTS = ROOT / "link/layout_asserts.cpp"
+
+
+def check_layout_asserts() -> str:
+    """Compile link/layout_asserts.cpp, which holds nothing but asserts on the
+    consolidated types' sizes and offsets (docs/linking.md phase 2). They live in
+    a unit of their own because an assert is a declaration and would move
+    matched functions if it sat in the type's header (docs/c2-regalloc.md)."""
+    if not LAYOUT_ASSERTS.exists():
+        return ""
+    obj, log = compile_source(LAYOUT_ASSERTS, out_dir="layout")
+    if obj is not None:
+        return ""
+    last = log.strip().splitlines()[-1] if log.strip() else "no compiler output"
+    return f"{LAYOUT_ASSERTS.relative_to(ROOT)}: a layout assert does not hold ({last})"
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--verbose", "-v", action="store_true", help="list every symbol behind each count")
@@ -1009,6 +1028,9 @@ def main() -> None:
     args = ap.parse_args()
 
     objects, failed = load_objects()
+    bad_assert = check_layout_asserts()
+    if bad_assert:
+        failed.append(bad_assert)
     rep, _ = analyse(objects)
     rep.failed = failed
     print_report(rep, args.verbose)
