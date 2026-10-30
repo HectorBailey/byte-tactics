@@ -44,13 +44,7 @@ typedef List_0046ca60::iterator (List_0046ca60::iterator::*PostIncFn_0046ca60)(i
 EraseFn_0046ca60 g_erase_0046ca60 = &List_0046ca60::erase;
 PostIncFn_0046ca60 g_postinc_0046ca60 = &List_0046ca60::iterator::operator++;
 
-struct UnitSyncEntry {                 // the map mapped type, 0x10 bytes
-    int x;
-    int y;
-    short w;
-    short h;
-    int limit;
-};
+#include "unit_sync_entry.h"
 
 class VecInt_0046ca60 {               // std::vector<int>
 public:

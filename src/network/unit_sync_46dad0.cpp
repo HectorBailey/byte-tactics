@@ -27,11 +27,7 @@ struct UnitSyncPacket { // 0xe bytes
 // Inline-budget filler, see the header.
 inline int Pass(int v) { return v; }
 
-struct UnitSyncEntry {
-    int x, y;
-    short w, h;
-    int limit;
-};
+#include "unit_sync_entry.h"
 
 // The vector members are modelled by the classes data/symbols.csv names
 // for their out-of-line pieces: 0x46e5c0 is the vector constructor body

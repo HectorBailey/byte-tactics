@@ -46,13 +46,7 @@ struct Elem_0046faf0 {             // the 14-byte element type
 };
 #pragma pack(pop)
 
-struct UnitSyncEntry {             // the map's mapped type, 0x10 bytes
-    int x;                         // +0x0
-    int y;                         // +0x4
-    short w;                       // +0x8
-    short h;                       // +0xa
-    int limit;                     // +0xc
-};
+#include "unit_sync_entry.h"
 
 class UnitSyncPlayer {             // 0x5c bytes, the vector at +0x10 holds these
 public:

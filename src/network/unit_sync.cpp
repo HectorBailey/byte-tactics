@@ -164,6 +164,9 @@ struct HapinetSession {                 // the object at g_game+0x14
 #include "../units/unit_def.h"
 #include "player.h"
 
+// Unused here: the symbol ids these declarations take keep 0x470040 matching (docs/c2-regalloc.md).
+void RegisterUnitOrders(void);
+
 #pragma pack(push, 1)
 // UnitDef::flags1 (+0x241) read as bit fields.
 struct UnitDefFlags_0046e160 {
@@ -300,13 +303,7 @@ void FUN_0046c8d0(void)
 
 // --- UnitSync: the shared unit list ------------------------------------------
 
-struct UnitSyncEntry {                 // the map's mapped type, 0x10 bytes
-    int x;                             // +0x0
-    int y;                             // +0x4
-    short w;                           // +0x8
-    short h;                           // +0xa
-    int limit;                         // +0xc
-};
+#include "unit_sync_entry.h"
 
 // A node of the std::map<unsigned int, UnitSyncEntry> tree (MSVC 5 xtree's
 // _Node): the links, the pair (key at +0xc, entry at +0x10) and the colour.

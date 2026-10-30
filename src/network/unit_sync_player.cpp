@@ -20,13 +20,7 @@ struct Elem_0046faf0 {                 // 14 bytes
 // The rects map's mapped type (0x10 bytes), the record unit_sync.cpp,
 // unit_sync_46ca60.cpp and unit_sync_46d1a0.cpp call UnitSyncEntry: the unit a
 // sync covers and the box it covers.
-struct UnitSyncEntry {
-    int x;                             // +0x0
-    int y;                             // +0x4
-    short w;                           // +0x8
-    short h;                           // +0xa
-    int limit;                         // +0xc
-};
+#include "unit_sync_entry.h"
 
 // The two 14-byte-element vectors, a sub-struct with a copy constructor of its
 // own: that is what spends the copy constructor's inline budget so the fourth
