@@ -1249,6 +1249,9 @@ void FreeMemoryCache(void);
 void InitExplosions(void);
 void FreeExplosions(void);
 void UpdateExplosions(void);
+int FindFreeExplodedPieceSlot(void);
+void UpdateExplodedPieces(void);
+void StampFeatureMetal(void);
 
 #pragma pack(push, 1)
 // One view of the 0xe byte projectile detonate packet (type 0xe): the sender
@@ -2488,36 +2491,27 @@ int __stdcall FireDroppedWeapon(Unit* unit, Aim_0049dd60* aim,
     return 0;
 }
 
-#pragma pack(push, 1)
-struct Proj_0049df10 {
-    char unknown_0[0x1c];
-    Vec3 dir;                 // +0x1c
-    char unknown_28[0x4e - 0x28];
-    int targetUnit;                    // +0x4e
-    char unknown_52[0x69 - 0x52];
-    unsigned short flags;              // +0x69
-};
+// The projectile record this function fills is weapons/projectile.h's.
 
 // Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
 void Unused_0049df10(int a, int b, int c, int d, int e, int f);
-#pragma pack(pop)
 
 int __cdecl GetLocalDpid();
-void __stdcall InitProjectile(Proj_0049df10*, void*, void*, int, int, void*);
+void __stdcall InitProjectile(Projectile*, void*, void*, int, int, void*);
 
 // FUNCTION: 0x49df10
 int __stdcall SpawnProjectile(WeaponDef* weapon, Vec3* a, Vec3* b, int flag)
 {
-    Proj_0049df10* proj = 0;
+    Projectile* proj = 0;
     if (g_game->projCount < 300) {
-        proj = &((Proj_0049df10*)g_game->projectiles)[g_game->projCount++];
+        proj = &((Projectile*)g_game->projectiles)[g_game->projCount++];
         proj->flags &= ~2;
         proj->targetUnit = 0;
     }
     if (!proj)
         return 0;
     InitProjectile(proj, weapon, a, 0, g_game->gameTick, 0);
-    proj->dir = *b;
+    *(Vec3*)&proj->velX = *b;
     if (flag) {
         // Read into a local first: only then does MSVC hoist the byte load
         // above the g_game->netGameFlagsWord test, into the low byte of the register
