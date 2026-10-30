@@ -279,21 +279,6 @@ struct Proj_0049c740 {
 
 struct Unit_0049c880;
 
-#pragma pack(push, 1)
-// Must end at +0x6b with no trailing padding: the loop stride follows it.
-struct Projectile_0049c880 {
-    WeaponDef* type;                   // +0x0
-    Vec3 pos;                          // +0x4
-    char unknown_10[0x52 - 0x10];
-    Unit_0049c880* owner;              // +0x52, the unit that fired it
-    char unknown_56[0x60 - 0x56];
-    short active;                      // +0x60
-    char unknown_62[0x69 - 0x62];
-    unsigned short flags;              // +0x69, 16-bit: the byte form changes
-                                       // the register allocation of 0x49c880
-};
-#pragma pack(pop)
-
 // Unused here: real functions declared for their symbol ids, which keep
 // 0x49a890 and 0x49aa80 matching, and make up the ids of the bit-field views
 // that weapon_def.h no longer declares (docs/c2-regalloc.md).
@@ -304,7 +289,9 @@ int HAPINET_enumconnections(void*, void*, unsigned long, void*, unsigned long, v
 int PickRandomReclaimableResourcesInRadius(int, int, int, int, int, int);
 int CreateUnit(int, int, int, int, int, int);
 
-struct Projectile;
+// The position and aim words are read as a Vec3 here: the explosion calls take
+// a Vec3*, so the view casts at the use (projectile.h keeps them as ints).
+#include "projectile.h"
 // The game state, as the weapon code sees it. The time word keeps one name per
 // view (now, frame, gameTick, teamColor); the two tracked-projectile pointers
 // are one union, 499a30's selected and 49c740's tracked.
@@ -349,7 +336,7 @@ struct Game {
     Unit* cameraFollowUnit;            // +0x142f3
     union {
         Proj_0049c740* cameraFollowTrackObj;  // +0x142f7
-        Projectile_0049c880* tracked;
+        Projectile* tracked;
         void* selected;                // 499a30's spelling
         Projectile* selectedProjectile;    // 499e50's and 499eb0's
     };
@@ -551,11 +538,11 @@ void __stdcall RockUnit(Object_00499c10* obj, Source_00499c10* src)
 
 #include "../ai/squad_manager.h"
 
-// The position and aim words are read as a Vec3 here: the explosion calls take
-// a Vec3*, so the view casts at the use (projectile.h keeps them as ints).
-#include "projectile.h"
-
-// Unused here: the symbol ids this declaration takes keep 0x49be60 matching (docs/c2-regalloc.md).
+// Unused here: the symbol ids these declarations take keep 0x49be60 matching (docs/c2-regalloc.md).
+void OpenEndMissionScreen(void);
+void EnableEndMissionButtons(void);
+void ShowEndMissionScreen(void);
+void OpenCdCheckDialog(void);
 int ShouldShowNextMission(void);
 
 int __stdcall ApplyWeaponDamage(Projectile* weapon, Unit* target, float scale);
@@ -713,7 +700,8 @@ void __stdcall DetonateProjectile(Projectile* projectile, Unit* unit)
     if (value != 0)
         hostile = value[5] < g_game->seaLevel;
     if (!type->flags.b.noExplode) {
-        if (projectile == g_game->selected) {            g_game->cameraSnapPos = *(Vec3_0049b720*)&g_game->selectedProjectile->posX;
+        if (projectile == g_game->selected) {
+            g_game->cameraSnapPos = *(Vec3_0049b720*)&g_game->selectedProjectile->posX;
             g_game->cameraSnapTicks = projectile->weapon->holdTime;
             g_game->selected = 0;
         }
@@ -1553,11 +1541,11 @@ void __stdcall InitProjectile(Proj_0049c740* proj, WeaponDef* shot, Vec3* pos,
 void CompactProjectiles();
 
 // Same body as the matched 0x499e50, which the original inlined here.
-static inline void Untrack_0049c880(Projectile_0049c880* proj)
+static inline void Untrack_0049c880(Projectile* proj)
 {
     if (proj == g_game->tracked) {
-        g_game->cameraSnapPos = g_game->tracked->pos;
-        g_game->cameraSnapTicks = proj->type->holdTime;
+        g_game->cameraSnapPos = *(Vec3*)&g_game->tracked->posX;
+        g_game->cameraSnapTicks = proj->weapon->holdTime;
         g_game->tracked = 0;
     }
     proj->flags |= 2;
@@ -1566,9 +1554,9 @@ static inline void Untrack_0049c880(Projectile_0049c880* proj)
 // FUNCTION: 0x49c880
 void __stdcall RemoveUnitProjectiles(Unit_0049c880* owner)
 {
-    Projectile_0049c880* proj = (Projectile_0049c880*)g_game->projectiles;
+    Projectile* proj = (Projectile*)g_game->projectiles;
     for (int i = 0; i < g_game->projectileCount; i++, proj++) {
-        if (proj->active != 0 && proj->owner == owner) {
+        if (proj->burstRemaining != 0 && proj->ownerUnit == (Unit*)owner) {
             Untrack_0049c880(proj);
             CompactProjectiles();
         }
