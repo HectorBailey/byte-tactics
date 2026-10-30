@@ -22,7 +22,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from check import (COMPILE_SCHEME, DEFAULT_FLAGS, ROOT, SYMBOLS, Original, annotations, base_name, compare,
-                   compile_source)
+                   compile_source, select_function)
 from coff import parse_object
 from issues import BANDS
 from sources import gap_annotations, include_hash, sources as files_of_kind
@@ -38,15 +38,57 @@ NOT_LEARNED = ("$", "??_C@", "__real@", "??_G", "??_E")
 LOCAL_STATIC = re.compile(r"@\?[0-9A-P]{1,4}@\?\?")
 
 
+def object_is_whole(src: Path, obj: Path) -> str:
+    """Why a cached object cannot be trusted, or "" when it is whole.
+
+    A compile can be cut short without failing, leaving an object that is
+    missing functions. Cached, it made a correct tree look broken until build/
+    was cleared by hand (#5777), so nothing may be cached, or reused from the
+    cache, before this check passes. Each function the file's annotations name
+    must be selectable in the object, the way tools/check.py picks it.
+    """
+    data = obj.read_bytes()
+    try:
+        parsed = parse_object(data, obj.name)
+    except Exception:
+        return "it does not parse as an object"
+    # The object names the file it was built from, which refuses an object of
+    # another source even for a file with no function to look for.
+    if src.name.encode() not in data:
+        return f"it was not built from {src.name}"
+    if not parsed.symbols:
+        return "it defines no symbol"
+    for address, qualname in annotations(src):
+        _, error = select_function(parsed, None, qualname)
+        if error:
+            return f"{address:#x} is missing from it ({error.splitlines()[0]})"
+    return ""
+
+
 def compile_cached(src: Path, ihash: str):
     key = hashlib.sha256(src.read_bytes() + ihash.encode() + (DEFAULT_FLAGS + COMPILE_SCHEME).encode()).hexdigest()[:16]
     stamp = ROOT / "build/progress" / src.relative_to(ROOT / "src").with_suffix(".key")
     obj = stamp.with_suffix(".obj")
     if stamp.exists() and stamp.read_text() == key and obj.exists():
-        return obj, ""
+        why = object_is_whole(src, obj)
+        if not why:
+            return obj, ""
+        # Rebuild rather than report a function this object does not have; the
+        # key alone says the file has not changed, not that the object is all there.
+        obj.unlink(missing_ok=True)
     obj, log = compile_source(src, out_dir="progress")
-    if obj:
-        stamp.write_text(key)
+    if obj is None:
+        # Under parallel load a compile fails at random, for no reason of the
+        # source's (C1033 and friends), so one retry is worth a whole build.
+        obj, log = compile_source(src, out_dir="progress")
+    if obj is None:
+        return None, log
+    why = object_is_whole(src, obj)
+    if why:
+        obj.unlink(missing_ok=True)
+        stamp.unlink(missing_ok=True)
+        return None, f"the compiler left an object with {why}\n{log}"
+    stamp.write_text(key)
     return obj, log
 
 
