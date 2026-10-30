@@ -364,7 +364,7 @@ struct Game {  // 0x3924d bytes
     char password[11];  // +0x2be3
     unsigned short flags;  // +0x2bee
     unsigned char mode_2bf0;  // +0x2bf0
-    unsigned char field_2bf1[11];  // +0x2bf1
+    unsigned char chatRecipients[11];  // +0x2bf1, ten players and the saved byte
     char unknown_2bfc[44];
     int table_2c28[10];  // +0x2c28
     char unknown_2c50[38];
@@ -489,8 +489,7 @@ struct Game {  // 0x3924d bytes
     int unitDefEnumDirty;  // +0x14397
     UnitDef* unitDefs;  // +0x1439b
     char unknown_1439f[8];
-    char field_143a7[4];  // +0x143a7
-    char unknown_143ab[1020];
+    char paletteRgba[0x400];  // +0x143a7, 256 RGB entries
     int baseHeight;  // +0x147a7
     int count_147ab;  // +0x147ab
     AnimEntry_00429700* entries_147af;  // +0x147af
@@ -705,8 +704,7 @@ struct Game {  // 0x3924d bytes
     void (__stdcall *handler)(void);  // +0x391f5
     int fontComix;  // +0x391f9
     void* fontSmlFont;  // +0x391fd
-    char field_39201[1];  // +0x39201
-    char unknown_39202[15];
+    char providerGuid[16];  // +0x39201, the selected service provider's GUID
     int connection;  // +0x39211
     int selectedDplayConnection;  // +0x39215
     int singleCommanderDeath;  // +0x39219
