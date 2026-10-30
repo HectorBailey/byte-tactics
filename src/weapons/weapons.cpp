@@ -1240,14 +1240,13 @@ done:
     g_game->projectileCount = count;
 }
 
-#pragma pack(push, 1)
-struct Projectile_0049af90 {
-    WeaponDef* type;                   // +0x0
-    char unknown_4[0x28 - 0x4];
-    Vec3 pos;                          // +0x28
-    char unknown_34[0x6b - 0x34];
-};
+// Unused here: the symbol ids these declarations take keep 0x49be60 matching
+// (docs/c2-regalloc.md).
+int DrawEndGameFrame(void);
+void RunEndGameState(void);
+void InitMemoryCache(void);
 
+#pragma pack(push, 1)
 // One view of the 0xe byte projectile detonate packet (type 0xe): the sender
 // at 0x49a120, a view of which is in the gap file, holds the other.
 struct ProjectileDetonatePacket {
@@ -1257,7 +1256,7 @@ struct ProjectileDetonatePacket {
 };
 #pragma pack(pop)
 
-void __stdcall DetonateProjectile(Projectile_0049af90* proj, int flag);
+void __stdcall DetonateProjectile(Projectile* proj, int flag);
 
 static inline int SamePos(const Vec3& a, const Vec3& b)
 {
@@ -1270,9 +1269,9 @@ static inline int SamePos(const Vec3& a, const Vec3& b)
 // FUNCTION: 0x49af90
 void __stdcall ApplyProjectileHitPacket(int unused, ProjectileDetonatePacket* p)
 {
-    Projectile_0049af90* proj = (Projectile_0049af90*)g_game->projectiles;
+    Projectile* proj = (Projectile*)g_game->projectiles;
     for (int i = 0; i < g_game->projectileCount; i++, proj++) {
-        if (SamePos(proj->pos, p->aim) && proj->type->index == p->weaponIndex) {
+        if (SamePos(*(Vec3*)&proj->aimX, p->aim) && proj->weapon->index == p->weaponIndex) {
             DetonateProjectile(proj, 0);
             return;
         }
