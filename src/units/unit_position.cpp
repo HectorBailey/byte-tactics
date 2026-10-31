@@ -500,7 +500,7 @@ void __stdcall UpdateAllUnits(void)
                             KillUnit(u, u->lastDamageType);
                         }
                     }
-                    u = (Unit*)((char*)u + 0x118);
+                    u = u + 1;
                 }
                 if (g_game->netGameFlags & 1) {
                     if (p->active != 0) {
@@ -782,8 +782,7 @@ void __stdcall ReceiveUnitStates(Player* p, unsigned int* data)
         index = (short)reader.ReadBits(0x10);
     }
 
-    for (Unit* u = p->unitsBegin; u <= p->unitsEnd;
-         u = (Unit*)((char*)u + 0x118)) {
+    for (Unit* u = p->unitsBegin; u <= p->unitsEnd; u = u + 1) {
         if ((u->flags & 0x10000000) && u->motion) {
             u->motion->UpdateMotion(u);
             UpdateUnitHeight(u);

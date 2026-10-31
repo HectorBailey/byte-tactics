@@ -24,6 +24,13 @@ void SetMemFussyDefault(void);
 #include "../map/mission.h"
 #include "../sound/sound.h"
 
+// Unused here: the symbol ids these declarations take keep 0x489800, 0x4898b0,
+// 0x489960, 0x4899b0, 0x489a70, 0x489a90, 0x48b090 matching (docs/c2-regalloc.md).
+void RegisterUnitOrders(void);
+void RegisterGroundOrders(void);
+void EnableAICommands(void);
+void RegisterAICommands(void);
+void FUN_00406f40(void);
 
 class Unit;
 
@@ -180,15 +187,14 @@ void Unit::ClaimWeapons(unsigned char index)
 // FUNCTION: 0x489960
 int Unit::CanReclaim(void *param_1)
 {
-    void *ptr = *(void **)((char *)this + 0x92);
-    unsigned int val1 = *(unsigned int *)((char *)ptr + 0x245);
+    Unit* other = (Unit*)param_1;
+    unsigned int val1 = def->flags2;
 
     if ((val1 & 0x400) != 0) {
-        unsigned int val2 = *(unsigned int *)((char *)param_1 + 0x110);
+        unsigned int val2 = other->flags;
 
         if ((val2 & 3) != 2) {
-            void *ptr2 = *(void **)((char *)param_1 + 0x92);
-            unsigned int val3 = *(unsigned int *)((char *)ptr2 + 0x245);
+            unsigned int val3 = other->def->flags2;
 
             if ((val3 & 0x1000) == 0) {
                 return 1;

@@ -110,6 +110,13 @@ struct Obj {
     unsigned char f10a;                 // +0x10a
 };
 
+// The unit type's two name fields only; units/unit_def.h holds the whole
+// 0x249-byte class but cannot be included here without moving the functions.
+struct UnitDefNames {
+    char name[0x20];                    // +0x000
+    char unitname[0x20];                // +0x020
+};
+
 struct Unit {
     void* motion;                       // +0x0
     Piece weapons[3];                   // +0x4
@@ -124,7 +131,7 @@ struct Unit {
     char gap_82[4];
     void* carrier;                      // +0x86
     char gap_8a[8];
-    void* def;                     // +0x92
+    UnitDefNames* def;                  // +0x92
     char gap_96[4];
     class CobScript* script;          // +0x9a
     char gap_9e[0xa];
@@ -381,7 +388,7 @@ void __stdcall SaveUnits(HapiBank* file)
     file->OpenAccount("Units");
     end = g_game->unitsEnd;
     unit = g_game->units;
-    for (; unit <= end; unit = (Unit*)((char*)unit + 0x118)) {
+    for (; unit <= end; unit = unit + 1) {
         if (unit->flags & 0x10000000) {
             SaveRec rec;
             char bufTail[32], script[32];
@@ -409,9 +416,9 @@ void __stdcall SaveUnits(HapiBank* file)
 
             if (unit->motion != 0)
                 ((UnitMotion*)unit->motion)->SaveMotion(unit, file);
-            ((UnitResources*)((char*)unit + 0xbc))->SaveUnitAccounts((UnitInfo*)unit, file);
+            ((UnitResources*)&unit->resourceSlot)->SaveUnitAccounts((UnitInfo*)unit, file);
 
-            strcpy(rec.name, (char*)unit->def + 0x20);
+            strcpy(rec.name, unit->def->unitname);
             rec.player = unit->playerIndex;
             rec.id = unit->id;
 
