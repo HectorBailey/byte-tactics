@@ -213,8 +213,8 @@ void __cdecl GameAllocIgnoreTag(unsigned int name, unsigned int size)
     GameAlloc(size);
 }
 
-class CritSec_004da780;
-CritSec_004da780* GetAllocLock();
+class AllocLock;
+AllocLock* GetAllocLock();
 void* __cdecl AllocDebugBlock(unsigned int size, int flags);
 void __cdecl CountAlloc(unsigned int size);
 extern void (*g_outOfMemoryHandler)();
@@ -1353,20 +1353,20 @@ failed:
 // use. The empty inline destructor makes MSVC register the empty atexit
 // thunk AllocLockAtexitHandler.
 
-class CritSec_004da780 {
+class AllocLock {
 public:
     CRITICAL_SECTION cs;
 
-    CritSec_004da780() { InitializeCriticalSection(&cs); }
-    ~CritSec_004da780() {}
+    AllocLock() { InitializeCriticalSection(&cs); }
+    ~AllocLock() {}
 };
 
 // The original calls this out of line from the allocator, the block map and the trees.
 #pragma auto_inline(off)
 // FUNCTION: 0x4da780
-CritSec_004da780* GetAllocLock()
+AllocLock* GetAllocLock()
 {
-    static CritSec_004da780 lock;
+    static AllocLock lock;
     return &lock;
 }
 #pragma auto_inline(on)
@@ -2246,7 +2246,7 @@ typedef void (Vec_004dd8c0::*InsertFn_004dd8c0)(
 char IsMemFussy();
 char IsBackAlign();
 int GetDebugFillPattern();
-CritSec_004da780* GetAllocLock();
+AllocLock* GetAllocLock();
 void* GetBlockMap();
 Container_004da9f0<int>* GetFreedBlockRing();
 unsigned int __cdecl RoundUpToPage(unsigned int size);
@@ -3712,14 +3712,8 @@ public:
     void CloseMappedFile();
 };
 
-// One FPO_DATA record (see 0x4de020).
-struct Fpo_004de020 {
-    unsigned int offStart;             // +0x0
-    unsigned int procSize;             // +0x4
-    unsigned int locals;               // +0x8
-    unsigned short params;             // +0xc
-    unsigned short flags;              // +0xe
-};
+// The records 0x4de020 binary-searches are the image's FPO table, so they are
+// FPO_DATA from <winnt.h> (16 bytes, as the record count's sizeof reads them).
 
 class LoadedImage : public MappedFile {
 public:
@@ -3732,9 +3726,9 @@ public:
 
     LoadedImage(HMODULE m);
     ~LoadedImage();
-    Fpo_004de020* GetFpoRecords();
+    FPO_DATA* GetFpoRecords();
     unsigned int GetFpoRecordCount();
-    Fpo_004de020* FindFpoRecord(unsigned int address);
+    FPO_DATA* FindFpoRecord(unsigned int address);
 };
 
 // The loaded-image reader of the debug library; 0x4de0a0's function-local
@@ -3772,13 +3766,13 @@ LoadedImage::LoadedImage(HMODULE m) : MappedFile(0)
 // The original calls this out of line from 0x4de020.
 #pragma auto_inline(off)
 // FUNCTION: 0x4ddfa0
-Fpo_004de020* LoadedImage::GetFpoRecords()
+FPO_DATA* LoadedImage::GetFpoRecords()
 {
     if (debugDirs == 0)
         return 0;
     for (int i = 0; i < numDebugDirs; i++) {
         if (debugDirs[i].Type == IMAGE_DEBUG_TYPE_FPO)
-            return (Fpo_004de020*)((char*)view + debugDirs[i].PointerToRawData);
+            return (FPO_DATA*)((char*)view + debugDirs[i].PointerToRawData);
     }
     return 0;
 }
@@ -3793,32 +3787,32 @@ unsigned int LoadedImage::GetFpoRecordCount()
         return 0;
     for (int i = 0; i < numDebugDirs; i++) {
         if (debugDirs[i].Type == 3)
-            return debugDirs[i].SizeOfData / sizeof(Fpo_004de020);
+            return debugDirs[i].SizeOfData / sizeof(FPO_DATA);
     }
     return 0;
 }
 #pragma auto_inline(on)
 
 // FUNCTION: 0x4de020
-Fpo_004de020* LoadedImage::FindFpoRecord(unsigned int address)
+FPO_DATA* LoadedImage::FindFpoRecord(unsigned int address)
 {
-    Fpo_004de020* first = GetFpoRecords();
+    FPO_DATA* first = GetFpoRecords();
     if (first == 0)
         return 0;
     int n = GetFpoRecordCount();
     if (n == 0)
         return 0;
-    Fpo_004de020* last = first + n;
-    Fpo_004de020* mid = first + n / 2;
+    FPO_DATA* last = first + n;
+    FPO_DATA* mid = first + n / 2;
     unsigned int rva = address - imageBase;
     while (first + 1 != last) {
-        if (rva < mid->offStart)
+        if (rva < mid->ulOffStart)
             last = mid;
         else
             first = mid;
         mid = first + (last - first) / 2;
     }
-    if (rva >= first->offStart && rva < first->offStart + first->procSize)
+    if (rva >= first->ulOffStart && rva < first->ulOffStart + first->cbProcSize)
         return first;
     return 0;
 }
@@ -4796,8 +4790,8 @@ public:
     CRITICAL_SECTION cs;
 };
 
-class CritSec_004e1ac0;
-CritSec_004e1ac0* GetNameTableLock();
+class NameTableLock;
+NameTableLock* GetNameTableLock();
 
 struct Node_004e18c0 {
     Node_004e18c0* left;               // +0x0
@@ -5684,12 +5678,12 @@ BOOL __stdcall MemoryStatusDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 
 // Returns a critical section that is initialised on first use (a
 // function-local static; its atexit destructor 0x4e0730 is empty).
-class CritSec_004e06f0 {
+class MemStatusLock {
 public:
     CRITICAL_SECTION cs;
 
-    CritSec_004e06f0() { InitializeCriticalSection(&cs); }
-    ~CritSec_004e06f0() {}
+    MemStatusLock() { InitializeCriticalSection(&cs); }
+    ~MemStatusLock() {}
 };
 
 // The original calls this from 0x4e0740, 0x4e0790 and FormatWorkingSet
@@ -5698,7 +5692,7 @@ public:
 // FUNCTION: 0x4e06f0
 LPCRITICAL_SECTION GetMemStatusLock(void)
 {
-    static CritSec_004e06f0 lock;
+    static MemStatusLock lock;
     return &lock.cs;
 }
 #pragma auto_inline(on)
@@ -6130,15 +6124,15 @@ void Class_004e18c0::Clear()
 }
 #pragma auto_inline(on)
 
-class CritSec_004e1ac0 {
+class NameTableLock {
 public:
     CRITICAL_SECTION cs;
 
-    CritSec_004e1ac0() { InitializeCriticalSection(&cs); }
-    ~CritSec_004e1ac0() {}
+    NameTableLock() { InitializeCriticalSection(&cs); }
+    ~NameTableLock() {}
 };
 
-CritSec_004e1ac0* GetNameTableLock();
+NameTableLock* GetNameTableLock();
 
 // 0x4e1990 (src/debug/debug_lib_4e1990.cpp) stays in its own file: this merge
 // would make NameKey::LessThan (0x4e1a30, below) inlinable at its call
@@ -6182,9 +6176,9 @@ NameTable* GetNameTable()
 // The original calls this from 0x4e1990 rather than inlining it.
 #pragma auto_inline(off)
 // FUNCTION: 0x4e1ac0
-CritSec_004e1ac0* GetNameTableLock()
+NameTableLock* GetNameTableLock()
 {
-    static CritSec_004e1ac0 lock;
+    static NameTableLock lock;
     return &lock;
 }
 #pragma auto_inline(on)
