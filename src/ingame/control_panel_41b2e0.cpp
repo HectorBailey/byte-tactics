@@ -47,6 +47,9 @@ struct UnitType_0041b2e0 {
     unsigned int bits15 : 17;
 };
 
+// Same bit names as units/unit.h's +0x110 union (#7329), kept as this file's
+// own copy: ta_types.h also defines Unit and the include set decides the
+// match, so this view cannot take the header here.
 struct UnitFlags {
     unsigned int bits0 : 4;
     unsigned int selected : 1;         // bit 4
@@ -55,8 +58,8 @@ struct UnitFlags {
     unsigned int bits12 : 6;
     unsigned int moveOrder : 2;        // bits 18-19
     unsigned int fireOrder : 2;        // bits 20-21
-    unsigned int buildPage : 1;        // bit 22
-    unsigned int page : 3;             // bits 23-25
+    unsigned int buildMenuOpen : 1;    // bit 22
+    unsigned int buildMenuPage : 3;    // bits 23-25
     unsigned int bits26 : 6;
 };
 
@@ -244,7 +247,7 @@ void RefreshSelectionOrders()
         PopUntilNamedLayout(0);
         g_game->orders.refresh = 0;
     } else if (count == 1 && first->def->buildMenuPageCount) {
-        int page = first->flags.buildPage ? first->flags.page : 0;
+        int page = first->flags.buildMenuOpen ? first->flags.buildMenuPage : 0;
         if (page > 0 || (first->def->flags1 & 0x80000000)) {
             char name[256];
             char gui[256];
