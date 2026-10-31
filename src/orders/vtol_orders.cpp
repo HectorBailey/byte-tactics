@@ -116,7 +116,7 @@ public:
     char unknown_0[8];
     Vec3 v;                            // +0x8
     char unknown_14[0x22 - 0x14];
-    short field_22;                    // +0x22
+    short speedWhole;                  // +0x22, the whole half of the 16.16 speed
     char unknown_24[0x2e - 0x24];
     unsigned char flags;               // +0x2e
     void SetFlightMode(Unit* unit, int state);

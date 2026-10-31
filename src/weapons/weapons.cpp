@@ -1140,7 +1140,7 @@ int __stdcall WeaponCanReachPos(Unit* a1, Vec3_0049aa80* a2, Vec3_0049aa80* a3, 
         return 0;
 
     if (wdef->flags.b.ballistic) {
-        if (LineOfFire_0049aa80(*a2, *a3, wdef->speed, wdef->field_c8) == (short)0x8000)
+        if (LineOfFire_0049aa80(*a2, *a3, wdef->speed, wdef->minBarrelAngleBits) == (short)0x8000)
             return 0;
     }
     return 1;
@@ -1206,7 +1206,7 @@ int __stdcall WeaponCanReachUnit(Unit* unit1, Unit* unit2, unsigned char weapon)
         return 0;
     // Nested ifs, not one && condition: the flag test codegen differs.
     if (w->flags.b.ballistic) {
-        if (LineOfFire_0049abb0(unit1->pos_0049abb0, unit2->pos_0049abb0, w->speed, w->field_c8) == (short)0x8000)
+        if (LineOfFire_0049abb0(unit1->pos_0049abb0, unit2->pos_0049abb0, w->speed, w->minBarrelAngleBits) == (short)0x8000)
             return 0;
     }
     return Dist2_0049abb0(&unit1->pos_0049abb0, &unit2->pos_0049abb0) <= w->range * w->range;
@@ -2073,7 +2073,7 @@ int __stdcall FireTurretWeapon(Unit* fire, Unit* unit,
             int dy = p.y - point->y;
             int dz = p.z - point->z;
             heading = FUN_004b715a(dx, dz) - fire->f_66;
-            pitch = SolveLaunchAngle(dx, dy, dz, def->speed, def->pitch);
+            pitch = SolveLaunchAngle(dx, dy, dz, def->speed, def->minBarrelAngle);
             ok = (unsigned short)pitch != 0x8000;
         } else if (def->flags.b.lineOfSight) {
             ok = CalcAimAngles(fire, def, (short*)&heading, (short*)&pitch,
@@ -2518,7 +2518,7 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
                     GetAimFromPosition(unit, &aim, (unsigned char)((e->flags >> WEAPON_SLOT_INDEX_SHIFT) & 3));
                     SubtractVec3(&aim, &pos, &dx, &dy, &dz);
                     heading = (unsigned short)(FUN_004b715a(dx, dz) - unit->heading);
-                    angle = SolveLaunchAngle(dx, dy, dz, t->speed, t->pitch);
+                    angle = SolveLaunchAngle(dx, dy, dz, t->speed, t->minBarrelAngle);
                     ok = (angle != 0x8000);
                 } else if (t->flags.b.lineOfSight) {
                     ok = CalcAimAngles(unit, t, &heading, &angle, (unsigned char)(e->flags >> WEAPON_SLOT_INDEX_SHIFT & 3),

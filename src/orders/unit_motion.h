@@ -56,7 +56,7 @@ public:
         int speed;                     // +0x20
         struct {
             short speedLow;            // +0x20
-            short field_22;            // +0x22
+            short speedWhole;          // +0x22, the whole half of the 16.16 speed
         };
     };
     short turn;                        // +0x24, turn this tick

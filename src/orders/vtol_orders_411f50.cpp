@@ -31,7 +31,7 @@ struct Unit;
 class UnitMotion {
 public:
     char unknown_0[0x22];
-    short field_22;                    // +0x22
+    short speedWhole;                  // +0x22, the whole half of the 16.16 speed
     char unknown_24[0x2e - 0x24];
     unsigned char flags;               // +0x2e
     void SetFlightMode(Unit* unit, int state);
@@ -235,7 +235,7 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         // Float local x: keeps the constant multiply from moving outermost.
         float x = (float)sqrt(size * 2.0 / rate) * 30.0f;
         // attackrunlength is added in a second statement: one sum changes the x87 order.
-        int time = (int)(x * unit->motion->field_22) + 1;
+        int time = (int)(x * unit->motion->speedWhole) + 1;
         time += def->attackrunlength;
         PathOrder* obj;
         if (order->target.owner)

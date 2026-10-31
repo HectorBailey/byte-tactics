@@ -70,8 +70,8 @@ struct WeaponDef {
     float energyPerShot;              // +0xc0
     float metalPerShot;               // +0xc4
     union {
-        float pitch;                  // +0xc8
-        int field_c8;                 // the launch-angle solvers read the float's bits
+        float minBarrelAngle;         // +0xc8, TDF minbarrelangle, in radians
+        int minBarrelAngleBits;       // the launch-angle solvers read the float's bits
     };
     int shakeMagnitude;               // +0xcc, the screen shake of the blast
     int shakeDuration;                // +0xd0

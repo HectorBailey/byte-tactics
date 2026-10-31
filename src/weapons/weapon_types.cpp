@@ -125,7 +125,7 @@ void __stdcall LoadWeaponType(TdfRecord* parser) {
     // +0xfe is the TDF holdtime in ticks; the blast code copies it to cameraSnapTicks.
     w->holdTime = (unsigned short)(parser->GetFieldDouble("holdtime", 0.0) * 30.0);
     // No (float) cast: it costs the scheduler one unit and shifts later bitfield stores.
-    w->pitch =
+    w->minBarrelAngle =
         parser->GetFieldDouble("minbarrelangle", -11.25) * (PI / 180);
     w->fireStarter = (unsigned char)parser->GetFieldInt("firestarter", 0);
     w->shotKind = (unsigned char)parser->GetFieldInt("rendertype", 0);
