@@ -9,16 +9,12 @@
 #include <stdio.h>
 
 #pragma pack(push, 1)
-struct Entry_0044c420 {                // DESCLIST / PICLIST gadget
-    char unknown_0[0xbc];
-    short firstRow;                    // +0xbc
-    char unknown_be[0xc0 - 0xbe];
-    short count;                       // +0xc0 picture slot count
-    void* listText;                    // +0xc2 the DESCLIST text lines, freed here
-    void* rows;                        // +0xc6 freed scratch
-    char unknown_ca[0xd6 - 0xca];
-    char* flags;                       // +0xd6 per-item flags, freed
-};
+
+#include "../gui/gadget.h"
+#include "../gui/gui.h"
+#include "../gui/layer.h"
+#include "../network/unit_sync.h"
+#include "../units/unit_def.h"
 
 struct Record_005129b4 {               // 0x62-byte slider/picture record
     char unknown_0[0x52];
@@ -38,82 +34,66 @@ union Flags_0044c420 {                 // the dword at +0x245
 };
 
 // game.h's unitDefs is a UnitDef* (units/unit_def.h, the same 0x249-byte
-// record); this file reads the two fields the restriction list tests, so it
-// casts the pointer to its own view at the use.
+// record); this view stays because the restriction list reads bit 15 of the
+// flag word as a 1-bit field, and the shift-and-test the original emits only
+// comes out of a bitfield (folded onto UnitDef's plain flag word the function
+// comes out three bytes short).
 struct Item_0044c420 {                 // 0x249-byte unit type instance
     char unknown_0[0x20];
     char name[0x225];                  // +0x20
     Flags_0044c420 flags2;             // +0x245
 };
 
-struct Inner_0044c420 {
-    int unknown_0;
-    void* gadgets;                     // +0x4
-};
-
-struct Menu_0044c420 {
-    char unknown_0[0x18];
-    Inner_0044c420* inner;             // +0x18
-    char unknown_1c[0x60 - 0x1c];
-    int current;                       // +0x60 current gadget, -1 for none
-};
-
-#include "../network/unit_sync.h"
-#include "../units/unit_def.h"
 #pragma pack(pop)
 
 #include "../game/game.h"
-
-struct Struct_004c6ac0 {
-    char unknown_0[0x2c];
-    unsigned char flags;               // +0x2c
-};
+#include "../graphics/surface.h"
 
 extern Game* g_game;
 extern int* g_unitRestrictPics;
 extern Record_005129b4* g_unitRestrictEntries;
 extern int* g_unitRestrictOldCounts;
 
-Entry_0044c420* __stdcall FindGadgetChecked(void* gadgets, char* name);
-int __stdcall IsCurrentGadgetNamed(Menu_0044c420* gui, char* name);
-void __stdcall ClearSelectedGadget(Menu_0044c420* obj);
+Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
+int __stdcall IsCurrentGadgetNamed(Gui* gui, char* name);
+void __stdcall ClearSelectedGadget(Gui* obj);
 void __stdcall SetDescListCleanupFlag(int param_1, int param_2);
-void __stdcall MarkChanged(Menu_0044c420* obj);
+void __stdcall MarkChanged(Gui* obj);
 void __stdcall PlaySoundByName(char* name, int param_2);
-void __stdcall UpdateUnitSliders(Menu_0044c420* menu, int value);
+void __stdcall UpdateUnitSliders(Gui* menu, int value);
 void OpenLoadListDialog();
 void OpenSaveGameDialog();
-void __stdcall FreeSurface(Struct_004c6ac0* obj);
+void __stdcall FreeSurface(Surface* obj);
 void __cdecl GameFreeThunk(void* p);
 int IsHostLocal();
 
 // FUNCTION: 0x44c420
-void __stdcall HandleRestrictionsClick(Menu_0044c420* menu)
+void __stdcall HandleRestrictionsClick(Gui* menu)
 {
     int i;
     int n;
     int type;
     int* p;
     Item_0044c420* item;
-    Entry_0044c420* desc;
-    Entry_0044c420* pic;
+    Gadget* desc;
+    Gadget* pic;
 
-    desc = FindGadgetChecked(menu->inner->gadgets, "DESCLIST");
-    if (menu->current == -1) {
+    desc = FindGadgetChecked(menu->layer->entries, "DESCLIST");
+    if (menu->hotGadgetIndex == -1) {
         i = 0;
         p = g_unitRestrictPics;
-        if (desc->count > 0) {
+        if (desc->u.list.rowCount > 0) {
             do {
                 if (*p != 0)
-                    FreeSurface((Struct_004c6ac0*)*p);
+                    FreeSurface((Surface*)*p);
                 p++;
                 i++;
-            } while (i < desc->count);
+            } while (i < desc->u.list.rowCount);
         }
-        GameFreeThunk(desc->rows);
+        GameFreeThunk(desc->u.list.rows);
         GameFreeThunk(g_unitRestrictPics);
         g_unitRestrictPics = 0;
-        GameFreeThunk(desc->listText);
+        GameFreeThunk(desc->u.list.listText);
         SetDescListCleanupFlag((int)menu, 1);
         if (IsHostLocal() != 0) {
             for (i = 0; i < g_game->unitDefCount; i++) {
@@ -132,10 +112,10 @@ void __stdcall HandleRestrictionsClick(Menu_0044c420* menu)
         }
         GameFreeThunk(g_unitRestrictEntries);
         GameFreeThunk(g_unitRestrictOldCounts);
-        GameFreeThunk(desc->flags);
-        pic = FindGadgetChecked(menu->inner->gadgets, "PICLIST");
-        if (pic != 0 && pic->rows != 0)
-            GameFreeThunk(pic->rows);
+        GameFreeThunk(desc->u.list.filebuf);
+        pic = FindGadgetChecked(menu->layer->entries, "PICLIST");
+        if (pic != 0 && pic->u.list.rows != 0)
+            GameFreeThunk(pic->u.list.rows);
         g_unitRestrictEntries = 0;
         return;
     }
@@ -192,6 +172,6 @@ void __stdcall HandleRestrictionsClick(Menu_0044c420* menu)
         }
         return;
     }
-    if (menu->current != -1)
+    if (menu->hotGadgetIndex != -1)
         ClearSelectedGadget(menu);
 }
