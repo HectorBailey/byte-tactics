@@ -2833,8 +2833,10 @@ struct LobbySlotNetIdsPacket {
 };
 
 
-struct Packet_00456de0 {
-    unsigned char type;                 // +0x0
+// The load progress packet (type 0x2a) SendLoadProgress broadcasts: the
+// average of the six load-stage percentages (Thaldren's AveragePlayerSkill).
+struct LoadProgressPacket {
+    unsigned char type;                 // +0x0, 0x2a
     unsigned char progress;             // +0x1
 };
 
@@ -3321,7 +3323,7 @@ static inline int PlayerId_00456de0(unsigned char i)
 // FUNCTION: 0x456de0
 void __stdcall SendLoadProgress()
 {
-    Packet_00456de0 packet;
+    LoadProgressPacket packet;
     // The type store must be the first statement, ahead of the prologue stores.
     packet.type = 0x2a;
     // Own int total, summed as a += chain in this order: sets the load order.
