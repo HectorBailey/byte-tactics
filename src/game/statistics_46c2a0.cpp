@@ -80,9 +80,7 @@ int FillScoreTables()
             for (; n < 10; n++)
                 allies[n] = 0;
             Mission* c = g_game->mapInfo;
-            // Unsigned, as Thaldren types dwGameTick; game.h's int keeps economy_401360.cpp's
-            // signed compare.
-            int score = (int)((unsigned int)g_game->gameTick / 60 * c->timeMul);
+            int score = (int)(g_game->gameTick / 60 * c->timeMul);
             score += (int)(p->kills * c->killMul);
             g_onlineReportScoreBoards[i]->score = score;
             g_onlineReportScoreBoards[i]->count = 9;

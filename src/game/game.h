@@ -584,7 +584,7 @@ struct Game {  // 0x3924d bytes
     int frames_38a3b;  // +0x38a3b
     int scrollScale;  // +0x38a3f
     int carry;        // +0x38a43
-    int gameTick;     // +0x38a47
+    unsigned int gameTick;  // +0x38a47, Thaldren's dwGameTick
     unsigned short speedCtrl;    // +0x38a4b
     short effectiveGameSpeed;  // +0x38a4d
     short streak;  // +0x38a4f
