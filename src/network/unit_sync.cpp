@@ -764,11 +764,11 @@ UnitSync::UnitSync(int param)
         UnitSyncEntry v;
         for (unsigned short i = 1; i < g_game->unitDefCount; i++) {
             unsigned int key = g_game->unitDefs[i].fbiChecksum;
-            v.x = key;
-            v.y = 0;
-            v.w = 1;
-            v.h = (short)sub2.direct;
-            v.limit = FlagOf_0046d040(&g_game->unitDefs[i]) ? 0 : -1;
+            v.fbiChecksum = key;
+            v.scriptChecksum = 0;
+            v.unitEnabled = 1;
+            v.checksumMatch = (short)sub2.direct;
+            v.maxThisUnit = FlagOf_0046d040(&g_game->unitDefs[i]) ? 0 : -1;
             map[key] = v;
         }
     }
@@ -780,13 +780,13 @@ void UnitSync::ResetEntries()
 {
     UnitSyncEntry v;
     for (unsigned short i = 1; i < g_game->unitDefCount; i++) {
-        v.x = g_game->unitDefs[i].fbiChecksum;
+        v.fbiChecksum = g_game->unitDefs[i].fbiChecksum;
         // Dead store that must stay: the uninitialised slot is what the insert copies.
-        v.y = 0;
-        v.w = 1;
-        v.h = (short)direct;
-        v.limit = FlagOf_0046d040(&g_game->unitDefs[i]) ? 0 : -1;
-        ((std::map<unsigned int, UnitSyncEntry>&)map)[v.x] = v;
+        v.scriptChecksum = 0;
+        v.unitEnabled = 1;
+        v.checksumMatch = (short)direct;
+        v.maxThisUnit = FlagOf_0046d040(&g_game->unitDefs[i]) ? 0 : -1;
+        ((std::map<unsigned int, UnitSyncEntry>&)map)[v.fbiChecksum] = v;
     }
 }
 
@@ -956,11 +956,11 @@ void UnitSync::HandleSyncPacket(UnitSyncPacket* packet, unsigned char player)
     } else {
         if (packet->arg != 0 && packet->arg == 3) {
             UnitSyncEntry r;
-            r.x = packet->key;
-            r.y = 0;
-            r.w = packet->enabled;
-            r.h = packet->match;
-            r.limit = packet->limit;
+            r.fbiChecksum = packet->key;
+            r.scriptChecksum = 0;
+            r.unitEnabled = packet->enabled;
+            r.checksumMatch = packet->match;
+            r.maxThisUnit = packet->limit;
             map[packet->key] = r;
             this->NotifyEntryChanged(packet->key);
         }
@@ -987,10 +987,10 @@ void UnitSync::NotifyEntryChanged(unsigned int param_1)
                 UnitSyncPacket packet;
                 packet.type = 0x1a;
                 packet.arg = 3;
-                packet.key = v->x;
-                packet.enabled = v->w;
-                packet.match = v->h;
-                packet.limit = v->limit;
+                packet.key = v->fbiChecksum;
+                packet.enabled = v->unitEnabled;
+                packet.match = v->checksumMatch;
+                packet.limit = v->maxThisUnit;
                 this->SendSyncPacket(&i->id, &packet, 1);
                 i->sent++;
             }
@@ -1022,20 +1022,20 @@ void UnitSync::CheckUnitAvailable(unsigned int key, int y)
 
     int h = 1;
     if (y != 0) {
-        if (it.ptr->value.y == 0) {
+        if (it.ptr->value.scriptChecksum == 0) {
             int n = g_game->unitDefCount;
             for (int i = 1; i < n; i++) {
                 UnitDef* def = &g_game->unitDefs[i];
                 if (def->fbiChecksum == key) {
                     ComputeUnitScriptChecksum(def);
-                    it.ptr->value.y = def->scriptChecksum;
+                    it.ptr->value.scriptChecksum = def->scriptChecksum;
                     break;
                 }
             }
         }
     }
     if (y != 0) {
-        if (y != it.ptr->value.y)
+        if (y != it.ptr->value.scriptChecksum)
             h = 0;
     }
 
@@ -1071,7 +1071,7 @@ void UnitSync::CheckUnitAvailable(unsigned int key, int y)
         }
     }
 
-    it.ptr->value.h = h;
+    it.ptr->value.checksumMatch = h;
     NotifyEntryChanged(key);
 }
 
@@ -1184,8 +1184,8 @@ void UnitSync::ApplyToUnitTypes()
             def->versionCompatible = 0;
         } else {
             ProtectUnitDefsReadWrite();
-            def->versionCompatible = (it.ptr->value.w != 0 && it.ptr->value.h != 0);
-            def->maxThisUnit = it.ptr->value.limit;
+            def->versionCompatible = (it.ptr->value.unitEnabled != 0 && it.ptr->value.checksumMatch != 0);
+            def->maxThisUnit = it.ptr->value.maxThisUnit;
         }
         ProtectUnitDefsReadOnly();
     }
@@ -1214,7 +1214,7 @@ int UnitSync::PopChangedEntry(UnitSyncEntry* out)
 int UnitSync::GetUnitEntry(UnitDef* unit, UnitSyncEntry* out)
 {
     *out = Find(&unit->fbiChecksum).ptr->value;
-    return out->w != 0 && out->h != 0;
+    return out->unitEnabled != 0 && out->checksumMatch != 0;
 }
 
 // Toggles the entry's width; returns whether the entry now has a non-empty
@@ -1223,9 +1223,9 @@ int UnitSync::GetUnitEntry(UnitDef* unit, UnitSyncEntry* out)
 int UnitSync::ToggleUnitAllowed(UnitDef* unit)
 {
     UnitSyncNode* n = Find(&unit->fbiChecksum).ptr;
-    n->value.w = (n->value.w == 0);
+    n->value.unitEnabled = (n->value.unitEnabled == 0);
     NotifyEntryChanged(unit->fbiChecksum);
-    return n->value.w != 0 && n->value.h != 0;
+    return n->value.unitEnabled != 0 && n->value.checksumMatch != 0;
 }
 
 // Clears the entry's width; returns whether the entry now has a non-empty
@@ -1234,9 +1234,9 @@ int UnitSync::ToggleUnitAllowed(UnitDef* unit)
 int UnitSync::DisallowUnit(UnitDef* unit)
 {
     UnitSyncNode* n = Find(&unit->fbiChecksum).ptr;
-    n->value.w = 0;
+    n->value.unitEnabled = 0;
     NotifyEntryChanged(unit->fbiChecksum);
-    return n->value.w != 0 && n->value.h != 0;
+    return n->value.unitEnabled != 0 && n->value.checksumMatch != 0;
 }
 
 // Sets the entry's width to 1; returns whether the entry now has a non-empty
@@ -1245,9 +1245,9 @@ int UnitSync::DisallowUnit(UnitDef* unit)
 int UnitSync::AllowUnit(UnitDef* unit)
 {
     UnitSyncNode* n = Find(&unit->fbiChecksum).ptr;
-    n->value.w = 1;
+    n->value.unitEnabled = 1;
     NotifyEntryChanged(unit->fbiChecksum);
-    return n->value.w != 0 && n->value.h != 0;
+    return n->value.unitEnabled != 0 && n->value.checksumMatch != 0;
 }
 
 // Sets the last field of the unit's entry and has NotifyEntryChanged look at it.
@@ -1256,7 +1256,7 @@ void UnitSync::SetUnitLimit(UnitDef* unit, int value)
 {
     UnitSyncIter it = Find(&unit->fbiChecksum);
     if (!(it == End())) {
-        it.ptr->value.limit = value;
+        it.ptr->value.maxThisUnit = value;
         NotifyEntryChanged(unit->fbiChecksum);
     }
 }
