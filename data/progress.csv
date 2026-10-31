@@ -922,7 +922,7 @@ address,size,file,symbol,status,similarity
 0x44c0d0,335,src/frontend/multi.cpp,?LoadUnitPortrait@@YGXXZ,matched,100.0
 0x44c220,333,src/frontend/multi.cpp,?UnitRestrictDialogFrame@@YGXXZ,matched,100.0
 0x44c370,166,src/frontend/multi.cpp,?ShowSelectedUnitCosts@@YGXPAXPAUGadget@@@Z,matched,100.0
-0x44c420,889,src/frontend/multi_44c420.cpp,?HandleRestrictionsClick@@YGXPAUMenu_0044c420@@@Z,matched,100.0
+0x44c420,889,src/frontend/multi_44c420.cpp,?HandleRestrictionsClick@@YGXPAUGui@@@Z,matched,100.0
 0x44c7a0,59,src/frontend/multi.cpp,?CompareUnitRestrictEntries@@YAHPBD0@Z,matched,100.0
 0x44c7e0,1586,src/frontend/multi.cpp,?OpenUnitRestrictions@@YGXXZ,matched,100.0
 0x44ce20,18,src/frontend/multi.cpp,??0OrderFx@@QAE@H@Z,matched,100.0
