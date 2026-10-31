@@ -11,8 +11,10 @@
 #define DISPLAY_CONTEXT_H
 
 #include <windows.h>
+#include "../gui/mouse_event.h"
 
 struct Surface;
+struct GafFrame;
 // The bitmap font the font API reads at +0x204 (font.cpp defines it).
 struct Font;
 
@@ -84,9 +86,25 @@ struct DisplayContext {
     int mappedKeyQueue[30];                  // +0xf6
     int mappedKeyWriteIdx;                   // +0x16e
     int mappedKeyReadIdx;                    // +0x172
-    char unknown_176[0x1d2 - 0x176];         // +0x176, the mouse queue
+    char unknown_176[0x186 - 0x176];         // +0x176
+    // The mouse: its event queue, the current event, and the cursor and its
+    // thread (Thaldren's names; gui/mouse.cpp reads them).
+    int mouseEventQueueCap;                  // +0x186
+    MouseEvent* mouseEventQueue;             // +0x18a
+    int mouseEventWriteIdx;                  // +0x18e
+    int mouseEventReadIdx;                   // +0x192
+    MouseEvent curMouseEvent;                // +0x196
+    int cursorHideCount;                     // +0x1ae
+    GafFrame* cursorGafFrame;                // +0x1b2
+    int cursorBlitX;                         // +0x1b6
+    int cursorBlitY;                         // +0x1ba
+    Surface* saveMouse1;                     // +0x1be, the saved-background surfaces
+    Surface* saveMouse2;                     // +0x1c2
+    Surface* saveMouse3;                     // +0x1c6
+    int mouseThreadActive;                   // +0x1ca, the thread's handle
+    int cursorThreadEnabled;                 // +0x1ce
     int cursorOverlayEnabled;                // +0x1d2
-    char unknown_1d6[0x1da - 0x1d6];         // +0x1d6
+    int mouseThreadStopReq;                  // +0x1d6
     int fpsAccum;                            // +0x1da
     unsigned int fpsTick;                    // +0x1de
     int fpsFrames;                           // +0x1e2

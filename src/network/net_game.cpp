@@ -1227,8 +1227,6 @@ struct ChatPacket {
     char text[0x40];                   // +0x1
 };
 
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
-void Unused_00452960(int a, int b, int c, int d, int e);
 
 struct AllyFlagsPacket {
     unsigned char type;                // +0x0
