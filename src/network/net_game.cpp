@@ -366,10 +366,7 @@ struct Game {
     };
 };
 
-struct SideDataPacket {
-    unsigned char type;                // +0x0
-    PlayerInfo data;                   // +0x1
-};
+#include "side_data_packet.h"
 
 // The packets that start with a player id at +0x1: reject (0x1b), drop (0x1c)
 // and alliance (0x24). net_game_453d40.cpp reads them with the same layout;
@@ -871,8 +868,8 @@ int __stdcall AddNetPlayer(int id)
         for (int i = 0; i < 10; i++) {
             Player* q = &g_game->players[i];
             if (q->active != 0 && (q->type == 1 || q->type == 2)) {
-                packet.data = *q->data;
-                packet.data.id = q->id;
+                packet.info = *q->data;
+                packet.info.id = q->id;
                 packet.type = 0x20;
                 BroadcastPacket(q->id, &packet, sizeof(packet));
                 if (q->active != 0 && (q->type == 1 || q->type == 2)) {
@@ -1007,8 +1004,8 @@ void BroadcastPlayerInfo()
         for (int i = 0; i < 10; i++) {
             Player* player = &g_game->players[i];
             if (IsPlaying_00450f90(player)) {
-                packet.data = *player->data;
-                packet.data.id = player->id;
+                packet.info = *player->data;
+                packet.info.id = player->id;
                 packet.type = 0x20;
                 BroadcastPacket(player->id, &packet, sizeof(packet));
                 if (IsPlaying_00450f90(player)) {
@@ -1545,8 +1542,8 @@ int __stdcall JoinNetGame(Guid_4517b0 guid, int player)
             for (int i = 0; i < 10; i++) {
                 Player* q = &g_game->players[i];
                 if (q->active != 0 && (q->state == 1 || q->state == 2)) {
-                    packet.data = *q->info;
-                    packet.data.id = q->id;
+                    packet.info = *q->info;
+                    packet.info.id = q->id;
                     packet.type = 0x20;
                     BroadcastPacket(q->id, &packet, sizeof(packet));
                     if (q->active != 0 && (q->state == 1 || q->state == 2)) {
@@ -2836,10 +2833,6 @@ struct Msg26_00456310 {
     int table[10];                     // +0x01
 };
 
-struct Msg20_00456310 {
-    unsigned char type;                // +0x00
-    PlayerInfo info;                   // +0x01
-};
 
 struct Packet_00456de0 {
     unsigned char type;                 // +0x0
@@ -2985,7 +2978,7 @@ int __stdcall SendScriptCall(Unit* obj, short index, char argCount,
     return BroadcastPacket(obj->player->id, &packet, 0x16);
 }
 
-// Declaring the Msg20 message at function scope (not inside the loop) is what
+// Declaring the SideDataPacket at function scope (not inside the loop) is what
 // puts its address in eax and fixes the whole send block; the trailing
 // g_game+0x2bee flag is a 1-bit unsigned short bitfield, which is what makes
 // the original emit `or byte ptr [eax+0x2bee], 1` in one instruction.
@@ -3043,7 +3036,7 @@ void SendNetHeartbeat()
         }
     }
 
-    Msg20_00456310 msg;
+    SideDataPacket msg;
     if (g_game->netGameFlags & 1) {
         for (int i = 0; i < 10; i++) {
             Player* p = &g_game->players[i];
