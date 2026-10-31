@@ -2162,9 +2162,9 @@ void ShowSelectedMapInfo()
     }
 
     sprintf(buffer, "%s  %s: %s",
-            (char*)g_game->mapInfo + 0xdc4,
+            g_game->mapInfo->memory,
             Translate("Players"),
-            (char*)g_game->mapInfo + 0xe44);
+            g_game->mapInfo->numPlayers);
     SetTranslatedTextByName(&g_game->gui, "SIZE", (char*)buffer, 0);
 
     Gadget* entry = FindGadgetChecked_E(g_game->gui.layer->entries, "MAPPIC");
@@ -3295,7 +3295,7 @@ void __stdcall HandleAlliesClick(Gui* gadget)
             SetAlliance(local->id, p->id, local->allied[i] ^= 1, 0);
             char* verb = local->allied[i] ? "allied with" : "broke alliance with";
             sprintf(buf, " %s %s", Translate(verb),
-                    (char*)g_game + 0x1b8e + i * 0x14b);
+                    g_game->players[i].name);
             SendChatMessage(local, buf, 4, 0);
             RebuildAllyList();
             DrawButton(&g_game->gui, gadget->hotGadgetIndex);
@@ -4371,10 +4371,10 @@ void __stdcall SaveUnitRestrictListFile(char* filename)
 
     for (int i = 1; i < count; i++) {
         for (int j = 0; j < g_game->unitDefCount; j++) {
-            if (*(int*)((char*)g_unitRestrictEntries + 0x52 + j * 0x62) == i) {
+            if (g_unitRestrictEntries[j].unitIndex == i) {
                 int v = g_game->unitDefs[i].fbiChecksum;
                 fwrite(&v, 4, 1, f);
-                v = *(int*)((char*)g_unitRestrictEntries + 0x5a + j * 0x62);
+                v = g_unitRestrictEntries[j].max;
                 fwrite(&v, 4, 1, f);
                 break;
             }
