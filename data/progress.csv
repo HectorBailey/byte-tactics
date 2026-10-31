@@ -1415,11 +1415,11 @@ address,size,file,symbol,status,similarity
 0x46e0b0,163,src/network/unit_sync.cpp,?IsPlayerSynced@UnitSync@@QAEHH@Z,matched,100.0
 0x46e160,276,src/network/unit_sync.cpp,?ApplyToUnitTypes@UnitSync@@QAEXXZ,matched,100.0
 0x46e280,173,src/network/unit_sync.cpp,?PopChangedEntry@UnitSync@@QAEHPAUUnitSyncEntry@@@Z,matched,100.0
-0x46e330,134,src/network/unit_sync.cpp,?GetUnitEntry@UnitSync@@QAEHPAUUnit_0046e330@@PAUUnitSyncEntry@@@Z,matched,100.0
-0x46e3c0,129,src/network/unit_sync.cpp,?ToggleUnitAllowed@UnitSync@@QAEHPAUUnit_0046e330@@@Z,matched,100.0
-0x46e450,122,src/network/unit_sync.cpp,?DisallowUnit@UnitSync@@QAEHPAUUnit_0046e330@@@Z,matched,100.0
-0x46e4d0,122,src/network/unit_sync.cpp,?AllowUnit@UnitSync@@QAEHPAUUnit_0046e330@@@Z,matched,100.0
-0x46e550,106,src/network/unit_sync.cpp,?SetUnitLimit@UnitSync@@QAEXPAUUnit_0046e330@@H@Z,matched,100.0
+0x46e330,134,src/network/unit_sync.cpp,?GetUnitEntry@UnitSync@@QAEHPAVUnitDef@@PAUUnitSyncEntry@@@Z,matched,100.0
+0x46e3c0,129,src/network/unit_sync.cpp,?ToggleUnitAllowed@UnitSync@@QAEHPAVUnitDef@@@Z,matched,100.0
+0x46e450,122,src/network/unit_sync.cpp,?DisallowUnit@UnitSync@@QAEHPAVUnitDef@@@Z,matched,100.0
+0x46e4d0,122,src/network/unit_sync.cpp,?AllowUnit@UnitSync@@QAEHPAVUnitDef@@@Z,matched,100.0
+0x46e550,106,src/network/unit_sync.cpp,?SetUnitLimit@UnitSync@@QAEXPAVUnitDef@@H@Z,matched,100.0
 0x46e5c0,24,src/network/unit_sync.cpp,?InitTaggedVector@SyncTaggedVector@@QAEPAU1@PAD@Z,matched,100.0
 0x46e5e0,34,src/network/unit_sync.cpp,??1SyncTempTaggedVector@@QAE@XZ,matched,100.0
 0x46e610,34,src/network/unit_sync.cpp,??1SyncChecksumVector@@QAE@XZ,matched,100.0

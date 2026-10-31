@@ -60,6 +60,11 @@ void StepScreenFade(void);
 void ScheduleFadeTick(void);
 int IsFadeDone(void);
 void StepPaletteFade(void);
+void AbortProgram(void);
+void AddDownloadBuildOptions(void);
+void ApplyBrightnessAndVolume(void);
+void FreeSoundCategories(void);
+void LoadSoundCategories(void);
 
 struct Gadget_0044a680 {                // 0x15b bytes
     char unknown_0[0x1b];
