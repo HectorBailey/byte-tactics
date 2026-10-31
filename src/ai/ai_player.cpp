@@ -83,71 +83,35 @@ struct WeaponDef {                     // 0x115 bytes
     };
 };
 
-struct UnitWeaponSlot {                // 0x1c bytes, one of a unit's three
-    char unknown_0[0xc];               // the aim target pair and the aim callback
-    WeaponDef* weapon;                 // +0xc
-    char unknown_10[0x1b - 0x10];
-    unsigned char flags;               // +0x1b
-};
-
-// Local Order view: the file's own Vec3 conflicts with order.h.
+// Local Order view, not orders/order.h: the header's declarations move 0x409520
+// and 0x4095d0 (86.4% and 92.7%, measured without padding).
 struct Order {
     char unknown_0[0x42];
     unsigned int flags;                // +0x42
 };
 
-union Fixed {                          // a 16.16 fixed-point value
-    int value;
-    struct {
-        unsigned short fraction;
-        short whole;
-    };
-};
+#include "../util/vec3.h"
 
-// Own Vec3, not vec3.h: each coordinate is also a Fixed or two words, and it has
-// operator+ and operator-.
-struct Vec3 {
-    union {
-        int x;
-        Fixed xf;
-        struct {
-            unsigned short xFrac;
-            short xWhole;
-        };
-    };
-    union {
-        int y;
-        Fixed yf;
-        struct {
-            unsigned short yFrac;
-            short yWhole;
-        };
-    };
-    union {
-        int z;
-        Fixed zf;
-        struct {
-            unsigned short zFrac;
-            short zWhole;
-        };
-    };
-
-    Vec3 operator+(Vec3& o) { Vec3 r; r.x = x + o.x; r.y = y + o.y; r.z = z + o.z; return r; }
-    Vec3 operator-(Vec3& o) { Vec3 r; r.x = x - o.x; r.y = y - o.y; r.z = z - o.z; return r; }
-    void operator+=(Vec3& v) { x += v.x; y += v.y; z += v.z; }
+// The vector helpers the file's own Vec3 had as members, over util/vec3.h's Vec3.
+static inline Vec3 operator+(Vec3& a, Vec3& o) { Vec3 r; r.x = a.x + o.x; r.y = a.y + o.y; r.z = a.z + o.z; return r; }
+static inline void operator+=(Vec3& a, Vec3& v) { a.x += v.x; a.y += v.y; a.z += v.z; }
+// The difference MoveTowards scales, with the length and scale the file's
+// own Vec3 had as members: as members they keep the original's frame.
+struct Delta3 {
+    Vec3 v;
     int Length() const
     {
         // One double local per component: `(double)x * x` reorders the sum.
-        double fx = x;
-        double fy = y;
-        double fz = z;
+        double fx = v.x;
+        double fy = v.y;
+        double fz = v.z;
         return (int)sqrt(fx * fx + fy * fy + fz * fz);
     }
     void Scale(int s)                  // s is 16.16 fixed point
     {
-        x = (int)(((__int64)x * s) >> 16);
-        y = (int)(((__int64)y * s) >> 16);
-        z = (int)(((__int64)z * s) >> 16);
+        v.x = (int)(((__int64)v.x * s) >> 16);
+        v.y = (int)(((__int64)v.y * s) >> 16);
+        v.z = (int)(((__int64)v.z * s) >> 16);
     }
 };
 
@@ -170,11 +134,6 @@ static inline Vec3 MakeVec3(int x, int y, int z)
     v.z = z;
     return v;
 }
-
-struct Point16 {
-    short x;
-    short y;
-};
 
 // A 32-bit word of bits, tested by unit type id.
 struct Bits {
@@ -203,56 +162,9 @@ struct Flags245 {
 
 struct Player;
 struct Group;
-struct Economy;
 class SquadTimer;
 
-struct Unit {                          // 0x118 bytes
-    int motion;                       // +0x0
-    UnitWeaponSlot weapons[3];         // +0x4, stride 0x1c
-    char unknown_58[0x5c - 0x58];
-    Order* list;                       // +0x5c
-    char unknown_60[0x6a - 0x60];
-    Vec3 pos;                          // +0x6a
-    char unknown_76[0x92 - 0x76];
-    UnitDef* def;                      // +0x92
-    union {
-        Player* player;                // +0x96
-        Economy* economy;
-    };
-    char unknown_9a[0xa6 - 0x9a];
-    union {
-        unsigned short unitDefIndex;   // +0xa6
-        unsigned short id;
-    };
-    char unknown_a8[0xac - 0xa8];
-    int group;                         // +0xac
-    char unknown_b0[0xf4 - 0xb0];
-    unsigned char lastAttackerSlot;    // +0xf4
-    unsigned char lastDamageType;      // +0xf5
-    char unknown_f6[0xff - 0xf6];
-    unsigned char playerIndex;         // +0xff
-    char unknown_100[0x104 - 0x100];
-    float buildLeft;                   // +0x104
-    unsigned char allied[6];           // +0x108
-    union {
-        unsigned short flags10e;       // +0x10e
-        unsigned char activateFlags;
-        unsigned char status;
-        unsigned char active;
-    };
-    // The unit's state flags: each handler names its own bits.
-    union {
-        unsigned int flags;            // +0x110
-        struct {
-            unsigned int mode : 2;
-            unsigned int rest : 30;
-        };
-    };
-    char unknown_114[4];
-
-    void SetStateBits(int which, int on);
-    int Ready() const;
-};
+#include "../units/unit.h"
 
 // Unused here: these forward declarations take the symbol ids that keep 0x406f80, 0x408670, 0x4086d0 and 0x4089a0 matching (docs/c2-regalloc.md).
 struct Sound;
@@ -266,15 +178,7 @@ struct Packet;
 struct Pathfinder;
 #include "../network/player.h"
 
-inline int Unit::Ready() const { return (flags & 0x10000000) && !(flags & 0x4000); }
-
-struct Economy {                       // a unit's resources
-    char unknown_0[0x8c];
-    float energy;                      // +0x8c
-    float energyIncome;                // +0x90
-    float energyUsage;                 // +0x94
-    float cost;                        // +0x98
-};
+static inline int Ready(const Unit* u) { return (u->flags & 0x10000000) && !(u->flags & 0x4000); }
 
 // 0x20 bytes, one of a player's squads.
 #include "../units/group.h"
@@ -587,7 +491,6 @@ unsigned short __stdcall ChooseBuildOption(unsigned int player, Unit* unit);
 int __stdcall GetBuilderCount(unsigned int player);
 MissionType __stdcall GetOrderType(unsigned char mode, Unit* unit, Unit* target, Vec3* pos);
 void __stdcall AddOrder(MissionType kind, int remove, Unit* unit, Unit* target, Vec3* pos, int param_6, int param_7);
-float __stdcall GetNetEnergy(Economy* economy);
 void __stdcall QueueBuildOrder(char* name, Unit* unit, int count);
 int __cdecl FUN_004b70ef(short angle, int scale);
 int __cdecl FUN_004b7123(short angle, int scale);
@@ -661,15 +564,16 @@ static inline float Max(float a, float b) { return a > b ? a : b; }
 
 static inline Vec3 MoveTowards(const Vec3* from, const Vec3* to, int maxLen)
 {
-    Vec3 d = *to - *from;
+    Delta3 d;
+    d.v = *to - *from;
     int len = d.Length();
     if (maxLen >= len)
         return *to;
     d.Scale((int)(((__int64)maxLen << 16) / len));
     Vec3 r;
-    r.x = from->x + d.x;
-    r.y = from->y + d.y;
-    r.z = from->z + d.z;
+    r.x = from->x + d.v.x;
+    r.y = from->y + d.v.y;
+    r.z = from->z + d.v.z;
     return r;
 }
 
@@ -824,7 +728,7 @@ Unit* SquadManager::FindNearestEnemyUnit(int x,int y,int z)
             Unit* u=p->unitsBegin;
             Unit* last=p->unitsEnd;
             for(;u<=last;++u) {
-                if((u->flags&0x10000000) && u->mode!=2 && !(u->flags&0x8000) && !(u->flags10e&4)) {
+                if((u->flags&0x10000000) && u->occupyLayer!=2 && !(u->flags&0x8000) && !(u->activateFlags&4)) {
                     int dz=z-u->pos.z;
                     int dx=x-u->pos.x;
                     int distance=(int)(((__int64)dx*dx)>>32)+(int)(((__int64)dz*dz)>>32);
@@ -892,9 +796,9 @@ int SquadTimer::GetAveragePosition(Vec3* out)
         return 0;
     int x = 0, y = 0, z = 0;
     for (std::vector<Unit*>::iterator it = g->units.begin(); it != g->units.end(); ++it) {
-        x += (*it)->pos.xf.whole;
-        y += (*it)->pos.yf.whole;
-        z += (*it)->pos.zf.whole;
+        x += ((short*)&(*it)->pos.x)[1];
+        y += ((short*)&(*it)->pos.y)[1];
+        z += ((short*)&(*it)->pos.z)[1];
     }
     // Built as a temporary and assigned whole: per-field stores interleave with the divisions.
     *out = MakeVec3(x / n << 16, y / n << 16, z / n << 16);
@@ -910,8 +814,8 @@ int SquadTimer::CountGroupUnitsInRadius(Vec3* pos, int radius)
     Unit* last = group->player->unitsEnd;
     for (; u <= last; ++u) {
         if (u->group == group->id) {
-            int dz = pos->z - u->pos.zf.value;
-            int dx = pos->x - u->pos.xf.value;
+            int dz = pos->z - u->pos.z;
+            int dx = pos->x - u->pos.x;
             int distance = (int)(((__int64)dx * dx) >> 32) + (int)(((__int64)dz * dz) >> 32);
             if (distance <= squared)
                 ++count;
@@ -941,8 +845,8 @@ void AssaultTimer::RebalanceAssaultGroupByCentroid(int kind, int limit)
     int sx = 0, sz = 0;
     std::vector<Unit*>::iterator it;
     for (it = group->units.begin(); it != group->units.end(); ++it) {
-        sx += (*it)->pos.xWhole;
-        sz += (*it)->pos.zWhole;
+        sx += ((short*)&(*it)->pos.x)[1];
+        sz += ((short*)&(*it)->pos.z)[1];
     }
     int cx, cz;
     while (1) {
@@ -954,8 +858,8 @@ void AssaultTimer::RebalanceAssaultGroupByCentroid(int kind, int limit)
         int maxd = 0;
         std::vector<Unit*>::iterator best = g->units.end();
         for (it = g->units.begin(); it != g->units.end(); ++it) {
-            int dx = (*it)->pos.xWhole - cx;
-            int dz = (*it)->pos.zWhole - cz;
+            int dx = ((short*)&(*it)->pos.x)[1] - cx;
+            int dz = ((short*)&(*it)->pos.z)[1] - cz;
             int d = dx * dx + dz * dz;
             if (d > maxd) {
                 maxd = d;
@@ -965,13 +869,13 @@ void AssaultTimer::RebalanceAssaultGroupByCentroid(int kind, int limit)
         if (maxd < limit * (int)g->units.size())
             break;
         SetUnitSquad(*best, kind);
-        sx -= (*best)->pos.xWhole;
-        sz -= (*best)->pos.zWhole;
+        sx -= ((short*)&(*best)->pos.x)[1];
+        sz -= ((short*)&(*best)->pos.z)[1];
     }
     std::vector<Unit*> list;
     for (it = other->group->units.begin(); it != other->group->units.end(); ++it) {
-        int dx = (*it)->pos.xWhole - cx;
-        int dz = (*it)->pos.zWhole - cz;
+        int dx = ((short*)&(*it)->pos.x)[1] - cx;
+        int dz = ((short*)&(*it)->pos.z)[1] - cz;
         // Own statement: inside the comparison the size() ternary goes first.
         int d = dx * dx + dz * dz;
         if (d < limit * (int)group->units.size())
@@ -1114,7 +1018,7 @@ void SquadScoutTimer::OnTimer()
         // Read through an inline returning by value: pos must not be the local
         // whose address goes to GetBasePosition.
         Vec3 pos = GetRallyPoint(player);
-        if ((pos.xWhole | pos.zWhole) == 0) {
+        if ((((short*)&pos.x)[1] | ((short*)&pos.z)[1]) == 0) {
             GetAveragePosition(&dest);
             Unit* target = owner->FindNearestEnemyUnit(dest);
             group->Send(9, 1, 0, &target->pos, 0, 0);
@@ -1161,9 +1065,9 @@ ScoutTimer::ScoutTimer(SquadManager* p, Group* q)
 // FUNCTION: 0x408670
 void __stdcall UpdateConverter(Unit* unit)
 {
-    Economy* economy = unit->economy;
-    if (economy->cost + economy->cost < economy->energy) {
-        if (GetNetEnergy(economy) > Zero_004fc968 && RandomInt(5) != 0) {
+    Player* owner = unit->player;
+    if (owner->metal + owner->metal < owner->energy) {
+        if (GetNetEnergy(owner) > Zero_004fc968 && RandomInt(5) != 0) {
             unit->SetStateBits(1, 1);
         }
     } else {
@@ -1182,8 +1086,8 @@ void BuildTimer::OnTimer()
         Unit* u = *it;
         if ((u->flags & 0x20000000) && (u->flags & 0x10000000) && !(u->flags & 0x4000)) {
             if (u->def->makesMetal) {
-                if (u->economy->cost + u->economy->cost < u->economy->energy) {
-                    if (GetNetEnergy(u->economy) > Zero_004fc968 && RandomInt(5))
+                if (u->player->metal + u->player->metal < u->player->energy) {
+                    if (GetNetEnergy(u->player) > Zero_004fc968 && RandomInt(5))
                         u->SetStateBits(1, 1);
                 } else
                     u->SetStateBits(1, 0);
@@ -1724,7 +1628,7 @@ void __stdcall GetVisibleEnemiesInRadius(int player,const Vec* pos,int radius,in
         int dz=pos->z-unit->pos.z;
         int dx=pos->x-unit->pos.x;
         int d=(int)(((__int64)dx*dx)>>32)+(int)(((__int64)dz*dz)>>32);
-        if(d<=radius2 && unit->Ready()) out->push_back(unit);
+        if(d<=radius2 && Ready(unit)) out->push_back(unit);
     }
     PlayerAI* owner=g_playerAI[player];
     if(owner->hasSpecial && out->empty()) {
@@ -1733,7 +1637,7 @@ void __stdcall GetVisibleEnemiesInRadius(int player,const Vec* pos,int radius,in
             int dz=pos->z-unit->pos.z;
         int dx=pos->x-unit->pos.x;
         int d=(int)(((__int64)dx*dx)>>32)+(int)(((__int64)dz*dz)>>32);
-        if(d<=radius2 && unit->Ready()) out->push_back(unit);
+        if(d<=radius2 && Ready(unit)) out->push_back(unit);
         }
     }
 }
@@ -1822,12 +1726,12 @@ Unit* __stdcall FindWeaponTarget(Unit* unit,unsigned char weapon,int useRange)
         if((target->flags&0x10000000) && !(target->flags&0x4000) &&
            ((target->def->flags1&0x8000) || ai || (g_game->matchFlags&4)) &&
            ((unit->def->flags1&0x10000000) || WeaponCanReachUnit(unit,target,weapon)) &&
-           (useRange || !((Bits*)&unit->def->categories)->Test(target->id)) &&
-           (!(unit->weapons[weapon].weapon->flags8&0x80) || !(target->status&0x10))) {
+           (useRange || !((Bits*)&unit->def->categories)->Test(target->unitDefIndex)) &&
+           (!(unit->weapons[weapon].weapon->flags8&0x80) || !(target->activateFlags&0x10))) {
             int dz=unit->pos.z-target->pos.z;
             int dx=unit->pos.x-target->pos.x;
             int d=RandomInt((int)(((__int64)dx*dx)>>32)+(int)(((__int64)dz*dz)>>32));
-            if(((Bits*)unit->def->weaponCategories)[weapon].Test(target->id)) {
+            if(((Bits*)unit->def->weaponCategories)[weapon].Test(target->unitDefIndex)) {
                 if(d<fallbackDistance) { fallbackDistance=d; fallback=target; }
             } else if(d<bestDistance) { bestDistance=d; best=target; }
         }
