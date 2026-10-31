@@ -130,8 +130,8 @@ void Unit::ReleaseWeapons(unsigned char index)
         index = 2;
     }
     UnitWeaponSlot* e = &weapons[index];
-    if ((e->flags & 2) != 0 && (e->flags & 0x10) == 0) {
-        e->flags |= 0x10;
+    if ((e->flags & WEAPON_SLOT_HAS_WEAPON) != 0 && (e->flags & WEAPON_SLOT_ACTIVE) == 0) {
+        e->flags |= WEAPON_SLOT_ACTIVE;
         int i = index;
         UnitWeaponSlot* p = &weapons[i];
         if (p->aimTargetXOrUnitId != 0 || p->aimTargetZOrUnitSentinel != (short)0x8000) {
@@ -159,8 +159,8 @@ void Unit::ClaimWeapons(unsigned char index)
         index = 2;
     }
     UnitWeaponSlot* e = &weapons[index];
-    if ((e->flags & 2) != 0 && (e->flags & 0x10) != 0) {
-        e->flags &= ~0x10;
+    if ((e->flags & WEAPON_SLOT_HAS_WEAPON) != 0 && (e->flags & WEAPON_SLOT_ACTIVE) != 0) {
+        e->flags &= ~WEAPON_SLOT_ACTIVE;
         int i = index;
         UnitWeaponSlot* p = &weapons[i];
         if (p->aimTargetXOrUnitId != 0 || p->aimTargetZOrUnitSentinel != (short)0x8000) {

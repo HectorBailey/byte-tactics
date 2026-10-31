@@ -1163,7 +1163,7 @@ void SquadManager::RetargetWeapons(int force)
             && (cursor->flags & 0x300000) == 0x200000) {
             // The counter stays a byte, and the flag8 test keeps its (unsigned char) cast.
             for (unsigned char w = 0; w < 3; w++) {
-                if ((cursor->weapons[w].flags & 2) && (cursor->weapons[w].flags & 0x10)
+                if ((cursor->weapons[w].flags & WEAPON_SLOT_HAS_WEAPON) && (cursor->weapons[w].flags & WEAPON_SLOT_ACTIVE)
                     && !(unsigned char)cursor->weapons[w].weapon->flag8
                     && (force || !cursor->weapons[w].weapon->flag26)) {
                     Unit* target = GetWeaponTargetUnit(cursor, w);

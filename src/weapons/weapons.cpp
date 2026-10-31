@@ -1697,8 +1697,8 @@ int __stdcall FireLineOfSightProjectile(UnitWeaponSlot* fire, Unit* unit,
     proj->targetUnit = (Unit*)param_5;
 
     proj->burstRemaining = fire->weapon->burst;
-    unit->anims->StartScript(g_fireScriptNames[(fire->flags >> 2) & 3], 0, 0);
-    short angle = unit->f_1a[((fire->flags >> 2) & 3) * 7].angle - unit->heading;
+    unit->anims->StartScript(g_fireScriptNames[(fire->flags >> WEAPON_SLOT_INDEX_SHIFT) & 3], 0, 0);
+    short angle = unit->f_1a[((fire->flags >> WEAPON_SLOT_INDEX_SHIFT) & 3) * 7].angle - unit->heading;
     int a = -FUN_004b70ef(angle, 800);
     int b = -FUN_004b7123(angle, 800);
     unit->anims->StartScriptWithArgs("RockUnit", 0, 0, 2, b, a, 0, 0);
@@ -1743,8 +1743,8 @@ int __stdcall FireVLaunchProjectile(UnitWeaponSlot* shot, Unit* unit, Vec3* pos,
     proj->targetUnit = (Unit*)param_5;
     proj->interceptedProjectile = (Projectile*)param_6;
     proj->burstRemaining = shot->weapon->burst;
-    unit->anims->StartScript(g_fireScriptNames[(shot->flags >> 2) & 3], 0, 0);
-    short angle = unit->aim_0049cc20[(shot->flags >> 2) & 3][0][0] - unit->heading;
+    unit->anims->StartScript(g_fireScriptNames[(shot->flags >> WEAPON_SLOT_INDEX_SHIFT) & 3], 0, 0);
+    short angle = unit->aim_0049cc20[(shot->flags >> WEAPON_SLOT_INDEX_SHIFT) & 3][0][0] - unit->heading;
     int a = -FUN_004b70ef(angle, 800);
     int b = -FUN_004b7123(angle, 800);
     unit->anims->StartScriptWithArgs("RockUnit", 0, 0, 2, b, a, 0, 0);
@@ -1784,8 +1784,8 @@ int __stdcall FireBallisticProjectile(UnitWeaponSlot* shot, Unit* unit, Vec3* po
         // burstRemaining before targetUnit: the reverse of the natural order is the original's.
         proj->burstRemaining = shot->weapon->burst;
         proj->targetUnit = (Unit*)param_5;
-        unit->anims->StartScript(g_fireScriptNames[(shot->flags >> 2) & 3], 0, 0);
-        short angle = unit->aim_0049cde0[(shot->flags >> 2) & 3][0] - unit->heading;
+        unit->anims->StartScript(g_fireScriptNames[(shot->flags >> WEAPON_SLOT_INDEX_SHIFT) & 3], 0, 0);
+        short angle = unit->aim_0049cde0[(shot->flags >> WEAPON_SLOT_INDEX_SHIFT) & 3][0] - unit->heading;
         int a = -FUN_004b70ef(angle, 800);
         int b = -FUN_004b7123(angle, 800);
         unit->anims->StartScriptWithArgs("RockUnit", 0, 0, 2, b, a, 0, 0);
@@ -2203,7 +2203,7 @@ int __stdcall FireLineOfSightWeapon(Unit* unit, UnitWeaponSlot* aim,
                            Unit* target, Vec3* point)
 {
     Vec3 p;
-    GetWeaponPiecePosition(unit, &p, aim->flags >> 2 & 3, -1);
+    GetWeaponPiecePosition(unit, &p, aim->flags >> WEAPON_SLOT_INDEX_SHIFT & 3, -1);
     int dx = p.x - point->x;
     Fixed dy;
     dy.value = p.y - point->y;
@@ -2219,7 +2219,7 @@ int __stdcall FireLineOfSightWeapon(Unit* unit, UnitWeaponSlot* aim,
                 msg.origin = unit->pos;
                 msg.aimOrVel = *point;
                 msg.weaponDefIndex = aim->weapon->index;
-                msg.weaponSlotIndex = aim->flags >> 2 & 3;
+                msg.weaponSlotIndex = aim->flags >> WEAPON_SLOT_INDEX_SHIFT & 3;
                 // if/else testing the unit, not a ternary: the ternary flips the branches.
                 if (unit == 0)
                     msg.ownerUnitId = 0;
@@ -2331,7 +2331,7 @@ int __stdcall FireDroppedWeapon(Unit* unit, UnitWeaponSlot* aim,
                            Unit* target, Vec3* point)
 {
     Vec3 p;
-    GetWeaponPiecePosition(unit, &p, aim->flags >> 2 & 3, -1);
+    GetWeaponPiecePosition(unit, &p, aim->flags >> WEAPON_SLOT_INDEX_SHIFT & 3, -1);
     Projectile* projectile = 0;
     if (g_game->projectile_count < 300) {
         projectile = &((Projectile*)g_game->projectiles)[g_game->projectile_count++];
@@ -2351,7 +2351,7 @@ int __stdcall FireDroppedWeapon(Unit* unit, UnitWeaponSlot* aim,
             packet.origin = p;
             packet.aimOrVel = *point;
             packet.weaponDefIndex = aim->weapon->index;
-            packet.weaponSlotIndex = aim->flags >> 2 & 3;
+            packet.weaponSlotIndex = aim->flags >> WEAPON_SLOT_INDEX_SHIFT & 3;
             if (unit == 0)
                 packet.ownerUnitId = 0;
             else
@@ -2496,29 +2496,29 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
         UnitWeaponSlot* e = &unit->weapons[i];
         unsigned char fl = e->flags;
         WeaponDef* attached = e->weapon;
-        if (!(fl & 2))
+        if (!(fl & WEAPON_SLOT_HAS_WEAPON))
             continue;
         if (e->reloadTimer > 0)
             e->reloadTimer--;
         if (!GetWeaponTargetPos(unit, &pos, i)) {
-            e->flags &= 0xfe;
+            e->flags &= ~WEAPON_SLOT_AIMING;
             continue;
         }
         if (attached->fire == 0)
             continue;
         if (attached->flags.b.turret) {
-            if (!(e->flags & 1)) {
+            if (!(e->flags & WEAPON_SLOT_AIMING)) {
                 WeaponDef* t = e->weapon;
                 unsigned short angle;
                 int ok;
                 if (t->flags.b.ballistic) {
-                    GetAimFromPosition(unit, &aim, (unsigned char)((e->flags >> 2) & 3));
+                    GetAimFromPosition(unit, &aim, (unsigned char)((e->flags >> WEAPON_SLOT_INDEX_SHIFT) & 3));
                     SubtractVec3(&aim, &pos, &dx, &dy, &dz);
                     heading = (unsigned short)(FUN_004b715a(dx, dz) - unit->heading);
                     angle = SolveLaunchAngle(dx, dy, dz, t->speed, t->pitch);
                     ok = (angle != 0x8000);
                 } else if (t->flags.b.lineOfSight) {
-                    ok = CalcAimAngles(unit, t, &heading, &angle, (unsigned char)(e->flags >> 2 & 3),
+                    ok = CalcAimAngles(unit, t, &heading, &angle, (unsigned char)(e->flags >> WEAPON_SLOT_INDEX_SHIFT & 3),
                                       &pos);
                 } else {
                     ok = 0;
@@ -2528,21 +2528,21 @@ void __stdcall UpdateUnitWeapons(Unit* unit) {
                     e->fireHeading = heading;
                     e->aimCob.nAimCobDone = 0;
                     // Name read afresh for each call, no cached local: lets the two tails merge.
-                    unit->script->StartScriptWithArgs(g_aimScriptNames[(e->flags >> 2) & 3], (Callback*)&e->aimCob, 0, 2,
+                    unit->script->StartScriptWithArgs(g_aimScriptNames[(e->flags >> WEAPON_SLOT_INDEX_SHIFT) & 3], (Callback*)&e->aimCob, 0, 2,
                                                heading, angle, 0, 0);
-                    SendScriptCallByName(unit, g_aimScriptNames[(e->flags >> 2) & 3], 2, heading, angle, 0, 0);
-                    e->flags |= 1;
+                    SendScriptCallByName(unit, g_aimScriptNames[(e->flags >> WEAPON_SLOT_INDEX_SHIFT) & 3], 2, heading, angle, 0, 0);
+                    e->flags |= WEAPON_SLOT_AIMING;
                 }
             }
         } else {
             // Via a bool local: testing the bitfield in place shifts the register rotation.
             bool armed = attached->flags.b.vLaunch;
-            if (armed && (!attached->flags.b.stockpile || e->stockpile) && !(e->flags & 1)) {
+            if (armed && (!attached->flags.b.stockpile || e->stockpile) && !(e->flags & WEAPON_SLOT_AIMING)) {
                 e->aimCob.nAimCobDone = 0;
-                unit->script->StartScriptWithArgs(g_aimScriptNames[(e->flags >> 2) & 3], (Callback*)&e->aimCob, 0, 2, 0, 0,
+                unit->script->StartScriptWithArgs(g_aimScriptNames[(e->flags >> WEAPON_SLOT_INDEX_SHIFT) & 3], (Callback*)&e->aimCob, 0, 2, 0, 0,
                                            0, 0);
-                SendScriptCallByName(unit, g_aimScriptNames[(e->flags >> 2) & 3], 2, 0, 0, 0, 0);
-                e->flags |= 1;
+                SendScriptCallByName(unit, g_aimScriptNames[(e->flags >> WEAPON_SLOT_INDEX_SHIFT) & 3], 2, 0, 0, 0, 0);
+                e->flags |= WEAPON_SLOT_AIMING;
             }
         }
         if (e->reloadTimer != 0)

@@ -406,7 +406,7 @@ void __stdcall GiveUnitToPlayer(Unit* unit, Player* other, OwnershipTransferPack
             pk.buildPercent = (int)unit->buildLeft;
             pk.hitPoints = unit->health;
             pk.angles = unit->angles;
-            unsigned char a = unit->weapons[0].flags & 2;
+            unsigned char a = unit->weapons[0].flags & WEAPON_SLOT_HAS_WEAPON;
             pk.stockpile0 = a ? unit->weapons[0].stockpile : 0;
             pk.stockpile1 = a ? unit->weapons[1].stockpile : 0;
             pk.stockpile2 = a ? unit->weapons[2].stockpile : 0;
@@ -428,21 +428,21 @@ void __stdcall GiveUnitToPlayer(Unit* unit, Player* other, OwnershipTransferPack
         n->health = (short)p->hitPoints;
         n->buildLeft = (float)p->buildPercent;
         n->angles = p->angles;
-        if (n->weapons[0].flags & 2)
+        if (n->weapons[0].flags & WEAPON_SLOT_HAS_WEAPON)
             n->weapons[0].stockpile = p->stockpile0;
-        if (n->weapons[1].flags & 2)
+        if (n->weapons[1].flags & WEAPON_SLOT_HAS_WEAPON)
             n->weapons[1].stockpile = p->stockpile1;
-        if (n->weapons[2].flags & 2)
+        if (n->weapons[2].flags & WEAPON_SLOT_HAS_WEAPON)
             n->weapons[2].stockpile = p->stockpile2;
     } else {
         n->health = unit->health;
         n->buildLeft = unit->buildLeft;
         n->angles = unit->angles;
-        if (n->weapons[0].flags & 2)
+        if (n->weapons[0].flags & WEAPON_SLOT_HAS_WEAPON)
             n->weapons[0].stockpile = unit->weapons[0].stockpile;
-        if (n->weapons[1].flags & 2)
+        if (n->weapons[1].flags & WEAPON_SLOT_HAS_WEAPON)
             n->weapons[1].stockpile = unit->weapons[1].stockpile;
-        if (n->weapons[2].flags & 2)
+        if (n->weapons[2].flags & WEAPON_SLOT_HAS_WEAPON)
             n->weapons[2].stockpile = unit->weapons[2].stockpile;
         DamageUnit(0, unit, 30000, 4, 0);
     }
