@@ -30,32 +30,16 @@ static inline Vec3 operator+(const Vec3& a, const Vec3& b)
 // The 0x100-byte feature record in the pool at +0x1426f.
 #include "../map/feature.h"
 
-#pragma pack(push, 1)
-struct Game {
-    char unknown_0[0x2a42];
-    unsigned char localPlayer;    // +0x2a42
-    unsigned char playerIndex;    // +0x2a43
-    char unknown_2a44[0x14233 - 0x2a44];
-    int mapWidthTiles;  // +0x14233
-    char unknown_14237[0x14253 - 0x14237];
-    int featureCount; // +0x14253
-    char unknown_14257[0x1426f - 0x14257];
-    Feature* features;                 // +0x1426f
-    unsigned short* visibilityMask;    // +0x14273
-    char unknown_14277[0x1427f - 0x14277];
-    unsigned char seaLevel;            // +0x1427f
-    char unknown_14280[0x37efa - 0x14280];
-    int interfaceType; // +0x37efa
-};
-
-#pragma pack(pop)
+// g_game is declared before game.h: with the header's symbols ahead of it, its
+// id moves GetOrderCursor (0x43e490) (docs/c2-regalloc.md).
+struct Game;
+extern Game* g_game;
+#include "../game/game.h"
 
 class Class_0043db50 {
 public:
     void UpdateSfxOccupy(Unit* unit);
 };
-
-extern Game* g_game;
 
 // FUNCTION: 0x43db50
 void Class_0043db50::UpdateSfxOccupy(Unit* unit)
