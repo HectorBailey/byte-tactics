@@ -21,6 +21,7 @@
 #include "../network/settings.h"
 #include "../network/player.h"
 #include "../gui/gui.h"
+#include "side_def.h"
 
 #pragma pack(push, 1)
 
@@ -576,9 +577,8 @@ struct Game {  // 0x3924d bytes
     unsigned short uiOptionFlags;  // +0x37f2f
     unsigned int lobbyTimeoutSecs;  // +0x37f31
     int netSendDropPct;  // +0x37f35
-    int sides;  // +0x37f39
-    char names[1][562];  // +0x37f3d
-    char unknown_3816f[2248];
+    int sideCount;  // +0x37f39, Thaldren's nSideCount
+    SideDef sideDefs[5];  // +0x37f3d, Thaldren's aSideDefs
     unsigned int lastTick;  // +0x38a37
     int frames_38a3b;  // +0x38a3b
     int scrollScale;  // +0x38a3f
