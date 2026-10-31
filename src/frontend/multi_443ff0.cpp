@@ -9,7 +9,7 @@
 extern "C" __declspec(dllimport) char* __stdcall lstrcpynA(char*, const char*, int);
 // Kept: <guiddef.h> is not on this translation unit's include path; this is the Windows GUID layout.
 struct GUID { unsigned long Data1; unsigned short Data2; unsigned short Data3; unsigned char Data4[8]; };
-struct HapinetProviderConnEntry { void* pConnectionBlob; int dwCbConnectionBlob; };
+#include "../network/provider_conn.h"
 struct ConnInfo_443ff0 { GUID guid; HapinetProviderConnEntry conn; };
 #pragma pack(push,1)
 struct Game {
