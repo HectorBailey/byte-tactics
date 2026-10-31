@@ -231,10 +231,12 @@ void __stdcall SleepMilliseconds(unsigned int milliseconds)
     Sleep(milliseconds);
 }
 
-extern void* g_display;
+#include "../graphics/display_context.h"
+
+extern DisplayContext* g_display;
 
 // FUNCTION: 0x4b6b60
 void __stdcall SetMediaNotifyCallback(int callback)
 {
-    *(int*)((char*)g_display + 0x80) = callback;
+    g_display->callback = (void (__cdecl*)(int, int, int))callback;
 }
