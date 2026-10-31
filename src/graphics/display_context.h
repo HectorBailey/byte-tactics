@@ -13,6 +13,8 @@
 #include <windows.h>
 
 struct Surface;
+// The bitmap font the font API reads at +0x204 (font.cpp defines it).
+struct Font;
 
 // Packed to 2: the frame counter at +0x1da, the mode rectangle at +0x1ea and
 // the size at +0x1fa sit on 2-byte boundaries.
@@ -78,7 +80,10 @@ struct DisplayContext {
     int startWidth;                          // +0x1fa
     int startHeight;                         // +0x1fe
     unsigned short videoFlags;               // +0x202
-    char unknown_204[0x214 - 0x204];         // +0x204, the font and the text colours
+    Font* bitmapFont;                        // +0x204, the bitmap font
+    int textFgColor;                         // +0x208, the set bit colour
+    int textBgColor;                         // +0x20c, the clear bit colour
+    int textSkipColor;                       // +0x210, the colour not written
     PALETTEENTRY entries[256];               // +0x214
     float scale;                             // +0x614
     void** items;                            // +0x618, the open archive files

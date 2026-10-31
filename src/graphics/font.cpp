@@ -11,15 +11,11 @@ struct Font {
     unsigned short offsets[1];          // +0x4, glyph offsets from the font start
 };
 
-struct Game {
-    char unknown_0[0x204];
-    Font* font;                         // +0x204
-    int colour1;                        // +0x208
-    int colour2;                        // +0x20c
-    int colour3;                        // +0x210
-};
+// The display object, graphics/display_context.h: it names the bitmap font at
+// +0x204 and the text colours at +0x208, +0x20c and +0x210 this file reads.
+#include "display_context.h"
 
-Game* GetDisplay(void);
+DisplayContext* GetDisplay(void);
 int __stdcall RectInsideRect(Rect* a, Rect* b);
 int __stdcall LockScreen(Surface* out);
 int __stdcall UnlockScreen(Surface* s);
@@ -75,12 +71,12 @@ static inline int WidthTextGlyphs(Font* font, unsigned char* text)
 // it fits. The text's rectangle is checked against the surface's clip rect
 // with RectInsideRect and only then drawn by the glyph blitter BlitText,
 // which takes the surface's pixels and pitch, the font, the text, the
-// position and the game's three colour fields at +0x208, +0x20c, +0x210.
+// position and the display's three text colours at +0x208, +0x20c, +0x210.
 // FUNCTION: 0x4c14f0
 void __stdcall DrawString(Surface* dst, unsigned char* text, int x, int y, int maxWidth)
 {
-    Game* game = GetDisplay();
-    int width = WidthTextGlyphs(game->font, text);
+    DisplayContext* game = GetDisplay();
+    int width = WidthTextGlyphs(game->bitmapFont, text);
     if (maxWidth != -1 && width > maxWidth) {
         unsigned char buf[0x12c];
         strncpy((char*)buf, (char*)text, 0x12b);
@@ -93,7 +89,7 @@ void __stdcall DrawString(Surface* dst, unsigned char* text, int x, int y, int m
             if (end == buf)
                 break;
             end--;
-            width = WidthTextGlyphs(game->font, text);
+            width = WidthTextGlyphs(game->bitmapFont, text);
             if (width <= maxWidth)
                 break;
         }
@@ -103,23 +99,23 @@ void __stdcall DrawString(Surface* dst, unsigned char* text, int x, int y, int m
     r.top = y;
     r.right = x + width;
     // From r.top, not y: r is address-taken, so the original reloads it.
-    r.bottom = r.top + GetDisplay()->font->glyphs[0];
+    r.bottom = r.top + GetDisplay()->bitmapFont->glyphs[0];
     if (dst == 0) {
         Surface screen;
         if (LockScreen(&screen) != 0) {
             Rect clip;
             screen.GetClipRect(&clip);
             if (RectInsideRect(&r, &clip))
-                BlitText(screen.pixels, screen.pitch, game->font, text, x, y, game->colour1,
-                             game->colour2, game->colour3);
+                BlitText(screen.pixels, screen.pitch, game->bitmapFont, text, x, y, game->textFgColor,
+                             game->textBgColor, game->textSkipColor);
             UnlockScreen(&screen);
         }
     } else {
         Rect clip;
         dst->GetClipRect(&clip);
         if (RectInsideRect(&r, &clip))
-            BlitText(dst->pixels, dst->pitch, game->font, text, x, y, game->colour1,
-                         game->colour2, game->colour3);
+            BlitText(dst->pixels, dst->pitch, game->bitmapFont, text, x, y, game->textFgColor,
+                         game->textBgColor, game->textSkipColor);
     }
 }
 
@@ -193,8 +189,8 @@ void __stdcall DrawOutlinedString(Surface* dst, unsigned char* text, int fore,
                             int back, int y)
 {
     // Font arrives as a typed field read through `glyphs`: a cast form swaps base and index.
-    Game* game = (Game*)GetDisplay();
-    int width = WidthTextGlyphs(game->font, text);
+    DisplayContext* game = GetDisplay();
+    int width = WidthTextGlyphs(game->bitmapFont, text);
     if (dst == 0) {
         Surface r;
         if (LockScreen(&r) != 0) {
