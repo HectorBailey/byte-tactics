@@ -102,13 +102,7 @@ struct Entry_00428730 {
     char name[0x20];                   // +0x08
 };
 
-// The display object GetDisplay returns: bit 1 at +0xf0 is fullscreen.
-struct Display_00425d80 {
-    char unknown_0[0xf0];
-    unsigned short bit0 : 1;           // +0xf0
-    unsigned short fullscreen : 1;
-    unsigned short rest : 14;
-};
+#include "../graphics/display_context.h"
 
 // The game object.
 struct Game {
@@ -236,7 +230,7 @@ void __stdcall SetCursorMode(int param_1);
 int __stdcall IsCurrentGadgetNamed(Gui* gui, char* name);
 void __stdcall ClearSelectedGadget(void* param_1);
 char* __stdcall Translate(char* text);
-Display_00425d80* __stdcall GetDisplay(void);
+DisplayContext* __stdcall GetDisplay(void);
 void __stdcall CloseTopScreen(Gui* sub);
 void HideSoftwareCursor();
 void Force640x480Surfaces();
@@ -607,8 +601,8 @@ void __stdcall HandleMainMenuClick(Gui* gui)
     }
     if (IsCurrentGadgetNamed(gui, "INTRO")) {
         PlaySoundByName("smlButton", 0);
-        Display_00425d80* display = GetDisplay();
-        if (!display->fullscreen) {
+        DisplayContext* display = GetDisplay();
+        if (!display->flags.bits.fullscreen) {
             OpenMessageBox(&g_game->gui,
                          "Debug:  You must be in full-screen mode to play a movie.",
                          200, 1, 1);
@@ -653,8 +647,8 @@ void __stdcall HandleMainMenuClick(Gui* gui)
     }
     if (IsCurrentGadgetNamed(gui, "Credits")) {
         PlaySoundByName("smlButton", 0);
-        Display_00425d80* display = GetDisplay();
-        if (!display->fullscreen) {
+        DisplayContext* display = GetDisplay();
+        if (!display->flags.bits.fullscreen) {
             OpenMessageBox(&g_game->gui,
                          "Debug:  You must be in full-screen mode to play a movie.",
                          200, 1, 1);
@@ -1056,9 +1050,9 @@ void RunFrontendStateMachine(void)
 
     switch ((unsigned char)g_game->frontendMenuState) {
     case 0: {
-        Display_00425d80* p = GetDisplay();
+        DisplayContext* p = GetDisplay();
         SetCursorOverlayEnabled(0);
-        if (p->fullscreen) {
+        if (p->flags.bits.fullscreen) {
             if (g_game->playMovie) {
                 PlayMovie(g_zrbMovie1);
                 SetState(1, 0x3dc, g_frontendSourceFile);
