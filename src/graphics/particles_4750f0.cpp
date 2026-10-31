@@ -3,12 +3,8 @@
 // class is in particles_4750b0.cpp; this stays apart because it returns bool,
 // where Update tests the result as an int.
 
-#pragma pack(push, 1)
-struct Game {
-    char unknown_0[0x38a47];
-    unsigned int gameTick;             // +0x38a47
-};
-#pragma pack(pop)
+#include "../game/game.h"
+
 extern Game* g_game;
 
 class TimedSubParticles {
