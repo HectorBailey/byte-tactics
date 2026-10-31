@@ -3,7 +3,8 @@
 // file keeps the view (docs/c2-regalloc.md).
 // Decompiled by space-bunny-free, Haiku, deepseek-v4.1-flash, Claude Sonnet 5.5, GPT-6.1-sol, deepseek-v4.1 and mimo-v2.6-pro. Names are provisional.
 
-// <windows.h> is needed for CanRepair's operand order (see there).
+// Only for its symbol ids, as in unit.cpp's prelude this file keeps: SetStateBits
+// matches at one symbol count.
 #include <windows.h>
 // Only for its symbol ids: SetStateBits matches at one symbol count.
 #include <ddraw.h>
@@ -22,7 +23,7 @@ void SetMemFussyDefault(void);
 #include "unit_def.h"
 
 // Unused here: these headers and forward declarations take the symbol ids that keep
-// CanLoad (0x489a90) and SetStateBits (0x48b090) matching (docs/c2-regalloc.md).
+// SetStateBits (0x48b090) matching (docs/c2-regalloc.md).
 #include "../util/hapi_bank.h"
 #include "../map/mission.h"
 #include "../sound/sound.h"
