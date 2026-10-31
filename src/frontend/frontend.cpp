@@ -102,24 +102,6 @@ struct Entry_00428730 {
     char name[0x20];                   // +0x08
 };
 
-// The gadget record a click handler is called with.
-struct Gadget_00425d80 {
-    char unknown_0[0x60];
-    int selected;                      // +0x60
-};
-
-struct GadgetOwner_00426190 {
-    int unknown_0;
-    int gadgets;                       // +0x4
-};
-
-struct Gadget_00426190 {
-    char unknown_0[0x18];
-    GadgetOwner_00426190* owner;       // +0x18
-    char unknown_1c[0x60 - 0x1c];
-    int selected;                      // +0x60
-};
-
 // The display object GetDisplay returns: bit 1 at +0xf0 is fullscreen.
 struct Display_00425d80 {
     char unknown_0[0xf0];
@@ -251,7 +233,7 @@ void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const
 void __cdecl GameFreeThunk(void* p);
 void __stdcall PlaySoundByName(char* name, int param_2);
 void __stdcall SetCursorMode(int param_1);
-int __stdcall IsCurrentGadgetNamed(Gadget_00425d80* gadget, char* name);
+int __stdcall IsCurrentGadgetNamed(Gui* gui, char* name);
 void __stdcall ClearSelectedGadget(void* param_1);
 char* __stdcall Translate(char* text);
 Display_00425d80* __stdcall GetDisplay(void);
@@ -332,8 +314,8 @@ void __stdcall SetFrontendErrorText(char* text);
 void ShowFrontendErrorText();
 void BlankScreen();
 void PresentFrontendFrame();
-void __stdcall HandleMainMenuClick(Gadget_00425d80* gadget);
-void __stdcall HandleCloseCdPlayerChoice(Gadget_00426190* gadget);
+void __stdcall HandleMainMenuClick(Gui* gui);
+void __stdcall HandleCloseCdPlayerChoice(Gui* gui);
 void __stdcall OpenCloseCdPlayerDialog();
 void __stdcall FreeSurface(void* param_1);
 void* __stdcall LoadBitmapByName(const char* name, int param_2);
@@ -590,21 +572,21 @@ void UpdateMenuSparks()
 // the movie state (clearing +0x2bbe/+0x2bbf/+0x2bc0), EXIT goes to 8 and
 // Credits to 9; unknown gadgets just release themselves.
 // FUNCTION: 0x425d80
-void __stdcall HandleMainMenuClick(Gadget_00425d80* gadget)
+void __stdcall HandleMainMenuClick(Gui* gui)
 {
     char buf[256];
 
-    if (gadget->selected == -1) {
+    if (gui->hotGadgetIndex == -1) {
         GameFreeThunk(g_menuSparks);
         return;
     }
-    if (IsCurrentGadgetNamed(gadget, "SINGLE")) {
+    if (IsCurrentGadgetNamed(gui, "SINGLE")) {
         PlaySoundByName("BigButton", 0);
         SetCursorMode(0x14);
         g_game->frontendSubstateRequest = 5;
         return;
     }
-    if (IsCurrentGadgetNamed(gadget, "MULTI")) {
+    if (IsCurrentGadgetNamed(gui, "MULTI")) {
         PlaySoundByName("BigButton", 0);
         SetCursorMode(0x14);
         RegisterDataArchives();
@@ -623,7 +605,7 @@ void __stdcall HandleMainMenuClick(Gadget_00425d80* gadget)
         ClearSelectedGadget(&g_game->gui);
         return;
     }
-    if (IsCurrentGadgetNamed(gadget, "INTRO")) {
+    if (IsCurrentGadgetNamed(gui, "INTRO")) {
         PlaySoundByName("smlButton", 0);
         Display_00425d80* display = GetDisplay();
         if (!display->fullscreen) {
@@ -663,13 +645,13 @@ void __stdcall HandleMainMenuClick(Gadget_00425d80* gadget)
         g_game->frontendSubstateRequest = 0;
         return;
     }
-    if (IsCurrentGadgetNamed(gadget, "EXIT")) {
+    if (IsCurrentGadgetNamed(gui, "EXIT")) {
         PlaySoundByName("exit", 0);
         SetCursorMode(0x14);
         g_game->frontendSubstateRequest = 8;
         return;
     }
-    if (IsCurrentGadgetNamed(gadget, "Credits")) {
+    if (IsCurrentGadgetNamed(gui, "Credits")) {
         PlaySoundByName("smlButton", 0);
         Display_00425d80* display = GetDisplay();
         if (!display->fullscreen) {
@@ -690,23 +672,23 @@ void __stdcall HandleMainMenuClick(Gadget_00425d80* gadget)
         g_game->frontendSubstateRequest = 9;
         return;
     }
-    ClearSelectedGadget(gadget);
+    ClearSelectedGadget(gui);
 }
 
 // Handler for a two-choice dialog gadget (same shape as 0x446020): plays
 // the button sound, "CHOICE1" closes the game window, "CHOICE2" does
 // nothing, anything else is passed on.
 // FUNCTION: 0x426190
-void __stdcall HandleCloseCdPlayerChoice(Gadget_00426190* gadget)
+void __stdcall HandleCloseCdPlayerChoice(Gui* gui)
 {
-    int owner = gadget->owner->gadgets;
-    if (gadget->selected == -1)
+    int owner = (int)gui->layer->entries;
+    if (gui->hotGadgetIndex == -1)
         return;
     PlaySoundByName("SmallButton", 0);
-    if (IsGadgetNamed(owner, gadget->selected, "CHOICE1")) {
+    if (IsGadgetNamed(owner, gui->hotGadgetIndex, "CHOICE1")) {
         g_game->sound->CloseCdPlayerWindow();
-    } else if (!IsGadgetNamed(owner, gadget->selected, "CHOICE2")) {
-        ClearSelectedGadget(gadget);
+    } else if (!IsGadgetNamed(owner, gui->hotGadgetIndex, "CHOICE2")) {
+        ClearSelectedGadget(gui);
     }
 }
 

@@ -498,8 +498,8 @@ address,size,file,symbol,status,similarity
 0x425a90,196,src/frontend/frontend.cpp,?EnterMainMenuState@@YGXXZ,matched,100.0
 0x425b60,32,src/frontend/frontend.cpp,?PresentFrontendFrame@@YGXXZ,matched,100.0
 0x425b80,497,src/frontend/frontend.cpp,?UpdateMenuSparks@@YGXXZ,matched,100.0
-0x425d80,1034,src/frontend/frontend.cpp,?HandleMainMenuClick@@YGXPAUGadget_00425d80@@@Z,matched,100.0
-0x426190,100,src/frontend/frontend.cpp,?HandleCloseCdPlayerChoice@@YGXPAUGadget_00426190@@@Z,matched,100.0
+0x425d80,1034,src/frontend/frontend.cpp,?HandleMainMenuClick@@YGXPAUGui@@@Z,matched,100.0
+0x426190,100,src/frontend/frontend.cpp,?HandleCloseCdPlayerChoice@@YGXPAUGui@@@Z,matched,100.0
 0x426200,420,src/frontend/frontend.cpp,?OpenCloseCdPlayerDialog@@YGXXZ,matched,100.0
 0x4263b0,971,src/frontend/frontend.cpp,?OpenMainMenu@@YGXXZ,matched,100.0
 0x426780,289,src/frontend/frontend.cpp,?PlayMovie@@YGXPAD@Z,matched,100.0
