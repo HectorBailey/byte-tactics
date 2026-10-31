@@ -61,7 +61,25 @@ struct DisplayContext {
     char unknown_e4[4];                      // +0xe4
     int tickScale;                           // +0xe8, ticks per second
     int wa_left;                             // +0xec, work area left
-    unsigned short flags;                    // +0xf0
+    // The state flags, as one word (the masks) or as bits (display.cpp's
+    // DisplayFlags names; SetFullScreen takes bit 1).
+    union {
+        unsigned short word;
+        struct {
+            unsigned short opt : 1;          // bit 0
+            unsigned short fullscreen : 1;   // bit 1
+            unsigned short gdi : 1;          // bit 2
+            unsigned short unknown_3 : 2;    // bits 3-4
+            unsigned short has_c0 : 1;       // bit 5
+            unsigned short has_c4 : 1;       // bit 6
+            unsigned short has_c8 : 1;       // bit 7
+            unsigned short has_cc : 1;       // bit 8
+            unsigned short has_d0 : 1;       // bit 9
+            unsigned short sound_opt : 1;    // bit 10
+            unsigned short quitting : 1;     // bit 11
+            unsigned short unknown_12 : 4;   // bits 12-15
+        } bits;
+    } flags;                                 // +0xf0
     int mappedKeyQueueCap;                   // +0xf2
     int mappedKeyQueue[30];                  // +0xf6
     int mappedKeyWriteIdx;                   // +0x16e
