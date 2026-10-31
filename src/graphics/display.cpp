@@ -16,7 +16,7 @@ union DisplayFlags {
     unsigned short word;
     struct {
         unsigned short opt : 1;        // bit 0
-        unsigned short bit1 : 1;       // bit 1, full screen
+        unsigned short fullscreen : 1; // bit 1, display_context.h's name
         unsigned short gdi : 1;        // bit 2
         unsigned short bit3 : 1;       // bit 3
         unsigned short bit4 : 1;       // bit 4
@@ -69,9 +69,9 @@ struct DirectDrawState {
 
 // The display context at g_display. Packed to 2: the mode struct and the two
 // ints after it sit at 0x1ea, 0x1fa and 0x1fe, and videoFlags is a word at
-// +0x202. Its own view, not graphics/display_context.h: the methods it calls
-// on the DirectDraw objects and the flag bits it names are one pointer and one
-// word in that header.
+// +0x202. Its own view, not graphics/display_context.h: the DirectDraw objects
+// it calls methods on are untyped pointers in that header. The flag word's bit
+// names (DisplayFlags) are the header's.
 #pragma pack(push, 2)
 struct DisplayContext {
     HINSTANCE hInstance;                 // +0x00
@@ -607,7 +607,7 @@ fail:
 // FUNCTION: 0x4b5910
 void ToggleFullScreen()
 {
-    if (g_display->flags.bits.bit1) {
+    if (g_display->flags.bits.fullscreen) {
         SetFullScreen(0);
     } else {
         SetFullScreen(1);
@@ -619,7 +619,7 @@ void __stdcall SetResolution(int x, int y)
 {
     g_display->width = x;
     g_display->height = y;
-    SetFullScreen(g_display->flags.bits.bit1);
+    SetFullScreen(g_display->flags.bits.fullscreen);
 }
 
 // Suspected original bug: the work area rectangle fetched with
@@ -755,7 +755,7 @@ long __stdcall WindowProc(HWND hwnd, unsigned int msg, unsigned int wparam,
     case WM_CREATE:
         return 0;
     case WM_DESTROY:
-        if (g_display->flags.bits.bit1)
+        if (g_display->flags.bits.fullscreen)
             SetFullScreen(0);
         PostQuitMessage(0);
         return 0;
@@ -907,7 +907,7 @@ int GetDisplay(void)
 void __stdcall QuitApp(char* message)
 {
     g_display->flags.bits.quitting = 1;
-    if (g_display->flags.bits.bit1) {
+    if (g_display->flags.bits.fullscreen) {
         SetFullScreen(0);
     }
     if (message) {
