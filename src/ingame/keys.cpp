@@ -33,18 +33,20 @@ class Mission;
 
 #include "../gui/gui.h"
 
-struct Flags_00495e90_37ebe {
+// The orders panel's flag word (Thaldren's wOrdersPanelFlags).
+struct OrdersPanelFlags {
     unsigned short b0 : 1;
     unsigned short b1 : 1;
     unsigned short b2 : 1;
     unsigned short rest : 13;
 };
 
-struct Flags_00495e90_37f06 {
-    unsigned short b0 : 1;      // mask 0x0001
+// The visual options word (Thaldren's wVisualFlags), named as settings.cpp names it.
+struct VisualFlags {
+    unsigned short damagebars : 1;      // mask 0x0001
     unsigned short b1_6 : 6;
-    unsigned short b7 : 1;      // mask 0x0080
-    unsigned short b8 : 1;      // mask 0x0100
+    unsigned short b7 : 1;              // mask 0x0080, not saved by settings.cpp
+    unsigned short switchAlt : 1;       // mask 0x0100
     unsigned short rest : 7;
 };
 
@@ -131,9 +133,9 @@ struct Game {
     unsigned short unitIndex;           // +0x37e9c
     char unknown_37e9e[0x37ea0 - 0x37e9e];
     char guiName[0x37ebe - 0x37ea0];
-    Flags_00495e90_37ebe ordersPanelFlags; // +0x37ebe
+    OrdersPanelFlags ordersPanelFlags; // +0x37ebe
     char unknown_37ec0[0x37f06 - 0x37ec0];
-    Flags_00495e90_37f06 visualFlags;   // +0x37f06
+    VisualFlags visualFlags;   // +0x37f06
     char unknown_37f08[0x37f27 - 0x37f08];
     int textLines;                      // +0x37f27
     char unknown_37f2b[0x37f2f - 0x37f2b];
@@ -493,7 +495,7 @@ void HandleGameKey(void)
     case 0x37:
     case 0x38:
     case 0x39:
-        if (g_game->visualFlags.b8) {
+        if (g_game->visualFlags.switchAlt) {
             if (IsKeyDown(0xfb) != 0) {
                 OpenBuildMenuPage(event - 0x31);
             } else {
@@ -530,7 +532,7 @@ void HandleGameKey(void)
     case 0x2a:
     case 0x60:
     case 0x7e:
-        g_game->visualFlags.b0 = !g_game->visualFlags.b0;
+        g_game->visualFlags.damagebars = !g_game->visualFlags.damagebars;
         SaveSettings();
         break;
 
