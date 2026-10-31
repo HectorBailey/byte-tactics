@@ -111,7 +111,7 @@ struct Game {
             char unknown_1bd2[0x1d15 - 0x1bd2];
             UnitList units2;           // +0x1d15
             char unknown_1d1d[0x1df2 - 0x1d1d];
-            short field_1df2;          // +0x1df2
+            short player1UnitCount;    // +0x1df2, players[1].unitCount (player.h +0x144)
         };
     };
     char unknown_2851[0x2a42 - 0x2851];
@@ -605,12 +605,12 @@ void VictoryKillEnemyCommander::LoadState(HapiBank* obj)
 extern char g_destroyAllUnitsKey[]; // "VictoryCondition_DestroyAllUnits"
 
 // Slot 0 (IsSatisfied) of the "destroy all units" victory condition (vtable
-// 0x4fd948, state saved by 0x48eb80): satisfied while the game field at
-// +0x1df2 is zero, announcing "Victory Condition" once.
+// 0x4fd948, state saved by 0x48eb80): satisfied while player 1 has no units
+// (its unit count, g_game+0x1df2), announcing "Victory Condition" once.
 // FUNCTION: 0x48eb40
 int VictoryDestroyAllUnits::IsSatisfied()
 {
-    if (g_game->field_1df2 == 0) {
+    if (g_game->player1UnitCount == 0) {
         if (celebrated == 0) {
             PlaySoundByName("Victory Condition", 0);
             celebrated = 1;
