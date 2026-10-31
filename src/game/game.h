@@ -323,7 +323,7 @@ struct Game {  // 0x3924d bytes
     int loaded[10];  // +0x29a4
     char unknown_29cc[4];
     int field_29d0[11];  // +0x29d0
-    int field_29fc[10];  // +0x29fc
+    int startPosShuffle[10];  // +0x29fc
     char unknown_2a24[4];
     int startPosShuffleReady;  // +0x2a28
     char unknown_2a2c[4];
@@ -336,7 +336,7 @@ struct Game {  // 0x3924d bytes
     unsigned char localPlayer;  // +0x2a42
     unsigned char playerIndex;  // +0x2a43
     unsigned char netGameFlags;  // +0x2a44, the low byte; the word is net_game.cpp's netGameFlagsWord
-    unsigned char unknown_2a45[1];
+    unsigned char netGameFlagsHi;  // +0x2a45, the high byte of the same word
     unsigned char netOrCdSentinel;  // +0x2a46
     char unknown_2a47[4];
     void* data[15];  // +0x2a4b
@@ -437,7 +437,7 @@ struct Game {  // 0x3924d bytes
     int worldHeightFixed;  // +0x142b3
     int overflowBucket;  // +0x142b7
     Rect viewLimit;  // +0x142bb
-    char unknown_142cb[16];
+    int minimapViewRect[4];  // +0x142cb, the radar viewport rectangle
     void* finalSurface;  // +0x142db
     void* mappedSurface;  // +0x142df
     void* pictureSurface;  // +0x142e3
@@ -508,7 +508,7 @@ struct Game {  // 0x3924d bytes
     void* nuclogo;      // +0x147e7
     void* src1;  // +0x147eb
     void* src2;  // +0x147ef
-    void* unknown_147f3;  // +0x147f3
+    void* flameStreamSeq;  // +0x147f3
     void* src3;  // +0x147f7
     int explode2;  // +0x147fb
     int explode3;  // +0x147ff
@@ -519,10 +519,10 @@ struct Game {  // 0x3924d bytes
     unsigned short* image_14813;  // +0x14813
     unsigned short* image_14817;  // +0x14817
     int igpaused;  // +0x1481b
-    unsigned short* field_1481f[5];  // +0x1481f
-    unsigned short* field_14833[5];  // +0x14833
-    unsigned short* field_14847[5];  // +0x14847
-    Cell_004816a0* field_1485b;  // +0x1485b
+    unsigned short* sidePanelTopSeq[5];   // +0x1481f
+    unsigned short* sidePanelBotSeq[5];   // +0x14833
+    unsigned short* sidePanelSideSeq[5];  // +0x14847
+    Cell_004816a0* losTable;     // +0x1485b
     void* black[4];  // +0x1485f
     void* gray[4];  // +0x1486f
     Src_004ab400* table[1];  // +0x1487f
@@ -593,7 +593,7 @@ struct Game {  // 0x3924d bytes
     unsigned short cloak : 2;
     unsigned short activation : 2;
     unsigned short flags_7 : 9;
-    char unknown_37ec2[2];
+    unsigned short ordersCapabilityBitsHi;  // +0x37ec2
     unsigned int windCounter;  // +0x37ec4
     int windSpeedDenominator;  // +0x37ec8
     int windX;  // +0x37ecc
@@ -629,7 +629,7 @@ struct Game {  // 0x3924d bytes
     int mousespeed;  // +0x37f2b
     unsigned short uiOptionFlags;  // +0x37f2f
     unsigned int lobbyTimeoutSecs;  // +0x37f31
-    char unknown_37f35[4];
+    int netSendDropPct;  // +0x37f35
     int sides;  // +0x37f39
     char names[1][562];  // +0x37f3d
     char unknown_3816f[2248];
@@ -683,7 +683,7 @@ struct Game {  // 0x3924d bytes
     void* currentPalette;  // +0x39083
     void* desiredPalette;  // +0x39087
     void* fadeTable;  // +0x3908b
-    char unknown_3908f[256];
+    char glamourBriefPath[256];  // +0x3908f
     int maxStats[7];  // +0x3918f
     int mission;  // +0x391ab
     int won;          // +0x391af
@@ -695,9 +695,7 @@ struct Game {  // 0x3924d bytes
     int showBps;      // +0x391c3
     int buildListCount;  // +0x391c7
     BuildList_0041ace0* buildLists;  // +0x391cb
-    char field_391cf[24];  // +0x391cf
-    char field_391e7;  // +0x391e7
-    char field_391e8;  // +0x391e8
+    char campaignMissionStatus[26];  // +0x391cf, Thaldren's one 26-byte field
     Mission* mapInfo;  // +0x391e9
     Class_0048ff40* list_391ed;  // +0x391ed
     int frontendState;  // +0x391f1, the frontend mode eight other views name this way
@@ -719,7 +717,7 @@ struct Game {  // 0x3924d bytes
     unsigned short endGameFlags;  // +0x3923b
     int playMovie;  // +0x3923d
     int introMovieLoop;  // +0x39241
-    char unknown_39245[4];
+    int cmdlineSkipIntroMovie;  // +0x39245
     int restartMissionRequest;  // +0x39249
     Game(void);
     Player* Current(void);
