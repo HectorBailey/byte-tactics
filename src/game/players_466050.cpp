@@ -4,55 +4,10 @@
 // Two functions with aligned frames (`and esp, -8`) under the default flags,
 // no /Op: the doubles they pass and receive are enough for MSVC to align.
 
-#pragma pack(push, 1)
 #include "../network/player_info.h"
+#include "game.h"
 
-// The header's type, kept local: the +0x149 storage flag must stay a 1-bit
-// bitfield (a plain word moves LoadPlayers).
-struct Player {                        // 0x14b bytes
-    int active;                        // +0x00
-    char unknown_4[0x27 - 0x4];
-    PlayerInfo* info;                  // +0x27
-    char unknown_2b[0x73 - 0x2b];
-    unsigned char type;                // +0x73
-    char unknown_74[0x8c - 0x74];
-    float energy;                      // +0x8c
-    char unknown_90[0x98 - 0x90];
-    float metal;                       // +0x98
-    char unknown_9c[0xac - 0x9c];
-    double totalEnergyProduced;        // +0xac
-    double totalMetalProduced;         // +0xb4
-    double totalEnergyConsumed;        // +0xbc
-    double totalMetalConsumed;         // +0xc4
-    double energyWasted;               // +0xcc
-    double metalWasted;                // +0xd4
-    float energyStorageBonus;          // +0xdc
-    float metalStorageBonus;           // +0xe0
-    char unknown_e4[0xf0 - 0xe4];
-    int updateTime;                    // +0xf0
-    int winLoseTime;                   // +0xf4
-    int displayTimer;                  // +0xf8
-    short kills;                       // +0xfc
-    short losses;                      // +0xfe
-    char unknown_100[0x108 - 0x100];
-    char allied[11];                   // +0x108
-    char unknown_113[0x149 - 0x113];
-    unsigned short flags : 1;          // +0x149, bit 0
-    unsigned short bits_149_1 : 15;
-};
-
-struct Game_00466050 {
-    char unknown_0[0x1b63];
-    Player players[10];                // +0x1b63
-    char unknown_2851[0x2a42 - 0x2851];
-    unsigned char localPlayer;         // +0x2a42
-    unsigned char playerIndex;         // +0x2a43
-    char unknown_2a44[0x38a37 - 0x2a44];
-    char gameTime[0x1c];               // +0x38a37
-};
-#pragma pack(pop)
-
-extern Game_00466050* g_game;
+extern Game* g_game;
 
 #include "../util/hapi_bank.h"
 
@@ -67,7 +22,7 @@ void __stdcall LoadPlayers(HapiBank* file)
     g_game->localPlayer = file->GetIntegerItem("Human Player", 10);
     g_game->playerIndex = g_game->localPlayer;
     file->OpenNamedBox("GameTime");
-    if (file->ReadBox(g_game->gameTime, 0x1c) != 0x1c)
+    if (file->ReadBox(&g_game->lastTick, 0x1c) != 0x1c)
         return;
     for (int i = 0; i < 10; i++) {
         Player* p = &g_game->players[i];
@@ -83,7 +38,11 @@ void __stdcall LoadPlayers(HapiBank* file)
             p->metalWasted = file->GetDoubleItem("MetalWasted", 0);
             p->energyStorageBonus = file->GetDoubleItem("PlayerEnergyStorage", 0);
             p->metalStorageBonus = file->GetDoubleItem("PlayerMetalStorage", 0);
-            p->flags = file->GetIntegerItem("AddPlayerStorage", 0);
+            // The storage flag is bit 0 of flags. The value and the old word in
+            // locals, as the original's bit-field store reads them.
+            int storage = file->GetIntegerItem("AddPlayerStorage", 0);
+            unsigned short f = p->flags;
+            p->flags = (f & ~1) | (storage & 1);
             p->kills = file->GetIntegerItem("Kills", 0);
             p->losses = file->GetIntegerItem("Losses", 0);
             p->updateTime = file->GetIntegerItem("UpdateTime", 0);
@@ -109,7 +68,7 @@ void __stdcall SavePlayers(HapiBank* file)
     file->OpenAccount("Players");
     file->SetIntegerItem("Human Player", g_game->localPlayer);
     file->OpenNamedBox("GameTime");
-    file->WriteBox(g_game->gameTime, 0x1c);
+    file->WriteBox(&g_game->lastTick, 0x1c);
     for (int i = 0; i < 10; i++) {
         Player* p = &g_game->players[i];
         if (p->type) {
@@ -125,7 +84,7 @@ void __stdcall SavePlayers(HapiBank* file)
             file->SetDoubleItem("MetalWasted", p->metalWasted);
             file->SetDoubleItem("PlayerEnergyStorage", p->energyStorageBonus);
             file->SetDoubleItem("PlayerMetalStorage", p->metalStorageBonus);
-            file->SetIntegerItem("AddPlayerStorage", p->flags);
+            file->SetIntegerItem("AddPlayerStorage", p->flags & 1);
             file->SetIntegerItem("Kills", p->kills);
             file->SetIntegerItem("Losses", p->losses);
             file->SetIntegerItem("UpdateTime", p->updateTime);
