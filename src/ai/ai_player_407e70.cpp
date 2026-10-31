@@ -97,7 +97,7 @@ static inline int IsVisible(Player* player, FixedVec3* pos)
     return IsPointVisible(player, pos);
 }
 
-#include "../units/unit_def.h"
+#include "../units/unit.h"
 
 // The flags at +0x245 read as the original's bitfield; the header keeps the
 // plain word.
@@ -108,13 +108,6 @@ struct UnitDefFlags_00407e90 {
     unsigned int flag4 : 1;             // +0x245 bit 4
 };
 
-struct Unit {
-    int motion;                        // +0x0
-    char unknown_4[0x6a - 0x4];
-    Vec3_00407d40 pos;                  // +0x6a
-    char unknown_76[0x92 - 0x76];
-    UnitDef* def;                       // +0x92
-};
 #pragma pack(pop)
 
 // A player's squad group, the same 0x20-byte record units/group.h declares.
@@ -130,6 +123,10 @@ struct Group {
 #include "../orders/mission_type.h"
 
 #include "squad_manager.h"
+
+// Unused here: the symbol ids this header takes keep 0x407e70 and 0x407e90
+// matching (docs/c2-regalloc.md).
+#include "../sound/sound.h"
 
 // Vtable 0x4fc980, constructor 0x407350, ??_G 0x407390.
 class SquadTimer {
@@ -170,7 +167,7 @@ static inline Vec3_00407d40 Offset(int angle, int distance)
 }
 
 int __stdcall SumUnitRatingsInRange(int index, Vec3_00407d40* pos, int range);
-int __stdcall WeaponCanReachPos(Unit* unit, Vec3_00407d40* from, Vec3_00407d40* to, int flags);
+int __stdcall WeaponCanReachPos(Unit* unit, Vec3* from, Vec3_00407d40* to, int flags);
 MissionType __stdcall GetOrderType(unsigned char mode, Unit* unit,
                                       Unit* target, Vec3_00407d40* pos);
 void __stdcall AddOrder(MissionType kind, int remove, Unit* unit,
