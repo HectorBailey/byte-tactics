@@ -47,8 +47,12 @@ struct Entry_486360 {
 
 #include "../network/player_info.h"
 
-// Unused here: a real function declared to keep the file's symbol count (docs/c2-regalloc.md).
+// Unused here: real functions declared to keep the file's symbol count (docs/c2-regalloc.md).
 int StepTowards(int, int, int);
+void RegisterUnitOrders(void);
+void RegisterGroundOrders(void);
+void EnableAICommands(void);
+void RegisterAICommands(void);
 
 struct Unit;
 
@@ -129,21 +133,14 @@ struct UnitType {                      // 0x249 bytes
     char unknown_245[0x249 - 0x245];
 };
 
-struct Fixed_00485070 {
-    unsigned short frac;
-    short whole;
-};
-
-struct Pos_00485070 {
-    Fixed_00485070 x;                  // +0x0
-    Fixed_00485070 y;                  // +0x4
-    Fixed_00485070 z;                  // +0x8
-};
+#include "../util/fixed.h"
 
 struct Pos_00485a40 {
     int x, y, z;
 };
 
+// Not util/fixed.h: the halves are bit fields, and MakeFixed's stores through
+// them are what 0x4853b0 compiles (on the header's shorts, 26.3%).
 struct FixedParts_004853b0 {
     unsigned int frac : 16;
     int whole : 16;
@@ -375,7 +372,7 @@ static inline Cell* GetCellCachedWidth(int x, int y)
 }
 
 // FUNCTION: 0x485140
-int __stdcall GetCellMeanHeight(Pos_00485070* p)
+int __stdcall GetCellMeanHeight(FixedVec3* p)
 {
     // One statement for x and y: settles the order of the two height-byte loads.
     int x = p->x.whole / 16, y = p->z.whole / 16;
@@ -391,7 +388,7 @@ int __stdcall GetCellMeanHeight(Pos_00485070* p)
 // through a copy of the pointer).
 
 // FUNCTION: 0x485330
-void __stdcall GetCellPosition(int x, int y, Pos_00485070* out)
+void __stdcall GetCellPosition(int x, int y, FixedVec3* out)
 {
     Cell* cell = GetCell(x, y);
     if (cell) {
@@ -996,11 +993,11 @@ struct Result_486360 {
 void* __stdcall GetMapCell(int x, int y);
 // GetGroundHeight (units_485070.cpp) only matches in a file of its own: its symbol
 // ids have to stay below a low limit.
-int __stdcall GetGroundHeight(Pos_00485070* pos);
+int __stdcall GetGroundHeight(FixedVec3* pos);
 // Also declared for the symbol count that AllocateUnitMemory needs.
 int __stdcall FindHighestPointOnLine(Pos_00485a40 a, Pos_00485a40 b);
-Result_486360* __stdcall PlaceFeature(void* target, unsigned short id, Pos_00485070* pos, void* field_64, unsigned char owner);
-void __stdcall EmitSmoke(Pos_00485070* pos, int a, int b, int c);
+Result_486360* __stdcall PlaceFeature(void* target, unsigned short id, FixedVec3* pos, void* field_64, unsigned char owner);
+void __stdcall EmitSmoke(FixedVec3* pos, int a, int b, int c);
 
 // FUNCTION: 0x486360
 void __stdcall CreateUnitCorpse(Unit* unit, int depth, int flag)
@@ -1015,7 +1012,7 @@ void __stdcall CreateUnitCorpse(Unit* unit, int depth, int flag)
     if (id < 0xfffb) {
         void* target = GetMapCell(unit->cell.x, unit->cell.y);
         if (target != 0) {
-            Pos_00485070* pos = (Pos_00485070*)&unit->pos;
+            FixedVec3* pos = (FixedVec3*)&unit->pos;
             if (GetGroundHeight(pos) <= g_game->seaLevel) {
                 Result_486360* r = PlaceFeature(target, id, pos, &unit->angles, unit->playerIndex);
                 if (r != 0) {

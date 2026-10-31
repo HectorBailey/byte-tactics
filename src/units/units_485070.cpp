@@ -15,21 +15,12 @@ struct Game {
 };
 #pragma pack(pop)
 
-struct Fixed_00485070 {
-    unsigned short frac;
-    short whole;
-};
-
-struct Pos_00485070 {
-    Fixed_00485070 x;                  // +0x0
-    Fixed_00485070 y;                  // +0x4
-    Fixed_00485070 z;                  // +0x8
-};
+#include "../util/fixed.h"
 
 extern Game* g_game;
 
 // FUNCTION: 0x485070
-int __stdcall GetGroundHeight(Pos_00485070* p)
+int __stdcall GetGroundHeight(FixedVec3* p)
 {
     int x = p->x.whole;
     int z = p->z.whole;
