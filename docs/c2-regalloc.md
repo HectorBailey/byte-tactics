@@ -726,6 +726,8 @@ What a declaration costs, measured with 100 of each in front of 0x471de0's file:
 | a destructor | 4 |
 | a class's first virtual member | 1 more |
 | an anonymous union inside a struct | 7 |
+| an anonymous union holding an anonymous struct (`union { int value; struct { short lo, hi; }; };`) | 14, 7 for each: pay back both (#7104 was released as impossible after paying back 7; #7329) |
+| a `#define` | 0: the preprocessor removes it, so flag masks named that way move nothing (#7375) |
 
 So data members take no ids at all: a type costs 7 whatever its size, and what
 a header of types adds is set by how many types, member functions and
