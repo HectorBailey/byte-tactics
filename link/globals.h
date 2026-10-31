@@ -14,13 +14,14 @@ class Sound;
 class SpeechQueue;
 class TranslationTable;
 struct Chunk;
+struct DisplayContext;
 struct Entry_004426e0;
 struct Entry_004df590;
 struct ExplodedPiece;
 struct Game;
 struct Record_005129b4;
 struct Smoke_00425b80;
-struct Struct_00526ff0;
+struct SquashTree;
 struct Surface;
 struct WeaponDef;
 
@@ -277,7 +278,7 @@ extern unsigned int g_netStatsTick;                                             
 extern unsigned int g_byteRatesTick;                                                                            // 0x511ddc, 4 bytes; 1 of 1 files
 extern int g_cdBypassDriveScan;                                                                                 // 0x511de0, 4 bytes; 2 of 2 files
 extern int g_cdPathMismatch;                                                                                    // 0x511de4, 4 bytes; 1 of 1 files
-extern Game* g_game;                                                                                            // 0x511de8, 4 bytes; 130 of 144 files (conflicting: shape)
+extern Game* g_game;                                                                                            // 0x511de8, 4 bytes; 134 of 143 files (conflicting: shape)
 extern int g_endGameGlamourSoundStarted;                                                                        // 0x511dec, 4 bytes; 1 of 1 files
 extern ExplodedPiece* g_explodedPieces[100];                                                                    // 0x511df0, 400 bytes; 1 of 1 files
 extern unsigned char g_debrisMemCache[16];                                                                      // 0x511f80, 16 bytes; CMemoryCache by value in 2 of 2 files
@@ -460,6 +461,7 @@ extern int DAT_0051fba8;                                                        
 extern int DAT_0051fbac;                                                                                        // 0x51fbac, 4 bytes; 1 of 1 files
 extern int DAT_0051fbb0;                                                                                        // 0x51fbb0, 4 bytes; 1 of 1 files
 extern int DAT_0051fbb4;                                                                                        // 0x51fbb4, 4 bytes; 1 of 1 files
+extern DisplayContext* g_display;                                                                               // 0x51fbd0, 4 bytes; 2 of 2 files
 extern unsigned char DAT_0051fbd4[4];                                                                           // 0x51fbd4, 4 bytes; nothing refers to it
 extern unsigned char g_timerSlots[172];                                                                         // 0x51fbd8, 172 bytes; TimerSlot[10] by value in 1 of 1 files
 extern unsigned int g_lastTimerTick;                                                                            // 0x51fc84, 4 bytes; 1 of 1 files
@@ -494,7 +496,7 @@ extern char g_delayedSampleName[112];                                           
 extern char g_lzssPresetWindow[176];                                                                            // 0x51ffd0, 176 bytes; 1 of 1 files
 extern unsigned char DAT_00520080[3944];                                                                        // 0x520080, 3944 bytes; nothing refers to it
 extern char g_lzssPresetTree[24584];                                                                            // 0x520fe8, 24584 bytes; 1 of 1 files
-extern Struct_00526ff0* g_squashDictTree;                                                                       // 0x526ff0, 4 bytes; 1 of 2 files (conflicting: struct names only)
+extern SquashTree* g_squashDictTree;                                                                            // 0x526ff0, 4 bytes; 1 of 2 files (conflicting: struct names only)
 extern int g_lzssPresetReady;                                                                                   // 0x526ff8, 4 bytes; 1 of 1 files
 extern int g_lzssUsePreset;                                                                                     // 0x526ffc, 4 bytes; 1 of 1 files
 extern char g_memFussyQueried;                                                                                  // 0x5289b4, 1 bytes; 1 of 1 files
@@ -593,22 +595,22 @@ extern int g_lzssLockOwner;                                                     
 extern void* g_squashThreadLockEvent;                                                                           // 0x52a4f8, 4 bytes; 2 of 2 files
 extern long g_squashThreadLockTicket;                                                                           // 0x52a4fc, 4 bytes; 1 of 2 files (conflicting: signedness or const)
 
-// Not declared: 194 globals defined in a data file or whose type is not settled (see data/globals.csv).
+// Not declared: 193 globals defined in a data file or whose type is not settled (see data/globals.csv).
 //   0x513000 g_packetManager: defined in src/network/packets_460e20.cpp
 //   0x4fcdb8 g_dpspGuidSerial: defined in src/data/guids.cpp
 //   0x4fcdc8 g_dpspGuidModem: defined in src/data/guids.cpp
+//   0x51e598 IUUnitSyncEntry::IU?$pair::?$_Tree::_Nil: defined in src/network/unit_sync.cpp
 //   0x4fcd98 g_dpspGuidIpx: defined in src/data/guids.cpp
 //   0x4fcda8 g_dpspGuidTcpip: defined in src/data/guids.cpp
-//   0x51e598 IUUnitSyncEntry::IU?$pair::?$_Tree::_Nil: defined in src/network/unit_sync.cpp
+//   0x51e59c IUUnitSyncEntry::IU?$pair::?$_Tree::_Nilrefs: defined in src/network/unit_sync.cpp
 //   0x5292c4 QBDUValue_004e17c0::PBDU?$pair::?$_Tree::_Nil: defined in src/debug/debug_lib.cpp
 //   0x4fcfb8 DAT_004fcfb8: defined in src/data/guids.cpp
 //   0x4fd2f8 g_orderFxVtable: defined in src/data/vtables.cpp
 //   0x512344 g_missionOrderTableBegin: part of another global: g_missionOrderTableVec+0x4
 //   0x512ca8 g_cmdlineHostGameName: part of another global: g_cmdlineDplayProvider+0x28
 //   0x512d48 g_onlineLobbyPlayerName: part of another global: g_cmdlineDplayProvider+0xc8
-//   0x51e574 g_onlineReportPlayers: PlayerInfo_0046c2a0** (1), PlayerInfo_0046bce0** (1), int* (1)
-//   0x51e57c g_onlineReportScoreBoards: ScoreBoard_0046c2a0** (1), ScoreBoard_0046bce0** (1), void* (1)
-//   0x51e59c IUUnitSyncEntry::IU?$pair::?$_Tree::_Nilrefs: defined in src/network/unit_sync.cpp
+//   0x51e574 g_onlineReportPlayers: OnlineReportPlayerInfo** (2), int* (1)
+//   0x51e57c g_onlineReportScoreBoards: OnlineReportScoreBoard** (2), void* (1)
 //   0x51e6a0 g_losTables: defined in src/map/line_of_sight.cpp
 //   0x51fba4 g_guiContext: Root_004a32a0* (1), Gui* (1), int* (1)
 //   0x528a54 std::IH::IU?$pair::?$_Tree::_Nil: defined in src/debug/debug_lib_4db610.cpp
@@ -660,7 +662,6 @@ extern long g_squashThreadLockTicket;                                           
 //   0x51f2e4 g_savegameDescs: int* (1), char* (1)
 //   0x51f2e8 g_savegameSideList: int* (1), char* (1)
 //   0x51f2ec g_savegameRadarPreview: int* (1), char* (1)
-//   0x51fbd0 g_display: DisplayContext* (1), void* (1)
 //   0x526ff4 g_squashWindow: void* (1), char* (1)
 //   0x529500 QBDUValue_004e17c0::PBDU?$pair::?$_Tree::_Nilrefs: defined in src/debug/debug_lib.cpp
 //   0x529e00 g_pmcEvent0: PerformanceCounter (1), Entry_004df590[] (1)

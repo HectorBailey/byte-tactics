@@ -547,6 +547,7 @@ int DAT_0051fba8;  // 0x51fba8 .bss
 int DAT_0051fbac;  // 0x51fbac .bss
 int DAT_0051fbb0;  // 0x51fbb0 .bss
 int DAT_0051fbb4;  // 0x51fbb4 .bss
+DisplayContext* g_display;  // 0x51fbd0 .bss
 unsigned char DAT_0051fbd4[4];  // 0x51fbd4 .bss
 unsigned char g_timerSlots[172];  // 0x51fbd8 .bss
 unsigned int g_lastTimerTick;  // 0x51fc84 .bss
@@ -581,7 +582,7 @@ char g_delayedSampleName[112];  // 0x51ff60 .bss
 char g_lzssPresetWindow[176];  // 0x51ffd0 .bss
 unsigned char DAT_00520080[3944];  // 0x520080 .bss
 char g_lzssPresetTree[24584];  // 0x520fe8 .bss
-Struct_00526ff0* g_squashDictTree;  // 0x526ff0 .bss
+SquashTree* g_squashDictTree;  // 0x526ff0 .bss
 int g_lzssPresetReady;  // 0x526ff8 .bss
 int g_lzssUsePreset;  // 0x526ffc .bss (the type runs past the next known address, 0x526ffc+0x3)
 char g_memFussyQueried;  // 0x5289b4 .bss
