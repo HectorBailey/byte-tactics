@@ -124,44 +124,7 @@ struct Flags46b_3923b { unsigned short b0:1; unsigned short b1:1; };
 // The game state this file reads, with the member names the other Game views
 // use. The bit word shares a union with this view's bitfield type.
 #pragma pack(push, 1)
-// A side's panel layout at g_game+0x37f3d, stride 0x232 (Thaldren: SideDef).
-struct SideDef {
-    char aName[0x1e];                   // +0x000
-    char aNamePrefix[4];                // +0x01e
-    char aCommander[0x20];              // +0x022
-    Rect rcLogo;               // +0x042
-    Rect rcEnergyBar;          // +0x052
-    Rect rcEnergyNum;          // +0x062
-    Rect rcMetalBar;           // +0x072
-    Rect rcMetalNum;           // +0x082
-    Rect rcTotalUnits;         // +0x092
-    Rect rcTotalTime;          // +0x0a2
-    Rect rcEnergyMax;          // +0x0b2
-    Rect rcMetalMax;           // +0x0c2
-    Rect rcEnergy0;            // +0x0d2
-    Rect rcMetal0;             // +0x0e2
-    Rect rcEnergyProduced;     // +0x0f2
-    Rect rcEnergyConsumed;     // +0x102
-    Rect rcMetalProduced;      // +0x112
-    Rect rcMetalConsumed;      // +0x122
-    Rect rcLogo2;              // +0x132
-    Rect rcUnitName;           // +0x142
-    Rect rcDamageBar;          // +0x152
-    Rect rcUnitEnergyMake;     // +0x162
-    Rect rcUnitEnergyUse;      // +0x172
-    Rect rcUnitMetalMake;      // +0x182
-    Rect rcUnitMetalUse;       // +0x192
-    Rect rcMissionText;        // +0x1a2
-    Rect rcUnitName2;          // +0x1b2
-    Rect rcDamageBar2;         // +0x1c2
-    Rect rcName;               // +0x1d2
-    Rect rcDescription;        // +0x1e2
-    Rect aReloadRects[3];      // +0x1f2
-    int nEnergyColor;                   // +0x222
-    int nMetalColor;                    // +0x226
-    int nSideIndex;                     // +0x22a
-    char* pFontData;                    // +0x22e
-};
+#include "../game/side_def.h"
 
 struct Game {
     char unknown_0[0xc];
@@ -348,7 +311,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
     PlayerInfo* info = playerInfo->info;
     int side = info->side;
     SideDef* panel = &g_game->sideDefs[side];
-    SetFont((int)panel->pFontData);
+    SetFont((int)panel->font);
     int y = 0x81;
     do {
         int dy = GetScreenHeight() - 0x20;
@@ -370,10 +333,10 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
             if (_strcmpi(text, "CORBUILD") != 0) {
                 sprintf(text, "%s  M:%d E:%d", entry, (int)entry->metalCost,
                         (int)entry->energyCost);
-                DrawString(surface, (unsigned char*)text, panel->rcName.left,
-                             panel->rcName.top + yOffset, -1);
-                DrawString(surface, (unsigned char*)entry->description, panel->rcDescription.left,
-                             panel->rcDescription.top + yOffset, -1);
+                DrawString(surface, (unsigned char*)text, panel->nameBlock.left,
+                             panel->nameBlock.top + yOffset, -1);
+                DrawString(surface, (unsigned char*)entry->description, panel->description.left,
+                             panel->description.top + yOffset, -1);
                 return;
             }
         }
@@ -390,17 +353,17 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                     strcpy(text, unit->player->name);
                 else
                     strcpy(text, (char*)unit->def);
-                int titleX = panel->rcUnitName.left -
-                             GetTextWidth((void*)panel->pFontData, (unsigned char*)text) / 2;
+                int titleX = panel->unitName.left -
+                             GetTextWidth((void*)panel->font, (unsigned char*)text) / 2;
                 SetTextColors(0x53, GetTextKeyColor());
-                DrawString(surface, (unsigned char*)text, titleX, yOffset + panel->rcUnitName.top, -1);
+                DrawString(surface, (unsigned char*)text, titleX, yOffset + panel->unitName.top, -1);
                 if (unit->player->index == g_game->playerIndex ||
                     !(unit->def->flags1 & 0x4000)) {
                     int maximum = unit->def->maxHealth;
-                    DrawBar_0046a860(surface, &panel->rcDamageBar, unit->health,
+                    DrawBar_0046a860(surface, &panel->damageBar, unit->health,
                                      maximum, yOffset, (unsigned char*)palette);
                 }
-                BlitSideLogoToRect(surface, unit->player, &panel->rcLogo2, yOffset);
+                BlitSideLogoToRect(surface, unit->player, &panel->logo2, yOffset);
                 if (unit->playerIndex == g_game->playerIndex ||
                     (g_game->flagsByte_3923b & 2)) {
                     // Declared in this block, not at function scope: affects load scheduling.
@@ -408,20 +371,20 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                     char killsText[100];
                     SetTextColors((unsigned char)palette[10], GetTextKeyColor());
                     sprintf(amount, "+%.1f", Positive_0046a860(snapshot.values[3]));
-                    DrawString(surface, (unsigned char*)amount, panel->rcUnitMetalMake.left,
-                                 panel->rcUnitMetalMake.top + yOffset, -1);
+                    DrawString(surface, (unsigned char*)amount, panel->unitMetalMake.left,
+                                 panel->unitMetalMake.top + yOffset, -1);
                     sprintf(amount, "+%.0f", Positive_0046a860(snapshot.values[1]));
-                    DrawString(surface, (unsigned char*)amount, panel->rcUnitEnergyMake.left,
-                                 panel->rcUnitEnergyMake.top + yOffset, -1);
+                    DrawString(surface, (unsigned char*)amount, panel->unitEnergyMake.left,
+                                 panel->unitEnergyMake.top + yOffset, -1);
                     SetTextColors((unsigned char)palette[12], GetTextKeyColor());
                     sprintf(amount, "-%.1f", Positive_0046a860(snapshot.values[2]));
-                    DrawString(surface, (unsigned char*)amount, panel->rcUnitMetalUse.left,
-                                 panel->rcUnitMetalUse.top + yOffset, -1);
+                    DrawString(surface, (unsigned char*)amount, panel->unitMetalUse.left,
+                                 panel->unitMetalUse.top + yOffset, -1);
                     sprintf(amount, "-%.0f", Positive_0046a860(snapshot.values[0]));
-                    DrawString(surface, (unsigned char*)amount, panel->rcUnitEnergyUse.left,
-                                 panel->rcUnitEnergyUse.top + yOffset, -1);
+                    DrawString(surface, (unsigned char*)amount, panel->unitEnergyUse.left,
+                                 panel->unitEnergyUse.top + yOffset, -1);
                     if ((unit->flags & 0x80000000) && unit->killCount) {
-                        int killsY = panel->rcDamageBar.bottom + yOffset + 2, killsX = panel->rcDamageBar.left;
+                        int killsY = panel->damageBar.bottom + yOffset + 2, killsX = panel->damageBar.left;
                         char* plural = Translate("kills");
                         char* singular = Translate("kill");
                         if (unit->killCount > 4)
@@ -436,10 +399,10 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                     }
                     if (snapshot.orderName) {
                         strcpy(amount, Translate((char*)snapshot.orderName));
-                        int orderX = panel->rcMissionText.left -
-                                     GetTextWidth((void*)panel->pFontData, (unsigned char*)amount) / 2;
+                        int orderX = panel->missionText.left -
+                                     GetTextWidth((void*)panel->font, (unsigned char*)amount) / 2;
                         SetTextColors(0x53, GetTextKeyColor());
-                        DrawString(surface, (unsigned char*)amount, orderX, panel->rcMissionText.top + yOffset, -1);
+                        DrawString(surface, (unsigned char*)amount, orderX, panel->missionText.top + yOffset, -1);
                     }
                 }
                 int progress = GetBuildWeaponPercent(unit);
@@ -447,11 +410,11 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                     if (unit->player->index != g_game->playerIndex)
                         return;
                     char* weaponText = Translate("Weapon");
-                    int progressX = panel->rcUnitName2.left -
-                                    GetTextWidth((void*)panel->pFontData, (unsigned char*)weaponText) / 2;
+                    int progressX = panel->unitName2.left -
+                                    GetTextWidth((void*)panel->font, (unsigned char*)weaponText) / 2;
                     SetTextColors(0x53, GetTextKeyColor());
-                    DrawString(surface, (unsigned char*)weaponText, progressX, panel->rcUnitName2.top + yOffset, -1);
-                    DrawBar_0046a860(surface, &panel->rcDamageBar2, progress, 100, yOffset,
+                    DrawString(surface, (unsigned char*)weaponText, progressX, panel->unitName2.top + yOffset, -1);
+                    DrawBar_0046a860(surface, &panel->damageBar2, progress, 100, yOffset,
                                      (unsigned char*)palette);
                     return;
                 }
@@ -459,15 +422,15 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                     Unit_0046a860* target = g_game->units + snapshot.targetType;
                     if (!target->unitDefIndex || !IsUnitVisibleToPlayer(playerMap, target))
                         return;
-                    int targetX = panel->rcUnitName2.left -
-                                  GetTextWidth((void*)panel->pFontData, (unsigned char*)target->def) / 2;
+                    int targetX = panel->unitName2.left -
+                                  GetTextWidth((void*)panel->font, (unsigned char*)target->def) / 2;
                     SetTextColors(0x53, GetTextKeyColor());
                     DrawString(surface, (unsigned char*)target->def, targetX,
-                                 panel->rcUnitName2.top + yOffset, -1);
+                                 panel->unitName2.top + yOffset, -1);
                     if (target->player->index == g_game->playerIndex ||
                         !(target->def->flags1 & 0x4000)) {
                         int maximum = target->def->maxHealth;
-                        DrawBar_0046a860(surface, &panel->rcDamageBar2, target->health,
+                        DrawBar_0046a860(surface, &panel->damageBar2, target->health,
                                          maximum, yOffset, (unsigned char*)palette);
                     }
                 }
@@ -475,10 +438,10 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
                 char* prefix = ((unsigned char)(unit->flags >> 9) & 1) != 0 ? "S: " : "R: ";
                 char* s = Translate("Unidentified object");
                 sprintf(text, "%s%s", prefix, s);
-                int w = GetTextWidth((void*)panel->pFontData, (unsigned char*)text);
-                int x = panel->rcUnitName.left - w / 2;
+                int w = GetTextWidth((void*)panel->font, (unsigned char*)text);
+                int x = panel->unitName.left - w / 2;
                 SetTextColors(0x53, GetTextKeyColor());
-                DrawString(surface, (unsigned char*)text, x, panel->rcUnitName.top + yOffset, -1);
+                DrawString(surface, (unsigned char*)text, x, panel->unitName.top + yOffset, -1);
                 return;
             }
         }
@@ -501,7 +464,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
             else
                 strcpy(text, Translate(name));
             SetTextColors(0x53, GetTextKeyColor());
-            DrawString(surface, (unsigned char*)text, panel->rcName.left, panel->rcName.top + yOffset, -1);
+            DrawString(surface, (unsigned char*)text, panel->nameBlock.left, panel->nameBlock.top + yOffset, -1);
         }
     }
 }
