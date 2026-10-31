@@ -25,12 +25,7 @@ struct CondensedHeader {
     unsigned short sum;                // +0x1
 };
 
-struct Game {
-    char unknown_0[0x4ed];
-    int compressionOff;                // +0x4ed
-    char unknown_4f1[0x37f35 - 0x4f1];
-    int netSendDropPct;                // +0x37f35
-};
+#include "../game/game.h"
 #pragma pack(pop)
 
 extern Game* g_game;
@@ -71,12 +66,12 @@ public:
 
 // Two global instances, with initialisers (0x44f720, 0x44f7e0) and atexit
 // destructors (0x44f7a0, 0x44f860).
-// FUNCTION: 0x44f720 _$E4
-// FUNCTION: 0x44f7a0 _$E2
+// FUNCTION: 0x44f720 _$E5
+// FUNCTION: 0x44f7a0 _$E3
 NetCondenser g_receiveCondenser;
 
-// FUNCTION: 0x44f7e0 _$E9
-// FUNCTION: 0x44f860 _$E7
+// FUNCTION: 0x44f7e0 _$E10
+// FUNCTION: 0x44f860 _$E8
 NetCondenser g_sendCondenser;
 
 // FUNCTION: 0x44f8a0

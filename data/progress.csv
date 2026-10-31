@@ -1037,10 +1037,10 @@ address,size,file,symbol,status,similarity
 0x44f650,74,src/orders/order_targets.cpp,?FillWaypointWorldPos@PatrolGoal@@UAEXPAUVec3_004907e0@@HH@Z,matched,100.0
 0x44f6a0,52,src/orders/order_targets.cpp,?CreatePathfinder@@YGXXZ,matched,100.0
 0x44f6e0,50,src/orders/order_targets.cpp,?DestroyPathfinder@@YGXXZ,matched,100.0
-0x44f720,126,src/network/net_condenser.cpp,_$E4,matched,100.0
-0x44f7a0,57,src/network/net_condenser.cpp,_$E2,matched,100.0
-0x44f7e0,126,src/network/net_condenser.cpp,_$E9,matched,100.0
-0x44f860,57,src/network/net_condenser.cpp,_$E7,matched,100.0
+0x44f720,126,src/network/net_condenser.cpp,_$E5,matched,100.0
+0x44f7a0,57,src/network/net_condenser.cpp,_$E3,matched,100.0
+0x44f7e0,126,src/network/net_condenser.cpp,_$E10,matched,100.0
+0x44f860,57,src/network/net_condenser.cpp,_$E8,matched,100.0
 0x44f8a0,92,src/network/net_condenser.cpp,??0NetCondenser@@QAE@XZ,matched,100.0
 0x44f900,52,src/network/net_condenser.cpp,??1NetCondenser@@QAE@XZ,matched,100.0
 0x44f940,125,src/network/net_condenser.cpp,?Accumulate@NetCondenser@@QAEXPAXH@Z,matched,100.0
