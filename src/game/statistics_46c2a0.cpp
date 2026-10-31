@@ -12,26 +12,8 @@
 
 #include "../network/player.h"
 
-#pragma pack(push, 1)
 #include "../network/player_info.h"
-
-struct Game_0046c2a0 {
-    char unknown_0[0x1b63];
-    Player players[10];                // +0x1b63
-    char unknown_2851[0x2a42 - 0x2851];
-    unsigned char localPlayer;         // +0x2a42
-    char unknown_2a43[0x38a47 - 0x2a43];
-    unsigned int gameTick;             // +0x38a47
-    char unknown_38a4b[0x391e9 - 0x38a4b];
-    Mission* mapInfo;                  // +0x391e9
-    char unknown_391ed[0x3923b - 0x391ed];
-    unsigned short bits0_3923b : 2;    // +0x3923b
-    unsigned short bit2_3923b : 1;
-    unsigned short bit3_3923b : 1;
-    unsigned short bit4_3923b : 1;
-    unsigned short bits5_3923b : 11;
-};
-#pragma pack(pop)
+#include "../game/game.h"
 
 // Thaldren's online report records, the ones the stats DLL is handed: a player
 // block with its allies, a score board with its entries, and one entry.
@@ -55,7 +37,7 @@ struct OnlineReportScoreBoard {        // 0xc bytes
     OnlineReportStatEntry** scores;    // +0x8
 };
 
-extern Game_0046c2a0* g_game;
+extern Game* g_game;
 extern OnlineReportPlayerInfo** g_onlineReportPlayers;
 extern OnlineReportScoreBoard** g_onlineReportScoreBoards;
 extern char* g_sideNames[2];           // "Arm", "Core"
@@ -98,7 +80,9 @@ int FillScoreTables()
             for (; n < 10; n++)
                 allies[n] = 0;
             Mission* c = g_game->mapInfo;
-            int score = (int)(g_game->gameTick / 60 * c->timeMul);
+            // Unsigned, as Thaldren types dwGameTick; game.h's int keeps economy_401360.cpp's
+            // signed compare.
+            int score = (int)((unsigned int)g_game->gameTick / 60 * c->timeMul);
             score += (int)(p->kills * c->killMul);
             g_onlineReportScoreBoards[i]->score = score;
             g_onlineReportScoreBoards[i]->count = 9;
@@ -129,7 +113,9 @@ int FillScoreTables()
             s->value = p->commanderLosses;
             s = g_onlineReportScoreBoards[i]->scores[8];
             s->name = g_scoreNames[8];
-            s->value = (i == g_game->localPlayer || (p->active && p->type == 2)) ? g_game->bit4_3923b : 0;
+            // Bit 4 of the end-game flags, set when the victory conditions are met
+            // (players_464290.cpp).
+            s->value = (i == g_game->localPlayer || (p->active && p->type == 2)) ? (g_game->endGameFlags >> 4) & 1 : 0;
         }
     }
     return count;
