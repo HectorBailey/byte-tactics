@@ -10,17 +10,7 @@
 #include "player.h"
 #include "player_info.h"
 
-#pragma pack(push, 1)
-
-struct UnitSyncPacket { // 0xe bytes
-    unsigned char type;  // +0x0
-    unsigned char arg;   // +0x1
-    int id;              // +0x2
-    int key;             // +0x6
-    int value;           // +0xa
-};
-
-#pragma pack(pop)
+#include "unit_sync_packet.h"
 
 #include "../game/game.h"
 

@@ -1413,7 +1413,7 @@ address,name
 0x46e5e0,SyncTempTaggedVector::~SyncTempTaggedVector
 0x46e610,SyncChecksumVector::~SyncChecksumVector
 0x46e640,std::H::HV?$allocator::?$vector::insert
-0x46e870,UElem_0046faf0::?$vector::_Destroy
+0x46e870,UUnitSyncPacket::?$vector::_Destroy
 0x46e880,UnitSyncMap::Begin
 0x46e890,IUUnitSyncEntry::IU?$pair::?$_Tree::erase
 0x46e9b0,UnitSyncMap::FindExact
@@ -1427,8 +1427,8 @@ address,name
 0x46f7a0,VUnitSyncPlayer::?$vector::insert
 0x46fac0,??Eiterator@?$list@HV?$allocator@H@std@@@std@@QAE?AV012@H@Z
 0x46fad0,InsertResult::InsertResult
-0x46faf0,UElem_0046faf0::?$vector::_Ucopy
-0x46fb40,UElem_0046faf0::?$vector::_Ufill
+0x46faf0,UUnitSyncPacket::?$vector::_Ucopy
+0x46fb40,UUnitSyncPacket::?$vector::_Ufill
 0x46fb80,IUUnitSyncEntry::IU?$pair::?$_Tree::_Insert
 0x46fe60,UnitSyncMap::LowerBound
 0x46feb0,IUUnitSyncEntry::IU?$pair::?$_Tree::_Lrotate
@@ -1445,8 +1445,8 @@ address,name
 0x470300,??_GUnitSyncPlayer@@QAEPAXI@Z
 0x470390,UnitSyncPlayer::UnitSyncPlayer
 0x470560,??4PacketSequencer@@QAEAAU0@ABU0@@Z
-0x470770,UElem_0046faf0::?$vector::size
-0x4707a0,??4?$vector@UElem_0046faf0@@V?$allocator@UElem_0046faf0@@@std@@@std@@QAEAAV01@ABV01@@Z
+0x470770,UUnitSyncPacket::?$vector::size
+0x4707a0,??4?$vector@UUnitSyncPacket@@V?$allocator@UUnitSyncPacket@@@std@@@std@@QAEAAV01@ABV01@@Z
 0x470a40,CopyStructRange
 0x470a90,ObjectPool::Construct
 0x470ae0,??_GObjectPool@@UAEPAXI@Z

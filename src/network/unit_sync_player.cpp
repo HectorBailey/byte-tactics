@@ -9,12 +9,7 @@
 #include <vector>
 
 #pragma pack(push, 2)
-struct Elem_0046faf0 {                 // 14 bytes
-    int a;                             // +0x0
-    int b;                             // +0x4
-    int c;                             // +0x8
-    short d;                           // +0xc
-};
+#include "unit_sync_packet.h"
 #pragma pack(pop)
 
 // The rects map's mapped type (0x10 bytes), the record unit_sync.cpp,
@@ -26,8 +21,8 @@ struct Elem_0046faf0 {                 // 14 bytes
 // own: that is what spends the copy constructor's inline budget so the fourth
 // _Ucopy stays a call (see there).
 struct Pair_0046faf0 {                 // 32 bytes
-    std::vector<Elem_0046faf0> sentQueue;
-    std::vector<Elem_0046faf0> heldQueue;
+    std::vector<UnitSyncPacket> sentQueue;
+    std::vector<UnitSyncPacket> heldQueue;
     Pair_0046faf0(const Pair_0046faf0& other)
         : sentQueue(other.sentQueue), heldQueue(other.heldQueue)
     {
