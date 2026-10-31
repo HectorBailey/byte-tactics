@@ -369,6 +369,12 @@ struct Point_00417f60 {
 
 #include "../graphics/rect.h"
 
+// Unused here: real functions declared to keep DrawCellContours (0x4181d0)
+// and DrawMapDebugOverlay (0x418310) matching now that CmdNowISee and
+// CmdMusicMode read their members (docs/c2-regalloc.md).
+void ResetGameSpeed(void);
+void IncreaseGameSpeed(void);
+
 // The command records the three tables hold. Kept, not util/console_command.h:
 // including it moves CmdDoubleShot (0x417030), CmdMakePoster (0x417600),
 // DrawCellContours (0x4181d0) and DrawMapDebugOverlay (0x418310), and no
@@ -1160,12 +1166,12 @@ void __stdcall CmdProfile(void* args)
 // FUNCTION: 0x417540
 void __stdcall CmdNowISee(void*)
 {
-    void* p_game = g_game;
-    unsigned short* p = (unsigned short*)((char*)p_game + 0x14281);
+    Game* p_game = g_game;
+    unsigned short* p = (unsigned short*)&p_game->mapFlags;
     *p = *p & 0xfffe;
 
     p_game = g_game;
-    p = (unsigned short*)((char*)p_game + 0x14281);
+    p = (unsigned short*)&p_game->mapFlags;
     *p = *p & 0xfffd;
 
     RecalculateLineOfSight(1);
@@ -1199,7 +1205,7 @@ void __stdcall CmdMusicMode(void* args)
     // The void* parameter stays: retyping it moves the window of 0x4181d0 (docs/c2-regalloc.md).
     CommandArgs* obj = (CommandArgs*)args;
     int result = obj->GetIntArg(1, 0);
-    void* p = *(void**)((char*)g_game + 0x10);
+    void* p = g_game->sound;
     ((Sound*)p)->SetTrackCategory(result);
 }
 
