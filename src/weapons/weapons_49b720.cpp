@@ -35,13 +35,7 @@ struct Vec3_0049b720 {
 #include "weapon_def.h"
 #include "unit_weapon_slot.h"
 
-// The unit's three weapon slots, which the burst branch walks. The view stays
-// rather than including unit.h, whose declarations move the ballistic compare
-// in 0x49b720 (docs/c2-regalloc.md).
-struct Unit {
-    char unknown_0[0x4];
-    UnitWeaponSlot weapons[3];         // +0x4, stride 0x1c
-};
+#include "../units/unit.h"
 
 // Thaldren's wFlags bits: the projectile's flags word at +0x69, one field per
 // bit the update loop tests.
@@ -111,6 +105,10 @@ struct Game {
 #include "../map/cell.h"
 
 #pragma pack(pop)
+
+// Unused here: these headers' symbol ids keep 0x49b720 matching (docs/c2-regalloc.md).
+#include "../map/mission.h"
+#include "../sound/sound.h"
 
 extern Game* g_game;
 
