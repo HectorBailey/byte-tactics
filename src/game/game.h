@@ -45,11 +45,11 @@ struct HapinetProviderConnEntry;
 struct Ctx_00499890;
 struct CursorState_0041cc60;
 struct Data_0046d970;
-struct Debris_00420f30;
+struct WorldEffect;
 struct Def_0049d270;
 struct Desc_004437c0;
 struct SoundCategory;
-struct Entry_00463ca0;
+struct ChatHudEntry;
 struct Entry_00479620;
 struct Eye_00482130;
 struct FaceFlags_459830;
@@ -74,7 +74,7 @@ struct PlayerRef;
 struct Point_0041cd50;
 struct Rect;
 struct Settings;
-struct Slot_0041e420;
+struct EndGamePlayerStatRow;
 struct Src_004ab400;
 struct ResourceHudCache;
 struct SelectionInfoCache;
@@ -106,10 +106,15 @@ struct CursorState_0041cc60 {  // 0x2c bytes
 };
 
 
-struct Slot_0041e420 {  // 0x3a bytes
-    unsigned char active;  // +0x0
-    char unknown_1[29];
-    int stats[7];  // +0x1e
+struct EndGamePlayerStatRow {  // 0x3a bytes, Thaldren's: one player's line of the end-game table
+    char name[30];  // +0x0
+    int kills;  // +0x1e
+    int losses;  // +0x22
+    int energyProduced;  // +0x26
+    int metalProduced;  // +0x2a
+    int energyWasted;  // +0x2e
+    int metalWasted;  // +0x32
+    int score;  // +0x36
 };
 
 struct Object3do {  // 0x34 bytes
@@ -130,8 +135,8 @@ struct Object3do {  // 0x34 bytes
 };
 
 
-struct Debris_00420f30 {  // 0x54 bytes
-    int field_0;  // +0x0
+struct WorldEffect {  // 0x54 bytes, Thaldren's
+    int explodePiece;  // +0x0, Thaldren's pExplodePiece
     Handle ref1;  // +0x4
     Handle ref2;  // +0x10
     Vec3 pos;  // +0x1c
@@ -247,11 +252,11 @@ struct Flags_00495e90_37f06 {  // 0x2 bytes
     char unknown_0[2];
 };
 
-struct Entry_00463ca0 {  // 0x48 bytes
+struct ChatHudEntry {  // 0x48 bytes, Thaldren's: one line of the chat HUD ring
     char text[64];  // +0x0
     unsigned int time;  // +0x40
-    unsigned short field_44;  // +0x44
-    char field_46;  // +0x46
+    unsigned short unit;  // +0x44, the unit the message points at (net_chat.cpp)
+    char player;  // +0x46, the sender's slot, 10 for none
     unsigned char flags;  // +0x47
 };
 
@@ -316,7 +321,7 @@ struct Game {  // 0x3924d bytes
     int lag;  // +0x515
     Gui gui;  // +0x519, the GUI root (gui.h), 0xcf6 bytes
     char unknown_120f[0xe0];
-    Entry_00463ca0 entries[30];  // +0x12ef
+    ChatHudEntry chatHudRing[30];  // +0x12ef, Thaldren's aChatHudRing
     int lobbySyncTick;  // +0x1b5f
     Player players[10];  // +0x1b63
     char unknown_2851[331];
@@ -564,7 +569,7 @@ struct Game {  // 0x3924d bytes
     int array_14907[1];  // +0x14907
     char unknown_1490b[16];
     int count_1491b;  // +0x1491b
-    Debris_00420f30 debris[300];  // +0x1491f
+    WorldEffect debris[300];  // +0x1491f, Thaldren's aWorldEffects
     List_00420960* lists[3];  // +0x1ab8f
     void* explosionLensFrame;  // +0x1ab9b
     Object3do slots[300];  // +0x1ab9f
@@ -669,7 +674,7 @@ struct Game {  // 0x3924d bytes
     int numSkirmishPlayers;  // +0x38d81
     Class_0046a400 timers;  // +0x38d85
     int profileBarsEnabled;  // +0x38dd5
-    Slot_0041e420 slots_38dd9[10];  // +0x38dd9
+    EndGamePlayerStatRow endGamePlayerStats[10];  // +0x38dd9
     char unknown_3901d[58];
     int field_39057;  // +0x39057
     unsigned int deadline;  // +0x3905b

@@ -10,10 +10,10 @@ void CycleMessageUnits(void)
 {
     int i;
     for (i = 0; i < 30; i++)
-        g_game->entries[i].flags &= ~0x20;
+        g_game->chatHudRing[i].flags &= ~0x20;
     if (ScrollToNextMessageUnit() == 0) {
         for (i = 0; i < 30; i++)
-            g_game->entries[i].flags &= ~0x10;
+            g_game->chatHudRing[i].flags &= ~0x10;
         ScrollToNextMessageUnit();
     }
 }
