@@ -192,14 +192,8 @@ struct ResourceSharePacket {
     int amount;                        // +0xd
 };
 
-// A lobby sync request (0x21): the flag, the player asked about and the
-// caller. net_game_450530.cpp names the same record.
-struct Msg_00450530 {
-    unsigned char type;                // +0x0
-    unsigned char flag;                // +0x1
-    int id;                            // +0x2
-    int arg;                           // +0x6
-};
+// A lobby data sync request (0x21).
+#include "lobby_data_sync_packet.h"
 
 // An alliance flag change (0x23): the two players, the flag and the mode.
 // net_game.cpp and net_game_452960.cpp name the same record.
@@ -876,7 +870,7 @@ int HandleNetPackets()
             break;
         }
         case 33: {
-            Msg_00450530* request = (Msg_00450530*)packet;
+            LobbyDataSyncPacket* request = (LobbyDataSyncPacket*)packet;
             Player* a = PlayerByIndex(request->id);
             Player* b = PlayerByIndex(request->arg);
             if (!IsConnected(&g_game->players[FindHost()]))

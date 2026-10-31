@@ -12,12 +12,7 @@
 
 #include "../game/game.h"
 
-struct Msg_00450530 {
-    unsigned char type;                // +0x0
-    unsigned char flag;                // +0x1
-    int id;                            // +0x2
-    int arg;                           // +0x6
-};
+#include "lobby_data_sync_packet.h"
 #pragma pack(pop)
 
 extern Game* g_game;
@@ -83,7 +78,7 @@ static inline int FindToB_00450530()
 void SendLobbySyncRequests()
 {
     // Function scope, before the mode == 6 guard: orders the stores in the three branches.
-    Msg_00450530 msg;
+    LobbyDataSyncPacket msg;
     if (g_game->frontendState == 6)
         return;
     for (int i = 0; i < 10; i++) {
