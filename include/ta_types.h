@@ -1486,7 +1486,7 @@ struct NameLess_004c4760;
 struct NameNe_004b7620;
 struct NameNe_004b7760;
 struct NameTable_004b0830;
-struct Name_0046c620;
+struct SessionName;
 struct Name_004866d0;
 struct Name_0048d630;
 struct Named_004c4450;
@@ -10046,13 +10046,13 @@ struct ElemB_0046c190 {  // 0xc bytes, 2 views
     void* ppScores;  // +0x8
 };
 
-struct Name_0046c620 {  // 0x11 bytes, 1 view
+struct SessionName {    // 0x11 bytes, 1 view
     char text[16];  // +0x0
     char flag;  // +0x10
 };
 
 struct Class_0046c620 {  // 0x4d4 bytes, 2 views
-    Name_0046c620 name;  // +0x0
+    SessionName name;    // +0x0
     char unknown_11[1211];
     int field_4c9;  // +0x4cc
     char unknown_4d0[4];
