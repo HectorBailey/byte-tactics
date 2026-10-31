@@ -263,7 +263,7 @@ class UnitTable {
 public:
     char unknown_0[0x10];
     union {
-        int field_10;                  // +0x10
+        int compositeFrame;            // +0x10, Thaldren's pCompositeFrame
         void* ptr;                     // +0x10
     };
 
