@@ -204,10 +204,19 @@ struct DownloadMenuFile {
 
 class UnitTable;
 
+// The one word this file reads of the display object (graphics/
+// display_context.h's availPhys at +0x620); the rest stays private.
+struct DisplayAvailPhys {
+    char unknown_0[0x620];
+    int availPhys;                     // +0x620, bytes of system memory
+};
+
 struct Game {
     char unknown_0[0xc];               // +0x0
     void* displayContext;              // +0xc
-    char unknown_10[0x14377 - 0x10];
+    char unknown_10[0x2cf3 - 0x10];
+    char weaponDefs[0x115];            // +0x2cf3, Thaldren's aWeaponDefs[256], stride 0x115
+    char unknown_2e08[0x14377 - 0x2e08];
     void** unitModels;                 // +0x14377
     UnitTable* unitTable;              // +0x1437b
     char unknown_1437f[0x1438f - 0x1437f];
@@ -520,8 +529,7 @@ void CheckDownloadableFlags()
 {
     UnitDef* def = g_game->unitDefs;
     // One for statement with `i++, def += 0x249`; no source guard on the first test.
-    for (int i = 0; i < g_game->unitDefCount;
-         i++, def = (UnitDef*)((char*)def + 0x249)) {
+    for (int i = 0; i < g_game->unitDefCount; i++, def = def + 1) {
         for (int j = 0; j < g_game->buildListCount; j++) {
             if (_strcmpi(g_game->buildLists[j].slots[0].unitName, def->unitname) == 0
                 && !def->downloadable) {
@@ -834,7 +842,7 @@ void __stdcall LoadUnitFbi(char* fbi_file, UnitDef* unitdef) {
             unitdef->maxwaterslope = move->maxWaterSlope;
             unitdef->maxslopevelocity = (int)(((__int64)unitdef->maxvelocity << 16) /
                                              ((unitdef->maxslope + 1) * 0x10000));
-            char* defaultWeapon = (char*)g_game + 0x2cf3;
+            char* defaultWeapon = g_game->weaponDefs;
             parser.current->GetFieldString(weapon, "weapon1", 128, g_emptyStringLiteral);
             char* weapon1 = FindWeaponByName(weapon);
             unitdef->weapons[0] = weapon1 ? weapon1 : defaultWeapon;
@@ -1001,7 +1009,7 @@ void LoadUnitTypes() {
     int t = g_game->screenHeight * g_game->screenWidth * 2;
     int v = (int)(t * 1.3);
 
-    int n = *(int*)((char*)g_game->displayContext + 0x620) / 0x100000 + 1;
+    int n = ((DisplayAvailPhys*)g_game->displayContext)->availPhys / 0x100000 + 1;
     float scale = 1.0f;
     if (n > 0x10) {
         double d = (double)n * 0.0625;

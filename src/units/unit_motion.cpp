@@ -10,6 +10,8 @@ void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 
 #include "cob_script.h"
 
+#include "../orders/unit_motion.h"
+
 #include "../map/cell.h"
 #include "../util/vec3.h"
 
@@ -36,7 +38,7 @@ struct Vertex_458810 { int x; int y; int z; };
 // The unit whose object state is drawn: its motion pointer, the draw flags and the
 // z-buffer flag.
 struct Unit_458810 {
-    void* motion;                 // +0x00
+    UnitMotion* motion;           // +0x00
     char unknown_4[0x1c];
     int field_20;                 // +0x20
     char unknown_24[0xff - 0x24];
@@ -255,7 +257,7 @@ int CMemoryCache::AllocHandle(void** p, int need)
             void** owner = *(void***)q;
             if (owner != 0 && (int)*owner == q + 8)
                 *owner = 0;
-            q += *(int*)(q + 4);
+            q += ((Chunk_00437a30*)q)->size;
             end = base + cap;
         }
     } else {
@@ -263,11 +265,11 @@ int CMemoryCache::AllocHandle(void** p, int need)
     }
     int q = (int)start;
     while (total < size) {
-        total += *(int*)(q + 4);
+        total += ((Chunk_00437a30*)q)->size;
         void** owner = *(void***)q;
         if (owner != 0 && (int)*owner == q + 8)
             *owner = 0;
-        q += *(int*)(q + 4);
+        q += ((Chunk_00437a30*)q)->size;
     }
     if (total - size > 8u) {
         Chunk_00437a30* nc = (Chunk_00437a30*)((char*)start + size);
@@ -283,7 +285,7 @@ int CMemoryCache::AllocHandle(void** p, int need)
     }
     start->owner = p;
     start->size = size;
-    *p = (void*)((char*)start + 8);
+    *p = (void*)(start + 1);
     return 1;
 }
 
@@ -392,7 +394,7 @@ void CMemoryCache::DrawObjectState(List_458810* list, Vec3* result)
         else
             visible = 0;
     } else {
-        visible = *(int*)((char*)owner->motion + 0x20) == 0;
+        visible = owner->motion->speed == 0;
     }
     if (list->frame == 0)
         rebuild = 1;
