@@ -56,6 +56,9 @@ struct Root_004a32a0 {                 // g_guiContext
 extern Root_004a32a0* g_guiContext;
 
 #include "../graphics/rect.h"
+// Unused here: the symbol id this declaration takes keeps the functions after
+// ClearChanged matching now that it takes a Dialog* (docs/c2-regalloc.md).
+void FUN_004161f0(void);
 
 // Unused here: the symbol ids this declaration takes keep the functions below matching (docs/c2-regalloc.md).
 void FUN_00406f40(void);
@@ -226,9 +229,9 @@ void __stdcall MarkChanged(Dialog* obj)
 }
 
 // FUNCTION: 0x49fab0
-void __stdcall ClearChanged(void* param_1)
+void __stdcall ClearChanged(Dialog* obj)
 {
-    *(int*)((char*)param_1 + 0xcca) = 0;
+    obj->changed = 0;
 }
 
 // FUNCTION: 0x49fad0
