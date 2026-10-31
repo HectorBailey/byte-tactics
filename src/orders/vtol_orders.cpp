@@ -84,11 +84,7 @@ struct Box {
     Vec3 hi;
 };
 
-// A 16.16 fixed-point number, or its two halves.
-union Fixed {
-    int value;
-    struct { unsigned short frac; short whole; } parts;
-};
+#include "../util/fixed.h"
 
 #include "../units/cob_script.h"
 
@@ -108,12 +104,6 @@ class AssaultTimer;
 class EscortTimer;
 class SquadScoutTimer;
 class SpatialTimer;
-
-// Unused here: the symbol ids these declarations take keep the allocation
-// (docs/c2-regalloc.md), standing in for the placeholder class ta_types.h
-// no longer declares.
-void RegisterEmptyAtexitB(void);
-bool __cdecl ReadGdperf(unsigned long, void*);
 
 
 // The command kind, one byte wide, but not a POD type.

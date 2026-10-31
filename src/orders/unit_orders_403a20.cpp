@@ -61,7 +61,7 @@ struct Game {
 #pragma pack(pop)
 extern Game* g_game;
 static inline UnitDef* Definitions() { return g_game->unitDefs; }
-union Fixed { int value; struct { unsigned short fraction; short whole; }; };
+#include "../util/fixed.h"
 void __stdcall QueueUnitSpeech(Unit*, int, const char*);
 void __stdcall MarkSelectionOrdersDirty(Unit*);
 int __stdcall CanPlaceUnitFootprint(UnitDef*, int, Point, int);

@@ -64,7 +64,7 @@ class SpatialTimer;
 struct Account_004b4d70;
 void __stdcall AttachUnitToPiece(Unit*, Unit*, char, char);
 short __stdcall GetHeadingBetween(Vec3*, Vec3*);
-union Fixed { int value; struct { unsigned short frac; short whole; } parts; };
+#include "../util/fixed.h"
 Vec3 __stdcall DirectionFromAngle(short, Fixed);
 static inline Vec3 Direction(short angle, int range) { Fixed distance; distance.value=range; return DirectionFromAngle(angle,distance); }
 Vec3 __stdcall AddVec3(const Vec3&, const Vec3&);
@@ -85,10 +85,6 @@ static inline Vec3 Offset(short angle, int distance) { Vec3 v; v.x=-FUN_004b70ef
 class LandingPadList : public std::vector<Unit*> { public: LandingPadList(); };
 void __stdcall GetFactoriesInRadius(int, Vec3*, int, std::vector<Unit*>*);
 Unit* __stdcall FindBestTargetIfFireAtWill(Unit*);
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
-void __stdcall AddOrder(int kind, int remove, Unit* owner, void* id, Vec3* pos, int param_6, int param_7);
-int __stdcall GetOrderName(Unit* obj);
-void __stdcall DeleteOrders(Unit* owner, int all);
 // Stays in a file of its own: it matches only in this file's symbol context.
 // FUNCTION: 0x4103e0
 int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)

@@ -65,7 +65,7 @@ void __stdcall AppendOrder(Unit*, Order*);
 void __stdcall GetFactoriesInRadius(int player, Vec3* pos, int range, std::vector<Unit*>* out);
 void __stdcall VisitObjectsInRange(Vec3*, int, const RepairableUnitVisitor&);
 int __stdcall IssueRepairOrder(Unit*, Unit*, int);
-union Fixed { int v; struct { unsigned short frac; short whole; } p; };
+#include "../util/fixed.h"
 int __stdcall PickRandomReclaimableResourcesInRadius(Vec3*, Fixed, Vec3**, float*, Vec3**, float*);
 
 // inline: no function may be compiled before VtolRepairPatrolOrder, or the landed test returns.
@@ -165,7 +165,7 @@ int __stdcall VtolRepairPatrolOrder(Unit* unit, Order* order, unsigned int flags
             Vec3* metal = &metalPos;
             float energyAmount, metalAmount;
             Fixed range;
-            range.v = 0xf00000;
+            range.value = 0xf00000;
             if (PickRandomReclaimableResourcesInRadius(&unit->pos, range, &energy, &energyAmount, &metal, &metalAmount)) {
                 // Amounts read through GetEnergy/GetMetal and Total: gives the x87 load order.
                 if (unit->player->GetMetal() < unit->player->metalCapacity * 0.2 && metal) {
