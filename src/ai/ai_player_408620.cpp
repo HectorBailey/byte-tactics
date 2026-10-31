@@ -3,16 +3,11 @@
 
 #include "../units/unit.h"
 
-// game.h's Game, of which this method reads only the unit def array at
-// +0x1439b; including that header here would move 0x408620.
-#pragma pack(push, 1)
-struct Game {
-    char unknown_0[0x1439b];
-    UnitDef* unitDefs;                 // +0x1439b
-};
-#pragma pack(pop)
-
+// g_game is declared before game.h: with the header's symbols ahead of it, its
+// id moves 0x408620 (docs/c2-regalloc.md).
+struct Game;
 extern Game* g_game;
+#include "../game/game.h"
 
 unsigned short __stdcall ChooseBuildOption(int player, Unit* unit);
 void __stdcall QueueBuildOrder(char* name, Unit* unit, int count);
