@@ -132,7 +132,8 @@ struct Display_00425d80 {
 struct Game {
     char unknown_0[0x10];
     Sound* sound;                      // +0x10
-    char unknown_14[0x4e5 - 0x14];
+    char session[4];                   // +0x14
+    char unknown_18[0x4e5 - 0x18];
     int dplConnection;                 // +0x4e5
     char unknown_4e9[0x519 - 0x4e9];
     Gui gui;                           // +0x519
@@ -1446,7 +1447,7 @@ void RunFrontendStateMachine(void)
                 g_game->players[(unsigned char)g_game->localPlayer].info->host = 0;
             if (g_game->frontendSubstate == 0x13)
                 g_game->players[(unsigned char)g_game->localPlayer].info->bit6 = 1;
-            unsigned char* q = (unsigned char*)g_game + 0x14b * (unsigned char)g_game->localPlayer + 0x1b84;
+            unsigned char* q = &g_game->players[(unsigned char)g_game->localPlayer].keepaliveFlags;
             *q = (g_game->flags_2b4c.b4 << 1) | (*q & 0xfd);
             if (g_game->flags_2b4c.b4) {
                 g_game->mapInfo->LoadMissionByName((char*)g_game + 0x2ab1);
@@ -1507,7 +1508,7 @@ void RunFrontendStateMachine(void)
         }
         case 3:
             g_game->netGameFlags.b0 = 1;
-            HAPINET_quitgame((int)((char*)g_game + 0x14));
+            HAPINET_quitgame((int)g_game->session);
             InitPacketManager(2, 100);
             DeleteUnitSync();
             ReportGameEvent(8);
