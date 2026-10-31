@@ -25,12 +25,23 @@ static inline bool Less(const char* a, const char* b) {
 
 #include "weapon_damage.h"
 
+#include "../map/mission.h"
+
 void __stdcall SetWeaponFireHandler(WeaponDef*);
 
 #pragma pack(push, 1)
+// The GAF entry header, as graphics/gaf.cpp spells it: FindGafEntry returns
+// one, and the loader clears its kind byte so the loaded anim does not loop.
+struct GafEntryKind {
+    unsigned short count;              // +0x0
+    unsigned char kind;                // +0x2, loops while set
+};
+
 struct Game {
     char unknown_0[0x2cf3];
     WeaponDef weaponDefs[0x100];  // +0x2cf3, stride 0x115
+    char unknown_141f3[0x391e9 - 0x141f3];
+    Mission* mapInfo;              // +0x391e9, Thaldren's pMapInfo
 };
 #pragma pack(pop)
 
@@ -201,16 +212,16 @@ model_done:
         parser->GetFieldString(model, "explosionart", 0x100, g_emptyStringLiteral) != 0) {
         void* a = LoadAnimGaf(gaf);
         void* r = FindGafEntry(a, model);
-        *(unsigned char*)((char*)r + 2) = 0;
+        ((GafEntryKind*)r)->kind = 0;
         w->explosionSeq = r;
     }
     w->splash = 0;
-    if (*(int*)(*(char**)((char*)g_game + 0x391e9) + 0xd44) != 0) {
+    if (g_game->mapInfo->lavaWorld != 0) {
         if (parser->GetFieldString(gaf, "lavaexplosiongaf", 0x100, g_emptyStringLiteral) != 0 &&
             parser->GetFieldString(model, "lavaexplosionart", 0x100, g_emptyStringLiteral) != 0) {
             void* a = LoadAnimGaf(gaf);
             void* r = FindGafEntry(a, model);
-            *(unsigned char*)((char*)r + 2) = 0;
+            ((GafEntryKind*)r)->kind = 0;
             w->splash = r;
         }
     } else {
@@ -218,7 +229,7 @@ model_done:
             parser->GetFieldString(model, "waterexplosionart", 0x100, g_emptyStringLiteral) != 0) {
             void* a = LoadAnimGaf(gaf);
             void* r = FindGafEntry(a, model);
-            *(unsigned char*)((char*)r + 2) = 0;
+            ((GafEntryKind*)r)->kind = 0;
             w->splash = r;
         }
     }

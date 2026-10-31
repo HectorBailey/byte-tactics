@@ -178,7 +178,10 @@ struct Unit {
 };
 
 // A piece of a unit's model, 0x36 bytes each, 0x22 bytes after the count in
-// PieceList.
+// PieceList. Thaldren's ObjectPiece. Its array stays undeclared in PieceList:
+// giving PieceList the aPieces member needs this type defined first, and the
+// ids it moves take StartExplodePiece (0x421620) and four others off their
+// windows (docs/c2-regalloc.md).
 struct PieceRec {
     Object3D* desc;                    // +0x00
     char unknown_4[0xc];
@@ -385,7 +388,7 @@ void __stdcall AddExplosionEffect(Vec3* pos, GafSequence* src, int index, int fl
             InitGafSequence(&e->ref2, *(GafSequence**)((char*)pCount + index * 4 + 0x6274), 0);
         else
             e->ref2.src = 0;
-        if (flag == 0 && *(short*)((char*)&pos->y + 2) > (short)g_game->seaLevel)
+        if (flag == 0 && (int)((short*)&pos->y)[1] > (short)g_game->seaLevel)
             EmitSmoke((int*)pos, 7, 0xf, 9);
         e->obj = 0;
     }
@@ -492,10 +495,10 @@ void UpdateExplosions()
             d->angle_z += d->spin.z;
             int r = GetCellMeanHeight(&d->pos);
             if (d->pos.y > (int)((unsigned)g_game->seaLevel << 16) || r >= (int)g_game->seaLevel) {
-                if (*(short*)((char*)&d->pos.y + 2) <= r) {
+                if ((int)((short*)&d->pos.y)[1] <= r) {
                     d->pos = old;
                     d->vel.y = -(d->vel.y / 2);
-                    if (*(short*)((char*)&d->vel.y + 2) <= 0) {
+                    if ((int)((short*)&d->vel.y)[1] <= 0) {
                         if (d->flag)
                             AddExplosionEffect(&d->pos, g_game->explosionSeq, 0, 0);
                         d->obj->state = 0xff;
