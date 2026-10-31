@@ -1249,22 +1249,7 @@ struct BuilderLinkPacket {
     short builderUnitId;               // +0x3
 };
 
-// The DirectPlay system message HandleNetPackets reads when the sender is 0:
-// +0x00 is its DPSYS_ type (3 create, 5 destroy, 0x102 set data, 0x103 set
-// name, 0x104 set session description). The fields are named for the
-// create-player layout and the set-data layout, which overlay: a create has
-// its data at createData/dataSize, a set-data has it at data, a set-name has
-// its short name at +0x14 and the long name at longName, and a set-session
-// description starts at +0x04.
-struct Packet_00453d40 {
-    unsigned int type;                 // +0x00
-    int playerType;                    // +0x04, 1 is a player
-    int id;                            // +0x08
-    char* data;                        // +0x0c
-    char* createData;                  // +0x10
-    int dataSize;                      // +0x14
-    char* longName;                    // +0x18
-};
+#include "dpsys_message.h"
 
 #pragma pack(pop)
 
