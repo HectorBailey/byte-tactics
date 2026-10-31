@@ -69,7 +69,19 @@ struct Rot16 {
     short x, y, z;
 };
 
-#include "../util/fixed.h"
+struct Fixed {
+    unsigned short frac;
+    short whole;
+};
+
+union Coord {
+    int value;
+    Fixed f;
+};
+
+struct SmokePos {
+    Coord x, y, z;
+};
 
 struct GafFrame {
     unsigned short width;
@@ -515,7 +527,7 @@ void __stdcall SpreadFire(Feature* f, Point16* cell);
 int __stdcall StepGafSequence(Anim* anim);
 int __stdcall GetCellMeanHeight(Vec3* pos);
 GafFrame* __stdcall GetGafSequenceFrame(Anim* anim);
-void __stdcall EmitWhiteSmoke(FixedVec3* pos, short index);
+void __stdcall EmitWhiteSmoke(SmokePos* pos, short index);
 void __stdcall ApplyAreaDamageAt(void* owner, Vec3* pos);
 void* __stdcall CreateObjectState(void* obj);
 void __stdcall EmitTimedSubParticles(Vec3* p, short index);
@@ -998,8 +1010,8 @@ void __stdcall SpreadFire(Feature* f, Point16* cell)
             }
         }
     }
-    Fixed px;
-    Fixed pz;
+    Coord px;
+    Coord pz;
     px.value = cell->x << 16;
     // Computed from its own read of cell->z, before lastZ copies it.
     pz.value = cell->z << 16;
@@ -1008,8 +1020,8 @@ void __stdcall SpreadFire(Feature* f, Point16* cell)
     for (int i = 5; i; i--) {
         px.value += (int)(((__int64)g_game->windVelX * 0x20000) >> 16);
         pz.value += (int)(((__int64)g_game->windZ * 0x20000) >> 16);
-        int x = px.whole;
-        int z = pz.whole;
+        int x = px.f.whole;
+        int z = pz.f.whole;
         if (x != lastX || z != lastZ) {
             Cell* c = GetMapCell(x, z);
             if (c && c->feature < 0xfffb && !(c->flags & 1)) {
@@ -1133,11 +1145,11 @@ Spot* __stdcall PlaceFeature(Cell* cell, unsigned short feature,
 
 // Inlined copy of GetFootprintCentre: the 16.16 world position of the centre of a
 // feature footprint whose corner is at map cell `cell`.
-static inline FixedVec3 FootprintCentreSmoke(Point16* cell, Feature* def)
+static inline SmokePos FootprintCentreSmoke(Point16* cell, Feature* def)
 {
     Point16 f = def->footprint;
     Point16 c = *cell;
-    FixedVec3 p;
+    SmokePos p;
     p.x.value = (f.x + c.x * 2) << 19;
     p.z.value = (f.z + c.z * 2) << 19;
     p.y.value = GetGroundHeight((Vec3*)&p) << 16;
@@ -1162,16 +1174,16 @@ static inline int Rand(unsigned short n)
     return (int)((__int64)rand() * n / 0x8000);
 }
 
-static inline FixedVec3 SmokeAt(Spot* spot, Feature* f)
+static inline SmokePos SmokeAt(Spot* spot, Feature* f)
 {
-    FixedVec3 p = FootprintCentreSmoke(&spot->cell, f);
+    SmokePos p = FootprintCentreSmoke(&spot->cell, f);
     GafFrame* frame = GetGafSequenceFrame(&spot->anim);
     unsigned short w = frame->width;
     // The narrowed (unsigned short)(w >> 2) keeps `r - originX` before the add.
-    p.x.whole += Rand(w >> 1) - frame->originX + (unsigned short)(w >> 2);
+    p.x.f.whole += Rand(w >> 1) - frame->originX + (unsigned short)(w >> 2);
     unsigned short h = frame->height;
     // The second term is a shift of a narrowed value: a linear form gets factored.
-    p.y.whole += (frame->originY - Rand(h >> 1)) * 2 - ((unsigned short)(h >> 2) << 1);
+    p.y.f.whole += (frame->originY - Rand(h >> 1)) * 2 - ((unsigned short)(h >> 2) << 1);
     return p;
 }
 // Per-tick update of map features: advances the animations of animated
@@ -1235,7 +1247,7 @@ void __stdcall UpdateFeatures()
             }
         } else if (spot->flags & 1) {
             if (smoke) {
-                FixedVec3 q = SmokeAt(spot, f);
+                SmokePos q = SmokeAt(spot, f);
                 EmitWhiteSmoke(&q, 5);
             }
             StepGafSequence(&spot->anim);
