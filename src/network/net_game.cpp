@@ -303,10 +303,7 @@ struct Game {
         };
     };
     char unknown_2bfb[0x2c28 - 0x2bfb];
-    union {
-        int playerIds[11];             // +0x2c28
-        int table_2c28[10];
-    };
+    int lobbySlotNetIds[11];           // +0x2c28, Thaldren's aLobbySlotNetIds
     char unknown_2c54[0x2cf3 - 0x2c54];
     WeaponDef weaponDefs[256];         // +0x2cf3
     char unknown_after_weapons[0x14357 - (0x2cf3 + 0x115 * 256)];
@@ -2828,9 +2825,11 @@ struct LatencyPacket {
     int targetPlayerNetId;             // +0x09
 };
 
-struct Msg26_00456310 {
-    unsigned char type;                // +0x00
-    int table[10];                     // +0x01
+// The lobby slot table broadcast (type 0x26): the ten slots' net ids from
+// g_game+0x2c28.
+struct LobbySlotNetIdsPacket {
+    unsigned char type;                // +0x00, 0x26
+    int netIds[10];                    // +0x01
 };
 
 
@@ -3021,15 +3020,15 @@ void SendNetHeartbeat()
                 for (int k = 0; k < 10; k++) {
                     unsigned char st = g_game->players[k].type;
                     if (st == 4)
-                        g_game->table_2c28[k] = -1;
+                        g_game->lobbySlotNetIds[k] = -1;
                     else if (st == 0)
-                        g_game->table_2c28[k] = 0;
+                        g_game->lobbySlotNetIds[k] = 0;
                     else
-                        g_game->table_2c28[k] = g_game->players[k].id;
+                        g_game->lobbySlotNetIds[k] = g_game->players[k].id;
                 }
 
-                Msg26_00456310 msg26;
-                memcpy(msg26.table, g_game->table_2c28, 0x28);
+                LobbySlotNetIdsPacket msg26;
+                memcpy(msg26.netIds, g_game->lobbySlotNetIds, 0x28);
                 msg26.type = 0x26;
                 BroadcastPacket(p->id, (unsigned char*)&msg26, 0x29);
             }
