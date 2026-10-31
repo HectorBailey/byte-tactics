@@ -741,7 +741,7 @@ address,size,file,symbol,status,similarity
 0x439740,674,src/ingame/markers.cpp,?DrawWeaponCoverage@@YGXPAXPAUView@@PAUOrder@@PAUPos@@H@Z,matched,100.0
 0x4399f0,312,src/ingame/markers.cpp,?DrawOrderRangeRing@@YGXPAXPAUView@@PAUOrder@@PAUPos@@H@Z,matched,100.0
 0x439b30,441,src/orders/order_list.cpp,?DrawOrderOverlays@@YGXPAUUnit@@IPAX1H@Z,matched,100.0
-0x439cf0,40,src/orders/order_list.cpp,?GetOrderTargetIfFlagged@@YGHPAX@Z,matched,100.0
+0x439cf0,40,src/orders/order_list.cpp,?GetOrderTargetIfFlagged@@YGHPAUUnit@@@Z,matched,100.0
 0x439d20,81,src/orders/order_list.cpp,?GetBuildWeaponPercent@@YGHPAUUnit@@@Z,matched,100.0
 0x439d80,76,src/orders/order_list.cpp,?SumQueuedBuildCount@@YGHPAUUnit@@H@Z,matched,100.0
 0x439dd0,26,src/orders/order_list.cpp,?GetOrderTarget@@YGHH@Z,matched,100.0

@@ -421,20 +421,19 @@ void __stdcall DrawOrderOverlays(Unit* unit, unsigned int mask, void* obj,
 }
 
 // FUNCTION: 0x439cf0
-int __stdcall GetOrderTargetIfFlagged(void* param_1)
+int __stdcall GetOrderTargetIfFlagged(Unit* unit)
 {
     int eax;
-    if (param_1 == 0) {
+    if (unit == 0) {
         eax = 0;
     } else {
-        int* field_5c = *(int**)((char*)param_1 + 0x5c);
-        if (field_5c == 0)
+        if (unit->list == 0)
             eax = 0;
         else
-            eax = *(int*)((char*)field_5c + 0x42);
+            eax = unit->list->flags;
     }
     if ((eax & 8) != 0)
-        return *(int*)((char*)*(int**)((char*)param_1 + 0x5c) + 0x16);
+        return (int)unit->list->link.owner;
     return 0;
 }
 
@@ -512,8 +511,8 @@ Order* __stdcall FindOrderByType(Unit* obj, unsigned char kind)
 void Order::SetDeadlineTicks(int param)
 {
     this->flags6 |= 1;
-    int val = *(int*)((char*)g_game + 0x38a47);
-    *(int*)((char*)this + 0xa) = val + param;
+    int val = g_game->gameTick;
+    wakeFrame = val + param;
 }
 
 // FUNCTION: 0x439ea0
