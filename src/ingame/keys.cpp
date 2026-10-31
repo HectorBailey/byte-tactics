@@ -50,7 +50,8 @@ struct VisualFlags {
     unsigned short rest : 7;
 };
 
-struct Flags_00495e90_37f2f {
+// The UI options word (Thaldren's wUiOptionFlags, game.h's uiOptionFlags).
+struct UiOptionFlags {
     unsigned short b0 : 1;
     unsigned short b1 : 1;
     unsigned short rest : 14;
@@ -61,7 +62,8 @@ struct Flags_00495e90_38a51 {
     unsigned short rest : 15;
 };
 
-union Flags_00495e90_3923b {
+// The end-game flag word (Thaldren's wEndGameFlags).
+union EndGameFlags {
     unsigned short raw;
     struct {
         unsigned short b0 : 1;
@@ -142,7 +144,7 @@ struct Game {
     // Both views of the flag word are used: raw `& 2` tests and the b1 bitfield.
     union {
         unsigned short uiOptionFlags;   // +0x37f2f
-        Flags_00495e90_37f2f flags_37f2f;
+        UiOptionFlags uiOptionBits;
     };
     char unknown_37f31[0x38a47 - 0x37f31];
     int gameTick;                       // +0x38a47
@@ -165,7 +167,7 @@ struct Game {
     char unknown_391bf[0x391e9 - 0x391bf];
     Mission* mapInfo;                   // +0x391e9
     char unknown_391ed[0x3923b - 0x391ed];
-    Flags_00495e90_3923b endGameFlags;  // +0x3923b
+    EndGameFlags endGameFlags;  // +0x3923b
 };
 
 #pragma pack(pop)
@@ -596,7 +598,7 @@ void HandleGameKey(void)
         break;
 
     case 0xd7: {
-        if (g_game->flags_37f2f.b1) {
+        if (g_game->uiOptionBits.b1) {
             if (g_game->movieCaptureIndex != 0) {
                 g_game->movieCaptureIndex = 0;
             } else {
@@ -628,7 +630,7 @@ void HandleGameKey(void)
     }
 
     case 0xec:
-        if (g_game->flags_37f2f.b1) {
+        if (g_game->uiOptionBits.b1) {
             g_game->endGameFlags.b1 = !g_game->endGameFlags.b1;
             if (g_game->endGameFlags.b1) {
                 SetDescListCleanupFlag(&g_game->gui, 0);
@@ -641,7 +643,7 @@ void HandleGameKey(void)
         break;
 
     case 0x5c:
-        if (g_game->flags_37f2f.b1)
+        if (g_game->uiOptionBits.b1)
             ExecuteCommandLine(0, -1);
         break;
 
