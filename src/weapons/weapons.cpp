@@ -75,6 +75,8 @@ void RunFrontendStateMachine(void);
 void FreePictureCache(void);
 void ClearPictureCache(void);
 void OrLabelAttribs(void);
+void EmptyPreFrontendInitHook(void);
+int CodeChecksumFailed(void);
 
 struct Gun_0049c9c0 {
     short angle;
@@ -1955,28 +1957,8 @@ Projectile* __stdcall FindRemoteProjectile(Event_0049d1e0* ev)
     return 0;
 }
 
-#pragma pack(push, 1)
-struct Proj_0049d270 {                // 0x6b bytes
-    Type_0049d270* type;              // +0
-    char unknown_4[0x1c - 0x4];
-    Vec3 pos;                         // +0x1c
-    Vec3 aim;                         // +0x28
-    char unknown_34[0x36 - 0x34];
-    unsigned short f_36;              // +0x36
-    char unknown_38[0x3a - 0x38];
-    int f_3a;                         // +0x3a
-    char unknown_3e[0x4e - 0x3e];
-    int f_4e;                         // +0x4e
-    Unit* owner;                      // +0x52
-    char unknown_56[0x66 - 0x56];
-    char player;                      // +0x66
-    char unknown_67[0x69 - 0x67];
-    unsigned short flags;             // +0x69
-};
-
 // Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
 void Unused_0049d270(int a, int b, int c, int d, int e, int f);
-#pragma pack(pop)
 
 static inline int SamePos_0049d270(Vec3& a, Vec3& b)
 {
@@ -1989,13 +1971,13 @@ static inline int SamePos_0049d270(Vec3& a, Vec3& b)
 // test, which also matches 0x49d1e0 on its own; the `if (!ev->flag) return 0;`
 // spelling above compiles to the same standalone bytes but, inlined here,
 // gives the cursor a register and spills `unit`.
-Proj_0049d270* __stdcall FindRemoteProjectile_0049d270(WeaponFirePacket* ev)
+Projectile* __stdcall FindRemoteProjectile_0049d270(WeaponFirePacket* ev)
 {
     if (ev->flag) {
         char me = g_game->localPlayer;
-        Proj_0049d270* proj = (Proj_0049d270*)g_game->projectiles;
+        Projectile* proj = (Projectile*)g_game->projectiles;
         for (int i = 0; i < g_game->projCount; i++, proj++) {
-            if (proj->player != me && SamePos_0049d270(proj->aim, ev->aimOrVel) && proj->owner->f_a8u == ev->targetUnitId)
+            if ((char)proj->ownerPlayer != me && SamePos_0049d270(*(Vec3*)&proj->aimX, ev->aimOrVel) && proj->ownerUnit->f_a8u == ev->targetUnitId)
                 return proj;
         }
     }
@@ -2015,16 +1997,16 @@ void __stdcall ApplyWeaponFirePacket(int arg1, WeaponFirePacket* ev)
     if (def->flags.b.meteor) {
         Vec3* pos = &ev->aimOrVel;
         void* arg = (void*)((char*)ev + 1);
-        Proj_0049d270* proj = 0;
+        Projectile* proj = 0;
         if (g_game->projCount < 300) {
-            proj = &((Proj_0049d270*)g_game->projectiles)[g_game->projCount++];
+            proj = &((Projectile*)g_game->projectiles)[g_game->projCount++];
             proj->flags &= 0xfffd;
-            proj->f_4e = 0;
+            proj->targetUnit = 0;
         }
         if (!proj)
             return;
         InitProjectile(proj, def, arg, 0, g_game->teamColor, 0);
-        proj->pos = *pos;
+        *(Vec3*)&proj->velX = *pos;
         return;
     }
     Unit* unit = ev->ownerUnitId == 0 ? 0 : &g_game->units[ev->ownerUnitId];
@@ -2037,7 +2019,7 @@ void __stdcall ApplyWeaponFirePacket(int arg1, WeaponFirePacket* ev)
     entry->fireHeading = ev->fireHeading;
     unsigned short targetId = ev->targetUnitId;
     Unit* target = targetId == 0 ? 0 : &g_game->units[targetId];
-    Proj_0049d270* found = FindRemoteProjectile_0049d270(ev);
+    Projectile* found = FindRemoteProjectile_0049d270(ev);
     if (def->flags.b.ballistic) {
         FireBallisticProjectile(entry, unit, (void*)((char*)ev + 1), &ev->aimOrVel, target);
         return;
@@ -2051,20 +2033,20 @@ void __stdcall ApplyWeaponFirePacket(int arg1, WeaponFirePacket* ev)
         return;
     }
     if (def->flags.b.dropped) {
-        Proj_0049d270* proj = 0;
+        Projectile* proj = 0;
         if (g_game->projCount < 300) {
-            proj = &((Proj_0049d270*)g_game->projectiles)[g_game->projCount++];
+            proj = &((Projectile*)g_game->projectiles)[g_game->projCount++];
             proj->flags &= 0xfffd;
-            proj->f_4e = 0;
+            proj->targetUnit = 0;
         }
         if (!proj)
             return;
         InitProjectile(proj, entry->weapon, (void*)((char*)ev + 1), 0, g_game->teamColor, unit);
-        proj->f_36 = unit->f_66;
-        proj->f_3a = 0;
-        proj->pos.y = 0;
-        proj->pos.x = -FUN_004b70ef(proj->f_36, unit->def->param);
-        proj->pos.z = -FUN_004b7123(proj->f_36, unit->def->param);
+        proj->heading = unit->f_66;
+        proj->speed = 0;
+        proj->velY = 0;
+        proj->velX = -FUN_004b70ef(proj->heading, unit->def->param);
+        proj->velZ = -FUN_004b7123(proj->heading, unit->def->param);
         return;
     }
 }
