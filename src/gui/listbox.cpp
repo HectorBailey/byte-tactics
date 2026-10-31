@@ -2,9 +2,11 @@
 
 #include "../graphics/rect.h"
 #include "../graphics/gaf_frame.h"
+#include "../graphics/surface.h"
 
 #include "gui.h"
 #include "layer.h"
+#include "gadget.h"
 
 struct Bits_004b0230 {
     unsigned short count;            // +0x0
@@ -21,20 +23,14 @@ struct Cell_004b0230 {
     int step_y;                      // +0x4
 };
 
-struct Surface_004b0230 {
-    int tiles_x;                     // +0x0
-    int tiles_y;                     // +0x4
-    char unknown_8[0xbc - 0x8];
-};
-
 int __stdcall DrawLine(void* surface, int x0, int y0, int x1, int y1, unsigned char color);
 void __stdcall FillRectangle(void* surface, void* rect, int color);
 void __stdcall GetGadgetRectByIndex(char* entries, int index, Rect* out);
 int __stdcall FindBackgroundCell(char* entries, int index);
 Bits_004b0230* __stdcall FindGafEntry(Gaf_004b0230* gaf, const char* name);
-void __stdcall DrawSurface(Surface_004b0230* dst, Cell_004b0230* cell, int x, int y);
+void __stdcall DrawSurface(Surface* dst, Cell_004b0230* cell, int x, int y);
 GafFrame* __stdcall GetGafFrame(Bits_004b0230* bits, int index);
-void __stdcall DrawFrame(Surface_004b0230* dst, GafFrame* pic, int x, int y);
+void __stdcall DrawFrame(Surface* dst, GafFrame* pic, int x, int y);
 
 // Draws a double (two-line) bevelled border: the top and left pairs of edges
 // use the third argument's colour, the right and bottom pairs the fourth's.
@@ -85,7 +81,7 @@ void __stdcall DrawListboxFrame(Gui* obj, int index, Bits_004b0230* bmp)
 {
     char* entries;
     int col;
-    Surface_004b0230* surface;
+    Surface* surface;
     int height;
     int x;
     int width;
@@ -117,12 +113,12 @@ void __stdcall DrawListboxFrame(Gui* obj, int index, Bits_004b0230* bmp)
         rect.bottom += 3;
     }
 
-    surface = *(Surface_004b0230**)((char*)obj->layer->entries + 0xbc);
+    surface = (Surface*)obj->layer->entries->u.assets.surface;
     cell = (Cell_004b0230*)FindBackgroundCell(entries, index);
 
     if (cell != 0) {
-        for (x = 0; x < surface->tiles_x; x += cell->step_x) {
-            for (y = 0; y < surface->tiles_y; y += cell->step_y) {
+        for (x = 0; x < surface->width; x += cell->step_x) {
+            for (y = 0; y < surface->height; y += cell->step_y) {
                 DrawSurface(surface, cell, x, y);
             }
         }
