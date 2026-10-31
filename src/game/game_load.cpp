@@ -193,9 +193,7 @@ struct Options_00497180 {               // at g_game+0x29a0
     int fixedloc;                       // +0x118
 };
 
-struct SideName_00497180 {              // 0x232 bytes, table at g_game+0x37f5b
-    char name[0x232];
-};
+#include "side_def.h"
 
 // One view of the game state. The ranges two views name differently sit in
 // anonymous unions, so each function keeps the names it matched with.
@@ -302,9 +300,8 @@ struct Game {
     char unknown_37efa[0x37f1b - 0x37efa];
     int displayWidth;                   // +0x37f1b
     int displayHeight;                  // +0x37f1f
-    char unknown_37f23[0x37f5b - 0x37f23];
-    SideName_00497180 sideNames[2];     // +0x37f5b, only the two sides are named here
-    char unknown_383bf[0x38a37 - 0x383bf];
+    char unknown_37f23[0x37f3d - 0x37f23];
+    SideDef sideDefs[5];                // +0x37f3d
     unsigned int lastSimBudgetTick;     // +0x38a37
     int simStepsPending;                // +0x38a3b
     char pad_38a3f[0x38a47 - 0x38a3f];
@@ -673,7 +670,7 @@ void __cdecl LoadMatch(void*)
                 ((Mission*)g_game->mapInfo)->GetStartPosition(&pos, which);
                 if (rec->active != 0 && rec->team == 1)
                     start = pos;
-                unsigned short id = FindUnitTypeId(g_game->sideNames[side].name + 4);
+                unsigned short id = FindUnitTypeId(g_game->sideDefs[side].commander);
                 CreateUnit(rec->kind, id, pos, 1, 1, 0);
                 int s1 = pl->energy * 100;
                 int s2 = pl->metal * 100;
@@ -767,7 +764,7 @@ tail:
         LoadPictureCached(0, 0, 0, 0);
         PlayerInfo* pl = rec->data;
         int side = pl->side;
-        sprintf(g_game->mainHudLayoutName, "%sMAIN2.GUI", g_game->sideNames[side].name);
+        sprintf(g_game->mainHudLayoutName, "%sMAIN2.GUI", g_game->sideDefs[side].namePrefix);
     }
     Gadget_497180* gadget =
         LoadGuiLayer((Sub_497180*)&g_game->menu, g_game->mainHudLayoutName, 0x20);
