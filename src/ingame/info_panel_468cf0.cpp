@@ -146,44 +146,7 @@ struct Unit_00468cf0 {                 // 0x118 bytes
   char unknown_111[0x118 - 0x111];
 };
 
-// A side's panel layout at g_game+0x37f3d, stride 0x232 (Thaldren: SideDef).
-struct SideDef {
-  char aName[0x1e];                   // +0x000
-  char aNamePrefix[4];                // +0x01e
-  char aCommander[0x20];              // +0x022
-  Rect rcLogo;                 // +0x042
-  Rect rcEnergyBar;            // +0x052
-  Rect rcEnergyNum;            // +0x062
-  Rect rcMetalBar;             // +0x072
-  Rect rcMetalNum;             // +0x082
-  Rect rcTotalUnits;           // +0x092
-  Rect rcTotalTime;            // +0x0a2
-  Rect rcEnergyMax;            // +0x0b2
-  Rect rcMetalMax;             // +0x0c2
-  Rect rcEnergy0;              // +0x0d2
-  Rect rcMetal0;               // +0x0e2
-  Rect rcEnergyProduced;       // +0x0f2
-  Rect rcEnergyConsumed;       // +0x102
-  Rect rcMetalProduced;        // +0x112
-  Rect rcMetalConsumed;        // +0x122
-  Rect rcLogo2;                // +0x132
-  Rect rcUnitName;             // +0x142
-  Rect rcDamageBar;            // +0x152
-  Rect rcUnitEnergyMake;       // +0x162
-  Rect rcUnitEnergyUse;        // +0x172
-  Rect rcUnitMetalMake;        // +0x182
-  Rect rcUnitMetalUse;         // +0x192
-  Rect rcMissionText;          // +0x1a2
-  Rect rcUnitName2;            // +0x1b2
-  Rect rcDamageBar2;           // +0x1c2
-  Rect rcName;                 // +0x1d2
-  Rect rcDescription;          // +0x1e2
-  Rect aReloadRects[3];        // +0x1f2
-  int nEnergyColor;                   // +0x222
-  int nMetalColor;                    // +0x226
-  int nSideIndex;                     // +0x22a
-  char* pFontData;                    // +0x22e
-};
+#include "../game/side_def.h"
 
 struct Game {
   char unknown_0[0x519];
@@ -329,7 +292,7 @@ static void DrawResourcePanel(Surface *ctx, Player *pl, Resources *res)
   char text[32];
   int side = pl->info->side;
   SideDef *sideDef = &g_game->sideDefs[side];
-  SetFont((int)sideDef->pFontData);
+  SetFont((int)sideDef->font);
   GetFontHeight();
   byte *pal = &g_game->colors[0];
   SetTextColors(pal[0xf], GetTextKeyColor());
@@ -340,12 +303,12 @@ static void DrawResourcePanel(Surface *ctx, Player *pl, Resources *res)
     BlitGafFrameAtOffset((int)ctx, (int)gaf, bx, 0);
     bx += *gaf;
   } while (bx < g_game->screenWidth);
-  BlitSideLogoToRect((int)ctx, (int)pl, (int)&sideDef->rcLogo, 0);
-  Rect *r = &sideDef->rcEnergyBar;
+  BlitSideLogoToRect((int)ctx, (int)pl, (int)&sideDef->logo, 0);
+  Rect *r = &sideDef->energyBar;
   bar = *r;
   if (pl->energyCapacity > 0.0f) {
     bar.right = (int)((bar.right - bar.left) * res->metal / pl->energyCapacity + bar.left);
-    FillRectangle((int)ctx, (int)&bar, sideDef->nEnergyColor);
+    FillRectangle((int)ctx, (int)&bar, sideDef->energyColor);
     if (pl->shareEnergy > 0.0f && pl->energy > pl->shareEnergy) {
       box = *r;
       box.left = (int)((box.right - box.left) * pl->shareEnergy / pl->energyCapacity + box.left);
@@ -354,28 +317,28 @@ static void DrawResourcePanel(Surface *ctx, Player *pl, Resources *res)
     }
   }
   sprintf(text, "%d", (int)res->metal);
-  DrawString((int)ctx, (int)text, sideDef->rcEnergyNum.left, sideDef->rcEnergyNum.top, -1);
-  DrawString((int)ctx, (int)"0", sideDef->rcEnergy0.left, sideDef->rcEnergy0.top, -1);
+  DrawString((int)ctx, (int)text, sideDef->energyNum.left, sideDef->energyNum.top, -1);
+  DrawString((int)ctx, (int)"0", sideDef->energy0.left, sideDef->energy0.top, -1);
   sprintf(text, "%d", (int)pl->energyCapacity);
-  int w = GetTextWidth((int)sideDef->pFontData, (int)text);
-  DrawString((int)ctx, (int)text, sideDef->rcEnergyMax.left - w, sideDef->rcEnergyMax.top, -1);
+  int w = GetTextWidth((int)sideDef->font, (int)text);
+  DrawString((int)ctx, (int)text, sideDef->energyMax.left - w, sideDef->energyMax.top, -1);
   if (res->metalIncome > 99999.0f)
     sprintf(text, "%dK", (int)res->metalIncome / 1000);
   else
     sprintf(text, "%d", (int)res->metalIncome);
   SetTextColors(pal[0xa], GetTextKeyColor());
-  DrawString((int)ctx, (int)text, sideDef->rcEnergyProduced.left, sideDef->rcEnergyProduced.top, -1);
+  DrawString((int)ctx, (int)text, sideDef->energyProduced.left, sideDef->energyProduced.top, -1);
   if (res->metalUse < -99999.0f)
     sprintf(text, "%dK", (int)res->metalUse / 1000);
   else
     sprintf(text, "%d", abs((int)res->metalUse));
   SetTextColors(pal[0xc], GetTextKeyColor());
-  DrawString((int)ctx, (int)text, sideDef->rcEnergyConsumed.left, sideDef->rcEnergyConsumed.top, -1);
-  r = &sideDef->rcMetalBar;
+  DrawString((int)ctx, (int)text, sideDef->energyConsumed.left, sideDef->energyConsumed.top, -1);
+  r = &sideDef->metalBar;
   bar = *r;
   if (pl->metalCapacity > 0.0f) {
     bar.right = (int)((bar.right - bar.left) * res->energy / pl->metalCapacity + bar.left);
-    FillRectangle((int)ctx, (int)&bar, sideDef->nMetalColor);
+    FillRectangle((int)ctx, (int)&bar, sideDef->metalColor);
     if (pl->shareMetal > 0.0f && pl->metal > pl->shareMetal) {
       box = *r;
       box.left = (int)((box.right - box.left) * pl->shareMetal / pl->metalCapacity + box.left);
@@ -385,17 +348,17 @@ static void DrawResourcePanel(Surface *ctx, Player *pl, Resources *res)
   }
   SetTextColors(pal[0xf], GetTextKeyColor());
   sprintf(text, "%d", (int)res->energy);
-  DrawString((int)ctx, (int)text, sideDef->rcMetalNum.left, sideDef->rcMetalNum.top, -1);
-  DrawString((int)ctx, (int)"0", sideDef->rcMetal0.left, sideDef->rcMetal0.top, -1);
+  DrawString((int)ctx, (int)text, sideDef->metalNum.left, sideDef->metalNum.top, -1);
+  DrawString((int)ctx, (int)"0", sideDef->metal0.left, sideDef->metal0.top, -1);
   sprintf(text, "%d", (int)pl->metalCapacity);
-  w = GetTextWidth((int)sideDef->pFontData, (int)text);
-  DrawString((int)ctx, (int)text, sideDef->rcMetalMax.left - w, sideDef->rcMetalMax.top, -1);
+  w = GetTextWidth((int)sideDef->font, (int)text);
+  DrawString((int)ctx, (int)text, sideDef->metalMax.left - w, sideDef->metalMax.top, -1);
   sprintf(text, "%.1f", res->energyIncome);
   SetTextColors(pal[0xa], GetTextKeyColor());
-  DrawString((int)ctx, (int)text, sideDef->rcMetalProduced.left, sideDef->rcMetalProduced.top, -1);
+  DrawString((int)ctx, (int)text, sideDef->metalProduced.left, sideDef->metalProduced.top, -1);
   sprintf(text, "%.1f", fabs(res->energyUse));
   SetTextColors(pal[0xc], GetTextKeyColor());
-  DrawString((int)ctx, (int)text, sideDef->rcMetalConsumed.left, sideDef->rcMetalConsumed.top, -1);
+  DrawString((int)ctx, (int)text, sideDef->metalConsumed.left, sideDef->metalConsumed.top, -1);
 }
 
 static inline int ShowSelectBox(int drawObjects)
@@ -486,7 +449,7 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
   idx = g_game->playerIndex;
   mv = &g_game->sortUnits;
   player = &g_game->players[idx];
-  SetFont((int)g_game->sideDefs[player->info->side].pFontData);
+  SetFont((int)g_game->sideDefs[player->info->side].font);
   SetTextColors(g_game->colors[15], GetTextKeyColor());
   {
     int vx = g_game->scrollX / 16, vy = g_game->scrollY / 16, h, w, x0, y0, skip;
