@@ -60,9 +60,7 @@ struct SkirmishPlayerSlot {
     int color;                         // +0x14
 };
 
-struct PlayerName_00496ee0 {            // 0x232 bytes, array at g_game+0x37f5f
-    char name[0x232];
-};
+#include "side_def.h"
 
 struct Struct_00496e90 {
     char unknown_0[0xdc];
@@ -195,30 +193,25 @@ struct Game {
     };   // +0x37ebe
     char unknown_37ec0[0x37ef6 - 0x37ec0];
     int battleCommanderDeath;                  // +0x37ef6
-    char unknown_37efa[0x37f5f - 0x37efa];
-    union {
-        PlayerName_00496ee0 names[8];          // +0x37f5f
-        struct {
-            char unknown_37f5f[0x38a37 - 0x37f5f];
-            unsigned int lastSimBudgetTick;    // +0x38a37
-            int simStepsPending;               // +0x38a3b
-            char unknown_38a3f[0x38a47 - 0x38a3f];
-            unsigned int gameTick;             // +0x38a47
-            char unknown_38a4b[0x38a51 - 0x38a4b];
-            unsigned short paused : 1;
-            unsigned short rest_38a51 : 15;    // +0x38a51
-            char unknown_38a53[0x38b53 - 0x38a53];
-            char text_38b53[0x100];            // +0x38b53
-            int movieCaptureIndex;             // +0x38c53
-            int movieOutputRate;               // +0x38c57
-            unsigned int nextMovieFrameTick;   // +0x38c5b
-            char unknown_38c5f[0x38d75 - 0x38c5f];
-            Flags_38d75 loadingFlags;              // +0x38d75
-            char unknown_38d77[0x38d85 - 0x38d77];
-            FrameTimers profileTimingBars;     // +0x38d85
-        };
-    };
-    char unknown_390ef[0x391e9 - 0x390ef];
+    char unknown_37efa[0x37f3d - 0x37efa];
+    SideDef sideDefs[5];                       // +0x37f3d
+    unsigned int lastSimBudgetTick;            // +0x38a37
+    int simStepsPending;                       // +0x38a3b
+    char unknown_38a3f[0x38a47 - 0x38a3f];
+    unsigned int gameTick;                     // +0x38a47
+    char unknown_38a4b[0x38a51 - 0x38a4b];
+    unsigned short paused : 1;
+    unsigned short rest_38a51 : 15;            // +0x38a51
+    char unknown_38a53[0x38b53 - 0x38a53];
+    char text_38b53[0x100];                    // +0x38b53
+    int movieCaptureIndex;                     // +0x38c53
+    int movieOutputRate;                       // +0x38c57
+    unsigned int nextMovieFrameTick;           // +0x38c5b
+    char unknown_38c5f[0x38d75 - 0x38c5f];
+    Flags_38d75 loadingFlags;                  // +0x38d75
+    char unknown_38d77[0x38d85 - 0x38d77];
+    FrameTimers profileTimingBars;             // +0x38d85
+    char unknown_38dd5[0x391e9 - 0x38dd5];
     union {
         Mission* mapInfo;                      // +0x391e9
         Mission* net;
@@ -559,7 +552,7 @@ void __stdcall SpawnCommanderAtStartPos(int team, int startpos)
     FixedVec3 pos;
     if (g_game->net->GetStartPosition((Vec3*)&pos, startpos)) {
         unsigned short id = FindUnitTypeId(
-            g_game->names[g_game->players[team].info->side].name);
+            g_game->sideDefs[g_game->players[team].info->side].commander);
         CreateUnit(team, id, pos, 1, 1, 0);
     } else {
         char buf[128];
