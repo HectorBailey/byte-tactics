@@ -34,7 +34,7 @@ InitEnvironment later maps videoFlags bits 1..8 to context flag bits 2..9, retai
 | 10 | Input-start option copied from videoFlags bit 9; passed to InitMouse |
 | 11 | Quitting flag |
 
-Startup videoFlags bit 0 separately selects fullscreen versus windowed mode. The provisional field name sound_opt for context bit 10 is not evidence that this module initializes audio through that flag: the concrete call passes it to mouse initialization.
+Startup videoFlags bit 0 separately selects fullscreen versus windowed mode. Context bit 10 is `mouseThread`: InitEnvironment passes it to InitMouse (`0x4c2bd0`) as its start flag, which starts the mouse thread only when it is set, and ShutdownMouse (`0x4c2cc0`) tests it before stopping that thread. It does not select audio.
 
 ## 3. DirectX compatibility check
 
