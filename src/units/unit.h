@@ -70,7 +70,7 @@ struct Unit {
     int unfinishedInitZero;            // +0x100
     float buildLeft;                   // +0x104
     short health;                      // +0x108
-    char unknown_10a[4];               // +0x10a
+    int sfxOccupy;                     // +0x10a, Thaldren's nSfxOccupy
     // The script's activation and COB state bits, one bit each: a bit test
     // rather than a byte compare, which is what the original codegen does.
     unsigned char on : 1;              // +0x10e bit 0

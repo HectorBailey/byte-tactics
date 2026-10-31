@@ -25,9 +25,7 @@ static inline Vec3 operator+(const Vec3& a, const Vec3& b)
 #include "../sound/sound.h"
 
 
-struct Unit_0043e490;
-
-#include "../units/unit_def.h"
+#include "unit.h"
 
 // The 0x100-byte feature record in the pool at +0x1426f.
 #include "../map/feature.h"
@@ -50,29 +48,6 @@ struct Game {
     int interfaceType; // +0x37efa
 };
 
-struct Object {
-    char unknown_0[0x6a];
-    Vec3 pos;                          // +0x6a
-    char unknown_76[0x9a - 0x76];
-    CobScript* script;                 // +0x9a
-};
-
-struct Unit {
-    char unknown_0[0x70];
-    short yWhole;                      // +0x70, the whole part of pos.y
-    char unknown_72[0x92 - 0x72];
-    UnitDef* def;                      // +0x92
-    char unknown_96[0x9a - 0x96];
-    CobScript* script;                 // +0x9a
-    char unknown_9e[0x10a - 0x9e];
-    int state;                         // +0x10a
-    char unknown_10e[0x110 - 0x10e];
-    unsigned int flags;                // +0x110
-
-    int CanLoad(Unit_0043e490* other);
-    int CanReclaim(Unit_0043e490* other);
-    int CanRepair(Unit_0043e490* other);
-};
 #pragma pack(pop)
 
 class Class_0043db50 {
@@ -86,8 +61,9 @@ extern Game* g_game;
 void Class_0043db50::UpdateSfxOccupy(Unit* unit)
 {
     int seaLevel = g_game->seaLevel;
-    int y = unit->yWhole;
-    int newState = unit->state;
+    // The whole part of the 16.16 pos.y, read as the 16-bit load the original does.
+    int y = ((short*)&unit->pos.y)[1];
+    int newState = unit->sfxOccupy;
     if ((unit->flags & 3) == 1 || (unit->flags & 3) == 2) {
         if (y > seaLevel) {
             newState = 4;
@@ -102,9 +78,9 @@ void Class_0043db50::UpdateSfxOccupy(Unit* unit)
     } else {
         newState = 0;
     }
-    if (unit->state != newState) {
+    if (unit->sfxOccupy != newState) {
         unit->script->StartScriptWithArgs("setSFXoccupy", 0, 1, 1, newState, 0, 0, 0);
-        unit->state = newState;
+        unit->sfxOccupy = newState;
     }
 }
 
@@ -208,7 +184,7 @@ Vec3 __stdcall GetPieceOffset(Object_0043def0* obj, int index)
 #include <io.h>
 
 // FUNCTION: 0x43e060
-Vec3 __stdcall GetPiecePosition(Object* obj, int param)
+Vec3 __stdcall GetPiecePosition(Unit* obj, int param)
 {
     return obj->pos + GetPieceOffset((Object_0043def0*)obj, param);
 }
@@ -312,7 +288,7 @@ Angles16 __stdcall GetPieceAngles(Obj_0043e180* obj, int index)
 // Asks the unit's script which piece the weapon (0..2) aims from
 // ("QueryPrimary", "QuerySecondary", "QueryTertiary") and returns it.
 // FUNCTION: 0x43e1e0
-int __stdcall QueryWeaponPiece(Object* obj, unsigned char weapon)
+int __stdcall QueryWeaponPiece(Unit* obj, unsigned char weapon)
 {
     char* names[3] = { "QueryPrimary", "QuerySecondary", "QueryTertiary" };
     int piece = 0;
@@ -324,7 +300,7 @@ int __stdcall QueryWeaponPiece(Object* obj, unsigned char weapon)
 // plus the piece offset, like 0x43e060); a negative piece is first asked
 // from the unit's script (0x43e1e0, inlined).
 // FUNCTION: 0x43e240
-void __stdcall GetWeaponPiecePosition(Object* obj, Vec3* out, unsigned char weapon, int piece)
+void __stdcall GetWeaponPiecePosition(Unit* obj, Vec3* out, unsigned char weapon, int piece)
 {
     if (piece < 0)
         piece = QueryWeaponPiece(obj, weapon);
@@ -336,7 +312,7 @@ void __stdcall GetWeaponPiecePosition(Object* obj, Vec3* out, unsigned char weap
 // (-1), falls back to the "Query" piece. The unit's position is then
 // added to the piece offset.
 // FUNCTION: 0x43e2e0
-void __stdcall GetAimFromPosition(Object* obj, Vec3* out, unsigned char weapon)
+void __stdcall GetAimFromPosition(Unit* obj, Vec3* out, unsigned char weapon)
 {
     char* names[3] = { "AimFromPrimary", "AimFromSecondary", "AimFromTertiary" };
     int piece = -1;
@@ -372,7 +348,7 @@ void __stdcall GetSweetSpot(Obj_0043e3c0* obj, int out)
 // Asks the unit's script for its nano piece and returns that piece's world
 // position (the unit's position plus the piece offset), like 0x43e060.
 // FUNCTION: 0x43e400
-void __stdcall GetNanoPiecePosition(Object* obj, Vec3* out)
+void __stdcall GetNanoPiecePosition(Unit* obj, Vec3* out)
 {
     int piece = 0;
     obj->script->QueryScript("QueryNanoPiece", &piece, 0, 0, 0);
@@ -388,19 +364,11 @@ int __stdcall OrderModeTakesTarget(unsigned char type)
     return 0;
 }
 
-#pragma pack(push, 1)
-struct Node_0043e490 {
-    char unknown_0[0x111];
-    union {
-        unsigned int f111; // +0x111
-        struct {
-            unsigned int b0_7 : 8;
-            unsigned int b8 : 1;
-            unsigned int b9_31 : 23;
-        } f111b;
-    };
-};
+// Included here, not at the top: its symbol ids before GetPieceOffset (0x43def0)
+// move that function (docs/c2-regalloc.md).
+#include "../weapons/weapon_def.h"
 
+#pragma pack(push, 1)
 struct Flags_0043e490 {
     unsigned int b0 : 1;
     unsigned int b1 : 1;
@@ -434,42 +402,6 @@ struct Size_0043e490 {
 
 #include "../network/player.h"
 
-struct Stats_0043e490 {
-    char unknown_0[0x8c];
-    float f8c; // +0x8c
-    char unknown_90[0x98 - 0x90];
-    float f98; // +0x98
-};
-
-struct Limits_0043e490 {
-    char unknown_0[0xc0];
-    float fc0; // +0xc0
-    float fc4; // +0xc4
-};
-
-struct Unit_0043e490 {
-    int motion; // +0x0
-    char unknown_4[0x10 - 0x4];
-    Node_0043e490* f10; // +0x10
-    char unknown_14[0x48 - 0x14];
-    Limits_0043e490* f48; // +0x48
-    char unknown_4c[0x6a - 0x4c];
-    char f6a[0x86 - 0x6a]; // +0x6a
-    Unit_0043e490* carrier; // +0x86
-    char unknown_8a[0x92 - 0x8a];
-    UnitDef* def;            // +0x92
-    Player* player; // +0x96
-    char unknown_9a[0xec - 0x9a];
-    Stats_0043e490* fec; // +0xec
-    char unknown_f0[0xfb - 0xf0];
-    int postTransferHoldoff; // +0xfb
-    unsigned char playerIndex; // +0xff
-    char unknown_100[0x104 - 0x100];
-    float buildLeft; // +0x104
-    char unknown_108[0x110 - 0x108];
-    unsigned int flags; // +0x110
-};
-
 struct Pos_0043e490 {
     short xf, x;
     short yf, y;
@@ -480,14 +412,14 @@ struct Pos_0043e490 {
 #pragma pack(pop)
 
 Cell* __stdcall GetMapCellAtPosition(Pos_0043e490* pos);
-int __stdcall WeaponCanReachPos(Unit_0043e490* unit, void* slot, Pos_0043e490* pos, int which);
-int __stdcall WeaponCanReachUnit(Unit_0043e490* unit, Unit_0043e490* target, int which);
+int __stdcall WeaponCanReachPos(Unit* unit, void* slot, Pos_0043e490* pos, int which);
+int __stdcall WeaponCanReachUnit(Unit* unit, Unit* target, int which);
 
 // The same test as IsPointVisible: is the map square under pos in sight of the
 // local player? The width is read again through unit->player for the index;
 // MSVC folds it back into the CSE'd load, which it then reloads into edx for
 // the imul as the original does.
-static inline int Visible(Unit_0043e490* unit, Pos_0043e490* pos) {
+static inline int Visible(Unit* unit, Pos_0043e490* pos) {
     Player* p = unit->player;
     int y, x;
     x = pos->x >> 5;
@@ -531,7 +463,7 @@ static inline Feature* GetFeature(Cell* cell) {
         }                                                            \
     } while (0)
 
-static inline int Selectable(Unit_0043e490* t) {
+static inline int Selectable(Unit* t) {
     return t && t->playerIndex == g_game->localPlayer && (t->flags & 0x20) && t->buildLeft == 0.0f && t->postTransferHoldoff == 0 &&
            (t->carrier == 0 || (t->carrier->flags & 0x40000000));
 }
@@ -540,11 +472,11 @@ static inline int Selectable(Unit_0043e490* t) {
 // `mode` given by `unit` on `target` / `pos`; GetOrderType is the sibling that
 // returns the action's name.
 // FUNCTION: 0x43e490
-int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e490* target,
+int __stdcall GetOrderCursor(unsigned char mode, Unit* unit, Unit* target,
                            Pos_0043e490* pos) {
     // Declared friendly, enemy, then def (a real local); g_game read directly.
     UnitDef* def;
-    Node_0043e490* node;
+    WeaponDef* node;
     int friendly;
     int enemy;
     friendly = 0;
@@ -559,15 +491,15 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
 
     switch (mode) {
     case 3:
-        if ((def->flags2 & 0x10) && ((Node_0043e490*)def->weapons[0])->f111b.b8)
+        if ((def->flags2 & 0x10) && def->weapons[0]->flags.b.dropped)
             return 2;
         if (((UnitDefFlags_0043e490*)def)->f245b.b4) {
-            node = unit->f10;
+            node = unit->weapons[0].weapon;
             if (unit->motion)
                 return 1;
             if (target)
                 return WeaponCanReachUnit(unit, target, 0) ? 1 : 3;
-            if (!WeaponCanReachPos(unit, unit->f6a, pos, 0) || (node->f111 & 0x20000))
+            if (!WeaponCanReachPos(unit, &unit->pos, pos, 0) || node->flags.b.toAirWeapon)
                 return 3;
             return 1;
         }
@@ -575,7 +507,7 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
     case 9:
         return ((UnitDefFlags_0043e490*)def)->f245b.b6 ? 7 : 0x13;
     case 8:
-        return ((Unit*)unit)->CanRepair(target) ? 6 : 0x13;
+        return unit->CanRepair(target) ? 6 : 0x13;
     case 7:
         if (!(def->flags2 & 0x20) || !friendly)
             break;
@@ -585,7 +517,7 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
     case 12:
         // Every check goes through the macro: an inline helper blows the budget.
         RECLAIM_CHECK(def, unit, pos, 0x400, 0xb);
-        if (target && ((Unit*)unit)->CanReclaim(target))
+        if (target && unit->CanReclaim(target))
             return 0xb;
         break;
     case 13:
@@ -593,7 +525,7 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
             return 4;
         break;
     case 6:
-        if (!target || !((Unit*)unit)->CanLoad(target))
+        if (!target || !unit->CanLoad(target))
             break;
         return ((UnitDefFlags_0043e490*)def)->f241b.b11 ? 8 : 0xc;
     case 5:
@@ -604,10 +536,10 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
         return 0x10;
     case 4:
         if (((UnitDefFlags_0043e490*)def)->f245b.b14) {
-            // f48 pointer declared before the fec one.
-            Limits_0043e490* l = unit->f48;
-            Stats_0043e490* s = unit->fec;
-            if (s->f8c < l->fc0 || s->f98 < l->fc4)
+            // The weapon pointer declared before the player one.
+            WeaponDef* weapon = unit->weapons[2].weapon;
+            Player* player = unit->resourceSlot.player;
+            if (player->energy < weapon->energyPerShot || player->metal < weapon->metalPerShot)
                 return 3;
             return 1;
         }
@@ -622,15 +554,15 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
             return 0xe;
         if ((def->flags2 & 0x1000) && enemy)
             return 4;
-        if (enemy && ((Unit*)unit)->CanReclaim(target))
+        if (enemy && unit->CanReclaim(target))
             return 0xb;
-        if (friendly && ((Unit*)unit)->CanRepair(target) && target->buildLeft != 0.0f)
+        if (friendly && unit->CanRepair(target) && target->buildLeft != 0.0f)
             return 6;
-        if (friendly && ((Unit*)unit)->CanRepair(target))
+        if (friendly && unit->CanRepair(target))
             return 6;
         if ((def->flags1 & 0x800) && (target->def->flags1 & 0x200))
             return 0xd;
-        if (((Unit*)unit)->CanLoad(target))
+        if (unit->CanLoad(target))
             return ((UnitDefFlags_0043e490*)def)->f241b.b11 ? 8 : 0xc;
         if ((def->flags2 & 0x20) && friendly)
             return 5;
@@ -652,7 +584,7 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
             return GetOrderCursor(3, unit, target, pos);
         if ((def->flags2 & 0x400) && enemy)
             return GetOrderCursor(0xc, unit, target, pos);
-        if (target && ((Unit*)unit)->CanRepair(target) && target->buildLeft != 0.0f)
+        if (target && unit->CanRepair(target) && target->buildLeft != 0.0f)
             return 6;
         if (Selectable(target))
             return 0xf;
