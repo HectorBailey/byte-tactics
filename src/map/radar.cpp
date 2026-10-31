@@ -21,7 +21,7 @@ struct Surface_4665d0 {
     int width;                          // +0x0
     int height;                         // +0x4
     int pitch;                          // +0x8
-    int bits;                           // +0xc
+    unsigned char* bits;                // +0xc
     int zPriority;                      // +0x10
     int colorKey;                       // +0x14
     unsigned short x;                   // +0x18
@@ -463,8 +463,8 @@ void UpdateRadarMapped()
         unsigned char fog = g_game->fogColor;
         Player* t = &g_game->players[g_game->playerIndex];
         unsigned int mask = 1 << g_game->playerIndex;
-        unsigned char* dst = *(unsigned char**)((char*)g_game->mappedSurface + 0xc);
-        unsigned char* src = *(unsigned char**)((char*)g_game->pictureSurface + 0xc);
+        unsigned char* dst = ((Surface_4665d0*)g_game->mappedSurface)->bits;
+        unsigned char* src = ((Surface_4665d0*)g_game->pictureSurface)->bits;
         int halfWidth = g_game->mapWidthTiles / 2;
         int halfHeight = g_game->mapHeightTiles / 2;
         for (int i = 0; i < g_game->minimapGadgetH; i++) {
@@ -624,20 +624,20 @@ void DrawRadarUnits(void)
                         }
                     }
                     out[0] = u->id;
-                    *(int*)(out + 1) = g_game->minimapGadgetX + x;
-                    *(int*)(out + 3) = g_game->minimapGadgetY + y;
+                    *(int*)&out[1] = g_game->minimapGadgetX + x;
+                    *(int*)&out[3] = g_game->minimapGadgetY + y;
                     out += 5;
                     g_game->hotRadarUnitCount++;
                 }
             }
-            u = (Unit*)((char*)u + 0x118);
+            u = u + 1;
         } while (u <= g_game->unitsEnd);
     }
 
     Projectile* p = g_game->projectiles;
     int i = 0;
     if (g_game->projectileCount > 0) {
-        short* q = (short*)((char*)p + 0xa);
+        short* q = (short*)&p->posY + 1;
         do {
             int px = q[-2];
             int x = (int)g_game->minimapGadgetW * px / g_game->mapPixelWidth;
@@ -660,8 +660,10 @@ void DrawRadarUnits(void)
                 }
             }
             i++;
-            p = (Projectile*)((char*)p + 0x6b);
-            q = (short*)((char*)q + 0x6b);
+            p = p + 1;
+            // The 0x6b stride is an odd byte count, so the short* walk stays
+            // byte-wise: sizeof says what the 0x6b is.
+            q = (short*)((char*)q + sizeof(Projectile));
         } while (i < g_game->projectileCount);
     }
 

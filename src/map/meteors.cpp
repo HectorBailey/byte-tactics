@@ -4,9 +4,16 @@
 #include <string.h>
 #include <memory>
 
+// The 0x115-byte weapon definition, its flags read as a byte here.
+#include "../weapons/weapon_def.h"
+
 #pragma pack(push, 1)
 struct Game {
-    char unknown_0[0x14233];
+    char unknown_0[0x2cf3];
+    // The first of the 256 weapon definitions, game.h's weapons (Thaldren's
+    // aWeaponDefs): the meteor fallback weapon.
+    WeaponDef defaultWeapons[1];         // +0x2cf3
+    char unknown_2e08[0x14233 - 0x2e08];
     int mapWidthTiles;               // +0x14233
     int mapHeightTiles;              // +0x14237
     char unknown_1423b[0x38a47 - 0x1423b];
@@ -17,9 +24,6 @@ struct Game {
     };
 };
 #pragma pack(pop)
-
-// The 0x115-byte weapon definition, its flags read as a byte here.
-#include "../weapons/weapon_def.h"
 
 #include "../util/vec3.h"
 
@@ -89,11 +93,11 @@ void InitMeteors()
     g_meteorNextStrikeTime = g_meteorSpawnInterval;
     g_meteorWeapon = FindWeaponByName(g_meteorWeaponName);
     if (g_meteorWeapon == 0) {
-        g_meteorWeapon = (WeaponDef*)((char*)g_game + 0x2cf3);
+        g_meteorWeapon = &g_game->defaultWeapons[0];
         return;
     }
     if (!g_meteorWeapon->flags.b.meteor)
-        g_meteorWeapon = (WeaponDef*)((char*)g_game + 0x2cf3);
+        g_meteorWeapon = &g_game->defaultWeapons[0];
 }
 
 // FUNCTION: 0x437d30

@@ -5,6 +5,11 @@
 
 struct Obj_0047cc30;
 
+struct Motion_0047cc30 {
+    char unknown_0[0x26];
+    int pathLockStamp;                  // +0x26, UnitMotion's stamp in units/movement_class.cpp
+};
+
 struct Owner_0047cc30 {
     char unknown_0[6];
     Obj_0047cc30* first;                // +0x6
@@ -40,7 +45,7 @@ union Flags_0047cc30 {
 };
 
 struct Obj_0047cc30 {
-    unsigned char* motion;              // +0x0
+    Motion_0047cc30* motion;            // +0x0
     char unknown_4[0x26 - 0x4];
     int field_26;                       // +0x26
     char unknown_2a[0x6a - 0x2a];
@@ -111,7 +116,7 @@ void __stdcall AddUnitToMap(Obj_0047cc30* obj)
 {
     Point16 size = obj->footprint;
     if (obj->motion != 0)
-        *(int*)(obj->motion + 0x26) = g_game->gameTick;
+        obj->motion->pathLockStamp = g_game->gameTick;
     {
         // px and py are short locals, py declared after px's test; the sums
         // stay on the left of >=.

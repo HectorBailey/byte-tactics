@@ -895,6 +895,9 @@ int Mission::LoadMission(char* map)
         OpenMessageBox(g_game->messages, "No GlobalHeader block in mission file!", 0x1e0, 1, 1);
         return 0;
     }
+    // The GlobalHeader block's first int, read out of util/tdf.cpp's TdfRecord
+    // `text` slot. Stays a cast: data members in util/tdf.h's TdfRecord move
+    // 27 functions in network/unit_sync.cpp and others off their windows.
     headerChecksum = *(int*)((char*)parser.current + 0x25);
     GetLocalizedString(&parser, value, "brief", 0x100, g_emptyStringLiteral);
     BuildCampaignFilePath(2, "camps\\briefs", value, "TXT");
