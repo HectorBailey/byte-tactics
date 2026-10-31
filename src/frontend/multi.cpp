@@ -2162,9 +2162,9 @@ void ShowSelectedMapInfo()
     }
 
     sprintf(buffer, "%s  %s: %s",
-            (char*)g_game->mapInfo + 0xdc4,
+            g_game->mapInfo->memory,
             Translate("Players"),
-            (char*)g_game->mapInfo + 0xe44);
+            g_game->mapInfo->numPlayers);
     SetTranslatedTextByName(&g_game->gui, "SIZE", (char*)buffer, 0);
 
     Gadget* entry = FindGadgetChecked_E(g_game->gui.layer->entries, "MAPPIC");
@@ -3295,7 +3295,7 @@ void __stdcall HandleAlliesClick(Gui* gadget)
             SetAlliance(local->id, p->id, local->allied[i] ^= 1, 0);
             char* verb = local->allied[i] ? "allied with" : "broke alliance with";
             sprintf(buf, " %s %s", Translate(verb),
-                    (char*)g_game + 0x1b8e + i * 0x14b);
+                    g_game->players[i].name);
             SendChatMessage(local, buf, 4, 0);
             RebuildAllyList();
             DrawButton(&g_game->gui, gadget->hotGadgetIndex);
