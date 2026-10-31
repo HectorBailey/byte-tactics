@@ -40,7 +40,10 @@ struct UnitDef_0048cf30 {
     unsigned char flags;                // +0x245
 };
 
-// pos stays as x and z: util/vec3.h adds 14 symbol ids and 0x48cf30 matches only within 5 of this count.
+// pos stays as plain x and z ints, not units/unit.h: with the header's Vec3
+// pos, the delta sums (pos[0] + u->pos.x - avg[0]) take their two loads in
+// the other register order. Padding does not fix it (at most 96.6% up to 540
+// ids, with or without game/game.h), so it is not the symbol count (#6933).
 struct Unit {
     char unknown_0[0x6a];
     int x;                              // +0x6a
