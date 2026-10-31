@@ -193,7 +193,7 @@ void UnitSync::ProcessSync() {
             // vector::_Destroy, 11 or more also un-inlines the pairs wrapper.
             for (std::map<unsigned int, UnitSyncEntry>::iterator k = map.begin(); k != map.end();
                  (k.*increment)()) {
-                CheckUnitAvailable(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(k->second.x)))))))))), 0);
+                CheckUnitAvailable(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(Pass(k->second.fbiChecksum)))))))))), 0);
             }
         }
         return;
