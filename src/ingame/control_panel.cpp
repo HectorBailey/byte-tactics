@@ -19,6 +19,11 @@
 #include "../util/vec3.h"
 #include "../graphics/display_context.h"
 
+// Unused here: the symbol id this declaration takes keeps AddBuildProgress
+// (0x41ba60) matching now that display_context.h forward-declares Font
+// (docs/c2-regalloc.md).
+void RegisterUnitOrders(void);
+
 // The copy constructor is only declared: it is never called (the temporary is
 // elided), but declaring it makes MSVC build the by-value argument in place in
 // the callee's argument slot, which is what the original does.
