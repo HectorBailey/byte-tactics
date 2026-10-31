@@ -18,17 +18,12 @@ struct Gaf_004b0230 {
     char unknown_0[0x14];
 };
 
-struct Cell_004b0230 {
-    int step_x;                      // +0x0
-    int step_y;                      // +0x4
-};
-
 int __stdcall DrawLine(void* surface, int x0, int y0, int x1, int y1, unsigned char color);
 void __stdcall FillRectangle(void* surface, void* rect, int color);
 void __stdcall GetGadgetRectByIndex(char* entries, int index, Rect* out);
-int __stdcall FindBackgroundCell(char* entries, int index);
+int __stdcall FindBackgroundCell(Gadget* entries, int index);
 Bits_004b0230* __stdcall FindGafEntry(Gaf_004b0230* gaf, const char* name);
-void __stdcall DrawSurface(Surface* dst, Cell_004b0230* cell, int x, int y);
+void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y);
 GafFrame* __stdcall GetGafFrame(Bits_004b0230* bits, int index);
 void __stdcall DrawFrame(Surface* dst, GafFrame* pic, int x, int y);
 
@@ -67,8 +62,9 @@ void __stdcall DrawBevelBorderDarkFirst(void* surface, Rect* rect, int dark, int
 // Draws a list box's frame. GetGadgetRectByIndex gives the entry's rectangle; when no
 // bitmap arrives, the "Listbox" piece is looked up in the object's GAF and, if
 // found, the rectangle is grown by 3 on every side. The destination is the
-// surface at entries+0xbc. When FindBackgroundCell finds a background cell for the
-// entry, the area is tiled with it through DrawSurface and only the bevel
+// first gadget's GUI surface (u.assets.surface). When FindBackgroundCell finds
+// a background bitmap for the entry, the area is tiled with it, one bitmap
+// width and height at a time, through DrawSurface and only the bevel
 // (DrawBevelBorderDarkFirst) is drawn; with no cell and no bitmap the rectangle is filled
 // (FillRectangle) and bevelled; with a bitmap set of more than one child the
 // set is laid out as a 3x3 border around the rectangle, rows 0/3/6 and columns
@@ -79,7 +75,7 @@ void __stdcall DrawBevelBorderDarkFirst(void* surface, Rect* rect, int dark, int
 // FUNCTION: 0x4b0230
 void __stdcall DrawListboxFrame(Gui* obj, int index, Bits_004b0230* bmp)
 {
-    char* entries;
+    Gadget* entries;
     int col;
     Surface* surface;
     int height;
@@ -95,11 +91,11 @@ void __stdcall DrawListboxFrame(Gui* obj, int index, Bits_004b0230* bmp)
     int yoff;
     GafFrame* p;
     int y0;
-    Cell_004b0230* cell;
+    Surface* cell;
     int h;
     GafFrame* sub;
-    entries = (char*)obj->layer->entries;
-    GetGadgetRectByIndex(entries, index, &rect);
+    entries = obj->layer->entries;
+    GetGadgetRectByIndex((char*)entries, index, &rect);
 
     if (bmp == 0) {
         if (obj->gaf == 0)
@@ -114,11 +110,11 @@ void __stdcall DrawListboxFrame(Gui* obj, int index, Bits_004b0230* bmp)
     }
 
     surface = (Surface*)obj->layer->entries->u.assets.surface;
-    cell = (Cell_004b0230*)FindBackgroundCell(entries, index);
+    cell = (Surface*)FindBackgroundCell(entries, index);
 
     if (cell != 0) {
-        for (x = 0; x < surface->width; x += cell->step_x) {
-            for (y = 0; y < surface->height; y += cell->step_y) {
+        for (x = 0; x < surface->width; x += cell->width) {
+            for (y = 0; y < surface->height; y += cell->height) {
                 DrawSurface(surface, cell, x, y);
             }
         }
