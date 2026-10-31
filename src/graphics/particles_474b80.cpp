@@ -26,6 +26,8 @@ struct Pos_00474b80 {
 
 // The header's type, kept local: its explored pointer cannot spell the
 // ByteMap this fog test needs.
+// game.h's Game stays out with it: on that header the fog read's base load
+// folds into the addressing and DrawParticle comes out two bytes short.
 struct Player {
     char unknown_0[0x7c];
     ByteMap explored;// +0x7c
