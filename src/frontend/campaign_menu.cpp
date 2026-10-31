@@ -76,6 +76,8 @@ struct Item {
     int owner;                         // +0x14
 };
 
+#include "../game/side_def.h"
+
 struct Game {
     int unknown_0;
     char unknown_4[0x10 - 4];
@@ -102,8 +104,8 @@ struct Game {
     };
     char unknown_37ef6[0x37f39 - 0x37ef6];
     int sideCount;                     // +0x37f39, the sides
-    char names[1][0x232];              // +0x37f3d
-    char unknown_3816f[0x38d7f - 0x3816f];
+    SideDef sideDefs[5];               // +0x37f3d
+    char unknown_38a37[0x38d7f - 0x38a37];
     unsigned short allMissionsFlags;   // +0x38d7f
     int numSkirmishPlayers;            // +0x38d81
     char unknown_38d85[0x391e9 - 0x38d85];
@@ -270,7 +272,7 @@ char* BuildSideList()
 
     buf[0] = 0;
     for (i = 0; i < g_game->sideCount; i++) {
-        p = strcat(p, g_game->names[i]);
+        p = strcat(p, g_game->sideDefs[i].name);
         p = p + strlen(p) + 1;
         p[0] = 0;
     }
@@ -349,7 +351,7 @@ int __stdcall BuildCampaignNameList(char** out, int side)
         if ((&parser)->LoadFile(path)) {
             if ((&parser)->SelectRecord("HEADER")) {
                 parser.current->GetFieldString(name, "campaignside", 0x40, g_emptyStringLiteral);
-                if (strcmp(g_game->names[side], name) == 0 || strcmp("ALL", name) == 0) {
+                if (strcmp(g_game->sideDefs[side].name, name) == 0 || strcmp("ALL", name) == 0) {
                     found++;
                     p = AppendName_00476a60(p, q);
                 }
@@ -1326,7 +1328,7 @@ void OpenMissionBriefing(void)
     unsigned char side;
 
     side = g_game->players[g_game->localPlayer].info->side;
-    sprintf(buf, "mbrief%s", (char*)g_game + 0x37f5b + side * 0x232);
+    sprintf(buf, "mbrief%s", g_game->sideDefs[side].namePrefix);
 
     dialog = LoadGuiLayer(&g_game->gui, "MSNBRIEF.GUI", 0x80);
     dialog->handler = (void (__stdcall*)(void*))HandleMissionBriefingClick;
