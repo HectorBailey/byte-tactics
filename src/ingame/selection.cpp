@@ -52,13 +52,9 @@ struct HotRadarUnitEntry {
     int screenY;                       // +0x6
 };
 
-// One side's SideDef record (0x232 bytes): the commander name read at +0x22
-// is what FocusCommander matches against a unit type name.
-struct SideDef {
-    char unknown_0[0x22];              // +0x00
-    char aCommander[0x20];             // +0x22, the commander name
-    char unknown_42[0x232 - 0x42];
-};
+// The commander name at +0x22 of a side's SideDef is what FocusCommander
+// matches against a unit type name.
+#include "../game/side_def.h"
 
 struct Game {
     char unknown_0[0x1b63];
@@ -833,7 +829,7 @@ void __cdecl ClearCameraFollowState(void);
 void __stdcall FocusCommander(int param_1)
 {
     Player* team = &g_game->players[g_game->playerIndex];
-    char* playerName = g_game->sideDefs[team->info->side].aCommander;
+    char* playerName = g_game->sideDefs[team->info->side].commander;
     Unit* last = team->unitsEnd;
     for (Unit* u = team->unitsBegin; u <= last; u++) {
         if (u->selectable && u->buildLeft == 0.0f && u->postTransferHoldoff == 0
