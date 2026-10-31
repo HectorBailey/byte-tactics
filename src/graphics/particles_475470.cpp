@@ -7,9 +7,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <vector>
-// Only for its symbol ids: the fog-culled draw (slot 2) matches only in a
-// window of the symbol count.
-#include <io.h>
 
 #include "../util/vec3.h"
 
@@ -44,39 +41,17 @@ struct ByteMap {
 };
 
 #pragma pack(push, 1)
-// The header's type, kept local: its explored pointer cannot spell the
-// ByteMap this fog test needs.
-struct Player {
+// A player slot with its explored map spelled as a ByteMap: network/player.h
+// has the same three members at +0x7c as separate fields, which cannot give
+// this fog test the helpers it inlines.
+struct FogPlayer {
     char unknown_0[0x7c];
     ByteMap explored;                  // +0x7c
     char unknown_88[0x14b - 0x88];
 };
-
-struct Game {
-    char unknown_0[0x1b63];
-    Player players[10];       // +0x1b63
-    char unknown_2851[0x2a43 - 0x2851];
-    unsigned char playerIndex;         // +0x2a43
-    char unknown_2a44[0x14263 - 0x2a44];
-    int gravity;                       // +0x14263
-    char unknown_14267[0x14273 - 0x14267];
-    unsigned short* visibilityMask;    // +0x14273
-    char unknown_14277[0x14281 - 0x14277];
-    unsigned short mapFlags;           // +0x14281
-    char unknown_14283[0x1431f - 0x14283];
-    int scrollX;                       // +0x1431f
-    int scrollY;                       // +0x14323
-    char unknown_14327[0x147cf - 0x14327];
-    void* smoke1;                      // +0x147cf, the smoke animation
-    void* smoke2;                      // +0x147d3, the other smoke animation
-    char unknown_147d7[0x37ecc - 0x147d7];
-    int windVelX;                      // +0x37ecc
-    char unknown_37ed0[4];
-    int windZ;                         // +0x37ed4
-    char unknown_37ed8[0x38a47 - 0x37ed8];
-    int gameTick;                      // +0x38a47
-};
 #pragma pack(pop)
+
+#include "../game/game.h"
 
 extern Game* g_game;
 
@@ -84,7 +59,7 @@ int __stdcall GetGafFrameCount(void* ptr);
 void* __stdcall GetGafFrame(void* a, int b);
 void __stdcall DrawFrameBlended(void* dest, void* src, int x, int y);
 
-static inline int IsExplored(Player* map, FixedVec3* pos)
+static inline int IsExplored(FogPlayer* map, FixedVec3* pos)
 {
     int tx = pos->x.whole >> 5;
     int ty = (pos->z.whole - (pos->y.whole >> 1)) >> 5;
@@ -94,7 +69,7 @@ static inline int IsExplored(Player* map, FixedVec3* pos)
 }
 
 // The body of the matched 0x408090.
-static inline int IsSeen(Player* map, FixedVec3* pos)
+static inline int IsSeen(FogPlayer* map, FixedVec3* pos)
 {
     int tx = pos->x.whole >> 5;
     int ty = (pos->z.whole - (pos->y.whole >> 1)) >> 5;
@@ -108,7 +83,7 @@ static inline int IsSeen(Player* map, FixedVec3* pos)
             (1 << g_game->playerIndex)) != 0;
 }
 
-static inline int IsVisible(Player* map, FixedVec3* pos)
+static inline int IsVisible(FogPlayer* map, FixedVec3* pos)
 {
     if ((g_game->mapFlags & 2) == 2)
         return IsExplored(map, pos);
@@ -135,7 +110,7 @@ struct SmokeParticle {
     {
         short sx = posw.x.whole - px + 0x80;
         short sy = posw.z.whole - (posw.y.whole >> 1) - py + 0x20;
-        if (IsVisible(&g_game->players[g_game->playerIndex], &posw))
+        if (IsVisible((FogPlayer*)&g_game->players[g_game->playerIndex], &posw))
             DrawFrameBlended(dest, GetGafFrame(data, count), sx, sy);
     }
 };
@@ -169,6 +144,6 @@ void SmokeParticles::Render(int dest)
 {
     for (std::vector<SmokeParticle>::iterator it = records.begin(); it != records.end();
          ++it) {
-        it->DrawIfVisible((void*)dest, g_game->scrollX, g_game->scrollY);
+        it->DrawIfVisible((void*)dest, g_game->scroll_x, g_game->scroll_y);
     }
 }

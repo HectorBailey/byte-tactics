@@ -10,6 +10,11 @@
 #include <stdlib.h>
 #include <vector>
 
+// g_game before the shared header: its symbol id decides which register holds
+// the draw arguments and their order in Render.
+struct Game;
+extern Game* g_game;
+
 // The TimedSubParticles class.
 #include "timed_sub_particles.h"
 
@@ -25,25 +30,7 @@ struct FixedVec3 {
     Fixed z;
 };
 
-#pragma pack(push, 1)
-struct Game {
-    char unknown_0[0x14263];
-    int gravity;                       // +0x14263
-    char unknown_14267[0x1431f - 0x14267];
-    int scrollX;                       // +0x1431f
-    int scrollY;                       // +0x14323
-    char unknown_14327[0x147cf - 0x14327];
-    void* smoke1;                      // +0x147cf, the animation
-    char unknown_147d3[0x37ecc - 0x147d3];
-    int windVelX;                      // +0x37ecc
-    char unknown_37ed0[4];
-    int windZ;                         // +0x37ed4
-    char unknown_37ed8[0x38a47 - 0x37ed8];
-    int gameTick;                      // +0x38a47
-};
-#pragma pack(pop)
-
-extern Game* g_game;
+#include "../game/game.h"
 
 // Declared returning int: the original uses the full eax without masking it.
 int __stdcall GetGafFrameCount(void* ptr);
@@ -79,6 +66,6 @@ struct TimedSubParticle {
 void TimedSubParticles::Render(int dest)
 {
     for (std::vector<TimedSubParticle>::iterator it = records.begin(); it != records.end(); ++it) {
-        it->Draw((void*)dest, g_game->scrollX, g_game->scrollY);
+        it->Draw((void*)dest, g_game->scroll_x, g_game->scroll_y);
     }
 }
