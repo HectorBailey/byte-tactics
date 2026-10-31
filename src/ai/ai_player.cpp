@@ -60,7 +60,13 @@ public:
 };
 
 struct WeaponDef {                     // 0x115 bytes
-    char unknown_0[0x111];
+    char unknown_0[0xd4];
+    unsigned short damage;             // +0xd4, the default damage
+    char unknown_d6[0xdc - 0xd6];
+    int range;                         // +0xdc
+    char unknown_e0[0x10a - 0xe0];
+    unsigned char index;               // +0x10a, the weapon's number in the definitions
+    char unknown_10b[0x111 - 0x10b];
     union {
         unsigned int flags;            // +0x111
         unsigned char flags8;          // the same byte, read as a byte in 0x40b7b0
@@ -168,15 +174,6 @@ static inline Vec3 MakeVec3(int x, int y, int z)
 struct Point16 {
     short x;
     short y;
-};
-
-struct Sub_00409520 {
-    char unknown_0[0xd4];
-    unsigned short damage;             // +0xd4
-    char unknown_d6[6];
-    int range;                         // +0xdc
-    char unknown_e0[0x2a];
-    char index;                        // +0x10a
 };
 
 // A 32-bit word of bits, tested by unit type id.
@@ -1424,9 +1421,9 @@ int __stdcall RateWeapons(UnitDef* p)
     int result = 1;
     if (((Flags245*)&p->flags2)->flag4)
         result = 0xb;
-    Sub_00409520** pp = (Sub_00409520**)p->weapons;
+    WeaponDef** pp = (WeaponDef**)p->weapons;
     for (int i = 3; i != 0; i--) {
-        Sub_00409520* s = *pp;
+        WeaponDef* s = *pp;
         if (s->index != 0)
             result = result + s->damage / 40 + s->range / 100 + 5;
         pp++;
@@ -1450,9 +1447,9 @@ int __stdcall RateUnitType(UnitDef* p)
     int extra = 1;
     if (((Flags245*)&p->flags2)->flag4)
         extra = 0xb;
-    Sub_00409520** pp = (Sub_00409520**)p->weapons;
+    WeaponDef** pp = (WeaponDef**)p->weapons;
     for (int i = 3; i != 0; i--) {
-        Sub_00409520* s = *pp;
+        WeaponDef* s = *pp;
         if (s->index != 0)
             extra = extra + s->damage / 40 + s->range / 100 + 5;
         pp++;
