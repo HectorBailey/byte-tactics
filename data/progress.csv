@@ -2537,11 +2537,11 @@ address,size,file,symbol,status,similarity
 0x4b7e00,33,src/util/commands.cpp,?AssignEntry@CommandEntry@@QAEPAXPAH@Z,matched,100.0
 0x4b7e30,33,src/util/commands.cpp,??0CommandEntry@@QAE@ABV0@@Z,matched,100.0
 0x4b7e60,121,src/graphics/gaf.cpp,?ClipRects@@YGXPAURect@@00@Z,matched,100.0
-0x4b7ee0,23,src/graphics/gaf.cpp,?GetGafSequenceFrame@@YGHPAUHandle_004b7ee0@@@Z,matched,100.0
-0x4b7f00,39,src/graphics/gaf.cpp,?SetGafSequenceFrame@@YGHPAUObj_004b7f00@@H@Z,matched,100.0
+0x4b7ee0,23,src/graphics/gaf.cpp,?GetGafSequenceFrame@@YGHPAUHandle@@@Z,matched,100.0
+0x4b7f00,39,src/graphics/gaf.cpp,?SetGafSequenceFrame@@YGHPAUHandle@@H@Z,matched,100.0
 0x4b7f30,36,src/graphics/gaf.cpp,?GetGafFrame@@YGHPAGH@Z,matched,100.0
 0x4b7f60,12,src/graphics/gaf.cpp,?GetGafFrameCount@@YGGPAX@Z,matched,100.0
-0x4b7f70,32,src/graphics/gaf.cpp,?GetGafFrameDuration@@YGGPAUObj_004b7f70@@@Z,matched,100.0
+0x4b7f70,32,src/graphics/gaf.cpp,?GetGafFrameDuration@@YGGPAUHandle@@@Z,matched,100.0
 0x4b7f90,439,src/graphics/gaf.cpp,?DrawFrame@@YGXPAUSurface@@PAUGafFrame@@HH@Z,matched,100.0
 0x4b8150,436,src/graphics/gaf.cpp,?DrawFrameOpaque@@YGXPAUSurface@@PAUGafFrame@@HH@Z,matched,100.0
 0x4b8310,484,src/graphics/gaf.cpp,?DrawFrameLit@@YGXPAUSurface@@PAUGafFrame@@HHH@Z,matched,100.0
@@ -2550,8 +2550,8 @@ address,size,file,symbol,status,similarity
 0x4b88d0,427,src/graphics/gaf.cpp,?EraseFrameDithered@@YGXPAUSurface@@PAUGafFrame@@HHH@Z,matched,100.0
 0x4b8a80,89,src/graphics/gaf.cpp,?SurfaceFromFrame@@YGXPAUSurface@@PAUGafFrame@@@Z,matched,100.0
 0x4b8ae0,69,src/graphics/gaf.cpp,?FrameFromSurface@@YGXPAUGafFrame@@PAUSurface@@@Z,matched,100.0
-0x4b8b30,81,src/graphics/gaf.cpp,?InitGafSequence@@YGXPAURef_004b8b30@@PAUSrc_004b8b30@@H@Z,matched,100.0
-0x4b8b90,91,src/graphics/gaf.cpp,?StepGafSequence@@YGHPAURef_004b8b30@@@Z,matched,100.0
+0x4b8b30,81,src/graphics/gaf.cpp,?InitGafSequence@@YGXPAUHandle@@PAUGafEntry@@H@Z,matched,100.0
+0x4b8b90,91,src/graphics/gaf.cpp,?StepGafSequence@@YGHPAUHandle@@@Z,matched,100.0
 0x4b8bf0,101,src/graphics/gaf.cpp,?AdvanceGafSequence@@YGXPAURef_004b8bf0@@F@Z,matched,100.0
 0x4b8c60,216,src/graphics/gaf.cpp,?LoadGaf@@YGPAXPAD@Z,matched,100.0
 0x4b8d40,85,src/graphics/gaf.cpp,?FindGafEntry@@YGPAUGafEntry_004b8d40@@PAUGaf_004b8d40@@PBD@Z,matched,100.0
