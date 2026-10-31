@@ -189,6 +189,9 @@ struct Game {
 
 #include "../units/movement_class.h"
 
+// Not util/fixed.h: the whole half is read through the named member `p`, and on
+// the header's anonymous halves CanBuildAt (0x47d2e0) drops to 98.7%; padding up
+// to 160 ids does not bring it back.
 union Fixed {
     int value;
     int v;
