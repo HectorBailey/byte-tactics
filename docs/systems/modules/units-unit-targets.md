@@ -6,7 +6,7 @@ Module group: `units/unit_targets`, from `0x489280` through the boundary before 
 
 ## 1. References protect reusable unit slots
 
-A [UnitRef](../../../src/units/unit_ref.h) is a 0x10-byte node containing a virtual-table pointer, referenced unit, next-node link and optional listener. Units keep the head of their incoming-reference list at +0xa2. The field called owner on the reference means the unit being referenced, not the unit's player.
+A unit reference, [PathOrderAttach](../../../src/orders/path_order_attach.h) (once also declared as `UnitRef`), is a 0x10-byte node containing a virtual-table pointer, referenced unit, next-node link and optional listener. Units keep the head of their incoming-reference list at +0xa2. The field called owner on the reference means the unit being referenced, not the unit's player.
 
 `LinkToUnit`, `0x489540`, prepends to a nonnull unit whose definition index is nonzero. Otherwise it clears the reference. It does not first unlink an existing association. `UnlinkFromUnit`, `0x489580`, searches the current owner's chain, reconnects the predecessor and clears the node. The search assumes list membership and does not handle a missing node as a separate failure case.
 
