@@ -3141,9 +3141,9 @@ address,size,file,symbol,status,similarity
 0x4dddf0,126,src/debug/debug_lib.cpp,?Allocate@BlockMapAllocator@@QAEPAXI@Z,matched,100.0
 0x4dde70,132,src/debug/debug_lib.cpp,?NextNode@BlockMapIter@@QAEXXZ,matched,100.0
 0x4ddf00,158,src/debug/debug_lib.cpp,??0LoadedImage@@QAE@PAX@Z,matched,100.0
-0x4ddfa0,63,src/debug/debug_lib.cpp,?GetFpoRecords@LoadedImage@@QAEPAUFpo_004de020@@XZ,matched,100.0
+0x4ddfa0,63,src/debug/debug_lib.cpp,?GetFpoRecords@LoadedImage@@QAEPAU_FPO_DATA@@XZ,matched,100.0
 0x4ddfe0,57,src/debug/debug_lib.cpp,?GetFpoRecordCount@LoadedImage@@QAEIXZ,matched,100.0
-0x4de020,125,src/debug/debug_lib.cpp,?FindFpoRecord@LoadedImage@@QAEPAUFpo_004de020@@I@Z,matched,100.0
+0x4de020,125,src/debug/debug_lib.cpp,?FindFpoRecord@LoadedImage@@QAEPAU_FPO_DATA@@I@Z,matched,100.0
 0x4de0a0,70,src/debug/debug_lib.cpp,?FunctionTableAccess@@YGXHI@Z,matched,100.0
 0x4de0f0,10,src/debug/debug_lib.cpp,?CloseLoadedImage@@YGXXZ,matched,100.0
 0x4de100,8,src/debug/debug_lib.cpp,?GetModuleBase@@YGXHH@Z,matched,100.0

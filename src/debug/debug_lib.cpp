@@ -3712,14 +3712,8 @@ public:
     void CloseMappedFile();
 };
 
-// One FPO_DATA record (see 0x4de020).
-struct Fpo_004de020 {
-    unsigned int offStart;             // +0x0
-    unsigned int procSize;             // +0x4
-    unsigned int locals;               // +0x8
-    unsigned short params;             // +0xc
-    unsigned short flags;              // +0xe
-};
+// The records 0x4de020 binary-searches are the image's FPO table, so they are
+// FPO_DATA from <winnt.h> (16 bytes, as the record count's sizeof reads them).
 
 class LoadedImage : public MappedFile {
 public:
@@ -3732,9 +3726,9 @@ public:
 
     LoadedImage(HMODULE m);
     ~LoadedImage();
-    Fpo_004de020* GetFpoRecords();
+    FPO_DATA* GetFpoRecords();
     unsigned int GetFpoRecordCount();
-    Fpo_004de020* FindFpoRecord(unsigned int address);
+    FPO_DATA* FindFpoRecord(unsigned int address);
 };
 
 // The loaded-image reader of the debug library; 0x4de0a0's function-local
@@ -3772,13 +3766,13 @@ LoadedImage::LoadedImage(HMODULE m) : MappedFile(0)
 // The original calls this out of line from 0x4de020.
 #pragma auto_inline(off)
 // FUNCTION: 0x4ddfa0
-Fpo_004de020* LoadedImage::GetFpoRecords()
+FPO_DATA* LoadedImage::GetFpoRecords()
 {
     if (debugDirs == 0)
         return 0;
     for (int i = 0; i < numDebugDirs; i++) {
         if (debugDirs[i].Type == IMAGE_DEBUG_TYPE_FPO)
-            return (Fpo_004de020*)((char*)view + debugDirs[i].PointerToRawData);
+            return (FPO_DATA*)((char*)view + debugDirs[i].PointerToRawData);
     }
     return 0;
 }
@@ -3793,32 +3787,32 @@ unsigned int LoadedImage::GetFpoRecordCount()
         return 0;
     for (int i = 0; i < numDebugDirs; i++) {
         if (debugDirs[i].Type == 3)
-            return debugDirs[i].SizeOfData / sizeof(Fpo_004de020);
+            return debugDirs[i].SizeOfData / sizeof(FPO_DATA);
     }
     return 0;
 }
 #pragma auto_inline(on)
 
 // FUNCTION: 0x4de020
-Fpo_004de020* LoadedImage::FindFpoRecord(unsigned int address)
+FPO_DATA* LoadedImage::FindFpoRecord(unsigned int address)
 {
-    Fpo_004de020* first = GetFpoRecords();
+    FPO_DATA* first = GetFpoRecords();
     if (first == 0)
         return 0;
     int n = GetFpoRecordCount();
     if (n == 0)
         return 0;
-    Fpo_004de020* last = first + n;
-    Fpo_004de020* mid = first + n / 2;
+    FPO_DATA* last = first + n;
+    FPO_DATA* mid = first + n / 2;
     unsigned int rva = address - imageBase;
     while (first + 1 != last) {
-        if (rva < mid->offStart)
+        if (rva < mid->ulOffStart)
             last = mid;
         else
             first = mid;
         mid = first + (last - first) / 2;
     }
-    if (rva >= first->offStart && rva < first->offStart + first->procSize)
+    if (rva >= first->ulOffStart && rva < first->ulOffStart + first->cbProcSize)
         return first;
     return 0;
 }
