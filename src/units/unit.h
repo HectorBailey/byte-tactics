@@ -71,12 +71,9 @@ struct Unit {
     float buildLeft;                   // +0x104
     short health;                      // +0x108
     int sfxOccupy;                     // +0x10a, Thaldren's nSfxOccupy
-    // The script's activation and COB state bits, one bit each: a bit test
-    // rather than a byte compare, which is what the original codegen does.
-    unsigned char on : 1;              // +0x10e bit 0
-    unsigned char on2 : 1;             // +0x10e bit 1
-    unsigned char cloaked : 1;         // +0x10e bit 2, the cloak range ring
-    unsigned char unknown_10e : 5;
+    // The script's activation bits: bit 0 on, bit 1 on2, bit 2 the cloak range
+    // ring. One byte, as the files that pass it whole read it.
+    unsigned char activateFlags;       // +0x10e
     unsigned char bit0 : 1;            // +0x10f bit 0
     unsigned char bit1 : 1;
     unsigned char bit2 : 1;
@@ -109,7 +106,9 @@ struct Unit {
     int CanRepair(Unit* other);
     int CountCargo();
     int CanLoad(Unit* other);
-    void SetStateBits(int mask, int set);
+    // The callers pass the mask as a byte, with no zero extension, so it is an
+    // unsigned char here; unit.cpp's definition reads it as an int.
+    void SetStateBits(unsigned char mask, int set);
 };
 
 #pragma pack(pop)
