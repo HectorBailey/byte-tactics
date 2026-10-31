@@ -2144,7 +2144,7 @@ address,size,file,symbol,status,similarity
 0x49fa50,17,src/gui/gui.cpp,?EnableKeyCommands@@YGXPAUDialog@@@Z,matched,100.0
 0x49fa70,17,src/gui/gui.cpp,?DisableKeyCommands@@YGXPAUDialog@@@Z,matched,100.0
 0x49fa90,17,src/gui/gui.cpp,?MarkChanged@@YGXPAUDialog@@@Z,matched,100.0
-0x49fab0,17,src/gui/gui.cpp,?ClearChanged@@YGXPAX@Z,matched,100.0
+0x49fab0,17,src/gui/gui.cpp,?ClearChanged@@YGXPAUDialog@@@Z,matched,100.0
 0x49fad0,21,src/gui/gui.cpp,?MarkLayerChanged@@YGXPAUDialog@@@Z,matched,100.0
 0x49faf0,17,src/gui/gui.cpp,?ClearLayerChanged@@YGXPAUDialog@@@Z,matched,100.0
 0x49fb10,21,src/gui/gui.cpp,?SetKeyboardInput@@YGXHH@Z,matched,100.0
