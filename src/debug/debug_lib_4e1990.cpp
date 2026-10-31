@@ -6,12 +6,12 @@
 // hidden pointer.
 #include <windows.h>
 
-class CritSec_004e1ac0 {
+class NameTableLock {
 public:
     CRITICAL_SECTION cs;
 };
 
-CritSec_004e1ac0* GetNameTableLock();
+NameTableLock* GetNameTableLock();
 
 // The key: a C string ordered by strcmp.
 class NameKey {
@@ -78,7 +78,7 @@ public:
 // FUNCTION: 0x4e1990
 void NameTable::Upsert(const NameKey& key)
 {
-    CritSec_004e1ac0* lock = GetNameTableLock();
+    NameTableLock* lock = GetNameTableLock();
     EnterCriticalSection(&lock->cs);
     Iter_004e1990 it = Find(key);
     if (it != End())

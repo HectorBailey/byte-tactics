@@ -3083,7 +3083,7 @@ address,size,file,symbol,status,similarity
 0x4da540,65,src/debug/debug_lib.cpp,?CreateDialogFromTemplate@@YAPAXHPAXP6GHXZJ@Z,matched,100.0
 0x4da590,27,src/debug/debug_lib.cpp,?GetFileNameFromPath@@YAPADPAD@Z,matched,100.0
 0x4da5b0,460,src/debug/debug_lib.cpp,?OpenUrl@@YAXPAXPAD1@Z,matched,100.0
-0x4da780,50,src/debug/debug_lib.cpp,?GetAllocLock@@YGPAVCritSec_004da780@@XZ,matched,100.0
+0x4da780,50,src/debug/debug_lib.cpp,?GetAllocLock@@YGPAVAllocLock@@XZ,matched,100.0
 0x4da7c0,1,src/debug/debug_lib.cpp,?AllocLockAtexitHandler@@YGXXZ,matched,100.0
 0x4da7d0,109,src/debug/debug_lib.cpp,?CountAlloc@@YAXI@Z,matched,100.0
 0x4da840,30,src/debug/debug_lib.cpp,?CountFree@@YAXH@Z,matched,100.0
@@ -3203,7 +3203,7 @@ address,size,file,symbol,status,similarity
 0x4e1a30,80,src/debug/debug_lib.cpp,?LessThan@NameKey@@QBE_NABV1@@Z,matched,100.0
 0x4e1a80,14,src/debug/debug_lib.cpp,?GlobalAllocFixed@@YAPAXI@Z,matched,100.0
 0x4e1a90,44,src/debug/debug_lib.cpp,?GetNameTable@@YGPAVNameTable@@XZ,matched,100.0
-0x4e1ac0,50,src/debug/debug_lib.cpp,?GetNameTableLock@@YGPAVCritSec_004e1ac0@@XZ,matched,100.0
+0x4e1ac0,50,src/debug/debug_lib.cpp,?GetNameTableLock@@YGPAVNameTableLock@@XZ,matched,100.0
 0x4e1b00,1,src/debug/debug_lib.cpp,?NameTableLockAtexitHandler@@YGXXZ,matched,100.0
 0x4e1b10,195,src/debug/debug_lib.cpp,?SyncPerformanceSettings@@YAXH@Z,matched,100.0
 0x4e1be0,305,src/debug/debug_lib.cpp,?InitPerformanceEvents@@YGXXZ,matched,100.0

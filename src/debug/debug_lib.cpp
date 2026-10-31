@@ -213,8 +213,8 @@ void __cdecl GameAllocIgnoreTag(unsigned int name, unsigned int size)
     GameAlloc(size);
 }
 
-class CritSec_004da780;
-CritSec_004da780* GetAllocLock();
+class AllocLock;
+AllocLock* GetAllocLock();
 void* __cdecl AllocDebugBlock(unsigned int size, int flags);
 void __cdecl CountAlloc(unsigned int size);
 extern void (*g_outOfMemoryHandler)();
@@ -1353,20 +1353,20 @@ failed:
 // use. The empty inline destructor makes MSVC register the empty atexit
 // thunk AllocLockAtexitHandler.
 
-class CritSec_004da780 {
+class AllocLock {
 public:
     CRITICAL_SECTION cs;
 
-    CritSec_004da780() { InitializeCriticalSection(&cs); }
-    ~CritSec_004da780() {}
+    AllocLock() { InitializeCriticalSection(&cs); }
+    ~AllocLock() {}
 };
 
 // The original calls this out of line from the allocator, the block map and the trees.
 #pragma auto_inline(off)
 // FUNCTION: 0x4da780
-CritSec_004da780* GetAllocLock()
+AllocLock* GetAllocLock()
 {
-    static CritSec_004da780 lock;
+    static AllocLock lock;
     return &lock;
 }
 #pragma auto_inline(on)
@@ -2246,7 +2246,7 @@ typedef void (Vec_004dd8c0::*InsertFn_004dd8c0)(
 char IsMemFussy();
 char IsBackAlign();
 int GetDebugFillPattern();
-CritSec_004da780* GetAllocLock();
+AllocLock* GetAllocLock();
 void* GetBlockMap();
 Container_004da9f0<int>* GetFreedBlockRing();
 unsigned int __cdecl RoundUpToPage(unsigned int size);
@@ -4790,8 +4790,8 @@ public:
     CRITICAL_SECTION cs;
 };
 
-class CritSec_004e1ac0;
-CritSec_004e1ac0* GetNameTableLock();
+class NameTableLock;
+NameTableLock* GetNameTableLock();
 
 struct Node_004e18c0 {
     Node_004e18c0* left;               // +0x0
@@ -5678,12 +5678,12 @@ BOOL __stdcall MemoryStatusDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 
 // Returns a critical section that is initialised on first use (a
 // function-local static; its atexit destructor 0x4e0730 is empty).
-class CritSec_004e06f0 {
+class MemStatusLock {
 public:
     CRITICAL_SECTION cs;
 
-    CritSec_004e06f0() { InitializeCriticalSection(&cs); }
-    ~CritSec_004e06f0() {}
+    MemStatusLock() { InitializeCriticalSection(&cs); }
+    ~MemStatusLock() {}
 };
 
 // The original calls this from 0x4e0740, 0x4e0790 and FormatWorkingSet
@@ -5692,7 +5692,7 @@ public:
 // FUNCTION: 0x4e06f0
 LPCRITICAL_SECTION GetMemStatusLock(void)
 {
-    static CritSec_004e06f0 lock;
+    static MemStatusLock lock;
     return &lock.cs;
 }
 #pragma auto_inline(on)
@@ -6124,15 +6124,15 @@ void Class_004e18c0::Clear()
 }
 #pragma auto_inline(on)
 
-class CritSec_004e1ac0 {
+class NameTableLock {
 public:
     CRITICAL_SECTION cs;
 
-    CritSec_004e1ac0() { InitializeCriticalSection(&cs); }
-    ~CritSec_004e1ac0() {}
+    NameTableLock() { InitializeCriticalSection(&cs); }
+    ~NameTableLock() {}
 };
 
-CritSec_004e1ac0* GetNameTableLock();
+NameTableLock* GetNameTableLock();
 
 // 0x4e1990 (src/debug/debug_lib_4e1990.cpp) stays in its own file: this merge
 // would make NameKey::LessThan (0x4e1a30, below) inlinable at its call
@@ -6176,9 +6176,9 @@ NameTable* GetNameTable()
 // The original calls this from 0x4e1990 rather than inlining it.
 #pragma auto_inline(off)
 // FUNCTION: 0x4e1ac0
-CritSec_004e1ac0* GetNameTableLock()
+NameTableLock* GetNameTableLock()
 {
-    static CritSec_004e1ac0 lock;
+    static NameTableLock lock;
     return &lock;
 }
 #pragma auto_inline(on)
