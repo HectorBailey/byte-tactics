@@ -597,8 +597,7 @@ int __stdcall DrawUnitStateProbe(void* surface)
 
     if (g_game->unitInfoHoverTrack == 0 || g_game->unitInfoHoverUnitId == 0)
         return 0;
-    unit = (Unit*)(*(int*)((char*)g_game + 0x14357)
-                            + g_game->unitInfoHoverUnitId * 0x118);
+    unit = &g_game->units[g_game->unitInfoHoverUnitId];
     if ((unit->flags & 0x10000000) == 0 || (unit->flags & 0x4000) != 0) {
         g_game->unitInfoHoverTrack = 0;
         g_game->unitInfoHoverUnitId = 0;
@@ -981,7 +980,7 @@ void __stdcall DrawHitPointBar(void* surface, Unit* unit, int x, int y)
 // FUNCTION: 0x46a530
 void __stdcall DrawSelectionBox(Vec3* view, Unit* unit)
 {
-    Flags_0046a530* f = (Flags_0046a530*)((char*)g_game + 0x37f2f);
+    Flags_0046a530* f = (Flags_0046a530*)&g_game->uiOptionFlags;
     if (f->flag) {
         Vec3 lo;
         Vec3 hi;
@@ -1044,7 +1043,7 @@ void __stdcall DrawProfileBarLine(int surface, const char* text, int index)
 // FUNCTION: 0x46b9d0
 void __stdcall DrawMapTileSelectionOutline(void* surface, short* pos, Size_0046b9d0 size, int kind)
 {
-    unsigned char* colors = (unsigned char*)g_game + 0xdcb;
+    unsigned char* colors = g_game->colors;
     int h = GetCellHeight(pos);
     int y1 = (pos[1] << 4) - g_game->scrollY;
     int x1 = ((pos[0] + 8) << 4) - g_game->scrollX;
@@ -1075,13 +1074,6 @@ void __stdcall DrawClosedPolygon(void* surface, Point* points, int count, int co
     }
     DrawLine(surface, points->x, points->y, p->x, p->y, color);
 }
-
-// Unused here: real zero-argument functions whose symbol ids keep
-// DrawModel3doProjected's allocation after the Surface view became surface.h
-// (docs/c2-regalloc.md).
-void ResetCameraState(void);
-void ClampCameraPosition(void);
-void ClampCameraTarget(void);
 
 // Draws a piece of a 3D model: projects obj->count vertices through
 // RotateByAngles (the same rotate/project idiom as the matched 0x467a50) into
