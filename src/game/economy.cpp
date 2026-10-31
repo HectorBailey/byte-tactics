@@ -46,22 +46,15 @@ struct UnitInfo {
 
 #include "../units/unit.h"
 
-struct Game {
-    char unknown_0[0x1b63];
-    Player players[10];                // +0x1b63
-    char unknown_2851[0x14267 - 0x2851];
-    float tidal;                       // +0x14267
-    char unknown_1426b[0x37ede - 0x1426b];
-    float windFraction;                // +0x37ede
-    char unknown_37ee2[0x37eee - 0x37ee2];
-    int difficulty;                    // +0x37eee
-    char unknown_37ef2[0x38a47 - 0x37ef2];
-    unsigned int gameTick;             // +0x38a47
-};
+#include "game.h"
 #pragma pack(pop)
 
 // GLOBAL: 0x511de8
 extern Game* g_game;
+
+// Unused here: these headers' symbol ids keep 0x401320 matching (docs/c2-regalloc.md).
+#include "../map/mission.h"
+#include "../sound/sound.h"
 
 // Calls a destructor-like member function on each of `count` objects of
 // `stride` bytes, last to first (the counterpart of 0x401000).
