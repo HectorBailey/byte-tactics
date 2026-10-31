@@ -22,13 +22,7 @@ void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 
 #include "../game/game.h"
 
-union Fixed_437840 {
-    int value;
-    struct {
-        unsigned short fraction;
-        short whole;
-    } parts;
-};
+#include "../util/fixed.h"
 
 struct Chunk_00437a30 {
     void** owner;                      // +0x0
@@ -158,20 +152,20 @@ Cell* __stdcall GetMapCell(int x, int y);
 void __stdcall UpdateMetalExtraction(Unit* unit)
 {
     if (unit->def->extractsMetal > 0.0f) {
-        Fixed_437840 total;
+        Fixed total;
         total.value = 0;
         Point16 fp = unit->footprint;
         for (int y = unit->cell.y; y < unit->cell.y + fp.y; y++) {
             for (int x = unit->cell.x; x < unit->cell.x + fp.x; x++) {
                 Cell* c = GetMapCell(x, y);
                 if (c) {
-                    total.parts.whole += c->metal + 1;
+                    total.whole += c->metal + 1;
                 }
             }
         }
         unit->extraction = unit->def->extractsMetal * 1.52587890625e-05 * (float)total.value;
         if (unit->script)
-            unit->script->StartScriptWithArgs("SetSpeed", 0, 0, 1, total.parts.whole, 0, 0, 0);
+            unit->script->StartScriptWithArgs("SetSpeed", 0, 0, 1, total.whole, 0, 0, 0);
     }
 }
 
