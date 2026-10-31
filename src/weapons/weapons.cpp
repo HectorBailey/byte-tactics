@@ -148,7 +148,9 @@ union Fba_0049e1a0 {
     unsigned char b[2];
 };
 
-// 499a30's fixed-point position view (Unit below holds it beside Vec3).
+// 499a30's fixed-point position view (Unit below holds it beside Vec3). This is
+// Fixed's 16.16 value; it stays separate because the symbol ids after it decide
+// 0x49aa80, 0x49b090 and 0x49be60 (docs/c2-regalloc.md).
 union Fixed_0049abb0 {
     int value;                                      // 16.16 fixed point
     struct {
@@ -831,7 +833,8 @@ struct Vec3_0049a120 {
     int z;                             // +0x8
 };
 
-// A 16.16 fixed-point value and its whole part.
+// A 16.16 fixed-point value and its whole part: Fixed's value again, kept
+// separate where 0x49aa80, 0x49b090 and 0x49be60 need the declarations.
 union Fixed_0049a120 {
     int raw;
     struct {
@@ -1077,6 +1080,7 @@ void UpdateEdgeScroll();
 // order in the height check; both are already included above.
 #pragma pack(push, 1)
 
+// Fixed's 16.16 value again, kept separate where 0x49aa80 negates it.
 union Fixed_0049aa80 {
     int value;
     struct { unsigned short fraction; short whole; } parts;
@@ -1430,6 +1434,7 @@ struct Unit_0049b520 {
 };
 
 // 16.16 value in a 4 byte union: an 8 byte one (or short[4]) changes the frame.
+// Fixed's value again, kept here where 0x49b520 needs the declarations.
 union Fixed_0049b520 {
     int value;
     struct { unsigned short fraction; short whole; };
@@ -2185,31 +2190,20 @@ int __stdcall CalcAimAngles(Unit* unit, Unit* target, short* out_heading, short*
     return 1;
 }
 
-#pragma pack(push, 1)
-struct Aim_0049d9c0 {
-    char unknown_0[0xc];
-    WeaponDef* type;                  // +0xc
-    char unknown_10[0x16 - 0x10];
-    short fireHeading;                // +0x16
-    short firePitch;                  // +0x18
-    char unknown_1a;
-    unsigned char weapon;             // +0x1b
-};
-
 // Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
 void Unused_0049d9c0(int a, int b, int c, int d, int e, int f);
-#pragma pack(pop)
 
-int __stdcall AimWithinTolerance(Unit* unit, Aim_0049d9c0* aim, short angle1, short angle2);
-int __stdcall FireLineOfSightProjectile(Aim_0049d9c0* aim, Unit* unit, Vec3* aimPos,
+// This call hands 0x49c9c0 a target unit, where its own definition takes the
+// fifth parameter as an int.
+int __stdcall FireLineOfSightProjectile(UnitWeaponSlot* aim, Unit* unit, Vec3* aimPos,
                            Vec3* point, Unit* target);
 
 // FUNCTION: 0x49d9c0
-int __stdcall FireLineOfSightWeapon(Unit* unit, Aim_0049d9c0* aim,
+int __stdcall FireLineOfSightWeapon(Unit* unit, UnitWeaponSlot* aim,
                            Unit* target, Vec3* point)
 {
     Vec3 p;
-    GetWeaponPiecePosition(unit, &p, aim->weapon >> 2 & 3, -1);
+    GetWeaponPiecePosition(unit, &p, aim->flags >> 2 & 3, -1);
     int dx = p.x - point->x;
     Fixed dy;
     dy.value = p.y - point->y;
@@ -2224,8 +2218,8 @@ int __stdcall FireLineOfSightWeapon(Unit* unit, Aim_0049d9c0* aim,
                 msg.type = 0xd;
                 msg.origin = unit->pos;
                 msg.aimOrVel = *point;
-                msg.weaponDefIndex = aim->type->index;
-                msg.weaponSlotIndex = aim->weapon >> 2 & 3;
+                msg.weaponDefIndex = aim->weapon->index;
+                msg.weaponSlotIndex = aim->flags >> 2 & 3;
                 // if/else testing the unit, not a ternary: the ternary flips the branches.
                 if (unit == 0)
                     msg.ownerUnitId = 0;
@@ -2234,7 +2228,7 @@ int __stdcall FireLineOfSightWeapon(Unit* unit, Aim_0049d9c0* aim,
                 msg.targetUnitId = target ? target->id : 0;
                 msg.fireHeading = aim->fireHeading;
                 msg.firePitch = aim->firePitch;
-                msg.flag = aim->type->flags.value >> 30;
+                msg.flag = aim->weapon->flags.value >> 30;
                 BroadcastPacket(unit->player->id, &msg, 0x24);
             }
             return 1;
@@ -2327,29 +2321,17 @@ int __stdcall FireVLaunchWeapon(Object_0049db70* source, Shot_0049db70* shot,
     return 0;
 }
 
-#pragma pack(push, 1)
-struct Aim_0049dd60 {
-    char unknown_0[0xc];
-    WeaponDef* type;
-    char unknown_10[0x16 - 0x10];
-    short fireHeading;
-    short firePitch;
-    char unknown_1a;
-    unsigned char weapon;
-};
-
 // Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
 void Unused_0049dd60(int a, int b, int c, int d, int e, int f);
-#pragma pack(pop)
 
 void __stdcall InitProjectile(Projectile*, WeaponDef*, Vec3*, int, int, Unit*);
 
 // FUNCTION: 0x49dd60
-int __stdcall FireDroppedWeapon(Unit* unit, Aim_0049dd60* aim,
+int __stdcall FireDroppedWeapon(Unit* unit, UnitWeaponSlot* aim,
                            Unit* target, Vec3* point)
 {
     Vec3 p;
-    GetWeaponPiecePosition(unit, &p, aim->weapon >> 2 & 3, -1);
+    GetWeaponPiecePosition(unit, &p, aim->flags >> 2 & 3, -1);
     Projectile* projectile = 0;
     if (g_game->projectile_count < 300) {
         projectile = &((Projectile*)g_game->projectiles)[g_game->projectile_count++];
@@ -2357,7 +2339,7 @@ int __stdcall FireDroppedWeapon(Unit* unit, Aim_0049dd60* aim,
         projectile->targetUnit = 0;
     }
     if (projectile != 0) {
-        InitProjectile(projectile, aim->type, &p, 0, g_game->gameTick, unit);
+        InitProjectile(projectile, aim->weapon, &p, 0, g_game->gameTick, unit);
         projectile->heading = unit->heading;
         projectile->speed = 0;
         projectile->velY = 0;
@@ -2368,8 +2350,8 @@ int __stdcall FireDroppedWeapon(Unit* unit, Aim_0049dd60* aim,
             packet.type = 0xd;
             packet.origin = p;
             packet.aimOrVel = *point;
-            packet.weaponDefIndex = aim->type->index;
-            packet.weaponSlotIndex = aim->weapon >> 2 & 3;
+            packet.weaponDefIndex = aim->weapon->index;
+            packet.weaponSlotIndex = aim->flags >> 2 & 3;
             if (unit == 0)
                 packet.ownerUnitId = 0;
             else
@@ -2380,7 +2362,7 @@ int __stdcall FireDroppedWeapon(Unit* unit, Aim_0049dd60* aim,
                 packet.targetUnitId = target->id;
             packet.fireHeading = aim->fireHeading;
             packet.firePitch = aim->firePitch;
-            packet.flag = aim->type->flags.value >> 30;
+            packet.flag = aim->weapon->flags.value >> 30;
             BroadcastPacket(unit->player->id, &packet, 0x24);
         }
         return 1;
@@ -2822,6 +2804,16 @@ void __stdcall CheckProjectileCollision(WeaponDef* type, Proj_0049b090* proj)
 // FUNCTION: 0x49e610 _$E5
 // FUNCTION: 0x49e630 _$E3
 TdfFile g_tdfGlobalParser;
+
+// Unused here: the symbol ids these declarations take keep 0x49be60 matching (docs/c2-regalloc.md).
+void EmptyMainLoopHook(void);
+void EmptyMainLoopHook_B(void);
+void EmptyMainLoopHook_C(void);
+void ProtectUnitDefsReadOnly(void);
+void ProtectUnitDefsReadWrite(void);
+void CheckGpfVersion(void);
+void LoadGameResources(void);
+void FreeAnimFiles(void);
 
 // 0x49be60 sits after the TdfFile global: its palette and scroll register plan
 // follows the symbol ids.
