@@ -89,7 +89,8 @@ static inline void UnlockMain(LONG held)
 }
 
 // Blits the cursor's current frame at its position when the cursor is
-// visible (count <= 0) and the mouse thread does not own the blit (mode != 1).
+// visible (cursorHideCount <= 0) and the mouse thread does not own the blit
+// (cursorThreadEnabled != 1).
 // FUNCTION: 0x4c2380
 void DrawSoftwareCursor()
 {
