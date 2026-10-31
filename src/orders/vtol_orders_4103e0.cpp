@@ -20,9 +20,7 @@ struct Order;
 
 #pragma pack(push, 1)
 struct WeaponDef { char pad0[0xdc]; int range; char pade0[0x111-0xe0]; unsigned int flags; };
-struct Weapon { char pad0[8]; WeaponDef* def; char padc[11]; unsigned char flags; char pad18[4]; };
 #include "../units/unit_def.h"
-struct Owner { char pad0[0x108]; unsigned char allied[0x3e]; unsigned char index; };
 #include "unit_motion.h"
 // Unused here: real forward declarations whose symbol ids keep 0x4103e0 matching (docs/c2-regalloc.md).
 class BitWriter;
@@ -31,28 +29,9 @@ class ScoutTimer;
 class EscortTimer;
 class AssaultTimer;
 class SquadManager;
-struct Unit {
-    UnitMotion* motion; char pad4[4]; Weapon weapons[3]; Order* list;
-    char pad60[10]; Vec3 pos; char pad76[8]; Point16 footprint; int spatialBucket; int carrier;
-    char pad8a[8]; UnitDef* def; Owner* player; char pad9a[12]; unsigned short unitDefIndex;
-    char pada8[0xf0-0xa8]; Unit* attacker; char padf4[0x108-0xf4]; short health;
-    char pad10a[6]; unsigned int flags;
-    void ReleaseWeapons(int);
-    int CanRepair(Unit*);
-    void ClaimWeapons(int);
-    void SetStateBits(int, int);
-};
+#include "../units/unit.h"
+#include "../network/player.h"
 #include "order.h"
-
-// Unused here: forward declarations of real functions; their symbol ids keep
-// VtolSeekAttackOrder matching (docs/c2-regalloc.md).
-void UpdateMouseScroll();
-void UpdateEdgeScroll();
-void CenterCameraOnRadarClick();
-void CenterCameraOnStartPosition();
-void RegisterDataArchives();
-void CreateGameObject();
-void InitMissionStatus();
 
 // The order object the vtol orders build: PathOrder, the class order_targets.cpp
 // defines. The constructor keeps that definition's argument types so the call
@@ -64,7 +43,7 @@ public:
     void SetApproachRadius(int);
     void SetAltitude(int);
 };
-struct Game { char pad0[0x1422b]; int width, height; char pad14233[0x142b7-0x14233]; int overflowBucket; };
+struct Game { char pad0[0x1422b]; int width, height; char pad14233[0x142b7-0x14233]; SpatialBucket* overflowBucket; };
 #pragma pack(pop)
 extern Game* g_game;
 // Unused here: real declarations that keep the symbol ids the separate setter
@@ -167,7 +146,7 @@ int __stdcall VtolSeekAttackOrder(Unit* unit, Order* order, int flags)
         Unit* target=FindBestTargetIfFireAtWill(unit);
         if (target && IssueAttackOrder(unit,target,0)) return 5;
         if (flags&0xe0) order->angle+=-RandomInt(0x2000)-0x5555;
-        Vec3 pos=AddVec3(order->pos,Offset((short)order->angle,(unit->weapons[0].def->range+160)<<16));
+        Vec3 pos=AddVec3(order->pos,Offset((short)order->angle,(unit->weapons[0].weapon->range+160)<<16));
         PathOrder* move=new PathOrder(order,pos);
         move->SetApproachRadius(128);
         order->SetAttachedFx((OrderFx*)move);
