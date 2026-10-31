@@ -1191,12 +1191,9 @@ struct DPLCONNECTION {
     DPNAME* playerName;                // +0xc
 };
 
-// The display object of 0x451640 and 0x4517b0: one type for both views.
-struct Obj_00451640 {
-    char unknown_0[0xf0];
-    unsigned short bit0 : 1;
-    unsigned short flag : 1;           // +0xf0, mask 2
-};
+// The display object GetDisplay returns (0x451640 and 0x4517b0 read its
+// fullscreen bit).
+#include "../graphics/display_context.h"
 
 // The LOBBY JOIN INFO block (Thaldren's LOBBY_JOIN_INFO) 0x451640 allocates
 // and its join thread 0x451770 hands to HAPINET_createorjoinlobbygame, named
@@ -1308,7 +1305,7 @@ void ResetPlayerSlots(void);
 int __stdcall HAPINET_joingame(void* net, Guid_4517b0 guid);
 int __stdcall HAPINET_enumplayers(void* net, void* session, void* callback, void* context,
                            unsigned long flags);
-Obj_00451640* GetDisplay(void);
+DisplayContext* GetDisplay(void);
 void ToggleFullScreen(void);
 void __stdcall FatalError(char* msg);
 int __stdcall HAPINET_sendpacket(void* net, unsigned long from, unsigned long to, void* data, unsigned long size);
@@ -1427,7 +1424,7 @@ int __stdcall JoinLobbyGame(Player* p)
         if (h != 0) {
             if (WaitForSingleObject((HANDLE)h, 40000) == WAIT_TIMEOUT) {
                 SetCursorMode(0x13);
-                if (GetDisplay()->flag) {
+                if (GetDisplay()->flags.bits.fullscreen) {
                     ToggleFullScreen();
                     Sleep(500);
                 }
@@ -1523,7 +1520,7 @@ int __stdcall JoinNetGame(Guid_4517b0 guid, int player)
         if (g_game->dplConnection != 0) {
             result = JoinLobbyGame(p);
             if (result == 0) {
-                if (GetDisplay()->flag) {
+                if (GetDisplay()->flags.bits.fullscreen) {
                     ToggleFullScreen();
                     Sleep(500);
                 }
