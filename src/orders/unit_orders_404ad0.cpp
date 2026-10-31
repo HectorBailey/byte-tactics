@@ -71,7 +71,7 @@ int __stdcall ReclaimOrder(Unit* unit, Order* order, int flags)
         pos.x = (size.x + cell.x * 2) << 19;
         pos.z = (size.y + cell.y * 2) << 19;
         pos.y = (RandomInt(f->height) + GetGroundHeight(&pos)) << 16;
-        StartBuildingScript(unit, order, GetHeadingBetween(&unit->pos, &pos) - unit->heading);
+        StartBuildingScript(unit, order, GetHeadingBetween(&unit->pos, &pos) - unit->angles.heading);
         return 1;
     }
     case 2:

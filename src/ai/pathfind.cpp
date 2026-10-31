@@ -1030,7 +1030,7 @@ void Pathfinder::StartSearch(Target* t)
     unsigned int i = grid.Index(start.x, start.y);
     grid.dirty[i >> 8] |= 1 << ((i >> 3) & 0x1f);
     grid.cells[i].flags |= 1;
-    grid.cells[i].dir = ((object->heading + 0x1000) >> 13) & 7;
+    grid.cells[i].dir = ((object->angles.heading + 0x1000) >> 13) & 7;
     grid.cells[i].node = Push(d);
     range = 4;
 }

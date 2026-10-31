@@ -27,14 +27,9 @@ struct Unit {
     float extraction;                  // +0x58
     Order* list;                       // +0x5c
     Order* list2;                      // +0x60
-    union {
-        struct {
-            short bank;                // +0x64
-            unsigned short heading;    // +0x66
-            short pitch;               // +0x68
-        };
-        Angles16 angles;               // +0x64
-    };
+    // Not a union with the three angles: the flag word's union below takes the
+    // 14 symbol ids that one did, so every includer keeps its count (docs/c2-regalloc.md).
+    Angles16 angles;                   // +0x64, bank, heading and pitch
     Vec3 pos;                          // +0x6a
     Point16 cell;                      // +0x76
     short losCacheCellX;               // +0x7a
@@ -87,7 +82,24 @@ struct Unit {
     unsigned char bit2 : 1;
     unsigned char bit3 : 1;
     unsigned char unknown_10f : 4;
-    unsigned int flags;                // +0x110
+    // The state word, as one integer or as its named bits (Thaldren's dwFlags).
+    union {
+        unsigned int flags;            // +0x110
+        struct {
+            unsigned int unknown_110_0 : 4;
+            unsigned int selected : 1;      // bit 4
+            unsigned int unknown_110_5 : 6;
+            unsigned int cloak : 1;         // bit 11, cloaking wanted
+            unsigned int unknown_110_12 : 6;
+            unsigned int moveOrder : 2;     // bits 18-19, the standing move order
+            unsigned int fireOrder : 2;     // bits 20-21, the standing fire order
+            unsigned int buildMenuOpen : 1; // bit 22
+            unsigned int buildMenuPage : 3; // bits 23-25
+            unsigned int unknown_110_26 : 3;
+            unsigned int building : 1;      // bit 29
+            unsigned int unknown_110_30 : 2;
+        };
+    };
     unsigned int zBufferFlag;          // +0x114
 
     unsigned char ChooseWeapon();
