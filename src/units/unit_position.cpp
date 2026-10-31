@@ -96,10 +96,11 @@ public:
     void PrependUnit(int node);
 };
 
-// The block behind +0x9e, of which 0x48b3f0 clears the int at +0x10.
+// The block behind +0x9e (Thaldren's UnitObjectState), of which 0x48b3f0 clears
+// the draw frame at +0x10.
 struct ObjectState {
     char unknown_0[0x10];
-    int field_10;                      // +0x10
+    int drawFrame;                     // +0x10, Thaldren's pDrawFrame
 };
 
 #include "../orders/unit_motion.h"
@@ -619,7 +620,7 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u)
         spawn.tail = u->angles;
         CreateUnitFromPacket((u->angles.bank & ~0xff) | u->playerIndex, &spawn);
     }
-    u->state->field_10 = zero;
+    u->state->drawFrame = zero;
     u->health = reader->ReadBits(0x10);
     // Unsigned into an __int64: gives `fild qword` with no `cdq`.
     __int64 alpha = (unsigned int)reader->ReadBits(8);

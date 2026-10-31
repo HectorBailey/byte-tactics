@@ -37,7 +37,7 @@ struct ObjectState {
     int unknown_4;                      // +0x04, cleared when a cached piece changes
     int dirty;                          // +0x08
     Unit* unit;                         // +0x0c
-    int field_10;                       // +0x10
+    int drawFrame;                      // +0x10, Thaldren's pDrawFrame
     char unknown_14[0x22 - 0x14];
     PieceState pieces[1];               // +0x22
 };
@@ -308,7 +308,7 @@ void UnitScript::SetPieceVisible(int index, int flag)
 void UnitScript::SetPieceCached(int index, int flag)
 {
     state->pieces[index].cached = flag;
-    state->field_10 = 0;
+    state->drawFrame = 0;
 }
 
 // Slot 4 of UnitScript (see 0x485e30.cpp); compare 0x480d50.
@@ -316,7 +316,7 @@ void UnitScript::SetPieceCached(int index, int flag)
 void UnitScript::SetPieceShaded(int index, int flag)
 {
     state->pieces[index].shaded = flag;
-    state->field_10 = 0;
+    state->drawFrame = 0;
 }
 
 // Slot 7 of UnitScript (vtable 0x4fd698), overriding
