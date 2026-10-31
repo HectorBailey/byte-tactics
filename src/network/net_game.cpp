@@ -1165,11 +1165,24 @@ struct Guid_4517b0 {
     int data[4];
 };
 
-// The session description behind the connection's +0x8 (DPSESSIONDESC2;
-// hapinet.cpp has the whole record).
-struct SessionDesc_004517b0 {
-    char unknown_0[0x30];
+// DirectPlay's session description (DPSESSIONDESC2), behind the connection's
+// +0x8. The toolchain's DirectX 3 <dplay.h> lacks it; hapinet.cpp declares the
+// same record.
+struct DPSESSIONDESC2 {
+    unsigned long dwSize;              // +0x00
+    unsigned long dwFlags;             // +0x04
+    GUID guidInstance;                 // +0x08
+    GUID guidApplication;              // +0x18
+    unsigned long dwMaxPlayers;        // +0x28
+    unsigned long dwCurrentPlayers;    // +0x2c
     char* lpszSessionName;             // +0x30
+    char* lpszPassword;                // +0x34
+    unsigned long dwReserved1;         // +0x38
+    unsigned long dwReserved2;         // +0x3c
+    unsigned long dwUser1;             // +0x40
+    unsigned long dwUser2;             // +0x44
+    unsigned long dwUser3;             // +0x48
+    unsigned long dwUser4;             // +0x4c
 };
 
 // DirectPlay Lobby's DPLCONNECTION, the connection settings at g_game+0x4e5
@@ -1178,7 +1191,7 @@ struct SessionDesc_004517b0 {
 struct DPLCONNECTION {
     char unknown_0[4];
     unsigned int flags;                // +0x4
-    SessionDesc_004517b0* sessionDesc; // +0x8
+    DPSESSIONDESC2* sessionDesc;       // +0x8
     DPNAME* playerName;                // +0xc
 };
 
