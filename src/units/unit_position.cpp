@@ -2,8 +2,8 @@
 //
 // The unit_position module: a unit's position, height, cell, heading, the
 // attach/detach order (0x48aac0 and 0x48ab70) and the per-unit state packet
-// writer/reader (0x48b200 to 0x48b920). The module's views of Game and Unit are
-// one definition each, with every field at its own offset.
+// writer/reader (0x48b200 to 0x48b920). The unit is units/unit.h's; the
+// module's view of Game is one definition, with every field at its own offset.
 
 #include <stdio.h>
 
@@ -19,39 +19,21 @@ union Fixed {
     };
 };
 
-// Own definitions, not vec3.h: y is a 16.16 Fixed, and vec3.h would redefine Vec3.
-struct Vec3 {
-    int x;                             // +0x0
-    Fixed y;                           // +0x4
-    int z;                             // +0x8
-};
-
-struct Point16 {
-    short x;
-    short y;
-};
+#include "../util/vec3.h"
 
 #include "../util/angles.h"
 
-// The angle triple at +0x64 (Angles16): 0x48b3f0 and 0x48b200 read it as three
-// shorts, 0x48b920 as an int and a short (Tail32).
 
-struct Tail32 {
-    int a;
-    unsigned short b;
-};
-
-class Unit;
+struct Unit;
 class CobScript;
 class UnitMotion;
 class PlayerData;
 class BitWriter;
 class BitReader;
-struct Block;
+struct ObjectState;
 struct Beacon;
 struct Order;
 struct Spawn;
-struct UnitType;
 struct Player;
 
 #include "../map/mission.h"
@@ -96,67 +78,6 @@ void GonzoAtexitHandler(void);
 
 #include "../network/player.h"
 
-// A view of UnitDef (units/unit_def.h) whose +0x241 flag word has a bit view the
-// header lacks. +0x241 is the flag word the position code tests: bit 12
-// floats, bit 19 floats on water, bit 20 can leave the water.
-struct UnitType {
-    char unknown_0[0x1fa];
-    unsigned int f1fa;                 // +0x1fa
-    char unknown_1fe[0x200 - 0x1fe];
-    unsigned short f200;               // +0x200
-    char unknown_202[0x22c - 0x202];
-    unsigned char draft;               // +0x22c
-    char unknown_22d[0x241 - 0x22d];
-    union {
-        struct {
-            unsigned int low : 12;
-            unsigned int floats : 1;   // bit 12
-            unsigned int unknown_13 : 6;
-            unsigned int on_water : 1; // bit 19
-            unsigned int over_water : 1;// bit 20
-            unsigned int unknown_21 : 11;
-        } bits;
-        unsigned int all;
-    } f241;                            // +0x241
-};
-
-// The +0x110 flag word, one bit view per function that reads it.
-union Flags {
-    struct {
-        unsigned int colour : 2;       // bits 0..1
-        unsigned int b2 : 1;
-        unsigned int b3 : 1;
-        unsigned int b4 : 1;
-        unsigned int b5 : 1;
-        unsigned int mid6 : 7;         // bits 6..12
-        unsigned int b13 : 1;
-        unsigned int b14 : 1;
-        unsigned int b15 : 1;
-        unsigned int b16 : 1;
-        unsigned int b17 : 1;
-        unsigned int mid18 : 10;       // bits 18..27
-        unsigned int b28 : 1;
-        unsigned int b29 : 1;
-        unsigned int b30 : 1;
-        unsigned int b31 : 1;
-    } bits;
-    unsigned int all;
-};
-
-// What a unit's +0 points at: its motion, the serialisation interface at +0
-// and the int of 0x48b200 at +0x20. 0x48ab70's two bit field is at +0x2e.
-class UnitMotion {
-public:
-    PlayerData* player;                // +0x00
-    char unknown_4[0x20 - 4];
-    int speed;                         // +0x20
-    char unknown_24[0x2e - 0x24];
-    unsigned char bits_2e : 2;         // +0x2e
-    char unknown_2f[0x8a - 0x2f];
-
-    void UpdateMotion(Unit* u);
-};
-
 // The serialisation interface behind a unit's owner: the writer 0x48b710 calls
 // slot +0x20, the reader 0x48b920 slot +0x24.
 class PlayerData {
@@ -181,51 +102,14 @@ public:
     void PrependUnit(int node);
 };
 
-struct Unit {
-    UnitMotion* motion;                // +0x00
-    char unknown_4[0x64 - 4];
-    union {
-        Angles16 angles;                // +0x64
-        Tail32 tail32;                 // +0x64
-    };
-    Vec3 pos;                          // +0x6a
-    Point16 cell;                      // +0x76
-    char unknown_7a[0x7e - 0x7a];
-    Point16 footprint;                 // +0x7e
-    SpatialBucket* spatialBucket;      // +0x82
-    Unit* carrier;                     // +0x86
-    Unit* cargo;                       // +0x8a
-    Unit* cargoNext;                   // +0x8e
-    UnitType* def;                     // +0x92
-    Player* player;                    // +0x96
-    CobScript* script;                 // +0x9a
-    Block* state;                      // +0x9e
-    char unknown_a2[0xa6 - 0xa2];
-    unsigned short unitDefIndex;           // +0xa6
-    unsigned short id;                 // +0xa8
-    char unknown_aa[0xf5 - 0xaa];
-    unsigned char lastDamageType;      // +0xf5
-    unsigned char healthPercent;       // +0xf6
-    unsigned char prevHealthPercent;   // +0xf7
-    char losSightFrameIdx;             // +0xf8
-    signed char transportPiece;        // +0xf9
-    unsigned char recentlyDamagedTimer;  // +0xfa
-    int postTransferHoldoff;           // +0xfb
-    unsigned char playerIndex;         // +0xff
-    char unknown_100[0x104 - 0x100];
-    float buildLeft;                   // +0x104
-    short health;                   // +0x108
-    char unknown_10a[0x10e - 0x10a];
-    unsigned char activateFlags;           // +0x10e
-    char unknown_10f[0x110 - 0x10f];
-    union {
-        unsigned int flags;            // +0x110
-        Flags f110;                    // +0x110
-    };
-    char unknown_114[0x118 - 0x114];
-
-    void SetStateBits(unsigned char mask, int set);
+// The block behind +0x9e, of which 0x48b3f0 clears the int at +0x10.
+struct ObjectState {
+    char unknown_0[0x10];
+    int field_10;                      // +0x10
 };
+
+#include "../orders/unit_motion.h"
+#include "unit.h"
 
 union F14373 {
     struct {
@@ -275,16 +159,9 @@ struct Spawn {
     unsigned short type;               // +0x01
     unsigned short id;                 // +0x03
     Vec3 pos;                          // +0x05
-    union {
-        Angles16 words;                // +0x11
-        Tail32 dword;                  // +0x11
-    } tail;
+    Angles16 tail;                     // +0x11
 };
 
-struct Block {
-    char unknown_0[0x10];
-    int field_10;                      // +0x10
-};
 
 #include "cob_script.h"
 
@@ -292,7 +169,8 @@ struct Block {
 // SendUnitStates (0x48b710) matching (docs/c2-regalloc.md).
 #include "../sound/sound.h"
 #include "../util/tdf.h"
-
+#include "../graphics/memory_cache.h"
+#include "../network/packet_receiver.h"
 
 #include "../network/bit_writer.h"
 
@@ -330,47 +208,49 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u);
 extern float g_buildPercentScale;
 
 // Snaps a unit's height (pos.y, 16.16 fixed point) to the ground. Units
-// whose type has the flag at +0x241 bit 12 (floating) stay at least at the
-// sea level minus the type's draft. The ground height is fetched twice on
-// the floating path: the source used a max() macro.
+// whose type can hover (+0x241 bit 12) stay at least at the sea level minus
+// the type's draft. The ground height is fetched twice on the hover path: the
+// source used a max() macro.
 // FUNCTION: 0x48a7f0
 void __stdcall SnapUnitToGround(Unit* unit)
 {
     extern Game* g_game;
-    if (unit->def->f241.bits.floats) {
-        unit->pos.y.value = max(GetGroundHeight(&unit->pos), g_game->seaLevel - unit->def->draft) << 16;
+    if (unit->def->canHover) {
+        unit->pos.y = max(GetGroundHeight(&unit->pos), g_game->seaLevel - unit->def->draft) << 16;
     } else {
-        unit->pos.y.value = GetGroundHeight(&unit->pos) << 16;
+        unit->pos.y = GetGroundHeight(&unit->pos) << 16;
     }
 }
 
 // Places a unit's height (pos.y, 16.16 fixed point) on the ground, at the sea
 // level or on the water surface, depending on the flags in the unit's type
-// (+0x241): bit 12 floats, bit 19 floats on water, bit 20 can leave the water.
-// Only runs for a unit that belongs to somebody and whose type can be off the
-// ground; the flag at +0x110 bit 16 asks for this to be redone.
+// (+0x241): an upright unit (bit 20) sits on the ground, or for a hovercraft
+// (bit 12) at least at the sea level, a floater (bit 19) on the water, and
+// any other unit is tilted to the ground by AlignUnitToGround. Only runs for
+// a unit that belongs to somebody and whose type can be off the ground; the
+// `moved` flag (+0x110 bit 16) asks for this to be redone.
 //
-// The bit 19 branch builds the height in a 16.16 `Fixed` union local and
+// The floater branch builds the height in a 16.16 `Fixed` union local and
 // copies the whole union into pos.y (as 0x4589c0 does with its `Fixed yv`).
 // FUNCTION: 0x48a870
 void __stdcall UpdateUnitHeight(Unit* unit)
 {
     extern Game* g_game;
-    if ((unit->flags & 0x10000) || unit->def->f241.bits.floats) {
+    if ((unit->flags & 0x10000) || unit->def->canHover) {
         unit->flags &= ~0x10000;
         if (unit->motion && (unit->flags & 3) == 1) {
-            if (unit->def->f241.bits.over_water) {
-                if (unit->def->f241.bits.floats) {
-                    unit->pos.y.value = max(GetGroundHeight(&unit->pos), g_game->seaLevel - unit->def->draft) << 16;
+            if (unit->def->upright) {
+                if (unit->def->canHover) {
+                    unit->pos.y = max(GetGroundHeight(&unit->pos), g_game->seaLevel - unit->def->draft) << 16;
                 } else {
-                    unit->pos.y.value = GetGroundHeight(&unit->pos) << 16;
+                    unit->pos.y = GetGroundHeight(&unit->pos) << 16;
                 }
-            } else if (unit->def->f241.bits.on_water) {
+            } else if (unit->def->floater) {
                 // Union copy: an int would fold the product, sum and shift into (sea - draft) << 16.
                 Fixed h;
                 h.value = unit->def->draft * 0xffff + g_game->seaLevel;
                 h.value <<= 16;
-                unit->pos.y = h;
+                *(Fixed*)&unit->pos.y = h;
             } else {
                 AlignUnitToGround(unit);
             }
@@ -484,12 +364,12 @@ void __stdcall ApplyAttachUnit(Order* order)
     Unit* u = !order->id1 ? 0 : &g_game->units[order->id1];
     Unit* t = !order->id2 ? 0 : &g_game->units[order->id2];
     if (u) {
-        unsigned int f = u->f110.all;
+        unsigned int f = u->flags;
         if (f & 0x10000000) {
             if (!(f & 0x20000000)) {
                 if (u->cargo == 0) {
                     if (t == 0
-                        || ((t->f110.all & 0x10000000) && t != u && t->carrier == 0)) {
+                        || ((t->flags & 0x10000000) && t != u && t->carrier == 0)) {
                         if (u->carrier != 0) {
                             Unit* n = u->carrier;
                             Unit** link = &n->cargo;
@@ -509,18 +389,18 @@ void __stdcall ApplyAttachUnit(Order* order)
                             t->cargo = u;
                             // Named bool, `char` compared with -1, masked with `& 1`: keeps the field width mask.
                             bool v = ((order->param == -1) & 1);
-                            u->f110.bits.b17 = v;
+                            u->hideCargo = v;
                         } else {
                             u->cargoNext = 0;
-                            u->f110.bits.b17 = 0;
+                            u->hideCargo = 0;
                             u->carrier = 0;
                             u->spatialBucket->PrependUnit((int)u);
                         }
-                        u->motion->bits_2e = order->param2;
+                        u->motion->mode = order->param2;
                         if (u->player->active) {
                             unsigned char k = u->player->type;
                             if (k == 1 || k == 2) {
-                                if (t && !(t->def->f241.bits.low & 0x200))
+                                if (t && !t->def->isAirBase)
                                     AddBeCarriedOrder((Beacon*)u);
                             }
                         }
@@ -580,15 +460,15 @@ void __stdcall UpdateAllUnits(void)
                         if (u->postTransferHoldoff != 0) {
                             u->postTransferHoldoff--;
                         }
-                        if (u->f110.bits.b4 != 0) {
-                            if (!(u->f110.bits.b5) || u->buildLeft != 0.0f || u->postTransferHoldoff != 0
-                                || (u->carrier != 0 && !(u->carrier->f110.bits.b30))) {
-                                u->f110.bits.b4 = 0;
+                        if (u->selected != 0) {
+                            if (!(u->selectable) || u->buildLeft != 0.0f || u->postTransferHoldoff != 0
+                                || (u->carrier != 0 && !(u->carrier->isAirBase))) {
+                                u->selected = 0;
                             }
                         }
                         // Unsigned `% 30` (here and below) keeps the original's `div`.
                         if ((unsigned int)g_game->gameTick % 30 == 0) {
-                            int v = u->health * 100 / u->def->f1fa;
+                            int v = u->health * 100 / u->def->maxHealth;
                             if (v < 0) {
                                 v = 0;
                             }
@@ -604,13 +484,13 @@ void __stdcall UpdateAllUnits(void)
                             if (k3 == 1 || k3 == 2) {
                                 if (g_game->mapInfo->waterDoesDamage != 0
                                     && g_game->mapInfo->waterDamage != 0
-                                    && (unsigned int)g_game->gameTick % 30 == 0 && u->pos.y.whole <= g_game->seaLevel
-                                    && !u->def->f241.bits.floats) {
+                                    && (unsigned int)g_game->gameTick % 30 == 0 && ((short*)&u->pos.y)[1] <= g_game->seaLevel
+                                    && !u->def->canHover) {
                                     DamageUnit(0, u, g_game->mapInfo->waterDamage, 0xb, 0);
                                 }
-                                if (u->def->f200 != 0 && u->health < u->def->f1fa
+                                if (u->def->healtime != 0 && u->health < u->def->maxHealth
                                     && (g_game->gameTick & 7) == 0) {
-                                    int n = u->def->f200 * 8;
+                                    int n = (unsigned short)u->def->healtime * 8;
                                     AddRepairProgress(u, u, (float)(n / 30));
                                 }
                                 RunOrders(u);
@@ -621,7 +501,7 @@ void __stdcall UpdateAllUnits(void)
                                 }
                             }
                         }
-                        if (u->f110.bits.b14) {
+                        if (u->dying) {
                             KillUnit(u, u->lastDamageType);
                         }
                     }
@@ -680,7 +560,7 @@ void __stdcall WriteUnitState(BitWriter* stream, Unit* u)
         }
         // `!owner ? 0 : ...` lays the zero arm ahead of the load; keep the redundant `& 0xffff`.
         stream->WriteBits((!u->carrier ? 0 : u->carrier->id) & 0xffff, 0xf);
-        stream->WriteBits(u->transportPiece, 8);
+        stream->WriteBits((signed char)u->transportPiece, 8);
     } else {
         stream->bit++;
         if (stream->bit == 0x20) {
@@ -692,7 +572,7 @@ void __stdcall WriteUnitState(BitWriter* stream, Unit* u)
             stream->data[stream->index] = 0;
         }
         stream->WriteBits(u->pos.x, 0x20);
-        stream->WriteBits(u->pos.y.value, 0x20);
+        stream->WriteBits(u->pos.y, 0x20);
         stream->WriteBits(u->pos.z, 0x20);
         stream->WriteBits(u->angles.heading, 0x10);
         stream->WriteBits((unsigned short)u->angles.pitch, 0x10);
@@ -711,15 +591,16 @@ void __stdcall WriteUnitState(BitWriter* stream, Unit* u)
 // its position and its tail. Then the block at +0x9e is cleared, and the
 // unit's own state comes in: 16 bits at +0x108, the alpha byte (which also
 // rescale u->f104 when it moved), the state byte at +0x10e (set through
-// 0x48b090 once set and once cleared with its complement), two bits of
-// colour, and then one bit that picks the rest: set, the two ids and one more
-// byte go to 0x48ab70 as a seven byte order record and the function is done.
+// 0x48b090 once set and once cleared with its complement), the two bits of
+// the occupy layer, and then one bit that picks the rest: set, the two ids
+// and one more byte go to 0x48ab70 as a seven byte order record and the
+// function is done.
 // Clear, a unit that already has an owner sends 0xff as the order's parameter,
 // and the position (three 32 bit words) and the tail (three 16 bit words) are
 // read; the position is converted from world units to the unit's 1/16 units
 // against the fixed point pair at +0x7e, and if it, the tail owner and the
-// colour are all unchanged the position is stored as it is, else the unit is
-// unlinked, the position, the 1/16 pair and the colour are stored and the unit
+// layer are all unchanged the position is stored as it is, else the unit is
+// unlinked, the position, the 1/16 pair and the layer are stored and the unit
 // is re-registered (0x47cc30 then 0x4827b0). The last word in the packet goes
 // to the int at +0x20 of whatever the unit's own first pointer (at +0x00, not
 // the owner at +0x86 that the order record tests) points at.
@@ -732,7 +613,7 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u)
     int zero = 0;
     if (type == zero) {
         if (u->unitDefIndex != zero)
-            u->f110.bits.b14 = 1;
+            u->dying = 1;
         return;
     }
     if (u->unitDefIndex != type) {
@@ -741,7 +622,7 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u)
         spawn.id = u->id;
         spawn.player = 9;
         spawn.pos = u->pos;
-        spawn.tail.words = u->angles;
+        spawn.tail = u->angles;
         CreateUnitFromPacket((u->angles.bank & ~0xff) | u->playerIndex, &spawn);
     }
     u->state->field_10 = zero;
@@ -751,20 +632,20 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u)
     float scale = (float)alpha * g_buildPercentScale;
     if (scale != u->buildLeft) {
         u->buildLeft = scale;
-        u->f110.bits.b13 = 1;
+        u->hpDirty = 1;
     }
     // Byte-typed: SetStateBits takes a byte, spilled with a byte store.
     unsigned char state = (unsigned char)reader->ReadBits(8);
     u->SetStateBits(state, 1);
     u->SetStateBits((unsigned char)~state, zero);
-    int colour = reader->ReadBits(2);
+    int layer = reader->ReadBits(2);
     if (reader->ReadBit()) {
         Order order;
         order.id1 = u->id;
         order.id2 = (unsigned short)reader->ReadBits(0xf);
         // `param` before `param2`: the reverse order hoists the byte store above the reads.
         order.param = (unsigned char)reader->ReadSignedBits(8);
-        order.param2 = (unsigned char)colour;
+        order.param2 = (unsigned char)layer;
         ApplyAttachUnit(&order);
         return;
     }
@@ -773,12 +654,12 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u)
         order.id1 = u->id;
         order.id2 = 0;
         order.param = 0xff;
-        order.param2 = (unsigned char)colour;
+        order.param2 = (unsigned char)layer;
         ApplyAttachUnit(&order);
     }
     Vec3 pos;
     pos.x = reader->ReadBits(0x20);
-    pos.y.value = reader->ReadBits(0x20);
+    pos.y = reader->ReadBits(0x20);
     pos.z = reader->ReadBits(0x20);
     Angles16 tail;
     tail.heading = (unsigned short)reader->ReadBits(0x10);
@@ -790,18 +671,18 @@ void __stdcall ReadUnitState(BitReader* reader, Unit* u)
     Point16 np;
     np.x = (short)((pos.x - fixed.x * 0x80000 + 0x80000) >> 20);
     np.y = (short)((pos.z - fixed.y * 0x80000 + 0x80000) >> 20);
-    if (np.x == u->cell.x && np.y == u->cell.y && colour == (u->f110.all & 3)) {
+    if (np.x == u->cell.x && np.y == u->cell.y && layer == (u->flags & 3)) {
         u->pos = pos;
     } else {
         RemoveUnitFromMap(u);
         u->pos = pos;
         u->cell = np;
-        // The (unsigned short) cast stops the int colour getting a frame home.
-        u->f110.bits.colour = (unsigned int)(unsigned short)colour;
+        // The (unsigned short) cast stops the int layer getting a frame home.
+        u->occupyLayer = (unsigned int)(unsigned short)layer;
         AddUnitToMap(u);
         UpdateUnitLineOfSight(u);
     }
-    u->f110.bits.b16 = 1;
+    u->moved = 1;
     u->angles = tail;
     if (u->motion)
         u->motion->speed = reader->ReadBits(0x20);
@@ -899,7 +780,7 @@ void __stdcall ReceiveUnitStates(Player* p, unsigned int* data)
             spawn.type = type;
             spawn.player = 9;
             spawn.pos = unit->pos;
-            spawn.tail.dword = unit->tail32;
+            spawn.tail = unit->angles;
             CreateUnitFromPacket(unit->playerIndex, &spawn);
         }
         unit->motion->player->ReadFrom(&reader);
