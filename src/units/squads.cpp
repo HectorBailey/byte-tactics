@@ -8,20 +8,13 @@
 #include "../network/player.h"
 
 #pragma pack(push, 1)
-// Kept as a view: unit.h's declarations move the push_back expansion in
-// 0x480250 (docs/c2-regalloc.md).
-struct Unit {
-    char unknown_0[0x96];
-    Player* player;                    // +0x96
-    char unknown_9a[0xa6 - 0x9a];
-    short unitDefIndex;                // +0xa6
-    char unknown_a8[0xac - 0xa8];
-    int group;                         // +0xac, the squad index; OrderSquad's `key`
-    char unknown_b0[0x118 - 0xb0];
-};
+#include "unit.h"
 
 // A player's squad group, the elements of Player::groups.
 #include "group.h"
+// Unused here: the order header's symbol ids keep the push_back expansion in
+// 0x480250 matching (docs/c2-regalloc.md).
+#include "../orders/order.h"
 #pragma pack(pop)
 
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);

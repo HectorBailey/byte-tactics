@@ -38,22 +38,11 @@ struct Cell {
 
 #include "order.h"
 
-struct Game {
-    char unknown_0[0x1420b];
-    FeatureSpot* spots;                // +0x1420b
-    char unknown_1420f[0x14233 - 0x1420f];
-    int mapWidthTiles;                 // +0x14233
-    char unknown_14237[0x1426f - 0x14237];
-    Feature* features;                 // +0x1426f
-    char unknown_14273[0x14287 - 0x14273];
-    Cell* heightMap;                   // +0x14287
-    char unknown_1428b[0x1439b - 0x1428b];
-    UnitDef* unitDefs;                 // +0x1439b
-    char unknown_1439f[0x38a47 - 0x1439f];
-    int gameTick;                      // +0x38a47
-    char unknown_38a4b[0x391e9 - 0x38a4b];
-    Mission* mapInfo;                  // +0x391e9
-};
+// g_game is declared before game.h: with the header's symbols ahead of it, its
+// id moves 0x404db0 (docs/c2-regalloc.md).
+struct Game;
+extern Game* g_game;
+#include "../game/game.h"
 
 struct FeatureDamagePacket {
     unsigned char type;
@@ -62,8 +51,6 @@ struct FeatureDamagePacket {
     short z;
 };
 #pragma pack(pop)
-
-extern Game* g_game;
 
 unsigned short __stdcall FindFeatureAtPos(Vec3* pos, Point16* cell, Point16* size);
 void __stdcall QueueUnitSpeech(Unit* unit, int kind, char* text);

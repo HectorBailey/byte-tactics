@@ -61,16 +61,7 @@ struct MissionOrderTableEntry {                // 0x19-byte entries at g_mission
     char* name;                        // +0x15
 };
 
-struct Game {
-    char unknown_0[0x14357];
-    Unit* units;                       // +0x14357
-    char unknown_1435b[0x1438f - 0x1435b];
-    int unitDefCount;                  // +0x1438f
-    char unknown_14393[0x1439b - 0x14393];
-    UnitDef* unitDefs;                // +0x1439b
-    char unknown_1439f[0x38a47 - 0x1439f];
-    unsigned int gameTick;             // +0x38a47
-};
+#include "../game/game.h"
 
 struct SaveDesc_0043a1f0 {             // the 0x3a-byte snapshot, read and written raw
     unsigned short unitType;           // +0x00
@@ -90,6 +81,9 @@ struct SaveDesc_0043a1f0 {             // the 0x3a-byte snapshot, read and writt
     int subFlags;                      // +0x36
 };
 #pragma pack(pop)
+
+// Unused here: the sound header's symbol ids keep 0x438650 matching (docs/c2-regalloc.md).
+#include "../sound/sound.h"
 
 #include "../units/cob_script.h"
 

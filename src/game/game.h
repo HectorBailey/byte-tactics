@@ -402,12 +402,12 @@ struct Game {  // 0x3924d bytes
     char unknown_14213[8];
     int list_1421b;  // +0x1421b
     void** grid;         // +0x1421f
-    int baseX;  // +0x14223
-    int baseY;  // +0x14227
+    int mapWidthWorld;  // +0x14223, Thaldren's nMapWidthWorld
+    int mapHeightWorld;  // +0x14227
     int mapWidth;  // +0x1422b
     int mapHeight;  // +0x1422f
-    int width;  // +0x14233
-    int height;  // +0x14237
+    int mapWidthTiles;  // +0x14233, Thaldren's nMapWidthTiles
+    int mapHeightTiles;  // +0x14237
     int screenTilesX;  // +0x1423b
     int screenTilesY;  // +0x1423f
     char unknown_14243[16];
@@ -424,9 +424,9 @@ struct Game {  // 0x3924d bytes
     Eye_00482130* eyes;  // +0x1427b
     unsigned char seaLevel;  // +0x1427f
     unsigned char debugMode;    // +0x14280
-    unsigned short flags_14281;  // +0x14281
+    unsigned short mapFlags;  // +0x14281, Thaldren's wMapFlags
     IconSet_00466780* iconSet;  // +0x14283
-    Cell* cells;  // +0x14287
+    Cell* heightMap;  // +0x14287, Thaldren's pHeightMap
     unsigned short* mapValues;  // +0x1428b
     Grid grid1;  // +0x1428f
     Class_0047cb00* cells_1429f;  // +0x1429f
@@ -468,7 +468,7 @@ struct Game {  // 0x3924d bytes
     unsigned short poolCount;  // +0x14351
     int f14353;  // +0x14353
     Unit* units;  // +0x14357
-    Unit* units_end;  // +0x1435b
+    Unit* unitsEnd;  // +0x1435b, Thaldren's pUnitArrayEnd
     unsigned short* list_1435f;  // +0x1435f
     void* hotRadar;  // +0x14363
     int count_14367;  // +0x14367
@@ -499,8 +499,8 @@ struct Game {  // 0x3924d bytes
     void* gaf_147c3;  // +0x147c3
     void* gaf_147c7;  // +0x147c7
     void* gaf_147cb;  // +0x147cb
-    void* unknown_147cf;  // +0x147cf
-    void* unknown_147d3;  // +0x147d3
+    void* smoke1;  // +0x147cf, Thaldren's pSmoke1Seq
+    void* smoke2;  // +0x147d3, Thaldren's pSmoke2Seq
     int fire1;  // +0x147d7
     int alfboom1;  // +0x147db
     void* radlogo;      // +0x147df
