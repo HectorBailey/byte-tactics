@@ -9,7 +9,7 @@
 // with the hand-written _Tree helpers, from 0x46c620 to 0x4707a0. Files that
 // stay apart, and the constraint that keeps each there:
 // - unit_sync_46ca60.cpp: FinishUnitSync calls the out-of-line _Destroy of the
-//   Elem_0046faf0 vector (0x46e870), where the real <vector> inlines its empty
+//   UnitSyncPacket vector (0x46e870), where the real <vector> inlines its empty
 //   body; it needs a hand-written std::vector.
 // - unit_sync_46cc10.cpp: SendSequenced inlines vector::insert but calls the
 //   out-of-line _Destroy, _Ucopy and _Ufill, which the real <vector> inlines
@@ -335,24 +335,7 @@ struct Unit_0046e330 {
 #include "player_info.h"
 
 #pragma pack(push, 1)
-// The 0xe-byte command packet of type 0x1a that UnitSync sends and
-// PacketSequencer queues: a sub-type, a sequence number (0 when it is sent
-// without one), the key of the unit it is about, and one payload word or the
-// unit's permission bytes.
-struct UnitSyncPacket {                // 0xe bytes
-    unsigned char type;                // +0x0
-    unsigned char arg;                 // +0x1
-    unsigned int id;                   // +0x2
-    int key;                           // +0x6
-    union {
-        int value;                     // +0xa
-        struct {
-            unsigned char enabled;     // +0xa
-            unsigned char match;       // +0xb
-            short limit;               // +0xc
-        };
-    };
-};
+#include "unit_sync_packet.h"
 
 // A player's slot in the sync: its id and how many packets were sent to it.
 struct Target_0046d530 {
@@ -512,20 +495,6 @@ public:
 
 // UnitSyncPlayer (0x5c bytes): one player's unit-sync state, with four
 // std::vector members.
-#pragma pack(push, 2)
-struct Elem_0046faf0 {                 // 14 bytes, a queued sync packet
-    union {
-        struct {
-            int a;                     // +0x0
-            int b;                     // +0x4
-            int c;                     // +0x8
-            short d;                   // +0xc
-        };
-        UnitSyncPacket packet;
-    };
-};
-#pragma pack(pop)
-
 class UnitSyncPlayer {                 // the vector's element, 0x5c bytes
 public:
     char unknown_0[0x5c];
@@ -683,15 +652,15 @@ struct PacketSequencer {
     unsigned int max;                  // +0x08
     // Nested struct with its own out-of-line operator=: sets the inline depth
     // that keeps sentQueue's _Destroy out of line and heldQueue's inlined.
-    std::vector<Elem_0046faf0> sentQueue; // +0x0c (16 bytes, _First at +0x10)
-    std::vector<Elem_0046faf0> heldQueue; // +0x1c (operator= is 0x4707a0)
+    std::vector<UnitSyncPacket> sentQueue; // +0x0c (16 bytes, _First at +0x10)
+    std::vector<UnitSyncPacket> heldQueue; // +0x1c (operator= is 0x4707a0)
     PacketSequencer();
     PacketSequencer& operator=(const PacketSequencer& rhs);
     // A method that ignores `this`: see its definition.
     void SendUnsequenced(unsigned int param_1, void* param_2);
     // In unit_sync_46cc10.cpp: it needs a hand-written std::vector, which
     // cannot share a file with <vector>.
-    void SendSequenced(Elem_0046faf0* param_1, Elem_0046faf0* param_2);
+    void SendSequenced(UnitSyncPacket* param_1, UnitSyncPacket* param_2);
     void ReceiveSequenced(UnitSyncPacket* packet, int param_2, void* param_3, unsigned int target);
 };
 
@@ -726,8 +695,8 @@ void PacketSequencer::SendUnsequenced(unsigned int param_1, void* param_2)
 void PacketSequencer::ReceiveSequenced(UnitSyncPacket* packet, int param_2, void* param_3, unsigned int target)
 {
     if (packet->arg == 0x65) {
-        for (Elem_0046faf0* p = sentQueue.begin(); p != sentQueue.end(); p++) {
-            if (p->packet.id == packet->id) {
+        for (UnitSyncPacket* p = sentQueue.begin(); p != sentQueue.end(); p++) {
+            if (p->id == packet->id) {
                 SendPacketToPlayer(GetLocalHumanDpid(), target, p, 0xe);
                 break;
             }
@@ -741,13 +710,13 @@ void PacketSequencer::ReceiveSequenced(UnitSyncPacket* packet, int param_2, void
         cur = packet->id;
         ((UnitSync*)param_3)->HandleSyncPacket(packet, param_2);
         for (unsigned int i = cur + 1; i <= max; i++) {
-            Elem_0046faf0* p;
+            UnitSyncPacket* p;
             for (p = heldQueue.begin(); p != heldQueue.end(); p++) {
-                if (p->packet.id == i) break;
+                if (p->id == i) break;
             }
             if (p == heldQueue.end()) break;
             cur = i;
-            ((UnitSync*)param_3)->HandleSyncPacket(&p->packet, param_2);
+            ((UnitSync*)param_3)->HandleSyncPacket(p, param_2);
         }
         return;
     }
@@ -759,9 +728,9 @@ void PacketSequencer::ReceiveSequenced(UnitSyncPacket* packet, int param_2, void
     Class_0046eba0& v = *(Class_0046eba0*)&heldQueue;
     v.InsertPacket(v.last, 1, packet);
     for (unsigned int i = cur + 1; i <= max; i++) {
-        Elem_0046faf0* p;
+        UnitSyncPacket* p;
         for (p = heldQueue.begin(); p != heldQueue.end(); p++) {
-            if (p->packet.id == i) break;
+            if (p->id == i) break;
         }
         if (p == heldQueue.end()) {
             UnitSyncPacket msg;
@@ -1353,12 +1322,12 @@ SyncChecksumVector::~SyncChecksumVector()
 }
 #pragma auto_inline(on)
 
-// std::vector<Elem_0046faf0>::_Destroy(first, last) from MSVC 5's <vector>:
+// std::vector<UnitSyncPacket>::_Destroy(first, last) from MSVC 5's <vector>:
 // empty, since the element type is trivial.
 // A 14-byte element type (its layout is a guess). Its callers (0x46cc10,
 // 0x470390, 0x470560, 0x46ca60 and others) call 0x46fb40 (_Ufill), 0x46faf0
 // (_Ucopy) and 0x46e870 (_Destroy) with ecx set to the vector.
-typedef std::vector<Elem_0046faf0> Vec_0046e870;
+typedef std::vector<UnitSyncPacket> Vec_0046e870;
 typedef void (Vec_0046e870::*DestroyFn_0046e870)(Vec_0046e870::iterator, Vec_0046e870::iterator);
 
 // _Destroy is protected: a derived class takes its address to emit it out of line.
@@ -1366,7 +1335,7 @@ struct Access_0046e870 : Vec_0046e870 {
     static DestroyFn_0046e870 fn;
 };
 
-// FUNCTION: 0x46e870 ?_Destroy@?$vector@UElem_0046faf0@@V?$allocator@UElem_0046faf0@@@std@@@std@@IAEXPAUElem_0046faf0@@0@Z
+// FUNCTION: 0x46e870 ?_Destroy@?$vector@UUnitSyncPacket@@V?$allocator@UUnitSyncPacket@@@std@@@std@@IAEXPAUUnitSyncPacket@@0@Z
 DestroyFn_0046e870 Access_0046e870::fn = &Access_0046e870::_Destroy;
 
 // The tree's begin(): stores the leftmost node (the head's left link) through the
@@ -1425,7 +1394,7 @@ template class std::_Tree<unsigned int, std::pair<const unsigned int, UnitSyncEn
 void __stdcall NopChecksumEntryDtor(int);
 
 namespace std {
-template<> inline void allocator<Elem_0046faf0>::destroy(Elem_0046faf0* p)
+template<> inline void allocator<UnitSyncPacket>::destroy(UnitSyncPacket* p)
 {
     // Direct call: an inline std::_Destroy overload would be one inline
     // level too deep.
@@ -1631,9 +1600,9 @@ InsertResult::InsertResult(Node_0046fad0* const& f, const bool& s)
 {
 }
 
-// --- vector<Elem_0046faf0> members (0x46faf0, 0x46fb40, 0x470770, 0x4707a0) --
+// --- vector<UnitSyncPacket> members (0x46faf0, 0x46fb40, 0x470770, 0x4707a0) --
 
-typedef std::vector<Elem_0046faf0> Vec_0046faf0;
+typedef std::vector<UnitSyncPacket> Vec_0046faf0;
 typedef Vec_0046faf0::iterator (Vec_0046faf0::*UcopyFn_0046faf0)(
     Vec_0046faf0::const_iterator, Vec_0046faf0::const_iterator, Vec_0046faf0::iterator);
 
@@ -1641,25 +1610,25 @@ struct Access_0046faf0 : Vec_0046faf0 {
     static UcopyFn_0046faf0 fn;
 };
 
-// std::vector<Elem_0046faf0>::_Ucopy(first, last, dest) from MSVC 5's
+// std::vector<UnitSyncPacket>::_Ucopy(first, last, dest) from MSVC 5's
 // <vector>: copies [first, last) into raw storage at dest and returns the
 // end of the copies.
 // A 14-byte element type (its layout is a guess). Its callers (0x46cc10,
 // 0x470390, 0x470560, 0x46ca60 and others) call 0x46fb40 (_Ufill), 0x46faf0
 // (_Ucopy) and 0x46e870 (_Destroy) with ecx set to the vector.
-// FUNCTION: 0x46faf0 ?_Ucopy@?$vector@UElem_0046faf0@@V?$allocator@UElem_0046faf0@@@std@@@std@@IAEPAUElem_0046faf0@@PBU3@0PAU3@@Z
+// FUNCTION: 0x46faf0 ?_Ucopy@?$vector@UUnitSyncPacket@@V?$allocator@UUnitSyncPacket@@@std@@@std@@IAEPAUUnitSyncPacket@@PBU3@0PAU3@@Z
 UcopyFn_0046faf0 Access_0046faf0::fn = &Access_0046faf0::_Ucopy;
 
 typedef void (Vec_0046faf0::*UfillFn_0046faf0)(
-    Vec_0046faf0::iterator, Vec_0046faf0::size_type, const Elem_0046faf0&);
+    Vec_0046faf0::iterator, Vec_0046faf0::size_type, const UnitSyncPacket&);
 
 struct Access_0046fb40 : Vec_0046faf0 {
     static UfillFn_0046faf0 fn;
 };
 
-// std::vector<Elem_0046faf0>::_Ufill(first, n, value) from MSVC 5's <vector>:
+// std::vector<UnitSyncPacket>::_Ufill(first, n, value) from MSVC 5's <vector>:
 // copy-constructs n copies of value into raw storage at first.
-// FUNCTION: 0x46fb40 ?_Ufill@?$vector@UElem_0046faf0@@V?$allocator@UElem_0046faf0@@@std@@@std@@IAEXPAUElem_0046faf0@@IABU3@@Z
+// FUNCTION: 0x46fb40 ?_Ufill@?$vector@UUnitSyncPacket@@V?$allocator@UUnitSyncPacket@@@std@@@std@@IAEXPAUUnitSyncPacket@@IABU3@@Z
 UfillFn_0046faf0 Access_0046fb40::fn = &Access_0046fb40::_Ufill;
 
 // --- the map's lower_bound (0x46fe60) ----------------------------------------
@@ -1781,21 +1750,21 @@ int* __stdcall CopyDwordRangeOverwrite(int* first, int* last, int* dest)
     return dest;
 }
 
-// --- vector<Elem_0046faf0>::size and operator= (0x470770, 0x4707a0) ----------
+// --- vector<UnitSyncPacket>::size and operator= (0x470770, 0x4707a0) ----------
 
 typedef Vec_0046faf0::size_type (Vec_0046faf0::*SizeFn_00470770)() const;
 
-// std::vector<Elem_0046faf0>::size() for the 14-byte element (three ints and
+// std::vector<UnitSyncPacket>::size() for the 14-byte element (three ints and
 // a short, packed to 2 bytes), the same vector as _Ucopy (0x46faf0) and the
 // operator= at 0x4707a0. Its callers are in 0x470560.
-// FUNCTION: 0x470770 ?size@?$vector@UElem_0046faf0@@V?$allocator@UElem_0046faf0@@@std@@@std@@QBEIXZ
+// FUNCTION: 0x470770 ?size@?$vector@UUnitSyncPacket@@V?$allocator@UUnitSyncPacket@@@std@@@std@@QBEIXZ
 SizeFn_00470770 g_size_00470770 = &Vec_0046faf0::size;
 
 typedef Vec_0046faf0& (Vec_0046faf0::*AssignFn_0046faf0)(const Vec_0046faf0&);
 
-// std::vector<Elem_0046faf0>::operator= from MSVC 5's <vector>. The element
+// std::vector<UnitSyncPacket>::operator= from MSVC 5's <vector>. The element
 // type is 14 bytes (three ints and a short, packed to 2), the same vector as
 // _Ucopy (0x46faf0), _Destroy (0x46e870), _Ufill (0x46fb40) and size (0x470770).
 // Its one caller is PacketSequencer::operator= (0x470560).
-// FUNCTION: 0x4707a0 ??4?$vector@UElem_0046faf0@@V?$allocator@UElem_0046faf0@@@std@@@std@@QAEAAV01@ABV01@@Z
+// FUNCTION: 0x4707a0 ??4?$vector@UUnitSyncPacket@@V?$allocator@UUnitSyncPacket@@@std@@@std@@QAEAAV01@ABV01@@Z
 AssignFn_0046faf0 g_assign_0046faf0 = &Vec_0046faf0::operator=;

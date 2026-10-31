@@ -29,12 +29,7 @@ protected:
 }
 
 #pragma pack(push, 2)
-struct Elem_0046faf0 {
-    int a;
-    int b;
-    int c;
-    short d;
-};
+#include "unit_sync_packet.h"
 #pragma pack(pop)
 
 typedef std::list<int> List_0046ca60;
@@ -121,8 +116,8 @@ public:
     int seqSent;
     int seqCur;
     int seqMax;
-    std::vector<Elem_0046faf0> seqSentQueue;
-    std::vector<Elem_0046faf0> seqHeldQueue;
+    std::vector<UnitSyncPacket> seqSentQueue;
+    std::vector<UnitSyncPacket> seqHeldQueue;
     int direct;
     int pendingPlayerCount;
     int checksumProgress;

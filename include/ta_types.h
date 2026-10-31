@@ -1015,7 +1015,7 @@ struct Elem_0043ca70;
 struct Elem_00441c30;
 struct Elem_0044ce90;
 struct Elem_0046e5e0;
-struct Elem_0046faf0;
+struct UnitSyncPacket;
 struct Elem_004702a0;
 struct Elem_004702a0_2;
 struct Elem_00470a40;
@@ -10064,7 +10064,7 @@ public:
     ~SyncChecksumVector(void);
 };
 
-struct Elem_0046faf0 {  // 0xe bytes, 12 views
+struct UnitSyncPacket {  // 0xe bytes, 12 views
     int a;  // +0x0
     int b;  // +0x4
     int c;  // +0x8
@@ -10085,8 +10085,8 @@ struct Class_00470560 {  // 0x2c bytes, 5 views
     int field_0;  // +0x0
     int field_4;  // +0x4
     int field_8;  // +0x8
-    std::vector<Elem_0046faf0> list_c;  // +0xc
-    std::vector<Elem_0046faf0> list_d;  // +0x1c
+    std::vector<UnitSyncPacket> list_c;  // +0xc
+    std::vector<UnitSyncPacket> list_d;  // +0x1c
     Class_00470560(Class_00470560&);
     Class_00470560(void);
     Class_00470560& operator=(Class_00470560&);
@@ -10096,8 +10096,8 @@ class Class_0046cc10 {  // 0x1c bytes, 1 view
 public:
     int field_0;  // +0x0
     char unknown_4[8];
-    std::vector<Elem_0046faf0> vec;  // +0xc
-    void SendSequenced(Elem_0046faf0*, Elem_0046faf0*);
+    std::vector<UnitSyncPacket> vec;  // +0xc
+    void SendSequenced(UnitSyncPacket*, UnitSyncPacket*);
 };
 
 class PacketSequencer {  // 0x1 bytes, 2 views
@@ -10602,7 +10602,7 @@ public:
     int field_2c;  // +0x2c
     int field_30;  // +0x30
     int field_34;  // +0x34
-    std::vector<Elem_0046faf0> field_38;  // +0x38
+    std::vector<UnitSyncPacket> field_38;  // +0x38
     std::vector<int> field_48;  // +0x48
     int field_58;  // +0x58
     int field_5c;  // +0x5c
@@ -10672,8 +10672,8 @@ struct Elem_004702a0 {  // 0x4 bytes, 3 views
 };
 
 struct Pair_0046faf0 {  // 0x20 bytes, 1 view
-    std::vector<Elem_0046faf0> list_c;  // +0x0
-    std::vector<Elem_0046faf0> list_d;  // +0x10
+    std::vector<UnitSyncPacket> list_c;  // +0x0
+    std::vector<UnitSyncPacket> list_d;  // +0x10
     Pair_0046faf0(Pair_0046faf0&);
 };
 

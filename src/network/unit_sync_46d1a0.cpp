@@ -9,7 +9,7 @@
 // the out-of-line copy /Ob2 emitted for another delete.
 //
 // The members are destroyed last-declared first: the trivial vector at +0x48,
-// the vector<Elem_0046faf0> at +0x38, the list<int> at +0x20, the
+// the vector<UnitSyncPacket> at +0x38, the list<int> at +0x20, the
 // vector<UnitSyncPlayer> at +0x10 and the std::map at +0x00.
 #include <list>
 #include <map>
@@ -38,12 +38,7 @@ protected:
 }
 
 #pragma pack(push, 2)
-struct Elem_0046faf0 {             // the 14-byte element type
-    int a;                         // +0x0
-    int b;                         // +0x4
-    int c;                         // +0x8
-    short d;                       // +0xc
-};
+#include "unit_sync_packet.h"
 #pragma pack(pop)
 
 #include "unit_sync_entry.h"
@@ -117,7 +112,7 @@ public:
     int seqSent;                          // +0x2c
     int seqCur;                           // +0x30
     int seqMax;                           // +0x34
-    std::vector<Elem_0046faf0> seqSentQueue; // +0x38
+    std::vector<UnitSyncPacket> seqSentQueue; // +0x38
     Vec_0046d1a0 seqHeldQueue;            // +0x48
     int direct;                           // +0x58
     int pendingPlayerCount;               // +0x5c
