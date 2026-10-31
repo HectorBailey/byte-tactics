@@ -61,11 +61,13 @@ public:
 
 #include "../util/vec3.h"
 
-struct Ring_00453640 {                 // 0x48 bytes, 30 of them at g_game+0x12ef
+// One line of the chat HUD ring (Thaldren's ChatHudEntry, aChatHudRing[30] at
+// g_game+0x12ef), with game.h's names.
+struct ChatHudEntry {                  // 0x48 bytes
     char text[0x40];                   // +0x00
     unsigned int time;                 // +0x40
     unsigned short unit;               // +0x44
-    char unit_46;                      // +0x46
+    char player;                       // +0x46, the sender's slot, 10 for none
     unsigned char flags;               // +0x47
 };
 
@@ -237,7 +239,7 @@ struct Game {
             char message[0x531 - 0x519];
             Layer* layer;              // +0x531
             char unknown_535[0x12ef - 0x535];
-            Ring_00453640 chatHudRing[30];  // +0x12ef
+            ChatHudEntry chatHudRing[30];   // +0x12ef
             int lobbySyncTick;         // +0x1b5f
         };
     };
