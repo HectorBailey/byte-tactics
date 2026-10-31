@@ -30,6 +30,10 @@
 #include <vector>
 #include "los_tables.h"
 
+// Unused here: the symbol ids this declaration takes keep 0x433500 and the other
+// functions of this file matching (docs/c2-regalloc.md).
+void RegisterUnitOrders(void);
+
 // Kept local, not util/string_ref.h: the two scalar deleting destructors
 // 0x432c00 and 0x432c20 are StringRef members here, and declaring them in the
 // header would cost every other file their ids.
@@ -488,12 +492,9 @@ int LosLine::GetLosLineStepCount()
 void LosLine::GetLosLineStep(short index, unsigned short* out1, unsigned short* out2)
 {
     int idx = index;
-    unsigned char* base = (unsigned char*)*(void**)((char*)this + 4);
-    unsigned char* ptr = base + idx * 4;
-    unsigned short val1 = *(unsigned short*)ptr;
-    *out1 = val1;
-    unsigned short val2 = *(unsigned short*)(ptr + 2);
-    *out2 = val2;
+    Elem_00434020* ptr = _First + idx;
+    *out1 = ptr->a;
+    *out2 = ptr->b;
 }
 
 // std::vector<Elem_00434020>::vector(const allocator&): copies the empty

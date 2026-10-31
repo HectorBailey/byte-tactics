@@ -40,7 +40,7 @@ struct Point {
 // and the ground heights at +0x4 to +0x6.
 struct Cell {
     unsigned short unit;               // +0x0
-    char unknown_2[2];
+    unsigned short unit2;              // +0x2
     unsigned char height;              // +0x4
     unsigned char high;                // +0x5
     unsigned char low;                 // +0x6
@@ -979,6 +979,8 @@ struct MapSettings {
 // FUNCTION: 0x483610
 void LoadTntMap()
 {
+    // Stays a cast: viewing g_game's +0x141fb through the Game view moves
+    // LoadTntMap and RevealAroundUnit off their register windows.
     MapSettings* mapSettings = (MapSettings*)((char*)g_game + 0x141fb);
     TntInfo info;
     GafFrame pic;
@@ -1075,7 +1077,7 @@ void LoadTntMap()
         pic.reserved = 0;
         pic.pixelsOrLayers = (unsigned char*)(info.feature_data + 4);
         pic.scratch = 0;
-        g_game->radarFrame = AllocFrame("TED GENERATED PIC", *(int*)info.feature_data, *(int*)(info.feature_data + 2));
+        g_game->radarFrame = AllocFrame("TED GENERATED PIC", *(int*)info.feature_data, *(int*)&info.feature_data[2]);
         SurfaceFromFrame(text, g_game->radarFrame);
         DrawFrame(text, &pic, 0, 0);
     } else {
@@ -1095,11 +1097,11 @@ void LoadTntMap()
     if (fill < 0 || info.version < 0x2000)
         fill = 0;
     for (int i = a.n; i > 0; i--) {
-        plot[0xc] &= 0xfc;
-        *(unsigned short*)plot = 0;
-        *(unsigned short*)(plot + 2) = 0;
-        *(unsigned short*)(plot + 8) = 0xffff;
-        plot[7] = (unsigned char)fill;
+        ((Cell*)plot)->flags &= 0xfc;
+        ((Cell*)plot)->unit = 0;
+        ((Cell*)plot)->unit2 = 0;
+        ((Cell*)plot)->feature = 0xffff;
+        ((Cell*)plot)->metal = (unsigned char)fill;
         plot += 0xd;
     }
     InitFeatureAnimPool(&info.version);
@@ -1137,6 +1139,8 @@ void LoadTntMap()
                 do {
                     q[4] = *src;
                     q[0xc] = (q[0xc] & 0xd7) | 0x50;
+                    // The map file's two-byte field at src+1, not a Cell: the
+                    // sentinel 0xfffc is "no feature".
                     if (*(unsigned short*)(src + 1) == 0xfffc)
                         PlaceFeature(q, 0xfffc, 0, 0, 10);
                     q += 0xd;
