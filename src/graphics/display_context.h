@@ -77,7 +77,7 @@ struct DisplayContext {
             unsigned short has_c8 : 1;       // bit 7
             unsigned short has_cc : 1;       // bit 8
             unsigned short has_d0 : 1;       // bit 9
-            unsigned short sound_opt : 1;    // bit 10
+            unsigned short mouseThread : 1;  // bit 10, the mouse runs its own thread
             unsigned short quitting : 1;     // bit 11
             unsigned short unknown_12 : 4;   // bits 12-15
         } bits;
