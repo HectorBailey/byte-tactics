@@ -4371,10 +4371,10 @@ void __stdcall SaveUnitRestrictListFile(char* filename)
 
     for (int i = 1; i < count; i++) {
         for (int j = 0; j < g_game->unitDefCount; j++) {
-            if (*(int*)((char*)g_unitRestrictEntries + 0x52 + j * 0x62) == i) {
+            if (g_unitRestrictEntries[j].unitIndex == i) {
                 int v = g_game->unitDefs[i].fbiChecksum;
                 fwrite(&v, 4, 1, f);
-                v = *(int*)((char*)g_unitRestrictEntries + 0x5a + j * 0x62);
+                v = g_unitRestrictEntries[j].max;
                 fwrite(&v, 4, 1, f);
                 break;
             }
