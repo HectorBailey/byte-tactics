@@ -28,18 +28,12 @@ public:
     int weaponHashXor;                 // +0x146
     // The footprint, one pair rather than an int placeholder and two shorts.
     // Not a Point16: ai_player.cpp, which includes this header, declares its own
-    // fixed-point Vec3 and Point16, so util/vec3.h cannot be included here. The
-    // union wrapper stays for the symbol count (docs/c2-regalloc.md).
-    union {
-        struct {
-            short x;                   // +0x14a
-            short y;                   // +0x14c
-        } footprint;
-    };
-    union {
-        int f14e;                      // +0x14e
-        char* yardmap;                 // +0x14e
-    };
+    // fixed-point Vec3 and Point16, so util/vec3.h cannot be included here.
+    struct {
+        short x;                       // +0x14a
+        short y;                       // +0x14c
+    } footprint;
+    char* yardmap;                     // +0x14e
     int count;                         // +0x152
     // The unit type ids it can build; vtol_orders_414380.cpp tests it as
     // canBuild, but every indexing read is unsigned short.
@@ -125,7 +119,44 @@ public:
     char defaultmissiontype;           // +0x230
     unsigned int* weaponCategories[3]; // +0x231
     unsigned int* categories;          // +0x23d
-    unsigned int flags1;               // +0x241
+    // Thaldren's UnitTypeFlags, as one word or as its bits, each named after the
+    // FBI key the loader (0x42bf40) sets it from. The footprint's and the
+    // yardmap's former unions paid for this one's symbol ids, so every includer
+    // keeps its count (docs/c2-regalloc.md).
+    union {
+        unsigned int flags1;           // +0x241
+        struct {
+            unsigned int standingMoveOrder : 2;  // bits 0-1
+            unsigned int standingFireOrder : 2;  // bits 2-3
+            unsigned int initCloaked : 1;        // bit 4
+            unsigned int downloadable : 1;
+            unsigned int builder : 1;
+            unsigned int zbuffer : 1;
+            unsigned int stealth : 1;            // bit 8
+            unsigned int isAirBase : 1;
+            unsigned int isTargetingUpgrade : 1;
+            unsigned int canFly : 1;             // bit 11
+            unsigned int canHover : 1;
+            unsigned int teleporter : 1;
+            unsigned int hideDamage : 1;
+            unsigned int shootMe : 1;            // bit 15
+            unsigned int hasWeapons : 1;
+            unsigned int armoredState : 1;
+            unsigned int activateWhenBuilt : 1;  // bit 18
+            unsigned int floater : 1;
+            unsigned int upright : 1;
+            unsigned int amphibious : 1;         // bit 21
+            unsigned int unknown_241_22 : 2;
+            unsigned int isFeature : 1;          // bit 24
+            unsigned int noShadow : 1;
+            unsigned int immuneToParalyzer : 1;
+            unsigned int hoverAttack : 1;
+            unsigned int kamikaze : 1;           // bit 28
+            unsigned int antiWeapons : 1;
+            unsigned int digger : 1;             // bit 30
+            unsigned int unknown_241_31 : 1;
+        };
+    };
     unsigned int flags2;               // +0x245
 
     UnitDef& operator=(const UnitDef& src);
