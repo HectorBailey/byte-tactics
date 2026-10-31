@@ -388,10 +388,9 @@ struct Flags_0043e490 {
     unsigned int b15_31 : 17;
 };
 
-// The flag words at +0x241 and +0x245 read as bit fields; the header keeps plain words.
+// The flag word at +0x245 read as bit fields; unit_def.h keeps flags2 a plain word.
 struct UnitDefFlags_0043e490 {
-    char unknown_0[0x241];
-    Flags_0043e490 f241b;              // +0x241
+    char unknown_0[0x245];
     Flags_0043e490 f245b;              // +0x245
 };
 
@@ -527,7 +526,7 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit* unit, Unit* target,
     case 6:
         if (!target || !unit->CanLoad(target))
             break;
-        return ((UnitDefFlags_0043e490*)def)->f241b.b11 ? 8 : 0xc;
+        return def->canFly ? 8 : 0xc;
     case 5:
         return ((UnitDefFlags_0043e490*)def)->f245b.b8 ? 0xd : 0x13;
     case 14:
@@ -563,7 +562,7 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit* unit, Unit* target,
         if ((def->flags1 & 0x800) && (target->def->flags1 & 0x200))
             return 0xd;
         if (unit->CanLoad(target))
-            return ((UnitDefFlags_0043e490*)def)->f241b.b11 ? 8 : 0xc;
+            return def->canFly ? 8 : 0xc;
         if ((def->flags2 & 0x20) && friendly)
             return 5;
         return 0xe;
