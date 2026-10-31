@@ -17,6 +17,9 @@
 
 typedef Vec3 Vec3_0049e1a0;
 
+// Not util/fixed.h: the header brings FixedVec3's ids here, ahead of this file's
+// own unused one below (with Fixed_0049a120), and DrawProjectiles (0x49be60)
+// drops to 97.4%.
 union Fixed {
     int value;
     struct {

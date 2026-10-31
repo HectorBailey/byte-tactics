@@ -7,7 +7,9 @@
 
 #pragma pack(push, 1)
 
-// A 16.16 fixed-point coordinate.
+// A 16.16 fixed-point coordinate. Not util/fixed.h: the header brings a
+// FixedVec3 this file does not use, whose ids take 0x438c00 and 0x439740 to
+// 94.3% and 95.4%.
 union Fixed {
     int value;
     struct {
