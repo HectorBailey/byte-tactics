@@ -168,14 +168,6 @@ struct HapinetSession {                 // the object at g_game+0x14
 // Unused here: the symbol ids these declarations take keep 0x470040 matching (docs/c2-regalloc.md).
 void RegisterUnitOrders(void);
 
-#pragma pack(push, 1)
-// UnitDef::flags1 (+0x241) read as bit fields.
-struct UnitDefFlags_0046e160 {
-    unsigned int bits_0 : 23;
-    unsigned int flag_23 : 1;           // bit 23
-    unsigned int bits_24 : 8;
-};
-#pragma pack(pop)
 
 struct UnitSync;
 
@@ -1189,10 +1181,10 @@ void UnitSync::ApplyToUnitTypes()
         if (it == End()) {
             ProtectUnitDefsReadWrite();
             def->maxThisUnit = 0;
-            ((UnitDefFlags_0046e160*)&def->flags1)->flag_23 = 0;
+            def->versionCompatible = 0;
         } else {
             ProtectUnitDefsReadWrite();
-            ((UnitDefFlags_0046e160*)&def->flags1)->flag_23 = (it.ptr->value.w != 0 && it.ptr->value.h != 0);
+            def->versionCompatible = (it.ptr->value.w != 0 && it.ptr->value.h != 0);
             def->maxThisUnit = it.ptr->value.limit;
         }
         ProtectUnitDefsReadOnly();
