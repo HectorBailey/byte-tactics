@@ -89,7 +89,7 @@ struct Unit {
             unsigned int moveRate : 2;      // bits 2-3
             unsigned int selected : 1;      // bit 4
             unsigned int selectable : 1;    // bit 5, Thaldren's MakeSelectable
-            unsigned int unknown_110_6 : 2;
+            unsigned int cycleMark : 2;     // bits 6-7, set once FocusNextLocalUnit has visited the unit
             unsigned int radar : 1;         // bit 8
             unsigned int sonar : 1;         // bit 9
             unsigned int jammed : 1;        // bit 10
