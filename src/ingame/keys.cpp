@@ -305,16 +305,6 @@ void __stdcall BuildScreenshotPath(char* out, const char* dir, const char* name,
 // keep the allocation (docs/c2-regalloc.md).
 void UpdateBuildMenuIfFocusUnit(void*);
 void ActivatePlayerGadgets(char*);
-// Unused here: real zero-argument functions whose symbol ids keep
-// WriteScreenshot's allocation after the Surface view became surface.h
-// (docs/c2-regalloc.md).
-void ResetCameraState(void);
-void ClampCameraPosition(void);
-void ClampCameraTarget(void);
-void UpdateScreenShake(void);
-void UpdateCameraFollow(void);
-void BeginMouseScroll(void);
-void RegisterUnitOrders(void);
 // FUNCTION: 0x495a30
 void __stdcall WriteScreenshot(char* dir, char* name, int x, int y, int w, int h)
 {

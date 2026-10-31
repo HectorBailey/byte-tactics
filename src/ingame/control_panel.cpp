@@ -1809,7 +1809,7 @@ void UpdateEdgeScroll()
         return;
     GetCurrentMouseEvent(&mouse);
     DisplayContext* d = GetDisplay();
-    if (!(d->flags & 2)) {
+    if (!(d->flags.word & 2)) {
         GetCursorPos(&pt);
         int w = g_game->screenWidth;
         int h = g_game->screenHeight;

@@ -93,6 +93,6 @@ void MainFrameTick()
     else
         g_game->selected = second;
     UpdateTimers();
-    if (!(g_game->displayContext->flags & 0x800))
+    if (!(g_game->displayContext->flags.word & 0x800))
         g_game->callback();
 }
