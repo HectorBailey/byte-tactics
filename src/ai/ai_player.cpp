@@ -1860,18 +1860,13 @@ int __stdcall FindBuildPosition(int player, const Vec3* from, UnitDef* type, Vec
 int __stdcall GetUnitCount(int param_1, unsigned int param_2)
 {
     unsigned int idx = param_2 & 0xffff;
-    void* p = g_playerAI[param_1];
-    int* ptr = (int*)((char*)p + 0x81);
-    short* arr = (short*)(*ptr);
-    return (int)arr[idx];
+    return (int)g_playerAI[param_1]->counts[idx];
 }
 
 // FUNCTION: 0x40c230
 int __stdcall GetBuilderCount(int param_1)
 {
-    char* base = (char*)&g_playerAI;
-    void* ptr = *(void**)(base + param_1 * 4);
-    return *(int*)((char*)ptr + 0x75);
+    return g_playerAI[param_1]->builders;
 }
 
 // FUNCTION: 0x40c250
