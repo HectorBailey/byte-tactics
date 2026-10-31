@@ -11,17 +11,7 @@ class TdfFile;
 #pragma pack(push, 1)
 #include "side_def.h"
 
-struct Game {
-    char unknown_0[0x148d7];
-    union {
-        void* logos;                   // +0x148d7
-        int logosGaf;
-    };
-    void* logos32;                     // +0x148db
-    char unknown_148df[0x37f39 - 0x148df];
-    int sideCount;                     // +0x37f39
-    SideDef sideDefs[5];               // +0x37f3d, stride 0x232
-};
+#include "game.h"
 #pragma pack(pop)
 
 extern Game* g_game;
@@ -47,9 +37,9 @@ void LoadLogos()
 // FUNCTION: 0x431920
 void FreeLogos(void)
 {
-    int val = g_game->logosGaf;
+    int val = (int)g_game->logos;
     GameFreeThunk((int*)val);
-    g_game->logosGaf = 0;
+    g_game->logos = 0;
 }
 
 // Parses the x1/y1/x2/y2 fields of the current TDF node into four ints.

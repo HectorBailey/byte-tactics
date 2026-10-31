@@ -31,6 +31,8 @@ void __stdcall DrawUnit(void*, Unit*);
 
 #include "order.h"
 
+#include "../game/game.h"
+
 // The order object the vtol orders build: PathOrder, the class order_targets.cpp
 // defines. The constructor keeps that definition's argument types so the call
 // reaches it by name.
@@ -41,12 +43,6 @@ public:
     void SetAltitude(int);
 };
 
-struct Game {
-    char unknown_0[0x1426f];
-    Feature* features;                 // +0x1426f
-    char unknown_14273[0x38a47 - 0x14273];
-    int gameTick;                      // +0x38a47
-};
 #pragma pack(pop)
 
 extern Game* g_game;
