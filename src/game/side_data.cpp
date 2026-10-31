@@ -9,43 +9,7 @@ class TdfFile;
 #include "../graphics/rect.h"
 
 #pragma pack(push, 1)
-struct Side_00431a60 {                  // 0x232 bytes
-    char name[0x1e];                    // +0x00
-    char nameprefix[4];                 // +0x1e
-    char commander[0x20];               // +0x22
-    Rect logo;                          // +0x42
-    Rect energyBar;                     // +0x52
-    Rect energyNum;                     // +0x62
-    Rect metalBar;                      // +0x72
-    Rect metalNum;                      // +0x82
-    Rect totalUnits;                    // +0x92
-    Rect totalTime;                     // +0xa2
-    Rect energyMax;                     // +0xb2
-    Rect metalMax;                      // +0xc2
-    Rect energy0;                       // +0xd2
-    Rect metal0;                        // +0xe2
-    Rect energyProduced;                // +0xf2
-    Rect energyConsumed;                // +0x102
-    Rect metalProduced;                 // +0x112
-    Rect metalConsumed;                 // +0x122
-    Rect logo2;                         // +0x132
-    Rect unitName;                      // +0x142
-    Rect damageBar;                     // +0x152
-    Rect unitEnergyMake;                // +0x162
-    Rect unitEnergyUse;                 // +0x172
-    Rect unitMetalMake;                 // +0x182
-    Rect unitMetalUse;                  // +0x192
-    Rect missionText;                   // +0x1a2
-    Rect unitName2;                     // +0x1b2
-    Rect damageBar2;                    // +0x1c2
-    Rect nameBlock;                     // +0x1d2
-    Rect description;                   // +0x1e2
-    Rect reload[3];                     // +0x1f2
-    int energyColor;                    // +0x222
-    int metalColor;                     // +0x226
-    int sideNumber;                     // +0x22a
-    void* font;                         // +0x22e
-};
+#include "side_def.h"
 
 struct Game {
     char unknown_0[0x148d7];
@@ -56,7 +20,7 @@ struct Game {
     void* logos32;                     // +0x148db
     char unknown_148df[0x37f39 - 0x148df];
     int sideCount;                     // +0x37f39
-    Side_00431a60 sideDefs[5];         // +0x37f3d, stride 0x232
+    SideDef sideDefs[5];               // +0x37f3d, stride 0x232
 };
 #pragma pack(pop)
 
@@ -173,7 +137,7 @@ void __stdcall LoadSideData(void)
     char msgEnergymax[0x100];
     char msgEnergybar[0x100];
     char msgMetalmax[0x100];
-    Side_00431a60* s;
+    SideDef* s;
 
     BuildDataPath(name, "gamedata", "sidedata", "TDF");
     parser.LoadFile(name);
@@ -189,7 +153,7 @@ void __stdcall LoadSideData(void)
         if (parser.current->GetFieldString(name, "name", 0x1e, g_emptyStringLiteral))
             strcpy(s->name, name);
         if (parser.current->GetFieldString(name, "nameprefix", 4, g_emptyStringLiteral))
-            strcpy(s->nameprefix, name);
+            strcpy(s->namePrefix, name);
         if (parser.current->GetFieldString(name, "commander", 0x20, g_emptyStringLiteral))
             strcpy(s->commander, name);
         if (parser.current->GetFieldString(name, "font", 0x100, g_emptyStringLiteral)) {
