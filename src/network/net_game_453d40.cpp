@@ -53,15 +53,7 @@ struct WeaponDef {
 
 #include "../units/cob_script.h"
 
-class Unit {
-public:
-    char unknown_0[0x9a];
-    CobScript* script;               // +0x9a
-    char unknown_9e[0x110 - 0x9e];
-    unsigned int flags;                // +0x110
-    char unknown_114[4];
-    void SetStateBits(unsigned char, int);
-};
+#include "../units/unit.h"
 
 class UnitSync {
 public:
@@ -69,6 +61,10 @@ public:
 };
 
 #include "settings.h"
+// Unused here: the symbol ids these declarations take keep 0x453d40 matching (docs/c2-regalloc.md).
+void RegisterUnitOrders(void);
+void RegisterGroundOrders(void);
+void EnableAICommands(void);
 
 struct Game {
     char unknown_0[0x14];
