@@ -5,20 +5,7 @@
 #include "../ai/squad_manager.h"
 #include "../network/player.h"
 
-// A 16.16 fixed-point value and its whole part.
-union Fixed {
-    int raw;
-    struct {
-        unsigned short frac;
-        short whole;
-    } part;
-};
-
-struct FixedVec3 {
-    Fixed x;
-    Fixed y;
-    Fixed z;
-};
+#include "../util/fixed.h"
 
 #pragma pack(push, 1)
 
@@ -186,10 +173,10 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
     memset(&hits, 0, 8);
     int radius = weapon->weapon->areaOfEffect >> 1;
     int r = radius / 16 + 1;
-    int cx = ((FixedVec3*)pos)->x.part.whole;
+    int cx = ((FixedVec3*)pos)->x.whole;
     int x0 = cx / 16 - r;
     int x1 = cx / 16 + r;
-    int cz = ((FixedVec3*)pos)->z.part.whole;
+    int cz = ((FixedVec3*)pos)->z.whole;
     int z0 = cz / 16 - r;
     int z1 = cz / 16 + r;
     if (x0 < 0)
@@ -255,8 +242,8 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
                     }
                 }
                 Fixed dist;
-                dist.raw = Length(&d);
-                int distance = dist.part.whole;
+                dist.value = Length(&d);
+                int distance = dist.whole;
                 if (distance < radius) {
                     float edge = weapon->weapon->edgeDamage;
                     float scale;
@@ -301,14 +288,14 @@ void __stdcall ApplyAreaDamage(Projectile* weapon, Vec3* pos)
             if ((cell->flags & 1) && spot) {
                 Vec3 v = Sub(*pos, spot->pos);
                 Fixed dist;
-                dist.raw = VectorLength(&v);
-                distance = dist.part.whole;
+                dist.value = VectorLength(&v);
+                distance = dist.whole;
             } else {
                 Vec3 p = GetFootprintCentre(&at, &g_game->features[feature]);
                 Vec3 v = Sub(*pos, p);
                 Fixed dist;
-                dist.raw = (int)sqrt((double)v.x * v.x + (double)v.y * v.y + (double)v.z * v.z);
-                distance = dist.part.whole;
+                dist.value = (int)sqrt((double)v.x * v.x + (double)v.y * v.y + (double)v.z * v.z);
+                distance = dist.whole;
             }
             if (distance >= radius)
                 continue;
