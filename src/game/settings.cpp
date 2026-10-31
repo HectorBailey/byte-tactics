@@ -30,7 +30,7 @@ struct Options {
     int skirmishDifficulty;             // +0x228
 };
 
-struct Flags_0042f9a0 {
+struct GraphicsFlags {
     unsigned short damagebars : 1;       // bit 0
     unsigned short antiAlias : 1;        // bit 1
     unsigned short shadows : 1;          // bit 2
@@ -50,11 +50,11 @@ struct SoundFlags {
     unsigned short speechfx : 1;         // bit 6
 };
 
-struct MusicFlags_0042f9a0 {
+struct MusicFlags {
     unsigned short musicmode : 1;        // bit 0
 };
 
-struct ClockFlags_0042f9a0 {
+struct ClockFlags {
     unsigned short unused0 : 1;          // bit 0
     unsigned short bit1 : 1;             // bit 1
     unsigned short bit2 : 1;             // bit 2
@@ -64,7 +64,7 @@ struct ClockFlags_0042f9a0 {
     unsigned short clock : 1;            // bit 6
 };
 
-struct MissionFlags_0042f9a0 {
+struct MissionFlags {
     unsigned short allMissions : 1;      // bit 0
 };
 
@@ -94,13 +94,13 @@ struct Game {
     int interfaceType;                   // +0x37efa
     char unknown_37efe[0x37f02 - 0x37efe];
     int screenChat;                      // +0x37f02
-    Flags_0042f9a0 visualFlags;          // +0x37f06
+    GraphicsFlags visualFlags;          // +0x37f06
     int gamma;                           // +0x37f08
     int fxVolume;                        // +0x37f0c
     int musicVolume;                     // +0x37f10
     union {
         unsigned char musicMode;         // +0x37f14
-        MusicFlags_0042f9a0 musicFlags;
+        MusicFlags musicFlags;
     };
     unsigned char cdMode;                // +0x37f16
     unsigned char unitChat;              // +0x37f17
@@ -111,7 +111,7 @@ struct Game {
     int textScroll;                      // +0x37f23
     int textLines;                       // +0x37f27
     int mousespeed;                      // +0x37f2b
-    ClockFlags_0042f9a0 uiOptionFlags;   // +0x37f2f
+    ClockFlags uiOptionFlags;   // +0x37f2f
     char unknown_37f31[0x38a4b - 0x37f31];
     unsigned short speedCtrl;            // +0x38a4b
     unsigned short effectiveGameSpeed;   // +0x38a4d
@@ -122,7 +122,7 @@ struct Game {
     int imageOutputDirDirty;             // +0x38c5f
     int movieOutputRateDirty;            // +0x38c63
     char unknown_38c67[0x38d7f - 0x38c67];
-    MissionFlags_0042f9a0 allMissionsFlags; // +0x38d7f
+    MissionFlags allMissionsFlags; // +0x38d7f
     int numSkirmishPlayers;              // +0x38d81
     char unknown_38d85[0x391e9 - 0x38d85];
     Mission* mapInfo;                    // +0x391e9
