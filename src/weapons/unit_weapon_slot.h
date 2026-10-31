@@ -20,7 +20,16 @@ struct UnitWeaponSlot {
     short fireHeading;                 // +0x16
     short firePitch;                   // +0x18
     unsigned char stockpile;           // +0x1a
-    unsigned char flags;               // +0x1b
+    unsigned char flags;               // +0x1b, the WEAPON_SLOT_ bits below
 };
+
+// The bits of `flags`, as masks: macros take no symbol ids, so every includer
+// keeps its count, and a mask test compiles as it did. InitUnitWeaponSlots
+// (0x49e070) writes the slot index and HAS_WEAPON, and sets ACTIVE.
+#define WEAPON_SLOT_AIMING      0x01  // the Aim script has been started (weapons.cpp)
+#define WEAPON_SLOT_HAS_WEAPON  0x02  // the slot's weapon has a nonzero index
+#define WEAPON_SLOT_INDEX       0x0c  // bits 2-3, which of the three slots this is
+#define WEAPON_SLOT_INDEX_SHIFT 2
+#define WEAPON_SLOT_ACTIVE      0x10  // Thaldren's Unit_ActivateWeaponSlot sets it
 
 #endif

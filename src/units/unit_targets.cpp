@@ -298,12 +298,12 @@ void __stdcall NotifyUnitRefs(Unit* obj, int event)
 unsigned char Unit::ChooseWeapon()
 {
     unsigned char result;
-    if (weapons[0].flags & 2)
+    if (weapons[0].flags & WEAPON_SLOT_HAS_WEAPON)
         result = 0;
-    else if (weapons[1].flags & 2)
+    else if (weapons[1].flags & WEAPON_SLOT_HAS_WEAPON)
         result = 1;
     else
-        result = weapons[2].flags & 2;
+        result = weapons[2].flags & WEAPON_SLOT_HAS_WEAPON;
     return result;
 }
 

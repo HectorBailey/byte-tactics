@@ -1009,7 +1009,7 @@ int __stdcall StandingFireOrder(Unit* unit, Order* order, int unused)
     unit->mode = order->mode;
     if (order->mode == 0 || order->mode == 1) {
         for (char i = 0; i < 3; i++) {
-            if (unit->weapons[i].flags & 0x10) {
+            if (unit->weapons[i].flags & WEAPON_SLOT_ACTIVE) {
                 ClearWeaponTarget(unit, i);
             }
         }

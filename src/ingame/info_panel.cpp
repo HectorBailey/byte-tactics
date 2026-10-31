@@ -655,9 +655,9 @@ int __stdcall DrawUnitStateProbe(void* surface)
         && (unit->player->type == 1
             || unit->player->type == 2)) {
         sprintf(buf, "autotarget w[pri:sec:spe]: w[%c:%c:%c]\n",
-                (unit->weapons[0].flags & 0x10) ? 'X' : '-',
-                (unit->weapons[1].flags & 0x10) ? 'X' : '-',
-                (unit->weapons[2].flags & 0x10) ? 'X' : '-');
+                (unit->weapons[0].flags & WEAPON_SLOT_ACTIVE) ? 'X' : '-',
+                (unit->weapons[1].flags & WEAPON_SLOT_ACTIVE) ? 'X' : '-',
+                (unit->weapons[2].flags & WEAPON_SLOT_ACTIVE) ? 'X' : '-');
         DrawString(surface, buf, 0x86, y, -1);
         y += lineH;
         if (unit->list != 0) {
@@ -826,9 +826,9 @@ int __stdcall DrawUnitBuilderProbe(void* surface)
     y += lineHeight;
     if (unit->player->active != 0 && (unit->player->type == 1 || unit->player->type == 2)) {
         sprintf(buf, "Units I can build, and the probabilities:\n",
-                ((unit->weapons[0].flags & 0x10) ? 'X' : '-'),
-                ((unit->weapons[1].flags & 0x10) ? 'X' : '-'),
-                ((unit->weapons[2].flags & 0x10) ? 'X' : '-'));
+                ((unit->weapons[0].flags & WEAPON_SLOT_ACTIVE) ? 'X' : '-'),
+                ((unit->weapons[1].flags & WEAPON_SLOT_ACTIVE) ? 'X' : '-'),
+                ((unit->weapons[2].flags & WEAPON_SLOT_ACTIVE) ? 'X' : '-'));
         DrawString(surface, buf, 0x86, y, -1);
         int i = 0;
         y += lineHeight;
