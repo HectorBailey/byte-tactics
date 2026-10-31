@@ -27,7 +27,6 @@
 struct Game;
 
 struct AnimEntry_00429700;
-struct Bits_0045c570;
 struct BuildList_0041ace0;
 struct Cell;
 struct Cell_004816a0;
@@ -671,9 +670,17 @@ struct Game {  // 0x3924d bytes
     Player* Current2(void);
 };
 
-struct Bits_0045c570 {  // 0x2 bytes
-    char unknown_0[2];
-};
+// Unused here: real functions declared where an unused two-byte placeholder
+// type stood, keeping UpdateBattleRoom (0x44a680) and plot_map.cpp's plotmap
+// functions matching (docs/c2-regalloc.md).
+void ResetGameSpeed(void);
+void IncreaseGameSpeed(void);
+void DecreaseGameSpeed(void);
+void LoadCdLists(void);
+void CloseTopScreenIfNotNamed(void);
+void FreePreviewCaches(void);
+void InitStartingResourcesFromSkirmish(void);
+void __stdcall ShowSavedGameInfo(void);
 
 
 #pragma pack(pop)
