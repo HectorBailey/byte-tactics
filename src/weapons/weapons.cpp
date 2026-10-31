@@ -53,6 +53,15 @@ int GetTickRate();
 #include "../units/unit_def.h"
 #include "unit_weapon_slot.h"
 
+// Unused here: the symbol ids these 6 declarations take keep DrawProjectiles
+// (0x49be60) matching (docs/c2-regalloc.md).
+void LoadGameFonts(void);
+void FreeGameFonts(void);
+void RegisterUnitOrders(void);
+void RegisterGroundOrders(void);
+void EnableAICommands(void);
+void RegisterAICommands(void);
+
 // Unused here: the symbol ids these declarations take keep 0x49be60 matching (docs/c2-regalloc.md).
 void FreeFeaturePool(void);
 void LoadFeatureFileList(void);
@@ -402,7 +411,9 @@ struct Game {
     char unknown_1ab9f[0x37e27 - 0x1ab9f];
     char region_37e27[0x37ecc - 0x37e27];
     Vec3 wind;                         // +0x37ecc
-    char unknown_37ed8[0x38a47 - 0x37ed8];
+    char unknown_37ed8[0x37f2f - 0x37ed8];
+    unsigned short uiOptionFlags;      // +0x37f2f
+    char unknown_37f31[0x38a47 - 0x37f31];
     union {
         int gameTick;                  // +0x38a47
         int frame;
@@ -688,7 +699,7 @@ int __stdcall ApplyWeaponDamage(Projectile* weapon, Unit* target,
             armour = 5;
         damage = (armour * 6 + 100) * damage / 100;
     }
-    Flags_00499cd0* flags = (Flags_00499cd0*)((char*)g_game + 0x37f2f);
+    Flags_00499cd0* flags = (Flags_00499cd0*)&g_game->uiOptionFlags;
     if (flags->flag7)
         damage *= 2;
     if (flags->flag8)
@@ -1217,8 +1228,8 @@ int __stdcall GetWeaponRange(int param1, unsigned int param2)
 {
     unsigned char idx = (unsigned char)param2;
     int offset = idx * 7;
-    int* intermediate = (int*)((char*)param1 + offset * 4 + 0x10);
-    int result = *(int*)((char*)*intermediate + 0xdc);
+    WeaponDef* weapon = ((Unit*)((char*)param1 + offset * 4))->slots[0].weapon;
+    int result = weapon->range;
     return result;
 }
 
@@ -1983,7 +1994,7 @@ void __stdcall ApplyWeaponFirePacket(int arg1, WeaponFirePacket* ev)
     WeaponDef* def = &g_game->weaponDefs[defIndex];
     if (def->flags.b.meteor) {
         Vec3* pos = &ev->aimOrVel;
-        void* arg = (void*)((char*)ev + 1);
+        void* arg = (void*)&ev->origin;
         Projectile* proj = 0;
         if (g_game->projCount < 300) {
             proj = &((Projectile*)g_game->projectiles)[g_game->projCount++];
@@ -2008,15 +2019,15 @@ void __stdcall ApplyWeaponFirePacket(int arg1, WeaponFirePacket* ev)
     Unit* target = targetId == 0 ? 0 : &g_game->units[targetId];
     Projectile* found = FindRemoteProjectile_0049d270(ev);
     if (def->flags.b.ballistic) {
-        FireBallisticProjectile(entry, unit, (void*)((char*)ev + 1), &ev->aimOrVel, target);
+        FireBallisticProjectile(entry, unit, (void*)&ev->origin, &ev->aimOrVel, target);
         return;
     }
     if (def->flags.b.vLaunch) {
-        FireVLaunchProjectile(entry, unit, (void*)((char*)ev + 1), &ev->aimOrVel, target, found);
+        FireVLaunchProjectile(entry, unit, (void*)&ev->origin, &ev->aimOrVel, target, found);
         return;
     }
     if (def->flags.b.lineOfSight || def->flags.b.selfProp) {
-        FireLineOfSightProjectile(entry, unit, (void*)((char*)ev + 1), &ev->aimOrVel, target);
+        FireLineOfSightProjectile(entry, unit, (void*)&ev->origin, &ev->aimOrVel, target);
         return;
     }
     if (def->flags.b.dropped) {
@@ -2028,7 +2039,7 @@ void __stdcall ApplyWeaponFirePacket(int arg1, WeaponFirePacket* ev)
         }
         if (!proj)
             return;
-        InitProjectile(proj, entry->weapon, (void*)((char*)ev + 1), 0, g_game->teamColor, unit);
+        InitProjectile(proj, entry->weapon, (void*)&ev->origin, 0, g_game->teamColor, unit);
         proj->heading = unit->f_66;
         proj->speed = 0;
         proj->velY = 0;
@@ -2901,13 +2912,13 @@ void __stdcall DrawProjectiles(void* surface)
         Proj_0049be60* p = (Proj_0049be60*)((char*)g_game->projectiles + offset);
         if (p->counter == 0) {
             unsigned char player = g_game->playerIndex;
-            char* pb = (char*)g_game + 0x1b63 + 0x14b * player;
+            Player* pb = &g_game->players[player];
             Vec3* pos = &p->pos;
             if ((g_game->mapFlags & 2) == 2) {
-                int col = (int)*(short*)((char*)pos + 2) >> 5;
+                int col = (int)((short*)&pos->x)[1] >> 5;
                 ExploredMap* playerSlot = (ExploredMap*)pb;
-                int row = ((int)*(short*)((char*)pos + 10)
-                           - ((int)*(short*)((char*)pos + 6) >> 1)) >> 5;
+                int row = ((int)((short*)&pos->z)[1]
+                           - ((int)((short*)&pos->y)[1] >> 1)) >> 5;
                 if (playerSlot->explored.size.Contains(col, row) && playerSlot->explored.Get(col, row))
                     visible = 1;
                 else
@@ -2924,13 +2935,13 @@ void __stdcall DrawProjectiles(void* surface)
                     int y1;
                     int x2;
                     int y2;
-                    x1 = (int)*(short*)((char*)pos + 2) - (short)g_game->scrollX + 0x80;
-                    y1 = ((int)*(short*)((char*)pos + 10)
-                              - ((int)*(short*)((char*)pos + 6) >> 1))
+                    x1 = (int)((short*)&pos->x)[1] - (short)g_game->scrollX + 0x80;
+                    y1 = ((int)((short*)&pos->z)[1]
+                              - ((int)((short*)&pos->y)[1] >> 1))
                              - (short)g_game->scrollY + 0x20;
-                    x2 = (int)*(short*)((char*)&p->start + 2) - (short)g_game->scrollX + 0x80;
-                    y2 = ((int)*(short*)((char*)&p->start + 10)
-                              - ((int)*(short*)((char*)&p->start + 6) >> 1))
+                    x2 = (int)((short*)&p->start.x)[1] - (short)g_game->scrollX + 0x80;
+                    y2 = ((int)((short*)&p->start.z)[1]
+                              - ((int)((short*)&p->start.y)[1] >> 1))
                              - (short)g_game->scrollY + 0x20;
                     if (type->colour2 != 0) {
                         // Both calls stay in each arm: one shared colour1 call swaps the colour slots.
@@ -2956,8 +2967,8 @@ void __stdcall DrawProjectiles(void* surface)
                     sp.x = pos->x - (g_game->scrollX << 16);
                     sp.y = p->pos.y;
                     sp.z = p->pos.z - (g_game->scrollY << 16);
-                    int sx = 0x80 + (int)*(short*)((char*)&sp + 2);
-                    int sy = (int)*(short*)((char*)&sp + 10) - ((unsigned short)p->groundHeightAvg >> 1) + 0x20;
+                    int sx = 0x80 + (int)((short*)&sp.x)[1];
+                    int sy = (int)((short*)&sp.z)[1] - ((unsigned short)p->groundHeightAvg >> 1) + 0x20;
                     DrawFrameBlended(surface, frame0, sx, sy);
                     Angles16 rot = p->angles;
                     rot.heading += 0x8000;
@@ -2973,9 +2984,9 @@ void __stdcall DrawProjectiles(void* surface)
                         }
                     }
                 } else if (type->shotKind == 2) {
-                    int sx = (int)*(short*)((char*)pos + 2) - (short)g_game->scrollX + 0x80;
-                    int sy = ((int)*(short*)((char*)pos + 10)
-                              - ((int)*(short*)((char*)pos + 6) >> 1))
+                    int sx = (int)((short*)&pos->x)[1] - (short)g_game->scrollX + 0x80;
+                    int sy = ((int)((short*)&pos->z)[1]
+                              - ((int)((short*)&pos->y)[1] >> 1))
                              - (short)g_game->scrollY + 0x20;
                     if (PointInRect(g_game->region_37e27, sx, sy) == 0)
                         return;
@@ -2984,8 +2995,8 @@ void __stdcall DrawProjectiles(void* surface)
                     sp.x = pos->x - (g_game->scrollX << 16);
                     sp.y = p->pos.y;
                     sp.z = p->pos.z - (g_game->scrollY << 16);
-                    int sx = (int)*(short*)((char*)&sp + 2) + 0x80;
-                    int sy = (int)*(short*)((char*)&sp + 10) - ((unsigned short)p->groundHeightAvg >> 1) + 0x20;
+                    int sx = (int)((short*)&sp.x)[1] + 0x80;
+                    int sy = (int)((short*)&sp.z)[1] - ((unsigned short)p->groundHeightAvg >> 1) + 0x20;
                     DrawFrameBlended(surface, frame0, sx, sy);
                     Angles16 rot3;
                     DrawModel3doProjected(surface, &sp, type->model, &rot3);
@@ -2996,11 +3007,11 @@ void __stdcall DrawProjectiles(void* surface)
                         sp.y = p->pos.y;
                         sp.z = p->pos.z - (g_game->scrollY << 16);
                         DrawFrameBlended(surface, frame0,
-                                     (int)*(short*)((char*)&sp + 2) + 0x80,
-                                     (int)*(short*)((char*)&sp + 10) - ((unsigned short)p->groundHeightAvg >> 1) + 0x20);
-                        int sy = ((int)*(short*)((char*)&sp + 10)
-                                  - ((int)*(short*)((char*)&sp + 6) >> 1)) + 0x20;
-                        int sx = (int)*(short*)((char*)&sp + 2) + 0x80;
+                                     (int)((short*)&sp.x)[1] + 0x80,
+                                     (int)((short*)&sp.z)[1] - ((unsigned short)p->groundHeightAvg >> 1) + 0x20);
+                        int sy = ((int)((short*)&sp.z)[1]
+                                  - ((int)((short*)&sp.y)[1] >> 1)) + 0x20;
+                        int sx = (int)((short*)&sp.x)[1] + 0x80;
                         switch (type->colour) {
                         case 0: gaf = g_game->cannonShellSeq; break;
                         case 1: gaf = g_game->plasmaSmSeq; break;
@@ -3014,9 +3025,9 @@ void __stdcall DrawProjectiles(void* surface)
                         }
                     }
                 } else if (type->shotKind == 5) {
-                    int sx = (int)*(short*)((char*)pos + 2) - (short)g_game->scrollX + 0x80;
-                    int sy = ((int)*(short*)((char*)pos + 10)
-                              - ((int)*(short*)((char*)pos + 6) >> 1))
+                    int sx = (int)((short*)&pos->x)[1] - (short)g_game->scrollX + 0x80;
+                    int sy = ((int)((short*)&pos->z)[1]
+                              - ((int)((short*)&pos->y)[1] >> 1))
                              - (short)g_game->scrollY + 0x20;
                     void* gaf = g_game->flameStreamSeq;
                     int n = GetGafFrameCount(gaf);
@@ -3028,8 +3039,8 @@ void __stdcall DrawProjectiles(void* surface)
                     sp.x = pos->x - (g_game->scrollX << 16);
                     sp.y = p->pos.y;
                     sp.z = p->pos.z - (g_game->scrollY << 16);
-                    int sy = (int)*(short*)((char*)&sp + 10) - ((unsigned short)p->groundHeightAvg >> 1) + 0x20;
-                    int sx = (int)*(short*)((char*)&sp + 2) + 0x80;
+                    int sy = (int)((short*)&sp.z)[1] - ((unsigned short)p->groundHeightAvg >> 1) + 0x20;
+                    int sx = (int)((short*)&sp.x)[1] + 0x80;
                     DrawFrameBlended(surface, frame0, sx, sy);
                     DrawModel3doProjected(surface, &sp, type->model, &p->angles);
                 } else if (type->shotKind == 7) {
@@ -3061,20 +3072,20 @@ void __stdcall DrawProjectiles(void* surface)
                                         sp.y += d.y;
                                         sp.z += d.z;
                                         pt = sp;
-                                        *(short*)((char*)&pt + 2) +=
+                                        ((short*)&pt.x)[1] +=
                                             (short)((int)(((__int64)rand() * 11) / 0x8000) - 5);
-                                        *(short*)((char*)&pt + 6) +=
+                                        ((short*)&pt.y)[1] +=
                                             (short)((int)(((__int64)rand() * 11) / 0x8000) - 5);
-                                        *(short*)((char*)&pt + 10) +=
+                                        ((short*)&pt.z)[1] +=
                                             (short)((int)(((__int64)rand() * 11) / 0x8000) - 5);
                                         DrawLine(surface,
-                                            (int)*(short*)(2 + (char*)&prev) - (short)g_game->scrollX + 0x80,
-                                            ((int)*(short*)(10 + (char*)&prev)
-                                             - ((int)*(short*)((char*)&prev + 6) >> 1))
+                                            (int)((short*)&prev.x)[1] - (short)g_game->scrollX + 0x80,
+                                            ((int)((short*)&prev.z)[1]
+                                             - ((int)((short*)&prev.y)[1] >> 1))
                                             - (short)g_game->scrollY + 0x20,
-                                            (int)*(short*)((char*)&pt + 2) - (short)g_game->scrollX + 0x80,
-                                            0x20 + (((int)*(short*)((char*)&pt + 10)
-                                             - ((int)*(short*)(6 + (char*)&pt) >> 1))
+                                            (int)((short*)&pt.x)[1] - (short)g_game->scrollX + 0x80,
+                                            0x20 + (((int)((short*)&pt.z)[1]
+                                             - ((int)((short*)&pt.y)[1] >> 1))
                                             - (short)g_game->scrollY),
                                             color);
                                         i = i - 1;
