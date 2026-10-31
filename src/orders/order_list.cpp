@@ -127,14 +127,12 @@ struct PointInit : Point {
 
 #include "../network/player.h"
 
-// The unit's target: the object at unit+0x96, whose +0xe4 is the divisor
-// 0x439d20 uses.
+// The unit's owner, the Player at unit+0x96 (network/player.h's): only its
+// `active` and `type` are read here.
 struct Target_0043d6d0 {
     int active;                        // +0x0
     char unknown_4[0x73 - 0x4];
     unsigned char type;                // +0x73
-    char unknown_74[0xe4 - 0x74];
-    unsigned short field_e4;           // +0xe4
 };
 
 struct TargetData_0043d6d0 {
@@ -265,10 +263,12 @@ public:
     Vec3* Position();
 };
 
-// The weapon a slot points to; its +0xe4 is the divisor 0x439d20 uses.
+// The weapon a slot points to. Its reload time (+0xe4, the TDF key reloadtime
+// in ticks, weapon_def.h's reloadTime) is also the length of a weapon build:
+// 0x439d20 divides a build order's progress by it for the build percent.
 struct WeaponDef {
     char unknown_0[0xe4];
-    unsigned short buildTime;          // +0xe4
+    unsigned short reloadTime;         // +0xe4
 };
 
 // This header's symbol ids replace those of the Slot view and of the
@@ -444,7 +444,7 @@ int __stdcall GetBuildWeaponPercent(Unit* owner)
     Order* p;
     for (p = owner->list2; p; p = p->next) {
         if (p->flags & 0x80000)
-            return p->progress * 100 / owner->weapons[p->id].weapon->buildTime;
+            return p->progress * 100 / owner->weapons[p->id].weapon->reloadTime;
     }
     return 0;
 }
