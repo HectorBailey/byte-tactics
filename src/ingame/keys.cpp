@@ -93,12 +93,6 @@ struct BmpWriter {
     void Close();
 };
 
-// Unused here: the symbol ids these declarations take keep WriteScreenshot's
-// allocation, standing in for the view classes merged above
-// (docs/c2-regalloc.md).
-int RIReport(int, int, int, int, int, int, int, int, int, int);
-void WalkFrameChain(int*, int*, int, int, int*, int, int*, int*, int, int*);
-
 #include "../graphics/gaf_frame.h"
 
 #include "../graphics/surface.h"
