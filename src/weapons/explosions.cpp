@@ -40,19 +40,7 @@ struct Point16 {
     short z;
 };
 
-struct Fixed {
-    union {
-        int value;
-        struct {
-            unsigned short fraction;
-            short whole;
-        } parts;
-    };
-};
-
-struct Position {
-    Fixed x, y, z;
-};
+#include "../util/fixed.h"
 
 struct ImageFrame {
     void* image;                       // +0x0
@@ -276,7 +264,7 @@ void* __stdcall GetGafSequenceFrame(GafRef* ref);
 void* __stdcall GetGafFrame(GafSequence* table, int index);
 void __stdcall DrawFrameShadow(void* surface, void* frame, int x, int y);
 void __stdcall DrawFrame(void* surface, void* frame, int x, int y);
-void __stdcall DrawModel3doProjected(void* surface, Position* pos, void* model, short* rotation);
+void __stdcall DrawModel3doProjected(void* surface, FixedVec3* pos, void* model, short* rotation);
 void __stdcall FillPolygon(void* surface, Point* points, int count, int flags);
 void __stdcall DrawFrameQuad(void* surface, void* pic, Point* points, void* src);
 int __stdcall RandomInt(int range);
@@ -411,13 +399,13 @@ void __stdcall DrawExplosions(void* surface)
         if (g_explodedPieces[i] && !DrawExplodedPiece(surface, g_explodedPieces[i])) g_explodedPieces[i] = 0;
     int* pCount = &g_game->count;
     Debris* d = (Debris*)(pCount + 1);
-    Position pos;
+    FixedVec3 pos;
     for (i = 0; i < *pCount; ++i, d++) {
         pos.x.value = d->pos.x - (g_game->scrollX << 16);
         pos.y.value = d->pos.y;
         pos.z.value = d->pos.z - (g_game->scrollY << 16);
-        int x = pos.x.parts.whole + 128;
-        int y = pos.z.parts.whole - (pos.y.parts.whole >> 1) + 32;
+        int x = pos.x.whole + 128;
+        int y = pos.z.whole - (pos.y.whole >> 1) + 32;
         if (PointInRect(g_game->viewport, x, y) && d->ref2.src)
             DrawFrameShadow(surface, GetGafSequenceFrame(&d->ref2), x, y);
     }
@@ -426,8 +414,8 @@ void __stdcall DrawExplosions(void* surface)
         pos.x.value = d->pos.x - (g_game->scrollX << 16);
         pos.y.value = d->pos.y;
         pos.z.value = d->pos.z - (g_game->scrollY << 16);
-        int x = pos.x.parts.whole + 128;
-        int y = pos.z.parts.whole - (pos.y.parts.whole >> 1) + 32;
+        int x = pos.x.whole + 128;
+        int y = pos.z.whole - (pos.y.whole >> 1) + 32;
         if (PointInRect(g_game->viewport, x, y)) {
             if (d->obj) DrawModel3doProjected(surface, &pos, d->obj, &d->angle_x);
             if (d->ref1.src) DrawFrame(surface, GetGafSequenceFrame(&d->ref1), x, y);
@@ -805,8 +793,11 @@ void __stdcall StartExplodePiece(ExplodedPiece* piece)
 // (twice, as a box), pushes the back four out along the face normal by
 // param->scale, centres the box on its own origin and copies the face's
 // texture and colour into the object's faces.
-// Unused here: its symbol id keeps the function below matching (docs/c2-regalloc.md).
+// Unused here: their symbol ids keep the function below matching (docs/c2-regalloc.md).
 void RegisterUnitOrders(void);
+void RegisterGroundOrders(void);
+void EnableAICommands(void);
+void RegisterAICommands(void);
 
 // FUNCTION: 0x421700
 void __stdcall BreakPieceIntoDebris(ExplodedPiece* param)
