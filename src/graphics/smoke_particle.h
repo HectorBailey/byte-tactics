@@ -9,18 +9,7 @@
 
 #include "../util/vec3.h"
 
-// A 16.16 fixed-point value: the whole part in the high half.
-struct Fixed {
-    unsigned short frac;
-    short whole;
-};
-
-// The smoke puff's 16.16 position.
-struct FixedVec3 {
-    Fixed x;
-    Fixed y;
-    Fixed z;
-};
+#include "../util/fixed.h"
 
 // One smoke puff (the element of SmokeParticles' vector), 0x20 bytes.
 struct SmokeParticle {

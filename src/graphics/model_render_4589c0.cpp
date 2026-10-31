@@ -105,16 +105,7 @@ struct Game {
     GameFlags_459200 visualFlags;
 };
 
-struct Fixed {
-    unsigned short frac;
-    short whole;
-};
-
-struct FixedVec3 {
-    Fixed x;
-    Fixed y;
-    Fixed z;
-};
+#include "../util/fixed.h"
 
 union Vec3_459200 {
     int v[3];

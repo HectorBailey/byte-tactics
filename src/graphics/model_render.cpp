@@ -41,20 +41,7 @@ extern const float DAT_004fd4c0;
 struct Game;
 extern Game* g_game;
 
-// A 16.16 fixed-point number: the whole part in the high half.
-union Fixed {
-    int value;
-    struct {
-        unsigned short fraction;
-        short whole;
-    };
-};
-
-struct FixedVec3 {
-    Fixed x;
-    Fixed y;
-    Fixed z;
-};
+#include "../util/fixed.h"
 
 // The 12-byte vector: its integer coordinates, or the three 16.16 words of a
 // position, or the three words of a direction.

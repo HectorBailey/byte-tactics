@@ -18,17 +18,7 @@ extern Game* g_game;
 // The TimedSubParticles class.
 #include "timed_sub_particles.h"
 
-// A 16.16 fixed-point value: the whole part in the high half.
-struct Fixed {
-    unsigned short frac;
-    short whole;
-};
-
-struct FixedVec3 {
-    Fixed x;
-    Fixed y;
-    Fixed z;
-};
+#include "../util/fixed.h"
 
 #include "../game/game.h"
 
