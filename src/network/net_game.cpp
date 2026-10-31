@@ -79,7 +79,7 @@ struct WeaponDef {
 #include "../gui/gadget.h"
 #include "../gui/layer.h"
 struct DPLCONNECTION;
-// The forward declaration takes one symbol id: Unused_00452960 has one parameter fewer.
+// Forward-declared: Game's ChatPacket* member comes before the definition.
 struct ChatPacket;
 class UnitSync;
 
@@ -1226,7 +1226,6 @@ struct ChatPacket {
     unsigned char type;                // +0x0
     char text[0x40];                   // +0x1
 };
-
 
 struct AllyFlagsPacket {
     unsigned char type;                // +0x0
