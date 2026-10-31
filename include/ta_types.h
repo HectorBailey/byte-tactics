@@ -938,7 +938,7 @@ class DirectPlay_004c9920;
 class DirectPlay_004c9e50;
 class DirectPlay_004ca6a0;
 class DirectPlay_004ca990;
-class DirectPlay_4c97b0;
+class IDirectPlay3;
 class DirectPlay_4c9800;
 class DirectPlay_4c9840;
 class DirectPlay_4c9890;
@@ -1416,7 +1416,7 @@ class Listener_0048ff40_2;
 class Listener_0048ff40_3;
 struct LiveNode;
 union LoadFlags_00497f40;
-class Lobby_4c9a70;
+class IDirectPlayLobby2;
 struct LockEntry_004c5d90;
 struct LogoEntry_00445110;
 struct Logos_00445110;
@@ -17531,7 +17531,7 @@ public:
     Class_004c9490 SubString(int, int);
 };
 
-class DirectPlay_4c97b0 {  // 0x4 bytes, 1 view
+class IDirectPlay3 {  // 0x4 bytes, 1 view
 public:
     virtual int __stdcall Slot00(void);
     virtual int __stdcall Slot01(void);
@@ -17564,7 +17564,7 @@ public:
 
 struct HapinetSession {  // 0x4c9 bytes, 1 view
     char unknown_0[1221];
-    DirectPlay_4c97b0* dp;  // +0x4c5
+    IDirectPlay3* dp;  // +0x4c5
 };
 
 class DirectPlay_4c9800 {  // 0x4 bytes, 1 view
@@ -17765,7 +17765,7 @@ struct DPSessionDesc_4c9a70 {  // 0x50 bytes, 1 view
     unsigned long user4;  // +0x4c
 };
 
-class Lobby_4c9a70 {  // 0x4 bytes, 1 view
+class IDirectPlayLobby2 {  // 0x4 bytes, 1 view
 public:
     virtual int __stdcall Slot00(void);
     virtual int __stdcall Slot01(void);
@@ -17788,7 +17788,7 @@ struct Net_4c9a70 {  // 0x4d9 bytes, 1 view
     char unknown_4ad[24];
     void* dp;  // +0x4c5
     void* field_4c9;  // +0x4c9
-    Lobby_4c9a70* lobby;  // +0x4cd
+    IDirectPlayLobby2* lobby;  // +0x4cd
     DPLCONNECTION* connection;      // +0x4d1
     int connection_size;  // +0x4d5
 };

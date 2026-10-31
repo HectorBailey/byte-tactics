@@ -57,8 +57,10 @@ struct DPLCONNECTION {
     DPSESSIONDESC2* sessionDesc;     // +0x08
 };
 
-// IDirectPlay3-like COM interface: the slots this module calls.
-class DirectPlay_4c97b0 {
+// DirectPlay's IDirectPlay3 COM interface (the DirectX 5 one; the toolchain's
+// DirectX 3 <dplay.h> lacks it): the slots this module calls. dp1 holds the
+// first interface DirectPlayCreate returns through the same view.
+class IDirectPlay3 {
 public:
     virtual int __stdcall QueryInterface(void* iid, void** out);
     virtual unsigned long __stdcall AddRef();
@@ -102,8 +104,10 @@ public:
     virtual int __stdcall Slot38(int val, int flag);                                          // +0x98
 };
 
-// IDirectPlayLobby-like COM interface: the slots this module calls.
-class Lobby_4c9a70 {
+// DirectPlay's IDirectPlayLobby2 COM interface (DirectX 5, which the toolchain's
+// headers lack): the slots this module calls, CreateCompoundAddress among them.
+// directPlayLobby holds the first lobby interface through the same view.
+class IDirectPlayLobby2 {
 public:
     virtual int __stdcall QueryInterface(GUID* riid, void** ppvObject);
     virtual unsigned long __stdcall AddRef();
@@ -150,10 +154,10 @@ struct HapinetSession {
     unsigned long recvFromId;         // +0x4b5
     unsigned long recvToId;           // +0x4b9
     GameRec_4c9c50* games;            // +0x4bd
-    DirectPlay_4c97b0* dp1;           // +0x4c1
-    DirectPlay_4c97b0* dp;            // +0x4c5
-    Lobby_4c9a70* directPlayLobby;    // +0x4c9
-    Lobby_4c9a70* directPlayLobby2;   // +0x4cd
+    IDirectPlay3* dp1;           // +0x4c1
+    IDirectPlay3* dp;            // +0x4c5
+    IDirectPlayLobby2* directPlayLobby;    // +0x4c9
+    IDirectPlayLobby2* directPlayLobby2;   // +0x4cd
     DPLCONNECTION* dplConnection;     // +0x4d1
     int connectionSize;               // +0x4d5
     char disableOutgoingCompression[4]; // +0x4d9, a dword: nonzero stops outgoing compression
@@ -170,8 +174,8 @@ struct HapinetSession {
 // The DirectPlay interface pair HAPINET_createdplayinterface fills: the base
 // object at +0x0 and the IDirectPlay3 interface at +0x4.
 struct DPlayIfacePair {
-    DirectPlay_4c97b0* dp;            // +0x0
-    DirectPlay_4c97b0* dp3;           // +0x4
+    IDirectPlay3* dp;            // +0x0
+    IDirectPlay3* dp3;           // +0x4
 };
 
 // DPLAYX.dll ordinal 2 (DirectPlayEnumerateA from the DirectX 5 dplay.h).
@@ -195,9 +199,9 @@ int __cdecl PeekKey();
 int __cdecl PopKey();
 char* __stdcall SkipTextLines(char* text, int n);
 int GetDisplay();
-extern "C" HRESULT __stdcall DirectPlayCreate(GUID* sp, DirectPlay_4c97b0** dp, void* unknown);
+extern "C" HRESULT __stdcall DirectPlayCreate(GUID* sp, IDirectPlay3** dp, void* unknown);
 extern "C" HRESULT __stdcall DirectPlayLobbyCreateA(GUID* lpGUID,
-                                                    Lobby_4c9a70** lplpDPL,
+                                                    IDirectPlayLobby2** lplpDPL,
                                                     void* lpUnkOuter, void* lpReserved,
                                                     unsigned long dwFlags);
 extern "C" HRESULT __stdcall DirectPlayEnumerateA(EnumSpCallback_4ca400 callback, void* context);
