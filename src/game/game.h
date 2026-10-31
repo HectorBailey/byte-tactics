@@ -43,7 +43,7 @@ class Sound;
 class UnitSync;
 struct HapinetProviderConnEntry;
 struct Ctx_00499890;
-struct CursorState_0041cc60;
+struct CursorState;
 struct Data_0046d970;
 struct WorldEffect;
 struct Def_0049d270;
@@ -98,9 +98,11 @@ struct Point_0041cd50 {  // 0x8 bytes, 1 view
     int y;  // +0x4
 };
 
-struct CursorState_0041cc60 {  // 0x2c bytes
-    Arg_00419670 rect;  // +0x0
-    int flag;  // +0x18
+// The middle-mouse scroll (control_panel.cpp's CursorState; Thaldren's
+// aMiddleMouseSavedCursor and the nMiddleMouse fields after it).
+struct CursorState {  // 0x2c bytes
+    Arg_00419670 start;  // +0x0, the mouse when the scroll began
+    int active;  // +0x18, Thaldren's nMiddleMouseScrollActive
     Point_0041cd50 center;  // +0x1c
     Point_0041cd50 savedScroll;  // +0x24
 };
@@ -396,7 +398,7 @@ struct Game {  // 0x3924d bytes
     unsigned char bit5_2cc6 : 1;
     unsigned char bit6_2cc6 : 1;
     unsigned char rest_2cc6 : 1;
-    CursorState_0041cc60 cursor;  // +0x2cc7
+    CursorState cursor;  // +0x2cc7
     Def_0049d270 weapons[256];  // +0x2cf3
     int projectileCount;  // +0x141f3
     Obj_00406f50* projectiles;  // +0x141f7
