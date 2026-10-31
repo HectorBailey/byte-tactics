@@ -13,6 +13,11 @@
 #include <string.h>
 
 #include "../util/tdf.h"
+// g_game is declared before game.h: its symbol id decides the base and
+// index order of the features[j].anims load (docs/c2-regalloc.md).
+struct Game;
+extern Game* g_game;
+#include "../game/game.h"
 
 // Thaldren's FeatureTdfParserVector, 0x10 bytes: the dummy allocator byte and
 // its pad, then the begin and end pointers. The capacity word at +0xc is not
@@ -84,16 +89,6 @@ struct Feature {
     unsigned short nodrawundergray : 1;
 };
 
-#pragma pack(push, 1)
-struct Game {
-    char unknown_0[0x14253];
-    int featureCount;                   // +0x14253
-    char unknown_14257[0x1426f - 0x14257];
-    Feature* features;      // +0x1426f
-};
-#pragma pack(pop)
-
-extern Game* g_game;
 extern FeatureTdfParserVector* s_featureTdfParsers;
 extern char g_emptyStringLiteral[];
 
