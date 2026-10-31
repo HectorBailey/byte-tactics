@@ -47,6 +47,8 @@ struct Fx_00466c20 {
 
 struct WeaponDef;
 
+// Unused here: the unit's and the unit type's former flag views, kept for the
+// symbol ids they take (docs/c2-regalloc.md).
 union Flags110_00466dc0 {
     unsigned int all;
     struct {
@@ -124,47 +126,7 @@ struct WeaponDef {
 #include "../util/angles.h"
 #include "../weapons/unit_weapon_slot.h"
 
-// A partial view of UnitDef (units/unit_def.h), kept as a view of its own here
-// because its two flag words are read as the bit fields of Flags241_00466dc0
-// and a byte.
-struct UnitDef {
-    char unknown_0[0x204];
-    short radardistance;                 // +0x204
-    short sonardistance;                 // +0x206
-    char unknown_208[0x20a - 0x208];
-    short radardistancejam;              // +0x20a
-    short sonardistancejam;              // +0x20c
-    char unknown_20e[0x241 - 0x20e];
-    Flags241_00466dc0 flags1;           // +0x241
-    unsigned char flags2;                // +0x245
-};
-
-struct Unit {
-    char unknown_0[0x4];
-    UnitWeaponSlot weapons[3];           // +0x4, stride 0x1c
-    char unknown_58[0xc];
-    Angles16 angles;                     // +0x64
-    char unknown_6a[0x2];
-    short xWhole;                        // +0x6c, the whole part of pos.x
-    char unknown_6e[2];
-    short yWhole;                        // +0x70, the whole part of pos.y
-    char unknown_72[2];
-    short zWhole;                        // +0x74, the whole part of pos.z
-    char unknown_76[0x1c];
-    UnitDef* def;              // +0x92
-    char unknown_96[0x10];
-    short unitDefIndex;                      // +0xa6
-    short id;                      // +0xa8
-    char unknown_aa[0x50];
-    unsigned char recentlyDamagedTimer;              // +0xfa
-    char unknown_fb[0x4];
-    unsigned char playerIndex;              // +0xff
-    char unknown_100[0xe];
-    unsigned char activateFlags;             // +0x10e
-    char unknown_10f[0x1];
-    Flags110_00466dc0 flags;             // +0x110
-    char unknown_114[0x4];
-};
+#include "../units/unit.h"
 
 #include "../weapons/projectile.h"
 
@@ -290,6 +252,10 @@ struct Game {
     Flags14281_00466dc0 uiOptionFlags;   // +0x37f2f
 };
 #pragma pack(pop)
+
+// Unused here: these headers' symbol ids keep the radar functions matching (docs/c2-regalloc.md).
+#include "../sound/sound.h"
+#include "../units/cob_script.h"
 
 extern Game* g_game;
 extern char g_radarPictureName[];
@@ -574,7 +540,7 @@ static inline int OnRadar_00466dc0(int px, int py)
 // A unit's screen y (height folded into z) times the minimap scale.
 static inline int ScaleY_00466dc0(Unit* u)
 {
-    return ((int)u->zWhole - ((int)u->yWhole >> 1)) * (int)g_game->minimapGadgetH;
+    return ((int)((short*)&u->pos.z)[1] - ((int)((short*)&u->pos.y)[1] >> 1)) * (int)g_game->minimapGadgetH;
 }
 
 // FUNCTION: 0x466dc0
@@ -601,9 +567,9 @@ void DrawRadarUnits(void)
         do {
             UnitDef*& type = u->def;
             if (u->unitDefIndex != 0) {
-                if (enabled != 0 || (u->flags.all & 0x300) != 0 ||
+                if (enabled != 0 || (u->flags & 0x300) != 0 ||
                     u->playerIndex == g_game->playerIndex) {
-                    int x = u->xWhole * g_game->minimapGadgetW /
+                    int x = ((short*)&u->pos.x)[1] * g_game->minimapGadgetW /
                             g_game->mapPixelWidth;
                     int y = ScaleY_00466dc0(u) / g_game->mapPixelHeight;
                     if (u->recentlyDamagedTimer == 0 ||
@@ -613,11 +579,11 @@ void DrawRadarUnits(void)
                                 Player_Get(u->playerIndex)->info->color),
                             x, y);
                     }
-                    if (u->id == g_game->hoverUnitId) {
+                    if ((short)u->id == g_game->hoverUnitId) {
                         DrawFrame(surface,
                             GetGafFrame(g_game->radlogohigh, 0), x, y);
                     }
-                    if (u->flags.bits.bit4) {
+                    if (u->selected) {
                         if ((u->activateFlags & 1) != 0 ||
                             (type->flags2 & 4) == 0) {
                             if (type->radardistance != 0)
@@ -637,7 +603,7 @@ void DrawRadarUnits(void)
                                     (int)g_game->minimapGadgetW * type->sonardistancejam /
                                     g_game->mapPixelWidth, base[0xc]);
                         }
-                        if (type->flags1.bit29) {
+                        if (type->antiWeapons) {
                             UnitWeaponSlot* slot = u->weapons;
                             int n = 3;
                             do {
