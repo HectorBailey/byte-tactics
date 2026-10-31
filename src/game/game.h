@@ -1,7 +1,7 @@
 // Game: the game state (Thaldren's GameState), 0x3924d bytes. The names are the
 // settled ones from the #6655 measurement. Types with a shared header are included;
 // the headerless ones it holds by value are laid out in front, pointer targets are
-// forward declarations. Flags_0045c570 at +0x37f19 is spelled from its neighbours.
+// forward declarations.
 #ifndef GAME_H
 #define GAME_H
 
@@ -55,8 +55,8 @@ struct Eye_00482130;
 struct FaceFlags_459830;
 struct Feature;
 struct FeatureSpot;
-struct Flags_0045c570;
-struct Flags_00495e90_37f06;
+struct SoundFlags;
+struct VisualFlags;
 struct FrameTimers;
 struct Game;
 struct Grid;
@@ -250,8 +250,19 @@ struct Def_0049d270 {  // 0x115 bytes
     unsigned int : 1;
 };
 
-struct Flags_00495e90_37f06 {  // 0x2 bytes
-    char unknown_0[2];
+// The visual options word (Thaldren's wVisualFlags), with the bit names
+// settings.cpp reads from the registry.
+struct VisualFlags {  // 0x2 bytes
+    unsigned short damagebars : 1;      // bit 0
+    unsigned short antiAlias : 1;       // bit 1
+    unsigned short shadows : 1;         // bit 2
+    unsigned short vehicleShadows : 1;  // bit 3
+    unsigned short featureShadows : 1;  // bit 4
+    unsigned short shading : 1;         // bit 5
+    unsigned short ditheredFog : 1;     // bit 6
+    unsigned short b7 : 1;              // bit 7, toggled by key 0xe5 (keys.cpp), not saved
+    unsigned short switchAlt : 1;       // bit 8
+    unsigned short rest : 7;
 };
 
 struct ChatHudEntry {  // 0x48 bytes, Thaldren's: one line of the chat HUD ring
@@ -289,8 +300,14 @@ struct Class_0046a400 {  // 0x50 bytes
     void AccumulateProfileTime(int);
 };
 
-struct Flags_0045c570 {  // 2 bytes, the sound flag word
-    unsigned short bits;
+// The sound options word (Thaldren's wSoundFlags), with settings.cpp's bit names.
+struct SoundFlags {  // 2 bytes
+    unsigned short soundMode : 3;       // bits 0-2
+    unsigned short restoreVolume : 1;   // bit 3
+    unsigned short ackfx : 1;           // bit 4
+    unsigned short buildfx : 1;         // bit 5
+    unsigned short speechfx : 1;        // bit 6
+    unsigned short rest : 9;
 };
 
 struct Game {  // 0x3924d bytes
@@ -622,7 +639,7 @@ struct Game {  // 0x3924d bytes
     int interfaceType;  // +0x37efa
     int mode;  // +0x37efe
     int screenChat;  // +0x37f02
-    Flags_00495e90_37f06 visualFlags;  // +0x37f06
+    VisualFlags visualFlags;  // +0x37f06
     int gamma;  // +0x37f08
     int fxVolume;  // +0x37f0c
     int musicVolume;  // +0x37f10
@@ -630,7 +647,7 @@ struct Game {  // 0x3924d bytes
     unsigned char cdMode;       // +0x37f16
     unsigned char unitChat;     // +0x37f17
     unsigned char unitChatText;  // +0x37f18
-    Flags_0045c570 soundFlags;  // +0x37f19
+    SoundFlags soundFlags;  // +0x37f19
     int displayWidth;  // +0x37f1b
     int displayHeight;  // +0x37f1f
     int textScroll;   // +0x37f23
