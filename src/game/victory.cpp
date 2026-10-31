@@ -110,8 +110,6 @@ struct Game {
             UnitList units;            // +0x1bca
             char unknown_1bd2[0x1d15 - 0x1bd2];
             UnitList units2;           // +0x1d15
-            char unknown_1d1d[0x1df2 - 0x1d1d];
-            short player1UnitCount;    // +0x1df2, players[1].unitCount (player.h +0x144)
         };
     };
     char unknown_2851[0x2a42 - 0x2851];
@@ -610,7 +608,7 @@ extern char g_destroyAllUnitsKey[]; // "VictoryCondition_DestroyAllUnits"
 // FUNCTION: 0x48eb40
 int VictoryDestroyAllUnits::IsSatisfied()
 {
-    if (g_game->player1UnitCount == 0) {
+    if (g_game->players[1].unitCount == 0) {
         if (celebrated == 0) {
             PlaySoundByName("Victory Condition", 0);
             celebrated = 1;
