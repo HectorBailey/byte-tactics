@@ -724,19 +724,10 @@ struct UnitType_00446f50 {
     } flags2;
 };
 
-struct Event_44c220 {                   // UnitSyncEntry: the map's changed entries
-    int fbiChecksum;                   // +0x00
-    int scriptChecksum;                // +0x04, UnitSyncEntry::y
-    short enabled;                     // +0x08
-    short peerEnabled;                 // +0x0a
-    int max;                           // +0x0c
-};
+// The sync map's entries (the changed ones PopChangedEntry returns, and the
+// one GetUnitEntry fills).
+#include "../network/unit_sync_entry.h"
 
-struct Info_0044c7e0 {                  // filled by UnitSync::GetUnitEntry
-    char unknown_0[0xa];
-    short peerEnabled;                 // +0x0a
-    int max;                           // +0x0c
-};
 
 class UnitSync {
 public:
@@ -746,11 +737,11 @@ public:
     void ProcessSync();
     char* GetSyncStatusText();
     void CheckUnitAvailable(unsigned int, int);
-    int PopChangedEntry(Event_44c220* event);
+    int PopChangedEntry(UnitSyncEntry* event);
     void SetUnitLimit(UnitType_00446f50* unit, int value);
     int DisallowUnit(UnitType_00446f50* unit);
     int AllowUnit(UnitType_00446f50* unit);
-    int GetUnitEntry(UnitType_00446f50* type, Info_0044c7e0* out);
+    int GetUnitEntry(UnitType_00446f50* type, UnitSyncEntry* out);
 };
 
 struct Options_00446f50 {
@@ -4733,7 +4724,7 @@ void LoadUnitPortrait()
 // FUNCTION: 0x44c220
 void UnitRestrictDialogFrame()
 {
-    Event_44c220 event;
+    UnitSyncEntry event;
     int n = 0;
     Gadget* entry = (Gadget*)FindGadgetChecked(g_game->gui.layer->entries, "PICLIST");
 
@@ -4746,10 +4737,10 @@ void UnitRestrictDialogFrame()
         n++;
         for (int i = 0; i < entry->u.list.rowCount; i++) {
             if (event.fbiChecksum == g_game->unitDefs[g_unitRestrictEntries[i].unitIndex].fbiChecksum) {
-                ((unsigned char*)entry->u.list.filebuf)[i] = (event.peerEnabled == 0);
-                g_unitRestrictEntries[i].peerEnabled = event.peerEnabled;
-                g_unitRestrictEntries[i].max = event.max;
-                ((unsigned char*)entry->u.list.filebuf)[i] |= (event.max != 0) ? 0 : 2;
+                ((unsigned char*)entry->u.list.filebuf)[i] = (event.checksumMatch == 0);
+                g_unitRestrictEntries[i].peerEnabled = event.checksumMatch;
+                g_unitRestrictEntries[i].max = event.maxThisUnit;
+                ((unsigned char*)entry->u.list.filebuf)[i] |= (event.maxThisUnit != 0) ? 0 : 2;
             }
         }
     }
@@ -4858,7 +4849,7 @@ void OpenUnitRestrictions()
             continue;
         {
             UnitType_00446f50* type = &g_game->unitDefs[i];
-            Info_0044c7e0 info;
+            UnitSyncEntry info;
             int count;
             sprintf(g_unitRestrictEntries[n].name, "%s\r%s %dM  %dE",
                     g_game->unitDefs[i].unitName, Translate(type->description),
@@ -4866,10 +4857,10 @@ void OpenUnitRestrictions()
             g_unitRestrictEntries[n].unitIndex = i;
             g_game->sync->GetUnitEntry(&g_game->unitDefs[i], &info);
             // One ternary: the if-statement form swaps the ebx/ebp registers.
-            count = info.max == -1 ? 0x65 : info.max;
+            count = info.maxThisUnit == -1 ? 0x65 : info.maxThisUnit;
             g_unitRestrictEntries[n].max = count;
             g_unitRestrictOldCounts[n] = count;
-            g_unitRestrictEntries[n].peerEnabled = info.peerEnabled;
+            g_unitRestrictEntries[n].peerEnabled = info.checksumMatch;
             n++;
         }
     }
