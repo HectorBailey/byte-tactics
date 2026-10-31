@@ -34,7 +34,6 @@ struct Cell;
 struct Cell_004816a0;
 struct Class_00437c80;
 struct Class_0045ae80;
-struct Class_0046a400;
 struct Class_00472200;
 struct Class_0047cb00;
 struct Class_00480160;
@@ -292,13 +291,6 @@ struct SelectionInfoCache {  // 0x38 bytes of Thaldren's 0x3c; its +0x38 is Game
     unsigned short* lightbar;  // +0x34, the cached lightbar frame
 };
 
-struct Class_0046a400 {  // 0x50 bytes
-    int last;  // +0x0
-    int total;  // +0x4
-    int values[9];  // +0x8
-    int acc[9];  // +0x2c
-    void AccumulateProfileTime(int);
-};
 
 // The sound options word (Thaldren's wSoundFlags), with settings.cpp's bit names.
 struct SoundFlags {  // 2 bytes
@@ -309,6 +301,19 @@ struct SoundFlags {  // 2 bytes
     unsigned short speechfx : 1;        // bit 6
     unsigned short rest : 9;
 };
+
+// Unused here: the symbol ids these declarations take stand where game.h's own
+// copy of FrameTimers stood, keeping UpdateBattleRoom (0x44a680) matching
+// (docs/c2-regalloc.md).
+void RegisterUnitOrders(void);
+void RegisterGroundOrders(void);
+void EnableAICommands(void);
+void RegisterAICommands(void);
+void FUN_00406f40(void);
+void ResetAIPlayers(void);
+void RegisterVtolOrders(void);
+void StepAllGafSequences(void);
+void ResetNetStats(void);
 
 struct Game {  // 0x3924d bytes
     char unknown_0;  // +0x0
@@ -691,7 +696,7 @@ struct Game {  // 0x3924d bytes
     void* moviePlayer;  // +0x38d7b
     unsigned short allMissionsFlags;  // +0x38d7f
     int numSkirmishPlayers;  // +0x38d81
-    Class_0046a400 timers;  // +0x38d85
+    FrameTimers timers;  // +0x38d85, Thaldren's profileTimingBars
     int profileBarsEnabled;  // +0x38dd5
     EndGamePlayerStatRow endGamePlayerStats[10];  // +0x38dd9
     char unknown_3901d[58];
