@@ -69,6 +69,9 @@ struct Rot16 {
     short x, y, z;
 };
 
+// Not util/fixed.h: the halves are reached through the named member `f`, and on
+// the header's anonymous halves 0x424840 drops to 92.3% (0x424050 and 0x424890
+// to 99.4% and 99.2%).
 struct Fixed {
     unsigned short frac;
     short whole;
