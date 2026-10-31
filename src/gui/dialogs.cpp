@@ -397,7 +397,7 @@ int __stdcall IsScreenNamed(Gui* obj, const char* name)
 // FUNCTION: 0x4ab0a0
 void __stdcall ClearSelectedGadget(void* gui)
 {
-    *(int*)((char*)gui + 0x60) = -1;
+    ((Gui*)gui)->hotGadgetIndex = -1;
 }
 
 // FUNCTION: 0x4ab0b0
@@ -697,8 +697,8 @@ void __stdcall UpdateCursorAndMouse(Gui* p)
 // FUNCTION: 0x4ab690
 void __stdcall SetClickMode(void* gui, int mode)
 {
-    *(int*)((char*)gui + 0x58) = mode;
-    *(int*)(*(int*)((char*)gui + 0x18) + 0x37) = mode;
+    ((Gui*)gui)->clickMode = mode;
+    ((Gui*)gui)->layer->clickMode = mode;
 }
 
 // FUNCTION: 0x4ab6b0
@@ -851,6 +851,13 @@ done:
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+
+// Unused here: real functions declared to keep RemapPaletteToClosestIndices
+// (0x4ac7d0) and GetColorCellAt (0x4acbe0) matching now that
+// ClearSelectedGadget and SetClickMode name their Gui members
+// (docs/c2-regalloc.md).
+int UpdatePlacementGhostValidity(void);
+void RefreshSelectionOrders(void);
 
 #pragma pack(push, 1)
 // One palette entry.
