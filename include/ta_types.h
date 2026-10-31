@@ -46,7 +46,7 @@ struct App_004c25e0;
 struct Arena_004da9f0;
 struct Arg_00419670;
 struct Arg_004c6210;
-struct Args_00451640;
+struct LobbyJoinInfo;
 struct Arr_00421550;
 struct ArrayA;
 struct ArrayB;
@@ -7998,7 +7998,7 @@ struct Packet_00450f90 {  // 0xba bytes, 1 view
     Data_0046d970 data;  // +0x1
 };
 
-struct Args_00451640 {  // 0x1c bytes, 2 views
+struct LobbyJoinInfo {  // 0x1c bytes, 2 views
     char* name;  // +0x0
     int arg_4;  // +0x4
     int arg_8;  // +0x8

@@ -1198,15 +1198,17 @@ struct Obj_00451640 {
     unsigned short flag : 1;           // +0xf0, mask 2
 };
 
-// The LOBBY JOIN INFO argument block of 0x451640 and 0x451770.
-struct Args_00451640 {
-    char* name;                        // +0x00
-    int arg_4;                         // +0x04
-    int arg_8;                         // +0x08
-    int arg_c;                         // +0x0c
-    int arg_10;                        // +0x10
-    int arg_14;                        // +0x14
-    int result;                        // +0x18
+// The LOBBY JOIN INFO block (Thaldren's LOBBY_JOIN_INFO) 0x451640 allocates
+// and its join thread 0x451770 hands to HAPINET_createorjoinlobbygame, named
+// for that function's parameters in hapinet.cpp.
+struct LobbyJoinInfo {
+    char* password;                    // +0x00
+    int maxPlayers;                    // +0x04
+    int user1;                         // +0x08
+    int user2;                         // +0x0c
+    int user3;                         // +0x10
+    int user4;                         // +0x14
+    int result;                        // +0x18, the join's result
 };
 
 // The packet data object of 0x451fd0 and 0x452370: one type for both views.
@@ -1280,7 +1282,7 @@ void* __cdecl GameAllocIgnoreTag(char* tag, int size);
 int __stdcall InitPacketTables(Class_00451fd0* obj);
 void __stdcall EnumPlayersCallback(int id, int unused1, int unused2, int unused3, int unused4);
 int __stdcall JoinLobbyGame(Player* p);
-void __stdcall JoinLobbyGameThread(Args_00451640* args);
+void __stdcall JoinLobbyGameThread(LobbyJoinInfo* args);
 unsigned __stdcall JoinLobbyGameThread(void* args);
 int __stdcall SendPacketToPlayer(int from, int to, void* packet, int size);
 int __stdcall AssignPlayerColor(int from, int to, int group);
@@ -1408,15 +1410,15 @@ int __stdcall JoinLobbyGame(Player* p)
         g_game->netMode = count;
     }
 
-    Args_00451640* args = (Args_00451640*)GameAllocIgnoreTag("LOBBY JOIN INFO", 0x1c);
+    LobbyJoinInfo* args = (LobbyJoinInfo*)GameAllocIgnoreTag("LOBBY JOIN INFO", 0x1c);
     if (args != 0) {
         memset(args, 0, 0x1c);
-        args->arg_4 = count;
-        args->name = name;
-        args->arg_8 = 0;
-        args->arg_c = 0;
-        args->arg_10 = 0;
-        args->arg_14 = 0;
+        args->maxPlayers = count;
+        args->password = name;
+        args->user1 = 0;
+        args->user2 = 0;
+        args->user3 = 0;
+        args->user4 = 0;
         args->result = 0;
 
         unsigned int tid = 0;
@@ -1443,10 +1445,10 @@ int __stdcall JoinLobbyGame(Player* p)
 }
 
 // FUNCTION: 0x451770
-void __stdcall JoinLobbyGameThread(Args_00451640* args)
+void __stdcall JoinLobbyGameThread(LobbyJoinInfo* args)
 {
-    args->result = HAPINET_createorjoinlobbygame(g_game->session, args->name, args->arg_4, args->arg_8,
-                                args->arg_c, args->arg_10, args->arg_14);
+    args->result = HAPINET_createorjoinlobbygame(g_game->session, args->password, args->maxPlayers, args->user1,
+                                args->user2, args->user3, args->user4);
 }
 
 // FUNCTION: 0x4517b0
