@@ -62,7 +62,7 @@ struct IconSet_00466780;
 struct List_00420960;
 struct Map_0042e440;
 class Mission;
-struct Net_4517b0;
+struct DPLCONNECTION;
 struct Projectile;
 struct Object3do;
 struct PathMap;
@@ -249,7 +249,7 @@ struct Game {  // 0x3924d bytes
     int lobby2;  // +0x4c9
     int local_id;  // +0x4cd
     char unknown_4d1[20];
-    Net_4517b0* dplConnection;  // +0x4e5
+    DPLCONNECTION* dplConnection;  // +0x4e5
     char unknown_4e9[4];
     int compressionOff;  // +0x4ed
     int netMode;  // +0x4f1

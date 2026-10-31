@@ -76,7 +76,7 @@ struct WeaponDef {
 #include "../gui/gui.h"
 #include "../gui/gadget.h"
 #include "../gui/layer.h"
-struct Net_4517b0;
+struct DPLCONNECTION;
 // The forward declaration takes one symbol id: Unused_00452960 has one parameter fewer.
 struct ChatPacket;
 class UnitSync;
@@ -227,7 +227,7 @@ struct Game {
         };
     };
     char unknown_4dd[0x4e5 - 0x4dd];
-    Net_4517b0* dplConnection;         // +0x4e5
+    DPLCONNECTION* dplConnection;      // +0x4e5
     char unknown_4e9[0x4f1 - 0x4e9];
     int netMode;                       // +0x4f1
     char unknown_4f5[0x519 - 0x4f5];
@@ -1172,11 +1172,14 @@ struct SessionDesc_004517b0 {
     char* lpszSessionName;             // +0x30
 };
 
-struct Net_4517b0 {
+// DirectPlay Lobby's DPLCONNECTION, the connection settings at g_game+0x4e5
+// (hapinet.cpp's view names the same +0x8 sessionDesc; the toolchain's DirectX 3
+// headers lack the type).
+struct DPLCONNECTION {
     char unknown_0[4];
     unsigned int flags;                // +0x4
-    SessionDesc_004517b0* desc;        // +0x8
-    DPNAME* name;                      // +0xc
+    SessionDesc_004517b0* sessionDesc; // +0x8
+    DPNAME* playerName;                // +0xc
 };
 
 // The display object of 0x451640 and 0x4517b0: one type for both views.
@@ -1457,14 +1460,14 @@ int __stdcall JoinNetGame(Guid_4517b0 guid, int player)
     if (player == g_game->localPlayer) {
         Player* p = &g_game->players[player];
 
-        Net_4517b0* net = g_game->dplConnection;
+        DPLCONNECTION* net = g_game->dplConnection;
         if (net != 0) {
             int v = IsOnlineConfigLoaded();
             char* s = &g_onlineLobbyPlayerName;
             if (v == 0)
                 s = g_emptyStringLiteral;
 
-            DPNAME* n2 = net->name;
+            DPNAME* n2 = net->playerName;
             if (n2 != 0) {
                 char* t = n2->lpszShortNameA;
                 if (t != 0 && *t != 0) {
@@ -1524,13 +1527,13 @@ int __stdcall JoinNetGame(Guid_4517b0 guid, int player)
                 FatalError(Translate("Unable to connect to DirectPlay lobby."));
             }
         } else {
-            result = HAPINET_joingame((Net_4517b0*)g_game->session, guid);
+            result = HAPINET_joingame((void*)g_game->session, guid);
         }
         if (result == 0)
             return 0;
 
         CreateLocalPlayer(player, 1);
-        HAPINET_enumplayers((Net_4517b0*)g_game->session, 0, (void*)EnumPlayersCallback, 0, 0);
+        HAPINET_enumplayers((void*)g_game->session, 0, (void*)EnumPlayersCallback, 0, 0);
         if (g_game->netGameFlags & 1) {
             for (int i = 0; i < 10; i++) {
                 Player* q = &g_game->players[i];
@@ -3620,7 +3623,7 @@ int InitLobbiedConnection()
         g_game->netMode = 10;
         if (InitPacketManager(2, 100)) {
             SetMissionType(3);
-            char* name = g_game->dplConnection->desc->lpszSessionName;
+            char* name = g_game->dplConnection->sessionDesc->lpszSessionName;
             if (name != 0) {
                 strncpy(g_game->session, name, 0x10);
                 return 1;
