@@ -9,7 +9,7 @@
 #ifndef UNIT_SYNC_H
 #define UNIT_SYNC_H
 
-struct Unit_0046e330;
+class UnitDef;
 struct UnitSyncEntry;
 struct UnitSyncPacket;
 struct Target_0046d530;
@@ -51,11 +51,11 @@ public:
     int IsPlayerSynced(int id);
     void ApplyToUnitTypes();
     int PopChangedEntry(UnitSyncEntry* out);
-    int GetUnitEntry(Unit_0046e330* unit, UnitSyncEntry* out);
-    int ToggleUnitAllowed(Unit_0046e330* unit);
-    int DisallowUnit(Unit_0046e330* unit);
-    int AllowUnit(Unit_0046e330* unit);
-    void SetUnitLimit(Unit_0046e330* unit, int value);
+    int GetUnitEntry(UnitDef* unit, UnitSyncEntry* out);
+    int ToggleUnitAllowed(UnitDef* unit);
+    int DisallowUnit(UnitDef* unit);
+    int AllowUnit(UnitDef* unit);
+    void SetUnitLimit(UnitDef* unit, int value);
 };
 
 #endif

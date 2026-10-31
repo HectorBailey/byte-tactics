@@ -103,9 +103,9 @@ void __stdcall HandleRestrictionsClick(Gui* menu)
                     if (item->flags2.bits.flag) {
                     } else {
                         if (g_unitRestrictEntries[i].max == 0)
-                            g_game->sync->DisallowUnit((Unit_0046e330*)item);
+                            g_game->sync->DisallowUnit((UnitDef*)item);
                         else
-                            g_game->sync->AllowUnit((Unit_0046e330*)item);
+                            g_game->sync->AllowUnit((UnitDef*)item);
                     }
                 }
             }
@@ -143,7 +143,7 @@ void __stdcall HandleRestrictionsClick(Gui* menu)
                     g_unitRestrictEntries[i].max = 0;
                 if (g_unitRestrictEntries[i].max != g_unitRestrictEntries[i].previousMax) {
                     g_game->sync->SetUnitLimit(
-                        (Unit_0046e330*)&g_game->unitDefs[g_unitRestrictEntries[i].unitIndex],
+                        &g_game->unitDefs[g_unitRestrictEntries[i].unitIndex],
                         g_unitRestrictEntries[i].max);
                 }
             }
@@ -166,7 +166,7 @@ void __stdcall HandleRestrictionsClick(Gui* menu)
             if (((Item_0044c420*)g_game->unitDefs)[i].flags2.bits.flag) {
             } else if (((Item_0044c420*)g_game->unitDefs)[i].name != 0) {
                 g_game->sync->SetUnitLimit(
-                    (Unit_0046e330*)&g_game->unitDefs[i], g_unitRestrictOldCounts[n]);
+                    &g_game->unitDefs[i], g_unitRestrictOldCounts[n]);
                 n++;
             }
         }

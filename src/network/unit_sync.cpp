@@ -325,10 +325,6 @@ public:
 };
 
 #pragma pack(push, 1)
-struct Unit_0046e330 {
-    char unknown_0[0x13e];
-    unsigned int key;                  // +0x13e
-};
 
 #pragma pack(pop)
 
@@ -574,11 +570,11 @@ public:
     int AllPlayersSynced();
     int IsPlayerSynced(int id);
     int PopChangedEntry(UnitSyncEntry* out);
-    int GetUnitEntry(Unit_0046e330* unit, UnitSyncEntry* out);
-    int ToggleUnitAllowed(Unit_0046e330* unit);
-    int DisallowUnit(Unit_0046e330* unit);
-    int AllowUnit(Unit_0046e330* unit);
-    void SetUnitLimit(Unit_0046e330* unit, int value);
+    int GetUnitEntry(UnitDef* unit, UnitSyncEntry* out);
+    int ToggleUnitAllowed(UnitDef* unit);
+    int DisallowUnit(UnitDef* unit);
+    int AllowUnit(UnitDef* unit);
+    void SetUnitLimit(UnitDef* unit, int value);
     void ApplyToUnitTypes();
     void ResetEntries();
 };
@@ -1222,53 +1218,53 @@ int UnitSync::PopChangedEntry(UnitSyncEntry* out)
 
 // Copies out the unit's entry and returns whether it has a non-empty size.
 // FUNCTION: 0x46e330
-int UnitSync::GetUnitEntry(Unit_0046e330* unit, UnitSyncEntry* out)
+int UnitSync::GetUnitEntry(UnitDef* unit, UnitSyncEntry* out)
 {
-    *out = Find(&unit->key).ptr->value;
+    *out = Find(&unit->fbiChecksum).ptr->value;
     return out->w != 0 && out->h != 0;
 }
 
 // Toggles the entry's width; returns whether the entry now has a non-empty
 // size.
 // FUNCTION: 0x46e3c0
-int UnitSync::ToggleUnitAllowed(Unit_0046e330* unit)
+int UnitSync::ToggleUnitAllowed(UnitDef* unit)
 {
-    UnitSyncNode* n = Find(&unit->key).ptr;
+    UnitSyncNode* n = Find(&unit->fbiChecksum).ptr;
     n->value.w = (n->value.w == 0);
-    NotifyEntryChanged(unit->key);
+    NotifyEntryChanged(unit->fbiChecksum);
     return n->value.w != 0 && n->value.h != 0;
 }
 
 // Clears the entry's width; returns whether the entry now has a non-empty
 // size.
 // FUNCTION: 0x46e450
-int UnitSync::DisallowUnit(Unit_0046e330* unit)
+int UnitSync::DisallowUnit(UnitDef* unit)
 {
-    UnitSyncNode* n = Find(&unit->key).ptr;
+    UnitSyncNode* n = Find(&unit->fbiChecksum).ptr;
     n->value.w = 0;
-    NotifyEntryChanged(unit->key);
+    NotifyEntryChanged(unit->fbiChecksum);
     return n->value.w != 0 && n->value.h != 0;
 }
 
 // Sets the entry's width to 1; returns whether the entry now has a non-empty
 // size.
 // FUNCTION: 0x46e4d0
-int UnitSync::AllowUnit(Unit_0046e330* unit)
+int UnitSync::AllowUnit(UnitDef* unit)
 {
-    UnitSyncNode* n = Find(&unit->key).ptr;
+    UnitSyncNode* n = Find(&unit->fbiChecksum).ptr;
     n->value.w = 1;
-    NotifyEntryChanged(unit->key);
+    NotifyEntryChanged(unit->fbiChecksum);
     return n->value.w != 0 && n->value.h != 0;
 }
 
 // Sets the last field of the unit's entry and has NotifyEntryChanged look at it.
 // FUNCTION: 0x46e550
-void UnitSync::SetUnitLimit(Unit_0046e330* unit, int value)
+void UnitSync::SetUnitLimit(UnitDef* unit, int value)
 {
-    UnitSyncIter it = Find(&unit->key);
+    UnitSyncIter it = Find(&unit->fbiChecksum);
     if (!(it == End())) {
         it.ptr->value.limit = value;
-        NotifyEntryChanged(unit->key);
+        NotifyEntryChanged(unit->fbiChecksum);
     }
 }
 
