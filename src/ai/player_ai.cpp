@@ -14,10 +14,8 @@
 
 #pragma pack(push,1)
 struct Player { char pad[0x108]; unsigned char allied[0x3e]; unsigned char index; int IsAllied(unsigned char p) const { return allied[p]; } };
-struct Def { char pad[0x156]; int builder; char pad15a[0x22f-0x15a]; char mobile; char pad230[0x241-0x230]; unsigned flags; char pad245[0x249-0x245]; };
-struct Unit { char pad[0x6a]; Vec3 pos; char pad76[0x92-0x76]; Def* def; Player* player; char pad9a[12]; unsigned short unitDefIndex; char pada8[0x104-0xa8]; float buildLeft; char pad108[6]; unsigned char activateFlags; char pad10f; unsigned flags; int pad114; unsigned char PlayerIndex() const { return player->index; } int Ready() const { return (flags&0x10000000) && !(flags&0x4000); } };
 
-#include "../units/unit_def.h"
+#include "../units/unit.h"
 
 #include "../map/mission.h"
 
@@ -37,7 +35,7 @@ struct Game {
     char unknown_1435f[0x1438f - 0x1435f];
     int unitDefCount;                  // +0x1438f
     char unknown_14393[0x1439b - 0x14393];
-    Def* unitDefs;                     // +0x1439b
+    UnitDef* unitDefs;                 // +0x1439b
     char unknown_1439f[0x38a47 - 0x1439f];
     unsigned int gameTick;             // +0x38a47
     char unknown_38a4b[0x391e9 - 0x38a4b];
@@ -104,15 +102,15 @@ void PlayerAI::RefreshUnitLists()
     struct { float x,y,z,total; } sum={0,0,0,0};
     std::fill(counts.begin(),counts.end(),(short)0);
     for(Unit* u=g_game->units+1;u<=g_game->unitsEnd;++u) {
-        if(u->Ready()) {
-            if(!owner->IsAllied(u->PlayerIndex())) {
+        if((u->flags&0x10000000) && !(u->flags&0x4000)) {
+            if(!owner->IsAllied(u->player->index)) {
                 if(IsUnitVisibleToPlayer(owner,u) && !(u->flags&0x8000)) visible.units.push_back(u);
                 if((unsigned char)(u->flags>>8)&1) known.units.push_back(u);
-            } else if(u->PlayerIndex()==owner->index && u->buildLeft==0.0) {
+            } else if(u->player->index==owner->index && u->buildLeft==0.0) {
                 ++counts[u->unitDefIndex];
-                if(u->def->builder) ++builders;
-                if((u->def->flags&0x40) && (u->def->flags&0x200) && (u->activateFlags&1)) factories.list.units.push_back(u);
-                if((u->def->flags&0x400) && (u->activateFlags&1)) hasSpecial=1;
+                if(u->def->ids) ++builders;
+                if((u->def->flags1&0x40) && (u->def->flags1&0x200) && (u->activateFlags&1)) factories.list.units.push_back(u);
+                if((u->def->flags1&0x400) && (u->activateFlags&1)) hasSpecial=1;
                 // The table holds signed bytes: the cast gives the sign-extending load.
                 float weight=(char)weights[u->unitDefIndex];
                 sum.total+=weight;
