@@ -12,7 +12,6 @@
 #include "../util/angles.h"
 
 struct Unit;
-class UnitRef;
 class PathOrderAttach;
 class Order;
 
@@ -129,48 +128,15 @@ int __stdcall UnitCanBuild(Unit* unit, short id)
     return 0;
 }
 
-#include "unit_ref.h"
-
-// unit.h types the list head at +0xa2 as PathOrderAttach*, the other view of
-// the same 0x10-byte node; the UnitRef methods walk the list through this.
-static inline UnitRef** UnitRefs(Unit* u)
-{
-    return (UnitRef**)&u->head;
-}
-
-// FUNCTION: 0x489540
-void UnitRef::LinkToUnit(Unit* o)
-{
-    if (o != 0 && o->unitDefIndex != 0) {
-        owner = o;
-        next = *UnitRefs(o);
-        *UnitRefs(o) = this;
-        return;
-    }
-    owner = 0;
-    next = 0;
-}
-
-// Unlinks the link from its owner's list (head at +0xa2); the counterpart of
-// 0x489540, which links it in.
-// FUNCTION: 0x489580
-void UnitRef::UnlinkFromUnit()
-{
-    if (owner != 0) {
-        UnitRef** link = UnitRefs(owner);
-        while (*link != this)
-            link = &(*link)->next;
-        *link = next;
-        owner = 0;
-        next = 0;
-    }
-}
-
+// The 0x10-byte node a unit's list (head at +0xa2) is made of: the link an
+// order keeps at +0x12, and the reference the PathGoal family holds. This file
+// keeps its own view of orders/path_order_attach.h's class: it defines the
+// methods with the destructor inline.
 class PathOrderAttach {
 public:
     Unit* owner;                       // +0x4
     PathOrderAttach* next;             // +0x8
-    Listener_004896f0* value;          // +0xc
+    Listener_004896f0* listener;       // +0xc, told when the reference changes
 
     PathOrderAttach(Unit* o, int v);
     virtual ~PathOrderAttach()
@@ -185,14 +151,48 @@ public:
         }
     }
     void SetUnit(Unit* o);
+    // The empty do-while is a debug check that compiles to nothing.
+    Unit* Get() { do {} while (0); return owner; }
+    void ClearRef(void);
+    void LinkToUnit(Unit* o);
+    void UnlinkFromUnit();
+    void Unlink();
 };
+
+// FUNCTION: 0x489540
+void PathOrderAttach::LinkToUnit(Unit* o)
+{
+    if (o != 0 && o->unitDefIndex != 0) {
+        owner = o;
+        next = o->head;
+        o->head = this;
+        return;
+    }
+    owner = 0;
+    next = 0;
+}
+
+// Unlinks the link from its owner's list (head at +0xa2); the counterpart of
+// 0x489540, which links it in.
+// FUNCTION: 0x489580
+void PathOrderAttach::UnlinkFromUnit()
+{
+    if (owner != 0) {
+        PathOrderAttach** link = &owner->head;
+        while (*link != this)
+            link = &(*link)->next;
+        *link = next;
+        owner = 0;
+        next = 0;
+    }
+}
 
 // A link that registers itself in its owner's list (head at +0xa2) when the
 // owner is set and its flag at +0xa6 is non-zero. The only vtable slot is
 // the scalar deleting destructor (0x489600), which unlinks it again.
 // FUNCTION: 0x4895c0
 PathOrderAttach::PathOrderAttach(Unit* o, int v)
-    : value((Listener_004896f0*)v)
+    : listener((Listener_004896f0*)v)
 {
     if (o != 0 && o->unitDefIndex != 0) {
         owner = o;
@@ -212,12 +212,12 @@ PathOrderAttach::PathOrderAttach(Unit* o, int v)
 
 // The out-of-line destructor of PathOrderAttach (vtable 0x4fd754): unlinks
 // the object from its owner's list (head at +0xa2) and clears the link.
-// Callers already call it as UnitRef::Unlink, so it is written as that
-// method, which runs the real destructor non-virtually.
+// Callers call it as Unlink, so it is written as that method, which runs the
+// real destructor non-virtually.
 // FUNCTION: 0x489650
-void UnitRef::Unlink()
+void PathOrderAttach::Unlink()
 {
-    ((PathOrderAttach*)this)->PathOrderAttach::~PathOrderAttach();
+    this->PathOrderAttach::~PathOrderAttach();
 }
 
 // Moves the link to a new owner: unlinks it from the current owner's list
@@ -245,13 +245,13 @@ void PathOrderAttach::SetUnit(Unit* o)
 }
 
 // FUNCTION: 0x4896f0
-void UnitRef::ClearRef(void)
+void PathOrderAttach::ClearRef(void)
 {
     Unit* saved = owner;
     if (listener)
         listener->Notify(8);
     if (owner == saved && owner) {
-        UnitRef** pp = UnitRefs(owner);
+        PathOrderAttach** pp = &owner->head;
         while (*pp != this)
             pp = &(*pp)->next;
         *pp = next;
@@ -266,12 +266,12 @@ void UnitRef::ClearRef(void)
 // FUNCTION: 0x489740
 void __stdcall ClearUnitRefs(Unit* obj)
 {
-    for (UnitRef* n = *UnitRefs(obj); n != 0; n = *UnitRefs(obj)) {
+    for (PathOrderAttach* n = obj->head; n != 0; n = obj->head) {
         Unit* saved = n->owner;
         if (n->listener)
             n->listener->Notify(8);
         if (n->owner == saved && n->owner) {
-            UnitRef** pp = UnitRefs(n->owner);
+            PathOrderAttach** pp = &n->owner->head;
             while (*pp != n)
                 pp = &(*pp)->next;
             *pp = n->next;
@@ -285,7 +285,7 @@ void __stdcall ClearUnitRefs(Unit* obj)
 // FUNCTION: 0x4897b0
 void __stdcall NotifyUnitRefs(Unit* obj, int event)
 {
-    for (UnitRef* n = *UnitRefs(obj); n != 0; n = n->next) {
+    for (PathOrderAttach* n = obj->head; n != 0; n = n->next) {
         if (n->listener != 0)
             n->listener->Notify(event);
     }

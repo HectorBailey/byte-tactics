@@ -1826,13 +1826,13 @@ address,size,file,symbol,status,similarity
 0x489260,27,src/units/unit_commands.cpp,??0UnitCategory@@QAE@ABV0@@Z,matched,100.0
 0x489280,618,src/units/unit_targets.cpp,?MakePropList@@YGPADPAVUnitDef@@@Z,matched,100.0
 0x4894f0,68,src/units/unit_targets.cpp,?UnitCanBuild@@YGHPAUUnit@@F@Z,matched,100.0
-0x489540,49,src/units/unit_targets.cpp,?LinkToUnit@UnitRef@@QAEXPAUUnit@@@Z,matched,100.0
-0x489580,53,src/units/unit_targets.cpp,?UnlinkFromUnit@UnitRef@@QAEXXZ,matched,100.0
+0x489540,49,src/units/unit_targets.cpp,?LinkToUnit@PathOrderAttach@@QAEXPAUUnit@@@Z,matched,100.0
+0x489580,53,src/units/unit_targets.cpp,?UnlinkFromUnit@PathOrderAttach@@QAEXXZ,matched,100.0
 0x4895c0,64,src/units/unit_targets.cpp,??0PathOrderAttach@@QAE@PAUUnit@@H@Z,matched,100.0
 0x489600,77,src/units/unit_targets.cpp,??_GPathOrderAttach@@UAEPAXI@Z,matched,100.0
-0x489650,59,src/units/unit_targets.cpp,?Unlink@UnitRef@@QAEXXZ,matched,100.0
+0x489650,59,src/units/unit_targets.cpp,?Unlink@PathOrderAttach@@QAEXXZ,matched,100.0
 0x489690,96,src/units/unit_targets.cpp,?SetUnit@PathOrderAttach@@QAEXPAUUnit@@@Z,matched,100.0
-0x4896f0,79,src/units/unit_targets.cpp,?ClearRef@UnitRef@@QAEXXZ,matched,100.0
+0x4896f0,79,src/units/unit_targets.cpp,?ClearRef@PathOrderAttach@@QAEXXZ,matched,100.0
 0x489740,101,src/units/unit_targets.cpp,?ClearUnitRefs@@YGXPAUUnit@@@Z,matched,100.0
 0x4897b0,44,src/units/unit_targets.cpp,?NotifyUnitRefs@@YGXPAUUnit@@H@Z,matched,100.0
 0x4897e0,26,src/units/unit_targets.cpp,?ChooseWeapon@Unit@@QAEEXZ,matched,100.0

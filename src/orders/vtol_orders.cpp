@@ -404,12 +404,6 @@ public:
 
 // Unused here: forward declarations of real functions; their symbol ids keep
 // the allocation of the functions after the AirManeuverOrder view (docs/c2-regalloc.md).
-void UpdateMouseScroll();
-void UpdateEdgeScroll();
-void CenterCameraOnRadarClick();
-void CenterCameraOnStartPosition();
-void RegisterDataArchives();
-int GetCdPathMismatch();
 void CreateGameObject();
 void InitMissionStatus();
 void SetUpEndMissionScreen();

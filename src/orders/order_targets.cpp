@@ -506,8 +506,15 @@ struct Owner_004895c0 {
 };
 #pragma pack(pop)
 
-
-#include "../units/unit_ref.h"
+// Unused here: the symbol ids these declarations take stand where
+// the old UnitRef header's stood (docs/c2-regalloc.md).
+void FUN_00406f40(void);
+void FUN_004161f0(void);
+void InitCommands(void);
+int UpdatePlacementGhostValidity(void);
+void RefreshSelectionOrders(void);
+void UpdateCameraFollow(void);
+void BeginMouseScroll(void);
 
 extern void* g_pathOrderVtable[];
 extern void* g_airManeuverOrderVtable[];
@@ -1660,7 +1667,7 @@ PathOrder::PathOrder(int owner, HapiBank* file, char* name)
         pos = *(Vec3_0044e3c0*)&rec.pos;
         followOffset = rec.i4;
     }
-    ((UnitRef*)&rec.ref_vt)->Unlink();
+    ((PathOrderAttach*)&rec.ref_vt)->Unlink();
 }
 
 // FUNCTION: 0x44df70
@@ -1670,13 +1677,13 @@ int PathOrder::GetType()
 }
 
 // Scalar-deleting-destructor shape: unlink the embedded list node at +0x16
-// (via UnitRef::Unlink, the same unlink method used elsewhere),
+// (via PathOrderAttach::Unlink, the same unlink method used elsewhere),
 // restore this object's own vtable, conditionally operator delete, and
 // return `this`.
 // FUNCTION: 0x44df80
 void* PathOrder::Destroy(unsigned char flag)
 {
-    ((UnitRef*)((char*)this + 0x16))->Unlink();
+    ((PathOrderAttach*)((char*)this + 0x16))->Unlink();
     vtable = g_orderFxVtable;
     if (flag & 1) {
         operator delete(this);
@@ -1739,7 +1746,7 @@ int PathOrder::SerializeToSave(int unused, HapiBank* file, char* name)
     file->OpenNamedBox(name);
     file->SeekBox(0);
     file->WriteBox(&rec, 0x36);
-    ((UnitRef*)&rec.ref_vt)->Unlink();
+    ((PathOrderAttach*)&rec.ref_vt)->Unlink();
     return 1;
 }
 
