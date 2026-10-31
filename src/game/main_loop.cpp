@@ -122,11 +122,10 @@ struct Player {                        // 0x14b bytes, array at g_game+0x1b63
 };
 
 // One view of the game state. The ten team records and the sub-object at
-// +0x1cd5 overlap
-// the same bytes, as do the name table at +0x37f5f and the timing block the
-// main loop reads there, so each pair sits in an anonymous union. Two views
-// name the pointer at +0x29a0 differently (team definitions, start-position
-// slots), and two name the Mission pointer at +0x391e9 (obj, net).
+// +0x1cd5 overlap the same bytes, so the pair sits in an anonymous union. Two
+// views name the pointer at +0x29a0 differently (team definitions,
+// start-position slots), and two name the Mission pointer at +0x391e9 (obj,
+// net).
 struct Game {
     char unknown_0[0x519];
     Gui gui;                                   // +0x519
@@ -525,15 +524,15 @@ void __stdcall SetStartingStorageBonus(Struct_00496e90* obj, int height, int wid
 //
 // Layout notes, for whoever reads the neighbours of this code:
 // - the ten team records at g_game+0x1b63 are 0x14b bytes: +0x27 the PlayerInfo
-//   (its +0x95 is the index into the name table, its +0x96 the second copied
-//   byte), +0xdc and +0xe0 the two clamped sizes as floats, +0x149 a 1-bit
-//   unsigned short bitfield.
+//   (its +0x95 is the side, the index into the SideDef table, its +0x96 the
+//   second copied byte), +0xdc and +0xe0 the two clamped sizes as floats,
+//   +0x149 a 1-bit unsigned short bitfield.
 // - the start options are 0x18-byte records behind the pointer at
 //   g_game+0x29a0: +0x4 the side and +0x14 the colour, both copied a byte at a
 //   time, and +0xc and +0x10 the starting metal and energy, +0x10 stored to the
 //   player's +0xdc first.
-// - the name table at g_game+0x37f5f is 0x232 bytes per entry and the player
-//   index selects the entry, whose name is looked up by FindUnitTypeId.
+// - the side's SideDef (the table at g_game+0x37f3d, 0x232 bytes per side)
+//   gives the commander name, which FindUnitTypeId looks up.
 // - the position is a Vec3 of 16.16 values; the view is centred on the whole
 //   part of x and z, read as the high half of each fixed-point int through a
 //   `union Fixed`. x goes with the view width and z with the view height.
