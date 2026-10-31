@@ -57,6 +57,7 @@ void ScheduleFadeTick(void);
 int IsFadeDone(void);
 void StepPaletteFade(void);
 void FillEndGameStatistics(void);
+int AreStatBarsComplete(void);
 
 #pragma pack(push, 1)
 struct Feature {
@@ -125,7 +126,7 @@ void __stdcall DrawUnit(void* dest, Unit* unit);
 // Bit 4 of the draw flags word: shadows may be drawn.
 static int DrawFlags()
 {
-    return *(unsigned char*)((char*)g_game + 0x37f06);
+    return (unsigned char)g_game->visualFlags;
 }
 
 // A frame is drawn mirrored when the feature says so. This has to be a macro:

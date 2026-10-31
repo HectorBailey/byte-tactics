@@ -208,7 +208,7 @@ void SelectAllIdleUnits(void)
                 u->flags |= 0x10;
                 g_game->unitIndex = 0;
             }
-            u = (Unit*)((char*)u + 0x118);
+            u++;
         } while (u <= pl->unitsEnd);
     }
     SelectStopOrder();
