@@ -31,30 +31,8 @@ struct Unit;
 #include "unit_motion.h"
 
 
-// Kept, not unit_def.h: including it costs five symbol ids and 0x412d40 drops
-// to 97.5% (the attack lead's registers follow the file's count).
 #pragma pack(push, 1)
-struct UnitDef {
-    char pad0[0x192]; int maxvelocity;
-    char pad196[0x21c - 0x196]; short altitude;
-    char pad21e[0x241 - 0x21e]; unsigned int flags;
-};
-struct Unit {
-    UnitMotion* motion;
-    char pad4[0x66 - 4]; short heading;
-    char pad68[2];
-    union {
-        Vec3 pos;
-        struct { unsigned short xf; short x; int y; unsigned short zf; short z; } p;
-    };
-    char pad76[0x82 - 0x76];
-    int spatialBucket; int carrier;
-    char pad8a[8]; UnitDef* def;
-    char pad96[0x110 - 0x96]; unsigned int flags;
-    void ClaimWeapons(int);
-    void ReleaseWeapons(int);
-    void SetStateBits(int, int);
-};
+#include "../units/unit.h"
 struct Order {
     char pad0[5]; unsigned char state; unsigned int flags;
     char padA[0x16 - 0xa]; Unit* target;
@@ -76,7 +54,7 @@ struct Order {
 };
 struct Game {
     char pad0[0x1422b]; int width; int height;
-    char pad14233[0x142b7 - 0x14233]; int overflowBucket;
+    char pad14233[0x142b7 - 0x14233]; SpatialBucket* overflowBucket;
 };
 // The order object the vtol orders build: PathOrder, the class order_targets.cpp
 // defines. The constructor keeps that definition's argument types so the call
@@ -99,6 +77,10 @@ public:
     void SetAltitude(int);
 };
 #pragma pack(pop)
+
+// Unused here: these headers' symbol ids keep 0x412d40 matching (docs/c2-regalloc.md).
+#include "../map/mission.h"
+#include "../units/cob_script.h"
 
 extern Game* g_game;
 
@@ -155,7 +137,7 @@ static inline int IsAhead(Unit* unit, Order* order)
     Vec3 toward = Offset(GetHeadingBetween(&unit->pos, &order->target->pos), 0x140000);
     Fixed dist;
     dist.v = 0x140000;
-    Vec3 facing = DirectionFromAngle(unit->heading, dist);
+    Vec3 facing = DirectionFromAngle(unit->angles.heading, dist);
     return (short)(Whole(toward.x) * Whole(facing.x) + Whole(toward.z) * Whole(facing.z)) > 0;
 }
 
@@ -185,11 +167,11 @@ int __stdcall AirToAirOrder(Unit* unit, Order* order, int flags)
         order->SetAttachedFx((int)obj);
         return 2;
     }
-    if (order->range && (int)_hypot(unit->p.x - order->x, unit->p.z - order->z) >= order->range)
+    if (order->range && (int)_hypot(((short*)&unit->pos.x)[1] - order->x, ((short*)&unit->pos.z)[1] - order->z) >= order->range)
         return 5;
     switch (order->state) {
     case 0:
-        if (unit->motion && (unit->def->flags & 0x800)) {
+        if (unit->motion && (unit->def->flags1 & 0x800)) {
             order->AnnounceStatusIfFlagged("Attacking");
             PrepVtolClimb(unit, order, 0);
             order->SetDeadlineTicks(1);
@@ -203,8 +185,8 @@ int __stdcall AirToAirOrder(Unit* unit, Order* order, int flags)
         SetWeaponTargetUnit(unit, order->target, 0);
         if (flags & 0xe0) {
             if (IsAhead(unit, order)) {
-                Vec3 from = Add(unit->pos, Offset(unit->heading, unit->def->maxvelocity * 30));
-                Vec3 to = Offset(unit->heading, unit->def->maxvelocity);
+                Vec3 from = Add(unit->pos, Offset(unit->angles.heading, unit->def->maxvelocity * 30));
+                Vec3 to = Offset(unit->angles.heading, unit->def->maxvelocity);
                 AirManeuverOrder* obj = new AirManeuverOrder(order, from, to);
                 obj->SetAltitude(unit->def->altitude);
                 order->SetAttachedFx((int)obj);
@@ -225,7 +207,7 @@ int __stdcall AirToAirOrder(Unit* unit, Order* order, int flags)
                 p.x += order->target->motion->velocity.x * 45;
                 p.z += order->target->motion->velocity.z * 45;
                 order->SetAttachedFx((int)new AirManeuverOrder(order, p,
-                    Sum(order->target->motion->velocity, Offset(order->target->heading, order->target->def->maxvelocity / 2))));
+                    Sum(order->target->motion->velocity, Offset(order->target->angles.heading, order->target->def->maxvelocity / 2))));
             }
             order->SetDeadlineTicks(0x2d);
             order->flags |= 0x100e8;
