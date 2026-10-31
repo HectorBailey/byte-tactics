@@ -164,14 +164,8 @@ struct HapinetSession {
 };
 #pragma pack(pop)
 
-#pragma pack(push, 1)
 // The player data block HAPINET_addplayer passes to CreatePlayer.
-struct PlayerData_004ca6a0 {
-    char name[17];                     // +0x00
-    short versionMajor;                // +0x11, the host rejects a joiner unless 0
-    short versionMinor;                // +0x13, the host rejects a joiner unless 0x50
-};
-#pragma pack(pop)
+#include "hapinet_player.h"
 
 // The DirectPlay interface pair HAPINET_createdplayinterface fills: the base
 // object at +0x0 and the IDirectPlay3 interface at +0x4.
@@ -803,9 +797,9 @@ int __stdcall HAPINET_addplayer(HapinetSession* net, unsigned long* id, char* sh
         dpname.lpszLongNameA = longName;
         strncpy(net->playerLongName, longName, 16);
         strncpy(net->playerShortName, shortName, 16);
-        PlayerData_004ca6a0 data;
+        HapinetPlayerData data;
         memset(&data, 0, sizeof(data));
-        strncpy(data.name, name, 16);
+        strncpy(data.password, name, 16);
         data.versionMajor = versionMajor;
         data.versionMinor = versionMinor;
         int hr = net->dp->CreatePlayer(id, &dpname, 0, &data, sizeof(data), 0);
