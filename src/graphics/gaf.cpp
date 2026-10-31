@@ -15,6 +15,31 @@
 
 #include "rect.h"
 
+// Unused here: the symbol ids these declarations take keep 0x4b9740, 0x4b9d70, 0x4b90a0, 0x4b95a0 matching (docs/c2-regalloc.md).
+void RegisterUnitOrders(void);
+void RegisterGroundOrders(void);
+void EnableAICommands(void);
+void RegisterAICommands(void);
+void FUN_00406f40(void);
+void ResetAIPlayers(void);
+void RegisterVtolOrders(void);
+void StepAllGafSequences(void);
+void ResetNetStats(void);
+void FUN_004161f0(void);
+void InitCommands(void);
+int UpdatePlacementGhostValidity(void);
+void RefreshSelectionOrders(void);
+void DispatchOrdersPanelPageFlags(void);
+void ResetCameraState(void);
+void FindLocalCommander(void);
+void ClampCameraPosition(void);
+void ClampCameraTarget(void);
+void UpdateScreenShake(void);
+void UpdateCameraFollow(void);
+void BeginMouseScroll(void);
+void EndMouseScroll(void);
+void UpdateMouseScroll(void);
+
 // Clips `rect` to `bounds`, moving `other` by the same amounts.
 // FUNCTION: 0x4b7e60
 void __stdcall ClipRects(Rect* other, Rect* rect, Rect* bounds)
@@ -42,44 +67,45 @@ void __stdcall ClipRects(Rect* other, Rect* rect, Rect* bounds)
     }
 }
 
-struct Entry_004b7ee0 {
-    int value;                         // +0x0
-    int unknown_4;
+// A GAF sequence reference (handle.h's Handle): the frame index, the current
+// entry's countdown, the loop byte and the sequence behind it.
+#include "handle.h"
+
+// One 8-byte entry of a GAF sequence (Thaldren's GafFrameEntry): the frame it
+// names, then that frame's duration in timers.
+struct GafFrameEntry {
+    int frame;                         // +0x0
+    unsigned short duration;           // +0x4
+    unsigned short reserved;           // +0x6
 };
 
-struct Table_004b7ee0 {
+// A GAF sequence (Thaldren's GafSequence, 0x30 bytes): its entry count, the
+// loop byte, the name, then the entries from +0x28. handle.h declares it as
+// GafEntry, the type behind a Handle's src and the entries the sequence
+// functions advance.
+struct GafEntry {
     unsigned short count;              // +0x0
-    char unknown_2[0x26];
-    Entry_004b7ee0 entries[1];         // +0x28
+    unsigned char kind;                // +0x2, loops while set
+    char unknown_3[0x28 - 3];
+    GafFrameEntry entries[1];          // +0x28
 };
 
-struct Handle_004b7ee0 {
-    unsigned short index;              // +0x0
-    char unknown_2[6];
-    Table_004b7ee0* table;             // +0x8
-};
-
-// Looks up an entry of the table that GetGafFrame indexes (count at +0,
-// 8-byte entries from +0x28) through a handle holding an index and the table.
+// Looks up an entry of the sequence that GetGafFrame indexes (count at +0,
+// 8-byte entries from +0x28) through the reference holding an index and it.
 // FUNCTION: 0x4b7ee0
-int __stdcall GetGafSequenceFrame(Handle_004b7ee0* h)
+int __stdcall GetGafSequenceFrame(Handle* h)
 {
     int result = 0;
-    if (h->table != 0)
-        result = h->table->entries[h->index].value;
+    if (h->src != 0)
+        result = h->src->entries[h->index].frame;
     return result;
 }
 
-struct Obj_004b7f00 {
-    unsigned short index;              // +0x0
-    char unknown_2[6];
-    unsigned short* table;             // +0x8, starts with the entry count
-};
 // FUNCTION: 0x4b7f00
-int __stdcall SetGafSequenceFrame(Obj_004b7f00* obj, int index)
+int __stdcall SetGafSequenceFrame(Handle* obj, int index)
 {
     int result = 0;
-    if (obj->table != 0 && *obj->table > index) {
+    if (obj->src != 0 && obj->src->count > index) {
         obj->index = index;
         result = 1;
     }
@@ -102,27 +128,12 @@ unsigned short __stdcall GetGafFrameCount(void* ptr)
     return (unsigned short)result;
 }
 
-struct Entry_004b7f70 {
-    unsigned short value;
-    char unknown_2[6];
-};
-
-struct Obj_004b7f70 {
-    unsigned short index;
-    char unknown_2[6];
-    void* table;
-};
-
-static inline Entry_004b7f70* GetEntries(Obj_004b7f70* obj)
-{
-    return (Entry_004b7f70*)((char*)obj->table + 0x2c);
-}
 // FUNCTION: 0x4b7f70
-unsigned short __stdcall GetGafFrameDuration(Obj_004b7f70* param1)
+unsigned short __stdcall GetGafFrameDuration(Handle* param1)
 {
     unsigned short result;
-    if (param1->table != 0) {
-        result = GetEntries(param1)[param1->index].value;
+    if (param1->src != 0) {
+        result = param1->src->entries[param1->index].duration;
     } else {
         result = 0xffff;
     }
@@ -601,38 +612,15 @@ void __stdcall FrameFromSurface(GafFrame* dst, Surface* src)
     dst->blend = 0;
 }
 
-// One 8-byte entry of a GAF sequence: the frame's timer value.
-struct Entry_004b8b30 {
-    unsigned short value;
-    char unknown_2[6];
-};
-
-// A GAF sequence: its entry count, the loop flag and the 8-byte entries.
-struct Src_004b8b30 {
-    unsigned short count;           // +0x0
-    unsigned char kind;             // +0x2
-    char unknown_3[0x2c - 3];
-    Entry_004b8b30 entries[1];      // +0x2c
-};
-
-// A reference into a sequence: the current entry, its timer value, the loop
-// flag and the sequence itself.
-struct Ref_004b8b30 {
-    unsigned short index;           // +0x0
-    unsigned short value;           // +0x2
-    unsigned char kind;             // +0x4
-    char unknown_5[3];
-    Src_004b8b30* src;              // +0x8
-};
-
-static inline unsigned short Value_004b8b30(Src_004b8b30* s, unsigned short i)
+// The current entry's duration, or 0xffff when there is no sequence.
+static inline unsigned short Value_004b8b30(GafEntry* s, unsigned short i)
 {
     if (s)
-        return s->entries[i].value;
+        return s->entries[i].duration;
     return 0xffff;
 }
 // FUNCTION: 0x4b8b30
-void __stdcall InitGafSequence(Ref_004b8b30* ref, Src_004b8b30* src, int index)
+void __stdcall InitGafSequence(Handle* ref, GafEntry* src, int index)
 {
     ref->index = index < src->count ? index : 0;
     ref->src = src;
@@ -645,9 +633,9 @@ void __stdcall InitGafSequence(Ref_004b8b30* ref, Src_004b8b30* src, int index)
 // dropping the sequence when it doesn't loop). Returns 1 when the entry
 // changed.
 // FUNCTION: 0x4b8b90
-int __stdcall StepGafSequence(Ref_004b8b30* ref)
+int __stdcall StepGafSequence(Handle* ref)
 {
-    Src_004b8b30* src = ref->src;
+    GafEntry* src = ref->src;
     if (src) {
         if (ref->value < 2) {
             ref->index++;
@@ -659,7 +647,7 @@ int __stdcall StepGafSequence(Ref_004b8b30* ref)
                     return 1;
                 }
             }
-            ref->value = src->entries[ref->index].value;
+            ref->value = src->entries[ref->index].duration;
             return 1;
         }
         ref->value--;
@@ -668,19 +656,19 @@ int __stdcall StepGafSequence(Ref_004b8b30* ref)
 }
 
 // The advancing view of a sequence reference: the timer value is signed here,
-// so a step can take it below zero.
+// so a step can take it below zero (handle.h's value is unsigned).
 struct Ref_004b8bf0 {
     unsigned short index;           // +0x0
     short value;                    // +0x2
     unsigned char kind;             // +0x4
     char unknown_5[3];
-    Src_004b8b30* src;              // +0x8
+    GafEntry* src;                  // +0x8
 };
 
 static inline unsigned short Value_004b8bf0(Ref_004b8bf0* r)
 {
     if (r->src)
-        return r->src->entries[r->index].value;
+        return r->src->entries[r->index].duration;
     return 0xffff;
 }
 
@@ -690,7 +678,7 @@ static inline unsigned short Value_004b8bf0(Ref_004b8bf0* r)
 // FUNCTION: 0x4b8bf0
 void __stdcall AdvanceGafSequence(Ref_004b8bf0* ref, short step)
 {
-    Src_004b8b30* src = ref->src;
+    GafEntry* src = ref->src;
     if (src == 0 || src->count <= 1) {
         return;
     }
@@ -754,6 +742,8 @@ void* __stdcall LoadGaf(char* name)
 }
 
 // A GAF entry as FindGafEntry reads it: its name follows the 8-byte header.
+// Stays its own view: adding the name to GafEntry moves 0x4b9d70, 0x4b90a0 and
+// 0x4b95a0, and idpad.py finds no id count that brings all three back.
 struct GafEntry_004b8d40 {
     char unknown_0[8];
     char name[1];                      // +0x8
