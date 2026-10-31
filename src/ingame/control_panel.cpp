@@ -151,12 +151,13 @@ struct DownloadMenuFile {              // 0xbd bytes, Thaldren's DownloadMenuFil
     DownloadMenuSlot slots[5];         // +0x04
 };
 
-// One player's side name (0x232 bytes); 0x419560 reads the dword at +0x224.
-struct SideName {
-    char name[0x224];                  // +0x0
-    int gameTick;                      // +0x224
-    char unknown_228[0x232 - 0x228];
-};
+#include "../game/side_def.h"
+
+// Unused here: real functions declared where the side name view and its union
+// stood, keeping OpenBuildMenuGui (0x41ace0) matching (docs/c2-regalloc.md).
+void EnableAICommands(void);
+void RegisterAICommands(void);
+void ResetAIPlayers(void);
 
 // The mouse record at g_game+0x2c76: copied by 0x41cc60, read by 0x41cd50.
 #include "../gui/mouse_event.h"
@@ -247,17 +248,13 @@ struct Game {
     int difficulty;                    // +0x37eee (a guess)
     char unknown_37ef2[0x37f2f - 0x37ef2];
     unsigned char uiOptionFlags;       // +0x37f2f
-    char unknown_37f30[0x37f5b - 0x37f30];
-    // The side names and the scroll scale overlap: 0x41ce90 reads a dword
-    // inside the side name table.
-    union {
-        SideName sideNames[8];         // +0x37f5b
-        struct {
-            char unknown_37f5b[0x38a3f - 0x37f5b];
-            int simBudgetDtTicks;      // +0x38a3f
-        };
-    };
-    char unknown_390eb[0x391c7 - 0x390eb];
+    char unknown_37f30[0x37f3d - 0x37f30];
+    SideDef sideDefs[5];               // +0x37f3d
+    char unknown_38a37[0x38a3f - 0x38a37];
+    int simBudgetDtTicks;              // +0x38a3f
+    char unknown_38a43[0x38a47 - 0x38a43];
+    int gameTick;                      // +0x38a47
+    char unknown_38a4b[0x391c7 - 0x38a4b];
     int buildListCount;                // +0x391c7
     DownloadMenuFile* buildLists;      // +0x391cb
 };
@@ -354,7 +351,7 @@ static inline void CellToWorld(Point16 origin, Point16 c, Vec3* v)
 // FUNCTION: 0x419560
 void InitCommands()
 {
-    DAT_00511c20 = g_game->sideNames[4].gameTick;
+    DAT_00511c20 = g_game->gameTick;
     g_messageBytesReceived = 0;
     g_messageBytesSent = 0;
     // The second field of the second table is cleared through a walking
@@ -902,9 +899,9 @@ void __stdcall SetPrevNextGadgetNames(Unit* unit)
 {
     char buf[256];
     if (unit->def->buildMenuPageCount < 2) {
-        sprintf(buf, "%sPREV", g_game->sideNames[unit->player->info->side].name);
+        sprintf(buf, "%sPREV", g_game->sideDefs[unit->player->info->side].namePrefix);
         SetGadgetActiveByName(&g_game->gui, buf, 0);
-        sprintf(buf, "%sNEXT", g_game->sideNames[unit->player->info->side].name);
+        sprintf(buf, "%sNEXT", g_game->sideDefs[unit->player->info->side].namePrefix);
         SetGadgetActiveByName(&g_game->gui, buf, 0);
     }
 }
@@ -992,9 +989,9 @@ static inline void SetPrevNext(Unit* unit)
 {
     char buf[256];
     if (unit->def->buildMenuPageCount < 2) {
-        sprintf(buf, "%sPREV", g_game->sideNames[unit->player->info->side].name);
+        sprintf(buf, "%sPREV", g_game->sideDefs[unit->player->info->side].namePrefix);
         SetGadgetActiveByName(&g_game->gui, buf, 0);
-        sprintf(buf, "%sNEXT", g_game->sideNames[unit->player->info->side].name);
+        sprintf(buf, "%sNEXT", g_game->sideDefs[unit->player->info->side].namePrefix);
         SetGadgetActiveByName(&g_game->gui, buf, 0);
     }
 }
@@ -1028,7 +1025,7 @@ void __stdcall OpenBuildMenuGui(Unit* unit, char* guiName, int page)
         char name[256];
         BuildDataPath(path, "guis", guiName, "GUI");
         if (HAPI_FileLengthByName(path) == 0)
-            sprintf(name, "%sDL", g_game->sideNames[player->info->side].name);
+            sprintf(name, "%sDL", g_game->sideDefs[player->info->side].namePrefix);
         else
             strcpy(name, guiName);
         Layer* layer = LoadGuiLayer(&g_game->gui, name, 0);
@@ -1080,7 +1077,7 @@ void __stdcall OpenGeneratorDialog(Unit* unit)
 {
     char name[256];
     sprintf(name, "%sGEN.GUI",
-            g_game->sideNames[g_game->players[g_game->localPlayer].info->side].name);
+            g_game->sideDefs[g_game->players[g_game->localPlayer].info->side].namePrefix);
     Layer* gadget = LoadGuiLayer(&g_game->gui, name, 0);
     if (gadget != 0) {
         gadget->handler = (void (__stdcall*)(void*))HandleBuildPanelClick;
