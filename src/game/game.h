@@ -31,16 +31,16 @@ struct Bits_0045c570;
 struct BuildList_0041ace0;
 struct Cell;
 struct Cell_004816a0;
-struct Class_00437c80;
+class CMemoryCache;
 struct Class_0045ae80;
-struct Class_00472200;
+class ParticleLists;
 struct Class_0047cb00;
 struct Class_00480160;
-struct Class_0048ff40;
+class MissionConditions;
 class Sound;
 class UnitSync;
 struct HapinetProviderConnEntry;
-struct Ctx_00499890;
+struct DisplayContext;
 struct CursorState;
 struct Data_0046d970;
 struct WorldEffect;
@@ -63,7 +63,7 @@ struct List_00420960;
 struct Map_0042e440;
 class Mission;
 struct Net_4517b0;
-struct Obj_00406f50;
+struct Projectile;
 struct Object3do;
 struct PathMap;
 struct PieceFrame;
@@ -238,7 +238,7 @@ struct Game {  // 0x3924d bytes
     unsigned char gameVersionBuild;  // +0x3
     char* build_date;  // +0x4
     char* build_time;  // +0x8
-    Ctx_00499890* displayContext;  // +0xc
+    DisplayContext* displayContext;  // +0xc
     Sound* sound;              // +0x10
     char session[4];  // +0x14
     char unknown_18[1069];
@@ -339,7 +339,7 @@ struct Game {  // 0x3924d bytes
     CursorState cursor;  // +0x2cc7
     WeaponDef weapons[256];  // +0x2cf3, Thaldren's aWeaponDefs
     int projectileCount;  // +0x141f3
-    Obj_00406f50* projectiles;  // +0x141f7
+    Projectile* projectiles;  // +0x141f7
     void* sortUnitList;  // +0x141fb
     void* sortIndices;  // +0x141ff
     void* sortLineCount;  // +0x14203
@@ -395,7 +395,7 @@ struct Game {  // 0x3924d bytes
     short blinkTimer;  // +0x142ef
     unsigned short flags_142f1;  // +0x142f1
     int value_142f3;  // +0x142f3
-    Obj_00406f50* tracked;  // +0x142f7
+    Projectile* cameraFollowTrackObj;  // +0x142f7, Thaldren's pCameraFollowTrackObj
     int xs[4];  // +0x142fb
     int ys[4];  // +0x1430b
     unsigned char valid[4];  // +0x1431b
@@ -426,7 +426,7 @@ struct Game {  // 0x3924d bytes
     unsigned int paused : 1;
     unsigned int rest : 30;
     Class_0045ae80** types;  // +0x14377
-    Class_00437c80* obj;  // +0x1437b
+    CMemoryCache* unitTable;  // +0x1437b, graphics/memory_cache.h's model cache
     char unknown_1437f[4];
     void* xform;  // +0x14383
     void* projected;  // +0x14387
@@ -608,7 +608,7 @@ struct Game {  // 0x3924d bytes
     unsigned char progress_38d73;  // +0x38d73
     unsigned char shade;  // +0x38d74
     unsigned short net_flags;  // +0x38d75
-    Class_00472200* lists_38d77;  // +0x38d77
+    ParticleLists* particleLists;  // +0x38d77
     void* moviePlayer;  // +0x38d7b
     unsigned short allMissionsFlags;  // +0x38d7f
     int numSkirmishPlayers;  // +0x38d81
@@ -644,7 +644,7 @@ struct Game {  // 0x3924d bytes
     BuildList_0041ace0* buildLists;  // +0x391cb
     char campaignMissionStatus[26];  // +0x391cf, Thaldren's one 26-byte field
     Mission* mapInfo;  // +0x391e9
-    Class_0048ff40* list_391ed;  // +0x391ed
+    MissionConditions* victoryConditions;  // +0x391ed
     int frontendState;  // +0x391f1, the frontend mode eight other views name this way
     void (__stdcall *handler)(void);  // +0x391f5
     int fontComix;  // +0x391f9
