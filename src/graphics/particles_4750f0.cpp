@@ -3,8 +3,13 @@
 // class is in particles_4750b0.cpp; this stays apart because it returns bool,
 // where Update tests the result as an int.
 
-struct UnknownStruct;
-extern UnknownStruct* g_game;
+#pragma pack(push, 1)
+struct Game {
+    char unknown_0[0x38a47];
+    unsigned int gameTick;             // +0x38a47
+};
+#pragma pack(pop)
+extern Game* g_game;
 
 class TimedSubParticles {
 public:
@@ -16,5 +21,5 @@ public:
 // FUNCTION: 0x4750f0
 bool TimedSubParticles::IsEmitDue()
 {
-    return this->emitTime <= *(unsigned int*)((char*)g_game + 0x38a47);
+    return this->emitTime <= g_game->gameTick;
 }

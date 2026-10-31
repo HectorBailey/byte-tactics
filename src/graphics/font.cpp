@@ -159,21 +159,21 @@ void __stdcall DrawStringCentered(Surface* dst, unsigned char* text, int flag)
     }
 }
 
-// GetTextKeyColor, inlined: the current value of field_0x210.
+// GetTextKeyColor, inlined: the display's current textSkipColor.
 static inline int CurrentColour(void)
 {
-    return *(int*)((unsigned char*)GetDisplay() + 0x210);
+    return GetDisplay()->textSkipColor;
 }
 
-// SetTextColors, inlined: field_0x208 then field_0x20c, each only if not -1.
+// SetTextColors, inlined: textFgColor then textBgColor, each only if not -1.
 static inline void SetColour(int a, int b)
 {
-    unsigned char* obj = (unsigned char*)GetDisplay();
+    DisplayContext* obj = GetDisplay();
     if (a != -1) {
-        *(int*)(obj + 0x208) = a;
+        obj->textFgColor = a;
     }
     if (b != -1) {
-        *(int*)(obj + 0x20c) = b;
+        obj->textBgColor = b;
     }
 }
 
