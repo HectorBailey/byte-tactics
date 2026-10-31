@@ -64,6 +64,17 @@ void FlushKeyQueue(void);
 void ApplyPendingSubState(void);
 void ResetFrontendState(void);
 void RemoveAllFeatures(void);
+void EnterMainMenuState(void);
+void PresentFrontendFrame(void);
+void UpdateMenuSparks(void);
+void OpenCloseCdPlayerDialog(void);
+void OpenMainMenu(void);
+void HandleFrontendDebugKey(void);
+int ConnectToService(void);
+void RunFrontendStateMachine(void);
+void FreePictureCache(void);
+void ClearPictureCache(void);
+void OrLabelAttribs(void);
 
 struct Gun_0049c9c0 {
     short angle;
@@ -1709,85 +1720,52 @@ int __stdcall FireLineOfSightProjectile(UnitWeaponSlot* fire, Unit* unit,
 }
 
 
-#pragma pack(push, 1)
-struct Shot_0049cc20 {
-    char unknown_0[0x8];
-    int aimCobDone;                    // +0x8, the slot's aimCob.nAimCobDone
-    WeaponDef* def;                    // +0xc, the weapon that fired
-    char unknown_10[0x1b - 0x10];
-    unsigned char flags;               // +0x1b
-};
-
-struct Proj_0049cc20 {
-    WeaponDef* unit;                   // +0x0
-    char unknown_4[0x1c - 0x4];
-    Vec3 dir;                          // +0x1c
-    char unknown_28[0x36 - 0x28];
-    short angle;                       // +0x36
-    short pitch0;                      // +0x38
-    int speed;
-    char unknown_3e[0x46 - 0x3e];
-    int time;                          // +0x46
-    char unknown_4a[0x4e - 0x4a];
-    int targetUnit;
-    char unknown_52[0x56 - 0x52];
-    int interceptedProjectile;
-    char unknown_5a[0x60 - 0x5a];
-    short active;                      // +0x60
-    char unknown_62[0x69 - 0x62];
-    unsigned short flags;              // +0x69
-};
-#pragma pack(pop)
-
-void __stdcall InitProjectile(Proj_0049cc20* proj, WeaponDef* shot, Vec3* pos,
+void __stdcall InitProjectile(Projectile* proj, WeaponDef* shot, Vec3* pos,
                             Vec3* aim, int field_5, Unit* unit);
 
 // FUNCTION: 0x49cc20
-int __stdcall FireVLaunchProjectile(Shot_0049cc20* shot, Unit* unit, Vec3* pos,
+int __stdcall FireVLaunchProjectile(UnitWeaponSlot* shot, Unit* unit, Vec3* pos,
                            Vec3* aim, int param_5, int param_6)
 {
-    Proj_0049cc20* proj = 0;
+    Projectile* proj = 0;
     if (g_game->projCount < 300) {
-        proj = &((Proj_0049cc20*)g_game->projectiles)[g_game->projCount++];
+        proj = &((Projectile*)g_game->projectiles)[g_game->projCount++];
         proj->flags &= ~2;
         proj->targetUnit = 0;
     }
     if (!proj)
         return 0;
 
-    InitProjectile(proj, shot->def, pos, aim, g_game->gameTick, unit);
-    proj->angle = 0;
-    proj->pitch0 = 0x4000;
-    shot->aimCobDone = 0;
-    if (shot->def->startSpeed) {
-        proj->speed = shot->def->startSpeed;
-    } else if (shot->def->acceleration == 0) {
-        proj->speed = shot->def->speed;
+    InitProjectile(proj, shot->weapon, pos, aim, g_game->gameTick, unit);
+    proj->heading = 0;
+    proj->pitch = 0x4000;
+    shot->aimCob.nAimCobDone = 0;
+    if (shot->weapon->startSpeed) {
+        proj->speed = shot->weapon->startSpeed;
+    } else if (shot->weapon->acceleration == 0) {
+        proj->speed = shot->weapon->speed;
     } else {
         proj->speed = 0;
     }
-    memset(&proj->dir, 0, 12);
-    WeaponDef* u = proj->unit;
+    memset(&proj->velX, 0, 12);
+    WeaponDef* u = proj->weapon;
     if (u->speed != 0 && !u->flags.b.noAutoRange) {
-        proj->time = (u->range << 16) / (unsigned int)u->speed + g_game->gameTick;
+        proj->expireTick = (u->range << 16) / (unsigned int)u->speed + g_game->gameTick;
     } else {
-        proj->time = g_game->gameTick + u->lifetime;
+        proj->expireTick = g_game->gameTick + u->lifetime;
     }
-    proj->targetUnit = param_5;
-    proj->interceptedProjectile = param_6;
-    proj->active = shot->def->burst;
+    proj->targetUnit = (Unit*)param_5;
+    proj->interceptedProjectile = (Projectile*)param_6;
+    proj->burstRemaining = shot->weapon->burst;
     unit->anims->StartScript(g_fireScriptNames[(shot->flags >> 2) & 3], 0, 0);
     short angle = unit->aim_0049cc20[(shot->flags >> 2) & 3][0][0] - unit->heading;
     int a = -FUN_004b70ef(angle, 800);
     int b = -FUN_004b7123(angle, 800);
     unit->anims->StartScriptWithArgs("RockUnit", 0, 0, 2, b, a, 0, 0);
-    if (shot->def->flags.b.startSmoke)
+    if (shot->weapon->flags.b.startSmoke)
         EmitWeaponSmoke(pos, 9);
     return 1;
 }
-
-void __stdcall InitProjectile(Projectile* proj, WeaponDef* shot, Vec3* pos,
-                            Vec3* aim, int field_5, Unit* unit);
 
 // FUNCTION: 0x49cde0
 int __stdcall FireBallisticProjectile(UnitWeaponSlot* shot, Unit* unit, Vec3* pos,
