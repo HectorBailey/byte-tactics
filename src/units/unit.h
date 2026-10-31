@@ -79,22 +79,35 @@ struct Unit {
     unsigned char bit2 : 1;
     unsigned char bit3 : 1;
     unsigned char unknown_10f : 4;
-    // The state word, as one integer or as its named bits (Thaldren's dwFlags).
+    // The state word, as one integer or as its named bits (Thaldren's dwFlags,
+    // whose note on UnitInstance+0x110 gives the bits named here).
     union {
         unsigned int flags;            // +0x110
         struct {
-            unsigned int unknown_110_0 : 4;
+            unsigned int occupyLayer : 2;   // bits 0-1, the map layer the unit occupies
+            unsigned int moveRate : 2;      // bits 2-3
             unsigned int selected : 1;      // bit 4
-            unsigned int unknown_110_5 : 6;
+            unsigned int selectable : 1;    // bit 5, Thaldren's MakeSelectable
+            unsigned int unknown_110_6 : 2;
+            unsigned int radar : 1;         // bit 8
+            unsigned int sonar : 1;         // bit 9
+            unsigned int jammed : 1;        // bit 10
             unsigned int cloak : 1;         // bit 11, cloaking wanted
-            unsigned int unknown_110_12 : 6;
+            unsigned int unknown_110_12 : 1;
+            unsigned int hpDirty : 1;       // bit 13, build progress or health changed
+            unsigned int dying : 1;         // bit 14
+            unsigned int unknown_110_15 : 1;
+            unsigned int moved : 1;         // bit 16, moved this tick
+            unsigned int hideCargo : 1;     // bit 17, carried with no piece (0xff)
             unsigned int moveOrder : 2;     // bits 18-19, the standing move order
             unsigned int fireOrder : 2;     // bits 20-21, the standing fire order
             unsigned int buildMenuOpen : 1; // bit 22
             unsigned int buildMenuPage : 3; // bits 23-25
-            unsigned int unknown_110_26 : 3;
+            unsigned int unknown_110_26 : 2;
+            unsigned int alive : 1;         // bit 28
             unsigned int building : 1;      // bit 29
-            unsigned int unknown_110_30 : 2;
+            unsigned int isAirBase : 1;     // bit 30
+            unsigned int hasWeapons : 1;    // bit 31
         };
     };
     unsigned int zBufferFlag;          // +0x114
