@@ -1839,9 +1839,9 @@ address,size,file,symbol,status,similarity
 0x489800,162,src/units/unit.cpp,?ReleaseWeapons@Unit@@QAEXE@Z,matched,100.0
 0x4898b0,162,src/units/unit.cpp,?ClaimWeapons@Unit@@QAEXE@Z,matched,100.0
 0x489960,65,src/units/unit.cpp,?CanReclaim@Unit@@QAEHPAX@Z,matched,100.0
-0x4899b0,186,src/units/unit.cpp,?CanRepair@Unit@@QAEHPAV1@@Z,matched,100.0
+0x4899b0,186,src/units/unit.cpp,?CanRepair@Unit@@QAEHPAU1@@Z,matched,100.0
 0x489a70,32,src/units/unit.cpp,?CountCargo@Unit@@QAEHXZ,matched,100.0
-0x489a90,275,src/units/unit.cpp,?CanLoad@Unit@@QAEHPAV1@@Z,matched,100.0
+0x489a90,275,src/units/unit.cpp,?CanLoad@Unit@@QAEHPAU1@@Z,matched,100.0
 0x489bb0,299,src/units/unit_targets.cpp,?DamageUnit@@YGXPAUUnit@@0HHG@Z,matched,100.0
 0x489ce0,697,src/units/unit_targets.cpp,?ApplyUnitDamage@@YGXPAUUnitDamagePacket@@@Z,matched,100.0
 0x489fa0,186,src/units/unit_targets.cpp,?ParalyzeUnit@@YGXPAUUnit@@H@Z,matched,100.0
@@ -1861,7 +1861,7 @@ address,size,file,symbol,status,similarity
 0x48aac0,173,src/units/unit_position.cpp,?AttachUnitToPiece@@YGXPAUUnit@@0DD@Z,matched,100.0
 0x48ab70,448,src/units/unit_position.cpp,?ApplyAttachUnit@@YGXPAUOrder@@@Z,matched,100.0
 0x48ad30,849,src/units/unit_position.cpp,?UpdateAllUnits@@YGXXZ,matched,100.0
-0x48b090,367,src/units/unit.cpp,?SetStateBits@Unit@@QAEXHH@Z,matched,100.0
+0x48b090,367,src/units/unit_position_48b090.cpp,?SetStateBits@Unit@@QAEXHH@Z,matched,100.0
 0x48b200,481,src/units/unit_position.cpp,?WriteUnitState@@YGXPAVBitWriter@@PAUUnit@@@Z,matched,100.0
 0x48b3f0,790,src/units/unit_position.cpp,?ReadUnitState@@YGXPAVBitReader@@PAUUnit@@@Z,matched,100.0
 0x48b710,525,src/units/unit_position.cpp,?SendUnitStates@@YGXPAUPlayer@@@Z,matched,100.0
