@@ -45,7 +45,6 @@ struct Ctx_00499890;
 struct CursorState;
 struct Data_0046d970;
 struct WorldEffect;
-struct Def_0049d270;
 struct Desc_004437c0;
 struct SoundCategory;
 struct ChatHudEntry;
@@ -168,86 +167,7 @@ struct PieceFrame {  // 0x20 bytes
     FaceFlags_459830 flags;  // +0x1c
 };
 
-struct Def_0049d270 {  // 0x115 bytes
-    unsigned char used;  // +0x0
-    char unknown_1[31];
-    char name2[64];  // +0x20
-    char unknown_60[4];
-    Map_0042e440* sub;  // +0x64
-    int weaponvelocity;  // +0x68
-    int startvelocity;  // +0x6c
-    int weaponacceleration;  // +0x70
-    void* text;  // +0x74
-    void* anim1;  // +0x78
-    void* anim2;  // +0x7c
-    char model[64];  // +0x80
-    float energypershot;  // +0xc0
-    float metalpershot;  // +0xc4
-    float minbarrelangle;  // +0xc8
-    int shakemagnitude;  // +0xcc
-    int shakeduration;  // +0xd0
-    unsigned short damage;  // +0xd4
-    short areaofeffect;  // +0xd6
-    float edgeeffectiveness;  // +0xd8
-    int range;  // +0xdc
-    int coverage;  // +0xe0
-    short reloadtime;  // +0xe4
-    short weapontimer;  // +0xe6
-    short turnrate;  // +0xe8
-    short burst;  // +0xea
-    short burstrate;  // +0xec
-    short sprayangle;  // +0xee
-    short duration;  // +0xf0
-    short randomdecay;  // +0xf2
-    unsigned short soundstart;  // +0xf4
-    unsigned short soundhit;  // +0xf6
-    unsigned short soundwater;  // +0xf8
-    short smokedelay;  // +0xfa
-    short flighttime;  // +0xfc
-    short holdtime;  // +0xfe
-    char unknown_100[4];
-    short accuracy;  // +0x104
-    short tolerance;  // +0x106
-    short pitchtolerance;  // +0x108
-    unsigned char id;  // +0x10a
-    unsigned char firestarter;  // +0x10b
-    unsigned char rendertype;  // +0x10c
-    unsigned char color;  // +0x10d
-    unsigned char color2;  // +0x10e
-    char unknown_10f[2];
-    unsigned int lineofsight : 1;  // +0x111
-    unsigned int ballistic : 1;
-    unsigned int shellweapon : 1;
-    unsigned int beamweapon : 1;
-    unsigned int vlaunch : 1;
-    unsigned int meteor : 1;
-    unsigned int noradar : 1;
-    unsigned int paralyzer : 1;
-    unsigned int dropped : 1;
-    unsigned int startsmoke : 1;
-    unsigned int endsmoke : 1;
-    unsigned int soundtrigger : 1;
-    unsigned int guidance : 1;
-    unsigned int tracks : 1;
-    unsigned int unitsonly : 1;
-    unsigned int groundbounce : 1;
-    unsigned int waterweapon : 1;
-    unsigned int toairweapon : 1;
-    unsigned int smoketrail : 1;
-    unsigned int turret : 1;
-    unsigned int selfprop : 1;
-    unsigned int propeller : 1;
-    unsigned int noexplode : 1;
-    unsigned int burnblow : 1;
-    unsigned int twophase : 1;
-    unsigned int cruise : 1;
-    unsigned int commandfire : 1;
-    unsigned int noautorange : 1;
-    unsigned int stockpile : 1;
-    unsigned int targetable : 1;
-    unsigned int interceptor : 1;
-    unsigned int : 1;
-};
+#include "../weapons/weapon_def.h"
 
 // The visual options word (Thaldren's wVisualFlags), with the bit names
 // settings.cpp reads from the registry.
@@ -421,7 +341,7 @@ struct Game {  // 0x3924d bytes
     unsigned char bit6_2cc6 : 1;
     unsigned char rest_2cc6 : 1;
     CursorState cursor;  // +0x2cc7
-    Def_0049d270 weapons[256];  // +0x2cf3
+    WeaponDef weapons[256];  // +0x2cf3, Thaldren's aWeaponDefs
     int projectileCount;  // +0x141f3
     Obj_00406f50* projectiles;  // +0x141f7
     void* sortUnitList;  // +0x141fb

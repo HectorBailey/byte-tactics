@@ -19,9 +19,8 @@ static inline Vec3 operator+(const Vec3& a, const Vec3& b)
 
 #include "cob_script.h"
 
-// Unused here: these headers take the symbol ids that keep
-// GetPieceOffset (0x43def0) and the piece position functions after it matching (docs/c2-regalloc.md).
-#include "../map/mission.h"
+// Unused here: this header takes the symbol ids that keep GetPieceOffset
+// (0x43def0) and the piece position functions after it matching (docs/c2-regalloc.md).
 #include "../sound/sound.h"
 
 
@@ -347,10 +346,6 @@ int __stdcall OrderModeTakesTarget(unsigned char type)
         return 1;
     return 0;
 }
-
-// Included here, not at the top: its symbol ids before GetPieceOffset (0x43def0)
-// move that function (docs/c2-regalloc.md).
-#include "../weapons/weapon_def.h"
 
 #pragma pack(push, 1)
 struct Flags_0043e490 {
