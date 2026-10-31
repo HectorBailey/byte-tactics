@@ -1131,8 +1131,8 @@ int OrderFx::KeepAfterComplete()
 // FUNCTION: 0x44cf00
 void Class_0044cf00::ContainsUnit(int param_1)
 {
-    short esi = *(short*)(param_1 + 0x78);
-    short eax = *(short*)(param_1 + 0x76);
+    short esi = ((Unit*)param_1)->y;
+    short eax = ((Unit*)param_1)->x;
 
     ContainsCell(eax, esi);
 }
@@ -1683,7 +1683,7 @@ int PathOrder::GetType()
 // FUNCTION: 0x44df80
 void* PathOrder::Destroy(unsigned char flag)
 {
-    ((PathOrderAttach*)((char*)this + 0x16))->Unlink();
+    ref.Unlink();
     vtable = g_orderFxVtable;
     if (flag & 1) {
         operator delete(this);
@@ -1897,7 +1897,7 @@ int PathOrder::FillWorldPos(Vec3_0044e3c0* out)
             if (def->flag22)
                 pos.y = (def->altitude + g_game->seaLevel) << 16;
             else
-                pos.y = (def->altitude + *(unsigned char*)(unit->spatialBucket + 1)) << 16;
+                pos.y = (def->altitude + ((unsigned char*)unit->spatialBucket)[1]) << 16;
         }
     }
     if (pos.y > 0x1ff0000)
