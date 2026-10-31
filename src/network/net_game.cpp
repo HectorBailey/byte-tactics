@@ -1224,14 +1224,6 @@ struct Class_00451fd0 {
     };
 };
 
-// The dialog object returned by LoadGuiLayer.
-struct Gui_00453a50 {
-    char unknown_0[4];
-    void* entries;                     // +0x04
-    void (__stdcall* callback)(void*); // +0x08
-    char unknown_c[0x1c - 0xc];
-    void (__stdcall* onFrame)(void*); // +0x1c
-};
 
 // The chat message (0x05): the type, then the text. net_game_453d40.cpp
 // reads the text from +0x1 as well.
@@ -2704,10 +2696,9 @@ void __stdcall OpenTimeoutDialog(int id)
         return;
     }
 
-    Gui_00453a50* gui = (Gui_00453a50*)LoadGuiLayer(g_game->menu,
-                                                    "TIMEOUT.GUI", 0x800);
+    Layer* gui = (Layer*)LoadGuiLayer(g_game->menu, "TIMEOUT.GUI", 0x800);
     void* entries = gui->entries;
-    gui->callback = &HandleTimeoutDialog;
+    gui->handler = &HandleTimeoutDialog;
     g_timeoutPlayerDpid = id;
 
     char* p = (char*)GameAllocIgnoreTag("LOUNGE CHATTER", 0xa00);
@@ -2718,7 +2709,7 @@ void __stdcall OpenTimeoutDialog(int id)
     ConfigureListBoxByName(g_game->menu, "OUTPUT", g_loungeChatter,
                  (int)out->height / (GetFontLineHeight() + 2), 0);
 
-    gui->onFrame = &UpdateTimeoutDialog;
+    gui->cb1c = &UpdateTimeoutDialog;
     BeginTextEdit(g_game->menu, FindGadgetIndex(entries, "TALK", 3));
 
     SetTranslatedTextByName(g_game->menu, "NAME",
