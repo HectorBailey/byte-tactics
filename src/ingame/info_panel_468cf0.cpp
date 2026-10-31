@@ -115,10 +115,13 @@ struct Resources {          // g_game+0x37e3f, 33 bytes
 };
 #pragma pack(pop)
 
-struct Unit_00468cf0;
-struct MapGrid { Unit_00468cf0 **buf; Unit_00468cf0 ***cursor; ushort *count; char pad1[0x2c]; int width; int height; char pad2[0x10]; int stride; int rows; char pad3[0x34]; Cell *tiles; };
+struct Unit;
+struct MapGrid { Unit **buf; Unit ***cursor; ushort *count; char pad1[0x2c]; int width; int height; char pad2[0x10]; int stride; int rows; char pad3[0x34]; Cell *tiles; };
 struct Bits8 { ushort b0:1; ushort b1:1; ushort b2:1; ushort b3:1; ushort b4:1; ushort b5:1; ushort b6:1; ushort b7:1; };
-struct UnitFlags { uint kind:2; uint b2:1; uint b3:1; uint b4:1; uint b5:1; uint b6:1; uint b7:1; };
+
+// The unit is units/unit.h's; its 16.16 pos halves are the whole-number screen
+// coordinates this drawer wants.
+#include "../units/unit.h"
 
 // The player table and the info block behind Player::info are spelled by their
 // own headers.
@@ -128,23 +131,6 @@ struct UnitFlags { uint kind:2; uint b2:1; uint b3:1; uint b4:1; uint b5:1; uint
 // The game state this file reads, with the member names the other Game views
 // use. The bit words share a union with each view's bitfield type.
 #pragma pack(push, 1)
-
-struct Unit_00468cf0 {                 // 0x118 bytes
-  char unknown_0[0x6c];
-  short xWhole;                       // +0x6c
-  char unknown_6e[2];
-  short yWhole;                       // +0x70
-  char unknown_72[2];
-  short zWhole;                       // +0x74
-  char unknown_76[0x96 - 0x76];
-  Player* player;                     // +0x96
-  void* script;                       // +0x9a
-  char unknown_9e[0xac - 0x9e];
-  int group;                          // +0xac, the control group number
-  char unknown_b0[0x110 - 0xb0];
-  UnitFlags flags;                    // +0x110
-  char unknown_111[0x118 - 0x111];
-};
 
 #include "../game/side_def.h"
 
@@ -482,10 +468,10 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
     ushort *pIdx = g_game->visibleUnitIdList;
     k = 0;
     while (k < g_game->count) {
-      Unit_00468cf0 *unit = (Unit_00468cf0 *)(g_game->units + *pIdx * 0x118);
-      int row = ((int)unit->zWhole - g_game->scrollY) / 16 + 0x10;
+      Unit *unit = (Unit *)(g_game->units + *pIdx * 0x118);
+      int row = (((int)((short*)&unit->pos.z)[1]) - g_game->scrollY) / 16 + 0x10;
       if (row >= 0 && row < mv->rows) {
-        Unit_00468cf0 ***pCur = &mv->cursor[row];
+        Unit ***pCur = &mv->cursor[row];
         mv->count[row]++;
         if (*pCur != 0) {
           **pCur = unit;
@@ -533,12 +519,12 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
       // row and y are computed inside the loop: y becomes the induction variable.
       int row = i + skip;
       y = y0 + i;
-      Unit_00468cf0 **pUnit = mv->buf + row * mv->stride;
+      Unit **pUnit = mv->buf + row * mv->stride;
       for (k = 0; k < mv->count[row]; k++, pUnit++) {
 
-        Unit_00468cf0 *u = *pUnit;
-        if (u->flags.kind == 1 && param_1 != 0) {
-          if (u->flags.b4)
+        Unit *u = *pUnit;
+        if (u->occupyLayer == 1 && param_1 != 0) {
+          if (u->selected)
             DrawSelectionBox((int)&ctx, (int)u);
           if (u->script != 0)
             DrawUnit((int)&ctx, (int)u);
@@ -567,12 +553,12 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
     DrawExplosions((int)&ctx);
     DrawParticleList((int)&ctx, 7);
     for (i = 0; i < mv->rows; i++) {
-      Unit_00468cf0 **pUnit = mv->buf + mv->stride * i;
+      Unit **pUnit = mv->buf + mv->stride * i;
       k = 0;
       while (k < mv->count[i]) {
-        Unit_00468cf0 *u = *pUnit;
-        if (u->flags.kind != 1) {
-          if (u->flags.b4)
+        Unit *u = *pUnit;
+        if (u->occupyLayer != 1) {
+          if (u->selected)
             DrawSelectionBox((int)&ctx, (int)u);
           if (u->script != 0)
             DrawUnit((int)&ctx, (int)u);
@@ -593,12 +579,12 @@ void __stdcall DrawBattleFrame(int param_1, int param_2)
   if (param_1 != 0) {
     ushort *pIdx = g_game->visibleUnitIdList;
     for (k = 0; k < g_game->count; k++, pIdx++) {
-      Unit_00468cf0 *unit = (Unit_00468cf0 *)(g_game->units + *pIdx * 0x118);
+      Unit *unit = (Unit *)(g_game->units + *pIdx * 0x118);
       if ((g_game->visualFlagsByte & 1) || unit->group != 0) {
         char str[2];
         str[1] = 0;
-        x = unit->xWhole - g_game->scrollX + 0x80;
-        y = unit->zWhole - g_game->scrollY - (unit->yWhole >> 1) + 0x20;
+        x = ((short*)&unit->pos.x)[1] - g_game->scrollX + 0x80;
+        y = ((short*)&unit->pos.z)[1] - g_game->scrollY - (((short*)&unit->pos.y)[1] >> 1) + 0x20;
         if (g_game->visualFlagsByte & 1) {
           // The slot compares as a signed char, as the original does.
           if ((char)unit->player->index == (char)idx)
