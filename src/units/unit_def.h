@@ -146,7 +146,8 @@ public:
             unsigned int floater : 1;
             unsigned int upright : 1;
             unsigned int amphibious : 1;         // bit 21
-            unsigned int unknown_241_22 : 2;
+            unsigned int unknown_241_22 : 1;
+            unsigned int versionCompatible : 1;  // bit 23, Thaldren's VERSION_COMPATIBLE
             unsigned int isFeature : 1;          // bit 24
             unsigned int noShadow : 1;
             unsigned int immuneToParalyzer : 1;
