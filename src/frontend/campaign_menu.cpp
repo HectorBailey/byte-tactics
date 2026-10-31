@@ -885,8 +885,8 @@ void __stdcall HandleNewGameClick(Gui* menu)
         }
         if (g_game->mapInfo->SelectMission(index) != 0) {
             SetCursorMode(0x14);
-            *(unsigned char*)(*(int*)((char*)g_game + 0x1b8a) + 0x96) = 0;
-            *(unsigned char*)(*(int*)((char*)g_game + 0x1cd5) + 0x96) = 1;
+            g_game->players[0].info->color = 0;
+            g_game->players[1].info->color = 1;
             SaveSettings();
             if (g_anyMissionMode != 0) {
                 g_game->frontendSubstateRequest = 0x10;
@@ -933,7 +933,7 @@ void __stdcall HandleNewGameClick(Gui* menu)
         *(unsigned char*)(*(int*)(playerInfo + 0x1b8a) + 0x95) = 1;
         *(unsigned char*)(*(int*)(playerInfo + 0x1cd5) + 0x95) = 0;
         if (g_campaignSimplifiedLayout == 0)
-            FillCampaignListInline(*(unsigned char*)(*(int*)((char*)g_game + 0x14b * g_game->localPlayer + 0x1b8a) + 0x95));
+            FillCampaignListInline(g_game->players[g_game->localPlayer].info->side);
         if (g_anyMissionMode != 0) {
             FillMissionListInline(&g_game->gui, FindGadgetChecked(entries, "Campaign"));
             ClearSelectedGadget(menu);
@@ -950,7 +950,7 @@ ArmSide:
         g_game->flag_37ef2 = 0;
         *(unsigned char*)(*(int*)(playerInfo + 0x1b8a) + 0x95) = 0;
         *(unsigned char*)(*(int*)(playerInfo + 0x1cd5) + 0x95) = 1;
-        FillCampaignListInline(*(unsigned char*)(*(int*)((char*)g_game + 0x14b * g_game->localPlayer + 0x1b8a) + 0x95));
+        FillCampaignListInline(g_game->players[g_game->localPlayer].info->side);
         SetGadgetActiveByName(menu, "Campaign", g_campaignSimplifiedLayout == 0);
         if (g_anyMissionMode != 0)
             FillMissionListInline(&g_game->gui, FindGadgetChecked(entries, "Campaign"));
