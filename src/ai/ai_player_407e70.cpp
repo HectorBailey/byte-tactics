@@ -37,19 +37,8 @@ struct Vec3_00407d40 {
     void operator+=(const Vec3_00407d40& v) { x += v.x; y += v.y; z += v.z; }
 };
 
-// The 16.16 position the fog test reads, the same Fixed and FixedVec3
-// graphics/particles_475470.cpp (0x475470) declares; only the whole words are
-// read here.
-struct Fixed {
-    unsigned short frac;
-    short whole;
-};
-
-struct FixedVec3 {
-    Fixed x;
-    Fixed y;
-    Fixed z;
-};
+// The 16.16 position the fog test reads; only the whole words are read here.
+#include "../util/fixed.h"
 
 // Own views, not map/byte_map.h's MapSize and ByteMap: that header's version has
 // Index and at as well, and its ids move OnTimer (0x407e90) off its registers

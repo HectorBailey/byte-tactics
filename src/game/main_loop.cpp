@@ -81,19 +81,7 @@ struct Settings_00496e10 {
 
 #include "../map/mission.h"
 
-union Fixed {
-    int i;                              // 16.16
-    struct {
-        short frac;
-        short whole;
-    } h;
-};
-
-struct FixedPos {
-    Fixed x;
-    Fixed y;
-    Fixed z;
-};
+#include "../util/fixed.h"
 
 // The ten team records at g_game+0x1b63 are 0x14b bytes. Three functions view
 // them under different names; the fields that disagree over the same bytes sit
@@ -295,7 +283,7 @@ void __stdcall SetupPlayerSlot(unsigned char player, unsigned char kind);
 unsigned short __stdcall FindUnitTypeId(const char* name);
 void __stdcall FatalError(char* message);
 void __stdcall SetCameraPosition(int x, int y, int instant);
-void __stdcall CreateUnit(int team, unsigned short id, FixedPos pos, int a, int b,
+void __stdcall CreateUnit(int team, unsigned short id, FixedVec3 pos, int a, int b,
     int c);
 
 static inline void Charge(int bucket)
@@ -568,7 +556,7 @@ void __stdcall SpawnCommanderAtStartPos(int team, int startpos)
     p->size1 = (float)(w >= 200 ? w : 200);
     p->size2 = (float)(v >= 200 ? v : 200);
 
-    FixedPos pos;
+    FixedVec3 pos;
     if (g_game->net->GetStartPosition((Vec3*)&pos, startpos)) {
         unsigned short id = FindUnitTypeId(
             g_game->names[g_game->players[team].info->side].name);
@@ -582,8 +570,8 @@ void __stdcall SpawnCommanderAtStartPos(int team, int startpos)
     }
 
     if (team == g_game->localPlayer)
-        SetCameraPosition(pos.x.h.whole - g_game->viewPixelWidth / 2,
-            pos.z.h.whole - g_game->viewPixelHeight / 2, 0);
+        SetCameraPosition(pos.x.whole - g_game->viewPixelWidth / 2,
+            pos.z.whole - g_game->viewPixelHeight / 2, 0);
 }
 
 // Walks the ten player slots: for every player that is playing (the same

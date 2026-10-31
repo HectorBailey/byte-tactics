@@ -25,19 +25,7 @@ struct Game {
 };
 #pragma pack(pop)
 extern Game* g_game;
-// The 16.16 position the fog test builds and reads, the same Fixed and
-// FixedVec3 graphics/particles_475470.cpp declares; only the whole words are
-// read here.
-struct Fixed {
-    unsigned short frac;
-    short whole;
-};
-
-struct FixedVec3 {
-    Fixed x;
-    Fixed y;
-    Fixed z;
-};
+#include "../util/fixed.h"
 static inline int IsExplored(ExploredMap* map, FixedVec3* pos)
 {
     int tx = pos->x.whole >> 5;

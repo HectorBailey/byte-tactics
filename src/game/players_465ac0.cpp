@@ -33,19 +33,7 @@ struct Game {
 #include "../units/unit_def.h"
 #include "../util/vec3.h"
 #include "../units/unit.h"
-// The 16.16 position the fog test builds and reads, the same Fixed and
-// FixedVec3 graphics/particles_475470.cpp declares; only the whole words are
-// read here.
-struct Fixed {
-    unsigned short frac;
-    short whole;
-};
-
-struct FixedVec3 {
-    Fixed x;
-    Fixed y;
-    Fixed z;
-};
+#include "../util/fixed.h"
 #pragma pack(pop)
 
 extern Game* g_game;
