@@ -76,8 +76,8 @@ struct Rect;
 struct Settings;
 struct Slot_0041e420;
 struct Src_004ab400;
-struct Sub_004679a0_a;
-struct Sub_004679a0_b;
+struct ResourceHudCache;
+struct SelectionInfoCache;
 struct Unit;
 struct UnitDef;
 struct V4i;
@@ -256,20 +256,22 @@ struct Entry_00463ca0 {  // 0x48 bytes
 };
 
 
-struct Sub_004679a0_a {  // 0x21 bytes, 1 view
-    char unknown_0[1];
-    int field_1;  // +0x1
-    char unknown_5[8];
-    int field_d;  // +0xd
-    char unknown_11[8];
-    int field_19;  // +0x19
-    int field_1d;  // +0x1d
+struct ResourceHudCache {  // 0x21 bytes, Thaldren's: the resource bar's per-slot cache
+    unsigned char slotIndex;  // +0x0
+    float energyAmountDisp;  // +0x1
+    float energyIncome;  // +0x5
+    float energyUsage;  // +0x9
+    float metalAmountDisp;  // +0xd
+    float metalIncome;  // +0x11
+    float metalUsage;  // +0x15
+    float energyStorage;  // +0x19
+    float metalStorage;  // +0x1d
 };
 
-struct Sub_004679a0_b {  // 0x38 bytes, 1 view
-    char unknown_0[48];
-    int field_30;  // +0x30
-    unsigned short* lightbar;  // +0x34
+struct SelectionInfoCache {  // 0x38 bytes of Thaldren's 0x3c; its +0x38 is Game's optionsLightbarDirty
+    char unknown_0[48];  // Thaldren's hoverKey, a selection hover snapshot
+    int totalUnitsPanelSlide;  // +0x30
+    unsigned short* lightbar;  // +0x34, the cached lightbar frame
 };
 
 struct Class_0046a400 {  // 0x50 bytes
@@ -582,8 +584,8 @@ struct Game {  // 0x3924d bytes
     Rect rect;  // +0x37e27
     int viewWidth;  // +0x37e37
     int viewHeight;  // +0x37e3b
-    Sub_004679a0_a a;  // +0x37e3f
-    Sub_004679a0_b b;  // +0x37e60
+    ResourceHudCache resourceHudCache;  // +0x37e3f
+    SelectionInfoCache selectionInfoCache;  // +0x37e60
     int optionsLightbarDirty;  // +0x37e98
     unsigned short unitIndex;  // +0x37e9c
     unsigned short unitDefIndex;  // +0x37e9e
