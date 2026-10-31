@@ -91,13 +91,9 @@ struct UnitList {
 #include "../network/player.h"
 #include "../network/player_info.h"
 
-// One side's SideDef record (0x232 bytes, Thaldren): the commander name at
-// +0x22 is what the victory conditions match against a unit type name.
-struct PlayerName {
-    char unknown_0[0x22];              // +0x00
-    char commander[0x20];              // +0x22
-    char unknown_42[0x232 - 0x42];
-};
+// The commander name at +0x22 of a side's SideDef is what the victory
+// conditions match against a unit type name.
+#include "side_def.h"
 
 #include "../map/mission.h"
 
@@ -120,7 +116,7 @@ struct Game {
     int battleCommanderDeath;          // +0x37ef6
     char unknown_37efa[0x37f3d - 0x37efa];
     union {
-        PlayerName sideDefs[5];        // +0x37f3d, one SideDef per side
+        SideDef sideDefs[5];           // +0x37f3d, one per side
         struct {
             char unknown_37f3d[0x38a47 - 0x37f3d];
             unsigned int gameTick;     // +0x38a47
