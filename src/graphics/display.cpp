@@ -25,7 +25,7 @@ union DisplayFlags {
         unsigned short has_c8 : 1;     // bit 7
         unsigned short has_cc : 1;     // bit 8
         unsigned short has_d0 : 1;     // bit 9
-        unsigned short sound_opt : 1;  // bit 10
+        unsigned short mouseThread : 1; // bit 10, InitMouse's start
         unsigned short quitting : 1;   // bit 11
         unsigned short bit12 : 4;      // bits 12 to 15
     } bits;
@@ -651,9 +651,9 @@ int __stdcall InitEnvironment(DisplayContext* d)
     // Three plain bitfield statements, not one whole-word expression.
     d->flags.bits.quitting = 0;
     d->hwnd = 0;
-    d->flags.bits.sound_opt = (d->videoFlags >> 9) & 1;
+    d->flags.bits.mouseThread = (d->videoFlags >> 9) & 1;
     InitKeyQueue(0x1e);
-    InitMouse(0x14, d->flags.bits.sound_opt);
+    InitMouse(0x14, d->flags.bits.mouseThread);
     MouseEvent view;
     view.x = 0;
     view.y = 0;
