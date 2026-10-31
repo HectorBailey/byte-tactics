@@ -23,7 +23,7 @@ struct Unit;
 #include "../units/unit.h"
 
 #pragma pack(push, 1)
-#include "../units/unit_ref.h"
+#include "path_order_attach.h"
 
 struct Order {
     char unknown_0[5];
@@ -31,7 +31,7 @@ struct Order {
     unsigned int flags;                // +0x6
     char unknown_a[0xe - 0xa];
     Unit* source;                      // +0xe
-    UnitRef target;                    // +0x12
+    PathOrderAttach target;            // +0x12
     Vec3 pos;                          // +0x22
     char unknown_2e[0x36 - 0x2e];
     int elapsed;                       // +0x36

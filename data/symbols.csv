@@ -1811,13 +1811,13 @@ address,name
 0x489260,UnitCategory::UnitCategory
 0x489280,MakePropList
 0x4894f0,UnitCanBuild
-0x489540,UnitRef::LinkToUnit
-0x489580,UnitRef::UnlinkFromUnit
+0x489540,PathOrderAttach::LinkToUnit
+0x489580,PathOrderAttach::UnlinkFromUnit
 0x4895c0,PathOrderAttach::PathOrderAttach
 0x489600,??_GPathOrderAttach@@UAEPAXI@Z
-0x489650,UnitRef::Unlink
+0x489650,PathOrderAttach::Unlink
 0x489690,PathOrderAttach::SetUnit
-0x4896f0,UnitRef::ClearRef
+0x4896f0,PathOrderAttach::ClearRef
 0x489740,ClearUnitRefs
 0x4897b0,NotifyUnitRefs
 0x4897e0,Unit::ChooseWeapon

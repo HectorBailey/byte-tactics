@@ -803,7 +803,7 @@ tail:
 //   the symbol ids, so it moves with the headers and with code-neutral
 //   spellings. What puts all six in place (found by the permuter): <memory.h>
 //   plus <windows.h>, the state 0 test written as two nested ifs, and an empty
-//   `do {} while (0);` in UnitRef::Get(), a debug check that compiles to
+//   `do {} while (0);` in PathOrderAttach::Get(), a debug check that compiles to
 //   nothing. Without the do-while, or without the `ok` local, the registers
 //   come out differently.
 // Reading the record address through a named base (a temp_intro the permuter

@@ -87,7 +87,9 @@ struct SaveDesc_0043a1f0 {             // the 0x3a-byte snapshot, read and writt
 
 #include "../units/cob_script.h"
 
-#include "../units/unit_ref.h"
+// Unused here: the symbol ids this header takes stand where the old UnitRef header's
+// stood, keeping 0x438650 matching (docs/c2-regalloc.md).
+#include "../units/weapon_aim_cob_cb.h"
 
 #include "air_maneuver_order.h"
 
@@ -146,6 +148,7 @@ public:
 
     PathOrderAttach(Unit* o, int v);
     void SetUnit(Unit* o);
+    void Unlink();
 };
 
 // An order type held as its index in the sorted order-type table. Callers
@@ -612,7 +615,7 @@ Order::~Order()
     if (!(flags & 0x10000)) {
         unit->ReleaseWeapons(3);
     }
-    ((UnitRef*)&link)->Unlink();
+    link.Unlink();
 }
 
 // The real resolver at 0x43a360 (matched in its own file), defined here without

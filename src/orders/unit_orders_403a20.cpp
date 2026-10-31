@@ -88,8 +88,6 @@ static inline void CellToWorld(Point origin, Point c, Vec3* v)
 }
 // Unused here: the symbol ids these declarations take stand where the UnitDef
 // view stood, keeping 0x403a20's allocation (docs/c2-regalloc.md).
-struct Feature;
-int __stdcall IsUnitCommander(Unit*);
 void __stdcall DrawUnit(void*, Unit*);
 void CmdMem(int);
 // FUNCTION: 0x403a20

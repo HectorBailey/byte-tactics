@@ -38,12 +38,6 @@ struct WeaponDef {
     char pad0[0xdc]; int range;
 };
 #include "../units/unit.h"
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
-unsigned short __stdcall ChooseBuildOption(unsigned int, Unit*);
-void __stdcall ClearWeaponTarget(Unit*, int);
-void __stdcall DetonateUnitWeapon(Unit*, int);
-void __stdcall DrawUnit(void*, Unit*);
-void __stdcall KillUnit(Unit*, int);
 
 struct Order {
     char pad0[5]; unsigned char state; unsigned int flags;
