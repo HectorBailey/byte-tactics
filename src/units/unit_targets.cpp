@@ -11,7 +11,7 @@
 #include "cob_script.h"
 #include "../util/angles.h"
 
-class Unit;
+struct Unit;
 class UnitRef;
 class PathOrderAttach;
 class Order;
@@ -35,61 +35,7 @@ public:
 
 #include "../network/player.h"
 
-class Unit {
-public:
-    UnitMotion* motion;                // +0x0
-    UnitWeaponSlot weapons[3];         // +0x4, stride 0x1c
-    char unknown_58[0x5c - 0x58];
-    Order* list;                       // +0x5c
-    char unknown_60[0x64 - 0x60];
-    Angles16 angles;                   // +0x64
-    struct {
-        int x;                         // +0x6a
-        union {
-            int y;                     // +0x6e, 16.16
-            struct {
-                unsigned short y_fraction;
-                short roll;            // +0x70
-            };
-        };
-        int z;                         // +0x72
-    } pos;
-    char unknown_76[0x92 - 0x76];
-    UnitDef* def;                     // +0x92
-    Player* player;                    // +0x96
-    CobScript* script;                 // +0x9a
-    char unknown_9e[0xa2 - 0x9e];
-    union {
-        UnitRef* head;                 // +0xa2, the links of this unit's list
-        PathOrderAttach* link;
-    };
-    unsigned short unitDefIndex;       // +0xa6
-    unsigned short id;                 // +0xa8
-    unsigned short hoverBobPhase;      // +0xaa
-    char unknown_ac[0xb8 - 0xac];
-    unsigned short killCount;           // +0xb8, armour: divided by 5, capped at 5
-    char unknown_ba[0xf0 - 0xba];
-    void* attacker;                    // +0xf0
-    char lastAttackerSlot;
-    unsigned char lastDamageType;      // +0xf5
-    char unknown_f6[0xff - 0xf6];
-    unsigned char playerIndex;         // +0xff
-    char unknown_100[0x108 - 0x100];
-    short health;                      // +0x108
-    char unknown_10a[0x10e - 0x10a];
-    unsigned char activateFlags;       // +0x10e
-    char cobStateFlags;
-    union {
-        unsigned int flags;            // +0x110
-        struct {
-            char unknown_110;
-            unsigned int weaponFlags;    // +0x111
-        };
-    };
-    char unknown_115[0x118 - 0x115];
-
-    unsigned char ChooseWeapon();
-};
+#include "unit.h"
 
 struct MapInfo_0048a490;
 
@@ -185,13 +131,20 @@ int __stdcall UnitCanBuild(Unit* unit, short id)
 
 #include "unit_ref.h"
 
+// unit.h types the list head at +0xa2 as PathOrderAttach*, the other view of
+// the same 0x10-byte node; the UnitRef methods walk the list through this.
+static inline UnitRef** UnitRefs(Unit* u)
+{
+    return (UnitRef**)&u->head;
+}
+
 // FUNCTION: 0x489540
 void UnitRef::LinkToUnit(Unit* o)
 {
     if (o != 0 && o->unitDefIndex != 0) {
         owner = o;
-        next = o->head;
-        o->head = this;
+        next = *UnitRefs(o);
+        *UnitRefs(o) = this;
         return;
     }
     owner = 0;
@@ -204,7 +157,7 @@ void UnitRef::LinkToUnit(Unit* o)
 void UnitRef::UnlinkFromUnit()
 {
     if (owner != 0) {
-        UnitRef** link = &owner->head;
+        UnitRef** link = UnitRefs(owner);
         while (*link != this)
             link = &(*link)->next;
         *link = next;
@@ -223,7 +176,7 @@ public:
     virtual ~PathOrderAttach()
     {
         if (owner != 0) {
-            PathOrderAttach** pp = &owner->link;
+            PathOrderAttach** pp = &owner->head;
             while (*pp != this)
                 pp = &(*pp)->next;
             *pp = next;
@@ -243,8 +196,8 @@ PathOrderAttach::PathOrderAttach(Unit* o, int v)
 {
     if (o != 0 && o->unitDefIndex != 0) {
         owner = o;
-        next = o->link;
-        o->link = this;
+        next = o->head;
+        o->head = this;
         return;
     }
     owner = 0;
@@ -274,7 +227,7 @@ void UnitRef::Unlink()
 void PathOrderAttach::SetUnit(Unit* o)
 {
     if (owner != 0) {
-        PathOrderAttach** pp = &owner->link;
+        PathOrderAttach** pp = &owner->head;
         while (*pp != this)
             pp = &(*pp)->next;
         *pp = next;
@@ -283,8 +236,8 @@ void PathOrderAttach::SetUnit(Unit* o)
     }
     if (o != 0 && o->unitDefIndex != 0) {
         owner = o;
-        next = o->link;
-        o->link = this;
+        next = o->head;
+        o->head = this;
         return;
     }
     owner = 0;
@@ -298,7 +251,7 @@ void UnitRef::ClearRef(void)
     if (listener)
         listener->Notify(8);
     if (owner == saved && owner) {
-        UnitRef** pp = &owner->head;
+        UnitRef** pp = UnitRefs(owner);
         while (*pp != this)
             pp = &(*pp)->next;
         *pp = next;
@@ -313,12 +266,12 @@ void UnitRef::ClearRef(void)
 // FUNCTION: 0x489740
 void __stdcall ClearUnitRefs(Unit* obj)
 {
-    for (UnitRef* n = obj->head; n != 0; n = obj->head) {
+    for (UnitRef* n = *UnitRefs(obj); n != 0; n = *UnitRefs(obj)) {
         Unit* saved = n->owner;
         if (n->listener)
             n->listener->Notify(8);
         if (n->owner == saved && n->owner) {
-            UnitRef** pp = &n->owner->head;
+            UnitRef** pp = UnitRefs(n->owner);
             while (*pp != n)
                 pp = &(*pp)->next;
             *pp = n->next;
@@ -332,7 +285,7 @@ void __stdcall ClearUnitRefs(Unit* obj)
 // FUNCTION: 0x4897b0
 void __stdcall NotifyUnitRefs(Unit* obj, int event)
 {
-    for (UnitRef* n = obj->head; n != 0; n = n->next) {
+    for (UnitRef* n = *UnitRefs(obj); n != 0; n = n->next) {
         if (n->listener != 0)
             n->listener->Notify(event);
     }
@@ -726,11 +679,11 @@ int __cdecl FUN_004b715a(int x, int y);
 void __cdecl FUN_004b7173(unsigned short deg, Pos2_0048a490* p);
 
 // Samples the ground under a unit at its four surrounding terrain vertices and
-// stores the resulting pitch (0x68) and roll (0x70) on the unit, plus a heading
-// (0x64) from the two side vertices. The 0x11/0x04 bytes of a heightmap tile are
-// the two half heights of its edge pair, and the corner heights are bilinearly
-// interpolated with a plain / 16. The sea-level block then adds a jitter that
-// fades out over 60 frames.
+// stores the resulting height (the whole half of pos.y, +0x70) and pitch
+// (+0x68) on the unit, plus a bank (+0x64) from the two side vertices. The
+// 0x11/0x04 bytes of a heightmap tile are the two half heights of its edge
+// pair, and the corner heights are bilinearly interpolated with a plain / 16.
+// The sea-level block then adds a jitter that fades out over 60 frames.
 // FUNCTION: 0x48a490
 void __stdcall AlignUnitToGround(Unit* u)
 {
@@ -804,14 +757,14 @@ void __stdcall AlignUnitToGround(Unit* u)
             }
             hs[k].spare = hz;
         }
-        // hs[1] read before hs[0]; roll and pitch use (h0+h1)/2, not /2/2.
+        // hs[1] read before hs[0]; the height and pitch use (h0+h1)/2, not /2/2.
         int h1 = hs[1].h;
         int h0 = hs[0].h;
         int h2 = hs[2].h;
         int h3 = hs[3].h;
         int a = (h0 + h1) / 2;
         int b = (h2 + h3) / 2;
-        u->pos.roll = (a + b) / 2;
+        ((short*)&u->pos.y)[1] = (a + b) / 2;  // the whole half of the 16.16 height
         u->angles.pitch = FUN_004b715a(b - a, (short)(abs(pts[0].z - pts[3].z) >> 16));
         u->angles.bank = FUN_004b715a(h0 - h1, (short)(abs(pts[0].x - pts[1].x) >> 16));
     }
