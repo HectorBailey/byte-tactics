@@ -8,6 +8,9 @@
 #include <stdio.h>
 #include <string.h>
 
+// The connection record EnumConnections fills, one per provider.
+#include "provider_conn.h"
+
 // DirectPlay session description (DPSESSIONDESC2).
 struct DPSESSIONDESC2 {
     unsigned long dwSize;            // +0x00
@@ -37,12 +40,6 @@ struct GameRec_4c9c50 {
     char name[0x20];                 // +0x18
     GUID guidInstance;      // +0x38
     char unknown_48[0xc];            // +0x48
-};
-
-// A connection the EnumConnections callback records.
-struct HapinetProviderConnEntry {
-    void* connectionBlob;            // +0x0
-    unsigned long connectionBytes;   // +0x4
 };
 
 // A connection's name, from the EnumConnections callback.
@@ -649,11 +646,11 @@ int __stdcall HAPINET_enumconnections(GUID* guid, void* connection, unsigned lon
             return 1;
     }
     net->providerGuids[net->providerCount] = *guid;
-    net->providerConnections[net->providerCount].connectionBlob = GameAllocIgnoreTag("DPLAY CONNECTION", size);
-    if (net->providerConnections[net->providerCount].connectionBlob == 0)
+    net->providerConnections[net->providerCount].pConnectionBlob = GameAllocIgnoreTag("DPLAY CONNECTION", size);
+    if (net->providerConnections[net->providerCount].pConnectionBlob == 0)
         return 0;
-    memcpy(net->providerConnections[net->providerCount].connectionBlob, connection, size);
-    net->providerConnections[net->providerCount].connectionBytes = size;
+    memcpy(net->providerConnections[net->providerCount].pConnectionBlob, connection, size);
+    net->providerConnections[net->providerCount].dwCbConnectionBlob = size;
     sprintf(local, "%s", name->lpszShortNameA);
     char* dest = SkipTextLines(net->providerDescLines, net->providerCount);
     strcpy(dest, local);

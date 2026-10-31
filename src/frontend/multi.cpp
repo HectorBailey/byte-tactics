@@ -24,6 +24,7 @@
 #include <math.h>
 
 #include "../gui/gadget.h"
+#include "../network/provider_conn.h"
 
 // Unused here: the symbol ids these declarations take keep 0x441220, 0x441460,
 // 0x4468c0 and 0x447b10 matching (docs/c2-regalloc.md).
@@ -83,16 +84,10 @@ struct Msg_004437c0 {
     char pad_1[0x13];
 };
 
-// A DirectPlay connection block.
-struct Conn_443ff0 {
-    void* data;                        // +0x0
-    int size;                          // +0x4
-};
-
 // The selected connection: its GUID and its block.
 struct ConnInfo_443ff0 {
     GUID guid;                         // +0x0
-    Conn_443ff0 conn;                  // +0x10
+    HapinetProviderConnEntry conn;     // +0x10
 };
 
 // The network object at g_game+0x14, as the HAPINET_ wrappers lay it out.
@@ -251,7 +246,7 @@ struct Game {
     char unknown_2a87[0x2a9b - 0x2a87]; // +0x2a87
     char* chatter;                     // +0x2a9b
     GUID* sessions;                    // +0x2a9f
-    Conn_443ff0* conns;                // +0x2aa3
+    HapinetProviderConnEntry* conns;   // +0x2aa3
     Desc_004437c0* desc;               // +0x2aa7
     char* shared;                      // +0x2aab
     union {                            // +0x2aaf
@@ -1301,9 +1296,9 @@ int __stdcall TryConnect(int unused)
     int b = 0;
     int result = BuildCompoundAddress(&a, &b);
     if (result >= 0) {
-        g_game->info.conn.data = (void*)a;
+        g_game->info.conn.pConnectionBlob = (void*)a;
         result = 0;
-        g_game->info.conn.size = b;
+        g_game->info.conn.dwCbConnectionBlob = b;
     }
     return result;
 }
@@ -1325,8 +1320,8 @@ static int TryConnect_00442050()
     int b = 0;
     int result = BuildCompoundAddress(&a, &b);
     if (result >= 0) {
-        g_game->info.conn.data = (void*)a;
-        g_game->info.conn.size = b;
+        g_game->info.conn.pConnectionBlob = (void*)a;
+        g_game->info.conn.dwCbConnectionBlob = b;
     }
     return result;
 }
@@ -1452,8 +1447,8 @@ void __stdcall HandleSerialDialogClick(Gui* gadget)
         int b = 0;
         r = BuildCompoundAddress(&a, &b);
         if (r >= 0) {
-            g_game->info.conn.data = (void*)a;
-            g_game->info.conn.size = b;
+            g_game->info.conn.pConnectionBlob = (void*)a;
+            g_game->info.conn.dwCbConnectionBlob = b;
         }
         PlaySoundByName("SMLBUTTON", 0);
         BlankScreen();
@@ -1463,8 +1458,8 @@ void __stdcall HandleSerialDialogClick(Gui* gadget)
         int a = 0, b = 0;
         r = BuildCompoundAddress(&a, &b);
         if (r >= 0) {
-            g_game->info.conn.data = (void*)a;
-            g_game->info.conn.size = b;
+            g_game->info.conn.pConnectionBlob = (void*)a;
+            g_game->info.conn.dwCbConnectionBlob = b;
         }
         PlaySoundByName("SMLBUTTON", 0);
     } else if (IsCurrentGadgetNamed(gadget, "PREV")) {
@@ -1633,8 +1628,8 @@ static inline int TryConnect_00442a30()
     int b = 0;
     int result = BuildCompoundAddress(&a, &b);
     if (result >= 0) {
-        g_game->info.conn.data = (void*)a;
-        g_game->info.conn.size = b;
+        g_game->info.conn.pConnectionBlob = (void*)a;
+        g_game->info.conn.dwCbConnectionBlob = b;
     }
     return result;
 }

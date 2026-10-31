@@ -9,12 +9,7 @@
 #include "../gui/gui.h"
 #include "../gui/gadget.h"
 #include "../gui/layer.h"
-
-
-struct HapinetProviderConnEntry {
-    void* pConnectionBlob;
-    int dwCbConnectionBlob;
-};
+#include "../network/provider_conn.h"
 
 #include "../map/mission.h"
 

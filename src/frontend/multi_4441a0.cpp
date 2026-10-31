@@ -8,12 +8,9 @@
 #include "../gui/layer.h"
 #include "../gui/gui.h"
 
-#pragma pack(push, 1)
+#include "../network/provider_conn.h"
 
-struct HapinetProviderConnEntry {
-    void* pConnectionBlob;
-    int dwCbConnectionBlob;
-};
+#pragma pack(push, 1)
 
 struct Game_004441a0 {
     char unknown_0[0x2a4b];

@@ -41,7 +41,7 @@ struct Class_00480160;
 struct Class_0048ff40;
 class Sound;
 class UnitSync;
-struct Conn_443ff0;
+struct HapinetProviderConnEntry;
 struct Ctx_00499890;
 struct CursorState_0041cc60;
 struct Data_0046d970;
@@ -343,7 +343,7 @@ struct Game {  // 0x3924d bytes
     char unknown_2a87[20];
     void* list;  // +0x2a9b
     V4i* sessions;  // +0x2a9f
-    Conn_443ff0* conns;  // +0x2aa3
+    HapinetProviderConnEntry* conns;  // +0x2aa3, the DPLAY_CONNECTIONS array
     Desc_004437c0* desc;  // +0x2aa7
     char* shared;  // +0x2aab
     unsigned short bit0 : 1;  // +0x2aaf
