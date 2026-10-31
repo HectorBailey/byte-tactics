@@ -20,10 +20,10 @@ static inline Vec3 Sum(const Vec3& a, const Vec3& b)
     return r;
 }
 
-union Fixed {
-    int v;
-    struct { unsigned short frac; short whole; } p;
-};
+#include "../util/fixed.h"
+// Unused here: the symbol ids this header takes keep 0x412d40 matching on
+// util/fixed.h (docs/c2-regalloc.md).
+#include "../util/hapi_bank.h"
 
 #include "mission_type.h"
 
@@ -136,7 +136,7 @@ static inline int IsAhead(Unit* unit, Order* order)
 {
     Vec3 toward = Offset(GetHeadingBetween(&unit->pos, &order->target->pos), 0x140000);
     Fixed dist;
-    dist.v = 0x140000;
+    dist.value = 0x140000;
     Vec3 facing = DirectionFromAngle(unit->angles.heading, dist);
     return (short)(Whole(toward.x) * Whole(facing.x) + Whole(toward.z) * Whole(facing.z)) > 0;
 }
@@ -201,8 +201,8 @@ int __stdcall AirToAirOrder(Unit* unit, Order* order, int flags)
             else
                 order->ticks += 0x2d;
             Fixed d;
-            d.v = (int)_hypot(unit->pos.x - order->target->pos.x, unit->pos.z - order->target->pos.z);
-            if (d.p.whole > 0xa0) {
+            d.value = (int)_hypot(unit->pos.x - order->target->pos.x, unit->pos.z - order->target->pos.z);
+            if (d.whole > 0xa0) {
                 Vec3 p = order->target->pos;
                 p.x += order->target->motion->velocity.x * 45;
                 p.z += order->target->motion->velocity.z * 45;

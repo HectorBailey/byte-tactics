@@ -69,7 +69,7 @@ int __stdcall RandomInt(int);
 int __cdecl FUN_004b70ef(short, int);
 int __cdecl FUN_004b7123(short, int);
 Vec3 __stdcall AddVec3(const Vec3& a, const Vec3& b);
-union Fixed { int value; struct { unsigned short frac; short whole; } parts; };
+#include "../util/fixed.h"
 Vec3 __stdcall DirectionFromAngle(short angle, Fixed scale);
 // A free function, not a member: its smaller IL size keeps it inlined.
 static inline Vec3 operator+(const Vec3& a, const Vec3& b) { Vec3 r; r.x=a.x+b.x; r.y=a.y+b.y; r.z=a.z+b.z; return r; }

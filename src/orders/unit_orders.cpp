@@ -1139,16 +1139,7 @@ char* __stdcall lstrcpynA(char* dest, const char* src, int count);
 #include <stdlib.h>
 #include <string.h>
 
-union Fixed {
-    int value;
-    struct {
-        unsigned short fraction;
-        short whole;
-    };
-};
-
-// Unused here: the symbol ids this declaration takes keep the allocation (docs/c2-regalloc.md).
-int DrawWrappedText(char*, char*, int, int, int, int, int);
+#include "../util/fixed.h"
 
 #include "../map/feature.h"
 

@@ -127,7 +127,10 @@ public:
 #pragma pack(pop)
 extern Game* g_game;
 static inline UnitDef* Definitions() { return g_game->unitDefs; }
-union Fixed { int value; struct { unsigned short fraction; short whole; }; };
+#include "../util/fixed.h"
+// Unused here: the symbol ids this header takes keep 0x414380 matching on
+// util/fixed.h (docs/c2-regalloc.md).
+#include "../util/archive_entry.h"
 void __stdcall QueueUnitSpeech(Unit*, int, const char*);
 void __stdcall MarkSelectionOrdersDirty(Unit*);
 int __stdcall CanPlaceUnitFootprint(UnitDef*, int, Point, int);

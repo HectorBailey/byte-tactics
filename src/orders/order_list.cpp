@@ -21,6 +21,8 @@
 
 #pragma pack(push, 1)
 
+// Not util/fixed.h: the halves are bit fields here, and MakeFixed's two stores
+// through them are what 0x43d6d0 compiles (on the header's shorts, 82.0%).
 struct FixedParts {
     unsigned int frac : 16;
     int whole : 16;

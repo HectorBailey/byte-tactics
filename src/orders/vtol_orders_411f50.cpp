@@ -22,17 +22,10 @@ static inline Vec3 operator+(const Vec3& a, const Vec3& b)
     r.z = a.z + b.z;
     return r;
 }
-// A 16.16 fixed-point value: the whole part in the high half.
-struct Fixed {
-    unsigned short frac;
-    short whole;
-};
-
-struct FixedVec3 {
-    Fixed x;
-    Fixed y;
-    Fixed z;
-};
+#include "../util/fixed.h"
+// Unused here: the symbol ids this header takes keep 0x411f50 matching on
+// util/fixed.h (docs/c2-regalloc.md).
+#include "../util/hapi_bank.h"
 
 struct Unit;
 class UnitMotion {
