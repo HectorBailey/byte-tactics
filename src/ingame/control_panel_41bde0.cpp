@@ -6,22 +6,9 @@
 // that pointer from esi to edx.
 #include <stdlib.h>
 
-#include "../units/unit_def.h"
+#include "../units/unit.h"
 
 #pragma pack(push, 1)
-struct Unit {
-    char unknown_0[0x92];
-    UnitDef* def;                        // +0x92
-    char unknown_96[0xa6 - 0x96];
-    short unitDefIndex;                      // +0xa6
-    char unknown_a8[0x110 - 0xa8];
-    unsigned int bits_110_0 : 22;
-    unsigned int menuOpen : 1;           // bit 22
-    unsigned int page : 3;               // bits 23-25
-    unsigned int bits_110_26 : 6;
-    char unknown_114[0x118 - 0x114];
-};
-
 struct Game {
     char unknown_0[0x14357];
     Unit* units;                         // +0x14357
@@ -45,21 +32,21 @@ void __stdcall StepBuildMenuPage(int toggle)
             unit = 0;
         if (unit != 0) {
             if (toggle != 0) {
-                if (!unit->menuOpen) {
-                    unit->menuOpen = 1;
-                    unit->page = 1;
-                } else if (unit->page == unit->def->buildMenuPageCount - 1) {
-                    unit->menuOpen = 0;
+                if (!unit->buildMenuOpen) {
+                    unit->buildMenuOpen = 1;
+                    unit->buildMenuPage = 1;
+                } else if (unit->buildMenuPage == unit->def->buildMenuPageCount - 1) {
+                    unit->buildMenuOpen = 0;
                 } else {
-                    unit->page++;
+                    unit->buildMenuPage++;
                 }
             } else {
                 // Compared as page == buildMenuPageCount - 1; keeps the original load order.
-                if (unit->page == unit->def->buildMenuPageCount - 1)
-                    unit->page = 1;
+                if (unit->buildMenuPage == unit->def->buildMenuPageCount - 1)
+                    unit->buildMenuPage = 1;
                 else
-                    unit->page++;
-                unit->menuOpen = 1;
+                    unit->buildMenuPage++;
+                unit->buildMenuOpen = 1;
             }
             g_game->ordersPanelFlags |= 0x10;
         }
