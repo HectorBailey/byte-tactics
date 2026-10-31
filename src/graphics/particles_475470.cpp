@@ -10,17 +10,7 @@
 
 #include "../util/vec3.h"
 
-// A 16.16 fixed-point value: the whole part in the high half.
-struct Fixed {
-    unsigned short frac;
-    short whole;
-};
-
-struct FixedVec3 {
-    Fixed x;
-    Fixed y;
-    Fixed z;
-};
+#include "../util/fixed.h"
 
 // Kept, not map/byte_map.h: the header's helpers move Render (0x475470) to 96.0%.
 struct MapSize {
