@@ -275,6 +275,10 @@ struct WeaponDef {
 // declarations dropped above and below (docs/c2-regalloc.md).
 #include "../weapons/unit_weapon_slot.h"
 
+// Unused here: the symbol id this declaration takes keeps 0x43bc90 and the
+// other functions of this file matching (docs/c2-regalloc.md).
+void FUN_00406f40(void);
+
 struct Game {
     char unknown_0[0x14263];
     int gravity;                       // +0x14263
@@ -337,8 +341,8 @@ struct Unit {                          // 0x118 bytes
 
 // The whole (high) halves of the position's x and z components, which 43b1f0
 // reads as its own short view of the position.
-static inline short PosXWhole(Unit* unit) { return *(short*)((char*)&unit->pos + 2); }
-static inline short PosZWhole(Unit* unit) { return *(short*)((char*)&unit->pos + 0xa); }
+static inline short PosXWhole(Unit* unit) { return ((short*)&unit->pos.x)[1]; }
+static inline short PosZWhole(Unit* unit) { return ((short*)&unit->pos.z)[1]; }
 
 // One 25-byte record of the global order-type table at 0x512344 (a
 // std::vector's _First), Thaldren's MissionOrderTableEntry: the status text at
@@ -471,9 +475,9 @@ int __stdcall GetOrderTarget(int param_1)
 {
     int eax = param_1;
     if (eax != 0) {
-        eax = *(int*)(eax + 0x5c);
+        eax = (int)((Unit*)eax)->list;
         if (eax != 0) {
-            eax = *(int*)(eax + 0x16);
+            eax = (int)((Order*)eax)->link.owner;
             return eax;
         }
     }
@@ -573,18 +577,18 @@ void __stdcall DeleteOrder(Unit* owner, Order* node)
 // FUNCTION: 0x439fe0 ?MoveOrderToTail@@YGXPAD0@Z
 void __stdcall MoveOrderToTail(char* param_1, char* param_2)
 {
-    char** pp = (char**)(param_1 + 0x5c);
-    char* node = *pp;
-    for (; node != param_2; node = *(char**)(node + 0x4a)) {
-        pp = (char**)(node + 0x4a);
+    Order** pp = (Order**)(param_1 + 0x5c);
+    Order* node = *pp;
+    for (; node != (Order*)param_2; node = node->next) {
+        pp = &node->next;
     }
-    node = *(char**)(param_2 + 0x4a);
+    node = ((Order*)param_2)->next;
     *pp = node;
-    for (; node != 0; node = *(char**)(node + 0x4a)) {
-        pp = (char**)(node + 0x4a);
+    for (; node != 0; node = node->next) {
+        pp = &node->next;
     }
-    *pp = param_2;
-    *(char**)(param_2 + 0x4a) = 0;
+    *pp = (Order*)param_2;
+    ((Order*)param_2)->next = 0;
 }
 
 // Links `child` into the parent's list in front of `before` (see EnqueueOrderType).
@@ -705,7 +709,7 @@ short __stdcall ResolveUnitTypeKey(HapiBank* file, unsigned short id)
 // FUNCTION: 0x43a940
 int __stdcall OrderTypeNameLess(int param_1, char* param_2)
 {
-    int result = _strcmpi(*(char**)(param_1 + 0x15), param_2);
+    int result = _strcmpi(((MissionOrderTableEntry*)param_1)->lookupName, param_2);
     return result < 0;
 }
 

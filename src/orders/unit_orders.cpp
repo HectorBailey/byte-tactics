@@ -184,10 +184,12 @@ struct Sub_403010 {
     unsigned int unused_bits2 : 29;
 };
 
+// A unit type seen at its flags2 word (+0x245): the cloak handlers test bit 13,
+// Thaldren's CANCLOAK_FROM_COST.
 struct Target {
     char unknown_0[0x245];
     unsigned int lowbits : 13;
-    unsigned int flag : 1;             // +0x245, bit 13
+    unsigned int flag : 1;             // +0x245 bit 13, Thaldren's CANCLOAK_FROM_COST
 };
 
 #include "../util/angles.h"
@@ -978,6 +980,10 @@ int __stdcall DeactivateOrder(Unit* unit, int unused1, int unused2)
 // FUNCTION: 0x403070
 int __stdcall CloakOnOrder(char* param1, int unused1, int unused2)
 {
+    // Thaldren's MissionTick_Cloak_On: the def's CANCLOAK_FROM_COST bit
+    // (flags2 +0x245 bit 13) sets the unit's want-cloak bit (flags bit 11).
+    // The reads stay offsets: typing them through the views moves
+    // HelpBuildOrder, ReclaimUnitOrder and CollectDamagedAlly.
     Target* p = *(Target**)(param1 + 0x92);
     if (p->flag) {
         *(unsigned int*)(param1 + 0x110) |= 0x800;
@@ -988,6 +994,7 @@ int __stdcall CloakOnOrder(char* param1, int unused1, int unused2)
 // FUNCTION: 0x4030a0
 int __stdcall CloakOffOrder(char* unit, int unused1, int unused2)
 {
+    // The same gate as CloakOnOrder, clearing the want-cloak bit; same note.
     Target* p = *(Target**)(unit + 0x92);
     if (p->flag) {
         *(unsigned int*)(unit + 0x110) &= ~0x800;

@@ -38,7 +38,10 @@ struct Unit {                          // 0x118 bytes
     unsigned short id;                 // +0xa8
     char unknown_aa[0xb8 - 0xaa];
     unsigned short killCount;           // +0xb8
-    char unknown_ba[0x110 - 0xba];
+    char unknown_ba[0x10f - 0xba];
+    // Bit 0 is the build stance (WaitIfNotInBuildStance), bit 1 the busy flag
+    // (WaitIfCobBusy); units/unit.h names bits of the same byte.
+    unsigned char cobFlags;            // +0x10f
     unsigned int flags;                // +0x110
     char unknown_114[0x118 - 0x114];
 
@@ -357,8 +360,8 @@ int __stdcall ComputeReclaimDamagePulse(Unit* a, Unit* b, int n)
 // FUNCTION: 0x438700
 unsigned int __stdcall WaitIfNotInBuildStance(void* param_1, void* param_2, unsigned int param_3)
 {
-    if ((*(unsigned char*)((char*)param_1 + 0x10f) & 1) == 0) {
-        *(unsigned int*)((char*)param_2 + 6) = param_3 | 4;
+    if ((((Unit*)param_1)->cobFlags & 1) == 0) {
+        ((Order*)param_2)->flags6 = param_3 | 4;
         return 2;
     }
     return 1;
@@ -367,8 +370,8 @@ unsigned int __stdcall WaitIfNotInBuildStance(void* param_1, void* param_2, unsi
 // FUNCTION: 0x438730
 int __stdcall WaitIfCobBusy(char* param_1, char* param_2, unsigned int param_3)
 {
-    if (*(unsigned char*)(param_1 + 0x10f) & 2) {
-        *(unsigned int*)(param_2 + 6) = param_3 | 4;
+    if (((Unit*)param_1)->cobFlags & 2) {
+        ((Order*)param_2)->flags6 = param_3 | 4;
         return 2;
     }
     return 1;
@@ -448,6 +451,8 @@ void Order::AnnounceStatusIfFlagged(char* text)
 void Order::ReattachFxToUnit()
 {
     if (attached != 0) {
+        // The unit's vtable chain, third vtable, slot 1: no class in the
+        // sources declares these three vtables, so the walk stays raw.
         void* p1 = *(void**)unit;
         void* p2 = *(void**)p1;
         void* p3 = *(void**)p2;
@@ -575,9 +580,9 @@ void Order::MergeFlagsFromTable(int k)
 int __stdcall GetOrderFlags(void* param)
 {
     if (!param) return 0;
-    void* ptr1 = *(void**)((char*)param + 0x5c);
+    Order* ptr1 = ((Unit*)param)->list;
     if (!ptr1) return 0;
-    return *(int*)((char*)ptr1 + 0x42);
+    return ptr1->flags;
 }
 
 #include "../util/hapi_bank.h"

@@ -149,8 +149,9 @@ int __stdcall ResurrectOrder(Unit* unit, Order* order, int flags)
         }
         break;
     case 5: {
-        // The attach link starts at +0x12; its owner is Order::target at +0x16.
-        ((PathOrderAttach*)((char*)order + 0x12))->SetUnit(CreateUnit(unit->playerIndex, order->unitType, order->pos, 0, 1, 0));
+        // The attach link starts at +0x12 (the order's unknown_12 slot);
+        // its owner is Order::target at +0x16.
+        ((PathOrderAttach*)order->unknown_12)->SetUnit(CreateUnit(unit->playerIndex, order->unitType, order->pos, 0, 1, 0));
         if (!order->target) {
             QueueUnitSpeech(unit, 7, "Unable to create any more units");
             order->SetDeadlineTicks(300);
