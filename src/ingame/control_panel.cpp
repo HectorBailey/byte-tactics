@@ -63,145 +63,21 @@ struct ObjectState {
     int drawFrame;                     // +0x10
 };
 
-struct UnitTypeFlagsBits {
-    unsigned int unknown_0 : 6;        // +0x241 bits 0-5
-    unsigned int flag_6 : 1;           // bit 6
-    unsigned int unknown_7 : 4;        // bits 7-10
-    unsigned int flag_11 : 1;          // bit 11
-    unsigned int unknown_12 : 6;       // bits 12-17
-    unsigned int flag_18 : 1;          // bit 18
-    unsigned int unknown_19 : 5;       // bits 19-23
-    unsigned int flag_24 : 1;          // bit 24
-    unsigned int unknown_25 : 7;       // bits 25-31
-};
-
-union UnitTypeFlags {
-    unsigned int raw;
-    UnitTypeFlagsBits bits;
-};
-
-struct UnitTypeFlags2 {
-    unsigned int canMoveOrder : 1;     // +0x245 bit 0
-    unsigned int canFireOrder : 1;     // bit 1
-    unsigned int canOnOff : 1;         // bit 2
-    unsigned int canStop : 1;          // bit 3
-    unsigned int canAttack : 1;        // bit 4
-    unsigned int canDefend : 1;        // bit 5
-    unsigned int canPatrol : 1;        // bit 6
-    unsigned int canMove : 1;          // bit 7
-    unsigned int canLoad : 1;          // bit 8
-    unsigned int canRepair : 1;        // bit 9
-    unsigned int canReclaim : 1;       // bit 10
-    unsigned int bit11 : 1;
-    unsigned int canCapture : 1;       // bit 12
-    unsigned int canCloak : 1;         // bit 13
-    unsigned int canBlast : 1;         // bit 14
-    unsigned int bits15 : 17;
-};
-
-// UnitDef (units/unit_def.h, 0x249 bytes) with its flag words read as bit fields,
-// which the header lacks: the unit's own type and a build menu entry.
-struct UnitType {
-    char unknown_0[0x20];
-    char unitname[0x20];               // +0x20
-    char unknown_40[0x111 - 0x40];
-    unsigned int weaponFlags;            // +0x111
-    char unknown_115[0x14a - 0x115];
-    Point16 origin;                   // +0x14a
-    char unknown_14e[0x156 - 0x14e];
-    int ids;                           // +0x156
-    char unknown_15a[0x186 - 0x15a];
-    float energyCost;                  // +0x186 (TDF buildcostenergy)
-    float metalCost;                   // +0x18a (TDF buildcostmetal)
-    char unknown_18e[0x1ea - 0x18e];
-    int buildtime;                     // +0x1ea
-    char unknown_1ee[0x1fa - 0x1ee];
-    unsigned int maxHealth;            // +0x1fa
-    char unknown_1fe[0x21e - 0x1fe];
-    unsigned short id;                 // +0x21e
-    char unknown_220[0x22e - 0x220];
-    unsigned char buildMenuPageCount;  // +0x22e
-    unsigned char mobile;              // +0x22f
-    char unknown_230[0x241 - 0x230];
-    UnitTypeFlags flags;               // +0x241
-    UnitTypeFlags2 flags2;             // +0x245
-};
 
 #include "../gui/gadget.h"
 #include "../gui/layer.h"
 #include "../gui/gui.h"
 
-// Unused here: a real function declared to keep the file's symbol count (docs/c2-regalloc.md).
+// Unused here: real functions declared to keep the file's symbol count (docs/c2-regalloc.md).
 void StepAllGafSequences();
+void RegisterGroundOrders(void);
 
 #include "../network/player_info.h"
 
 #include "../network/player.h"
 
-struct UnitFlagsBits {
-    unsigned int unknown_0 : 4;        // +0x110 bits 0-3
-    unsigned int selected : 1;         // bit 4
-    unsigned int unknown_5 : 6;        // bits 5-10
-    unsigned int cloak : 1;            // bit 11
-    unsigned int unknown_12 : 6;       // bits 12-17
-    unsigned int moveOrder : 2;        // bits 18-19
-    unsigned int fireOrder : 2;        // bits 20-21
-    unsigned int buildPage : 1;        // bit 22
-    unsigned int page : 3;             // bits 23-25
-    unsigned int unknown_26 : 3;       // bits 26-28
-    unsigned int flag_29 : 1;          // bit 29
-    unsigned int unknown_30 : 2;       // bits 30-31
-};
-
-// lo is the byte view 0x41c110 tests; the bitfields are 0x41c060's view of
-// the same word.
-union UnitFlags {
-    unsigned int raw;
-    unsigned char lo;
-    UnitFlagsBits bits;
-};
-
-struct UnitWeaponSlot {                // 0x1c bytes, one of a unit's three
-    char unknown_0[0xc];               // the aim target pair and the aim callback
-    void* weapon;                      // +0xc
-    char unknown_10[0x1a - 0x10];
-    unsigned char stockpile;           // +0x1a
-    unsigned char flags;               // +0x1b
-};
-
-struct Unit {
-    int motion;                       // +0x0
-    UnitWeaponSlot weapons[3];         // +0x4, stride 0x1c
-    char unknown_58[0x6a - 0x58];
-    Vec3 pos;                          // +0x6a
-    char unknown_76[0x86 - 0x76];
-    int carrier;                      // +0x86
-    char unknown_8a[0x92 - 0x8a];
-    UnitType* def;                     // +0x92
-    Player* player;                    // +0x96
-    char unknown_9a[0x9e - 0x9a];
-    ObjectState* state;                // +0x9e
-    char unknown_a2[0xa6 - 0xa2];
-    unsigned short unitDefIndex;           // +0xa6
-    unsigned short id;           // +0xa8
-    char unknown_aa[0xbb - 0xaa];
-    unsigned char flags_bb;            // +0xbb
-    UnitResources resourceSlot;        // +0xbc, 0x34 bytes (metalMake at +0xd4, player at +0xec)
-    char unknown_f0[0xf5 - 0xf0];
-    unsigned char lastDamageType;            // +0xf5
-    char unknown_f6[0xff - 0xf6];
-    unsigned char playerIndex;            // +0xff
-    char unknown_100[0x104 - 0x100];
-    float buildLeft;                   // +0x104
-    short health;                      // +0x108
-    char unknown_10a[0x10e - 0x10a];
-    unsigned short onOff : 1;          // +0x10e bit 0
-    unsigned short bits_10e : 15;
-    UnitFlags flags;                   // +0x110
-    char unknown_114[0x118 - 0x114];
-
-    void SetStateBits(int a, int b);
-};
+#include "../units/unit.h"
+#include "../weapons/weapon_def.h"
 
 struct OrdersBits {
     unsigned short unknown_0 : 1;      // +0x37ebe bit 0
@@ -355,7 +231,7 @@ struct Game {
     char unknown_1434f[0x14357 - 0x1434f];
     Unit* units;                       // +0x14357
     char unknown_1435b[0x1439b - 0x1435b];
-    UnitType* unitDefs;                // +0x1439b
+    UnitDef* unitDefs;                // +0x1439b
     char unknown_1439f[0x37e1f - 0x1439f];
     int screenWidth;                   // +0x37e1f
     int screenHeight;                  // +0x37e23
@@ -424,9 +300,9 @@ void __stdcall DefaultCommandHandler(int args);
 void __stdcall GetGadgetName(Gadget* entries, char* name, int index);
 void __stdcall IssueOrCancelOrder(MissionType kind, int remove, Unit* owner,
                             int id, Vec3* pos, int typeId, int amount);
-int __stdcall CanBuildAt(UnitType* type, Point16 cell, int a, Player* player);
+int __stdcall CanBuildAt(UnitDef* type, Point16 cell, int a, Player* player);
 int GetBuildSiteHeight(void);
-int __stdcall GetFootprintHeight(UnitType* unit, Point16 cell);
+int __stdcall GetFootprintHeight(UnitDef* unit, Point16 cell);
 Gadget* __stdcall FindGadgetOrNull(Gadget* entries, char* name);
 unsigned short __stdcall FindUnitTypeId(char* name);
 int __stdcall SumQueuedBuildCount(void* owner, int index);
@@ -530,10 +406,12 @@ void __stdcall IssueMobileBuildOrders(MouseEvent* arg)
 {
     unsigned int remove = (arg->keyFlags >> 2) & 1;
     unsigned short index = g_game->buildTypeIndex;
-    UnitType* def = &g_game->unitDefs[index];
+    UnitDef* def = &g_game->unitDefs[index];
     Vec3 pos = g_game->pos;
-    // origin read once into a local: passing def->origin to each helper changes the frame.
-    Point16 origin = def->origin;
+    // The footprint read once into a local: passing it to each helper changes the
+    // frame. unit_def.h spells it as its own pair of shorts, so the helpers'
+    // Point16 takes it through a cast, here and in 0x4197d0.
+    Point16 origin = *(Point16*)&def->footprint;
     Point16 cell = WorldToCell(pos, origin);
     CellToWorld(origin, cell, &pos);
     pos.y = g_game->boxStartHeight << 16;
@@ -541,12 +419,11 @@ void __stdcall IssueMobileBuildOrders(MouseEvent* arg)
     unsigned char team = g_game->localPlayer;
     Player* p = &g_game->players[team];
     for (Unit* u = p->unitsBegin; u <= p->unitsEnd; u++) {
-        if ((u->flags.raw & 0x10) && (u->def->flags.raw & 0x40)) {
-            if (!(u->def->flags.raw & 0x800)) {
+        if ((u->flags & 0x10) && (u->def->flags1 & 0x40)) {
+            if (!(u->def->flags1 & 0x800)) {
                 IssueOrCancelOrder("MOBILEBUILD", remove, u, 0, &pos, index, 0);
             } else {
-                UnitTypeFlagsBits flags = u->def->flags.bits;
-                if (flags.flag_11) {
+                if (u->def->canFly) {
                     IssueOrCancelOrder("VTOL_MOBILEBUILD", remove, u, 0, &pos, index, 0);
                 }
             }
@@ -557,11 +434,11 @@ void __stdcall IssueMobileBuildOrders(MouseEvent* arg)
 // FUNCTION: 0x4197d0
 int UpdatePlacementGhostValidity(void)
 {
-    UnitType* item = &g_game->unitDefs[g_game->buildTypeIndex];
-    Point16 cell = WorldToCell(g_game->pos, item->origin);
+    UnitDef* item = &g_game->unitDefs[g_game->buildTypeIndex];
+    Point16 cell = WorldToCell(g_game->pos, *(Point16*)&item->footprint);
     g_game->boxStartX = cell.x << 4;
     g_game->boxStartZ = cell.y << 4;
-    Point16 origin = item->origin;
+    Point16 origin = *(Point16*)&item->footprint;
     g_game->boxEndX = (origin.x << 4) + g_game->boxStartX;
     g_game->boxEndZ = (origin.y << 4) + g_game->boxStartZ;
     g_game->inputFlags.bits.b6 = CanBuildAt(item, cell, 0, &g_game->players[g_game->localPlayer]);
@@ -638,7 +515,7 @@ void __stdcall UpdateOnOffButton(Unit* unit)
 {
     int index = FindGadgetIndexBySubstring((int)g_game->gui.layer->entries, "ONOFF");
     if (index != -1) {
-        SetGadgetStatus(&g_game->gui, index, unit->onOff);
+        SetGadgetStatus(&g_game->gui, index, unit->activateFlags & 1);
     }
 }
 
@@ -658,7 +535,7 @@ void __stdcall QueueBuildOrder(char* name, Unit* unit, int count)
     unsigned short id = FindUnitTypeId(name);
     if (id == 0)
         return;
-    int mobile = unit->motion;
+    UnitMotion* mobile = unit->motion;
     const char* kind = mobile ? "MOBILEBUILD" : "BUILDINGBUILD";
     AdjustBuildCount(MissionType(kind), unit, id, count);
 }
@@ -813,7 +690,7 @@ void __stdcall RefreshOrderButtons(Unit* unit)
     index = FindGadgetIndexBySubstring(layer, "BUILD");
     if (index != -1) {
         if (unit && unit->def->buildMenuPageCount) {
-            SetGadgetStatus(menu, index, unit->flags.bits.buildPage);
+            SetGadgetStatus(menu, index, unit->buildMenuOpen);
         } else {
             SetGrayedOut(menu, index, 1);
         }
@@ -821,7 +698,7 @@ void __stdcall RefreshOrderButtons(Unit* unit)
     index = FindGadgetIndexBySubstring(layer, "ORDERS");
     if (index != -1) {
         if (unit && unit->def->buildMenuPageCount) {
-            SetGadgetStatus(menu, index, !unit->flags.bits.buildPage);
+            SetGadgetStatus(menu, index, !unit->buildMenuOpen);
         } else {
             SetGrayedOut(menu, index, 1);
         }
@@ -1066,7 +943,7 @@ void __stdcall HandleBuildPanelClick(Gui* menu)
             PlaySoundByName("addbuild", 0);
         } else if (!HandleOrdersPanelClick(menu, entries) && !HandleOrderButtonClick(menu, entries)) {
             // Own nested if: inside the && chain the bit test is compiled differently.
-            if (unit->flags.bits.selected) {
+            if (unit->selected) {
                 char text[256];
                 GetGadgetName(entries, text, menu->hotGadgetIndex);
                 if (IsKeyDown(0xf9)) {
@@ -1080,8 +957,8 @@ void __stdcall HandleBuildPanelClick(Gui* menu)
                     else
                         QueueBuildOrder(text, unit, -1);
                 }
-                if (unit->flags.bits.flag_29
-                    || (((UnitType*)unit->weapons[0].weapon)->weaponFlags & 0x10000000))
+                if (unit->building
+                    || (unit->weapons[0].weapon->flags.value & 0x10000000))
                     RefreshBuildCountTexts(menu, unit);
                 MarkChanged(&g_game->gui);
             }
@@ -1182,10 +1059,10 @@ void __stdcall OpenBuildMenuGui(Unit* unit, char* guiName, int page)
             SetPrevNext(unit);
             RefreshOrderButtons(unit);
             RefreshBuildCountTexts(&g_game->gui, unit);
-            if (unit->flags.raw & 0x20000000) {
+            if (unit->flags & 0x20000000) {
                 int index = FindGadgetIndexBySubstring(g_game->gui.layer->entries, "ONOFF");
                 if (index != -1)
-                    SetGadgetStatus(&g_game->gui, index, unit->onOff);
+                    SetGadgetStatus(&g_game->gui, index, unit->activateFlags & 1);
             }
             if (page != 0)
                 UpdateCounts(&g_game->gui);
@@ -1223,8 +1100,8 @@ void __stdcall OpenGeneratorDialog(Unit* unit)
 // FUNCTION: 0x41b200
 int __stdcall GetBuildMenuPage(Unit* obj)
 {
-    if (obj->flags.bits.buildPage) {
-        return obj->flags.bits.page;
+    if (obj->buildMenuOpen) {
+        return obj->buildMenuPage;
     }
     return 0;
 }
@@ -1260,15 +1137,15 @@ Unit* GetBuildMenuFocusUnit()
 // FUNCTION: 0x41b8d0
 void __stdcall FinishConstruction(Unit* unit, Unit* target)
 {
-    if (unit && (unit->flags.raw & 0x10000000) && unit->def->ids != 0
-        && target && (target->flags.raw & 0x10000000)) {
+    if (unit && (unit->flags & 0x10000000) && unit->def->ids != 0
+        && target && (target->flags & 0x10000000)) {
         target->state->drawFrame = 0;
         target->buildLeft = 0;
         // In place, not through a local: the OR result is reused for the 0x20000000 test.
-        target->flags.raw |= 0x2000;
+        target->flags |= 0x2000;
         if (target->player->active != 0
             && (target->player->type == 1 || target->player->type == 2)) {
-            if (target->flags.raw & 0x20000000) {
+            if (target->flags & 0x20000000) {
                 if (IsScreenNamed(&g_game->gui, "BUILDER.GUI"))
                     MarkChanged(&g_game->gui);
             } else {
@@ -1276,18 +1153,18 @@ void __stdcall FinishConstruction(Unit* unit, Unit* target)
                     AttachUnitToPiece(target, 0, -1, 1);
             }
         }
-        if (target->def->flags.bits.flag_18)
+        if (target->def->activateWhenBuilt)
             target->SetStateBits(1, 1);
         if (g_game->unitIndex == unit->id)
             RefreshBuildCountTexts(&g_game->gui, unit);
-        if (target->def->flags.bits.flag_24) {
+        if (target->def->isFeature) {
             target->lastDamageType = 7;
-            target->flags.raw |= 0x4000;
+            target->flags |= 0x4000;
         }
         if (target->player->active != 0
             && (target->player->type == 1 || target->player->type == 2))
             BroadcastBuilderLink(unit, target);
-        if ((unit->flags.raw & 0x10) || (target->flags.raw & 0x10))
+        if ((unit->flags & 0x10) || (target->flags & 0x10))
             g_game->ordersPanelFlags.raw |= 0x10;
     }
 }
@@ -1308,10 +1185,10 @@ int __stdcall AddBuildProgress(Unit* builder, Unit* unit, float amount)
     if (unit->buildLeft == 0.0f)
         return 0;
     if (amount >= 0.0f)
-        unit->flags_bb |= 0x80;
+        unit->buildDirty = 1;
     if (amount == 0.0f)
         return 0;
-    UnitType* type = unit->def;
+    UnitDef* type = unit->def;
     float prev = unit->buildLeft;
     float next = min(max(prev - amount / type->buildtime, 0.0f), 1.0f);
     float step = prev - next;
@@ -1340,13 +1217,13 @@ int __stdcall AddBuildProgress(Unit* builder, Unit* unit, float amount)
         // health is set before remaining; the other order also changes the build path.
         unit->health = max(hp + unit->health, 0);
         unit->buildLeft = next;
-        unit->flags.raw |= 0x2000;
+        unit->flags |= 0x2000;
         if (next >= 1.0f)
             DamageUnit(unit, unit, 30000, 9, 0);
     } else if (builder->resourceSlot.RequestEnergyAndMetal(energyCharge, metalCharge)) {
         unit->health = min(hp + unit->health, unit->def->maxHealth);
         unit->buildLeft = next;
-        unit->flags.raw |= 0x2000;
+        unit->flags |= 0x2000;
         result = 1;
     }
     if (unit->buildLeft == 0.0f)
@@ -1365,7 +1242,7 @@ void __stdcall ApplyUnfinishedBuildDecay(Unit* unit, int ticks)
 int __stdcall AddRepairProgress(Unit* builder, Unit* unit, float f)
 {
     int result = 0;
-    UnitType* s = unit->def;
+    UnitDef* s = unit->def;
     int max = s->maxHealth;
     int v = s->buildtime;
     if (unit->health >= max)
@@ -1411,23 +1288,23 @@ void __stdcall StepBuildMenuPageBack(int toggle)
     // Each branch declares its own f: a single shared local made MSVC put the
     // field in eax and the unit in ecx, swapping every later operand.
     if (toggle) {
-        unsigned int f = u->flags.raw;
+        unsigned int f = u->flags;
         if ((f & 0x400000) == 0) {
             f |= 0x400000;
-            u->flags.raw = f;
-            u->flags.raw = SetPage(u, f);
+            u->flags = f;
+            u->flags = SetPage(u, f);
         } else if ((f & 0x3800000) == 0x800000) {
-            u->flags.raw = f & 0xffbfffff;
+            u->flags = f & 0xffbfffff;
         } else {
-            u->flags.raw = StepPage(f);
+            u->flags = StepPage(f);
         }
     } else {
-        unsigned int f = u->flags.raw;
+        unsigned int f = u->flags;
         if ((f & 0x3800000) < 0x1000000)
-            u->flags.raw = SetPage(u, f);
+            u->flags = SetPage(u, f);
         else
-            u->flags.raw = StepPage(f);
-        u->flags.raw |= 0x400000;
+            u->flags = StepPage(f);
+        u->flags |= 0x400000;
     }
     g_game->ordersPanelFlags.lo |= 0x10;
 
@@ -1450,9 +1327,9 @@ void __stdcall OpenBuildMenuPage(int page)
             unit = 0;
         if (unit != 0) {
             if (page < unit->def->buildMenuPageCount) {
-                unit->flags.bits.buildPage = page > 0;
+                unit->buildMenuOpen = page > 0;
                 if (page != 0)
-                    unit->flags.bits.page = page;
+                    unit->buildMenuPage = page;
                 g_game->ordersPanelFlags.lo |= 0x10;
                 PlaySoundByName("nextbuildmenu", 0);
             }
@@ -1463,7 +1340,7 @@ void __stdcall OpenBuildMenuPage(int page)
 // FUNCTION: 0x41c110
 void __stdcall MarkSelectionOrdersDirty(Unit* unit)
 {
-    if (unit->playerIndex == g_game->localPlayer && (unit->flags.lo & 0x10)) {
+    if (unit->playerIndex == g_game->localPlayer && ((unsigned char)unit->flags & 0x10)) {
         g_game->ordersPanelFlags.raw |= 0x10;
     }
 }
@@ -1513,7 +1390,7 @@ void DispatchOrdersPanelPageFlags()
         g_game->ordersPanelFlags.bits.build = 0;
         Unit* unit = GetSelectedUnit();
         if (unit) {
-            unit->flags.raw |= 0x400000;
+            unit->flags |= 0x400000;
             g_game->ordersPanelFlags.bits.flag_4 = 1;
         }
         return;
@@ -1522,7 +1399,7 @@ void DispatchOrdersPanelPageFlags()
         g_game->ordersPanelFlags.bits.orders = 0;
         Unit* unit = GetSelectedUnit();
         if (unit) {
-            unit->flags.raw &= ~0x400000;
+            unit->flags &= ~0x400000;
             g_game->ordersPanelFlags.bits.flag_4 = 1;
         }
     }
@@ -1815,7 +1692,7 @@ void UpdateCameraFollow()
     } else if (g_game->cameraFollowTrackObj != 0) {
         p = (Vec3*)&g_game->cameraFollowTrackObj->posX;
     } else if (g_game->cameraFollowUnit != 0) {
-        if (g_game->cameraFollowUnit->flags.raw & 0x10000000) {
+        if (g_game->cameraFollowUnit->flags & 0x10000000) {
             p = &g_game->cameraFollowUnit->pos;
         } else {
             g_game->cameraSnapTicks = 0;

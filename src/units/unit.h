@@ -55,7 +55,8 @@ struct Unit {
     // single or, which a byte member would not give.
     unsigned short unknown_ba : 2;
     unsigned short dirty : 1;          // +0xba bit 2
-    unsigned short unknown_ba_3 : 13;
+    unsigned short unknown_ba_3 : 12;
+    unsigned short buildDirty : 1;     // +0xba bit 15, set by AddBuildProgress
     UnitResources resourceSlot;        // +0xbc, 0x34 bytes
     Unit* attacker;                    // +0xf0
     unsigned char lastAttackerSlot;    // +0xf4
