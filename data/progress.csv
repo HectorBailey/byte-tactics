@@ -1080,7 +1080,7 @@ address,size,file,symbol,status,similarity
 0x451540,135,src/network/net_game.cpp,?CreateNetGame@@YGXXZ,matched,100.0
 0x4515d0,104,src/network/net_game.cpp,?EnumPlayersCallback@@YGXHHHHH@Z,matched,100.0
 0x451640,300,src/network/net_game.cpp,?JoinLobbyGame@@YGHPAUPlayer@@@Z,matched,100.0
-0x451770,49,src/network/net_game.cpp,?JoinLobbyGameThread@@YGXPAUArgs_00451640@@@Z,matched,100.0
+0x451770,49,src/network/net_game.cpp,?JoinLobbyGameThread@@YGXPAULobbyJoinInfo@@@Z,matched,100.0
 0x4517b0,937,src/network/net_game.cpp,?JoinNetGame@@YGHUGuid_4517b0@@H@Z,matched,100.0
 0x451b60,84,src/network/net_game.cpp,?RemoveLocalPlayers@@YGXXZ,matched,100.0
 0x451bc0,554,src/network/net_game.cpp,?SendPacketToPlayer@@YGHHHPAEH@Z,matched,100.0
