@@ -53,7 +53,7 @@ int GetTickRate();
 #include "../units/unit_def.h"
 #include "unit_weapon_slot.h"
 
-// Unused here: the symbol ids these 6 declarations take keep DrawProjectiles
+// Unused here: the symbol ids these 8 declarations take keep DrawProjectiles
 // (0x49be60) matching (docs/c2-regalloc.md).
 void LoadGameFonts(void);
 void FreeGameFonts(void);
@@ -61,6 +61,8 @@ void RegisterUnitOrders(void);
 void RegisterGroundOrders(void);
 void EnableAICommands(void);
 void RegisterAICommands(void);
+void InitCommands(void);
+void FUN_004161f0(void);
 
 // Unused here: the symbol ids these declarations take keep 0x49be60 matching (docs/c2-regalloc.md).
 void FreeFeaturePool(void);
@@ -1227,8 +1229,7 @@ int __stdcall WeaponCanReachUnit(Unit* unit1, Unit* unit2, unsigned char weapon)
 int __stdcall GetWeaponRange(int param1, unsigned int param2)
 {
     unsigned char idx = (unsigned char)param2;
-    int offset = idx * 7;
-    WeaponDef* weapon = ((Unit*)((char*)param1 + offset * 4))->slots[0].weapon;
+    WeaponDef* weapon = ((Unit*)param1)->slots[idx].weapon;
     int result = weapon->range;
     return result;
 }
