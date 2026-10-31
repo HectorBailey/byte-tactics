@@ -27,15 +27,7 @@ struct Cell {
     };
 };
 
-struct Game {
-    char unknown_0[0x14233];
-    int mapWidthTiles;                  // +0x14233
-    int mapHeightTiles;                 // +0x14237
-    char unknown_1423b[0x14273 - 0x1423b];
-    void* visibilityMask;               // +0x14273
-    char unknown_14277[0x14287 - 0x14277];
-    Cell* heightMap;                    // +0x14287
-};
+#include "../game/game.h"
 #pragma pack(pop)
 
 extern Game* g_game;
