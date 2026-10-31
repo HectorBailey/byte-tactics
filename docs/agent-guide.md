@@ -814,6 +814,21 @@ effect, the missing piece is usually a helper that was inlined:
   order do not matter. When an EH function's stack offsets are wrong, count
   the original's hidden 4-byte slots to get the number of named locals, then
   pick names whose buckets give the original's order (0x49eda0, WinMain).
+- **A bit field reached through an anonymous union can cost a register**: in
+  0x48c7f0 (`ClickSelectHoverUnit`), `unit->selected = !unit->selected` on
+  `units/unit.h`'s +0x110 bits came out one register short (85.7%), where the
+  file's old view reached the same bits through a named member. Giving the old
+  view an anonymous union reproduced the miss, and no padding fixed it
+  (`tools/idpad.py`, 600 variants up to 300 ids). A copy of the word with
+  masks matched: `unsigned int f = unit->flags; unit->flags = (f & ~0x10) |
+  (~f & 0x10);` (#7367). To find what causes a miss that no padding fixes,
+  stub every other function body to `;` in a scratch copy at the same path
+  length, then change one declaration at a time.
+- **Name flag bits with macros when a shared header must not grow**: an
+  anonymous union of a flag byte with named bits cost 14 ids in every file
+  that included `weapons/unit_weapon_slot.h` and moved 24 functions in 18
+  files; `#define` masks next to the plain byte cost nothing, and a test
+  written with one expands to the same tokens (#7375).
 - **Keep notes above the annotation**: put comments before the
   `// FUNCTION:` line, not between it and the definition.
 
