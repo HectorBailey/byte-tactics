@@ -165,8 +165,9 @@ struct BuilderLinkPacket {
 };
 
 // A sound (0x13): the positional flag, the sound index and the sound's
-// position. sound/sound.cpp names the same record.
-struct Packet_0047f0c0 {
+// position. sound/sound.cpp's SoundPacket, whose position is its own 16.16
+// FixedPosition union; only its address is passed on here.
+struct SoundPacket {
     unsigned char type;                // +0x0
     unsigned char flag;                // +0x1
     int index;                         // +0x2
@@ -795,11 +796,11 @@ int HandleNetPackets()
             break;
         }
         case 19: {
-            Packet_0047f0c0* sound = (Packet_0047f0c0*)packet;
+            SoundPacket* sound = (SoundPacket*)packet;
             if (sound->flag)
                 PlaySoundByIndex(sound->index, 0);
             else
-                PlaySoundAt(sound->index, packet + 6, 0);
+                PlaySoundAt(sound->index, sound->pos, 0);
             break;
         }
         case 20: {
