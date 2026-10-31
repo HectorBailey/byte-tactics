@@ -400,9 +400,9 @@ void DetectionVisitor::MarkUnitsInRadarOrSonarRadius(Unit* unit)
 }
 
 // FUNCTION: 0x467950
-void __stdcall MarkRecentlyDamaged(void* param_1)
+void __stdcall MarkRecentlyDamaged(Unit* unit)
 {
-    *(char*)((char*)param_1 + 0xfa) = 0xf0;
+    unit->recentlyDamagedTimer = 0xf0;
 }
 
 // Same as ApplySonarJamFlag but clears flag 0x100 instead of 0x200.
