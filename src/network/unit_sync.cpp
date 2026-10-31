@@ -139,22 +139,23 @@ inline void __stdcall swap(_Ty& _X, _Ty& _Y)
 
 // --- the game-event reporting the statistics DLL calls -----------------------
 
-// Four ints, but the session GUID instance GetSessionGuidInstance returns at
-// net+0x465, not a rectangle, so it stays off rect.h.
-struct Rect_0046c620 {                  // 16 bytes
+// The session's GUID instance GetSessionGuidInstance returns (DPSESSIONDESC2's
+// guidInstance, net+0x465), held as four ints: this file does not include
+// windows.h's GUID.
+struct SessionGuid {                    // 16 bytes
     int x0;
     int y0;
     int x1;
     int y1;
 };
 
-struct Name_0046c620 {                  // 17 bytes, the player's name
+struct SessionName {                    // 17 bytes, Thaldren's aSessionName
     char text[16];
     char flag;
 };
 
 struct HapinetSession {                 // the object at g_game+0x14
-    Name_0046c620 name;                 // +0x00
+    SessionName name;                   // +0x00
     char unknown_11[0x4c9 - 0x11];
     int created;                        // +0x4c9
     char unknown_4cd[4];
@@ -201,11 +202,11 @@ struct Game {
 
 extern Game* g_game;
 
-typedef int (__stdcall *SendFn_0046c620)(int, Rect_0046c620*, void*, int, Name_0046c620*,
+typedef int (__stdcall *SendFn_0046c620)(int, SessionGuid*, void*, int, SessionName*,
                                          int, int, int, void*, void*);
 
 extern int g_onlineReportScores;
-extern Name_0046c620 g_reportPlayerName;
+extern SessionName g_reportPlayerName;
 extern int* g_onlineReportPlayers;
 extern void* g_onlineReportScoreBoards;
 extern SendFn_0046c620 g_riReport;
@@ -215,10 +216,10 @@ extern int g_reportFlags;
 extern void (*g_riIntervalTimer)(void);
 extern int (__stdcall* g_riReportGameChat)(int, int);
 
-Rect_0046c620* __stdcall GetSessionGuidInstance(HapinetSession* p);
+SessionGuid* __stdcall GetSessionGuidInstance(HapinetSession* p);
 int __stdcall GetCreatedLobbyInterface(HapinetSession* p);
 int __stdcall QueryOnlineFlags(int mode);
-int __stdcall RIReport(int, Rect_0046c620*, void*, int, Name_0046c620*, int,
+int __stdcall RIReport(int, SessionGuid*, void*, int, SessionName*, int,
                            int, int, void*, void*);
 int FillScoreTables();
 int __stdcall RIReportGameChat(int arg1, int arg2);
@@ -231,7 +232,7 @@ int __stdcall ReportGameEvent(int msg)
     if (!g_onlineReportPlayers || !g_onlineReportScoreBoards || !g_onlineReportScores)
         return 1;
 
-    Rect_0046c620 rect = *GetSessionGuidInstance(&g_game->session);
+    SessionGuid guid = *GetSessionGuidInstance(&g_game->session);
     int thing = GetCreatedLobbyInterface(&g_game->session);
 
     if (msg == 1) {
@@ -250,7 +251,7 @@ int __stdcall ReportGameEvent(int msg)
             // its own statement, not an argument: the call has to be emitted
             // ahead of the other nine arguments being set up
             int team = (int)g_game->mapInfo->GetMissionName();
-            if (RIReport(msg, &rect, (char*)&g_game->providerGuid, thing, &g_reportPlayerName,
+            if (RIReport(msg, &guid, (char*)&g_game->providerGuid, thing, &g_reportPlayerName,
                              team, g_game->localPlayer,
                              id, g_onlineReportPlayers, g_onlineReportScoreBoards))
                 g_hapinetOnlineReport = 0;
@@ -259,7 +260,7 @@ int __stdcall ReportGameEvent(int msg)
 
     if (g_reporterDll) {
         int team = (int)g_game->mapInfo->GetMissionName();
-        g_riReport(msg, &rect, (char*)&g_game->providerGuid, thing, &g_reportPlayerName,
+        g_riReport(msg, &guid, (char*)&g_game->providerGuid, thing, &g_reportPlayerName,
                      team, g_game->localPlayer,
                      id, g_onlineReportPlayers, g_onlineReportScoreBoards);
     }

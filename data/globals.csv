@@ -511,7 +511,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x51e554,g_riGetVersion,.bss,4,type,data,int (__stdcall*)(char*),1,0,1,one type,1,,DAT_0051e554,,,
 0x51e558,g_riTerminate,.bss,4,type,data,void (__cdecl*)(void),1,0,1,one type,1,,DAT_0051e558,,,
 0x51e55c,DAT_0051e55c,.bss,4,gap,unreferenced,unsigned char[4],0,0,0,,0,,,,,
-0x51e560,g_reportPlayerName,.bss,20,gap,data,Name_0046c620,1,0,1,one type,1,0x10,DAT_0051e560,,,
+0x51e560,g_reportPlayerName,.bss,20,gap,data,SessionName,1,0,1,one type,1,0x10,DAT_0051e560,,,
 0x51e574,g_onlineReportPlayers,.bss,4,type,data,OnlineReportPlayerInfo**,2,1,2,conflicting: shape,3,,DAT_0051e574,,,
 0x51e578,g_riSetCallbacks,.bss,4,type,data,"void (__stdcall*)(void (__stdcall*)(int), int (__stdcall*)(char*, int))",1,0,1,one type,1,,DAT_0051e578,,,
 0x51e57c,g_onlineReportScoreBoards,.bss,4,type,data,OnlineReportScoreBoard**,2,1,2,conflicting: shape,3,,DAT_0051e57c,,,

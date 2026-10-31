@@ -389,7 +389,7 @@ extern int (__stdcall* g_riInitializeEx)(int*, int);                            
 extern int (__stdcall* g_riGetVersion)(char*);                                                                  // 0x51e554, 4 bytes; 1 of 1 files
 extern void (__cdecl* g_riTerminate)(void);                                                                     // 0x51e558, 4 bytes; 1 of 1 files
 extern unsigned char DAT_0051e55c[4];                                                                           // 0x51e55c, 4 bytes; nothing refers to it
-extern unsigned char g_reportPlayerName[20];                                                                    // 0x51e560, 20 bytes; Name_0046c620 by value in 1 of 1 files
+extern unsigned char g_reportPlayerName[20];                                                                    // 0x51e560, 20 bytes; SessionName by value in 1 of 1 files
 extern void (__stdcall* g_riSetCallbacks)(void (__stdcall*)(int), int (__stdcall*)(char*, int));                // 0x51e578, 4 bytes; 1 of 1 files
 extern int (__stdcall* g_riEnable)(int);                                                                        // 0x51e588, 4 bytes; 1 of 1 files
 extern int g_hapinetOnlineReport;                                                                               // 0x51e590, 4 bytes; 2 of 2 files
@@ -656,7 +656,7 @@ extern long g_squashThreadLockTicket;                                           
 //   0x51e548 g_riReportGameChat: int (__stdcall*)(int, char*) (1), int (__stdcall*)(int, int) (1)
 //   0x51e550 g_onlineReportScores: char** (1), int (1)
 //   0x51e580 g_riIntervalTimer: int (__stdcall*)(void) (1), void (__stdcall*)(void) (1)
-//   0x51e584 g_riReport: int (__stdcall*)(int, int, int, int, int, int, int, int, int, int) (1), int (__stdcall*)(int, Rect_0046c620*, void*, int, Name_0046c620*, int, int, int, void*, void*) (1)
+//   0x51e584 g_riReport: int (__stdcall*)(int, int, int, int, int, int, int, int, int, int) (1), int (__stdcall*)(int, SessionGuid*, void*, int, SessionName*, int, int, int, void*, void*) (1)
 //   0x51e58c g_reporterDll: void* (1), int (1)
 //   0x51f2e0 g_savegameFileNames: int* (1), char* (1)
 //   0x51f2e4 g_savegameDescs: int* (1), char* (1)
