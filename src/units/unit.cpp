@@ -2,13 +2,13 @@
 
 // <windows.h> is needed for CanRepair's operand order (see there).
 #include <windows.h>
-// Only for its symbol ids: SetStateBits matches at one symbol count.
+// Only for its symbol ids: the six methods here match at one symbol count.
 #include <ddraw.h>
 
 #include "cob_script.h"
 #include "../weapons/unit_weapon_slot.h"
 
-// Unused here: the symbol ids these declarations take keep SetStateBits (0x48b090)
+// Unused here: the symbol ids these declarations take keep the six methods
 // matching (docs/c2-regalloc.md).
 char IsMemFussy();
 char IsGonzo();
@@ -18,21 +18,23 @@ void SetMemFussyDefault(void);
 
 #include "unit_def.h"
 
-// Unused here: these headers and forward declarations take the symbol ids that keep
-// CanLoad (0x489a90) and SetStateBits (0x48b090) matching (docs/c2-regalloc.md).
+// Unused here: these headers and forward declarations take the symbol ids that
+// keep CanLoad (0x489a90) matching (docs/c2-regalloc.md).
 #include "../util/hapi_bank.h"
 #include "../map/mission.h"
 #include "../sound/sound.h"
 
 // Unused here: the symbol ids these declarations take keep 0x489800, 0x4898b0,
-// 0x489960, 0x4899b0, 0x489a70, 0x489a90, 0x48b090 matching (docs/c2-regalloc.md).
+// 0x489960, 0x4899b0, 0x489a70 and 0x489a90 matching (docs/c2-regalloc.md).
 void RegisterUnitOrders(void);
 void RegisterGroundOrders(void);
 void EnableAICommands(void);
 void RegisterAICommands(void);
 void FUN_00406f40(void);
 
-class Unit;
+// The unit is units/unit.h's. SetStateBits keeps its own file: it only matches
+// at the symbol count its pre-#7097 view gave it (docs/c2-regalloc.md).
+#include "unit.h"
 
 #pragma pack(push, 1)
 // Bit 19 is a one-bit bitfield (MSVC shifts it down to test it), while bit 8
@@ -79,47 +81,6 @@ public:
 };
 
 #pragma pack(push, 1)
-class Unit {
-public:
-    int motion;                        // +0x0
-    UnitWeaponSlot weapons[3];         // +0x4, stride 0x1c
-    char unknown_58[0x6e - 0x58];
-    union {
-        int f6e;                       // +0x6e, 16.16
-        struct {
-            unsigned short f6e_fraction;
-            short f70;                 // +0x70
-        };
-    };
-    char unknown_72[0x86 - 0x72];
-    Unit* carrier;                     // +0x86, the unit this one is loaded on
-    Unit* cargo;                       // +0x8a, list head of the cargo count
-    Unit* cargoNext;                   // +0x8e
-    UnitDef* def;                      // +0x92
-    Player* player;                    // +0x96
-    CobScript* script;                 // +0x9a
-    void* state;                       // +0x9e
-    PathOrderAttach* head;             // +0xa2
-    char unknown_a6[0xa8 - 0xa6];
-    unsigned short id;                 // +0xa8
-    char unknown_aa[0x104 - 0xaa];
-    float buildLeft;                   // +0x104
-    short health;                      // +0x108
-    char unknown_10a[0x10e - 0x10a];
-    unsigned char activateFlags;       // +0x10e
-    char cobStateFlags;
-    int flags;                         // +0x110
-
-    unsigned char GetState() { return activateFlags; }
-
-    void ReleaseWeapons(unsigned char index);
-    void ClaimWeapons(unsigned char index);
-    int CanReclaim(void *param_1);
-    int CanRepair(Unit* other);
-    int CountCargo();
-    int CanLoad(Unit* other);
-    void SetStateBits(int mask, int set);
-};
 #pragma pack(pop)
 
 void __stdcall QueueUnitSpeech(Unit* unit, int kind, char* text);
@@ -217,12 +178,12 @@ int Unit::CanRepair(Unit* other)
         && (other->health != other->def->maxHealth)
         && ((other->flags & 3) != 2)) {
         if (def->flags1 & 0x800) {
-            if (!(def->flags1 & 0x200000) && other->f70 + other->def->modelMaxYHigh < g_game->seaLevel)
+            if (!(def->flags1 & 0x200000) && ((short*)&other->pos.y)[1] + other->def->modelMaxYHigh < g_game->seaLevel)
                 goto fail;
         }
         // Tests the same condition again, not an else.
         if (!(def->flags1 & 0x800)) {
-            if (other->f70 + other->def->modelMaxYHigh < g_game->seaLevel - def->maxwaterdepth)
+            if (((short*)&other->pos.y)[1] + other->def->modelMaxYHigh < g_game->seaLevel - def->maxwaterdepth)
                 goto fail;
         }
         return 1;
@@ -266,101 +227,10 @@ int Unit::CanLoad(Unit* other)
         return 0;
     if (!(ourDef->flags1 & 0x800) && theirDef->minwaterdepth >= 0)
         return 0;
-    if (other->f6e + theirDef->modelMaxY <= (g_game->seaLevel << 16))
+    if (((int*)&other->pos.y)[0] + theirDef->modelMaxY <= (g_game->seaLevel << 16))
         return 0;
     if (other->buildLeft != 0.0f)           // the fcomp tests equality, not a range
         return 0;
     return 1;
 }
 
-// Sets or clears bits of the unit's state byte at +0x10e and reacts to the three
-// bits that mean active (1), building (8) and working (4). The gained and the
-// lost bits are tested separately: each gained bit plays its script event and
-// its message, and losing the working bit (4) tells every object linked to this
-// unit (the list head at +0xa2) to update, then a network packet (0x11) tells
-// the owner when the owner is a real player (1 or 2).
-static inline int HasBit(unsigned char bits) { return 1 & bits; }
-
-static inline int LostBits(unsigned char was, int is) { return (unsigned char)was & ~is; }
-
-static inline unsigned char GainedBits(unsigned char was, int is) { return (unsigned char)(~was & (int)is); }
-
-static inline unsigned char AsByte(unsigned char bits) { return (unsigned char)bits; }
-
-// Unused here: their symbol ids are what SetStateBits (0x48b090) matches at
-// (docs/c2-regalloc.md). They stand where the removed Point_004898b0,
-// Flags_004898b0, Entry_004898b0 and Node_00489a90 views stood.
-void FreeCobScript(int);
-int CheckMapCrc();
-int FindUnusedLogo();
-int LoadUnitInfo();
-void AddDownloadBuildOptions();
-void BuildAllPassMaps(void);
-void CheckDownloadableFlags();
-void FreeDownloadMenus();
-void FreeMovementClasses(void);
-void FreeUnitCategories();
-void FreeUnitInfo();
-void FreeUnitMemory(void);
-void FreeUnitTypes();
-void InitUnitCategories();
-void KillAllUnits(void);
-
-// FUNCTION: 0x48b090
-void Unit::SetStateBits(int mask, int set)
-{
-    // Old state read through the in-class accessor: it fixes the set arm's load order.
-    unsigned char lost, gained, old = GetState();
-    int isOne, active;
-    PathOrderAttach* link;
-    int now;
-    if (set)
-        now = old | (unsigned char)mask;
-    else
-        now = old & ~(mask & 0xff);
-    activateFlags = (unsigned char)now;
-    {
-        if ((unsigned char)now != old) {
-            // LostBits returns int and narrows its first operand, and lost then
-            // goes round AsByte: that pair is what makes MSVC 5 compute `lost`
-            // into cl, the original's register, instead of into al. isOne and
-            // active are unused, and so are HasBit and GainedBits above; all
-            // four are dead weight the bytes need.
-            lost = LostBits(old, now);
-            unsigned char newLost = AsByte(lost);
-            gained = ~old & now;
-            lost = (unsigned char)newLost;
-            if (gained & 1) {
-                script->StartScript("Activate", 0, 0);
-                QueueUnitSpeech(this, 3, 0);
-            }
-            if (lost & 1) {
-                script->StartScript("Deactivate", 0, 0);
-                QueueUnitSpeech(this, 4, 0);
-            }
-            if (gained & 8)
-                script->StartScript("StartBuilding", 0, 0);
-            if (lost & 8)
-                script->StartScript("StopBuilding", 0, 0);
-            if (gained & 4) {
-                QueueUnitSpeech(this, 0xe, 0);
-                for (link = head; link; link = link->next) {
-                    if (link->value)
-                        link->value->OrStatusFlags(0x10000);
-                }
-            }
-            if (lost & 4)
-                QueueUnitSpeech(this, 0xf, 0);
-            MarkSelectionOrdersDirty(this);
-            if (player->active != 0) {
-                if (player->type == 1 || player->type == 2) {
-                    ActivateFlagsPacket packet;
-                    packet.type = 0x11;
-                    packet.unitId = id;
-                    packet.activateFlags = activateFlags;
-                    BroadcastPacket(player->id, &packet, 4);
-                }
-            }
-        }
-    }
-}
