@@ -170,7 +170,7 @@ int UnitScript::GetUnitValue(int which, int a, int b, int c, int d)
         int lo = a << 16;
         if (lo < 0)
             hi += 0x10000;
-        return (unsigned short)(FUN_004b715a(hi, lo) - unit->heading);
+        return (unsigned short)(FUN_004b715a(hi, lo) - unit->angles.heading);
     }
     case 13: {
         int hi = a & 0xffff0000;
