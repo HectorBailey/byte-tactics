@@ -126,7 +126,7 @@ int UnitScript::GetUnitValue(int which, int a, int b, int c, int d)
     Unit* unit = state->unit;
     switch (which) {
     case 1:
-        return unit->on;
+        return unit->activateFlags & 1;
     case 2:
         return (unit->flags >> 18) & 3;
     case 3:
@@ -204,7 +204,7 @@ int UnitScript::GetUnitValue(int which, int a, int b, int c, int d)
     case 19:
         return unit->bit3;
     case 20:
-        return unit->on2;
+        return (unit->activateFlags >> 1) & 1;
     }
     return 0;
 }

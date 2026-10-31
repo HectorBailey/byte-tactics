@@ -18,7 +18,7 @@ void __stdcall GetFactoriesInRadius(int player,const Vec* pos,int radius,std::ve
     radius*=radius;
     for(std::vector<Unit*>::iterator it=list.begin();it!=list.end();++it) {
         Unit* unit=*it;
-        if((unit->def->flags1&0x40) && (unit->def->flags1&0x200) && (unit->on)) {
+        if((unit->def->flags1&0x40) && (unit->def->flags1&0x200) && (unit->activateFlags & 1)) {
             int dz=pos->z-unit->pos.z;
             int dx=pos->x-unit->pos.x;
             int d=(int)(((__int64)dx*dx)>>32)+(int)(((__int64)dz*dz)>>32);

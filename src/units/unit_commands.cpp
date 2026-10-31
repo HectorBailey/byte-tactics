@@ -22,32 +22,7 @@ struct Item_00485940;
 struct UnitDef;
 #include "unit_def.h"
 
-struct Unit {
-    int motion;                       // +0x0
-    UnitWeaponSlot weapons[3];         // +0x4, stride 0x1c
-    char unknown_58[0x64 - 0x58];
-    Angles16 angles;               // +0x64
-    Vec3 pos;                          // +0x6a
-    char unknown_76[0x92 - 0x76];
-    UnitDef* def;                      // +0x92
-    Player* player;                    // +0x96
-    char unknown_9a[0xa6 - 0x9a];
-    unsigned short unitDefIndex;       // +0xa6
-    short id;                          // +0xa8
-    char unknown_aa[0xfb - 0xaa];
-    int postTransferHoldoff;           // +0xfb
-    char unknown_ff[0x104 - 0xff];
-    union {
-        float buildLeft;               // +0x104
-        int speed_bits;
-    };
-    short health;                      // +0x108
-    char unknown_10a[0x10e - 0x10a];
-    unsigned char activateFlags;       // +0x10e
-    char unknown_10f[0x110 - 0x10f];
-    unsigned int flags;                // +0x110
-    void SetStateBits(unsigned char mask, int set);
-};
+#include "unit.h"
 
 #pragma pack(pop)
 
@@ -56,8 +31,6 @@ struct Unit {
 // to be known where the declaration is.
 // Needed though unused: dropping it moves the f108 multiply onto the other register.
 #include <math.h>
-// Included only for its declarations, which the symbol counter of CreateMissionUnits needs.
-#include <memory.h>
 #include <vector>
 
 // std::vector<Unit*> is specialised here rather than taken from <vector>
@@ -463,7 +436,7 @@ void __stdcall GiveUnitToPlayer(Unit* unit, Player* other, OwnershipTransferPack
             n->weapons[2].stockpile = p->stockpile2;
     } else {
         n->health = unit->health;
-        n->speed_bits = unit->speed_bits;
+        n->buildLeft = unit->buildLeft;
         n->angles = unit->angles;
         if (n->weapons[0].flags & 2)
             n->weapons[0].stockpile = unit->weapons[0].stockpile;
@@ -604,11 +577,6 @@ public:
     }
     void* AssignCategory(int* other);
 };
-
-// Unused here: the symbol ids these declarations take keep the static's $S
-// suffix, standing in for the UnitCategory view merged above (docs/c2-regalloc.md).
-void CountPacket(int, int, int);
-void SetMissionStatus(int, int, int);
 
 // FUNCTION: 0x4889d0 _$E5
 // FUNCTION: 0x488a00 _$E3
