@@ -5,19 +5,9 @@
 #include <ctype.h>
 #include <malloc.h>
 
-#pragma pack(push, 1)
-struct Game_0049ee30 {
-    char unknown_0[0x2c74];
-    unsigned short lockFlags;                // +0x2c74
-    char unknown_2c76[0x37f31 - 0x2c76];
-    int lobbyTimeoutSecs;                    // +0x37f31
-    int netSendDropPct;                      // +0x37f35
-    char unknown_37f39[0x39245 - 0x37f39];
-    int cmdlineSkipIntroMovie;               // +0x39245
-};
-#pragma pack(pop)
+#include "game.h"
 
-extern Game_0049ee30* g_game;
+extern Game* g_game;
 extern int g_cmdlineDisplaySeed;
 extern char g_preferredLanguage[];
 extern GUID DAT_004fcfb8;
@@ -86,7 +76,7 @@ int __stdcall ParseCommandLine(char* cmdLine, char* appName)
                     p = strtok(NULL, " \t");
                 if (p && *p) {
                     if (!_strcmpi(p, "lock"))
-                        g_game->lockFlags |= 1;
+                        g_game->lobbyLockFlags |= 1;
                     else if (!_strcmpi(p, "deathends"))
                         ;
                     else if (!_strcmpi(p, "deathplays"))

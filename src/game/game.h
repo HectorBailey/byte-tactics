@@ -314,7 +314,8 @@ struct Game {  // 0x3924d bytes
     unsigned char chatRecipients[11];  // +0x2bf1, ten players and the saved byte
     char unknown_2bfc[44];
     int table_2c28[10];  // +0x2c28
-    char unknown_2c50[38];
+    char unknown_2c50[36];
+    unsigned short lobbyLockFlags;  // +0x2c74, Thaldren's wLobbyLockFlags
     MouseEvent view;  // +0x2c76
     short x;  // +0x2c8e
     short y;  // +0x2c90
