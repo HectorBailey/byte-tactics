@@ -120,12 +120,7 @@ struct Game {
 
 #include "dpsys_message.h"
 
-// The player-info broadcast packet (type 0x20): a type byte then the sender's
-// PlayerInfo, whose id sits at +0x91. net_game.cpp has the same record.
-struct SideDataPacket {
-    unsigned char type;                // +0x0
-    PlayerInfo data;                   // +0x1
-};
+#include "side_data_packet.h"
 
 // The packets whose payload is a player id dword at +0x1: reject (0x1b), drop
 // (0x1c), integrity (0x1d), start-position ack (0x1f), team assignment (0x22),
@@ -380,8 +375,8 @@ static inline int FirstConnectedId()
 static inline unsigned char* InfoPacket(unsigned char* buf, Player* p)
 {
     SideDataPacket* pkt = (SideDataPacket*)buf;
-    memcpy(&pkt->data, p->info, 0xb9);
-    pkt->data.id = p->id;
+    memcpy(&pkt->info, p->info, 0xb9);
+    pkt->info.id = p->id;
     pkt->type = 0x20;
     return buf;
 }
@@ -601,11 +596,11 @@ int HandleNetPackets()
         switch (packet[0]) {
         case 32: {
             SideDataPacket* infoPacket = (SideDataPacket*)packet;
-            int target = FindPlayerIndex(infoPacket->data.id);
+            int target = FindPlayerIndex(infoPacket->info.id);
             if (target == 10)
                 break;
             if (g_game->players[target].active && g_game->players[target].state == 3) {
-                memcpy(g_game->players[target].info, &infoPacket->data, 0xb9);
+                memcpy(g_game->players[target].info, &infoPacket->info, 0xb9);
                 CheckDuplicatePlayerIds();
             }
             break;
