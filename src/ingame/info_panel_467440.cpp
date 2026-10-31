@@ -8,35 +8,17 @@
 
 #include "../util/vec3.h"
 
-// Left with its address name: nothing names this view of the position's three
-// whole words.
-union UnitPos_00467440 {
-    Vec3 vec;
-    short half[6];                     // the words of x, y and z: [1] x whole, [3] y whole, [5] z whole
-};
-
-#include "../units/unit_def.h"
+#include "../units/unit.h"
 
 #include "../network/player_info.h"
 
-struct Player;
+// Unused here: these headers take the symbol ids that keep 0x467440 matching
+// (docs/c2-regalloc.md).
+#include "../graphics/memory_cache.h"
+#include "../util/hapi_bank.h"
+#include "../network/unit_sync.h"
 
-struct Unit {
-    char unknown_0[0x6a];
-    UnitPos_00467440 pos;              // +0x6a
-    char unknown_76[0x92 - 0x76];
-    UnitDef* def;                      // +0x92
-    Player* player;                    // +0x96
-    char unknown_9a[0xb0 - 0x9a];
-    int workTime;                      // +0xb0
-    char unknown_b4[0xff - 0xb4];
-    unsigned char playerIndex;            // +0xff
-    char unknown_100[0x10e - 0x100];
-    unsigned char activateFlags;           // +0x10e
-    char cobStateFlags;
-    unsigned int flags;                // +0x110
-    char unknown_114[0x118 - 0x114];
-};
+struct Player;
 
 // Kept, not map/byte_map.h: the header's helpers move UpdateSensorRadarAndCloak
 // (0x467440) to 96.1%.
@@ -120,19 +102,19 @@ extern Game* g_game;
 void __stdcall VisitObjectsInRange(Vec3* pos, int range, void* visitor);
 bool __stdcall HasReadyUnitInRange(int player, Vec3* p, int range);
 
-static inline int IsExplored_00467440(Player* p, UnitPos_00467440* pos)
+static inline int IsExplored_00467440(Player* p, Vec3* pos)
 {
-    int tx = pos->half[1] >> 5;
-    int ty = (pos->half[5] - (pos->half[3] >> 1)) >> 5;
+    int tx = ((short*)&pos->x)[1] >> 5;
+    int ty = (((short*)&pos->z)[1] - (((short*)&pos->y)[1] >> 1)) >> 5;
     if (p->explored.size.Contains(tx, ty) && p->explored.Get(tx, ty) != 0)
         return 1;
     return 0;
 }
 
-static inline int IsSeen_00467440(Player* p, UnitPos_00467440* pos)
+static inline int IsSeen_00467440(Player* p, Vec3* pos)
 {
-    int tx = pos->half[1] >> 5;
-    int ty = (pos->half[5] - (pos->half[3] >> 1)) >> 5;
+    int tx = ((short*)&pos->x)[1] >> 5;
+    int ty = (((short*)&pos->z)[1] - (((short*)&pos->y)[1] >> 1)) >> 5;
     if (!p->explored.size.Contains(tx, ty))
         return 0;
     return (g_game->visibilityMask[p->explored.size.width * ty + tx] &
@@ -171,18 +153,18 @@ void UpdateSensorRadarAndCloak(void)
             if (u->def->radardistance != 0 || u->def->sonardistance != 0) {
                 // t is computed before b is loaded, then squared.
                 short a = u->def->radardistance;
-                int t = a + u->pos.half[3] * 2;
+                int t = a + ((short*)&u->pos.y)[1] * 2;
                 short b = u->def->sonardistance;
                 t = t * t;
                 int s = (int)b * (int)b;
                 if (a <= b) {
                     a = b;
                 }
-                Vec3* pp = &u->pos.vec;
+                Vec3* pp = &u->pos;
                 DetectionVisitor v;
                 v.radarRangeSq = t;
                 v.sonarRangeSq = s;
-                v.pos = u->pos.vec;
+                v.pos = u->pos;
                 VisitObjectsInRange(pp, (int)a << 16, &v);
             }
         }
@@ -194,13 +176,13 @@ void UpdateSensorRadarAndCloak(void)
         if ((u->flags & 0x10000000) && (ff = u->playerIndex, 1) && ff != pl->index && (u->activateFlags & 1)) {
             if (u->def->radardistancejam != 0) {
                 int r = (int)u->def->radardistancejam << 16;
-                Vec3* pp = &u->pos.vec;
+                Vec3* pp = &u->pos;
                 RadarJamVisitor v;
                 VisitObjectsInRange(pp, r, &v);
             }
             if (u->def->sonardistancejam != 0) {
                 int r2 = (int)u->def->sonardistancejam << 16;
-                Vec3* pp2 = &u->pos.vec;
+                Vec3* pp2 = &u->pos;
                 SonarJamVisitor v;
                 VisitObjectsInRange(pp2, r2, &v);
             }
@@ -212,7 +194,7 @@ void UpdateSensorRadarAndCloak(void)
             char c = u->player->type;
             if (c == 1 || c == 2) {
                 if (u->def->flags2 & 0x2000) {
-                    if (HasReadyUnitInRange(u->playerIndex, &u->pos.vec, u->def->mincloakdistance)) {
+                    if (HasReadyUnitInRange(u->playerIndex, &u->pos, u->def->mincloakdistance)) {
                         // Written through an int& so the flags load stays after the store.
                         int& b0 = u->workTime;
                         b0 = g_game->gameTick + 0x5a;
