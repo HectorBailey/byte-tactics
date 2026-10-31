@@ -27,7 +27,6 @@
 struct Game;
 
 struct AnimEntry_00429700;
-struct Arg_00419670;
 struct Bits_0045c570;
 struct BuildList_0041ace0;
 struct Cell;
@@ -69,7 +68,6 @@ struct Object3do;
 struct PathMap;
 struct PieceFrame;
 struct PlayerRef;
-struct Point_0041cd50;
 struct Rect;
 struct Settings;
 struct EndGamePlayerStatRow;
@@ -85,24 +83,22 @@ struct Vec3;
 
 
 
-struct Arg_00419670 {  // 0x18 bytes
-    int x;  // +0x0
-    int y;  // +0x4
-    int unknown_8[4];  // +0x8
-};
+#include "../gui/mouse_event.h"
+#include "../util/point.h"
 
-struct Point_0041cd50 {  // 0x8 bytes, 1 view
-    int x;  // +0x0
-    int y;  // +0x4
-};
+// Unused here: two real functions declared to keep UpdateBattleRoom
+// (0x44a680) and plot_map.cpp's plotmap functions matching now that the mouse
+// record and the points come from their shared headers (docs/c2-regalloc.md).
+void CreateOffscreenSurface(void);
+void FreeOffscreenSurface(void);
 
 // The middle-mouse scroll (control_panel.cpp's CursorState; Thaldren's
 // aMiddleMouseSavedCursor and the nMiddleMouse fields after it).
 struct CursorState {  // 0x2c bytes
-    Arg_00419670 start;  // +0x0, the mouse when the scroll began
+    MouseEvent start;  // +0x0, the mouse when the scroll began
     int active;  // +0x18, Thaldren's nMiddleMouseScrollActive
-    Point_0041cd50 center;  // +0x1c
-    Point_0041cd50 savedScroll;  // +0x24
+    Point center;  // +0x1c
+    Point savedScroll;  // +0x24
 };
 
 
@@ -319,7 +315,7 @@ struct Game {  // 0x3924d bytes
     char unknown_2bfc[44];
     int table_2c28[10];  // +0x2c28
     char unknown_2c50[38];
-    Arg_00419670 view;  // +0x2c76
+    MouseEvent view;  // +0x2c76
     short x;  // +0x2c8e
     short y;  // +0x2c90
     int boxStartX;   // +0x2c92
