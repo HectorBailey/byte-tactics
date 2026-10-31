@@ -34,19 +34,7 @@ struct ViewFlags {               // g_game + 0x14281
     unsigned short rest : 13;
 };
 
-union Fixed {
-    int i;                              // 16.16
-    struct {
-        short frac;
-        short whole;
-    } h;
-};
-
-struct FixedPos {
-    Fixed x;
-    Fixed y;
-    Fixed z;
-};
+#include "../util/fixed.h"
 
 struct RecFlag_497180 {
     unsigned short started : 1;
@@ -369,7 +357,7 @@ public:
     int GetGameType();
     char* GetMissionName();
     void LoadMissionByName(void* player);
-    int GetStartPosition(FixedPos* pos, int id);
+    int GetStartPosition(FixedVec3* pos, int id);
     // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
     void LoadBriefing();
     int CountMissions();
@@ -443,7 +431,7 @@ void RebuildAIFeatureCells();
 void __stdcall SetCameraPosition(int x, int y, int z);
 unsigned short __stdcall FindUnitTypeId(const char* name);
 void __stdcall SpawnCommanderAtStartPos(int team, int startpos);
-void __stdcall CreateUnit(unsigned char team, unsigned short id, FixedPos pos, int a,
+void __stdcall CreateUnit(unsigned char team, unsigned short id, FixedVec3 pos, int a,
     int b, int c);
 Gadget_497180* __stdcall LoadGuiLayer(Sub_497180* sub, const char* name, int flags);
 void __stdcall HandleMain2LayoutEvent(Gadget_497180* gadget);
@@ -548,7 +536,7 @@ unsigned short __stdcall GetCellFeature(Cell* cell);
 // mission-count loop with `i++` before `def += 6`; the ten-player walks with
 // `(unsigned char)i` so the multiply is not strength-reduced; the
 // std::random_shuffle call; rec+0x149 as a 1-bit bitfield (direct `or byte`);
-// `pos.x.i` before `pos.y.i = 0`.
+// `pos.x.value` before `pos.y.value = 0`.
 // Inlined into cases 1 and 2 below (matched on its own in 0x496e10.cpp).
 inline void __stdcall ApplyMissionOptionFlags(Settings_00496e10* s)
 {
@@ -562,8 +550,8 @@ inline void __stdcall ApplyMissionOptionFlags(Settings_00496e10* s)
 void __cdecl LoadMatch(void*)
 {
     LARGE_INTEGER perfCount;
-    FixedPos pos;
-    FixedPos start;
+    FixedVec3 pos;
+    FixedVec3 start;
     int order[10];
 
     QueryPerformanceCounter(&perfCount);
@@ -674,9 +662,9 @@ void __cdecl LoadMatch(void*)
                 unsigned char st = rec->team;
                 if (st != 1 && st != 2)
                     continue;
-                pos.x.i = (RandomInt(g_game->mapWidthWorld - 0xa0) + 0x50) << 16;
-                pos.y.i = 0;
-                pos.z.i = (RandomInt(g_game->mapHeightWorld - 0xa0) + 0x50) << 16;
+                pos.x.value = (RandomInt(g_game->mapWidthWorld - 0xa0) + 0x50) << 16;
+                pos.y.value = 0;
+                pos.z.value = (RandomInt(g_game->mapHeightWorld - 0xa0) + 0x50) << 16;
                 if (rec->active != 0 && (rec->data->flags_9b & 0x40))
                     continue;
                 PlayerInfo* pl2 = rec->data;
@@ -704,8 +692,8 @@ void __cdecl LoadMatch(void*)
                 cx = g_game->viewPixelWidth / 2;
                 cz = g_game->viewPixelHeight / 2;
             } else {
-                cx = start.x.h.whole - g_game->viewPixelWidth / 2;
-                cz = start.z.h.whole - g_game->viewPixelHeight / 2;
+                cx = start.x.whole - g_game->viewPixelWidth / 2;
+                cz = start.z.whole - g_game->viewPixelHeight / 2;
             }
             SetCameraPosition(cx, cz, 0);
             ReportGameEvent(6);
