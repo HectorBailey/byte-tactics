@@ -13,7 +13,7 @@ struct GafFrame;
 struct Chunk_00437a30;
 struct Vec3;
 union Vec3_459200;
-struct Model_459200;
+struct UnitObjectState;
 struct Model_4584d0;
 struct Vec3_4584d0;
 struct PieceInfo_4584d0;
@@ -58,17 +58,17 @@ public:
     void DrawPiece(Model_4584d0* model, void* surface, Vec3_4584d0* camera,
         PieceInfo_4584d0* info, Vertex_4584d0* vertices, unsigned int palette,
         int useColor);
-    void DrawObjectPicture(int param_2, Model_459200* model, Vec3_459200 v, int useColor);
-    void DrawObjectPieces(int param_1, Model_459200* list, Vec3 v, int param_6);
-    void MergeIntoComposite(GafFrame* src, Model_459200* model);
+    void DrawObjectPicture(int param_2, UnitObjectState* model, Vec3_459200 v, int useColor);
+    void DrawObjectPieces(int param_1, UnitObjectState* list, Vec3 v, int param_6);
+    void MergeIntoComposite(GafFrame* src, UnitObjectState* model);
     void AddModelBounds(int* minX, int* maxX, int* minY, int* maxY,
-        Model_459200* model, Pos_4589c0 pos);
+        UnitObjectState* model, Pos_4589c0 pos);
     void RecolorByShade(GafFrame* img, unsigned char level, int above, int below, int between);
-    int ShadeByIntensity(GafFrame* image, Model_459200* model);
+    int ShadeByIntensity(GafFrame* image, UnitObjectState* model);
     void DrawPieceEdges(GafFrame* view, Model_00458fa0* model, int color);
     GafFrame* MakeSilhouette(GafFrame* src);
-    void MeasureShadow(int* width, int* height, int* originX, int* originY, Model_459200* model);
-    void DrawShadowShape(GafFrame* view, Model_459200* model);
+    void MeasureShadow(int* width, int* height, int* originX, int* originY, UnitObjectState* model);
+    void DrawShadowShape(GafFrame* view, UnitObjectState* model);
 };
 
 #endif

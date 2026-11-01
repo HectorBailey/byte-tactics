@@ -447,7 +447,7 @@ struct Primitive3do {                  // 0x20 bytes
         int ptr_c;                     // +0xc
         unsigned short* indices;       // +0xc
     };
-    int ptr_10;                        // +0x10
+    void* pic;                         // +0x10, the picture the primitive draws
     int unknown_14[3];
 };
 
@@ -557,8 +557,8 @@ void __stdcall RelocateObject(int delta, Object3do* node)
         if (e->always0)
             e->always0 += delta;
         e->ptr_c += delta;
-        if (e->ptr_10)
-            e->ptr_10 += delta;
+        if (e->pic)
+            e->pic = (void*)((char*)e->pic + delta);
     }
     SortPrimitives(node);
 }
