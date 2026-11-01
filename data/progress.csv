@@ -2576,7 +2576,7 @@ address,size,file,symbol,status,similarity
 0x4ba1b0,69,src/graphics/gaf.cpp,?CutFrameBelow@@YGXPAUGafFrame@@E@Z,matched,100.0
 0x4ba200,689,src/graphics/palette.cpp,?SetPaletteColors@@YGHPAEHH@Z,matched,100.0
 0x4ba4c0,207,src/graphics/palette.cpp,?GetPaletteColors@@YGHPAEHH@Z,matched,100.0
-0x4ba590,36,src/graphics/palette.cpp,?SetBrightness@@YGXH@Z,matched,100.0
+0x4ba590,36,src/graphics/palette.cpp,?SetBrightness@@YGXM@Z,matched,100.0
 0x4ba5c0,36,src/graphics/palette.cpp,?AllocAlphaTable@@YGHH@Z,matched,100.0
 0x4ba5f0,22,src/graphics/palette.cpp,?FreeAlphaTable@@YGXPAUDisplayContext@@@Z,matched,100.0
 0x4ba610,36,src/graphics/palette.cpp,?AllocShadeTable@@YGHPAUDisplayContext@@@Z,matched,100.0
