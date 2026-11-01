@@ -2207,11 +2207,11 @@ address,size,file,symbol,status,similarity
 0x4a1990,87,src/gui/gui.cpp,?FindAssocListBox@@YGHPAUGadget@@H@Z,matched,100.0
 0x4a19f0,87,src/gui/gui.cpp,?FindAssocSlider@@YGHPAUGadget@@H@Z,matched,100.0
 0x4a1a50,87,src/gui/gui.cpp,?FindAssocTextInput@@YGHPAUGadget@@H@Z,matched,100.0
-0x4a1ab0,143,src/gui/gui.cpp,?RedrawGadgetRect@@YGXPAUDialog_4a1ab0@@H@Z,matched,100.0
-0x4a1b40,2160,src/gui/gui.cpp,?DrawListBox@@YGXPAUDialog_4a1b40@@H@Z,matched,100.0
+0x4a1ab0,143,src/gui/gui.cpp,?RedrawGadgetRect@@YGXPAUGui@@H@Z,matched,100.0
+0x4a1b40,2160,src/gui/gui.cpp,?DrawListBox@@YGXPAUGui@@H@Z,matched,100.0
 0x4a23b0,196,src/gui/gui.cpp,?GetSliderRects@@YGXPAUGadget@@HPAH1@Z,matched,100.0
 0x4a2480,242,src/gui/gui.cpp,?DrawGafBar@@YGXPAUGui@@H@Z,matched,100.0
-0x4a2580,1631,src/gui/gui.cpp,?DrawSliderBar@@YGXPAUObject_004a2580@@H@Z,matched,100.0
+0x4a2580,1631,src/gui/gui.cpp,?DrawSliderBar@@YGXPAUGui@@H@Z,matched,100.0
 0x4a2be0,597,src/gui/gui.cpp,?SyncAssocGadgets@@YGXPAUDialog_4a2be0@@H@Z,matched,100.0
 0x4a2e40,640,src/gui/gui.cpp,?SetListBoxScrollByName@@YGXPAUDialog_4a2e40@@PADH@Z,matched,100.0
 0x4a30c0,244,src/gui/gui.cpp,?ResetListBox@@YGXPAUGui@@H@Z,matched,100.0
