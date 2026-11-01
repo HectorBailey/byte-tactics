@@ -155,12 +155,12 @@ struct Elem_0040d550 {
 
 #include "../util/vec3.h"
 
-struct Elem_0040cc40 {
+struct ScoredCell {
     Point16 pos;                       // +0x0
     float key;                         // +0x4
-    Elem_0040cc40() {}
-    Elem_0040cc40(const Elem_0040cc40& o) : pos(o.pos), key(o.key) {}
-    bool operator<(const Elem_0040cc40& o) const { return key < o.key; }
+    ScoredCell() {}
+    ScoredCell(const ScoredCell& o) : pos(o.pos), key(o.key) {}
+    bool operator<(const ScoredCell& o) const { return key < o.key; }
 };
 
 #pragma pack(push, 1)
@@ -247,7 +247,7 @@ public:
     UnitList_00409730 factories;   // +0x25
     int pos_35[3];                 // +0x35
     int pos_41[3];                 // +0x41
-    std::vector<Elem_0040cc40> cells;// +0x4d
+    std::vector<ScoredCell> cells; // +0x4d
     short centerX;                 // +0x5d
     short centerY;                 // +0x5f
     int unused_61;                 // +0x61, zeroed by the constructor, never read

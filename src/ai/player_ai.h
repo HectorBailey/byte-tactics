@@ -15,16 +15,17 @@ struct Unit;
 struct UnitDef;
 struct Vec3;
 
-// A map cell and its sort key, the element of the player AI's cell vector.
-struct Elem_0040cc40 {
+// A map cell and its sort key, the element of the player AI's cell vector
+// (Thaldren's ScoredCell: PlayerAI+0x4d is its StlVec_ScoredCell).
+struct ScoredCell {
     Point16 pos;                       // +0x0
     float key;                         // +0x4
-    Elem_0040cc40() {}
+    ScoredCell() {}
     // Defined out of line in ai_player.cpp (0x40a5b0), not in the class, so the compiler emits it.
-    Elem_0040cc40(const Elem_0040cc40& o);
+    ScoredCell(const ScoredCell& o);
     // The value is taken as a float parameter: gives the original's fld/fstp copy.
-    Elem_0040cc40(short x, short y, float k) { pos.x = x; pos.y = y; key = k; }
-    bool operator<(const Elem_0040cc40& o) const { return key < o.key; }
+    ScoredCell(short x, short y, float k) { pos.x = x; pos.y = y; key = k; }
+    bool operator<(const ScoredCell& o) const { return key < o.key; }
 };
 
 struct Elem_0040cfb0 {
@@ -75,7 +76,7 @@ public:
     Group_00409160 factories;          // +0x25
     Vec3_00409160 centre;              // +0x35
     Vec3_00409160 pos_41;              // +0x41
-    std::vector<Elem_0040cc40> cells;  // +0x4d
+    std::vector<ScoredCell> cells;     // +0x4d
     Pos_00409160 center;               // +0x5d
     std::vector<Elem_0040cfb0> vec_65; // +0x65
     int builders;                      // +0x75
@@ -100,7 +101,7 @@ public:
     void InitUnitTables();
     void InitPlacementGrid();
     void ComputeBaseWeights();
-    bool FindCellNearFeatures(UnitDef* type, Vec3* pos, std::vector<Elem_0040cc40>* list, int range, Point16* out);
+    bool FindCellNearFeatures(UnitDef* type, Vec3* pos, std::vector<ScoredCell>* list, int range, Point16* out);
     bool FindRandomPlacementCell(UnitDef* type, Vec3* pos, int range, Point16* out);
     void BuildFeatureCells();
     void RefreshUnitLists();
