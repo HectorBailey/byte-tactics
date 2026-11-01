@@ -154,7 +154,7 @@ char* __stdcall Translate(const char* text);
 void __stdcall AddTextGadget(Layer* layer, char* name, char* text, int x, int y, int w, int flags);
 void __stdcall SetTranslatedTextByName(Gui* menu, const char* name, char* text, int value);
 void __stdcall SetGadgetColorByName(Gui* menu, const char* name, int value);
-void __stdcall AddBlinkWord(Gui* menu, char* text, int x, int y, int count,
+int __stdcall AddBlinkWord(Gui* menu, const char* text, int x, int y, int count,
                             int colour, float a, float b);
 void __stdcall ClearBlinkWords(Gui* menu);
 void __stdcall SetBlinkGadget(Gui* menu, int value);

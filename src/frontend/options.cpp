@@ -422,10 +422,6 @@ struct Rule_0045f1d0 {                 // 0x18 bytes, the record g_game->options
     char unknown_18[0x18 - 0x14];
 };
 
-struct Sub_0045f800 {
-    char unknown_0[0x10];
-};
-
 struct Sub_0045fb30 {
     char unknown_0[0x10];
 };
@@ -713,8 +709,7 @@ char* __stdcall SkipTextLines(char* text, int n);
 char* __stdcall Translate(char* text);
 const char* __stdcall Translate(const char* text);
 void __stdcall InitBriefingText();
-void __stdcall FreeBlinkWords(int param_1);
-void __stdcall AllocBlinkWords(Sub_0045f800* sub, int value);
+void __stdcall FreeBlinkWords(Gui* gui);
 void __stdcall AllocBlinkWords(Gui* sub, int value);
 void DrawHelpPage();
 
@@ -2212,7 +2207,7 @@ void ShowGameSettingsDialog()
 void __stdcall HandleBriefingClick(Gui* gui)
 {
     if (gui->hotGadgetIndex == -1) {
-        FreeBlinkWords((int)&g_game->gui);
+        FreeBlinkWords(&g_game->gui);
         return;
     }
     if (IsCurrentGadgetNamed(gui, "OK")) {
@@ -2240,7 +2235,7 @@ void OpenBriefingDialog()
     i = FindGadgetIndex(gadgets, "TextRegion", 0xe);
     gadgets[i].attribs &= ~0x10;
     LoadPictureCached("igmbrief", 0, 0, 0);
-    AllocBlinkWords((Sub_0045f800*)&g_game->gui, 0xf);
+    AllocBlinkWords(&g_game->gui, 0xf);
     InitBriefingText();
     RenderLayer(&g_game->gui, 0x40);
 }
