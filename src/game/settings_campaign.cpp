@@ -101,14 +101,14 @@ void __stdcall LoadUnits(HapiBank* file);
 void __stdcall LoadMeteors(HapiBank* file);
 
 void __stdcall SaveSurface(void* surface, void* file);
-void __stdcall WriteCameraPosition(void* file);
+void __stdcall WriteCameraPosition(HapiBank* file);
 void __stdcall SavePlayers(void* file);
-void __stdcall SaveUnits(void* file);
-void __stdcall SaveMappingData(void* file);
-void __stdcall SaveFeatures(void* file);
-void __stdcall SavePlayerFeaturesPlotmap(void* file);
-void __stdcall SaveMetalPlotmap(void* file);
-void __stdcall SaveMeteors(void* file);
+void __stdcall SaveUnits(HapiBank* file);
+void __stdcall SaveMappingData(HapiBank* file);
+void __stdcall SaveFeatures(HapiBank* file);
+void __stdcall SavePlayerFeaturesPlotmap(HapiBank* file);
+void __stdcall SaveMetalPlotmap(HapiBank* file);
+void __stdcall SaveMeteors(HapiBank* file);
 
 extern int __stdcall ReadRegistryData(const char* app, const char* key, char* buf, int* size);
 extern void __stdcall WriteRegistryString(const char* app, const char* key, const char* value);
