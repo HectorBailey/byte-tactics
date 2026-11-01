@@ -85,9 +85,9 @@ struct Primitive3doFlags {
 };
 
 struct Primitive3do {
-    int unknown_0;                   // +0x00
+    int colorIndex;                  // +0x00, the colour FillShadedPolygon takes
     int count;                       // +0x04
-    int unknown_8;                   // +0x08
+    int always0;                     // +0x08
     unsigned short* indices;         // +0x0c
     void* pic;                       // +0x10
     int unknown_14;                  // +0x14
@@ -337,7 +337,7 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, UnitObjectState* list,
                             DrawLitTexturedPolygon(bitmap, pic, poly, 0);
                         }
                     } else {
-                        FillShadedPolygon(bitmap, poly, face->count, face->unknown_0);
+                        FillShadedPolygon(bitmap, poly, face->count, face->colorIndex);
                     }
                 }
             }

@@ -13,7 +13,7 @@ struct Pos_4589c0 {
 #include "gaf_frame.h"
 
 
-struct Model_459200;
+struct UnitObjectState;
 
 #include "../units/unit_def.h"
 
@@ -48,7 +48,7 @@ struct Unit_459200 {
     Unit_459200* cargoNext;
     UnitDef* def;
     char unknown_96[8];
-    Model_459200* state;
+    UnitObjectState* state;
     char unknown_a2[4];
     short unitDefIndex;
     char unknown_a8[0xff-0xa8];
@@ -70,7 +70,7 @@ struct Piece_459200 {
     char unknown_2a[0x36 - 0x2a];
 };
 
-struct Model_459200 {
+struct UnitObjectState {
     int count;                         // +0x0
     char unknown_4[0xc - 0x4];
     Unit_459200* owner;                // +0xc
@@ -129,7 +129,7 @@ template <class T> inline void Swap(T& a, T& b)
 extern Game* g_game;
 extern const float DAT_004fd4c0;
 
-struct UnitTable { void BuildObjectPicture(Model_459200*,int,int); void DrawPieces(GafFrame*,Model_459200*,int,int); };
+struct UnitTable { void BuildObjectPicture(UnitObjectState*,int,int); void DrawPieces(GafFrame*,UnitObjectState*,int,int); };
 
 // The cache under the name the picture code uses: the same object, so it
 // derives from UnitTable to reach BuildObjectPicture and DrawPieces without a
@@ -138,11 +138,11 @@ struct CMemoryCache : UnitTable {
     char unknown_0[0x10];
     GafFrame* bitmap;               // +0x10
 
-    void BuildShadow(Model_459200*, GafFrame*);
-    void DrawPiece(Model_459200*, int, Vec3_459200*, int, int, unsigned char, int);
-    void DrawObjectPicture(int param_2, Model_459200* model, Vec3_459200 v, int useColor);
-    void MergeIntoComposite(GafFrame* src, Model_459200* model);
-    int ShadeByIntensity(GafFrame* image, Model_459200* model);
+    void BuildShadow(UnitObjectState*, GafFrame*);
+    void DrawPiece(UnitObjectState*, int, Vec3_459200*, int, int, unsigned char, int);
+    void DrawObjectPicture(int param_2, UnitObjectState* model, Vec3_459200 v, int useColor);
+    void MergeIntoComposite(GafFrame* src, UnitObjectState* model);
+    int ShadeByIntensity(GafFrame* image, UnitObjectState* model);
     GafFrame* MakeSilhouette(GafFrame* src);
 };
 
@@ -153,14 +153,14 @@ void __stdcall TintFrameBelow(GafFrame* param_1, int value);
 void __stdcall CutFrameBelow(GafFrame* param_1, int value);
 
 // digger_bias (if/return) is used only in the digger arm; other sites keep shade_bias.
-static inline int digger_bias(Model_459200* model)
+static inline int digger_bias(UnitObjectState* model)
 {
     if (((UnitDefFlags_459200*)model->owner->def)->flags.bits.digger)
         return 125;
     return 50;
 }
 
-static inline int shade_bias(Model_459200* model)
+static inline int shade_bias(UnitObjectState* model)
 {
     bool c = ((((UnitDefFlags_459200*)model->owner->def)->flags.word >> 30) & 1) != 0;
     return c ? 125 : 50;
@@ -180,7 +180,7 @@ static inline int shade_bias(Model_459200* model)
 // Must stay before MergeIntoComposite (0x4589c0): compiled after it, the sum in
 // the b3 arm goes into the wrong register.
 // FUNCTION: 0x459200
-void CMemoryCache::DrawObjectPicture(int param_2, Model_459200* model, Vec3_459200 v, int useColor)
+void CMemoryCache::DrawObjectPicture(int param_2, UnitObjectState* model, Vec3_459200 v, int useColor)
 {
     GafFrame* bmp = model->bitmap;
     UnitTypeFlags_459200 f;

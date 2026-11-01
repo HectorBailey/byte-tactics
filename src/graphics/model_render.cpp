@@ -163,7 +163,7 @@ struct Piece_459c70 {
 
 #include "../units/unit_def.h"
 
-struct Model_459200;
+struct UnitObjectState;
 struct Unit_459200;
 
 // The game's flags word at +0x37f06.
@@ -225,25 +225,25 @@ public:
     int AllocTwoPlaneBitmap(GafFrame** handle, int w, int h);
     void FlushCache();
     void ReleaseHandle(int handle);
-    void BuildShadow(Model_459200*, GafFrame*);
-    void DrawObjectState(Model_459200*, void* context);
-    void DrawObjectPieces(int param_1, Model_459200* list, Vec3 v, int param_6);
+    void BuildShadow(UnitObjectState*, GafFrame*);
+    void DrawObjectState(UnitObjectState*, void* context);
+    void DrawObjectPieces(int param_1, UnitObjectState* list, Vec3 v, int param_6);
     // Defined at the end of this file, out of address order.
-    void DrawPiece(Model_459200* model, void* surface, Vec3* camera,
+    void DrawPiece(UnitObjectState* model, void* surface, Vec3* camera,
         Object3do* info, Vec3* vertices, unsigned char palette, int useColor);
     // Defined in model_render_4589c0.cpp: it needs that file's CMemoryCache, which
     // derives from UnitTable to reach BuildObjectPicture and DrawPieces.
-    void DrawObjectPicture(int param_2, Model_459200* model, Vec3 v, int useColor);
-    void MergeIntoComposite(GafFrame* src, Model_459200* model);
-    void MeasureShadow(int* width, int* height, int* originX, int* originY, Model_459200* model);
-    void DrawShadowShape(GafFrame* view, Model_459200* model);
-    void AddModelBounds(int* minX, int* maxX, int* minY, int* maxY, Model_459200* model,
+    void DrawObjectPicture(int param_2, UnitObjectState* model, Vec3 v, int useColor);
+    void MergeIntoComposite(GafFrame* src, UnitObjectState* model);
+    void MeasureShadow(int* width, int* height, int* originX, int* originY, UnitObjectState* model);
+    void DrawShadowShape(GafFrame* view, UnitObjectState* model);
+    void AddModelBounds(int* minX, int* maxX, int* minY, int* maxY, UnitObjectState* model,
                         Pos_4589c0 pos);
     // level stays unsigned char: only the low byte of the quotient is needed.
     void RecolorByShade(GafFrame* img, unsigned char level, int above, int below, int between);
-    int ShadeByIntensity(GafFrame* image, Model_459200* model);
+    int ShadeByIntensity(GafFrame* image, UnitObjectState* model);
     // Defined in model_render_458fa0.cpp: only matches at that file's symbol count.
-    void DrawPieceEdges(GafFrame* view, Model_459200* model, int color);
+    void DrawPieceEdges(GafFrame* view, UnitObjectState* model, int color);
     GafFrame* MakeSilhouette(GafFrame* src);
 };
 
@@ -262,7 +262,7 @@ struct Unit_459200 {
     Unit_459200* cargoNext;            // +0x8e
     UnitDef* def;                      // +0x92
     char unknown_96[8];
-    Model_459200* state;               // +0x9e
+    UnitObjectState* state;            // +0x9e
     char unknown_a2[4];
     short unitDefIndex;                // +0xa6
     unsigned short id;                 // +0xa8
@@ -281,7 +281,7 @@ struct Unit_459200 {
 // The object state of one unit: a count, the draw flags, the owner and the
 // pictures, the base angles, the root piece and the piece records.
 #pragma pack(push, 2)
-struct Model_459200 {
+struct UnitObjectState {
     int count;                         // +0x00
     int cacheDrawCount;                // +0x04
     int animDirty;                     // +0x08
@@ -301,12 +301,12 @@ public:
     UnitTable* Construct(void);
     int Initialize(unsigned int size);
     void Destroy();
-    void MeasureModel(int* width, int* height, int* originX, int* originY, Model_459200* model, Vec3* offset);
-    int BuildObjectPicture(Model_459200* list, int param_2, int param_3);
-    void DrawPieces(GafFrame* bitmap, Model_459200* list, int kind, int useColor);
+    void MeasureModel(int* width, int* height, int* originX, int* originY, UnitObjectState* model, Vec3* offset);
+    int BuildObjectPicture(UnitObjectState* list, int param_2, int param_3);
+    void DrawPieces(GafFrame* bitmap, UnitObjectState* list, int kind, int useColor);
     // Defined in model_render_4581e0.cpp: it must be the first function after its
     // own types, and the merged context still moves its summing loop's lea.
-    void DrawLitPieces(GafFrame* bitmap, Model_459200* list, int kind, int useColor);
+    void DrawLitPieces(GafFrame* bitmap, UnitObjectState* list, int kind, int useColor);
 };
 
 // Unused here: the symbol ids these declarations take keep the allocation,
@@ -347,11 +347,11 @@ void __stdcall CutFrameBelow(GafFrame* param_1, int value);
 void __stdcall ZeroFramePixels(GafFrame* image);
 void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles);
 int __stdcall CountObjects(Object3do* obj);
-Piece_459c70* __stdcall AddStateEntries(Model_459200* state, Object3do* obj, Piece_459c70* parent);
-Piece_459c70* __stdcall LinkStateEntries(Model_459200* state, Object3do* obj, Piece_459c70* parent);
+Piece_459c70* __stdcall AddStateEntries(UnitObjectState* state, Object3do* obj, Piece_459c70* parent);
+Piece_459c70* __stdcall LinkStateEntries(UnitObjectState* state, Object3do* obj, Piece_459c70* parent);
 // Defined at the end of this file, out of address order.
-void __fastcall PoseModel(Model_459200* state, Piece_459c70* entry, int flag);
-void __fastcall TransformPieces(Model_459200* model, Piece_459c70* piece,
+void __fastcall PoseModel(UnitObjectState* state, Piece_459c70* entry, int flag);
+void __fastcall TransformPieces(UnitObjectState* model, Piece_459c70* piece,
                                 Vector3s* pos, Vec3* box, int force);
 
 // FUNCTION: 0x458160
@@ -389,7 +389,7 @@ static __inline int shade_bias(Unit_459200* owner)
 }
 
 // FUNCTION: 0x4581e0
-void UnitTable::MeasureModel(int* width, int* height, int* originX, int* originY, Model_459200* model, Vec3* offset)
+void UnitTable::MeasureModel(int* width, int* height, int* originX, int* originY, UnitObjectState* model, Vec3* offset)
 {
     int minX;
     int minY;
@@ -436,7 +436,7 @@ void UnitTable::MeasureModel(int* width, int* height, int* originX, int* originY
 // them, stores the origin in the bitmap header and hands the drawing to
 // 0x459c70 / 0x459830.
 // FUNCTION: 0x4586a0
-int UnitTable::BuildObjectPicture(Model_459200* list, int param_2, int param_3)
+int UnitTable::BuildObjectPicture(UnitObjectState* list, int param_2, int param_3)
 {
     // Plain ints: the stores into the short header fields narrow them.
     int w;
@@ -470,7 +470,7 @@ int UnitTable::BuildObjectPicture(Model_459200* list, int param_2, int param_3)
 // unit flagged, it draws into the doubled shadow bitmap instead and then
 // downsamples that back into the caller's bitmap.
 // FUNCTION: 0x459830
-void UnitTable::DrawPieces(GafFrame* bitmap, Model_459200* list,
+void UnitTable::DrawPieces(GafFrame* bitmap, UnitObjectState* list,
     int kind, int useColor)
 {
     Vec3 vertex[2000];
@@ -594,7 +594,7 @@ void UnitTable::DrawPieces(GafFrame* bitmap, Model_459200* list,
 
 // FUNCTION: 0x458310
 void CMemoryCache::AddModelBounds(int* minX, int* maxX, int* minY, int* maxY,
-                                    Model_459200* model, Pos_4589c0 pos)
+                                    UnitObjectState* model, Pos_4589c0 pos)
 {
     int hiY = 0;
     int loY = 0;
@@ -628,7 +628,7 @@ void CMemoryCache::AddModelBounds(int* minX, int* maxX, int* minY, int* maxY,
 }
 
 // FUNCTION: 0x458430
-void CMemoryCache::DrawObjectPieces(int param_1, Model_459200* list, Vec3 v, int param_6)
+void CMemoryCache::DrawObjectPieces(int param_1, UnitObjectState* list, Vec3 v, int param_6)
 {
     if (list->bitmap != 0) {
         DrawObjectPicture(param_1, list, v, param_6);
@@ -671,7 +671,7 @@ template <class T> inline void Swap(T& a, T& b)
 // re-blits `bmp` (pixels, then the shade plane through a pixels/shade swap) into
 // it.
 // FUNCTION: 0x4589c0
-void CMemoryCache::MergeIntoComposite(GafFrame* bmp, Model_459200* model)
+void CMemoryCache::MergeIntoComposite(GafFrame* bmp, UnitObjectState* model)
 {
     // One named origin is passed to both AddModelBounds calls.
     Pos_4589c0 origin(0, 0, 0);
@@ -809,7 +809,7 @@ void CMemoryCache::RecolorByShade(GafFrame* img, unsigned char level, int above,
 }
 
 // FUNCTION: 0x458dd0
-int CMemoryCache::ShadeByIntensity(GafFrame* image, Model_459200* model)
+int CMemoryCache::ShadeByIntensity(GafFrame* image, UnitObjectState* model)
 {
     if (image->scratch == 0)
         return 0;
@@ -880,7 +880,7 @@ GafFrame* CMemoryCache::MakeSilhouette(GafFrame* src)
 }
 
 // FUNCTION: 0x45a510
-void CMemoryCache::MeasureShadow(int* width, int* height, int* originX, int* originY, Model_459200* model)
+void CMemoryCache::MeasureShadow(int* width, int* height, int* originX, int* originY, UnitObjectState* model)
 {
     int minX;
     int minY;
@@ -918,7 +918,7 @@ void CMemoryCache::MeasureShadow(int* width, int* height, int* originX, int* ori
 }
 
 // FUNCTION: 0x45a610
-void CMemoryCache::DrawShadowShape(GafFrame* view, Model_459200* model)
+void CMemoryCache::DrawShadowShape(GafFrame* view, UnitObjectState* model)
 {
     Vec3 verts[2000];
     Vec3 tmp[25];
@@ -966,7 +966,7 @@ void CMemoryCache::DrawShadowShape(GafFrame* view, Model_459200* model)
 }
 
 // FUNCTION: 0x45a8d0
-Model_459200* __stdcall CreateObjectState(Object3do* obj)
+UnitObjectState* __stdcall CreateObjectState(Object3do* obj)
 {
     int count = 1;
     if (obj->child != 0) {
@@ -977,7 +977,7 @@ Model_459200* __stdcall CreateObjectState(Object3do* obj)
         count += CountObjects(obj->sibling);
     }
     int size = count * 0x36 + 0x22;
-    Model_459200* state = (Model_459200*)GameAllocIgnoreTag("Object State", size);
+    UnitObjectState* state = (UnitObjectState*)GameAllocIgnoreTag("Object State", size);
     memset(state, 0, size);
     state->root = AddStateEntries(state, obj, 0);
     state->animDirty = 1;
@@ -992,7 +992,7 @@ struct BuildList_0045a950 {
 };
 
 // FUNCTION: 0x45a950
-Model_459200* __stdcall CreatePlayerObjectState(Object3do* obj, BuildList_0045a950* list, int player)
+UnitObjectState* __stdcall CreatePlayerObjectState(Object3do* obj, BuildList_0045a950* list, int player)
 {
     int count = 1;
     if (obj->child != 0) {
@@ -1003,7 +1003,7 @@ Model_459200* __stdcall CreatePlayerObjectState(Object3do* obj, BuildList_0045a9
         count += CountObjects(obj->sibling);
     }
     int size = count * 0x36 + 0x22;
-    Model_459200* state = (Model_459200*)GameAllocIgnoreTag("Object State", size);
+    UnitObjectState* state = (UnitObjectState*)GameAllocIgnoreTag("Object State", size);
     memset(state, 0, size);
     state->root = AddStateEntries(state, obj, 0);
     state->animDirty = 1;
@@ -1025,7 +1025,7 @@ Model_459200* __stdcall CreatePlayerObjectState(Object3do* obj, BuildList_0045a9
 }
 
 // FUNCTION: 0x45aaa0
-void __stdcall FreeObjectState(Model_459200* state)
+void __stdcall FreeObjectState(UnitObjectState* state)
 {
     for (int i = 0; i < state->count; i++) {
         GameFreeThunk(state->pieces[i].points);
@@ -1064,7 +1064,7 @@ int __fastcall RestorePieceVertices(Piece_459c70* piece, int force)
 
 // Nonzero when the state's position is 8 or more away from `pos` on any axis.
 // Takes a pointer to the position: other signatures change the register use.
-static inline int FarFrom(Model_459200* state, const Vector3s* pos)
+static inline int FarFrom(UnitObjectState* state, const Vector3s* pos)
 {
     return abs((short)(state->pos.z - pos->z)) >= 8
         || abs((short)(state->pos.y - pos->y)) >= 8
@@ -1074,7 +1074,7 @@ static inline int FarFrom(Model_459200* state, const Vector3s* pos)
 // FUNCTION: 0x45ab10
 void __stdcall UpdateObjectState(Unit_459200* unit)
 {
-    Model_459200* state = unit->state;
+    UnitObjectState* state = unit->state;
     if (FarFrom(state, &unit->angles)) {
         // One 6-byte struct copy.
         state->pos = unit->angles;
@@ -1095,7 +1095,7 @@ void __stdcall UpdateObjectState(Unit_459200* unit)
 void __stdcall DrawUnit(void* context, Unit_459200* unit)
 {
     if (unit->carrier == 0) {
-        Model_459200* state = unit->state;
+        UnitObjectState* state = unit->state;
         if (FarFrom(state, &unit->angles)) {
             // One 6-byte struct copy.
             state->pos = unit->angles;
@@ -1112,7 +1112,7 @@ void __stdcall DrawUnit(void* context, Unit_459200* unit)
         }
         for (Unit_459200* u = unit->cargo; u; u = u->cargoNext) {
             if (!(u->flags & 0x20000)) {
-                Model_459200* child = u->state;
+                UnitObjectState* child = u->state;
                 if (FarFrom(child, &u->angles)) {
                     child->pos = u->angles;
                     child->animDirty = 1;
@@ -1160,7 +1160,7 @@ int __stdcall CountObjects(Object3do* edi)
 #pragma auto_inline(on)
 
 // FUNCTION: 0x45aec0
-Piece_459c70* __stdcall AddStateEntries(Model_459200* state, Object3do* obj,
+Piece_459c70* __stdcall AddStateEntries(UnitObjectState* state, Object3do* obj,
                                        Piece_459c70* parent)
 {
     Piece_459c70* e = &state->pieces[state->count];
@@ -1193,7 +1193,7 @@ Piece_459c70* __stdcall AddStateEntries(Model_459200* state, Object3do* obj,
 }
 
 // FUNCTION: 0x45af90
-Piece_459c70* __stdcall LinkStateEntries(Model_459200* state, Object3do* obj, Piece_459c70* parent)
+Piece_459c70* __stdcall LinkStateEntries(UnitObjectState* state, Object3do* obj, Piece_459c70* parent)
 {
     int i = state->count - 1;
     if (i >= 0) {
@@ -1222,7 +1222,7 @@ Piece_459c70* __stdcall LinkStateEntries(Model_459200* state, Object3do* obj, Pi
 }
 
 // FUNCTION: 0x45b150
-void __fastcall TransformPieces(Model_459200* owner, Piece_459c70* piece,
+void __fastcall TransformPieces(UnitObjectState* owner, Piece_459c70* piece,
                              Vector3s* angles, Vec3* delta, int deep)
 {
     for (;;) {
@@ -1269,7 +1269,7 @@ void __cdecl BlitSurface(Surface* dst, Surface* src, int x, int y);
 // defined at their addresses their bodies' symbol ids would move the register
 // windows the other functions match in (docs/c2-regalloc.md).
 // FUNCTION: 0x45b0a0
-void __fastcall PoseModel(Model_459200* model, Piece_459c70* piece, int force)
+void __fastcall PoseModel(UnitObjectState* model, Piece_459c70* piece, int force)
 {
     if (piece->child)
         PoseModel(model, piece->child, 1);
@@ -1297,7 +1297,7 @@ void __fastcall PoseModel(Model_459200* model, Piece_459c70* piece, int force)
 }
 
 // FUNCTION: 0x4584d0
-void CMemoryCache::DrawPiece(Model_459200* model, void* surface, Vec3* camera,
+void CMemoryCache::DrawPiece(UnitObjectState* model, void* surface, Vec3* camera,
     Object3do* info, Vec3* vertices, unsigned char palette, int useColor)
 {
     void* pic;
