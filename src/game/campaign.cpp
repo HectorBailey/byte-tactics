@@ -3,7 +3,7 @@
 
 struct FileHandle;
 
-void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
+char* __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
 FileHandle* __stdcall HAPI_OpenFileAppend(char* path);
 int __stdcall HAPI_CloseFile(FileHandle* file);
 

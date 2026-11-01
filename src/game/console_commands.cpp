@@ -497,7 +497,7 @@ extern unsigned char g_contourColors[];  // colour by height band
 extern unsigned char g_movementClassColors[];
 extern signed char g_dirDeltaX[], g_dirDeltaZ[];
 
-void __stdcall AddMessage(char* text, int key, int value, int last);
+void __stdcall AddMessage(char* text, unsigned char key, unsigned short value, char last);
 extern void RemoveAllFeatures();
 void* __stdcall GetMapCell(int x, int y);
 void __stdcall RemoveFeature(void* target, int flag);
@@ -510,8 +510,8 @@ void KillAllUnits(void);
 void __stdcall KillPlayerUnits(unsigned char player);
 void __stdcall RecalculateLineOfSight(int flag);
 void __stdcall SetLightVector(int x, int y, int z);
-void __stdcall TransferEnergy(unsigned char a, int b, float c, int d);
-void __stdcall TransferMetal(unsigned char a, int b, float c, int d);
+void __stdcall TransferEnergy(unsigned char from, unsigned char to, float amount, int flag);
+void __stdcall TransferMetal(unsigned char from, unsigned char to, float amount, int flag);
 void __stdcall SetBrightness(float value);
 void __stdcall MakeDirectoryPath(char* dir);
 int __stdcall SaveGameFile(char* path, char* description, int gameId);
@@ -528,7 +528,7 @@ void DisableMeteors();
 void StartMeteorShower();
 void* __stdcall HAPI_OpenFileRead(char* path);
 void* __stdcall HAPI_LoadOpenFile(char* path, void* file, int* out);
-unsigned int __stdcall ExecuteCommandText(char* text, int size, CommandArgs* vars, unsigned int mask);
+int __stdcall ExecuteCommandText(char* text, int size, CommandArgs* vars, int mask);
 void __cdecl GameFreeThunk(void* data);
 int __stdcall HAPI_CloseFile(void* file);
 int __stdcall MatchWildcard(const char* name, const char* pattern);
@@ -537,7 +537,7 @@ void* __stdcall CreateUnit(unsigned char owner, short id, Vec3 pos, int param_4,
 extern Display_00417a60* GetDisplay();
 void ToggleFullScreen();
 void __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
-void __stdcall ExecuteCommand(void* obj, int mask);
+int __stdcall ExecuteCommand(CommandArgs* obj, int mask);
 // The real callee takes unsigned char; int here reproduces the original's
 // loop-invariant widening of the colour byte.
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int color);

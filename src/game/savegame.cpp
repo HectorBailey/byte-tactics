@@ -176,7 +176,7 @@ void __stdcall InitMissionStatus();
 void OrLabelAttribs();
 void __stdcall BlankScreen();
 void __stdcall RegisterDataArchives();
-void __stdcall SetFrontendState(int code, int line, char* file);
+void __stdcall SetFrontendState(char code, int line, char* file);
 char __stdcall FindGameCdDrive(int flag);
 void __stdcall SetCloseHandler(void (__cdecl *callback)(int), int param);
 void __cdecl LeaveNetGameCallback(int param);
