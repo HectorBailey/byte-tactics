@@ -37,6 +37,10 @@ struct List_004a32a0 {
 
 struct Gadget;
 
+#include "gadget.h"
+#include "layer.h"
+#include "gui.h"
+
 struct Holder_004a32a0 {
     int unknown_0;
     Gadget* entries;           // +0x04
@@ -57,7 +61,7 @@ extern Root_004a32a0* g_guiContext;
 
 #include "../graphics/rect.h"
 // Unused here: the symbol id this declaration takes keeps the functions after
-// ClearChanged matching now that it takes a Dialog* (docs/c2-regalloc.md).
+// ClearChanged matching (docs/c2-regalloc.md).
 void FUN_004161f0(void);
 
 // Unused here: the symbol ids this declaration takes keep the functions below matching (docs/c2-regalloc.md).
@@ -69,66 +73,18 @@ void FreeGameFonts(void);
 void LoadDefaultPalette(void);
 class SquadManager;
 
-
 #pragma pack(push, 1)
 
-struct Holder_0049f8c0;
-
-// The 0x15b-byte GUI layout entry: entry 0 holds the entry count at +0xb6,
-// the other entries hold their text there, and a control's value sits at
-// +0x29.
-struct Entry_0049f8c0 {
-    unsigned char type;            // +0x00
-    char team;                     // +0x01
-    char name[0x10];               // +0x02
-    char unknown_12[0x29 - 0x12];
-    char value;                    // +0x29
-    char unknown_2a[0x33 - 0x2a];
-    char key[0xb6 - 0x33];         // +0x33, the selected entry's text
-    union {
-        struct {
-            short count;           // +0xb6, entry 0: the entry count
-            char unknown_b8[0x138 - 0xb8];
-            short status;          // +0x138
-            char unknown_13a[0x15b - 0x13a];
-        };
-        char text[0x15b - 0xb6];   // +0xb6, the other entries' text
-    };
-};
-
-// The layer a dialog's +0x18 points at: the entry table at +4.
-struct Holder_0049f8c0 {
-    char unknown_0[4];
-    Entry_0049f8c0* entries;       // +0x04
-    char unknown_8[0x14 - 0x8];
-    int dirty;                     // +0x14
-    int keyboardInput;             // +0x18
-    char unknown_1c[0x20 - 0x1c];
-    int selected;                  // +0x20
-};
-
-// The GUI context at g_game's +0x519: the layer at +0x18, the current entry
-// at +0x60, the focused entry at +0x64, the help text's index at +0x68, the
-// 0x100-byte name buffers from +0x9b6 on, and the changed flag at +0xcca.
-struct Dialog {
-    char unknown_0[0x18];
-    Holder_0049f8c0* holder;       // +0x18
-    char unknown_1c[0x60 - 0x1c];
-    int current;                   // +0x60
-    int focus;                     // +0x64
-    int index;                     // +0x68
-    int used;                      // +0x6c
-    char unknown_70[0x74 - 0x70];
-    int length;                    // +0x74
-    char unknown_78[0xa2 - 0x78];
-    int dirty;                     // +0xa2
-    char unknown_a6[0x9b6 - 0xa6];
-    char path_9b6[0x100];          // +0x9b6
-    char path_ab6[0x100];          // +0xab6
-    char path_bb6[0x100];          // +0xbb6
-    char unknown_cb6[0xcca - 0xcb6];
-    int changed;                   // +0xcca
-};
+// Unused here: real declarations that keep the file's symbol count (docs/c2-regalloc.md).
+int FUN_0041d8a0(void);
+int DrawEndGameFrame(void);
+void RunEndGameState(void);
+void InitExplosions(void);
+void FreeExplosions(void);
+void UpdateExplosions(void);
+int FindFreeExplodedPieceSlot(void);
+void UpdateExplodedPieces(void);
+void StampFeatureMetal(void);
 
 struct Vec6_49fd20 {
     int x;                         // +0x0
@@ -149,20 +105,20 @@ struct Obj2_49fd20 {
 
 #pragma pack(pop)
 
-void __stdcall UpdateMenu(Dialog* menu);
+int __stdcall UpdateMenu(Gui* menu);
 void __stdcall BlitLayers(void* param_1, unsigned int* param_2, int* param_3);
 void ShowSoftwareCursor();
 void FlipScreen();
 void __stdcall FatalError(char* path);
 char* __stdcall Translate(char* text);
-void __stdcall DrawButton(Dialog* param_1, int param_2);
-void __stdcall SelectAdjacentGadget(Dialog* menu, int value);
+void __stdcall DrawButton(Gui* param_1, int param_2);
+void __stdcall SelectAdjacentGadget(Gui* menu, int value);
 
 extern char g_emptyStringLiteral[];
 
-static inline int FindEntry(Entry_0049f8c0* entries, char* name)
+static inline int FindEntry(Gadget* entries, char* name)
 {
-    for (int i = 1; i < entries->count + 1; i++) {
+    for (int i = 1; i < entries->u.count + 1; i++) {
         if (strncmp(entries[i].name, name, 0x10) == 0)
             return i;
     }
@@ -170,10 +126,10 @@ static inline int FindEntry(Entry_0049f8c0* entries, char* name)
 }
 
 // FUNCTION: 0x49f8c0
-int __stdcall HasGadgetNamed(Dialog* obj, char* name, int unused)
+int __stdcall HasGadgetNamed(Gui* obj, char* name, int unused)
 {
-    Entry_0049f8c0* entries = obj->holder->entries;
-    for (int i = 1; i < entries->count + 1; i++) {
+    Gadget* entries = obj->layer->entries;
+    for (int i = 1; i < entries->u.count + 1; i++) {
         if (strncmp(entries[i].name, name, 0x10) == 0) {
             return 1;
         }
@@ -182,10 +138,10 @@ int __stdcall HasGadgetNamed(Dialog* obj, char* name, int unused)
 }
 
 // FUNCTION: 0x49f930
-void __stdcall SetGadgetName(Dialog* obj, char* name, char* text)
+void __stdcall SetGadgetName(Gui* obj, char* name, char* text)
 {
-    if (obj->holder) {
-        Entry_0049f8c0* entries = obj->holder->entries;
+    if (obj->layer) {
+        Gadget* entries = obj->layer->entries;
         int index = FindEntry(entries, name);
         if (index != -1)
             lstrcpynA(entries[index].name, text, 0x11);
@@ -193,59 +149,59 @@ void __stdcall SetGadgetName(Dialog* obj, char* name, char* text)
 }
 
 // FUNCTION: 0x49f9c0
-void __stdcall RunWhileScreenNamed(Dialog* menu, char* name)
+void __stdcall RunWhileScreenNamed(Gui* menu, char* name)
 {
     MSG msg;
     while (1) {
-        if (!menu->holder || _strnicmp(menu->holder->entries->name, name, 16) != 0)
+        if (!menu->layer || _strnicmp(menu->layer->entries->name, name, 16) != 0)
             break;
         if (PeekMessageA(&msg, 0, 0, 0, PM_REMOVE)) {
             TranslateMessage(&msg);
             DispatchMessageA(&msg);
         }
         UpdateMenu(menu);
-        BlitLayers(menu->holder, 0, 0);
+        BlitLayers(menu->layer, 0, 0);
         ShowSoftwareCursor();
         FlipScreen();
     }
 }
 
 // FUNCTION: 0x49fa50
-void __stdcall EnableKeyCommands(Dialog* p)
+void __stdcall EnableKeyCommands(Gui* p)
 {
     p->dirty = 1;
 }
 
 // FUNCTION: 0x49fa70
-void __stdcall DisableKeyCommands(Dialog* obj)
+void __stdcall DisableKeyCommands(Gui* obj)
 {
     obj->dirty = 0;
 }
 
 // FUNCTION: 0x49fa90
-void __stdcall MarkChanged(Dialog* obj)
+void __stdcall MarkChanged(Gui* obj)
 {
     obj->changed = 1;
 }
 
 // FUNCTION: 0x49fab0
-void __stdcall ClearChanged(Dialog* obj)
+void __stdcall ClearChanged(Gui* obj)
 {
     obj->changed = 0;
 }
 
 // FUNCTION: 0x49fad0
-void __stdcall MarkLayerChanged(Dialog* obj)
+void __stdcall MarkLayerChanged(Gui* obj)
 {
-    if (obj->holder != 0) {
-        obj->holder->dirty = 1;
+    if (obj->layer != 0) {
+        obj->layer->dirty = 1;
     }
 }
 
 // FUNCTION: 0x49faf0
-void __stdcall ClearLayerChanged(Dialog* param)
+void __stdcall ClearLayerChanged(Gui* param)
 {
-    param->holder->dirty = 0;
+    param->layer->dirty = 0;
 }
 
 // FUNCTION: 0x49fb10
@@ -258,56 +214,61 @@ void __stdcall SetKeyboardInput(int param_1, int param_2)
 }
 
 // FUNCTION: 0x49fb30
-int __stdcall GetKeyboardInput(Dialog* obj)
+int __stdcall GetKeyboardInput(Gui* obj)
 {
-    if (obj->holder != 0) {
-        return obj->holder->keyboardInput;
+    if (obj->layer != 0) {
+        return obj->layer->keyboardInput;
     }
     return 0;
 }
 
 // FUNCTION: 0x49fb50
-void __stdcall SetFontsPath(Dialog* obj, const char* dir)
+void __stdcall SetFontsPath(Gui* obj, const char* dir)
 {
-    strncpy(obj->path_bb6, dir, 0x100);
-    strcat(obj->path_bb6, "\\");
+    strncpy(obj->str_bb6, dir, 0x100);
+    strcat(obj->str_bb6, "\\");
 }
 
 // FUNCTION: 0x49fba0
-void __stdcall SetGuiPath(Dialog* obj, const char* dir)
+void __stdcall SetGuiPath(Gui* obj, const char* dir)
 {
-    strncpy(obj->path_9b6, dir, 0x100);
-    strcat(obj->path_9b6, "\\");
+    strncpy(obj->str_9b6, dir, 0x100);
+    strcat(obj->str_9b6, "\\");
 }
 
 // FUNCTION: 0x49fbf0
-void __stdcall SetAnimsPath(Dialog* obj, const char* dir)
+void __stdcall SetAnimsPath(Gui* obj, const char* dir)
 {
-    strncpy(obj->path_ab6, dir, 0x100);
-    strcat(obj->path_ab6, "\\");
+    strncpy(obj->str_ab6, dir, 0x100);
+    strcat(obj->str_ab6, "\\");
 }
 
 // FUNCTION: 0x49fc40
-void __stdcall ClearFocus(Dialog* param_1)
+void __stdcall ClearFocus(Gui* param_1)
 {
     param_1->focus = 0xffffffff;
 }
 
+// The original calls this out of line from the text-edit and selection functions
+// below (HandleButtonInput, BeginTextEdit, SelectGadgetByIndex).
+#pragma auto_inline(off)
 // FUNCTION: 0x49fc50
-int __stdcall TrySetFocus(Dialog* obj, int index)
+int __stdcall TrySetFocus(Gui* obj, int index)
 {
-    if (obj->focus != -1 && obj->holder->entries[obj->focus].type == 3) {
+    if (obj->focus != -1 && obj->layer->entries[obj->focus].type == 3) {
         obj->focus = -1;
     }
     if (obj->focus != -1 && obj->focus != index) {
         return 0;
     }
     obj->focus = index;
-    if (index != -1 && obj->holder->entries[index].type == 3) {
-        obj->length = strlen(obj->holder->entries[index].text);
+    if (index != -1 && obj->layer->entries[index].type == 3) {
+        obj->cursor = strlen(obj->layer->entries[index].u.text);
     }
     return 1;
 }
+
+#pragma auto_inline(on)
 
 // FUNCTION: 0x49fcf0
 int __stdcall IsFocused(int param_1, int param_2)
@@ -332,19 +293,19 @@ void __stdcall FUN_0049fd20(Obj1_49fd20* param_1, Obj2_49fd20* param_2, Vec6_49f
 }
 
 // FUNCTION: 0x49fd60
-int __stdcall IsCurrentGadgetNamed(Dialog* gui, char* name)
+int __stdcall IsCurrentGadgetNamed(Gui* gui, char* name)
 {
-    if (!gui->holder)
+    if (!gui->layer)
         return 0;
-    if (gui->current == -1)
+    if (gui->hotGadgetIndex == -1)
         return 0;
-    return strcmp(gui->holder->entries[gui->current].name, name) == 0;
+    return strcmp(gui->layer->entries[gui->hotGadgetIndex].name, name) == 0;
 }
 
 // FUNCTION: 0x49fdf0
-int __stdcall FindGadgetIndex(Entry_0049f8c0* entries, char* name, int type)
+int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type)
 {
-    for (int i = 1; i < entries->count + 1; i++) {
+    for (int i = 1; i < entries->u.count + 1; i++) {
         if (strncmp(entries[i].name, name, 0x10) == 0) {
             return i;
         }
@@ -353,9 +314,9 @@ int __stdcall FindGadgetIndex(Entry_0049f8c0* entries, char* name, int type)
 }
 
 // FUNCTION: 0x49fe60
-int __stdcall FindGadgetIndexBySubstring(Entry_0049f8c0* entries, char* name)
+int __stdcall FindGadgetIndexBySubstring(Gadget* entries, char* name)
 {
-    for (int i = 1; i < entries->count + 1; i++) {
+    for (int i = 1; i < entries->u.count + 1; i++) {
         if (strstr(entries[i].name, name)) {
             return i;
         }
@@ -364,14 +325,14 @@ int __stdcall FindGadgetIndexBySubstring(Entry_0049f8c0* entries, char* name)
 }
 
 // FUNCTION: 0x49fed0
-void __stdcall GetGadgetName(Entry_0049f8c0* entries, char* name, int index)
+void __stdcall GetGadgetName(Gadget* entries, char* name, int index)
 {
     strncpy(name, entries[index].name, 0x10);
     name[0x10] = 0;
 }
 
 // FUNCTION: 0x49ff10
-Entry_0049f8c0* __stdcall FindGadgetOrNull(Entry_0049f8c0* entries, char* name)
+Gadget* __stdcall FindGadgetOrNull(Gadget* entries, char* name)
 {
     int i = FindEntry(entries, name);
     if (i != -1) {
@@ -381,7 +342,7 @@ Entry_0049f8c0* __stdcall FindGadgetOrNull(Entry_0049f8c0* entries, char* name)
 }
 
 // FUNCTION: 0x49ff90
-Entry_0049f8c0* __stdcall FindGadgetChecked(Entry_0049f8c0* entries, char* name)
+Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name)
 {
     int i = FindEntry(entries, name);
     if (i != -1) {
@@ -392,7 +353,7 @@ Entry_0049f8c0* __stdcall FindGadgetChecked(Entry_0049f8c0* entries, char* name)
 }
 
 // FUNCTION: 0x4a0010
-Entry_0049f8c0* __stdcall FindGadgetChecked_B(Entry_0049f8c0* entries, char* name)
+Gadget* __stdcall FindGadgetChecked_B(Gadget* entries, char* name)
 {
     int i = FindEntry(entries, name);
     if (i != -1) {
@@ -403,23 +364,23 @@ Entry_0049f8c0* __stdcall FindGadgetChecked_B(Entry_0049f8c0* entries, char* nam
 }
 
 // FUNCTION: 0x4a0090
-void __stdcall UpdateHelpText(Dialog* obj)
+void __stdcall UpdateHelpText(Gui* obj)
 {
     char* text = g_emptyStringLiteral;
-    if (obj->index != -1) {
-        obj->used = obj->index;
-        text = obj->holder->entries[obj->index].key;
+    if (obj->hoverGadgetIndex != -1) {
+        obj->prevHoverGadget = obj->hoverGadgetIndex;
+        text = obj->layer->entries[obj->hoverGadgetIndex].helpKey;
     }
-    int found = FindEntry(obj->holder->entries, "HELPTEXT");
+    int found = FindEntry(obj->layer->entries, "HELPTEXT");
     if (found != -1) {
         // re-read the entry pointer here: the original reloads it after the call
-        strcpy((char*)&obj->holder->entries[found].count, Translate(text));
+        strcpy((char*)&obj->layer->entries[found].u.count, Translate(text));
         obj->changed = 1;
     }
 }
 
 // FUNCTION: 0x4a0180
-Entry_0049f8c0* __stdcall FindGadgetChecked_C(Entry_0049f8c0* entries, char* name)
+Gadget* __stdcall FindGadgetChecked_C(Gadget* entries, char* name)
 {
     int i = FindEntry(entries, name);
     if (i != -1) {
@@ -430,7 +391,7 @@ Entry_0049f8c0* __stdcall FindGadgetChecked_C(Entry_0049f8c0* entries, char* nam
 }
 
 // FUNCTION: 0x4a0200
-Entry_0049f8c0* __stdcall FindGadgetChecked_D(Entry_0049f8c0* entries, char* name)
+Gadget* __stdcall FindGadgetChecked_D(Gadget* entries, char* name)
 {
     int i = FindEntry(entries, name);
     if (i != -1) {
@@ -441,7 +402,7 @@ Entry_0049f8c0* __stdcall FindGadgetChecked_D(Entry_0049f8c0* entries, char* nam
 }
 
 // FUNCTION: 0x4a0280
-Entry_0049f8c0* __stdcall FindGadgetChecked_E(Entry_0049f8c0* entries, char* name)
+Gadget* __stdcall FindGadgetChecked_E(Gadget* entries, char* name)
 {
     int i = FindEntry(entries, name);
     if (i != -1) {
@@ -452,7 +413,7 @@ Entry_0049f8c0* __stdcall FindGadgetChecked_E(Entry_0049f8c0* entries, char* nam
 }
 
 // FUNCTION: 0x4a0300
-int __stdcall IsGadgetNamed(Entry_0049f8c0* entries, int i, char* name)
+int __stdcall IsGadgetNamed(Gadget* entries, int i, char* name)
 {
     if (i == -1) {
         return 0;
@@ -460,47 +421,51 @@ int __stdcall IsGadgetNamed(Entry_0049f8c0* entries, int i, char* name)
     return strncmp(entries[i].name, name, 0x10) == 0;
 }
 
+// The original calls this out of line from HandleButtonInput and HandleGuiCommand.
+#pragma auto_inline(off)
 // FUNCTION: 0x4a0340
-void __stdcall ClearPeerStatus(Dialog* param_1, int index)
+void __stdcall ClearPeerStatus(Gui* param_1, int index)
 {
-    Entry_0049f8c0* entries = param_1->holder->entries;
-    Entry_0049f8c0* me = &entries[index];
+    Gadget* entries = param_1->layer->entries;
+    Gadget* me = &entries[index];
     if (me->team != 0) {
-        Entry_0049f8c0* e = &entries[1];
-        for (int i = 1; i < entries->count + 1; i++, e++) {
+        Gadget* e = &entries[1];
+        for (int i = 1; i < entries->u.count + 1; i++, e++) {
             if (e->type == 1 && i != index && e->team == me->team
                 && e->status != 0) {
                 e->status = 0;
                 DrawButton(param_1, i);
-                if (param_1->holder != 0) {
-                    param_1->holder->dirty = 1;
+                if (param_1->layer != 0) {
+                    param_1->layer->dirty = 1;
                 }
             }
         }
     }
 }
 
+#pragma auto_inline(on)
+
 // FUNCTION: 0x4a03f0
-void __stdcall SetGadgetActive(Dialog* menu, int index, int value)
+void __stdcall SetGadgetActive(Gui* menu, int index, int value)
 {
-    Entry_0049f8c0* entries = menu->holder->entries;
+    Gadget* entries = menu->layer->entries;
     int i;
 
-    entries[index].value = value;
+    entries[index].active = value;
 
     if (entries[index].type == 4) {
-        for (i = 0; i <= entries[0].count; i++) {
+        for (i = 0; i <= entries[0].u.count; i++) {
             if (entries[i].type == 1 && entries[i].team == entries[index].team) {
-                entries[i].value = value;
+                entries[i].active = value;
             }
         }
     } else if (entries[index].type == 2) {
         if (value == 0) {
-            char team = entries[index].team;
+            unsigned char team = entries[index].team;
             int found = 0;
             i = 1;
             for (;;) {
-                if (i >= entries[0].count + 1) {
+                if (i >= entries[0].u.count + 1) {
                     found = 0;
                     break;
                 }
@@ -516,7 +481,7 @@ void __stdcall SetGadgetActive(Dialog* menu, int index, int value)
         }
     }
 
-    if (value == 0 && index == menu->holder->selected) {
+    if (value == 0 && index == menu->layer->current) {
         SelectAdjacentGadget(menu, 1);
     }
     menu->changed = 1;
@@ -526,11 +491,6 @@ void __stdcall SetGadgetActive(Dialog* menu, int index, int value)
 // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 struct Pad_p2_0 { int field; };
 
-struct GafEntry;
-struct GafFrame;
-struct Gui;
-
-#include "gadget.h"
 
 #pragma pack(push, 1)
 
@@ -4143,7 +4103,6 @@ int IsFootprintVisible(int, int, int, int, int, int);
 int DrawProgressBar(int, int, int, int, int, int);
 int PickRandomReclaimableResourcesInRadius(int, int, int, int, int, int);
 int CreateUnit(int, int, int, int, int, int);
-#include "layer.h"
 
 // Unused here: the font table behind gui.h's values and language; its symbol ids
 // keep the allocation (docs/c2-regalloc.md).
@@ -4159,7 +4118,6 @@ void LoadCdLists(void);
 void CloseTopScreenIfNotNamed(void);
 void FreePreviewCaches(void);
 
-#include "gui.h"
 
 #pragma pack(pop)
 
@@ -4277,14 +4235,23 @@ static inline int LineHeightDirect()
     return (int)GetGafFrame(g_guiContext->language->glyphs, 0x49)->height + 2;
 }
 
-static inline int FindEntry(Gadget* entries, char* name)
-{
-    for (int i = 1; i < entries->u.count + 1; i++) {
-        if (strncmp(entries[i].name, name, 0x10) == 0)
-            return i;
-    }
-    return -1;
-}
+// Unused here: real declarations that keep the file's symbol count (docs/c2-regalloc.md).
+void FreeFeaturePool(void);
+void LoadFeatureFileList(void);
+void FreeFeatureFileList(void);
+void ResolveFeatureLinks(void);
+void PlaceMissionFeatures(void);
+void UpdateFeatures(void);
+void RemoveAllFeatures(void);
+void EmptyPostSimStepHook_B(void);
+int MainLoopContinueStub(void);
+void EmptyMainLoopHook(void);
+void EmptyMainLoopHook_B(void);
+void LoadTextureGafs(void);
+void FreeTextureGafs(void);
+void FreeUnitInfo(void);
+void RefreshUnitInfo(void);
+void CheckDownloadableFlags(void);
 
 // The body of SelectFontForEntry at 0x4a1810, which the compiler inlined into LayoutLabelText.
 static inline int SelectLabelFont(Gadget* entries, int index)
@@ -5065,11 +5032,11 @@ int __stdcall HandleTextInput(Gui* obj, int index, int key)
                      obj->colours[entries[index].image]);
         int r = HandleTextEditKey(obj, index, key);
         if (r == 13) {
-            ClearFocus((Dialog*)obj);
+            ClearFocus(obj);
             return 1;
         }
         if (r == 27) {
-            ClearFocus((Dialog*)obj);
+            ClearFocus(obj);
             entries[index].u.text[0] = 0;
             return 1;
         }
@@ -6340,21 +6307,6 @@ static inline void SelectCurrentByName(Gui* menu, Gadget* entries, int sel)
     menu->layer->current = sel;
     CommitTextEdit(menu, sel, entry->u.text, entry->status, 0);
     ClearKeyQueue();
-}
-
-// The real UpdateHelpText (0x4a0090), inlined here by /Ob2.
-static inline void UpdateHelpText(Gui* obj)
-{
-    char* text = g_emptyStringLiteral;
-    if (obj->hoverGadgetIndex != -1) {
-        obj->prevHoverGadget = obj->hoverGadgetIndex;
-        text = obj->layer->entries[obj->hoverGadgetIndex].helpKey;
-    }
-    int found = FindEntry(obj->layer->entries, "HELPTEXT");
-    if (found != -1) {
-        strcpy(obj->layer->entries[found].u.text, Translate(text));
-        obj->changed = 1;
-    }
 }
 
 // The real TickProgressBar (0x4a4890), inlined here by /Ob2.
