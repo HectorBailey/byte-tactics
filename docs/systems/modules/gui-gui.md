@@ -68,7 +68,7 @@ UpdateHelpText (`0x4a0090`) retains the hovered index, obtains its help-key stor
 
 ## Geometry and font/background helpers
 
-GetGadgetRectByIndex/GetGadgetRect (`0x4a15c0`, `0x4a1630`) use origin zero for type zero, otherwise the gadget's local X/Y, with inclusive right/bottom equal to origin plus dimension minus one. GetGadgetScreenRect (`0x4a1680`) starts from the record's X/Y and adds panel origin for nonzero type. FUN_0049fd20 copies a six-integer input snapshot and subtracts supplied gadget origin from its first two coordinates.
+GetGadgetRectByIndex/GetGadgetRect (`0x4a15c0`, `0x4a1630`) use origin zero for type zero, otherwise the gadget's local X/Y, with inclusive right/bottom equal to origin plus dimension minus one. GetGadgetScreenRect (`0x4a1680`) starts from the record's X/Y and adds panel origin for nonzero type. GetGadgetRelativeMouse (`0x49fd20`) copies the GUI's last mouse event (`Gui::point`) and subtracts the gadget's origin from its X and Y, giving the mouse position relative to the gadget.
 
 IsPointInRect (`0x4a1920`) is inclusive. Helpers `0x4a1950`/`0x4a1970` test whether a value is above top or below bottom. RedrawGadgetRect (`0x4a1ab0`) grays and darkens a local gadget rectangle; its name does not mean a full type-specific redraw.
 
