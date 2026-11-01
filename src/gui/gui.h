@@ -4,23 +4,26 @@
 // (+0x60), the colour remap, the GUI file paths and the changed flag. The one
 // declaration of the type, for the files that define or read it.
 //
-// The members are plain data and Layer is the only type named: every type or
-// forward declaration the header adds moves the symbol ids of the small views
-// it replaces (docs/c2-regalloc.md), and those views match in narrow windows.
-// The files that read the pointers behind the members (the font tables, the
-// cursor animation, the mouse event) keep their own view of them.
+// The members are plain data, and Layer and Gaf (a font table: the GAF file
+// LoadGafIntoSlot loads) are the only types named. Every type or forward
+// declaration the header adds moves the symbol ids of the small views it
+// replaces (docs/c2-regalloc.md), and those views match in narrow windows: the
+// files that broke when Gaf came in each gave up one filler type name. The
+// files that read the records behind the members (the font tables, the cursor
+// animation, the mouse event) keep their own view of them.
 #ifndef GUI_H
 #define GUI_H
 
 #pragma pack(push, 1)
 
+struct Gaf;
 struct Layer;
 
 struct Gui {
     int font;                           // +0x00
     void* gaf;                          // +0x04
-    void* values[3];                    // +0x08, the font tables
-    void* language;                     // +0x14, the font table in use
+    Gaf* values[3];                     // +0x08, the font tables
+    Gaf* language;                      // +0x14, the font table in use
     Layer* layer;                       // +0x18
     int cursorSharedFrame;              // +0x1c
     int cursorDefaultFrame;             // +0x20

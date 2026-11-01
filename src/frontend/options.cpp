@@ -514,9 +514,6 @@ struct GadgetOwner_004605c0 {
 
 #include "../graphics/gaf_frame.h"
 
-// Unused: keeps the symbol ids in line for 0x45e4c0 (docs/c2-regalloc.md).
-struct Unit;
-
 typedef int (__stdcall* Handler_0045e100)(Gui*);
 
 struct Screen_0045e100 {
