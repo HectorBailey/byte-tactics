@@ -1167,11 +1167,11 @@ address,size,file,symbol,status,similarity
 0x45ab10,260,src/graphics/model_render.cpp,?UpdateObjectState@@YGXPAUUnit_459200@@@Z,matched,100.0
 0x45ac20,608,src/graphics/model_render.cpp,?DrawUnit@@YGXPAXPAUUnit_459200@@@Z,matched,100.0
 0x45ae80,49,src/graphics/model_render.cpp,?CountObjects@@YGHPAUObject3do@@@Z,matched,100.0
-0x45aec0,202,src/graphics/model_render.cpp,?AddStateEntries@@YGPAUPiece_459c70@@PAUUnitObjectState@@PAUObject3do@@PAU1@@Z,matched,100.0
-0x45af90,152,src/graphics/model_render.cpp,?LinkStateEntries@@YGPAUPiece_459c70@@PAUUnitObjectState@@PAUObject3do@@PAU1@@Z,matched,100.0
-0x45b030,105,src/graphics/model_render.cpp,?RestorePieceVertices@@YIHPAUPiece_459c70@@H@Z,matched,100.0
-0x45b0a0,174,src/graphics/model_render.cpp,?PoseModel@@YIXPAUUnitObjectState@@PAUPiece_459c70@@H@Z,matched,100.0
-0x45b150,242,src/graphics/model_render.cpp,?TransformPieces@@YIXPAUUnitObjectState@@PAUPiece_459c70@@PAUVector3s@@PATVec3@@H@Z,matched,100.0
+0x45aec0,202,src/graphics/model_render.cpp,?AddStateEntries@@YGPAUObjectPiece@@PAUUnitObjectState@@PAUObject3do@@PAU1@@Z,matched,100.0
+0x45af90,152,src/graphics/model_render.cpp,?LinkStateEntries@@YGPAUObjectPiece@@PAUUnitObjectState@@PAUObject3do@@PAU1@@Z,matched,100.0
+0x45b030,105,src/graphics/model_render.cpp,?RestorePieceVertices@@YIHPAUObjectPiece@@H@Z,matched,100.0
+0x45b0a0,174,src/graphics/model_render.cpp,?PoseModel@@YIXPAUUnitObjectState@@PAUObjectPiece@@H@Z,matched,100.0
+0x45b150,242,src/graphics/model_render.cpp,?TransformPieces@@YIXPAUUnitObjectState@@PAUObjectPiece@@PAUVector3s@@PATVec3@@H@Z,matched,100.0
 0x45b480,13,src/network/online.cpp,?OnlineTranslate@@YGXPAE@Z,matched,100.0
 0x45b640,27,src/network/online.cpp,?OnlineUnload@@YGXXZ,matched,100.0
 0x45b660,6,src/network/online.cpp,?IsOnlineConfigLoaded@@YGHXZ,matched,100.0
