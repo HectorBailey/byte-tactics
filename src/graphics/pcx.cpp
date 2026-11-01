@@ -14,6 +14,26 @@ struct PcxImage {
     int height;              // +0xc
 };
 
+// PCX file header (128 bytes), the layout the format gives it.
+struct PcxHeader {
+    unsigned char manufacturer;   // +0x00, 0x0a in the files it reads
+    unsigned char version;        // +0x01, 5
+    unsigned char encoding;       // +0x02, 1 for run length
+    unsigned char bitsPerPixel;   // +0x03, 8
+    unsigned short xmin;          // +0x04
+    unsigned short ymin;          // +0x06
+    unsigned short xmax;          // +0x08
+    unsigned short ymax;          // +0x0a
+    short hres;                   // +0x0c, the writer stores the width here
+    short vres;                   // +0x0e
+    unsigned char palette[0x30];  // +0x10, the 16-colour palette
+    unsigned char reserved;       // +0x40
+    unsigned char planes;         // +0x41, 1
+    unsigned short bytesPerLine;  // +0x42
+    unsigned short paletteInfo;   // +0x44
+    unsigned char rest[0x3a];     // +0x46
+};
+
 int __stdcall HAPI_readfromfile(void* file, void* buf, int size);
 void __stdcall HAPI_SeekFile(void* file, int pos);
 int __stdcall HAPI_FileLength(void* file);
@@ -58,11 +78,11 @@ static inline void FUN_row(void* file, unsigned char* p, int x)
 // FUNCTION: 0x4caa40
 int __stdcall DecodePcx(void* file, PcxImage* pcx)
 {
-    unsigned char header[0x80];
+    PcxHeader header;
     memset(pcx, 0, 16);
-    if (HAPI_readfromfile(file, header, 0x80) == 0x80 && header[0] == 0x0a && header[1] == 5) {
-        pcx->width = *(unsigned short*)(header + 8) - *(unsigned short*)(header + 4) + 1;
-        pcx->height = *(unsigned short*)(header + 10) - *(unsigned short*)(header + 6) + 1;
+    if (HAPI_readfromfile(file, &header, 0x80) == 0x80 && header.manufacturer == 0x0a && header.version == 5) {
+        pcx->width = header.xmax - header.xmin + 1;
+        pcx->height = header.ymax - header.ymin + 1;
         pcx->pixels = (unsigned char*)GameAllocIgnoreTag("PCX BODY", pcx->width * pcx->height);
         pcx->palette = (unsigned char*)GameAllocIgnoreTag("COLOR MAP", 0x300);
         HAPI_SeekFile(file, HAPI_FileLength(file) - 0x300);
@@ -89,26 +109,6 @@ int __stdcall DecodePcx(void* file, PcxImage* pcx)
 extern void* __stdcall HAPI_OpenFileAppend(void* thing);
 extern void __stdcall HAPI_CloseFile(void* file);
 extern unsigned int __stdcall HAPI_WriteFile(void* file, void* buf, unsigned int size);
-
-// PCX file header (128 bytes), the layout the format gives it.
-struct PcxHeader {
-    unsigned char manufacturer;   // +0x00, 0x0a in the files it reads
-    unsigned char version;        // +0x01, 5
-    unsigned char encoding;       // +0x02, 1 for run length
-    unsigned char bitsPerPixel;   // +0x03, 8
-    unsigned short xmin;          // +0x04
-    unsigned short ymin;          // +0x06
-    short xmax;                   // +0x08
-    short ymax;                   // +0x0a
-    short hres;                   // +0x0c, the writer stores the width here
-    short vres;                   // +0x0e
-    unsigned char palette[0x30];  // +0x10, the 16-colour palette
-    unsigned char reserved;       // +0x40
-    unsigned char planes;         // +0x41, 1
-    unsigned short bytesPerLine;  // +0x42
-    unsigned short paletteInfo;   // +0x44
-    unsigned char rest[0x3a];     // +0x46
-};
 
 // Writes a PCX file: opens `filename` through HAPI_OpenFileAppend, writes the 128
 // byte header (manufacturer 10, version 5, RLE encoding, 8 bits per pixel,
@@ -145,8 +145,8 @@ int __stdcall WritePcx(void* filename, unsigned char* data, int width, int heigh
     hdr.bitsPerPixel = 8;
     hdr.xmin = 0;
     hdr.ymin = 0;
-    hdr.xmax = (short)(width - 1);
-    hdr.ymax = (short)(height - 1);
+    hdr.xmax = (unsigned short)(width - 1);
+    hdr.ymax = (unsigned short)(height - 1);
     hdr.hres = (short)width;
     hdr.vres = (short)height;
     memcpy(hdr.palette, block, 0x30);
@@ -294,13 +294,13 @@ Surface* __stdcall LoadPcx(char* path, unsigned char* outPalette)
         return 0;
     int ok;
     PcxImage pcx;
-    unsigned char header[0x80];
-    if (HAPI_readfromfile(file, header, 0x80) != 0x80 || header[0] != 0x0a || header[1] != 5) {
+    PcxHeader header;
+    if (HAPI_readfromfile(file, &header, 0x80) != 0x80 || header.manufacturer != 0x0a || header.version != 5) {
         HAPI_CloseFile(file);
         return 0;
     }
-    int width = *(unsigned short*)(header + 8) - *(unsigned short*)(header + 4) + 1;
-    int height = *(unsigned short*)(header + 10) - *(unsigned short*)(header + 6) + 1;
+    int width = header.xmax - header.xmin + 1;
+    int height = header.ymax - header.ymin + 1;
     Surface* image = AllocSurface(path, width, height);
     if (image == 0) {
         HAPI_CloseFile(file);
@@ -343,13 +343,13 @@ int __stdcall LoadPcxPalette(char* path, unsigned int* out)
     if (file == 0)
         return 0;
     PcxImage pcx;
-    unsigned char header[0x80];
+    PcxHeader header;
     PALETTEENTRY pal[0x100];
-    if (HAPI_readfromfile(file, header, 0x80) != 0x80) {
+    if (HAPI_readfromfile(file, &header, 0x80) != 0x80) {
         HAPI_CloseFile(file);
         return 0;
     }
-    if (header[0] != 0x0a || header[1] != 5) {
+    if (header.manufacturer != 0x0a || header.version != 5) {
         HAPI_CloseFile(file);
         return 0;
     }
@@ -377,6 +377,10 @@ int __stdcall LoadPcxPalette(char* path, unsigned int* out)
 // Unused here: the symbol ids these declarations take keep 0x4cb6a0 matching
 // (docs/c2-regalloc.md).
 void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y);
+void CreateOffscreenSurface(void);
+void FreeOffscreenSurface(void);
+void BlankScreen(void);
+int LoadDefaultPalette(void);
 struct GafFrame;
 
 extern char g_pathSepBackslash[];
