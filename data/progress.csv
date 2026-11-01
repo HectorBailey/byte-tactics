@@ -3152,7 +3152,7 @@ address,size,file,symbol,status,similarity
 0x4de4c0,1,src/debug/debug_lib.cpp,?ImageHlpAtexitHandler@@YGXXZ,matched,100.0
 0x4de4d0,109,src/debug/debug_lib.cpp,?TryEnableImageHlpLines@@YGDXZ,matched,100.0
 0x4de540,1,src/debug/debug_lib.cpp,?ImageHlpLinesAtexitHandler@@YGXXZ,matched,100.0
-0x4de550,175,src/debug/debug_lib.cpp,?GetLineFromAddress@@YADKPAULine_004de550@@PAK@Z,matched,100.0
+0x4de550,175,src/debug/debug_lib.cpp,?GetLineFromAddress@@YADKPAUIMAGEHLP_LINE@@PAK@Z,matched,100.0
 0x4de600,243,src/debug/debug_lib.cpp,?WalkFrameChain@@YAXPAH0HH0H00H0@Z,matched,100.0
 0x4de700,271,src/debug/debug_lib.cpp,?WalkStack@@YAXHHHHPAHH0@Z,matched,100.0
 0x4de810,130,src/debug/debug_lib.cpp,?FileExists@@YA_NPAD0@Z,matched,100.0

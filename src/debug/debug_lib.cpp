@@ -3808,23 +3808,23 @@ void __stdcall GetModuleBase(int arg1, int arg2)
 // The imagehlp entry points, resolved by LoadImageHelp (0x4de180): the
 // loader, the stack walker and the call-stack formatter each use a different
 // signature of the same pointer.
-typedef DWORD (__stdcall *SymSetOptions_004de180)(DWORD);
-typedef BOOL (__stdcall *SymInitialize_004de180)(HANDLE, char*, DWORD);
-typedef void (__stdcall *SymProc_004de180)(void);
-typedef BOOL (__stdcall *StackWalk_004de700)(DWORD, HANDLE, HANDLE, void*, void*, void*, void*, void*, void*);
+typedef DWORD (__stdcall *SymSetOptionsProc)(DWORD);
+typedef BOOL (__stdcall *SymInitializeProc)(HANDLE, char*, DWORD);
+typedef void (__stdcall *ImagehlpProc)(void);
+typedef BOOL (__stdcall *StackWalkProc)(DWORD, HANDLE, HANDLE, void*, void*, void*, void*, void*, void*);
 
 extern char g_imageHelpLoaded;
 extern char g_imageHelpInited;
 extern HMODULE g_imageHelpModule;
-extern SymSetOptions_004de180 g_pfnSymSetOptions;
-extern SymInitialize_004de180 g_pfnSymInitialize;
+extern SymSetOptionsProc g_pfnSymSetOptions;
+extern SymInitializeProc g_pfnSymInitialize;
 extern BOOL (__stdcall* g_pfnSymCleanup)(HANDLE);
-extern StackWalk_004de700 g_pfnStackWalk;
+extern StackWalkProc g_pfnStackWalk;
 extern void* g_pfnSymFunctionTableAccess;
 extern void* g_pfnSymGetModuleBase;
-extern SymProc_004de180 g_pfnSymGetSymFromAddr;
-extern SymProc_004de180 g_pfnSymGetLineFromAddr;
-extern SymProc_004de180 g_pfnUnDecorateSymbolName;
+extern ImagehlpProc g_pfnSymGetSymFromAddr;
+extern ImagehlpProc g_pfnSymGetLineFromAddr;
+extern ImagehlpProc g_pfnUnDecorateSymbolName;
 
 // The original calls this out of line from 0x4de180.
 #pragma auto_inline(off)
@@ -3860,8 +3860,8 @@ char __cdecl LoadImageHelp(char param)
     char* searchPath;
     char* windir;
     char* slash;
-    typedef int (__stdcall *GetProcAddress_004de180)(HMODULE, char*);
-    GetProcAddress_004de180 getProcAddress = (GetProcAddress_004de180)GetProcAddress;
+    typedef int (__stdcall *GetProcAddressProc)(HMODULE, char*);
+    GetProcAddressProc getProcAddress = (GetProcAddressProc)GetProcAddress;
     HANDLE (__stdcall *getCurrentProcess)(void) = GetCurrentProcess;
 
     if (!param && !imagehlp.on)
@@ -3871,21 +3871,21 @@ char __cdecl LoadImageHelp(char param)
     g_imageHelpLoaded = 1;
     if (!(g_imageHelpModule = LoadLibraryA("IMAGEHLP.DLL")))
         return 0;
-    if (!(g_pfnSymSetOptions = (SymSetOptions_004de180)getProcAddress(g_imageHelpModule, "SymSetOptions")))
+    if (!(g_pfnSymSetOptions = (SymSetOptionsProc)getProcAddress(g_imageHelpModule, "SymSetOptions")))
         return 0;
-    if (!(g_pfnSymInitialize = (SymInitialize_004de180)getProcAddress(g_imageHelpModule, "SymInitialize")))
+    if (!(g_pfnSymInitialize = (SymInitializeProc)getProcAddress(g_imageHelpModule, "SymInitialize")))
         return 0;
     if (!(g_pfnSymCleanup = (BOOL (__stdcall*)(HANDLE))getProcAddress(g_imageHelpModule, "SymCleanup")))
         return 0;
-    if (!(g_pfnStackWalk = (StackWalk_004de700)getProcAddress(g_imageHelpModule, "StackWalk")))
+    if (!(g_pfnStackWalk = (StackWalkProc)getProcAddress(g_imageHelpModule, "StackWalk")))
         return 0;
-    if (!(g_pfnSymFunctionTableAccess = (SymProc_004de180)getProcAddress(g_imageHelpModule, "SymFunctionTableAccess")))
+    if (!(g_pfnSymFunctionTableAccess = (ImagehlpProc)getProcAddress(g_imageHelpModule, "SymFunctionTableAccess")))
         return 0;
-    if (!(g_pfnSymGetModuleBase = (SymProc_004de180)getProcAddress(g_imageHelpModule, "SymGetModuleBase")))
+    if (!(g_pfnSymGetModuleBase = (ImagehlpProc)getProcAddress(g_imageHelpModule, "SymGetModuleBase")))
         return 0;
-    g_pfnSymGetSymFromAddr = (SymProc_004de180)getProcAddress(g_imageHelpModule, "SymGetSymFromAddr");
-    g_pfnSymGetLineFromAddr = (SymProc_004de180)getProcAddress(g_imageHelpModule, "SymGetLineFromAddr");
-    g_pfnUnDecorateSymbolName = (SymProc_004de180)getProcAddress(g_imageHelpModule, "UnDecorateSymbolName");
+    g_pfnSymGetSymFromAddr = (ImagehlpProc)getProcAddress(g_imageHelpModule, "SymGetSymFromAddr");
+    g_pfnSymGetLineFromAddr = (ImagehlpProc)getProcAddress(g_imageHelpModule, "SymGetLineFromAddr");
+    g_pfnUnDecorateSymbolName = (ImagehlpProc)getProcAddress(g_imageHelpModule, "UnDecorateSymbolName");
     DWORD symOpts = 4;
     if (g_pfnSymGetLineFromAddr)
         symOpts = 0x14;
@@ -3909,8 +3909,8 @@ char __cdecl LoadImageHelp(char param)
     // The second SymInitialize passes this result as its last argument, not a literal.
     BOOL inited = g_pfnSymInitialize(getCurrentProcess(), searchPath, 1);
     if (!inited) {
-        g_pfnSymFunctionTableAccess = (SymProc_004de180)FunctionTableAccess;
-        g_pfnSymGetModuleBase = (SymProc_004de180)GetModuleBase;
+        g_pfnSymFunctionTableAccess = (ImagehlpProc)FunctionTableAccess;
+        g_pfnSymGetModuleBase = (ImagehlpProc)GetModuleBase;
         g_pfnSymGetSymFromAddr = 0;
         g_pfnSymGetLineFromAddr = 0;
         if (!g_pfnSymInitialize(getCurrentProcess(), searchPath, inited)) {
@@ -3947,8 +3947,10 @@ void ImageHlpLinesAtexitHandler(void)
 {
 }
 
-// The stack line the imagehlp lookup fills in.
-struct Line_004de550 {
+// The stack line the imagehlp lookup fills in: the record SymGetLineFromAddr
+// fills, IMAGEHLP_LINE in later SDKs. The toolchain's IMAGEHLP.H does not
+// declare it (and this file does not include that header).
+struct IMAGEHLP_LINE {
     DWORD SizeOfStruct;
     DWORD Key;
     DWORD LineNumber;
@@ -3956,7 +3958,7 @@ struct Line_004de550 {
     DWORD Address;
 };
 
-typedef BOOL (__stdcall *SymGetLineFromAddr_004de550)(HANDLE, DWORD, DWORD*, Line_004de550*);
+typedef BOOL (__stdcall *SymGetLineFromAddrProc)(HANDLE, DWORD, DWORD*, IMAGEHLP_LINE*);
 
 extern char g_lineProcessHandleRead;
 extern HANDLE g_lineProcessHandle;
@@ -3964,7 +3966,7 @@ extern HANDLE g_lineProcessHandle;
 // The original calls this out of line from 0x4dea00.
 #pragma auto_inline(off)
 // FUNCTION: 0x4de550
-char __cdecl GetLineFromAddress(DWORD addr, Line_004de550* out, DWORD* err)
+char __cdecl GetLineFromAddress(DWORD addr, IMAGEHLP_LINE* out, DWORD* err)
 {
     if (g_pfnSymGetLineFromAddr) {
         if (!(g_lineProcessHandleRead & 1)) {
@@ -3972,12 +3974,12 @@ char __cdecl GetLineFromAddress(DWORD addr, Line_004de550* out, DWORD* err)
             g_lineProcessHandle = GetCurrentProcess();
         }
         // Aggregate-initialised inside this block, not hoisted: keeps the zero stores here.
-        Line_004de550 line = { 0x14 };
+        IMAGEHLP_LINE line = { 0x14 };
         // No initialiser, zeroed after the Address store: fixes where the store lands.
         DWORD disp;
         line.Address = addr;
         disp = 0;
-        if (((SymGetLineFromAddr_004de550)g_pfnSymGetLineFromAddr)(g_lineProcessHandle, addr, &disp, &line)) {
+        if (((SymGetLineFromAddrProc)g_pfnSymGetLineFromAddr)(g_lineProcessHandle, addr, &disp, &line)) {
             *out = line;
             return 1;
         }
@@ -4153,8 +4155,10 @@ void __cdecl GetSourceFilePath(char* out, char* name)
 }
 #pragma auto_inline(on)
 
-// The imagehlp symbol record FormatCallStack fills in.
-struct Sym_004dea00 {
+// The imagehlp symbol record FormatCallStack fills in: IMAGEHLP_SYMBOL with its
+// name buffer inline (the SDK's Name is [1]; this one is 0x204 bytes, and
+// FormatCallStack sets MaxNameLength to 0x200), as SymGetSymFromAddr fills it.
+struct ImagehlpSymbolWithName {
     unsigned long SizeOfStruct;
     unsigned long Address;
     unsigned long Size;
@@ -4163,8 +4167,8 @@ struct Sym_004dea00 {
     char Name[0x204];
 };
 
-typedef BOOL (__stdcall *SymFn_004dea00)(HANDLE, unsigned long, int*, void*);
-typedef DWORD (__stdcall *UnDecFn_004dea00)(char*, char*, DWORD, DWORD);
+typedef BOOL (__stdcall *SymGetSymFromAddrProc)(HANDLE, unsigned long, int*, void*);
+typedef DWORD (__stdcall *UnDecorateSymbolNameProc)(char*, char*, DWORD, DWORD);
 
 // FUNCTION: 0x4dea00
 void __cdecl FormatCallStack(char* dest, int space, int per, int n, unsigned long* addrs)
@@ -4175,8 +4179,8 @@ void __cdecl FormatCallStack(char* dest, int space, int per, int n, unsigned lon
     int width;
     int disp;
     DWORD err;
-    Line_004de550 line;
-    Sym_004dea00 sym;
+    IMAGEHLP_LINE line;
+    ImagehlpSymbolWithName sym;
     char path[1000];
     char undec[2000];
 
@@ -4202,9 +4206,9 @@ void __cdecl FormatCallStack(char* dest, int space, int per, int n, unsigned lon
             sym.SizeOfStruct = 0x218;
             sym.MaxNameLength = 0x200;
             disp = 0;
-            if (((SymFn_004dea00)g_pfnSymGetSymFromAddr)(GetCurrentProcess(), addrs[i], &disp, &sym)) {
+            if (((SymGetSymFromAddrProc)g_pfnSymGetSymFromAddr)(GetCurrentProcess(), addrs[i], &disp, &sym)) {
                 char* str;
-                if (g_pfnUnDecorateSymbolName && ((UnDecFn_004dea00)g_pfnUnDecorateSymbolName)(sym.Name, undec, 0x7d0, 0) > 0) {
+                if (g_pfnUnDecorateSymbolName && ((UnDecorateSymbolNameProc)g_pfnUnDecorateSymbolName)(sym.Name, undec, 0x7d0, 0) > 0) {
                     str = undec;
                 } else {
                     if (strcmp(sym.Name, "??2@YAPAXI@Z") == 0 ||
