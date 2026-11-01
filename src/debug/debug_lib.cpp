@@ -1826,14 +1826,14 @@ public:
 // The game's file-record tree: a std::map keyed on the block address, as
 // hand-walked red-black tree code. The nodes are 0x40 bytes, carved from the
 // pool at g_blockMapFreeList; g_blockMapNil is its _Nil node.
-struct Less_004dd3d0 {
+struct BlockMapLess {
     bool operator()(const unsigned int& a, const unsigned int& b) const { return a < b; }
 };
 
 class BlockMap {
 public:
     BlockMapAllocator allocator;       // +0x0
-    Less_004dd3d0 key_compare;         // +0x1
+    BlockMapLess key_compare;          // +0x1
     BlockMapNode* head;                // +0x4
     unsigned char multi;             // +0x8
     int size;                          // +0xc
@@ -1965,7 +1965,7 @@ public:
     Iter_004dc620(FreeBlockNode* p) : ptr(p) {}
 };
 
-struct Less_004db000 {
+struct FreeBlockLess {
     bool operator()(const unsigned int& a, const unsigned int& b) const { return a < b; }
 };
 
@@ -1979,7 +1979,7 @@ struct InsertResult_004db450 { FreeBlockIter first; int second; };
 
 struct Frame_004db450 { InsertResult_004db450 r; Pair_004db450 p; };
 
-struct Kfn_004db000 {
+struct FreeBlockKfn {
     const unsigned int& operator()(const FreeBlock& x) const { return x.offset; }
 };
 
@@ -1988,7 +1988,7 @@ public:
     enum Redbl { _Red, _Black };
 
     FreeBlockAllocator allocator;      // +0x0
-    Less_004db000 key_compare;         // +0x1
+    FreeBlockLess key_compare;         // +0x1
     FreeBlockNode* head;               // +0x4
     bool multi;                        // +0x8
     unsigned int count;                // +0xc
@@ -1999,7 +1999,7 @@ public:
     static FreeBlockNode*& Right(FreeBlockNode* p) { return p->right; }
     static int& Color(FreeBlockNode* p) { return p->color; }
     static unsigned int* _Value(FreeBlockNode* p) { return (unsigned int*)&p->value; }
-    static const unsigned int& Key(FreeBlockNode* p) { return Kfn_004db000()(p->value); }
+    static const unsigned int& Key(FreeBlockNode* p) { return FreeBlockKfn()(p->value); }
 
     FreeBlockNode*& Root() { return Parent(head); }
     FreeBlockNode*& Lmost() { return Left(head); }
@@ -2549,7 +2549,7 @@ inline MapInsertResult FreeBlockMap::TreeInsert(const FreeBlock& V)
         std::_Lockit Lk;
         while (X != DAT_00528a54) {
             Y = X;
-            Ans = key_compare(Kfn_004db000()(V), Key(X));
+            Ans = key_compare(FreeBlockKfn()(V), Key(X));
             X = Ans ? Left(X) : Right(X);
         }
     }
@@ -2562,7 +2562,7 @@ inline MapInsertResult FreeBlockMap::TreeInsert(const FreeBlock& V)
         return MapInsertResult(Insert(X, Y, &V), true);
     else
         P.PrevNode();
-    if (key_compare(Key(P.Mynode()), Kfn_004db000()(V)))
+    if (key_compare(Key(P.Mynode()), FreeBlockKfn()(V)))
         return MapInsertResult(Insert(X, Y, &V), true);
     MapInsertResult res;
     res.Assign(P, false);
