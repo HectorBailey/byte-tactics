@@ -143,7 +143,7 @@ union ObjectPieceFlags {
 
 // One 0x36-byte piece record: the model node, its move, turn and transform
 // values, its point list, and its place in the piece tree.
-struct Piece_459c70 {
+struct ObjectPiece {
     Object3do* object;                 // +0x00
     int rot_x;                         // +0x04
     int rot_y;                         // +0x08
@@ -155,9 +155,9 @@ struct Piece_459c70 {
     Vec3* points;                      // +0x22
     short modified;                    // +0x26
     ObjectPieceFlags flags;           // +0x28
-    Piece_459c70* sibling;             // +0x2a
-    Piece_459c70* child;               // +0x2e
-    Piece_459c70* parent;              // +0x32
+    ObjectPiece* sibling;              // +0x2a
+    ObjectPiece* child;                // +0x2e
+    ObjectPiece* parent;               // +0x32
 };
 #pragma pack(pop)
 
@@ -289,8 +289,8 @@ struct UnitObjectState {
     GafFrame* bitmap;                  // +0x10
     GafFrame* shadow;                  // +0x14
     Vector3s pos;                      // +0x18
-    Piece_459c70* root;                // +0x1e
-    Piece_459c70 pieces[1];            // +0x22
+    ObjectPiece* root;                 // +0x1e
+    ObjectPiece pieces[1];             // +0x22
 };
 #pragma pack(pop)
 
@@ -347,11 +347,11 @@ void __stdcall CutFrameBelow(GafFrame* param_1, int value);
 void __stdcall ZeroFramePixels(GafFrame* image);
 void __stdcall RotateByAngles(Vec3* in, Vec3* out, short* angles);
 int __stdcall CountObjects(Object3do* obj);
-Piece_459c70* __stdcall AddStateEntries(UnitObjectState* state, Object3do* obj, Piece_459c70* parent);
-Piece_459c70* __stdcall LinkStateEntries(UnitObjectState* state, Object3do* obj, Piece_459c70* parent);
+ObjectPiece* __stdcall AddStateEntries(UnitObjectState* state, Object3do* obj, ObjectPiece* parent);
+ObjectPiece* __stdcall LinkStateEntries(UnitObjectState* state, Object3do* obj, ObjectPiece* parent);
 // Defined at the end of this file, out of address order.
-void __fastcall PoseModel(UnitObjectState* state, Piece_459c70* entry, int flag);
-void __fastcall TransformPieces(UnitObjectState* model, Piece_459c70* piece,
+void __fastcall PoseModel(UnitObjectState* state, ObjectPiece* entry, int flag);
+void __fastcall TransformPieces(UnitObjectState* model, ObjectPiece* piece,
                                 Vector3s* pos, Vec3* box, int force);
 
 // FUNCTION: 0x458160
@@ -397,7 +397,7 @@ void UnitTable::MeasureModel(int* width, int* height, int* originX, int* originY
     int maxY;
     minX = maxX = minY = maxY = 0;
     for (int i = model->count - 1; i >= 0; i--) {
-        Piece_459c70* piece = &model->pieces[i];
+        ObjectPiece* piece = &model->pieces[i];
         if (piece->flags.bits.visible) {
             Vec3* v = piece->points;
             for (int n = 0; n < piece->object->vertexCount; n++) {
@@ -601,7 +601,7 @@ void CMemoryCache::AddModelBounds(int* minX, int* maxX, int* minY, int* maxY,
     int hiX = 0;
     int loX = 0;
     for (int i = model->count - 1; i >= 0; i--) {
-        Piece_459c70* piece = &model->pieces[i];
+        ObjectPiece* piece = &model->pieces[i];
         if (piece->flags.bits.visible) {
             Vec3* v = piece->points;
             for (int n = 0; n < piece->object->vertexCount; n++) {
@@ -889,7 +889,7 @@ void CMemoryCache::MeasureShadow(int* width, int* height, int* originX, int* ori
     minX = maxX = minY = maxY = 0;
     *width = *height = *originX = *originY = 0;
     for (int i = model->count - 1; i >= 0; i--) {
-        Piece_459c70* piece = &model->pieces[i];
+        ObjectPiece* piece = &model->pieces[i];
         if (piece->flags.bits.visible) {
             Vec3* v = piece->points;
             for (int n = 0; n < piece->object->vertexCount; n++) {
@@ -927,7 +927,7 @@ void CMemoryCache::DrawShadowShape(GafFrame* view, UnitObjectState* model)
     int i = model->count - 1;
     if (i >= 0) {
         // Loop variable stepped beside the index: anchors on the element base.
-        Piece_459c70* piece = &model->pieces[i];
+        ObjectPiece* piece = &model->pieces[i];
         while (i >= 0) {
             if (piece->flags.word & 1) {
                 if (piece->flags.word & 2) {
@@ -1012,7 +1012,7 @@ UnitObjectState* __stdcall CreatePlayerObjectState(Object3do* obj, BuildList_004
         for (int j = i; j < state->count; j++) {
             if (_strcmpi(list->names[i], state->pieces[j].object->name) == 0) {
                 if (i != j) {
-                    Piece_459c70 temp = state->pieces[i];
+                    ObjectPiece temp = state->pieces[i];
                     state->pieces[i] = state->pieces[j];
                     state->pieces[j] = temp;
                 }
@@ -1043,7 +1043,7 @@ void __stdcall FreeObjectState(UnitObjectState* state)
 // DrawUnit, as the original does; the out-of-line body is the loop MSVC
 // makes of it.
 // FUNCTION: 0x45b030
-int __fastcall RestorePieceVertices(Piece_459c70* piece, int force)
+int __fastcall RestorePieceVertices(ObjectPiece* piece, int force)
 {
     int result = force;
     if (piece->modified == 0 || force) {
@@ -1160,10 +1160,10 @@ int __stdcall CountObjects(Object3do* edi)
 #pragma auto_inline(on)
 
 // FUNCTION: 0x45aec0
-Piece_459c70* __stdcall AddStateEntries(UnitObjectState* state, Object3do* obj,
-                                       Piece_459c70* parent)
+ObjectPiece* __stdcall AddStateEntries(UnitObjectState* state, Object3do* obj,
+                                       ObjectPiece* parent)
 {
-    Piece_459c70* e = &state->pieces[state->count];
+    ObjectPiece* e = &state->pieces[state->count];
     e->flags.word |= 2;
     e->object = obj;
     e->modified = 0;
@@ -1193,7 +1193,7 @@ Piece_459c70* __stdcall AddStateEntries(UnitObjectState* state, Object3do* obj,
 }
 
 // FUNCTION: 0x45af90
-Piece_459c70* __stdcall LinkStateEntries(UnitObjectState* state, Object3do* obj, Piece_459c70* parent)
+ObjectPiece* __stdcall LinkStateEntries(UnitObjectState* state, Object3do* obj, ObjectPiece* parent)
 {
     int i = state->count - 1;
     if (i >= 0) {
@@ -1204,7 +1204,7 @@ Piece_459c70* __stdcall LinkStateEntries(UnitObjectState* state, Object3do* obj,
             if (i < 0)
                 return 0;
         }
-        Piece_459c70* e = &state->pieces[i];
+        ObjectPiece* e = &state->pieces[i];
         if (e->object->sibling != 0) {
             e->sibling = LinkStateEntries(state, e->object->sibling, parent);
         } else {
@@ -1222,7 +1222,7 @@ Piece_459c70* __stdcall LinkStateEntries(UnitObjectState* state, Object3do* obj,
 }
 
 // FUNCTION: 0x45b150
-void __fastcall TransformPieces(UnitObjectState* owner, Piece_459c70* piece,
+void __fastcall TransformPieces(UnitObjectState* owner, ObjectPiece* piece,
                              Vector3s* angles, Vec3* delta, int deep)
 {
     for (;;) {
@@ -1269,7 +1269,7 @@ void __cdecl BlitSurface(Surface* dst, Surface* src, int x, int y);
 // defined at their addresses their bodies' symbol ids would move the register
 // windows the other functions match in (docs/c2-regalloc.md).
 // FUNCTION: 0x45b0a0
-void __fastcall PoseModel(UnitObjectState* model, Piece_459c70* piece, int force)
+void __fastcall PoseModel(UnitObjectState* model, ObjectPiece* piece, int force)
 {
     if (piece->child)
         PoseModel(model, piece->child, 1);
