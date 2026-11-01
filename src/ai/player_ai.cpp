@@ -124,5 +124,5 @@ void PlayerAI::RefreshUnitLists()
     int ix=(int)(sum.x*65536.0);
     int iy=(int)(sum.y*65536.0);
     int iz=(int)(sum.z*65536.0);
-    centre=Vec3_00409160(ix,iy,iz);
+    scoutAnchor=Vec3_00409160(ix,iy,iz);
 }

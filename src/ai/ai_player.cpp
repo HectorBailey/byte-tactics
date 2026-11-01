@@ -1843,7 +1843,7 @@ int __stdcall FindBuildPosition(int player, const Vec3* from, UnitDef* type, Vec
     PlayerAI* ai=g_playerAI[player];
     int maximum=g_game->mapWidthWorld > g_game->mapHeightWorld ? g_game->mapWidthWorld : g_game->mapHeightWorld;
     if (ai->searchRadius<maximum) ai->searchRadius+=160;
-    Vec3 pos=MoveTowards(from,(const Vec3*)&ai->centre,ai->searchRadius<<16);
+    Vec3 pos=MoveTowards(from,(const Vec3*)&ai->scoutAnchor,ai->searchRadius<<16);
     Point16 cell;
     int result;
     if (type->extractsMetal!=0.0f && g_game->mapInfo->threshold<RandomInt(255))

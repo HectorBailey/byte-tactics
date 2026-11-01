@@ -1,6 +1,6 @@
 // PlayerAI: the per-player AI state (g_playerAI[player], built by CreatePlayerAI
 // at 0x40b320): the owner and its index, the visible, known and factory unit
-// lists, the base centre, the placement cells, and the per-unit-type rating,
+// lists, the scout anchor, the placement cells, and the per-unit-type rating,
 // count and weight tables. The one declaration of the class, for ai_player.cpp
 // and the files that hold its other methods; the types behind the pointers
 // stay private to their own files.
@@ -78,8 +78,10 @@ public:
     UnitList_00409160 visible;         // +0x05
     UnitList_00409160 known;           // +0x15
     Group_00409160 factories;          // +0x25
-    Vec3_00409160 centre;              // +0x35
-    Vec3_00409160 pos_41;              // +0x41
+    // The scouts' anchor: the weighted centroid of the AI's units (Thaldren's
+    // nScoutAnchorX/Y/Z, read by UnitTbl_GetScoutAnchorPos).
+    Vec3_00409160 scoutAnchor;         // +0x35
+    Vec3_00409160 unused_41;           // +0x41, zeroed by the constructor, never read
     std::vector<ScoredCell> cells;     // +0x4d
     Pos_00409160 center;               // +0x5d
     std::vector<BuildScoreTriplet> buildScoreTriplets; // +0x65
