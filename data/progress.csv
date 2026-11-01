@@ -2577,12 +2577,12 @@ address,size,file,symbol,status,similarity
 0x4ba200,689,src/graphics/palette.cpp,?SetPaletteColors@@YGHPAEHH@Z,matched,100.0
 0x4ba4c0,207,src/graphics/palette.cpp,?GetPaletteColors@@YGHPAEHH@Z,matched,100.0
 0x4ba590,36,src/graphics/palette.cpp,?SetBrightness@@YGXM@Z,matched,100.0
-0x4ba5c0,36,src/graphics/palette.cpp,?AllocAlphaTable@@YGHH@Z,matched,100.0
+0x4ba5c0,36,src/graphics/palette.cpp,?AllocAlphaTable@@YGHPAUDisplayContext@@@Z,matched,100.0
 0x4ba5f0,22,src/graphics/palette.cpp,?FreeAlphaTable@@YGXPAUDisplayContext@@@Z,matched,100.0
 0x4ba610,36,src/graphics/palette.cpp,?AllocShadeTable@@YGHPAUDisplayContext@@@Z,matched,100.0
 0x4ba640,22,src/graphics/palette.cpp,?FreeShadeTable@@YGXPAUDisplayContext@@@Z,matched,100.0
 0x4ba660,36,src/graphics/palette.cpp,?AllocLightTable@@YGHPAUDisplayContext@@@Z,matched,100.0
-0x4ba690,22,src/graphics/palette.cpp,?FreeLightTable@@YGXH@Z,matched,100.0
+0x4ba690,22,src/graphics/palette.cpp,?FreeLightTable@@YGXPAUDisplayContext@@@Z,matched,100.0
 0x4ba6b0,36,src/graphics/palette.cpp,?AllocGrayTable@@YGHPAUDisplayContext@@@Z,matched,100.0
 0x4ba6e0,22,src/graphics/palette.cpp,?FreeGrayTable@@YGXPAUDisplayContext@@@Z,matched,100.0
 0x4ba700,36,src/graphics/palette.cpp,?AllocBlueTable@@YGHPAUDisplayContext@@@Z,matched,100.0
