@@ -21,6 +21,10 @@ public:
     bool LessThan(const NameKey& other) const;
 };
 
+// The name map's value_type and mapped text (debug_lib.cpp defines them).
+namespace std { template<class T1, class T2> struct pair; }
+struct NameMapText;
+
 struct NameMapNode {
     NameMapNode* left;                 // +0x0
     NameMapNode* parent;               // +0x4
@@ -38,7 +42,8 @@ public:
     bool operator!=(const NameMapIter& other) const { return !(*this == other); }
 };
 
-struct NameMapInsertResult {
+class NameMapInsertResult {
+public:
     NameMapIter first;
     bool second;
 
@@ -57,7 +62,8 @@ public:
     // Defined in debug_lib_4e2580.cpp, keyed by the name's C string.
     NameMapIter LowerBound(const char* const& key);
     NameMapIter Erase(NameMapIter it);
-    NameMapInsertResult InsertOrFind(const NameKey& key);
+    // Defined in debug_lib.cpp (0x4e2250), on the map's value_type.
+    NameMapInsertResult InsertOrFind(const std::pair<const NameKey, NameMapText>& v);
 };
 
 class NameTable : public NameMapTree {
@@ -87,6 +93,6 @@ void NameTable::Upsert(const NameKey& key)
         Erase(it);
     else
         changed = 1;
-    InsertOrFind(key);
+    InsertOrFind((const std::pair<const NameKey, NameMapText>&)key);
     LeaveCriticalSection(&lock->cs);
 }
