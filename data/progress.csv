@@ -1335,7 +1335,7 @@ address,size,file,symbol,status,similarity
 0x464b30,301,src/game/players_464290.cpp,?TransferMetal@@YGXEEMH@Z,matched,100.0
 0x464c60,305,src/game/players_464290.cpp,?TransferEnergy@@YGXEEMH@Z,matched,100.0
 0x464da0,55,src/game/players_464290.cpp,?RefreshOwnedUnitsLineOfSight@@YGXPAUPlayer@@@Z,matched,100.0
-0x464de0,143,src/game/players_464290.cpp,?ContinueWatchingCallback@@YGXPAUGadget@@@Z,matched,100.0
+0x464de0,143,src/game/players_464290.cpp,?ContinueWatchingCallback@@YGXPAUGui@@@Z,matched,100.0
 0x464e70,263,src/game/players_464290.cpp,?ShowContinueWatchingDialog@@YGXXZ,matched,100.0
 0x464f80,2392,src/game/players_464290.cpp,?UpdatePlayers@@YGXXZ,matched,100.0
 0x4658e0,469,src/game/players_4658e0.cpp,?IsFootprintVisible@@YGHPAUExploredMap@@HHHHF@Z,matched,100.0
