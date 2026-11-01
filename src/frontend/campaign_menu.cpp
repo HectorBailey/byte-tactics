@@ -206,7 +206,7 @@ void __stdcall SetOffscreenSurface(int param_1);
 void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y);
 void __stdcall FreeSurface(Surface* obj);
 int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, int autoHeight);
-void __stdcall ClearSelectedGadget(void* menu);
+void __stdcall ClearSelectedGadget(Gui* gui);
 void __stdcall SetCursorMode(int n);
 int __stdcall IsCurrentGadgetNamed(Gui* menu, char* name);
 int __stdcall BuildCampaignNameList(char** out, int side);
@@ -677,7 +677,7 @@ void __stdcall HandleSingleMenuClick(Gui* gadget)
             SetCursorMode(0x14);
         } else {
             OpenMessageBox(&g_game->gui, Translate("Please insert the Campaign CD (Disc 2) and try again"), 200, 1, 1);
-            ClearSelectedGadget((char*)&g_game->gui);
+            ClearSelectedGadget(&g_game->gui);
         }
         return;
     }
@@ -689,7 +689,7 @@ void __stdcall HandleSingleMenuClick(Gui* gadget)
             SetCursorMode(0x14);
         } else {
             OpenMessageBox(&g_game->gui, Translate("Please insert the Multiplayer CD (Disc 1) and try again"), 200, 1, 1);
-            ClearSelectedGadget((char*)&g_game->gui);
+            ClearSelectedGadget(&g_game->gui);
         }
         return;
     }
@@ -721,7 +721,7 @@ void __stdcall HandleSingleMenuClick(Gui* gadget)
             SetCursorMode(0x14);
         } else {
             OpenMessageBox(&g_game->gui, Translate("Please insert the Campaign CD (Disc 2) and try again"), 200, 1, 1);
-            ClearSelectedGadget((char*)&g_game->gui);
+            ClearSelectedGadget(&g_game->gui);
         }
         return;
     }

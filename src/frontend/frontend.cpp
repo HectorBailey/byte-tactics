@@ -226,7 +226,7 @@ void __cdecl GameFreeThunk(void* p);
 void __stdcall PlaySoundByName(char* name, int param_2);
 void __stdcall SetCursorMode(int param_1);
 int __stdcall IsCurrentGadgetNamed(Gui* gui, char* name);
-void __stdcall ClearSelectedGadget(void* param_1);
+void __stdcall ClearSelectedGadget(Gui* gui);
 char* __stdcall Translate(char* text);
 DisplayContext* __stdcall GetDisplay(void);
 void __stdcall CloseTopScreen(Gui* gui);

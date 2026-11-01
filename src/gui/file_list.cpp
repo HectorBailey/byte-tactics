@@ -91,7 +91,7 @@ int __stdcall IsGadgetNamed(Gadget* entries, int i, char* name);
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
 void __stdcall MarkChanged(Gui* obj);
-void __stdcall ClearSelectedGadget(void* obj);
+void __stdcall ClearSelectedGadget(Gui* gui);
 void __stdcall RefreshFileList(FileRequester* obj);
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, unsigned int flags);
 int __stdcall SelectFontForEntry(Gadget* entries, int index);
