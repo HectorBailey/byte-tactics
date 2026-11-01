@@ -16,18 +16,18 @@
 // symbol count (see its comment).
 #include <malloc.h>
 
-struct Pair_004db000 {
+struct FreeBlock {
     unsigned int offset;               // +0x0
     unsigned int length;               // +0x4
-    Pair_004db000() {}
-    Pair_004db000(unsigned int o, unsigned int l) : offset(o), length(l) {}
+    FreeBlock() {}
+    FreeBlock(unsigned int o, unsigned int l) : offset(o), length(l) {}
 };
 
-struct Node_004db000 {
-    Node_004db000* left;               // +0x0
-    Node_004db000* parent;             // +0x4
-    Node_004db000* right;              // +0x8
-    Pair_004db000 value;               // +0xc
+struct FreeBlockNode {
+    FreeBlockNode* left;               // +0x0
+    FreeBlockNode* parent;             // +0x4
+    FreeBlockNode* right;              // +0x8
+    FreeBlock value;                   // +0xc
     int color;                         // +0x14
 };
 
@@ -38,21 +38,21 @@ struct Node_004dd1b0 {
 
 Node_004dd1b0* __cdecl FindLeftmost(Node_004dd1b0* p);
 
-extern Node_004db000* DAT_00528a54;    // the tree's _Nil node
+extern FreeBlockNode* DAT_00528a54;    // the tree's _Nil node
 extern unsigned int g_lastAllocOffset;  // the last offset handed out
 extern unsigned int g_freeBlockWraps;  // how often the search wrapped
 
 // The tree's iterator: one pointer. PrevNode is its _Dec().
 class FreeBlockIter {
 public:
-    Node_004db000* ptr;
+    FreeBlockNode* ptr;
 
     FreeBlockIter() {}
-    FreeBlockIter(Node_004db000* q) : ptr(q) {}
+    FreeBlockIter(FreeBlockNode* q) : ptr(q) {}
     bool operator==(const FreeBlockIter& o) const { return ptr == o.ptr; }
     bool operator!=(const FreeBlockIter& o) const { return !(*this == o); }
-    Pair_004db000& operator*() const { return ptr->value; }
-    Pair_004db000* operator->() const { return &ptr->value; }
+    FreeBlock& operator*() const { return ptr->value; }
+    FreeBlock* operator->() const { return &ptr->value; }
     FreeBlockIter& operator++() { Inc(); return *this; }
     FreeBlockIter operator++(int) { FreeBlockIter tmp = *this; ++*this; return tmp; }
     FreeBlockIter& operator--() { PrevNode(); return *this; }
@@ -62,9 +62,9 @@ public:
     {
         std::_Lockit lock;
         if (ptr->right != DAT_00528a54)
-            ptr = (Node_004db000*)FindLeftmost((Node_004dd1b0*)ptr->right);
+            ptr = (FreeBlockNode*)FindLeftmost((Node_004dd1b0*)ptr->right);
         else {
-            Node_004db000* p;
+            FreeBlockNode* p;
             while (ptr == (p = ptr->parent)->right)
                 ptr = p;
             if (ptr->right != p)
@@ -113,7 +113,7 @@ struct Less_004db000 {
 class FreeBlockMap {
 public:
     Less_004db000 key_compare;         // +0x0
-    Node_004db000* head;               // +0x4
+    FreeBlockNode* head;               // +0x4
     unsigned char rebuild;             // +0x8
     unsigned int count;                // +0xc
     unsigned int total;                // +0x10
@@ -124,21 +124,21 @@ public:
     // The original tests this as a value (sete; neg; sbb; inc; test), which
     // MSVC 5 only does for a `!` applied to a bool-returning member.
     bool Neq(FreeBlockIter a, FreeBlockIter b) { return !(a == b); }
-    FreeBlockIter upper_bound(const Pair_004db000& k)
+    FreeBlockIter upper_bound(const FreeBlock& k)
     {
         return FreeBlockIter(LowerBound(k));
     }
 
-    Node_004db000* LowerBound(const Pair_004db000& k);
+    FreeBlockNode* LowerBound(const FreeBlock& k);
     FreeBlockIter Erase(FreeBlockIter it);
-    MapInsertResult InsertOrFindInline(const Pair_004db000& v);
+    MapInsertResult InsertOrFindInline(const FreeBlock& v);
     // Insert is an insert() that returns through a hidden pointer (its
     // return type has a constructor), so its result arrives in eax as the address
     // of the caller's temporary.
-    FreeBlockIter Insert(Node_004db000* x, Node_004db000* y,
-                                 Pair_004db000* v);
+    FreeBlockIter Insert(FreeBlockNode* x, FreeBlockNode* y,
+                                 FreeBlock* v);
 
-    void AddFreeBlock(Pair_004db000 p);
+    void AddFreeBlock(FreeBlock p);
     unsigned int TakeFreeBlock(unsigned int bytes);
 
     // 0x4db450: reserve more address space and add it to the free blocks.
@@ -166,7 +166,7 @@ public:
                                               PAGE_READWRITE);
         }
         total += len;
-        AddFreeBlock(Pair_004db000(base, len));
+        AddFreeBlock(FreeBlock(base, len));
         return true;
     }
 };
@@ -184,7 +184,7 @@ public:
 unsigned int FreeBlockMap::TakeFreeBlock(unsigned int bytes)
 {
     // Function scope, not inside the if: otherwise the recursive return becomes a jump.
-    Pair_004db000 k;
+    FreeBlock k;
     if (size() > 0) {
         k.offset = g_lastAllocOffset;
         k.length = 0;
@@ -219,10 +219,10 @@ unsigned int FreeBlockMap::TakeFreeBlock(unsigned int bytes)
                 else
                     mark = base;
                 if (mark > base)
-                    InsertOrFindInline(Pair_004db000(base, mark - base));
+                    InsertOrFindInline(FreeBlock(base, mark - base));
                 unsigned int end = mark + bytes;
                 if (end < base + len)
-                    InsertOrFindInline(Pair_004db000(end, base - mark + len - bytes));
+                    InsertOrFindInline(FreeBlock(end, base - mark + len - bytes));
                 g_lastAllocOffset = end;
                 return mark;
             }

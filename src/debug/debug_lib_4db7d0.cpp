@@ -104,7 +104,7 @@ struct Arena_004da9f0 {
 
 // 0x4db000: add a free block, merged with the free blocks on either side. The
 // original inlines this into FreeDebugBlock, so the definition stays here.
-inline void FreeBlockMap::AddFreeBlock(Pair_004db000 p)
+inline void FreeBlockMap::AddFreeBlock(FreeBlock p)
 {
     FreeBlockIter it;
     FreeBlockIter n = UpperBound(p.offset);
@@ -177,6 +177,6 @@ void __cdecl FreeDebugBlock(void* p, int flags)
     VirtualFree(p, commit, MEM_DECOMMIT);
     unsigned int reserve = RoundUpToDoublePage(size);
     FreeBlockMap* blocks = GetFreeBlockSet();
-    blocks->AddFreeBlock(Pair_004db000((unsigned int)p, reserve));
+    blocks->AddFreeBlock(FreeBlock((unsigned int)p, reserve));
     LeaveCriticalSection(lock);
 }

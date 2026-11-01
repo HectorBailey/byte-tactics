@@ -11,18 +11,18 @@
 #ifndef FREE_BLOCK_MAP_H
 #define FREE_BLOCK_MAP_H
 
-struct Pair_004db000 {
+struct FreeBlock {
     unsigned int offset;               // +0x0
     unsigned int length;               // +0x4
-    Pair_004db000() {}
-    Pair_004db000(unsigned int o, unsigned int l) : offset(o), length(l) {}
+    FreeBlock() {}
+    FreeBlock(unsigned int o, unsigned int l) : offset(o), length(l) {}
 };
 
-struct Node_004db000 {
-    Node_004db000* left;               // +0x0
-    Node_004db000* parent;             // +0x4
-    Node_004db000* right;              // +0x8
-    Pair_004db000 value;               // +0xc
+struct FreeBlockNode {
+    FreeBlockNode* left;               // +0x0
+    FreeBlockNode* parent;             // +0x4
+    FreeBlockNode* right;              // +0x8
+    FreeBlock value;                   // +0xc
     int color;                         // +0x14
 };
 
@@ -30,14 +30,14 @@ struct Node_004db000 {
 // and Next are its out-of-line operator--(int) and operator++(int).
 class FreeBlockIter {
 public:
-    Node_004db000* ptr;
+    FreeBlockNode* ptr;
 
     FreeBlockIter() {}
-    FreeBlockIter(Node_004db000* q) : ptr(q) {}
+    FreeBlockIter(FreeBlockNode* q) : ptr(q) {}
     bool operator==(const FreeBlockIter& o) const { return ptr == o.ptr; }
     bool operator!=(const FreeBlockIter& o) const { return !(*this == o); }
-    Pair_004db000& operator*() const { return ptr->value; }
-    Pair_004db000* operator->() const { return &ptr->value; }
+    FreeBlock& operator*() const { return ptr->value; }
+    FreeBlock* operator->() const { return &ptr->value; }
     FreeBlockIter Previous(int); // operator--(int)
     FreeBlockIter Next(int); // operator++(int)
 };
@@ -53,7 +53,7 @@ public:
 class FreeBlockMap {
 public:
     char unknown_0[4];     // +0x0
-    Node_004db000* head;   // +0x4
+    FreeBlockNode* head;   // +0x4
     unsigned char rebuild; // +0x8
     unsigned int count;    // +0xc
     unsigned int total;    // +0x10
@@ -64,10 +64,10 @@ public:
 
     FreeBlockIter Begin();
     FreeBlockIter EraseCopyIter(FreeBlockIter it);
-    MapInsertResult InsertOrFind(const Pair_004db000& v);
-    FreeBlockIter lower_bound(const Pair_004db000& k);
+    MapInsertResult InsertOrFind(const FreeBlock& v);
+    FreeBlockIter lower_bound(const FreeBlock& k);
     FreeBlockIter UpperBound(const unsigned int& k);
-    void AddFreeBlock(Pair_004db000 p);
+    void AddFreeBlock(FreeBlock p);
     unsigned int TakeFreeBlock(unsigned int bytes);
     bool GrowReservation(unsigned int size);
 };

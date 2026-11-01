@@ -1638,18 +1638,18 @@ public:
     void* Allocate(unsigned int n);
 };
 
-struct Pair_004db000 {
+struct FreeBlock {
     unsigned int offset;               // +0x0
     unsigned int length;               // +0x4
-    Pair_004db000() {}
-    Pair_004db000(unsigned int o, unsigned int l) : offset(o), length(l) {}
+    FreeBlock() {}
+    FreeBlock(unsigned int o, unsigned int l) : offset(o), length(l) {}
 };
 
-struct Node_004db000 {
-    Node_004db000* left;               // +0x0
-    Node_004db000* parent;             // +0x4
-    Node_004db000* right;              // +0x8
-    Pair_004db000 value;               // +0xc
+struct FreeBlockNode {
+    FreeBlockNode* left;               // +0x0
+    FreeBlockNode* parent;             // +0x4
+    FreeBlockNode* right;              // +0x8
+    FreeBlock value;                   // +0xc
     int color;                         // +0x14
 };
 
@@ -1661,7 +1661,7 @@ struct Node_004dd1b0 {
 Node_004dd1b0* __cdecl FindLeftmost(Node_004dd1b0* p);
 
 // The other out-of-line moves, on the shared node type.
-static inline Node_004db000* Max_004dd2a0(Node_004db000* p)
+static inline FreeBlockNode* Max_004dd2a0(FreeBlockNode* p)
 {
     std::_Lockit lock;
     while (p->right != DAT_00528a54) {
@@ -1670,7 +1670,7 @@ static inline Node_004db000* Max_004dd2a0(Node_004db000* p)
     return p;
 }
 
-static inline Node_004db000* Min(Node_004db000* p)
+static inline FreeBlockNode* Min(FreeBlockNode* p)
 {
     std::_Lockit lock;
     while (p->left != DAT_00528a54)
@@ -1678,7 +1678,7 @@ static inline Node_004db000* Min(Node_004db000* p)
     return p;
 }
 
-static inline Node_004db000* Min_004dbd80(Node_004db000* p)
+static inline FreeBlockNode* Min_004dbd80(FreeBlockNode* p)
 {
     std::_Lockit lock;
     while (p->left != DAT_00528a54) {
@@ -1687,7 +1687,7 @@ static inline Node_004db000* Min_004dbd80(Node_004db000* p)
     return p;
 }
 
-static inline Node_004db000* Max_004dbd80(Node_004db000* p)
+static inline FreeBlockNode* Max_004dbd80(FreeBlockNode* p)
 {
     std::_Lockit lock;
     while (p->right != DAT_00528a54) {
@@ -1700,20 +1700,20 @@ static inline Node_004db000* Max_004dbd80(Node_004db000* p)
 // and Previous are its out-of-line operator++(int) and operator--(int).
 class FreeBlockIter {
 public:
-    Node_004db000* ptr;
+    FreeBlockNode* ptr;
 
     FreeBlockIter() {}
-    FreeBlockIter(Node_004db000* q) : ptr(q) {}
+    FreeBlockIter(FreeBlockNode* q) : ptr(q) {}
     bool operator==(const FreeBlockIter& o) const { return ptr == o.ptr; }
     bool operator!=(const FreeBlockIter& o) const { return !(*this == o); }
-    Pair_004db000& operator*() const { return ptr->value; }
-    Pair_004db000* operator->() const { return &ptr->value; }
+    FreeBlock& operator*() const { return ptr->value; }
+    FreeBlock* operator->() const { return &ptr->value; }
     FreeBlockIter& operator++() { NextNode(); return *this; }
     FreeBlockIter operator++(int) { FreeBlockIter tmp = *this; ++*this; return tmp; }
     FreeBlockIter& operator--() { PrevNode(); return *this; }
     FreeBlockIter operator--(int) { FreeBlockIter tmp = *this; --*this; return tmp; }
-    Node_004db000* Mynode() const { return ptr; }
-    Node_004db000* _Mynode() const { return ptr; }
+    FreeBlockNode* Mynode() const { return ptr; }
+    FreeBlockNode* _Mynode() const { return ptr; }
     void PrevNode();
     void NextNode();                   // _Inc, out of line at 0x4dd340
     FreeBlockIter Previous(int); // operator--(int)
@@ -1725,7 +1725,7 @@ public:
         if (ptr->right != DAT_00528a54) {
             ptr = Min_004dbd80(ptr->right);
         } else {
-            Node_004db000* p;
+            FreeBlockNode* p;
             while (ptr == (p = ptr->parent)->right) {
                 ptr = p;
             }
@@ -1743,7 +1743,7 @@ public:
         } else if (ptr->left != DAT_00528a54) {
             ptr = Max_004dbd80(ptr->left);
         } else {
-            Node_004db000* p;
+            FreeBlockNode* p;
             while (ptr == (p = ptr->parent)->left) {
                 ptr = p;
             }
@@ -1784,7 +1784,7 @@ public:
 
     MapInsertResult() {}
     MapInsertResult(const FreeBlockIter& i, const unsigned char& b) : first(i), second(b) {}
-    MapInsertResult(const BlockMapIter& i, unsigned char b) : first((Node_004db000*)i.ptr), second(b) {}
+    MapInsertResult(const BlockMapIter& i, unsigned char b) : first((FreeBlockNode*)i.ptr), second(b) {}
     // The byte is copied before the iterator on purpose: 0x4dbbc0 needs the
     // byte in cl and the dword in edx at every return.
     inline MapInsertResult(const MapInsertResult& o)
@@ -1809,23 +1809,23 @@ static inline Node_004daa30* Max_004dd820(Node_004daa30* p)
 // std::_Tree<...>::upper_bound returns this; the out-of-line copy is 0x4dbd20.
 class Iter_004dbd20 {
 public:
-    Node_004db000* ptr;
+    FreeBlockNode* ptr;
     Iter_004dbd20() : ptr(0) {}
-    Iter_004dbd20(Node_004db000* p) : ptr(p) {}
+    Iter_004dbd20(FreeBlockNode* p) : ptr(p) {}
 };
 
 class Iter_004dbd00 {
 public:
-    Node_004db000* ptr;                // +0x0
+    FreeBlockNode* ptr;                // +0x0
 
     Iter_004dbd00() {}
-    Iter_004dbd00(Node_004db000* p) : ptr(p) {}
+    Iter_004dbd00(FreeBlockNode* p) : ptr(p) {}
 };
 
 class ConstIter_004dbd00 : public Iter_004dbd00 {
 public:
     ConstIter_004dbd00() {}
-    ConstIter_004dbd00(Node_004db000* p) : Iter_004dbd00(p) {}
+    ConstIter_004dbd00(FreeBlockNode* p) : Iter_004dbd00(p) {}
     ConstIter_004dbd00(const Iter_004dbd00& x) : Iter_004dbd00(x) {}
 };
 
@@ -1966,9 +1966,9 @@ public:
 
 class Iter_004dc620 {
 public:
-    Node_004db000* ptr;
+    FreeBlockNode* ptr;
     Iter_004dc620() : ptr(0) {}
-    Iter_004dc620(Node_004db000* p) : ptr(p) {}
+    Iter_004dc620(FreeBlockNode* p) : ptr(p) {}
 };
 
 struct Less_004db000 {
@@ -1986,7 +1986,7 @@ struct InsertResult_004db450 { FreeBlockIter first; int second; };
 struct Frame_004db450 { InsertResult_004db450 r; Pair_004db450 p; };
 
 struct Kfn_004db000 {
-    const unsigned int& operator()(const Pair_004db000& x) const { return x.offset; }
+    const unsigned int& operator()(const FreeBlock& x) const { return x.offset; }
 };
 
 class FreeBlockMap {
@@ -1995,23 +1995,23 @@ public:
 
     FreeBlockAllocator allocator;      // +0x0
     Less_004db000 key_compare;         // +0x1
-    Node_004db000* head;               // +0x4
+    FreeBlockNode* head;               // +0x4
     bool multi;                        // +0x8
     unsigned int count;                // +0xc
     unsigned int total;                // +0x10
 
-    static Node_004db000*& Left(Node_004db000* p) { return p->left; }
-    static Node_004db000*& Parent(Node_004db000* p) { return p->parent; }
-    static Node_004db000*& Right(Node_004db000* p) { return p->right; }
-    static int& Color(Node_004db000* p) { return p->color; }
-    static unsigned int* _Value(Node_004db000* p) { return (unsigned int*)&p->value; }
-    static const unsigned int& Key(Node_004db000* p) { return Kfn_004db000()(p->value); }
+    static FreeBlockNode*& Left(FreeBlockNode* p) { return p->left; }
+    static FreeBlockNode*& Parent(FreeBlockNode* p) { return p->parent; }
+    static FreeBlockNode*& Right(FreeBlockNode* p) { return p->right; }
+    static int& Color(FreeBlockNode* p) { return p->color; }
+    static unsigned int* _Value(FreeBlockNode* p) { return (unsigned int*)&p->value; }
+    static const unsigned int& Key(FreeBlockNode* p) { return Kfn_004db000()(p->value); }
 
-    Node_004db000*& Root() { return Parent(head); }
-    Node_004db000*& Lmost() { return Left(head); }
-    Node_004db000*& Rmost() { return Right(head); }
+    FreeBlockNode*& Root() { return Parent(head); }
+    FreeBlockNode*& Lmost() { return Left(head); }
+    FreeBlockNode*& Rmost() { return Right(head); }
 
-    static Node_004db000* Min(Node_004db000* p)
+    static FreeBlockNode* Min(FreeBlockNode* p)
     {
         std::_Lockit _Lk;
         while (Left(p) != DAT_00528a54)
@@ -2019,7 +2019,7 @@ public:
         return p;
     }
 
-    static Node_004db000* Max(Node_004db000* p)
+    static FreeBlockNode* Max(FreeBlockNode* p)
     {
         std::_Lockit _Lk;
         while (Right(p) != DAT_00528a54)
@@ -2027,10 +2027,10 @@ public:
         return p;
     }
 
-    void Lrotate(Node_004db000* x)
+    void Lrotate(FreeBlockNode* x)
     {
         std::_Lockit _Lk;
-        Node_004db000* y = Right(x);
+        FreeBlockNode* y = Right(x);
         Right(x) = Left(y);
         if (Left(y) != DAT_00528a54)
             Parent(Left(y)) = x;
@@ -2045,10 +2045,10 @@ public:
         Parent(x) = y;
     }
 
-    void Rrotate(Node_004db000* x)
+    void Rrotate(FreeBlockNode* x)
     {
         std::_Lockit _Lk;
-        Node_004db000* y = Left(x);
+        FreeBlockNode* y = Left(x);
         Left(x) = Right(y);
         if (Right(y) != DAT_00528a54)
             Parent(Right(y)) = x;
@@ -2065,7 +2065,7 @@ public:
 
     static void Destval(unsigned int*) { }
 
-    static void Freenode(Node_004db000* p)
+    static void Freenode(FreeBlockNode* p)
     {
         if (p != 0) {
             *(void**)p = g_freeBlockFreeList;
@@ -2082,17 +2082,17 @@ public:
     // The original tests this as a value (sete; neg; sbb; inc; test), which
     // MSVC 5 only does for a `!` applied to a bool-returning member.
     bool Neq(FreeBlockIter a, FreeBlockIter b) { return !(a == b); }
-    FreeBlockIter upper_bound(const Pair_004db000& k)
+    FreeBlockIter upper_bound(const FreeBlock& k)
     {
         return FreeBlockIter(LowerBound(k));
     }
 
     // Inlined std::_Tree<...>::_Ubound(const _K&): its own lock scope.
-    Node_004db000* Ubound(const unsigned int& kv)
+    FreeBlockNode* Ubound(const unsigned int& kv)
     {
         std::_Lockit lock;
-        Node_004db000* x = head->parent;
-        Node_004db000* y = head;
+        FreeBlockNode* x = head->parent;
+        FreeBlockNode* y = head;
         while (x != DAT_00528a54)
             if (key_compare(kv, x->value.offset))
                 y = x, x = x->left;
@@ -2133,7 +2133,7 @@ public:
     InsertOrFindInline(&f.r, &f.p);
     }
 
-    void AddFreeBlock(Pair_004db000 p);
+    void AddFreeBlock(FreeBlock p);
     unsigned int TakeFreeBlock(unsigned int bytes);
     bool GrowReservation(unsigned int size);
 
@@ -2162,7 +2162,7 @@ public:
                                               PAGE_READWRITE);
         }
         total += len;
-        AddFreeBlock(Pair_004db000(base, len));
+        AddFreeBlock(FreeBlock(base, len));
         return true;
     }
 
@@ -2171,12 +2171,12 @@ public:
     // A method that ignores `this`: its caller (0x4dbec0, an inlined tree insert
     // after its std::_Lockit) sets ecx to the tree. Shaped like
     // std::_Tree<...>::_Buynode(parent, colour) with a pooled allocator.
-    Node_004db000* CreateNode(int parent, int color);
-    MapInsertResult TreeInsert(const Pair_004db000& V);
-    MapInsertResult InsertOrFind(const Pair_004db000& V);
-    MapInsertResult InsertOrFindInline(Pair_004db000* p);
+    FreeBlockNode* CreateNode(int parent, int color);
+    MapInsertResult TreeInsert(const FreeBlock& V);
+    MapInsertResult InsertOrFind(const FreeBlock& V);
+    MapInsertResult InsertOrFindInline(FreeBlock* p);
     void InsertOrFindInline(InsertResult_004db450* it, Pair_004db450* p);
-    FreeBlockIter Insert(Node_004db000* x, Node_004db000* y, const Pair_004db000* v);
+    FreeBlockIter Insert(FreeBlockNode* x, FreeBlockNode* y, const FreeBlock* v);
     FreeBlockIter Erase(FreeBlockIter _P);
     void Erase(FreeBlockIter* out, FreeBlockIter it);
     Iter_004dbd00 Erase(Iter_004dbd00 it);
@@ -2185,10 +2185,10 @@ public:
     Iter_004dc620 lower_bound(const unsigned int& kv);
     void lower_bound(FreeBlockIter* out, const unsigned int& kv);
     // Takes the pair; the out-of-line function reads only its first dword.
-    Node_004db000* LowerBound(const Pair_004db000& k);
-    Node_004db000* LowerBound(const unsigned int& kv);
-    void RotateLeft(Node_004db000* x);
-    void RotateRight(Node_004db000* x);
+    FreeBlockNode* LowerBound(const FreeBlock& k);
+    FreeBlockNode* LowerBound(const unsigned int& kv);
+    void RotateLeft(FreeBlockNode* x);
+    void RotateRight(FreeBlockNode* x);
 };
 
 FreeBlockMap* GetFreeBlockSet();
@@ -2348,7 +2348,7 @@ char __cdecl DescribeFreedBlocks(unsigned int address, char* buf, unsigned int n
 // ---- from src/debug/free_block_map.cpp --------------------
 
 // FUNCTION: 0x4db000
-void FreeBlockMap::AddFreeBlock(Pair_004db000 p)
+void FreeBlockMap::AddFreeBlock(FreeBlock p)
 {
     FreeBlockIter it;
     FreeBlockIter it2;
@@ -2370,7 +2370,7 @@ void FreeBlockMap::AddFreeBlock(Pair_004db000 p)
         }
     }
     if (Neq(it, end())) {
-        Node_004db000* m = it.ptr;
+        FreeBlockNode* m = it.ptr;
         if (m->value.length + m->value.offset == p.offset) {
             p.length = p.length + m->value.length;
             p.offset = m->value.offset;
@@ -2378,9 +2378,9 @@ void FreeBlockMap::AddFreeBlock(Pair_004db000 p)
         }
     }
 
-    Node_004db000* y = head;
+    FreeBlockNode* y = head;
     bool less = true;
-    Node_004db000* x = y->parent;
+    FreeBlockNode* x = y->parent;
     {
         std::_Lockit lock;
         while (x != DAT_00528a54) {
@@ -2546,10 +2546,10 @@ void __cdecl RoundRangeToPages(unsigned int* start, unsigned int* end)
 
 // ---- from src/debug/debug_lib_4dbbc0.cpp --------------------
 
-inline MapInsertResult FreeBlockMap::TreeInsert(const Pair_004db000& V)
+inline MapInsertResult FreeBlockMap::TreeInsert(const FreeBlock& V)
 {
-    Node_004db000* X = Root();
-    Node_004db000* Y = head;
+    FreeBlockNode* X = Root();
+    FreeBlockNode* Y = head;
     bool Ans = true;
     {
         std::_Lockit Lk;
@@ -2576,7 +2576,7 @@ inline MapInsertResult FreeBlockMap::TreeInsert(const Pair_004db000& V)
 }
 
 // FUNCTION: 0x4dbbc0
-MapInsertResult FreeBlockMap::InsertOrFind(const Pair_004db000& V)
+MapInsertResult FreeBlockMap::InsertOrFind(const FreeBlock& V)
 {
     MapInsertResult ans = TreeInsert(V);
     return MapInsertResult(ans.first, ans.second);
@@ -2590,17 +2590,17 @@ MapInsertResult FreeBlockMap::InsertOrFind(const Pair_004db000& V)
 // the node is linked in. Then the red-black fixup walks up from the new node
 // with a cursor z, colouring and rotating until z's parent is black or the root
 // is reached, and finally blackens the root.
-// FUNCTION: 0x4dce60 ?Insert@FreeBlockMap@@QAE?AVFreeBlockIter@@PAUNode_004db000@@0PBUPair_004db000@@@Z
-FreeBlockIter FreeBlockMap::Insert(Node_004db000* x, Node_004db000* y,
-                                         const Pair_004db000* v)
+// FUNCTION: 0x4dce60 ?Insert@FreeBlockMap@@QAE?AVFreeBlockIter@@PAUFreeBlockNode@@0PBUFreeBlock@@@Z
+FreeBlockIter FreeBlockMap::Insert(FreeBlockNode* x, FreeBlockNode* y,
+                                         const FreeBlock* v)
 {
     std::_Lockit lock;
-    Node_004db000* p = (Node_004db000*)allocator.Allocate(0x18);
+    FreeBlockNode* p = (FreeBlockNode*)allocator.Allocate(0x18);
     p->parent = y;
     p->color = 0;                      // red
-    p->left = (Node_004db000*)DAT_00528a54;
-    p->right = (Node_004db000*)DAT_00528a54;
-    new (&p->value) Pair_004db000(*v);
+    p->left = (FreeBlockNode*)DAT_00528a54;
+    p->right = (FreeBlockNode*)DAT_00528a54;
+    new (&p->value) FreeBlock(*v);
     ++count;
 
     // A positive disjunction through the bool comparator: keeps the left-child block as the then-part.
@@ -2619,14 +2619,14 @@ FreeBlockIter FreeBlockMap::Insert(Node_004db000* x, Node_004db000* y,
             head->right = p;
     }
 
-    Node_004db000* z = p;
+    FreeBlockNode* z = p;
     // Explicit break, and z->parent->... re-read from the cursor: parent/grandparent locals cost a register.
     while (z != head->parent) {
         if (z->parent->color != 0)
             break;
 
         if (z->parent == z->parent->parent->left) {
-            Node_004db000* u = z->parent->parent->right;
+            FreeBlockNode* u = z->parent->parent->right;
             if (u->color == 0) {
                 // Red uncle: recolour and carry on two levels up.
                 z->parent->color = 1;
@@ -2643,7 +2643,7 @@ FreeBlockIter FreeBlockMap::Insert(Node_004db000* x, Node_004db000* y,
                 Rrotate(z->parent->parent);
             }
         } else {
-            Node_004db000* u = z->parent->parent->left;
+            FreeBlockNode* u = z->parent->parent->left;
             if (u->color == 0) {
                 z->parent->color = 1;
                 u->color = 1;
@@ -2715,13 +2715,13 @@ int* FreeBlockMap::Begin(int* out)
 // ---- from src/debug/debug_lib_4dbec0.cpp --------------------
 
 // FUNCTION: 0x4dbec0
-MapInsertResult FreeBlockMap::InsertOrFindInline(Pair_004db000* p)
+MapInsertResult FreeBlockMap::InsertOrFindInline(FreeBlock* p)
 {
     // The pair is returned by value (no out parameter) and _Insert returns its
     // iterator by value too; a &p result slot would make p address-taken.
-    Node_004db000* y = head;
+    FreeBlockNode* y = head;
     bool less = true;
-    Node_004db000* x = y->parent;
+    FreeBlockNode* x = y->parent;
     FreeBlockIter it2;
     FreeBlockIter it;
     {
@@ -2736,10 +2736,10 @@ MapInsertResult FreeBlockMap::InsertOrFindInline(Pair_004db000* p)
         {
             std::_Lockit lock;
             it = FreeBlockIter(CreateNode((int)y, 0));
-            Node_004db000* z = it.ptr;
-            z->left = (Node_004db000*)DAT_00528a54;
-            z->right = (Node_004db000*)DAT_00528a54;
-            new (&z->value) Pair_004db000(*p);
+            FreeBlockNode* z = it.ptr;
+            z->left = (FreeBlockNode*)DAT_00528a54;
+            z->right = (FreeBlockNode*)DAT_00528a54;
+            new (&z->value) FreeBlock(*p);
             count++;
             if (y == head || x != DAT_00528a54 || key_compare(p->offset, y->value.offset)) {
                 y->left = z;
@@ -2755,9 +2755,9 @@ MapInsertResult FreeBlockMap::InsertOrFindInline(Pair_004db000* p)
                     head->right = z;
                 }
             }
-            for (Node_004db000* q = z; q != head->parent && q->parent->color == 0; ) {
+            for (FreeBlockNode* q = z; q != head->parent && q->parent->color == 0; ) {
                 if (q->parent == q->parent->parent->left) {
-                    Node_004db000* w = q->parent->parent->right;
+                    FreeBlockNode* w = q->parent->parent->right;
                     if (w->color == 0) {
                         q->parent->color = 1;
                         w->color = 1;
@@ -2773,7 +2773,7 @@ MapInsertResult FreeBlockMap::InsertOrFindInline(Pair_004db000* p)
                         RotateRight(q->parent->parent);
                     }
                 } else {
-                    Node_004db000* w = q->parent->parent->left;
+                    FreeBlockNode* w = q->parent->parent->left;
                     if (w->color == 0) {
                         q->parent->color = 1;
                         w->color = 1;
@@ -2810,9 +2810,9 @@ MapInsertResult FreeBlockMap::InsertOrFindInline(Pair_004db000* p)
 // FUNCTION: 0x4dc130 ?Erase@FreeBlockMap@@QAE?AVFreeBlockIter@@V2@@Z
 FreeBlockIter FreeBlockMap::Erase(FreeBlockIter _P)
 {
-    Node_004db000* _X;
-    Node_004db000* _Y = (_P++)._Mynode();
-    Node_004db000* _Z = _Y;
+    FreeBlockNode* _X;
+    FreeBlockNode* _Y = (_P++)._Mynode();
+    FreeBlockNode* _Z = _Y;
     std::_Lockit _Lk;
     if (Left(_Y) == DAT_00528a54)
         _X = Right(_Y);
@@ -2864,7 +2864,7 @@ FreeBlockIter FreeBlockMap::Erase(FreeBlockIter _P)
     if (Color(_Y) == _Black) {
         while (_X != Root() && Color(_X) == _Black)
             if (_X == Left(Parent(_X))) {
-                Node_004db000* _W = Right(Parent(_X));
+                FreeBlockNode* _W = Right(Parent(_X));
                 if (Color(_W) == _Red) {
                     Color(_W) = _Black;
                     Color(Parent(_X)) = _Red;
@@ -2888,7 +2888,7 @@ FreeBlockIter FreeBlockMap::Erase(FreeBlockIter _P)
                     break;
                 }
             } else {
-                Node_004db000* _W = Left(Parent(_X));
+                FreeBlockNode* _W = Left(Parent(_X));
                 if (Color(_W) == _Red) {
                     Color(_W) = _Black;
                     Color(Parent(_X)) = _Red;
@@ -2928,7 +2928,7 @@ Iter_004dc620 FreeBlockMap::lower_bound(const unsigned int& kv)
     Iter_004dc620 y;
     {
         std::_Lockit lock;
-        Node_004db000* x = head->parent;
+        FreeBlockNode* x = head->parent;
         y.ptr = head;
         while (x != DAT_00528a54)
             if (key_compare(kv, x->value.offset))
@@ -3180,10 +3180,10 @@ BlockMapIter BlockMap::Find(const unsigned int& key)
 // ---- from src/debug/debug_lib_4dd150.cpp --------------------
 
 // FUNCTION: 0x4dd150
-void FreeBlockMap::RotateLeft(Node_004db000* x)
+void FreeBlockMap::RotateLeft(FreeBlockNode* x)
 {
     std::_Lockit lock;
-    Node_004db000* y = x->right;
+    FreeBlockNode* y = x->right;
     x->right = y->left;
     if (y->left != DAT_00528a54)
         y->left->parent = x;
@@ -3216,10 +3216,10 @@ Node_004dd1b0* __cdecl FindLeftmost(Node_004dd1b0* p)
 // ---- from src/debug/debug_lib_4dd1f0.cpp --------------------
 
 // FUNCTION: 0x4dd1f0
-void FreeBlockMap::RotateRight(Node_004db000* x)
+void FreeBlockMap::RotateRight(FreeBlockNode* x)
 {
     std::_Lockit lock;
-    Node_004db000* y = x->left;
+    FreeBlockNode* y = x->left;
     x->left = y->right;
     if (y->right != DAT_00528a54)
         y->right->parent = x;
@@ -3237,11 +3237,11 @@ void FreeBlockMap::RotateRight(Node_004db000* x)
 // ---- from src/debug/debug_lib_4dd250.cpp --------------------
 
 // FUNCTION: 0x4dd250
-Node_004db000* FreeBlockMap::LowerBound(const unsigned int& kv)
+FreeBlockNode* FreeBlockMap::LowerBound(const unsigned int& kv)
 {
     std::_Lockit lock;
-    Node_004db000* x = head->parent;
-    Node_004db000* y = head;
+    FreeBlockNode* x = head->parent;
+    FreeBlockNode* y = head;
     while (x != DAT_00528a54)
         if (key_compare(kv, x->value.offset))
             y = x, x = x->left;
@@ -3264,7 +3264,7 @@ void FreeBlockIter::PrevNode()
     } else if (ptr->left != DAT_00528a54) {
         ptr = Max_004dd2a0(ptr->left);
     } else {
-        Node_004db000* p;
+        FreeBlockNode* p;
         while (ptr == (p = ptr->parent)->left) {
             ptr = p;
         }
@@ -3282,7 +3282,7 @@ void FreeBlockIter::NextNode()
     if (ptr->right != DAT_00528a54)
         ptr = Min(ptr->right);
     else {
-        Node_004db000* p;
+        FreeBlockNode* p;
         while (ptr == (p = ptr->parent)->right)
             ptr = p;
         if (ptr->right != p)
@@ -3464,7 +3464,7 @@ MapInsertResult* MapInsertResult::Assign(int* iter, unsigned char* inserted)
     int* ecx = iter;
     int edx = *ecx;
     unsigned char* ecx2 = (unsigned char*)inserted;
-    eax->first.ptr = (Node_004db000*)edx;
+    eax->first.ptr = (FreeBlockNode*)edx;
     unsigned char dl = *ecx2;
     eax->second = dl;
     return eax;
@@ -3484,12 +3484,12 @@ MapInsertResult* MapInsertResult::Assign(int* iter, unsigned char* inserted)
 extern void* g_freeBlockFreeList;      // free list
 extern void (*g_outOfMemoryHandler)();  // out-of-memory handler
 
-static inline Node_004db000* AllocNode_004db000()
+static inline FreeBlockNode* AllocFreeBlockNode()
 {
     if (g_freeBlockFreeList == 0) {
-        Node_004db000* block;
+        FreeBlockNode* block;
         do {
-            block = (Node_004db000*)GlobalAlloc(0, 0x2000);
+            block = (FreeBlockNode*)GlobalAlloc(0, 0x2000);
             if (block == 0 && g_outOfMemoryHandler != 0) {
                 g_outOfMemoryHandler();
             }
@@ -3497,7 +3497,7 @@ static inline Node_004db000* AllocNode_004db000()
         if (block == 0) {
             return 0;
         }
-        Node_004db000* head = (Node_004db000*)g_freeBlockFreeList;
+        FreeBlockNode* head = (FreeBlockNode*)g_freeBlockFreeList;
         for (int i = 0; i < 0x155; i++) {
             block->left = head;
             head = block;
@@ -3505,7 +3505,7 @@ static inline Node_004db000* AllocNode_004db000()
         }
         g_freeBlockFreeList = head;
     }
-    Node_004db000* node = (Node_004db000*)g_freeBlockFreeList;
+    FreeBlockNode* node = (FreeBlockNode*)g_freeBlockFreeList;
     g_freeBlockFreeList = node->left;
     return node;
 }
@@ -3517,10 +3517,10 @@ static inline Node_004db000* AllocNode_004db000()
 // The original calls this out of line from the file-record tree insert.
 #pragma auto_inline(off)
 // FUNCTION: 0x4ddc00
-Node_004db000* FreeBlockMap::CreateNode(int parent, int color)
+FreeBlockNode* FreeBlockMap::CreateNode(int parent, int color)
 {
-    Node_004db000* node = AllocNode_004db000();
-    node->parent = (Node_004db000*)parent;
+    FreeBlockNode* node = AllocFreeBlockNode();
+    node->parent = (FreeBlockNode*)parent;
     node->color = color;
     return node;
 }
