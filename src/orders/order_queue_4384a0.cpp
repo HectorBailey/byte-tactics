@@ -96,27 +96,6 @@ struct SaveDesc_0043a1f0 {             // the 0x3a-byte snapshot, read and writt
 
 #include "air_maneuver_order.h"
 
-// Unused here: forward declarations of real functions; their symbol ids keep
-// ComputeReclaimDamagePulse (0x438650) matching (docs/c2-regalloc.md).
-void UpdateMouseScroll();
-void UpdateEdgeScroll();
-void CenterCameraOnRadarClick();
-void CenterCameraOnStartPosition();
-void RegisterDataArchives();
-int GetCdPathMismatch();
-void CreateGameObject();
-void InitMissionStatus();
-void SetUpEndMissionScreen();
-void StartScreenFade();
-void StepScreenFade();
-void BeginMouseScroll();
-void ScheduleFadeTick();
-int IsFadeDone();
-void StepPaletteFade();
-int DrawEndGameFrame();
-int AreStatBarsComplete();
-void ClearPictureCache();
-
 class Slot_0043a1f0 {
 public:
     virtual void Slot0();

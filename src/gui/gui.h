@@ -5,13 +5,14 @@
 // declaration of the type, for the files that define or read it.
 //
 // The members are plain data. The only types named are Layer, Gaf (a font
-// table: the GAF file LoadGafIntoSlot loads) and MouseEvent (mouse_event.h:
-// the last mouse event, and the one a knob drag began with). Every type or
-// forward declaration the header adds moves the symbol ids of the small views
-// it replaces (docs/c2-regalloc.md), and those views match in narrow windows:
-// the files that broke when Gaf and MouseEvent came in each changed one filler
-// block. The files that read the records behind the pointer members (the font
-// tables, the cursor animation) keep their own view of them.
+// table: the GAF file LoadGafIntoSlot loads), Surface (the fallback draw
+// surface) and MouseEvent (mouse_event.h: the last mouse event, and the one a
+// knob drag began with). Every type or forward declaration the header adds
+// moves the symbol ids of the small views it replaces (docs/c2-regalloc.md),
+// and those views match in narrow windows: the files that broke when Gaf,
+// MouseEvent and Surface came in each changed one filler block. The files
+// that read the records behind the pointer members (the font tables, the
+// cursor animation) keep their own view of them.
 #ifndef GUI_H
 #define GUI_H
 
@@ -20,6 +21,7 @@
 #pragma pack(push, 1)
 
 struct Gaf;
+struct Surface;
 struct Layer;
 
 struct Gui {
@@ -67,7 +69,7 @@ struct Gui {
     int pathsReady;                     // +0xcc6
     int changed;                        // +0xcca
     int clickStatusCache;               // +0xcce
-    void* fallback;                     // +0xcd2, the fallback draw surface
+    Surface* fallback;                  // +0xcd2, the fallback draw surface
     char cachedBgName[0x20];            // +0xcd6, the cached background bitmap name
 };
 

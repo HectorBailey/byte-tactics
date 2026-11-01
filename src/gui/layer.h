@@ -3,11 +3,13 @@
 // close and key handlers, the flags and focus state, the key state and the
 // background surface. The one declaration of the record for the files that
 // open or walk a screen; the types behind the pointers stay private to their
-// own files. Nothing is included: one forward declaration.
+// own files, except the draw surface, which is graphics/surface.h's Surface.
+// Nothing is included: two forward declarations.
 #ifndef LAYER_H
 #define LAYER_H
 
 struct Gadget;
+struct Surface;
 
 #pragma pack(push, 1)
 
@@ -21,7 +23,7 @@ struct Layer {
     int keyboardInput;                     // +0x18
     void (__stdcall* cb1c)();              // +0x1c
     int current;                           // +0x20, the focused entry, -1 for none
-    void* surface;                         // +0x24, the screen's draw surface
+    Surface* surface;                      // +0x24, the screen's draw surface
     char text[0xe];                        // +0x28, the key state
     char lastKey;                          // +0x36
     int clickMode;                         // +0x37
