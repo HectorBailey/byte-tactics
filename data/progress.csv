@@ -2225,7 +2225,7 @@ address,size,file,symbol,status,similarity
 0x4a4170,714,src/gui/gui.cpp,?HandleSliderInput@@YGXPAUGui@@H@Z,matched,100.0
 0x4a4440,477,src/gui/gui.cpp,?HandleLabelInput@@YGHPAUGui@@HD@Z,matched,100.0
 0x4a4620,57,src/gui/gui.cpp,?ScheduleGadgetEndTick@@YGXPAUGui@@H@Z,matched,100.0
-0x4a4660,556,src/gui/gui.cpp,?DrawProgressBarGadget@@YGXPAUDialog_4a4660@@H@Z,matched,100.0
+0x4a4660,556,src/gui/gui.cpp,?DrawProgressBarGadget@@YGXPAUGui@@H@Z,matched,100.0
 0x4a4890,158,src/gui/gui.cpp,?TickProgressBar@@YGXPAUGui@@H@Z,matched,100.0
 0x4a4930,65,src/gui/gui.cpp,?ResetProgressBar@@YGXPAUGameState_4a4930@@H@Z,matched,100.0
 0x4a4980,462,src/gui/gui.cpp,?DrawHotspot@@YGXPAUGui@@H@Z,matched,100.0
