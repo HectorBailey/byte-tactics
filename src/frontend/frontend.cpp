@@ -96,9 +96,9 @@ struct Entry_428b60 {
 };
 
 // One picture-cache record (0x28 bytes each) of g_pictureCache.
-struct Entry_00428730 {
+struct PictureCacheEntry {
     void* surface;                     // +0x00
-    int* data;                         // +0x04
+    int* palette;                      // +0x04, the picture's palette (Thaldren's pPalette)
     char name[0x20];                   // +0x08
 };
 
@@ -207,7 +207,7 @@ extern int g_gpfCheckDone;
 extern int g_noSoundDriverShown;
 extern int g_directXCheckDone;
 extern int g_cdPlayerDialogShown;
-extern Entry_00428730 g_pictureCache[10];
+extern PictureCacheEntry g_pictureCache[10];
 
 int CodeChecksumFailed(void);
 void __stdcall OpenMessageBox(Gui* sub, char* text, int param_3, int param_4, int param_5);
@@ -711,12 +711,12 @@ void __stdcall OpenCloseCdPlayerDialog()
 }
 
 // Looks a picture-cache entry up by name and returns its palette data.
-static char* Lookup_004263b0(const char* name)
+static char* LookupPicturePalette(const char* name)
 {
     if (name != 0) {
         for (int i = 0; i < 10; i++) {
             if (strcmp(g_pictureCache[i].name, name) == 0)
-                return (char*)g_pictureCache[i].data;
+                return (char*)g_pictureCache[i].palette;
         }
     }
     return 0;
@@ -746,7 +746,7 @@ void __stdcall OpenMainMenu()
     EnableKeyCommands(&g_game->gui);
 
     char* name = "FrontendX";
-    char* found = Lookup_004263b0(name);
+    char* found = LookupPicturePalette(name);
 
     char version[32];
     char palpath[256];
@@ -1514,7 +1514,7 @@ void FreePictureCache()
     for (int i = 0; i < 10; i++) {
         if (g_pictureCache[i].surface != 0) {
             FreeSurface(g_pictureCache[i].surface);
-            GameFreeThunk(g_pictureCache[i].data);
+            GameFreeThunk(g_pictureCache[i].palette);
             if (g_game->gui.fallback == g_pictureCache[i].surface) {
                 g_game->gui.fallback = 0;
             }
@@ -1522,7 +1522,7 @@ void FreePictureCache()
                 g_game->gui.layer->surface = 0;
             }
             g_pictureCache[i].surface = 0;
-            g_pictureCache[i].data = 0;
+            g_pictureCache[i].palette = 0;
             memset(g_pictureCache[i].name, 0, sizeof(g_pictureCache[i].name));
         }
     }
@@ -1542,7 +1542,7 @@ int* __stdcall FindCachedPicturePalette(const char* name)
         return 0;
     for (int i = 0; i < 10; i++) {
         if (strcmp(g_pictureCache[i].name, name) == 0)
-            return g_pictureCache[i].data;
+            return g_pictureCache[i].palette;
     }
     return 0;
 }
@@ -1568,7 +1568,7 @@ int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int 
 {
     void* surface = 0;
     int* data = 0;
-    Entry_00428730 saved;
+    PictureCacheEntry saved;
 
     if (param_2 != 0) {
         SetOffscreenSurface(g_game->offscreen);
@@ -1580,7 +1580,7 @@ int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int 
         for (int i = 0; i < 10; i++) {
             if (strcmp(g_pictureCache[i].name, name) == 0) {
                 surface = g_pictureCache[i].surface;
-                data = g_pictureCache[i].data;
+                data = g_pictureCache[i].palette;
                 saved = g_pictureCache[i];
                 for (int j = i - 1; j >= 0; j--)
                     g_pictureCache[j + 1] = g_pictureCache[j];
@@ -1595,12 +1595,12 @@ int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int 
             if (g_game->frontendState != 6) {
                 if (g_pictureCache[9].surface != 0) {
                     FreeSurface(g_pictureCache[9].surface);
-                    GameFreeThunk(g_pictureCache[9].data);
+                    GameFreeThunk(g_pictureCache[9].palette);
                 }
                 for (int j = 9; j > 0; j--)
                     g_pictureCache[j] = g_pictureCache[j - 1];
                 g_pictureCache[0].surface = surface;
-                g_pictureCache[0].data = data;
+                g_pictureCache[0].palette = data;
                 strcpy(g_pictureCache[0].name, name);
             }
         }

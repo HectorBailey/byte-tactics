@@ -293,7 +293,7 @@ extern int g_explosion2StartSize;                                               
 extern int g_explosion2EndSize;                                                                                 // 0x511fb0, 4 bytes; 1 of 1 files
 extern unsigned char DAT_00511fb4[4];                                                                           // 0x511fb4, 4 bytes; nothing refers to it
 extern char g_frontendErrorText[256];                                                                           // 0x511fb8, 256 bytes; 1 of 1 files
-extern unsigned char g_pictureCache[464];                                                                       // 0x5120b8, 464 bytes; Entry_00428730[10] by value in 1 of 1 files
+extern unsigned char g_pictureCache[464];                                                                       // 0x5120b8, 464 bytes; PictureCacheEntry[10] by value in 1 of 1 files
 extern int DAT_00512288;                                                                                        // 0x512288, 4 bytes; 1 of 1 files
 extern int g_directXCheckDone;                                                                                  // 0x51228c, 4 bytes; 1 of 1 files
 extern int g_gpfCheckDone;                                                                                      // 0x512290, 4 bytes; 1 of 1 files

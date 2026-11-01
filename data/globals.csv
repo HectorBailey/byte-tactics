@@ -364,7 +364,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x511fb0,g_explosion2EndSize,.bss,4,type,data,int,1,0,1,one type,1,,INT_00511fb0,,,
 0x511fb4,DAT_00511fb4,.bss,4,gap,unreferenced,unsigned char[4],0,0,0,,0,,DAT_00511fb4,,,
 0x511fb8,g_frontendErrorText,.bss,256,gap,data,char[],1,0,1,one type,1,,s__00511fb8,,,
-0x5120b8,g_pictureCache,.bss,464,gap,data,Entry_00428730[10],1,0,1,one type,1,0x198,DAT_005120b8,,,
+0x5120b8,g_pictureCache,.bss,464,gap,data,PictureCacheEntry[10],1,0,1,one type,1,0x198,DAT_005120b8,,,
 0x512288,DAT_00512288,.bss,4,type,data,int,1,0,1,one type,1,,INT_00512288,,,
 0x51228c,g_directXCheckDone,.bss,4,type,data,int,1,0,1,one type,1,,INT_0051228c,,,
 0x512290,g_gpfCheckDone,.bss,4,type,data,int,1,0,1,one type,1,,INT_00512290,,,
