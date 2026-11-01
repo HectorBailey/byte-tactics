@@ -1376,7 +1376,7 @@ struct Less_0046e3c0;
 struct Less_0046e450;
 struct Less_0046e4d0;
 struct Less_0046fe60;
-struct Less_004db000;
+struct FreeBlockLess;
 struct Less_004dbbc0;
 struct Less_004dbd20;
 struct Less_004dbec0;
@@ -1386,7 +1386,7 @@ struct Less_004dc680;
 struct Less_004dce00;
 struct Less_004dce60;
 struct Less_004dd250;
-struct Less_004dd3d0;
+struct BlockMapLess;
 struct Less_004dd430;
 struct Less_004dd7d0;
 struct Less_004ddc90;
@@ -19016,14 +19016,14 @@ public:
     MapInsertResult* Assign(int*, unsigned char*);
 };
 
-struct Less_004db000 {  // 0x1 bytes, 1 view
+struct FreeBlockLess {  // 0x1 bytes, 1 view
     char unknown_0[1];
     unsigned char operator()(unsigned int&, unsigned int&);
 };
 
 class FreeBlockMap {    // 0x14 bytes, 5 views
 public:
-    Less_004db000 key_compare;  // +0x0
+    FreeBlockLess key_compare;  // +0x0
     char unknown_1[3];
     LiveNode* head;  // +0x4
     unsigned char rebuild;  // +0x8
@@ -19105,14 +19105,14 @@ struct Elem_004dd8c0 {  // 0x30 bytes, 2 views
     unsigned int w[12];  // +0x0
 };
 
-struct Less_004dd3d0 {  // 0x1 bytes, 2 views
+struct BlockMapLess {   // 0x1 bytes, 2 views
     char unknown_0[1];
     unsigned char operator()(unsigned int&, unsigned int&);
 };
 
 class BlockMap {  // 0x8 bytes, 2 views
 public:
-    Less_004dd3d0 compare;  // +0x0
+    BlockMapLess compare;   // +0x0
     char unknown_1[3];
     LiveNode* head;  // +0x4
     Iter_0046e330 End(void);

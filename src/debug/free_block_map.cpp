@@ -106,13 +106,13 @@ void* __cdecl GameRealloc(void* block, unsigned int size);
 char* __cdecl GameStrdup(char* s);
 void __cdecl ProtectBlock(void* p, int protect);
 
-struct Less_004db000 {
+struct FreeBlockLess {
     bool operator()(const unsigned int& a, const unsigned int& b) const { return a < b; }
 };
 
 class FreeBlockMap {
 public:
-    Less_004db000 key_compare;         // +0x0
+    FreeBlockLess key_compare;         // +0x0
     FreeBlockNode* head;               // +0x4
     unsigned char rebuild;             // +0x8
     unsigned int count;                // +0xc
