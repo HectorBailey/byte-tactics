@@ -5,10 +5,10 @@
 // Runs every 90 ticks over the units of this object's group: first gives each
 // unit that ChooseBuildOption picks an item for an order (mode 0xe) at the
 // place FindBuildPosition finds, within a third of the map size of the player's
-// base (GetBasePosition) for flag12 units; then sends the idle units towards
-// the base: flag12 units to the point mirrored through it (a random point 0x280
-// from it when farther), the others to the base itself, or when within 0x140 of
-// it, 0x140 onwards in its direction.
+// scout anchor (GetScoutAnchorPos) for flag12 units; then sends the idle units
+// towards the anchor: flag12 units to the point mirrored through it (a random
+// point 0x280 from it when farther), the others to the anchor itself, or when
+// within 0x140 of it, 0x140 onwards in its direction.
 #include <ta_types.h>
 // The system header set decides operand and load order in the _allmul and
 // MapRange code.
@@ -83,7 +83,7 @@ inline MissionType::MissionType() {}
 
 extern Game_00408100* g_game;
 
-void __stdcall GetBasePosition(int index, Vec3* out);
+void __stdcall GetScoutAnchorPos(int index, Vec3* out);
 unsigned short __stdcall ChooseBuildOption(unsigned int player, Unit_00408100* unit);
 int __stdcall FindBuildPosition(unsigned int player, Vec3* from, UnitDef* item, Vec3* out);
 int __stdcall GetBuilderCount(unsigned int player);
@@ -137,7 +137,7 @@ void ScoutTimer::OnTimer()
 {
     field_c = g_game->gameTick + 90;
     Vec3 origin;
-    GetBasePosition(field_10, &origin);
+    GetScoutAnchorPos(field_10, &origin);
     std::vector<Unit_00408100*>::iterator it;
     for (it = ((Group_00408100*)field_8)->units.begin(); it != ((Group_00408100*)field_8)->units.end(); ++it) {
         Unit_00408100* u = *it;
