@@ -22,7 +22,7 @@ extern char g_fxEventPoolBlocked;
 // Chat command: toggles the local player's ShareMetal bit and prints the new
 // state ("ON"/"OFF"); compare the sibling toggles 0x4194d0 and 0x419400.
 // FUNCTION: 0x418cd0
-void __stdcall CmdShareMetal(int unused)
+void __stdcall CmdShareMetal(CommandArgs* unused)
 {
     char buf[256];
     if (g_game->netGameFlags & 1) {
@@ -39,7 +39,7 @@ void __stdcall CmdShareMetal(int unused)
 // Chat command: toggles the local player's energy-sharing flag and prints the
 // new state.
 // FUNCTION: 0x418d90
-void __stdcall CmdShareEnergy(int unused)
+void __stdcall CmdShareEnergy(CommandArgs* unused)
 {
     char buf[256];
     if (g_game->netGameFlags & 1) {
@@ -56,7 +56,7 @@ void __stdcall CmdShareEnergy(int unused)
 // Chat command: toggles the local player's ShareMapping flag and prints the
 // new state.
 // FUNCTION: 0x418e50
-void __stdcall CmdShareMapping(int unused)
+void __stdcall CmdShareMapping(CommandArgs* unused)
 {
     char buf[256];
     if (g_game->netGameFlags & 1) {
@@ -89,7 +89,7 @@ void __stdcall ToggleShareLos(int unused)
 // Chat command: toggles the local player's ShareRadar flag and prints the
 // new state.
 // FUNCTION: 0x418fd0
-void __stdcall CmdShareRadar(int unused)
+void __stdcall CmdShareRadar(CommandArgs* unused)
 {
     char buf[256];
     if (g_game->netGameFlags & 1) {
@@ -108,7 +108,7 @@ void __stdcall CmdShareRadar(int unused)
 // commands 0x418cd0, 0x418d90, 0x418e50 and 0x418fd0, inlined. The last one
 // must be the mask form with a pointer local (as in 0x418d90): the `!` on a
 // bitfield form gives its block different registers from the other three.
-static inline void ShareMetal(int unused)
+static inline void ShareMetal(CommandArgs* unused)
 {
     char buf[256];
     if (g_game->netGameFlags & 1) {
@@ -122,7 +122,7 @@ static inline void ShareMetal(int unused)
     }
 }
 
-static inline void ShareEnergy(int unused)
+static inline void ShareEnergy(CommandArgs* unused)
 {
     char buf[256];
     if (g_game->netGameFlags & 1) {
@@ -136,7 +136,7 @@ static inline void ShareEnergy(int unused)
     }
 }
 
-static inline void ShareMapping(int unused)
+static inline void ShareMapping(CommandArgs* unused)
 {
     char buf[256];
     if (g_game->netGameFlags & 1) {
@@ -150,7 +150,7 @@ static inline void ShareMapping(int unused)
     }
 }
 
-static inline void ShareRadar(int unused)
+static inline void ShareRadar(CommandArgs* unused)
 {
     char buf[256];
     if (g_game->netGameFlags & 1) {
@@ -165,7 +165,7 @@ static inline void ShareRadar(int unused)
 }
 
 // FUNCTION: 0x419090
-void __stdcall CmdShareAll(int unused)
+void __stdcall CmdShareAll(CommandArgs* unused)
 {
     if (g_game->netGameFlags & 1) {
         ShareMetal(unused);
@@ -209,7 +209,7 @@ void __stdcall CmdSetShareEnergy(CommandArgs* args)
 }
 
 // FUNCTION: 0x4194c0
-void __stdcall CmdShowRanges(int unused)
+void __stdcall CmdShowRanges(CommandArgs* unused)
 {
     int* ptr = &g_game->showRanges;
     *ptr ^= 1;
@@ -217,7 +217,7 @@ void __stdcall CmdShowRanges(int unused)
 
 // Chat command: toggles outgoing packet compression and prints the new state.
 // FUNCTION: 0x4194d0
-void __stdcall CmdCompression(int unused)
+void __stdcall CmdCompression(CommandArgs* unused)
 {
     char buf[256];
     if (g_game->netGameFlags & 1) {
@@ -229,13 +229,13 @@ void __stdcall CmdCompression(int unused)
 }
 
 // FUNCTION: 0x419540
-void __stdcall CmdBPS(int unused)
+void __stdcall CmdBPS(CommandArgs* unused)
 {
     g_game->showBps ^= 1;
 }
 
 // FUNCTION: 0x419550
-void __stdcall CmdSFX(int arg1)
+void __stdcall CmdSFX(CommandArgs* arg1)
 {
     g_fxEventPoolBlocked ^= 1;
 }
