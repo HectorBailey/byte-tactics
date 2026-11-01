@@ -74,9 +74,6 @@ union EndGameFlags {
 
 #include "../network/player_info.h"
 
-// Unused here: a real function declared to keep the file's symbol count (docs/c2-regalloc.md).
-int StepTowards(int, int, int);
-
 #include "../network/player.h"
 
 struct FindData {

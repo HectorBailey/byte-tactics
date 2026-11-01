@@ -15,6 +15,12 @@
 
 struct Surface;
 struct GafFrame;
+// The DirectDraw interfaces the display holds (ddraw.h declares them; a
+// forward declaration here keeps that header out of every includer).
+struct IDirectDraw;
+struct IDirectDrawSurface;
+struct IDirectDrawClipper;
+struct IDirectDrawPalette;
 // The bitmap font the font API reads at +0x204 (font.cpp defines it).
 struct Font;
 
@@ -36,11 +42,11 @@ struct DisplayContext {
     HPALETTE hpalette;                       // +0x4c
     char unknown_50[0x80 - 0x50];            // +0x50, the DIB surface
     void (__cdecl *callback)(int, int, int); // +0x80
-    void* ddraw;                             // +0x84, IDirectDraw
-    void* primary;                           // +0x88, the primary surface
-    void* back;                              // +0x8c, the back buffer
-    void* clipper;                           // +0x90
-    void* palette;                           // +0x94, the DirectDraw palette
+    IDirectDraw* ddraw;                      // +0x84
+    IDirectDrawSurface* primary;             // +0x88, the primary surface
+    IDirectDrawSurface* back;                // +0x8c, the back buffer
+    IDirectDrawClipper* clipper;             // +0x90
+    IDirectDrawPalette* palette;             // +0x94, the DirectDraw palette
     Surface* activeSurface;                  // +0x98
     int haveBackBuffer;                      // +0x9c
     int clipLeft;                            // +0xa0, the primary surface clip
@@ -48,7 +54,7 @@ struct DisplayContext {
     int clipRight;                           // +0xa8
     int clipBottom;                          // +0xac
     HFONT font;                              // +0xb0
-    void* lastBackBuffer;                    // +0xb4
+    IDirectDrawSurface* lastBackBuffer;      // +0xb4
     char unknown_b8[4];                      // +0xb8
     Surface* overrideSurface;                // +0xbc
     unsigned char* alphaTable;               // +0xc0
