@@ -1067,18 +1067,23 @@ void __stdcall GetGadgetRect(Gadget* entry, Rect* rect)
 }
 
 // FUNCTION: 0x4a1680
-void __stdcall GetGadgetScreenRect(char* param_1, int param_2, Rect* param_3)
+void __stdcall GetGadgetScreenRect(Gadget* table, int index, Rect* rect)
 {
-    char* e = param_1 + param_2 * 0x15b;
-    param_3->left = *(short*)(e + 0x13);
-    param_3->top = *(short*)(e + 0x15);
-    if (*e != 0) {
-        param_3->left += *(short*)(param_1 + 0x13);
-        param_3->top += *(short*)(param_1 + 0x15);
+    Gadget* e = &table[index];
+    rect->left = e->x;
+    rect->top = e->y;
+    if (e->type != 0) {
+        rect->left += table->x;
+        rect->top += table->y;
     }
-    param_3->right = *(short*)(e + 0x17) - 1 + param_3->left;
-    param_3->bottom = *(short*)(e + 0x19) - 1 + param_3->top;
+    rect->right = e->width - 1 + rect->left;
+    rect->bottom = e->height - 1 + rect->top;
 }
+
+// Unused here: real declarations that keep the file's symbol count (docs/c2-regalloc.md).
+void MarkLocalVisibleUnits(void);
+unsigned short __stdcall PickUnitUnderCursor(void);
+void FocusNextLocalUnit(void);
 
 // Marks GUI entry `index` as the selected one and outlines it: every entry of
 // type 3 is cleared first, then the selected one is given state 30 and, unless
@@ -2270,20 +2275,20 @@ void __stdcall ResetListBox(Gui* obj, int index)
 }
 void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
 char* __stdcall SkipTextLines(char* text, int n);
-void __stdcall TruncateTextWithEllipsis(int a1, char* text, int a3, int a4, int a5);
+void __stdcall TruncateTextWithEllipsis(Gui* gui, unsigned char* text, int limit, int a4, int a5);
 
 // Builds a block of NUL-terminated item strings from the text blob at a3
 // (one name per line) and copies it back over a3. Each line is truncated to
 // 100 bytes, expanded by TruncateTextWithEllipsis (marker glyphs) and appended in place.
 // FUNCTION: 0x4a31c0
-void __stdcall TruncateListItems(int a1, int a2, char* a3, int a4)
+void __stdcall TruncateListItems(Gui* gui, int a2, char* a3, int a4)
 {
     char* items = (char*)GameAllocIgnoreTag("SCROLLITEMS", *(int*)(a3 - 0x44));
     char* out = items;
     for (int i = 0; i < a4; i++) {
         char buf[100];
         strncpy(buf, SkipTextLines(a3, i), 100);
-        TruncateTextWithEllipsis(a1, buf, a2, -1, 0);
+        TruncateTextWithEllipsis(gui, (unsigned char*)buf, a2, -1, 0);
         strcpy(out, buf);
         out += strlen(buf);
         *out = 0;
