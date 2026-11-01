@@ -6454,7 +6454,7 @@ NameMapInsertResult NameMapTree::InsertOrFind(const Pair_004e2250& _V)
 }
 
 // 0x4e2580 (src/debug/debug_lib_4e2580.cpp) stays in its own file: its view
-// of NameMapTree is keyed by const char* and returns Iter_004e2580, which
+// of NameMapTree is keyed by const char* and returns NameMapIter, which
 // cannot be one class with the NameKey-keyed view the tree methods above use.
 // 0x4e2620 (src/debug/debug_lib_4e2620.cpp) stays in its own file: its
 // NameMapTree carries the tree's fields and its own _Lrotate/_Rrotate,

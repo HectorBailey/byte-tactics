@@ -711,7 +711,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x528ae8,g_crtSourceRoot,.bss,1000,gap>type,data,char[488],1,0,1,one type,1,,s__00528ae8,,,
 0x528ed0,g_mfcSourceRoot,.bss,1000,gap>type,data,char[488],1,0,1,one type,1,,s__00528ed0,,,
 0x5292b8,DAT_005292b8,.bss,4,gap,unreferenced,unsigned char[4],0,0,0,,0,,DAT_005292b8,,,
-0x5292c4,QBDUValue_004e17c0::PBDU?$pair::?$_Tree::_Nil,.bss,4,definition,template,NameMapNode*,2,3,4,conflicting: shape,4,,DAT_005292c4,,src/debug/debug_lib.cpp,
+0x5292c4,QBDUValue_004e17c0::PBDU?$pair::?$_Tree::_Nil,.bss,4,definition,template,NameMapNode*,3,2,3,conflicting: shape,4,,DAT_005292c4,,src/debug/debug_lib.cpp,
 0x5292c8,DAT_005292c8,.bss,8,gap,unreferenced,unsigned char[8],0,0,0,,0,,DAT_005292c8,,,
 0x529500,QBDUValue_004e17c0::PBDU?$pair::?$_Tree::_Nilrefs,.bss,4,definition,template,unsigned int,2,0,1,one type,2,,UINT_00529500,,src/debug/debug_lib.cpp,
 0x529504,DAT_00529504,.bss,4,gap,unreferenced,unsigned char[4],0,0,0,,0,,,,,
