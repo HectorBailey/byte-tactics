@@ -8,18 +8,18 @@
 
 // Declared in the header's class; defined here so the tree insert below
 // inlines it, as the original's memcpy copy does.
-inline Value_004e2620& Value_004e2620::operator=(const Value_004e2620& v)
+inline NameMapValue& NameMapValue::operator=(const NameMapValue& v)
 {
     if (this)
-        memcpy(this, &v, sizeof(Value_004e2620));
+        memcpy(this, &v, sizeof(NameMapValue));
     return *this;
 }
 
 // FUNCTION: 0x4e2620
-Iter_004e2620 NameMapTree::Insert(Node_004e2620* _X, Node_004e2620* _Y, const Value_004e2620& _V)
+Iter_004e2620 NameMapTree::Insert(NameMapNode* _X, NameMapNode* _Y, const NameMapValue& _V)
 {
     std::_Lockit _Lk;
-    Node_004e2620* _Z = (Node_004e2620*)((NameMapAllocator*)this)->Allocate(0x208);
+    NameMapNode* _Z = (NameMapNode*)((NameMapAllocator*)this)->Allocate(0x208);
     _Parent(_Z) = _Y;
     _Color(_Z) = 0;
     _Left(_Z) = DAT_005292c4;
