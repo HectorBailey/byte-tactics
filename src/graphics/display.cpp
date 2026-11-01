@@ -7,123 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "rect.h"
-#include "../gui/mouse_event.h"
-
-// +0xf0: the display context's state flags. Set through the bitfield and read
-// whole by SetFullScreen.
-union DisplayFlags {
-    unsigned short word;
-    struct {
-        unsigned short opt : 1;        // bit 0
-        unsigned short fullscreen : 1; // bit 1, display_context.h's name
-        unsigned short gdi : 1;        // bit 2
-        unsigned short bit3 : 1;       // bit 3
-        unsigned short bit4 : 1;       // bit 4
-        unsigned short has_c0 : 1;     // bit 5
-        unsigned short has_c4 : 1;     // bit 6
-        unsigned short has_c8 : 1;     // bit 7
-        unsigned short has_cc : 1;     // bit 8
-        unsigned short has_d0 : 1;     // bit 9
-        unsigned short mouseThread : 1; // bit 10, InitMouse's start
-        unsigned short quitting : 1;   // bit 11
-        unsigned short bit12 : 4;      // bits 12 to 15
-    } bits;
-};
-
-// The frame counter at +0x1da: milliseconds accumulated since the last sample,
-// the last tick, the frames since then and the rate of the last second.
-struct FrameCounter {
-    int accum;                       // +0x0
-    unsigned int lastTick;           // +0x4
-    int frames;                      // +0x8
-    int rate;                        // +0xc
-
-    void Tick()
-    {
-        unsigned int now = GetTickCount();
-        accum += now - lastTick;
-        lastTick = now;
-        frames++;
-        if (accum > 2000) {
-            accum = 1000;
-        }
-        if (accum > 1000) {
-            rate = frames;
-            accum -= 1000;
-            frames = 0;
-        }
-    }
-};
-
-// The display's DirectDraw objects at +0x84.
-struct DirectDrawState {
-    IDirectDraw *ddraw;          // +0x84
-    IDirectDrawSurface *primary; // +0x88
-    IDirectDrawSurface *back;    // +0x8c
-    IDirectDrawClipper *clipper; // +0x90
-    IDirectDrawPalette *palette; // +0x94
-    void *activeSurface;         // +0x98
-    int haveBackBuffer;          // +0x9c
-};
-
-// The display context at g_display. Packed to 2: the mode struct and the two
-// ints after it sit at 0x1ea, 0x1fa and 0x1fe, and videoFlags is a word at
-// +0x202. Its own view, not graphics/display_context.h: the DirectDraw objects
-// it calls methods on are untyped pointers in that header. The flag word's bit
-// names (DisplayFlags) are the header's.
-#pragma pack(push, 2)
-struct DisplayContext {
-    HINSTANCE hInstance;                 // +0x00
-    int nCmdShow;                        // +0x04
-    char* className;                     // +0x08
-    char* title;                         // +0x0c
-    WNDPROC wndProc;                     // +0x10
-    unsigned short menuId;               // +0x14
-    // Pads WNDCLASSA to +0x18 by hand, for the same packing reason.
-    char unknown_16[2];
-    WNDCLASSA wc;                        // +0x18
-    HWND hwnd;                           // +0x40
-    HBITMAP dib;                         // +0x44
-    HDC dc;                              // +0x48
-    HPALETTE hpalette;                   // +0x4c
-    char unknown_50[0x80 - 0x50];
-    void (__cdecl *callback)(int, int, int); // +0x80
-    DirectDrawState draw;                // +0x84
-    Rect clip;                           // +0xa0
-    HFONT font;                          // +0xb0
-    char unknown_b4[0xc0 - 0xb4];
-    unsigned char* alphaTable;           // +0xc0
-    unsigned char* shadeTable;           // +0xc4
-    unsigned char* lightTable;           // +0xc8
-    unsigned char* grayTable;            // +0xcc
-    unsigned char* blueTable;            // +0xd0
-    int width;                           // +0xd4
-    int height;                          // +0xd8
-    int useOverrideSurface;              // +0xdc
-    int active;                          // +0xe0
-    char unknown_e4[0xe8 - 0xe4];
-    int tickScale;                       // +0xe8, ticks per second
-    int wa_left;                         // +0xec, work area left
-    DisplayFlags flags;                  // +0xf0, work area top
-    char wa_rest[0xfc - 0xf2];
-    char unknown_fc[0x1da - 0xfc];
-    FrameCounter counter;               // +0x1da
-    Rect startMode;                      // +0x1ea
-    int startWidth;                      // +0x1fa
-    int startHeight;                     // +0x1fe
-    unsigned short videoFlags;           // +0x202
-    char unknown_204[0x214 - 0x204];
-    PALETTEENTRY entries[256];           // +0x214
-    float scale;                         // +0x614
-    void** items;                        // +0x618
-    int itemCount;                       // +0x61c
-    int availPhys;                       // +0x620
-    int unknown_624;                     // +0x624
-    char unknown_628[0x728 - 0x628];
-    unsigned char lastDir;               // +0x728, the first byte of the last directory set
-};
-#pragma pack(pop)
+#include "display_context.h"
 
 // The installed DirectX version, in four 16-bit halves.
 struct DXVersion {
@@ -658,7 +542,7 @@ int __stdcall InitEnvironment(DisplayContext* d)
     view.x = 0;
     view.y = 0;
     view.keyFlags = 0;
-    d->lastDir = 0;
+    d->lastDir[0] = 0;
     SaveStartDirectory();
     SetCurrentMouseEvent(&view);
 
@@ -1086,7 +970,19 @@ int __stdcall DrawFrameRate()
 // FUNCTION: 0x4b66a0
 int GetFrameRate()
 {
-    g_display->counter.Tick();
+    FrameCounter* c = &g_display->counter;
+    unsigned int now = GetTickCount();
+    c->accum += now - c->lastTick;
+    c->lastTick = now;
+    c->frames++;
+    if (c->accum > 2000) {
+        c->accum = 1000;
+    }
+    if (c->accum > 1000) {
+        c->rate = c->frames;
+        c->accum -= 1000;
+        c->frames = 0;
+    }
     return g_display->counter.rate;
 }
 

@@ -19,8 +19,8 @@ void StepPaletteFade(void);
 int IsFadeDone(void);
 
 // The display flags word at +0xf0: set through the bitfield, read whole
-// (FlipScreen) or as its low byte (FillSurface). display.cpp and gaf.cpp
-// declare the same word under this name.
+// (FlipScreen) or as its low byte (FillSurface). gaf.cpp declares the same
+// word under this name, and display_context.h as its flags union.
 union DisplayFlags {
     unsigned short word;
     unsigned char byte;

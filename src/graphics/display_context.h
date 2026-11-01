@@ -4,14 +4,16 @@
 // declaration for the modules that read it, at the offsets Thaldren's
 // DisplayContext rows give (data/thaldren/structs.csv, size 0x828), with the
 // Hungarian prefix dropped and the name display.cpp already uses where it has
-// one. Records another module owns (the DIB surface, the DirectDraw objects,
-// the surfaces, the open archive array) are a pointer here, so a module that
-// reads the whole record keeps its own view.
+// one. The DirectDraw block, the two rectangles and the frame counter are
+// records of their own, because display.cpp reaches them through a pointer to
+// the block or copies them whole. Records another module owns (the DIB
+// surface, the surfaces, the open archive array) are a pointer or bytes here.
 #ifndef DISPLAY_CONTEXT_H
 #define DISPLAY_CONTEXT_H
 
 #include <windows.h>
 #include "../gui/mouse_event.h"
+#include "rect.h"
 
 struct Surface;
 struct GafFrame;
@@ -23,6 +25,28 @@ struct IDirectDrawClipper;
 struct IDirectDrawPalette;
 // The bitmap font the font API reads at +0x204 (font.cpp defines it).
 struct Font;
+
+// The display's DirectDraw objects at +0x84. SetFullScreen fills them through
+// a pointer to this block.
+struct DirectDrawState {
+    IDirectDraw* ddraw;                      // +0x0
+    IDirectDrawSurface* primary;             // +0x4, the primary surface
+    IDirectDrawSurface* back;                // +0x8, the back buffer
+    IDirectDrawClipper* clipper;             // +0xc
+    IDirectDrawPalette* palette;             // +0x10, the DirectDraw palette
+    Surface* activeSurface;                  // +0x14
+    int haveBackBuffer;                      // +0x18
+};
+
+// The frame counter at +0x1da: milliseconds accumulated since the last sample,
+// the last tick, the frames since then and the rate of the last second.
+// GetFrameRate and DrawFrameRate tick it through a pointer to it.
+struct FrameCounter {
+    int accum;                               // +0x0
+    unsigned int lastTick;                   // +0x4
+    int frames;                              // +0x8
+    int rate;                                // +0xc
+};
 
 // Packed to 2: the frame counter at +0x1da, the mode rectangle at +0x1ea and
 // the size at +0x1fa sit on 2-byte boundaries.
@@ -42,17 +66,8 @@ struct DisplayContext {
     HPALETTE hpalette;                       // +0x4c
     char unknown_50[0x80 - 0x50];            // +0x50, the DIB surface
     void (__cdecl *callback)(int, int, int); // +0x80
-    IDirectDraw* ddraw;                      // +0x84
-    IDirectDrawSurface* primary;             // +0x88, the primary surface
-    IDirectDrawSurface* back;                // +0x8c, the back buffer
-    IDirectDrawClipper* clipper;             // +0x90
-    IDirectDrawPalette* palette;             // +0x94, the DirectDraw palette
-    Surface* activeSurface;                  // +0x98
-    int haveBackBuffer;                      // +0x9c
-    int clipLeft;                            // +0xa0, the primary surface clip
-    int clipTop;                             // +0xa4
-    int clipRight;                           // +0xa8
-    int clipBottom;                          // +0xac
+    DirectDrawState draw;                    // +0x84
+    Rect clip;                               // +0xa0, the primary surface clip
     HFONT font;                              // +0xb0
     IDirectDrawSurface* lastBackBuffer;      // +0xb4
     char unknown_b8[4];                      // +0xb8
@@ -69,8 +84,8 @@ struct DisplayContext {
     char unknown_e4[4];                      // +0xe4
     int tickScale;                           // +0xe8, ticks per second
     int wa_left;                             // +0xec, work area left
-    // The state flags, as one word (the masks) or as bits (display.cpp's
-    // DisplayFlags names; SetFullScreen takes bit 1).
+    // The state flags, as one word (the masks) or as bits (display.cpp sets
+    // and tests them by name; SetFullScreen takes bit 1).
     union {
         unsigned short word;
         struct {
@@ -111,14 +126,8 @@ struct DisplayContext {
     int cursorThreadEnabled;                 // +0x1ce
     int cursorOverlayEnabled;                // +0x1d2
     int mouseThreadStopReq;                  // +0x1d6
-    int fpsAccum;                            // +0x1da
-    unsigned int fpsTick;                    // +0x1de
-    int fpsFrames;                           // +0x1e2
-    int fpsRate;                             // +0x1e6
-    int startLeft;                           // +0x1ea, the mode the display starts in
-    int startTop;                            // +0x1ee
-    int startRight;                          // +0x1f2
-    int startBottom;                         // +0x1f6
+    FrameCounter counter;                    // +0x1da
+    Rect startMode;                          // +0x1ea, the mode the display starts in
     int startWidth;                          // +0x1fa
     int startHeight;                         // +0x1fe
     unsigned short videoFlags;               // +0x202
