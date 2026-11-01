@@ -214,7 +214,7 @@ void MainFrameTick();
 void ShutdownMouse();
 void ShutdownGame();
 int __stdcall ParseCommandLine(char* param_1, char* param_2);
-void __stdcall ReadGameRegistryValue(const char* param_1, void* param_2, int* param_3);
+int __stdcall ReadGameRegistryValue(const char* key, void* buf, unsigned int* size);
 void __stdcall WriteGameRegistryValue(const char* param_1, void* param_2, int param_3);
 void __stdcall LoadTranslations(const char* param_1, char* param_2);
 
@@ -277,7 +277,7 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     g_game->versionBuild = 1;
     if (strlen(g_preferredLanguage) == 0) {
         size1c = 0x40;
-        ReadGameRegistryValue(g_languageValueName, g_preferredLanguage, (int*)&size1c);
+        ReadGameRegistryValue(g_languageValueName, g_preferredLanguage, (unsigned int*)&size1c);
         if (g_preferredLanguage[0] == 0)
             strcpy(g_preferredLanguage, g_defaultLanguage);
     }
@@ -296,7 +296,7 @@ int __stdcall GameMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             strcpy(buf40, g_emptyStringLiteral);
         }
         size14 = 0x32;
-        ReadGameRegistryValue(g_cdShellValueName, buf74, (int*)&size14);
+        ReadGameRegistryValue(g_cdShellValueName, buf74, (unsigned int*)&size14);
         if (strlen(buf74) != 0)
             strcpy(buf40, buf74);
         else
@@ -382,7 +382,7 @@ int GetPreferredLanguage(void)
 }
 
 // FUNCTION: 0x49f5a0
-UINT __stdcall GetPreferenceInt(char* key, int defaultValue)
+UINT __stdcall GetPreferenceInt(const char* key, int defaultValue)
 {
     char exePath[256];
     char iniPath[256];
