@@ -1801,8 +1801,8 @@ struct Dialog_4a2580 {
 
 void __stdcall SetFont(int id);
 void __stdcall GetSliderRects(Gadget* base, int index, Rect* bar, Rect* knob);
-void __stdcall DrawRaisedBox(void* surface, Rect* rect, int light, unsigned char dark, int fill);
-void __stdcall DrawSunkenBox(void* surface, Rect* rect, int light, int dark, int fill);
+void __stdcall DrawRaisedBox(Surface* surface, Rect* rect, int light, int dark, int fill);
+void __stdcall DrawSunkenBox(Surface* surface, Rect* rect, int light, int dark, int fill);
 char* __stdcall GetGafFrame(void* glyphs, int c);
 void __stdcall DrawFrame(void* surface, void* glyph, int x, int y);
 int GetTextKeyColor();
@@ -3156,7 +3156,7 @@ struct Language_004a4660 { char unknown_0[0xc]; unsigned short *glyphs; };
 struct LanguageRoot_004a4660 { char unknown_0[0x14]; Language_004a4660 *language; };
 
 int __stdcall LockScreen(Surface *);
-void __stdcall FillBevelBox(void *, Rect *, int, int, int);
+void __stdcall FillBevelBox(Surface *, Rect *, int, int, int);
 int __stdcall FillRectangle(Surface *, Rect *, int);
 void __stdcall DrawTextClipped(void *, char *, int, int, int, int);
 char* __stdcall GetGafFrame(void* glyphs, int c);
@@ -4077,8 +4077,8 @@ int __stdcall FadeRectangle(Surface* surface, Rect* rect, int level);
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int colour);
 void __stdcall DrawFrame(void* surface, GafFrame* glyph, int x, int y);
 void __stdcall DrawFrameLit(Surface* surface, GafFrame* glyph, int x, int y, int style);
-void __stdcall FillBevelBox(void* surface, Rect* rect, int light, int dark, int fill);
-void __stdcall FillBevelBoxDarkFirst(void* surface, Rect* rect, int light, int dark, int fill);
+void __stdcall FillBevelBox(Surface* surface, Rect* rect, int light, int dark, int fill);
+void __stdcall FillBevelBoxDarkFirst(Surface* surface, Rect* rect, int light, int dark, int fill);
 void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw, int style);
 int __stdcall DrawWrappedText(void* surface, char* text, int x, int y, int maxw, int rem, int style);
 

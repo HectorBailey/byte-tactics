@@ -18,8 +18,8 @@ struct Gaf_004b0230 {
     char unknown_0[0x14];
 };
 
-int __stdcall DrawLine(void* surface, int x0, int y0, int x1, int y1, unsigned char color);
-void __stdcall FillRectangle(void* surface, void* rect, int color);
+int __stdcall DrawLine(Surface* surface, int x0, int y0, int x1, int y1, int color);
+int __stdcall FillRectangle(Surface* surface, Rect* rect, int color);
 void __stdcall GetGadgetRectByIndex(char* entries, int index, Rect* out);
 int __stdcall FindBackgroundCell(Gadget* entries, int index);
 Bits_004b0230* __stdcall FindGafEntry(Gaf_004b0230* gaf, const char* name);
@@ -30,8 +30,8 @@ void __stdcall DrawFrame(Surface* dst, GafFrame* pic, int x, int y);
 // Draws a double (two-line) bevelled border: the top and left pairs of edges
 // use the third argument's colour, the right and bottom pairs the fourth's.
 // FUNCTION: 0x4b0090
-void __stdcall DrawBevelBorder(void* surface, Rect* rect, int light,
-                            unsigned char dark, int unused)
+void __stdcall DrawBevelBorder(Surface* surface, Rect* rect, int light,
+                            int dark, int unused)
 {
     DrawLine(surface, rect->left, rect->top, rect->right, rect->top, light);
     DrawLine(surface, rect->left, rect->top + 1, rect->right - 1, rect->top + 1, light);
@@ -47,7 +47,7 @@ void __stdcall DrawBevelBorder(void* surface, Rect* rect, int light,
 // use `light`, the right and bottom edges use `dark`. The fifth argument is
 // not read by the original.
 // FUNCTION: 0x4b0160
-void __stdcall DrawBevelBorderDarkFirst(void* surface, Rect* rect, int dark, int light, int unused)
+void __stdcall DrawBevelBorderDarkFirst(Surface* surface, Rect* rect, int dark, int light, int unused)
 {
     DrawLine(surface, rect->left, rect->top, rect->right, rect->top, light);
     DrawLine(surface, rect->left, rect->top + 1, rect->right - 1, rect->top + 1, light);
@@ -169,7 +169,7 @@ void __stdcall DrawListboxFrame(Gui* obj, int index, Bits_004b0230* bmp)
 // Fills a rectangle, then draws its bevelled border through DrawBevelBorder
 // (compare 0x4b0510 and 0x4b0590).
 // FUNCTION: 0x4b04b0
-void __stdcall FillBevelBox(void* surface, Rect* rect, int light, int dark, int fill)
+void __stdcall FillBevelBox(Surface* surface, Rect* rect, int light, int dark, int fill)
 {
     FillRectangle(surface, rect, fill);
     DrawBevelBorder(surface, rect, light, dark, fill);
@@ -178,7 +178,7 @@ void __stdcall FillBevelBox(void* surface, Rect* rect, int light, int dark, int 
 // Fills a rectangle, then draws its border through DrawBevelBorderDarkFirst (same shape
 // as 0x4b04b0, which uses DrawBevelBorder).
 // FUNCTION: 0x4b04e0
-void __stdcall FillBevelBoxDarkFirst(void* surface, Rect* rect, int light, int dark, int fill)
+void __stdcall FillBevelBoxDarkFirst(Surface* surface, Rect* rect, int light, int dark, int fill)
 {
     FillRectangle(surface, rect, fill);
     DrawBevelBorderDarkFirst(surface, rect, light, dark, fill);
@@ -187,7 +187,7 @@ void __stdcall FillBevelBoxDarkFirst(void* surface, Rect* rect, int light, int d
 // Fills a rectangle and draws a bevelled border: top and left edges in one
 // colour, right and bottom edges in another.
 // FUNCTION: 0x4b0510
-void __stdcall DrawRaisedBox(void* surface, Rect* rect, int light, unsigned char dark, int fill)
+void __stdcall DrawRaisedBox(Surface* surface, Rect* rect, int light, int dark, int fill)
 {
     FillRectangle(surface, rect, fill);
     DrawLine(surface, rect->left, rect->top, rect->right, rect->top, light);
@@ -200,7 +200,7 @@ void __stdcall DrawRaisedBox(void* surface, Rect* rect, int light, unsigned char
 // left edges in the fourth argument's colour, the right and bottom edges in
 // the third's.
 // FUNCTION: 0x4b0590
-void __stdcall DrawSunkenBox(void* surface, Rect* rect, int light, int dark, int fill)
+void __stdcall DrawSunkenBox(Surface* surface, Rect* rect, int light, int dark, int fill)
 {
     FillRectangle(surface, rect, fill);
     DrawLine(surface, rect->left, rect->top, rect->right, rect->top, dark);
