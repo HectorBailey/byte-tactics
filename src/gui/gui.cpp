@@ -1278,10 +1278,11 @@ int __stdcall FindAssocTextInput(Gadget* entries, int index)
 // Redraws the rectangle of GUI entry `index` on the list's surface (entry 0
 // holds the surface at +0xbc); an entry of type 0 is placed at (0, 0).
 
-struct Surface_004a1ab0;
 
 
 // Unused here: real declarations that keep the file's symbol count.
+void __stdcall CycleSelection(void);
+void FreeMapResources(void);
 void StopAllSounds();
 void FreeLosTables();
 void InitEyeballs();
@@ -1312,8 +1313,8 @@ void RemoveLocalPlayers(void);
 int __stdcall ReceiveNetPacket(void);
 void UpdateTimeoutDialog(void);
 
-void __stdcall GrayRectangle(Surface_004a1ab0* dst, Rect* rect);
-void __stdcall FadeRectangle(Surface_004a1ab0* dst, Rect* rect, int level);
+int __stdcall GrayRectangle(Surface* dst, Rect* rect);
+int __stdcall FadeRectangle(Surface* dst, Rect* rect, int level);
 
 // FUNCTION: 0x4a1ab0
 void __stdcall RedrawGadgetRect(Gui* obj, int index)
@@ -1330,8 +1331,8 @@ void __stdcall RedrawGadgetRect(Gui* obj, int index)
     }
     rect.right = e->width + rect.left - 1;
     rect.bottom = e->height + rect.top - 1;
-    GrayRectangle((Surface_004a1ab0*)entries->u.assets.surface, &rect);
-    FadeRectangle((Surface_004a1ab0*)entries->u.assets.surface, &rect, -0x14);
+    GrayRectangle(entries->u.assets.surface, &rect);
+    FadeRectangle(entries->u.assets.surface, &rect, -0x14);
 }
 // Draws one entry of a list gadget: the frame, then either the text rows
 // (flags 0x10) or the cell rows (flags 0x20/0x80).
@@ -1399,7 +1400,7 @@ int __stdcall DrawWrappedText(void* surface, char* text, int x, int y, int maxw,
                             int rem, int style);
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2,
                             int colour);
-void __stdcall FadeRectangle(void* surface, Rect* rect, int id);
+int __stdcall FadeRectangle(Surface* surface, Rect* rect, int id);
 void __stdcall DrawFrameQuad(void* surface, void* bitmap, Quad_004a1b40* dst,
                             Quad_004a1b40* src);
 
@@ -1459,7 +1460,7 @@ void __stdcall DrawListBox(Gui* obj, int index)
     entries = obj->layer->entries;
     Gadget* me = &entries[index];
     int h = me->height;
-    void* surface;
+    Surface* surface;
     GetGadgetRect(&entries[index], (Rect*)&bounds);
     surface = holder->surface;
     if (surface == 0)
@@ -1565,7 +1566,7 @@ void __stdcall DrawListBox(Gui* obj, int index)
         Rect cellRect;
         Rect clip;
         unsigned int bp = (flags >> 7) & 1;
-        void* surf = entries->u.assets.surface;
+        Surface* surf = entries->u.assets.surface;
         // surf stays void*: typing it as Surface* needs a cast at the declaration, and the file stops matching without the casts below.
         ((Surface*)surf)->GetClipRect(&clip);
         ((Surface*)surf)->SetClipRect(bounds);
@@ -1742,7 +1743,7 @@ struct Proj_0049c740;
 void __stdcall DrawGafBar(Gui* param_1, int index)
 {
     Gadget* base = param_1->layer->entries;
-    void* surface = base->u.assets.surface;
+    Surface* surface = base->u.assets.surface;
     Gadget* e = &base[index];
     GafEntry* glyphs = e->inputGaf;
     GafFrame* glyph = (GafFrame*)GetGafFrame(glyphs, 0);
@@ -1810,10 +1811,10 @@ int GetFont();
 void __stdcall GetTextWidth(Font_004a2580* font, char* text);
 int GetFontHeight();
 void __stdcall DrawString(void* surface, char* text, int x, int y, int maxw);
-void __stdcall GrayRectangle(void* surface, void* rect);
-void __stdcall FadeRectangle(void* surface, void* rect, int a);
+int __stdcall GrayRectangle(Surface* surface, Rect* rect);
+int __stdcall FadeRectangle(Surface* surface, Rect* rect, int a);
 
-static inline void* Surface_004a2580(Gui* o)
+static inline Surface* Surface_004a2580(Gui* o)
 {
     return o->layer->entries->u.assets.surface;
 }
@@ -1846,7 +1847,7 @@ void __stdcall DrawSliderBar(Gui* obj, int index)
 {
     Gadget* entries = obj->layer->entries;
     Gadget* e = &entries[index];
-    void* surface = Surface_004a2580(obj);
+    Surface* surface = Surface_004a2580(obj);
     // One glyph pointer for every fetch, and one limit in the w<h arm: frame slot order.
     GafFrame* g;
 
@@ -1876,7 +1877,7 @@ void __stdcall DrawSliderBar(Gui* obj, int index)
         short w = e->width;
         short h = e->height;
         if (w < h) {
-            void* surf = Surface_004a2580(obj);
+            Surface* surf = Surface_004a2580(obj);
             int y = e->y;
             int x = e->x;
             int limit = y + e->height - 1;
@@ -1915,7 +1916,7 @@ void __stdcall DrawSliderBar(Gui* obj, int index)
             g = (GafFrame*)GetGafFrame(e->sliderGaf, e->sliderStyle + 5);
             DrawFrame(surf, g, x, limit - g->height + 1);
         } else {
-            void* surf = Surface_004a2580(obj);
+            Surface* surf = Surface_004a2580(obj);
             int x = e->x;
             int y = e->y;
             int limit = x + e->width - 1;
@@ -1981,18 +1982,18 @@ void __stdcall DrawSliderBar(Gui* obj, int index)
     }
 
     if ((e->attribs & 0x10) || e->sliderLocked != 0) {
-        int rect[4];
+        Rect rect;
         if (e->type == 0) {
-            rect[0] = 0;
-            rect[1] = 0;
+            rect.left = 0;
+            rect.top = 0;
         } else {
-            rect[0] = e->x;
-            rect[1] = e->y;
+            rect.left = e->x;
+            rect.top = e->y;
         }
-        rect[2] = e->width + rect[0] - 1;
-        rect[3] = e->height + rect[1] - 1;
-        GrayRectangle(entries->u.assets.surface, rect);
-        FadeRectangle(entries->u.assets.surface, rect, -0x14);
+        rect.right = e->width + rect.left - 1;
+        rect.bottom = e->height + rect.top - 1;
+        GrayRectangle(entries->u.assets.surface, &rect);
+        FadeRectangle(entries->u.assets.surface, &rect, -0x14);
     }
 }
 #pragma pack(push, 1)
@@ -3154,9 +3155,9 @@ void ApplyDefaultSoundOptions();
 struct Language_004a4660 { char unknown_0[0xc]; unsigned short *glyphs; };
 struct LanguageRoot_004a4660 { char unknown_0[0x14]; Language_004a4660 *language; };
 
-void __stdcall LockScreen(void *);
+int __stdcall LockScreen(Surface *);
 void __stdcall FillBevelBox(void *, Rect *, int, int, int);
-int __stdcall FillRectangle(void *, Rect *, int);
+int __stdcall FillRectangle(Surface *, Rect *, int);
 void __stdcall DrawTextClipped(void *, char *, int, int, int, int);
 char* __stdcall GetGafFrame(void* glyphs, int c);
 int GetFont();
@@ -3192,7 +3193,7 @@ void __stdcall DrawProgressBarGadget(Gui *obj, int index)
     Gadget *entry = (Gadget *)((char *)entries + index * 0x15b);
     obj->language = obj->values[1];
 
-    void *surface = entries->u.assets.surface;
+    Surface *surface = entries->u.assets.surface;
     if (surface == 0)
         surface = obj->fallback;
     LockScreen(surface);
@@ -3361,7 +3362,7 @@ double __stdcall DotProduct(float ax, float ay, float az, float bx, float by, fl
 
 char* __stdcall GetGafFrame(void* glyphs, int c);
 void __stdcall DrawFrame(void* surface, void* frame, int x, int y);
-int __stdcall FillRectangle(void* surface, Rect* rect, int color);
+int __stdcall FillRectangle(Surface* surface, Rect* rect, int color);
 void __stdcall DrawFrameQuad(void* surf, void* entry, Quad_004a4980* dst, Quad_004a4980* src);
 
 // FUNCTION: 0x4a4980
@@ -3650,7 +3651,7 @@ void __stdcall SetTextColors(int colour, int font);
 int GetTextKeyColor();
 void __stdcall DrawListboxFrame(Gui* obj, int index, void* bmp);
 void __stdcall CopySurfaceRect(void* dst, void* src, Rect* rect, int* pos);
-int __stdcall FillRectangle(void* surface, Rect* rect, int colour);
+int __stdcall FillRectangle(Surface* surface, Rect* rect, int colour);
 void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw, int style);
 // The colour parameter must be int: forces the zero extension of the colour load.
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2,
@@ -3725,7 +3726,7 @@ void __stdcall DrawTextInput(Gui* obj, int index)
     if (me->attribs & 1) {
         FillRectangle(entries->u.assets.surface, &rect, obj->colours[0]);
     } else {
-        void* surface = obj->layer->surface;
+        Surface* surface = obj->layer->surface;
         if (surface == 0)
             surface = obj->fallback;
         if (surface == 0) {
@@ -4070,9 +4071,9 @@ Surface* __stdcall AllocSurface(char* name, int width, int height);
 void __stdcall FreeSurface(void* surface);
 void __stdcall DrawSurface(void* dst, void* bmp, int x, int y);
 void __stdcall DrawString(void* surface, char* text, int x, int y, int maxw);
-int __stdcall FillRectangle(void* surface, Rect* rect, int colour);
-void __stdcall GrayRectangle(void* surface, Rect* rect);
-void __stdcall FadeRectangle(void* surface, Rect* rect, int level);
+int __stdcall FillRectangle(Surface* surface, Rect* rect, int colour);
+int __stdcall GrayRectangle(Surface* surface, Rect* rect);
+int __stdcall FadeRectangle(Surface* surface, Rect* rect, int level);
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int colour);
 void __stdcall DrawFrame(void* surface, GafFrame* glyph, int x, int y);
 void __stdcall DrawFrameLit(void* surface, GafFrame* glyph, int x, int y, int style);
@@ -4411,7 +4412,7 @@ void __stdcall DrawButton(Gui* menu, int index)
 {
     char* p;
     char key2[2];
-    void* surface;
+    Surface* surface;
     Gadget* me;
     // Declaration order matters: rect before flagy and t, textw last.
     // Kept: calling GetGadgetRect_inlined here moves DecrementKnobPos (0x4a96d0).
@@ -4625,6 +4626,8 @@ void CheckPlayerTimeouts(void);
 int HandleNetPackets(void);
 void RegisterEmptyAtexitB(void);
 void RegisterEmptyAtexitC(void);
+void BuildFogTiles(void);
+
 // FUNCTION: 0x4a69d0
 void __stdcall ClearAllStatus(Gui* param_1)
 {
