@@ -220,7 +220,7 @@ void __stdcall PlayMovie(char* param);
 int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int param_4);
 void __stdcall MarkLayerChanged(void* menu);
 void RegisterDataArchives();
-char __stdcall FindGameCdDrive(int side);
+char __stdcall FindGameCdDrive(int param_1);
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
 void __cdecl GameFreeThunk(void* p);
 void __stdcall PlaySoundByName(char* name, int param_2);
