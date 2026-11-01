@@ -4051,7 +4051,7 @@ int GetTextKeyColor();
 GafFrame* __stdcall GetGafFrame(GafEntry* table, int index);
 GafEntry* __stdcall FindGafEntry(void* gaf, const char* name);
 void* __stdcall LoadGaf(char* path);
-char* __stdcall ChangeExtension(char* out, char* in, const char* ext);
+char* __stdcall ChangeExtension(char* out, char* in, char* ext);
 long __stdcall HAPI_FileLengthByName(char* path);
 char* __stdcall HAPI_LoadFile(char* name, int* size);
 char* __stdcall Translate(char* key);
