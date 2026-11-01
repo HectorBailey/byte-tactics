@@ -114,16 +114,16 @@ struct Primitive3do {
 // One node of a model's piece tree: its geometry, its box relative to its
 // parent and its child and sibling links.
 struct Object3do {
-    char unknown_0[4];
+    int version;                       // +0x00
     int vertexCount;                   // +0x04
     int faceCount;                     // +0x08
     int firstFace;                     // +0x0c
-    int box_x;                         // +0x10
-    int box_y;                         // +0x14
-    int box_z;                         // +0x18
+    int x;                             // +0x10, the offset from the parent
+    int y;                             // +0x14
+    int z;                             // +0x18
     const char* name;                  // +0x1c
-    char unknown_20[4];
-    Vec3* points;                      // +0x24
+    int always0;                       // +0x20
+    Vec3* vertices;                    // +0x24
     Primitive3do* faces;                // +0x28
     Object3do* sibling;                // +0x2c
     Object3do* child;                  // +0x30
@@ -1047,7 +1047,7 @@ int __fastcall RestorePieceVertices(Piece_459c70* piece, int force)
 {
     int result = force;
     if (piece->modified == 0 || force) {
-        memcpy(piece->points, piece->object->points, piece->object->vertexCount * 12);
+        memcpy(piece->points, piece->object->vertices, piece->object->vertexCount * 12);
         piece->offset.x = 0;
         piece->offset.y = 0;
         piece->offset.z = 0;
@@ -1168,7 +1168,7 @@ Piece_459c70* __stdcall AddStateEntries(Model_459200* state, Object3do* obj,
     e->object = obj;
     e->modified = 0;
     e->points = (Vec3*)GameAllocIgnoreTag("Point List", obj->vertexCount * 12);
-    memcpy(e->points, obj->points, obj->vertexCount * 12);
+    memcpy(e->points, obj->vertices, obj->vertexCount * 12);
     if (obj->vertexCount >= 3) {
         e->flags.word |= 1;
     } else {
@@ -1286,9 +1286,9 @@ void __fastcall PoseModel(Model_459200* model, Piece_459c70* piece, int force)
 
     Object3do* object = piece->object;
     Vec3 box;
-    box.x = piece->rot_x + object->box_x;
-    box.y = piece->rot_y + object->box_y;
-    box.z = piece->rot_z + object->box_z;
+    box.x = piece->rot_x + object->x;
+    box.y = piece->rot_y + object->y;
+    box.z = piece->rot_z + object->z;
 
     TransformPieces(model, piece, &pos, &box, 0);
 
