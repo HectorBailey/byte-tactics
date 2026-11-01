@@ -645,7 +645,7 @@ extern long g_squashThreadLockTicket;                                           
 //   0x512348 g_missionOrderTableEnd: part of another global: g_missionOrderTableVec+0x8
 //   0x512358 MovementClassTable::g_movementClasses: defined in src/units/movement_class.cpp
 //   0x512764 g_battleRoomBaseGadgetCount: short (1), int (1)
-//   0x512770 g_serialPortNumber: char[] (1), Serial_00441c30 (1)
+//   0x512770 g_serialPortNumber: char[] (1), DPCOMPORTADDRESS (1)
 //   0x5129d0 g_sendCondenser: defined in src/network/net_condenser.cpp
 //   0x5129f8 g_receiveCondenser: defined in src/network/net_condenser.cpp
 //   0x512c84 g_cmdlineHostMode: part of another global: g_cmdlineDplayProvider+0x4
