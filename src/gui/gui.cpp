@@ -549,7 +549,7 @@ void __stdcall SetGadgetActive(Gui* menu, int index, int value);
 void __stdcall ClearPeerStatus(Gui* obj, int index);
 char* __stdcall Translate(char* text);
 void __stdcall FatalError(char* path);
-void __stdcall DrawLitRectangle(int surface, Rect* rect, int level);
+Surface* __stdcall DrawLitRectangle(Surface* surface, int* rect, int color);
 void __stdcall SetFont(int id);
 int __cdecl tolower(int c);
 
@@ -1131,7 +1131,7 @@ void __stdcall DrawGadgetSelectionBox(Gui* obj, int index, int param_3)
             rect.top--;
             rect.right++;
             rect.bottom++;
-            DrawLitRectangle((int)obj->layer->entries->u.assets.surface, &rect, level);
+            DrawLitRectangle(obj->layer->entries->u.assets.surface, (int*)&rect, level);
             level += -3 - step;
         }
     }
@@ -4076,7 +4076,7 @@ int __stdcall GrayRectangle(Surface* surface, Rect* rect);
 int __stdcall FadeRectangle(Surface* surface, Rect* rect, int level);
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int colour);
 void __stdcall DrawFrame(void* surface, GafFrame* glyph, int x, int y);
-void __stdcall DrawFrameLit(void* surface, GafFrame* glyph, int x, int y, int style);
+void __stdcall DrawFrameLit(Surface* surface, GafFrame* glyph, int x, int y, int style);
 void __stdcall FillBevelBox(void* surface, Rect* rect, int light, int dark, int fill);
 void __stdcall FillBevelBoxDarkFirst(void* surface, Rect* rect, int light, int dark, int fill);
 void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw, int style);
