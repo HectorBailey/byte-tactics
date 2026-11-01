@@ -3116,26 +3116,25 @@ int CheckMapCrc();
 void OpenNewMultiDialog();
 int __cdecl GetLocalPlayerPassword();
 
-struct Holder_004a4660 {
-    char unknown_0[4];
-    Gadget *entries;
-};
-
-struct Dialog_4a4660 {
-    char unknown_0[0xc];
-    void *surface;
-    int unknown_10;
-    void *oldSurface;
-    Holder_004a4660 *holder;
-    char unknown_1c[0x8b2 - 0x1c];
-    unsigned char color1;
-    char unknown_8b3[0x8c3 - 0x8b3];
-    unsigned char color2;
-    char unknown_8c4[2];
-    unsigned char color3;
-    char unknown_8c7[0xcd2 - 0x8c7];
-    void *fallbackSurface;
-};
+// Unused here: real declarations that keep the file's symbol count (docs/c2-regalloc.md).
+void InitStartingResourcesFromSkirmish(void);
+void __stdcall ShowSavedGameInfo(void);
+void ShowSaveGameScreen(void);
+void ShowLoadGameScreen(void);
+bool IsReporterDllLoaded(void);
+int IsLocalPlayerEliminated(void);
+int FUN_00490200(void);
+void QueryGlobalMemoryStatus(void);
+void ToggleFullScreen(void);
+int GetDisplay(void);
+void UpdateTimers(void);
+void ResetTimers(void);
+unsigned long GetMilliseconds(void);
+int __stdcall DrawFrameRate(void);
+int GetTextForeColor(void);
+int GetTextBackColor(void);
+int GetScreenLockCount(void);
+void UnlockAllScreens(void);
 
 // Unused here: the symbol ids this declaration takes keep the allocation after
 // the Rect_004a4660 view was dropped (docs/c2-regalloc.md).
@@ -3180,15 +3179,15 @@ static inline int Measure_004a4660(char *text)
 }
 
 // FUNCTION: 0x4a4660
-void __stdcall DrawProgressBarGadget(Dialog_4a4660 *obj, int index)
+void __stdcall DrawProgressBarGadget(Gui *obj, int index)
 {
-    Gadget *entries = obj->holder->entries;
+    Gadget *entries = obj->layer->entries;
     Gadget *entry = (Gadget *)((char *)entries + index * 0x15b);
-    obj->oldSurface = obj->surface;
+    obj->language = obj->values[1];
 
     void *surface = entries->u.assets.surface;
     if (surface == 0)
-        surface = *(void **)((char *)obj + 0xcd2);
+        surface = obj->fallback;
     LockScreen(surface);
 
     Rect rect;
@@ -3196,7 +3195,7 @@ void __stdcall DrawProgressBarGadget(Dialog_4a4660 *obj, int index)
     rect.top = entry->y;
     rect.right = entry->width + entry->x;
     rect.bottom = entry->height + entry->y;
-    FillBevelBox(surface, &rect, obj->color1, obj->color2, obj->color3);
+    FillBevelBox(surface, &rect, obj->colours[0], obj->colours[0x11], obj->colours[0x14]);
 
     rect.left += 2;
     rect.top += 2;
@@ -3225,7 +3224,7 @@ void __stdcall DrawProgressBarGadget(Dialog_4a4660 *obj, int index)
             (entry->height / 2 - height / 2) + entry->y, -1, 0);
     }
 
-    obj->oldSurface = *(void **)((char *)obj + 8);
+    obj->language = obj->values[0];
     UnlockScreen(surface);
 }
 // Advances GUI entry i's animated value by its step each time its interval
