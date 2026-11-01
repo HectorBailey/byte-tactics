@@ -8,6 +8,10 @@ extern "C" unsigned int __cdecl strlen(const char*);
 #include "gui.h"
 #include "layer.h"
 
+// Unused here: the symbol ids these declarations take keep 0x4a0880 matching (docs/c2-regalloc.md).
+void EnableAICommands(void);
+void RegisterAICommands(void);
+
 // FUNCTION: 0x4a0880
 void __stdcall SetGadgetText(Gui* obj, int index, char* text)
 {
