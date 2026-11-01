@@ -1,11 +1,12 @@
 // Decompiled by Opus. Names are provisional.
-// Under the global critical section (GetNameTableLock), re-inserts a name key
-// into the name map's tree at +0x0 (its LowerBound, Erase and InsertOrFind
-// are the name map's, 0x4e2580, 0x4dfea0 and 0x4e2250): an existing entry is
-// erased first, otherwise the "changed" flag at +0x10 is set. Erase is
-// erase(iterator) and InsertOrFind is insert(key), both returning through a
-// hidden pointer.
+// Under the global critical section (GetNameTableLock), re-inserts a name's
+// value into the name map's tree at +0x0 (its LowerBound, Erase and
+// InsertOrFind are the name map's, 0x4e2580, 0x4dfea0 and 0x4e2250): an
+// existing entry is erased first, otherwise the "changed" flag at +0x10 is
+// set. Erase is erase(iterator) and InsertOrFind is insert(value), both
+// returning through a hidden pointer.
 #include <windows.h>
+#include <utility>
 
 class NameTableLock {
 public:
@@ -21,9 +22,12 @@ public:
     bool LessThan(const NameKey& other) const;
 };
 
-// The name map's value_type and mapped text (debug_lib.cpp defines them).
-namespace std { template<class T1, class T2> struct pair; }
-struct NameMapText;
+// The name map's mapped text and value_type, as debug_lib.cpp declares them.
+struct NameMapText {
+    char text[500];
+};
+
+typedef std::pair<const NameKey, NameMapText> NameMapValue;
 
 struct NameMapNode {
     NameMapNode* left;                 // +0x0
@@ -63,7 +67,7 @@ public:
     NameMapIter LowerBound(const char* const& key);
     NameMapIter Erase(NameMapIter it);
     // Defined in debug_lib.cpp (0x4e2250), on the map's value_type.
-    NameMapInsertResult InsertOrFind(const std::pair<const NameKey, NameMapText>& v);
+    NameMapInsertResult InsertOrFind(const NameMapValue& v);
 };
 
 class NameTable : public NameMapTree {
@@ -80,19 +84,19 @@ public:
         NameMapIter p = LowerBound((const char* const&)key.name);
         return (p == End() || compare(key, p.ptr->key)) ? End() : p;
     }
-    void Upsert(const NameKey& key);
+    void Upsert(const NameMapValue& value);
 };
 
 // FUNCTION: 0x4e1990
-void NameTable::Upsert(const NameKey& key)
+void NameTable::Upsert(const NameMapValue& value)
 {
     NameTableLock* lock = GetNameTableLock();
     EnterCriticalSection(&lock->cs);
-    NameMapIter it = Find(key);
+    NameMapIter it = Find(value.first);
     if (it != End())
         Erase(it);
     else
         changed = 1;
-    InsertOrFind((const std::pair<const NameKey, NameMapText>&)key);
+    InsertOrFind(value);
     LeaveCriticalSection(&lock->cs);
 }

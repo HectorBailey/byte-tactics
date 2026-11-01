@@ -4746,7 +4746,7 @@ public:
     bool changed;                      // +0x10
 
     NameTable();
-    void Upsert(void* key);
+    void Upsert(const NameMapValue& value);
 };
 
 NameTable* GetNameTable();
@@ -5186,7 +5186,7 @@ BOOL PerformanceDialog::HandlePerformanceMessage(UINT msg, WPARAM wParam, LPARAM
             // Guarded do-while: a while or for loop moves the loop registers.
             if (Iterator_004df590(node) != Iterator_004df590(names->head)) {
                 do {
-                    map.Upsert(&node->value);
+                    map.Upsert((const NameMapValue&)node->value);
                     SendDlgItemMessageA(hwnd, 0x3f4, 0x180, 0, (LPARAM)node->value.id);
                     if (NamesEqual_004df590(node->value.id, selected.id))
                         sel = n;

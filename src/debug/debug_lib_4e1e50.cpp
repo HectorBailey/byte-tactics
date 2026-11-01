@@ -24,13 +24,14 @@ extern unsigned char g_perfDisplayInWindow;  // reports go to the log
 extern char g_reportIndentText[];       // the indent of the current report
 extern char g_emptyStringLiteral[];     // ""
 
-// A report for the log: its name and its text.
-class NameKey {
+// A report for the log: its name and its text, the name map's value as this
+// file builds it.
+class NameMapValue {
 public:
     const char* name;                   // +0x0
     char text[500];                     // +0x4
 
-    NameKey(const char* name_)
+    NameMapValue(const char* name_)
     {
         name = name_;
         if (!name_)
@@ -39,9 +40,15 @@ public:
     }
 };
 
+// The map's key and mapped text (debug_lib.cpp defines them): Upsert takes
+// the value as their std::pair, as debug_lib_4e1990.cpp defines it.
+class NameKey;
+struct NameMapText;
+namespace std { template<class T1, class T2> struct pair; }
+
 class NameTable {
 public:
-    void Upsert(const NameKey& key);
+    void Upsert(const std::pair<const NameKey, NameMapText>& value);
 };
 
 NameTable* GetNameTable();
@@ -107,9 +114,9 @@ void Timer::ReportElapsedTime(const char* label)
     if (g_perfDisplayInDebugger && (flags & 2))
         OutputDebugStringA(text);
     if (g_perfDisplayInWindow) {
-        NameKey report(label);
+        NameMapValue report(label);
         strcpy(report.text, text);
-        GetNameTable()->Upsert(report);
+        GetNameTable()->Upsert((const std::pair<const NameKey, NameMapText>&)report);
     }
 }
 
