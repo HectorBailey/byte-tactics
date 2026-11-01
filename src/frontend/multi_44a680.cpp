@@ -124,7 +124,7 @@ int __stdcall GetTextPixelWidth(char* text);
 int __stdcall GetFontLineHeight();
 void __stdcall DrawTextClipped(int a, char* text, int x, int y, int w, int h);
 void __stdcall SetCurrentFont(Gui* gui, int flag);
-void __stdcall CloseTopScreen(void* gui);
+void __stdcall CloseTopScreen(Gui* gui);
 int __stdcall IsScreenNamed(Gui* gui, const char* name);
 void __stdcall SetSliderFromValue(Gadget_0044a680* gadget, int value);
 int __stdcall ReadSliderValue(Gadget_0044a680* gadget);

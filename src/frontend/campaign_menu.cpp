@@ -187,7 +187,7 @@ void __stdcall MarkLayerChanged(Gui* menu);
 void __stdcall SetKeyboardInput(Gui* menu, int value);
 int __stdcall RenderLayer(Gui* gui, unsigned int flags);
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, unsigned int flags);
-void __stdcall SelectGadgetByName(Gui* menu, const char* name);
+void __stdcall SelectGadgetByName(Gui* menu, char* name);
 void __stdcall RemapPaletteToClosestIndices(Gui* menu, void* param_2, void* param_3);
 void __stdcall PlaySoundByName(char* name, int param_2);
 char __stdcall FindGameCdDrive(int side);
@@ -205,7 +205,7 @@ int __stdcall SetPaletteColors(unsigned char* src, int start, int count);
 void __stdcall SetOffscreenSurface(int param_1);
 struct Surface;
 void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y);
-void __stdcall FreeSurface(void* param_1);
+void __stdcall FreeSurface(Surface* obj);
 int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, int autoHeight);
 void __stdcall ClearSelectedGadget(void* menu);
 void __stdcall SetCursorMode(int n);
@@ -220,17 +220,17 @@ void __stdcall DrawBitmapBackground(char* name, int lock)
 {
     char path[0x100];
     unsigned char palette[0x400];
-    void* image;
+    Surface* image;
 
     if (lock) {
         HideSoftwareCursor();
         BlankScreen();
     }
     BuildDataPath(path, "bitmaps", name, "PCX");
-    image = LoadBitmapByName(name, palette);
+    image = (Surface*)LoadBitmapByName(name, palette);
     SetPaletteColors(palette, 0, 0x100);
     SetOffscreenSurface(g_game->offscreen);
-    DrawSurface(0, (Surface*)image, 0, 0);
+    DrawSurface(0, image, 0, 0);
     FreeSurface(image);
     if (lock) {
         ShowSoftwareCursor();

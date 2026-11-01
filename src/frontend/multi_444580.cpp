@@ -37,7 +37,7 @@ extern Game_00444580* g_game;
 extern LinkInfo g_linkInfo[];
 extern char DAT_004fcfb8[];
 
-void __stdcall CloseTopScreen(void* menu);
+void __stdcall CloseTopScreen(Gui* gui);
 int __stdcall SetPaletteColors(unsigned char* src, int start, int count);
 void __stdcall RemapPaletteToClosestIndices(void* menu, void* palette, void* copy);
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, unsigned int flags);

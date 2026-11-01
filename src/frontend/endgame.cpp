@@ -311,7 +311,7 @@ int __stdcall AddBarGadget(Gui* menu, Bar* record);
 int GetFontLineHeight();
 void __stdcall AddTextGadget(Layer* layer, char* name, char* text, int x, int y, int w, int flags);
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, unsigned int flags);
-void __stdcall SelectGadgetByName(Gui* menu, const char* name);
+void __stdcall SelectGadgetByName(Gui* menu, char* name);
 char* __stdcall BuildScrollItems1(char* names, char* flags, int count);
 void __stdcall ConfigureListBoxByName(Gui* menu, char* name, void* items, int count, int flag);
 Gadget* __stdcall FindGadgetChecked_D(char* entries, char* name);
