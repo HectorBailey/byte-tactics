@@ -152,8 +152,7 @@ void __stdcall HandleMissionBriefingClick(Gui* menu);
 void __stdcall HandleNewGameClick(Gui* menu);
 void __stdcall FillMissionList();
 char* __stdcall Translate(const char* text);
-void __stdcall AddTextGadget(Layer* dialog, const char* name, char* text, int x, int y,
-                            int w, int flags);
+void __stdcall AddTextGadget(Layer* layer, char* name, char* text, int x, int y, int w, int flags);
 void __stdcall SetTranslatedTextByName(Gui* menu, const char* name, char* text, int value);
 void __stdcall SetGadgetColorByName(Gui* menu, const char* name, int value);
 void __stdcall AddBlinkWord(Gui* menu, char* text, int x, int y, int count,
@@ -206,7 +205,7 @@ void __stdcall SetPaletteColors(unsigned char* palette, int first, int count);
 void __stdcall SetOffscreenSurface(int param_1);
 void __stdcall DrawSurface(void* dest, void* image, int x, int y);
 void __stdcall FreeSurface(void* param_1);
-void __stdcall OpenMessageBox(char* dest, char* text, int param_3, int param_4, int param_5);
+int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, int autoHeight);
 void __stdcall ClearSelectedGadget(void* menu);
 void __stdcall SetCursorMode(int n);
 int __stdcall IsCurrentGadgetNamed(Gui* menu, char* name);
@@ -677,7 +676,7 @@ void __stdcall HandleSingleMenuClick(Gui* gadget)
             g_game->frontendSubstateRequest = 10;
             SetCursorMode(0x14);
         } else {
-            OpenMessageBox((char*)&g_game->gui, Translate("Please insert the Campaign CD (Disc 2) and try again"), 200, 1, 1);
+            OpenMessageBox(&g_game->gui, Translate("Please insert the Campaign CD (Disc 2) and try again"), 200, 1, 1);
             ClearSelectedGadget((char*)&g_game->gui);
         }
         return;
@@ -689,7 +688,7 @@ void __stdcall HandleSingleMenuClick(Gui* gadget)
             g_game->frontendSubstateRequest = 11;
             SetCursorMode(0x14);
         } else {
-            OpenMessageBox((char*)&g_game->gui, Translate("Please insert the Multiplayer CD (Disc 1) and try again"), 200, 1, 1);
+            OpenMessageBox(&g_game->gui, Translate("Please insert the Multiplayer CD (Disc 1) and try again"), 200, 1, 1);
             ClearSelectedGadget((char*)&g_game->gui);
         }
         return;
@@ -721,7 +720,7 @@ void __stdcall HandleSingleMenuClick(Gui* gadget)
             g_game->frontendSubstateRequest = 14;
             SetCursorMode(0x14);
         } else {
-            OpenMessageBox((char*)&g_game->gui, Translate("Please insert the Campaign CD (Disc 2) and try again"), 200, 1, 1);
+            OpenMessageBox(&g_game->gui, Translate("Please insert the Campaign CD (Disc 2) and try again"), 200, 1, 1);
             ClearSelectedGadget((char*)&g_game->gui);
         }
         return;
@@ -854,7 +853,7 @@ void __stdcall HandleNewGameClick(Gui* menu)
         index = 0;
         PlaySoundByName("bigButton", 0);
         if (!FindGameCdDrive(0)) {
-            OpenMessageBox((char*)&g_game->gui,
+            OpenMessageBox(&g_game->gui,
                          Translate("Please insert the Campaign CD (Disc 2) and try again"),
                          200, 1, 1);
             ClearSelectedGadget(&g_game->gui);
@@ -1268,7 +1267,7 @@ void __stdcall HandleMissionBriefingClick(Gui* menu)
             g_game->frontendSubstateRequest = 2;
             return;
         }
-        OpenMessageBox((char*)&g_game->gui,
+        OpenMessageBox(&g_game->gui,
                      Translate("Please insert the Campaign CD (Disc 2) and try again"),
                      200, 1, 1);
         ClearSelectedGadget(&g_game->gui);

@@ -227,7 +227,7 @@ void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const
 void* __stdcall LoadPcx(char* path, int param);
 char* __stdcall MakePropList(void* obj);
 char* __stdcall Translate(char* text);
-void __stdcall AddTextGadget(Layer* obj, char* name, char* text, int x, short y, int w, int flags);
+void __stdcall AddTextGadget(Layer* obj, char* name, char* text, int x, int y, int w, int flags);
 int __stdcall IsUnitVisibleToPlayer(Player* player, Unit* unit);
 unsigned short __stdcall FindUnitTypeId(char* name);
 void __stdcall DisableKeyCommands(Gui* menu);

@@ -28,7 +28,7 @@ void __stdcall SetCursorMode(int value);
 int __stdcall OnlineProcessButtonCommand(int button, char* message, unsigned int size);
 void OnlineUnload();
 char* __stdcall Translate(char* text);
-void __stdcall OpenMessageBox(void* menu, char* text, int size, int param_4, int param_5);
+int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, int autoHeight);
 void __stdcall ClearSelectedGadget(void* menu);
 void OpenOptionsPanel();
 

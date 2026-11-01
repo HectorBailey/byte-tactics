@@ -208,7 +208,7 @@ extern int g_cdPlayerDialogShown;
 extern PictureCacheEntry g_pictureCache[10];
 
 int CodeChecksumFailed(void);
-void __stdcall OpenMessageBox(Gui* sub, char* text, int param_3, int param_4, int param_5);
+int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, int autoHeight);
 int __stdcall GetTextPixelWidth(char* text);
 void __stdcall SetOffscreenSurface(int param_1);
 void __stdcall FillSurface(int param_1, int param_2);

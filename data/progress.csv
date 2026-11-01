@@ -2276,7 +2276,7 @@ address,size,file,symbol,status,similarity
 0x4ab0b0,188,src/gui/dialogs.cpp,?BlitLayers@@YGHPAULayer@@PAXPAURect@@@Z,matched,100.0
 0x4ab170,26,src/gui/dialogs.cpp,?BlitMenuLayers@@YGXPAUGui@@PAIPAH@Z,matched,100.0
 0x4ab190,17,src/gui/dialogs.cpp,?SetDescListCleanupFlag@@YGXHH@Z,matched,100.0
-0x4ab1b0,215,src/gui/dialogs.cpp,?AddTextGadget@@YGXPAULayer@@PAD1HFHH@Z,matched,100.0
+0x4ab1b0,215,src/gui/dialogs.cpp,?AddTextGadget@@YGXPAULayer@@PAD1HHHH@Z,matched,100.0
 0x4ab290,26,src/gui/dialogs.cpp,?SetBackgroundSurface@@YGHPAUGui@@H@Z,matched,100.0
 0x4ab2b0,90,src/gui/dialogs.cpp,?AddButtonGadget@@YGHPAUGui@@PAURecord_004ab2b0@@@Z,matched,100.0
 0x4ab310,129,src/gui/dialogs.cpp,?AddHotspotGadget@@YGHPAUGui@@PAURecord_004ab310@@@Z,matched,100.0

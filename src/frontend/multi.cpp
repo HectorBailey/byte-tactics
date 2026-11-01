@@ -374,11 +374,11 @@ extern GUID g_dpspGuidIpx;
 extern GUID g_dpspGuidSerial;
 int __stdcall FindGadgetIndex(void* entries, const char* name, int flag);
 void __stdcall MarkChanged(void* menu);
-void __stdcall BlitMenuLayers(void* menu, int a, int b);
+void __stdcall BlitMenuLayers(Gui* gui, unsigned int* surface, int* rect);
 void __stdcall SetGadgetActiveByName(void* menu, const char* name, int value);
 void __stdcall ConfigureListBoxByName(void* menu, const char* name, char* text, int count, int flag);
 void __stdcall CloseTopScreen(void* menu);
-void __stdcall OpenMessageBox(void* menu, const char* text, int a, int b, int c);
+int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, int autoHeight);
 char* __stdcall Translate(const char* text);
 void __stdcall SetOffscreenSurface(int a);
 void FlipScreen();
@@ -494,7 +494,7 @@ conn:
     msg = "Connecting  (ESC to abort)";
 shown:
     OpenMessageBox(&g_game->gui, Translate(msg), 0x96, 0, 1);
-    BlitMenuLayers(&g_game->gui, g_game->offscreen, 0);
+    BlitMenuLayers(&g_game->gui, (unsigned int*)g_game->offscreen, 0);
     SetOffscreenSurface(g_game->offscreen);
     FlipScreen();
     FlipScreen();
@@ -1016,7 +1016,7 @@ void OpenLoadListDialog();
 void OpenSaveGameDialog();
 void OpenUnitRestrictions();
 void UnitRestrictDialogFrame();
-int __stdcall IsScreenNamed(void* gui, const char* name);
+int __stdcall IsScreenNamed(Gui* gui, const char* name);
 void __stdcall GetGadgetRectByIndex(Gadget* entries, int widget, RECT* rect);
 void __stdcall DrawTextClipped(int a, char* text, int x, int y, int w, int h);
 int AreAllPlayersReady();
@@ -1086,7 +1086,7 @@ void __stdcall HandleNewMultiClick(Gui* gadget)
         if (strlen(namebuf) == 0) {
             BeginTextEdit(gadget, gi);
             ClearSelectedGadget(gadget);
-            OpenMessageBox((char*)gadget, Translate("You must enter a game name"), 0x140, 1, 1);
+            OpenMessageBox(gadget, Translate("You must enter a game name"), 0x140, 1, 1);
             return;
         }
         ni = FindGadgetIndex(entries, "NICKNAME", 3);
@@ -1094,7 +1094,7 @@ void __stdcall HandleNewMultiClick(Gui* gadget)
         if (strlen(nickbuf) == 0) {
             BeginTextEdit(gadget, ni);
             ClearSelectedGadget(gadget);
-            OpenMessageBox((char*)gadget, Translate("You must enter your name"), 0x140, 1, 1);
+            OpenMessageBox(gadget, Translate("You must enter your name"), 0x140, 1, 1);
             return;
         }
         strcpy(g_game->gameName, namebuf);
