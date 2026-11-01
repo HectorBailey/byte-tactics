@@ -3432,7 +3432,6 @@ struct Explosion;
 // inside the rectangle of the entry whose focus was just cleared.
 #pragma pack(push, 1)
 
-struct Dialog_4a4b50;
 // Kept with the 0x4a1b40 view above.
 struct Point_004a4b50 { int x, y; };
 
@@ -3446,25 +3445,24 @@ int HasNetUnitState();
 int TryClaimRepath();
 void CreatePathfinder();
 
-struct Table_004a4b50 {
-    char unknown_0[4];
-    Gadget* entries;                  // +0x4
-};
-
-struct Dialog_4a4b50 {
-    char unknown_0[0x18];
-    Table_004a4b50* table;                    // +0x18
-    char unknown_1c[0x3c - 0x1c];
-    Point_004a4b50 pos;                       // +0x3c
-    char unknown_44[0x64 - 0x44];
-    int focus;                                // +0x64
-};
 #pragma pack(pop)
 
-extern int __stdcall IsMouseButtonMessage(Dialog_4a4b50* obj, unsigned char buttons);
-extern int __stdcall HasMouseKeyFlags(Dialog_4a4b50* obj, unsigned int mask);
-extern void __stdcall SetClickMode(Dialog_4a4b50* obj, int value);
-extern int __stdcall TrySetFocus(Dialog_4a4b50* obj, int index);
+extern int __stdcall IsMouseButtonMessage(Gui* obj, unsigned char buttons);
+extern int __stdcall HasMouseKeyFlags(Gui* obj, unsigned int mask);
+extern void __stdcall SetClickMode(Gui* obj, int value);
+extern int __stdcall TrySetFocus(Gui* obj, int index);
+
+// Unused here: real declarations that keep the file's symbol count (docs/c2-regalloc.md).
+void RestoreScreen(void);
+void DestroyPreCleanup(void);
+void InitBlitLock(void);
+void DrawSoftwareCursor(void);
+int GetCursorSprite(void);
+void ClearMouseEventQueue(void);
+void ShutdownMouse(void);
+void BattleFrame(void);
+void EndGameFrame(void);
+void OpenShareDialog(void);
 
 // Unused here: the symbol ids this declaration takes keep the allocation after
 // the Rect_004a4b50 view was dropped (docs/c2-regalloc.md).
@@ -3478,9 +3476,9 @@ static inline int PointInHotspotRect(const Rect& r, const Point_004a4b50& p)
 }
 
 // FUNCTION: 0x4a4b50
-int __stdcall HandleHotspotInput(Dialog_4a4b50* obj, int index)
+int __stdcall HandleHotspotInput(Gui* obj, int index)
 {
-    Gadget* entries = obj->table->entries;
+    Gadget* entries = obj->layer->entries;
     // Entries are indexed as entries[index], not through a stored pointer.
     // 16-byte stack struct: gives the frame its size.
     Rect r;
@@ -3494,17 +3492,21 @@ int __stdcall HandleHotspotInput(Dialog_4a4b50* obj, int index)
     r.right = entries[index].width - 1 + r.left;
     r.bottom = entries[index].height - 1 + r.top;
     if (entries[index].u.hotspot.callback)
-        entries[index].u.hotspot.callback((Gui*)obj, &entries[index]);
+        entries[index].u.hotspot.callback(obj, &entries[index]);
     if (entries[index].u.hotspot.flags & 1) {
         if (IsMouseButtonMessage(obj, 1)) {
             // Position copied into a local Point before each hit test.
-            Point_004a4b50 p = obj->pos;
+            Point_004a4b50 p;
+            p.x = obj->point.x;
+            p.y = obj->point.y;
             if (PointInHotspotRect(r, p)) {
                 TrySetFocus(obj, index);
                 SetClickMode(obj, 1);
             }
         } else if (IsMouseButtonMessage(obj, 2)) {
-            Point_004a4b50 p = obj->pos;
+            Point_004a4b50 p;
+            p.x = obj->point.x;
+            p.y = obj->point.y;
             if (PointInHotspotRect(r, p)) {
                 TrySetFocus(obj, index);
                 SetClickMode(obj, 2);
@@ -3513,7 +3515,7 @@ int __stdcall HandleHotspotInput(Dialog_4a4b50* obj, int index)
         if (obj->focus == index && !HasMouseKeyFlags(obj, 3)) {
             obj->focus = -1;
             // Read through a pointer so the two loads stay after the focus store.
-            Point_004a4b50* pp = &obj->pos;
+            MouseEvent* pp = &obj->point;
             Point_004a4b50 q;
             q.y = pp->y;
             q.x = pp->x;
