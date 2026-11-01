@@ -88,7 +88,7 @@ struct Pos_4589c0 {
 
 // One primitive of a model node: its vertex indices, its picture and its
 // flags.
-struct FaceFlags_459c70 {
+struct Primitive3doFlags {
     union {
         unsigned int raw;
         struct {
@@ -100,7 +100,7 @@ struct FaceFlags_459c70 {
     };
 };
 
-struct Face_459c70 {
+struct Primitive3do {
     int unknown_0;                     // +0x00
     int count;                         // +0x04
     int unknown_8;                     // +0x08
@@ -108,7 +108,7 @@ struct Face_459c70 {
     void* pic;                         // +0x10
     int unknown_14;                    // +0x14
     unsigned short* color;             // +0x18
-    FaceFlags_459c70 flags;            // +0x1c
+    Primitive3doFlags flags;            // +0x1c
 };
 
 // One node of a model's piece tree: its geometry, its box relative to its
@@ -124,14 +124,14 @@ struct Object3do {
     const char* name;                  // +0x1c
     char unknown_20[4];
     Vec3* points;                      // +0x24
-    Face_459c70* faces;                // +0x28
+    Primitive3do* faces;                // +0x28
     Object3do* sibling;                // +0x2c
     Object3do* child;                  // +0x30
 };
 
 // The flags word of one piece record, read whole or through its bits.
 #pragma pack(push, 2)
-union PieceFlags_459c70 {
+union ObjectPieceFlags {
     unsigned short word;
     struct {
         unsigned short visible : 1;
@@ -154,7 +154,7 @@ struct Piece_459c70 {
     Vec3 offset;                       // +0x16
     Vec3* points;                      // +0x22
     short modified;                    // +0x26
-    PieceFlags_459c70 flags;           // +0x28
+    ObjectPieceFlags flags;           // +0x28
     Piece_459c70* sibling;             // +0x2a
     Piece_459c70* child;               // +0x2e
     Piece_459c70* parent;              // +0x32
@@ -531,7 +531,7 @@ void UnitTable::DrawPieces(GafFrame* bitmap, Model_459200* list,
                     verts++;
                 }
 
-                Face_459c70* face;
+                Primitive3do* face;
                 int fi;
                 if (info->firstFace != -1) {
                     face = info->faces + 1;
@@ -545,7 +545,7 @@ void UnitTable::DrawPieces(GafFrame* bitmap, Model_459200* list,
                     for (int j = 0; j < face->count; j++, idx++) {
                         poly[j] = vertex[*idx];
                     }
-                    FaceFlags_459c70 fflags = face->flags;
+                    Primitive3doFlags fflags = face->flags;
                     if (!fflags.bits.textured) {
                         if (face->count == 4) {
                             void* pic;
@@ -942,7 +942,7 @@ void CMemoryCache::DrawShadowShape(GafFrame* view, Model_459200* model)
                         verts[j].y += view->yOffset;
                         v++;
                     }
-                    Face_459c70* seg = info->faces;
+                    Primitive3do* seg = info->faces;
                     if (info->firstFace != -1) {
                         seg++;
                         segno = 1;
@@ -1318,7 +1318,7 @@ void CMemoryCache::DrawPiece(Model_459200* model, void* surface, Vec3* camera,
                 - ((short)((off.y + vertices->y) >> 16) >> 1)));
         }
     }
-    Face_459c70* face;
+    Primitive3do* face;
     if (info->firstFace != -1) {
         face = info->faces + 1;
         i = 1;
@@ -1339,7 +1339,7 @@ void CMemoryCache::DrawPiece(Model_459200* model, void* surface, Vec3* camera,
                     break;
             }
         }
-        FaceFlags_459c70 flags = face->flags;
+        Primitive3doFlags flags = face->flags;
         if (!flags.bits.textured) {
             if (face->count != 4) goto skip0;
             if (flags.bits.usePic) {
