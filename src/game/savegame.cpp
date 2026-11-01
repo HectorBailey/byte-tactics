@@ -150,7 +150,7 @@ void __stdcall FrameFromSurface(void* dst, void* src);
 void __stdcall FreeSurface(void* image);
 void* __stdcall LoadSurface(HapiBank* obj);
 HapiBank* __stdcall OpenSummaryBank(char* name);
-void __stdcall FreeSummaryBank(void* handle);
+void __stdcall FreeSummaryBank(HapiBank* handle);
 HapiBank* __stdcall OpenHapiBank(char* path);
 void __stdcall SetMissionType(int value);
 void __stdcall PlaySoundByName(char* name, int param);
