@@ -666,15 +666,7 @@ void __stdcall SetOffscreenSurface(void* p);
 void __stdcall SetOffscreenSurface(int param_1);
 void FlipScreen();
 
-int __stdcall LoadGuiLayer(void* obj, char* buf, int size);
-int __stdcall LoadGuiLayer(Menu_0045de30* obj, char* name, int size);
-Layer* __stdcall LoadGuiLayer(Menu_0045e5e0* menu, char* name, int flags);
-Layer* __stdcall LoadGuiLayer(Layer* menu, const char* name, int flags);
-Layer* __stdcall LoadGuiLayer(Sub_0045f800* sub, const char* name, int flags);
-Layer* __stdcall LoadGuiLayer(Sub_0045fb30* sub, const char* name, int flags);
-Layer* __stdcall LoadGuiLayer(Menu_004604a0* menu, const char* name, int flags);
-Layer* __stdcall LoadGuiLayer(Sub_00460680* sub, const char* name, int flags);
-Layer* __stdcall LoadGuiLayer(Gui* sub, const char* name, int flags);
+Layer* __stdcall LoadGuiLayer(Gui* gui, const char* name, unsigned int flags);
 
 void __stdcall SetGrayedOutByName(void* obj, char* name, int value);
 void __stdcall SetGrayedOutByName(Dialog* obj, char* name, int value);
@@ -1420,7 +1412,7 @@ int __cdecl OpenOptionsLayout()
     } else {
         strcpy(buf, "STARTOPT.GUI");
     }
-    int result = LoadGuiLayer((void*)&g_game->gui, buf, 0x80);
+    int result = (int)LoadGuiLayer(&g_game->gui, buf, 0x80);
     SetGrayedOutByName(&g_game->gui, "MUSIC", *(int*)g_game->sound == 0);
     EnableKeyCommands(&g_game->gui);
     if (g_game->bits_2a44.prefsWord.prefs && g_game->mapInfo->GetGameType() != 3) {
@@ -1887,7 +1879,7 @@ void __stdcall OpenVisualOptions(int param_1)
     Menu_0045e5e0* menu;
 
     if (param_1 != i) {
-        layer = LoadGuiLayer((Menu_0045e5e0*)&g_game->gui, "SELVMODE.GUI", 0x800);
+        layer = LoadGuiLayer(&g_game->gui, "SELVMODE.GUI", 0x800);
     } else {
         layer = (Layer*)OpenOptionsLayout();
         RenderLayer(&g_game->gui, 2);
@@ -2155,7 +2147,7 @@ void ShowGameSettingsDialog()
 {
 
 
-    Layer* layer = LoadGuiLayer((Layer*)&g_game->gui, "GAMEOPTIONS.GUI", 0x1881);
+    Layer* layer = LoadGuiLayer(&g_game->gui, "GAMEOPTIONS.GUI", 0x1881);
     Gadget* entries = layer->entries;
     layer->handler = HandleGameSettingsDialogClick;
     LoadPictureCached("GameSettings", 0, 0, 0);
@@ -2260,7 +2252,7 @@ void __stdcall HandleBriefingClick(Gui* gui)
 // FUNCTION: 0x45f800
 void OpenBriefingDialog()
 {
-    Layer* g = LoadGuiLayer((Sub_0045f800*)&g_game->gui, "BRIEFING.GUI", 0);
+    Layer* g = LoadGuiLayer(&g_game->gui, "BRIEFING.GUI", 0);
     Gadget* gadgets = g->entries;
     g->handler = HandleBriefingClick;
     int i = FindGadgetIndex(gadgets, "MOREBAR", 0xe);
@@ -2352,7 +2344,7 @@ void __stdcall HandleHelpClick(Gui* gui)
 // FUNCTION: 0x45fb30
 void OpenHelpDialog()
 {
-    Layer* g = LoadGuiLayer((Sub_0045fb30*)&g_game->gui, "HELP.GUI", 0x1881);
+    Layer* g = LoadGuiLayer(&g_game->gui, "HELP.GUI", 0x1881);
     g->handler = HandleHelpClick;
     LoadPictureCached("dhelp", 0, 0, 0);
     g_helpDialogBaseGadgetCount = g->entries->u.count;
@@ -2617,7 +2609,7 @@ void __stdcall HandleRestartDialogClick(Gui* gui)
 void OpenRestartDialog()
 {
     Menu_004604a0* menu = (Menu_004604a0*)&g_game->gui;
-    Layer* dialog = LoadGuiLayer(menu, "RESTART.GUI", 0x1000);
+    Layer* dialog = LoadGuiLayer((Gui*)menu, "RESTART.GUI", 0x1000);
     Gadget* gadgets = dialog->entries;
     dialog->handler = HandleRestartDialogClick;
     LoadPictureCached("drestart", 0, 0, 0);
@@ -2670,7 +2662,7 @@ void __stdcall HandleSurrenderChoice(Gui* gui)
 // FUNCTION: 0x460680
 void OpenSurrenderDialog()
 {
-    Layer* layer = LoadGuiLayer((Sub_00460680*)&g_game->gui, "YESORNO.GUI", 0x1000);
+    Layer* layer = LoadGuiLayer(&g_game->gui, "YESORNO.GUI", 0x1000);
     if (layer == 0) {
         return;
     }

@@ -187,7 +187,7 @@ void __stdcall MarkChanged(Gui* menu);
 void __stdcall MarkLayerChanged(Gui* menu);
 void __stdcall SetKeyboardInput(Gui* menu, int value);
 void __stdcall RenderLayer(Gui* menu, int value);
-Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
+Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, unsigned int flags);
 void __stdcall SelectGadgetByName(Gui* menu, const char* name);
 void __stdcall RemapPaletteToClosestIndices(Gui* menu, void* param_2, void* param_3);
 void __stdcall PlaySoundByName(const char* name, int value);
