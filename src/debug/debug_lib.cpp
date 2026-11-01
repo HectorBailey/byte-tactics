@@ -534,7 +534,9 @@ void BlockInfo::SetName(char* newName)
 // symbol-id window it matches in (docs/c2-regalloc.md).
 #include <io.h>
 
-struct Stack_004d89b0 {
+// A call site's stack: up to 14 return addresses, as FormatCallStack prints
+// them.
+struct CallStack {
     unsigned long addrs[14];    // +0x00
     int count;                  // +0x38
 };
@@ -544,7 +546,7 @@ class CallSite {
 public:
     char name[0x40];            // +0x00
     int id;                     // +0x40
-    Stack_004d89b0 stack;       // +0x44
+    CallStack stack;            // +0x44
     void FormatCallSite(char* out, int size);
 };
 
@@ -566,7 +568,7 @@ void CallSite::FormatCallSite(char* out, int size)
         strcat(out, " : ");
         strcat(out, "\n");
     }
-    Stack_004d89b0& s = stack;
+    CallStack& s = stack;
     // q then space stay locals, in this order: inline expressions change the count load.
     char* q = out + strlen(out);
     int space = size - strlen(out);
@@ -2188,19 +2190,19 @@ public:
 FreeBlockMap* GetFreeBlockSet();
 
 // The <vector> the freed-block ring is (the real header supplies insert).
-struct Elem_004dd8c0 {
+struct FreedRecord {
     unsigned int w[0xc];               // +0x0, 0x30 bytes
 };
 
-class Alloc_004dd8c0 {
+class FreedRecordAllocator {
 public:
     typedef unsigned int size_type;
     typedef int difference_type;
-    typedef Elem_004dd8c0* pointer;
-    typedef const Elem_004dd8c0* const_pointer;
-    typedef Elem_004dd8c0& reference;
-    typedef const Elem_004dd8c0& const_reference;
-    typedef Elem_004dd8c0 value_type;
+    typedef FreedRecord* pointer;
+    typedef const FreedRecord* const_pointer;
+    typedef FreedRecord& reference;
+    typedef const FreedRecord& const_reference;
+    typedef FreedRecord value_type;
 
     pointer allocate(size_type _N, const void* = 0)
     {
@@ -2226,9 +2228,9 @@ public:
     size_type max_size() const { return (size_type)(-1) / sizeof(value_type); }
 };
 
-typedef std::vector<Elem_004dd8c0, Alloc_004dd8c0> Vec_004dd8c0;
+typedef std::vector<FreedRecord, FreedRecordAllocator> Vec_004dd8c0;
 typedef void (Vec_004dd8c0::*InsertFn_004dd8c0)(
-    Vec_004dd8c0::iterator, Vec_004dd8c0::size_type, const Elem_004dd8c0&);
+    Vec_004dd8c0::iterator, Vec_004dd8c0::size_type, const FreedRecord&);
 
 // The free functions the gathered functions call.
 // AllocDebugBlock (0x4dacf0), GetFreeBlockSet (0x4db610) and FreeDebugBlock
@@ -3446,7 +3448,7 @@ void BlockMapIter::PrevNode()
 
 // ---- from src/debug/debug_lib_4dd8c0.cpp --------------------
 
-// FUNCTION: 0x4dd8c0 ?insert@?$vector@UElem_004dd8c0@@VAlloc_004dd8c0@@@std@@QAEXPAUElem_004dd8c0@@IABU3@@Z
+// FUNCTION: 0x4dd8c0 ?insert@?$vector@UFreedRecord@@VFreedRecordAllocator@@@std@@QAEXPAUFreedRecord@@IABU3@@Z
 InsertFn_004dd8c0 g_insert_004dd8c0 = &Vec_004dd8c0::insert;
 
 // ---- from src/debug/debug_lib_4ddbe0.cpp --------------------

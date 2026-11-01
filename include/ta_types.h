@@ -24,7 +24,7 @@ struct Alloc_0046d040;
 struct Alloc_0046e5c0;
 struct Alloc_004b2290;
 struct Alloc_004dc130;
-class Alloc_004dd8c0;
+class FreedRecordAllocator;
 class Alloc_004e2b60;
 struct Amount;
 struct Angles_0049be60;
@@ -1039,7 +1039,7 @@ struct Elem_004c5740;
 struct TdfField;
 struct Elem_004cb4c0;
 struct Elem_004cb5f0;
-struct Elem_004dd8c0;
+struct FreedRecord;
 struct Elem_432cb0;
 struct Elem_432cb0_2;
 struct Elem_4b0610;
@@ -1943,7 +1943,7 @@ struct Src_004ab400;
 struct Src_004ab5d0;
 struct Src_004b8310;
 struct Src_004b8a80;
-struct Stack_004d89b0;
+struct CallStack;
 struct State_004bb2e0;
 struct StructA_004ada10;
 struct StructA_004ae610;
@@ -18800,7 +18800,7 @@ public:
     void SetName(char*);
 };
 
-struct Stack_004d89b0 {  // 0x3c bytes, 1 view
+struct CallStack {       // 0x3c bytes, 1 view
     unsigned long addrs[14];  // +0x0
     int count;  // +0x38
 };
@@ -18809,7 +18809,7 @@ class CallSite {        // 0x80 bytes, 2 views
 public:
     char name[64];  // +0x0
     int line;  // +0x40
-    Stack_004d89b0 stack;  // +0x44
+    CallStack stack;       // +0x44
     void FormatCallSite(char*, int);
 };
 
@@ -19069,13 +19069,13 @@ public:
     char* _Charalloc(unsigned int);
 };
 
-class Alloc_004dd8c0 {  // 0x1 bytes, 2 views
+class FreedRecordAllocator {  // 0x1 bytes, 2 views
 public:
     char unknown_0[1];
-    Elem_004dd8c0* allocate(unsigned int, void*);
-    void deallocate(Elem_004dd8c0*, unsigned int);
-    void construct(Elem_004dd8c0*, Elem_004dd8c0&);
-    void destroy(Elem_004dd8c0*);
+    FreedRecord* allocate(unsigned int, void*);
+    void deallocate(FreedRecord*, unsigned int);
+    void construct(FreedRecord*, FreedRecord&);
+    void destroy(FreedRecord*);
     unsigned int max_size(void);
 };
 
@@ -19101,7 +19101,7 @@ public:
     void _Rrotate(LiveNode*);
 };
 
-struct Elem_004dd8c0 {  // 0x30 bytes, 2 views
+struct FreedRecord {    // 0x30 bytes, 2 views
     unsigned int w[12];  // +0x0
 };
 

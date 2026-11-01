@@ -3132,7 +3132,7 @@ address,size,file,symbol,status,similarity
 0x4dd770,92,src/debug/debug_lib.cpp,?RotateRight@BlockMap@@QAEXPAUBlockMapNode@@@Z,matched,100.0
 0x4dd7d0,79,src/debug/debug_lib.cpp,?Ubound@BlockMap@@QAEPAUBlockMapNode@@ABI@Z,matched,100.0
 0x4dd820,159,src/debug/debug_lib.cpp,?PrevNode@BlockMapIter@@QAEXXZ,matched,100.0
-0x4dd8c0,785,src/debug/debug_lib.cpp,?insert@?$vector@UElem_004dd8c0@@VAlloc_004dd8c0@@@std@@QAEXPAUElem_004dd8c0@@IABU3@@Z,matched,100.0
+0x4dd8c0,785,src/debug/debug_lib.cpp,?insert@?$vector@UFreedRecord@@VFreedRecordAllocator@@@std@@QAEXPAUFreedRecord@@IABU3@@Z,matched,100.0
 0x4ddbe0,22,src/debug/debug_lib.cpp,?Assign@MapInsertResult@@QAEPAV1@PAHPAE@Z,matched,100.0
 0x4ddc00,133,src/debug/debug_lib.cpp,?CreateNode@FreeBlockMap@@QAEPAUFreeBlockNode@@HH@Z,matched,100.0
 0x4ddc90,79,src/debug/debug_lib.cpp,?LowerBound@BlockMap@@QAEPAUBlockMapNode@@ABI@Z,matched,100.0

@@ -3158,7 +3158,7 @@ address,name
 0x4dd770,BlockMap::RotateRight
 0x4dd7d0,BlockMap::Ubound
 0x4dd820,BlockMapIter::PrevNode
-0x4dd8c0,UElem_004dd8c0::?$vector::insert
+0x4dd8c0,UFreedRecord::?$vector::insert
 0x4ddbe0,MapInsertResult::Assign
 0x4ddc00,FreeBlockMap::CreateNode
 0x4ddc90,BlockMap::LowerBound
