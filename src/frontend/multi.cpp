@@ -117,20 +117,24 @@ struct Entry_004426e0 {
     char number[0x81];                 // +0x81
 };
 
-// The serial address block written to g_serialPortNumber.
-struct Serial_00441c30 {               // 0x14 bytes
-    int unknown_0;                     // +0x00
-    char unknown_4[4];                 // +0x04
-    unsigned long unknown_8;           // +0x08
-    unsigned long unknown_c;           // +0x0c
-    unsigned long unknown_10;          // +0x10
+// The serial connection's address block at g_serialPortNumber, DirectPlay's
+// DPCOMPORTADDRESS (the toolchain's DX3 headers lack the DirectPlay address
+// types). Its baud rate is written through g_serialBaudRate, the global at
+// its +0x4.
+struct DPCOMPORTADDRESS {              // 0x14 bytes
+    int dwComPort;                     // +0x00, the port number
+    unsigned long dwBaudRate;          // +0x04
+    unsigned long dwStopBits;          // +0x08
+    unsigned long dwParity;            // +0x0c
+    unsigned long dwFlowControl;       // +0x10
 };
 
-// One element of the compound address list.
-struct Elem_00441c30 {                 // 0x18 bytes
-    GUID guid;                         // +0x00
-    unsigned long size;                // +0x10
-    void* data;                        // +0x14
+// One element of the compound address list, DirectPlay's
+// DPCOMPOUNDADDRESSELEMENT: a DPAID_ data type, its size and the data.
+struct DPCOMPOUNDADDRESSELEMENT {      // 0x18 bytes
+    GUID guidDataType;                 // +0x00
+    unsigned long dwDataSize;          // +0x10
+    void* lpData;                      // +0x14
 };
 
 // The record header of a game description block: a flag word with bitfields
@@ -849,7 +853,7 @@ extern GUID DPAID_Phone;
 extern GUID DPAID_INet;
 extern GUID DPAID_ComPort;
 extern char DAT_004fcfb8[];
-extern Serial_00441c30 g_serialPortNumber;
+extern DPCOMPORTADDRESS g_serialPortNumber;
 extern int g_serialBaudRate;
 extern int g_serialBaudRateTable[];
 extern unsigned int g_reporterCount;
@@ -1193,7 +1197,7 @@ int __stdcall BuildCompoundAddress(int* addressOut, int* sizeOut)
     // block before size, all three buffers at function top: prologue and frame layout.
     HGLOBAL block = 0;
     unsigned long size = 0;
-    Elem_00441c30 elements[3];
+    DPCOMPOUNDADDRESSELEMENT elements[3];
     GUID guid;
     char buf1[200];
     char buf2[200];
@@ -1204,9 +1208,9 @@ int __stdcall BuildCompoundAddress(int* addressOut, int* sizeOut)
     guid = g_game->info.guid;
 
     if (memcmp(&guid, &g_dpspGuidModem, sizeof(GUID)) == 0) {
-        elements[0].guid = DPAID_ServiceProvider;
-        elements[0].size = 0x10;
-        elements[0].data = &g_dpspGuidModem;
+        elements[0].guidDataType = DPAID_ServiceProvider;
+        elements[0].dwDataSize = 0x10;
+        elements[0].lpData = &g_dpspGuidModem;
         // memset, not = "": plain rep stosd.
         memset(buf1, 0, sizeof(buf1));
         char* s = g_modemInfo;
@@ -1214,47 +1218,47 @@ int __stdcall BuildCompoundAddress(int* addressOut, int* sizeOut)
             s = g_emptyStringLiteral;
         }
         lstrcpyA(buf1, s);
-        elements[1].guid = DPAID_Modem;
-        elements[1].size = lstrlenA(buf1) + 1;
-        elements[1].data = buf1;
+        elements[1].guidDataType = DPAID_Modem;
+        elements[1].dwDataSize = lstrlenA(buf1) + 1;
+        elements[1].lpData = buf1;
         lstrcpyA(buf2, GetGadgetText(&g_game->gui, "NUMBER", 0));
-        elements[2].guid = DPAID_Phone;
-        elements[2].size = lstrlenA(buf2) + 1;
-        elements[2].data = buf2;
+        elements[2].guidDataType = DPAID_Phone;
+        elements[2].dwDataSize = lstrlenA(buf2) + 1;
+        elements[2].lpData = buf2;
         count = 3;
     } else if (memcmp(&guid, &g_dpspGuidTcpip, sizeof(GUID)) == 0) {
-        elements[0].guid = DPAID_ServiceProvider;
-        elements[0].size = 0x10;
-        elements[0].data = &g_dpspGuidTcpip;
+        elements[0].guidDataType = DPAID_ServiceProvider;
+        elements[0].dwDataSize = 0x10;
+        elements[0].lpData = &g_dpspGuidTcpip;
         char* t = GetGadgetText(&g_game->gui, "ADDRESS", 0);
         if (t == 0) {
             t = g_emptyStringLiteral;
         }
         lstrcpyA(buf3, t);
-        elements[1].guid = DPAID_INet;
-        elements[1].size = lstrlenA(buf3) + 1;
-        elements[1].data = buf3;
+        elements[1].guidDataType = DPAID_INet;
+        elements[1].dwDataSize = lstrlenA(buf3) + 1;
+        elements[1].lpData = buf3;
         count = 2;
     } else if (memcmp(&guid, &g_dpspGuidIpx, sizeof(GUID)) == 0) {
-        elements[0].guid = DPAID_ServiceProvider;
-        elements[0].size = 0x10;
-        elements[0].data = &g_dpspGuidIpx;
+        elements[0].guidDataType = DPAID_ServiceProvider;
+        elements[0].dwDataSize = 0x10;
+        elements[0].lpData = &g_dpspGuidIpx;
         count = 1;
     } else if (memcmp(&guid, &g_dpspGuidSerial, sizeof(GUID)) == 0) {
-        elements[0].guid = DPAID_ServiceProvider;
-        elements[0].size = 0x10;
-        elements[0].data = &g_dpspGuidSerial;
-        g_serialPortNumber.unknown_8 = 0;
-        g_serialPortNumber.unknown_c = 0;
-        g_serialPortNumber.unknown_10 = 3;
-        elements[1].guid = DPAID_ComPort;
-        elements[1].size = 0x14;
-        elements[1].data = &g_serialPortNumber;
+        elements[0].guidDataType = DPAID_ServiceProvider;
+        elements[0].dwDataSize = 0x10;
+        elements[0].lpData = &g_dpspGuidSerial;
+        g_serialPortNumber.dwStopBits = 0;
+        g_serialPortNumber.dwParity = 0;
+        g_serialPortNumber.dwFlowControl = 3;
+        elements[1].guidDataType = DPAID_ComPort;
+        elements[1].dwDataSize = 0x14;
+        elements[1].lpData = &g_serialPortNumber;
         count = 2;
     } else {
-        elements[0].guid = DPAID_ServiceProvider;
-        elements[0].size = 0x10;
-        elements[0].data = &guid;
+        elements[0].guidDataType = DPAID_ServiceProvider;
+        elements[0].dwDataSize = 0x10;
+        elements[0].lpData = &guid;
         count = 1;
     }
 
@@ -1413,7 +1417,7 @@ void __stdcall SetSerialPortFromGadget(Gui* menu, Gadget* entry)
 {
     int val = entry->u.list.selected;
     if (val >= 0) {
-        g_serialPortNumber.unknown_0 = val + 1;
+        g_serialPortNumber.dwComPort = val + 1;
     }
 }
 #pragma auto_inline(on)

@@ -1012,7 +1012,7 @@ struct Elem_00434360_2;
 struct Elem_00434a60;
 struct MissionOrderTableEntry;
 struct Elem_0043ca70;
-struct Elem_00441c30;
+struct DPCOMPOUNDADDRESSELEMENT;
 struct Elem_0044ce90;
 struct Elem_0046e5e0;
 struct UnitSyncPacket;
@@ -1884,7 +1884,7 @@ struct ScriptTable;
 struct Section_004b4800;
 struct Section_004b4850;
 struct Seg_00473b50;
-struct Serial_00441c30;
+struct DPCOMPORTADDRESS;
 struct SessionDesc_004c9920;
 struct SessionDesc_4c9dd0;
 struct Settings;
@@ -6865,13 +6865,13 @@ struct Settings_00441460 {  // 0x10 bytes, 1 view
     unsigned short version;  // +0xe
 };
 
-struct Elem_00441c30 {  // 0x18 bytes, 1 view
+struct DPCOMPOUNDADDRESSELEMENT {  // 0x18 bytes, 1 view
     V4i guid;  // +0x0
     unsigned long size;  // +0x10
     void* data;  // +0x14
 };
 
-struct Serial_00441c30 {  // 0x14 bytes, 1 view
+struct DPCOMPORTADDRESS {  // 0x14 bytes, 1 view
     char unknown_0[8];
     unsigned long unknown_8;  // +0x8
     unsigned long unknown_c;  // +0xc
