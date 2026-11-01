@@ -1624,10 +1624,10 @@ extern unsigned int g_allocSerial;
 extern FreeBlockMap* g_freeBlockSet;   // the free-block set singleton
 
 // The file-record tree's node, the fullest of its views.
-struct Node_004daa30 {
-    Node_004daa30* left;           // +0x0
-    Node_004daa30* parent;         // +0x4
-    Node_004daa30* right;          // +0x8
+struct BlockMapNode {
+    BlockMapNode* left;            // +0x0
+    BlockMapNode* parent;          // +0x4
+    BlockMapNode* right;           // +0x8
     BlockInfo value;              // +0xc
     unsigned int color;            // +0x3c
 };
@@ -1756,10 +1756,10 @@ public:
 // NextNode its _Inc.
 class BlockMapIter {
 public:
-    Node_004daa30* ptr;                // +0x0
+    BlockMapNode* ptr;                 // +0x0
 
     BlockMapIter() {}
-    BlockMapIter(Node_004daa30* q) : ptr(q) {}
+    BlockMapIter(BlockMapNode* q) : ptr(q) {}
     bool operator==(const BlockMapIter& o) const { return ptr == o.ptr; }
     BlockInfo& operator*() const { return ptr->value; }
     BlockInfo* operator->() const { return &ptr->value; }
@@ -1770,7 +1770,7 @@ public:
         NextNode();
         return _Tmp;
     }
-    Node_004daa30* _Mynode() const { return ptr; }
+    BlockMapNode* _Mynode() const { return ptr; }
     void PrevNode();
     void NextNode();
 };
@@ -1797,7 +1797,7 @@ public:
     MapInsertResult* Assign(const FreeBlockIter& first, const bool& second);
 };
 
-static inline Node_004daa30* Max_004dd820(Node_004daa30* p)
+static inline BlockMapNode* Max_004dd820(BlockMapNode* p)
 {
     std::_Lockit lock;
     while (p->right != g_blockMapNil) {
@@ -1840,7 +1840,7 @@ class BlockMap {
 public:
     BlockMapAllocator allocator;       // +0x0
     Less_004dd3d0 key_compare;         // +0x1
-    Node_004daa30* head;               // +0x4
+    BlockMapNode* head;                // +0x4
     unsigned char multi;             // +0x8
     int size;                          // +0xc
 
@@ -1853,11 +1853,11 @@ public:
         return (it == End() || key_compare(key, it.ptr->value.address)) ? End() : it;
     }
 
-    Node_004daa30* Lbound(const unsigned int& key) const
+    BlockMapNode* Lbound(const unsigned int& key) const
     {
         std::_Lockit lock;
-        Node_004daa30* x = head->parent;
-        Node_004daa30* y = head;
+        BlockMapNode* x = head->parent;
+        BlockMapNode* y = head;
         while (x != g_blockMapNil) {
             if (key_compare(x->value.address, key))
                 x = x->right;
@@ -1867,25 +1867,25 @@ public:
         return y;
     }
 
-    Node_004daa30*& _Root() { return head->parent; }
-    Node_004daa30*& _Lmost() { return head->left; }
-    Node_004daa30*& _Rmost() { return head->right; }
+    BlockMapNode*& _Root() { return head->parent; }
+    BlockMapNode*& _Lmost() { return head->left; }
+    BlockMapNode*& _Rmost() { return head->right; }
 
-    static Node_004daa30* _Min(Node_004daa30* _P)
+    static BlockMapNode* _Min(BlockMapNode* _P)
         { std::_Lockit _Lk;
           while (_P->left != g_blockMapNil)
               _P = _P->left;
           return _P; }
 
-    static Node_004daa30* _Max(Node_004daa30* _P)
+    static BlockMapNode* _Max(BlockMapNode* _P)
         { std::_Lockit _Lk;
           while (_P->right != g_blockMapNil)
               _P = _P->right;
           return _P; }
 
-    void _Lrotate(Node_004daa30* _X)
+    void _Lrotate(BlockMapNode* _X)
         { std::_Lockit _Lk;
-          Node_004daa30* _Y = _X->right;
+          BlockMapNode* _Y = _X->right;
           _X->right = _Y->left;
           if (_Y->left != g_blockMapNil)
               _Y->left->parent = _X;
@@ -1899,9 +1899,9 @@ public:
           _Y->left = _X;
           _X->parent = _Y; }
 
-    void _Rrotate(Node_004daa30* _X)
+    void _Rrotate(BlockMapNode* _X)
         { std::_Lockit _Lk;
-          Node_004daa30* _Y = _X->left;
+          BlockMapNode* _Y = _X->left;
           _X->left = _Y->right;
           if (_Y->right != g_blockMapNil)
               _Y->right->parent = _X;
@@ -1915,10 +1915,10 @@ public:
           _Y->right = _X;
           _X->parent = _Y; }
 
-    void Lrotate(Node_004daa30* x)
+    void Lrotate(BlockMapNode* x)
     {
         std::_Lockit lock;
-        Node_004daa30* y = x->right;
+        BlockMapNode* y = x->right;
         x->right = y->left;
         if (y->left != g_blockMapNil)
             y->left->parent = x;
@@ -1933,10 +1933,10 @@ public:
         x->parent = y;
     }
 
-    void Rrotate(Node_004daa30* x)
+    void Rrotate(BlockMapNode* x)
     {
         std::_Lockit lock;
-        Node_004daa30* y = x->left;
+        BlockMapNode* y = x->left;
         x->left = y->right;
         if (y->right != g_blockMapNil)
             y->right->parent = x;
@@ -1952,16 +1952,16 @@ public:
     }
 
     MapInsertResult Insert(BlockInfo* p);
-    BlockMapIter InsertHinted(Node_004daa30* x, Node_004daa30* y, const BlockInfo& v);
-    BlockMapIter* InsertHinted(BlockMapIter* out, Node_004daa30* x, Node_004daa30* y, const BlockInfo* v);
+    BlockMapIter InsertHinted(BlockMapNode* x, BlockMapNode* y, const BlockInfo& v);
+    BlockMapIter* InsertHinted(BlockMapIter* out, BlockMapNode* x, BlockMapNode* y, const BlockInfo* v);
     BlockMapIter erase(BlockMapIter _P);
     BlockMapIter Find(const unsigned int& key);
     BlockMapIter lower_bound(const unsigned int& key);
-    Node_004daa30* LowerBound(const unsigned int& key);
-    Node_004daa30* Ubound(const unsigned int& key);
-    Node_004daa30* CreateNode(int parent, int color);
-    void RotateLeft(Node_004daa30* x);
-    void RotateRight(Node_004daa30* x);
+    BlockMapNode* LowerBound(const unsigned int& key);
+    BlockMapNode* Ubound(const unsigned int& key);
+    BlockMapNode* CreateNode(int parent, int color);
+    void RotateLeft(BlockMapNode* x);
+    void RotateRight(BlockMapNode* x);
 };
 
 class Iter_004dc620 {
@@ -2944,10 +2944,10 @@ Iter_004dc620 FreeBlockMap::lower_bound(const unsigned int& kv)
 // FUNCTION: 0x4dc680 ?Insert@BlockMap@@QAE?AVMapInsertResult@@PAVBlockInfo@@@Z
 MapInsertResult BlockMap::Insert(BlockInfo* p)
 {
-    Node_004daa30* y = head;
+    BlockMapNode* y = head;
     bool less = true;
     // Read before the first _Lockit.
-    Node_004daa30* x = y->parent;
+    BlockMapNode* x = y->parent;
     BlockMapIter it2;
     BlockMapIter it;
     {
@@ -2962,9 +2962,9 @@ MapInsertResult BlockMap::Insert(BlockInfo* p)
         {
             std::_Lockit lock;
             it = BlockMapIter(CreateNode((int)y, 0));
-            Node_004daa30* z = it.ptr;
-            z->left = (Node_004daa30*)g_blockMapNil;
-            z->right = (Node_004daa30*)g_blockMapNil;
+            BlockMapNode* z = it.ptr;
+            z->left = (BlockMapNode*)g_blockMapNil;
+            z->right = (BlockMapNode*)g_blockMapNil;
             new (&z->value) BlockInfo(*p);
             size++;
             if (y == head || x != g_blockMapNil || key_compare(p->address, y->value.address)) {
@@ -2981,9 +2981,9 @@ MapInsertResult BlockMap::Insert(BlockInfo* p)
                     head->right = z;
                 }
             }
-            for (Node_004daa30* q = z; q != head->parent && q->parent->color == 0; ) {
+            for (BlockMapNode* q = z; q != head->parent && q->parent->color == 0; ) {
                 if (q->parent == q->parent->parent->left) {
-                    Node_004daa30* w = q->parent->parent->right;
+                    BlockMapNode* w = q->parent->parent->right;
                     if (w->color == 0) {
                         q->parent->color = 1;
                         w->color = 1;
@@ -2999,7 +2999,7 @@ MapInsertResult BlockMap::Insert(BlockInfo* p)
                         RotateRight(q->parent->parent);
                     }
                 } else {
-                    Node_004daa30* w = q->parent->parent->left;
+                    BlockMapNode* w = q->parent->parent->left;
                     if (w->color == 0) {
                         q->parent->color = 1;
                         w->color = 1;
@@ -3037,9 +3037,9 @@ MapInsertResult BlockMap::Insert(BlockInfo* p)
 // FUNCTION: 0x4dc910
 BlockMapIter BlockMap::erase(BlockMapIter _P)
 {
-    Node_004daa30* _X;
-    Node_004daa30* _Y = (_P++)._Mynode();
-    Node_004daa30* _Z = _Y;
+    BlockMapNode* _X;
+    BlockMapNode* _Y = (_P++)._Mynode();
+    BlockMapNode* _Z = _Y;
     std::_Lockit _Lk;
     if (_Y->left == g_blockMapNil)
         _X = _Y->right;
@@ -3097,7 +3097,7 @@ BlockMapIter BlockMap::erase(BlockMapIter _P)
         while (_X != _Root() && _X->color == 1)
             if (_X == _X->parent->left)
                 {
-                Node_004daa30* _W = _X->parent->right;
+                BlockMapNode* _W = _X->parent->right;
                 if (_W->color == 0)
                     {
                     _W->color = 1;
@@ -3128,7 +3128,7 @@ BlockMapIter BlockMap::erase(BlockMapIter _P)
                 }
             else
                 {
-                Node_004daa30* _W = _X->parent->left;
+                BlockMapNode* _W = _X->parent->left;
                 if (_W->color == 0)
                     {
                     _W->color = 1;
@@ -3305,15 +3305,15 @@ BlockMapIter BlockMap::lower_bound(const unsigned int& key)
 // ---- from src/debug/debug_lib_4dd430.cpp --------------------
 
 // FUNCTION: 0x4dd430
-BlockMapIter BlockMap::InsertHinted(Node_004daa30* x, Node_004daa30* y,
+BlockMapIter BlockMap::InsertHinted(BlockMapNode* x, BlockMapNode* y,
                                     const BlockInfo& v)
 {
     std::_Lockit lock;
-    Node_004daa30* z = (Node_004daa30*)allocator.Allocate(0x40);
+    BlockMapNode* z = (BlockMapNode*)allocator.Allocate(0x40);
     z->parent = y;
     z->color = 0;
-    z->left = (Node_004daa30*)g_blockMapNil;
-    z->right = (Node_004daa30*)g_blockMapNil;
+    z->left = (BlockMapNode*)g_blockMapNil;
+    z->right = (BlockMapNode*)g_blockMapNil;
     new (&z->value) BlockInfo(v);
     size++;
     if (y == head || x != g_blockMapNil || key_compare(v.address, y->value.address)) {
@@ -3332,7 +3332,7 @@ BlockMapIter BlockMap::InsertHinted(Node_004daa30* x, Node_004daa30* y,
     }
     for (x = z; x != head->parent && x->parent->color == 0; ) {
         if (x->parent == x->parent->parent->left) {
-            Node_004daa30* w = x->parent->parent->right;
+            BlockMapNode* w = x->parent->parent->right;
             if (w->color == 0) {
                 x->parent->color = 1;
                 w->color = 1;
@@ -3348,7 +3348,7 @@ BlockMapIter BlockMap::InsertHinted(Node_004daa30* x, Node_004daa30* y,
                 Rrotate(x->parent->parent);
             }
         } else {
-            Node_004daa30* w = x->parent->parent->left;
+            BlockMapNode* w = x->parent->parent->left;
             if (w->color == 0) {
                 x->parent->color = 1;
                 w->color = 1;
@@ -3372,10 +3372,10 @@ BlockMapIter BlockMap::InsertHinted(Node_004daa30* x, Node_004daa30* y,
 // ---- from src/debug/debug_lib_4dd710.cpp --------------------
 
 // FUNCTION: 0x4dd710
-void BlockMap::RotateLeft(Node_004daa30* x)
+void BlockMap::RotateLeft(BlockMapNode* x)
 {
     std::_Lockit lock;
-    Node_004daa30* y = x->right;
+    BlockMapNode* y = x->right;
     x->right = y->left;
     if (y->left != g_blockMapNil)
         y->left->parent = x;
@@ -3393,10 +3393,10 @@ void BlockMap::RotateLeft(Node_004daa30* x)
 // ---- from src/debug/debug_lib_4dd770.cpp --------------------
 
 // FUNCTION: 0x4dd770
-void BlockMap::RotateRight(Node_004daa30* x)
+void BlockMap::RotateRight(BlockMapNode* x)
 {
     std::_Lockit lock;
-    Node_004daa30* y = x->left;
+    BlockMapNode* y = x->left;
     x->left = y->right;
     if (y->right != g_blockMapNil)
         y->right->parent = x;
@@ -3417,11 +3417,11 @@ void BlockMap::RotateRight(Node_004daa30* x)
 // definition to inline.
 #pragma auto_inline(off)
 // FUNCTION: 0x4dd7d0
-Node_004daa30* BlockMap::Ubound(const unsigned int& kv)
+BlockMapNode* BlockMap::Ubound(const unsigned int& kv)
 {
     std::_Lockit lock;
-    Node_004daa30* x = head->parent;
-    Node_004daa30* y = head;
+    BlockMapNode* x = head->parent;
+    BlockMapNode* y = head;
     while (x != g_blockMapNil)
         if (key_compare(kv, x->value.address))
             y = x, x = x->left;
@@ -3442,7 +3442,7 @@ void BlockMapIter::PrevNode()
     } else if (ptr->left != g_blockMapNil) {
         ptr = Max_004dd820(ptr->left);
     } else {
-        Node_004daa30* p;
+        BlockMapNode* p;
         while (ptr == (p = ptr->parent)->left) {
             ptr = p;
         }
@@ -3535,11 +3535,11 @@ extern void* g_blockMapNil;            // the tree's _Nil node
 // The original calls this out of line from BlockMap::Find.
 #pragma auto_inline(off)
 // FUNCTION: 0x4ddc90
-Node_004daa30* BlockMap::LowerBound(const unsigned int& key)
+BlockMapNode* BlockMap::LowerBound(const unsigned int& key)
 {
     std::_Lockit lock;
-    Node_004daa30* x = head->parent;
-    Node_004daa30* y = head;
+    BlockMapNode* x = head->parent;
+    BlockMapNode* y = head;
     while (x != g_blockMapNil) {
         if (key_compare(x->value.address, key))
             x = x->right;
@@ -3553,12 +3553,12 @@ Node_004daa30* BlockMap::LowerBound(const unsigned int& key)
 // A 0x40-byte pooled node, allocated 0x80 at a time.
 extern void* g_blockMapFreeList;       // free list
 
-static inline Node_004daa30* AllocNode_004daa30()
+static inline BlockMapNode* AllocNode_004daa30()
 {
     if (g_blockMapFreeList == 0) {
-        Node_004daa30* block;
+        BlockMapNode* block;
         do {
-            block = (Node_004daa30*)GlobalAlloc(0, 0x2000);
+            block = (BlockMapNode*)GlobalAlloc(0, 0x2000);
             if (block == 0 && g_outOfMemoryHandler != 0) {
                 g_outOfMemoryHandler();
             }
@@ -3566,7 +3566,7 @@ static inline Node_004daa30* AllocNode_004daa30()
         if (block == 0) {
             return 0;
         }
-        Node_004daa30* head = (Node_004daa30*)g_blockMapFreeList;
+        BlockMapNode* head = (BlockMapNode*)g_blockMapFreeList;
         for (int i = 0; i < 0x80; i++) {
             block->left = head;
             head = block;
@@ -3574,7 +3574,7 @@ static inline Node_004daa30* AllocNode_004daa30()
         }
         g_blockMapFreeList = head;
     }
-    Node_004daa30* node = (Node_004daa30*)g_blockMapFreeList;
+    BlockMapNode* node = (BlockMapNode*)g_blockMapFreeList;
     g_blockMapFreeList = node->left;
     return node;
 }
@@ -3586,10 +3586,10 @@ static inline Node_004daa30* AllocNode_004daa30()
 // The original calls this out of line from the file-record tree insert.
 #pragma auto_inline(off)
 // FUNCTION: 0x4ddce0
-Node_004daa30* BlockMap::CreateNode(int parent, int color)
+BlockMapNode* BlockMap::CreateNode(int parent, int color)
 {
-    Node_004daa30* node = AllocNode_004daa30();
-    node->parent = (Node_004daa30*)parent;
+    BlockMapNode* node = AllocNode_004daa30();
+    node->parent = (BlockMapNode*)parent;
     node->color = color;
     return node;
 }
@@ -3673,7 +3673,7 @@ void* BlockMapAllocator::Allocate(unsigned int n)
 // (step an iterator to the in-order successor) under a lock object;
 // g_blockMapNil is the tree's _Nil node. Compare 0x4dd710 and 0x4ddc90.
 
-static inline Node_004daa30* Min_004dde70(Node_004daa30* p)
+static inline BlockMapNode* Min_004dde70(BlockMapNode* p)
 {
     std::_Lockit lock;
     while (p->left != g_blockMapNil)
@@ -3690,7 +3690,7 @@ void BlockMapIter::NextNode()
     if (ptr->right != g_blockMapNil)
         ptr = Min_004dde70(ptr->right);
     else {
-        Node_004daa30* p;
+        BlockMapNode* p;
         while (ptr == (p = ptr->parent)->right)
             ptr = p;
         if (ptr->right != p)
