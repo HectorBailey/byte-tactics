@@ -14,6 +14,8 @@
 #ifndef GUI_H
 #define GUI_H
 
+#include "mouse_event.h"
+
 #pragma pack(push, 1)
 
 struct Gaf;
@@ -35,12 +37,7 @@ struct Gui {
     unsigned char cursorKind;           // +0x34
     char unknown_35[3];
     void* cursorSrc;                    // +0x38
-    int pointX;                         // +0x3c, the last mouse event
-    int pointY;                         // +0x40
-    unsigned int pointKeyFlags;         // +0x44
-    int pointTick;                      // +0x48
-    int pointMessage;                   // +0x4c
-    int pointDoubleClick;               // +0x50
+    MouseEvent point;                   // +0x3c, the last mouse event
     int mouseKeyFlags;                  // +0x54
     int clickMode;                      // +0x58
     unsigned int cursorFlags;           // +0x5c, bit 0 set while the cursor animates

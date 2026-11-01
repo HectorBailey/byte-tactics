@@ -52,6 +52,7 @@ struct Flags_004ab400 {
 // Unused here: the symbol ids these declarations take keep 0x4ac7d0, 0x4acbe0 matching (docs/c2-regalloc.md).
 void FUN_004161f0(void);
 void InitCommands(void);
+void ProtectUnitDefsReadOnly(void);
 
 // The records AddButtonGadget, AddHotspotGadget and AddBarGadget copy into an
 // entry slot: the slot's first bytes viewed as the control's definition.
@@ -374,7 +375,7 @@ int __stdcall IsPointInEntryRect(Gui* obj)
     r.top = info->y;
     r.right = r.left + info->width - 1;
     r.bottom = r.top + info->height - 1;
-    return PointInRect(&r, obj->pointX, obj->pointY);
+    return PointInRect(&r, obj->point.x, obj->point.y);
 }
 
 // FUNCTION: 0x4ab040
@@ -626,7 +627,7 @@ void __stdcall InitCursorFrames(Gui* p, int value)
 // FUNCTION: 0x4ab510
 int __stdcall IsMouseButtonMessage(Gui* obj, unsigned char buttons)
 {
-    int& msg = obj->pointMessage;
+    int& msg = obj->point.msg;
     if (buttons & 1) {
         if (msg == WM_LBUTTONDOWN)
             return 1;
@@ -646,7 +647,7 @@ int __stdcall IsMouseButtonMessage(Gui* obj, unsigned char buttons)
 // FUNCTION: 0x4ab570
 int __stdcall IsDoubleClickMessage(Gui* obj, unsigned char buttons)
 {
-    int& msg = obj->pointMessage;
+    int& msg = obj->point.msg;
     if (buttons & 1) {
         if (msg == WM_LBUTTONDBLCLK)
             return 1;
@@ -686,11 +687,11 @@ void __stdcall UpdateCursorAndMouse(Gui* p)
             if (IsPointInRect(&r, e.x, e.y) != 0 || e.keyFlags == 0) {
                 PopMouseEvent(&e);
                 p->mouseKeyFlags = e.keyFlags;
-                *(MouseEvent*)&p->pointX = e;
+                p->point = e;
             }
         }
     } else {
-        GetCurrentMouseEvent((MouseEvent*)&p->pointX);
+        GetCurrentMouseEvent(&p->point);
     }
 }
 

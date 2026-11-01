@@ -38,11 +38,14 @@ public:
     void FreeBuffer();
 };
 
-// Unused here: real declarations whose symbol ids keep the functions below
-// matching (docs/c2-regalloc.md).
+// Unused here: real declarations whose symbol ids keep 0x41dfc0, 0x41e270,
+// 0x41ea30, 0x41f0a0 and 0x41f7f0 matching (docs/c2-regalloc.md).
+struct SideDef;
 void EnableAICommands(void);
 void RegisterAICommands(void);
 void FUN_00406f40(void);
+void ResetAIPlayers(void);
+void ProtectUnitDefsReadOnly(void);
 
 #include "../map/grid.h"
 

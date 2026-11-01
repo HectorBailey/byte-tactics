@@ -46,8 +46,6 @@ void UpdateCameraFollow(void);
 void BeginMouseScroll(void);
 void EndMouseScroll(void);
 void UpdateMouseScroll(void);
-void UpdateEdgeScroll(void);
-void CenterCameraOnRadarClick(void);
 
 struct Layer;
 struct Game;

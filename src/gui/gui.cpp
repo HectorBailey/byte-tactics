@@ -4211,9 +4211,6 @@ void EmptyMainLoopHook(void);
 void EmptyMainLoopHook_B(void);
 void LoadTextureGafs(void);
 void FreeTextureGafs(void);
-void FreeUnitInfo(void);
-void RefreshUnitInfo(void);
-void CheckDownloadableFlags(void);
 
 // The body of SelectFontForEntry at 0x4a1810, which the compiler inlined into LayoutLabelText.
 static inline int SelectLabelFont(Gadget* entries, int index)
@@ -4734,7 +4731,7 @@ int __stdcall HandleButtonInput(Gui* obj, int index, int param_3)
     Rect r;
     GetGadgetRect_inlined(entry, &r);
 
-    MouseEvent point = *(MouseEvent*)&obj->pointX;
+    MouseEvent point = obj->point;
     point.x -= entries->x;
     point.y -= entries->y;
 
@@ -4979,7 +4976,7 @@ int __stdcall HandleTextInput(Gui* obj, int index, int key)
     GetGadgetRectByIndex((char*)entries, index, &rect);
     SelectFontForEntry_inlined(entries, index);
 
-    MouseEvent point = *(MouseEvent*)&obj->pointX;
+    MouseEvent point = obj->point;
     int rel_x = point.x - entries->x;
     int rel_y = point.y - entries->y;
 
@@ -6381,7 +6378,7 @@ int __stdcall UpdateMenu(Gui* menu)
     if (entries == 0)
         return 1;
 
-    MouseEvent& pt = *(MouseEvent*)&menu->pointX;
+    MouseEvent& pt = menu->point;
     {
         // Rect local, not named ints: right/bottom spill into slots shared with `point`.
         Rect box;
@@ -6402,7 +6399,7 @@ int __stdcall UpdateMenu(Gui* menu)
     menu->hoverGadgetIndex = -1;
 
     MouseEvent point;
-    memcpy(&point, &menu->pointX, 24);
+    memcpy(&point, &menu->point, 24);
     point.x -= entries->x;
     point.y -= entries->y;
 
