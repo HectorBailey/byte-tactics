@@ -1135,6 +1135,8 @@ void __stdcall DrawGadgetSelectionBox(Gui* obj, int index, int param_3)
 // Selects the entry of type 7 whose group number (the number of type-7 entries
 // before it) matches the group of entry `index`, and makes that entry's id the
 // current one. Returns the entry's number, or -1 when there is no such entry.
+// The original calls this out of line from HandleTextInput and UpdateMenu.
+#pragma auto_inline(off)
 // FUNCTION: 0x4a1810
 int __stdcall SelectFontForEntry(Gadget* entries, int index)
 {
@@ -1155,6 +1157,7 @@ int __stdcall SelectFontForEntry(Gadget* entries, int index)
     }
     return i;
 }
+#pragma auto_inline(on)
 
 // Counts the type-8 entries up to the one numbered by entries[index].textureNumber.
 // Both paths return 0 in the original, although the caller tests the result.
@@ -3905,7 +3908,7 @@ char* __stdcall GetGafFrame(void* glyphs, int c);
 int GetFont();
 int __stdcall GetTextWidth(int a, char* text);
 int GetFontHeight();
-void __stdcall DrawTextClipped(char* dest, char* text, int p3, int x, int maxw, int style);
+void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw, int style);
 
 static inline int LineHeight_004a50b0()
 {
@@ -3930,7 +3933,7 @@ static inline int Measure(char* word, int t)
 }
 
 // FUNCTION: 0x4a51d0
-int __stdcall DrawWrappedText(char* p2, char* text, int p4, int y, int maxw, int rem, int p7)
+int __stdcall DrawWrappedText(void* surface, char* text, int p4, int y, int maxw, int rem, int p7)
 {
     int last = 0;
     int w;
@@ -3956,7 +3959,7 @@ int __stdcall DrawWrappedText(char* p2, char* text, int p4, int y, int maxw, int
             i++;
             continue;
         }
-        DrawTextClipped(p2, word, p4, y, maxw, p7);
+        DrawTextClipped(surface, word, p4, y, maxw, p7);
         text[i] = saved;
         y += LineHeight_004a50b0() + 2;
         rem -= LineHeight_004a50b0() + 2;
@@ -4085,8 +4088,8 @@ void __stdcall DrawTextInput(Gui* obj, int index);
 void __stdcall DrawListboxFrame(Gui* obj, int index, void* bmp);
 void __stdcall DrawProgressBarGadget(Gui* obj, int index);
 void __stdcall DrawHotspot(Gui* obj, int index);
-void __stdcall DrawLineGadget(Gui* obj, int index, unsigned int param3);
-int __stdcall HandleLabelInput(Gui* obj, int index, int key);
+void __stdcall DrawLineGadget(Gui* obj, int index, unsigned char param3);
+int __stdcall HandleLabelInput(Gui* obj, int index, char key);
 int __stdcall HandleHotspotInput(Gui* obj, int index);
 int __stdcall TrySetFocus(Gui* obj, int index);
 int __stdcall IsMouseButtonMessage(Gui* obj, unsigned char buttons);
@@ -4101,7 +4104,7 @@ int __stdcall HandleTextEditKey(Gui* obj, int index, int key);
 void __cdecl GameFreeThunk(void* p);
 // Out of line like the original, which calls it from another unit: a void* parameter
 // keeps /Ob2 from inlining the definition at 0x4a1810 into the callers.
-int __stdcall SelectFontForEntry(void* entries, int index);
+int __stdcall SelectFontForEntry(Gadget* entries, int index);
 
 // The real GetTextPixelWidth (0x4a5030), which /Ob2 inlines into its callers here.
 static inline int GetTextPixelWidth(char* text)
@@ -4152,6 +4155,9 @@ void EmptyMainLoopHook(void);
 void EmptyMainLoopHook_B(void);
 void LoadTextureGafs(void);
 void FreeTextureGafs(void);
+void SelectUnitsOfSameTypes(void);
+void SelectAllVisibleUnits(void);
+void ClearUnitSelectFlags(void);
 
 // The body of SelectFontForEntry at 0x4a1810, which the compiler inlined into LayoutLabelText.
 static inline int SelectLabelFont(Gadget* entries, int index)
@@ -4898,7 +4904,7 @@ static inline void Activate(Gui* obj, int index)
     Gadget* ep = obj->layer->entries;
     GetGadgetRectByIndex((char*)ep, index, &rect);
     SetTextColors(obj->colours[ep[index].colours], GetTextKeyColor());
-    SelectFontForEntry((void*)ep, index);
+    SelectFontForEntry(ep, index);
     TrySetFocus(obj, index);
     obj->layer->current = index;
     CommitTextEdit(obj, index, ep[index].u.text, ep[index].status, 0);
@@ -6207,7 +6213,7 @@ static inline void SelectCurrentByName(Gui* menu, Gadget* entries, int sel)
 {
     Gadget* entry = &entries[sel];
     SetTextColors(menu->colours[entry->colours], GetTextKeyColor());
-    SelectFontForEntry((void*)entries, sel);
+    SelectFontForEntry(entries, sel);
     TrySetFocus(menu, sel);
     menu->layer->current = sel;
     CommitTextEdit(menu, sel, entry->u.text, entry->status, 0);

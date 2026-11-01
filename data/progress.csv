@@ -2236,7 +2236,7 @@ address,size,file,symbol,status,similarity
 0x4a5030,113,src/gui/gui.cpp,?GetTextPixelWidth@@YGHPAE@Z,matched,100.0
 0x4a50b0,40,src/gui/gui.cpp,?GetFontLineHeight@@YGHXZ,matched,100.0
 0x4a50e0,238,src/gui/gui.cpp,?DrawTextClipped@@YGXPAXPADHHHH@Z,matched,100.0
-0x4a51d0,485,src/gui/gui.cpp,?DrawWrappedText@@YGHPAD0HHHHH@Z,matched,100.0
+0x4a51d0,485,src/gui/gui.cpp,?DrawWrappedText@@YGHPAXPADHHHHH@Z,matched,100.0
 0x4a53c0,748,src/gui/gui.cpp,?LayoutLabelText@@YGXPAUGui@@H@Z,matched,100.0
 0x4a56b0,1662,src/gui/gui.cpp,?DrawLabel@@YGXPAUGui@@H@Z,matched,100.0
 0x4a5d30,18,src/gui/gui.cpp,?SetCurrentFont@@YGXPAUGui@@H@Z,matched,100.0
