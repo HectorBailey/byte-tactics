@@ -292,7 +292,7 @@ void RegisterDataArchives();
 void EnterMainMenuState();
 void __stdcall SetGameMode(int a);
 void __stdcall SetCursorOverlayEnabled(int param);
-void __stdcall SetFrontendState(int state, int line, const char* file);
+void __stdcall SetFrontendState(char state, int line, char* file);
 void __stdcall SetMissionType(int param);
 void __stdcall SetCursorMode(int n);
 void Force640x480Surfaces();
