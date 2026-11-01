@@ -202,7 +202,7 @@ Surface* __stdcall LoadBitmapByName(const char* name, unsigned char* palette)
     return bitmap;
 }
 
-void* __stdcall HAPI_LoadFile(char* path, int* outSize);
+char* __stdcall HAPI_LoadFile(char* path, int* outSize);
 
 // FUNCTION: 0x4292e0
 void* __stdcall LoadFontByName(const char* name)
@@ -219,7 +219,7 @@ void* __stdcall LoadFontByName(const char* name)
 int __stdcall HAPI_FileLengthByName(char* path);
 int __stdcall LoadPcxPalette(char* path, void* data);
 int __stdcall WriteBufferToFile(char* filename, void* data, int size);
-void __stdcall RemoveFile(char* path);
+void __stdcall RemoveFile(const char* path);
 
 // Loads palettes\<name>.PAL; when that is missing, builds it from the
 // palettes\PALETTE.PCX file (0x400 bytes) and tries to drop the cached
@@ -302,7 +302,7 @@ struct Pic_004295b0 {
 int __stdcall HAPI_FileLength(void* file);
 int __stdcall HAPI_readfromfile(void* file, void* buf, int size);
 int __stdcall HAPI_SeekFile(void* file, int pos);
-GafFrame* __stdcall AllocFrame(char* name, int width, int height);
+GafFrame* __stdcall AllocFrame(const char* name, int width, int height);
 
 // Loads a picture from `path`. It reads a 0x40-byte header; if bit 0 of the
 // byte at header+0x2c is set it seeks to the offset stored at header+0x28,

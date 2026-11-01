@@ -509,7 +509,7 @@ extern const char g_unitLimitKey[];        // "UnitLimit"
 
 int GetScreenWidth();
 int GetScreenHeight();
-void __stdcall SetPageFlipping(int enable);
+int __stdcall SetPageFlipping(int enable);
 void __stdcall SetMissionType(int type);
 void LoadGameResources();
 void InitSound();
@@ -517,11 +517,11 @@ void ResetFrontendState();
 void __stdcall InitPacketTables(void* param_1);
 void RegisterAllOrderTypes();
 void LoadGameFonts();
-void LoadDefaultPalette();
+int LoadDefaultPalette();
 void LoadAllSound();
-void __stdcall LoadAlphaTable(void* palette);
-void __stdcall LoadShadeTable(void* palette);
-void __stdcall LoadLightTable(void* palette);
+unsigned int* __stdcall LoadAlphaTable(void* palette);
+unsigned int* __stdcall LoadShadeTable(void* palette);
+unsigned int* __stdcall LoadLightTable(void* palette);
 void __stdcall MakeGrayTable(void* palette);
 void __stdcall MakeBlueTable(void* palette);
 void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
@@ -870,7 +870,7 @@ void ShutdownIngameSystems()
 
 void BlankScreen();
 void RemoveLocalPlayers();
-void __stdcall QuitApp(const char*);
+void __stdcall QuitApp(char*);
 
 // FUNCTION: 0x491c60
 void ShutdownIngameAndQuit()
@@ -898,8 +898,8 @@ void __stdcall SetCursorMode(int n)
 
 // Picks the order/state table entry at +0x1487f and hands it to
 // SetCursorAnimation for the object at +0x519, mirroring 0x491c80.
-int __cdecl UpdatePlacementGhostValidity(void);
-unsigned short __cdecl PickUnitUnderCursor(void);
+int __stdcall UpdatePlacementGhostValidity(void);
+unsigned short __stdcall PickUnitUnderCursor(void);
 int __stdcall ResolveCursorModeForSelection(unsigned char mode);
 
 // FUNCTION: 0x491cc0
@@ -926,7 +926,7 @@ void __stdcall UpdateBattleHoverMode(int unused)
     }
 }
 
-int __stdcall IsScreenNamed(Gui* queue, char* name);
+int __stdcall IsScreenNamed(Gui* queue, const char* name);
 void __stdcall CloseTopScreen(Gui* queue);
 
 // FUNCTION: 0x491d70

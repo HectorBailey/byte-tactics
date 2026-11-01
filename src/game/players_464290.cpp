@@ -217,7 +217,7 @@ struct Game {
 
 extern Game* g_game;
 
-const char* __stdcall Translate(const char* text);
+char* __stdcall Translate(char* text);
 
 // FUNCTION: 0x464290
 void __stdcall SetupPlayerSlot(int player, char type)
@@ -417,7 +417,7 @@ guard:
 
 #include "../util/command_args.h"
 
-char* __stdcall HAPI_LoadFile(const char* name, int* size);
+char* __stdcall HAPI_LoadFile(char* name, int* size);
 int __stdcall ExecuteCommandText(char* text, int len, CommandArgs* vars, int param_4);
 void __cdecl GameFreeThunk(char* text);
 void __stdcall ParseDownloadableAiWeightScripts(int player);

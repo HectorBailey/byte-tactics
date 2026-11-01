@@ -112,7 +112,7 @@ void __stdcall SaveMeteors(void* file);
 
 extern int __stdcall ReadRegistryData(const char* app, const char* key, char* buf, int* size);
 extern void __stdcall WriteRegistryString(const char* app, const char* key, const char* value);
-extern int __stdcall WriteRegistryDword(const char* param1, const char* param2, int param3);
+extern void __stdcall WriteRegistryDword(char* param1, char* param2, int param3);
 
 // Allocates a 4-byte object, initialises it, and opens it with the given
 // name and two global strings; frees it and returns 0 on failure.
