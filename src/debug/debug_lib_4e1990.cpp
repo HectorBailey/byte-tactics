@@ -54,7 +54,8 @@ struct NameKeyLess {
 
 class NameMapTree {
 public:
-    NameMapIter LowerBound(const NameKey& key);
+    // Defined in debug_lib_4e2580.cpp, keyed by the name's C string.
+    NameMapIter LowerBound(const char* const& key);
     NameMapIter Erase(NameMapIter it);
     NameMapInsertResult InsertOrFind(const NameKey& key);
 };
@@ -70,7 +71,7 @@ public:
     NameMapIter End() { return NameMapIter(head); }
     NameMapIter Find(const NameKey& key)
     {
-        NameMapIter p = LowerBound(key);
+        NameMapIter p = LowerBound((const char* const&)key.name);
         return (p == End() || compare(key, p.ptr->key)) ? End() : p;
     }
     void Upsert(const NameKey& key);
