@@ -23,7 +23,7 @@ int __stdcall IsCurrentGadgetNamed(void* menu, char* name);
 Gadget* __stdcall FindGadgetChecked(void* entries, char* name);
 int __stdcall FindGadgetIndex(void* entries, const char* name, int flag);
 int __stdcall SelectConnection(int index);
-void __stdcall PlaySoundByName(char* name, int flag);
+void __stdcall PlaySoundByName(char* name, int param_2);
 void __stdcall SetCursorMode(int value);
 int __stdcall OnlineProcessButtonCommand(int button, char* message, unsigned int size);
 void OnlineUnload();
