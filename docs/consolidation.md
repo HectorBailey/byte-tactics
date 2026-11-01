@@ -352,7 +352,7 @@ can disagree on types (a real link would fail). Known cases:
 - A constructor's address can't be taken, and no vector member calls
   `vector(const allocator&)`, so 0x40c510.cpp emits it with an explicit
   instantiation, `template class std::vector<Unit*>;`, which emits every member.
-- One element type, one name: `Elem_0040cc40` (a cell and its float sort key,
+- One element type, one name: `ScoredCell` (a cell and its float sort key,
   copy constructor 0x40a5b0) is the element of the vector at +0x4d of the
   player AI object, and `Elem_0040cfb0` (three bytes) the one at +0x65. The
   files that use them define them identically. `PlayerAI`,
