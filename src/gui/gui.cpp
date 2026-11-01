@@ -85,23 +85,6 @@ int FindFreeExplodedPieceSlot(void);
 void UpdateExplodedPieces(void);
 void StampFeatureMetal(void);
 
-struct Vec6_49fd20 {
-    int x;                         // +0x0
-    int y;                         // +0x4
-    char pad[16];                  // +0x8 .. +0x17 (unused by this function)
-};
-
-struct Obj1_49fd20 {
-    char unknown_0[0x3c];
-    Vec6_49fd20 data;              // +0x3c
-};
-
-struct Obj2_49fd20 {
-    char unknown_0[0x13];
-    short val_13;                  // +0x13
-    short val_15;                  // +0x15
-};
-
 #pragma pack(pop)
 
 int __stdcall UpdateMenu(Gui* menu);
@@ -204,11 +187,11 @@ void __stdcall ClearLayerChanged(Gui* param)
 }
 
 // FUNCTION: 0x49fb10
-void __stdcall SetKeyboardInput(int param_1, int param_2)
+void __stdcall SetKeyboardInput(Gui* gui, int value)
 {
-    int eax = *(int*)(param_1 + 0x18);
-    if (eax != 0) {
-        *(int*)(eax + 0x18) = param_2;
+    Layer* layer = gui->layer;
+    if (layer != 0) {
+        layer->keyboardInput = value;
     }
 }
 
@@ -270,26 +253,42 @@ int __stdcall TrySetFocus(Gui* obj, int index)
 #pragma auto_inline(on)
 
 // FUNCTION: 0x49fcf0
-int __stdcall IsFocused(int param_1, int param_2)
+int __stdcall IsFocused(Gui* gui, int index)
 {
     int result = 0;
-    result = *(int*)(param_1 + 0x64) == param_2;
+    result = gui->focus == index;
     return result;
 }
 
 // FUNCTION: 0x49fd10
-bool __stdcall HasFocus(int param_1)
+bool __stdcall HasFocus(Gui* gui)
 {
-    return *(int*)(param_1 + 0x64) != -1;
+    return gui->focus != -1;
 }
 
 // FUNCTION: 0x49fd20
-void __stdcall FUN_0049fd20(Obj1_49fd20* param_1, Obj2_49fd20* param_2, Vec6_49fd20* param_3)
+void __stdcall FUN_0049fd20(Gui* gui, Gadget* gadget, MouseEvent* out)
 {
-    *param_3 = param_1->data;
-    param_3->x -= param_2->val_13;
-    param_3->y -= param_2->val_15;
+    *out = gui->point;
+    out->x -= gadget->x;
+    out->y -= gadget->y;
 }
+
+// Unused here: real declarations that keep the file's symbol count (docs/c2-regalloc.md),
+// one type name among them.
+void ResetPlayerGadgets(void);
+void OpenTalkDialog(void);
+void __stdcall OpenUnitInfoDialog(void);
+void UpdateCdCategoryByActivity(void);
+void ToggleTabMenu(void);
+void OpenMain2Layout(void);
+void UpdateFramePacing(void);
+void SelectStopOrder(void);
+void HandleGameKey(void);
+void MainFrameTick(void);
+void ClearSelection(void);
+void SelectAllIdleUnits(void);
+struct PlayerInfo;
 
 // FUNCTION: 0x49fd60
 int __stdcall IsCurrentGadgetNamed(Gui* gui, char* name)
@@ -4933,7 +4932,7 @@ int __stdcall HandleTextInput(Gui* obj, int index, int key)
         }
     }
 
-    if (IsFocused((int)obj, index)) {
+    if (IsFocused(obj, index)) {
         SetTextColors(obj->colours[entries[index].colours],
                      obj->colours[entries[index].image]);
         int r = HandleTextEditKey(obj, index, key);
