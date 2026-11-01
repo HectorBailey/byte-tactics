@@ -299,8 +299,8 @@ void Force640x480Surfaces();
 void ApplyDifficultyButtons();
 void StartGlamourSound();
 char __stdcall FindGameCdDrive(int side);
-const char* __stdcall Translate(const char* text);
-void __stdcall OpenMessageBox(Gui* menu, const char* text, int wrapWidth, int centre, int autoHeight);
+char* __stdcall Translate(char* text);
+int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, int autoHeight);
 void __stdcall PlaySoundByName(const char* name, int broadcast);
 int __stdcall IsCurrentGadgetNamed(Gui* gadget, char* name);
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
@@ -309,8 +309,7 @@ void __stdcall ClearSelectedGadget(Gui* menu);
 int __stdcall AddHotspotGadget(Gui* menu, Button* record);
 int __stdcall AddBarGadget(Gui* menu, Bar* record);
 int GetFontLineHeight();
-int __stdcall AddTextGadget(Layer* holder, char* type, char* text, int x, int y,
-                           int width, int attribs);
+void __stdcall AddTextGadget(Layer* layer, char* name, char* text, int x, int y, int w, int flags);
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, unsigned int flags);
 void __stdcall SelectGadgetByName(Gui* menu, const char* name);
 char* __stdcall BuildScrollItems1(char* names, char* flags, int count);
@@ -327,14 +326,14 @@ void __stdcall MarkLayerChanged(Gui* menu);
 void __stdcall MarkChanged(Gui* menu);
 void __stdcall EnableKeyCommands(Gui* menu);
 void __stdcall UpdateMenu(Gui* menu);
-void __stdcall BlitMenuLayers(Gui* menu, void* dest, void* clip);
+void __stdcall BlitMenuLayers(Gui* gui, unsigned int* surface, int* rect);
 void __stdcall DrawSurface(void* dest, void* image, int x, int y);
 void __stdcall DrawMessages(void* surface);
 void __stdcall SetOffscreenSurface(void* surface);
 void* __stdcall AllocSurface(const char* name, int width, int height);
 void HandleNetPackets();
 void __stdcall ReportGameEvent(int event);
-const char* __stdcall GetRejectReasonText(unsigned reason);
+char* __stdcall GetRejectReasonText(int reason);
 int GetTickRate();
 struct MouseEvent;
 void __stdcall GetCurrentMouseEvent(MouseEvent* event);
@@ -344,7 +343,7 @@ void ShowSoftwareCursor();
 void HideSoftwareCursor();
 void __stdcall StartPaletteFade(unsigned char* target, unsigned char* current, int steps);
 void __stdcall SendPlayerEconomy(Player* player, int a, int b);
-int __stdcall IsScreenNamed(Gui* menu, const char* name);
+int __stdcall IsScreenNamed(Gui* gui, const char* name);
 
 // Creates the global game object at a random offset (0..6993 bytes) inside a
 // zeroed allocation, using placement new.
@@ -1012,7 +1011,7 @@ void __stdcall RunEndGameState()
             g_game->state=1;
             Player* player=&g_game->players[g_game->localPlayer];
             if(player->message && player->message!=2) {
-                const char* name=GetRejectReasonText(player->message);
+                char* name=GetRejectReasonText(player->message);
                 OpenMessageBox(&g_game->gui,Translate(name),320,1,1);
                 MarkChanged(&g_game->gui);
                 MarkLayerChanged(&g_game->gui);

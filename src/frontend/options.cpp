@@ -711,8 +711,7 @@ int __stdcall FindGadgetIndex(void* entries, const char* name, int type);
 void __stdcall LoadPictureCached(char* name, int a, int b, int c);
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
-void __stdcall AddTextGadget(Layer* layer, char* type, char* text, int x, int y,
-                             int width, int attr);
+void __stdcall AddTextGadget(Layer* layer, char* name, char* text, int x, int y, int w, int flags);
 char* __stdcall SkipTextLines(char* text, int n);
 char* __stdcall Translate(char* text);
 const char* __stdcall Translate(const char* text);
@@ -761,7 +760,7 @@ int __stdcall SetCursorMode(int value);
 void ApplyDifficultyButtons();
 char __stdcall FindGameCdDrive(int disc);
 void __stdcall RegisterDataArchives();
-void __stdcall OpenMessageBox(char* dest, char* text, int param_3, int param_4, int param_5);
+int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, int autoHeight);
 int __stdcall IsGadgetNamed(int param1, int param2, char* name);
 void ShutdownIngameSystems();
 void ShutdownIngameAndQuit();
@@ -2557,7 +2556,7 @@ void __stdcall HandleRestartDialogClick(Gui* gui)
         switch (mode) {
         case 1:
             if (!FindGameCdDrive(0)) {
-                OpenMessageBox((char*)&g_game->gui,
+                OpenMessageBox(&g_game->gui,
                              Translate("Please insert the Campaign CD (Disc 2) and try again"),
                              200, 1, 1);
                 ClearSelectedGadget((char*)&g_game->gui);
@@ -2567,7 +2566,7 @@ void __stdcall HandleRestartDialogClick(Gui* gui)
             break;
         case 2:
             if (!FindGameCdDrive(1)) {
-                OpenMessageBox((char*)&g_game->gui,
+                OpenMessageBox(&g_game->gui,
                              Translate("Please insert the Multiplayer CD (Disc 1) and try again"),
                              200, 1, 1);
                 ClearSelectedGadget((char*)&g_game->gui);

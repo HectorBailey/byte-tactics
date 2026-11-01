@@ -452,7 +452,7 @@ void __stdcall SetDescListCleanupFlag(int gui, int flag)
 // terminator), which spills past the name into the x field at +0x13.
 // FUNCTION: 0x4ab1b0
 void __stdcall AddTextGadget(Layer* obj, char* name, char* text,
-                            int x, short y, int w, int flags)
+                            int x, int y, int w, int flags)
 {
     Gadget* entries = obj->entries;
     short n = entries->u.count;
