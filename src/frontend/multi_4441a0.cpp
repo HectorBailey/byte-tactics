@@ -10,22 +10,11 @@
 
 #include "../network/provider_conn.h"
 
-#pragma pack(push, 1)
-
-struct Game_004441a0 {
-    char unknown_0[0x2a4b];
-    void* descriptions;                 // +0x2a4b
-    char unknown_2a4f[0x2a9f - 0x2a4f];
-    void* guids;                        // +0x2a9f
-    HapinetProviderConnEntry* conns;               // +0x2aa3
-    char unknown_2aa7[0x2bc0 - 0x2aa7];
-    char frontendSubstateRequest;       // +0x2bc0
-};
-#pragma pack(pop)
-
 #include "../network/link_info.h"
 
-extern Game_004441a0* g_game;
+#include "../game/game.h"
+
+extern Game* g_game;
 // GLOBAL: 0x5127c8
 extern LinkInfo g_linkInfo[];
 
@@ -53,8 +42,8 @@ void __stdcall HandleSelectProviderClick(Gui* menu)
     int id;
     int cur;
     if (menu->hotGadgetIndex == -1) {
-        if (g_game->guids != 0) {
-            GameFreeThunk(g_game->guids);
+        if (g_game->sessions != 0) {
+            GameFreeThunk(g_game->sessions);
             for (i = 0; i < 10; i++) {
                 if (g_game->conns[i].pConnectionBlob != 0) {
                     GameFreeThunk(g_game->conns[i].pConnectionBlob);
@@ -62,9 +51,9 @@ void __stdcall HandleSelectProviderClick(Gui* menu)
                 }
             }
             GameFreeThunk(g_game->conns);
-            GameFreeThunk(g_game->descriptions);
-            g_game->guids = 0;
-            g_game->descriptions = 0;
+            GameFreeThunk(g_game->data[0]);
+            g_game->sessions = 0;
+            g_game->data[0] = 0;
         }
         return;
     }
