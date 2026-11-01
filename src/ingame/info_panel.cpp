@@ -297,12 +297,16 @@ public:
 class Model3do {                       // the model or piece being drawn
 public:
     int version;                       // +0x00
-    int count;                         // +0x04
+    int vertexCount;                   // +0x04
     int faceCount;                     // +0x08
     int firstFace;                     // +0x0c
-    char unknown_10[0x24 - 0x10];
-    Vec3* verts;                       // +0x24
-    Model3doPrimitive* prims;          // +0x28
+    int x;                             // +0x10, the offset from the parent
+    int y;                             // +0x14
+    int z;                             // +0x18
+    const char* name;                  // +0x1c
+    int always0;                       // +0x20
+    Vec3* vertices;                    // +0x24
+    Model3doPrimitive* faces;          // +0x28
 };
 
 #pragma pack(pop)
@@ -1075,9 +1079,9 @@ void __stdcall DrawClosedPolygon(void* surface, Point* points, int count, int co
     DrawLine(surface, points->x, points->y, p->x, p->y, color);
 }
 
-// Draws a piece of a 3D model: projects obj->count vertices through
+// Draws a piece of a 3D model: projects obj->vertexCount vertices through
 // RotateByAngles (the same rotate/project idiom as the matched 0x467a50) into
-// screen points, then draws each primitive in obj->prims (from index 1 when
+// screen points, then draws each primitive in obj->faces (from index 1 when
 // obj->firstFace is not -1, otherwise from 0). A primitive whose bit 0 is set
 // is a flat filled polygon (FillPolygon); otherwise a 4-vertex textured quad
 // (DrawFrameQuad), whose texture is either the direct pointer at +0x10 or, when
@@ -1087,12 +1091,12 @@ void __stdcall DrawClosedPolygon(void* surface, Point* points, int count, int co
 void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,
                             Model3do* obj, short* angles)
 {
-    Vec3* v = obj->verts;
+    Vec3* v = obj->vertices;
     Vec3* scratch = g_game->tempXformPts;
     Point* points = g_game->tempProjectedPts;
     int i = 0;
     // Every increment of both loops stays in the for header.
-    for (; i < obj->count; i++, v++, scratch++, points++) {
+    for (; i < obj->vertexCount; i++, v++, scratch++, points++) {
         RotateByAngles(v, scratch, angles);
         int y = (short)((scratch->y + offset->y) >> 16);
         int z = (short)((offset->z - scratch->z) >> 16);
@@ -1102,7 +1106,7 @@ void __stdcall DrawModel3doProjected(void* surface, Vec3* offset,
     }
 
     int j;
-    Model3doPrimitive* e = obj->prims;
+    Model3doPrimitive* e = obj->faces;
     if (obj->firstFace != -1) {
         e++;
         j = 1;

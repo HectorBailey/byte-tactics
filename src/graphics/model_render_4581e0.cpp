@@ -96,14 +96,16 @@ struct Primitive3do {
 };
 
 struct Object3do {
-    char unknown_0[4];
+    int version;                     // +0x00
     int vertexCount;                 // +0x04
     int faceCount;                   // +0x08
     int firstFace;                   // +0x0c
-    int box_x;                       // +0x10
-    int box_y;                       // +0x14
-    int box_z;                       // +0x18
-    char unknown_1c[0xc];
+    int x;                           // +0x10, the offset from the parent
+    int y;                           // +0x14
+    int z;                           // +0x18
+    const char* name;                // +0x1c
+    int always0;                     // +0x20
+    Vec3* vertices;                  // +0x24
     Primitive3do* faces;        // +0x28
 };
 

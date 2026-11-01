@@ -454,15 +454,15 @@ struct Primitive3do {                  // 0x20 bytes
 struct Object3do {
     int version;                       // +0x0
     int vertexCount;                   // +0x4
-    int count;                         // +0x8 primitives
-    int index;                         // +0xc
+    int faceCount;                     // +0x8 primitives
+    int firstFace;                     // +0xc, the primitive drawn first
     int x;                             // +0x10
     int y;                             // +0x14
     int z;                             // +0x18
-    int name;                          // +0x1c
+    char* name;                        // +0x1c, the node's name, offset by the load
     int always0;                       // +0x20
     Vec3* vertices;                    // +0x24
-    Primitive3do* elems;               // +0x28
+    Primitive3do* faces;               // +0x28
     Object3do* sibling;                // +0x2c
     Object3do* child;                  // +0x30
 };
@@ -488,26 +488,26 @@ void __stdcall SwapPrimitives(Primitive3do* a, Primitive3do* b)
     *b = tmp;
 }
 
-// Moves the element selected by node->index to the front (if any), then bubble
+// Moves the element selected by node->firstFace to the front (if any), then bubble
 // sorts the remaining elements ascending by the integer average of the y of
 // the vertices each element's `count` ushort indices select.
 // FUNCTION: 0x4cb370
 void __stdcall SortPrimitives(Object3do* node)
 {
-    if (node->index != -1 && node->count > 0) {
-        Primitive3do* elems = node->elems;
-        Primitive3do temp = elems[node->index];
-        elems[node->index] = elems[0];
+    if (node->firstFace != -1 && node->faceCount > 0) {
+        Primitive3do* elems = node->faces;
+        Primitive3do temp = elems[node->firstFace];
+        elems[node->firstFace] = elems[0];
         elems[0] = temp;
-        node->index = 0;
+        node->firstFace = 0;
     }
     Primitive3do* e;
     int i;
     int swapped;
     do {
         swapped = 0;
-        e = node->elems + 1;
-        for (i = 1; i < node->count - 1; i++, e++) {
+        e = node->faces + 1;
+        for (i = 1; i < node->faceCount - 1; i++, e++) {
             // Pointer cached in a local, counting down: keeps node in ebp.
             unsigned short* q = e->indices;
             int a = 0;
@@ -542,7 +542,7 @@ void __stdcall RelocateObject(int delta, Object3do* node)
     if (node->always0)
         node->always0 += delta;
     node->vertices = (Vec3*)((char*)node->vertices + delta);
-    node->elems = (Primitive3do*)((char*)node->elems + delta);
+    node->faces = (Primitive3do*)((char*)node->faces + delta);
     if (node->sibling) {
         node->sibling = (Object3do*)((char*)node->sibling + delta);
         RelocateObject(delta, node->sibling);
@@ -552,8 +552,8 @@ void __stdcall RelocateObject(int delta, Object3do* node)
         RelocateObject(delta, node->child);
     }
     // Pointer walking the element array: the loop needs it.
-    Primitive3do* e = node->elems;
-    for (int i = 0; i < node->count; i++, e++) {
+    Primitive3do* e = node->faces;
+    for (int i = 0; i < node->faceCount; i++, e++) {
         if (e->always0)
             e->always0 += delta;
         e->ptr_c += delta;

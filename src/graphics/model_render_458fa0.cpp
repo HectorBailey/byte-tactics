@@ -17,11 +17,16 @@ struct Primitive3do {
 };
 
 struct Object3do {
-    char unknown_0[4];
+    int version;                     // +0x0
     int vertexCount;                 // +0x4
     int faceCount;                   // +0x8
     int firstFace;               // +0xc -1 skips the first face
-    char unknown_10[0x28 - 0x10];
+    int x;                           // +0x10, the offset from the parent
+    int y;                           // +0x14
+    int z;                           // +0x18
+    const char* name;                // +0x1c
+    int always0;                     // +0x20
+    Vec3* vertices;                  // +0x24
     Primitive3do* faces;        // +0x28
 };
 
