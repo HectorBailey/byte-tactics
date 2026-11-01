@@ -701,7 +701,7 @@ void __stdcall SetGadgetStatus(Gui* gui, int id, int flag);
 void __stdcall SetButtonStage(Menu_0045e5e0* menu, int index, int value);
 void __stdcall SetPaletteColors(unsigned char* palette, int first, int count);
 int __stdcall LockScreen(Surface_0045fbc0* out);
-void __stdcall FillSurface(Surface_0045fbc0* surface, int color);
+int __stdcall FillSurface(Surface* surface, int colour);
 int __stdcall UnlockScreen(Surface_0045fbc0* s);
 
 int __stdcall FindGadgetIndex(void* list, char* name, int flag);
@@ -2346,7 +2346,7 @@ void ClearScreenWithHudPalette()
     SetPaletteColors(palette, 0, 0x100);
     SetOffscreenSurface((int)g_game->offscreen);
     if (LockScreen(&screen)) {
-        FillSurface(&screen, g_game->gui.colours[0]);
+        FillSurface((Surface*)&screen, g_game->gui.colours[0]);
         UnlockScreen(&screen);
         FlipScreen();
     }
