@@ -467,7 +467,7 @@ One lever, and it decides **two** independent questions:
 - **A commutative `lea`/`add` whose base/index assignment will not move is a
   property of the small translation unit, not of the function, and it is
   independent of the element type.** `vector<T>::insert` carries the identical
-  single byte with `T` = `int`, `Unit*`, `Class_004c2ea0*` and `Elem_0040cfb0`
+  single byte with `T` = `int`, `Unit*`, `Class_004c2ea0*` and `BuildScoreTriplet`
   (0x46e640, 0x408f30, 0x425210, 0x40cca0). The exe holds both register variants,
   so treat it as one problem with several members and do not spend boxes on the
   siblings individually.
@@ -850,7 +850,7 @@ Which member it is decides the bytes, so try each:
 
 Those six are landed. The other four of Part 6's six were measured on scratch
 copies only and are not landed yet: 0x408f30 (`Unit*`), 0x40cca0 (3-byte
-`Elem_0040cfb0`), 0x425210 (`unsigned short`) and 0x44ec30 (two shorts) each
+`BuildScoreTriplet`), 0x425210 (`unsigned short`) and 0x44ec30 (two shorts) each
 MATCH with `// FLAGS: /Gi`, the real `<vector>` and a `reserve` or copy-ctor
 use (0x408f30 and 0x425210 also with `resize`). With no other use they are
 99.1% to 99.3%.
