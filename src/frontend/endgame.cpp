@@ -49,7 +49,7 @@ struct Amount {
 
 #pragma pack(push, 1)
 
-struct Surface_0041df20;
+struct Surface;
 
 #include "../graphics/rect.h"
 
@@ -275,7 +275,7 @@ void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 void __cdecl GameFreeThunk(void* p);
 unsigned int __cdecl GetTicks();
 void __stdcall SetPaletteColors(unsigned char* palette, int first, int count);
-void __stdcall FadeRectangle(Surface_0041df20* dst, void* rect, int level);
+int __stdcall FadeRectangle(Surface* surface, Rect* rect, int level);
 Display* GetDisplay();
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
 int __stdcall HAPI_FileLengthByName(char* path);
@@ -1045,7 +1045,7 @@ void __stdcall RunEndGameState()
             event[1]=0; event[0]=0;
             event[2]=g_game->screenWidth; event[3]=g_game->screenHeight;
             if(g_game->nextTime<GetTicks()) {
-                FadeRectangle(0,event,g_game->steps-29);
+                FadeRectangle(0,(Rect*)event,g_game->steps-29);
                 g_game->nextTime=GetTicks()+1;
                 --g_game->steps;
                 if(!g_game->steps) g_game->done=1;
