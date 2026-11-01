@@ -18,14 +18,16 @@ spells it changes at once.
 
 What it rewrites:
 
-  src/**/*.cpp, include/*.h   OLD as a whole word in code and in comments,
-                              never inside a string or character literal; in
+  src/**/*.cpp, src/**/*.h,   OLD as a whole word in code and in comments,
+  include/*.h                 never inside a string or character literal; in
                               the decorated symbol of a `// FUNCTION:` or
-                              `// ENTRY:` annotation too. In the generated
-                              headers only where it merges no two names: files
-                              match only at those headers' exact symbol counts
-                              (docs/c2-regalloc.md), and a second declaration
-                              of one name counts nothing
+                              `// ENTRY:` annotation too. A header under src/
+                              is one more source file: the one declaration of
+                              the types its includers share. In the generated
+                              headers under include/ only where it merges no
+                              two names: files match only at those headers'
+                              exact symbol counts (docs/c2-regalloc.md), and a
+                              second declaration of one name counts nothing
   data/aliases.csv            inside the names, decorated or not (the table is
   data/symbols.csv            kept by hand; symbols.csv is rebuilt by
                               tools/progress.py from the files, and rewritten
@@ -235,7 +237,8 @@ class Tree:
 
     def __init__(self, texts: dict[Path, str]):
         self.texts = texts
-        self.headers = {p for p in texts if p.suffix == ".h"}
+        # The generated headers; one under src/ is checked like a source file.
+        self.headers = {p for p in texts if is_generated_header(p)}
         self.codes = {p: code_of(t) for p, t in texts.items()}
         self.tokens = {p: set(TOKEN.findall(c)) for p, c in self.codes.items()}
         # A file that includes one of the generated headers sees its names too,
@@ -246,9 +249,9 @@ class Tree:
             for m in re.finditer(r'^\s*#\s*include\s*["<]([^">]+)[">]', text, re.M):
                 if re.search(r"\bnamespace\s+\w+\s*\{\s*$", text[:m.start()]):
                     continue
-                header = ROOT / "include" / m.group(1)
-                if header in self.tokens and header != p:
-                    self.included[p] |= self.tokens[header]
+                for header in (ROOT / "include" / m.group(1), (p.parent / m.group(1)).resolve()):
+                    if header in self.tokens and header != p:
+                        self.included[p] |= self.tokens[header]
         self.frames = {p: b for p, t in texts.items() if (b := frame_bodies(t, self.codes[p]))}
         self.entries = entry_names(texts)
         self.types: dict[str, list[Path]] = defaultdict(list)
@@ -332,8 +335,12 @@ def refusals(pairs: list[tuple[str, str]], tree: Tree, join: bool) -> dict[tuple
 
 # --- the rewrite and the checks ------------------------------------------------------------
 
+def is_generated_header(path: Path) -> bool:
+    return path.suffix == ".h" and path.parent == ROOT / "include"
+
+
 def sources_and_headers() -> list[Path]:
-    return source_files() + sorted((ROOT / "include").glob("*.h"))
+    return source_files() + sorted((ROOT / "src").rglob("*.h")) + sorted((ROOT / "include").glob("*.h"))
 
 
 def header_pairs(pairs: list[tuple[str, str]], tokens: set[str]) -> list[tuple[str, str]]:
@@ -359,7 +366,7 @@ def apply(pairs: list[tuple[str, str]], texts: dict[Path, str], dry_run: bool, d
                 path.write_bytes(after.encode("latin-1"))
 
     for path, text in texts.items():
-        if path.suffix == ".h":
+        if is_generated_header(path):
             own = header_pairs(pairs, set(TOKEN.findall(code_of(text))))
             save(path, text, Renamer(own).source(text) if own else text)
             continue
