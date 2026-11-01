@@ -26,7 +26,7 @@ void HAPI_ResolveShadowedFiles();
 int __stdcall HAPI_FindFirst(const char* path, FindData* fd, int a, int b);
 int __stdcall HAPI_FindNext(int handle, FindData* fd);
 void __stdcall HAPI_FindClose(int handle);
-int __stdcall HAPI_AddArchive(char* path, int flag);
+void* __stdcall HAPI_AddArchive(const char* path, int flag);
 char __stdcall FindNextCdDrive(char drive);
 char __stdcall FindGameCdDrive(int side);
 char* __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
