@@ -84,14 +84,18 @@ struct DirectDrawState {
     IDirectDrawPalette* palette;     // +0x10
 };
 
-struct Display_0047bdf0 {
+// The same record display_context.h declares, kept local: including that
+// header brings DisplayContext, its blocks and gui/mouse_event.h with it, and
+// this file's functions match only at their own symbol count
+// (docs/c2-regalloc.md).
+struct DisplayContext {
     char unknown_0[0x24];
     void* sound;                     // +0x24
     char unknown_28[0x40 - 0x28];
     HWND hwnd;                       // +0x40
     HBITMAP dib;                     // +0x44
     char unknown_48[0x84 - 0x48];
-    DirectDrawState surfaces;  // +0x84
+    DirectDrawState draw;      // +0x84
     char unknown_98[0xf0 - 0x98];
     unsigned short flags;            // +0xf0
 };
@@ -107,7 +111,7 @@ struct Display_0047c3a0 {
 #pragma pack(push, 1)
 struct Game {
     char unknown_0[0x10];
-    Display_0047bdf0* sound;            // +0x10
+    DisplayContext* sound;             // +0x10
     char unknown_14[0x37e1b - 0x14];
     Display_0047c3a0* offscreen;        // +0x37e1b
     char unknown_37e1f[0x39241 - 0x37e1f];
@@ -117,7 +121,7 @@ struct Game {
 
 extern Game* g_game;                    // 0x511de8
 
-Display_0047bdf0* GetDisplay();
+DisplayContext* GetDisplay();
 void __stdcall FatalError(char* message);
 void __stdcall SetOffscreenSurface(Display_0047c3a0* display);
 void FlipScreen();
@@ -211,12 +215,12 @@ MoviePlayer::MoviePlayer(char* path, int a, int b, int c, int d, int e)
         FatalError("Could not open movie file, please check filename in INI.");
     SmackSoundOnOff(smack, sound != 0);
 
-    Display_0047bdf0* disp = GetDisplay();
+    DisplayContext* disp = GetDisplay();
     hwnd = disp->hwnd;
-    if ((disp->flags & 2) && disp->surfaces.ddraw) {
-        wrapper = &disp->surfaces;
+    if ((disp->flags & 2) && disp->draw.ddraw) {
+        wrapper = &disp->draw;
         hasSurfaces = 0;
-    } else if (!(disp->flags & 2) && !disp->surfaces.ddraw) {
+    } else if (!(disp->flags & 2) && !disp->draw.ddraw) {
         wrapper = &surfaces;
         wrapper->ddraw = 0;
         wrapper->primary = 0;
