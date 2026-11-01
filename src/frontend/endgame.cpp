@@ -38,12 +38,11 @@ public:
     void FreeBuffer();
 };
 
-// Unused here: the symbol ids this type takes keep 0x41dfc0 and 0x41f0a0 matching
-// (docs/c2-regalloc.md).
-struct Amount {
-    int current;                       // +0x0
-    int required;                      // +0x4
-};
+// Unused here: real declarations whose symbol ids keep the functions below
+// matching (docs/c2-regalloc.md).
+void EnableAICommands(void);
+void RegisterAICommands(void);
+void FUN_00406f40(void);
 
 #include "../map/grid.h"
 

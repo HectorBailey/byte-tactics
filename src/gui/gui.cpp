@@ -71,7 +71,6 @@ void FUN_00406f40(void);
 void ShowFrontendErrorText(void);
 void FreeGameFonts(void);
 int LoadDefaultPalette(void);
-class SquadManager;
 
 #pragma pack(push, 1)
 

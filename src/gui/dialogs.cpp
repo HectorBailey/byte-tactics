@@ -1307,7 +1307,6 @@ struct Block_004b1ec0;
 struct Block_004c5ff0;
 struct BmpFileHeader;
 struct BmpInfo;
-struct BmpInfoHeader;
 void __stdcall CopyPaletteEntries(char* obj, void* dest);
 
 // Builds a 256-entry remap table: for each colour of the source palette,
