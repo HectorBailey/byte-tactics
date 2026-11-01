@@ -1363,7 +1363,7 @@ struct Item_4afec0;
 class Iter_0046e330;
 struct Iterator_004df590;
 struct Kfn_004dbbc0;
-struct Kfn_004e2250;
+struct NameMapKfn;
 struct Kind_00499ab0;
 struct Len;
 struct Less_0046d2e0;
@@ -2092,7 +2092,7 @@ struct V4i;
 struct Value_004df380;
 struct Value_004df590;
 struct Value_004e17c0;
-struct Value_004e2250;
+struct NameMapText;
 struct Vec;
 struct Vec3;
 struct Vec3Init_0043a1f0;
@@ -18951,7 +18951,7 @@ public:
     NameMapIter begin(void);
     static LiveNode*& _Right(LiveNode*);
     NameMapIter end(void);
-    static std::pair<NameKey, Value_004e2250>& _Value(LiveNode*);
+    static std::pair<NameKey, NameMapText>& _Value(LiveNode*);
     NameMapIter erase(NameMapIter, NameMapIter);
     static LiveNode* _Max(LiveNode*);
 };
@@ -19796,7 +19796,7 @@ class Class_004e2250 {  // 0x10 bytes, 2 views
 public:
     char unknown_0[16];
     NameMapIter begin(void);
-    NameMapInsertResult InsertOrFind(std::pair<NameKey, Value_004e2250>&);
+    NameMapInsertResult InsertOrFind(std::pair<NameKey, NameMapText>&);
 };
 
 class NameMapInsertResult {  // 0x8 bytes, 3 views
@@ -19967,12 +19967,12 @@ public:
 class Class_004e2a30 : public Class_004e2950 {  // 0x10 bytes, 2 views
 public:
     LiveNode* CreateNode(int, int);
-    void _Consval(std::pair<NameKey, Value_004e2250>*, std::pair<NameKey, Value_004e2250>&);
+    void _Consval(std::pair<NameKey, NameMapText>*, std::pair<NameKey, NameMapText>&);
 };
 
-struct Kfn_004e2250 {  // 0x1 bytes, 1 view
+struct NameMapKfn {    // 0x1 bytes, 1 view
     char unknown_0[1];
-    NameKey& operator()(std::pair<NameKey, Value_004e2250>&);
+    NameKey& operator()(std::pair<NameKey, NameMapText>&);
 };
 
 struct Less_004e2250 {  // 0x1 bytes, 1 view
@@ -19980,7 +19980,7 @@ struct Less_004e2250 {  // 0x1 bytes, 1 view
     unsigned char operator()(NameKey&, NameKey&);
 };
 
-struct Value_004e2250 {  // 0x1f4 bytes, 1 view
+struct NameMapText {     // 0x1f4 bytes, 1 view
     char text[500];  // +0x0
 };
 
