@@ -465,7 +465,7 @@ int __stdcall SetFullScreen(int mode) {
         ZeroMemory(bmi.bmiColors, sizeof(bmi.bmiColors));
         d->dib = CreateDIBSection(d->dc, (BITMAPINFO *)&bmi, DIB_RGB_COLORS, &bits,
                                   NULL, 0);
-        InitSurface((Surface *)&d->unknown_50[0], g_display->width, g_display->height,
+        InitSurface((Surface *)&d->dibSurface[0], g_display->width, g_display->height,
                      (g_display->width + 3) & ~3, (int)bits);
         SelectObject(d->dc, d->dib);
         SetWindowPos(d->hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);

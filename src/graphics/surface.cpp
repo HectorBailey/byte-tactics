@@ -9,6 +9,7 @@
 
 #include "surface.h"
 #include "gaf_frame.h"
+#include "display_context.h"
 
 // Unused here: real declarations that keep the file's symbol count (docs/c2-regalloc.md).
 void StepAllGafSequences(void);
@@ -17,45 +18,8 @@ void StepScreenFade(void);
 void ScheduleFadeTick(void);
 void StepPaletteFade(void);
 int IsFadeDone(void);
-
-// The display flags word at +0xf0: set through the bitfield, read whole
-// (FlipScreen) or as its low byte (FillSurface). gaf.cpp declares the same
-// word under this name, and display_context.h as its flags union.
-union DisplayFlags {
-    unsigned short word;
-    unsigned char byte;
-    struct {
-        unsigned short opt : 1;        // bit 0
-        unsigned short fullscreen : 1; // bit 1, display_context.h's name
-        unsigned short gdi : 1;        // bit 2
-        unsigned short bit3 : 1;       // bit 3
-        unsigned short bit4 : 1;       // bit 4
-        unsigned short has_c0 : 1;     // bit 5
-        unsigned short has_c4 : 1;     // bit 6
-        unsigned short has_c8 : 1;     // bit 7
-        unsigned short has_cc : 1;     // bit 8
-        unsigned short has_d0 : 1;     // bit 9
-        unsigned short mouseThread : 1; // bit 10, display_context.h's name
-        unsigned short quitting : 1;   // bit 11
-        unsigned short bit12 : 4;      // bits 12 to 15
-    } bits;
-};
-
-// The display's screen surfaces at +0x80: the primary at +0x8, the locked
-// surface at +0xc.
-struct Screen {
-    char unknown_0[0x8];
-    IDirectDrawSurface* primary;       // +0x8
-    IDirectDrawSurface* back;          // +0xc
-    char unknown_10[0x18 - 0x10];
-
-    // Lock in a one-expression method: gives the separate surface reload.
-    int LockSurface(DDSURFACEDESC* p) { return back->Lock(0, p, 0x801, 0); }
-    int LockPrimary(DDSURFACEDESC* p) { return primary->Lock(0, p, DDLOCK_WAIT, 0); }
-    void UnlockPrimary() { primary->Unlock(0); }
-    void UnlockSurface() { back->Unlock(0); }
-    void UnlockRect(LPRECT p) { back->Unlock(p); }
-};
+void CreateOffscreenSurface(void);
+void FreeOffscreenSurface(void);
 
 // One entry of the screen lock stack: a surface and the flag saying which
 // unlock to use (10 entries at g_screenLocks).
@@ -69,109 +33,75 @@ struct LockEntry {
 extern int g_screenLockCount;
 extern LockEntry g_screenLocks[];
 
-// The display object GetDisplay returns. Packed: rect_x sits at +0x196,
-// which the compiler would otherwise pad to a dword boundary.
-#pragma pack(push, 1)
-struct Display {
-    char unknown_0[0x40];
-    HWND hwnd;                         // +0x40
-    HBITMAP dib;                       // +0x44
-    HDC dc;                            // +0x48
-    HPALETTE hpalette;                 // +0x4c
-    Surface cached;                    // +0x50
-    Screen screen;                     // +0x80
-    Surface* activeSurface;            // +0x98
-    int haveBackBuffer;                // +0x9c
-    Rect clip;                         // +0xa0
-    char unknown_b0[0xb4 - 0xb0];
-    IDirectDrawSurface* lastBackBuffer;  // +0xb4
-    char unknown_b8[0xbc - 0xb8];
-    Surface* overrideSurface;          // +0xbc
-    unsigned char* alphaTable;         // +0xc0
-    unsigned char* shadeTable;         // +0xc4, 256 entries per light level
-    unsigned char* lightTable;         // +0xc8
-    unsigned char* grayTable;          // +0xcc
-    unsigned char* blueTable;          // +0xd0
-    int width;                         // +0xd4
-    int height;                        // +0xd8
-    int useOverrideSurface;            // +0xdc
-    char unknown_e0[0xe4 - 0xe0];
-    int field_e4;                      // +0xe4
-    char unknown_e8[0xf0 - 0xe8];
-    DisplayFlags flags;                // +0xf0
-    char unknown_f2[0x196 - 0xf2];
-    int rect_x;                        // +0x196
-    int rect_y;                        // +0x19a
-    char unknown_19e[0x1b2 - 0x19e];
-    GafFrame* bmp;                     // +0x1b2
-    int x;                             // +0x1b6
-    int y;                             // +0x1ba
-    Surface* saveMouse1;               // +0x1be
-    char unknown_1c2[0x1ce - 0x1c2];
-    int cursorThreadEnabled;           // +0x1ce
-    int cursorOverlayEnabled;          // +0x1d2
+// The screen surface calls, one expression each on the display's DirectDraw
+// block: going through the block is what gives the separate surface reload.
+static inline int LockBackSurface(DirectDrawState* s, DDSURFACEDESC* p) { return s->back->Lock(0, p, 0x801, 0); }
+static inline int LockPrimarySurface(DirectDrawState* s, DDSURFACEDESC* p) { return s->primary->Lock(0, p, DDLOCK_WAIT, 0); }
+static inline void UnlockPrimarySurface(DirectDrawState* s) { s->primary->Unlock(0); }
+static inline void UnlockBackSurface(DirectDrawState* s) { s->back->Unlock(0); }
+static inline void UnlockBackRect(DirectDrawState* s, LPRECT p) { s->back->Unlock(p); }
 
-    // Method of the display object: this is the call result.
-    int LockScreen(Surface* out)
-    {
-        if (useOverrideSurface != 0) {
-            *out = *overrideSurface;
-            return 1;
-        }
-        if (dib != 0) {
-            *out = cached;
-            return 1;
-        }
-        if (screen.back == 0)
-            return 0;
-        DDSURFACEDESC desc;
-        desc.dwSize = sizeof(desc);
-        // One-case switch: tests the result with test eax, eax.
-        switch (screen.LockSurface(&desc)) { case 0: break; default: return 0; }
-        out->width = width;
-        out->height = height;
-        out->pitch = desc.lPitch;
-        out->pixels = (unsigned char*)desc.lpSurface;
-        out->x = 0;
-        out->y = 0;
-        out->zPriority = 10000;
-        out->colorKey = -1;
-        out->flag0 = 0;
-        out->clip = clip;
-        if (g_screenLockCount < 10) {
-            g_screenLocks[g_screenLockCount].surface = out;
-            g_screenLocks[g_screenLockCount].flag = 0;
-        }
+// Fills `out` from the screen: the offscreen surface when one is set, the DIB
+// surface at +0x50 when there is one, else the locked back buffer. LockScreen
+// returns its result.
+static inline int LockDisplayScreen(DisplayContext* d, Surface* out)
+{
+    if (d->useOverrideSurface != 0) {
+        *out = *d->overrideSurface;
         return 1;
     }
-
-    // Method of the display object: this is the call result.
-    int LockPrimary(Surface* out)
-    {
-        if (dib != 0) {
-            *out = cached;
-            return 1;
-        }
-        if (screen.primary == 0)
-            return 0;
-        DDSURFACEDESC desc;
-        desc.dwSize = sizeof(desc);
-        // One-case switch: tests the result with test eax, eax.
-        switch (screen.LockPrimary(&desc)) { case 0: break; default: return 0; }
-        out->width = width;
-        out->height = height;
-        out->pitch = desc.lPitch;
-        out->pixels = (unsigned char*)desc.lpSurface;
-        out->x = 0;
-        out->y = 0;
-        out->zPriority = 10000;
-        out->colorKey = -1;
-        out->flag0 = 0;
-        out->clip = clip;
+    if (d->dib != 0) {
+        *out = *(Surface*)d->dibSurface;
         return 1;
     }
-};
-#pragma pack(pop)
+    if (d->draw.back == 0)
+        return 0;
+    DDSURFACEDESC desc;
+    desc.dwSize = sizeof(desc);
+    // One-case switch: tests the result with test eax, eax.
+    switch (LockBackSurface(&d->draw, &desc)) { case 0: break; default: return 0; }
+    out->width = d->width;
+    out->height = d->height;
+    out->pitch = desc.lPitch;
+    out->pixels = (unsigned char*)desc.lpSurface;
+    out->x = 0;
+    out->y = 0;
+    out->zPriority = 10000;
+    out->colorKey = -1;
+    out->flag0 = 0;
+    out->clip = d->clip;
+    if (g_screenLockCount < 10) {
+        g_screenLocks[g_screenLockCount].surface = out;
+        g_screenLocks[g_screenLockCount].flag = 0;
+    }
+    return 1;
+}
+
+// The same from the primary surface. LockPrimary returns its result.
+static inline int LockDisplayPrimary(DisplayContext* d, Surface* out)
+{
+    if (d->dib != 0) {
+        *out = *(Surface*)d->dibSurface;
+        return 1;
+    }
+    if (d->draw.primary == 0)
+        return 0;
+    DDSURFACEDESC desc;
+    desc.dwSize = sizeof(desc);
+    // One-case switch: tests the result with test eax, eax.
+    switch (LockPrimarySurface(&d->draw, &desc)) { case 0: break; default: return 0; }
+    out->width = d->width;
+    out->height = d->height;
+    out->pitch = desc.lPitch;
+    out->pixels = (unsigned char*)desc.lpSurface;
+    out->x = 0;
+    out->y = 0;
+    out->zPriority = 10000;
+    out->colorKey = -1;
+    out->flag0 = 0;
+    out->clip = d->clip;
+    return 1;
+}
 
 // The DirectDraw surface interface as this file calls it: 28 slots, in the
 // order <ddraw.h> declares them (slot 21 is GetPixelFormat, which
@@ -219,7 +149,7 @@ struct Surfaces {
     DirectDrawSurface* back;           // +0x8
 };
 
-Display* GetDisplay(void);
+DisplayContext* GetDisplay(void);
 int __stdcall LockScreen(Surface* out);
 int __stdcall UnlockScreen(Surface* s);
 int __stdcall UnlockPrimary(Surface* unused, RECT* r1, RECT* r2);
@@ -227,7 +157,7 @@ void __cdecl BlitSurface(Surface* dst, Surface* src, int x, int y);
 void __cdecl BlitSurfaceKeyed(Surface* dst, Surface* src, int x, int y, int color);
 void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y);
 void __stdcall DrawFrame(Surface* dst, GafFrame* bmp, int x, int y);
-void __stdcall DrawCursor(Display* obj, Surface* dst);
+void __stdcall DrawCursor(DisplayContext* obj, Surface* dst);
 int GetScreenWidth(void);
 int GetScreenHeight(void);
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
@@ -261,11 +191,11 @@ int GetScreenLockCount(void)
 // 0x4c5fa0, inlined here.
 static inline int UnlockScreenInline(Surface* s)
 {
-    Display* d = GetDisplay();
+    DisplayContext* d = GetDisplay();
     if (d->dib == 0 && d->useOverrideSurface == 0) {
-        if (d->screen.back == 0)
+        if (d->draw.back == 0)
             return 0;
-        d->screen.UnlockSurface();
+        UnlockBackSurface(&d->draw);
         if (g_screenLockCount > 0)
             g_screenLockCount--;
     }
@@ -299,12 +229,12 @@ void UnlockAllScreens(void)
 // FUNCTION: 0x4c5e70
 int __stdcall LockScreen(Surface* out)
 {
-    return GetDisplay()->LockScreen(out);
+    return LockDisplayScreen(GetDisplay(), out);
 }
 #pragma auto_inline(on)
 
 // Unlocks the screen surface locked by LockScreen. The Unlock call goes
-// through a method of the embedded screen struct, which is why the surface
+// through UnlockBackSurface on the DirectDraw block, which is why the surface
 // pointer is re-read.
 // The original's callers (Surface::Unlock in DrawFrameQuad) call this out of
 // line.
@@ -312,11 +242,11 @@ int __stdcall LockScreen(Surface* out)
 // FUNCTION: 0x4c5fa0
 int __stdcall UnlockScreen(Surface* s)
 {
-    Display* d = GetDisplay();
+    DisplayContext* d = GetDisplay();
     if (d->dib == 0 && d->useOverrideSurface == 0) {
-        if (d->screen.back == 0)
+        if (d->draw.back == 0)
             return 0;
-        d->screen.UnlockSurface();
+        UnlockBackSurface(&d->draw);
         if (g_screenLockCount > 0)
             g_screenLockCount--;
     }
@@ -332,7 +262,7 @@ int __stdcall UnlockScreen(Surface* s)
 // FUNCTION: 0x4c5ff0
 int __stdcall LockPrimary(Surface* out)
 {
-    return GetDisplay()->LockPrimary(out);
+    return LockDisplayPrimary(GetDisplay(), out);
 }
 
 // Blits two clip rectangles from the offscreen GDI surface to the window, or,
@@ -341,7 +271,7 @@ int __stdcall LockPrimary(Surface* out)
 // FUNCTION: 0x4c60d0
 int __stdcall UnlockPrimary(Surface* unused, RECT* r1, RECT* r2)
 {
-    Display* d = GetDisplay();
+    DisplayContext* d = GetDisplay();
     if (d->dib != 0) {
         HDC dc = GetDC(d->hwnd);
         SelectPalette(dc, d->hpalette, FALSE);
@@ -359,10 +289,10 @@ int __stdcall UnlockPrimary(Surface* unused, RECT* r1, RECT* r2)
         ReleaseDC(d->hwnd, dc);
         return 1;
     }
-    if (d->screen.primary == 0) {
+    if (d->draw.primary == 0) {
         return 0;
     }
-    d->screen.UnlockPrimary();
+    UnlockPrimarySurface(&d->draw);
     return 1;
 }
 
@@ -371,9 +301,9 @@ int __stdcall UnlockPrimary(Surface* unused, RECT* r1, RECT* r2)
 // FUNCTION: 0x4c61b0
 int __stdcall SetPageFlipping(int enable)
 {
-    Display* obj = GetDisplay();
+    DisplayContext* obj = GetDisplay();
     obj->flags.bits.opt = enable;
-    if (enable && obj->haveBackBuffer == 0) {
+    if (enable && obj->draw.haveBackBuffer == 0) {
         return 0;
     }
     return 1;
@@ -382,8 +312,8 @@ int __stdcall SetPageFlipping(int enable)
 // FUNCTION: 0x4c61f0
 void __stdcall SetRestoreSurface(int surface)
 {
-    Display* obj = GetDisplay();
-    obj->activeSurface = (Surface*)surface;
+    DisplayContext* obj = GetDisplay();
+    obj->draw.activeSurface = (Surface*)surface;
 }
 
 // Locks the screen into a local surface, blits the bitmap at display+0x98
@@ -393,7 +323,7 @@ void __stdcall SetRestoreSurface(int surface)
 // FUNCTION: 0x4c6210
 int __stdcall RestoreSurfaces(Surfaces* arg)
 {
-    Display* d = GetDisplay();
+    DisplayContext* d = GetDisplay();
     if (d->dib != 0)
         return 0;
 
@@ -403,11 +333,11 @@ int __stdcall RestoreSurfaces(Surfaces* arg)
         if (r == 0) {
             Surface screen;
             LockScreen(&screen);
-            BlitSurface(&screen, d->activeSurface, r, r);
+            BlitSurface(&screen, d->draw.activeSurface, r, r);
 
-            Display* d2 = GetDisplay();
-            if (d2->dib == 0 && d2->useOverrideSurface == 0 && d2->screen.back != 0) {
-                d2->screen.UnlockRect((LPRECT)r);
+            DisplayContext* d2 = GetDisplay();
+            if (d2->dib == 0 && d2->useOverrideSurface == 0 && d2->draw.back != 0) {
+                UnlockBackRect(&d2->draw, (LPRECT)r);
                 if (g_screenLockCount > 0)
                     g_screenLockCount--;
             }
@@ -419,11 +349,11 @@ int __stdcall RestoreSurfaces(Surfaces* arg)
 // 0x4c5fa0, inlined here.
 static inline int UnlockScreenInline()
 {
-    Display* d = GetDisplay();
+    DisplayContext* d = GetDisplay();
     if (d->dib == 0 && d->useOverrideSurface == 0) {
-        if (d->screen.back == 0)
+        if (d->draw.back == 0)
             return 0;
-        d->screen.UnlockSurface();
+        UnlockBackSurface(&d->draw);
         if (g_screenLockCount > 0)
             g_screenLockCount--;
     }
@@ -432,29 +362,29 @@ static inline int UnlockScreenInline()
 
 // Frame recovery for a lost DirectDraw surface: when bit 1 of the display
 // flags at +0xf0 is set, check whether the primary surface at +0x88 reports
-// DDERR_SURFACELOST, restore the two surfaces at screen+0x8 and screen+0xc,
-// lock the screen with LockScreen, blit the object at +0x98 onto it with
-// BlitSurface, then unlock with the +0x80 method. The screen surface at +0x8c
+// DDERR_SURFACELOST, restore the two surfaces at +0x88 and +0x8c, lock the
+// screen with LockScreen, blit the object at +0x98 onto it with BlitSurface,
+// then unlock through UnlockBackSurface. The screen surface at +0x8c
 // is saved to +0xb4 and +0xdc is always cleared.
 // FUNCTION: 0x4c62c0
 void RestoreScreen(void)
 {
-    Display* d = GetDisplay();
+    DisplayContext* d = GetDisplay();
     if (d->flags.bits.fullscreen) {
-        if (d->screen.primary->IsLost() == DDERR_SURFACELOST) {
-            Display* d2 = GetDisplay();
+        if (d->draw.primary->IsLost() == DDERR_SURFACELOST) {
+            DisplayContext* d2 = GetDisplay();
             if (d2->dib == 0) {
-                if (d->screen.primary->Restore() == 0) {
-                    if (d->screen.back->Restore() == 0) {
+                if (d->draw.primary->Restore() == 0) {
+                    if (d->draw.back->Restore() == 0) {
                         Surface screen;
                         LockScreen(&screen);
-                        BlitSurface(&screen, d2->activeSurface, 0, 0);
+                        BlitSurface(&screen, d2->draw.activeSurface, 0, 0);
                         UnlockScreenInline();
                     }
                 }
             }
         }
-        d->lastBackBuffer = d->screen.back;
+        d->lastBackBuffer = d->draw.back;
     }
     d->useOverrideSurface = 0;
 }
@@ -488,18 +418,18 @@ static inline void Unlock(LONG held)
 
 // Restores both surfaces after DDERR_SURFACELOST and redraws the screen.
 // Must stay an inline helper used in both places: gives matching registers.
-static inline HRESULT RestoreSurfacesInline(Display* d)
+static inline HRESULT RestoreSurfacesInline(DisplayContext* d)
 {
-    Display* dd = GetDisplay();
+    DisplayContext* dd = GetDisplay();
     if (dd->dib != 0)
         return 0;
-    HRESULT hr = d->screen.primary->Restore();
+    HRESULT hr = d->draw.primary->Restore();
     if (hr == 0) {
-        hr = d->screen.back->Restore();
+        hr = d->draw.back->Restore();
         if (hr == 0) {
             Surface screen;
             LockScreen(&screen);
-            BlitSurface(&screen, dd->activeSurface, 0, 0);
+            BlitSurface(&screen, dd->draw.activeSurface, 0, 0);
             UnlockScreenInline();
         }
     }
@@ -522,18 +452,18 @@ struct Desc {
 // FUNCTION: 0x4c63a0
 void FlipScreen(void)
 {
-    Display* d = GetDisplay();
+    DisplayContext* d = GetDisplay();
     unsigned short flags = d->flags.word;
 
     if ((flags & 2) == 0) {
         LONG held = Lock();
-        Surface* p = &d->cached;
+        Surface* p = (Surface*)d->dibSurface;
         DrawSurface(p, d->overrideSurface, 0, 0);
         DrawCursor(d, p);
         HDC hdc = GetDC(d->hwnd);
         SelectPalette(hdc, d->hpalette, 0);
         RealizePalette(hdc);
-        BitBlt(hdc, 0, 0, p->width, d->cached.height, d->dc, 0, 0, SRCCOPY);
+        BitBlt(hdc, 0, 0, p->width, ((Surface*)d->dibSurface)->height, d->dc, 0, 0, SRCCOPY);
         ReleaseDC(d->hwnd, hdc);
         Unlock(held);
         return;
@@ -550,7 +480,7 @@ void FlipScreen(void)
 
         LONG held = Lock();
         desc.dwSize = sizeof(desc);
-        unsigned long lr = d->screen.primary->Lock(0, (DDSURFACEDESC*)&desc, 1, 0);
+        unsigned long lr = d->draw.primary->Lock(0, (DDSURFACEDESC*)&desc, 1, 0);
         if (lr == 0) {
             out.width = d->width;
             out.height = d->height;
@@ -559,8 +489,8 @@ void FlipScreen(void)
             DrawCursor(d, bmp);
             BlitSurface(&out, bmp, 0, 0);
             if (d->cursorThreadEnabled != 0 && d->cursorOverlayEnabled != 0)
-                DrawSurface(bmp, d->saveMouse1, d->x, d->y);
-            d->screen.primary->Unlock(0);
+                DrawSurface(bmp, d->saveMouse1, d->cursorBlitX, d->cursorBlitY);
+            d->draw.primary->Unlock(0);
         } else if (lr == 0x887601c2) {
             RestoreSurfacesInline(d);
         }
@@ -568,8 +498,8 @@ void FlipScreen(void)
         return;
     }
 
-    if (d->haveBackBuffer != 0 && (flags & 1) != 0) {
-        d->screen.primary->Flip(0, 1);
+    if (d->draw.haveBackBuffer != 0 && (flags & 1) != 0) {
+        d->draw.primary->Flip(0, 1);
         return;
     }
 
@@ -585,7 +515,7 @@ void FlipScreen(void)
 
     int hr;
     while (1) {
-        hr = d->screen.primary->Blt(&rect, d->screen.back, &src, 0x1000000, 0);
+        hr = d->draw.primary->Blt(&rect, d->draw.back, &src, 0x1000000, 0);
         if (hr == 0)
             return;
         if (hr != 0x887601c2)
@@ -604,16 +534,16 @@ void FlipScreen(void)
 // the object by the bitmap's half size, blits it from `dst` and then draws
 // the bitmap at the stored rectangle.
 // FUNCTION: 0x4c67c0
-void __stdcall DrawCursor(Display* obj, Surface* dst)
+void __stdcall DrawCursor(DisplayContext* obj, Surface* dst)
 {
-    if (obj->cursorThreadEnabled != 0 && obj->cursorOverlayEnabled != 0 && obj->bmp != 0) {
-        obj->saveMouse1->width = obj->bmp->width;
-        obj->saveMouse1->height = obj->bmp->height;
-        obj->saveMouse1->pitch = obj->bmp->width;
-        obj->x = obj->rect_x - obj->bmp->xOffset;
-        obj->y = obj->rect_y - obj->bmp->yOffset;
-        DrawSurface(obj->saveMouse1, dst, -obj->x, -obj->y);
-        DrawFrame(dst, obj->bmp, obj->rect_x, obj->rect_y);
+    if (obj->cursorThreadEnabled != 0 && obj->cursorOverlayEnabled != 0 && obj->cursorGafFrame != 0) {
+        obj->saveMouse1->width = obj->cursorGafFrame->width;
+        obj->saveMouse1->height = obj->cursorGafFrame->height;
+        obj->saveMouse1->pitch = obj->cursorGafFrame->width;
+        obj->cursorBlitX = obj->curMouseEvent.x - obj->cursorGafFrame->xOffset;
+        obj->cursorBlitY = obj->curMouseEvent.y - obj->cursorGafFrame->yOffset;
+        DrawSurface(obj->saveMouse1, dst, -obj->cursorBlitX, -obj->cursorBlitY);
+        DrawFrame(dst, obj->cursorGafFrame, obj->curMouseEvent.x, obj->curMouseEvent.y);
     }
 }
 
@@ -659,9 +589,10 @@ static void clear_surface(Surface* s, int colour)
     memset(s->pixels, colour, s->height * s->pitch);
 }
 
-static void clear_screen(Display* o, int colour)
+static void clear_screen(DisplayContext* o, int colour)
 {
-    memset(o->cached.pixels, colour, o->cached.height * o->cached.pitch);
+    Surface* c = (Surface*)o->dibSurface;
+    memset(c->pixels, colour, c->height * c->pitch);
 }
 
 // Fills a surface with one colour byte. With no surface it uses the one the
@@ -672,7 +603,7 @@ static void clear_screen(Display* o, int colour)
 // FUNCTION: 0x4c6890
 int __stdcall FillSurface(Surface* surface, int colour)
 {
-    Display* obj = GetDisplay();
+    DisplayContext* obj = GetDisplay();
     int ret = 1;
     if (surface == 0) {
         if (obj->useOverrideSurface != 0) {
@@ -684,8 +615,8 @@ int __stdcall FillSurface(Surface* surface, int colour)
             Fade_004c6890 fade;
             fade.amount = 100;
             fade.colour = colour;
-            if (((Driver_004c6890*)obj->screen.back)->table->fade(
-                    (Driver_004c6890*)obj->screen.back, 0, 0, 0, 0x1000400, &fade) != 0)
+            if (((Driver_004c6890*)obj->draw.back)->table->fade(
+                    (Driver_004c6890*)obj->draw.back, 0, 0, 0, 0x1000400, &fade) != 0)
                 ret = 0;
             return ret;
         }
@@ -695,8 +626,8 @@ int __stdcall FillSurface(Surface* surface, int colour)
         Fade_004c6890 fade;
         fade.amount = 100;
         fade.colour = colour;
-        if (((Driver_004c6890*)obj->screen.back)->table->fade(
-                (Driver_004c6890*)obj->screen.back, 0, 0, 0, 0x1000400, &fade) != 0)
+        if (((Driver_004c6890*)obj->draw.back)->table->fade(
+                (Driver_004c6890*)obj->draw.back, 0, 0, 0, 0x1000400, &fade) != 0)
             ret = 0;
     }
     return ret;
@@ -705,7 +636,7 @@ int __stdcall FillSurface(Surface* surface, int colour)
 // FUNCTION: 0x4c69a0
 void __stdcall SetOffscreenSurface(int surface)
 {
-    Display* d = GetDisplay();
+    DisplayContext* d = GetDisplay();
     d->useOverrideSurface = 1;
     d->overrideSurface = (Surface*)surface;
 }
@@ -804,14 +735,14 @@ void Surface::SetClipRect(Rect r)
 // FUNCTION: 0x4c6b40
 void __stdcall SetDisplayFieldE4(int value)
 {
-    Display* d = GetDisplay();
-    d->field_e4 = value;
+    DisplayContext* d = GetDisplay();
+    d->unknown_e4 = value;
 }
 
 // FUNCTION: 0x4c6b60
 int GetDisplayFieldE4()
 {
-    return GetDisplay()->field_e4;
+    return GetDisplay()->unknown_e4;
 }
 
 // Blits a bitmap with the hand-written routine BlitSurface. If `dst` is
@@ -1609,7 +1540,7 @@ void __stdcall DrawLitTexturedSpan(int row, int* span, GafFrame* target, GafFram
     unsigned char* dest = target->pixelsOrLayers;
     unsigned char* depth = target->scratch;
     unsigned char* src = texture->pixelsOrLayers;
-    Display* display = GetDisplay();
+    DisplayContext* display = GetDisplay();
     int width = span[1] - span[0];
     int du = (span[4] - span[2]) / width;
     int dv = (span[5] - span[3]) / width;

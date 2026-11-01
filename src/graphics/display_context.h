@@ -64,7 +64,7 @@ struct DisplayContext {
     HBITMAP dib;                             // +0x44
     HDC dc;                                  // +0x48
     HPALETTE hpalette;                       // +0x4c
-    char unknown_50[0x80 - 0x50];            // +0x50, the DIB surface
+    char dibSurface[0x30];                   // +0x50, the DIB surface (a Surface)
     void (__cdecl *callback)(int, int, int); // +0x80
     DirectDrawState draw;                    // +0x84
     Rect clip;                               // +0xa0, the primary surface clip
@@ -81,13 +81,15 @@ struct DisplayContext {
     int height;                              // +0xd8
     int useOverrideSurface;                  // +0xdc
     int active;                              // +0xe0
-    char unknown_e4[4];                      // +0xe4
+    int unknown_e4;                          // +0xe4, read and set whole by surface.cpp
     int tickScale;                           // +0xe8, ticks per second
     int wa_left;                             // +0xec, work area left
-    // The state flags, as one word (the masks) or as bits (display.cpp sets
-    // and tests them by name; SetFullScreen takes bit 1).
+    // The state flags, as one word (the masks), its low byte (FillSurface) or
+    // as bits (display.cpp sets and tests them by name; SetFullScreen takes
+    // bit 1).
     union {
         unsigned short word;
+        unsigned char byte;
         struct {
             unsigned short opt : 1;          // bit 0
             unsigned short fullscreen : 1;   // bit 1
