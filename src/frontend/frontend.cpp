@@ -295,7 +295,7 @@ void __stdcall OpenBattleRoom(void);
 void __stdcall UpdateBattleRoom(void);
 int __stdcall GetServiceProviderIndex(void);
 int __stdcall ReportGameEvent(int msg);
-void __stdcall DeleteUnitSync(void);
+void __fastcall DeleteUnitSync();
 void __stdcall ShutdownScoreTables(void);
 int __stdcall InitScoreReporting(void);
 void __stdcall ShowEndMissionScreen(void);

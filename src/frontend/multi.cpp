@@ -379,7 +379,7 @@ void __stdcall SetGadgetActiveByName(void* menu, const char* name, int value);
 void __stdcall ConfigureListBoxByName(void* menu, const char* name, char* text, int count, int flag);
 void __stdcall CloseTopScreen(Gui* gui);
 int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, int autoHeight);
-char* __stdcall Translate(const char* text);
+char* __stdcall Translate(char* text);
 void __stdcall SetOffscreenSurface(int a);
 void FlipScreen();
 int __stdcall HAPINET_getgames(char* net, void* desc, int a);
@@ -461,7 +461,7 @@ int __stdcall ConnectToGame(Layer* gadget) {
     char buf[0x80];
     // Never address-taken, bigger than temp and names so it lands after them.
     struct { char pre[0x99]; Settings_00441460 s; char pad[0x13]; } sb;
-    const char* msg;
+    char* msg;
     char* lang;
 #define temp (buf)
 
@@ -900,7 +900,6 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, unsigned int flags);
 int __stdcall RenderLayer(Gui* gui, unsigned int flags);
 void __stdcall PlaySoundByName(char* name, int param_2);
 void BlankScreen();
-char* __stdcall Translate(char* text);
 void __stdcall SetFrontendState(char state, int line, char* file);
 void __stdcall SetFrontendErrorText(char* text);
 void __stdcall SetFrontendSubState(char state, int line, char* file);

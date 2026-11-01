@@ -150,7 +150,6 @@ void __stdcall UpdateSolarSystem(Gui* window, Gadget* item);
 void __stdcall UpdatePlanet(Gui* window, Gadget* item);
 void __stdcall HandleMissionBriefingClick(Gui* menu);
 void __stdcall HandleNewGameClick(Gui* menu);
-void __stdcall FillMissionList();
 char* __stdcall Translate(const char* text);
 void __stdcall AddTextGadget(Layer* layer, char* name, char* text, int x, int y, int w, int flags);
 void __stdcall SetTranslatedTextByName(Gui* menu, const char* name, char* text, int value);
@@ -1047,7 +1046,7 @@ void __stdcall OpenNewGameMenu(int param_1)
         Gadget* c = FindGadgetChecked(entries, "Campaign");
         // Original bug, kept: c is dereferenced on both branches even if null.
         if (c != 0 && g_anyMissionMode != 0)
-            c->u.list.callback = (void (__stdcall*)(Gui*, Gadget*))(void (__stdcall*)())FillMissionList;
+            c->u.list.callback = (void (__stdcall*)(Gui*, Gadget*))FillMissionList;
         else
             c->u.list.callback = 0;
 
