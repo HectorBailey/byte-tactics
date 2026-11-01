@@ -216,7 +216,7 @@ void __stdcall DrawUnitInfoPanel(void* surface) {
         // No pfable or field_c locals: the PFSTATE sprintf re-reads g_game->displayContext per argument.
         int pfstate = g_game->screenHeight - GetFontHeight() - 1;
         sprintf(text, "PFSTATE %d, PFABLE %d\n", g_game->displayContext->flags.word & 1,
-                g_game->displayContext->haveBackBuffer);
+                g_game->displayContext->draw.haveBackBuffer);
         DrawString(surface, (unsigned char*)text, 0x82, pfstate, -1);
 
         if (g_game->hoverUnitId != 0) {

@@ -295,7 +295,7 @@ void __stdcall DrawFrameOpaque(Surface* dst, GafFrame* bmp, int x, int y)
 
 // +0xf0: the display object's state flags, read as a byte, a word or a
 // bitfield. Bit 7 (has_c8) is the cached object the shadow draw needs. The
-// same word surface.cpp and display.cpp declare as DisplayFlags.
+// same word surface.cpp declares as DisplayFlags (display_context.h's flags).
 union DisplayFlags {
     unsigned short word;               // +0xf0
     unsigned char byte;                // +0xf0
