@@ -53,6 +53,7 @@ struct Flags_004ab400 {
 void FUN_004161f0(void);
 void InitCommands(void);
 void ProtectUnitDefsReadOnly(void);
+void ProtectUnitDefsReadWrite(void);
 
 // The records AddButtonGadget, AddHotspotGadget and AddBarGadget copy into an
 // entry slot: the slot's first bytes viewed as the control's definition.
@@ -696,10 +697,10 @@ void __stdcall UpdateCursorAndMouse(Gui* p)
 }
 
 // FUNCTION: 0x4ab690
-void __stdcall SetClickMode(void* gui, int mode)
+void __stdcall SetClickMode(Gui* gui, int mode)
 {
-    ((Gui*)gui)->clickMode = mode;
-    ((Gui*)gui)->layer->clickMode = mode;
+    gui->clickMode = mode;
+    gui->layer->clickMode = mode;
 }
 
 // FUNCTION: 0x4ab6b0
