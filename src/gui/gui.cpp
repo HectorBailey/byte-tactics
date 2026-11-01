@@ -88,7 +88,7 @@ void StampFeatureMetal(void);
 #pragma pack(pop)
 
 int __stdcall UpdateMenu(Gui* menu);
-void __stdcall BlitLayers(void* param_1, unsigned int* param_2, int* param_3);
+int __stdcall BlitLayers(Layer* node, void* surface, Rect* clipRect);
 void ShowSoftwareCursor();
 void FlipScreen();
 void __stdcall FatalError(char* path);
