@@ -111,8 +111,9 @@ struct Desc_004437c0 {
     int offset;                        // +0x50
 };
 
-// One 0x102-byte account record: a name and a number string.
-struct Entry_004426e0 {
+// One 0x102-byte modem account: a name and its phone number. g_modemAccounts
+// holds 20 of them ("MODEMACCOUNTS"), listed in the ACCOUNTS menu entry.
+struct ModemAccount {
     char name[0x81];                   // +0x00
     char number[0x81];                 // +0x81
 };
@@ -845,7 +846,7 @@ extern UnitRestrictEntry* g_unitRestrictEntries;
 extern char g_onlineLobbyPlayerName;
 extern char* g_modemInfo;
 extern int g_modemCount;
-extern Entry_004426e0* g_modemAccounts;
+extern ModemAccount* g_modemAccounts;
 extern char* g_modemAccountNames;
 extern GUID DPAID_Modem;
 extern GUID DPAID_ServiceProvider;
@@ -1571,7 +1572,7 @@ void SaveModemNumbers(void)
     if (g_modemAccounts != 0) {
         short count = FindGadgetChecked(g_game->gui.layer->entries, "ACCOUNTS")->u.list.selected;
         if (count > 0) {
-            Entry_004426e0 temp;
+            ModemAccount temp;
             memcpy(&temp, &g_modemAccounts[count], 0x102);
             for (int i = count; i > 0; i--)
                 memcpy(&g_modemAccounts[i], &g_modemAccounts[i - 1], 0x102);
@@ -1607,7 +1608,7 @@ static inline void SaveModemNumbers_00442a30()
     if (g_modemAccounts != 0) {
         short count = FindGadgetChecked(g_game->gui.layer->entries, "ACCOUNTS")->u.list.selected;
         if (count > 0) {
-            Entry_004426e0 temp;
+            ModemAccount temp;
             memcpy(&temp, &g_modemAccounts[count], 0x102);
             for (int i = count; i > 0; i--)
                 memcpy(&g_modemAccounts[i], &g_modemAccounts[i - 1], 0x102);
@@ -1772,7 +1773,7 @@ void __stdcall OpenModemDialog()
                     if (r >= 0) {
                         int i;
                         ConfigureListBoxByName(&g_game->gui, "MODEMS", g_modemInfo, g_modemCount, 0);
-                        g_modemAccounts = (Entry_004426e0*)GameAllocIgnoreTag("MODEMACCOUNTS", 0x1428);
+                        g_modemAccounts = (ModemAccount*)GameAllocIgnoreTag("MODEMACCOUNTS", 0x1428);
                         len.v = 0x1428;
                         r = ReadGameRegistryValue("MODEMNUMBERS", g_modemAccounts, &len.v);
                         if (r == 0) {

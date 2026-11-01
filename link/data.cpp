@@ -420,7 +420,7 @@ int g_unitRestrictPicCursor;  // 0x512978 .bss
 int g_unitRestrictRecordCursor;  // 0x51297c .bss
 char* g_modemInfo;  // 0x512980 .bss
 int g_modemCount;  // 0x512984 .bss
-Entry_004426e0* g_modemAccounts;  // 0x512988 .bss
+ModemAccount* g_modemAccounts;  // 0x512988 .bss
 char* g_modemAccountNames;  // 0x51298c .bss
 char* g_oldMapName;  // 0x512990 .bss
 int g_battleRoomSlotsBuilt;  // 0x512994 .bss

@@ -15,10 +15,10 @@ class SpeechQueue;
 class TranslationTable;
 struct Chunk;
 struct DisplayContext;
-struct Entry_004426e0;
 struct Entry_004df590;
 struct ExplodedPiece;
 struct Game;
+struct ModemAccount;
 struct Smoke_00425b80;
 struct SquashTree;
 struct Surface;
@@ -334,7 +334,7 @@ extern int g_unitRestrictPicCursor;                                             
 extern int g_unitRestrictRecordCursor;                                                                          // 0x51297c, 4 bytes; 1 of 1 files
 extern char* g_modemInfo;                                                                                       // 0x512980, 4 bytes; 1 of 1 files
 extern int g_modemCount;                                                                                        // 0x512984, 4 bytes; 1 of 1 files
-extern Entry_004426e0* g_modemAccounts;                                                                         // 0x512988, 4 bytes; 1 of 1 files
+extern ModemAccount* g_modemAccounts;                                                                           // 0x512988, 4 bytes; 1 of 1 files
 extern char* g_modemAccountNames;                                                                               // 0x51298c, 4 bytes; 1 of 1 files
 extern char* g_oldMapName;                                                                                      // 0x512990, 4 bytes; 1 of 1 files
 extern int g_battleRoomSlotsBuilt;                                                                              // 0x512994, 4 bytes; 3 of 3 files

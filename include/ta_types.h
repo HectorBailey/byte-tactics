@@ -1056,7 +1056,7 @@ struct Entry_00420960;
 struct Entry_004263b0;
 struct SoundCategory;
 struct Entry_00431a20;
-struct Entry_004426e0;
+struct ModemAccount;
 struct Entry_0044c370;
 struct Entry_00452570;
 struct Entry_0045a950;
@@ -6878,7 +6878,7 @@ struct DPCOMPORTADDRESS {  // 0x14 bytes, 1 view
     unsigned long unknown_10;  // +0x10
 };
 
-struct Entry_004426e0 {  // 0x102 bytes, 6 views
+struct ModemAccount {    // 0x102 bytes, 6 views
     char name[129];  // +0x0
     char number[129];  // +0x81
 };
