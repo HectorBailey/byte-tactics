@@ -46,10 +46,10 @@ struct Elem_0040d550 {
     int unknown_0;
 };
 
-struct Pos_00409160 {
+struct MapCenterTile {
     short x, y;
     int unknown_4;
-    Pos_00409160(short ax, short ay) : unknown_4(0) { x = ax; y = ay; }
+    MapCenterTile(short ax, short ay) : unknown_4(0) { x = ax; y = ay; }
 };
 
 // Own view, not vec3.h: it has constructors.
@@ -59,13 +59,13 @@ struct Vec3_00409160 {
     Vec3_00409160() { *this = Vec3_00409160(0, 0, 0); }
 };
 
-struct UnitList_00409160 {
+struct UnitInstanceList {
     std::vector<Unit*> units;
     void Clear() { units.clear(); }
 };
 
-struct Group_00409160 {
-    UnitList_00409160 list;
+struct BuilderAirbaseGroup {
+    UnitInstanceList list;
     void Clear() { list.Clear(); }
 };
 
@@ -75,15 +75,15 @@ public:
     unsigned char index;               // +0x04
     // Wrapper depth decides which vector constructors inline: visible and
     // known are one level deep, factories two.
-    UnitList_00409160 visible;         // +0x05
-    UnitList_00409160 known;           // +0x15
-    Group_00409160 factories;          // +0x25
+    UnitInstanceList visible;          // +0x05
+    UnitInstanceList known;            // +0x15
+    BuilderAirbaseGroup factories;     // +0x25
     // The scouts' anchor: the weighted centroid of the AI's units (Thaldren's
     // nScoutAnchorX/Y/Z, read by UnitTbl_GetScoutAnchorPos).
     Vec3_00409160 scoutAnchor;         // +0x35
     Vec3_00409160 unused_41;           // +0x41, zeroed by the constructor, never read
     std::vector<ScoredCell> cells;     // +0x4d
-    Pos_00409160 center;               // +0x5d
+    MapCenterTile center;              // +0x5d
     std::vector<BuildScoreTriplet> buildScoreTriplets; // +0x65
     int builders;                      // +0x75
     int hasSpecial;                    // +0x79
