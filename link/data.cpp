@@ -543,6 +543,7 @@ unsigned long g_lastSoundReapTick;  // 0x51fb94 .bss
 unsigned char DAT_0051fb98[4];  // 0x51fb98 .bss
 char* g_loopingWav;  // 0x51fb9c .bss
 int* g_diskWav;  // 0x51fba0 .bss
+Gui* g_guiContext;  // 0x51fba4 .bss
 int DAT_0051fba8;  // 0x51fba8 .bss
 int DAT_0051fbac;  // 0x51fbac .bss
 int DAT_0051fbb0;  // 0x51fbb0 .bss

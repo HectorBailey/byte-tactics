@@ -25,14 +25,14 @@
 
 struct GafEntry;
 
-// g_guiContext is the GUI context; its +0x14 layer holds the glyph table
-// (Language/Font/List in the individual file views).
-struct List_004a32a0 {
-    char unknown_0[0xc];
-    // A union of one member: the anonymous union takes the symbol ids that later functions need.
-    union {
-        GafEntry* glyphs;              // +0x0c
-    };
+// A loaded GAF file, as LoadGaf returns it: the entry count at +4 and the
+// entry pointers from +0xc. A font table is one: Gui's values and language
+// hold them, and a font's glyphs are the frames of its first entry.
+struct Gaf {
+    char unknown_0[4];
+    short count;                        // +0x04
+    char unknown_6[0xc - 0x6];
+    GafEntry* entries[1];               // +0x0c
 };
 
 struct Gadget;
@@ -41,23 +41,23 @@ struct Gadget;
 #include "layer.h"
 #include "gui.h"
 
-struct Holder_004a32a0 {
-    int unknown_0;
-    Gadget* entries;           // +0x04
-};
+// Unused here: real declarations that keep the file's symbol count (docs/c2-regalloc.md).
+void SetMemFussyDefault(void);
+char IsMemFussy(void);
+void MemFussyAtexitHandler(void);
+char IsGonzo(void);
+void GonzoAtexitHandler(void);
+char IsMemSet(void);
+void MemSetAtexitHandler(void);
+int GetMemSetValue(void);
+void SetValueAtexitHandler(void);
+void NopAbortHook(void);
+int __cdecl GetStackLow(void);
+void* GetStackHigh(void);
+int GetDebugLibInstance(void);
+int GetDebugLibVersion(void);
 
-struct Root_004a32a0 {                 // g_guiContext
-    union { int current; int group; int fontId; };  // +0x00
-    char unknown_04[0x14 - 0x04];
-    union {
-        List_004a32a0* language;       // +0x14
-        List_004a32a0* font;           // +0x14
-        List_004a32a0* list;           // +0x14
-    };
-    Holder_004a32a0* holder;           // +0x18
-};
-
-extern Root_004a32a0* g_guiContext;
+extern Gui* g_guiContext;
 
 #include "../graphics/rect.h"
 // Unused here: the symbol id this declaration takes keeps the functions after
@@ -1151,7 +1151,7 @@ int __stdcall SelectFontForEntry(Gadget* entries, int index)
         }
     }
     if (i == entries->u.count + 1) {
-        SetFont(g_guiContext->group);
+        SetFont(g_guiContext->font);
         i = -1;
     }
     return i;
@@ -1408,7 +1408,7 @@ static inline int Measure_004a1b40(char* text)
     while (*q) {
         char ch = *q;
         GafFrame* glyph = (GafFrame*)GetGafFrame(
-            g_guiContext->language->glyphs, (unsigned char)ch);
+            g_guiContext->language->entries[0], (unsigned char)ch);
         if (0 != glyph)
             width += glyph->width;
         q++;
@@ -1420,7 +1420,7 @@ static inline int LineHeight_004a1b40()
 {
     if (0 == g_guiContext->language)
         return GetFontHeight();
-    return ((GafFrame*)GetGafFrame(g_guiContext->language->glyphs, 0x49))->height + 2;
+    return ((GafFrame*)GetGafFrame(g_guiContext->language->entries[0], 0x49))->height + 2;
 }
 
 
@@ -1484,7 +1484,7 @@ void __stdcall DrawListBox(Gui* obj, int index)
                 t++;
             }
         }
-        if (i == entries->u.count + 1) { SetFont(g_guiContext->current); }
+        if (i == entries->u.count + 1) { SetFont(g_guiContext->font); }
         GetFont();
         font = GetTextKeyColor();
         char* q = SkipTextLines(me->u.list.listText, me->u.list.firstRow);
@@ -1855,7 +1855,7 @@ void __stdcall DrawSliderBar(Gui* obj, int index)
         }
     }
     if (i == entries->u.count + 1)
-        SetFont(g_guiContext->group);
+        SetFont(g_guiContext->font);
 
     int r1[4];
     int r2[4];
@@ -1954,22 +1954,22 @@ void __stdcall DrawSliderBar(Gui* obj, int index)
         char* text = buf;
         int total = 0;
         if (text != 0) {
-            if (g_guiContext->font == 0) {
+            if (g_guiContext->language == 0) {
                 GetTextWidth((Font_004a2580*)GetFont(), text);
             } else {
                 char* p = text;
                 for (; *p != 0; p++) {
                     unsigned char c = *p;
-                    g = (GafFrame*)GetGafFrame((unsigned short*)g_guiContext->font->glyphs, c);
+                    g = (GafFrame*)GetGafFrame((unsigned short*)g_guiContext->language->entries[0], c);
                     if (g != 0)
                         total += g->width;
                 }
             }
         }
-        if (g_guiContext->font == 0)
+        if (g_guiContext->language == 0)
             GetFontHeight();
         else
-            GetGafFrame((unsigned short*)g_guiContext->font->glyphs, 0x49);
+            GetGafFrame((unsigned short*)g_guiContext->language->entries[0], 0x49);
         DrawString(surface, buf, e->x + e->width + 2, e->y + 4, -1);
     }
 
@@ -2164,13 +2164,13 @@ void __stdcall SetListBoxScrollByName(Dialog_4a2e40* param_1, char* param_2, int
         }
     }
     if (i == entries->u.count + 1)
-        SetFont(g_guiContext->current);
+        SetFont(g_guiContext->font);
 
     int size;
-    if (g_guiContext->list == 0)
+    if (g_guiContext->language == 0)
         size = GetFontHeight();
     else
-        size = *(unsigned short*)(GetGafFrame(g_guiContext->list->glyphs, 0x49) + 2) + 2;
+        size = *(unsigned short*)(GetGafFrame(g_guiContext->language->entries[0], 0x49) + 2) + 2;
     int step = (me->height - 2) / (size + 1);
     short last = me->u.list.firstRow;
     short sel = me->u.list.selected;
@@ -2254,13 +2254,13 @@ void __stdcall ResetListBox(Gui* obj, int index)
         }
     }
     if (i == entries->u.count + 1) {
-        SetFont(g_guiContext->group);
+        SetFont(g_guiContext->font);
     }
     int step;
-    if (g_guiContext->font == 0) {
+    if (g_guiContext->language == 0) {
         step = GetFontHeight();
     } else {
-        step = *(unsigned short*)((char*)GetGafFrame(g_guiContext->font->glyphs, 0x49) + 2) + 2;
+        step = *(unsigned short*)((char*)GetGafFrame(g_guiContext->language->entries[0], 0x49) + 2) + 2;
     }
     int h = e->height;
     e->height = h - h % (step + 2);
@@ -2307,18 +2307,13 @@ void __stdcall BuildEntryGuiName(char* dest, unsigned short index, int n);
 int __stdcall AddNetPlayer(int param_1);
 void ApplyBrightnessAndVolume();
 
-struct Dialog_4a32a0 {
-    char unknown_00[0x18];
-    Holder_004a32a0* holder; // +0x18
-};
-
 void __stdcall FatalError(char* msg);
 int GetFontHeight();
 char* __stdcall GetGafFrame(void* glyphs, int c);
-void __stdcall SetGadgetActive(Root_004a32a0* menu, int index, int value);
+void __stdcall SetGadgetActive(Gui* menu, int index, int value);
 // Keeps its own file, src/gui/gui_4a3ef0.cpp: DrawSlider only
 // matches at that file's symbol count.
-void __stdcall DrawSlider(Root_004a32a0* param_1, int param_2);
+void __stdcall DrawSlider(Gui* param_1, int param_2);
 
 // The line height of one row: the default font height, or the height of the
 // glyph for 'I' plus two. Written out three times in the caller because the
@@ -2326,7 +2321,7 @@ void __stdcall DrawSlider(Root_004a32a0* param_1, int param_2);
 static inline int FontHeight_004a32a0() {
     if (g_guiContext->language == 0)
         return GetFontHeight();
-    return (int)((GafFrame*)GetGafFrame(g_guiContext->language->glyphs, 0x49))->height + 2;
+    return (int)((GafFrame*)GetGafFrame(g_guiContext->language->entries[0], 0x49))->height + 2;
 }
 
 // The entry search of 0x4a0180, 0x4a0200, 0x4a0280 and 0x4a35a0.
@@ -2348,8 +2343,8 @@ static inline int FindType_004a32a0(Gadget* entries, unsigned char kind) {
 }
 
 // FUNCTION: 0x4a32a0
-void __stdcall ConfigureListBoxByName(Dialog_4a32a0* param_1, char* name, int bitmap, int count, int flag) {
-    Holder_004a32a0* holder = param_1->holder;
+void __stdcall ConfigureListBoxByName(Gui* param_1, char* name, int bitmap, int count, int flag) {
+    Layer* holder = param_1->layer;
     Gadget* entries = holder->entries;
     int index = FindName_004a32a0(entries, name);
     Gadget* me;
@@ -2395,9 +2390,9 @@ void __stdcall ConfigureListBoxByName(Dialog_4a32a0* param_1, char* name, int bi
         return;
     char* text = (char*)&holder->entries[found].name;
     // Captured in a local before the name search, and passed on to SetGadgetActive.
-    Root_004a32a0* root = g_guiContext;
-    if (root->holder != 0) {
-        int j2 = FindName_004a32a0(root->holder->entries, text);
+    Gui* root = g_guiContext;
+    if (root->layer != 0) {
+        int j2 = FindName_004a32a0(root->layer->entries, text);
         if (j2 != -1) {
             SetGadgetActive(root, j2, remain < 0);
         }
@@ -2629,9 +2624,9 @@ void ApplyDefaultMusicOptions();
 
 static inline int LineHeight_004a3780()
 {
-    if (0 == g_guiContext->list)
+    if (0 == g_guiContext->language)
         return GetFontHeight();
-    return ((GafFrame*)GetGafFrame(g_guiContext->list->glyphs, 0x49))->height + 2;
+    return ((GafFrame*)GetGafFrame(g_guiContext->language->entries[0], 0x49))->height + 2;
 }
 
 // The body of SelectFontForEntry at 0x4a1810, which the compiler inlined into several
@@ -2650,7 +2645,7 @@ static inline int SelectFontForEntry_inlined(Gadget* entries, int index)
         }
     }
     if (i == entries->u.count + 1) {
-        SetFont(g_guiContext->fontId);
+        SetFont(g_guiContext->font);
         i = -1;
     }
     return i;
@@ -3225,7 +3220,7 @@ static inline int Measure_004a4660(char *text)
     while (*q != 0) {
         char ch = *q;
         GafFrame *glyph = (GafFrame *)GetGafFrame(
-            g_guiContext->language->glyphs, (unsigned char)ch);
+            g_guiContext->language->entries[0], (unsigned char)ch);
         if (glyph != 0)
             width += glyph->width;
         ++q;
@@ -3271,7 +3266,7 @@ void __stdcall DrawProgressBarGadget(Dialog_4a4660 *obj, int index)
             height = GetFontHeight();
         } else {
             GafFrame *glyph = (GafFrame *)GetGafFrame(
-                g_guiContext->language->glyphs, 0x49);
+                g_guiContext->language->entries[0], 0x49);
             height = glyph->height + 2;
         }
         DrawTextClipped(surface, text,
@@ -3714,7 +3709,7 @@ void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2,
 
 static inline GafFrame* GetGlyph_004a4d70(unsigned char c)
 {
-    return (GafFrame*)GetGafFrame(g_guiContext->language->glyphs, c);
+    return (GafFrame*)GetGafFrame(g_guiContext->language->entries[0], c);
 }
 
 static inline int Measure_004a4d70(char* text)
@@ -3753,7 +3748,7 @@ static inline int SelectTextInputFont(Gadget* entries, int index)
         }
     }
     if (i == entries->u.count + 1) {
-        SetFont(g_guiContext->fontId);
+        SetFont(g_guiContext->font);
         i = -1;
     }
     return i;
@@ -3832,7 +3827,7 @@ char* __stdcall GetGafFrame(void* glyphs, int c);
 // FUNCTION: 0x4a5010
 void* __stdcall GetCharGlyph(unsigned char c)
 {
-    return GetGafFrame(g_guiContext->font->glyphs, c);
+    return GetGafFrame(g_guiContext->language->entries[0], c);
 }
 // Width of a string in pixels: the sum of the glyph widths of the current
 // font, or GetTextWidth's measurement when no font is loaded.
@@ -3857,12 +3852,12 @@ int __stdcall GetTextPixelWidth(unsigned char* text)
     int width = 0;
     if (text == 0)
         return 0;
-    if (g_guiContext->font == 0)
+    if (g_guiContext->language == 0)
         return GetTextWidth(GetFont(), text);
     // Index text[i] and hold the character in its own local, not a walked pointer.
     for (int i = 0; text[i]; i++) {
         unsigned char c = text[i];
-        unsigned short* glyph = (unsigned short*)GetGafFrame(g_guiContext->font->glyphs, c);
+        unsigned short* glyph = (unsigned short*)GetGafFrame(g_guiContext->language->entries[0], c);
         if (glyph)
             width += *glyph;
     }
@@ -3892,10 +3887,10 @@ int GetFontHeight();
 // FUNCTION: 0x4a50b0
 int GetFontLineHeight()
 {
-    if (g_guiContext->font == 0) {
+    if (g_guiContext->language == 0) {
         return GetFontHeight();
     }
-    return ((GafFrame*)GetGafFrame(g_guiContext->font->glyphs, 'I'))->height + 2;
+    return ((GafFrame*)GetGafFrame(g_guiContext->language->entries[0], 'I'))->height + 2;
 }
 // Unused here: real functions declared to keep the file's symbol count.
 int __stdcall CloakOffOrder(char* unit, int unused1, int unused2);
@@ -3920,7 +3915,7 @@ void __stdcall DrawString(void* surface, char* text, int x, int y, int maxWidth)
 // FUNCTION: 0x4a50e0
 void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw, int style)
 {
-    if (g_guiContext->font == 0) {
+    if (g_guiContext->language == 0) {
         DrawString(surface, text, x, y, -1);
         return;
     }
@@ -3928,7 +3923,7 @@ void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw
     while (*s) {
         if (*s >= ' ') {
             unsigned char c = *s;
-            GafFrame* g = (GafFrame*)GetGafFrame(g_guiContext->font->glyphs, c);
+            GafFrame* g = (GafFrame*)GetGafFrame(g_guiContext->language->entries[0], c);
             if (g) {
                 if (maxw != -1 && (int)g->width > maxw)
                     return;
@@ -3973,20 +3968,20 @@ void __stdcall DrawTextClipped(char* dest, char* text, int p3, int x, int maxw, 
 
 static inline int LineHeight_004a50b0()
 {
-    if (g_guiContext->font == 0)
+    if (g_guiContext->language == 0)
         return GetFontHeight();
-    return (int)((GafFrame*)GetGafFrame(g_guiContext->font->glyphs, 'I'))->height + 2;
+    return (int)((GafFrame*)GetGafFrame(g_guiContext->language->entries[0], 'I'))->height + 2;
 }
 
 static inline int Measure(char* word, int t)
 {
     if (word == 0)
         return t;
-    if (g_guiContext->font == 0)
+    if (g_guiContext->language == 0)
         return GetTextWidth(GetFont(), word);
     for (char* n = word; *n; n++) {
         unsigned char ch = *n;
-        unsigned short* g = (unsigned short*)GetGafFrame(g_guiContext->font->glyphs, ch);
+        unsigned short* g = (unsigned short*)GetGafFrame(g_guiContext->language->entries[0], ch);
         if (g)
             t += *g;
     }
@@ -4178,7 +4173,7 @@ static inline int GetTextPixelWidth(char* text)
     char* p = text;
     while (*p != 0) {
         char ch = *p;
-        GafFrame* glyph = GetGafFrame(g_guiContext->language->glyphs, (unsigned char)ch);
+        GafFrame* glyph = GetGafFrame(g_guiContext->language->entries[0], (unsigned char)ch);
         if (glyph != 0)
             width += glyph->width;
         ++p;
@@ -4190,7 +4185,7 @@ static inline int LineHeight()
 {
     if (g_guiContext->language == 0)
         return GetFontHeight();
-    GafFrame* glyph = GetGafFrame(g_guiContext->language->glyphs, 0x49);
+    GafFrame* glyph = GetGafFrame(g_guiContext->language->entries[0], 0x49);
     return glyph->height + 2;
 }
 
@@ -4199,7 +4194,7 @@ static inline int LineHeightDirect()
 {
     if (g_guiContext->language == 0)
         return GetFontHeight();
-    return (int)GetGafFrame(g_guiContext->language->glyphs, 0x49)->height + 2;
+    return (int)GetGafFrame(g_guiContext->language->entries[0], 0x49)->height + 2;
 }
 
 // Unused here: real declarations that keep the file's symbol count (docs/c2-regalloc.md).
@@ -4235,7 +4230,7 @@ static inline int SelectLabelFont(Gadget* entries, int index)
         }
     }
     if (i == entries->u.count + 1) {
-        SetFont(g_guiContext->fontId);
+        SetFont(g_guiContext->font);
         i = -1;
     }
     return i;
@@ -4261,7 +4256,7 @@ void __stdcall LayoutLabelText(Gui* obj, int index)
     if (g_guiContext->language == 0)
         lh = GetFontHeight();
     else
-        lh = GetGafFrame(g_guiContext->language->glyphs, 0x49)->height + 2;
+        lh = GetGafFrame(g_guiContext->language->entries[0], 0x49)->height + 2;
     if (entry->attribs & 4) {
         nx = entry->width + x;
         nx -= GetTextPixelWidth(entry->u.text);
@@ -4945,7 +4940,7 @@ void __stdcall BeginTextEdit(Gui* obj, int index)
         }
     }
     if (i == entries->u.count + 1) {
-        SetFont(g_guiContext->fontId);
+        SetFont(g_guiContext->font);
     }
 
     TrySetFocus(obj, index);
@@ -5070,7 +5065,7 @@ static inline void DoSelect(Gui* menu, Gadget* entries, int sel)
         }
     }
     if (i == entries->u.count + 1)
-        SetFont(g_guiContext->fontId);
+        SetFont(g_guiContext->font);
     TrySetFocus(menu, sel);
     menu->layer->current = sel;
     CommitTextEdit(menu, sel, entry->u.text, entry->status, 0);
@@ -5125,7 +5120,7 @@ void __stdcall SelectGadgetByIndex(Gui* menu, int index)
             }
         }
         if (j == entries->u.count + 1) {
-            SetFont(g_guiContext->fontId);
+            SetFont(g_guiContext->font);
         }
 
         TrySetFocus(menu, i);
@@ -5155,7 +5150,7 @@ static inline void FUN_004a7190_inlined(Gui* obj, int index)
         }
     }
     if (i == entries->u.count + 1) {
-        SetFont(g_guiContext->fontId);
+        SetFont(g_guiContext->font);
     }
 
     TrySetFocus(obj, index);
@@ -5780,11 +5775,11 @@ int __stdcall RenderLayer(Gui* menu, unsigned int flags)
                         }
                     }
                     if (j == base[0].u.count + 1)
-                        SetFont(g_guiContext->fontId);
+                        SetFont(g_guiContext->font);
                     if (g_guiContext->language == 0)
                         fh = GetFontHeight();
                     else
-                        fh = GetGafFrame(g_guiContext->language->glyphs, 0x49)->height + 2;
+                        fh = GetGafFrame(g_guiContext->language->entries[0], 0x49)->height + 2;
                     int hh = base[i].height;
                     base[i].height = (short)(hh - ((int)base[i].height) % (fh + 2));
                     base[i].u.list.sortKey = GetTicks();
@@ -6020,14 +6015,14 @@ void __stdcall ListBoxSelectUp(Gui* param_1, int index)
         }
     }
     if (i == entries->u.count + 1) {
-        SetFont(g_guiContext->fontId);
+        SetFont(g_guiContext->font);
     }
     int size;
     if (g_guiContext->language == 0) {
         size = GetFontHeight();
     } else {
         // Indexed pg[1], not a pointer local: keeps the +2 offset in the load.
-        unsigned short* pg = (unsigned short*)GetGafFrame(g_guiContext->language->glyphs, 0x49);
+        unsigned short* pg = (unsigned short*)GetGafFrame(g_guiContext->language->entries[0], 0x49);
         size = pg[1] + 2;
     }
     size++;
@@ -6096,10 +6091,10 @@ void __stdcall ListBoxSelectDown(Gui* param_1, int index)
         }
     }
     if (i == entries->u.count + 1) {
-        SetFont(g_guiContext->fontId);
+        SetFont(g_guiContext->font);
     }
     int size = (g_guiContext->language == 0) ? GetFontHeight()
-        : (*(unsigned short*)((int)GetGafFrame(g_guiContext->language->glyphs, 0x49) + 2) + 2);
+        : (*(unsigned short*)((int)GetGafFrame(g_guiContext->language->entries[0], 0x49) + 2) + 2);
     size++;
     int step = (me->height - 2) / size;
     short last = me->u.list.firstRow;     // last line of the window
@@ -6539,7 +6534,7 @@ int __stdcall UpdateMenu(Gui* menu)
 // FUNCTION: 0x4aa850
 void __stdcall SetCurrentGuiContext(Gui* ctx)
 {
-    g_guiContext = (Root_004a32a0*)ctx;
+    g_guiContext = ctx;
     ctx->layer = 0;
     ctx->str_9b6[0] = 0;
     ctx->str_ab6[0] = 0;

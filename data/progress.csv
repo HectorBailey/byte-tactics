@@ -2216,7 +2216,7 @@ address,size,file,symbol,status,similarity
 0x4a2e40,640,src/gui/gui.cpp,?SetListBoxScrollByName@@YGXPAUDialog_4a2e40@@PADH@Z,matched,100.0
 0x4a30c0,244,src/gui/gui.cpp,?ResetListBox@@YGXPAUGui@@H@Z,matched,100.0
 0x4a31c0,210,src/gui/gui.cpp,?TruncateListItems@@YGXHHPADH@Z,matched,100.0
-0x4a32a0,765,src/gui/gui.cpp,?ConfigureListBoxByName@@YGXPAUDialog_4a32a0@@PADHHH@Z,matched,100.0
+0x4a32a0,765,src/gui/gui.cpp,?ConfigureListBoxByName@@YGXPAUGui@@PADHHH@Z,matched,100.0
 0x4a35a0,246,src/gui/gui.cpp,?SetGadgetRows@@YGXPAUTable_004a35a0@@PADPAURow_004a35a0@@H@Z,matched,100.0
 0x4a36a0,224,src/gui/gui.cpp,?SetGadgetItems@@YGXPAUTable_004a36a0@@PADPAHH@Z,matched,100.0
 0x4a3780,1832,src/gui/gui.cpp,?HandleListBoxInput@@YGHPAUObject_004a3780@@HH@Z,matched,100.0

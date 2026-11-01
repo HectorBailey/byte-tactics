@@ -99,7 +99,7 @@ struct Entry_004ab3a0 {
 
 #pragma pack(pop)
 
-extern int* g_guiContext;
+extern Gui* g_guiContext;
 
 extern void __stdcall FadeRectangle(void* surface, int* rect, int mode);
 extern char* __stdcall StripPath(char* path);
@@ -348,7 +348,7 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
             i++;
         }
         if (j == base->u.count + 1)
-            SetFont(*g_guiContext);
+            SetFont(g_guiContext->font);
         TrySetFocus(menu, 1);
         menu->layer->current = 1;
         CommitTextEdit(menu, 1, (char*)&sub->u.count,
