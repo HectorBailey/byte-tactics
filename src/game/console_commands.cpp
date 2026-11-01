@@ -369,9 +369,12 @@ struct Point_00417f60 {
 
 #include "../graphics/rect.h"
 
-// Unused here: real functions declared to keep DrawCellContours (0x4181d0)
-// and DrawMapDebugOverlay (0x418310) matching now that CmdNowISee and
-// CmdMusicMode read their members (docs/c2-regalloc.md).
+// Unused here: real declarations, one type name among them, that keep
+// CmdMakePoster (0x417600), DrawCellContours (0x4181d0) and DrawMapDebugOverlay
+// (0x418310) matching (docs/c2-regalloc.md).
+void EnableAICommands(void);
+void RegisterAICommands(void);
+struct Projectile;
 void ResetGameSpeed(void);
 void IncreaseGameSpeed(void);
 
@@ -551,7 +554,7 @@ void __stdcall DumpPlayerAI(int player, FILE* file);
 
 // Creates (truncates) memdump.txt and closes it again; the argument is unused.
 // FUNCTION: 0x416240
-void __stdcall CmdMemDump(char* args)
+void __stdcall CmdMemDump(CommandArgs* args)
 {
     HANDLE file = CreateFileA("memdump.txt", GENERIC_WRITE, 0, 0, CREATE_ALWAYS,
                               FILE_ATTRIBUTE_NORMAL, 0);
@@ -561,7 +564,7 @@ void __stdcall CmdMemDump(char* args)
 }
 
 // FUNCTION: 0x416270
-void __stdcall CmdMem(int)
+void __stdcall CmdMem(CommandArgs* args)
 {
 }
 
@@ -598,24 +601,24 @@ void __stdcall CmdAssign(CommandArgs* args)
 }
 
 // FUNCTION: 0x416370
-void __stdcall CmdAssert(int)
+void __stdcall CmdAssert(CommandArgs* args)
 {
 }
 
 // FUNCTION: 0x416380
-void __stdcall CmdDPrint(int)
+void __stdcall CmdDPrint(CommandArgs* args)
 {
 }
 
 // FUNCTION: 0x416390
-void __stdcall CmdBurnAll(int arg1)
+void __stdcall CmdBurnAll(CommandArgs* arg1)
 {
     RemoveAllFeatures();
 }
 
 // Console command handler (same family as 0x4163d0); the argument is unused.
 // FUNCTION: 0x4163a0
-void __stdcall CmdBurnOne(void* args)
+void __stdcall CmdBurnOne(CommandArgs* args)
 {
     if (g_game->cellFeature < 0xfffb) {
         void* target = GetMapCell(g_game->point.x, g_game->point.y);
@@ -634,7 +637,7 @@ void __stdcall CmdFeature(CommandArgs* args)
 }
 
 // FUNCTION: 0x416420
-void __stdcall CmdShading(int unused)
+void __stdcall CmdShading(CommandArgs* unused)
 {
     g_game->visualFlags.shading = !g_game->visualFlags.shading;
     g_game->unitTable->FlushCache();
@@ -642,7 +645,7 @@ void __stdcall CmdShading(int unused)
 }
 
 // FUNCTION: 0x416460
-void __stdcall CmdSelectable(int unused)
+void __stdcall CmdSelectable(CommandArgs* unused)
 {
     for (Unit* u = &g_game->units[1]; u <= g_game->unitsEnd; u++) {
         if (u->flags & 0x10000000) {
@@ -667,13 +670,13 @@ void __stdcall CmdKill(CommandArgs* args)
 }
 
 // FUNCTION: 0x416500
-void __stdcall CmdZBuffer(int)
+void __stdcall CmdZBuffer(CommandArgs* args)
 {
 }
 
 // Same as 0x416420 with bit 1 of the flags word at +0x37f06.
 // FUNCTION: 0x416510
-void __stdcall CmdAntiAlias(int unused)
+void __stdcall CmdAntiAlias(CommandArgs* unused)
 {
     g_game->visualFlags.antiAlias = !g_game->visualFlags.antiAlias;
     g_game->unitTable->FlushCache();
@@ -682,7 +685,7 @@ void __stdcall CmdAntiAlias(int unused)
 
 // Same as 0x416510 with bit 2 of the flags word at +0x37f06.
 // FUNCTION: 0x416550
-void __stdcall CmdShadow(int unused)
+void __stdcall CmdShadow(CommandArgs* unused)
 {
     g_game->visualFlags.shadows = !g_game->visualFlags.shadows;
     g_game->unitTable->FlushCache();
@@ -690,7 +693,7 @@ void __stdcall CmdShadow(int unused)
 }
 
 // FUNCTION: 0x416590
-void __stdcall CmdDither(int unused)
+void __stdcall CmdDither(CommandArgs* unused)
 {
     g_game->visualFlags.ditheredFog = !g_game->visualFlags.ditheredFog;
     SaveSettings();
@@ -709,7 +712,7 @@ void __stdcall CmdSwitchAlt(CommandArgs* args)
 
 // Toggles one flag bit in a 16-bit bitfield inside the game state.
 // FUNCTION: 0x416630
-void __stdcall CmdTShadow(int unused)
+void __stdcall CmdTShadow(CommandArgs* unused)
 {
     g_game->visualFlags.vehicleShadows = !g_game->visualFlags.vehicleShadows;
 }
@@ -717,13 +720,13 @@ void __stdcall CmdTShadow(int unused)
 // Toggles one flag bit in a 16-bit bitfield inside the game state (the same
 // flags word as 0x416630 and 0x417060).
 // FUNCTION: 0x416660
-void __stdcall CmdFShadow(int unused)
+void __stdcall CmdFShadow(CommandArgs* unused)
 {
     g_game->visualFlags.featureShadows = !g_game->visualFlags.featureShadows;
 }
 
 // FUNCTION: 0x416690
-void __stdcall CmdLOSType(int unused)
+void __stdcall CmdLOSType(CommandArgs* unused)
 {
     g_game->mapFlags.bit2 = !g_game->mapFlags.bit2;
     RecalculateLineOfSight(0);
@@ -737,7 +740,7 @@ void __stdcall CmdLight(CommandArgs* args)
 }
 
 // FUNCTION: 0x416710
-void __stdcall CmdRCache(int unused)
+void __stdcall CmdRCache(CommandArgs* unused)
 {
     g_game->unitTable->FlushCache();
 }
@@ -769,13 +772,13 @@ void __stdcall CmdCDPlay(CommandArgs* args)
 }
 
 // FUNCTION: 0x416810
-void __stdcall CmdCDStop(int unused)
+void __stdcall CmdCDStop(CommandArgs* unused)
 {
     ((Sound*)g_game->sound)->StopCdAudio();
 }
 
 // FUNCTION: 0x416820
-void __stdcall CmdSound3D(int unused)
+void __stdcall CmdSound3D(CommandArgs* unused)
 {
     if (((Sound*)g_game->sound)->Is3DEnabled()) {
         ((Sound*)g_game->sound)->Disable3D();
@@ -908,25 +911,26 @@ void __stdcall CmdGive(CommandArgs* args)
 }
 
 // FUNCTION: 0x416cf0
-void __stdcall CmdScrollSpeed(void* args)
+void __stdcall CmdScrollSpeed(CommandArgs* args)
 {
     // The void* parameter stays: retyping it moves the window of 0x4181d0 (docs/c2-regalloc.md).
+    // The cast stays: dropping it moves DrawCellContours and DrawMapDebugOverlay
+    // (docs/c2-regalloc.md).
     unsigned char result = ((CommandArgs*)args)->GetIntArg(1, 0);
     g_game->scrollSpeed = result;
     SaveSettings();
 }
 
 // FUNCTION: 0x416d20
-void __stdcall CmdIFace(void* args)
+void __stdcall CmdIFace(CommandArgs* args)
 {
-    // The void* parameter stays: retyping it moves the window of 0x4181d0 (docs/c2-regalloc.md).
-    int result = ((CommandArgs*)args)->GetIntArg(1, 0);
+    int result = args->GetIntArg(1, 0);
     g_game->interfaceType = result;
     SaveSettings();
 }
 
 // FUNCTION: 0x416d50
-void __stdcall CmdLOS(int unused)
+void __stdcall CmdLOS(CommandArgs* unused)
 {
     g_game->mapFlags.bit1 = !g_game->mapFlags.bit1;
     SaveSettings();
@@ -935,7 +939,7 @@ void __stdcall CmdLOS(int unused)
 
 // Toggles bit 0 of the game flags at +0x14281 (0x416d50 toggles bit 1).
 // FUNCTION: 0x416d80
-void __stdcall CmdMapping(int unused)
+void __stdcall CmdMapping(CommandArgs* unused)
 {
     g_game->mapFlags.bit0 = !g_game->mapFlags.bit0;
     SaveSettings();
@@ -952,20 +956,20 @@ void __stdcall CmdContour(CommandArgs* args)
 // Toggles one flag bit in a 16-bit bitfield inside the game state (the same
 // flags word as 0x417060, mask 4 = bit 2).
 // FUNCTION: 0x416e00
-void __stdcall CmdSelBoxes(int unused)
+void __stdcall CmdSelBoxes(CommandArgs* unused)
 {
     g_game->b2 = !g_game->b2;
 }
 
 // FUNCTION: 0x416e30
-void __stdcall CmdTreeDeath(int unused)
+void __stdcall CmdTreeDeath(CommandArgs* unused)
 {
     g_game->b3 = !g_game->b3;
 }
 
 // Toggles bit 4 of the flags word at g_game+0x37f2f (like 0x416e30, bit 3).
 // FUNCTION: 0x416e60
-void __stdcall CmdNoShake(int unused)
+void __stdcall CmdNoShake(CommandArgs* unused)
 {
     g_game->b4 = !g_game->b4;
 }
@@ -983,7 +987,7 @@ void __stdcall CmdNow(CommandArgs* args)
 }
 
 // FUNCTION: 0x417030
-void __stdcall CmdDoubleShot(int unused)
+void __stdcall CmdDoubleShot(CommandArgs* unused)
 {
     unsigned short* ptr = &g_game->uiOptionFlags;
     unsigned short ax = *ptr;
@@ -998,13 +1002,13 @@ void __stdcall CmdDoubleShot(int unused)
 // Toggles one flag bit in a 16-bit bitfield inside the game state (the same
 // flags word as 0x416e30 and 0x418ca0).
 // FUNCTION: 0x417060
-void __stdcall CmdHalfShot(int unused)
+void __stdcall CmdHalfShot(CommandArgs* unused)
 {
     g_game->b8 = !g_game->b8;
 }
 
 // FUNCTION: 0x417090
-void __stdcall CmdRadar(int unused)
+void __stdcall CmdRadar(CommandArgs* unused)
 {
     g_game->b9 = !g_game->b9;
 }
@@ -1019,7 +1023,7 @@ void __stdcall CmdATM(CommandArgs* args)
 }
 
 // FUNCTION: 0x417130
-void __stdcall CmdScreenChat(int unused)
+void __stdcall CmdScreenChat(CommandArgs* unused)
 {
     g_game->screenChat ^= 1;
     SaveSettings();
@@ -1074,7 +1078,7 @@ void __stdcall CmdGamma(CommandArgs* args)
 // A console command handler (like its neighbours 0x417130 and 0x417300):
 // toggles a global flag.
 // FUNCTION: 0x4172e0
-void __stdcall CmdSing(int unused)
+void __stdcall CmdSing(CommandArgs* unused)
 {
     g_cmdSingEnabled = !g_cmdSingEnabled;
 }
@@ -1082,7 +1086,7 @@ void __stdcall CmdSing(int unused)
 // Toggles one flag bit in the same 16-bit flags word as 0x416e30, 0x417060
 // and 0x418ca0 (mask 0x40 = bit 6), then calls SaveSettings.
 // FUNCTION: 0x417300
-void __stdcall CmdClock(int unused)
+void __stdcall CmdClock(CommandArgs* unused)
 {
     g_game->b6 = !g_game->b6;
     SaveSettings();
@@ -1139,13 +1143,13 @@ void __stdcall CmdReload(CommandArgs* args)
 }
 
 // FUNCTION: 0x4174d0
-void __stdcall CmdReloadAIProfiles(int arg1)
+void __stdcall CmdReloadAIProfiles(CommandArgs* arg1)
 {
     ResetAIPlayers();
 }
 
 // FUNCTION: 0x4174e0
-void __stdcall CmdBigBrother(int unused)
+void __stdcall CmdBigBrother(CommandArgs* unused)
 {
     if (g_game->autoFollow) {
         g_game->autoFollow = 0;
@@ -1158,13 +1162,13 @@ void __stdcall CmdBigBrother(int unused)
 
 // Chat command handler (table at 0x5020b8): toggles a game flag.
 // FUNCTION: 0x417520
-void __stdcall CmdProfile(void* args)
+void __stdcall CmdProfile(CommandArgs* args)
 {
     g_game->profileBarsEnabled = g_game->profileBarsEnabled == 0 ? 1 : 0;
 }
 
 // FUNCTION: 0x417540
-void __stdcall CmdNowISee(void*)
+void __stdcall CmdNowISee(CommandArgs* args)
 {
     Game* p_game = g_game;
     unsigned short* p = (unsigned short*)&p_game->mapFlags;
@@ -1179,7 +1183,7 @@ void __stdcall CmdNowISee(void*)
 
 // Same reset sequence as InitCommands, run as a callback after FUN_004161f0.
 // FUNCTION: 0x417570
-void __stdcall CmdNetStats(int)
+void __stdcall CmdNetStats(CommandArgs* args)
 {
     FUN_004161f0();
     DAT_00511c20 = g_game->gameTick;
@@ -1200,9 +1204,11 @@ void __stdcall CmdNetStats(int)
 }
 
 // FUNCTION: 0x4175e0
-void __stdcall CmdMusicMode(void* args)
+void __stdcall CmdMusicMode(CommandArgs* args)
 {
     // The void* parameter stays: retyping it moves the window of 0x4181d0 (docs/c2-regalloc.md).
+    // The cast stays: dropping it moves DrawCellContours and DrawMapDebugOverlay
+    // (docs/c2-regalloc.md).
     CommandArgs* obj = (CommandArgs*)args;
     int result = obj->GetIntArg(1, 0);
     void* p = g_game->sound;
@@ -1744,7 +1750,7 @@ void __stdcall CmdSenderror(CommandArgs* args)
 
 // Toggles bit 10 of the game flags word at +0x37f2f (0x4177a0 toggles bit 0).
 // FUNCTION: 0x418ca0
-void __stdcall CmdShootAll(int unused)
+void __stdcall CmdShootAll(CommandArgs* unused)
 {
     g_game->flag10 = !g_game->flag10;
 }
