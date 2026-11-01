@@ -384,7 +384,7 @@ int DAT_00512288;  // 0x512288 .bss
 int g_directXCheckDone;  // 0x51228c .bss
 int g_gpfCheckDone;  // 0x512290 .bss
 int g_noSoundDriverShown;  // 0x512294 .bss
-Smoke_00425b80* g_menuSparks;  // 0x512298 .bss
+MenuSpark* g_menuSparks;  // 0x512298 .bss
 int g_cdPlayerDialogShown;  // 0x51229c .bss
 unsigned char DAT_005122a0[4];  // 0x5122a0 .bss
 char* g_otaEnumFileList;  // 0x5122d4 .bss

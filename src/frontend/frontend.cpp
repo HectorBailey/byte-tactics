@@ -50,11 +50,15 @@ struct Bits_00426e80 {
     unsigned short : 11;
 };
 
+#include "../graphics/surface.h"
+
 #pragma pack(push, 1)
 #include "../network/player_info.h"
 
-// 13-byte smoke puff record: the loop steps the pointer by 13.
-struct Smoke_00425b80 {
+// One of the main menu's 100 sparks (g_menuSparks, allocated as "SPARKS",
+// 0x514 bytes; Thaldren's Gui_AnimateMainMenuSparks moves them): 13 bytes, the
+// loop steps the pointer by 13.
+struct MenuSpark {
     short x;                           // +0x0
     short y;                           // +0x2
     unsigned char active;              // +0x4
@@ -65,15 +69,9 @@ struct Smoke_00425b80 {
     int pos;                           // +0x9
 };
 
-// The cell map, a byte per cell whose low nibble is the feature there.
-struct Map_00425b80 {
-    char unknown_0[0xc];
-    unsigned char* cells;              // +0xc
-};
-
 struct World_00425b80 {
     char unknown_0[0xbc];
-    Map_00425b80* map;                 // +0xbc
+    Surface* map;                      // +0xbc, the panel's GUI SURFACE bitmap
 };
 
 // The front-end's current screen layer, the object at g_game+0x531: the
@@ -201,7 +199,7 @@ extern char g_dpspGuidTcpip[];
 extern V4i DAT_004fdaf0;
 
 extern char g_directXWarningText[];
-extern Smoke_00425b80* g_menuSparks;
+extern MenuSpark* g_menuSparks;
 extern int DAT_00512288;
 extern int g_gpfCheckDone;
 extern int g_noSoundDriverShown;
@@ -486,9 +484,9 @@ void UpdateMenuSparks()
 {
     Layer* terrain = g_game->gui.layer;
     if (terrain->surface != 0) {
-        unsigned char* src = ((Map_00425b80*)terrain->surface)->cells;
-        Smoke_00425b80* s = g_menuSparks;
-        unsigned char* dest = ((World_00425b80*)terrain->entries)->map->cells;
+        unsigned char* src = ((Surface*)terrain->surface)->pixels;
+        MenuSpark* s = g_menuSparks;
+        unsigned char* dest = ((World_00425b80*)terrain->entries)->map->pixels;
         int count = 100;
         do {
             if (s->active) {
@@ -774,7 +772,7 @@ void __stdcall OpenMainMenu()
     ShowSoftwareCursor();
     ClearMouseEventQueue();
 
-    g_menuSparks = (Smoke_00425b80*)GameAllocIgnoreTag("SPARKS", 0x514);
+    g_menuSparks = (MenuSpark*)GameAllocIgnoreTag("SPARKS", 0x514);
     memset(g_menuSparks, 0, 0x145 * 4);
 
     if (g_cdPlayerDialogShown == 0) {

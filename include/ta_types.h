@@ -1914,7 +1914,7 @@ struct SmackerSurfaces;
 struct SmkStats_0047c530;
 struct Smk_0047bf70;
 struct Smk_0047bf70_b;
-struct Smoke_00425b80;
+struct MenuSpark;
 struct Snapshot_0046a860;
 struct SoundInfo_005086fc;
 struct Sound_0047f210;
@@ -5248,7 +5248,7 @@ struct Map_00425b80 {  // 0x10 bytes, 1 view
     unsigned char* cells;  // +0xc
 };
 
-struct Smoke_00425b80 {  // 0xd bytes, 1 view
+struct MenuSpark {       // 0xd bytes, 1 view
     short x;  // +0x0
     short y;  // +0x2
     unsigned char active;  // +0x4
