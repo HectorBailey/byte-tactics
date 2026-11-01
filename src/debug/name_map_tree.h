@@ -4,9 +4,9 @@
 // debug_lib_4dfd50.cpp (the performance singleton's map teardown) and
 // debug_lib_4e2620.cpp (_Tree::_Insert). The header includes nothing and
 // expects <yvals.h> for std::_Lockit in the inlined rotations and teardown. The
-// other views stay in their own files: debug_lib_4e1990.cpp is the
-// NameKey-set interface NameTable derives from, with its own Iter_004e1990
-// and InsertResult_004e1990, and out-of-line tree methods; debug_lib_4e2580.cpp
+// other views stay in their own files: debug_lib_4e1990.cpp is the tree as
+// NameTable sees it, keyed by NameKey alone, with its own views of NameMapIter
+// and NameMapInsertResult and out-of-line tree methods; debug_lib_4e2580.cpp
 // is keyed by const char*; and debug_lib.cpp spells the tree through its own
 // _Nodeptr, pair value and NameMapIter view.
 #ifndef NAME_MAP_TREE_H
