@@ -38,11 +38,11 @@ extern LinkInfo g_linkInfo[];
 extern char DAT_004fcfb8[];
 
 void __stdcall CloseTopScreen(void* menu);
-void __stdcall SetPaletteColors(unsigned char* palette, int first, int count);
+int __stdcall SetPaletteColors(unsigned char* src, int start, int count);
 void __stdcall RemapPaletteToClosestIndices(void* menu, void* palette, void* copy);
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, unsigned int flags);
 void __stdcall HandleSelectProviderClick(void* menu);
-void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
+int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int param_4);
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 void __stdcall HAPINET_uninitmultiplay(void* net);
 void __stdcall HAPINET_getconnections(void* net, void* guids, void* conns, void* descriptions, void* application);

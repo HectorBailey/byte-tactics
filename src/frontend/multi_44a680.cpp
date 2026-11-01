@@ -103,14 +103,14 @@ extern int g_startCountdownNextTick;
 extern unsigned int g_heartbeatNextTick;
 extern unsigned int g_lastPlayerCount;
 
-int __stdcall HandleNetPackets();
+int HandleNetPackets();
 unsigned char __stdcall FindHostSlot();
-void __stdcall BuildPlayerSlotGadgets();
+void __cdecl BuildPlayerSlotGadgets(void);
 void __stdcall RefreshBattleRoomRows();
 void ShowSelectedMapInfo();
 void __stdcall UpdateMaxUnitsText(Gui* gui, int index);
 void __stdcall UpdateMetalText(Gui* gui, int index);
-void __stdcall PlaySoundByName(char* name, int param);
+void __stdcall PlaySoundByName(char* name, int param_2);
 void __stdcall MarkChanged(Gui* gui);
 void __stdcall MarkLayerChanged(Gui* gui);
 int __stdcall FindGadgetIndex(Gadget_0044a680* entries, char* name, int type);

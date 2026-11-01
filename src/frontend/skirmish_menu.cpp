@@ -662,7 +662,7 @@ void __cdecl CycleCurrentPlayerSide()
 #include "../map/mission.h"
 
 void __cdecl GameFreeThunk(void* ptr);
-void __stdcall PlaySoundByName(const char* name, int broadcast);
+void __stdcall PlaySoundByName(char* name, int param_2);
 int __stdcall IsCurrentGadgetNamed(Gui* menu, char* name);
 Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
 Gadget* __stdcall FindGadgetChecked_E(Gadget* entries, char* name);
@@ -726,7 +726,7 @@ int __stdcall LoadMapList(char** out, int param_2, int param_3);
 int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, int autoHeight);
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, unsigned int flags);
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
-void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
+int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int param_4);
 void __stdcall SortFileList(char* items, int b, int c, int count);
 void __stdcall ConfigureListBoxByName(Gui* menu, char* name, char* items, int count, int flag);
 void __stdcall SetListBoxScrollByName(Gui* menu, char* name, int index);
@@ -1194,7 +1194,7 @@ void __stdcall HandleSkirmishCheatText(Cheat* cheat)
         LoadSettings();
         cheat->text->target->u.count = g_game->options->baseGadgetCount;
         RefreshSkirmishSetup();
-        PlaySoundByName(g_skirmishCheatSoundName, 0);
+        PlaySoundByName((char*)g_skirmishCheatSoundName, 0);
         SelectAdjacentGadget(cheat, 1);
         MarkChanged(&g_game->gui);
     }
