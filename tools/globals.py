@@ -4,6 +4,8 @@ and link/data.cpp.
     uv run tools/globals.py            # write the three files and summarise
     uv run tools/globals.py --check    # also compile link/data.cpp and compare
                                        # every definition with the original bytes
+    uv run tools/globals.py --refresh-ghidra
+                                       # take the ghidra labels from build/ghidra
 
 One row per global the source refers to by address (a DAT_<address> name, or a
 name data/symbols.csv maps to an address in .rdata/.data), with:
@@ -23,8 +25,9 @@ name data/symbols.csv maps to an address in .rdata/.data), with:
                   types there are, and tools/linkcheck.py's verdict on them
   files           files that refer to it
   max_offset      the largest offset from it the source uses (DAT_x + 8 -> 0x8)
-  ghidra          the label Ghidra gives the address (s_ string, PTR_ pointer);
-                  kept from the existing table when build/ghidra is missing
+  ghidra          the label Ghidra gives the address (s_ string, PTR_ pointer):
+                  the table's own, or build/ghidra's for an address without one
+                  (--refresh-ghidra prefers build/ghidra's)
   pointers        dwords in its initial bytes that point into the exe
   init            its first bytes in the exe, in hex (none for .bss)
 
@@ -148,22 +151,31 @@ def text_fragment(low: bytes) -> bool:
     return all(0x20 <= c < 0x7F for c in low)
 
 
-def ghidra_labels() -> dict[int, str]:
-    """address -> the label Ghidra's pseudo-C uses most for it. A checkout
-    without the Ghidra export (build/ghidra) keeps the labels data/globals.csv
-    already has, so that regenerating the table there changes no label."""
+def exported_labels() -> dict[int, str]:
+    """address -> the label Ghidra's pseudo-C uses most for it, from the export
+    under build/ghidra (none without it)."""
     counts: dict[int, Counter] = {}
     if not GHIDRA.is_dir():
-        if not GLOBALS.exists():
-            return {}
-        with GLOBALS.open(newline="") as fh:
-            return {int(r["address"], 16): r["ghidra"] for r in csv.DictReader(fh) if r.get("ghidra")}
+        return {}
     label = re.compile(r"\b([A-Za-z_]\w*?_00(?:4f[c-f]|5[0-2][0-9a-f])[0-9a-f]{3})\b")
     for path in GHIDRA.glob("*.c"):
         for m in label.finditer(path.read_text(errors="replace")):
             text = m.group(1)
             counts.setdefault(int(text[-8:], 16), Counter())[text] += 1
     return {a: c.most_common(1)[0][0] for a, c in counts.items()}
+
+
+def ghidra_labels(refresh: bool = False) -> dict[int, str]:
+    """address -> the ghidra column's label. The labels data/globals.csv already
+    has are kept, and the export only fills an address that has none: the column
+    is reference data, so a run must not churn it with whatever export (or none)
+    the machine has (#7528). With refresh the export's label wins where it has one."""
+    existing: dict[int, str] = {}
+    if GLOBALS.exists():
+        with GLOBALS.open(newline="") as fh:
+            existing = {int(r["address"], 16): r["ghidra"] for r in csv.DictReader(fh) if r.get("ghidra")}
+    exported = exported_labels()
+    return {**existing, **exported} if refresh else {**exported, **existing}
 
 
 # --- choosing a type ---------------------------------------------------------------
@@ -292,7 +304,7 @@ def inside_piece(pieces: list[tuple[int, int, str]], addr: int) -> tuple[int, in
     return None
 
 
-def build(objects, img: Image) -> list[dict]:
+def build(objects, img: Image, refresh_labels: bool = False) -> list[dict]:
     symbols = load_symbols()
     extents = data_source_extents(symbols)
     table = global_table(objects, symbols)
@@ -303,7 +315,7 @@ def build(objects, img: Image) -> list[dict]:
     boundaries.add(img.bss_start)
     ordered = sorted(boundaries)
     img.boundaries = ordered
-    labels = ghidra_labels()
+    labels = ghidra_labels(refresh_labels)
     libs = library_symbols(set(CRT_LIBS))
     library_names = {n.lstrip("_") for n in libs}
     with (ROOT / "data/functions.csv").open() as fh:
@@ -880,6 +892,8 @@ def check_data(objects, defined: list[Entry], img: Image) -> None:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--check", action="store_true", help="compile link/data.cpp and compare it with the exe")
+    ap.add_argument("--refresh-ghidra", action="store_true",
+                    help="take the ghidra column's labels from build/ghidra where it has one, over the table's")
     ap.add_argument("--count", type=int, default=0,
                     help="define only the N most-referenced globals in link/data.cpp (default: all declared)")
     args = ap.parse_args()
@@ -888,7 +902,7 @@ def main() -> None:
     if failed:
         print(f"warning: {len(failed)} files failed to compile and are left out", file=sys.stderr)
     img = Image()
-    rows = build(objects, img)
+    rows = build(objects, img, args.refresh_ghidra)
     write_csv(rows)
     LINK.mkdir(exist_ok=True)
     entries = write_header(rows)
