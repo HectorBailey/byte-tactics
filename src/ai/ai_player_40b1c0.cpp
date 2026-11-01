@@ -31,7 +31,7 @@ int __stdcall SumUnitRatingsInRange(int player, Vec3* pos, int range)
         int dx = pos->x - u->pos.x;
         int d = (int)(((__int64)dx * dx) >> 32) + (int)(((__int64)dz * dz) >> 32);
         if (d <= r2)
-            total += (signed char)p->vec_8d[u->unitDefIndex];
+            total += (signed char)p->threatScores[u->unitDefIndex];
     }
     return total;
 }

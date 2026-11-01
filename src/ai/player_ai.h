@@ -28,13 +28,17 @@ struct ScoredCell {
     bool operator<(const ScoredCell& o) const { return key < o.key; }
 };
 
-struct Elem_0040cfb0 {
+// One unit type's three build scores, the element of the vector at +0x65
+// (Thaldren's vecUnitTypeBuildScoreTriplets).
+struct BuildScoreTriplet {
     char a;
     char b;
     char c;
 };
 
-struct Elem_0040d4f0 {
+// One unit type's AI weight in percent, the element of the vector at +0xad
+// (Thaldren's vecAiWeightPct).
+struct AiWeightPct {
     unsigned char value;
 };
 
@@ -78,14 +82,14 @@ public:
     Vec3_00409160 pos_41;              // +0x41
     std::vector<ScoredCell> cells;     // +0x4d
     Pos_00409160 center;               // +0x5d
-    std::vector<Elem_0040cfb0> vec_65; // +0x65
+    std::vector<BuildScoreTriplet> buildScoreTriplets; // +0x65
     int builders;                      // +0x75
     int hasSpecial;                    // +0x79
     std::vector<short> counts;         // +0x7d
-    std::vector<unsigned char> vec_8d; // +0x8d
+    std::vector<unsigned char> threatScores; // +0x8d
     std::vector<unsigned char> weights; // +0x9d
-    std::vector<Elem_0040d4f0> vec_ad; // +0xad
-    std::vector<Elem_0040d550> vec_bd; // +0xbd
+    std::vector<AiWeightPct> weightPcts; // +0xad
+    std::vector<Elem_0040d550> weightOverrides; // +0xbd
     std::vector<Elem_0040d550> values; // +0xcd
     std::vector<Elem_0040d550> locked; // +0xdd
     unsigned int lastTick;             // +0xed

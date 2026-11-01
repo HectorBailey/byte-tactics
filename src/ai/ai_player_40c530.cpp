@@ -30,10 +30,10 @@ void RegisterEmptyAtexitB(void);
 bool __cdecl ReadGdperf(unsigned long, void*);
 
 #define ScoredCell ScoredCell_view
-#define Elem_0040d4f0 Elem_0040d4f0_view
+#define AiWeightPct AiWeightPct_view
 #include "ta_types.h"
 #undef ScoredCell
-#undef Elem_0040d4f0
+#undef AiWeightPct
 
 // A map cell and its sort key, the element of the vector at +0x4d.
 struct ScoredCell {
@@ -47,26 +47,26 @@ struct ScoredCell {
 // The element of the vector at +0xad, a 1-byte type other than unsigned char
 // (a guess). It has no default constructor: the symbol ids of the vector
 // instantiations below follow the declaration count.
-struct Elem_0040d4f0 {
+struct AiWeightPct {
     char value;                        // +0x0
-    Elem_0040d4f0(const Elem_0040d4f0& o) : value(o.value) {}
+    AiWeightPct(const AiWeightPct& o) : value(o.value) {}
 };
 
 #include <new>
-// The placement copies of ScoredCell and Elem_0040d4f0 that insert and
+// The placement copies of ScoredCell and AiWeightPct that insert and
 // resize call instead of expanding: std::_Construct, which pathfind.cpp holds
 // at 0x40d5e0 and 0x40d600 under these names.
-inline void __stdcall CopyOneByte(Elem_0040d4f0* dest, const Elem_0040d4f0* src) { new (dest) Elem_0040d4f0(*src); }
+inline void __stdcall CopyOneByte(AiWeightPct* dest, const AiWeightPct* src) { new (dest) AiWeightPct(*src); }
 inline void __stdcall CopyDwordPair(ScoredCell* dest, const ScoredCell* src) { new (dest) ScoredCell(*src); }
 namespace std {
-inline void _Construct(Elem_0040d4f0* dest, const Elem_0040d4f0& src) { CopyOneByte(dest, &src); }
+inline void _Construct(AiWeightPct* dest, const AiWeightPct& src) { CopyOneByte(dest, &src); }
 inline void _Construct(ScoredCell* dest, const ScoredCell& src) { CopyDwordPair(dest, &src); }
 }
 
 typedef std::vector<Unit*> Vec_0040c530;
 typedef std::vector<ScoredCell> Vec_0040c580;
-typedef std::vector<Elem_0040cfb0> Vec_0040c5d0;
-typedef std::vector<Elem_0040d4f0> Vec_0040c600;
+typedef std::vector<BuildScoreTriplet> Vec_0040c5d0;
+typedef std::vector<AiWeightPct> Vec_0040c600;
 typedef std::vector<Elem_0040d550> Vec_0040c7f0;
 typedef std::vector<short> Vec_0040d000;
 typedef std::vector<unsigned char> Vec_0040d290;
@@ -101,17 +101,17 @@ typedef Vec_0040c580::size_type (Vec_0040c580::*SizeFn_0040c5b0)() const;
 // FUNCTION: 0x40c5b0 ?size@?$vector@UScoredCell@@V?$allocator@UScoredCell@@@std@@@std@@QBEIXZ
 SizeFn_0040c5b0 g_size_0040c5b0 = &Vec_0040c580::size;
 
-// std::vector<Elem_0040cfb0>::~vector() (the same code as 0x40c530). 0x40b390
+// std::vector<BuildScoreTriplet>::~vector() (the same code as 0x40c530). 0x40b390
 // calls it on the vector of 3-byte elements at +0x65.
 typedef std::vector<Vec_0040c5d0> Outer_0040c5d0;
 typedef Outer_0040c5d0& (Outer_0040c5d0::*AssignFn_0040c5d0)(const Outer_0040c5d0&);
-// FUNCTION: 0x40c5d0 ??1?$vector@UElem_0040cfb0@@V?$allocator@UElem_0040cfb0@@@std@@@std@@QAE@XZ
+// FUNCTION: 0x40c5d0 ??1?$vector@UBuildScoreTriplet@@V?$allocator@UBuildScoreTriplet@@@std@@@std@@QAE@XZ
 AssignFn_0040c5d0 g_assign_0040c5d0 = &Outer_0040c5d0::operator=;
 
-// std::vector<Elem_0040d4f0>::resize(), on the vector at +0xad. It calls
+// std::vector<AiWeightPct>::resize(), on the vector at +0xad. It calls
 // _Ucopy (0x40d4f0), _Ufill (0x40d520) and _Destroy (0x40d4b0).
-typedef void (Vec_0040c600::*ResizeFn_0040c600)(unsigned int, const Elem_0040d4f0&);
-// FUNCTION: 0x40c600 ?resize@?$vector@UElem_0040d4f0@@V?$allocator@UElem_0040d4f0@@@std@@@std@@QAEXIABUElem_0040d4f0@@@Z
+typedef void (Vec_0040c600::*ResizeFn_0040c600)(unsigned int, const AiWeightPct&);
+// FUNCTION: 0x40c600 ?resize@?$vector@UAiWeightPct@@V?$allocator@UAiWeightPct@@@std@@@std@@QAEXIABUAiWeightPct@@@Z
 ResizeFn_0040c600 g_resize_0040c600 = &Vec_0040c600::resize;
 
 // std::vector<Elem_0040d550>::resize(), on the 4-byte entries at +0xcd. It
@@ -163,16 +163,16 @@ DestroyFn_0040cc30 Access_0040c580::destroy = &Access_0040c580::_Destroy;
 // FUNCTION: 0x40cc40 ?_Ucopy@?$vector@UScoredCell@@V?$allocator@UScoredCell@@@std@@@std@@IAEPAUScoredCell@@PBU3@0PAU3@@Z
 UcopyFn_0040cc40 Access_0040c580::ucopy = &Access_0040c580::_Ucopy;
 
-// std::vector<Elem_0040cfb0>::size() for the 3-byte element type (the `/ 3`
+// std::vector<BuildScoreTriplet>::size() for the 3-byte element type (the `/ 3`
 // is the pointer difference). 0x409160 calls it on its vector at +0x65, from
 // the inlined resize() around the insert (0x40cca0) and erase (0x40cfb0).
 typedef Vec_0040c5d0::size_type (Vec_0040c5d0::*SizeFn_0040cc80)() const;
-// FUNCTION: 0x40cc80 ?size@?$vector@UElem_0040cfb0@@V?$allocator@UElem_0040cfb0@@@std@@@std@@QBEIXZ
+// FUNCTION: 0x40cc80 ?size@?$vector@UBuildScoreTriplet@@V?$allocator@UBuildScoreTriplet@@@std@@@std@@QBEIXZ
 SizeFn_0040cc80 g_size_0040cc80 = &Vec_0040c5d0::size;
 
-// std::vector<Elem_0040cfb0>::insert(iterator, size_type, const T&) on a
+// std::vector<BuildScoreTriplet>::insert(iterator, size_type, const T&) on a
 // 3-byte element; 0x409160 and 0x409730 call it.
-typedef void (Vec_0040c5d0::*InsertFn_0040cca0)(Vec_0040c5d0::iterator, unsigned int, const Elem_0040cfb0&);
+typedef void (Vec_0040c5d0::*InsertFn_0040cca0)(Vec_0040c5d0::iterator, unsigned int, const BuildScoreTriplet&);
 
 // A growth step on this vector type, standing in for the original TU's own;
 // the insert's bytes need the TU to instantiate reserve (or the copy
@@ -182,13 +182,13 @@ void __stdcall Grow_0040cca0(Vec_0040c5d0* v, int extra)
     v->reserve(extra + v->size());
 }
 
-// FUNCTION: 0x40cca0 ?insert@?$vector@UElem_0040cfb0@@V?$allocator@UElem_0040cfb0@@@std@@@std@@QAEXPAUElem_0040cfb0@@IABU3@@Z
+// FUNCTION: 0x40cca0 ?insert@?$vector@UBuildScoreTriplet@@V?$allocator@UBuildScoreTriplet@@@std@@@std@@QAEXPAUBuildScoreTriplet@@IABU3@@Z
 InsertFn_0040cca0 g_insert_0040cca0 = &Vec_0040c5d0::insert;
 
-// std::vector<Elem_0040cfb0>::erase(first, last) for a 3-byte element type.
+// std::vector<BuildScoreTriplet>::erase(first, last) for a 3-byte element type.
 typedef Vec_0040c5d0::iterator (Vec_0040c5d0::*EraseFn_0040cfb0)(
     Vec_0040c5d0::iterator, Vec_0040c5d0::iterator);
-// FUNCTION: 0x40cfb0 ?erase@?$vector@UElem_0040cfb0@@V?$allocator@UElem_0040cfb0@@@std@@@std@@QAEPAUElem_0040cfb0@@PAU3@0@Z
+// FUNCTION: 0x40cfb0 ?erase@?$vector@UBuildScoreTriplet@@V?$allocator@UBuildScoreTriplet@@@std@@@std@@QAEPAUBuildScoreTriplet@@PAU3@0@Z
 EraseFn_0040cfb0 g_erase_0040cfb0 = &Vec_0040c5d0::erase;
 
 // std::vector<short>::size(), on the vector at +0x7d, from the inlined
@@ -251,14 +251,14 @@ struct Access_0040d290 : Vec_0040d290 {
 // FUNCTION: 0x40d4a0 ?_Destroy@?$vector@EV?$allocator@E@std@@@std@@IAEXPAE0@Z
 DestroyFn_0040d4a0 Access_0040d290::destroy = &Access_0040d290::_Destroy;
 
-// The protected members of std::vector<Elem_0040d4f0>: _Destroy (empty, since
+// The protected members of std::vector<AiWeightPct>: _Destroy (empty, since
 // the element type is trivial), _Ucopy and _Ufill. The vector's resize
 // (0x40c600) calls them with ecx set to the vector at +0xad.
 typedef void (Vec_0040c600::*DestroyFn_0040d4b0)(Vec_0040c600::iterator, Vec_0040c600::iterator);
 typedef Vec_0040c600::iterator (Vec_0040c600::*UcopyFn_0040d4f0)(
     Vec_0040c600::const_iterator, Vec_0040c600::const_iterator, Vec_0040c600::iterator);
 typedef void (Vec_0040c600::*UfillFn_0040d520)(
-    Vec_0040c600::iterator, Vec_0040c600::size_type, const Elem_0040d4f0&);
+    Vec_0040c600::iterator, Vec_0040c600::size_type, const AiWeightPct&);
 
 struct Access_0040c600 : Vec_0040c600 {
     static DestroyFn_0040d4b0 destroy;
@@ -266,7 +266,7 @@ struct Access_0040c600 : Vec_0040c600 {
     static UfillFn_0040d520 ufill;
 };
 
-// FUNCTION: 0x40d4b0 ?_Destroy@?$vector@UElem_0040d4f0@@V?$allocator@UElem_0040d4f0@@@std@@@std@@IAEXPAUElem_0040d4f0@@0@Z
+// FUNCTION: 0x40d4b0 ?_Destroy@?$vector@UAiWeightPct@@V?$allocator@UAiWeightPct@@@std@@@std@@IAEXPAUAiWeightPct@@0@Z
 DestroyFn_0040d4b0 Access_0040c600::destroy = &Access_0040c600::_Destroy;
 
 // std::vector<Elem_0040d550>::size() (`>> 2`: a 4-byte element). Its caller
@@ -294,10 +294,10 @@ struct Access_0040c7f0 : Vec_0040c7f0 {
 // FUNCTION: 0x40d4e0 ?_Destroy@?$vector@UElem_0040d550@@V?$allocator@UElem_0040d550@@@std@@@std@@IAEXPAUElem_0040d550@@0@Z
 DestroyFn_0040d4e0 Access_0040c7f0::destroy = &Access_0040c7f0::_Destroy;
 
-// FUNCTION: 0x40d4f0 ?_Ucopy@?$vector@UElem_0040d4f0@@V?$allocator@UElem_0040d4f0@@@std@@@std@@IAEPAUElem_0040d4f0@@PBU3@0PAU3@@Z
+// FUNCTION: 0x40d4f0 ?_Ucopy@?$vector@UAiWeightPct@@V?$allocator@UAiWeightPct@@@std@@@std@@IAEPAUAiWeightPct@@PBU3@0PAU3@@Z
 UcopyFn_0040d4f0 Access_0040c600::ucopy = &Access_0040c600::_Ucopy;
 
-// FUNCTION: 0x40d520 ?_Ufill@?$vector@UElem_0040d4f0@@V?$allocator@UElem_0040d4f0@@@std@@@std@@IAEXPAUElem_0040d4f0@@IABU3@@Z
+// FUNCTION: 0x40d520 ?_Ufill@?$vector@UAiWeightPct@@V?$allocator@UAiWeightPct@@@std@@@std@@IAEXPAUAiWeightPct@@IABU3@@Z
 UfillFn_0040d520 Access_0040c600::ufill = &Access_0040c600::_Ufill;
 
 // FUNCTION: 0x40d550 ?_Ucopy@?$vector@UElem_0040d550@@V?$allocator@UElem_0040d550@@@std@@@std@@IAEPAUElem_0040d550@@PBU3@0PAU3@@Z
