@@ -1993,27 +1993,47 @@ void __stdcall DrawSliderBar(Gui* obj, int index)
 int WriteScreenshot(int, int, int, int, int, int);
 #pragma pack(pop)
 
-struct Holder_004a2be0 {
-    int current;                       // +0x00
-    Gadget* entries;                   // +0x04
-    char unknown_08[0x14 - 0x08];
-    void* list;                        // +0x14
-};
+// Unused here: real declarations that keep the file's symbol count (docs/c2-regalloc.md).
+void AbortProgram(void);
+void AllocLockAtexitHandler(void);
+void ResetAllocStats(void);
+void* GetBlockMap(void);
+char IsBackAlign(void);
+void BackAlignAtexitHandler(void);
+int GetDebugFillPattern(void);
+void CloseLoadedImage(void);
+void UnloadImageHelp(void);
+void ImageHlpAtexitHandler(void);
+char TryEnableImageHlpLines(void);
+void ImageHlpLinesAtexitHandler(void);
+void SetFpuFussy(void);
+void FpuFussyAtexitHandler(void);
+void ShowPerformanceStatus(void);
+void StartPerformanceStatus(void);
+void MemStatusLockAtexitHandler(void);
+void UnloadPsapiImpl(void);
+void UnloadPsapi(void);
+void ShowMemoryStatus(void);
+void MemoryStatusAtexitHandler(void);
+void __cdecl StartMemoryStatus(void);
+unsigned char __cdecl HasPerfCounters(void);
+char IsPentiumOrBetter(void);
+double __cdecl GetTimeSeconds(void);
+void NameTableLockAtexitHandler(void);
+void InitPerformanceEvents(void);
+bool CloseGdperf(void);
+int StringMaxSize(void);
+void RegisterEmptyAtexitA(void);
 
-struct Dialog_4a2be0 {
-    char unknown_0[0x18];
-    Holder_004a2be0* holder;           // +0x18
-};
-
-void __stdcall DrawListBox(Dialog_4a2be0* param_1, int param_2);
-void __stdcall DrawSliderBar(Dialog_4a2be0* param_1, int param_2);
-void __stdcall DrawTextInput(Dialog_4a2be0* param_1, int param_2);
+void __stdcall DrawListBox(Gui* param_1, int param_2);
+void __stdcall DrawSliderBar(Gui* param_1, int param_2);
+void __stdcall DrawTextInput(Gui* param_1, int param_2);
 char* __stdcall SkipTextLines(char* text, int line);
 
 // FUNCTION: 0x4a2be0
-void __stdcall SyncAssocGadgets(Dialog_4a2be0* param_1, int param_2)
+void __stdcall SyncAssocGadgets(Gui* param_1, int param_2)
 {
-    Gadget* entries = param_1->holder->entries;
+    Gadget* entries = param_1->layer->entries;
     int i = 1;
     char* me = (char*)entries + param_2 * 0x15b;
     int type = *(unsigned char*)me;
@@ -2089,26 +2109,6 @@ void __stdcall SyncAssocGadgets(Dialog_4a2be0* param_1, int param_2)
 int OpenInputDialog(int, int, int, int, int, int);
 #pragma pack(pop)
 
-struct List_004a2e40 {
-    char unknown_0[0x0c];
-    unsigned short* glyphs; // +0x0c
-};
-
-struct Holder_004a2e40 {
-    int current;             // +0x00
-    Gadget* entries;         // +0x04
-    char unknown_08[0x14 - 0x08];
-    List_004a2e40* list; // +0x14
-};
-
-#pragma pack(push, 1)
-struct Dialog_4a2e40 {
-    char unknown_00[0x18];
-    Holder_004a2e40* holder; // +0x18
-    char unknown_1c[0xcca - 0x1c];
-    int changed; // +0xcca
-};
-#pragma pack(pop)
 
 void __stdcall SetFont(int id);
 char* __stdcall GetGafFrame(void* glyphs, int c);
@@ -2143,8 +2143,8 @@ extern int Pad_a2e40_e1;
 extern int Pad_a2e40_e2;
 
 // FUNCTION: 0x4a2e40
-void __stdcall SetListBoxScrollByName(Dialog_4a2e40* param_1, char* param_2, int param_3) {
-    Gadget* entries = param_1->holder->entries;
+void __stdcall SetListBoxScrollByName(Gui* param_1, char* param_2, int param_3) {
+    Gadget* entries = param_1->layer->entries;
     int found = FindEntry_004a2e40(entries, param_2);
     if (found == -1)
         return;
@@ -4674,6 +4674,8 @@ void LoadAllSound(void);
 
 void CheckPlayerTimeouts(void);
 int HandleNetPackets(void);
+void RegisterEmptyAtexitB(void);
+void RegisterEmptyAtexitC(void);
 // FUNCTION: 0x4a69d0
 void __stdcall ClearAllStatus(Gui* param_1)
 {
