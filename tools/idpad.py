@@ -12,8 +12,8 @@ and prints the ones that bring the listed functions back.
 
 It reports the file's state now and on --base first, and stops if the listed
 functions already match. A candidate is otherwise a set of real
-zero-parameter prototypes from `include/ta_protos.h` (1 id each, and no type
-of its own to pay for), placed just after the file's includes or just before
+zero-parameter declarations of functions src/ defines, spelled as defined
+(1 id each, and no type of its own to pay for), placed just after the file's includes or just before
 the first listed function, or the removal of one existing "Unused here"
 block. Every variant is compiled in a scratch copy, in parallel, and the file
 itself is never written.
@@ -43,8 +43,9 @@ from pathlib import Path
 
 from check import ROOT, Original, annotations, compare, compile_source
 from coff import parse_object
+from sources import source_files
 
-PROTO = re.compile(r"^([A-Za-z_][\w \t\*]*?)\s+([A-Za-z_]\w*)\(([^();]*)\);\s*$", re.M)
+DEFINITION = re.compile(r"^([A-Za-z_][\w \t\*]*?)\s+((?:__stdcall|__cdecl|__fastcall)\s+)?([A-Za-z_]\w*)\(([^();]*)\)\s*(?:\{.*)?$")
 PRIMITIVE = re.compile(r"^(?:void|int|char|short|long|unsigned|signed|float|double|bool"
                        r"|unsigned (?:int|char|short|long)|signed (?:int|char|short|long))\s*\*?$")
 FUNCTION_LINE = re.compile(r"^// FUNCTION: 0x([0-9a-f]+)")
@@ -55,16 +56,34 @@ CREATED: list[Path] = []
 
 
 def prototypes() -> list[tuple[str, int]]:
-    """`include/ta_protos.h` as (line, id cost): a free function is 1, plus one per parameter."""
-    text = (ROOT / "include" / "ta_protos.h").read_text(errors="replace")
-    out = []
-    for ret, name, params in PROTO.findall(text):
-        if not PRIMITIVE.fullmatch(ret.strip()):
-            continue  # a return type of its own would cost its declaration too
-        params = params.strip()
-        count = 0 if params in ("", "void") else len([p for p in params.split(",") if p.strip()])
-        out.append((f"{ret.strip()} {name}({params or 'void'});", 1 + count))
-    return out
+    """The free functions src/ defines (the line after a `// FUNCTION:`
+    annotation), declared as defined, as (line, id cost): a free function is 1,
+    plus one per parameter. Taken from the definitions rather than the generated
+    `include/ta_protos.h`, which keeps names and signatures the source has since
+    changed (placeholder FUN_ names, other return types), so that a padding
+    declaration is always a real one. A name defined twice is left out."""
+    found: dict[str, tuple[str, int]] = {}
+    twice: set[str] = set()
+    for path in source_files():
+        lines = path.read_text(errors="replace").splitlines()
+        for i, line in enumerate(lines):
+            if not FUNCTION_LINE.match(line):
+                continue
+            j = i + 1
+            while j < len(lines) and lines[j].startswith("//"):
+                j += 1
+            m = DEFINITION.match(lines[j]) if j < len(lines) else None
+            if not m:
+                continue
+            ret, conv, name, params = m.group(1).strip(), m.group(2) or "", m.group(3), m.group(4).strip()
+            if ":" in ret or ret.startswith(("static", "inline")) or not PRIMITIVE.fullmatch(ret):
+                continue  # a method, a file-local, or a return type of its own to pay for
+            if name in found:
+                twice.add(name)
+                continue
+            count = 0 if params in ("", "void") else len([p for p in params.split(",") if p.strip()])
+            found[name] = (f"{ret} {conv}{name}({params or 'void'});", 1 + count)
+    return [found[name] for name in found if name not in twice]
 
 
 def padding_declarations(source: str, wanted: int) -> list[str]:
@@ -165,7 +184,7 @@ def main() -> int:
     include_dir = source.parent
 
     try:
-        print(f"{rel}: {len(targets)} function(s), {len(prototypes())} prototypes in ta_protos.h")
+        print(f"{rel}: {len(targets)} function(s), {len(prototypes())} prototypes of functions src/ defines")
         base = read_base(source, args.base)
         if base is None:
             print(f"  {args.base} does not have {rel}: no comparison")
