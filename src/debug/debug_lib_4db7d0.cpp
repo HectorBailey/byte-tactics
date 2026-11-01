@@ -58,19 +58,19 @@ public:
 
 // ---- the debug arena: a ring of the last 0x2000 freed records ---------------
 
-struct Elem_004dd8c0 {
+struct FreedRecord {
     unsigned int w[0xc];               // +0x0, 0x30 bytes
 };
 
-class Alloc_004dd8c0 {
+class FreedRecordAllocator {
 public:
     typedef unsigned int size_type;
     typedef int difference_type;
-    typedef Elem_004dd8c0* pointer;
-    typedef const Elem_004dd8c0* const_pointer;
-    typedef Elem_004dd8c0& reference;
-    typedef const Elem_004dd8c0& const_reference;
-    typedef Elem_004dd8c0 value_type;
+    typedef FreedRecord* pointer;
+    typedef const FreedRecord* const_pointer;
+    typedef FreedRecord& reference;
+    typedef const FreedRecord& const_reference;
+    typedef FreedRecord value_type;
 
     pointer allocate(size_type _N, const void* = 0)
     {
@@ -96,8 +96,8 @@ public:
 };
 
 struct Arena_004da9f0 {
-    std::vector<Elem_004dd8c0, Alloc_004dd8c0> ring; // +0x0
-    unsigned int count;                              // +0x10
+    std::vector<FreedRecord, FreedRecordAllocator> ring; // +0x0
+    unsigned int count;                                  // +0x10
 };
 
 // ---- the allocator's free-block set -----------------------------------------
@@ -160,7 +160,7 @@ void __cdecl FreeDebugBlock(void* p, int flags)
         CheckFillPattern((char*)p - pad, GetDebugFillPattern(), pad);
     else
         CheckFillPattern((char*)p + size, GetDebugFillPattern(), pad);
-    Elem_004dd8c0* old = (Elem_004dd8c0*)&*it;
+    FreedRecord* old = (FreedRecord*)&*it;
     Arena_004da9f0* arena = GetFreedBlockRing();
     if (arena->count < 0x2000)
         arena->ring.push_back(*old);
