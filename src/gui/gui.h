@@ -4,13 +4,14 @@
 // (+0x60), the colour remap, the GUI file paths and the changed flag. The one
 // declaration of the type, for the files that define or read it.
 //
-// The members are plain data, and Layer and Gaf (a font table: the GAF file
-// LoadGafIntoSlot loads) are the only types named. Every type or forward
-// declaration the header adds moves the symbol ids of the small views it
-// replaces (docs/c2-regalloc.md), and those views match in narrow windows: the
-// files that broke when Gaf came in each gave up one filler type name. The
-// files that read the records behind the members (the font tables, the cursor
-// animation, the mouse event) keep their own view of them.
+// The members are plain data. The only types named are Layer, Gaf (a font
+// table: the GAF file LoadGafIntoSlot loads) and MouseEvent (mouse_event.h:
+// the last mouse event, and the one a knob drag began with). Every type or
+// forward declaration the header adds moves the symbol ids of the small views
+// it replaces (docs/c2-regalloc.md), and those views match in narrow windows:
+// the files that broke when Gaf and MouseEvent came in each changed one filler
+// block. The files that read the records behind the pointer members (the font
+// tables, the cursor animation) keep their own view of them.
 #ifndef GUI_H
 #define GUI_H
 
@@ -49,7 +50,8 @@ struct Gui {
     int clearQuickKeys;                 // +0x70
     int cursor;                         // +0x74
     int knobDragging;                   // +0x78
-    char unknown_7c[0x96 - 0x7c];
+    MouseEvent dragStart;               // +0x7c, the mouse when a knob drag began
+    short dragKnobPos;                  // +0x94, the knob position then
     int time;                           // +0x96
     int animTimer;                      // +0x9a
     int inputEnabled;                   // +0x9e
