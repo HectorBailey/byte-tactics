@@ -161,10 +161,10 @@ void __stdcall SetBrightness(float brightness)
 }
 
 // FUNCTION: 0x4ba5c0
-int __stdcall AllocAlphaTable(int obj)
+int __stdcall AllocAlphaTable(DisplayContext* obj)
 {
     void* result = GameAllocIgnoreTag(g_alphaTableName, 0x10000);
-    *(void**)((int)obj + 0xc0) = result;
+    obj->alphaTable = (unsigned char*)result;
     return 1;
 }
 
@@ -195,9 +195,9 @@ int __stdcall AllocLightTable(DisplayContext* obj)
 }
 
 // FUNCTION: 0x4ba690
-void __stdcall FreeLightTable(int obj)
+void __stdcall FreeLightTable(DisplayContext* obj)
 {
-    GameFreeThunk(*(void**)(obj + 0xc8));
+    GameFreeThunk(obj->lightTable);
 }
 
 // FUNCTION: 0x4ba6b0

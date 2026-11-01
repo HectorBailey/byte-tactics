@@ -2687,8 +2687,8 @@ void __stdcall SyncAssocGadgets(Object_004a3780* obj, int index);
 
 // Unused here: real functions declared to keep the file's symbol count.
 void* __stdcall BuildLensFrame(int w, int h, int lens);
-int __stdcall AllocAlphaTable(int param_1);
-void __cdecl ApplyCampaignSideSelection();
+struct DisplayContext;
+int __stdcall AllocAlphaTable(DisplayContext* display);
 
 struct Item_004a3780 {
     char unknown_0[0x28];
