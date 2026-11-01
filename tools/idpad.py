@@ -87,7 +87,9 @@ def prototypes() -> list[tuple[str, int]]:
 
 
 def padding_declarations(source: str, wanted: int) -> list[str]:
-    """`wanted` ids' worth of real zero-parameter prototypes the file does not already name."""
+    """`wanted` ids' worth of real zero-parameter prototypes the file does not
+    already name, or [] when fewer than `wanted` are free: a caller asking for
+    more than `free_declarations` gets nothing, not a shorter block."""
     lines, total = [], 0
     for line, cost in prototypes():
         if cost != 1:
@@ -100,6 +102,13 @@ def padding_declarations(source: str, wanted: int) -> list[str]:
         if total >= wanted:
             return lines
     return []
+
+
+def free_declarations(source: str) -> int:
+    """How many real zero-parameter prototypes the file does not already name:
+    the most ids padding_declarations can give it."""
+    return sum(1 for line, cost in prototypes()
+               if cost == 1 and not re.search(rf"\b{re.escape(NAME_IN_DECL.search(line).group(1))}\b", source))
 
 
 def unused_blocks(lines: list[str]) -> list[tuple[int, int, int]]:
@@ -220,6 +229,10 @@ def main() -> int:
             return "".join(body)
 
         jobs = []  # (label, variant text, what it adds)
+        free = free_declarations(text)
+        if free < args.max:
+            print(f"  only {free} real zero-parameter declarations are free for this file: "
+                  f"--max {args.max} is capped at {free}")
         for where, at in places:
             for k in range(1, args.max + 1):
                 block = padding_declarations(text, k)
