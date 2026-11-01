@@ -988,8 +988,8 @@ void __stdcall UpdateMapSelection(Gui* menu, int unused);
 
 void __stdcall SetGameMode(int a);
 void LeaveNetGame();
-void* __stdcall LoadBitmapByName(char* name, unsigned char* palette);
 struct Surface;
+Surface* __stdcall LoadBitmapByName(const char* name, unsigned char* palette);
 void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y);
 void __stdcall FreeSurface(Surface* obj);
 void ShowSoftwareCursor();
@@ -1022,7 +1022,7 @@ int AreAllPlayersReady();
 void __stdcall CreateUnitSync(int param_1);
 char __stdcall FindGameCdDrive(int side);
 int HandleNetPackets();
-void* __stdcall LoadPcx(char* path, int param_2);
+Surface* __stdcall LoadPcx(char* path, unsigned char* outPalette);
 void __stdcall FrameFromSurface(void* dst, void* src);
 void* __stdcall FindGafEntry(void* gaf, const char* name);
 void FatalError(char* message);
@@ -4299,7 +4299,7 @@ void OpenEndMultiScreen()
     Surface* image;
 
     BlankScreen();
-    image = (Surface*)LoadBitmapByName("Mission02WinBW", palette);
+    image = LoadBitmapByName("Mission02WinBW", palette);
     SetPaletteColors(palette, 0, 0x100);
     SetOffscreenSurface(g_game->offscreen);
     DrawSurface(0, image, 0, 0);
@@ -4706,7 +4706,7 @@ void LoadUnitPortrait()
         if (defs[type].name && ((unsigned char)(defs[type].flags2.raw >> 15) & 1) == 0) {
             // Indexed by the reloaded entry field, not defs[type].name.
             BuildDataPath(path, "unitpics", defs[g_unitRestrictEntries[i].unitIndex].name, "PCX");
-            void* img = LoadPcx(path, 0);
+            Surface* img = LoadPcx(path, 0);
             *(void**)g_unitRestrictPicCursor = img;
             g_unitRestrictPicCursor += 4;
             if (img != 0) {

@@ -279,7 +279,7 @@ int __stdcall FadeRectangle(Surface* surface, Rect* rect, int level);
 Display* GetDisplay();
 void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
 int __stdcall HAPI_FileLengthByName(char* path);
-void* __stdcall LoadBitmapByName(char* name, unsigned char* palette);
+Surface* __stdcall LoadBitmapByName(const char* name, unsigned char* palette);
 int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int param_4);
 int __stdcall FillSurface(Surface* surface, int colour);
 void BlankScreen();
