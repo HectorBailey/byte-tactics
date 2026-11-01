@@ -16,7 +16,9 @@
 #include "../network/unit_sync.h"
 #include "../units/unit_def.h"
 
-struct Record_005129b4 {               // 0x62-byte slider/picture record
+// One 0x62-byte record of the unit restrictions table (g_unitRestrictEntries,
+// allocated as "UNITSRESTRICTINFO"): a slider and picture entry per unit type.
+struct UnitRestrictEntry {             // 0x62 bytes
     char unknown_0[0x52];
     int unitIndex;                     // +0x52 unit type index
     int previousMax;                   // +0x56 previous value
@@ -51,7 +53,7 @@ struct Item_0044c420 {                 // 0x249-byte unit type instance
 
 extern Game* g_game;
 extern int* g_unitRestrictPics;
-extern Record_005129b4* g_unitRestrictEntries;
+extern UnitRestrictEntry* g_unitRestrictEntries;
 extern int* g_unitRestrictOldCounts;
 
 Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);

@@ -429,7 +429,7 @@ int g_startCountdownNextTick;  // 0x5129a4 .bss
 unsigned int g_heartbeatNextTick;  // 0x5129a8 .bss
 char* g_saveListFileNames;  // 0x5129ac .bss
 char* g_saveListDisplayNames;  // 0x5129b0 .bss
-Record_005129b4* g_unitRestrictEntries;  // 0x5129b4 .bss
+UnitRestrictEntry* g_unitRestrictEntries;  // 0x5129b4 .bss
 int* g_unitRestrictPics;  // 0x5129b8 .bss
 unsigned char DAT_005129bc[4];  // 0x5129bc .bss
 int DAT_005129c0;  // 0x5129c0 .bss

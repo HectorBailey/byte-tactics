@@ -19,10 +19,10 @@ struct Entry_004426e0;
 struct Entry_004df590;
 struct ExplodedPiece;
 struct Game;
-struct Record_005129b4;
 struct Smoke_00425b80;
 struct SquashTree;
 struct Surface;
+struct UnitRestrictEntry;
 struct WeaponDef;
 
 extern unsigned char g_turnCosts[8];                                                                            // 0x4fca10, 8 bytes; const Table_0040d880 by value in 1 of 1 files
@@ -343,7 +343,7 @@ extern int g_startCountdownNextTick;                                            
 extern unsigned int g_heartbeatNextTick;                                                                        // 0x5129a8, 4 bytes; 1 of 1 files
 extern char* g_saveListFileNames;                                                                               // 0x5129ac, 4 bytes; 1 of 1 files
 extern char* g_saveListDisplayNames;                                                                            // 0x5129b0, 4 bytes; 1 of 1 files
-extern Record_005129b4* g_unitRestrictEntries;                                                                  // 0x5129b4, 4 bytes; 1 of 2 files (conflicting: struct names only)
+extern UnitRestrictEntry* g_unitRestrictEntries;                                                                // 0x5129b4, 4 bytes; 2 of 2 files
 extern int* g_unitRestrictPics;                                                                                 // 0x5129b8, 4 bytes; 2 of 2 files
 extern unsigned char DAT_005129bc[4];                                                                           // 0x5129bc, 4 bytes; nothing refers to it
 extern int DAT_005129c0;                                                                                        // 0x5129c0, 4 bytes; 1 of 1 files
