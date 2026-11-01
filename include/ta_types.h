@@ -997,8 +997,8 @@ struct ElemB_0046c190;
 struct Elem_00401000;
 struct ScoredCell;
 struct Elem_0040cc40_2;
-struct Elem_0040cfb0;
-struct Elem_0040d4f0;
+struct BuildScoreTriplet;
+struct AiWeightPct;
 struct Elem_0040d550;
 struct Elem_0040f110;
 struct Elem_004222e0;
@@ -20266,13 +20266,13 @@ public:
     void TickTimers(void);
 };
 
-struct Elem_0040cfb0 {  // 0x3 bytes, 8 views
+struct BuildScoreTriplet {  // 0x3 bytes, 8 views
     char a;  // +0x0
     char b;  // +0x1
     char c;  // +0x2
 };
 
-struct Elem_0040d4f0 {  // 0x1 bytes, 6 views
+struct AiWeightPct {    // 0x1 bytes, 6 views
     char value;  // +0x0
 };
 
@@ -20306,13 +20306,13 @@ public:
     Vec3 pos_41;  // +0x41
     std::vector<ScoredCell> vec_4d;     // +0x4d
     Pos_00409160 center;  // +0x5d
-    std::vector<Elem_0040cfb0> vec_65;  // +0x65
+    std::vector<BuildScoreTriplet> buildScoreTriplets;  // +0x65
     int field_75;  // +0x75
     int field_79;  // +0x79
     std::vector<short> vec_7d;  // +0x7d
-    std::vector<unsigned char> vec_8d;  // +0x8d
+    std::vector<unsigned char> threatScores;  // +0x8d
     std::vector<unsigned char> vec_9d;  // +0x9d
-    std::vector<Elem_0040d4f0> vec_ad;  // +0xad
+    std::vector<AiWeightPct> weightPcts;  // +0xad
     char unknown_bd[4];
     int* d;  // +0xc1
     char unknown_c5[8];
@@ -20364,11 +20364,11 @@ public:
     short centerX;  // +0x5d
     short centerY;  // +0x5f
     int field_61;  // +0x61
-    std::vector<Elem_0040cfb0> vec_65;  // +0x65
+    std::vector<BuildScoreTriplet> buildScoreTriplets;  // +0x65
     int field_75;  // +0x75
     int field_79;  // +0x79
     std::vector<short> vec_7d;  // +0x7d
-    std::vector<unsigned char> vec_8d;  // +0x8d
+    std::vector<unsigned char> threatScores;  // +0x8d
     std::vector<unsigned char> vec_9d;  // +0x9d
     void ComputeBaseWeights(void);
 };

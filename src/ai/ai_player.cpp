@@ -1253,7 +1253,7 @@ void SquadManager::DeleteTimers()
 // 0x40b320; 0x40b390 destroys it). Its out-of-line STL callees are
 // std::vector<Unit*>::vector(const allocator&) (0x40c510),
 // std::vector<short>::size() (0x40d000) and
-// std::vector<Elem_0040cfb0>::size() (0x40cc80), among others.
+// std::vector<BuildScoreTriplet>::size() (0x40cc80), among others.
 // FUNCTION: 0x409160
 PlayerAI::PlayerAI(unsigned char p)
     : owner(&g_game->players[p]), index(p),
@@ -1267,21 +1267,21 @@ PlayerAI::PlayerAI(unsigned char p)
     counts.resize(n, 0);
     // Fill values stay in block scopes so they share the dead parameter slot.
     {
-        Elem_0040cfb0 e;
+        BuildScoreTriplet e;
         e.a = 0;
         e.b = 0;
         e.c = 0;
-        vec_65.resize(n, e);
+        buildScoreTriplets.resize(n, e);
     }
     {
-        Elem_0040d4f0 f;
+        AiWeightPct f;
         f.value = 0;
-        vec_ad.resize(n, f);
+        weightPcts.resize(n, f);
     }
     {
         Elem_0040d550 g;
         g.unknown_0 = 0;
-        vec_bd.resize(n, g);
+        weightOverrides.resize(n, g);
         g.unknown_0 = 0;
         values.resize(n, g);
         g.unknown_0 = 0;
@@ -1304,8 +1304,8 @@ void PlayerAI::InitUnitTables()
         if (def->ids)
             weights[i] += 20;
         counts[i] = 0;
-        vec_ad[i].value = 100;
-        vec_bd[i].unknown_0 = 0;
+        weightPcts[i].value = 100;
+        weightOverrides[i].unknown_0 = 0;
         values[i].unknown_0 = -1;
         locked[i].unknown_0 = 0;
     }
@@ -1378,10 +1378,10 @@ void __stdcall ScaleUnitWeights(int player, unsigned int* mask, float scale, int
         if (mask[i >> 5] & (1 << (i & 0x1f))) {
             // Own local: the address is then encoded as [offset + base].
             int off = i * 4;
-            if (*(int*)(off + (int)p->vec_bd.begin()) == 0) {
-                p->vec_ad[i].value = (unsigned char)__min(__max((int)(p->vec_ad[i].value * scale), 0), 100);
+            if (*(int*)(off + (int)p->weightOverrides.begin()) == 0) {
+                p->weightPcts[i].value = (unsigned char)__min(__max((int)(p->weightPcts[i].value * scale), 0), 100);
                 if (lock)
-                    *(int*)(off + (int)p->vec_bd.begin()) = 1;
+                    *(int*)(off + (int)p->weightOverrides.begin()) = 1;
             }
         }
     }
@@ -1424,7 +1424,7 @@ void __stdcall ParseDownloadableAiWeightScripts(int player)
     for (unsigned short i = 1; i < g_game->unitDefCount; i++) {
         UnitDef* def = &g_game->unitDefs[i];
         if (((Flags241*)&def->flags1)->downloadable) {
-            if (p->vec_bd[i].unknown_0 != 1) {
+            if (p->weightOverrides[i].unknown_0 != 1) {
                 int len = strlen(def->aiWeight);
                 if (len != 0) {
                     CommandArgs vars;
@@ -1766,7 +1766,7 @@ int __stdcall GetBuildRating(int player,unsigned short type)
 #pragma pack(push, 1)
     struct Owner_40bb00 {
         char pad[0x69];                // +0x00
-        Elem_0040cfb0* ratings;        // +0x69
+        BuildScoreTriplet* ratings;    // +0x69
         char pad6d[0x81-0x6d];
         short* counts;                 // +0x81
         char pad85[0xb1-0x85];
@@ -1792,7 +1792,7 @@ int __stdcall GetBuildRating(int player,unsigned short type)
     int energy2=min(max(energy-metal2,0),100);
     int normal=max(100-metal2-energy2,0);
     if(!IsCountBelowAiLimit(player,type,owner->counts[type])) return 0;
-    Elem_0040cfb0* r=&owner->ratings[type];
+    BuildScoreTriplet* r=&owner->ratings[type];
     return (normal*r->a+r->b*metal2+r->c*energy2)*owner->weights[type]/10000;
 }
 
@@ -1897,7 +1897,7 @@ void __stdcall DumpPlayerAI(int player, FILE* file)
         UnitDef* type=&g_game->unitDefs[i];
         if (ai->values[i].unknown_0<0) fprintf(file,"n/a ");
         else fprintf(file,"%4d",ai->values[i].unknown_0);
-        sprintf(buffer," - %3d : %3d : %3d = %3d - '%s\t\t:%s'\r\n",ai->vec_65[i].a,ai->vec_65[i].b,ai->vec_65[i].c,ai->vec_ad[i].value,type->unitname,type->name);
+        sprintf(buffer," - %3d : %3d : %3d = %3d - '%s\t\t:%s'\r\n",ai->buildScoreTriplets[i].a,ai->buildScoreTriplets[i].b,ai->buildScoreTriplets[i].c,ai->weightPcts[i].value,type->unitname,type->name);
         // Original passes the formatted unit text as a format string, so percent signs are interpreted again.
         fprintf(file,buffer);
     }

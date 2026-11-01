@@ -139,13 +139,13 @@ struct Unit {
     int unknown_0;
 };
 
-struct Elem_0040cfb0 {
+struct BuildScoreTriplet {
     char a;
     char b;
     char c;
 };
 
-struct Elem_0040d4f0 {
+struct AiWeightPct {
     char value;
 };
 
@@ -251,11 +251,11 @@ public:
     short centerX;                 // +0x5d
     short centerY;                 // +0x5f
     int unused_61;                 // +0x61, zeroed by the constructor, never read
-    std::vector<Elem_0040cfb0> vec_65;// +0x65
+    std::vector<BuildScoreTriplet> buildScoreTriplets; // +0x65
     int builders;                  // +0x75
     int hasSpecial;                // +0x79
     std::vector<short> counts;     // +0x7d
-    std::vector<unsigned char> vec_8d;// +0x8d
+    std::vector<unsigned char> threatScores; // +0x8d
     std::vector<unsigned char> weights;// +0x9d
 
     void ComputeBaseWeights();
@@ -306,20 +306,20 @@ int __stdcall RateUnitType(UnitDef* p)
 // FUNCTION: 0x409730
 void PlayerAI::ComputeBaseWeights()
 {
-    vec_8d.resize(g_game->unitDefCount, 0);
+    threatScores.resize(g_game->unitDefCount, 0);
     {
-        Elem_0040cfb0 e;
+        BuildScoreTriplet e;
         e.a = 0;
         e.b = 0;
         e.c = 0;
-        vec_65.resize(g_game->unitDefCount, e);
+        buildScoreTriplets.resize(g_game->unitDefCount, e);
     }
     for (int i = 1; i < g_game->unitDefCount; i++) {
         UnitDef* def = &g_game->unitDefs[(unsigned short)i];
-        vec_8d[i] = RateUnitType(def);
+        threatScores[i] = RateUnitType(def);
 
         int a = 1;
-        Elem_0040cfb0* e = &vec_65[i];
+        BuildScoreTriplet* e = &buildScoreTriplets[i];
         int n = (short)counts[i];
         if (def->flag_245_4)
             a = 21;
@@ -347,7 +347,7 @@ void PlayerAI::ComputeBaseWeights()
         if (def->minwaterdepth >= 0)
             x *= 3;
         if (owner->unitCount > (unsigned short)(g_game->unitsPerPlayer / 2)) {
-            x += (char)vec_8d[i] / 2;
+            x += (char)threatScores[i] / 2;
         }
         if (def->flag_245_8)
             x = 0;
