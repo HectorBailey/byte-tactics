@@ -517,13 +517,13 @@ struct Game {  // 0x3924d bytes
     char vertices[300][96];  // +0x1e88f
     PieceFrame frames[300][6];  // +0x2590f
     int soundCount;  // +0x33a0f
-    int soundIds[1];  // +0x33a13
+    IDirectSoundBuffer** sounds[1];  // +0x33a13, the loaded buffers (256 slots, then the names)
     char unknown_33a17[1020];
     char soundNames[1][32];  // +0x33e13
     char unknown_33e33[8160];
     char soundFiles[256][32];  // +0x35e13
-    SoundCategory* entries_37e13;  // +0x37e13
-    int entry_count;  // +0x37e17
+    SoundCategory* soundCategories;  // +0x37e13, sound.cpp's TDF "Sound Categories" table
+    int soundCategoryCount;  // +0x37e17
     int offscreen;    // +0x37e1b
     int width_37e1f;  // +0x37e1f
     int screenHeight;  // +0x37e23

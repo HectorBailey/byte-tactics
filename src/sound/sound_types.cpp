@@ -5,6 +5,8 @@
 
 #include "../util/tdf.h"
 
+#include "../game/game.h"
+
 struct SpeechCategory {
     char* name;                         // +0x0
     int unknown_4[5];                   // +0x4
@@ -27,14 +29,6 @@ struct SoundCategory {
 struct IDirectSoundBuffer;
 
 #pragma pack(push, 1)
-struct Game {
-    char unknown_0[0x33a0f];
-    int soundCount;                    // +0x33a0f
-    IDirectSoundBuffer** sounds[1];    // +0x33a13
-    char unknown_33a17[0x37e13 - 0x33a17];
-    SoundCategory* soundCategories;   // +0x37e13
-    int soundCategoryCount;            // +0x37e17
-};
 #pragma pack(pop)
 
 extern Game* g_game;
