@@ -1602,7 +1602,7 @@ address,size,file,symbol,status,similarity
 0x477360,174,src/frontend/campaign_menu.cpp,?ApplyCampaignSideSelection@@YAXXZ,matched,100.0
 0x477410,188,src/frontend/campaign_menu.cpp,?ApplyDifficultyButtons@@YGXXZ,matched,100.0
 0x4774d0,60,src/frontend/campaign_menu.cpp,?HasFewerThanThreeCampaignFiles@@YGHXZ,matched,100.0
-0x477510,134,src/frontend/campaign_menu.cpp,?ToggleAnyMission@@YGXPAUObject_00477510@@@Z,matched,100.0
+0x477510,134,src/frontend/campaign_menu.cpp,?ToggleAnyMission@@YGXPAUGui@@@Z,matched,100.0
 0x4775a0,506,src/frontend/campaign_menu.cpp,?HandleSingleMenuClick@@YGXPAUGui@@@Z,matched,100.0
 0x4777a0,406,src/frontend/campaign_menu.cpp,?OpenSingleMenu@@YGXXZ,matched,100.0
 0x477940,153,src/frontend/campaign_menu.cpp,?FillCampaignList@@YGXPAD@Z,matched,100.0
