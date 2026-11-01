@@ -110,14 +110,14 @@ extern void* __cdecl GameAllocIgnoreTag(const char* path, unsigned int size);
 extern int __stdcall ReadGuiFile(void* entry, char* path);
 extern void __cdecl GameFreeThunk(void* p);
 extern int __stdcall RenderLayer(Gui* menu, unsigned int flags);
-extern void __cdecl HideSoftwareCursor(void);
+extern void __stdcall HideSoftwareCursor(void);
 extern void __cdecl ShowSoftwareCursor(void);
 extern void __stdcall SelectAdjacentGadget(Gui* menu, int value);
 extern void __stdcall TrySetFocus(Gui* menu, int value);
 extern int __cdecl GetTextKeyColor(void);
 extern void __stdcall SetTextColors(int a, int b);
 extern void __stdcall SetFont(int a);
-extern void __cdecl ClearKeyQueue(void);
+extern void __stdcall ClearKeyQueue(void);
 extern void __stdcall CommitTextEdit(Gui* menu, int index, char* text,
                                    int maxLength, int clear);
 
@@ -133,7 +133,7 @@ int GetCursorSprite();
 extern void __stdcall AdvanceGafSequence(Ref_004ab400* ref, int step);
 extern int __stdcall PeekMouseEvent(MouseEvent* out);
 extern void __stdcall GetCurrentMouseEvent(MouseEvent* out);
-extern void __stdcall PopMouseEvent(MouseEvent* out);
+extern int __stdcall PopMouseEvent(MouseEvent* out);
 extern void __stdcall GetGadgetScreenRect(Gadget* table, int index, Rect* out);
 extern int __stdcall IsPointInRect(Rect* r, int px, int py);
 
@@ -908,7 +908,7 @@ int GetScreenHeight();
 void __stdcall SetGadgetActiveByName(Gui* menu, const char* name, int flag);
 void __stdcall SetKeyboardInput(Gui* menu, int flag);
 void __stdcall MarkChanged(Gui* menu);
-void __stdcall UpdateMenu(Gui* menu);
+int __stdcall UpdateMenu(Gui* menu);
 int __stdcall SelectFontForEntry(Gadget* entries, int index);
 int GetFont();
 int __stdcall GetTextWidth(int font, unsigned char* text);

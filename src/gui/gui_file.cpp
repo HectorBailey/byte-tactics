@@ -19,12 +19,12 @@ extern int DAT_0051fba8;
 
 unsigned int __stdcall HAPI_WriteFile(FileHandle* file, void* data, unsigned int size);
 void __stdcall WriteTabs(FileHandle* out, int indent);
-char* __stdcall ChangeExtension(char* name, char* out, const char* ext);
+char* __stdcall ChangeExtension(char* name, char* out, char* ext);
 int __stdcall HAPI_FileLengthByName(char* path);
 void __stdcall RemoveFile(char* path);
-void __stdcall RenameFile(char* from, char* to);
+void __stdcall RenameFile(const char* from, const char* to);
 FileHandle* __stdcall HAPI_CreateFile(char* path);
-void __stdcall HAPI_CloseFile(FileHandle* file);
+int __stdcall HAPI_CloseFile(FileHandle* file);
 char* __stdcall Translate(char* text);
 void* __stdcall LoadGaf(char* path);
 void* __stdcall GetGafFrame(void* table, int index);
