@@ -1850,7 +1850,7 @@ struct Record_0044c0d0;
 struct Record_00474cd0;
 struct Record_004ab2b0;
 struct Record_004ab3a0;
-struct Record_005129b4;
+struct UnitRestrictEntry;
 struct Rect;
 struct Rect_004c2380;
 struct Rect_004c2870;
@@ -7031,7 +7031,7 @@ public:
     int AllPlayersSynced(void);
 };
 
-struct Record_005129b4 {  // 0x62 bytes, 7 views
+struct UnitRestrictEntry {  // 0x62 bytes, 7 views
     char name[82];  // +0x0
     int unitIndex;  // +0x52
     int previousMax;  // +0x56

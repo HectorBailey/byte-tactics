@@ -51,7 +51,7 @@ void CenterCameraOnRadarClick(void);
 
 struct Layer;
 struct Game;
-struct Record_00446f50;
+struct UnitRestrictEntry;
 struct Options_00446f50;
 struct PlayerInfo;
 struct UnitType_00446f50;
@@ -686,7 +686,7 @@ struct Head_00444930 {
 };
 
 // One 0x62-byte record of the unit restrictions table at 0x5129b4.
-struct Record_00446f50 {
+struct UnitRestrictEntry {
     char name[0x52];                   // +0x00
     int unitIndex;                     // +0x52 unit type index
     int previousMax;                   // +0x56 previous value
@@ -841,7 +841,7 @@ extern void* g_orderFxVtable;
 extern int g_usePacketManager;
 extern PacketManager g_packetManager;
 // GLOBAL: 0x5129b4
-extern Record_00446f50* g_unitRestrictEntries;
+extern UnitRestrictEntry* g_unitRestrictEntries;
 extern char g_onlineLobbyPlayerName;
 extern char* g_modemInfo;
 extern int g_modemCount;
@@ -4759,7 +4759,7 @@ void UnitRestrictDialogFrame()
 void __stdcall ShowSelectedUnitCosts(void* panel, Gadget* unit)
 {
     char buf[20];
-    UnitType_00446f50* def = &g_game->unitDefs[((Record_00446f50*)unit->u.list.records)[unit->u.list.selected].unitIndex];
+    UnitType_00446f50* def = &g_game->unitDefs[((UnitRestrictEntry*)unit->u.list.records)[unit->u.list.selected].unitIndex];
     sprintf(buf, "%d", (int)def->energyCost);
     SetTranslatedTextByName(panel, "ENERGYTEXT", (char*)buf, 0);
     sprintf(buf, "%d", (int)def->metalCost);
@@ -4834,7 +4834,7 @@ void OpenUnitRestrictions()
     text = (char*)GameAllocIgnoreTag("UNITTEXTARRAY", g_game->unitDefCount << 5);
     *(int*)text = 0;
 
-    g_unitRestrictEntries = (Record_00446f50*)GameAllocIgnoreTag("UNITSRESTRICTINFO", g_game->unitDefCount * 0x62);
+    g_unitRestrictEntries = (UnitRestrictEntry*)GameAllocIgnoreTag("UNITSRESTRICTINFO", g_game->unitDefCount * 0x62);
     desc->u.list.records = g_unitRestrictEntries;
     for (i = 0; i < g_game->unitDefCount; i++)
         g_unitRestrictEntries[i].unitIndex = 0;
@@ -4895,7 +4895,7 @@ void OpenUnitRestrictions()
 
     {
         Gui* gui = &g_game->gui;
-        UnitType_00446f50* type = &g_game->unitDefs[((Record_00446f50*)desc->u.list.records)[desc->u.list.selected].unitIndex];
+        UnitType_00446f50* type = &g_game->unitDefs[((UnitRestrictEntry*)desc->u.list.records)[desc->u.list.selected].unitIndex];
         char buf[0x14];
         sprintf(buf, "%d", (int)type->energyCost);
         SetTranslatedTextByName(gui, "ENERGYTEXT", buf, 0);

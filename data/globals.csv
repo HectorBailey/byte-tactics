@@ -424,7 +424,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x5129a8,g_heartbeatNextTick,.bss,4,type,data,unsigned int,1,0,1,one type,1,,UINT_005129a8,,,
 0x5129ac,g_saveListFileNames,.bss,4,type,data,char*,1,0,1,one type,1,,DAT_005129ac,,,
 0x5129b0,g_saveListDisplayNames,.bss,4,type,data,char*,1,0,1,one type,1,,DAT_005129b0,,,
-0x5129b4,g_unitRestrictEntries,.bss,4,type,data,Record_005129b4*,1,1,2,conflicting: struct names only,2,,DAT_005129b4,,,
+0x5129b4,g_unitRestrictEntries,.bss,4,type,data,UnitRestrictEntry*,2,0,1,one type,2,,DAT_005129b4,,,
 0x5129b8,g_unitRestrictPics,.bss,4,type,data,int*,2,0,1,one type,2,,DAT_005129b8,,,
 0x5129bc,DAT_005129bc,.bss,4,gap,unreferenced,unsigned char[4],0,0,0,,0,,,,,
 0x5129c0,DAT_005129c0,.bss,4,type,data,int,1,0,1,one type,1,,INT_005129c0,,,
