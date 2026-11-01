@@ -23,6 +23,14 @@ struct UnitWeaponSlot {
     unsigned char flags;               // +0x1b, the WEAPON_SLOT_ bits below
 };
 
+// The pair at +0x0 as one word, which is how unit_save.cpp copies it: 0x487080
+// and 0x4876c0 each move it with a single dword, and two short assignments
+// there come out as two 2-byte moves and stop matching. The halves are the
+// members, the word is this macro, for the same reason as the masks below: an
+// anonymous union here costs 14 symbol ids in every file that includes this
+// header (#7375).
+#define WEAPON_SLOT_AIM_TARGET(slot) (*(int*)&(slot)->aimTargetXOrUnitId)
+
 // The bits of `flags`, as masks: macros take no symbol ids, so every includer
 // keeps its count, and a mask test compiles as it did. InitUnitWeaponSlots
 // (0x49e070) writes the slot index and HAS_WEAPON, and sets ACTIVE.
