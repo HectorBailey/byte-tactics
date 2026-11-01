@@ -233,16 +233,10 @@ struct Game {
     char unknown_4e9[0x4f1 - 0x4e9];
     int netMode;                       // +0x4f1
     char unknown_4f5[0x519 - 0x4f5];
-    union {
-        char menu[0x1b63 - 0x519];     // +0x519
-        struct {
-            char message[0x531 - 0x519];
-            Layer* layer;              // +0x531
-            char unknown_535[0x12ef - 0x535];
-            ChatHudEntry chatHudRing[30];   // +0x12ef
-            int lobbySyncTick;         // +0x1b5f
-        };
-    };
+    Gui gui;                           // +0x519
+    char unknown_120f[0x12ef - 0x120f];
+    ChatHudEntry chatHudRing[30];      // +0x12ef
+    int lobbySyncTick;                 // +0x1b5f
     Player players[10];                // +0x1b63
     char unknown_2851[0x299c - 0x2851];
     union {
@@ -405,7 +399,7 @@ int __stdcall BroadcastPacket(int player, void* data, int size);
 void __stdcall SetupPlayerSlot(unsigned char player, char type);
 int GetTicks();
 void __stdcall ReportGameEvent(int msg);
-void __stdcall OpenMessageBox(void* menu, const char* text, int a, int b, int c);
+int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, int autoHeight);
 
 // FUNCTION: 0x44fd40
 int __stdcall DefaultPacketHandler(int arg1)
@@ -1125,12 +1119,12 @@ int __stdcall CreateLocalPlayer(unsigned char playerIndex, int flag)
         unsigned char i = FindPlayerInUse();
         Player* slot = &g_game->players[i];
         if (slot->active != 0 && (slot->type == 1 || slot->type == 2)) {
-            OpenMessageBox(g_game->menu,
+            OpenMessageBox(&g_game->gui,
                 Translate("Direct Play failed to add new player.\n\nRecommended you go to previous screen and re-create the game session.\n"),
                 500, 1, 1);
         }
         else {
-            OpenMessageBox(g_game->menu,
+            OpenMessageBox(&g_game->gui,
                 Translate("Direct Play failed to add new player.\n\nRecommended you go to previous screen and re-join the game session.\n"),
                 500, 1, 1);
         }
@@ -1288,7 +1282,7 @@ int __stdcall RejectPlayer(int id, unsigned char value);
 int __stdcall ReceiveNetPacket(void);
 void __stdcall OpenTimeoutDialog(int id);
 void CheckPlayerTimeouts(void);
-void __stdcall HandleTimeoutDialog(void* gadget);
+void __stdcall HandleTimeoutDialog(Gui* gadget);
 void __stdcall UpdateTimeoutDialog(void* gadget);
 void RebuildAllyList(void);
 int __stdcall HAPINET_passwordrequired(void* net);
@@ -1316,18 +1310,18 @@ int __stdcall IsCurrentGadgetNamed(Gui* gadget, char* name);
 Gadget* __stdcall FindGadgetChecked_B(Gadget* entries, char* name);
 int __stdcall SendChatMessage(Player* from, char* text, int key, char* to);
 int __stdcall FindGadgetIndex(void* gadgets, const char* name, int flag);
-void __stdcall BeginTextEdit(void* menu, int index);
-void __stdcall ClearSelectedGadget(void* gui);
-void __stdcall MarkChanged(void* menu);
-int __stdcall IsScreenNamed(void* obj, const char* name);
-void* __stdcall LoadGuiLayer(void* obj, const char* name, int size);
-void __stdcall CloseTopScreen(void* obj);
+void __stdcall BeginTextEdit(Gui* obj, int index);
+void __stdcall ClearSelectedGadget(Gui* gui);
+void __stdcall MarkChanged(Gui* obj);
+int __stdcall IsScreenNamed(Gui* obj, const char* name);
+Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, unsigned int flags);
+void __stdcall CloseTopScreen(Gui* gui);
 void* __stdcall FindGadgetChecked(void* entries, char* name);
 int GetFontLineHeight(void);
-void __stdcall ConfigureListBoxByName(void* obj, char* name, void* p, int count, int flags);
-void __stdcall SetTranslatedTextByName(void* obj, char* name, void* out, int flag);
-void __stdcall SetKeyboardInput(void* obj, int value);
-void __stdcall RenderLayer(void* obj, int value);
+void __stdcall ConfigureListBoxByName(Gui* obj, char* name, void* p, int count, int flags);
+void __stdcall SetTranslatedTextByName(Gui* obj, char* name, char* text, int flag);
+void __stdcall SetKeyboardInput(Gui* gui, int value);
+int __stdcall RenderLayer(Gui* menu, unsigned int flags);
 
 // The flag is a bit of an unsigned short bitfield in the packed info struct:
 // that gives "or byte ptr [m], 1"; an unsigned char or a plain byte "|= 1"
@@ -2549,11 +2543,11 @@ static inline unsigned char FindPlayerIndex_00453640(int id)
 // FUNCTION: 0x453640
 void UpdateTimeoutDialog()
 {
-    Gadget* entry = (Gadget*)FindGadgetChecked(g_game->layer->entries, "OUTPUT");
+    Gadget* entry = (Gadget*)FindGadgetChecked(g_game->gui.layer->entries, "OUTPUT");
 
     if (g_loungeRefreshTime < GetTicks()) {
         g_loungeRefreshTime = GetTicks() + 2;
-        MarkChanged(g_game->message);
+        MarkChanged(&g_game->gui);
     }
 
     memset(g_loungeChatter, 0, 0xa00);
@@ -2594,12 +2588,12 @@ void UpdateTimeoutDialog()
         char buf[200];
         sprintf(buf, Translate("will be rejected in %d seconds"),
                 g_game->lobbyTimeoutSecs - elapsed + 0x78);
-        SetTranslatedTextByName(g_game->message, "TIMETEXT", buf, 0);
-        MarkChanged(g_game->message);
+        SetTranslatedTextByName(&g_game->gui, "TIMETEXT", buf, 0);
+        MarkChanged(&g_game->gui);
         if (elapsed < g_game->lobbyTimeoutSecs + 0x78)
             return;
         RejectPlayer(g_timeoutPlayerDpid, 6);
-        CloseTopScreen(g_game->message);
+        CloseTopScreen(&g_game->gui);
     }
 }
 
@@ -2622,9 +2616,9 @@ void __stdcall HandleTimeoutDialog(Gui* gadget)
             g_game->flag0 = 1;
             strcpy(entry->u.text, g_emptyStringLiteral);
         }
-        BeginTextEdit(g_game->message, FindGadgetIndex(g_game->layer->entries, "TALK", 3));
-        ClearSelectedGadget(g_game->message);
-        MarkChanged(g_game->message);
+        BeginTextEdit(&g_game->gui, FindGadgetIndex(g_game->gui.layer->entries, "TALK", 3));
+        ClearSelectedGadget(&g_game->gui);
+        MarkChanged(&g_game->gui);
         return;
     }
     if (IsCurrentGadgetNamed(gadget, "REJECT")) {
@@ -2654,9 +2648,9 @@ static __inline unsigned char FindSlot_00453a50(int id)
 // FUNCTION: 0x453a50
 void __stdcall OpenTimeoutDialog(int id)
 {
-    if (IsScreenNamed(g_game->menu, "TIMEOUT.GUI")) {
+    if (IsScreenNamed(&g_game->gui, "TIMEOUT.GUI")) {
         if (id == -1) {
-            CloseTopScreen(g_game->menu);
+            CloseTopScreen(&g_game->gui);
         }
         return;
     }
@@ -2669,9 +2663,9 @@ void __stdcall OpenTimeoutDialog(int id)
         return;
     }
 
-    Layer* gui = (Layer*)LoadGuiLayer(g_game->menu, "TIMEOUT.GUI", 0x800);
+    Layer* gui = LoadGuiLayer(&g_game->gui, "TIMEOUT.GUI", 0x800);
     void* entries = gui->entries;
-    gui->handler = &HandleTimeoutDialog;
+    gui->handler = (void (__stdcall*)(void*))HandleTimeoutDialog;
     g_timeoutPlayerDpid = id;
 
     char* p = (char*)GameAllocIgnoreTag("LOUNGE CHATTER", 0xa00);
@@ -2679,16 +2673,16 @@ void __stdcall OpenTimeoutDialog(int id)
     memset(p, 0, 0x780);
 
     Gadget* out = (Gadget*)FindGadgetChecked(entries, "OUTPUT");
-    ConfigureListBoxByName(g_game->menu, "OUTPUT", g_loungeChatter,
+    ConfigureListBoxByName(&g_game->gui, "OUTPUT", g_loungeChatter,
                  (int)out->height / (GetFontLineHeight() + 2), 0);
 
     gui->cb1c = &UpdateTimeoutDialog;
-    BeginTextEdit(g_game->menu, FindGadgetIndex(entries, "TALK", 3));
+    BeginTextEdit(&g_game->gui, FindGadgetIndex(entries, "TALK", 3));
 
-    SetTranslatedTextByName(g_game->menu, "NAME",
+    SetTranslatedTextByName(&g_game->gui, "NAME",
                  g_game->players[i].name, 0);
-    SetKeyboardInput(g_game->menu, 1);
-    RenderLayer(g_game->menu, 0x40);
+    SetKeyboardInput(&g_game->gui, 1);
+    RenderLayer(&g_game->gui, 0x40);
 }
 
 static inline int IsTimedOut(Player* p, unsigned int now)
