@@ -416,14 +416,6 @@ struct Vec3_40b0d0 {
     int z;
 };
 
-struct Struct_0040ba80 {
-    int a, b, c;
-};
-
-struct Struct_0040bab0 {
-    int a, b, c;
-};
-
 // Own view, not vec3.h: it has the Length member and operator-.
 struct Vec3_0040beb0 {
     int x;
@@ -486,7 +478,7 @@ void __stdcall SetUnitSquad(Unit* unit, int squad);
 int* __stdcall FindTargetableProjectile(Unit* unit, unsigned int weapon);
 void __stdcall SetWeaponTargetPos(Unit* unit, int* param_2, unsigned int weapon);
 void __stdcall ClearWeaponTarget(Unit* unit, unsigned int weapon);
-void __stdcall GetBasePosition(int index, Vec3* out);
+void __stdcall GetScoutAnchorPos(int index, Vec3* out);
 unsigned short __stdcall ChooseBuildOption(unsigned int player, Unit* unit);
 int __stdcall GetBuilderCount(unsigned int player);
 MissionType __stdcall GetOrderType(unsigned char mode, Unit* unit, Unit* target, Vec3* pos);
@@ -517,7 +509,6 @@ float __stdcall GetMetalIncome(Player*);
 int __stdcall IsCountBelowAiLimit(int, unsigned short, int);
 int __stdcall GetBuildRating(unsigned int player, unsigned short id);
 int __stdcall FindWeaponTarget(Unit* unit, unsigned int weapon, int param_3);
-void __stdcall GetBasePosition(int index, Struct_0040ba80* out);
 
 // The original keeps the four 0.0f comparisons at 0x4fc968, apart from the
 // file's other 0.0f literal (0x4fc9b8): one constant per site keeps the
@@ -990,12 +981,12 @@ static inline Fixed_00407ae0 MakeFixed(int i)
 }
 
 // Copies the 12-byte position at +0x35 of g_playerAI[index] into *out.
-void __stdcall GetBasePosition(int index, Vec3* out);
+void __stdcall GetScoutAnchorPos(int index, Vec3* out);
 
 static inline Vec3 GetRallyPoint(int index)
 {
     Vec3 p;
-    GetBasePosition(index, &p);
+    GetScoutAnchorPos(index, &p);
     return p;
 }
 
@@ -1003,7 +994,7 @@ static inline Vec3 GetRallyPoint(int index)
 // (the family is listed at 0x407350).
 // Sets `next` to 30..929 ticks from now. A group of fewer than 5 units
 // either moves (mode 9) to the unit nearest its average position, or, when
-// GetBasePosition gives a rally point for the player, is sent to 2..3 random
+// GetScoutAnchorPos gives a rally point for the player, is sent to 2..3 random
 // points around it (mode 2 first, then mode 9). A bigger group is sent to a
 // random point on the map edge. The unit FindNearestEnemyUnit returns is used
 // without a null check.
@@ -1016,7 +1007,7 @@ void SquadScoutTimer::OnTimer()
     next = g_game->gameTick + delay;
     if ((int)group->units.size() < 5) {
         // Read through an inline returning by value: pos must not be the local
-        // whose address goes to GetBasePosition.
+        // whose address goes to GetScoutAnchorPos.
         Vec3 pos = GetRallyPoint(player);
         if ((((short*)&pos.x)[1] | ((short*)&pos.z)[1]) == 0) {
             GetAveragePosition(&dest);
@@ -1740,21 +1731,21 @@ Unit* __stdcall FindWeaponTarget(Unit* unit,unsigned char weapon,int useRange)
     return fallback;
 }
 
+// The original calls this out of line from SquadScoutTimer::OnTimer.
+#pragma auto_inline(off)
 // FUNCTION: 0x40ba80
-void __stdcall GetBasePosition(int index, Struct_0040ba80* out)
+void __stdcall GetScoutAnchorPos(int index, Vec3* out)
 {
-    Struct_0040ba80* entry = (Struct_0040ba80*)((char*)g_playerAI[index] + 0x35);
-    *out = *entry;
+    *out = *(Vec3*)&g_playerAI[index]->scoutAnchor;
 }
+#pragma auto_inline(on)
 
 // FUNCTION: 0x40bab0
-void __stdcall GetMirroredBasePosition(int index, int unused, Struct_0040bab0* out)
+void __stdcall GetMirroredScoutAnchorPos(int index, int unused, Vec3* out)
 {
-    out->a = (g_game->mapWidthWorld << 16) -
-             ((Struct_0040bab0*)((char*)g_playerAI[index] + 0x35))->a;
-    out->b = 0;
-    out->c = (g_game->mapWidthWorld << 16) -
-             ((Struct_0040bab0*)((char*)g_playerAI[index] + 0x35))->c;
+    out->x = (g_game->mapWidthWorld << 16) - g_playerAI[index]->scoutAnchor.x;
+    out->y = 0;
+    out->z = (g_game->mapWidthWorld << 16) - g_playerAI[index]->scoutAnchor.z;
 }
 
 // Both <minmax.h> and <math.h> are needed: together they set the SIB slot of

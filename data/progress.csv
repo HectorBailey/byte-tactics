@@ -135,8 +135,8 @@ address,size,file,symbol,status,similarity
 0x40b390,401,src/ai/ai_player.cpp,?DestroyPlayerAI@@YGXH@Z,matched,100.0
 0x40b530,627,src/ai/ai_player_40b530.cpp,?GetFactoriesInRadius@@YGXHPBUVec@@HPAV?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@@Z,matched,100.0
 0x40b7b0,720,src/ai/ai_player.cpp,?FindWeaponTarget@@YGPAUUnit@@PAU1@EH@Z,matched,100.0
-0x40ba80,37,src/ai/ai_player.cpp,?GetBasePosition@@YGXHPAUStruct_0040ba80@@@Z,matched,100.0
-0x40bab0,78,src/ai/ai_player.cpp,?GetMirroredBasePosition@@YGXHHPAUStruct_0040bab0@@@Z,matched,100.0
+0x40ba80,37,src/ai/ai_player.cpp,?GetScoutAnchorPos@@YGXHPAUVec3@@@Z,matched,100.0
+0x40bab0,78,src/ai/ai_player.cpp,?GetMirroredScoutAnchorPos@@YGXHHPAUVec3@@@Z,matched,100.0
 0x40bb00,686,src/ai/ai_player.cpp,?GetBuildRating@@YGHHG@Z,matched,100.0
 0x40bdb0,244,src/ai/ai_player.cpp,?ChooseBuildOption@@YGGIPAUUnit@@@Z,matched,100.0
 0x40beb0,302,src/ai/ai_player.cpp,?MoveToward@@YG?AUVec3_0040beb0@@PBU1@0H@Z,matched,100.0
