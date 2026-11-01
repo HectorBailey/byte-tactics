@@ -15,7 +15,8 @@ long __stdcall HAPI_FileLengthByName(char* name);
 void __stdcall GetCurrentDriveLetter(char* buf);
 char* __stdcall GetDriveDirectory(char* drive, char* buf, int size);
 int __stdcall ScanDirectory(char* path, char* list, char* sizes, int mode, int flag, int what);
-void __stdcall ConfigureListBoxByName(void* gui, const char* name, int x, int y, int z);
+struct Gui;
+void __stdcall ConfigureListBoxByName(Gui* menu, char* name, int bitmap, int count, int flag);
 char* __stdcall StripFileName(char* path);
 char* __stdcall StripPath(char* path);
 int __stdcall ChangeDrive(char* drive);
@@ -89,10 +90,10 @@ Gadget* __stdcall FindGadgetOrNull(Gadget* entries, char* name);
 int __stdcall IsGadgetNamed(Gadget* entries, int i, char* name);
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 Gadget* __stdcall FindGadgetChecked(Gadget* entries, char* name);
-void __stdcall MarkChanged(void* obj);
+void __stdcall MarkChanged(Gui* obj);
 void __stdcall ClearSelectedGadget(void* obj);
 void __stdcall RefreshFileList(FileRequester* obj);
-void* __stdcall LoadGuiLayer(void* param_1, char* param_2, int param_3);
+Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, unsigned int flags);
 int __stdcall SelectFontForEntry(Gadget* entries, int index);
 void __stdcall SetTextColors(int param_1, int param_2);
 void __stdcall DrawString(void* surface, const char* text, int x, int y, int maxWidth);
@@ -273,6 +274,8 @@ int __stdcall ScanDirectory(char* path, char* list, char* sizes, int mode, int f
     return num;
 }
 
+// The original calls this out of line from FileRequesterHandler and OpenFileRequester.
+#pragma auto_inline(off)
 // FUNCTION: 0x4af5b0
 void __stdcall RefreshFileList(FileRequester* obj)
 {
@@ -285,6 +288,7 @@ void __stdcall RefreshFileList(FileRequester* obj)
     obj->slider->knobPos = 0;
     strcpy(obj->pathGadget + 0xb6, obj->cwd);
 }
+#pragma auto_inline(on)
 
 // Click handler of the file requester (FILEREQ.GUI, opened by 0x4afa30).
 // On close (selected == -1) it restores the saved drive and directory and
@@ -395,8 +399,8 @@ void __stdcall FileRequesterHandler(Gui* gadget)
 // FUNCTION: 0x4afa30
 FileRequester* __stdcall OpenFileRequester(Gui* self, char* arg2, char* arg3, char* arg4)
 {
-    void* gui = LoadGuiLayer(self, "FILEREQ.GUI", 0);
-    if (gui == NULL) {
+    Layer* layer = LoadGuiLayer(self, "FILEREQ.GUI", 0);
+    if (layer == NULL) {
         return NULL;
     }
 
@@ -410,8 +414,8 @@ FileRequester* __stdcall OpenFileRequester(Gui* self, char* arg2, char* arg3, ch
         strcpy(obj->cwd, "NO PATH");
     }
 
-    ((void**)gui)[2] = (void*)FileRequesterHandler;
-    ((void**)gui)[3] = obj;
+    layer->handler = (void (__stdcall*)(void*))FileRequesterHandler;
+    layer->data = obj;
     obj->callback = 0;
 
     Gadget* entries = self->layer->entries;
