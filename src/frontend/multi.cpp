@@ -55,7 +55,7 @@ struct UnitRestrictEntry;
 struct Options_00446f50;
 struct PlayerInfo;
 struct UnitType_00446f50;
-struct Logos_00445110;
+struct GafEntry;
 class UnitSync;
 
 #pragma pack(push, 1)
@@ -305,7 +305,7 @@ struct Game {
     char unknown_1439f[0x148d7 - 0x1439f]; // +0x1439f
     void* logos;                       // +0x148d7
     union {                            // +0x148db
-        Logos_00445110* logos32;
+        GafEntry* logos32;
         int playerColorLogosSeq;
     };
     char unknown_148df[0x37e1b - 0x148df]; // +0x148df
@@ -608,16 +608,22 @@ shown:
 #undef PE
 #undef temp
 
-// One element of the team logo table at g_game+0x148db.
-struct LogoEntry_00445110 {
-    void* ptr;                             // +0x00
-    int unknown_4;                         // +0x04
+// A GAF sequence and its 8-byte frame entries, as graphics/gaf.cpp declares
+// them (Thaldren's GafSequence and GafFrameEntry): the team logo sequence at
+// g_game+0x148db, and the one-entry copies of it the logo dialog builds. gaf.cpp
+// keeps the definitions to itself: any further included file moves its
+// DownsampleFrame (0x4b95a0).
+struct GafFrameEntry {
+    int frame;                             // +0x0
+    unsigned short duration;               // +0x4
+    unsigned short reserved;               // +0x6
 };
 
-struct Logos_00445110 {
-    unsigned short count;                  // +0x00
-    char unknown_2[0x28 - 0x2];            // +0x02
-    LogoEntry_00445110 entries[1];         // +0x28
+struct GafEntry {
+    unsigned short count;                  // +0x0
+    unsigned char kind;                    // +0x2, loops while set
+    char unknown_3[0x28 - 3];
+    GafFrameEntry entries[1];              // +0x28
 };
 
 // The map selector's layout block at layer+0xc (0x444ea0).
@@ -635,16 +641,10 @@ struct Layout_00444cb0 {
 // The logo dialog's layout block at holder+0xc (0x445110): the byte list of
 // the free logo indices, the pointer list handed to the GUI and the copied
 // animation sequences.
-struct AnimSeq_00445110 {
-    char unknown_0[0x28];                  // +0x00
-    void* frame;                           // +0x28
-    char unknown_2c[0x30 - 0x2c];          // +0x2c
-};
-
 struct Layout_00445110 {
     char selected[0x18];                   // +0x00
     void** ptrList;                        // +0x18
-    AnimSeq_00445110* seqs;                // +0x1c
+    GafEntry* seqs;                        // +0x1c, one-entry copies of the logo sequence
 };
 
 // The map preview dialog's layout block at holder+0xc (0x444930).
@@ -2353,7 +2353,7 @@ void OpenLogoSelectDialog()
     gui->layout = layout;
     int count = g_game->logos32->count;
     layout->ptrList = (void**)GameAllocIgnoreTag("ANIMSEQ PTR LIST", count * 4);
-    layout->seqs = (AnimSeq_00445110*)GameAllocIgnoreTag("ACTUAL ANIMSEQS", count * 0x30);
+    layout->seqs = (GafEntry*)GameAllocIgnoreTag("ACTUAL ANIMSEQS", count * 0x30);
     void** cursor = layout->ptrList;
     int n = 0;
     for (int j = 0; j < count; j++) {
@@ -2364,8 +2364,8 @@ void OpenLogoSelectDialog()
                 && g_game->players[k].info->color >= j)
                 break;
         }
-        layout->seqs[j] = *(AnimSeq_00445110*)g_game->logos32;
-        layout->seqs[j].frame = g_game->logos32->entries[j].ptr;
+        layout->seqs[j] = *g_game->logos32;
+        layout->seqs[j].entries[0].frame = g_game->logos32->entries[j].frame;
         if (k == 10) {
             *cursor = &layout->seqs[j];
             ((char*)layout)[n] = (char)j;
