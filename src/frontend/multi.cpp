@@ -871,7 +871,7 @@ int __stdcall TrySetFocus(void* menu, int index);
 void __stdcall EnableKeyCommands(void* gui);
 void __stdcall SetKeyboardInput(void* menu, int value);
 void __stdcall MarkLayerChanged(void* menu);
-void __stdcall ClearSelectedGadget(void* menu);
+void __stdcall ClearSelectedGadget(Gui* gui);
 void __stdcall SetDescListCleanupFlag(void* gui, int flag);
 void __stdcall SetTranslatedTextByName(void* menu, const char* name, char* text, int param_4);
 void __stdcall SetGrayedOutByName(void* menu, const char* name, int value);

@@ -49,7 +49,8 @@ struct Flags_004ab400 {
 
 #include "gui.h"
 
-// Unused here: the symbol ids these declarations take keep 0x4ac7d0, 0x4acbe0 matching (docs/c2-regalloc.md).
+// Unused here: the symbol ids these declarations take keep 0x4ac710, 0x4ac7d0, 0x4ac8c0 and
+// 0x4acbe0 matching (docs/c2-regalloc.md).
 void FUN_004161f0(void);
 void InitCommands(void);
 void ProtectUnitDefsReadOnly(void);
@@ -398,9 +399,9 @@ int __stdcall IsScreenNamed(Gui* obj, const char* name)
 }
 
 // FUNCTION: 0x4ab0a0
-void __stdcall ClearSelectedGadget(void* gui)
+void __stdcall ClearSelectedGadget(Gui* gui)
 {
-    ((Gui*)gui)->hotGadgetIndex = -1;
+    gui->hotGadgetIndex = -1;
 }
 
 // FUNCTION: 0x4ab0b0
@@ -857,8 +858,10 @@ done:
 
 // Unused here: real functions declared to keep RemapPaletteToClosestIndices
 // (0x4ac7d0) and GetColorCellAt (0x4acbe0) matching now that
-// ClearSelectedGadget and SetClickMode name their Gui members
-// (docs/c2-regalloc.md).
+// ClearSelectedGadget and SetClickMode name their Gui members, and a type name
+// that keeps the four palette helpers (0x4ac710 to 0x4acbe0) matching now that
+// ClearSelectedGadget takes Gui* without a cast (docs/c2-regalloc.md).
+struct SideDef;
 int UpdatePlacementGhostValidity(void);
 void RefreshSelectionOrders(void);
 

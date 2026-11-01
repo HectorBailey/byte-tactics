@@ -29,7 +29,7 @@ int __stdcall OnlineProcessButtonCommand(int button, char* message, unsigned int
 void OnlineUnload();
 char* __stdcall Translate(char* text);
 int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, int autoHeight);
-void __stdcall ClearSelectedGadget(void* menu);
+void __stdcall ClearSelectedGadget(Gui* gui);
 void OpenOptionsPanel();
 
 // The SELPROV.GUI menu's handler.
