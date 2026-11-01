@@ -1283,9 +1283,9 @@ PlayerAI::PlayerAI(unsigned char p)
         g.unknown_0 = 0;
         weightOverrides.resize(n, g);
         g.unknown_0 = 0;
-        values.resize(n, g);
+        limits.resize(n, g);
         g.unknown_0 = 0;
-        locked.resize(n, g);
+        limitOverrides.resize(n, g);
     }
     InitUnitTables();
 }
@@ -1306,8 +1306,8 @@ void PlayerAI::InitUnitTables()
         counts[i] = 0;
         weightPcts[i].value = 100;
         weightOverrides[i].unknown_0 = 0;
-        values[i].unknown_0 = -1;
-        locked[i].unknown_0 = 0;
+        limits[i].unknown_0 = -1;
+        limitOverrides[i].unknown_0 = 0;
     }
 }
 
@@ -1392,10 +1392,10 @@ void __stdcall SetUnitLimits(int player, unsigned int* mask, int value, int lock
 {
     PlayerAI* p = g_playerAI[player];
     for (unsigned short i = 1; i < g_game->unitDefCount; i++) {
-        if ((mask[i >> 5] & (1 << (i & 0x1f))) && p->locked[i].unknown_0 == 0) {
-            p->values[i].unknown_0 = value;
+        if ((mask[i >> 5] & (1 << (i & 0x1f))) && p->limitOverrides[i].unknown_0 == 0) {
+            p->limits[i].unknown_0 = value;
             if (lock)
-                p->locked[i].unknown_0 = 1;
+                p->limitOverrides[i].unknown_0 = 1;
         }
     }
 }
@@ -1407,10 +1407,10 @@ void __stdcall SetUnitLimits(int player, unsigned int* mask, int value, int lock
 int __stdcall IsUnderLimit(int player, unsigned short index, int value)
 {
     if (index >= 1 && index < g_game->unitDefCount) {
-        int* values = (int*)&g_playerAI[player]->values[0];
-        if (values[index] == -1)
+        int* limits = (int*)&g_playerAI[player]->limits[0];
+        if (limits[index] == -1)
             return 1;
-        return value < values[index];
+        return value < limits[index];
     }
     return 0;
 }
@@ -1444,7 +1444,7 @@ void __stdcall ReparseAiWeightScriptsIfLimitNotSticky(int player)
     for (unsigned short i = 1; i < g_game->unitDefCount; i++) {
         UnitDef* def = &g_game->unitDefs[i];
         if (((Flags241*)&def->flags1)->downloadable) {
-            if (p->locked[i].unknown_0 != 1) {
+            if (p->limitOverrides[i].unknown_0 != 1) {
                 int len = strlen(def->aiWeight);
                 if (len != 0) {
                     CommandArgs vars;
@@ -1895,8 +1895,8 @@ void __stdcall DumpPlayerAI(int player, FILE* file)
     fprintf(file,"<limit> - <base:baseML:baseEL> : <end result - before economy-based tweaks> - <unit name>\r\n");
     for (unsigned short i=1;i<g_game->unitDefCount;++i) {
         UnitDef* type=&g_game->unitDefs[i];
-        if (ai->values[i].unknown_0<0) fprintf(file,"n/a ");
-        else fprintf(file,"%4d",ai->values[i].unknown_0);
+        if (ai->limits[i].unknown_0<0) fprintf(file,"n/a ");
+        else fprintf(file,"%4d",ai->limits[i].unknown_0);
         sprintf(buffer," - %3d : %3d : %3d = %3d - '%s\t\t:%s'\r\n",ai->buildScoreTriplets[i].a,ai->buildScoreTriplets[i].b,ai->buildScoreTriplets[i].c,ai->weightPcts[i].value,type->unitname,type->name);
         // Original passes the formatted unit text as a format string, so percent signs are interpreted again.
         fprintf(file,buffer);
