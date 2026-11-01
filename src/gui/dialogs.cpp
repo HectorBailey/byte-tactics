@@ -487,7 +487,7 @@ void __stdcall AddTextGadget(Layer* obj, char* name, char* text,
 int __stdcall SetBackgroundSurface(Gui* menu, int value)
 {
     if (menu->layer != 0)
-        menu->layer->surface = (void*)value;
+        menu->layer->surface = (Surface*)value;
     return 1;
 }
 
