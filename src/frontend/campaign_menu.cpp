@@ -186,7 +186,7 @@ void __stdcall ConfigureListBoxByName(Gui* menu, const char* name, void* data, i
 void __stdcall MarkChanged(Gui* menu);
 void __stdcall MarkLayerChanged(Gui* menu);
 void __stdcall SetKeyboardInput(Gui* menu, int value);
-void __stdcall RenderLayer(Gui* menu, int value);
+int __stdcall RenderLayer(Gui* gui, unsigned int flags);
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, unsigned int flags);
 void __stdcall SelectGadgetByName(Gui* menu, const char* name);
 void __stdcall RemapPaletteToClosestIndices(Gui* menu, void* param_2, void* param_3);

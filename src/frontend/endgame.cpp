@@ -322,7 +322,7 @@ void __stdcall SetTranslatedTextByName(Gui* menu, char* name, char* text, int va
 int __stdcall GetGafFrame(unsigned short* gaf, int frame);
 void __stdcall DrawFrame(void* dst, int bmp, int x, int y);
 void __stdcall SetKeyboardInput(Gui* menu, int value);
-void __stdcall RenderLayer(Gui* menu, int value);
+int __stdcall RenderLayer(Gui* gui, unsigned int flags);
 void __stdcall MarkLayerChanged(Gui* menu);
 void __stdcall MarkChanged(Gui* menu);
 void __stdcall EnableKeyCommands(Gui* menu);

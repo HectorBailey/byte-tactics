@@ -237,7 +237,7 @@ void __stdcall PlayLoopingSoundByName(const char* name, int param_2);
 void __stdcall EnableKeyCommands(Gui* sub);
 void* __stdcall HAPI_LoadFile(char* name, int flag);
 void __stdcall RemapPaletteToClosestIndices(Gui* sub, int value, void* palette);
-void __stdcall RenderLayer(Gui* sub, int value);
+int __stdcall RenderLayer(Gui* gui, unsigned int flags);
 void __stdcall SetKeyboardInput(Gui* sub, int value);
 void __stdcall SetFont(void* param);
 void __stdcall SetGadgetActiveByName(Gui* sub, const char* name, int value);
