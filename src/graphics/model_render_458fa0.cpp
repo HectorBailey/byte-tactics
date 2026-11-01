@@ -8,7 +8,7 @@
 
 #include "gaf_frame.h"
 
-struct Model3doPrimitive {
+struct Primitive3do {
     int unknown_0;
     int count;                       // +0x4 number of points in the face
     int unknown_8;
@@ -16,18 +16,18 @@ struct Model3doPrimitive {
     char unknown_10[0x20 - 0x10];
 };
 
-struct Model3do {
+struct Object3do {
     char unknown_0[4];
     int vertexCount;                 // +0x4
     int faceCount;                   // +0x8
     int firstFace;               // +0xc -1 skips the first face
     char unknown_10[0x28 - 0x10];
-    Model3doPrimitive* faces;        // +0x28
+    Primitive3do* faces;        // +0x28
 };
 
 #pragma pack(push, 1)
 struct ObjectPiece {
-    Model3do* info;                  // +0x0
+    Object3do* info;                  // +0x0
     char unknown_4[0x22 - 0x4];
     Vec3* vertices;                   // +0x22
     char unknown_26[0x28 - 0x26];
@@ -82,7 +82,7 @@ void CMemoryCache::DrawPieceEdges(GafFrame* view, UnitObjectState* model, int co
             unsigned char flags = piece->flags;
             do {} while (0);  // emits no code; the match needs it (header note 2)
             if (flags & 1) {
-                Model3do* info = piece->info;
+                Object3do* info = piece->info;
                 Vec3* v = piece->vertices;
                 for (int j = 0; j < info->vertexCount; j++, v++) {
                     int bright = model->owner->map->brightFaces ? 125 : 50;
@@ -96,7 +96,7 @@ void CMemoryCache::DrawPieceEdges(GafFrame* view, UnitObjectState* model, int co
                     verts[j].y += view->yOffset;
                 }
                 // f is assigned in both arms, not set before the if.
-                Model3doPrimitive* f;
+                Primitive3do* f;
                 if (info->firstFace != -1) {
                     f = info->faces + 1;
                     faceno = 1;

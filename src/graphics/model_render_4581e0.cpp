@@ -72,7 +72,7 @@ struct UnitInstance {
     unsigned char zBufferFlag;       // +0x114
 };
 
-struct Model3doPrimFlags {
+struct Primitive3doFlags {
     union {
         unsigned int raw;
         struct {
@@ -84,7 +84,7 @@ struct Model3doPrimFlags {
     };
 };
 
-struct Model3doPrimitive {
+struct Primitive3do {
     int unknown_0;                   // +0x00
     int count;                       // +0x04
     int unknown_8;                   // +0x08
@@ -92,10 +92,10 @@ struct Model3doPrimitive {
     void* pic;                       // +0x10
     int unknown_14;                  // +0x14
     unsigned short* color;           // +0x18
-    Model3doPrimFlags flags;         // +0x1c
+    Primitive3doFlags flags;         // +0x1c
 };
 
-struct Model3do {
+struct Object3do {
     char unknown_0[4];
     int vertexCount;                 // +0x04
     int faceCount;                   // +0x08
@@ -104,7 +104,7 @@ struct Model3do {
     int box_y;                       // +0x14
     int box_z;                       // +0x18
     char unknown_1c[0xc];
-    Model3doPrimitive* faces;        // +0x28
+    Primitive3do* faces;        // +0x28
 };
 
 struct ObjectPieceFlags {
@@ -115,7 +115,7 @@ struct ObjectPieceFlags {
 };
 
 struct ObjectPiece {
-    Model3do* info;                  // +0x00
+    Object3do* info;                  // +0x00
     char unknown_4[0x22 - 0x04];
     Vec3* vertices;                  // +0x22
     char unknown_26[0x28 - 0x26];
@@ -172,7 +172,7 @@ static __inline int shade_bias(UnitObjectState* list)
 void UnitTable::DrawLitPieces(GafFrame* bitmap, UnitObjectState* list,
     int kind, int useColor)
 {
-    Model3do* info;
+    Object3do* info;
     Poly_459c70 poly[25];
     float accum[2000][3];
     Vec3f normal[2000];
@@ -240,7 +240,7 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, UnitObjectState* list,
                     weight[k] = 0;
                 }
 
-                Model3doPrimitive* face;
+                Primitive3do* face;
                 int fi;
                 if (info->firstFace != -1) {
                     face = info->faces + 1;
