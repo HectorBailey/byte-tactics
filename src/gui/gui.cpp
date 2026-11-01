@@ -2552,20 +2552,34 @@ void __stdcall SetGadgetItems(Table_004a36a0* table, char* name, int* items, int
 int DrawTriangleContours(int, int, int, int, int, int, int);
 int DrawLitLine(int, int, int, int, int, int);
 
-struct List_004a3780 {
-    char unknown_0[0xc];
-    unsigned short* glyphs;            // +0x0c
-};
-
-struct Holder_004a3780 {
-    int current;                       // +0x00
-    Gadget* entries;                   // +0x04
-    char unknown_08[0x14 - 0x08];
-    List_004a3780* list;               // +0x14
-    char unknown_18[0x20 - 0x18];
-    int selected;                      // +0x20
-};
-
+// Unused here: real declarations that keep the file's symbol count (docs/c2-regalloc.md).
+void EnsureOptionsPanelGadget(void);
+void BlitOptionsPanel(void);
+int __cdecl OpenOptionsLayout(void);
+void TickMusicOptions(void);
+void UpdateMusicGadgets(void);
+void OpenMusicOptions(void);
+void UpdateSoundGadgets(void);
+void OpenSoundOptions(void);
+void OpenSpeedOptions(void);
+void ShowGameSettingsDialog(void);
+void OpenBriefingDialog(void);
+void OpenHelpDialog(void);
+void ClearScreenWithHudPalette(void);
+void CloseOptionsPanel(void);
+void OpenOptionsPanel(void);
+void OpenRestartDialog(void);
+void OpenSurrenderDialog(void);
+void OpenExitMenu(void);
+void OpenInGameOptions(void);
+void RestoreSoundOptions(void);
+void LoadingScreenFrame(void);
+void CreateOffscreenSurface(void);
+void FreeOffscreenSurface(void);
+void __cdecl UpdateWind(void);
+void ResetGameSpeed(void);
+void IncreaseGameSpeed(void);
+void SaveCdLists(void);
 // Unused here: the symbol ids this declaration takes keep the allocation after
 // the Rect_004a3780 view was dropped (docs/c2-regalloc.md).
 int ScanDirectory(int, int, int, int, int, int);
@@ -2579,17 +2593,6 @@ static inline int PointInListRect(const Rect& r, const MouseEvent& p)
     return p.x >= r.left && p.x <= r.right && p.y >= r.top && p.y <= r.bottom;
 }
 
-struct Object_004a3780 {
-    char unknown_00[0x18];
-    Holder_004a3780* holder;           // +0x18
-    char unknown_1c[0x3c - 0x1c];
-    MouseEvent point;                   // +0x3c
-    char unknown_54[0x60 - 0x54];
-    int hotGadgetIndex;                // +0x60
-    int focus;                         // +0x64
-    char unknown_68[0xcca - 0x68];
-    int changed;                       // +0xcca
-};
 #pragma pack(pop)
 
 extern char DAT_00502a20[];
@@ -2599,13 +2602,13 @@ int GetFontHeight();
 char* __stdcall GetGafFrame(void* glyphs, int c);
 char* __stdcall SkipTextLines(char* text, int n);
 unsigned int __cdecl GetTicks();
-int __stdcall IsDoubleClickMessage(Object_004a3780* obj, unsigned char buttons);
-int __stdcall IsMouseButtonMessage(Object_004a3780* obj, unsigned char buttons);
-int __stdcall HasMouseKeyFlags(Object_004a3780* obj, unsigned int mask);
-void __stdcall SetClickMode(Object_004a3780* obj, int param_2);
-void __stdcall TrySetFocus(Object_004a3780* obj, int index);
-void __stdcall DrawListBox(Object_004a3780* obj, int index);
-void __stdcall SyncAssocGadgets(Object_004a3780* obj, int index);
+int __stdcall IsDoubleClickMessage(Gui* obj, unsigned char buttons);
+int __stdcall IsMouseButtonMessage(Gui* obj, unsigned char buttons);
+int __stdcall HasMouseKeyFlags(Gui* obj, unsigned int mask);
+void __stdcall SetClickMode(Gui* obj, int param_2);
+int __stdcall TrySetFocus(Gui* obj, int index);
+void __stdcall DrawListBox(Gui* obj, int index);
+void __stdcall SyncAssocGadgets(Gui* obj, int index);
 
 // Unused here: real functions declared to keep the file's symbol count.
 void* __stdcall BuildLensFrame(int w, int h, int lens);
@@ -2652,11 +2655,11 @@ static inline int SelectFontForEntry_inlined(Gadget* entries, int index)
 }
 
 // FUNCTION: 0x4a3780
-int __stdcall HandleListBoxInput(Object_004a3780* obj, int index, int param_3)
+int __stdcall HandleListBoxInput(Gui* obj, int index, int param_3)
 {
     if (obj->hotGadgetIndex != -1)
         return 0;
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     Gadget* me = &entries[index];
     int orig_sel = me->u.list.selected;
     if (me->u.list.rowCount == 0)
@@ -2717,7 +2720,7 @@ skip0:;
     if (!HasMouseKeyFlags(obj, 3))
         obj->focus = -1;
     if (PointInListRect(r, point)) {
-        obj->holder->selected = index;
+        obj->layer->current = index;
         flags = me->attribs;
         if (flags & 0x10) {
             // Stores straight into me->u.list.selected and tests the field; clamps written plainly.
@@ -2873,40 +2876,23 @@ void LoadGameResources();
 void FreeAnimFiles();
 void LoadGameFonts();
 
-struct Holder_004a4170 {
-    char unknown_00[4];
-    Gadget* entries;           // +0x04
-    char unknown_08[0x14 - 0x08];
-    int dirty;                         // +0x14, set when off changed
-};
-
 // Unused here: the symbol ids these declarations take replace the local view
 // the shared MouseEvent header removes (docs/c2-regalloc.md).
 void __stdcall InitMemoryCache();
 int __stdcall CheckDirectXVersion(int, int, int, int, int);
+void ReopenCdAudio(void);
+void InitGame(void);
+void ShutdownGame(void);
 
-struct Object_004a4170 {
-    char unknown_00[0x18];
-    Holder_004a4170* holder;           // +0x18
-    char unknown_1c[0x3c - 0x1c];
-    MouseEvent point;                   // +0x3c, the mouse, table relative
-    char unknown_54[0x64 - 0x54];
-    int focus;                         // +0x64, -1 when nothing has the focus
-    char unknown_68[0x78 - 0x68];
-    int knobDragging;                  // +0x78, non-zero while dragging
-    MouseEvent saved;                   // +0x7c, the mouse when the drag began
-    short dragKnobPos;                 // +0x94, off when the drag began
-};
-
-void __stdcall TrySetFocus(Object_004a4170* obj, int index);
+int __stdcall TrySetFocus(Gui* obj, int index);
 void __stdcall GetSliderRects(Gadget* base, int index, int* r1, int* r2);
-void __stdcall DrawSliderBar(Object_004a4170* obj, int index);
-void __stdcall SyncAssocGadgets(Object_004a4170* obj, int index);
-int __stdcall IsMouseButtonMessage(Object_004a4170* obj, unsigned char buttons);
-int __stdcall HasMouseKeyFlags(Object_004a4170* obj, unsigned int mask);
-void __stdcall SetClickMode(Object_004a4170* obj, int param_2);
+void __stdcall DrawSliderBar(Gui* obj, int index);
+void __stdcall SyncAssocGadgets(Gui* obj, int index);
+int __stdcall IsMouseButtonMessage(Gui* obj, unsigned char buttons);
+int __stdcall HasMouseKeyFlags(Gui* obj, unsigned int mask);
+void __stdcall SetClickMode(Gui* obj, int param_2);
 
-static inline void OffsetChanged_004a4170(Object_004a4170* obj, int index, Gadget* e, int old)
+static inline void OffsetChanged_004a4170(Gui* obj, int index, Gadget* e, int old)
 {
     if (e->knobPos > e->range - 1)
         e->knobPos = e->range - 1;
@@ -2914,8 +2900,8 @@ static inline void OffsetChanged_004a4170(Object_004a4170* obj, int index, Gadge
         e->knobPos = 0;
     if (e->knobPos == old)
         return;
-    if (obj->holder)
-        obj->holder->dirty = 1;
+    if (obj->layer)
+        obj->layer->dirty = 1;
     DrawSliderBar(obj, index);
     SyncAssocGadgets(obj, index);
     if (e->sliderCallback)
@@ -2923,9 +2909,9 @@ static inline void OffsetChanged_004a4170(Object_004a4170* obj, int index, Gadge
 }
 
 // FUNCTION: 0x4a4170
-void __stdcall HandleSliderInput(Object_004a4170* obj, int index)
+void __stdcall HandleSliderInput(Gui* obj, int index)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     Gadget* e = &entries[index];
     if (e->attribs & 0x10)
         return;
@@ -2948,9 +2934,9 @@ void __stdcall HandleSliderInput(Object_004a4170* obj, int index)
         if (obj->knobDragging) {
             int old = e->knobPos;
             if (e->attribs & 1)
-                e->knobPos = obj->dragKnobPos - obj->saved.x + p.x;
+                e->knobPos = obj->dragKnobPos - obj->dragStart.x + p.x;
             else
-                e->knobPos = obj->dragKnobPos - obj->saved.y + p.y;
+                e->knobPos = obj->dragKnobPos - obj->dragStart.y + p.y;
             OffsetChanged_004a4170(obj, index, e, old);
         } else {
             // Per-path stores to e->knobPos (not one after the if/else): keeps the 16-bit loads.
@@ -2981,7 +2967,7 @@ void __stdcall HandleSliderInput(Object_004a4170* obj, int index)
         SetClickMode(obj, 1);
         if (p.x < r2[0] || p.x > r2[2] || p.y < r2[1] || p.y > r2[3])
             return;
-        obj->saved = p;
+        obj->dragStart = p;
         obj->knobDragging = 1;
         obj->dragKnobPos = e->knobPos;
         return;
@@ -2994,7 +2980,7 @@ void __stdcall HandleSliderInput(Object_004a4170* obj, int index)
         SetClickMode(obj, 2);
         if (p.x < r2[0] || p.x > r2[2] || p.y < r2[1] || p.y > r2[3])
             return;
-        obj->saved = p;
+        obj->dragStart = p;
         obj->knobDragging = 1;
         obj->dragKnobPos = e->knobPos;
     }
@@ -3012,11 +2998,6 @@ void OpenBattleRoom();
 void UpdateBattleRoom();
 void OpenEndMultiScreen();
 
-struct Holder_0049fc50 {
-    int unknown_0;
-    Gadget* entries;           // +0x4
-};
-
 // Unused here: the symbol ids these declarations take replace the local view
 // the shared MouseEvent header removes (docs/c2-regalloc.md).
 void __stdcall InitMemoryCache();
@@ -3024,29 +3005,19 @@ int __stdcall CheckDirectXVersion(int, int, int, int, int);
 void __cdecl FreeMemoryCache();
 
 #pragma pack(push, 1)
-struct Object_0049fc50 {
-    char unknown_0[0x18];
-    Holder_0049fc50* holder;           // +0x18
-    char unknown_1c[0x3c - 0x1c];
-    MouseEvent point;                   // +0x3c to +0x50
-    char unknown_54[0x64 - 0x54];
-    int focus;                         // +0x64
-    char unknown_68[0xcc6 - 0x68];
-    int pathsReady;                    // +0xcc6
-};
 #pragma pack(pop)
 
-int __stdcall TrySetFocus(Object_0049fc50* obj, int index);
-int __stdcall IsMouseButtonMessage(Object_0049fc50* obj, unsigned char buttons);
-int __stdcall HasMouseKeyFlags(Object_0049fc50* obj, unsigned int mask);
-void __stdcall SetClickMode(Object_0049fc50* obj, int param_2);
+int __stdcall TrySetFocus(Gui* obj, int index);
+int __stdcall IsMouseButtonMessage(Gui* obj, unsigned char buttons);
+int __stdcall HasMouseKeyFlags(Gui* obj, unsigned int mask);
+void __stdcall SetClickMode(Gui* obj, int param_2);
 int PopKey(void);
 int __stdcall IsKeyDown(int key);
 
 // FUNCTION: 0x4a4440
-int __stdcall HandleLabelInput(Object_0049fc50* obj, int index, char key)
+int __stdcall HandleLabelInput(Gui* obj, int index, char key)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     Gadget* entry = &entries[index];
     Rect rect;
     MouseEvent point;

@@ -2219,11 +2219,11 @@ address,size,file,symbol,status,similarity
 0x4a32a0,765,src/gui/gui.cpp,?ConfigureListBoxByName@@YGXPAUGui@@PADHHH@Z,matched,100.0
 0x4a35a0,246,src/gui/gui.cpp,?SetGadgetRows@@YGXPAUTable_004a35a0@@PADPAURow_004a35a0@@H@Z,matched,100.0
 0x4a36a0,224,src/gui/gui.cpp,?SetGadgetItems@@YGXPAUTable_004a36a0@@PADPAHH@Z,matched,100.0
-0x4a3780,1832,src/gui/gui.cpp,?HandleListBoxInput@@YGHPAUObject_004a3780@@HH@Z,matched,100.0
+0x4a3780,1832,src/gui/gui.cpp,?HandleListBoxInput@@YGHPAUGui@@HH@Z,matched,100.0
 0x4a3eb0,59,src/gui/gui.cpp,?FUN_004a3eb0@@YGXPAUGui@@H@Z,matched,100.0
 0x4a3ef0,629,src/gui/gui_4a3ef0.cpp,?DrawSlider@@YGXPAUGui@@H@Z,matched,100.0
-0x4a4170,714,src/gui/gui.cpp,?HandleSliderInput@@YGXPAUObject_004a4170@@H@Z,matched,100.0
-0x4a4440,477,src/gui/gui.cpp,?HandleLabelInput@@YGHPAUObject_0049fc50@@HD@Z,matched,100.0
+0x4a4170,714,src/gui/gui.cpp,?HandleSliderInput@@YGXPAUGui@@H@Z,matched,100.0
+0x4a4440,477,src/gui/gui.cpp,?HandleLabelInput@@YGHPAUGui@@HD@Z,matched,100.0
 0x4a4620,57,src/gui/gui.cpp,?ScheduleGadgetEndTick@@YGXPAUGui@@H@Z,matched,100.0
 0x4a4660,556,src/gui/gui.cpp,?DrawProgressBarGadget@@YGXPAUDialog_4a4660@@H@Z,matched,100.0
 0x4a4890,158,src/gui/gui.cpp,?TickProgressBar@@YGXPAUGui@@H@Z,matched,100.0
