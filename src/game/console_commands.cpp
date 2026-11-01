@@ -914,6 +914,8 @@ void __stdcall CmdGive(CommandArgs* args)
 void __stdcall CmdScrollSpeed(CommandArgs* args)
 {
     // The void* parameter stays: retyping it moves the window of 0x4181d0 (docs/c2-regalloc.md).
+    // The cast stays: dropping it moves DrawCellContours and DrawMapDebugOverlay
+    // (docs/c2-regalloc.md).
     unsigned char result = ((CommandArgs*)args)->GetIntArg(1, 0);
     g_game->scrollSpeed = result;
     SaveSettings();
@@ -1205,6 +1207,8 @@ void __stdcall CmdNetStats(CommandArgs* args)
 void __stdcall CmdMusicMode(CommandArgs* args)
 {
     // The void* parameter stays: retyping it moves the window of 0x4181d0 (docs/c2-regalloc.md).
+    // The cast stays: dropping it moves DrawCellContours and DrawMapDebugOverlay
+    // (docs/c2-regalloc.md).
     CommandArgs* obj = (CommandArgs*)args;
     int result = obj->GetIntArg(1, 0);
     void* p = g_game->sound;
