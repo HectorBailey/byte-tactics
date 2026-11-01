@@ -1272,7 +1272,7 @@ struct Grid_0040e050;
 struct Grid_0040e630;
 struct Grid_0047e5c0;
 struct Group;
-struct Group_00409160;
+struct BuilderAirbaseGroup;
 struct Group_004bc640;
 struct Groups_004bc640;
 struct Gui_00443100;
@@ -1804,7 +1804,7 @@ struct Pool_00422170;
 struct Pool_004232a0;
 struct Pos16_44dc60;
 struct Pos2_0048a490;
-struct Pos_00409160;
+struct MapCenterTile;
 struct Pos_004658e0;
 struct Pos_00465ac0;
 struct Pos_00473590;
@@ -20280,18 +20280,18 @@ struct Elem_0040d550 {  // 0x4 bytes, 7 views
     int unknown_0;  // +0x0
 };
 
-struct Pos_00409160 {  // 0x8 bytes, 2 views
+struct MapCenterTile {  // 0x8 bytes, 2 views
     short x;  // +0x0
     short y;  // +0x2
     int unknown_4;  // +0x4
-    Pos_00409160(short, short);
+    MapCenterTile(short, short);
 };
 
 struct UnitList_00409160 {  // 0x10 bytes, 2 views
     std::vector<Unit*> units;  // +0x0
 };
 
-struct Group_00409160 {  // 0x10 bytes, 2 views
+struct BuilderAirbaseGroup {  // 0x10 bytes, 2 views
     UnitList_00409160 list;  // +0x0
 };
 
@@ -20301,11 +20301,11 @@ public:
     unsigned char index;  // +0x4
     std::vector<Unit*> units;  // +0x5
     UnitList_00409160 list_15;  // +0x15
-    Group_00409160 group_25;  // +0x25
+    BuilderAirbaseGroup group_25;  // +0x25
     Vec3 pos_35;  // +0x35
     Vec3 pos_41;  // +0x41
     std::vector<ScoredCell> vec_4d;     // +0x4d
-    Pos_00409160 center;  // +0x5d
+    MapCenterTile center;  // +0x5d
     std::vector<BuildScoreTriplet> buildScoreTriplets;  // +0x65
     int field_75;  // +0x75
     int field_79;  // +0x79

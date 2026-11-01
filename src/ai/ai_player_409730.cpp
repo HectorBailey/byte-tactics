@@ -173,13 +173,13 @@ struct Weapon_00409730 {
     char index;                        // +0x10a
 };
 
-struct Flags241_00409730 {
+struct UnitTypeFlags {
     unsigned int bits_0 : 6;
-    unsigned int flag_6 : 1;           // bit 6
+    unsigned int builder : 1;          // bit 6, unit_def.h's builder
     unsigned int bits_7 : 4;
-    unsigned int flag_11 : 1;          // bit 11
+    unsigned int canFly : 1;           // bit 11, unit_def.h's canFly
     unsigned int bits_12 : 12;
-    unsigned int flag_24 : 1;          // bit 24
+    unsigned int isFeature : 1;        // bit 24, unit_def.h's isFeature
     unsigned int bits_25 : 7;
 };
 
@@ -203,7 +203,7 @@ struct UnitDef {
     char unknown_208[0x22d - 0x208];
     char makesMetal;                   // +0x22d
     char unknown_22e[0x241 - 0x22e];
-    Flags241_00409730 flags_241;       // +0x241
+    UnitTypeFlags flags_241;           // +0x241
     unsigned int bits_245_0 : 4;
     unsigned int flag_245_4 : 1;       // bit 4
     unsigned int bits_245_5 : 3;
@@ -231,7 +231,7 @@ struct Player {
     unsigned short unitCount;          // +0x144
 };
 
-struct UnitList_00409730 {
+struct UnitInstanceList {
     std::vector<Unit*> units;
 };
 
@@ -242,9 +242,9 @@ class PlayerAI {
 public:
     Player* owner;                 // +0x00
     unsigned char index;           // +0x04
-    UnitList_00409730 visible;     // +0x05
-    UnitList_00409730 known;       // +0x15
-    UnitList_00409730 factories;   // +0x25
+    UnitInstanceList visible;      // +0x05
+    UnitInstanceList known;        // +0x15
+    UnitInstanceList factories;    // +0x25
     int scoutAnchor[3];            // +0x35
     int unused_41[3];              // +0x41
     std::vector<ScoredCell> cells; // +0x4d
@@ -323,7 +323,7 @@ void PlayerAI::ComputeBaseWeights()
         int n = (short)counts[i];
         if (def->flag_245_4)
             a = 21;
-        if (def->flags_241.flag_6 && n < 3)
+        if (def->flags_241.builder && n < 3)
             a += 30;
         if (GetEnergyUse(def) < 0.0f)
             a += 50;
@@ -332,8 +332,8 @@ void PlayerAI::ComputeBaseWeights()
             a += 50;
         if (def->makesMetal)
             a += 25;
-        Flags241_00409730 flags = def->flags_241;
-        if (flags.flag_11)
+        UnitTypeFlags flags = def->flags_241;
+        if (flags.canFly)
             a += 40;
         if (def->sonardistance)
             a += 15;
@@ -351,7 +351,7 @@ void PlayerAI::ComputeBaseWeights()
         }
         if (def->flag_245_8)
             x = 0;
-        if (flags.flag_24)
+        if (flags.isFeature)
             x = 0;
         if (def->windgenerator != 0.0f && g_game->windSpeedMax < g_game->windSpeedDenominator / 2)
             x = 0;
