@@ -4399,16 +4399,17 @@ public:
     bool LessThan(const NameKey& other) const;
 };
 
-struct Value_004e2250 {
+// The map's mapped value: the name's 500-byte text.
+struct NameMapText {
     char text[500];
 };
 
 struct Data1;
 struct Data2;
-typedef std::pair<const NameKey, Value_004e2250> Pair_004e2250;
+typedef std::pair<const NameKey, NameMapText> NameMapValue;
 
 // std::less<key>.
-struct Less_004e2250 : public std::binary_function<NameKey, NameKey, bool> {
+struct NameKeyLess : public std::binary_function<NameKey, NameKey, bool> {
     bool operator()(const NameKey& _X, const NameKey& _Y) const
     {
         return (_X.LessThan(_Y));
@@ -4416,8 +4417,8 @@ struct Less_004e2250 : public std::binary_function<NameKey, NameKey, bool> {
 };
 
 // std::map<...>::_Kfn.
-struct Kfn_004e2250 : public std::unary_function<Pair_004e2250, NameKey> {
-    const NameKey& operator()(const Pair_004e2250& _X) const
+struct NameMapKfn : public std::unary_function<NameMapValue, NameKey> {
+    const NameKey& operator()(const NameMapValue& _X) const
     {
         return (_X.first);
     }
@@ -4428,24 +4429,24 @@ public:
     char* Allocate(unsigned int n);
 };
 
-enum _Redbl_004e2250 { _Red, _Black };
+enum NameMapRedbl { _Red, _Black };
 
-struct Node_004e2250 {
+struct NameMapNode {
     void* _Left;                       // +0x0
     void* _Parent;                     // +0x4
     void* _Right;                      // +0x8
-    Pair_004e2250 _Value;              // +0xc
-    _Redbl_004e2250 _Color;            // +0x204
+    NameMapValue _Value;               // +0xc
+    NameMapRedbl _Color;               // +0x204
 };
 
-typedef Node_004e2250* _Nodeptr;
+typedef NameMapNode* _Nodeptr;
 
 struct Node_004e18c0;
 class Iter_004e18c0;
 
 // std::_Tree<...>::iterator; _Inc is 0x4e0450 and _Dec is 0x4e2ab0. Passed by
 // value and returned by value, so the caller supplies a hidden return buffer.
-class NameMapIter : public std::_Bidit<Pair_004e2250, int> {
+class NameMapIter : public std::_Bidit<NameMapValue, int> {
 public:
     NameMapIter()
         {}
@@ -4485,18 +4486,18 @@ public:
 // Kept as the XTREE bodies and accessors: the inline budget follows their shape.
 class NameMapTree {
 public:
-    static _Redbl_004e2250& _Color(_Nodeptr _P)
-        {return ((_Redbl_004e2250&)(*_P)._Color); }
+    static NameMapRedbl& _Color(_Nodeptr _P)
+        {return ((NameMapRedbl&)(*_P)._Color); }
     static const NameKey& _Key(_Nodeptr _P)
-        {return (Kfn_004e2250()(_Value(_P))); }
+        {return (NameMapKfn()(_Value(_P))); }
     static _Nodeptr& _Left(_Nodeptr _P)
         {return ((_Nodeptr&)(*_P)._Left); }
     static _Nodeptr& _Parent(_Nodeptr _P)
         {return ((_Nodeptr&)(*_P)._Parent); }
     static _Nodeptr& _Right(_Nodeptr _P)
         {return ((_Nodeptr&)(*_P)._Right); }
-    static Pair_004e2250& _Value(_Nodeptr _P)
-        {return ((Pair_004e2250&)(*_P)._Value); }
+    static NameMapValue& _Value(_Nodeptr _P)
+        {return ((NameMapValue&)(*_P)._Value); }
     static _Nodeptr _Max(_Nodeptr _P)
         {std::_Lockit _Lk;
         while (_Right(_P) != DAT_005292c4)
@@ -4549,7 +4550,7 @@ public:
         {return (_Parent(_Head)); }
 
     Alloc_004e2b60 allocator;          // +0x0
-    Less_004e2250 key_compare;         // +0x1
+    NameKeyLess key_compare;           // +0x1
     _Nodeptr _Head;                    // +0x4
     bool _Multi;                       // +0x8
     unsigned int _Size;                // +0xc
@@ -4565,18 +4566,18 @@ public:
     // _Lrotate (0x4e2950).
     void RotateLeft(_Nodeptr _X);
     // _Buynode (0x4e2a30).
-    _Nodeptr CreateNode(_Nodeptr _Parg, _Redbl_004e2250 _Carg);
-    void _Consval(Pair_004e2250* _P, const Pair_004e2250& _V)
+    _Nodeptr CreateNode(_Nodeptr _Parg, NameMapRedbl _Carg);
+    void _Consval(NameMapValue* _P, const NameMapValue& _V)
         {std::_Construct(&*_P, _V); }
     // _Insert (0x4e2620).
-    NameMapIter Insert(_Nodeptr _X, _Nodeptr _Y, const Pair_004e2250& _V)
+    NameMapIter Insert(_Nodeptr _X, _Nodeptr _Y, const NameMapValue& _V)
         {std::_Lockit _Lk;
         _Nodeptr _Z = CreateNode(_Y, _Red);
         _Left(_Z) = (_Nodeptr)DAT_005292c4, _Right(_Z) = (_Nodeptr)DAT_005292c4;
         _Consval(&_Value(_Z), _V);
         ++_Size;
         if (_Y == _Head || _X != DAT_005292c4
-            || key_compare(Kfn_004e2250()(_V), _Key(_Y)))
+            || key_compare(NameMapKfn()(_V), _Key(_Y)))
             {_Left(_Y) = _Z;
             if (_Y == _Head)
                 {_Root() = _Z;
@@ -4623,7 +4624,7 @@ public:
     // std::_Tree<...>::insert(const value_type&).
     NameMapIter begin()
         {return (NameMapIter(_Lmost())); }
-    NameMapInsertResult InsertOrFind(const Pair_004e2250& _V);
+    NameMapInsertResult InsertOrFind(const NameMapValue& _V);
 };
 
 // The name map: comparator and allocator bytes, _Head, _Multi, _Size and the
@@ -6391,7 +6392,7 @@ Iter_004e18c0 Class_004e2240::Begin()
 #pragma auto_inline(on)
 
 // FUNCTION: 0x4e2250
-NameMapInsertResult NameMapTree::InsertOrFind(const Pair_004e2250& _V)
+NameMapInsertResult NameMapTree::InsertOrFind(const NameMapValue& _V)
 {
     _Nodeptr _X = _Root();
     _Nodeptr _Y = _Head;
@@ -6400,7 +6401,7 @@ NameMapInsertResult NameMapTree::InsertOrFind(const Pair_004e2250& _V)
         std::_Lockit Lk;
         while (_X != DAT_005292c4) {
             _Y = _X;
-            _Ans = key_compare(Kfn_004e2250()(_V), _Key(_X));
+            _Ans = key_compare(NameMapKfn()(_V), _Key(_X));
             _X = _Ans ? _Left(_X) : _Right(_X);
         }
     }
@@ -6413,7 +6414,7 @@ NameMapInsertResult NameMapTree::InsertOrFind(const Pair_004e2250& _V)
         return (NameMapInsertResult(Insert(_X, _Y, _V), true));
     else
         --_P;
-    if (key_compare(_Key(_P._Mynode()), Kfn_004e2250()(_V)))
+    if (key_compare(_Key(_P._Mynode()), NameMapKfn()(_V)))
         return (NameMapInsertResult(Insert(_X, _Y, _V), true));
     return (NameMapInsertResult(_P, false));
 }
@@ -6428,7 +6429,7 @@ NameMapInsertResult NameMapTree::InsertOrFind(const Pair_004e2250& _V)
 // helper with the window position save and restore, and the GDPERF driver
 // calls. 0x4e35b0 (OpenGdperf) is in a gap region and stays in its own file.
 
-typedef _Redbl_004e2250 Redbl;
+typedef NameMapRedbl Redbl;
 
 // The tree's _Nil node.
 extern void* DAT_005292c4;
@@ -6521,11 +6522,11 @@ static inline void* PoolAlloc(unsigned int n)
 }
 
 // FUNCTION: 0x4e2a30
-_Nodeptr NameMapTree::CreateNode(_Nodeptr _Parg, _Redbl_004e2250 _Carg)
+_Nodeptr NameMapTree::CreateNode(_Nodeptr _Parg, NameMapRedbl _Carg)
 {
     // The original inlines the pool allocator into this definition (0x4e2b60
     // is its out-of-line copy).
-    _Nodeptr _S = (_Nodeptr)PoolAlloc(sizeof(Node_004e2250));
+    _Nodeptr _S = (_Nodeptr)PoolAlloc(sizeof(NameMapNode));
     _Parent(_S) = _Parg;
     _Color(_S) = _Carg;
     return (_S);

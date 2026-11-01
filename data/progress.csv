@@ -3173,7 +3173,7 @@ address,size,file,symbol,status,similarity
 0x4dfd50,290,src/debug/debug_lib_4dfd50.cpp,_$E2,matched,100.0
 0x4dfe80,28,src/debug/debug_lib.cpp,?StartPerformanceStatus@@YGXXZ,matched,100.0
 0x4dfea0,1358,src/debug/debug_lib.cpp,?Erase@NameMapTree@@QAE?AVNameMapIter@@V2@@Z,matched,100.0
-0x4e03f0,88,src/debug/debug_lib.cpp,?EraseSubtree@NameMapTree@@QAEXPAUNode_004e2250@@@Z,matched,100.0
+0x4e03f0,88,src/debug/debug_lib.cpp,?EraseSubtree@NameMapTree@@QAEXPAUNameMapNode@@@Z,matched,100.0
 0x4e0450,132,src/debug/debug_lib.cpp,?NextNode@NameMapIter@@QAEXXZ,matched,100.0
 0x4e04e0,49,src/debug/debug_lib.cpp,?FindLeftmostNode@@YAPAUNode_004e04e0@@PAU1@@Z,matched,100.0
 0x4e0520,67,src/debug/debug_lib.cpp,?LoadWorkingSetPref@MemoryStatusDialog@@QAEXH@Z,matched,100.0
@@ -3219,13 +3219,13 @@ address,size,file,symbol,status,similarity
 0x4e21c0,42,src/debug/debug_lib.cpp,?SetElapsed@Timer@@QAEXN@Z,matched,100.0
 0x4e21f0,75,src/debug/debug_lib_4e21f0.cpp,?ComputeSampleRate@Timer@@QAENXZ,matched,100.0
 0x4e2240,14,src/debug/debug_lib.cpp,?Begin@Class_004e2240@@QAE?AVIter_004e18c0@@XZ,matched,100.0
-0x4e2250,801,src/debug/debug_lib.cpp,?InsertOrFind@NameMapTree@@QAE?AVNameMapInsertResult@@ABU?$pair@VNameKey@@UValue_004e2250@@@std@@@Z,matched,100.0
+0x4e2250,801,src/debug/debug_lib.cpp,?InsertOrFind@NameMapTree@@QAE?AVNameMapInsertResult@@ABU?$pair@VNameKey@@UNameMapText@@@std@@@Z,matched,100.0
 0x4e2580,146,src/debug/debug_lib_4e2580.cpp,?LowerBound@NameMapTree@@QAE?AVNameMapIter@@ABQBD@Z,matched,100.0
 0x4e2620,816,src/debug/debug_lib_4e2620.cpp,?Insert@NameMapTree@@QAE?AVIter_004e2620@@PAUNameMapNode@@0ABUNameMapValue@@@Z,matched,100.0
-0x4e2950,90,src/debug/debug_lib.cpp,?RotateLeft@NameMapTree@@QAEXPAUNode_004e2250@@@Z,matched,100.0
-0x4e29b0,92,src/debug/debug_lib.cpp,?RotateRight@NameMapTree@@QAEXPAUNode_004e2250@@@Z,matched,100.0
+0x4e2950,90,src/debug/debug_lib.cpp,?RotateLeft@NameMapTree@@QAEXPAUNameMapNode@@@Z,matched,100.0
+0x4e29b0,92,src/debug/debug_lib.cpp,?RotateRight@NameMapTree@@QAEXPAUNameMapNode@@@Z,matched,100.0
 0x4e2a10,22,src/debug/debug_lib.cpp,?Assign@NameMapInsertResult@@QAEPAV1@PBUData1@@PBUData2@@@Z,matched,100.0
-0x4e2a30,122,src/debug/debug_lib.cpp,?CreateNode@NameMapTree@@QAEPAUNode_004e2250@@PAU2@W4_Redbl_004e2250@@@Z,matched,100.0
+0x4e2a30,122,src/debug/debug_lib.cpp,?CreateNode@NameMapTree@@QAEPAUNameMapNode@@PAU2@W4NameMapRedbl@@@Z,matched,100.0
 0x4e2ab0,162,src/debug/debug_lib.cpp,?PrevNode@NameMapIter@@QAEXXZ,matched,100.0
 0x4e2b60,126,src/debug/debug_lib.cpp,?Allocate@NameMapAllocator@@QAEPAXI@Z,matched,100.0
 0x4e2be0,200,src/debug/debug_lib.cpp,??0CavedogRegistryKey@@QAE@DPAD0@Z,matched,100.0
