@@ -415,7 +415,7 @@ address,name,section,size,size_from,kind,type,type_files,other_files,types,verdi
 0x51297c,g_unitRestrictRecordCursor,.bss,4,type,data,int,1,0,1,one type,1,,INT_0051297c,,,
 0x512980,g_modemInfo,.bss,4,type,data,char*,1,0,1,one type,1,,PTR_00512980,,,
 0x512984,g_modemCount,.bss,4,type,data,int,1,0,1,one type,1,,INT_00512984,,,
-0x512988,g_modemAccounts,.bss,4,type,data,Entry_004426e0*,1,0,1,one type,1,,DAT_00512988,,,
+0x512988,g_modemAccounts,.bss,4,type,data,ModemAccount*,1,0,1,one type,1,,DAT_00512988,,,
 0x51298c,g_modemAccountNames,.bss,4,type,data,char*,1,0,1,one type,1,,PTR_0051298c,,,
 0x512990,g_oldMapName,.bss,4,type,data,char*,1,0,1,one type,1,,PTR_00512990,,,
 0x512994,g_battleRoomSlotsBuilt,.bss,4,type,data,int,3,0,1,one type,3,,INT_00512994,,,
