@@ -13,6 +13,7 @@
 struct GafEntry;
 struct GafFrame;
 struct Gui;
+struct Surface;
 
 struct Gadget {                         // 0x15b bytes, one GUI list entry
     unsigned char type;                 // +0x00
@@ -42,7 +43,7 @@ struct Gadget {                         // 0x15b bytes, one GUI list entry
         struct {                        // entry 0
             char unknown_b6[2];
             void* saveUnder;            // +0xb8, the SAVE UNDER bitmap
-            void* surface;              // +0xbc, the GUI SURFACE bitmap
+            Surface* surface;           // +0xbc, the GUI SURFACE bitmap
             void* archive;              // +0xc0
             GafEntry* background;       // +0xc4
         } assets;

@@ -4066,7 +4066,7 @@ char* __stdcall Translate(char* key);
 char* __stdcall GetGadgetText(Gui* menu, char* name, char* buf);
 char* __stdcall SkipTextLines(char* text, int line);
 
-void* __stdcall AllocSurface(char* name, int width, int height);
+Surface* __stdcall AllocSurface(char* name, int width, int height);
 void __stdcall FreeSurface(void* surface);
 void __stdcall DrawSurface(void* dst, void* bmp, int x, int y);
 void __stdcall DrawString(void* surface, char* text, int x, int y, int maxw);

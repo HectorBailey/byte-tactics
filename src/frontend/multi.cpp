@@ -45,7 +45,6 @@ void UpdateScreenShake(void);
 void UpdateCameraFollow(void);
 void BeginMouseScroll(void);
 void EndMouseScroll(void);
-void UpdateMouseScroll(void);
 
 struct Layer;
 struct Game;
