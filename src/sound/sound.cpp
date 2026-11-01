@@ -195,7 +195,7 @@ extern char g_noDirectSoundKey[]; // "NoDirectSound"
 extern char g_useWindowsSoundKey[]; // "UseWindowsSound"
 extern char g_soundInitError[]; // "Error:  Sound system initialization failed."
 
-unsigned int __stdcall GetPreferenceInt(char* key, int defaultValue);
+unsigned int __stdcall GetPreferenceInt(const char* key, int defaultValue);
 int IsWindowsSoundAvailable(void);
 void __stdcall FatalError(char* text);
 void* __cdecl operator new(size_t size);

@@ -542,7 +542,7 @@ void __stdcall LoadGafIntoSlot(void* obj, const char* name, int index);
 void __stdcall SetTextKeyColor(int value);
 void __stdcall SetFont(int font);
 void ClearPictureCache();
-int __stdcall GetPreferenceInt(const char* name, int defaultValue);
+unsigned int __stdcall GetPreferenceInt(const char* name, int defaultValue);
 
 // FUNCTION: 0x491200
 void InitGame()

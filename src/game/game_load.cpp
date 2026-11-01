@@ -458,7 +458,7 @@ void __stdcall RestoreScreen();
 void __stdcall FlipScreen();
 int __cdecl IsCdPlaying();
 void __cdecl GameFreeThunk(void*);
-void __stdcall BuildDataPath(void*, char*, char*, char*);
+char* __stdcall BuildDataPath(char* buf, const char* dir, const char* name, const char* ext);
 void __stdcall SendProbe(int from, int to);
 void __stdcall DrawSyncStatus(void*);
 void __stdcall DisableKeyCommands(void*);
@@ -473,8 +473,8 @@ int __stdcall StartThread(void (*)(void), int, int);
 void* __stdcall GetGafFrame(void*, int);
 void __stdcall DrawFrame(void*, void*, int, int);
 void* __stdcall FindGafEntry(int, char*);
-void __stdcall SetPaletteColors(void*, int, int);
-void* __stdcall HAPI_LoadFile(void*, unsigned int*);
+int __stdcall SetPaletteColors(unsigned char* colors, int first, int count);
+char* __stdcall HAPI_LoadFile(char* path, int* size);
 void __stdcall SetTextColors(int, int);
 void __stdcall SetFont(int);
 int __stdcall LockScreen(void*);
@@ -926,7 +926,7 @@ void LoadingScreenFrame(void)
             SetCursorAnimation(&g_game->guiRoot, (void*)g_game->cursorHourglass);
         }
         SetFont(g_game->fontComix);
-        SetPaletteColors(g_game->paletteRgba, 0, 0x100);
+        SetPaletteColors((unsigned char*)g_game->paletteRgba, 0, 0x100);
         if (g_game->mapInfo->GetGameType() != 2) {
             SaveSettings();
         }
@@ -948,7 +948,7 @@ void LoadingScreenFrame(void)
             SetOffscreenSurface((void*)g_game->offscreen);
         }
         BuildDataPath(aux, "palettes", "guipal", "PAL");
-        surfaceHandle = HAPI_LoadFile((unsigned int*)aux, 0);
+        surfaceHandle = HAPI_LoadFile(aux, 0);
         RemapPaletteToClosestIndices(&g_game->guiRoot, g_game->paletteRgba, surfaceHandle);
         GameFreeThunk(surfaceHandle);
         g_game->lastSimBudgetTick = GetTicks();
