@@ -1396,7 +1396,7 @@ struct Less_004e2250;
 struct Less_004e2580;
 struct NameKeyLess;
 struct Limits_0043e490;
-struct Line_004de550;
+struct IMAGEHLP_LINE;
 struct Link_0044f4a0;
 struct Link_00462ed0;
 struct Link_00481430;
@@ -1991,7 +1991,7 @@ struct Surface_004c5df0;
 struct Surface_004c6f80;
 class Surface_4b6570;
 struct Surfaces_0047bdf0;
-struct Sym_004dea00;
+struct ImagehlpSymbolWithName;
 struct Table_0040d880;
 struct Table_0041ace0;
 struct Table_004611e0;
@@ -19454,7 +19454,7 @@ public:
     Fpo_004de020* FindFpoRecord(unsigned int);
 };
 
-struct Line_004de550 {  // 0x14 bytes, 2 views
+struct IMAGEHLP_LINE {  // 0x14 bytes, 2 views
     unsigned long SizeOfStruct;  // +0x0
     unsigned long Key;  // +0x4
     unsigned long LineNumber;  // +0x8
@@ -19476,7 +19476,7 @@ struct Frame_004de700 {  // 0x70 bytes, 1 view
     char unknown_30[64];
 };
 
-struct Sym_004dea00 {  // 0x218 bytes, 1 view
+struct ImagehlpSymbolWithName {  // 0x218 bytes, 1 view
     unsigned long SizeOfStruct;  // +0x0
     unsigned long Address;  // +0x4
     unsigned long Size;  // +0x8
