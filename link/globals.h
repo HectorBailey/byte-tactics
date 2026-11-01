@@ -18,6 +18,7 @@ struct DisplayContext;
 struct Entry_004df590;
 struct ExplodedPiece;
 struct Game;
+struct Gui;
 struct MenuSpark;
 struct ModemAccount;
 struct SquashTree;
@@ -457,6 +458,7 @@ extern unsigned long g_lastSoundReapTick;                                       
 extern unsigned char DAT_0051fb98[4];                                                                           // 0x51fb98, 4 bytes; nothing refers to it
 extern char* g_loopingWav;                                                                                      // 0x51fb9c, 4 bytes; 1 of 1 files
 extern int* g_diskWav;                                                                                          // 0x51fba0, 4 bytes; 1 of 1 files
+extern Gui* g_guiContext;                                                                                       // 0x51fba4, 4 bytes; 3 of 3 files
 extern int DAT_0051fba8;                                                                                        // 0x51fba8, 4 bytes; 1 of 1 files
 extern int DAT_0051fbac;                                                                                        // 0x51fbac, 4 bytes; 1 of 1 files
 extern int DAT_0051fbb0;                                                                                        // 0x51fbb0, 4 bytes; 1 of 1 files
@@ -595,7 +597,7 @@ extern int g_lzssLockOwner;                                                     
 extern void* g_squashThreadLockEvent;                                                                           // 0x52a4f8, 4 bytes; 2 of 2 files
 extern long g_squashThreadLockTicket;                                                                           // 0x52a4fc, 4 bytes; 1 of 2 files (conflicting: signedness or const)
 
-// Not declared: 193 globals defined in a data file or whose type is not settled (see data/globals.csv).
+// Not declared: 192 globals defined in a data file or whose type is not settled (see data/globals.csv).
 //   0x513000 g_packetManager: defined in src/network/packets_460e20.cpp
 //   0x4fcdb8 g_dpspGuidSerial: defined in src/data/guids.cpp
 //   0x4fcdc8 g_dpspGuidModem: defined in src/data/guids.cpp
@@ -612,7 +614,6 @@ extern long g_squashThreadLockTicket;                                           
 //   0x51e574 g_onlineReportPlayers: OnlineReportPlayerInfo** (2), int* (1)
 //   0x51e57c g_onlineReportScoreBoards: OnlineReportScoreBoard** (2), void* (1)
 //   0x51e6a0 g_losTables: defined in src/map/line_of_sight.cpp
-//   0x51fba4 g_guiContext: Root_004a32a0* (1), Gui* (1), int* (1)
 //   0x528a54 std::IH::IU?$pair::?$_Tree::_Nil: defined in src/debug/debug_lib_4db610.cpp
 //   0x529e9c g_gdperfDriverReady: char (2), bool (1)
 //   0x4fc9a0 g_spatialTimerVtable: defined in src/data/vtables.cpp
