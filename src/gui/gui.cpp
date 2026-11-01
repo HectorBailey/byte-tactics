@@ -1412,9 +1412,9 @@ struct LanguageRoot_004a1b40 {
     Language_004a1b40* language;        // +0x14
 };
 
-// Kept: this file spells Point for its 24-byte mouse-event view below, and the
-// shared point.h moves 0x4a2580 and 0x4a3eb0 out of their symbol-id windows
-// (docs/c2-regalloc.md). The two views below stay with this one.
+// Kept, not util/point.h: including it moves 0x4a2580 and 0x4a3eb0 out of
+// their symbol-id windows, and no padding up to 540 ids brings all 128 back
+// (docs/c2-regalloc.md). The view below stays with this one.
 struct Point_004a1b40 { int x; int y; };
 struct Quad_004a1b40 { Point_004a1b40 points[4]; };
 
@@ -4152,12 +4152,12 @@ struct Language {
     GafEntry* glyphs;                   // +0x0c
 };
 
-// The mouse event at gui.h's pointX to pointDoubleClick.
-struct Point {                          // 24 bytes, copied with rep movsd
-    int x;
-    int y;
-    int unknown_08[4];
-};
+// Unused here: real functions declared where the mouse-event view stood
+// (docs/c2-regalloc.md).
+void DecreaseGameSpeed(void);
+void LoadCdLists(void);
+void CloseTopScreenIfNotNamed(void);
+void FreePreviewCaches(void);
 
 #include "gui.h"
 
@@ -4800,7 +4800,7 @@ int __stdcall HandleButtonInput(Gui* obj, int index, int param_3)
     Rect r;
     GetGadgetRect_inlined(entry, &r);
 
-    Point point = *(Point*)&obj->pointX;
+    MouseEvent point = *(MouseEvent*)&obj->pointX;
     point.x -= entries->x;
     point.y -= entries->y;
 
@@ -5045,7 +5045,7 @@ int __stdcall HandleTextInput(Gui* obj, int index, int key)
     GetGadgetRectByIndex((char*)entries, index, &rect);
     SelectFontForEntry_inlined(entries, index);
 
-    Point point = *(Point*)&obj->pointX;
+    MouseEvent point = *(MouseEvent*)&obj->pointX;
     int rel_x = point.x - entries->x;
     int rel_y = point.y - entries->y;
 
@@ -6462,7 +6462,7 @@ int __stdcall UpdateMenu(Gui* menu)
     if (entries == 0)
         return 1;
 
-    Point& pt = *(Point*)&menu->pointX;
+    MouseEvent& pt = *(MouseEvent*)&menu->pointX;
     {
         // Rect local, not named ints: right/bottom spill into slots shared with `point`.
         Rect box;
@@ -6482,7 +6482,7 @@ int __stdcall UpdateMenu(Gui* menu)
     int saved = menu->hoverGadgetIndex;
     menu->hoverGadgetIndex = -1;
 
-    Point point;
+    MouseEvent point;
     memcpy(&point, &menu->pointX, 24);
     point.x -= entries->x;
     point.y -= entries->y;
