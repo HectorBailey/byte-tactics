@@ -95,7 +95,7 @@ struct Entry_428b60 {
 
 // One picture-cache record (0x28 bytes each) of g_pictureCache.
 struct PictureCacheEntry {
-    void* surface;                     // +0x00
+    Surface* surface;                  // +0x00
     int* palette;                      // +0x04, the picture's palette (Thaldren's pPalette)
     char name[0x20];                   // +0x08
 };
@@ -229,7 +229,7 @@ int __stdcall IsCurrentGadgetNamed(Gui* gui, char* name);
 void __stdcall ClearSelectedGadget(void* param_1);
 char* __stdcall Translate(char* text);
 DisplayContext* __stdcall GetDisplay(void);
-void __stdcall CloseTopScreen(Gui* sub);
+void __stdcall CloseTopScreen(Gui* gui);
 void HideSoftwareCursor();
 void Force640x480Surfaces();
 Layer* __stdcall LoadGuiLayer(Gui* sub, const char* name, unsigned int flags);
@@ -252,7 +252,7 @@ int __stdcall CheckDirectXVersion(int a, int b, int c, int d, int e);
 void __stdcall CheckGpfVersion();
 int __stdcall IsGadgetNamed(int param1, int param2, char* name);
 void __stdcall SetTranslatedTextByName(char* sub, const char* name, const char* text, int param_4);
-void __stdcall SelectGadgetByName(char* sub, const char* name);
+void __stdcall SelectGadgetByName(Gui* menu, char* name);
 void StopAllSounds();
 char* __stdcall BuildCdFilePath(char* out, const char* dir, const char* name, const char* ext);
 int __stdcall HAPI_FileLengthByName(char* path);
@@ -309,9 +309,9 @@ void PresentFrontendFrame();
 void __stdcall HandleMainMenuClick(Gui* gui);
 void __stdcall HandleCloseCdPlayerChoice(Gui* gui);
 void __stdcall OpenCloseCdPlayerDialog();
-void __stdcall FreeSurface(void* param_1);
+void __stdcall FreeSurface(Surface* obj);
 void* __stdcall LoadBitmapByName(const char* name, int param_2);
-int __stdcall SetBackgroundSurface(int param_1, int param_2);
+int __stdcall SetBackgroundSurface(Gui* menu, int value);
 int __stdcall SetPaletteColors(unsigned char* src, int start, int count);
 
 // The original calls this out of line from the state helpers; with the whole
@@ -702,7 +702,7 @@ void __stdcall OpenCloseCdPlayerDialog()
         strcpy(choice1 + 0xb6, Translate("Yes"));
         strcpy(choice2 + 0xb6, Translate("No"));
         SetTranslatedTextByName((char*)&g_game->gui, "TITLE", Translate("Close Windows CD Player?"), 0);
-        SelectGadgetByName((char*)&g_game->gui, "CHOICE1");
+        SelectGadgetByName(&g_game->gui, "CHOICE1");
         gadget->handler = (void (__stdcall*)(void*))HandleCloseCdPlayerChoice;
         RenderLayer(&g_game->gui, 0x40);
     }
@@ -1564,7 +1564,7 @@ int __stdcall FindCachedPicture(char* name)
 // FUNCTION: 0x4288d0
 int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int param_4)
 {
-    void* surface = 0;
+    Surface* surface = 0;
     int* data = 0;
     PictureCacheEntry saved;
 
@@ -1588,7 +1588,7 @@ int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int 
         }
         if (surface == 0) {
             void* buf = GameAllocIgnoreTag("Palette", 0x400);
-            surface = LoadBitmapByName(name, (int)buf);
+            surface = (Surface*)LoadBitmapByName(name, (int)buf);
             data = (int*)buf;
             if (g_game->frontendState != 6) {
                 if (g_pictureCache[9].surface != 0) {
@@ -1612,7 +1612,7 @@ after:
     // Nested if, one trailing return 0: both failure exits share one return block.
     if (param_4 == 0) {
         if (g_game->gui.layer != 0) {
-            SetBackgroundSurface((int)&g_game->gui, (int)surface);
+            SetBackgroundSurface(&g_game->gui, (int)surface);
             if (param_3 != 0)
                 SetPaletteColors((unsigned char*)data, 0, 0x100);
         } else {

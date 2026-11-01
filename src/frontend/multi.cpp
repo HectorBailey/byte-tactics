@@ -362,7 +362,7 @@ struct Game {
 // prototype block with them; the first two below and the gadget lookups after
 // ConnectToGame are used only further down, and are here for the symbol ids
 // they take (docs/c2-regalloc.md).
-void __stdcall SetGadgetText(void* gui, int index, char* text);
+void __stdcall SetGadgetText(Gui* obj, int index, char* text);
 void __stdcall HandleNewMultiClick(Gui* gadget);
 // GLOBAL: 0x511de8
 extern Game* g_game;
@@ -377,7 +377,7 @@ void __stdcall MarkChanged(void* menu);
 void __stdcall BlitMenuLayers(Gui* gui, unsigned int* surface, int* rect);
 void __stdcall SetGadgetActiveByName(void* menu, const char* name, int value);
 void __stdcall ConfigureListBoxByName(void* menu, const char* name, char* text, int count, int flag);
-void __stdcall CloseTopScreen(void* menu);
+void __stdcall CloseTopScreen(Gui* gui);
 int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, int autoHeight);
 char* __stdcall Translate(const char* text);
 void __stdcall SetOffscreenSurface(int a);
@@ -397,7 +397,7 @@ Gadget* __stdcall FindGadgetChecked_B(void* entries, const char* name);
 Gadget* __stdcall FindGadgetChecked_C(void* entries, const char* name);
 Gadget* __stdcall FindGadgetChecked_D(void* entries, char* name);
 Gadget* __stdcall FindGadgetChecked_E(void* entries, char* name);
-void __stdcall SelectGadgetByIndex(void* menu, int index);
+void __stdcall SelectGadgetByIndex(Gui* menu, int index);
 
 static inline void Apply_00441220(unsigned short* p, unsigned short r, int ge, Gadget* entry)
 {
@@ -869,7 +869,7 @@ extern int DAT_0051276c;
 extern int g_battleRoomSlotsBuilt;
 extern int g_rejectPlayer;
 
-void __stdcall BeginTextEdit(void* menu, int index);
+void __stdcall BeginTextEdit(Gui* obj, int index);
 int __stdcall TrySetFocus(void* menu, int index);
 void __stdcall EnableKeyCommands(void* gui);
 void __stdcall SetKeyboardInput(void* menu, int value);
@@ -883,7 +883,7 @@ void __stdcall SetListBoxScrollByName(void* menu, const char* name, int index);
 void __stdcall SetTranslatedText(void* menu, int index, int param_3, int param_4);
 void __stdcall SetGadgetGrayedOutByName(void* menu, char* name, int value);
 void __stdcall SetCurrentFont(void* gui, int flag);
-int __stdcall TruncateGadgetText(void* menu, int index);
+int __stdcall TruncateGadgetText(Gui* menu, int index);
 char* __stdcall GetGadgetText(void* menu, const char* key, char* out);
 int __stdcall GetGadgetStatus(void* menu, int handle);
 char __stdcall GetGadgetActiveByName(void* menu, char* name);
@@ -894,7 +894,7 @@ int __stdcall SetButtonStageByName(Dialog_004a04f0* obj, char* name, int value);
 void __stdcall SetGadgetStatusByName(void* gui, char* name, int value);
 void __stdcall SetGadgetName(void* gui, char* name, char* text);
 void __stdcall SetGadgetRows(void* table, char* name, int* pics, int count);
-void __stdcall DrawButton(void* gadget, int value);
+void __stdcall DrawButton(Gui* menu, int index);
 int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int param_4);
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, unsigned int flags);
 int __stdcall RenderLayer(Gui* gui, unsigned int flags);
@@ -991,7 +991,7 @@ void LeaveNetGame();
 void* __stdcall LoadBitmapByName(char* name, unsigned char* palette);
 struct Surface;
 void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y);
-void __stdcall FreeSurface(void* image);
+void __stdcall FreeSurface(Surface* obj);
 void ShowSoftwareCursor();
 void __stdcall MakeDirectoryPath(char* path);
 void __stdcall RemoveFile(char* path);
@@ -4296,13 +4296,13 @@ void __stdcall HandleEndMultiClick(Gui* obj)
 void OpenEndMultiScreen()
 {
     unsigned char palette[0x400];
-    void* image;
+    Surface* image;
 
     BlankScreen();
-    image = LoadBitmapByName("Mission02WinBW", palette);
+    image = (Surface*)LoadBitmapByName("Mission02WinBW", palette);
     SetPaletteColors(palette, 0, 0x100);
     SetOffscreenSurface(g_game->offscreen);
-    DrawSurface(0, (Surface*)image, 0, 0);
+    DrawSurface(0, image, 0, 0);
     FreeSurface(image);
     FlipScreen();
     LoadGuiLayer(&g_game->gui, "ENDMULTI.GUI", 0x80)->handler = HandleEndMultiClick;
