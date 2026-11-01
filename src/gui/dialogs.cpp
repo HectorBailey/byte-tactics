@@ -54,6 +54,7 @@ void FUN_004161f0(void);
 void InitCommands(void);
 void ProtectUnitDefsReadOnly(void);
 void ProtectUnitDefsReadWrite(void);
+struct PlayerInfo;
 
 // The records AddButtonGadget, AddHotspotGadget and AddBarGadget copy into an
 // entry slot: the slot's first bytes viewed as the control's definition.
@@ -103,7 +104,7 @@ struct Entry_004ab3a0 {
 
 extern Gui* g_guiContext;
 
-extern void __stdcall FadeRectangle(void* surface, int* rect, int mode);
+extern int __stdcall FadeRectangle(Surface* surface, Rect* rect, int mode);
 extern char* __stdcall StripPath(char* path);
 extern char* __stdcall ChangeExtension(char* out, char* in, char* ext);
 extern int __stdcall HAPI_FileLengthByName(char* path);
@@ -185,7 +186,7 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
     Layer* layer;
     int ret = 1;
     int mask;
-    int rect[4];
+    Rect rect;
     char layerName[0x100];
     char guiName[0x100];
     Gadget* entry = 0;
@@ -193,8 +194,8 @@ Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name,
     if (flags & 0x800) {
         Layer* cur = menu->layer;
         if (cur != 0) {
-            GetGadgetRect_inlined(cur->entries, (Rect*)rect);
-            FadeRectangle(cur->entries->u.assets.surface, rect, -0x18);
+            GetGadgetRect_inlined(cur->entries, &rect);
+            FadeRectangle(cur->entries->u.assets.surface, &rect, -0x18);
             if (menu->layer != 0)
                 menu->layer->dirty = 1;
         } else {
@@ -913,7 +914,7 @@ int __stdcall UpdateMenu(Gui* menu);
 int __stdcall SelectFontForEntry(Gadget* entries, int index);
 int GetFont();
 int __stdcall GetTextWidth(int font, unsigned char* text);
-int __stdcall FillRectangle(void* surface, Rect* rect, int color);
+int __stdcall FillRectangle(Surface* surface, Rect* rect, int color);
 int __stdcall SetPaletteColors(unsigned char* src, int start, int count);
 
 struct FileHandle;
@@ -1385,7 +1386,7 @@ void __stdcall DrawColorGrid(Gui* obj)
     gadgets = obj->layer->entries;
     int index = FindGadgetIndex(gadgets, "COLS", 6);
     grid = &gadgets[index];
-    void* surface = gadgets->u.assets.surface;
+    Surface* surface = gadgets->u.assets.surface;
     int x0 = grid->x + gadgets->x;
     int y = gadgets->y + grid->y;
     Rect rect;
