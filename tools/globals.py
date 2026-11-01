@@ -23,7 +23,8 @@ name data/symbols.csv maps to an address in .rdata/.data), with:
                   types there are, and tools/linkcheck.py's verdict on them
   files           files that refer to it
   max_offset      the largest offset from it the source uses (DAT_x + 8 -> 0x8)
-  ghidra          the label Ghidra gives the address (s_ string, PTR_ pointer)
+  ghidra          the label Ghidra gives the address (s_ string, PTR_ pointer);
+                  kept from the existing table when build/ghidra is missing
   pointers        dwords in its initial bytes that point into the exe
   init            its first bytes in the exe, in hex (none for .bss)
 
@@ -148,10 +149,15 @@ def text_fragment(low: bytes) -> bool:
 
 
 def ghidra_labels() -> dict[int, str]:
-    """address -> the label Ghidra's pseudo-C uses most for it."""
+    """address -> the label Ghidra's pseudo-C uses most for it. A checkout
+    without the Ghidra export (build/ghidra) keeps the labels data/globals.csv
+    already has, so that regenerating the table there changes no label."""
     counts: dict[int, Counter] = {}
     if not GHIDRA.is_dir():
-        return {}
+        if not GLOBALS.exists():
+            return {}
+        with GLOBALS.open(newline="") as fh:
+            return {int(r["address"], 16): r["ghidra"] for r in csv.DictReader(fh) if r.get("ghidra")}
     label = re.compile(r"\b([A-Za-z_]\w*?_00(?:4f[c-f]|5[0-2][0-9a-f])[0-9a-f]{3})\b")
     for path in GHIDRA.glob("*.c"):
         for m in label.finditer(path.read_text(errors="replace")):
