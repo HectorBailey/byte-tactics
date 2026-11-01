@@ -245,8 +245,8 @@ public:
     UnitList_00409730 visible;     // +0x05
     UnitList_00409730 known;       // +0x15
     UnitList_00409730 factories;   // +0x25
-    int pos_35[3];                 // +0x35
-    int pos_41[3];                 // +0x41
+    int scoutAnchor[3];            // +0x35
+    int unused_41[3];              // +0x41
     std::vector<ScoredCell> cells; // +0x4d
     short centerX;                 // +0x5d
     short centerY;                 // +0x5f
