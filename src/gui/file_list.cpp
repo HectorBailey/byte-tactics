@@ -44,10 +44,6 @@ struct BlinkWord {
 
 #include "gadget.h"
 
-struct Obj18 {
-    char unknown_0[4];
-    char* entries;                   // +0x4
-};
 
 // The slider gadget behind FileRequester::slider.
 struct ReqSub {
@@ -56,7 +52,7 @@ struct ReqSub {
 };
 
 struct FileRequester {
-    void* gui;                       // +0x00
+    Gui* gui;                        // +0x00
     ReqSub* slider;                  // +0x04 (the SLID gadget)
     char* nameGadget;                // +0x08 (NAME)
     char* maskGadget;                // +0x0c (MASK)
@@ -76,21 +72,12 @@ struct FileRequester {
 
 #include "gui.h"
 
-struct Dialog {
-    char path[0x13];                 // +0x00
-    short field_13;                  // +0x13
-    char unknown_15[0x18 - 0x15];    // +0x15
-    Obj18* holder;                   // +0x18
-    char unknown_1c[0xa6 - 0x1c];
-    BlinkWord* words;                // +0xa6
-    int count;                       // +0xaa
-    int active;                      // +0xae
-    char unknown_b2[0xcca - 0xb2];
-    int changed;                     // +0xcca
+// Gui keeps the blinking words untyped; this file is the one that reads them.
+static inline BlinkWord* Words(Gui* gui)
+{
+    return (BlinkWord*)gui->blinkWords;
+}
 
-    // self is really the first stack argument, not `this`.
-    FileRequester* OpenFileRequester(Dialog* self, char* arg2, char* arg3, char* arg4);
-};
 
 #pragma pack(pop)
 
@@ -406,7 +393,7 @@ void __stdcall FileRequesterHandler(Gui* gadget)
 // The result of LoadGuiLayer is the object that gets the vtable slot at +8, not
 // the argument.
 // FUNCTION: 0x4afa30
-FileRequester* Dialog::OpenFileRequester(Dialog* self, char* arg2, char* arg3, char* arg4)
+FileRequester* __stdcall OpenFileRequester(Gui* self, char* arg2, char* arg3, char* arg4)
 {
     void* gui = LoadGuiLayer(self, "FILEREQ.GUI", 0);
     if (gui == NULL) {
@@ -427,7 +414,7 @@ FileRequester* Dialog::OpenFileRequester(Dialog* self, char* arg2, char* arg3, c
     ((void**)gui)[3] = obj;
     obj->callback = 0;
 
-    Gadget* entries = (Gadget*)self->holder->entries;
+    Gadget* entries = self->layer->entries;
     obj->nameGadget = (char*)FindGadgetChecked_B(entries, "NAME");
     obj->maskGadget = (char*)FindGadgetChecked_B(entries, "MASK");
     obj->pathGadget = (char*)FindGadgetOrNull(entries, "PATH");
@@ -464,61 +451,61 @@ FileRequester* Dialog::OpenFileRequester(Dialog* self, char* arg2, char* arg3, c
 }
 
 // FUNCTION: 0x4afc60
-void __stdcall AllocBlinkWords(Dialog* obj, int count)
+void __stdcall AllocBlinkWords(Gui* obj, int count)
 {
-    if (obj->words) {
-        GameFreeThunk(obj->words);
-        obj->words = 0;
+    if (obj->blinkWords) {
+        GameFreeThunk(obj->blinkWords);
+        obj->blinkWords = 0;
     }
-    obj->words = (BlinkWord*)GameAllocIgnoreTag("BlinkWords", count * sizeof(BlinkWord));
+    obj->blinkWords = GameAllocIgnoreTag("BlinkWords", count * sizeof(BlinkWord));
     for (int i = 0; i < count; i++)
-        obj->words[i].text[0] = 0;
-    obj->count = count;
-    obj->active = 1;
-    obj->words[0].value = -1;
+        Words(obj)[i].text[0] = 0;
+    obj->blinkCount = count;
+    obj->blinkActive = 1;
+    Words(obj)[0].value = -1;
 }
 
 // FUNCTION: 0x4afcf0
-void __stdcall FreeBlinkWords(int param_1)
+void __stdcall FreeBlinkWords(Gui* gui)
 {
-    int ptr = *(int*)(param_1 + 0xa6);
-    GameFreeThunk((void*)ptr);
-    *(int*)(param_1 + 0xa6) = 0;
-    *(int*)(param_1 + 0xae) = 0;
+    void* words = gui->blinkWords;
+    GameFreeThunk(words);
+    gui->blinkWords = 0;
+    gui->blinkActive = 0;
 }
 
 // FUNCTION: 0x4afd20
-void __stdcall SetBlinkGadget(Dialog* obj, int value)
+void __stdcall SetBlinkGadget(Gui* obj, int value)
 {
-    obj->words->value = value;
+    Words(obj)->value = value;
 }
 
 // FUNCTION: 0x4afd40
-void __stdcall EnableBlinkWords(int param_1)
+void __stdcall EnableBlinkWords(Gui* gui)
 {
-    int ecx = *(int*)(param_1 + 0xa6);
-    if (ecx != 0) {
-        *(int*)(param_1 + 0xae) = 1;
+    void* words = gui->blinkWords;
+    if (words != 0) {
+        gui->blinkActive = 1;
     }
 }
 
 // FUNCTION: 0x4afd60
-void __stdcall DisableBlinkWords(int param_1)
+void __stdcall DisableBlinkWords(Gui* gui)
 {
-    if (*(int*)(param_1 + 0xa6) != 0) {
-        *(int*)(param_1 + 0xae) = 0;
+    if (gui->blinkWords != 0) {
+        gui->blinkActive = 0;
     }
 }
 
 // FUNCTION: 0x4afd80
-int __stdcall AddBlinkWord(Dialog* obj, const char* text, int p2, int p3,
+int __stdcall AddBlinkWord(Gui* obj, const char* text, int p2, int p3,
                            int p4, int p5, float f6, float f7)
 {
-    BlinkWord* p = obj->words;
+    BlinkWord* p = Words(obj);
     if (p == 0)
         return 0;
 
-    int count = obj->count;
+    int count = obj->blinkCount;
     int i = 0;
     for (i = 0; i < count; i++, p++) {
         if (p->text[0] == 0)
@@ -529,74 +516,76 @@ int __stdcall AddBlinkWord(Dialog* obj, const char* text, int p2, int p3,
 
     int time = GetTicks();
 
-    strncpy(obj->words[i].text, text, 0x80);
-    obj->words[i].x = p2;
-    obj->words[i].y = p3;
-    obj->words[i].colourA = p4;
-    obj->words[i].colourB = p5;
-    obj->words[i].periodA = f6;
-    obj->words[i].periodB = f7;
+    strncpy(Words(obj)[i].text, text, 0x80);
+    Words(obj)[i].x = p2;
+    Words(obj)[i].y = p3;
+    Words(obj)[i].colourA = p4;
+    Words(obj)[i].colourB = p5;
+    Words(obj)[i].periodA = f6;
+    Words(obj)[i].periodB = f7;
 
     int rate = GetTickRate();
-    obj->words[i].nextToggle = (float)rate * f6 + (float)time;
-    obj->words[i].phase = 0;
+    Words(obj)[i].nextToggle = (float)rate * f6 + (float)time;
+    Words(obj)[i].phase = 0;
     return 1;
 }
 
 // FUNCTION: 0x4afe90
-void __stdcall ClearBlinkWord(Dialog* obj, int index)
+void __stdcall ClearBlinkWord(Gui* obj, int index)
 {
-    if (index <= obj->count)
-        obj->words[index].text[0] = 0;
+    if (index <= obj->blinkCount)
+        Words(obj)[index].text[0] = 0;
 }
 
 // FUNCTION: 0x4afec0
-void __stdcall ClearBlinkWords(Dialog* obj)
+void __stdcall ClearBlinkWords(Gui* obj)
 {
-    if (obj->words != 0) {
-        for (int i = 0; i < obj->count; i++) {
-            obj->words[i].text[0] = 0;
+    if (obj->blinkWords != 0) {
+        for (int i = 0; i < obj->blinkCount; i++) {
+            Words(obj)[i].text[0] = 0;
         }
     }
 }
 
-// The object at obj+0x18; +4 points at the entry array.
+// Reads the words through the cast written out each time: through Words() the
+// compiler stops inlining it partway (50.5%), and a BlinkWord* local moves the
+// loop's registers (47.4%).
 // FUNCTION: 0x4aff00
-void __stdcall DrawBlinkWords(Dialog* obj)
+void __stdcall DrawBlinkWords(Gui* obj)
 {
-    if (obj->active == 0)
+    if (obj->blinkActive == 0)
         return;
 
     int time = GetTicks();
 
-    if (obj->words->value != -1)
-        SelectFontForEntry((Gadget*)obj->holder->entries,
-                     obj->words->value);
+    if (((BlinkWord*)obj->blinkWords)->value != -1)
+        SelectFontForEntry(obj->layer->entries,
+                     ((BlinkWord*)obj->blinkWords)->value);
 
-    for (int i = 0; i < obj->count; i++) {
-        if (obj->words[i].text[0] == 0)
+    for (int i = 0; i < obj->blinkCount; i++) {
+        if (((BlinkWord*)obj->blinkWords)[i].text[0] == 0)
             continue;
 
         float ft = (float)time;
-        if (obj->words[i].nextToggle < ft) {
-            if (obj->words[i].phase != 0) {
-                obj->words[i].nextToggle =
-                    (float)GetTickRate() * obj->words[i].periodA + ft;
-                obj->words[i].phase = 0;
+        if (((BlinkWord*)obj->blinkWords)[i].nextToggle < ft) {
+            if (((BlinkWord*)obj->blinkWords)[i].phase != 0) {
+                ((BlinkWord*)obj->blinkWords)[i].nextToggle =
+                    (float)GetTickRate() * ((BlinkWord*)obj->blinkWords)[i].periodA + ft;
+                ((BlinkWord*)obj->blinkWords)[i].phase = 0;
             } else {
-                obj->words[i].nextToggle =
-                    (float)GetTickRate() * obj->words[i].periodB + ft;
-                obj->words[i].phase = 1;
+                ((BlinkWord*)obj->blinkWords)[i].nextToggle =
+                    (float)GetTickRate() * ((BlinkWord*)obj->blinkWords)[i].periodB + ft;
+                ((BlinkWord*)obj->blinkWords)[i].phase = 1;
             }
         }
 
-        if (obj->words[i].phase != 0)
-            SetTextColors(obj->words[i].colourB, GetTextKeyColor());
+        if (((BlinkWord*)obj->blinkWords)[i].phase != 0)
+            SetTextColors(((BlinkWord*)obj->blinkWords)[i].colourB, GetTextKeyColor());
         else
-            SetTextColors(obj->words[i].colourA, GetTextKeyColor());
+            SetTextColors(((BlinkWord*)obj->blinkWords)[i].colourA, GetTextKeyColor());
 
-        DrawString((void*)*(int*)(obj->holder->entries + 0xbc),
-                     obj->words[i].text, obj->words[i].x,
-                     obj->words[i].y, -1);
+        DrawString(obj->layer->entries->u.assets.surface,
+                     ((BlinkWord*)obj->blinkWords)[i].text, ((BlinkWord*)obj->blinkWords)[i].x,
+                     ((BlinkWord*)obj->blinkWords)[i].y, -1);
     }
 }
