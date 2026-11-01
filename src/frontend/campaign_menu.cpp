@@ -203,7 +203,8 @@ void ShowSoftwareCursor();
 void* __stdcall LoadBitmapByName(char* name, unsigned char* palette);
 void __stdcall SetPaletteColors(unsigned char* palette, int first, int count);
 void __stdcall SetOffscreenSurface(int param_1);
-void __stdcall DrawSurface(void* dest, void* image, int x, int y);
+struct Surface;
+void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y);
 void __stdcall FreeSurface(void* param_1);
 int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, int autoHeight);
 void __stdcall ClearSelectedGadget(void* menu);
@@ -229,7 +230,7 @@ void __stdcall DrawBitmapBackground(char* name, int lock)
     image = LoadBitmapByName(name, palette);
     SetPaletteColors(palette, 0, 0x100);
     SetOffscreenSurface(g_game->offscreen);
-    DrawSurface(0, image, 0, 0);
+    DrawSurface(0, (Surface*)image, 0, 0);
     FreeSurface(image);
     if (lock) {
         ShowSoftwareCursor();
