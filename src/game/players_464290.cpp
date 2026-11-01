@@ -120,39 +120,16 @@ struct SkirmishPlayerSlot {            // 0x18 bytes
     int unknown_14;
 };
 
-struct Menu {
-    char unknown_0[0x40];
-};
-
-struct Form {
-    char unknown_0[0xcc];
-    char choice1[0x10];                // +0xcc
-    char choice2[0x20];                // +0xdc
-};
-
-struct Gadget;
-
-struct Screen {
-    char unknown_0[4];
-    Form* form;                        // +0x4
-    void (__stdcall *callback)(Gadget*); // +0x8
-};
-
-// Not gui/gadget.h's entry: the watching dialog's callback is handed the screen
-// it loaded, whose form sits at +0x18 and whose selected line at +0x60.
-struct Gadget {
-    char unknown_0[0x18];
-    Screen* screen;                    // +0x18
-    char unknown_1c[0x60 - 0x1c];
-    int selected;                      // +0x60
-};
+#include "../gui/gui.h"
+#include "../gui/layer.h"
+#include "../gui/gadget.h"
 
 struct Game {
     char unknown_0[0xc];
     Map* displayContext;               // +0x0c
     char unknown_10[0x519 - 0x10];
-    Menu gui;                          // +0x519
-    char unknown_559[0x1a3f - 0x559];
+    Gui gui;                           // +0x519
+    char unknown_120f[0x1a3f - 0x120f];
     // Unused but must stay: the info pointer is addressed one slot below players.
     PlayerInfo* infos[11];             // +0x1a3f (addressing only, see above)
     char unknown_1a6b[0x1b63 - 0x1a6b];
@@ -668,24 +645,24 @@ void __stdcall RefreshOwnedUnitsLineOfSight(Player* range)
 void BroadcastPlayerInfo();
 void __stdcall ReportGameEvent(int param_1);
 void __stdcall PlaySoundByName(char* str, int flag);
-int __stdcall IsGadgetNamed(int param1, int param2, char* name);
-void __stdcall ClearSelectedGadget(void* param_1);
+int __stdcall IsGadgetNamed(Gadget* entries, int i, char* name);
+void __stdcall ClearSelectedGadget(Gui* gui);
 
 // FUNCTION: 0x464de0
-void __stdcall ContinueWatchingCallback(Gadget* gadget)
+void __stdcall ContinueWatchingCallback(Gui* gui)
 {
-    int screen = (int)gadget->screen->form;
-    if (gadget->selected == -1)
+    Gadget* entries = gui->layer->entries;
+    if (gui->hotGadgetIndex == -1)
         return;
     PlaySoundByName("BigButton", 0);
-    if (IsGadgetNamed(screen, gadget->selected, "CHOICE1")) {
+    if (IsGadgetNamed(entries, gui->hotGadgetIndex, "CHOICE1")) {
         BroadcastPlayerInfo();
         g_game->endGameFlags.b.bit4 = 0;
         ReportGameEvent(4);
         return;
     }
-    if (!IsGadgetNamed(screen, gadget->selected, "CHOICE2")) {
-        ClearSelectedGadget(gadget);
+    if (!IsGadgetNamed(entries, gui->hotGadgetIndex, "CHOICE2")) {
+        ClearSelectedGadget(gui);
         return;
     }
     g_game->endGameFlags.b.bit2 = 1;
@@ -700,25 +677,25 @@ extern char g_yesText[];
 extern char g_yesNoGuiName[];
 extern char g_continueWatchingTitle[];
 
-Screen* __stdcall LoadGuiLayer(Menu* menu, char* name, int value);
-void __stdcall SetKeyboardInput(Menu* menu, int flag);
-void __stdcall SetTranslatedTextByName(Menu* menu, char* name, char* text, int value);
-void __stdcall RenderLayer(Menu* menu, int value);
+Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, unsigned int flags);
+void __stdcall SetKeyboardInput(Gui* menu, int flag);
+void __stdcall SetTranslatedTextByName(Gui* menu, char* name, char* text, int value);
+int __stdcall RenderLayer(Gui* menu, unsigned int flags);
 
 // FUNCTION: 0x464e70
 void ShowContinueWatchingDialog()
 {
-    Screen* screen = LoadGuiLayer(&g_game->gui, g_yesNoGuiName, 0x900);
-    if (screen) {
-        Form* form;
+    Layer* layer = LoadGuiLayer(&g_game->gui, g_yesNoGuiName, 0x900);
+    if (layer) {
+        Gadget* form;
         SetKeyboardInput(&g_game->gui, 1);
-        form = screen->form;
+        form = layer->entries;
         SetTranslatedTextByName(&g_game->gui, g_choice1GadgetName, g_yesText, 0);
         SetTranslatedTextByName(&g_game->gui, g_choice2GadgetName, g_noText, 0);
         SetTranslatedTextByName(&g_game->gui, g_titleGadgetName, g_continueWatchingTitle, 0);
-        strcpy(form->choice1, g_choice1GadgetName);
-        strcpy(form->choice2, g_choice2GadgetName);
-        screen->callback = ContinueWatchingCallback;
+        strcpy(form->u.names.choice, g_choice1GadgetName);
+        strcpy(form->u.names.choice2, g_choice2GadgetName);
+        layer->handler = (void (__stdcall*)(void*))ContinueWatchingCallback;
         RenderLayer(&g_game->gui, 0x40);
     }
 }
@@ -744,7 +721,7 @@ void __stdcall UpdatePlayerEconomy(Player* player);
 void __stdcall SendPlayerEconomy(Player* player, int a, int b);
 int __stdcall CountCombatPlayers();
 int __stdcall CountActiveAIPlayers();
-void __stdcall OpenMessageBox(Menu* menu, const char* text, int a, int b, int c);
+int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, int autoHeight);
 
 static int loopCond_00464f80(unsigned char i)
 {
@@ -1018,17 +995,17 @@ void __stdcall UpdatePlayers()
                     RecalculateLineOfSight(1);
                     BroadcastPlayerInfo();
                     if (CountActiveAIPlayers() == 0) {
-                        Screen* dlg = LoadGuiLayer(&g_game->gui, "YESORNO.GUI", 0x900);
+                        Layer* dlg = LoadGuiLayer(&g_game->gui, "YESORNO.GUI", 0x900);
                         if (dlg != 0) {
                             SetKeyboardInput(&g_game->gui, 1);
-                            Form* w = dlg->form;
+                            Gadget* w = dlg->entries;
                             SetTranslatedTextByName(&g_game->gui, "CHOICE1", "Yes", 0);
                             SetTranslatedTextByName(&g_game->gui, "CHOICE2", "No", 0);
                             SetTranslatedTextByName(&g_game->gui, "TITLE",
                                          "You're out!  Continue Watching?", 0);
-                            strcpy(w->choice1, "CHOICE1");
-                            strcpy(w->choice2, "CHOICE2");
-                            dlg->callback = ContinueWatchingCallback;
+                            strcpy(w->u.names.choice, "CHOICE1");
+                            strcpy(w->u.names.choice2, "CHOICE2");
+                            dlg->handler = (void (__stdcall*)(void*))ContinueWatchingCallback;
                             RenderLayer(&g_game->gui, 0x40);
                         }
                         goto skip508;
