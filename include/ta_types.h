@@ -995,7 +995,7 @@ struct ElemA_0046c190;
 struct ElemArray_4a4930;
 struct ElemB_0046c190;
 struct Elem_00401000;
-struct Elem_0040cc40;
+struct ScoredCell;
 struct Elem_0040cc40_2;
 struct Elem_0040cfb0;
 struct Elem_0040d4f0;
@@ -3220,15 +3220,15 @@ public:
     Squad(int, int);
 };
 
-struct Elem_0040cc40 {  // 0x8 bytes, 19 views
+struct ScoredCell {     // 0x8 bytes, 19 views
     Point16 pos;  // +0x0
     float key;  // +0x4
-    Elem_0040cc40(Elem_0040cc40&);
-    Elem_0040cc40(Class_004c9390&, int);
-    Elem_0040cc40(short, short, float);
-    Elem_0040cc40(void);
-    ~Elem_0040cc40(void);
-    unsigned char operator<(Elem_0040cc40&);
+    ScoredCell(ScoredCell&);
+    ScoredCell(Class_004c9390&, int);
+    ScoredCell(short, short, float);
+    ScoredCell(void);
+    ~ScoredCell(void);
+    unsigned char operator<(ScoredCell&);
 };
 
 struct Point16_00437de0 {  // 0x4 bytes, 5 views
@@ -5582,8 +5582,8 @@ public:
 class Map_0042e440 {  // 0x11 bytes, 2 views
 public:
     char unknown_0;  // +0x0
-    std::vector<Elem_0040cc40> vec;  // +0x1
-    Elem_0040cc40* LowerBound(char*);
+    std::vector<ScoredCell> vec;     // +0x1
+    ScoredCell* LowerBound(char*);
 };
 
 struct Source_0042f450 {  // 0x8 bytes, 1 view
@@ -20304,7 +20304,7 @@ public:
     Group_00409160 group_25;  // +0x25
     Vec3 pos_35;  // +0x35
     Vec3 pos_41;  // +0x41
-    std::vector<Elem_0040cc40> vec_4d;  // +0x4d
+    std::vector<ScoredCell> vec_4d;     // +0x4d
     Pos_00409160 center;  // +0x5d
     std::vector<Elem_0040cfb0> vec_65;  // +0x65
     int field_75;  // +0x75
@@ -20329,7 +20329,7 @@ public:
     int margin1;  // +0x105
     int field_109;  // +0x109
     Owner(unsigned char);
-    bool FindCellNearFeatures(UnitDef*, Vec3*, std::vector<Elem_0040cc40>*, int, Point16*);
+    bool FindCellNearFeatures(UnitDef*, Vec3*, std::vector<ScoredCell>*, int, Point16*);
     bool FindRandomPlacementCell(UnitDef*, Vec3*, int, Point16*);
     void InitUnitTables(void);
 };
@@ -20394,7 +20394,7 @@ struct PlayerAI {        // 0x109 bytes, 2 views
 
 struct Class_0040a7b0 {  // 0x5d bytes, 2 views
     char unknown_0[77];
-    std::vector<Elem_0040cc40> cells;  // +0x4d
+    std::vector<ScoredCell> cells;     // +0x4d
     void BuildFeatureCells(void);
 };
 

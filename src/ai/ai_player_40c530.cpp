@@ -29,19 +29,19 @@
 void RegisterEmptyAtexitB(void);
 bool __cdecl ReadGdperf(unsigned long, void*);
 
-#define Elem_0040cc40 Elem_0040cc40_view
+#define ScoredCell ScoredCell_view
 #define Elem_0040d4f0 Elem_0040d4f0_view
 #include "ta_types.h"
-#undef Elem_0040cc40
+#undef ScoredCell
 #undef Elem_0040d4f0
 
 // A map cell and its sort key, the element of the vector at +0x4d.
-struct Elem_0040cc40 {
+struct ScoredCell {
     Point16 pos;                       // +0x0
     float key;                         // +0x4
-    Elem_0040cc40() {}
-    Elem_0040cc40(const Elem_0040cc40& o) : pos(o.pos), key(o.key) {}
-    bool operator<(const Elem_0040cc40& o) const { return key < o.key; }
+    ScoredCell() {}
+    ScoredCell(const ScoredCell& o) : pos(o.pos), key(o.key) {}
+    bool operator<(const ScoredCell& o) const { return key < o.key; }
 };
 
 // The element of the vector at +0xad, a 1-byte type other than unsigned char
@@ -53,18 +53,18 @@ struct Elem_0040d4f0 {
 };
 
 #include <new>
-// The placement copies of Elem_0040cc40 and Elem_0040d4f0 that insert and
+// The placement copies of ScoredCell and Elem_0040d4f0 that insert and
 // resize call instead of expanding: std::_Construct, which pathfind.cpp holds
 // at 0x40d5e0 and 0x40d600 under these names.
 inline void __stdcall CopyOneByte(Elem_0040d4f0* dest, const Elem_0040d4f0* src) { new (dest) Elem_0040d4f0(*src); }
-inline void __stdcall CopyDwordPair(Elem_0040cc40* dest, const Elem_0040cc40* src) { new (dest) Elem_0040cc40(*src); }
+inline void __stdcall CopyDwordPair(ScoredCell* dest, const ScoredCell* src) { new (dest) ScoredCell(*src); }
 namespace std {
 inline void _Construct(Elem_0040d4f0* dest, const Elem_0040d4f0& src) { CopyOneByte(dest, &src); }
-inline void _Construct(Elem_0040cc40* dest, const Elem_0040cc40& src) { CopyDwordPair(dest, &src); }
+inline void _Construct(ScoredCell* dest, const ScoredCell& src) { CopyDwordPair(dest, &src); }
 }
 
 typedef std::vector<Unit*> Vec_0040c530;
-typedef std::vector<Elem_0040cc40> Vec_0040c580;
+typedef std::vector<ScoredCell> Vec_0040c580;
 typedef std::vector<Elem_0040cfb0> Vec_0040c5d0;
 typedef std::vector<Elem_0040d4f0> Vec_0040c600;
 typedef std::vector<Elem_0040d550> Vec_0040c7f0;
@@ -88,17 +88,17 @@ typedef Vec_0040c530::size_type (Vec_0040c530::*SizeFn_0040c560)() const;
 // FUNCTION: 0x40c560 ?size@?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QBEIXZ
 SizeFn_0040c560 g_size_0040c560 = &Vec_0040c530::size;
 
-// std::vector<Elem_0040cc40>::~vector() (the same code as 0x40c530). 0x40b390
+// std::vector<ScoredCell>::~vector() (the same code as 0x40c530). 0x40b390
 // calls it on the vector at +0x4d.
 typedef std::vector<Vec_0040c580> Outer_0040c580;
 typedef Outer_0040c580& (Outer_0040c580::*AssignFn_0040c580)(const Outer_0040c580&);
-// FUNCTION: 0x40c580 ??1?$vector@UElem_0040cc40@@V?$allocator@UElem_0040cc40@@@std@@@std@@QAE@XZ
+// FUNCTION: 0x40c580 ??1?$vector@UScoredCell@@V?$allocator@UScoredCell@@@std@@@std@@QAE@XZ
 AssignFn_0040c580 g_assign_0040c580 = &Outer_0040c580::operator=;
 
-// std::vector<Elem_0040cc40>::size(). 0x40a7b0 calls it on the vector at
+// std::vector<ScoredCell>::size(). 0x40a7b0 calls it on the vector at
 // +0x4d; 0x40a260 and 0x40ca50 call it from the same inlined insert code.
 typedef Vec_0040c580::size_type (Vec_0040c580::*SizeFn_0040c5b0)() const;
-// FUNCTION: 0x40c5b0 ?size@?$vector@UElem_0040cc40@@V?$allocator@UElem_0040cc40@@@std@@@std@@QBEIXZ
+// FUNCTION: 0x40c5b0 ?size@?$vector@UScoredCell@@V?$allocator@UScoredCell@@@std@@@std@@QBEIXZ
 SizeFn_0040c5b0 g_size_0040c5b0 = &Vec_0040c580::size;
 
 // std::vector<Elem_0040cfb0>::~vector() (the same code as 0x40c530). 0x40b390
@@ -128,20 +128,20 @@ typedef Vec_0040c530::iterator (Vec_0040c530::*EraseFn_0040c9f0)(
 // FUNCTION: 0x40c9f0 ?erase@?$vector@PAUUnit@@V?$allocator@PAUUnit@@@std@@@std@@QAEPAPAUUnit@@PAPAU3@0@Z
 EraseFn_0040c9f0 g_erase_0040c9f0 = &Vec_0040c530::erase;
 
-// std::vector<Elem_0040cc40>::capacity(), called from the inlined reserve in
+// std::vector<ScoredCell>::capacity(), called from the inlined reserve in
 // 0x40a260.
 typedef Vec_0040c580::size_type (Vec_0040c580::*CapacityFn_0040ca30)() const;
-// FUNCTION: 0x40ca30 ?capacity@?$vector@UElem_0040cc40@@V?$allocator@UElem_0040cc40@@@std@@@std@@QBEIXZ
+// FUNCTION: 0x40ca30 ?capacity@?$vector@UScoredCell@@V?$allocator@UScoredCell@@@std@@@std@@QBEIXZ
 CapacityFn_0040ca30 g_capacity_0040ca30 = &Vec_0040c580::capacity;
 
-// std::vector<Elem_0040cc40>::insert(iterator, const T&), called from 0x40a7b0
+// std::vector<ScoredCell>::insert(iterator, const T&), called from 0x40a7b0
 // and with the insert code inlined: it calls _Ufill (0x40d5b0), _Ucopy
 // (0x40cc40) and _Destroy (0x40cc30) with ecx set to the vector.
-typedef Vec_0040c580::iterator (Vec_0040c580::*InsertFn_0040ca50)(Vec_0040c580::iterator, const Elem_0040cc40&);
-// FUNCTION: 0x40ca50 ?insert@?$vector@UElem_0040cc40@@V?$allocator@UElem_0040cc40@@@std@@@std@@QAEPAUElem_0040cc40@@PAU3@ABU3@@Z
+typedef Vec_0040c580::iterator (Vec_0040c580::*InsertFn_0040ca50)(Vec_0040c580::iterator, const ScoredCell&);
+// FUNCTION: 0x40ca50 ?insert@?$vector@UScoredCell@@V?$allocator@UScoredCell@@@std@@@std@@QAEPAUScoredCell@@PAU3@ABU3@@Z
 InsertFn_0040ca50 g_insert_0040ca50 = &Vec_0040c580::insert;
 
-// The members of std::vector<Elem_0040cc40> that are protected: _Destroy
+// The members of std::vector<ScoredCell> that are protected: _Destroy
 // (empty, since the element's destructor is trivial), _Ucopy (copies [first,
 // last) into raw storage at dest and returns the end of the copies) and
 // _Ufill (copy-constructs n copies of value into raw storage at first).
@@ -149,7 +149,7 @@ typedef void (Vec_0040c580::*DestroyFn_0040cc30)(Vec_0040c580::iterator, Vec_004
 typedef Vec_0040c580::iterator (Vec_0040c580::*UcopyFn_0040cc40)(
     Vec_0040c580::const_iterator, Vec_0040c580::const_iterator, Vec_0040c580::iterator);
 typedef void (Vec_0040c580::*UfillFn_0040d5b0)(
-    Vec_0040c580::iterator, Vec_0040c580::size_type, const Elem_0040cc40&);
+    Vec_0040c580::iterator, Vec_0040c580::size_type, const ScoredCell&);
 
 struct Access_0040c580 : Vec_0040c580 {
     static DestroyFn_0040cc30 destroy;
@@ -157,10 +157,10 @@ struct Access_0040c580 : Vec_0040c580 {
     static UfillFn_0040d5b0 ufill;
 };
 
-// FUNCTION: 0x40cc30 ?_Destroy@?$vector@UElem_0040cc40@@V?$allocator@UElem_0040cc40@@@std@@@std@@IAEXPAUElem_0040cc40@@0@Z
+// FUNCTION: 0x40cc30 ?_Destroy@?$vector@UScoredCell@@V?$allocator@UScoredCell@@@std@@@std@@IAEXPAUScoredCell@@0@Z
 DestroyFn_0040cc30 Access_0040c580::destroy = &Access_0040c580::_Destroy;
 
-// FUNCTION: 0x40cc40 ?_Ucopy@?$vector@UElem_0040cc40@@V?$allocator@UElem_0040cc40@@@std@@@std@@IAEPAUElem_0040cc40@@PBU3@0PAU3@@Z
+// FUNCTION: 0x40cc40 ?_Ucopy@?$vector@UScoredCell@@V?$allocator@UScoredCell@@@std@@@std@@IAEPAUScoredCell@@PBU3@0PAU3@@Z
 UcopyFn_0040cc40 Access_0040c580::ucopy = &Access_0040c580::_Ucopy;
 
 // std::vector<Elem_0040cfb0>::size() for the 3-byte element type (the `/ 3`
@@ -306,5 +306,5 @@ UcopyFn_0040d550 Access_0040c7f0::ucopy = &Access_0040c7f0::_Ucopy;
 // FUNCTION: 0x40d580 ?_Ufill@?$vector@UElem_0040d550@@V?$allocator@UElem_0040d550@@@std@@@std@@IAEXPAUElem_0040d550@@IABU3@@Z
 UfillFn_0040d580 Access_0040c7f0::ufill = &Access_0040c7f0::_Ufill;
 
-// FUNCTION: 0x40d5b0 ?_Ufill@?$vector@UElem_0040cc40@@V?$allocator@UElem_0040cc40@@@std@@@std@@IAEXPAUElem_0040cc40@@IABU3@@Z
+// FUNCTION: 0x40d5b0 ?_Ufill@?$vector@UScoredCell@@V?$allocator@UScoredCell@@@std@@@std@@IAEXPAUScoredCell@@IABU3@@Z
 UfillFn_0040d5b0 Access_0040c580::ufill = &Access_0040c580::_Ufill;

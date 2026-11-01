@@ -53,9 +53,9 @@ int __cdecl FUN_004b7123(short angle, int scale);
 int __stdcall CanPlaceUnitFootprint(UnitDef* type, short a, Point16 cell, int b);
 int __stdcall CanBuildAt(UnitDef* type, Point16 cell, int a, int b);
 int GetBuildSiteMetal(void);
-void __stdcall MakeHeap(Elem_0040cc40* first, Elem_0040cc40* last, int*, Elem_0040cc40*);
-void __stdcall PopHeapFirst(Elem_0040cc40* first, Elem_0040cc40* last, Elem_0040cc40* dest,
-                            Elem_0040cc40 val, int*);
+void __stdcall MakeHeap(ScoredCell* first, ScoredCell* last, int*, ScoredCell*);
+void __stdcall PopHeapFirst(ScoredCell* first, ScoredCell* last, ScoredCell* dest,
+                            ScoredCell val, int*);
 Cell* __stdcall GetMapCell(int x, int y);
 int __stdcall IsUnitVisibleToPlayer(Player*,Unit*);
 
@@ -75,9 +75,9 @@ static inline int DistSq(const Point16& a, const Point16& b)
 }
 
 // std::pop_heap(f, l) as the inline template expands it.
-static inline void PopHeap(Elem_0040cc40* f, Elem_0040cc40* l)
+static inline void PopHeap(ScoredCell* f, ScoredCell* l)
 {
-    PopHeapFirst(f, l - 1, l - 1, Elem_0040cc40(*(l - 1)), (int*)0);
+    PopHeapFirst(f, l - 1, l - 1, ScoredCell(*(l - 1)), (int*)0);
 }
 
 static inline Vec3 Direction(short angle, int scale)

@@ -494,9 +494,9 @@ void __stdcall AddOrder(MissionType kind, int remove, Unit* unit, Unit* target, 
 void __stdcall QueueBuildOrder(char* name, Unit* unit, int count);
 int __cdecl FUN_004b70ef(short angle, int scale);
 int __cdecl FUN_004b7123(short angle, int scale);
-void __stdcall MakeHeap(Elem_0040cc40* first, Elem_0040cc40* last, int*, Elem_0040cc40*);
-void __stdcall PopHeapFirst(Elem_0040cc40* first, Elem_0040cc40* last, Elem_0040cc40* dest,
-                            Elem_0040cc40 val, int*);
+void __stdcall MakeHeap(ScoredCell* first, ScoredCell* last, int*, ScoredCell*);
+void __stdcall PopHeapFirst(ScoredCell* first, ScoredCell* last, ScoredCell* dest,
+                            ScoredCell val, int*);
 Cell* __stdcall GetMapCell(int x, int y);
 int __stdcall IsUnitVisibleToPlayer(Player*, Unit*);
 int __stdcall CanPlaceUnitFootprint(UnitDef* type, short a, Point16 cell, int b);
@@ -555,9 +555,9 @@ static inline int DistSq(const Point16& a, const Point16& b)
 }
 
 // std::pop_heap(f, l) as the inline template expands it.
-static inline void PopHeap(Elem_0040cc40* f, Elem_0040cc40* l)
+static inline void PopHeap(ScoredCell* f, ScoredCell* l)
 {
-    PopHeapFirst(f, l - 1, l - 1, Elem_0040cc40(*(l - 1)), (int*)0);
+    PopHeapFirst(f, l - 1, l - 1, ScoredCell(*(l - 1)), (int*)0);
 }
 
 static inline float Max(float a, float b) { return a > b ? a : b; }
@@ -1490,15 +1490,15 @@ void PlayerAI::InitPlacementGrid()
 }
 
 // FUNCTION: 0x40a260
-bool PlayerAI::FindCellNearFeatures(UnitDef* type, Vec3* pos, std::vector<Elem_0040cc40>* list, int range, Point16* out)
+bool PlayerAI::FindCellNearFeatures(UnitDef* type, Vec3* pos, std::vector<ScoredCell>* list, int range, Point16* out)
 {
     if (list->empty())
         return false;
-    std::vector<Elem_0040cc40> heap;
+    std::vector<ScoredCell> heap;
     heap.reserve(list->size());
     int rangeSq = range * range;
     Point16 center = WorldToCell(*pos, *(Point16*)&type->footprint);
-    for (std::vector<Elem_0040cc40>::iterator p = list->begin(); p != list->end(); p++) {
+    for (std::vector<ScoredCell>::iterator p = list->begin(); p != list->end(); p++) {
         int d = DistSq(p->pos, center);
         if (d <= rangeSq) {
             heap.push_back(*p);
@@ -1507,7 +1507,7 @@ bool PlayerAI::FindCellNearFeatures(UnitDef* type, Vec3* pos, std::vector<Elem_0
     }
     // Written out, not an inline make_heap helper: the inline count sets the budget.
     if (2 <= heap.end() - heap.begin())
-        MakeHeap(heap.begin(), heap.end(), (int*)0, (Elem_0040cc40*)0);
+        MakeHeap(heap.begin(), heap.end(), (int*)0, (ScoredCell*)0);
     int limit = -1;
     int best = 0;
     Point16 result;
@@ -1542,7 +1542,7 @@ bool PlayerAI::FindCellNearFeatures(UnitDef* type, Vec3* pos, std::vector<Elem_0
 // and the score GetBuildSiteMetal is at most the type's footprint area times
 // twice mapInfo->surfaceMetal.
 // FUNCTION: 0x40a5b0
-Elem_0040cc40::Elem_0040cc40(const Elem_0040cc40& o) : pos(o.pos), key(o.key)
+ScoredCell::ScoredCell(const ScoredCell& o) : pos(o.pos), key(o.key)
 {
 }
 
@@ -1589,7 +1589,7 @@ void PlayerAI::BuildFeatureCells()
                 Feature* f = &g_game->features[row[x].feature];
                 // Keep flags a 16-bit word tested with 0x200, not a byte at +0xff.
                 if (f->value != 0.0f && (f->flags & 0x200))
-                    cells.push_back(Elem_0040cc40(x, y, f->value));
+                    cells.push_back(ScoredCell(x, y, f->value));
             }
         }
     }
