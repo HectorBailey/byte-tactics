@@ -535,7 +535,7 @@ address,size,file,symbol,status,similarity
 0x428fe0,21,src/ai/ai_profile.cpp,?ProtectUnitDefsReadWrite@@YGXXZ,matched,100.0
 0x429000,235,src/game/data_files.cpp,?CheckGpfVersion@@YGXXZ,matched,100.0
 0x4290f0,402,src/game/data_files.cpp,?BuildDataPath@@YGPADPADPBD11@Z,matched,100.0
-0x429290,78,src/game/data_files.cpp,?LoadBitmapByName@@YGPAXPBDH@Z,matched,100.0
+0x429290,78,src/game/data_files.cpp,?LoadBitmapByName@@YGPAUSurface@@PBDPAE@Z,matched,100.0
 0x4292e0,72,src/game/data_files.cpp,?LoadFontByName@@YGPAXPBD@Z,matched,100.0
 0x429330,310,src/game/data_files.cpp,?LoadPaletteByName@@YGPAXPAD@Z,matched,100.0
 0x429470,317,src/game/data_files.cpp,?LoadSoundByName@@YGHPADPBD@Z,matched,100.0

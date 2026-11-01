@@ -186,15 +186,16 @@ char* __stdcall BuildDataPath(char* buf, const char* dir, const char* name, cons
     return buf;
 }
 
-void* __stdcall LoadPcx(char* path, int outPalette);
+struct Surface;
+Surface* __stdcall LoadPcx(char* path, unsigned char* outPalette);
 
 // Loads bitmaps\<name>.PCX; reports the path when loading fails.
 // FUNCTION: 0x429290
-void* __stdcall LoadBitmapByName(const char* name, int palette)
+Surface* __stdcall LoadBitmapByName(const char* name, unsigned char* palette)
 {
     char path[256];
     BuildDataPath(path, "bitmaps", name, "PCX");
-    void* bitmap = LoadPcx(path, palette);
+    Surface* bitmap = LoadPcx(path, palette);
     if (bitmap == 0) {
         FatalError(path);
     }

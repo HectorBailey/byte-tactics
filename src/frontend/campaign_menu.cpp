@@ -200,10 +200,10 @@ void OpenOptionsPanel();
 void BlankScreen();
 void HideSoftwareCursor();
 void ShowSoftwareCursor();
-void* __stdcall LoadBitmapByName(char* name, unsigned char* palette);
+struct Surface;
+Surface* __stdcall LoadBitmapByName(const char* name, unsigned char* palette);
 int __stdcall SetPaletteColors(unsigned char* src, int start, int count);
 void __stdcall SetOffscreenSurface(int param_1);
-struct Surface;
 void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y);
 void __stdcall FreeSurface(Surface* obj);
 int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, int autoHeight);
@@ -227,7 +227,7 @@ void __stdcall DrawBitmapBackground(char* name, int lock)
         BlankScreen();
     }
     BuildDataPath(path, "bitmaps", name, "PCX");
-    image = (Surface*)LoadBitmapByName(name, palette);
+    image = LoadBitmapByName(name, palette);
     SetPaletteColors(palette, 0, 0x100);
     SetOffscreenSurface(g_game->offscreen);
     DrawSurface(0, image, 0, 0);

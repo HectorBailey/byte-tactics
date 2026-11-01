@@ -310,7 +310,7 @@ void __stdcall HandleMainMenuClick(Gui* gui);
 void __stdcall HandleCloseCdPlayerChoice(Gui* gui);
 void __stdcall OpenCloseCdPlayerDialog();
 void __stdcall FreeSurface(Surface* obj);
-void* __stdcall LoadBitmapByName(const char* name, int param_2);
+Surface* __stdcall LoadBitmapByName(const char* name, unsigned char* palette);
 int __stdcall SetBackgroundSurface(Gui* menu, int value);
 int __stdcall SetPaletteColors(unsigned char* src, int start, int count);
 
@@ -1588,7 +1588,7 @@ int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int 
         }
         if (surface == 0) {
             void* buf = GameAllocIgnoreTag("Palette", 0x400);
-            surface = (Surface*)LoadBitmapByName(name, (int)buf);
+            surface = LoadBitmapByName(name, (unsigned char*)buf);
             data = (int*)buf;
             if (g_game->frontendState != 6) {
                 if (g_pictureCache[9].surface != 0) {
