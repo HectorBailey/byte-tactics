@@ -44,7 +44,7 @@ void __cdecl FillPattern(void* at, int value, unsigned int count);
 inline unsigned int FreeBlockMap::TakeFreeBlock(unsigned int bytes)
 {
     if (size() > 0) {
-        Pair_004db000 k;
+        FreeBlock k;
         k.offset = g_lastAllocOffset;
         k.length = 0;
         FreeBlockIter lb = lower_bound(k);
@@ -66,7 +66,7 @@ inline unsigned int FreeBlockMap::TakeFreeBlock(unsigned int bytes)
             }
             if (cur->length >= bytes) {
                 // Copies the free block's value: its fields share one 8-byte local.
-                Pair_004db000 b = *cur;
+                FreeBlock b = *cur;
                 EraseCopyIter(cur);
                 if (g_lastAllocOffset == 0)
                     g_lastAllocOffset = b.offset;
@@ -77,11 +77,11 @@ inline unsigned int FreeBlockMap::TakeFreeBlock(unsigned int bytes)
                 else
                     mark = b.offset;
                 if (mark > b.offset)
-                    InsertOrFind(Pair_004db000(b.offset, mark - b.offset));
+                    InsertOrFind(FreeBlock(b.offset, mark - b.offset));
                 unsigned int end = mark + bytes;
                 // Length written as offset - mark + length - bytes: the other form is shorter.
                 if (end < b.offset + b.length)
-                    InsertOrFind(Pair_004db000(end, b.offset - mark + b.length - bytes));
+                    InsertOrFind(FreeBlock(end, b.offset - mark + b.length - bytes));
                 g_lastAllocOffset = end;
                 return mark;
             }
@@ -113,7 +113,7 @@ unsigned int __cdecl AllocDebugBlock(unsigned int n, unsigned int arg2)
         res = (unsigned int)VirtualAlloc((void*)base, need, MEM_COMMIT, PAGE_READWRITE);
         if (res == 0) {
             FreeBlockMap* pool = GetFreeBlockSet();
-            pool->AddFreeBlock(Pair_004db000(base, want));
+            pool->AddFreeBlock(FreeBlock(base, want));
         }
     }
     if (res == 0) {
