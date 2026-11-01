@@ -70,7 +70,7 @@ void FUN_00406f40(void);
 // Unused here: real declarations that keep the file's symbol count (docs/c2-regalloc.md).
 void ShowFrontendErrorText(void);
 void FreeGameFonts(void);
-void LoadDefaultPalette(void);
+int LoadDefaultPalette(void);
 class SquadManager;
 
 #pragma pack(push, 1)
@@ -535,34 +535,20 @@ int HasFewerThanThreeCampaignFiles();
 void OpenSingleMenu();
 void OpenMissionBriefing();
 int CountComputerSlots();
+void LoadUnitTypes(void);
+void FreeUnitTypes(void);
+void LoadDownloadMenus(void);
+void FreeDownloadMenus(void);
+void LoadWeaponTypes(void);
+void FreeWeaponTypes(void);
+void LoadSoundCategories(void);
+void FreeSoundCategories(void);
 int __cdecl CountHumanSlots();
-
-// The layer a dialog's +0x18 points at: the entry table at +4. In 0x4a0e00
-// the +0 is a second layer whose entries are searched.
-struct Holder_004a04f0 {
-    Holder_004a04f0* unknown_0;        // +0x00
-    Gadget* entries;                   // +0x04
-};
-
-// The GUI context at g_game's +0x519: the group at +0, the layer at +0x18,
-// the current entry at +0x64, the text length at +0x74 and the changed flag
-// at +0xcca.
-struct Dialog_004a04f0 {
-    int group;                         // +0x00
-    char unknown_04[0x18 - 0x04];
-    Holder_004a04f0* holder;           // +0x18
-    char unknown_1c[0x64 - 0x1c];
-    int current;                       // +0x64
-    char unknown_68[0x74 - 0x68];
-    int length;                        // +0x74
-    char unknown_78[0xcca - 0x78];
-    int changed;                       // +0xcca
-};
 
 #pragma pack(pop)
 
-void __stdcall SetGadgetActive(Dialog_004a04f0* menu, int index, int value);
-void __stdcall ClearPeerStatus(Dialog_004a04f0* obj, int index);
+void __stdcall SetGadgetActive(Gui* menu, int index, int value);
+void __stdcall ClearPeerStatus(Gui* obj, int index);
 char* __stdcall Translate(char* text);
 void __stdcall FatalError(char* path);
 void __stdcall DrawLitRectangle(int surface, Rect* rect, int level);
@@ -580,25 +566,25 @@ static inline int FindEntry_004a04f0(Gadget* entries, char* name)
     return -1;
 }
 
-static inline Gadget* GetEntry(Dialog_004a04f0* obj, int index)
+static inline Gadget* GetEntry(Gui* obj, int index)
 {
-    return obj->holder->entries + index;
+    return obj->layer->entries + index;
 }
 
-static inline Gadget* GetEntries(Dialog_004a04f0* obj)
+static inline Gadget* GetEntries(Gui* obj)
 {
-    return obj->holder->entries;
+    return obj->layer->entries;
 }
 
-static inline char* GetData(Dialog_004a04f0* obj)
+static inline char* GetData(Gui* obj)
 {
-    return (char*)obj->holder->entries;
+    return (char*)obj->layer->entries;
 }
 
 // FUNCTION: 0x4a04f0
-char __stdcall GetGadgetActiveByName(Dialog_004a04f0* obj, char* name)
+char __stdcall GetGadgetActiveByName(Gui* obj, char* name)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     int i = FindEntry_004a04f0(entries, name);
     if (i == -1) {
         return -1;
@@ -607,10 +593,10 @@ char __stdcall GetGadgetActiveByName(Dialog_004a04f0* obj, char* name)
 }
 
 // FUNCTION: 0x4a0570
-void __stdcall SetGadgetActiveByName(Dialog_004a04f0* obj, char* name, int param_3)
+void __stdcall SetGadgetActiveByName(Gui* obj, char* name, int param_3)
 {
-    if (obj->holder) {
-        int index = FindEntry_004a04f0(obj->holder->entries, name);
+    if (obj->layer) {
+        int index = FindEntry_004a04f0(obj->layer->entries, name);
         if (index != -1)
             SetGadgetActive(obj, index, param_3);
     }
@@ -620,7 +606,7 @@ void __stdcall SetGadgetActiveByName(Dialog_004a04f0* obj, char* name, int param
 // come from separate if statements that re-test entry->type; the tolower calls
 // are compared directly, with no named temporaries.
 // FUNCTION: 0x4a05e0
-void __stdcall AssignQuickKey(Dialog_004a04f0* obj, int index)
+void __stdcall AssignQuickKey(Gui* obj, int index)
 {
     Gadget* entries;
     Gadget* scan;
@@ -633,7 +619,7 @@ void __stdcall AssignQuickKey(Dialog_004a04f0* obj, int index)
     if (index == -1)
         return;
 
-    entries = obj->holder->entries;
+    entries = obj->layer->entries;
     entry = entries + index;
     if (entry->type == 1) {
         if ((entry->attribs & 0x10000) != 0)
@@ -690,10 +676,10 @@ void __stdcall AssignQuickKey(Dialog_004a04f0* obj, int index)
 }
 
 // FUNCTION: 0x4a07d0
-void __stdcall SetGadgetTextByName(Dialog_004a04f0* obj, char* name, char* text)
+void __stdcall SetGadgetTextByName(Gui* obj, char* name, char* text)
 {
-    if (obj->holder) {
-        Gadget* entries = obj->holder->entries;
+    if (obj->layer) {
+        Gadget* entries = obj->layer->entries;
         int index = FindEntry_004a04f0(entries, name);
         if (index != -1) {
             strncpy(entries[index].u.text, text, 0x80);
@@ -709,7 +695,7 @@ struct Object_004a0880;
 void __stdcall SetGadgetText(Object_004a0880* obj, int index, char* text);
 
 // FUNCTION: 0x4a08f0
-void __stdcall TranslateGadgetItems(Dialog_004a04f0* obj, int index)
+void __stdcall TranslateGadgetItems(Gui* obj, int index)
 {
     Gadget* entry = GetEntry(obj, index);
     char temp[0x80];
@@ -726,11 +712,11 @@ void __stdcall TranslateGadgetItems(Dialog_004a04f0* obj, int index)
 }
 
 // FUNCTION: 0x4a09c0
-void __stdcall SetTranslatedText(Dialog_004a04f0* context, int index, char* source, int value)
+void __stdcall SetTranslatedText(Gui* context, int index, char* source, int value)
 {
-    if (index == -1 || context->holder == 0)
+    if (index == -1 || context->layer == 0)
         return;
-    Gadget* entries = context->holder->entries;
+    Gadget* entries = context->layer->entries;
     char* text = Translate(source);
 
     switch (entries[index].type) {
@@ -741,9 +727,9 @@ void __stdcall SetTranslatedText(Dialog_004a04f0* context, int index, char* sour
         break;
     case 3:
         if (text != 0) {
-            strcpy(context->holder->entries[index].u.text, text);
-            if (context->current == index)
-                context->length = strlen(text);
+            strcpy(context->layer->entries[index].u.text, text);
+            if (context->focus == index)
+                context->cursor = strlen(text);
         }
         if (value != 0)
             entries[index].status = (short)value;
@@ -758,7 +744,7 @@ void __stdcall SetTranslatedText(Dialog_004a04f0* context, int index, char* sour
                     *p = 0;
                 p++;
             }
-            Gadget* entry = &context->holder->entries[index];
+            Gadget* entry = &context->layer->entries[index];
             char temp[0x80];
             char* dst = temp;
             char* src = entry->u.text;
@@ -777,10 +763,10 @@ void __stdcall SetTranslatedText(Dialog_004a04f0* context, int index, char* sour
 }
 
 // FUNCTION: 0x4a0bf0
-void __stdcall SetTranslatedTextByName(Dialog_004a04f0* obj, char* name, char* param_3, int param_4)
+void __stdcall SetTranslatedTextByName(Gui* obj, char* name, char* param_3, int param_4)
 {
-    if (obj->holder != 0) {
-        int index = FindEntry_004a04f0(obj->holder->entries, name);
+    if (obj->layer != 0) {
+        int index = FindEntry_004a04f0(obj->layer->entries, name);
         if (index != -1) {
             SetTranslatedText(obj, index, param_3, param_4);
         }
@@ -790,10 +776,10 @@ void __stdcall SetTranslatedTextByName(Dialog_004a04f0* obj, char* name, char* p
 // Finds a gadget by name (as in 0x4a0570), stores a value into it and marks
 // the object as changed.
 // FUNCTION: 0x4a0c70
-void __stdcall SetGadgetColorByName(Dialog_004a04f0* obj, char* name, int value)
+void __stdcall SetGadgetColorByName(Gui* obj, char* name, int value)
 {
-    if (obj->holder) {
-        Gadget* entries = obj->holder->entries;
+    if (obj->layer) {
+        Gadget* entries = obj->layer->entries;
         int index = FindEntry_004a04f0(entries, name);
         if (index != -1) {
             entries[index].colours = value;
@@ -807,14 +793,16 @@ void __stdcall SetGadgetColorByName(Dialog_004a04f0* obj, char* name, int value)
 // type byte at +0, read through a switch). With a non-zero third argument the
 // text is copied there as well; the return value is the text either way, 0 when
 // the entry is missing or of another type.
+// The original calls this out of line from TruncateGadgetText.
+#pragma auto_inline(off)
 // FUNCTION: 0x4a0d00
-char* __stdcall GetGadgetText(Dialog_004a04f0* obj, char* name, char* buf)
+char* __stdcall GetGadgetText(Gui* obj, char* name, char* buf)
 {
     char* desc = 0;
-    if (obj->holder == 0) {
+    if (obj->layer == 0) {
         FatalError("Internal error");
     }
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     int index = FindEntry_004a04f0(entries, name);
     if (index != -1) {
         switch (entries[index].type) {
@@ -831,35 +819,36 @@ char* __stdcall GetGadgetText(Dialog_004a04f0* obj, char* name, char* buf)
     // Single return at the end: keeps the local in memory.
     return desc;
 }
+#pragma auto_inline(on)
 
 // Sets the text of the GUI entry named `name`: entries of type 1 and 5 take
 // strncpy of 0x80 bytes, type 3 a plain strcpy, and for type 3, when the entry
 // is the current one, the text length is stored. Then the list is marked
-// changed. The entry is looked up in `holder->unknown_0->entries` but written
-// through `holder->entries` for type 3, the two chains the machine code takes.
+// changed. The entry is looked up in `layer->next->entries` but written
+// through `layer->entries` for type 3, the two chains the machine code takes.
 //
-// Suspected original bug: the lookup uses `holder->unknown_0->entries` while
-// the type 3 write goes to `holder->entries[index]`, so the text can be stored
+// Suspected original bug: the lookup uses `layer->next->entries` while
+// the type 3 write goes to `layer->entries[index]`, so the text can be stored
 // into a different array than the one that was searched. The function itself
 // walks both chains (the two-level one at the top, the three-level one inside
 // case 3), which is the evidence.
 // FUNCTION: 0x4a0e00
-void __stdcall SetControlTextByName(Dialog_004a04f0* obj, char* name, char* text)
+void __stdcall SetControlTextByName(Gui* obj, char* name, char* text)
 {
     // Loaded before the null test on purpose: the original loads the entries
     // pointer before the `je`.
-    Gadget* entries = obj->holder->unknown_0->entries;
+    Gadget* entries = obj->layer->next->entries;
     // Guards are early returns, not nested ifs.
-    if (obj->holder->unknown_0 == 0)
+    if (obj->layer->next == 0)
         return;
     int index = FindEntry_004a04f0(entries, name);
     if (index == -1)
         return;
     switch (entries[index].type) {
     case 3:
-        strcpy(obj->holder->entries[index].u.text, text);
-        if (obj->current == index)
-            obj->length = strlen(text);
+        strcpy(obj->layer->entries[index].u.text, text);
+        if (obj->focus == index)
+            obj->cursor = strlen(text);
         break;
     case 1:
         strncpy(entries[index].u.text, text, 0x80);
@@ -872,7 +861,7 @@ void __stdcall SetControlTextByName(Dialog_004a04f0* obj, char* name, char* text
 }
 
 // FUNCTION: 0x4a0f30
-int __stdcall GetGadgetStatus(Dialog_004a04f0* obj, int index)
+int __stdcall GetGadgetStatus(Gui* obj, int index)
 {
     return GetEntries(obj)[index].status;
 }
@@ -881,9 +870,9 @@ int __stdcall GetGadgetStatus(Dialog_004a04f0* obj, int index)
 // returns its field 0x137 when the entry's state is 1, otherwise -1 (compare
 // 0x4a0ff0).
 // FUNCTION: 0x4a0f60
-int __stdcall GetButtonStageByName(Dialog_004a04f0* obj, char* name)
+int __stdcall GetButtonStageByName(Gui* obj, char* name)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     int i = FindEntry_004a04f0(entries, name);
     if (i != -1 && entries[i].type == 1) {
         return entries[i].stageIndex;
@@ -895,9 +884,9 @@ int __stdcall GetButtonStageByName(Dialog_004a04f0* obj, char* name)
 // state is 1, otherwise -1. The entries pointer is loaded into a local before
 // the index multiply; indexing through the full chain loads it afterwards.
 // FUNCTION: 0x4a0ff0
-int __stdcall GetButtonStage(Dialog_004a04f0* obj, int index)
+int __stdcall GetButtonStage(Gui* obj, int index)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     if (entries[index].type == 1) {
         return entries[index].stageIndex;
     }
@@ -905,9 +894,9 @@ int __stdcall GetButtonStage(Dialog_004a04f0* obj, int index)
 }
 
 // FUNCTION: 0x4a1030
-int __stdcall SetButtonStage(Dialog_004a04f0* obj, int index, char value)
+int __stdcall SetButtonStage(Gui* obj, int index, char value)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     if (entries[index].type == 1) {
         entries[index].stageIndex = value;
         return 1;
@@ -916,9 +905,9 @@ int __stdcall SetButtonStage(Dialog_004a04f0* obj, int index, char value)
 }
 
 // FUNCTION: 0x4a1080
-int __stdcall SetButtonStageByName(Dialog_004a04f0* obj, char* name, char value)
+int __stdcall SetButtonStageByName(Gui* obj, char* name, char value)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     int i = FindEntry_004a04f0(entries, name);
     if (i != -1) {
         entries[i].stageIndex = value;
@@ -931,9 +920,9 @@ int __stdcall SetButtonStageByName(Dialog_004a04f0* obj, char* name, char value)
 // given value in the entry's field 0x138, flags the list as changed and, when
 // the value is not zero, tells the list to lay the entry out (0x4a0340).
 // FUNCTION: 0x4a1110
-int __stdcall SetGadgetStatusByName(Dialog_004a04f0* obj, char* name, int value)
+int __stdcall SetGadgetStatusByName(Gui* obj, char* name, int value)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     int i = FindEntry_004a04f0(entries, name);
     if (i != -1) {
         entries[i].status = value;
@@ -951,14 +940,14 @@ void ClearBorderFeatures();
 void LoadTntMap();
 
 // FUNCTION: 0x4a11c0
-void __stdcall SetGadgetStatus(Dialog_004a04f0* param_1, int param_2, short param_3)
+void __stdcall SetGadgetStatus(Gui* param_1, int param_2, short param_3)
 {
     *(short*)(GetData(param_1) + param_2 * 347 + 0x138) = param_3;
     ClearPeerStatus(param_1, param_2);
 }
 
 // FUNCTION: 0x4a1200
-void __stdcall SetGrayedOut(Dialog_004a04f0* obj, int index, int value)
+void __stdcall SetGrayedOut(Gui* obj, int index, int value)
 {
     GetEntries(obj)[index].flag_bit = value;
     obj->changed = 1;
@@ -966,9 +955,9 @@ void __stdcall SetGrayedOut(Dialog_004a04f0* obj, int index, int value)
 
 // Finds a gadget by name and sets its flag bit (see 0x4a1080 and 0x4a1200).
 // FUNCTION: 0x4a1250
-void __stdcall SetGrayedOutByName(Dialog_004a04f0* obj, char* name, int value)
+void __stdcall SetGrayedOutByName(Gui* obj, char* name, int value)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     int i = FindEntry_004a04f0(entries, name);
     if (i != -1) {
         entries[i].flag_bit = value;
@@ -981,9 +970,9 @@ void __stdcall SetGrayedOutByName(Dialog_004a04f0* obj, char* name, int value)
 // bits 0x1800. The other types write one flag bit. The `or`/`and` in type 2
 // and the `& 1` merges come from the source's explicit masks.
 // FUNCTION: 0x4a12e0
-void __stdcall SetGadgetGrayedOut(Dialog_004a04f0* obj, int index, int value)
+void __stdcall SetGadgetGrayedOut(Gui* obj, int index, int value)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     if (index == -1) {
         return;
     }
@@ -1023,9 +1012,9 @@ void __stdcall SetGadgetGrayedOut(Dialog_004a04f0* obj, int index, int value)
 // Looks up a menu entry by name and, when found, passes its index to
 // SetGadgetGrayedOut; byte-identical to 0x4a14c0.
 // FUNCTION: 0x4a1450
-void __stdcall SetGadgetGrayedOutByName(Dialog_004a04f0* obj, char* name, int param_3)
+void __stdcall SetGadgetGrayedOutByName(Gui* obj, char* name, int param_3)
 {
-    int index = FindEntry_004a04f0(obj->holder->entries, name);
+    int index = FindEntry_004a04f0(obj->layer->entries, name);
     if (index != -1)
         SetGadgetGrayedOut(obj, index, param_3);
 }
@@ -1033,18 +1022,18 @@ void __stdcall SetGadgetGrayedOutByName(Dialog_004a04f0* obj, char* name, int pa
 // Looks up a menu entry by name and, when found, passes its index to
 // SetGadgetGrayedOut; compare 0x4a0570 and 0x4a1530.
 // FUNCTION: 0x4a14c0
-void __stdcall FUN_004a14c0(Dialog_004a04f0* obj, char* name, int param_3)
+void __stdcall FUN_004a14c0(Gui* obj, char* name, int param_3)
 {
-    int index = FindEntry_004a04f0(obj->holder->entries, name);
+    int index = FindEntry_004a04f0(obj->layer->entries, name);
     if (index != -1)
         SetGadgetGrayedOut(obj, index, param_3);
 }
 
 // FUNCTION: 0x4a1530
-void __stdcall SetQuickKeyByName(Dialog_004a04f0* obj, char* name, char value)
+void __stdcall SetQuickKeyByName(Gui* obj, char* name, char value)
 {
-    int i = FindEntry_004a04f0(obj->holder->entries, name);
-    obj->holder->entries[i].quickKey = value;
+    int i = FindEntry_004a04f0(obj->layer->entries, name);
+    obj->layer->entries[i].quickKey = value;
     obj->changed = 1;
 }
 
@@ -1097,9 +1086,9 @@ void __stdcall GetGadgetScreenRect(char* param_1, int param_2, Rect* param_3)
 // type 3 is cleared first, then the selected one is given state 30 and, unless
 // its type rules it out, a box is drawn around it in six shrinking steps.
 // FUNCTION: 0x4a16f0
-void __stdcall DrawGadgetSelectionBox(Dialog_004a04f0* obj, int index, int param_3)
+void __stdcall DrawGadgetSelectionBox(Gui* obj, int index, int param_3)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     int i;
     // Declared up here, used only at the bottom: in this scope MSVC keeps the
     // entry field loads in source order instead of hoisting them together.
@@ -1139,7 +1128,7 @@ void __stdcall DrawGadgetSelectionBox(Dialog_004a04f0* obj, int index, int param
             rect.top--;
             rect.right++;
             rect.bottom++;
-            DrawLitRectangle((int)obj->holder->entries->u.assets.surface, &rect, level);
+            DrawLitRectangle((int)obj->layer->entries->u.assets.surface, &rect, level);
             level += -3 - step;
         }
     }
@@ -1753,9 +1742,9 @@ struct ProjType_0049b090;
 struct Proj_0049c740;
 
 // FUNCTION: 0x4a2480
-void __stdcall DrawGafBar(Dialog_004a04f0* param_1, int index)
+void __stdcall DrawGafBar(Gui* param_1, int index)
 {
-    Gadget* base = param_1->holder->entries;
+    Gadget* base = param_1->layer->entries;
     void* surface = base->u.assets.surface;
     Gadget* e = &base[index];
     GafEntry* glyphs = e->inputGaf;
@@ -2269,9 +2258,9 @@ int GetFontHeight();
 char* __stdcall GetGafFrame(void* glyphs, int c);
 unsigned int __cdecl GetTicks();
 // FUNCTION: 0x4a30c0
-void __stdcall ResetListBox(Dialog_004a04f0* obj, int index)
+void __stdcall ResetListBox(Gui* obj, int index)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     Gadget* e = &entries[index];
     e->u.list.firstRow = 0;
     e->u.list.selected = 0;
@@ -4708,6 +4697,7 @@ void __stdcall DrawButton(Gui* menu, int index)
 int DrawRangeCircle(int, int, int, int, int, int, int);
 void AddTextGadget(int, int, int, int, int, int, int);
 int DirectionFromStep(int, int);
+void LoadAllSound(void);
 
 // FUNCTION: 0x4a69d0
 void __stdcall ClearAllStatus(Gui* param_1)
