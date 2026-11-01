@@ -2209,7 +2209,7 @@ address,size,file,symbol,status,similarity
 0x4a1a50,87,src/gui/gui.cpp,?FindAssocTextInput@@YGHPAUGadget@@H@Z,matched,100.0
 0x4a1ab0,143,src/gui/gui.cpp,?RedrawGadgetRect@@YGXPAUGui@@H@Z,matched,100.0
 0x4a1b40,2160,src/gui/gui.cpp,?DrawListBox@@YGXPAUGui@@H@Z,matched,100.0
-0x4a23b0,196,src/gui/gui.cpp,?GetSliderRects@@YGXPAUGadget@@HPAH1@Z,matched,100.0
+0x4a23b0,196,src/gui/gui.cpp,?GetSliderRects@@YGXPAUGadget@@HPAURect@@1@Z,matched,100.0
 0x4a2480,242,src/gui/gui.cpp,?DrawGafBar@@YGXPAUGui@@H@Z,matched,100.0
 0x4a2580,1631,src/gui/gui.cpp,?DrawSliderBar@@YGXPAUGui@@H@Z,matched,100.0
 0x4a2be0,597,src/gui/gui.cpp,?SyncAssocGadgets@@YGXPAUGui@@H@Z,matched,100.0

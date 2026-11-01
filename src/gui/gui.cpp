@@ -1649,24 +1649,24 @@ struct Player_0044fed0;
 struct Player_004573d0;
 
 // FUNCTION: 0x4a23b0
-void __stdcall GetSliderRects(Gadget* base, int index, int* r1, int* r2)
+void __stdcall GetSliderRects(Gadget* base, int index, Rect* bar, Rect* knob)
 {
     Gadget* e = base + index;
-    r1[0] = e->x;
-    r1[1] = e->y;
-    r1[2] = r1[0] + e->width;
-    r1[3] = r1[1] + e->height;
+    bar->left = e->x;
+    bar->top = e->y;
+    bar->right = bar->left + e->width;
+    bar->bottom = bar->top + e->height;
     if (e->attribs & 1) {
-        int left = r1[0] + e->knobPos + 1;
-        r2[0] = left;
-        r2[1] = r1[1] + 1;
-        r2[2] = left + e->knobSize;
-        r2[3] = r2[1] + e->height - 2;
+        int left = bar->left + e->knobPos + 1;
+        knob->left = left;
+        knob->top = bar->top + 1;
+        knob->right = left + e->knobSize;
+        knob->bottom = knob->top + e->height - 2;
     } else {
-        r2[0] = r1[0] + 1;
-        r2[1] = r1[1] + e->knobPos + 2;
-        r2[2] = r2[0] + e->width - 2;
-        r2[3] = r2[1] + e->knobSize;
+        knob->left = bar->left + 1;
+        knob->top = bar->top + e->knobPos + 2;
+        knob->right = knob->left + e->width - 2;
+        knob->bottom = knob->top + e->knobSize;
     }
 }
 // Draws one gadget entry's three glyphs (start, repeated middle, end) across
@@ -1791,9 +1791,9 @@ struct Dialog_4a2580 {
 };
 
 void __stdcall SetFont(int id);
-void __stdcall GetSliderRects(Gadget* base, int index, int* r1, int* r2);
-void __stdcall DrawRaisedBox(void* surface, int* r, int a, int b, int c);
-void __stdcall DrawSunkenBox(void* surface, int* r, int a, int b, int c);
+void __stdcall GetSliderRects(Gadget* base, int index, Rect* bar, Rect* knob);
+void __stdcall DrawRaisedBox(void* surface, Rect* rect, int light, unsigned char dark, int fill);
+void __stdcall DrawSunkenBox(void* surface, Rect* rect, int light, int dark, int fill);
 char* __stdcall GetGafFrame(void* glyphs, int c);
 void __stdcall DrawFrame(void* surface, void* glyph, int x, int y);
 int GetTextKeyColor();
@@ -1856,14 +1856,14 @@ void __stdcall DrawSliderBar(Gui* obj, int index)
     if (i == entries->u.count + 1)
         SetFont(g_guiContext->font);
 
-    int r1[4];
-    int r2[4];
-    GetSliderRects(entries, index, r1, r2);
+    Rect bar;
+    Rect knob;
+    GetSliderRects(entries, index, &bar, &knob);
 
     GafEntry* gl = e->sliderGaf;
     if (gl == 0) {
-        DrawRaisedBox(surface, r1, obj->colours[0], obj->colours[0x11], obj->colours[0x14]);
-        DrawSunkenBox(surface, r2, obj->colours[0], obj->colours[0x11], obj->colours[0x14]);
+        DrawRaisedBox(surface, &bar, obj->colours[0], obj->colours[0x11], obj->colours[0x14]);
+        DrawSunkenBox(surface, &knob, obj->colours[0], obj->colours[0x11], obj->colours[0x14]);
     } else {
         short w = e->width;
         short h = e->height;
@@ -1938,7 +1938,7 @@ void __stdcall DrawSliderBar(Gui* obj, int index)
         // Original bug, kept as it is: the copy at 0x4a2a26 (strlen with repne
         // scasb, then rep movsd/rep movsb) is unbounded and the source field runs
         // from entry+0xb6 to the end of the 0x15b-byte entry, so a label longer
-        // than 15 characters runs off the 0x10-byte buffer into r1, r2 and the
+        // than 15 characters runs off the 0x10-byte buffer into bar, knob and the
         // saved registers.
         if (e->u.text[0] != 0) {
             strcpy(buf, e->u.text);
@@ -2884,7 +2884,7 @@ void InitGame(void);
 void ShutdownGame(void);
 
 int __stdcall TrySetFocus(Gui* obj, int index);
-void __stdcall GetSliderRects(Gadget* base, int index, int* r1, int* r2);
+void __stdcall GetSliderRects(Gadget* base, int index, Rect* bar, Rect* knob);
 void __stdcall DrawSliderBar(Gui* obj, int index);
 void __stdcall SyncAssocGadgets(Gui* obj, int index);
 int __stdcall IsMouseButtonMessage(Gui* obj, unsigned char buttons);
@@ -2920,9 +2920,9 @@ void __stdcall HandleSliderInput(Gui* obj, int index)
     MouseEvent p = obj->point;
     p.x -= entries->x;
     p.y -= entries->y;
-    int r1[4];
-    int r2[4];
-    GetSliderRects(entries, index, r1, r2);
+    Rect bar;
+    Rect knob;
+    GetSliderRects(entries, index, &bar, &knob);
 
     if (obj->focus == index) {
         if (!HasMouseKeyFlags(obj, 3)) {
@@ -2941,14 +2941,14 @@ void __stdcall HandleSliderInput(Gui* obj, int index)
             // Per-path stores to e->knobPos (not one after the if/else): keeps the 16-bit loads.
             int old = e->knobPos;
             if (e->attribs & 1) {
-                if (p.x < r2[0])
+                if (p.x < knob.left)
                     e->knobPos--;
-                else if (p.x > r2[2])
+                else if (p.x > knob.right)
                     e->knobPos++;
             } else {
-                if (p.y < r2[1])
+                if (p.y < knob.top)
                     e->knobPos--;
-                else if (p.y > r2[3])
+                else if (p.y > knob.bottom)
                     e->knobPos++;
             }
             OffsetChanged_004a4170(obj, index, e, old);
@@ -2960,11 +2960,11 @@ void __stdcall HandleSliderInput(Gui* obj, int index)
         return;
     if (IsMouseButtonMessage(obj, 1)) {
         obj->knobDragging = 0;
-        if (p.x < r1[0] || p.x > r1[2] || p.y < r1[1] || p.y > r1[3])
+        if (p.x < bar.left || p.x > bar.right || p.y < bar.top || p.y > bar.bottom)
             return;
         TrySetFocus(obj, index);
         SetClickMode(obj, 1);
-        if (p.x < r2[0] || p.x > r2[2] || p.y < r2[1] || p.y > r2[3])
+        if (p.x < knob.left || p.x > knob.right || p.y < knob.top || p.y > knob.bottom)
             return;
         obj->dragStart = p;
         obj->knobDragging = 1;
@@ -2973,11 +2973,11 @@ void __stdcall HandleSliderInput(Gui* obj, int index)
     }
     if (IsMouseButtonMessage(obj, 2)) {
         obj->knobDragging = 0;
-        if (p.x < r1[0] || p.x > r1[2] || p.y < r1[1] || p.y > r1[3])
+        if (p.x < bar.left || p.x > bar.right || p.y < bar.top || p.y > bar.bottom)
             return;
         TrySetFocus(obj, index);
         SetClickMode(obj, 2);
-        if (p.x < r2[0] || p.x > r2[2] || p.y < r2[1] || p.y > r2[3])
+        if (p.x < knob.left || p.x > knob.right || p.y < knob.top || p.y > knob.bottom)
             return;
         obj->dragStart = p;
         obj->knobDragging = 1;
@@ -3147,7 +3147,7 @@ struct Language_004a4660 { char unknown_0[0xc]; unsigned short *glyphs; };
 struct LanguageRoot_004a4660 { char unknown_0[0x14]; Language_004a4660 *language; };
 
 void __stdcall LockScreen(void *);
-void __stdcall FillBevelBox(void *, Rect *, unsigned int, unsigned int, unsigned int);
+void __stdcall FillBevelBox(void *, Rect *, int, int, int);
 int __stdcall FillRectangle(void *, Rect *, int);
 void __stdcall DrawTextClipped(void *, char *, int, int, int, int);
 char* __stdcall GetGafFrame(void* glyphs, int c);
@@ -4068,8 +4068,8 @@ void __stdcall FadeRectangle(void* surface, Rect* rect, int level);
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2, int colour);
 void __stdcall DrawFrame(void* surface, GafFrame* glyph, int x, int y);
 void __stdcall DrawFrameLit(void* surface, GafFrame* glyph, int x, int y, int style);
-void __stdcall FillBevelBox(void* surface, Rect* rect, unsigned int a, unsigned int b, unsigned int c);
-void __stdcall FillBevelBoxDarkFirst(void* surface, Rect* rect, unsigned int a, unsigned int b, unsigned int c);
+void __stdcall FillBevelBox(void* surface, Rect* rect, int light, int dark, int fill);
+void __stdcall FillBevelBoxDarkFirst(void* surface, Rect* rect, int light, int dark, int fill);
 void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw, int style);
 int __stdcall DrawWrappedText(void* surface, char* text, int x, int y, int maxw, int rem, int style);
 
