@@ -2783,7 +2783,7 @@ name (`std::_Lockit::_Lockit` is 0x4e39b0).
   2868 bytes, #2576).
 - **Aggregate initialisers keep stores that assignments lose.**
   `struct HapiBuf sb = {20};` is the only shape found that gives 0x4bd160's
-  fresh `xor ecx, ecx` (96.7% to 98.3%, #2187), and `Line_004de550 line =
+  fresh `xor ecx, ecx` (96.7% to 98.3%, #2187), and `IMAGEHLP_LINE line =
   { 0x14 };` keeps 0x4de550's entry test and the initialiser's dead zero store
   (77.5% to 92.9%, then MATCH, #2526).
 - **Copy STL template text verbatim.** Writing an insertion sort's backward
