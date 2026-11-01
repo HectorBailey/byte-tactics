@@ -896,7 +896,7 @@ void __stdcall SetGadgetName(void* gui, char* name, char* text);
 void __stdcall SetGadgetRows(void* table, char* name, int* pics, int count);
 void __stdcall DrawButton(void* gadget, int value);
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
-Layer* __stdcall LoadGuiLayer(void* menu, const char* name, int flags);
+Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, unsigned int flags);
 void __stdcall RenderLayer(void* menu, int value);
 void __stdcall PlaySoundByName(const char* name, int flag);
 void __stdcall PlaySoundByName(char* str, int flag);

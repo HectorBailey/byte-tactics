@@ -232,7 +232,7 @@ DisplayContext* __stdcall GetDisplay(void);
 void __stdcall CloseTopScreen(Gui* sub);
 void HideSoftwareCursor();
 void Force640x480Surfaces();
-Layer* __stdcall LoadGuiLayer(Gui* sub, const char* name, int flags);
+Layer* __stdcall LoadGuiLayer(Gui* sub, const char* name, unsigned int flags);
 void __stdcall PlayLoopingSoundByName(const char* name, int param_2);
 void __stdcall EnableKeyCommands(Gui* sub);
 void* __stdcall HAPI_LoadFile(char* name, int flag);

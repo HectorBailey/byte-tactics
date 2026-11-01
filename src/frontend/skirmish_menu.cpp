@@ -724,7 +724,7 @@ void __stdcall UpdateSkirmishMapSelection(Gui* menu, int unused)
 
 int __stdcall LoadMapList(char** out, int param_2, int param_3);
 void __stdcall OpenMessageBox(Gui* menu, char* text, int width, int a, int b);
-Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
+Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, unsigned int flags);
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 void __stdcall SortFileList(char* items, int b, int c, int count);
