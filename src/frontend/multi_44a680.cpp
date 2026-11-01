@@ -122,14 +122,14 @@ Gadget_0044a680* __stdcall FindGadgetChecked_E(Gadget_0044a680* entries, char* n
 void __stdcall GetGadgetRectByIndex(Gadget_0044a680* entries, int widget, RECT* rect);
 int __stdcall GetTextPixelWidth(char* text);
 int __stdcall GetFontLineHeight();
-void __stdcall DrawTextClipped(int a, char* text, int x, int y, int w, int h);
+void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw, int style);
 void __stdcall SetCurrentFont(Gui* gui, int flag);
 void __stdcall CloseTopScreen(Gui* gui);
 int __stdcall IsScreenNamed(Gui* gui, const char* name);
 void __stdcall SetSliderFromValue(Gadget_0044a680* gadget, int value);
 int __stdcall ReadSliderValue(Gadget_0044a680* gadget);
 int __stdcall GetTicks();
-unsigned char __stdcall FindGameCdDrive(int param);
+char __stdcall FindGameCdDrive(int side);
 void __stdcall SendNetHeartbeat();
 void __stdcall BroadcastPlayerInfo();
 void __stdcall UpdateNetGameInfo();

@@ -599,7 +599,7 @@ int __stdcall FindNextAllySlot(int self, int start)
     return -1;
 }
 
-void __stdcall SetupPlayerSlot(unsigned char player, unsigned char kind);
+void __stdcall SetupPlayerSlot(int player, char type);
 
 // Marks, for each active player (active 1 or 2), every player slot that shares
 // its team type (or is the player itself), in the entry's `allied` array.
@@ -727,7 +727,7 @@ int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, in
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, unsigned int flags);
 void* __cdecl GameAllocIgnoreTag(char* name, unsigned int size);
 int __stdcall LoadPictureCached(const char* name, int param_2, int param_3, int param_4);
-void __stdcall SortFileList(char* items, int b, int c, int count);
+void __stdcall SortFileList(char* list1, char* list2, int* keys, int count);
 void __stdcall ConfigureListBoxByName(Gui* menu, char* name, char* items, int count, int flag);
 void __stdcall SetListBoxScrollByName(Gui* menu, char* name, int index);
 void __stdcall SetKeyboardInput(Gui* menu, int value);
@@ -1253,7 +1253,7 @@ void OpenSkirmishMenu(void)
 
 extern char* g_forcesDestroyedTexts[];
 
-void __stdcall AddMessage(char* text, int key, int value, unsigned char last);
+void __stdcall AddMessage(char* text, unsigned char key, unsigned short value, char last);
 
 // Announces that a player's forces were destroyed: "<Core|Arm> <random
 // message>", using one of three (translated) messages.
