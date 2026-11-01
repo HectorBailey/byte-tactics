@@ -1454,12 +1454,13 @@ extern void (*g_outOfMemoryHandler)();  // out-of-memory handler
 extern int g_blockMapLiveCount;        // bumped on every node carved here
 extern void* g_blockMap;               // the tree singleton
 
-struct Node_004da8d0 {
-    Node_004da8d0* left;               // +0x0
-    Node_004da8d0* parent;             // +0x4
-    Node_004da8d0* right;              // +0x8
-    char value[0x30];                  // +0xc
-    int color;                         // +0x3c (0 = red)
+// The file-record tree's node, the one view of it the file's trees share.
+struct BlockMapNode {
+    BlockMapNode* left;                // +0x0
+    BlockMapNode* parent;              // +0x4
+    BlockMapNode* right;               // +0x8
+    BlockInfo value;                   // +0xc
+    unsigned int color;                // +0x3c (0 = red)
 };
 
 extern void* g_blockMapNil;            // the tree's _Nil node
@@ -1474,7 +1475,7 @@ class Tree_004da8d0 {
 public:
     char allocator;                    // +0x0
     char key_compare;                  // +0x1
-    Node_004da8d0* head;               // +0x4
+    BlockMapNode* head;                // +0x4
     unsigned char multi;               // +0x8
     int size;                          // +0xc
     void* operator new(unsigned int n) { return GlobalAlloc(0, n); }
@@ -1482,12 +1483,14 @@ public:
     void Init();
 };
 
-static inline Node_004da8d0* AllocNode()
+// A 0x40-byte pooled node, allocated 0x80 at a time. BlockMap::CreateNode
+// carves its nodes here too.
+static inline BlockMapNode* AllocBlockMapNode()
 {
     if (g_blockMapFreeList == 0) {
-        Node_004da8d0* block;
+        BlockMapNode* block;
         do {
-            block = (Node_004da8d0*)GlobalAlloc(0, 0x2000);
+            block = (BlockMapNode*)GlobalAlloc(0, 0x2000);
             if (block == 0 && g_outOfMemoryHandler != 0) {
                 g_outOfMemoryHandler();
             }
@@ -1495,7 +1498,7 @@ static inline Node_004da8d0* AllocNode()
         if (block == 0) {
             return 0;
         }
-        Node_004da8d0* head = (Node_004da8d0*)g_blockMapFreeList;
+        BlockMapNode* head = (BlockMapNode*)g_blockMapFreeList;
         for (int i = 0; i < 0x80; i++) {
             block->left = head;
             head = block;
@@ -1503,7 +1506,7 @@ static inline Node_004da8d0* AllocNode()
         }
         g_blockMapFreeList = head;
     }
-    Node_004da8d0* node = (Node_004da8d0*)g_blockMapFreeList;
+    BlockMapNode* node = (BlockMapNode*)g_blockMapFreeList;
     g_blockMapFreeList = node->left;
     return node;
 }
@@ -1513,18 +1516,18 @@ void Tree_004da8d0::Init()
     std::_Lockit lock;
     if (g_blockMapNil == 0) {
         // The allocator is the tree's +0 member, which this view types as char.
-        Node_004da8d0* nil =
-            (Node_004da8d0*)((BlockMapAllocator*)this)->Allocate(0x40);
+        BlockMapNode* nil =
+            (BlockMapNode*)((BlockMapAllocator*)this)->Allocate(0x40);
         nil->parent = 0;
         nil->color = 1;
         g_blockMapNil = nil;
         nil->left = 0;
         // Reads the global back: nil->right would reuse the register.
-        ((Node_004da8d0*)g_blockMapNil)->right = 0;
+        ((BlockMapNode*)g_blockMapNil)->right = 0;
     }
-    Node_004da8d0* nil = (Node_004da8d0*)g_blockMapNil;
+    BlockMapNode* nil = (BlockMapNode*)g_blockMapNil;
     g_blockMapLiveCount++;
-    Node_004da8d0* node = AllocNode();
+    BlockMapNode* node = AllocBlockMapNode();
     node->color = 0;
     node->parent = nil;
     head = node;
@@ -1622,15 +1625,6 @@ extern unsigned int g_committedBytes;  // bytes committed
 extern unsigned int g_committedBytesPeak;      // high-water mark of g_committedBytes
 extern unsigned int g_allocSerial;
 extern FreeBlockMap* g_freeBlockSet;   // the free-block set singleton
-
-// The file-record tree's node, the fullest of its views.
-struct BlockMapNode {
-    BlockMapNode* left;            // +0x0
-    BlockMapNode* parent;          // +0x4
-    BlockMapNode* right;           // +0x8
-    BlockInfo value;              // +0xc
-    unsigned int color;            // +0x3c
-};
 
 // size; each carves nodes from its own free list.
 class FreeBlockAllocator {
@@ -3550,35 +3544,6 @@ BlockMapNode* BlockMap::LowerBound(const unsigned int& key)
 }
 #pragma auto_inline(on)
 
-// A 0x40-byte pooled node, allocated 0x80 at a time.
-extern void* g_blockMapFreeList;       // free list
-
-static inline BlockMapNode* AllocNode_004daa30()
-{
-    if (g_blockMapFreeList == 0) {
-        BlockMapNode* block;
-        do {
-            block = (BlockMapNode*)GlobalAlloc(0, 0x2000);
-            if (block == 0 && g_outOfMemoryHandler != 0) {
-                g_outOfMemoryHandler();
-            }
-        } while (block == 0 && g_outOfMemoryHandler != 0);
-        if (block == 0) {
-            return 0;
-        }
-        BlockMapNode* head = (BlockMapNode*)g_blockMapFreeList;
-        for (int i = 0; i < 0x80; i++) {
-            block->left = head;
-            head = block;
-            block++;
-        }
-        g_blockMapFreeList = head;
-    }
-    BlockMapNode* node = (BlockMapNode*)g_blockMapFreeList;
-    g_blockMapFreeList = node->left;
-    return node;
-}
-
 // A method that ignores `this`: its caller (0x4dc680, an inlined tree insert
 // after its std::_Lockit) sets ecx to the tree. Shaped like
 // std::_Tree<...>::_Buynode(parent, colour) with a pooled allocator.
@@ -3588,7 +3553,7 @@ static inline BlockMapNode* AllocNode_004daa30()
 // FUNCTION: 0x4ddce0
 BlockMapNode* BlockMap::CreateNode(int parent, int color)
 {
-    BlockMapNode* node = AllocNode_004daa30();
+    BlockMapNode* node = AllocBlockMapNode();
     node->parent = (BlockMapNode*)parent;
     node->color = color;
     return node;
