@@ -1214,10 +1214,10 @@ address,size,file,symbol,status,similarity
 0x45cfc0,244,src/frontend/options.cpp,?OpenOptionsLayout@@YAHXZ,matched,100.0
 0x45d0c0,111,src/frontend/options.cpp,?TickMusicOptions@@YGXXZ,matched,100.0
 0x45d130,326,src/frontend/options.cpp,?UpdateMusicGadgets@@YGXXZ,matched,100.0
-0x45d280,1333,src/frontend/options.cpp,?HandleMusicOptionsClick@@YGXPAUObject_0045d280@@@Z,matched,100.0
+0x45d280,1333,src/frontend/options.cpp,?HandleMusicOptionsClick@@YGXPAUGui@@@Z,matched,100.0
 0x45d7c0,526,src/frontend/options.cpp,?OpenMusicOptions@@YGXXZ,matched,100.0
 0x45d9d0,177,src/frontend/options.cpp,?UpdateSoundGadgets@@YGXXZ,matched,100.0
-0x45da90,923,src/frontend/options.cpp,?HandleSoundOptionsClick@@YGXPAUObject_0045da90@@@Z,matched,100.0
+0x45da90,923,src/frontend/options.cpp,?HandleSoundOptionsClick@@YGXPAUGui@@@Z,matched,100.0
 0x45de30,710,src/frontend/options.cpp,?OpenSoundOptions@@YGXXZ,matched,100.0
 0x45e100,946,src/frontend/options.cpp,?HandleVisualOptionsClick@@YGXPAUGui@@@Z,matched,100.0
 0x45e4c0,287,src/frontend/options.cpp,?SortDisplayModes@@YGXPAUModeList@@@Z,matched,100.0
