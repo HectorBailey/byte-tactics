@@ -1284,24 +1284,35 @@ void ExpireEyeballs();
 void BuildDerivedLayers();
 void UpdateAllCellHeightRanges();
 void* __stdcall DrawBlendedLine(void* surface, int x0, int y0, int x1, int y1, int color);
-
-struct Holder_004a1ab0 {
-    char unknown_0[4];
-    Gadget* entries;                   // +0x4
-};
-
-struct Dialog_4a1ab0 {
-    char unknown_0[0x18];
-    Holder_004a1ab0* holder;           // +0x18
-};
+void FreeSounds(void);
+void LoadSettings(void);
+void SaveSettings(void);
+void ApplyUseOnlyUnits(void);
+void LoadLogos(void);
+void __stdcall LoadSideData(void);
+void SaveAllMissionsSetting(void);
+void SaveNumSkirmishPlayers(void);
+void FreeOtaEnumCacheAndMission(void);
+void InitMeteors(void);
+int AreEnemiesEliminated(void);
+int AssignStartPositions(void);
+int CheckAlliedVictory(void);
+int FillScoreTables(void);
+int GetCdPosition(void);
+int GetCpuFamily(void);
+int GetFrameRate(void);
+int GetTickRate(void);
+void RemoveLocalPlayers(void);
+int __stdcall ReceiveNetPacket(void);
+void UpdateTimeoutDialog(void);
 
 void __stdcall GrayRectangle(Surface_004a1ab0* dst, Rect* rect);
 void __stdcall FadeRectangle(Surface_004a1ab0* dst, Rect* rect, int level);
 
 // FUNCTION: 0x4a1ab0
-void __stdcall RedrawGadgetRect(Dialog_4a1ab0* obj, int index)
+void __stdcall RedrawGadgetRect(Gui* obj, int index)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     Gadget* e = &entries[index];
     Rect rect;
     if (e->type == 0) {
@@ -1327,26 +1338,6 @@ void __stdcall RedrawGadgetRect(Dialog_4a1ab0* obj, int index)
 #pragma pack(push, 1)
 
 
-struct Holder_004a1b40 {
-    char unknown_00[4];
-    Gadget* entries;                    // +0x04
-    char unknown_08[0x10 - 0x08];
-    int flags;                          // +0x10
-    int dirty;                          // +0x14
-    char unknown_18[0x20 - 0x18];
-    int current;                        // +0x20
-    void* surface;                      // +0x24
-};
-
-struct Dialog_4a1b40 {
-    char unknown_00[0x18];
-    Holder_004a1b40* holder;            // +0x18
-    char unknown_1c[0x8b2 - 0x1c];
-    unsigned char colour[0x8be - 0x8b2]; // +0x8b2
-    unsigned char colour_8be;           // +0x8be
-    char unknown_8bf[0xcd2 - 0x8bf];
-    void* fallback;                     // +0xcd2
-};
 
 #include "../graphics/gaf_frame.h"
 
@@ -1386,7 +1377,7 @@ struct Item_004a1b40 {
 void FreeLogos(void);
 void FreeSideFonts(void);
 
-void __stdcall DrawListboxFrame(Dialog_4a1b40* obj, int index, void* bmp);
+void __stdcall DrawListboxFrame(Gui* obj, int index, void* bmp);
 void __stdcall CopySurfaceRect(void* dst, void* src, Rect* rect, Rect* pos);
 void __stdcall SetFont(int id);
 int GetFont();
@@ -1447,7 +1438,7 @@ extern int Pad_a1b40_e3;
 
 
 // FUNCTION: 0x4a1b40
-void __stdcall DrawListBox(Dialog_4a1b40* obj, int index)
+void __stdcall DrawListBox(Gui* obj, int index)
 {
     unsigned char font;
     int yoff;
@@ -1455,11 +1446,11 @@ void __stdcall DrawListBox(Dialog_4a1b40* obj, int index)
     Rect bounds;
     int xw;
     int flag = 0;
-    if (0 != obj->holder)
-        obj->holder->dirty = 1;
-    Holder_004a1b40* holder = obj->holder;
+    if (0 != obj->layer)
+        obj->layer->dirty = 1;
+    Layer* holder = obj->layer;
     Gadget* entries;
-    entries = obj->holder->entries;
+    entries = obj->layer->entries;
     Gadget* me = &entries[index];
     int h = me->height;
     void* surface;
@@ -1507,7 +1498,7 @@ void __stdcall DrawListBox(Dialog_4a1b40* obj, int index)
             rowRect.top = bounds.top + yoff + 2;
             rowRect.bottom = rowRect.top + step;
             int w = Measure_004a1b40(q);
-            int col = obj->colour[me->colours];
+            int col = obj->colours[me->colours];
             if (me->u.list.filebuf == 0 || ((char*)me->u.list.filebuf)[y] != 1) {
                 if (*q == '&') {
                     if (q[1] == 'G')
@@ -1543,7 +1534,7 @@ void __stdcall DrawListBox(Dialog_4a1b40* obj, int index)
                 FadeRectangle(entries->u.assets.surface, &rowRect, -0x15);
                 FadeRectangle(entries->u.assets.surface, &rowRect, -0x16);
             } else if (!(me->attribs & 0x100) && me->u.list.selected == line + me->u.list.firstRow && me->u.list.rowCount) {
-                if (obj->holder->current == index)
+                if (obj->layer->current == index)
                     FadeRectangle(entries->u.assets.surface, &rowRect, 0x1e);
                 else
                     FadeRectangle(entries->u.assets.surface, &rowRect, 0x1e);
@@ -1620,10 +1611,10 @@ void __stdcall DrawListBox(Dialog_4a1b40* obj, int index)
                 if (1 & v) {
                     FadeRectangle(surf, &cellRect, -0x14);
                 } else if ((2 & v) != 0) {
-                    DrawLine(surf, cellRect.left + 1, cellRect.bottom - 1, cellRect.right - 2, 1 + cellRect.top, obj->colour_8be);
-                    DrawLine(surf, 2 + cellRect.left, cellRect.bottom - 1, cellRect.right - 1, cellRect.top + 1, obj->colour_8be);
-                    DrawLine(surf, 1 + cellRect.left, cellRect.top + 2, cellRect.right - 1, cellRect.bottom - 2, obj->colour_8be);
-                    DrawLine(surf, cellRect.left + 2, cellRect.top + 2, cellRect.right - 2, cellRect.bottom - 2, obj->colour_8be);
+                    DrawLine(surf, cellRect.left + 1, cellRect.bottom - 1, cellRect.right - 2, 1 + cellRect.top, obj->colours[0xc]);
+                    DrawLine(surf, 2 + cellRect.left, cellRect.bottom - 1, cellRect.right - 1, cellRect.top + 1, obj->colours[0xc]);
+                    DrawLine(surf, 1 + cellRect.left, cellRect.top + 2, cellRect.right - 1, cellRect.bottom - 2, obj->colours[0xc]);
+                    DrawLine(surf, cellRect.left + 2, cellRect.top + 2, cellRect.right - 2, cellRect.bottom - 2, obj->colours[0xc]);
                 }
             }
             // A selected row reads cell->width/height even when cell is null
@@ -1790,18 +1781,6 @@ void BlankScreen();
 void FlushKeyQueue();
 void ApplyPendingSubState();
 
-struct Holder_004a2580 {
-    char unknown_0[4];
-    Gadget* entries;           // +0x04
-};
-
-struct Object_004a2580 {
-    char unknown_0[0x18];
-    Holder_004a2580* holder;           // +0x18
-    char unknown_1c[0x8b2 - 0x1c];
-    unsigned char hudPaletteIndices[256]; // +0x8b2, GuiRoot's palette remap output
-};
-
 struct Font_004a2580 {
     char unknown_0[0xc];
     void* glyphs;                      // +0x0c
@@ -1828,9 +1807,9 @@ void __stdcall DrawString(void* surface, char* text, int x, int y, int maxw);
 void __stdcall GrayRectangle(void* surface, void* rect);
 void __stdcall FadeRectangle(void* surface, void* rect, int a);
 
-static inline void* Surface_004a2580(Object_004a2580* o)
+static inline void* Surface_004a2580(Gui* o)
 {
-    return o->holder->entries->u.assets.surface;
+    return o->layer->entries->u.assets.surface;
 }
 
 #include <setjmp.h>
@@ -1857,9 +1836,9 @@ struct Class_004a1200;
 struct Class_004a1530;
 
 // FUNCTION: 0x4a2580
-void __stdcall DrawSliderBar(Object_004a2580* obj, int index)
+void __stdcall DrawSliderBar(Gui* obj, int index)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     Gadget* e = &entries[index];
     void* surface = Surface_004a2580(obj);
     // One glyph pointer for every fetch, and one limit in the w<h arm: frame slot order.
@@ -1885,8 +1864,8 @@ void __stdcall DrawSliderBar(Object_004a2580* obj, int index)
 
     GafEntry* gl = e->sliderGaf;
     if (gl == 0) {
-        DrawRaisedBox(surface, r1, obj->hudPaletteIndices[0], obj->hudPaletteIndices[0x11], obj->hudPaletteIndices[0x14]);
-        DrawSunkenBox(surface, r2, obj->hudPaletteIndices[0], obj->hudPaletteIndices[0x11], obj->hudPaletteIndices[0x14]);
+        DrawRaisedBox(surface, r1, obj->colours[0], obj->colours[0x11], obj->colours[0x14]);
+        DrawSunkenBox(surface, r2, obj->colours[0], obj->colours[0x11], obj->colours[0x14]);
     } else {
         short w = e->width;
         short h = e->height;
@@ -1956,7 +1935,7 @@ void __stdcall DrawSliderBar(Object_004a2580* obj, int index)
 
     if (e->attribs & 4) {
         int cur = GetTextKeyColor();
-        SetTextColors(obj->hudPaletteIndices[0xf], cur);
+        SetTextColors(obj->colours[0xf], cur);
         char buf[0x10];
         // Original bug, kept as it is: the copy at 0x4a2a26 (strlen with repne
         // scasb, then rep movsd/rep movsb) is unbounded and the source field runs
@@ -4699,6 +4678,8 @@ void AddTextGadget(int, int, int, int, int, int, int);
 int DirectionFromStep(int, int);
 void LoadAllSound(void);
 
+void CheckPlayerTimeouts(void);
+int HandleNetPackets(void);
 // FUNCTION: 0x4a69d0
 void __stdcall ClearAllStatus(Gui* param_1)
 {
