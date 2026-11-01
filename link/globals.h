@@ -18,8 +18,8 @@ struct DisplayContext;
 struct Entry_004df590;
 struct ExplodedPiece;
 struct Game;
+struct MenuSpark;
 struct ModemAccount;
-struct Smoke_00425b80;
 struct SquashTree;
 struct Surface;
 struct UnitRestrictEntry;
@@ -298,7 +298,7 @@ extern int DAT_00512288;                                                        
 extern int g_directXCheckDone;                                                                                  // 0x51228c, 4 bytes; 1 of 1 files
 extern int g_gpfCheckDone;                                                                                      // 0x512290, 4 bytes; 1 of 1 files
 extern int g_noSoundDriverShown;                                                                                // 0x512294, 4 bytes; 1 of 1 files
-extern Smoke_00425b80* g_menuSparks;                                                                            // 0x512298, 4 bytes; 1 of 1 files
+extern MenuSpark* g_menuSparks;                                                                                 // 0x512298, 4 bytes; 1 of 1 files
 extern int g_cdPlayerDialogShown;                                                                               // 0x51229c, 4 bytes; 1 of 1 files
 extern unsigned char DAT_005122a0[4];                                                                           // 0x5122a0, 4 bytes; nothing refers to it
 extern char* g_otaEnumFileList;                                                                                 // 0x5122d4, 4 bytes; 1 of 1 files
