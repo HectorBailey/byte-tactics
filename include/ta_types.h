@@ -20316,9 +20316,9 @@ public:
     char unknown_bd[4];
     int* d;  // +0xc1
     char unknown_c5[8];
-    std::vector<Elem_0040d550> values;  // +0xcd
+    std::vector<Elem_0040d550> limits;  // +0xcd
     char unknown_dd[4];
-    int* locked;  // +0xe1
+    int* limitOverrides;  // +0xe1
     char unknown_e5[8];
     unsigned int lastTick;  // +0xed
     Point16 spacing0;  // +0xf1

@@ -90,8 +90,8 @@ public:
     std::vector<unsigned char> weights; // +0x9d
     std::vector<AiWeightPct> weightPcts; // +0xad
     std::vector<Elem_0040d550> weightOverrides; // +0xbd
-    std::vector<Elem_0040d550> values; // +0xcd
-    std::vector<Elem_0040d550> locked; // +0xdd
+    std::vector<Elem_0040d550> limits; // +0xcd
+    std::vector<Elem_0040d550> limitOverrides; // +0xdd
     unsigned int lastTick;             // +0xed
     Point16 spacing0;                  // +0xf1
     Point16 offset0;                   // +0xf5
