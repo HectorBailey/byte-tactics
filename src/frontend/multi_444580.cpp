@@ -73,9 +73,6 @@ static int __stdcall CloneServiceSlot(Gadget* entries, int from, short y, int so
 
 // Opens the SELPROV.GUI menu (choose a connection provider) and adds a button
 // for each online service online.dll reports, copied from the SERVICEX one.
-// Unused here: the real declaration from the frontend GUI code whose symbol
-// ids keep the allocation (docs/c2-regalloc.md).
-void ActivatePlayerGadgets(char*);
 // FUNCTION: 0x444580
 void FillProviderList()
 {
