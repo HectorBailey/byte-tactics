@@ -2838,16 +2838,6 @@ int MainLoopContinueStub_B();
 int MainLoopContinueStub_C();
 
 
-struct Table_004a3eb0 {
-    char unknown_0[4];
-    Gadget* entries;           // +0x4
-};
-
-struct Dialog_4a3eb0 {
-    char unknown_0[0x18];
-    Table_004a3eb0* table;             // +0x18
-};
-
 static inline void ClearEntry(Gadget* e)
 {
     e->knobPos = 0;
@@ -2861,9 +2851,9 @@ struct Pad_a3eb0_1 { int field; };
 struct Pad_a3eb0_2 { int field; };
 
 // FUNCTION: 0x4a3eb0
-void __stdcall FUN_004a3eb0(Dialog_4a3eb0* obj, int i)
+void __stdcall FUN_004a3eb0(Gui* obj, int i)
 {
-    ClearEntry(&obj->table->entries[i]);
+    ClearEntry(&obj->layer->entries[i]);
 }
 // The list gadget's scroll
 // bar thumb: while the entry has the focus, either drag the offset (+0x140)
@@ -3130,16 +3120,6 @@ void StartMeteorShower();
 void RegisterAllOrderTypes();
 void ClearOrderTypeTable();
 
-struct Table_004a4620 {
-    char unknown_0[4];
-    Gadget* entries;           // +0x4
-};
-
-struct Dialog_4a4620 {
-    char unknown_0[0x18];
-    Table_004a4620* table;             // +0x18
-};
-
 unsigned int __cdecl GetTicks();
 
 #include <time.h>
@@ -3150,9 +3130,9 @@ extern int Pad_a4620_e0;
 int AccessRegistryValue(int, int, int, int, int, int);
 
 // FUNCTION: 0x4a4620
-void __stdcall ScheduleGadgetEndTick(Dialog_4a4620* obj, int i)
+void __stdcall ScheduleGadgetEndTick(Gui* obj, int i)
 {
-    Gadget* e = &obj->table->entries[i];
+    Gadget* e = &obj->layer->entries[i];
     e->u.anim.next = GetTicks() + e->u.anim.interval;
 }
 
@@ -3304,23 +3284,42 @@ void CompactActivePlayerSlots();
 void __cdecl BuildPlayerSlotGadgets();
 void UpdateBattleRoomFlags();
 
-struct Table_004a4890 {
-    char unknown_0[4];
-    Gadget* entries;           // +0x4
-};
-
-struct Dialog_4a4890 {
-    char unknown_0[0x18];
-    Table_004a4890* table;             // +0x18
-};
-
 unsigned int __cdecl GetTicks();
-void __stdcall DrawProgressBarGadget(Dialog_4a4890* obj, int i);
+// Unused here: real declarations that keep the file's symbol count (docs/c2-regalloc.md),
+// one type name among them.
+struct SideDef;
+void RegisterEmptyAtexitD(void);
+void RegisterEmptyAtexitE(void);
+void RegisterEmptyAtexitF(void);
+void RegisterEmptyAtexitG(void);
+void __cdecl EmptyAtexitHandlerG(void);
+void __cdecl EmptyAtexitHandlerF(void);
+void __cdecl EmptyAtexitHandlerE(void);
+void __cdecl EmptyAtexitHandlerD(void);
+void __cdecl EmptyAtexitHandlerB(void);
+void __cdecl EmptyAtexitHandlerA(void);
+void __cdecl InitFullDebugSupport(void);
+void trigger_004dfd50(void);
+char FUN_004e16b0(void);
+char OpenGdperf(void);
+char* BuildSideList(void);
+void __cdecl ApplyCampaignSideSelection(void);
+void CollectEndGameStats(void);
+void FillProviderList(void);
+void UpdateTrackGadgets(void);
+void ApplyTrackType(void);
+void LoadSavedAudioSettings(void);
+void RestoreUiOptions(void);
+void RestoreVisualOptions(void);
+void LoadSavedSettings(void);
+void SaveGameSettings(void);
+
+void __stdcall DrawProgressBarGadget(Gui* obj, int i);
 
 // FUNCTION: 0x4a4890
-void __stdcall TickProgressBar(Dialog_4a4890* obj, int i)
+void __stdcall TickProgressBar(Gui* obj, int i)
 {
-    Gadget* e = &obj->table->entries[i];
+    Gadget* e = &obj->layer->entries[i];
     if (e->u.anim.active && e->u.anim.value < e->u.anim.max) {
         if ((int)GetTicks() > e->u.anim.next) {
             e->u.anim.value += (int)e->u.anim.step;
@@ -6277,7 +6276,7 @@ static inline void SelectCurrentByName(Gui* menu, Gadget* entries, int sel)
 }
 
 // The real TickProgressBar (0x4a4890), inlined here by /Ob2.
-static inline void TickProgressBar(Gui* menu, int i)
+static inline void TickProgressBar_inlined(Gui* menu, int i)
 {
     // Entries in their own local first: the one-expression form shifts registers.
     Gadget* entries = menu->layer->entries;
@@ -6499,7 +6498,7 @@ int __stdcall UpdateMenu(Gui* menu)
                     sel = i;
                 break;
             case 13:
-                TickProgressBar(menu, i);
+                TickProgressBar_inlined(menu, i);
                 break;
             case 12:
                 if (e->colours != 0 && elapsed) {
