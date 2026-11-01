@@ -55,17 +55,13 @@ struct Save_00492df0 {
     char path[0x100];                    // +8
 };
 
-// One view of the game state. The GUI object at +0x519 is read as a Gui
-// (0x491ec0, 0x493060), as a raw byte pointer (0x492b10) and as the message
-// buffer (0x492360, 0x492df0); the flags at +0x2a44 are read both as the
-// b0..b3 bitfield union (0x492360) and as bits0/bit2/bits3 (0x492df0).
+// One view of the game state: the GUI object at +0x519, and the flags at
+// +0x2a44 read both as the b0..b3 bitfield union (0x492360) and as
+// bits0/bit2/bits3 (0x492df0).
 struct Game {
     char unknown_0[0x519];
-    union {
-        char message[0x1b8a - 0x519];    // +0x519
-        char menu[1];
-        Gui gui;
-    };
+    Gui gui;                             // +0x519
+    char unknown_120f[0x1b8a - 0x120f];
     SideData* p1b8a;                     // +0x1b8a
     char unknown_1b8e[0x1cd5 - 0x1b8e];
     SideData* p1cd5;                     // +0x1cd5
@@ -147,8 +143,8 @@ int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 int __stdcall FindGadgetIndex(Gadget* entries, char* name, int type);
 void __stdcall SetGadgetText(Gui* menu, int index, char* text);
 Gadget* __stdcall FindGadgetChecked_E(Gadget* entries, char* name);
-void __stdcall SetGadgetActiveByName(void* menu, char* name, int value);
-void __stdcall SetTranslatedTextByName(void* menu, char* name, char* text, int param_4);
+void __stdcall SetGadgetActiveByName(Gui* menu, char* name, int value);
+void __stdcall SetTranslatedTextByName(Gui* menu, char* name, char* text, int param_4);
 char* __stdcall SkipTextLines(char* text, int n);
 void __stdcall FrameFromSurface(void* dst, void* src);
 void __stdcall FreeSurface(void* image);
@@ -161,15 +157,15 @@ void __stdcall PlaySoundByName(char* name, int param);
 void __stdcall ShutdownIngameSystems();
 void __stdcall PopUntilNamedLayout(int flag);
 void MenuFrame();
-void __stdcall DisableKeyCommands(void* menu);
-void __stdcall EnableKeyCommands(void* menu);
-void __stdcall SetKeyboardInput(void* menu, int value);
+void __stdcall DisableKeyCommands(Gui* menu);
+void __stdcall EnableKeyCommands(Gui* menu);
+void __stdcall SetKeyboardInput(Gui* menu, int value);
 void __stdcall ConfigureListBoxByName(void* menu, char* name, void* text, int value, int flag);
 void __stdcall BeginTextEdit(void* menu, int index);
-void __stdcall RenderLayer(void* menu, int value);
+int __stdcall RenderLayer(Gui* menu, unsigned int value);
 int __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 void __stdcall MakeDirectoryPath(char* path);
-void __stdcall CloseTopScreen(char* sub);
+void __stdcall CloseTopScreen(Gui* sub);
 void __stdcall RemoveFile(char* path);
 char* __stdcall BuildDataPath(char* buf, const char* dir, const char* name, const char* ext);
 char* __stdcall BuildSideList();
@@ -188,8 +184,7 @@ void __cdecl GameFreeThunk(void* p);
 void* __cdecl GameAllocIgnoreTag(const char* name, unsigned int size);
 void __cdecl operator delete(void* p);
 void* __cdecl operator new(unsigned int size);
-Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, int flags);
-Layer* __stdcall LoadGuiLayer(char* sub, const char* name, int flags);
+Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, unsigned int flags);
 int __stdcall IsCurrentGadgetNamed(Gui* gadget, char* name);
 int __stdcall IsCurrentGadgetNamed(Gui* gadget, char* name);
 void __stdcall ClearSelectedGadget(Gui* menu);
@@ -344,7 +339,7 @@ void __stdcall LoadGameScreenHandler(Gui* gadget)
 
     if (IsCurrentGadgetNamed(gadget, "CANCEL")) {
         if (g_game->netGameFlags.b2)
-            DisableKeyCommands(g_game->message);
+            DisableKeyCommands(&g_game->gui);
         if (g_savegameFileNames)
             GameFreeThunk(g_savegameFileNames);
         if (g_savegameDescs)
@@ -374,19 +369,19 @@ void __stdcall LoadGameScreenHandler(Gui* gadget)
         switch (type) {
         case 1:
             if (!FindGameCdDrive(0)) {
-                OpenMessageBox(g_game->message,
+                OpenMessageBox(&g_game->gui,
                     Translate("Please insert the Campaign CD (Disc 2) and try again"),
                     200, 1, 1);
-                ClearSelectedGadget((Gui*)g_game->message);
+                ClearSelectedGadget(&g_game->gui);
                 return;
             }
             break;
         case 2:
             if (!FindGameCdDrive(1)) {
-                OpenMessageBox(g_game->message,
+                OpenMessageBox(&g_game->gui,
                     Translate("Please insert the Multiplayer CD (Disc 1) and try again"),
                     200, 1, 1);
-                ClearSelectedGadget((Gui*)g_game->message);
+                ClearSelectedGadget(&g_game->gui);
                 return;
             }
             break;
@@ -397,10 +392,10 @@ void __stdcall LoadGameScreenHandler(Gui* gadget)
         BlankScreen();
         if (g_game->cursorMode != 20) {
             g_game->cursorMode = 20;
-            SetCursorAnimation(g_game->message, g_game->cursorHourglass);
+            SetCursorAnimation(&g_game->gui, g_game->cursorHourglass);
         }
         if (g_game->netGameFlags.b2)
-            DisableKeyCommands(g_game->message);
+            DisableKeyCommands(&g_game->gui);
         PlaySoundByName("SMLBUTTON", 0);
         e = FindGadgetChecked(entries, "GAMES");
         sprintf(g_game->saveName, "%s\\%s", g_savegameDir,
@@ -516,7 +511,7 @@ char* __stdcall ListSavedGames(int* count)
     BuildDataPath(buf, g_savegameDir, "*", "SAV");
     *count = CountDirectoryEntries(buf, 0);
     if (*count == 0) {
-        ConfigureListBoxByName(g_game->menu, "GAMES", g_emptyStringLiteral, 0, 0);
+        ConfigureListBoxByName(&g_game->gui, "GAMES", g_emptyStringLiteral, 0, 0);
         return 0;
     }
     g_savegameFileNames = (char*)GameAllocIgnoreTag("SAVEGAME NAMES", *count << 8);
@@ -551,7 +546,7 @@ char* __stdcall ListSavedGames(int* count)
         }
     }
     GameFreeThunk(copy);
-    ConfigureListBoxByName(g_game->menu, "GAMES", g_savegameDescs, found, 0);
+    ConfigureListBoxByName(&g_game->gui, "GAMES", g_savegameDescs, found, 0);
     *count = found;
     return found ? g_savegameFileNames : 0;
 }
@@ -590,7 +585,7 @@ void __stdcall SaveGameScreenHandler(Gui* gadget)
     }
     if (IsCurrentGadgetNamed(gadget, "CANCEL")) {
         if (g_game->netGameFlags.bit2_2a44)
-            DisableKeyCommands(g_game->message);
+            DisableKeyCommands(&g_game->gui);
         PlaySoundByName("Previous", 0);
         return;
     }
@@ -611,7 +606,7 @@ void __stdcall SaveGameScreenHandler(Gui* gadget)
         return;
     }
     if (g_game->netGameFlags.bit2_2a44)
-        DisableKeyCommands(g_game->message);
+        DisableKeyCommands(&g_game->gui);
     PlaySoundByName("smlbutton", 0);
     int index = FindGadgetIndex(entries, "GAMENAME", 3);
     char* text = entries[index].u.text;
@@ -657,31 +652,31 @@ void ShowSaveGameScreen()
 // FUNCTION: 0x4931d0
 void ShowLoadGameScreen()
 {
-    Layer* gadget = LoadGuiLayer((char*)&g_game->message[0], "LOADGAME.GUI", 0x980);
+    Layer* gadget = LoadGuiLayer(&g_game->gui, "LOADGAME.GUI", 0x980);
     gadget->handler = (void (__stdcall*)(void*))LoadGameScreenHandler;
     gadget->data = g_game;
     LoadPictureCached("DLOADGAME2", 0, 0, 0);
     int count;
     if (ListSavedGames(&count) == 0) {
-        CloseTopScreen((char*)&g_game->message[0]);
-        OpenMessageBox((char*)&g_game->message[0],
+        CloseTopScreen(&g_game->gui);
+        OpenMessageBox(&g_game->gui,
                      Translate("There are no saved games to choose from"),
                      0x140, 1, 1);
         return;
     }
     g_savegameSideList = BuildSideList();
-    ConfigureListBoxByName((char*)&g_game->message[0], "GAMES", g_savegameDescs, count, 0);
-    SetGadgetActiveByName((char*)&g_game->message[0], "DELETE", 0);
-    SetGadgetActiveByName((char*)&g_game->message[0], "GAMENAME", 0);
+    ConfigureListBoxByName(&g_game->gui, "GAMES", g_savegameDescs, count, 0);
+    SetGadgetActiveByName(&g_game->gui, "DELETE", 0);
+    SetGadgetActiveByName(&g_game->gui, "GAMENAME", 0);
     Entry_004931d0* entry = FindGadgetChecked((void*)gadget->entries, "GAMES");
     if (entry != 0) {
         entry->handler = (void*)SavedGameSelectHandler;
     }
     ShowSavedGameInfo();
-    SetKeyboardInput((char*)&g_game->message[0], 1);
+    SetKeyboardInput(&g_game->gui, 1);
     OrLabelAttribs();
-    SetGadgetActiveByName((char*)&g_game->message[0], "SaveGame", 0);
-    EnableKeyCommands((char*)&g_game->message[0]);
-    RenderLayer((char*)&g_game->message[0], 0x40);
+    SetGadgetActiveByName(&g_game->gui, "SaveGame", 0);
+    EnableKeyCommands(&g_game->gui);
+    RenderLayer(&g_game->gui, 0x40);
     ((char*)g_game)[0x38a51] |= 1;
 }
