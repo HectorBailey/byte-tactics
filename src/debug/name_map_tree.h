@@ -19,22 +19,22 @@ public:
     bool LessThan(const NameKey& other) const;
 };
 
-struct Value_004e2620 {
+struct NameMapValue {
     NameKey key;                       // +0x0
     char text[500];                    // +0x4
 
-    Value_004e2620& operator=(const Value_004e2620& v);
+    NameMapValue& operator=(const NameMapValue& v);
 };
 
-struct Node_004e2620 {
-    Node_004e2620* left;               // +0x0
-    Node_004e2620* parent;             // +0x4
-    Node_004e2620* right;              // +0x8
-    Value_004e2620 value;              // +0xc
+struct NameMapNode {
+    NameMapNode* left;                 // +0x0
+    NameMapNode* parent;               // +0x4
+    NameMapNode* right;                // +0x8
+    NameMapValue value;                // +0xc
     int color;                         // +0x204
 };
 
-extern Node_004e2620* DAT_005292c4;    // the tree's _Nil
+extern NameMapNode* DAT_005292c4;      // the tree's _Nil
 extern void* g_nameMapFreeList;        // node free list
 extern unsigned int DAT_00529500;      // tree _Nilrefs
 
@@ -43,7 +43,7 @@ public:
     void* Allocate(unsigned int n);
 };
 
-struct Less_004e2620 {
+struct NameKeyLess {
     bool operator()(const NameKey& a, const NameKey& b) const
     {
         return a.LessThan(b);
@@ -52,16 +52,16 @@ struct Less_004e2620 {
 
 class Iter_004e2620 {
 public:
-    Node_004e2620* ptr;
+    NameMapNode* ptr;
 
     Iter_004e2620() {}
-    Iter_004e2620(Node_004e2620* p) : ptr(p) {}
+    Iter_004e2620(NameMapNode* p) : ptr(p) {}
 };
 
 // The tree's iterator; its _Inc is out of line.
 class NameMapIter {
 public:
-    Node_004e2620* ptr;                // +0x0
+    NameMapNode* ptr;                  // +0x0
 
     void NextNode();
     NameMapIter& operator++() { NextNode(); return *this; }
@@ -77,26 +77,26 @@ public:
 
 class NameMapTree {
 public:
-    Less_004e2620 compare;             // +0x0
-    Node_004e2620* _Head;              // +0x4
+    NameKeyLess compare;               // +0x0
+    NameMapNode* _Head;                // +0x4
     bool _Multi;                       // +0x8
     char pad_9[3];
     unsigned int _Size;                // +0xc
 
-    Node_004e2620*& _Root() { return _Head->parent; }
-    Node_004e2620*& _Lmost() { return _Head->left; }
-    Node_004e2620*& _Rmost() { return _Head->right; }
+    NameMapNode*& _Root() { return _Head->parent; }
+    NameMapNode*& _Lmost() { return _Head->left; }
+    NameMapNode*& _Rmost() { return _Head->right; }
     unsigned int size() const { return _Size; }
 
-    static Node_004e2620*& _Left(Node_004e2620* p) { return p->left; }
-    static Node_004e2620*& _Right(Node_004e2620* p) { return p->right; }
-    static Node_004e2620*& _Parent(Node_004e2620* p) { return p->parent; }
-    static int& _Color(Node_004e2620* p) { return p->color; }
+    static NameMapNode*& _Left(NameMapNode* p) { return p->left; }
+    static NameMapNode*& _Right(NameMapNode* p) { return p->right; }
+    static NameMapNode*& _Parent(NameMapNode* p) { return p->parent; }
+    static int& _Color(NameMapNode* p) { return p->color; }
 
-    void _Lrotate(Node_004e2620* _X)
+    void _Lrotate(NameMapNode* _X)
     {
         std::_Lockit _Lk;
-        Node_004e2620* _Y = _Right(_X);
+        NameMapNode* _Y = _Right(_X);
         _Right(_X) = _Left(_Y);
         if (_Left(_Y) != DAT_005292c4)
             _Parent(_Left(_Y)) = _X;
@@ -110,10 +110,10 @@ public:
         _Left(_Y) = _X;
         _Parent(_X) = _Y;
     }
-    void _Rrotate(Node_004e2620* _X)
+    void _Rrotate(NameMapNode* _X)
     {
         std::_Lockit _Lk;
-        Node_004e2620* _Y = _Left(_X);
+        NameMapNode* _Y = _Left(_X);
         _Left(_X) = _Right(_Y);
         if (_Right(_Y) != DAT_005292c4)
             _Parent(_Right(_Y)) = _X;
@@ -128,7 +128,7 @@ public:
         _Parent(_X) = _Y;
     }
 
-    Iter_004e2620 Insert(Node_004e2620* _X, Node_004e2620* _Y, const Value_004e2620& _V);
+    Iter_004e2620 Insert(NameMapNode* _X, NameMapNode* _Y, const NameMapValue& _V);
 
     NameMapIter begin() const { NameMapIter i; i.ptr = _Head->left; return i; }
     NameMapIter end() const { NameMapIter i; i.ptr = _Head; return i; }
@@ -151,14 +151,14 @@ public:
         }
     }
 
-    void EraseSubtree(Node_004e2620* x);
+    void EraseSubtree(NameMapNode* x);
     NameMapIter Erase(NameMapIter it);
 
     ~NameMapTree()
     {
         erase(begin(), end());
         // Loaded nodes kept in locals (h, n) for the free-list push: re-reading shifts registers.
-        Node_004e2620* h = _Head;
+        NameMapNode* h = _Head;
         if (h != 0) {
             *(void**)h = g_nameMapFreeList;
             g_nameMapFreeList = h;
@@ -167,7 +167,7 @@ public:
         {
             std::_Lockit Lk;
             if (--DAT_00529500 == 0) {
-                Node_004e2620* n = DAT_005292c4;
+                NameMapNode* n = DAT_005292c4;
                 if (n != 0) {
                     *(void**)n = g_nameMapFreeList;
                     g_nameMapFreeList = n;

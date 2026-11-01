@@ -1394,7 +1394,7 @@ struct Less_004e17c0;
 struct Less_004e1990;
 struct Less_004e2250;
 struct Less_004e2580;
-struct Less_004e2620;
+struct NameKeyLess;
 struct Limits_0043e490;
 struct Line_004de550;
 struct Link_0044f4a0;
@@ -19998,14 +19998,14 @@ public:
     LiveNode* Lbound(char*&);
 };
 
-struct Less_004e2620 {  // 0x1 bytes, 1 view
+struct NameKeyLess {    // 0x1 bytes, 1 view
     char unknown_0[1];
     unsigned char operator()(NameKey&, NameKey&);
 };
 
 class Class_004e2620 {  // 0x10 bytes, 2 views
 public:
-    Less_004e2620 compare;  // +0x0
+    NameKeyLess compare;    // +0x0
     char unknown_1[3];
     LiveNode* head;  // +0x4
     int nilref;  // +0x8
