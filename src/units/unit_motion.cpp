@@ -33,8 +33,6 @@ struct Chunk_00437a30 {
 
 #include "../graphics/gaf_frame.h"
 
-struct Vertex_458810 { int x; int y; int z; };
-
 // The unit whose object state is drawn: its motion pointer, the draw flags and the
 // z-buffer flag.
 struct Unit_458810 {
@@ -53,18 +51,19 @@ struct Unit_458810 {
     char unknown_115[3];
 };
 
-struct PieceInfo_458810 { char unknown_0[4]; int vertexCount; };
-
 #pragma pack(push, 1)
-struct Piece_458810 {
-    PieceInfo_458810* info;       // +0x00
+struct ObjectPiece {
+    Object3do* info;               // +0x00
     char unknown_4[0x1e];
-    Vertex_458810* vertices;      // +0x22
+    Vec3* vertices;                // +0x22
     char unknown_26[2];
-    unsigned char flags;          // +0x28
+    unsigned char flags;           // +0x28
     char unknown_29[0xd];
 };
 
+// This is the 0x22+0x36*n piece-list record memory_cache.h spells by the name
+// model_render.cpp defines. It keeps this name until that header's two
+// CMemoryCache views are joined: its methods are spelled for one or the other.
 struct List_458810 {
     int pieceCount;               // +0x00
     int frame;                    // +0x04
@@ -73,7 +72,7 @@ struct List_458810 {
     GafFrame* bitmap;               // +0x10
     int shadow;                   // +0x14
     char unknown_18[0x22 - 0x18];
-    Piece_458810 pieces[1];       // +0x22
+    ObjectPiece pieces[1];        // +0x22
 };
 #pragma pack(pop)
 
@@ -117,7 +116,7 @@ public:
     void CopyPicture(GafFrame* source);
     void BuildShadow(ObjectState* obj, GafFrame* dest);
     void DrawPiece(List_458810* list, Vec3* param_2, void* param_3,
-        PieceInfo_458810* info, Vertex_458810* vertices, unsigned char kind, int visible);
+        Object3do* info, Vec3* vertices, unsigned char kind, int visible);
     void DrawObjectPicture(void* param_1, List_458810* list, Vec3 coords, int visible);
     void DrawObjectPieces(Vec3* result, List_458810* list, Vec3 v, int visible);
     void MeasureShadow(int* w, int* h, int* x, int* y, void* obj);
