@@ -3199,7 +3199,7 @@ address,size,file,symbol,status,similarity
 0x4e1730,132,src/debug/debug_lib.cpp,?GetTimeSeconds@@YANXZ,matched,100.0
 0x4e17c0,252,src/debug/debug_lib.cpp,??0NameTable@@QAE@XZ,matched,100.0
 0x4e18c0,198,src/debug/debug_lib.cpp,?Clear@Class_004e18c0@@QAEXXZ,matched,100.0
-0x4e1990,158,src/debug/debug_lib_4e1990.cpp,?Upsert@NameTable@@QAEXABVNameKey@@@Z,matched,100.0
+0x4e1990,158,src/debug/debug_lib_4e1990.cpp,?Upsert@NameTable@@QAEXABU?$pair@VNameKey@@UNameMapText@@@std@@@Z,matched,100.0
 0x4e1a30,80,src/debug/debug_lib.cpp,?LessThan@NameKey@@QBE_NABV1@@Z,matched,100.0
 0x4e1a80,14,src/debug/debug_lib.cpp,?GlobalAllocFixed@@YAPAXI@Z,matched,100.0
 0x4e1a90,44,src/debug/debug_lib.cpp,?GetNameTable@@YGPAVNameTable@@XZ,matched,100.0
