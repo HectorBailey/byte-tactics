@@ -991,7 +991,8 @@ void __stdcall UpdateMapSelection(Gui* menu, int unused);
 void __stdcall SetGameMode(int a);
 void LeaveNetGame();
 void* __stdcall LoadBitmapByName(char* name, unsigned char* palette);
-void __stdcall DrawSurface(void* dest, void* image, int x, int y);
+struct Surface;
+void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y);
 void __stdcall FreeSurface(void* image);
 void ShowSoftwareCursor();
 void __stdcall MakeDirectoryPath(char* path);
@@ -4303,7 +4304,7 @@ void OpenEndMultiScreen()
     image = LoadBitmapByName("Mission02WinBW", palette);
     SetPaletteColors(palette, 0, 0x100);
     SetOffscreenSurface(g_game->offscreen);
-    DrawSurface(0, image, 0, 0);
+    DrawSurface(0, (Surface*)image, 0, 0);
     FreeSurface(image);
     FlipScreen();
     LoadGuiLayer(&g_game->gui, "ENDMULTI.GUI", 0x80)->handler = HandleEndMultiClick;

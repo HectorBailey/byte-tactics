@@ -211,7 +211,7 @@ int CodeChecksumFailed(void);
 int __stdcall OpenMessageBox(Gui* gui, char* text, int wrapWidth, int centre, int autoHeight);
 int __stdcall GetTextPixelWidth(char* text);
 void __stdcall SetOffscreenSurface(int param_1);
-void __stdcall FillSurface(int param_1, int param_2);
+int __stdcall FillSurface(Surface* surface, int colour);
 void __stdcall FlipScreen(void);
 int __stdcall PopKey(void);
 void __stdcall SetCursorOverlayEnabled(int param);

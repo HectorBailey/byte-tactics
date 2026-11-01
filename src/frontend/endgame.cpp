@@ -209,7 +209,7 @@ struct Game {
     char unknown_1481b[0x148db - 0x1481b];
     void* logos32;                     // +0x148db
     char unknown_148df[0x37e1b - 0x148df];
-    void* offscreen;                   // +0x37e1b
+    Surface* offscreen;                // +0x37e1b
     int screenWidth;                   // +0x37e1f
     int screenHeight;                  // +0x37e23
     char unknown_37e27[0x37eee - 0x37e27];
@@ -227,7 +227,7 @@ struct Game {
     int bar;                           // +0x3906b
     float savedPaletteBrightness;      // +0x3906f
     int noMovie;                       // +0x39073
-    void* lastFrame;                   // +0x39077
+    Surface* lastFrame;                // +0x39077
     void* image_3907b;                 // +0x3907b
     unsigned char* palette_3907f;      // +0x3907f
     unsigned char* current;            // +0x39083
@@ -281,7 +281,7 @@ void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const
 int __stdcall HAPI_FileLengthByName(char* path);
 void* __stdcall LoadBitmapByName(char* name, unsigned char* palette);
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
-void __stdcall FillSurface(void* surface, int colour);
+int __stdcall FillSurface(Surface* surface, int colour);
 void BlankScreen();
 void FlipScreen();
 void __stdcall FreeSurface(void* image);
@@ -327,10 +327,10 @@ void __stdcall MarkChanged(Gui* menu);
 void __stdcall EnableKeyCommands(Gui* menu);
 void __stdcall UpdateMenu(Gui* menu);
 void __stdcall BlitMenuLayers(Gui* gui, unsigned int* surface, int* rect);
-void __stdcall DrawSurface(void* dest, void* image, int x, int y);
+void __stdcall DrawSurface(Surface* dst, Surface* bmp, int x, int y);
 void __stdcall DrawMessages(void* surface);
 void __stdcall SetOffscreenSurface(void* surface);
-void* __stdcall AllocSurface(const char* name, int width, int height);
+Surface* __stdcall AllocSurface(char* name, int width, int height);
 void HandleNetPackets();
 void __stdcall ReportGameEvent(int event);
 char* __stdcall GetRejectReasonText(int reason);
@@ -989,10 +989,6 @@ static inline int StatsComplete()
     return 1;
 }
 
-// Unused here: the symbol id this declaration takes keeps 0x41f7f0's register allocation
-// (docs/c2-regalloc.md).
-void __stdcall ClearBorderFeatures();
-
 // FUNCTION: 0x41f7f0
 void __stdcall RunEndGameState()
 {
@@ -1078,7 +1074,7 @@ void __stdcall RunEndGameState()
             StartPaletteFade(g_game->palette_3907f,(unsigned char*)palette,5);
             g_game->nextTime=GetTicks()+1;
             g_game->state=6;
-            DrawSurface(g_game->offscreen,g_game->image_3907b,0,0);
+            DrawSurface(g_game->offscreen,(Surface*)g_game->image_3907b,0,0);
         } else {
             OpenEndMissionScreen(); FillEndGameStatistics(); EnableEndMissionButtons();
             MarkLayerChanged(&g_game->gui); MarkChanged(&g_game->gui);
