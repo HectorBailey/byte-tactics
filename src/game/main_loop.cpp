@@ -271,7 +271,7 @@ void LoadingScreenFrame();
 void __stdcall BlitMenuLayers(Gui* sub, unsigned int* dest, int* clip);
 int __stdcall BroadcastPacket(int player, void* data, int size);
 void SendNetHeartbeat();
-void __stdcall SetupPlayerSlot(unsigned char player, unsigned char kind);
+void __stdcall SetupPlayerSlot(int player, char kind);
 unsigned short __stdcall FindUnitTypeId(const char* name);
 void __stdcall FatalError(char* message);
 void __stdcall SetCameraPosition(int x, int y, int instant);

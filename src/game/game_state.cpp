@@ -900,7 +900,7 @@ void __stdcall SetCursorMode(int n)
 // SetCursorAnimation for the object at +0x519, mirroring 0x491c80.
 int __stdcall UpdatePlacementGhostValidity(void);
 unsigned short __stdcall PickUnitUnderCursor(void);
-int __stdcall ResolveCursorModeForSelection(unsigned char mode);
+int __stdcall ResolveCursorModeForSelection(char mode);
 
 // FUNCTION: 0x491cc0
 void __stdcall UpdateBattleHoverMode(int unused)

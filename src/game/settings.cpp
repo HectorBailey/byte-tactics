@@ -146,8 +146,8 @@ extern char g_cmdlineHostGameName[];
 
 int __stdcall ReadRegistryDword(void* section, void* key, void* value);
 int __stdcall ReadRegistryData(void* section, void* key, void* buf, void* size);
-void __stdcall WriteRegistryString(void* section, void* key, void* value);
-void __stdcall WriteRegistryDword(void* section, void* key, int value);
+void __stdcall WriteRegistryString(void* section, void* key, char* value);
+void __stdcall WriteRegistryDword(char* section, char* key, int value);
 int __stdcall ReadRegistryValue(const char* app, const char* key, void* buf, unsigned int* size);
 void __stdcall WriteRegistryBinary(void* subKey, void* valueName, void* data, int unused);
 int __stdcall GetWindowsUserName(char* buf);
@@ -194,7 +194,7 @@ static inline void ReadSettingInt(const char* key, int Game::* field, int defaul
         g_game->*field = value;
     } else {
         g_game->*field = defaultValue;
-        WriteRegistryDword("Total Annihilation", (void*)key, g_game->*field);
+        WriteRegistryDword("Total Annihilation", (char*)key, g_game->*field);
     }
 }
 
@@ -216,7 +216,7 @@ static inline void ReadSettingInt(const char* key, int Options::* field, int def
         g_game->options->*field = value;
     } else {
         g_game->options->*field = defaultValue;
-        WriteRegistryDword("Total Annihilation", (void*)key, g_game->options->*field);
+        WriteRegistryDword("Total Annihilation", (char*)key, g_game->options->*field);
     }
 }
 

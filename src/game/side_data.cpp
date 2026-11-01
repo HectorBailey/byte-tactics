@@ -17,7 +17,7 @@ class TdfFile;
 extern Game* g_game;
 extern char g_emptyStringLiteral[];
 
-void __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
+char* __stdcall BuildDataPath(char* out, const char* dir, const char* name, const char* ext);
 void* __stdcall LoadGaf(char* path);
 void* __stdcall FindGafEntry(void* gaf, const char* name);
 void __stdcall FatalError(char* message);
