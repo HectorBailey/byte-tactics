@@ -268,7 +268,7 @@ int __stdcall SelectConnection(int param);
 int __stdcall CreateLocalPlayer(unsigned char playerIndex, int param2);
 int __stdcall JoinNetGame(V4i v, int idx);
 int __stdcall AddNetPlayer(int id);
-void __stdcall QuitApp(int param);
+void __stdcall QuitApp(char* message);
 int __stdcall HAPINET_guaranteepackets(int enable);
 void __stdcall HAPINET_quitgame(int param);
 int __stdcall InitPacketManager(int bufferCount, int packetCount);

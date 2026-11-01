@@ -954,8 +954,8 @@ int __stdcall CloneServiceSlot(Gadget* entries, int param_2, short param_3,
 void ReportDialogFrame(void);
 
 int __stdcall RequestPlayerColor(int param);
-void* __stdcall LoadRadarPic(char* path, int* outX, int* outY);
-void __stdcall ResizeRadarPicture(void* bmp, int param_2, int param_3, int param_4, int param_5);
+GafFrame* __stdcall LoadRadarPic(char* path, int* outX, int* outY);
+void __stdcall ResizeRadarPicture(GafFrame* pic, int x, int y, int w, int h);
 char* __stdcall SkipTextLines(char* text, int n);
 int __stdcall ReportGameEvent(int msg);
 void BroadcastPlayerInfo(void);
@@ -2165,9 +2165,9 @@ void ShowSelectedMapInfo()
         GameFreeThunk(entry->u.hotspot.frame);
         entry->u.hotspot.frame = 0;
     }
-    void* bmp = LoadRadarPic(
+    GafFrame* bmp = LoadRadarPic(
         (char*)g_game->mapInfo->GetNameSlot(1), &outX, &outY);
-    entry->u.hotspot.frame = (GafFrame*)bmp;
+    entry->u.hotspot.frame = bmp;
     if (bmp != 0) {
         ResizeRadarPicture(bmp, entry->width, entry->height, outX << 4, outY << 4);
     }
