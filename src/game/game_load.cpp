@@ -46,22 +46,6 @@ struct Display_00497f40 {
     HWND hwnd;                          // +0x40
 };
 
-struct Sub_497180 {
-    char unknown_0[0x10];
-};
-
-struct Gadget_497180 {
-    char unknown_0[0x8];
-    void (__stdcall* handler)(Gadget_497180*);   // +0x8
-    char* owner;                                 // +0xc
-};
-
-struct Menu_00497ce0 {
-    int field_51d;                      // +0x4 (g_game + 0x51d)
-    char unknown_8[0x18 - 0x8];
-    void* data;                         // +0x18 (g_game + 0x531)
-};
-
 #include "../network/player_info.h"
 
 // Unused here: real functions declared to keep the file's symbol count (docs/c2-regalloc.md).
@@ -140,7 +124,8 @@ struct Pos_00498d00 {
     Fixed_00498d00 z;                   // +0x8
 };
 
-#include "../gui/mouse_event.h"
+#include "../gui/gui.h"
+#include "../gui/layer.h"
 
 struct Pos_00498da0 {
     unsigned int x;                     // +0x0
@@ -205,31 +190,8 @@ struct Game {
     Display_00497f40* displayContext;   // +0xc
     Sound* sound;                       // +0x10
     char unknown_10[0x519 - 0x14];
-    union {                             // +0x519
-        Menu_00497ce0 menu;
-        struct {
-            int guiRoot;
-            int gaf;
-            char unknown_521[0x531 - 0x521];
-            int field_531;
-        };
-    };
-    char unknown_535[0x589 - 0x535];
-    int field_589;                      // +0x589
-    char unknown_58d[0xdcb - 0x58d];
-    union {                             // +0xdcb
-        unsigned char colors[16];
-        struct {
-            char unknown_dcb[4];
-            unsigned char color1;       // +0xdcf
-            char unknown_dd0[5];
-            unsigned char color2;       // +0xdd5
-            char unknown_dd6[5];
-        };
-    };
-    char unknown_ddb[0x11eb - 0xddb];
-    int surface;                        // +0x11eb
-    char unknown_11ef[0x1b63 - 0x11ef];
+    Gui gui;                            // +0x519
+    char unknown_120f[0x1b63 - 0x120f];
     PlayerRec_00497f40 players[10];     // +0x1b63
     char unknown_2851[0x29a0 - 0x2851];
     Options_00497180* options;          // +0x29a0
@@ -375,6 +337,13 @@ extern PacketManager g_packetManager;
 #include "../sound/sound.h"
 // Unused here: the symbol ids these declarations take keep the allocation of LoadMatch,
 // LoadingScreenFrame and OffsetWorldPosFromView (docs/c2-regalloc.md).
+void GonzoAtexitHandler(void);
+char IsMemSet(void);
+void MemSetAtexitHandler(void);
+int GetMemSetValue(void);
+void SetValueAtexitHandler(void);
+void NopAbortHook(void);
+int __cdecl GetStackLow(void);
 int GetHostDpid();
 void RegisterUnitOrders(void);
 void RegisterGroundOrders(void);
@@ -430,13 +399,13 @@ unsigned short __stdcall FindUnitTypeId(const char* name);
 void __stdcall SpawnCommanderAtStartPos(int team, int startpos);
 void __stdcall CreateUnit(unsigned char team, unsigned short id, FixedVec3 pos, int a,
     int b, int c);
-Gadget_497180* __stdcall LoadGuiLayer(Sub_497180* sub, const char* name, int flags);
-void __stdcall HandleMain2LayoutEvent(Gadget_497180* gadget);
+Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, unsigned int flags);
+void __stdcall HandleMain2LayoutEvent(Gui* gadget);
 void __cdecl operator delete(void* p);
 
-void __stdcall RenderLayer(Menu_00497ce0* menu, int value);
-void __stdcall MarkLayerChanged(Menu_00497ce0* menu);
-void __stdcall BlitMenuLayers(Menu_00497ce0* menu, int a, int b);
+int __stdcall RenderLayer(Gui* menu, unsigned int flags);
+void __stdcall MarkLayerChanged(Gui* obj);
+void __stdcall BlitMenuLayers(Gui* gui, unsigned int* surface, int* rect);
 void __stdcall FillRectangle(void* surface, void* rect, int color);
 void __stdcall DrawTextClipped(void* surface, const char* text, int x, int y, int len, int flag);
 char* __stdcall Translate(char* s);
@@ -461,10 +430,10 @@ void __cdecl GameFreeThunk(void*);
 char* __stdcall BuildDataPath(char* buf, const char* dir, const char* name, const char* ext);
 void __stdcall SendProbe(int from, int to);
 void __stdcall DrawSyncStatus(void*);
-void __stdcall DisableKeyCommands(void*);
+void __stdcall DisableKeyCommands(Gui*);
 int __stdcall GetTextPixelWidth(char*);
-void __stdcall CloseTopScreen(void*);
-void __stdcall SetCursorAnimation(void*, void*);
+void __stdcall CloseTopScreen(Gui*);
+void __stdcall SetCursorAnimation(Gui*, void*);
 void __stdcall RemapPaletteToClosestIndices(void*, void*, void*);
 void __stdcall SetCloseHandler(void (__cdecl *)(int), int);
 void __stdcall SetResolution(int, int);
@@ -472,7 +441,7 @@ void __stdcall FatalError(char*);
 int __stdcall StartThread(void (*)(void), int, int);
 void* __stdcall GetGafFrame(void*, int);
 void __stdcall DrawFrame(void*, void*, int, int);
-void* __stdcall FindGafEntry(int, char*);
+void* __stdcall FindGafEntry(void*, const char*);
 int __stdcall SetPaletteColors(unsigned char* colors, int first, int count);
 char* __stdcall HAPI_LoadFile(char* path, int* size);
 void __stdcall SetTextColors(int, int);
@@ -766,10 +735,9 @@ tail:
         int side = pl->side;
         sprintf(g_game->mainHudLayoutName, "%sMAIN2.GUI", g_game->sideDefs[side].namePrefix);
     }
-    Gadget_497180* gadget =
-        LoadGuiLayer((Sub_497180*)&g_game->menu, g_game->mainHudLayoutName, 0x20);
-    gadget->handler = HandleMain2LayoutEvent;
-    gadget->owner = (char*)g_game;
+    Layer* layer = LoadGuiLayer(&g_game->gui, g_game->mainHudLayoutName, 0x20);
+    layer->handler = (void (__stdcall*)(void*))HandleMain2LayoutEvent;
+    layer->data = g_game;
 
     PlayerRec_00497f40* currec = &g_game->players[g_game->localPlayer];
     currec->data->flags_9b |= 0x10;
@@ -813,9 +781,9 @@ void __stdcall DrawSyncStatus(void* surface)
     int off;
     extern Game* g_game;
 
-    RenderLayer(&g_game->menu, 0x40);
-    MarkLayerChanged(&g_game->menu);
-    BlitMenuLayers(&g_game->menu, 0, 0);
+    RenderLayer(&g_game->gui, 0x40);
+    MarkLayerChanged(&g_game->gui);
+    BlitMenuLayers(&g_game->gui, 0, 0);
 
     const char* text;
     if (g_game->netBits.synced) {
@@ -848,10 +816,10 @@ void __stdcall DrawSyncStatus(void* surface)
             {
                 r.left = x;
                 r.right = slot + x - 2;
-                FillRectangle(surface, &r, g_game->color1);
+                FillRectangle(surface, &r, g_game->gui.colours[4]);
                 int pc = q->percent;
                 r.right = r.left + (pc * (slot - 2)) / 100;
-                FillRectangle(surface, &r, g_game->color2);
+                FillRectangle(surface, &r, g_game->gui.colours[10]);
                 DrawTextClipped(surface, q->name, r.left, 420, slot - 2, 0);
                 x += slot;
             }
@@ -877,7 +845,7 @@ static inline void DrawLoadingBar(void* gadget, void* lightbar, int index, unsig
 {
     unsigned int color;
     int flash;
-    color = g_game->colors[g_game->progress[index] < 100 ? 12 : 10];
+    color = g_game->gui.colours[g_game->progress[index] < 100 ? 12 : 10];
     SetTextColors(color, GetTextKeyColor());
     if (g_game->progress[index] == 100 && *prev != 100) {
         alphas[slot] = 0x1e;
@@ -917,21 +885,21 @@ void LoadingScreenFrame(void)
     char namebuf[100];
 
     if (!g_game->loadingFlags.bits.started) {
-        while (g_game->field_531 != 0) {
-            CloseTopScreen(&g_game->guiRoot);
+        while (g_game->gui.layer != 0) {
+            CloseTopScreen(&g_game->gui);
         }
-        DisableKeyCommands(&g_game->guiRoot);
+        DisableKeyCommands(&g_game->gui);
         if (g_game->cursorMode != 0x14) {
             g_game->cursorMode = 0x14;
-            SetCursorAnimation(&g_game->guiRoot, (void*)g_game->cursorHourglass);
+            SetCursorAnimation(&g_game->gui, (void*)g_game->cursorHourglass);
         }
         SetFont(g_game->fontComix);
         SetPaletteColors((unsigned char*)g_game->paletteRgba, 0, 0x100);
         if (g_game->mapInfo->GetGameType() != 2) {
             SaveSettings();
         }
-        while (g_game->field_531 != 0) {
-            CloseTopScreen(&g_game->guiRoot);
+        while (g_game->gui.layer != 0) {
+            CloseTopScreen(&g_game->gui);
         }
         BlankScreen();
         g_game->screenWidth = 0x280;
@@ -949,7 +917,7 @@ void LoadingScreenFrame(void)
         }
         BuildDataPath(aux, "palettes", "guipal", "PAL");
         surfaceHandle = HAPI_LoadFile(aux, 0);
-        RemapPaletteToClosestIndices(&g_game->guiRoot, g_game->paletteRgba, surfaceHandle);
+        RemapPaletteToClosestIndices(&g_game->gui, g_game->paletteRgba, surfaceHandle);
         GameFreeThunk(surfaceHandle);
         g_game->lastSimBudgetTick = GetTicks();
         g_game->simStepsPending = 0;
@@ -1007,7 +975,7 @@ void LoadingScreenFrame(void)
         g_game->frontendState = 6;
         g_game->handler = BattleFrame;
         SetCloseHandler(HandleBattleQuitPrompt, 0);
-        g_game->field_589 = 0;
+        g_game->gui.clearQuickKeys = 0;
         memset((void*)g_game->progress, 0, 8);
         g_game->sound->SetTrackCategory(0);
         if (!g_game->sound->IsCdPlaying()) {
@@ -1045,7 +1013,7 @@ void LoadingScreenFrame(void)
     // The result stays in a local: it gives the compare against a register.
     int ok = LockScreen(&gadget);
     if (ok != 0) {
-        color = g_game->colors[15];
+        color = g_game->gui.colours[15];
         stamp = GetTicks();
         if (g_loadingBarFlashDecayTick < (int)stamp) {
             g_loadingBarFlashDecayTick = GetTicks();
@@ -1056,7 +1024,7 @@ void LoadingScreenFrame(void)
             }
         }
         SetFont(g_game->fontComix);
-        DrawSurface(&gadget, (void*)g_game->surface, 0, 0);
+        DrawSurface(&gadget, g_game->gui.fallback, 0, 0);
         if (g_game->mapInfo->GetGameType() != 1) {
             SetTextColors(color, 0xfe);
             // Local for the strncpy source: the call comes before the length push.
@@ -1075,7 +1043,7 @@ void LoadingScreenFrame(void)
             }
         }
         {
-            void* light = FindGafEntry(g_game->gaf, "LIGHTBAR");
+            void* light = FindGafEntry(g_game->gui.gaf, "LIGHTBAR");
             void* lightbar = GetGafFrame(light, 0);
             *((short*)lightbar + 3) = 0;
             *((short*)lightbar + 2) = 0;
