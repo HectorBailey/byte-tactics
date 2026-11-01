@@ -2228,10 +2228,10 @@ address,size,file,symbol,status,similarity
 0x4a4660,556,src/gui/gui.cpp,?DrawProgressBarGadget@@YGXPAUDialog_4a4660@@H@Z,matched,100.0
 0x4a4890,158,src/gui/gui.cpp,?TickProgressBar@@YGXPAUGui@@H@Z,matched,100.0
 0x4a4930,65,src/gui/gui.cpp,?ResetProgressBar@@YGXPAUGameState_4a4930@@H@Z,matched,100.0
-0x4a4980,462,src/gui/gui.cpp,?DrawHotspot@@YGXPAUDialog_4a4980@@H@Z,matched,100.0
+0x4a4980,462,src/gui/gui.cpp,?DrawHotspot@@YGXPAUGui@@H@Z,matched,100.0
 0x4a4b50,309,src/gui/gui.cpp,?HandleHotspotInput@@YGHPAUDialog_4a4b50@@H@Z,matched,100.0
-0x4a4c90,215,src/gui/gui.cpp,?DrawLineGadget@@YGXPAUDialog_4a4c90@@HE@Z,matched,100.0
-0x4a4d70,661,src/gui/gui.cpp,?DrawTextInput@@YGXPAUDialog_4a4d70@@H@Z,matched,100.0
+0x4a4c90,215,src/gui/gui.cpp,?DrawLineGadget@@YGXPAUGui@@HE@Z,matched,100.0
+0x4a4d70,661,src/gui/gui.cpp,?DrawTextInput@@YGXPAUGui@@H@Z,matched,100.0
 0x4a5010,31,src/gui/gui.cpp,?GetCharGlyph@@YGPAXE@Z,matched,100.0
 0x4a5030,113,src/gui/gui.cpp,?GetTextPixelWidth@@YGHPAE@Z,matched,100.0
 0x4a50b0,40,src/gui/gui.cpp,?GetFontLineHeight@@YGHXZ,matched,100.0

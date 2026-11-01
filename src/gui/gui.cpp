@@ -3336,19 +3336,6 @@ void LoadUnitPortrait();
 void UnitRestrictDialogFrame();
 void OpenUnitRestrictions();
 
-struct Holder_004a4980 {
-    char unknown_0[4];
-    Gadget* entries;           // +0x04
-};
-
-#pragma pack(push, 1)
-struct Dialog_4a4980 {
-    char unknown_0[0x18];
-    Holder_004a4980* holder;           // +0x18
-    char unknown_1c[0x8b9 - 0x1c];
-    unsigned char colour7;             // +0x8b9
-};
-#pragma pack(pop)
 
 // Kept with the 0x4a1b40 view above.
 struct Point_004a4980 {
@@ -3372,9 +3359,9 @@ int __stdcall FillRectangle(void* surface, Rect* rect, int color);
 void __stdcall DrawFrameQuad(void* surf, void* entry, Quad_004a4980* dst, Quad_004a4980* src);
 
 // FUNCTION: 0x4a4980
-void __stdcall DrawHotspot(Dialog_4a4980* obj, int index)
+void __stdcall DrawHotspot(Gui* obj, int index)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     Gadget* e = &entries[index];
 
     Rect rect;
@@ -3426,7 +3413,7 @@ void __stdcall DrawHotspot(Dialog_4a4980* obj, int index)
         src.p[3].y = e->u.hotspot.frame->height - 1;
         DrawFrameQuad(entries->u.assets.surface, e->u.hotspot.frame, &dst, &src);
     } else {
-        FillRectangle(entries->u.assets.surface, &rect, obj->colour7);
+        FillRectangle(entries->u.assets.surface, &rect, obj->colours[7]);
     }
 }
 
@@ -3552,17 +3539,6 @@ void SendLobbySyncRequests();
 char FindFreePlayerId();
 void __stdcall DrawDashedCircle(void* surface, int cx, int cy, int radius, int color, int n, int start);
 
-struct Holder_004a4c90 {
-    char unknown_0[4];
-    Gadget* entries;           // +0x4
-};
-
-struct Dialog_4a4c90 {
-    char unknown_0[0x18];
-    Holder_004a4c90* holder;           // +0x18
-    char unknown_1c[0x8b2 - 0x1c];
-    unsigned char colour[0x100];       // +0x8b2
-};
 
 // The colour parameter must be int, not unsigned char: forces a zero-extending load.
 void __stdcall DrawLine(void* surface, int x1, int y1, int x2, int y2,
@@ -3582,22 +3558,22 @@ static inline void FillRect_004a4c90(Gadget* e, Rect* r)
 }
 
 // FUNCTION: 0x4a4c90
-void __stdcall DrawLineGadget(Dialog_4a4c90* obj, int index, unsigned char param_3)
+void __stdcall DrawLineGadget(Gui* obj, int index, unsigned char param_3)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     Gadget* e = (Gadget*)((char*)entries + index * 0x15b);
     Rect rect;
     FillRect_004a4c90(e, &rect);
     if (param_3 & 1) {
         if (e->attribs & 1)
             DrawLine(entries->u.assets.surface, rect.left, rect.top, rect.right, rect.top,
-                         obj->colour[e->colours]);
+                         obj->colours[e->colours]);
         else if (e->attribs & 2)
             DrawLine(entries->u.assets.surface, rect.left, rect.top, rect.left, rect.bottom,
-                         obj->colour[e->colours]);
+                         obj->colours[e->colours]);
         else if (e->attribs & 4)
             DrawLine(entries->u.assets.surface, rect.left, rect.top, rect.right, rect.bottom,
-                         obj->colour[e->colours]);
+                         obj->colours[e->colours]);
     }
 }
 // Draws one list-gadget
@@ -3626,26 +3602,21 @@ struct List_004a4d70 {
     unsigned short* glyphs;            // +0x0c
 };
 
-struct Holder_004a4d70 {
-    int current;                       // +0x00
-    Gadget* entries;           // +0x04
-    char unknown_08[0x14 - 0x08];
-    List_004a4d70* language;           // +0x14
-    char unknown_18[0x24 - 0x18];
-    void* surface;                     // +0x24
-};
-
-struct Dialog_4a4d70 {
-    char unknown_00[0x18];
-    Holder_004a4d70* holder;           // +0x18
-    char unknown_1c[0x64 - 0x1c];
-    int focus;                         // +0x64
-    char unknown_68[0x74 - 0x68];
-    int cursor;                        // +0x74
-    char unknown_78[0x8b2 - 0x78];
-    unsigned char colours[0xcd2 - 0x8b2]; // +0x8b2
-    void* fallback;                    // +0xcd2
-};
+// Unused here: real declarations that keep the file's symbol count (docs/c2-regalloc.md).
+void LoadBattleAssets(void);
+void Force640x480Surfaces(void);
+void ShutdownIngameSystems(void);
+void ShutdownIngameAndQuit(void);
+void OutOfMemoryHandler(void);
+void AtexitNoOp(void);
+void ChdirToExeDirectory(void);
+int GetPreferredLanguage(void);
+void MainLoopTick(void);
+void InitFrame(void);
+void ReturnToMainMenuFrame(void);
+void MenuFrame(void);
+void PreBattleFrame(void);
+void CampaignSetupFrame(void);
 
 // Unused here: the symbol ids this declaration takes keep the allocation after
 // the Rect_004a4d70 view was dropped (docs/c2-regalloc.md).
@@ -3669,7 +3640,7 @@ int GetFontHeight();
 char* __stdcall GetGafFrame(void* glyphs, int c);
 void __stdcall SetTextColors(int colour, int font);
 int GetTextKeyColor();
-int __stdcall DrawListboxFrame(Dialog_4a4d70* obj, int index, void* bmp);
+void __stdcall DrawListboxFrame(Gui* obj, int index, void* bmp);
 void __stdcall CopySurfaceRect(void* dst, void* src, Rect* rect, int* pos);
 int __stdcall FillRectangle(void* surface, Rect* rect, int colour);
 void __stdcall DrawTextClipped(void* surface, char* text, int x, int y, int maxw, int style);
@@ -3725,9 +3696,9 @@ static inline int SelectTextInputFont(Gadget* entries, int index)
 }
 
 // FUNCTION: 0x4a4d70
-void __stdcall DrawTextInput(Dialog_4a4d70* obj, int index)
+void __stdcall DrawTextInput(Gui* obj, int index)
 {
-    Gadget* entries = obj->holder->entries;
+    Gadget* entries = obj->layer->entries;
     SelectTextInputFont(entries, index);
 
     Gadget* me = &entries[index];
@@ -3746,7 +3717,7 @@ void __stdcall DrawTextInput(Dialog_4a4d70* obj, int index)
     if (me->attribs & 1) {
         FillRectangle(entries->u.assets.surface, &rect, obj->colours[0]);
     } else {
-        void* surface = obj->holder->surface;
+        void* surface = obj->layer->surface;
         if (surface == 0)
             surface = obj->fallback;
         if (surface == 0) {
