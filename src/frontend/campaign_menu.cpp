@@ -24,16 +24,6 @@ public:
 
 #include "../map/mission.h"
 
-struct Info_00477510 {
-    char unknown_0[0x30];
-    char name[8];                      // +0x30
-};
-
-struct Object_00477510 {
-    char unknown_0[0x18];
-    Info_00477510* info;               // +0x18
-};
-
 // The frame sequencer at g_briefingPlanetFrameCursor.
 struct Anim_00478b40 {
     short index;                       // +0x0
@@ -656,10 +646,13 @@ int HasFewerThanThreeCampaignFiles(void)
     return n <= 2;
 }
 
+// The SINGLE menu's key handler: when the last keys typed (the layer's key
+// state, from +8) spell DRDEATH, toggles the AnyMsn gadget and the
+// all-missions setting.
 // FUNCTION: 0x477510
-void __stdcall ToggleAnyMission(Object_00477510* obj)
+void __stdcall ToggleAnyMission(Gui* gui)
 {
-    if (strncmp(obj->info->name, "DRDEATH", 7) == 0) {
+    if (strncmp(gui->layer->text + 8, "DRDEATH", 7) == 0) {
         if (!(g_game->allMissionsFlags & 1)) {
             SetGadgetActiveByName(&g_game->gui, "AnyMsn", 1);
             g_game->allMissionsFlags |= 1;
