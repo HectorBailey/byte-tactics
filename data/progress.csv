@@ -2156,7 +2156,7 @@ address,size,file,symbol,status,similarity
 0x49fc50,146,src/gui/gui.cpp,?TrySetFocus@@YGHPAUGui@@H@Z,matched,100.0
 0x49fcf0,21,src/gui/gui.cpp,?IsFocused@@YGHPAUGui@@H@Z,matched,100.0
 0x49fd10,16,src/gui/gui.cpp,?HasFocus@@YG_NPAUGui@@@Z,matched,100.0
-0x49fd20,53,src/gui/gui.cpp,?FUN_0049fd20@@YGXPAUGui@@PAUGadget@@PAUMouseEvent@@@Z,matched,100.0
+0x49fd20,53,src/gui/gui.cpp,?GetGadgetRelativeMouse@@YGXPAUGui@@PAUGadget@@PAUMouseEvent@@@Z,matched,100.0
 0x49fd60,138,src/gui/gui.cpp,?IsCurrentGadgetNamed@@YGHPAUGui@@PAD@Z,matched,100.0
 0x49fdf0,99,src/gui/gui.cpp,?FindGadgetIndex@@YGHPAUGadget@@PADH@Z,matched,100.0
 0x49fe60,97,src/gui/gui.cpp,?FindGadgetIndexBySubstring@@YGHPAUGadget@@PAD@Z,matched,100.0

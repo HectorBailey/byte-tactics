@@ -2144,7 +2144,7 @@ address,name
 0x49fc50,TrySetFocus
 0x49fcf0,IsFocused
 0x49fd10,HasFocus
-0x49fd20,FUN_0049fd20
+0x49fd20,GetGadgetRelativeMouse
 0x49fd60,IsCurrentGadgetNamed
 0x49fdf0,FindGadgetIndex
 0x49fe60,FindGadgetIndexBySubstring

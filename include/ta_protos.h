@@ -2403,7 +2403,7 @@ void ClearFocus(Class_0049fc40*);
 int TrySetFocus(Object_0049fc50*, int);
 int IsFocused(int, int);
 bool HasFocus(int);
-void FUN_0049fd20(Obj1_49fd20*, Obj2_49fd20*, Vec6_49fd20*);
+void GetGadgetRelativeMouse(Obj1_49fd20*, Obj2_49fd20*, Vec6_49fd20*);
 int IsCurrentGadgetNamed(Gui_0049fd60*, char*);
 int FindGadgetIndex(Entry_0049fdf0*, char*, int);
 int FindGadgetIndexBySubstring(Entry_0049fe60*, char*);

@@ -267,7 +267,7 @@ bool __stdcall HasFocus(Gui* gui)
 }
 
 // FUNCTION: 0x49fd20
-void __stdcall FUN_0049fd20(Gui* gui, Gadget* gadget, MouseEvent* out)
+void __stdcall GetGadgetRelativeMouse(Gui* gui, Gadget* gadget, MouseEvent* out)
 {
     *out = gui->point;
     out->x -= gadget->x;
