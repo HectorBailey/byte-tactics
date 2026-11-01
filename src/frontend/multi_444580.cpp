@@ -52,7 +52,7 @@ void __stdcall SetTranslatedText(void* menu, int index, int source, int value);
 void __stdcall ConfigureListBoxByName(void* menu, char* name, void* items, int count, int flag);
 void OrLabelAttribs();
 void __stdcall SetKeyboardInput(void* menu, int value);
-void __stdcall RenderLayer(void* menu, int value);
+int __stdcall RenderLayer(Gui* gui, unsigned int flags);
 
 // Appends a copy of entry `from` under a new name. This is 0x4444d0, which the
 // original defines between the two functions of this file and inlines here;

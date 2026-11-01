@@ -496,12 +496,6 @@ void ResetNetStats();
 void __stdcall StartScreenShake(int dx, int dy, int value);
 void __stdcall KillFeature(int x, int z, int flag);
 void __stdcall ToggleShareLos(int unused);
-// Unused here: real functions declared for their symbol ids. The five mode
-// views this file used to declare are one Mode and one ModeList now, and these
-// keep the ids the functions after them match at (docs/c2-regalloc.md).
-void __stdcall DrawTextClipped(int a, char* text, int x, int y, int w, int h);
-void __stdcall WriteScreenshot(char* dir, char* name, int x, int y, int w, int h);
-int __stdcall ScanDirectory(char* path, void* buffer, char* p3, int p4, int p5, int p6);
 
 struct Link_0045ead0 {
     void* obj;                                 // +0x0
@@ -640,17 +634,7 @@ void __stdcall GetGadgetName(Gadget* entries, char* name, int index);
 Gadget* __stdcall FindGadgetOrNull(Gadget* entries, char* name);
 void RestoreSoundOptions();
 
-void __stdcall RenderLayer(Sub_0045cf60* sub, int value);
-void __stdcall RenderLayer(void* obj, int n);
-void __stdcall RenderLayer(Menu_0045de30* obj, int value);
-void __stdcall RenderLayer(Menu_0045e5e0* menu, int value);
-void __stdcall RenderLayer(Layer* menu, int flag);
-void __stdcall RenderLayer(Sub_0045f800* sub, int value);
-void __stdcall RenderLayer(Sub_0045fb30* sub, int value);
-void __stdcall RenderLayer(Menu_00460160* menu, int value);
-void __stdcall RenderLayer(Sub_00460680* sub, int value);
-void __stdcall RenderLayer(Gui* sub, int value);
-void __stdcall RenderLayer(char* menu, int value);
+int __stdcall RenderLayer(Gui* gui, unsigned int flags);
 
 void __stdcall MarkChanged(Sub_0045cf60* sub);
 void __stdcall MarkChanged(Dialog* obj);
@@ -1392,7 +1376,7 @@ void BlitOptionsPanel()
     if (g_game->bits_2a44.bits.bit2) {
         return;
     }
-    RenderLayer((Sub_0045cf60*)&g_game->gui, 0x40);
+    RenderLayer(&g_game->gui, 0x40);
     MarkChanged((Sub_0045cf60*)&g_game->gui);
     BlitMenuLayers((Sub_0045cf60*)&g_game->gui, 0, 0);
     SetOffscreenSurface(g_game->offscreen);
@@ -2225,7 +2209,7 @@ void ShowGameSettingsDialog()
     for (i = count + 1; i <= layer->entries->u.count; i++)
         entries[i].attribs = 1;
     SetKeyboardInput((Layer*)&g_game->gui, 1);
-    RenderLayer((Layer*)&g_game->gui, 0x40);
+    RenderLayer(&g_game->gui, 0x40);
 }
 
 // FUNCTION: 0x45f770
@@ -2262,7 +2246,7 @@ void OpenBriefingDialog()
     LoadPictureCached("igmbrief", 0, 0, 0);
     AllocBlinkWords((Sub_0045f800*)&g_game->gui, 0xf);
     InitBriefingText();
-    RenderLayer((Sub_0045f800*)&g_game->gui, 0x40);
+    RenderLayer(&g_game->gui, 0x40);
 }
 
 // Emits one help line as its two text fields, left of the '|' and right of it,
@@ -2350,7 +2334,7 @@ void OpenHelpDialog()
     g_helpDialogBaseGadgetCount = g->entries->u.count;
     FillHelpPage((Sub_0045fb30*)&g_game->gui, 0, 0x11);
     SetKeyboardInput((Sub_0045fb30*)&g_game->gui, 1);
-    RenderLayer((Sub_0045fb30*)&g_game->gui, 0x40);
+    RenderLayer(&g_game->gui, 0x40);
 }
 
 // FUNCTION: 0x45fbc0
@@ -2388,7 +2372,7 @@ void __stdcall HandleOptionsPanelClick(Gui* gui)
         // Empty then-arm: the positive test alone changes the codegen.
         if (g_game->bits_2a44.bits.bit2) {
         } else {
-            RenderLayer((char*)&g_game->gui, 0x40);
+            RenderLayer(&g_game->gui, 0x40);
             MarkChanged((char*)&g_game->gui);
             BlitMenuLayers((char*)&g_game->gui, 0, 0);
             SetOffscreenSurface((int)g_game->offscreen);
@@ -2555,7 +2539,7 @@ void OpenOptionsPanel()
         g_optionsBackupTrackTypes[i] = g_game->sound->GetCategoryOfTrack(i);
     }
     SetKeyboardInput((Menu_00460160*)&g_game->gui, 1);
-    RenderLayer((Menu_00460160*)&g_game->gui, 0xc0);
+    RenderLayer(&g_game->gui, 0xc0);
     if (g_game->bits_2a44.bits.bit2) {
         PlaySoundByName("Panel", 0);
     }
@@ -2627,7 +2611,7 @@ void OpenRestartDialog()
     }
     ApplyDifficultyButtons();
     SetKeyboardInput((Menu_004604a0*)&g_game->gui, 1);
-    RenderLayer((Menu_004604a0*)&g_game->gui, 0x40);
+    RenderLayer(&g_game->gui, 0x40);
     SetCursorMode(0x13);
 }
 
@@ -2686,7 +2670,7 @@ void OpenSurrenderDialog()
     }
     SelectGadgetByName((Sub_00460680*)&g_game->gui, "CHOICE2");
     layer->handler = HandleSurrenderChoice;
-    RenderLayer((Sub_00460680*)&g_game->gui, 0x40);
+    RenderLayer(&g_game->gui, 0x40);
 }
 
 // FUNCTION: 0x460800

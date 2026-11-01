@@ -731,7 +731,7 @@ void __stdcall SortFileList(char* items, int b, int c, int count);
 void __stdcall ConfigureListBoxByName(Gui* menu, char* name, char* items, int count, int flag);
 void __stdcall SetListBoxScrollByName(Gui* menu, char* name, int index);
 void __stdcall SetKeyboardInput(Gui* menu, int value);
-void __stdcall RenderLayer(Gui* menu, int value);
+int __stdcall RenderLayer(Gui* gui, unsigned int flags);
 void __stdcall SetCursorMode(int value);
 
 // Opens the skirmish map selector (SELMAP.GUI): counts the skirmish maps,

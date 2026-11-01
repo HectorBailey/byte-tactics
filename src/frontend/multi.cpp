@@ -897,7 +897,7 @@ void __stdcall SetGadgetRows(void* table, char* name, int* pics, int count);
 void __stdcall DrawButton(void* gadget, int value);
 void __stdcall LoadPictureCached(const char* name, int a, int b, int c);
 Layer* __stdcall LoadGuiLayer(Gui* menu, const char* name, unsigned int flags);
-void __stdcall RenderLayer(void* menu, int value);
+int __stdcall RenderLayer(Gui* gui, unsigned int flags);
 void __stdcall PlaySoundByName(const char* name, int flag);
 void __stdcall PlaySoundByName(char* str, int flag);
 void BlankScreen();
@@ -2959,7 +2959,7 @@ void OpenControlDialog()
     SetButtonStageByName((Dialog_004a04f0*)&g_game->gui, "GAMEOPEN", !info->closed);
     MarkChanged((Dialog*)&g_game->gui);
     SetKeyboardInput((Dialog*)&g_game->gui, 1);
-    RenderLayer((Dialog*)&g_game->gui, 0x40);
+    RenderLayer(&g_game->gui, 0x40);
 }
 
 // Returns whether two players are allied: alliance 5 means "no alliance".
@@ -3501,7 +3501,7 @@ void OpenAlliesDialog()
     SetGadgetGrayedOutByName(&g_game->gui, "VICTORY",
                  (count > 1 || win) ? 1 : 0);
     SetKeyboardInput(&g_game->gui, 1);
-    RenderLayer((Dialog*)&g_game->gui, 0x40);
+    RenderLayer(&g_game->gui, 0x40);
 }
 
 static inline int IsPlaying_00447b10(Player* p)
