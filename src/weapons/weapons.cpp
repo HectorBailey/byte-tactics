@@ -1306,16 +1306,7 @@ int FindFreeExplodedPieceSlot(void);
 void UpdateExplodedPieces(void);
 void StampFeatureMetal(void);
 
-#pragma pack(push, 1)
-// One view of the 0xe byte projectile detonate packet (type 0xe): the sender
-// at 0x49a120, a view of which is in the gap file, holds the other.
-struct ProjectileDetonatePacket {
-    unsigned char type;                // +0x0
-    Vec3 aim;                          // +0x1
-    unsigned char weaponIndex;         // +0xd
-};
-#pragma pack(pop)
-
+#include "projectile_detonate_packet.h"
 void __stdcall DetonateProjectile(Projectile* proj, int flag);
 
 static inline int SamePos(const Vec3& a, const Vec3& b)
@@ -2861,6 +2852,10 @@ struct Proj_0049be60 {
 #pragma pack(pop)
 
 #include "../map/byte_map.h"
+
+// Unused here: the symbol id this declaration takes keeps DrawProjectiles
+// (0x49be60) matching (docs/c2-regalloc.md).
+void SetMemFussyDefault(void);
 
 #pragma pack(push, 1)
 // A player slot read for the explored grid at +0x7c (network/player.h's
