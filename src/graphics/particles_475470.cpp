@@ -12,15 +12,7 @@
 
 #include "../util/fixed.h"
 
-// Kept, not map/byte_map.h: the header's helpers move Render (0x475470) to 96.0%.
-struct MapSize {
-    unsigned int width;                // +0x0
-    unsigned int height;               // +0x4
-    int Contains(unsigned int tx, unsigned int ty)
-    {
-        return tx < width && ty < height;
-    }
-};
+#include "../map/map_size.h"
 
 struct ByteMap {
     unsigned char* data;               // +0x0
