@@ -23,15 +23,6 @@ public:
     LosLine* GetLosLine(short i);
 };
 
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
-void RegisterUnitOrders(void);
-void RegisterGroundOrders(void);
-void EnableAICommands(void);
-void RegisterAICommands(void);
-void FUN_00406f40(void);
-void ResetAIPlayers(void);
-void RegisterVtolOrders(void);
-
 extern LosTables g_losTables;
 
 #include "byte_map.h"

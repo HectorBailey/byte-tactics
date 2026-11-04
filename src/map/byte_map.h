@@ -5,16 +5,7 @@
 #ifndef BYTE_MAP_H
 #define BYTE_MAP_H
 
-struct MapSize {
-    unsigned int width;                // +0x0
-    unsigned int height;               // +0x4
-
-    int Contains(unsigned int col, unsigned int row)
-    {
-        return col < width && row < height;
-    }
-};
-
+#include "map_size.h"
 struct ByteMap {
     unsigned char* data;               // +0x0
     MapSize size;                      // +0x4

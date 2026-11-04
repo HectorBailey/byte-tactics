@@ -2862,6 +2862,10 @@ struct Proj_0049be60 {
 
 #include "../map/byte_map.h"
 
+// Unused here: the symbol id this declaration takes keeps DrawProjectiles
+// (0x49be60) matching (docs/c2-regalloc.md).
+void RegisterVtolOrders(void);
+
 #pragma pack(push, 1)
 // A player slot read for the explored grid at +0x7c (network/player.h's
 // explored, exploredWidth and exploredHeight). The same record in every file
