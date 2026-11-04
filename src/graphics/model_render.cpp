@@ -66,13 +66,7 @@ struct Vector3s {
 
 #include "../util/point.h"
 
-// A 12-byte 16.16 position with its constructor.
-struct Pos_4589c0 {
-    int x;
-    int y;
-    int z;
-    Pos_4589c0(int a, int b, int c) { x = a; y = b; z = c; }
-};
+#include "pos_4589c0.h"
 
 // A 0x18-byte frame header followed by its pixel planes: the picture the
 // object-picture builder allocates, its shadow and the scratch frames.

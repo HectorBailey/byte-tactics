@@ -3,12 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 
-struct Pos_4589c0 {
-    int x;
-    int y;
-    int z;
-    Pos_4589c0(int a, int b, int c) { x = a; y = b; z = c; }
-};
+#include "pos_4589c0.h"
 
 #include "gaf_frame.h"
 
