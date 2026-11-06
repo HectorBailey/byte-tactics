@@ -57,14 +57,7 @@ struct Spot_0049a120 {
     char unknown_14[0x30 - 0x14];
 };
 
-// One view of the 0xe byte projectile detonate packet (type 0xe): the
-// receiver at 0x49af90 in the weapons file holds the other.
-struct ProjectileDetonatePacket {
-    unsigned char type;                // +0x0
-    Vec3 aim;                          // +0x1
-    unsigned char weaponIndex;         // +0xd
-};
-
+#include "projectile_detonate_packet.h"
 struct Game_0049a120 {
     char unknown_0[0x141f3];
     int projectileCount;               // +0x141f3
