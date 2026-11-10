@@ -209,11 +209,6 @@ struct Def_0043f0e0 {
     };
 };
 
-struct Size_0043f0e0 {
-    unsigned int width;  // +0x0
-    unsigned int height; // +0x4
-};
-
 struct Unit_0043f0e0 {
     int motion; // +0x0
     char unknown_4[0x10 - 0x4];
@@ -275,13 +270,6 @@ class Unit {
     int CanRepair(Unit_0043e490* other);
     int CanReclaim(Unit_0043e490* other);
 };
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
-int __stdcall IsUnitCommander(Unit*);
-int __stdcall FindLandingPad(Unit*, int);
-unsigned short __stdcall ChooseBuildOption(unsigned int, Unit*);
-void __stdcall ClearWeaponTarget(Unit*, int);
-void __stdcall DetonateUnitWeapon(Unit*, int);
-void __stdcall DrawUnit(void*, Unit*);
 
 MissionType __stdcall GetOrderType(unsigned char mode, Unit_0043f0e0* unit,
                                       Unit_0043f0e0* target, Pos_0043f0e0* pos);
