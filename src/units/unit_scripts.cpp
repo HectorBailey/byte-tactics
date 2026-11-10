@@ -373,11 +373,6 @@ struct UnitDefFlags_0043e490 {
     Flags_0043e490 f245b;              // +0x245
 };
 
-struct Size_0043e490 {
-    unsigned int width;  // +0x0
-    unsigned int height; // +0x4
-};
-
 #include "../network/player.h"
 
 struct Pos_0043e490 {
