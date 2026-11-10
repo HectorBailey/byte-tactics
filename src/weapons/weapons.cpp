@@ -2241,17 +2241,6 @@ int __stdcall FireLineOfSightWeapon(Unit* unit, UnitWeaponSlot* aim,
 }
 
 #pragma pack(push, 1)
-struct Shot_0049db70 {
-    char unknown_0[8];
-    int piece;
-    WeaponDef* def;
-    char unknown_10[6];
-    short heading;
-    short pitch;
-    char unknown_1a;
-    unsigned char weapon;
-};
-
 struct Kind_0049db70 {
     char unknown_0[4];
     int player;
@@ -2271,30 +2260,30 @@ void Unused_0049db70(int a, int b, int c, int d, int e, int f);
 void __stdcall GetWeaponPiecePosition(Object_0049db70* obj, Vec3* out, unsigned char weapon, int piece);
 // The weapon index must stay an unsigned char: it makes the shift use byte registers.
 int* __stdcall FindTargetableProjectile(Object_0049db70* obj, unsigned char weapon);
-int __stdcall FireVLaunchProjectile(Shot_0049db70* shot, Object_0049db70* source, Vec3* pos,
+int __stdcall FireVLaunchProjectile(UnitWeaponSlot* shot, Object_0049db70* source, Vec3* pos,
                            Vec3* aim, Object_0049db70* target, int* param_6);
 double __cdecl _hypot(double x, double y);
 long __cdecl _ftol();
 
 // FUNCTION: 0x49db70
-int __stdcall FireVLaunchWeapon(Object_0049db70* source, Shot_0049db70* shot,
+int __stdcall FireVLaunchWeapon(Object_0049db70* source, UnitWeaponSlot* shot,
                            Object_0049db70* target, Vec3* aim)
 {
     Vec3 pos;
-    if (shot->piece != 0) {
-        GetWeaponPiecePosition(source, &pos, (shot->weapon >> 2) & 3, -1);
+    if (shot->aimCob.nAimCobDone != 0) {
+        GetWeaponPiecePosition(source, &pos, (shot->flags >> 2) & 3, -1);
         int dx = pos.x - aim->x;
         // dy must be a 4-byte union read by its high half, not a plain int.
         union { int value; short halves[2]; } dy;
         dy.value = pos.y - aim->y;
         int dz = pos.z - aim->z;
-        shot->heading = FUN_004b715a(dx, dz);
+        shot->fireHeading = FUN_004b715a(dx, dz);
         int dist = (int)_hypot((double)dx, (double)dz);
-        shot->pitch = FUN_004b715a(-(int)dy.halves[1], (short)(dist >> 16));
+        shot->firePitch = FUN_004b715a(-(int)dy.halves[1], (short)(dist >> 16));
         // Uninitialised here and zeroed only in the else arm.
         int* p;
-        if (shot->def->flags.b.interceptor) {
-            p = FindTargetableProjectile(source, (shot->weapon >> 2) & 3);
+        if (shot->weapon->flags.b.interceptor) {
+            p = FindTargetableProjectile(source, (shot->flags >> 2) & 3);
             if (!p)
                 return 0;
         } else {
@@ -2306,18 +2295,18 @@ int __stdcall FireVLaunchWeapon(Object_0049db70* source, Shot_0049db70* shot,
                 packet.type = 0xd;
                 packet.origin = pos;
                 packet.aimOrVel = *aim;
-                packet.weaponDefIndex = shot->def->index;
-                packet.weaponSlotIndex = (shot->weapon >> 2) & 3;
+                packet.weaponDefIndex = shot->weapon->index;
+                packet.weaponSlotIndex = (shot->flags >> 2) & 3;
                 // Keep the `== 0 ? 0 : team` ternaries: they put the zero store on the fall-through.
                 packet.ownerUnitId = source == 0 ? 0 : source->team;
                 packet.targetUnitId = target == 0 ? 0 : target->team;
-                packet.fireHeading = shot->heading;
-                packet.firePitch = shot->pitch;
-                packet.flag = shot->def->flags.b.interceptor;
+                packet.fireHeading = shot->fireHeading;
+                packet.firePitch = shot->firePitch;
+                packet.flag = shot->weapon->flags.b.interceptor;
                 BroadcastPacket(source->kind->player, &packet, 0x24);
             }
-            shot->piece = 0;
-            shot->weapon &= 0xfe;
+            shot->aimCob.nAimCobDone = 0;
+            shot->flags &= 0xfe;
             return 1;
         }
     }
@@ -2850,9 +2839,11 @@ struct Proj_0049be60 {
 
 #include "../map/byte_map.h"
 
-// Unused here: the symbol id this declaration takes keeps DrawProjectiles
+// Unused here: the 3 symbol ids these declarations take keep DrawProjectiles
 // (0x49be60) matching (docs/c2-regalloc.md).
 void SetMemFussyDefault(void);
+void AllocateUnitMemory(void);
+void BuildRadarPicture(void);
 
 #pragma pack(push, 1)
 // A player slot read for the explored grid at +0x7c (network/player.h's
