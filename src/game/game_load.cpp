@@ -54,6 +54,8 @@ void EnumPlayersCallback(int, int, int, int, int);
 int AimCobStub(int, int, int, int);
 void EmitBubbles(int, int, int, short);
 void DrawLine(int, int, int, int, int, int);
+void __stdcall LoadSideData(void);
+unsigned short __stdcall PickUnitUnderCursor(void);
 
 union LoadFlags_00497f40 {
     unsigned short value;
@@ -113,15 +115,12 @@ struct View_00498cd0 {
     int y;                              // +0x30
 };
 
-struct Fixed_00498d00 {
-    unsigned short frac;                // +0x0
-    short whole;                        // +0x2
-};
-
+// The 16.16 world position these minimap helpers build: three Fixed, the same
+// three ints in the same order as util/vec3.h's Vec3.
 struct Pos_00498d00 {
-    Fixed_00498d00 x;                   // +0x0
-    Fixed_00498d00 y;                   // +0x4
-    Fixed_00498d00 z;                   // +0x8
+    Fixed x;                            // +0x0
+    Fixed y;                            // +0x4
+    Fixed z;                            // +0x8
 };
 
 #include "../gui/gui.h"
