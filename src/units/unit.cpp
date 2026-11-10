@@ -56,11 +56,6 @@ struct Game {
 
 #include "../network/player.h"
 
-struct ActivateFlagsPacket {
-    unsigned char type;                // +0x0
-    short unitId;                      // +0x1, the unit id
-    unsigned char activateFlags;       // +0x3, the new state
-};
 #pragma pack(pop)
 
 extern Game* g_game;
