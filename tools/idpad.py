@@ -13,14 +13,17 @@ and prints the ones that bring the listed functions back.
 It reports the file's state now and on --base first, and stops if the listed
 functions already match. A candidate is otherwise a set of real
 zero-parameter declarations of functions src/ defines, spelled as defined
-(1 id each, and no type of its own to pay for), placed just after the file's includes or just before
-the first listed function, or the removal of one existing "Unused here"
-block. Every variant is compiled in a scratch copy, in parallel, and the file
-itself is never written.
+(1 id each, and no type of its own to pay for), placed just after the file's
+includes or just before one of the functions that is broken right now, or the
+removal of one existing "Unused here" block. Padding only reaches functions
+written after it, so anchoring on a function that already matches, which is
+what the first listed address usually is, inserts the block too early to help.
+Every variant is compiled in a scratch copy, in parallel, and the file itself
+is never written.
 
 List every // FUNCTION: address of the file, not only the ones that moved: a
-padding after the includes moves the functions before the first listed one as
-well.
+padding moves every function written after it, so a candidate that fixes the
+broken ones can still cost one that was fine.
 
 The copy has to sit at a path of exactly the same length as the original: the
 front end's counter moves 4 ids per character of the source path, so a copy
@@ -149,16 +152,17 @@ def variant_path(source: Path, index: int) -> Path:
 
 
 def attempt(variant: Path, text: str, include_dir: Path, targets: list[int], qual: dict):
-    """Compile one variant and compare every target: (matched count, best ratio, note)."""
+    """Compile one variant and compare every target: (per-target match,
+    best ratio, note)."""
     variant.write_text(text)
     obj, log = compile_source(variant, out_dir=f"scratch/idpad/{variant.parent.name}",
                               includes=(include_dir,))
     if obj is None:
-        return 0, 0.0, "did not compile"
+        return [False] * len(targets), 0.0, "did not compile"
     ours = parse_object(obj.read_bytes(), obj.name)
     orig = Original()
     results = [compare(orig, ours, a, None, qual.get(a)) for a in targets]
-    return sum(1 for r in results if r.matched), max((r.ratio for r in results), default=0.0), ""
+    return [r.matched for r in results], max((r.ratio for r in results), default=0.0), ""
 
 
 def read_base(source: Path, base: str) -> str | None:
@@ -198,19 +202,22 @@ def main() -> int:
         if base is None:
             print(f"  {args.base} does not have {rel}: no comparison")
         else:
-            matched, ratio, note = attempt(variant_path(source, 0), base, include_dir, targets, qual)
-            print(f"  {args.base}: {matched}/{len(targets)} MATCH"
-                  + (f", closest {ratio * 100:.1f}%" if matched < len(targets) else "")
+            flags, ratio, note = attempt(variant_path(source, 0), base, include_dir, targets, qual)
+            print(f"  {args.base}: {sum(flags)}/{len(targets)} MATCH"
+                  + (f", closest {ratio * 100:.1f}%" if sum(flags) < len(targets) else "")
                   + (f" ({note})" if note else ""))
 
-        matched, ratio, note = attempt(variant_path(source, 0x900), text, include_dir, targets, qual)
-        print(f"  now: {matched}/{len(targets)} MATCH"
-              + (f", closest {ratio * 100:.1f}%" if matched < len(targets) else "")
+        flags, ratio, note = attempt(variant_path(source, 0x900), text, include_dir, targets, qual)
+        print(f"  now: {sum(flags)}/{len(targets)} MATCH"
+              + (f", closest {ratio * 100:.1f}%" if sum(flags) < len(targets) else "")
               + (f" ({note})" if note else ""))
-        if matched == len(targets):
+        if all(flags):
             print("  the file already matches every listed function: no padding needed")
             return 0
-
+        # Padding only reaches functions written after it, so the anchor has to
+        # sit in front of a function that is broken right now. The first listed
+        # address is usually already matching, so anchoring there inserts the
+        # block a thousand lines too early and the search finds nothing.
         first = next((i for i, l in enumerate(lines) if any(
             FUNCTION_LINE.match(l) and int(FUNCTION_LINE.match(l).group(1), 16) == a for a in targets)), None)
         if first is None:
@@ -218,8 +225,17 @@ def main() -> int:
         last_include = max((i for i, l in enumerate(lines[:first]) if l.lstrip().startswith("#include")),
                            default=-1)
         places = [("after the includes", last_include + 1)]
-        if first != last_include + 1:
-            places.append((f"before the first function (line {first + 1})", first))
+        anchors = []
+        for addr, ok in zip(targets, flags):
+            if ok:
+                continue
+            at = next((i for i, l in enumerate(lines) if FUNCTION_LINE.match(l)
+                       and int(FUNCTION_LINE.match(l).group(1), 16) == addr), None)
+            if at is not None and at not in {at for _, at in places}:
+                anchors.append((f"before 0x{addr:x} (line {at + 1})", at))
+        if len(anchors) > 8:  # every anchor costs args.max more compiles
+            print(f"  {len(anchors)} functions are broken, searching the first 8 anchors only")
+        places += anchors[:8]
 
         def with_block(block: list[str], at: int) -> str:
             note = ["// Unused here: the symbol ids these declarations take keep "
@@ -247,8 +263,8 @@ def main() -> int:
 
         def go(job):
             i, (label, variant, block, delta) = job
-            n, ratio, note = attempt(variant_path(source, i + 1), variant, include_dir, targets, qual)
-            return label, n, ratio, note, block, delta
+            flags, ratio, note = attempt(variant_path(source, i + 1), variant, include_dir, targets, qual)
+            return label, sum(flags), ratio, note, block, delta
 
         with ThreadPoolExecutor(max_workers=args.jobs) as pool:
             results = list(pool.map(go, enumerate(jobs)))
