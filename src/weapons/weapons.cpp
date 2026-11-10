@@ -1800,11 +1800,6 @@ int __stdcall FireBallisticProjectile(UnitWeaponSlot* shot, Unit* unit, Vec3* po
 }
 
 #pragma pack(push, 1)
-struct Shot_0049d000 {
-    char unknown_0[0xc];
-    void* weapon;                     // +0xc
-};
-
 struct Proj_0049d000 {
     char unknown_0[0x1c];
     int dirX;                         // +0x1c
@@ -1827,7 +1822,7 @@ struct Proj_0049d000 {
 void __stdcall InitProjectile(Proj_0049d000*, void*, void*, int, int, Unit*);
 
 // FUNCTION: 0x49d000
-int __stdcall SpawnProjectileFromUnitMotion(Shot_0049d000* shot, Unit* unit, Vec3* pos)
+int __stdcall SpawnProjectileFromUnitMotion(UnitWeaponSlot* shot, Unit* unit, Vec3* pos)
 {
     Proj_0049d000* proj = 0;
     if (g_game->projCount < 300) {
@@ -1836,7 +1831,7 @@ int __stdcall SpawnProjectileFromUnitMotion(Shot_0049d000* shot, Unit* unit, Vec
         proj->targetUnit = 0;
     }
     if (proj) {
-        InitProjectile(proj, shot->weapon, pos, 0, g_game->gameTick, unit);
+        InitProjectile(proj, (void*)shot->weapon, pos, 0, g_game->gameTick, unit);
         proj->Setup(unit);
         proj->dirX = -FUN_004b70ef(proj->angle, unit->type->range);
         proj->dirZ = -FUN_004b7123(proj->angle, unit->type->range);
@@ -2839,8 +2834,11 @@ struct Proj_0049be60 {
 
 #include "../map/byte_map.h"
 
-// Unused here: the 3 symbol ids these declarations take keep DrawProjectiles
+// Unused here: the 6 symbol ids these declarations take keep DrawProjectiles
 // (0x49be60) matching (docs/c2-regalloc.md).
+void GonzoAtexitHandler(void);
+char IsMemSet(void);
+void MemSetAtexitHandler(void);
 void SetMemFussyDefault(void);
 void AllocateUnitMemory(void);
 void BuildRadarPicture(void);
