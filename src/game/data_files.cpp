@@ -290,6 +290,7 @@ int __stdcall LoadSoundByName(char* name, const char* file)
 }
 
 #include "../graphics/gaf_frame.h"
+#include "../graphics/handle.h"
 
 struct Pic_004295b0 {
     int w;               // +0x0
@@ -555,14 +556,6 @@ void __stdcall AddAnimplayPointer(void* item)
     g_game->animplayCursorCount++;
 }
 
-struct Ref_0042a140 {
-    unsigned short index;           // +0x0
-    unsigned short value;           // +0x2
-    unsigned char kind;             // +0x4
-    char unknown_5[3];
-    void* src;                      // +0x8
-};
-
 struct Elem_0042a140 {
     int type;                       // +0x0
     char unknown_4[0xc];
@@ -587,7 +580,7 @@ struct Model_0042a140 {
     Model_0042a140* child2;         // +0x30
 };
 
-void __stdcall InitGafSequence(Ref_0042a140* ref, void* src, int index);
+void __stdcall InitGafSequence(Handle* ref, void* src, int index);
 
 // Walks a loaded 3DO model: recurses into its two child models, then for each
 // object resolves its texture name against the loaded GAF files and either
@@ -623,7 +616,7 @@ void __stdcall BindModelTextures(Model_0042a140* model, const char* name)
                 }
             }
             if (*entry > 1) {
-                InitGafSequence((Ref_0042a140*)&elem->name, entry, 0);
+                InitGafSequence((Handle*)&elem->name, entry, 0);
                 elem->flags |= 2;
                 if (!(elem->flags & 4)) {
                     g_game->animplayCursors = (void**)GameReallocTagged(g_game->animplayCursors, "Animplay Pointers", (g_game->animplayCursorCount + 1) * 4);
