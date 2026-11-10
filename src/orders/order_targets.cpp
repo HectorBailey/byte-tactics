@@ -496,16 +496,6 @@ struct Vec3_0044de80 {
 
 class PathOrderAttach;
 
-#pragma pack(push, 2)
-struct Owner_004895c0 {
-    char unknown_0[0x92];
-    UnitDef* def;                      // +0x92
-    char unknown_96[0xa2 - 0x96];
-    PathOrderAttach* head;             // +0xa2
-    short flag;                        // +0xa6
-};
-#pragma pack(pop)
-
 // Unused here: the symbol ids these declarations take stand where
 // the old UnitRef header's stood (docs/c2-regalloc.md).
 void FUN_00406f40(void);
@@ -541,6 +531,13 @@ struct Rec_0044de80 {
 #pragma pack(pop)
 
 #include "../network/bit_reader.h"
+
+// Unused here: the symbol ids these declarations take keep 0x44d350, 0x44d720,
+// 0x44dd00 matching (docs/c2-regalloc.md).
+void SetMemFussyDefault(void);
+char IsMemFussy(void);
+void MemFussyAtexitHandler(void);
+char IsGonzo(void);
 
 struct Owner_0044e080;
 class Pathfinder;
