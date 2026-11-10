@@ -644,12 +644,6 @@ int __stdcall IsTargetingUnit(Unit* list, Unit* obj)
 }
 
 #pragma pack(push, 1)
-struct MapVertex_0048a490 {
-    int x;                              // +0x0
-    int y;                              // +0x4
-    int z;                              // +0x8
-};
-
 struct MapRow_0048a490 {
     char unknown_0[0xc];
     unsigned short* ids;                // +0xc
@@ -660,7 +654,7 @@ struct MapInfo_0048a490 {
     char unknown_0[0xc];
     int count;                          // +0xc
     char unknown_10[0x24 - 0x10];
-    MapVertex_0048a490* verts;           // +0x24
+    Vec3* verts;                         // +0x24
     MapRow_0048a490* rows;               // +0x28
 };
 
@@ -702,7 +696,7 @@ void __stdcall AlignUnitToGround(Unit* u)
         int k;
         // A for loop: a do/while is rotated the other way.
         for (k = 0; k < 4; k++) {
-            MapVertex_0048a490* v = m->verts + row->ids[k];
+            Vec3* v = m->verts + row->ids[k];
             int vx = v->x;
             // Chained: keeps the store order and the corner-array register.
             pts[k].x = t.x = vx;
