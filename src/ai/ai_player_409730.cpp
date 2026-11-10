@@ -145,14 +145,6 @@ struct BuildScoreTriplet {
     char c;
 };
 
-struct AiWeightPct {
-    char value;
-};
-
-struct Elem_0040d550 {
-    int unknown_0;
-};
-
 #include "../util/vec3.h"
 
 struct ScoredCell {
