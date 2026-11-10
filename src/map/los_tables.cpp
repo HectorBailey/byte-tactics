@@ -85,6 +85,13 @@ struct Elem_432cb0 {
 
 #pragma pack(push, 1)
 #include "../units/unit_def.h"
+
+// Unused here: the symbol ids these declarations take keep 0x433380,
+// 0x4335e0 and 0x433500 matching (docs/c2-regalloc.md).
+void EnableAICommands(void);
+void RegisterAICommands(void);
+void FUN_00406f40(void);
+void ResetAIPlayers(void);
 #pragma pack(pop)
 
 typedef int (__stdcall* Compare)(const UnitDef&, const UnitDef&);
@@ -154,7 +161,6 @@ struct Elem_004336c0 {
 
 // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 void CopyDwordIfNonNull(int*, int*);
-struct ApproachRadius { int GetType(); };
 struct RingApproach { int GetType(); };
 struct PointMarker { int GetType(); };
 int FUN_00490200();
