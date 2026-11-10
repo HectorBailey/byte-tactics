@@ -49,20 +49,6 @@ struct WeaponDef;
 
 // Unused here: the unit's and the unit type's former flag views, kept for the
 // symbol ids they take (docs/c2-regalloc.md).
-union Flags110_00466dc0 {
-    unsigned int all;
-    struct {
-        unsigned int :4;
-        unsigned int bit4 : 1;
-        unsigned int :27;
-    } bits;
-};
-
-struct Flags241_00466dc0 {
-    unsigned int :29;
-    unsigned int bit29 : 1;
-    unsigned int :2;
-};
 
 union Flags111_00466dc0 {
     unsigned int all;
@@ -256,6 +242,10 @@ struct Game {
 // Unused here: these headers' symbol ids keep the radar functions matching (docs/c2-regalloc.md).
 #include "../sound/sound.h"
 #include "../units/cob_script.h"
+
+// Unused here: the symbol ids these declarations take keep InitRadar matching (docs/c2-regalloc.md).
+void EnableAICommands(void);
+void RegisterAICommands(void);
 
 extern Game* g_game;
 extern char g_radarPictureName[];
