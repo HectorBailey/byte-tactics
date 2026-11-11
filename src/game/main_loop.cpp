@@ -69,12 +69,7 @@ struct Struct_00496e90 {
     unsigned short flag_149 : 1;       // +0x149
 };
 
-struct Settings_00496e10 {
-    int value;                         // +0x0
-    int flag_4;                        // +0x4
-    int flag_8;                        // +0x8
-    int flag_c;                        // +0xc
-};
+#include "mission_option_flags.h"
 
 #include "../map/mission.h"
 
@@ -490,7 +485,7 @@ void CampaignSetupFrame()
 // Copies a settings block into the game: the first value to +0x37ef6 and
 // three flags into bits 2, 0 and 1 of the word at +0x14281.
 // FUNCTION: 0x496e10
-void __stdcall ApplyMissionOptionFlags(Settings_00496e10* s)
+void __stdcall ApplyMissionOptionFlags(MissionOptionFlags* s)
 {
     g_game->battleCommanderDeath = s->value;
     g_game->bit2_14281 = s->flag_c;

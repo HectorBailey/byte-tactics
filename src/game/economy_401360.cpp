@@ -16,19 +16,12 @@
 struct Player;
 
 #pragma pack(push, 1)
-struct Res_00401360 {
-    float produced;                    // +0x0
-    float used;                        // +0x4
-    float demand;                      // +0x8
-    float backlog;                     // +0xc
-    float lastProduced;                // +0x10
-    float lastUsed;                    // +0x14
-};
+#include "resource_account.h"
 
 // The unit's (and the player's) resource accounts: energy, then metal.
 class Econ_00401360 {
 public:
-    Res_00401360 res[2];               // +0x0
+    ResourceAccount res[2];            // +0x0
     Player* owner;                     // +0x30
     int RequestEnergy(Econ_00401360* e, float amount);
     int RequestEnergyAndMetal(float energy, float metal);
@@ -135,7 +128,7 @@ int Econ_00401360::SpendEnergyAndMetal(float energy, float metal)
     return 0;
 }
 
-void __stdcall SettleResourceAccount(Res_00401360* r, float ratioBacklog, float ratioDemand)
+void __stdcall SettleResourceAccount(ResourceAccount* r, float ratioBacklog, float ratioDemand)
 {
     r->lastUsed = r->used;
     r->lastProduced = r->produced;

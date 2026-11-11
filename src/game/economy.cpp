@@ -16,15 +16,7 @@
 
 #pragma pack(push, 1)
 
-// One 0x18-byte resource account, the same struct economy_401360.cpp declares.
-struct Res_00401360 {
-    float produced;                    // +0x0
-    float used;                        // +0x4
-    float demand;                      // +0x8
-    float backlog;                     // +0xc
-    float lastProduced;                // +0x10
-    float lastUsed;                    // +0x14
-};
+#include "resource_account.h"
 
 #include "../util/hapi_bank.h"
 
@@ -176,7 +168,7 @@ int UnitResources::SpendEnergyAndMetal(float energy, float metal)
 }
 
 // FUNCTION: 0x401320
-void __stdcall SettleResourceAccount(Res_00401360* p, float a, float b)
+void __stdcall SettleResourceAccount(ResourceAccount* p, float a, float b)
 {
     p->lastUsed = p->used;
     p->lastProduced = p->produced;
