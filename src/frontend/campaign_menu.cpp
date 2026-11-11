@@ -24,11 +24,7 @@ public:
 
 #include "../map/mission.h"
 
-// The frame sequencer at g_briefingPlanetFrameCursor.
-struct Anim_00478b40 {
-    short index;                       // +0x0
-    char unknown_2[6];
-};
+#include "../graphics/handle.h"
 
 #include "../graphics/gaf_frame.h"
 
@@ -123,7 +119,8 @@ extern short g_briefingPanoramaScrollX;
 extern int g_briefingPanoramaNextTick;
 extern unsigned int g_briefingPlanetLastTick;
 extern unsigned int g_briefingPlanetNextTick;
-extern Anim_00478b40 g_briefingPlanetFrameCursor;
+// The frame sequencer at g_briefingPlanetFrameCursor.
+extern Handle g_briefingPlanetFrameCursor;
 extern unsigned char g_briefingTextColors[];
 extern int g_campaignSimplifiedLayout;
 extern char g_tdfExtension[];          // "TDF"
@@ -174,8 +171,8 @@ unsigned int GetTicks();
 int __stdcall GetGafFrame(void* gaf, int frame);
 void* __stdcall FindGafEntry(void* gaf, const char* name);
 int __stdcall LoadScreenGaf(Gui* menu, char* name);
-void __stdcall InitGafSequence(void* state, void* gaf, int param_3);
-int __stdcall StepGafSequence(Anim_00478b40* anim);
+void __stdcall InitGafSequence(Handle* state, void* gaf, int param_3);
+int __stdcall StepGafSequence(Handle* anim);
 int __stdcall GetButtonStageByName(Gui* menu, char* name);
 int __stdcall SetButtonStageByName(Gui* menu, char* name, char value);
 void __stdcall AllocBlinkWords(Gui* menu, int param_2);
