@@ -184,7 +184,15 @@ struct Game {
     };
 };
 
-struct Node_0043f0e0 {
+// The first weapon def, reached as def->f1ee. src/units/unit_def.h names that
+// member WeaponDef* weapons[3] at +0x1ee, and src/ai/ai_player.cpp and
+// src/network/net_game.cpp already declare WeaponDef (0x115 bytes, the table in
+// net_game.cpp is WeaponDef weaponDefs[256]). Thaldren has the same struct and
+// calls its +0x111 dwWeaponFlags. Not merged with the Node_0043e490 view above:
+// that one spells this union inline and this one uses Flags111_0043f0e0, and
+// merging them would move declarations this file keeps in order for
+// GetOrderType.
+struct WeaponDef {
     char unknown_0[0x111];
     union {
         unsigned int f111; // +0x111
@@ -199,7 +207,7 @@ struct Def_0043f0e0 {
     char unknown_15a[0x170 - 0x15a];
     short f170; // +0x170
     char unknown_172[0x1ee - 0x172];
-    Node_0043f0e0* f1ee; // +0x1ee
+    WeaponDef* f1ee; // +0x1ee
     char unknown_1f2[0x1fa - 0x1f2];
     unsigned int f1fa; // +0x1fa
     char unknown_1fe[0x241 - 0x1fe];
@@ -216,9 +224,9 @@ struct Def_0043f0e0 {
 struct Unit_0043f0e0 {
     int motion; // +0x0
     char unknown_4[0x10 - 0x4];
-    Node_0043f0e0* f10; // +0x10
+    WeaponDef* f10; // +0x10
     char unknown_14[0x2c - 0x14];
-    Node_0043f0e0* f2c; // +0x2c
+    WeaponDef* f2c; // +0x2c
     char unknown_30[0x3b - 0x30];
     unsigned char f3b; // +0x3b
     char unknown_3c[0x70 - 0x3c];
@@ -513,7 +521,7 @@ MissionType __stdcall GetOrderType(unsigned char mode, Unit_0043f0e0* unit,
         Flags110_0043f0e0 flags;
         flags.raw = unit->flags;
         if (flags.flag_31) {
-            Node_0043f0e0* node = unit->f10;
+            WeaponDef* node = unit->f10;
             if (!enemy) {
                 if (node->f111bits.flag_17)
                     break;
