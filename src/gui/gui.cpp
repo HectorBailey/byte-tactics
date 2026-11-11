@@ -1784,10 +1784,7 @@ void BlankScreen();
 void FlushKeyQueue();
 void ApplyPendingSubState();
 
-struct Font_004a2580 {
-    char unknown_0[0xc];
-    void* glyphs;                      // +0x0c
-};
+struct Font;
 
 void __stdcall SetFont(int id);
 void __stdcall GetSliderRects(Gadget* base, int index, Rect* bar, Rect* knob);
@@ -1798,7 +1795,7 @@ void __stdcall DrawFrame(void* surface, void* glyph, int x, int y);
 int GetTextKeyColor();
 void __stdcall SetTextColors(int a, int b);
 int GetFont();
-void __stdcall GetTextWidth(Font_004a2580* font, char* text);
+void __stdcall GetTextWidth(Font* font, char* text);
 int GetFontHeight();
 void __stdcall DrawString(void* surface, char* text, int x, int y, int maxw);
 int __stdcall GrayRectangle(Surface* surface, Rect* rect);
@@ -1832,9 +1829,12 @@ struct Class_004a1030;
 struct Class_004a1200;
 struct Class_004a1530;
 
-// Unused here: the symbol id this declaration takes keeps 0x4a2580 matching
-// (docs/c2-regalloc.md).
+// Unused here: the symbol ids these declarations take keep 0x4a2580 and the
+// functions below it matching (docs/c2-regalloc.md).
 void FUN_0047caf0(void);
+void OpenSoundOptions(void);
+void OpenSpeedOptions(void);
+void ShowGameSettingsDialog(void);
 
 // FUNCTION: 0x4a2580
 void __stdcall DrawSliderBar(Gui* obj, int index)
@@ -1957,7 +1957,7 @@ void __stdcall DrawSliderBar(Gui* obj, int index)
         int total = 0;
         if (text != 0) {
             if (g_guiContext->language == 0) {
-                GetTextWidth((Font_004a2580*)GetFont(), text);
+                GetTextWidth((Font*)GetFont(), text);
             } else {
                 char* p = text;
                 for (; *p != 0; p++) {
