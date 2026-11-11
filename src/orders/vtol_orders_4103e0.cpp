@@ -61,7 +61,6 @@ class AIProfileParser;
 struct FrameTable;
 class SquadScoutTimer;
 class SpatialTimer;
-struct Account_004b4d70;
 void __stdcall AttachUnitToPiece(Unit*, Unit*, char, char);
 short __stdcall GetHeadingBetween(Vec3*, Vec3*);
 #include "../util/fixed.h"
