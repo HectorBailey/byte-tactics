@@ -30,7 +30,10 @@ struct Options {
     int skirmishDifficulty;             // +0x228
 };
 
-struct GraphicsFlags {
+// The visual options word at +0x37f06 (Thaldren's wVisualFlags). game/game.h,
+// ingame/keys.cpp and map/line_of_sight.cpp declare the same record under this
+// name; each file keeps its own copy since none includes another's.
+struct VisualFlags {
     unsigned short damagebars : 1;       // bit 0
     unsigned short antiAlias : 1;        // bit 1
     unsigned short shadows : 1;          // bit 2
@@ -94,7 +97,7 @@ struct Game {
     int interfaceType;                   // +0x37efa
     char unknown_37efe[0x37f02 - 0x37efe];
     int screenChat;                      // +0x37f02
-    GraphicsFlags visualFlags;          // +0x37f06
+    VisualFlags visualFlags;             // +0x37f06
     int gamma;                           // +0x37f08
     int fxVolume;                        // +0x37f0c
     int musicVolume;                     // +0x37f10
