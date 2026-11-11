@@ -97,7 +97,11 @@ struct Unit_0043e490 {
     unsigned int flags; // +0x110
 };
 
-struct Pos_0043e490 {
+// The shared Vec3 (src/util/vec3.h) seen through its fixed-point shorts. Both
+// views this file had are merged into this one. Do not include vec3.h here: it
+// declares Vec3 as three ints, and this translation unit's symbol count is
+// load-bearing for GetOrderType below.
+struct Vec3 {
     short xf, x;
     short yf, y;
     short zf, z;
@@ -237,12 +241,6 @@ struct Unit_0043f0e0 {
     };
 };
 
-struct Pos_0043f0e0 {
-    short xf, x;
-    short yf, y;
-    short zf, z;
-};
-
 // Unused here: these real declarations take the symbol ids of the removed
 // second Cell view (docs/c2-regalloc.md).
 void RegisterUnitOrders();
@@ -261,7 +259,7 @@ struct Thing_0043f0e0 {
 
 extern Game* g_game;
 
-Cell* __stdcall GetMapCellAtPosition(Pos_0043f0e0* pos);
+Cell* __stdcall GetMapCellAtPosition(Vec3* pos);
 class Unit {
   public:
     int CanLoad(Unit_0043f0e0* other);
@@ -272,21 +270,21 @@ class Unit {
 };
 
 MissionType __stdcall GetOrderType(unsigned char mode, Unit_0043f0e0* unit,
-                                      Unit_0043f0e0* target, Pos_0043f0e0* pos);
+                                      Unit_0043f0e0* target, Vec3* pos);
 
 // GetOrderCursor as in 0x43e490.cpp (the annotated copy). It precedes GetOrderType in the
 // original file and is compiled first here for the compiler state it leaves; see the top.
-Cell* __stdcall GetMapCellAtPosition(Pos_0043e490* pos);
-int __stdcall WeaponCanReachPos(Unit_0043e490* unit, void* slot, Pos_0043e490* pos, int which);
+Cell* __stdcall GetMapCellAtPosition(Vec3* pos);
+int __stdcall WeaponCanReachPos(Unit_0043e490* unit, void* slot, Vec3* pos, int which);
 int __stdcall WeaponCanReachUnit(Unit_0043e490* unit, Unit_0043e490* target, int which);
 int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e490* target,
-                           Pos_0043e490* pos);
+                           Vec3* pos);
 
 // The same test as IsPointVisible: is the map square under pos in sight of the
 // local player? The width is read again through unit->player for the index;
 // MSVC folds it back into the CSE'd load, which it then reloads into edx for
 // the imul as the original does.
-static inline int Visible(Unit_0043e490* unit, Pos_0043e490* pos) {
+static inline int Visible(Unit_0043e490* unit, Vec3* pos) {
     Player* p = unit->player;
     int y, x;
     x = pos->x >> 5;
@@ -336,7 +334,7 @@ static inline int Selectable(Unit_0043e490* t) {
 }
 
 int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e490* target,
-                           Pos_0043e490* pos) {
+                           Vec3* pos) {
     UnitDef* def;
     Node_0043e490* node;
     int friendly;
@@ -459,7 +457,7 @@ static inline MissionType Pick(Def_0043f0e0* def, const char* vtol, const char* 
     return MissionType(def->f241bits.flag_11 ? vtol : ground);
 }
 
-static inline int Visible(Unit_0043f0e0* unit, Pos_0043f0e0* pos) {
+static inline int Visible(Unit_0043f0e0* unit, Vec3* pos) {
     Player* p = unit->player;
     int x = pos->x >> 5;
     int y = (pos->z - (pos->y >> 1)) >> 5;
@@ -475,7 +473,7 @@ static inline int Visible(Unit_0043f0e0* unit, Pos_0043f0e0* pos) {
 
 static inline int Marked(Thing_0043f0e0* t) { return t && (t->ffe & 0x80); }
 
-static inline Thing_0043f0e0* Lookup(Pos_0043f0e0* pos) {
+static inline Thing_0043f0e0* Lookup(Vec3* pos) {
     Cell* cell = GetMapCellAtPosition(pos);
     if (!cell)
         return 0;
@@ -495,7 +493,7 @@ static inline Thing_0043f0e0* Lookup(Pos_0043f0e0* pos) {
 
 // FUNCTION: 0x43f0e0
 MissionType __stdcall GetOrderType(unsigned char mode, Unit_0043f0e0* unit,
-                                      Unit_0043f0e0* target, Pos_0043f0e0* pos) {
+                                      Unit_0043f0e0* target, Vec3* pos) {
     Def_0043f0e0* def;
     int friendly = 0;
     int enemy = 0;
