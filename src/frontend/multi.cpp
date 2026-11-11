@@ -49,7 +49,7 @@ void EndMouseScroll(void);
 struct Layer;
 struct Game;
 struct UnitRestrictEntry;
-struct Options_00446f50;
+struct Options;
 struct PlayerInfo;
 struct UnitType_00446f50;
 struct GafEntry;
@@ -217,7 +217,7 @@ struct Game {
     char lobbySyncTick[0x1b63 - 0x1b5f]; // +0x1b5f
     Player players[10];                // +0x1b63
     char unknown_2851[0x29a0 - 0x2851]; // +0x2851
-    Options_00446f50* options;         // +0x29a0
+    Options* options;                   // +0x29a0
     char unknown_29a4[0x2a30 - 0x29a4]; // +0x29a4
     UnitSync* sync;                    // +0x2a30
     char unknown_2a34[0x2a3c - 0x2a34]; // +0x2a34
@@ -746,9 +746,11 @@ public:
     int GetUnitEntry(UnitType_00446f50* type, UnitSyncEntry* out);
 };
 
-struct Options_00446f50 {
+// The settings block g_game->options points at, 0x11c bytes. game/settings.cpp
+// declares the same record and names its +0x118 fixedLocations.
+struct Options {
     char unknown_0[0x118];
-    int fixedloc;                      // +0x118
+    int fixedLocations;                // +0x118
 };
 
 struct Record_0044c0d0 {
@@ -3882,7 +3884,7 @@ void __stdcall HandleBattleRoomClick(Gui* gadget)
         g_game->multiLineOfSight = me->info->los;
         g_game->multiLosTypeElev = me->info->losType;
         g_game->multiCommanderDeath = me->info->commander;
-        g_game->options->fixedloc = me->info->fixedloc;
+        g_game->options->fixedLocations = me->info->fixedloc;
         g_game->multiMapping = me->info->mapping;
         SaveSettings();
         g_game->difficulty = 2;
