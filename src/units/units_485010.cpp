@@ -140,15 +140,17 @@ struct Pos_00485a40 {
 };
 
 // Not util/fixed.h: the halves are bit fields, and MakeFixed's stores through
-// them are what 0x4853b0 compiles (on the header's shorts, 26.3%).
-struct FixedParts_004853b0 {
+// them are what 0x4853b0 compiles (on the header's shorts, 26.3%). The union
+// below therefore keeps its address suffix: util/fixed.h is included above and
+// already owns the plain name Fixed.
+struct FixedParts {
     unsigned int frac : 16;
     int whole : 16;
 };
 
 union Fixed_004853b0 {
     int value;
-    FixedParts_004853b0 parts;
+    FixedParts parts;
 };
 
 // Own view, not vec3.h: each coordinate is 16.16 fixed point.
