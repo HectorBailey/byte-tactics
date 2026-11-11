@@ -81,11 +81,7 @@ struct Msg_004437c0 {
     char pad_1[0x13];
 };
 
-// The selected connection: its GUID and its block.
-struct ConnInfo_443ff0 {
-    GUID guid;                         // +0x0
-    HapinetProviderConnEntry conn;     // +0x10
-};
+#include "../network/selected_conn.h"
 
 // The network object at g_game+0x14, as the HAPINET_ wrappers lay it out.
 struct Net_00443100 {
@@ -341,7 +337,7 @@ struct Game {
     char unknown_38d6b[0x391e9 - 0x38d6b]; // +0x38d6b
     Mission* mapInfo;                  // +0x391e9
     char unknown_391ed[0x39201 - 0x391ed]; // +0x391ed
-    ConnInfo_443ff0 info;              // +0x39201
+    SelectedConnection info;           // +0x39201
     char unknown_39219[0x39229 - 0x39219]; // +0x39219
     int multiCommanderDeath;           // +0x39229
     int multiMapping;                  // +0x3922d
