@@ -51,6 +51,9 @@ void EmitBubbles(int, int, int, short);
 void DrawLine(int, int, int, int, int, int);
 void __stdcall LoadSideData(void);
 unsigned short __stdcall PickUnitUnderCursor(void);
+void FUN_00406f40(void);
+void ProtectUnitDefsReadOnly(void);
+void ProtectUnitDefsReadWrite(void);
 
 union LoadFlags_00497f40 {
     unsigned short value;
@@ -108,14 +111,6 @@ struct View_00498cd0 {
     char unknown_0[0x2c];
     int x;                              // +0x2c
     int y;                              // +0x30
-};
-
-// The 16.16 world position these minimap helpers build: three Fixed, the same
-// three ints in the same order as util/vec3.h's Vec3.
-struct Pos_00498d00 {
-    Fixed x;                            // +0x0
-    Fixed y;                            // +0x4
-    Fixed z;                            // +0x8
 };
 
 #include "../gui/gui.h"
@@ -456,7 +451,7 @@ int __stdcall GetPreferredLanguage();
 
 int __stdcall ClampWorldPosToTerrain(int x, int y, int param_3);
 void __stdcall ClampWorldPosToTerrain(int x, int y, Pos_00498da0* out);
-int __stdcall GetGroundHeight(Pos_00498d00* pos);
+int __stdcall GetGroundHeight(FixedVec3* pos);
 int __stdcall PointInRect(Rect* r, int x, int y);
 Cell* __stdcall GetMapCell(int x, int y);
 unsigned short __stdcall GetCellFeature(Cell* cell);
@@ -1069,12 +1064,12 @@ void __stdcall OffsetWorldPosFromView(Point* p, View_00498cd0* view, int param_3
 // Converts the screen position stored at +0x2c76 into a 16.16 world position
 // (scaled from the view origin), with the height taken from the ground there.
 // FUNCTION: 0x498d00
-void __stdcall MinimapCursorToWorldPos(Pos_00498d00* out)
+void __stdcall MinimapCursorToWorldPos(FixedVec3* out)
 {
     MouseEvent r = g_game->view;
     int dx = r.x - g_game->minimapGadgetX;
     int dy = r.y - g_game->minimapGadgetY;
-    memset(out, 0, sizeof(Pos_00498d00));
+    memset(out, 0, sizeof(FixedVec3));
     out->x.whole = g_game->mapPixelWidth * dx / g_game->minimapGadgetW;
     out->z.whole = g_game->mapPixelHeight * dy / g_game->minimapGadgetH;
     out->y.whole = GetGroundHeight(out);
