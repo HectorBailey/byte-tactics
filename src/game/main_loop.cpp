@@ -37,8 +37,7 @@ struct Sub_00496db0 {
     char flag_96;                      // +0x96
 };
 
-struct Obj_004ab400;
-struct Src_004ab400;
+struct GafEntry;
 
 #include "../network/player_info.h"
 
@@ -167,7 +166,7 @@ struct Game {
     unsigned short bit2_14281 : 1;             // bit 2
     unsigned short rest_14281 : 13;
     char unknown_14283[0x1487f - 0x14283];
-    Src_004ab400* cursorModeSeq[1];            // +0x1487f
+    GafEntry* cursorModeSeq[1];                // +0x1487f
     char unknown_14883[0x37e37 - 0x14883];
     int viewPixelWidth;                        // +0x37e37
     int viewPixelHeight;                       // +0x37e3b
@@ -253,7 +252,7 @@ void CollectVisibleUnitIds();
 void RefreshSelectionOrders();
 void __stdcall DrawBattleFrame(int a, int b);
 int __stdcall SaveScreenshot(char* buf, char* name);
-void __stdcall SetCursorAnimation(Obj_004ab400* p, Src_004ab400* src);
+void __stdcall SetCursorAnimation(Gui* p, GafEntry* src);
 void ShowSoftwareCursor();
 void __stdcall SetMissionType(int param);
 void ClearKeyQueue();
@@ -370,7 +369,7 @@ void InitFrame()
 {
     if (g_game->cursorMode != 0x13) {
         g_game->cursorMode = 0x13;
-        SetCursorAnimation((Obj_004ab400*)&g_game->gui, g_game->cursorModeSeq[0x13]);
+        SetCursorAnimation((Gui*)&g_game->gui, g_game->cursorModeSeq[0x13]);
     }
     ShowSoftwareCursor();
     g_game->bit2 = 0;
