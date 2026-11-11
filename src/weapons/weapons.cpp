@@ -345,11 +345,6 @@ int CreateUnit(int, int, int, int, int, int);
 // The game state, as the weapon code sees it. The time word keeps one name per
 // view (now, frame, gameTick, teamColor); the two tracked-projectile pointers
 // are one union, 499a30's selected and 49c740's tracked.
-struct Net {
-    char unknown_0[0xd48];
-    int noSeaLevelTrigger;
-};
-
 struct Game {
     char unknown_0[0xdcb];
     unsigned char colors[0x2a];        // +0xdcb, the line colours of the shots
@@ -423,7 +418,7 @@ struct Game {
         int teamColor;
     };
     char unknown_38a4b[0x391e9 - 0x38a4b];
-    Net* mapInfo;                      // +0x391e9
+    Mission* mapInfo;                  // +0x391e9, map/mission.h
 };
 
 #pragma pack(pop)
@@ -2834,7 +2829,7 @@ struct Proj_0049be60 {
 
 #include "../map/byte_map.h"
 
-// Unused here: the 6 symbol ids these declarations take keep DrawProjectiles
+// Unused here: the 11 symbol ids these declarations take keep DrawProjectiles
 // (0x49be60) matching (docs/c2-regalloc.md).
 void GonzoAtexitHandler(void);
 char IsMemSet(void);
@@ -2842,6 +2837,11 @@ void MemSetAtexitHandler(void);
 void SetMemFussyDefault(void);
 void AllocateUnitMemory(void);
 void BuildRadarPicture(void);
+int GetMemSetValue(void);
+void SetValueAtexitHandler(void);
+void NopAbortHook(void);
+int __cdecl GetStackLow(void);
+void* GetStackHigh(void);
 
 #pragma pack(push, 1)
 // A player slot read for the explored grid at +0x7c (network/player.h's

@@ -76,10 +76,10 @@ struct Projectile {
     ProjectileFlags flags;             // +0x69, Thaldren's wFlags
 };
 
-struct Net_0049b720 {
-    char unknown_0[0xd48];
-    int noSeaLevelTrigger;
-};
+// Kept here rather than with the includes at the top: the symbol ids this
+// header's declarations take keep UpdateProjectiles (0x49b720) matching
+// (docs/c2-regalloc.md).
+#include "../map/mission.h"
 
 struct Game {
     char unknown_0[0x141f3];
@@ -99,7 +99,7 @@ struct Game {
     char unknown_37ed8[0x38a47 - 0x37ed8];
     unsigned int gameTick;             // +0x38a47
     char unknown_38a4b[0x391e9 - 0x38a4b];
-    Net_0049b720* mapInfo;             // +0x391e9
+    Mission* mapInfo;                  // +0x391e9, map/mission.h
 };
 
 #include "../map/cell.h"
