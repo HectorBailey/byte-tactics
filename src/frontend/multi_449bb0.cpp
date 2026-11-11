@@ -71,9 +71,11 @@ struct Gui_00449bb0 {
     Layer_00449bb0* table;              // +0x18
 };
 
-struct Options_00449bb0 {
+// The settings block g_game->options points at, the same record frontend/multi.cpp
+// and game/settings.cpp declare; game/settings.cpp names its +0x118 fixedLocations.
+struct Options {
     char unknown_0[0x118];
-    int fixedloc;                       // +0x118
+    int fixedLocations;                 // +0x118
 };
 
 struct Game_00449bb0 {
@@ -82,7 +84,7 @@ struct Game_00449bb0 {
     char unknown_535[0x1b63 - 0x535];
     Player players[10];                 // +0x1b63
     char unknown_2851[0x29a0 - 0x2851];
-    Options_00449bb0* options;          // +0x29a0
+    Options* options;                     // +0x29a0
     char unknown_29a4[0x2a30 - 0x29a4];
     UnitSync* net;                      // +0x2a30
     char unknown_2a34[0x2a42 - 0x2a34];
@@ -308,7 +310,7 @@ void OpenBattleRoom()
         info->mapping = g_game->mapping;
         info->los = g_game->los;
         info->losType = g_game->losType;
-        info->fixedloc = g_game->options->fixedloc;
+        info->fixedloc = g_game->options->fixedLocations;
         info->commander = g_game->commander;
     }
 
