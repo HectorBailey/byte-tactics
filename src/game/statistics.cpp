@@ -1,22 +1,10 @@
 // Decompiled by space-bunny-free, Haiku, nemotron-3.5-lightning-free. Names are provisional.
 // statistics_46c2a0.cpp stays split: FillScoreTables reads g_game through its
-// own Game view (players at +0x1b63, map at +0x391e9), which this file's Game
-// view (the reporter DLL fields) cannot also declare.
+// own Game view (players at +0x1b63, map at +0x391e9), offsets the shared Game
+// in game/game.h does not name. This file uses the shared one.
 #include <string.h>
 #include <windows.h>
-
-// The game state LoadReporterDll and ShutdownScoreTables share: the network game
-// at +0x4e5 and the service provider GUID it copies out at +0x39201.
-#pragma pack(push, 1)
-struct Game {
-    char unknown_0[0x14];
-    char session[1];                   // +0x14
-    char unknown_15[0x4e5 - 0x15];
-    char* dplConnection;               // +0x4e5
-    char unknown_4e9[0x39201 - 0x4e9];
-    char providerGuid[16];             // +0x39201
-};
-#pragma pack(pop)
+#include "../game/game.h"
 
 // The stats DLL's records (Thaldren's OnlineReportPlayerInfo and
 // OnlineReportScoreBoard), the ones both reporter files read through the two
@@ -187,7 +175,7 @@ int __stdcall LoadReporterDll(int* count, int names)
 
     ShutdownScoreTables();
 
-    net = g_game->dplConnection;
+    net = (char*)g_game->dplConnection;
     if (net != 0) {
         memcpy(g_game->providerGuid, net + 0x10, 16);
     }
