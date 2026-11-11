@@ -568,9 +568,9 @@ void __stdcall AllocateUnitMemory(void)
         *(unsigned char**)((char*)item + 0x67) = pool + c * 0x118;
         *(unsigned char**)((char*)item + 0x6b) =
             *(unsigned char**)((char*)item + 0x67) + g_game->maxUnits * 0x118 - 0x118;
-        *(unsigned short*)((char*)item + 0x6f) =
+        item->firstIndex =
             *(unsigned short*)(*(unsigned char**)((char*)item + 0x67) + 0xa8);
-        *(unsigned short*)((char*)item + 0x71) =
+        item->lastIndex =
             *(unsigned short*)(*(unsigned char**)((char*)item + 0x6b) + 0xa8);
         // Item fields read back directly, no `slot` local: keeps the edx/esi roles.
         for (unsigned char* q = *(unsigned char**)((char*)item + 0x67);
@@ -1405,7 +1405,8 @@ void __stdcall KillPlayerUnits(unsigned char player)
 }
 
 // Unused here: real functions declared to keep the file's symbol count (docs/c2-regalloc.md);
-// SaveUnits stands in for the ids the weapon slot header moved, the rest for the local Vec3 view.
+// SaveUnits stands in for the ids the weapon slot header moved, the rest for the local Vec3 view
+// and for the Player members this file now names.
 void __stdcall SaveUnits(void* file);
 void __stdcall NopRetC_B(int, int, int);
 void UpdateMouseScroll();
@@ -1415,6 +1416,8 @@ void CenterCameraOnStartPosition();
 void RegisterDataArchives();
 int GetCdPathMismatch();
 void CreateGameObject();
+void FUN_00406f40(void);
+void ResetAIPlayers(void);
 
 // FUNCTION: 0x4851c0
 int __stdcall FindHighestPointOnLine(Vec3 a, Vec3 b)
