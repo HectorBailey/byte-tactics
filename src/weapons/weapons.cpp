@@ -623,7 +623,10 @@ struct WeaponDef_DamagePair {
     int damage;                     // +0x4
 };
 
-struct NameLess_00499cd0 {
+// Case-insensitive key order for the name walk below. util/tdf.cpp declares the
+// comparator under this name; it is in that .cpp rather than in util/tdf.h,
+// which this file includes further down, so there is no header to share.
+struct NameLess {
     bool operator()(const char* a, const char* b) const
     {
         return _strcmpi(a, b) < 0;
@@ -656,7 +659,7 @@ void __stdcall DamageUnit(Unit* source, Unit* target,
 
 static inline int* Find_00499cd0(WeaponDef_DamageMap* table, char* name)
 {
-    NameLess_00499cd0 less;
+    NameLess less;
     WeaponDef_DamagePair* first = table->first;
     WeaponDef_DamagePair* last = table->last;
     while (first != last) {
