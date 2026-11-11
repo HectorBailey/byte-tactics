@@ -11,7 +11,7 @@
 #include "../map/mission.h"
 
 struct Display_00491a70;
-struct Src_004ab400;
+struct GafEntry;
 
 #pragma pack(push, 1)
 #include "../gui/gui.h"
@@ -92,7 +92,7 @@ struct Game {
     char unknown_1438f[0x143a7 - 0x1438f];
     char paletteRgba[4];   // +0x143a7
     char unknown_143ab[0x1487f - 0x143ab];
-    Src_004ab400* cursorModeSeq[1];   // +0x1487f
+    GafEntry* cursorModeSeq[1];   // +0x1487f
     char unknown_14883[0x148cb - 0x14883];
     unsigned short* cursorNormal;  // +0x148cb
     char unknown_148cf[0x37e1b - 0x148cf];
@@ -894,16 +894,15 @@ void ShutdownIngameAndQuit()
 
 // Selects entry n (a signed byte at +0x2cbe) and hands the matching table
 // entry at +0x1487f to SetCursorAnimation for the object at +0x519.
-struct Obj_004ab400;
 
-void __stdcall SetCursorAnimation(Obj_004ab400* p, Src_004ab400* src);
+void __stdcall SetCursorAnimation(Gui* p, GafEntry* src);
 
 // FUNCTION: 0x491c80
 void __stdcall SetCursorMode(int n)
 {
     if (g_game->cursorMode != n) {
         g_game->cursorMode = n;
-        SetCursorAnimation((Obj_004ab400*)&g_game->gui, g_game->cursorModeSeq[n]);
+        SetCursorAnimation((Gui*)&g_game->gui, g_game->cursorModeSeq[n]);
     }
 }
 
@@ -925,7 +924,7 @@ void __stdcall UpdateBattleHoverMode(int unused)
     if ((flags & 2) == 0 && (flags & 1) == 0) {
         if (g_game->cursorMode != 0x13) {
             g_game->cursorMode = 0x13;
-            SetCursorAnimation((Obj_004ab400*)&g_game->gui, g_game->cursorModeSeq[0x13]);
+            SetCursorAnimation((Gui*)&g_game->gui, g_game->cursorModeSeq[0x13]);
         }
         return;
     }
@@ -933,7 +932,7 @@ void __stdcall UpdateBattleHoverMode(int unused)
     int n = ResolveCursorModeForSelection(g_game->orderMode);
     if (g_game->cursorMode != n) {
         g_game->cursorMode = n;
-        SetCursorAnimation((Obj_004ab400*)&g_game->gui, g_game->cursorModeSeq[n]);
+        SetCursorAnimation((Gui*)&g_game->gui, g_game->cursorModeSeq[n]);
     }
 }
 
