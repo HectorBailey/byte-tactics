@@ -53,6 +53,12 @@ int GetTickRate();
 #include "../units/unit_def.h"
 #include "unit_weapon_slot.h"
 
+// Unused here: the symbol ids these declarations take keep DrawProjectiles
+// (0x49be60) matching after Obj_0049b3e0 folded into Unit (docs/c2-regalloc.md).
+int GetDebugLibInstance(void);
+int GetDebugLibVersion(void);
+void AbortProgram(void);
+
 // Unused here: the symbol ids these 8 declarations take keep DrawProjectiles
 // (0x49be60) matching (docs/c2-regalloc.md).
 void LoadGameFonts(void);
@@ -1376,13 +1382,6 @@ struct Vec3_0049b3e0 {
     }
 };
 
-struct Obj_0049b3e0 {
-    char unknown_0[0x6a];
-    Vec3_0049b3e0 pos;                 // +0x6a
-    char unknown_76[0x110 - 0x76];
-    unsigned int flags;                // +0x110
-};
-
 struct Proj_0049b3e0 {
     WeaponDef* weapon;                 // +0x0
     Vec3_0049b3e0 pos;                 // +0x4
@@ -1390,7 +1389,7 @@ struct Proj_0049b3e0 {
     char unknown_1c[0x28 - 0x1c];
     Vec3_0049b3e0 target;              // +0x28
     char unknown_34[0x4e - 0x34];
-    Obj_0049b3e0* targetUnit;          // +0x4e
+    Unit* targetUnit;                  // +0x4e
     char unknown_52[0x56 - 0x52];
     int* interceptedProjectile;        // +0x56
 };
@@ -1412,9 +1411,9 @@ Vec3_0049b3e0* __stdcall GetProjectileAimPoint(Proj_0049b3e0* p)
     } else {
         if (p->interceptedProjectile != 0)
             return (Vec3_0049b3e0*)(p->interceptedProjectile + 1);
-        Obj_0049b3e0* q = p->targetUnit;
+        Unit* q = p->targetUnit;
         if (q != 0 && (q->flags & 0x10000000) != 0)
-            return &q->pos;
+            return (Vec3_0049b3e0*)&q->pos;
     }
     if (flag) {
         p->start = p->target;
