@@ -21,7 +21,10 @@ struct GafFrame;
 
 #include "../util/vec3.h"
 
-struct Flags_37f06 {
+// The game's visual option word at Game+0x37f06, Thaldren's GameState
+// wVisualFlags. map/line_of_sight.cpp declares the same word under the same
+// name and game/settings.cpp writes it from the options dialog.
+struct VisualFlags {
     unsigned short damagebars : 1;
     unsigned short antiAlias : 1;
     unsigned short shadows : 1;
@@ -210,7 +213,7 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, UnitObjectState* list,
 
     int mode;
     GafFrame* src;
-    if (((Flags_37f06*)(g_game + 0x37f06))->antiAlias) {
+    if (((VisualFlags*)(g_game + 0x37f06))->antiAlias) {
         if ((list->owner->flags & 0x20000000) != 0 && useColor != 0) {
             GafFrame* shadow = this->shadow;
             mode = 1;
@@ -371,7 +374,7 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, UnitObjectState* list,
         }
     }
 
-    if (((Flags_37f06*)(g_game + 0x37f06))->antiAlias) {
+    if (((VisualFlags*)(g_game + 0x37f06))->antiAlias) {
         if (mode != 0) {
             DownsampleFrame(bitmap, src);
             unsigned char* s = (unsigned char*)src->data2;
