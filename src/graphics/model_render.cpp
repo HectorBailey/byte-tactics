@@ -178,7 +178,8 @@ class CMemoryCache;
 
 #pragma pack(push, 1)
 // One slot of the player table at g_game+0x1b63 (network/player.h's Player,
-// 0x14b bytes): only the info pointer is read here.
+// 0x14b bytes): only the info pointer is read here. Kept local: Player is not
+// declared this early in the file and including it here moves MeasureModel.
 struct PlayerSlot_004584d0 {
     char unknown_0[0x27];
     int info;                          // +0x27, the PlayerInfo (its color is at +0x96)
@@ -309,18 +310,11 @@ public:
     void DrawLitPieces(GafFrame* bitmap, UnitObjectState* list, int kind, int useColor);
 };
 
-// Unused here: the symbol ids these declarations take keep the allocation,
-// standing in for the view classes merged into CMemoryCache above; two of the
-// four were freed when PlayerSlot_004584d0 took their 7 ids
-// (docs/c2-regalloc.md).
-int SetCameraPosition(int, int, int);
-void StartScreenShake(int, int, int);
-
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
-int RIReport(int, int, int, int, int, int, int, int, int, int);
-void WalkFrameChain(int*, int*, int, int, int*, int, int*, int*, int, int*);
-int DrawWrappedText(char*, char*, int, int, int, int, int);
-void ScaleUnitWeights(int, unsigned int*, float, int);
+// Only the colour byte is read here. Included where six unused declarations
+// used to stand: MeasureModel (0x4581e0) is allocated against the symbol ids
+// before it, and this header's declarations replace the ones dropped here along
+// with the PlayerInfo_004584d0 view further down (docs/c2-regalloc.md).
+#include "../network/player_info.h"
 
 void* __stdcall AllocDepthFrame(const char* name, int width, int height);
 Vec3f __stdcall VectorFromToInt(Vec3 a, Vec3 b);
@@ -468,14 +462,6 @@ int UnitTable::BuildObjectPicture(UnitObjectState* list, int param_2, int param_
 // Draws a unit model's pieces into a bitmap. With anti-aliasing on and the
 // unit flagged, it draws into the doubled shadow bitmap instead and then
 // downsamples that back into the caller's bitmap.
-// Only the colour byte is read through it here; network/player_info.h holds
-// the whole record. Declared this late: MeasureModel's register allocation
-// follows the ids before it (docs/c2-regalloc.md).
-struct PlayerInfo_004584d0 {
-    char unknown_0[0x96];
-    unsigned char color;               // +0x96
-};
-
 // FUNCTION: 0x459830
 void UnitTable::DrawPieces(GafFrame* bitmap, UnitObjectState* list,
     int kind, int useColor)
@@ -560,7 +546,7 @@ void UnitTable::DrawPieces(GafFrame* bitmap, UnitObjectState* list,
                                 if (fflags.bits.shaded) {
                                     int unit = g_game->playerSlots[kind].info;
                                     pic = GetGafFrame(face->color,
-                                        ((PlayerInfo_004584d0*)unit)->color);
+                                        ((PlayerInfo*)unit)->color);
                                 } else if (useColor) {
                                     pic = GetGafFrame(face->color, 0);
                                 } else {
@@ -1352,7 +1338,7 @@ void CMemoryCache::DrawPiece(UnitObjectState* model, void* surface, Vec3* camera
             if (flags.bits.usePic) {
                 if (flags.bits.shaded) {
                     unit = g_game->playerSlots[palette & 0xff].info;
-                    pic = GetGafFrame(face->color, ((PlayerInfo_004584d0*)unit)->color);
+                    pic = GetGafFrame(face->color, ((PlayerInfo*)unit)->color);
                 } else pic = useColor ? GetGafFrame(face->color, 0) : GetGafSequenceFrame(&face->pic);
             } else pic = face->pic;
             DrawFrameQuad(surface, pic, poly, 0);

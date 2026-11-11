@@ -20,6 +20,8 @@ extern const float DAT_004fd4cc;
 struct GafFrame;
 
 #include "../util/vec3.h"
+#include "../network/player.h"
+#include "../network/player_info.h"
 
 // The game's visual option word at Game+0x37f06, Thaldren's GameState
 // wVisualFlags. map/line_of_sight.cpp declares the same word under the same
@@ -162,20 +164,9 @@ struct UnitDefFlags_4581e0 {
     unsigned int flags;                // +0x241, bit 30: the bright shade bias
 };
 
-struct PlayerSlot_4581e0 {
-    char unknown_0[0x27];
-    int info;                          // +0x27, the PlayerInfo
-    char unknown_2b[0x14b - 0x2b];
-};
-
 struct PlayerSlots_4581e0 {
     char unknown_0[0x1b63];
-    PlayerSlot_4581e0 slots[10];       // +0x1b63, stride 0x14b
-};
-
-struct PlayerInfo_4581e0 {
-    char unknown_0[0x96];
-    unsigned char color;               // +0x96
+    Player players[10];                // +0x1b63, stride 0x14b, info at +0x27
 };
 #pragma pack(pop)
 
@@ -353,9 +344,10 @@ void UnitTable::DrawLitPieces(GafFrame* bitmap, UnitObjectState* list,
                             void* pic;
                             if (face->flags.bits.usePic) {
                                 if (face->flags.bits.shaded) {
-                                    int unit = ((PlayerSlots_4581e0*)g_game)->slots[kind].info;
+                                    PlayerInfo* info =
+                                        ((PlayerSlots_4581e0*)g_game)->players[kind].info;
                                     pic = GetGafFrame(face->color,
-                                        ((PlayerInfo_4581e0*)unit)->color);
+                                        info->color);
                                 } else if (useColor) {
                                     pic = GetGafFrame(face->color, 0);
                                 } else {
