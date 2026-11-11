@@ -63,6 +63,7 @@ struct Item {
 };
 
 #include "../game/side_def.h"
+#include "../graphics/gaf_frame.h"
 
 struct Game {
     int unknown_0;
@@ -1009,17 +1010,17 @@ void __stdcall OpenNewGameMenu(int param_1)
         (unsigned short*)FindGafEntry(entries->u.assets.archive, "Side0");
     int n = 0;
     while (n < *p) {
-        char* r = (char*)GetGafFrame(p, 0);
-        *(short*)(r + 6) = 0;
-        *(short*)(r + 4) = 0;
+        GafFrame* r = (GafFrame*)GetGafFrame(p, 0);
+        r->yOffset = 0;
+        r->xOffset = 0;
         n++;
     }
     p = (unsigned short*)FindGafEntry(entries->u.assets.archive, "Side1");
     n = 0;
     while (n < *p) {
-        char* r = (char*)GetGafFrame(p, 0);
-        *(short*)(r + 6) = 0;
-        *(short*)(r + 4) = 0;
+        GafFrame* r = (GafFrame*)GetGafFrame(p, 0);
+        r->yOffset = 0;
+        r->xOffset = 0;
         n++;
     }
 
