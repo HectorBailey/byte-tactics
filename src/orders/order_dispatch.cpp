@@ -10,15 +10,31 @@
 
 #pragma pack(push, 1)
 
-struct Node_0043e490 {
+// The weapon's flag word at WeaponDef+0x111. src/weapons/weapon_def.h declares
+// it as union WeaponFlags with the same bit split and names bit 8 dropped and
+// bit 17 toAirWeapon; Thaldren calls the word dwWeaponFlags.
+union WeaponFlags {
+    unsigned int raw;
+    struct {
+        unsigned int bits_0 : 8;
+        unsigned int dropped : 1;             // bit 8
+        unsigned int bits_9 : 8;
+        unsigned int toAirWeapon : 1;         // bit 17
+        unsigned int bits_18 : 14;
+    };
+};
+
+// One weapon def, the record unit_def.h reaches through WeaponDef* weapons[3]
+// at +0x1ee. src/ai/ai_player.cpp and src/network/net_game.cpp already declare
+// WeaponDef at 0x115 bytes (the table in net_game.cpp is WeaponDef
+// weaponDefs[256]) and Thaldren has the same struct with +0x111 named
+// dwWeaponFlags. This is the view GetOrderCursor and GetOrderType reach as
+// def->f1ee and as unit->f10 and unit->f2c.
+struct WeaponDef {
     char unknown_0[0x111];
     union {
         unsigned int f111; // +0x111
-        struct {
-            unsigned int b0_7 : 8;
-            unsigned int b8 : 1;
-            unsigned int b9_31 : 23;
-        } f111b;
+        WeaponFlags f111bits;
     };
 };
 
@@ -47,7 +63,7 @@ struct UnitDef {
     char unknown_0[0x156];
     int f156; // +0x156
     char unknown_15a[0x1ee - 0x15a];
-    Node_0043e490* f1ee; // +0x1ee
+    WeaponDef* f1ee; // +0x1ee
     char unknown_1f2[0x241 - 0x1f2];
     union {
         unsigned int f241; // +0x241
@@ -77,7 +93,7 @@ struct Limits_0043e490 {
 struct Unit_0043e490 {
     int motion; // +0x0
     char unknown_4[0x10 - 0x4];
-    Node_0043e490* f10; // +0x10
+    WeaponDef* f10; // +0x10
     char unknown_14[0x48 - 0x14];
     Limits_0043e490* f48; // +0x48
     char unknown_4c[0x6a - 0x4c];
@@ -112,6 +128,12 @@ struct Vec3 {
 
 #include "mission_type.h"
 
+// Unused here: the symbol ids these declarations take keep 0x43f0e0 matching
+// (docs/c2-regalloc.md).
+void ProtectUnitDefsReadOnly(void);
+void ProtectUnitDefsReadWrite(void);
+void SetMemFussyDefault(void);
+
 union Flags110_0043f0e0 {
     unsigned int raw;
     struct {
@@ -130,20 +152,6 @@ union UnitTypeFlags {
         unsigned int bits_12 : 16;
         unsigned int kamikaze : 1;            // bit 28
         unsigned int bits_29 : 3;
-    };
-};
-
-// The weapon's flag word at WeaponDef+0x111. src/weapons/weapon_def.h declares
-// it as union WeaponFlags with the same bit split and names bit 8 dropped and
-// bit 17 toAirWeapon; Thaldren calls the word dwWeaponFlags.
-union WeaponFlags {
-    unsigned int raw;
-    struct {
-        unsigned int bits_0 : 8;
-        unsigned int dropped : 1;             // bit 8
-        unsigned int bits_9 : 8;
-        unsigned int toAirWeapon : 1;         // bit 17
-        unsigned int bits_18 : 14;
     };
 };
 
@@ -186,22 +194,6 @@ struct Game {
     union {
         int interfaceType; // +0x37efa
         int multiplayer;
-    };
-};
-
-// The first weapon def, reached as def->f1ee. src/units/unit_def.h names that
-// member WeaponDef* weapons[3] at +0x1ee, and src/ai/ai_player.cpp and
-// src/network/net_game.cpp already declare WeaponDef (0x115 bytes, the table in
-// net_game.cpp is WeaponDef weaponDefs[256]). Thaldren has the same struct and
-// calls its +0x111 dwWeaponFlags. Not merged with the Node_0043e490 view above:
-// that one spells this union inline and this one uses Flags111_0043f0e0, and
-// merging them would move declarations this file keeps in order for
-// GetOrderType.
-struct WeaponDef {
-    char unknown_0[0x111];
-    union {
-        unsigned int f111; // +0x111
-        WeaponFlags f111bits;
     };
 };
 
@@ -264,10 +256,6 @@ void FUN_00406f40();
 void ResetAIPlayers();
 void RegisterVtolOrders();
 
-struct Thing_0043f0e0 {
-    char unknown_0[0xfe];
-    unsigned char ffe; // +0xfe
-};
 #pragma pack(pop)
 
 extern Game* g_game;
@@ -349,7 +337,7 @@ static inline int Selectable(Unit_0043e490* t) {
 int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e490* target,
                            Vec3* pos) {
     UnitDef* def;
-    Node_0043e490* node;
+    WeaponDef* node;
     int friendly;
     int enemy;
     friendly = 0;
@@ -364,7 +352,7 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
 
     switch (mode) {
     case 3:
-        if ((def->f245 & 0x10) && def->f1ee->f111b.b8)
+        if ((def->f245 & 0x10) && def->f1ee->f111bits.dropped)
             return 2;
         if (def->f245b.b4) {
             node = unit->f10;
@@ -484,9 +472,9 @@ static inline int Visible(Unit_0043f0e0* unit, Vec3* pos) {
             return (result);                                                                   \
     } while (0)
 
-static inline int Marked(Thing_0043f0e0* t) { return t && (t->ffe & 0x80); }
+static inline int Marked(Feature* t) { return t && (t->flags & 0x80); }
 
-static inline Thing_0043f0e0* Lookup(Vec3* pos) {
+static inline Feature* Lookup(Vec3* pos) {
     Cell* cell = GetMapCellAtPosition(pos);
     if (!cell)
         return 0;
@@ -494,14 +482,14 @@ static inline Thing_0043f0e0* Lookup(Vec3* pos) {
     if (id < 0xfffb) {
         if (id >= g_game->unitCount)
             return 0;
-        return (Thing_0043f0e0*)((char*)g_game->features + (id << 8));
+        return (Feature*)((char*)g_game->features + (id << 8));
     }
     if (id != 0xfffe)
         return 0;
     id = (cell - (cell->offsetY * g_game->mapWidthTiles + cell->offsetX))->feature;
     if (id >= 0xfffb)
         return 0;
-    return (Thing_0043f0e0*)((char*)g_game->features + (id << 8));
+    return (Feature*)((char*)g_game->features + (id << 8));
 }
 
 // FUNCTION: 0x43f0e0
@@ -608,13 +596,13 @@ MissionType __stdcall GetOrderType(unsigned char mode, Unit_0043f0e0* unit,
             break;
         // Suspected original bug: the lookup runs before pos is tested, and GetMapCellAtPosition reads
         // [pos] unchecked (0x4815a5), so a null pos crashes here although the tests below allow it.
-        Thing_0043f0e0* t = Lookup(pos);
+        Feature* t = Lookup(pos);
         // RESURRECT check stays nested, with pos tested again for RECLAIM.
         if (pos && (def->f245 & 0x800)) {
-            if (Visible(unit, pos) && t && (t->ffe & 0x80))
+            if (Visible(unit, pos) && t && (t->flags & 0x80))
                 return MissionType("RESURRECT");
         }
-        if (pos && Visible(unit, pos) && t && (t->ffe & 0x80))
+        if (pos && Visible(unit, pos) && t && (t->flags & 0x80))
             return Pick(def, "VTOL_RECLAIM", "RECLAIM");
         if (!target)
             break;
