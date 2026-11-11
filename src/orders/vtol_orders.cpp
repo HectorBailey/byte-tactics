@@ -383,6 +383,9 @@ public:
 // Constructor views of PathOrder: one class per constructor, named after the
 // address of the constructor it models (its decorated name is in
 // data/aliases.csv), so the class above can be the type of the objects.
+
+// Stays a per-file view: the identical copy in vtol_orders_414380.cpp cannot be
+// shared with it, the fold moves the registers of 0x414380 and 0x414e70.
 class Class_0044e2d0 : public PathOrder {
 public:
     Class_0044e2d0(Order* order, const Vec3& pos);
@@ -393,10 +396,7 @@ public:
     Class_0044e190(Order* order, Unit* target);
 };
 
-class Class_0044e250 : public PathOrder {
-public:
-    Class_0044e250(Order* order, Unit* target, int value);
-};
+#include "class_0044e250.h"
 
 class Class_0044e330 : public PathOrder {
 public:

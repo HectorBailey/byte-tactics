@@ -66,12 +66,9 @@ struct Order {
 // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int __stdcall DirectionFromStep(int, int);
 #include "path_order.h"
-// The base is the explicit-position view above, so the inherited setters need no cast.
-class Class_0044e250 : public PathOrder {
-public:
-    // The pad index parameters are int, not char: the original loads a full dword.
-    Class_0044e250(Order* order, Unit* unit, int value);
-};
+// The unit-and-pad-index constructor of PathOrder, shared with vtol_orders.cpp.
+// The pad index parameter is int, not char: the original loads a full dword.
+#include "class_0044e250.h"
 #pragma pack(pop)
 
 int __stdcall RandomInt(int);
