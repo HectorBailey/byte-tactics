@@ -4,27 +4,9 @@
 // The nano spark: moved by Step, drawn as one pixel by DrawParticle when the
 // local player can see it, and dropped once IsExpired.
 
-// Own view, not vec3.h: it has operator+=.
-struct Vec3_004739b0 {
-    int x, y, z;
-    Vec3_004739b0& operator+=(const Vec3_004739b0& o)
-    {
-        x += o.x;
-        y += o.y;
-        z += o.z;
-        return *this;
-    }
-};
+#include "vec3_4739b0.h"
 
-// The integer halves of the 16.16 position.
-struct Pos_004739b0 {
-    char unknown_0[0x2];
-    short x;                           // +0x2
-    char unknown_4[0x2];
-    short height;                      // +0x6
-    char unknown_8[0x2];
-    short y;                           // +0xa
-};
+#include "pos_4739b0.h"
 
 #pragma pack(push, 1)
 

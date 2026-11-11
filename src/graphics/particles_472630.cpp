@@ -130,17 +130,7 @@ struct Vec3_004742c0 {
     }
 };
 
-// Own view, not vec3.h: it has operator+=.
-struct Vec3_004739b0 {
-    int x, y, z;
-    Vec3_004739b0& operator+=(const Vec3_004739b0& o)
-    {
-        x += o.x;
-        y += o.y;
-        z += o.z;
-        return *this;
-    }
-};
+#include "vec3_4739b0.h"
 
 // Own view, not vec3.h: it has operator+=.
 struct Vec3_00474580 {
@@ -149,24 +139,9 @@ struct Vec3_00474580 {
 };
 
 #pragma pack(push, 1)
-// The integer halves of the 16.16 position.
-struct Pos_00473590 {
-    short x;                       // +0x00 (record +0x06)
-    char unknown_2[0x4 - 0x2];
-    short h;                       // +0x04 (record +0x0a)
-    char unknown_6[0x8 - 0x6];
-    short y;                       // +0x08 (record +0x0e)
-};
+#include "pos_473590.h"
 
-// The integer halves of the 16.16 position.
-struct Pos_004739b0 {
-    char unknown_0[0x2];
-    short x;                           // +0x2
-    char unknown_4[0x2];
-    short height;                      // +0x6
-    char unknown_8[0x2];
-    short y;                           // +0xa
-};
+#include "pos_4739b0.h"
 
 #include "rect.h"
 

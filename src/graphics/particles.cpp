@@ -87,14 +87,7 @@ union Fix_004736e0 {
     short half[2];
 };
 
-// The integer halves of the 16.16 position.
-struct Pos_00473590 {
-    short x;                       // +0x00 (record +0x06)
-    char unknown_2[0x4 - 0x2];
-    short h;                       // +0x04 (record +0x0a)
-    char unknown_6[0x8 - 0x6];
-    short y;                       // +0x08 (record +0x0e)
-};
+#include "pos_473590.h"
 
 // Is this record's position inside the explored byte map of the local player
 // (flags bit 1 set), or inside their bit of the shared visibility mask (bit
@@ -144,27 +137,8 @@ public:
     void insert(char* where, int count, const TeleportParticle& val);
 };
 
-// Own view, not vec3.h: it has operator+=.
-struct Vec3_004739b0 {
-    int x, y, z;
-    Vec3_004739b0& operator+=(const Vec3_004739b0& o)
-    {
-        x += o.x;
-        y += o.y;
-        z += o.z;
-        return *this;
-    }
-};
-
-// The integer halves of the 16.16 position.
-struct Pos_004739b0 {
-    char unknown_0[0x2];
-    short x;                           // +0x2
-    char unknown_4[0x2];
-    short height;                      // +0x6
-    char unknown_8[0x2];
-    short y;                           // +0xa
-};
+#include "vec3_4739b0.h"
+#include "pos_4739b0.h"
 
 // One nano spark (the element of NanoParticles' vector), 0x30 bytes.
 struct NanoParticle {
