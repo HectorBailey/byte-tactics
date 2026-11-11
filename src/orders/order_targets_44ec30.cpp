@@ -6,12 +6,8 @@
 // 0x44da00, builds and appends with insert(end(), 1, p).
 #include <vector>
 
-// The element as 0x44da00.cpp declares it, so the insert has the name that
-// caller already uses.
-struct Point_0044eec0 {
-    short x;
-    short y;
-};
+// The element type 0x44da00.cpp's vector uses, so the insert names the same one.
+#include "point_44eec0.h"
 
 typedef std::vector<Point_0044eec0> Vec_0044ec30;
 typedef void (Vec_0044ec30::*InsertFn_0044ec30)(
