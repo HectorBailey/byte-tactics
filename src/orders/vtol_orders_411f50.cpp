@@ -101,21 +101,7 @@ struct Struct_Game391e9 {
 struct Game {
     char pad0[0x391e9]; Struct_Game391e9* mapInfo;
 };
-// The order object the vtol orders build: PathOrder, the class order_targets.cpp
-// defines. The constructor keeps that definition's argument types so the call
-// reaches it by name.
-class PathOrder {
-public:
-    char unknown_0[0x36];
-    PathOrder(Order* order, const Vec3& pos);
-    void SetAltitude(int);
-    void SetApproachRadius(short);
-};
-class Class_0044e190 {
-public:
-    char unknown_0[0x36];
-    Class_0044e190(Order* order, Unit* unit);
-};
+#include "path_order.h"
 #pragma pack(pop)
 
 extern Game* g_game;
@@ -239,7 +225,7 @@ int __stdcall AirStrikeOrder(Unit* unit, Order* order, unsigned int flags)
         time += def->attackrunlength;
         PathOrder* obj;
         if (order->target.owner)
-            obj = (PathOrder*)new Class_0044e190(order, order->target.owner);
+            obj = new PathOrder(order, order->target.owner);
         else
             obj = new PathOrder(order, order->pos);
         obj->SetApproachRadius(time);

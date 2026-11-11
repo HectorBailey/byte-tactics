@@ -22,26 +22,12 @@ void RegisterUnitOrders(void);
 
 #pragma pack(push, 1)
 #include "../map/feature.h"
-// Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
-int __stdcall FindLandingPad(Unit*, int);
-unsigned short __stdcall ChooseBuildOption(unsigned int, Unit*);
-void __stdcall ClearWeaponTarget(Unit*, int);
-void __stdcall DetonateUnitWeapon(Unit*, int);
-void __stdcall DrawUnit(void*, Unit*);
 
 #include "order.h"
 
 #include "../game/game.h"
 
-// The order object the vtol orders build: PathOrder, the class order_targets.cpp
-// defines. The constructor keeps that definition's argument types so the call
-// reaches it by name.
-class PathOrder {
-public:
-    char unknown_0[0x36];
-    PathOrder(Order* order, const Vec3& pos);
-    void SetAltitude(int);
-};
+#include "path_order.h"
 
 #pragma pack(pop)
 

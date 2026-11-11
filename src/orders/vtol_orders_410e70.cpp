@@ -60,7 +60,9 @@ struct Order {
 };
 // The order object the vtol orders build: PathOrder, the class order_targets.cpp
 // defines. The constructor keeps that definition's argument types so the call
-// reaches it by name.
+// reaches it by name. Stays a local view: the shared src/orders/path_order.h
+// declares a second constructor, and the symbol ids it costs move this file's
+// function (docs/c2-regalloc.md).
 class PathOrder {
 public:
     char unknown_0[0x36];

@@ -41,7 +41,8 @@ class EscortTimer;
 class SquadScoutTimer;
 // PathOrder: the order object the constructor below builds. Its definition is
 // in order_targets.cpp; here only the setters this order calls are declared
-// (0x44e6c0, 0x44e720 and 0x44e730).
+// (0x44e6c0, 0x44e720 and 0x44e730). Stays a local view: it needs SetHeading,
+// which src/orders/path_order.h does not declare.
 class PathOrder {
 public:
     char data[0x36];

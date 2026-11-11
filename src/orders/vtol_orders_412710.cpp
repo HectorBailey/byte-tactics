@@ -127,16 +127,7 @@ int __stdcall GetUnitCount(int, unsigned int);
 struct Game {
     char pad0[0x142b7]; int overflowBucket;
 };
-// The order object the vtol orders build: PathOrder, the class order_targets.cpp
-// defines. The constructor keeps that definition's argument types so the call
-// reaches it by name.
-class PathOrder {
-public:
-    char unknown_0[0x36];
-    PathOrder(Order* order, const Vec3& pos);
-    void SetAltitude(int);
-    void SetApproachRadius(short);
-};
+#include "path_order.h"
 #pragma pack(pop)
 
 extern Game* g_game;

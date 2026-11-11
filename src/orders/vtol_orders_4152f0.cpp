@@ -38,15 +38,7 @@ struct Unit {
     int CanRepair(Unit*);
 };
 #include "order.h"
-// The order object the constructor builds, the class order_targets.cpp defines.
-// The constructor keeps that definition's argument types so the call reaches it
-// by name.
-class PathOrder {
-public:
-    char unknown_0[0x36];
-    PathOrder(Order* order, const Vec3& pos);
-    void SetAltitude(int);
-};
+#include "path_order.h"
 #pragma pack(pop)
 
 class RepairableUnitVisitor {
