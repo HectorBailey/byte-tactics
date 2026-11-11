@@ -18,10 +18,7 @@
 #include <algorithm>
 #include <math.h>
 
-struct Point_0044eec0 {
-    short x;
-    short y;
-};
+#include "point_44eec0.h"
 
 // The vtables the area classes store by hand; the base class's is 0x4fd2f8.
 extern void* g_orderFxVtable[];

@@ -117,10 +117,7 @@ inline void __stdcall swap(_Ty& _X, _Ty& _Y)
 
 #include <vector>
 
-struct Point_0044eec0 {
-    short x;
-    short y;
-};
+#include "point_44eec0.h"
 
 // The out-of-line copy the inlined vector::clear tail calls (0x44eef0).
 Point_0044eec0* __stdcall CopyDwordRangeUnchecked(Point_0044eec0* first, Point_0044eec0* last, Point_0044eec0* dest);
