@@ -1145,21 +1145,12 @@ void OpenNewMultiDialog()
     RenderLayer(&g_game->gui, 0x40);
 }
 
-// Returns the local player's name, the byte at g_game+0x2a42 selecting the
-// player record and +0x1b8a (0x1b63 + 0x27) its info block; the name is at
-// +0x80 of that block.
+// The local player's password, returned as the char* in an int slot.
+// Thaldren: Lobby_GetLocalPlayerPassword.
 // FUNCTION: 0x441430
 int __cdecl GetLocalPlayerPassword()
 {
-    int ecx = (int)g_game;
-    unsigned int edx = *(unsigned char*)(ecx + 0x2a42);
-    int eax = edx;
-    ecx = ecx + edx;
-    eax = eax << 5;
-    eax = eax + edx;
-    eax = eax + eax * 4;
-    eax = *(int*)(ecx + eax * 2 + 0x1b8a);
-    return eax + 0x80;
+    return (int)g_game->players[g_game->localPlayer].info->password;
 }
 
 // Maps the selected DirectPlay service provider GUID to an index:
@@ -2504,7 +2495,7 @@ void __cdecl BuildPlayerSlotGadgets(void)
     int t;
     char** slot;
 
-    *(short*)(base + 0xb6) = g_battleRoomBaseGadgetCount;
+    ((Gadget*)base)->u.count = g_battleRoomBaseGadgetCount;
     do {
         for (t = 0, slot = g_battleRoomGadgetNames; *slot != 0; slot++, t++) {
             int index = FindGadgetIndex(base, *slot, 0xe);
@@ -2515,7 +2506,7 @@ void __cdecl BuildPlayerSlotGadgets(void)
             DAT_00512760 = rec->y;
             if (t == 0)
                 DAT_0051276c = rec->height;
-            count = ++*(short*)(base + 0xb6);
+            count = ++((Gadget*)base)->u.count;
             dst = (Gadget*)(base + 0x15b * count);
             *dst = *rec;
             dst->name[strlen(dst->name) - 1] = (char)('0' + p);
