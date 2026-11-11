@@ -44,7 +44,7 @@ struct SpotState {
     void* owner;                       // +0xc
 };
 
-struct Object_004cb650;
+struct Object3do;
 
 #include "../units/unit.h"
 
@@ -143,7 +143,7 @@ struct Game {
     Unit* units;                       // +0x14357
     Unit* unitsEnd;                    // +0x1435b
     char unknown_1435f[0x14377 - 0x1435f];
-    Object_004cb650** unitModels;      // +0x14377
+    Object3do** unitModels;            // +0x14377
     char unknown_1437b[0x14383 - 0x1437b];
     Vec3* tempXformPts;               // +0x14383
     Point* tempProjectedPts;           // +0x14387
@@ -378,7 +378,7 @@ void __stdcall PlaySoundByName(char* name, int param_2);
 int __stdcall IsKeyDown(int key);
 void __stdcall DrawTextClipped(void* surf, void* text, int x, int y, int color, int just);
 
-void __stdcall GetObjectBounds(Object_004cb650* obj, Vec3* lo, Vec3* hi, int arg);
+void __stdcall GetObjectBounds(Object3do* obj, Vec3* lo, Vec3* hi, int arg);
 void __stdcall DrawRotatedQuadOutline(void* surface, Vec3* offset, Vec3* corners, short* angles);
 void __stdcall DrawRotatedQuadOutline(Vec3* view, Vec3* pos, Vec3* corners, void* unit);
 
