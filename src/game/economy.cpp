@@ -16,16 +16,14 @@
 
 #pragma pack(push, 1)
 
-// The end-of-tick update's view of one 0x18-byte account: the same bytes as
-// Res_00401360. Kept a separate name so economy_401360.cpp, which defines the
-// Res_00401360 spelling, and this file do not define one symbol twice.
-struct Obj_00401320 {
-    float x0;                          // +0x00
-    float x1;                          // +0x04
-    float x2;                          // +0x08
-    float x3;                          // +0x0c
-    float prev0;                       // +0x10
-    float prev1;                       // +0x14
+// One 0x18-byte resource account, the same struct economy_401360.cpp declares.
+struct Res_00401360 {
+    float produced;                    // +0x0
+    float used;                        // +0x4
+    float demand;                      // +0x8
+    float backlog;                     // +0xc
+    float lastProduced;                // +0x10
+    float lastUsed;                    // +0x14
 };
 
 #include "../util/hapi_bank.h"
@@ -178,13 +176,13 @@ int UnitResources::SpendEnergyAndMetal(float energy, float metal)
 }
 
 // FUNCTION: 0x401320
-void __stdcall SettleResourceAccount(Obj_00401320* p, float a, float b)
+void __stdcall SettleResourceAccount(Res_00401360* p, float a, float b)
 {
-    p->prev1 = p->x1;
-    p->prev0 = p->x0;
+    p->lastUsed = p->used;
+    p->lastProduced = p->produced;
     // One combined expression: as two statements the demand term is evaluated first.
-    p->x3 = p->x3 - a * p->x3 + (p->x2 - b * p->x2);
-    p->x1 = 0;
-    p->x0 = 0;
-    p->x2 = 0;
+    p->backlog = p->backlog - a * p->backlog + (p->demand - b * p->demand);
+    p->used = 0;
+    p->produced = 0;
+    p->demand = 0;
 }
