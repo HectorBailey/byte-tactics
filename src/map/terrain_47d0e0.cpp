@@ -15,12 +15,12 @@ struct Cell {
     unsigned char flags;
 };
 
-struct Unit_0047db20 {
+struct UnitDef {
     char unknown_0[0x14e];
     unsigned char* mask;
 };
 
-union Flags_0047db20 {
+union UnitFlags {
     struct {
         unsigned int unknown_0 : 26;
         unsigned int flag26 : 1;
@@ -29,18 +29,18 @@ union Flags_0047db20 {
     int all;
 };
 
-struct Obj_0047db20 {
+struct Unit {
     char unknown_0[0x76];
     Point16 pos;
     char unknown_7a[4];
     Point16 footprint;
     int spatialBucket;
     char unknown_86[0x92 - 0x86];
-    Unit_0047db20* def;
+    UnitDef* def;
     char unknown_96[0xa8 - 0x96];
     short id;
     char unknown_aa[0x110 - 0xaa];
-    Flags_0047db20 flags;
+    UnitFlags flags;
 };
 
 struct Game {
@@ -63,7 +63,7 @@ extern ClaimFootprintVisitor g_claimFootprintVtable[];
 
 void __stdcall UpdateCellHeightRange(Point16 pos, Point16 size);
 void __stdcall VisitObjectsInArea(Point16 pos, Point16 size, ClaimFootprintVisitor* visitor);
-void __stdcall RefreshPassMapsForUnit(Obj_0047db20* obj);
+void __stdcall RefreshPassMapsForUnit(Unit* obj);
 
 // Reads the position through a const reference: written inline, the two
 // obj->pos.y reads become one common subexpression.
@@ -75,7 +75,7 @@ static inline Cell* CellAt(const Point16& p)
 // Stays in a file of its own: in the merged file the symbol count clears bit 14
 // of g_game's id, which decides how the cell index multiply folds.
 // FUNCTION: 0x47d0e0
-void __stdcall RemoveUnitFromMap(Obj_0047db20* obj)
+void __stdcall RemoveUnitFromMap(Unit* obj)
 {
     if (obj->spatialBucket != g_game->overflowBucket) {
         Point16 size = obj->footprint;

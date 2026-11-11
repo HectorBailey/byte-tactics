@@ -3,31 +3,33 @@
 
 #pragma pack(push, 1)
 
-struct Obj_0047cc30;
+struct Unit;
 
-struct Motion_0047cc30 {
+struct UnitMotion {
     char unknown_0[0x26];
-    int pathLockStamp;                  // +0x26, UnitMotion's stamp in units/movement_class.cpp
+    int pathLockStamp;                      // +0x26, UnitMotion's stamp in units/movement_class.cpp
 };
 
-struct Owner_0047cc30 {
+struct UnitBucket {
     char unknown_0[6];
-    Obj_0047cc30* first;                // +0x6
+    Unit* first;                            // +0x6
 };
 
-struct Unit_0047cc30 {
+struct UnitDef {
     char unknown_0[0x14e];
-    unsigned char* mask;                // +0x14e
+    unsigned char* mask;                    // +0x14e
 };
 
 #include "../network/player.h"
 
+// Second view of Unit for the g_game->units array. It keeps its placeholder tag
+// because Unit is already declared above with different members in this file.
 struct UnitRec_0047cc30 {               // 0x118 bytes
     char unknown_0[0x92];
-    void* def;                          // +0x92
-    Player* player;                     // +0x96
+    void* def;                              // +0x92
+    Player* player;                         // +0x96
     char unknown_9a[0x110 - 0x9a];
-    unsigned int flags;                 // +0x110
+    unsigned int flags;                     // +0x110
     char unknown_114[0x118 - 0x114];
 };
 
@@ -35,7 +37,7 @@ struct UnitRec_0047cc30 {               // 0x118 bytes
 
 #include "../util/vec3.h"
 
-union Flags_0047cc30 {
+union UnitFlags {
     struct {
         unsigned int unknown_0 : 27;
         unsigned int flag27 : 1;
@@ -44,44 +46,44 @@ union Flags_0047cc30 {
     int all;
 };
 
-struct Obj_0047cc30 {
-    Motion_0047cc30* motion;            // +0x0
+struct Unit {                         // Cavedog's Unit, seen through this file's offsets
+    UnitMotion* motion;                     // +0x0
     char unknown_4[0x26 - 0x4];
-    int field_26;                       // +0x26
+    int field_26;                           // +0x26
     char unknown_2a[0x6a - 0x2a];
-    Vec3 position;         // +0x6a
-    Point16 pos;                 // +0x76
+    Vec3 position;                          // +0x6a
+    Point16 pos;                            // +0x76
     char unknown_7a[4];
-    Point16 footprint;           // +0x7e
-    Owner_0047cc30* spatialBucket;      // +0x82
-    int carrier;                        // +0x86
+    Point16 footprint;                      // +0x7e
+    UnitBucket* spatialBucket;           // +0x82
+    int carrier;                            // +0x86
     char unknown_8a[4];
-    Obj_0047cc30* cargoNext;            // +0x8e
-    Unit_0047cc30* def;                 // +0x92
+    Unit* cargoNext;                        // +0x8e
+    UnitDef* def;                           // +0x92
     char unknown_96[0xa8 - 0x96];
-    unsigned short id;                  // +0xa8
+    unsigned short id;                      // +0xa8
     char unknown_aa[0x10f - 0xaa];
-    unsigned char bit0 : 1;             // +0x10f
+    unsigned char bit0 : 1;                 // +0x10f
     unsigned char bit1 : 1;
     unsigned char bit2 : 1;
-    Flags_0047cc30 flags;               // +0x110
+    UnitFlags flags;                        // +0x110
 };
 
 struct Game {
     char unknown_0[0x14233];
-    int mapWidthTiles;                  // +0x14233
-    int mapHeightTiles;                 // +0x14237
+    int mapWidthTiles;                      // +0x14233
+    int mapHeightTiles;                     // +0x14237
     char unknown_1423b[0x14287 - 0x1423b];
-    Cell* heightMap;                    // +0x14287
+    Cell* heightMap;                        // +0x14287
     char unknown_1428b[0x1429f - 0x1428b];
-    Owner_0047cc30* owners;             // +0x1429f
-    int bucketCols;                     // +0x142a3
+    UnitBucket* owners;                  // +0x1429f
+    int bucketCols;                         // +0x142a3
     char unknown_142a7[0x142b7 - 0x142a7];
-    Owner_0047cc30* overflowBucket;     // +0x142b7
+    UnitBucket* overflowBucket;          // +0x142b7
     char unknown_142bb[0x14357 - 0x142bb];
-    UnitRec_0047cc30* units;            // +0x14357
+    UnitRec_0047cc30* units;                // +0x14357
     char unknown_1435b[0x38a47 - 0x1435b];
-    int gameTick;                       // +0x38a47
+    int gameTick;                           // +0x38a47
 };
 #pragma pack(pop)
 
@@ -90,13 +92,13 @@ extern Game* g_game;
 void __stdcall UpdateCellHeightRange(Point16 pos, Point16 size);
 void __stdcall RefreshAllPassMaps(Point16 pos, Point16 size);
 
-static void SetOwner_0047cc30(Obj_0047cc30* obj, Owner_0047cc30* nw)
+static void SetOwner_0047cc30(Unit* obj, UnitBucket* nw)
 {
     if (nw != obj->spatialBucket) {
         if (obj->carrier == 0) {
-            Owner_0047cc30* old = obj->spatialBucket;
+            UnitBucket* old = obj->spatialBucket;
             if (old != 0) {
-                Obj_0047cc30** pp = &old->first;
+                Unit** pp = &old->first;
                 while (*pp != obj)
                     pp = &(*pp)->cargoNext;
                 *pp = obj->cargoNext;
@@ -112,7 +114,7 @@ static void SetOwner_0047cc30(Obj_0047cc30* obj, Owner_0047cc30* nw)
 // Stays in a file of its own: in the merged file the symbol count moves the
 // owner index multiply onto the other operand.
 // FUNCTION: 0x47cc30
-void __stdcall AddUnitToMap(Obj_0047cc30* obj)
+void __stdcall AddUnitToMap(Unit* obj)
 {
     Point16 size = obj->footprint;
     if (obj->motion != 0)
