@@ -20,12 +20,7 @@
 
 #pragma pack(push, 1)
 
-struct Settings_00496e10 {
-    int value;                          // +0x0
-    int flag_4;                         // +0x4
-    int flag_8;                         // +0x8
-    int flag_c;                         // +0xc
-};
+#include "mission_option_flags.h"
 
 struct ViewFlags {               // g_game + 0x14281
     unsigned short bit0 : 1;
@@ -173,7 +168,7 @@ struct Slot_00497180 {                  // 0x18 bytes
 struct Options_00497180 {               // at g_game+0x29a0
     Slot_00497180 slots[10];            // +0x0
     char unknown_f0[0x108 - 0xf0];
-    Settings_00496e10 settings;         // +0x108
+    MissionOptionFlags settings;        // +0x108
     int fixedloc;                       // +0x118
 };
 
@@ -291,7 +286,7 @@ struct Game {
     void (*handler)();                  // +0x391f5
     int fontComix;                      // +0x391f9
     char unknown_391fd[0x39219 - 0x391fd];
-    Settings_00496e10 singleSettings;   // +0x39219
+    MissionOptionFlags singleSettings;  // +0x39219
     char unknown_39229[0x39239 - 0x39229];
     short endGameCountdown;             // +0x39239
 };
@@ -503,7 +498,7 @@ unsigned short __stdcall GetCellFeature(Cell* cell);
 // std::random_shuffle call; rec+0x149 as a 1-bit bitfield (direct `or byte`);
 // `pos.x.value` before `pos.y.value = 0`.
 // Inlined into cases 1 and 2 below (matched on its own in 0x496e10.cpp).
-inline void __stdcall ApplyMissionOptionFlags(Settings_00496e10* s)
+inline void __stdcall ApplyMissionOptionFlags(MissionOptionFlags* s)
 {
     g_game->battleCommanderDeath = s->value;
     g_game->mapFlags.bit2 = s->flag_c;
