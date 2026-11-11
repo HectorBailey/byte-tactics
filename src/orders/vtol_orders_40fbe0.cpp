@@ -40,16 +40,7 @@ struct Order { char pad0[4]; MissionType kind; unsigned char state; unsigned int
     int Advance(int distance);
 };
 
-// The order object the vtol orders build: PathOrder, the class order_targets.cpp
-// defines. The constructor keeps that definition's argument types so the call
-// reaches it by name.
-class PathOrder {
-public:
-    char data[0x36];
-    PathOrder(Order*, const Vec3&);
-    void SetAltitude(int);
-    void SetApproachRadius(int);
-};
+#include "path_order.h"
 struct Game { char pad0[0x1422b]; int width, height; char pad14233[0x142b7-0x14233]; int overflowBucket; };
 #pragma pack(pop)
 extern Game* g_game;

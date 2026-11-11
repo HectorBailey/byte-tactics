@@ -363,7 +363,10 @@ struct Unit {
 
 // PathOrder: the order object the four constructors below build. Its
 // definition is in order_targets.cpp; here only the storage and the setters
-// the vtol orders call are declared (0x44e6c0, 0x44e720 and 0x44e730).
+// the vtol orders call are declared (0x44e6c0, 0x44e720 and 0x44e730). Stays a
+// local view: it needs SetHeading, which src/orders/path_order.h does not
+// declare, and it declares no constructor, so the shared one costs ids this
+// file's functions do not (docs/c2-regalloc.md).
 class PathOrder {
 public:
     char unknown_0[0x36];

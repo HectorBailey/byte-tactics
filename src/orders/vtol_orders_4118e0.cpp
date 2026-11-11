@@ -65,16 +65,7 @@ struct Order {
 };
 // Unused here: the symbol ids these declarations take keep the allocation (docs/c2-regalloc.md).
 int __stdcall DirectionFromStep(int, int);
-// The order object the vtol orders build: PathOrder, the class order_targets.cpp
-// defines. The constructor keeps that definition's argument types so the call
-// reaches it by name.
-class PathOrder {
-public:
-    char unknown_0[0x36];
-    PathOrder(Order* order, const Vec3& pos);
-    void SetAltitude(int);
-    void SetApproachRadius(short);
-};
+#include "path_order.h"
 // The base is the explicit-position view above, so the inherited setters need no cast.
 class Class_0044e250 : public PathOrder {
 public:
