@@ -131,7 +131,9 @@ struct Point_00498da0 {
     short y;                            // +0x2
 };
 
-struct BitFlags_00498da0 {
+// The battle input flags at +0x2cc6 (Thaldren's bBattleInputFlags). The same
+// byte is declared as InputFlagBits and InputFlags in ingame/control_panel.cpp.
+struct InputFlagBits {
     unsigned char b0:1;
     unsigned char b1:1;
     unsigned char b2:1;
@@ -142,9 +144,9 @@ struct BitFlags_00498da0 {
     unsigned char b7:1;
 };
 
-union Flags_00498da0 {
+union InputFlags {
     unsigned char value;
-    BitFlags_00498da0 bits;
+    InputFlagBits bits;
 };
 
 struct View_00498da0 {
@@ -200,7 +202,7 @@ struct Game {
     unsigned short cellFeature;         // +0x2cbc
     unsigned char cursorMode;           // +0x2cbe
     char unknown_2cbf[0x2cc6 - 0x2cbf];
-    Flags_00498da0 inputFlags;          // +0x2cc6
+    InputFlags inputFlags;              // +0x2cc6
     char unknown_2cc7[0x14223 - 0x2cc7];
     int mapWidthWorld;                  // +0x14223
     int mapHeightWorld;                 // +0x14227
