@@ -962,19 +962,19 @@ SquadScoutTimer::SquadScoutTimer(SquadManager* p, Group* q)
 {
 }
 
-struct FixedParts_00407ae0 {
+struct FixedParts {
     unsigned int frac : 16;
     int whole : 16;
 };
 
-union Fixed_00407ae0 {
+union Fixed {
     int value;
-    FixedParts_00407ae0 parts;
+    FixedParts parts;
 };
 
-static inline Fixed_00407ae0 MakeFixed(int i)
+static inline Fixed MakeFixed(int i)
 {
-    Fixed_00407ae0 f;
+    Fixed f;
     f.parts.frac = 0;
     f.parts.whole = i;
     return f;
