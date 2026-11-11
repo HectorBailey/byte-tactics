@@ -120,24 +120,29 @@ union Flags110_0043f0e0 {
     };
 };
 
-union Flags241_0043f0e0 {
+// The unit type's flag word at UnitDef+0x241. src/units/unit_def.h declares the
+// same word with the same bit split and names bit 11 canFly and bit 28 kamikaze.
+union UnitTypeFlags {
     unsigned int raw;
     struct {
         unsigned int bits_0 : 11;
-        unsigned int flag_11 : 1;
+        unsigned int canFly : 1;              // bit 11
         unsigned int bits_12 : 16;
-        unsigned int flag_28 : 1;
+        unsigned int kamikaze : 1;            // bit 28
         unsigned int bits_29 : 3;
     };
 };
 
-union Flags111_0043f0e0 {
+// The weapon's flag word at WeaponDef+0x111. src/weapons/weapon_def.h declares
+// it as union WeaponFlags with the same bit split and names bit 8 dropped and
+// bit 17 toAirWeapon; Thaldren calls the word dwWeaponFlags.
+union WeaponFlags {
     unsigned int raw;
     struct {
         unsigned int bits_0 : 8;
-        unsigned int flag_8 : 1;
+        unsigned int dropped : 1;             // bit 8
         unsigned int bits_9 : 8;
-        unsigned int flag_17 : 1;
+        unsigned int toAirWeapon : 1;         // bit 17
         unsigned int bits_18 : 14;
     };
 };
@@ -188,7 +193,7 @@ struct Node_0043f0e0 {
     char unknown_0[0x111];
     union {
         unsigned int f111; // +0x111
-        Flags111_0043f0e0 f111bits;
+        WeaponFlags f111bits;
     };
 };
 
@@ -205,7 +210,7 @@ struct Def_0043f0e0 {
     char unknown_1fe[0x241 - 0x1fe];
     union {
         unsigned int f241; // +0x241
-        Flags241_0043f0e0 f241bits;
+        UnitTypeFlags f241bits;
     };
     union {
         unsigned int f245; // +0x245
@@ -454,7 +459,7 @@ int __stdcall GetOrderCursor(unsigned char mode, Unit_0043e490* unit, Unit_0043e
 
 // A ternary: the flag is tested before the name is loaded.
 static inline MissionType Pick(Def_0043f0e0* def, const char* vtol, const char* ground) {
-    return MissionType(def->f241bits.flag_11 ? vtol : ground);
+    return MissionType(def->f241bits.canFly ? vtol : ground);
 }
 
 static inline int Visible(Unit_0043f0e0* unit, Vec3* pos) {
@@ -515,11 +520,11 @@ MissionType __stdcall GetOrderType(unsigned char mode, Unit_0043f0e0* unit,
         if (flags.flag_31) {
             Node_0043f0e0* node = unit->f10;
             if (!enemy) {
-                if (node->f111bits.flag_17)
+                if (node->f111bits.toAirWeapon)
                     break;
                 if (!(def->f241 & 0x800))
                     return MissionType("SUPPRESS");
-                if (def->f1ee->f111bits.flag_8)
+                if (def->f1ee->f111bits.dropped)
                     return MissionType("AIRSTRIKE");
                 return MissionType("AIRTOGROUND");
             }
@@ -544,7 +549,7 @@ MissionType __stdcall GetOrderType(unsigned char mode, Unit_0043f0e0* unit,
                 }
             }
             unsigned int f = def->f241;
-            if (def->f241bits.flag_11) {
+            if (def->f241bits.canFly) {
                 unsigned int air = def->f1ee->f111 & 0x100;
                 if (air && !(target->def->f241 & 0x800))
                     return MissionType("AIRSTRIKE");
@@ -562,7 +567,7 @@ MissionType __stdcall GetOrderType(unsigned char mode, Unit_0043f0e0* unit,
             if (flags.raw & 0x20000000)
                 return MissionType("ATTACK_NOMOVE");
         }
-        if (def->f241bits.flag_28)
+        if (def->f241bits.kamikaze)
             return MissionType("ATTACK_KAMIKAZE");
         break;
     }
@@ -571,11 +576,11 @@ MissionType __stdcall GetOrderType(unsigned char mode, Unit_0043f0e0* unit,
             if (unit->motion == 0)
                 return MissionType("QPATROL");
             if (def->f245bits.flag_9) {
-                if (def->f241bits.flag_11)
+                if (def->f241bits.canFly)
                     return MissionType("VTOL_REPAIRPATROL");
                 return MissionType("REPAIRPATROL");
             }
-            if (def->f241bits.flag_11)
+            if (def->f241bits.canFly)
                 return MissionType("VTOL_PATROL");
             return MissionType("PATROL");
         }
