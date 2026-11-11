@@ -9,7 +9,7 @@ address,size,file,symbol,status,similarity
 0x401220,61,src/game/economy.cpp,?SpendEnergy@UnitResources@@QAEHM@Z,matched,100.0
 0x401260,61,src/game/economy.cpp,?SpendMetal@UnitResources@@QAEHM@Z,matched,100.0
 0x4012a0,126,src/game/economy.cpp,?SpendEnergyAndMetal@UnitResources@@QAEHMM@Z,matched,100.0
-0x401320,53,src/game/economy.cpp,?SettleResourceAccount@@YGXPAURes_00401360@@MM@Z,matched,100.0
+0x401320,53,src/game/economy.cpp,?SettleResourceAccount@@YGXPAUResourceAccount@@MM@Z,matched,100.0
 0x401360,2239,src/game/economy_401360.cpp,?UpdatePlayerEconomy@@YGXPAUPlayer@@@Z,matched,100.0
 0x401c20,155,src/orders/unit_orders.cpp,?StopOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
 0x401cc0,30,src/orders/unit_orders.cpp,?MakeSelectableOrder@@YGHPAUUnit@@PAUOrder@@H@Z,matched,100.0
