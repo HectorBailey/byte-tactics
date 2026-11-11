@@ -700,10 +700,7 @@ void __stdcall SetGadgetTextByName(Gui* obj, char* name, char* text)
     }
 }
 
-// 0x4a0880 keeps its own file: the joined file's include set and prelude
-// put the entries pointer in eax instead of ecx.
-struct Object_004a0880;
-void __stdcall SetGadgetText(Object_004a0880* obj, int index, char* text);
+void __stdcall SetGadgetText(Gui* obj, int index, char* text);
 
 // FUNCTION: 0x4a08f0
 void __stdcall TranslateGadgetItems(Gui* obj, int index)
@@ -4266,6 +4263,7 @@ void __stdcall DrawGadgetGlyph(Gui* obj, int index)
 // Needed with the named glyph local in LineHeight: sets the flags 0x20 registers.
 // Unused here: real declarations that keep the file's symbol count.
 int AreAllPlayersReady();
+void OpenSoundOptions(void);
 
 
 // FUNCTION: 0x4a5f40
