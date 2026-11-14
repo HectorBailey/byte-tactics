@@ -84,7 +84,11 @@ struct UnitDef;
 #include "../units/unit_def.h"
 
 struct Unit {
-    char unknown_0[0x92];
+    char unknown_0[0x76];
+    Point16 cell;                      // +0x76
+    char unknown_7a[0x7e - 0x7a];
+    Point16 footprint;                 // +0x7e
+    char unknown_82[0x92 - 0x82];
     UnitDef* def;                      // +0x92
     char unknown_96[0x110 - 0x96];
     unsigned int flags;                // +0x110
@@ -339,7 +343,7 @@ struct Pos_00417bb0 {
 class AiSearchGoal {
 public:
     char unknown_4[4];
-    char* owner;                       // +0x8
+    Unit* owner;                       // +0x8
     Point16 points[20];                // +0xc
     int count;                         // +0x5c
     char unknown_60[4];
@@ -1465,7 +1469,7 @@ void ProtectUnitDefsReadOnly(void);
 // FUNCTION: 0x417e00
 void AiSearchGoal::DrawOnSurface(void* surface)
 {
-    DrawMapTileSelectionOutline(surface, (short*)(this->owner + 0x76), *(int*)(this->owner + 0x7e), 0xf);
+    DrawMapTileSelectionOutline(surface, (short*)&this->owner->cell, *(int*)&this->owner->footprint, 0xf);
     unsigned char color = g_game->colors[(this->active & 1) ? 9 : 12];
     for (int i = 0; i < this->count - 1; i++) {
         Pos_00417bb0 p1;
