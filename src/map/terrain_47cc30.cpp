@@ -10,10 +10,7 @@ struct UnitMotion {
     int pathLockStamp;                      // +0x26, UnitMotion's stamp in units/movement_class.cpp
 };
 
-struct UnitBucket {
-    char unknown_0[6];
-    Unit* first;                            // +0x6
-};
+#include "unit_bucket.h"
 
 struct UnitDef {
     char unknown_0[0x14e];

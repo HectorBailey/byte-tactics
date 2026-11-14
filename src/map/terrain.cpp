@@ -63,10 +63,7 @@ union Flags {
 
 #include "../network/player.h"
 
-struct UnitBucket {                     // 10 bytes: a spatial bucket, the head of its unit list
-    char unknown_0[6];
-    Unit* first;                        // +0x6
-};
+#include "unit_bucket.h"
 
 // Keeps its own view: with unit_def.h's symbol ids CanBuildAt (0x47d2e0) no longer matches.
 struct UnitDef {
