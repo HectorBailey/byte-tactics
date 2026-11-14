@@ -77,9 +77,10 @@ void FUN_00406f40(void);
 
 
 #pragma pack(push, 1)
-// Bit 19 is a one-bit bitfield (MSVC shifts it down to test it), while bit 8
-// of the same word is tested as a plain mask. Kept as a view: unit_def.h keeps
-// flags2 as a plain int, and the shift is what 0x489a90 emits.
+// Unused here: this is unit.cpp's Flags_00489a90 view of a definition's flags2
+// word, copied in and left behind. Nothing in this file reads it, but the symbol
+// ids its declarations take are what SetStateBits (0x48b090) matches with, so it
+// stays (docs/c2-regalloc.md).
 union Flags_00489a90 {
     struct {
         unsigned int unknown_0 : 19;
