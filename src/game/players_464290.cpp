@@ -8,6 +8,7 @@
 #include "../map/mission.h"
 #include "mission_conditions.h"
 #include "../game/unit_resources.h"
+#include "../units/unit.h"
 
 class Pathfinder {
 public:
@@ -15,7 +16,6 @@ public:
 };
 
 struct Player;
-struct Unit;
 
 #pragma pack(push, 1)
 
@@ -801,7 +801,7 @@ void __stdcall UpdatePlayers()
             while (u <= pi->units_end) {
                 if (u->flags & 0x10000000)
                     UpdateUnitLineOfSight(u);
-                u = (Unit*)((char*)u + 0x118);
+                u++;
             }
         }
 
