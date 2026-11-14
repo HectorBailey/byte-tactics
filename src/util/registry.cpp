@@ -59,8 +59,10 @@ int __stdcall RectsOverlap(Rect* a, Rect* b)
 // FUNCTION: 0x4b6820
 int __stdcall CompareByte1Equal(int a, int b)
 {
-    int cl = *(char*)(a + 1);
-    int bl = *(char*)(b + 1);
+    char* ca = (char*)a;
+    char* cb = (char*)b;
+    int cl = ca[1];
+    int bl = cb[1];
     return cl == bl ? 1 : 0;
 }
 

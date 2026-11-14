@@ -42,7 +42,7 @@ struct Info {
 
 #include "file_handle.h"
 
-struct ArchiveDirectory;
+#include "archive_directory.h"
 
 FileHandle* __stdcall HAPI_OpenFile(char* filename, const char* mode);
 int __stdcall HAPI_readfromfile(FileHandle* file, unsigned char* buf, int size);
@@ -100,8 +100,8 @@ void __stdcall HAPI_WriteArchiveData(char* path, char* base, int off, FILE* f,
 
     long pos2;
     long pos;
-    for (i = 0; i < *(unsigned*)(off + base); i++) {
-        e = (ArchiveEntry*)(base + *(int*)(off + base + 4)) + i;
+    for (i = 0; i < ((ArchiveDirectory*)(off + base))->count; i++) {
+        e = (ArchiveEntry*)(base + (int)((ArchiveDirectory*)(off + base))->entries) + i;
         strcpy(full, name);
         strcat(full, base + e->name);
         if ((e->flags & 1) != 0) {

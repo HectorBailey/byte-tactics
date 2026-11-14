@@ -727,7 +727,7 @@ int __stdcall SquashUnpackedSize(unsigned char* header)
     if (memcmp(header, "SQSH", 4) != 0) {
         return 0;
     }
-    return *(int*)(header + 0xb);
+    return ((SquashContainerHeader*)header)->size;
 }
 
 // FUNCTION: 0x4d1b70

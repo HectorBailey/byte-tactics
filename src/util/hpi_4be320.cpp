@@ -5,10 +5,7 @@
 
 #include "archive_entry.h"
 
-struct ArchiveDirectory {
-    int count;
-    ArchiveEntry* entries;          // +0x4
-};
+#include "archive_directory.h"
 
 struct ArchiveDirectoryNode {
     char unknown_0[0x10];
