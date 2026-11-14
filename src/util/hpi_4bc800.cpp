@@ -8,10 +8,7 @@
 #include "archive_entry.h"
 
 // An archive's directory tree (hpi.cpp names the same structs).
-struct ArchiveDirectory {
-    int count;                           // +0x0
-    ArchiveEntry* entries;               // +0x4
-};
+#include "archive_directory.h"
 
 // The list of the directory a backslash-separated path ends in (everything up
 // to its last backslash), walking down from `list`; 0 when a part of it is

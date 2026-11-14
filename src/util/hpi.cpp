@@ -87,10 +87,13 @@ struct Info {
 
 #include "archive_entry.h"
 
+// Stays a per-file view: including archive_directory.h here costs 4 symbol ids and
+// moves the registers of 0x4bb2e0 and 0x4bd160 (docs/c2-regalloc.md).
 struct ArchiveDirectory {
     int count;                         // +0x0
     ArchiveEntry* entries;             // +0x4
 };
+
 
 // An archive's header: the key at +0xc and the root directory at +0x10.
 struct Header {
@@ -1447,7 +1450,7 @@ unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf* out, int*
     out->size = nsize;
     base = (char*)GameReallocTagged(out->buf, g_packageDataName, nsize);
     out->buf = base;
-    *(unsigned int*)(base + root) = 0;
+    ((ArchiveDirectory*)(base + root))->count = 0;
 
     strcpy(buf, path);
     if (buf[strlen(buf) - 1] != '\\') {
@@ -1462,7 +1465,7 @@ unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf* out, int*
     if (h != (FindFiles*)-1) {
         do {
             if (strcmp(fd.name, g_dotExtSep) != 0 && strcmp(fd.name, g_dotDot) != 0)
-                ++(*(unsigned int*)(base + root));
+                ++((ArchiveDirectory*)(base + root))->count;
         } while (HAPI_FindNext(h, &fd) == 0);
         if (h != 0) {
             if (h->state < 0)
@@ -1471,8 +1474,8 @@ unsigned int __stdcall HAPI_BuildArchiveDirectory(char* path, HapiBuf* out, int*
         }
     }
 
-    entries = Grow(out, *(unsigned int*)(base + root) * 9);
-    *(unsigned int*)(out->buf + root + 4) = entries;
+    entries = Grow(out, ((ArchiveDirectory*)(base + root))->count * 9);
+    ((ArchiveDirectory*)(out->buf + root))->entries = (ArchiveEntry*)entries;
 
     h = (FindFiles*)HAPI_FindFirst(buf, &fd, -1, 1);
     if (h != (FindFiles*)-1) {

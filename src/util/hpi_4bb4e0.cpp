@@ -5,10 +5,7 @@
 #include "archive_entry.h"
 
 // An archive's directory tree (hpi.cpp names the same structs).
-struct ArchiveDirectory {
-    int count;                           // +0x0
-    ArchiveEntry* entries;               // +0x4
-};
+#include "archive_directory.h"
 
 // The entry a backslash-separated path names, walking down from `list`, or 0.
 // FUNCTION: 0x4bb4e0
