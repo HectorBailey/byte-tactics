@@ -13,16 +13,8 @@
 #include "archive_entry.h"
 
 #pragma pack(push, 1)
-// The header of the archive item a handle points at, the view hpi.cpp names
-// Header: the key at +0xc and the root directory at +0x10.
-struct Header {
-    char magic[4];                       // +0x0
-    unsigned char version[4];            // +0x4
-    unsigned int size;                   // +0x8
-    unsigned char obfuscate;             // +0xc
-    char unknown_d[3];
-    ArchiveDirectory* list;              // +0x10
-};
+// The archive header, the view hpi.cpp names Header.
+#include "hpi_header.h"
 
 struct OPENHAPIFILE {
     FILE* fp;                            // +0x0
@@ -178,7 +170,7 @@ void __stdcall HAPI_WriteArchiveData(char* path, char* base, int off, FILE* f,
                 GameFreeThunk(file->buffer2);
             GameFreeThunk(file);
             if (cb != 0)
-                cb(5 + (unsigned)(90 * info->offset - *(int*)(8 + base) * 90) / extra);
+                cb(5 + (unsigned)(90 * info->offset - (int)((Header*)base)->size * 90) / extra);
         }
     }
 }

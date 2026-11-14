@@ -87,23 +87,15 @@ struct Info {
 
 #include "archive_entry.h"
 
-// Stays a per-file view: including archive_directory.h here costs 4 symbol ids and
-// moves the registers of 0x4bb2e0 and 0x4bd160 (docs/c2-regalloc.md).
-struct ArchiveDirectory {
-    int count;                         // +0x0
-    ArchiveEntry* entries;             // +0x4
-};
+#include "archive_directory.h"
+#include "hpi_header.h"
 
-
-// An archive's header: the key at +0xc and the root directory at +0x10.
-struct Header {
-    char magic[4];                     // +0x0
-    unsigned char version[4];          // +0x4
-    unsigned int size;                 // +0x8
-    unsigned char obfuscate;           // +0xc
-    char unknown_d[3];
-    ArchiveDirectory* list;            // +0x10
-};
+// Unused here: the symbol ids these declarations take keep 0x4bb2e0 and 0x4bd160
+// matching after the two views above moved to headers (docs/c2-regalloc.md).
+void ProtectUnitDefsReadOnly(void);
+void ProtectUnitDefsReadWrite(void);
+void SetMemFussyDefault(void);
+char IsMemFussy(void);
 
 // An open archive: the file, the read position, its header, the open count
 // and the mode it was opened in.
