@@ -6,7 +6,8 @@
 // the list head; nothing in src/ reads the first six.
 //
 // Both files include this inside their own pack(1) region, so the record is 10
-// bytes in each, which is what their bucket grids are indexed by.
+// bytes in each, which is what SpatialBucket's recorded size says and what both
+// bucket grids are indexed by.
 #ifndef UNIT_BUCKET_H
 #define UNIT_BUCKET_H
 

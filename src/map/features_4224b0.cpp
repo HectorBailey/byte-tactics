@@ -18,6 +18,7 @@
 struct Game;
 extern Game* g_game;
 #include "../game/game.h"
+#include "feature_records.h"
 
 // Thaldren's FeatureTdfParserVector, 0x10 bytes: the dummy allocator byte and
 // its pad, then the begin and end pointers. The capacity word at +0xc is not
@@ -28,20 +29,7 @@ struct FeatureTdfParserVector {
     TdfFile** ppEnd;                   // +0x8
 };
 
-struct AnimSrc {
-    unsigned short count;               // +0x0
-    unsigned char kind;                 // +0x2
-};
-
 struct Gaf;
-
-struct Anim {
-    unsigned short index;               // +0x0
-    unsigned short value;               // +0x2
-    unsigned char kind;                 // +0x4
-    char unknown_5[3];
-    AnimSrc* src;                  // +0x8
-};
 
 struct Feature {
     char name[0x80];                    // +0x00
