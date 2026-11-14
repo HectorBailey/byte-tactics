@@ -292,12 +292,26 @@ int __stdcall LoadSoundByName(char* name, const char* file)
 #include "../graphics/gaf_frame.h"
 #include "../graphics/handle.h"
 
+// The 0x40-byte radar-picture header. Thaldren's Map_LoadRadarPic reports the two
+// sizes at +4 and +8 as pOutMapWTiles and pOutMapHTiles, so they are the map size
+// in tiles; +0x28 is the offset of the pixel data and bit 0 of the byte at +0x2c
+// says whether there is any.
+struct RadarPicHeader {
+    char unknown_0[4];
+    int mapWTiles;                   // +0x4
+    int mapHTiles;                   // +0x8
+    char unknown_c[0x28 - 0xc];
+    int pixelOffset;                 // +0x28
+    unsigned char hasPixels;         // +0x2c
+    char unknown_2d[0x40 - 0x2d];
+};
+
 struct Pic_004295b0 {
     int w;               // +0x0
     int h;               // +0x4
     // Never read, but makes the local frame 0x4c bytes.
     int unknown;         // +0x8
-    char header[0x40];   // +0xc
+    RadarPicHeader header;           // +0xc
 };
 
 int __stdcall HAPI_FileLength(void* file);
@@ -305,11 +319,10 @@ int __stdcall HAPI_readfromfile(void* file, void* buf, int size);
 int __stdcall HAPI_SeekFile(void* file, int pos);
 GafFrame* __stdcall AllocFrame(const char* name, int width, int height);
 
-// Loads a picture from `path`. It reads a 0x40-byte header; if bit 0 of the
-// byte at header+0x2c is set it seeks to the offset stored at header+0x28,
-// reads width and height (two dwords), allocates a RADARPIC bitmap and reads
-// width*height pixels into it. Otherwise it returns null. The two dwords at
-// header+4 and header+8 are reported through the output pointers.
+// Loads a picture from `path`. It reads a 0x40-byte header; if the pixel flag is
+// set it seeks to the stored pixel offset, reads width and height (two dwords),
+// allocates a RADARPIC bitmap and reads width*height pixels into it. Otherwise it
+// returns null. The map size in tiles is reported through the output pointers.
 // FUNCTION: 0x4295b0
 GafFrame* __stdcall LoadRadarPic(char* path, int* outX, int* outY)
 {
@@ -319,10 +332,10 @@ GafFrame* __stdcall LoadRadarPic(char* path, int* outX, int* outY)
     }
     HAPI_FileLength(file);
     Pic_004295b0 pic;
-    HAPI_readfromfile(file, pic.header, 0x40);
+    HAPI_readfromfile(file, &pic.header, 0x40);
     GafFrame* bmp;
-    if (pic.header[0x2c] & 1) {
-        HAPI_SeekFile(file, *(int*)(pic.header + 0x28));
+    if (pic.header.hasPixels & 1) {
+        HAPI_SeekFile(file, pic.header.pixelOffset);
         HAPI_readfromfile(file, &pic.w, 8);
         bmp = AllocFrame("RADARPIC", pic.w, pic.h);
         HAPI_readfromfile(file, bmp->pixelsOrLayers, pic.w * pic.h);
@@ -330,8 +343,8 @@ GafFrame* __stdcall LoadRadarPic(char* path, int* outX, int* outY)
         bmp = 0;
     }
     if (outX != 0 && outY != 0) {
-        *outX = *(int*)(pic.header + 4);
-        *outY = *(int*)(pic.header + 8);
+        *outX = pic.header.mapWTiles;
+        *outY = pic.header.mapHTiles;
     }
     HAPI_CloseFile(file);
     return bmp;
