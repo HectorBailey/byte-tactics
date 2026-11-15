@@ -4,13 +4,19 @@
 // the name slot, the name list, and the manager that owns the animation and name
 // pools.
 //
-// The pack(1) is load-bearing for three of them. FeatureUnit's int def sits at
-// +0x92, which is not 4-byte aligned, so the record is only 0x118 bytes at 1-byte
-// packing; AnimSrc is 3 bytes rather than 4, and Anim 12 rather than 16. All three
-// files already had these inside a pack(1) region, so the pragma moves here with
-// them. AnimEntry, NameEntry, List and AnimManager are the same size at either
-// packing: their char arrays need no padding and every pointer and int in
-// AnimManager already lands on a 4-byte boundary.
+// The pack(1) is load-bearing for FeatureUnit: its int def sits at +0x92, which is
+// not 4-byte aligned, so the record is only 0x118 bytes at 1-byte packing. Only
+// features.cpp had all seven records inside a pack(1) region: features_421f20.cpp
+// had FeatureUnit in one and the other four at default packing, and
+// features_4224b0.cpp had AnimSrc and Anim at default packing.
+//
+// Moving them here therefore changes the size of exactly one record. AnimSrc is 3
+// bytes instead of 4 in features_4224b0.cpp, because the trailing pad after the
+// unsigned char kind disappears. Nothing takes its size: it appears only as
+// AnimSrc*, and count (+0x0) and kind (+0x2) sit at the same offsets at either
+// packing, so no access changes. The other six are the same size at either
+// packing: their char arrays need no padding, and Anim's src pointer at +0x8 and
+// every pointer and int in AnimManager already land on a 4-byte boundary.
 #ifndef FEATURE_RECORDS_H
 #define FEATURE_RECORDS_H
 
